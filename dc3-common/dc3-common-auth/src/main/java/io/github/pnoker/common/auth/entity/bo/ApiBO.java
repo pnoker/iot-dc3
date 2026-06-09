@@ -19,7 +19,7 @@ package io.github.pnoker.common.auth.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.ApiExt;
-import io.github.pnoker.common.enums.ApiTypeFlagEnum;
+import io.github.pnoker.common.enums.ApiTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class ApiBO extends BaseBO {
     /**
      * ApiType
      */
-    private ApiTypeFlagEnum apiTypeFlag;
+    private ApiTypeEnum apiTypeFlag;
 
     /**
      * ApiName

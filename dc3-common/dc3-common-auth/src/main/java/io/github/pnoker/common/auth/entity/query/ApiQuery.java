@@ -18,7 +18,7 @@
 package io.github.pnoker.common.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.ApiTypeFlagEnum;
+import io.github.pnoker.common.enums.ApiTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,8 +65,8 @@ public class ApiQuery implements Serializable {
     /**
      * ApiType
      */
-    @Schema(description = "API type flag")
-    private ApiTypeFlagEnum apiTypeFlag;
+    @Schema(description = "API type flag", example = "GET")
+    private ApiTypeEnum apiTypeFlag;
 
     /**
      * ApiName
@@ -89,7 +89,7 @@ public class ApiQuery implements Serializable {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

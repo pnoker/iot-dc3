@@ -25,6 +25,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One config-change event — a driver/device/profile row whose operate_time differs from
@@ -39,6 +40,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "One config-change event overlaid on the alarm trend chart")
 public class ChangeImpactVO implements Serializable {
 
     @Serial
@@ -47,10 +49,13 @@ public class ChangeImpactVO implements Serializable {
     /**
      * {@code driver} | {@code device} | {@code profile}.
      */
+    @Schema(description = "changed entity kind: driver, device or profile")
     private String kind;
 
+    @Schema(description = "changed entity ID")
     private long entityId;
 
+    @Schema(description = "time the entity was edited")
     private LocalDateTime operateTime;
 
 }

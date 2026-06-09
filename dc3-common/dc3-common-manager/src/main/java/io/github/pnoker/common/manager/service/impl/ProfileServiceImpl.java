@@ -23,8 +23,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
-import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.AssociatedException;
 import io.github.pnoker.common.exception.DeleteException;
@@ -142,7 +142,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileBO getByNameAndType(Long tenantId, String name, ProfileTypeFlagEnum type) {
+    public ProfileBO getByNameAndType(Long tenantId, String name, ProfileTypeEnum type) {
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
         wrapper.eq(ProfileDO::getProfileName, name);
         wrapper.eq(ProfileDO::getProfileTypeFlag, type);
@@ -212,14 +212,14 @@ public class ProfileServiceImpl implements ProfileService {
                         + "and dgb.entity_type_flag = {0} "
                         + "and dgb.entity_id = dp.id "
                         + "and dgb.group_id = {1}",
-                EntityTypeFlagEnum.PROFILE.getIndex(), entityQuery.getGroupId());
+                EntityTypeEnum.PROFILE.getIndex(), entityQuery.getGroupId());
         wrapper.exists(FieldUtil.isValidIdField(entityQuery.getLabelId()),
                 "select 1 from dc3_label_bind dlb where dlb.deleted = 0 "
                         + "and dlb.tenant_id = dp.tenant_id "
                         + "and dlb.entity_type_flag = {0} "
                         + "and dlb.entity_id = dp.id "
                         + "and dlb.label_id = {1}",
-                EntityTypeFlagEnum.PROFILE.getIndex(), entityQuery.getLabelId());
+                EntityTypeEnum.PROFILE.getIndex(), entityQuery.getLabelId());
         return wrapper.lambda();
     }
 

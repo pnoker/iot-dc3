@@ -28,6 +28,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * A single bucket in a dashboard time-series response (e.g. point-value count at a given
@@ -42,14 +43,17 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "A single bucket in a dashboard time-series response")
 public class TimeseriesPointVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "time bucket start")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime bucket;
 
+    @Schema(description = "count in this time bucket")
     private long count;
 
 }

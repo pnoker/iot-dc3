@@ -18,16 +18,16 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * Resolves the free-form {@code RuleExt.Content.severity} string ("P0".."P3")
- * into a typed {@link AlarmMessageLevelFlagEnum}, falling back gracefully when
+ * into a typed {@link AlarmMessageLevelEnum}, falling back gracefully when
  * the value is missing or unrecognized.
  *
  * <p>The {@code dc3_entity_alarm.alarm_level_flag} column is a {@code SMALLINT}
- * with the same P0..P3 semantics as {@link AlarmMessageLevelFlagEnum}, so the
+ * with the same P0..P3 semantics as {@link AlarmMessageLevelEnum}, so the
  * enum index can be persisted directly. {@code dc3_message.message_level}
  * remains a passive payload column for template rendering — notification
  * routing reads severity from the resolved alarm level, not from the message.
@@ -43,19 +43,19 @@ public final class AlarmLevelResolver {
     }
 
     /**
-     * Returns the {@link AlarmMessageLevelFlagEnum} matching {@code severity},
+     * Returns the {@link AlarmMessageLevelEnum} matching {@code severity},
      * accepting both the upper-case name ("P1") and the lower-case code ("p1").
      * Returns {@code fallback} when {@code severity} is blank or unrecognized.
      */
-    public static AlarmMessageLevelFlagEnum resolve(String severity, AlarmMessageLevelFlagEnum fallback) {
+    public static AlarmMessageLevelEnum resolve(String severity, AlarmMessageLevelEnum fallback) {
         if (StringUtils.isBlank(severity)) {
             return fallback;
         }
-        AlarmMessageLevelFlagEnum byName = AlarmMessageLevelFlagEnum.ofName(severity.trim().toUpperCase());
+        AlarmMessageLevelEnum byName = AlarmMessageLevelEnum.ofName(severity.trim().toUpperCase());
         if (byName != null) {
             return byName;
         }
-        AlarmMessageLevelFlagEnum byCode = AlarmMessageLevelFlagEnum.ofCode(severity.trim().toLowerCase());
+        AlarmMessageLevelEnum byCode = AlarmMessageLevelEnum.ofCode(severity.trim().toLowerCase());
         return byCode != null ? byCode : fallback;
     }
 

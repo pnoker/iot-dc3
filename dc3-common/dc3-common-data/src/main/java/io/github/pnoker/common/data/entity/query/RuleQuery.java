@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -86,7 +86,7 @@ public class RuleQuery implements Serializable {
      * Alarm target type flag
      */
     @Schema(description = "alarm target type flag")
-    private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
+    private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     /**
      * Enable flag

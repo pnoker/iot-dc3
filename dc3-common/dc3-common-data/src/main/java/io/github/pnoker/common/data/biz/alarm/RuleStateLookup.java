@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.data.dal.RuleStateManager;
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
-import io.github.pnoker.common.enums.RuleStateFlagEnum;
+import io.github.pnoker.common.enums.RuleStatusEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +53,7 @@ public class RuleStateLookup {
                 .eq(RuleStateDO::getRuleId, ruleId)
                 .eq(RuleStateDO::getAlarmTargetTypeFlag, alarmTargetTypeFlag)
                 .eq(RuleStateDO::getEntityId, entityId)
-                .eq(RuleStateDO::getEntityStateFlag, RuleStateFlagEnum.FIRING.getIndex())
+                .eq(RuleStateDO::getEntityStateFlag, RuleStatusEnum.FIRING.getIndex())
                 .exists();
     }
 
@@ -69,7 +69,7 @@ public class RuleStateLookup {
                 .eq(RuleStateDO::getRuleId, ruleId)
                 .eq(RuleStateDO::getAlarmTargetTypeFlag, alarmTargetTypeFlag)
                 .eq(RuleStateDO::getEntityId, entityId)
-                .eq(RuleStateDO::getEntityStateFlag, RuleStateFlagEnum.FIRING.getIndex())
+                .eq(RuleStateDO::getEntityStateFlag, RuleStatusEnum.FIRING.getIndex())
                 .gt(RuleStateDO::getAlarmId, DefaultConstant.DEFAULT_ID)
                 .orderByDesc(RuleStateDO::getLastTriggerTime)
                 .last("limit 1")

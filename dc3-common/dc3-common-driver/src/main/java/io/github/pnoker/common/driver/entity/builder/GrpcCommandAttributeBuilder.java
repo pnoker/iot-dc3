@@ -22,7 +22,7 @@ import io.github.pnoker.api.common.GrpcCommandAttributeDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
 import io.github.pnoker.common.entity.ext.CommandAttributeExt;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.optional.EnableOptional;
 import io.github.pnoker.common.optional.JsonOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
@@ -65,7 +65,7 @@ public interface GrpcCommandAttributeBuilder {
 
         JsonOptional.ofNullable(entityGrpc.getAttributeExt())
                 .ifPresent(value -> entityDTO.setAttributeExt(JsonUtil.parseObject(value, CommandAttributeExt.class)));
-        Optional.ofNullable(AttributeTypeFlagEnum.ofIndex((byte) entityGrpc.getAttributeTypeFlag()))
+        Optional.ofNullable(AttributeTypeEnum.ofIndex((byte) entityGrpc.getAttributeTypeFlag()))
                 .ifPresent(entityDTO::setAttributeTypeFlag);
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityDTO::setEnableFlag);
     }

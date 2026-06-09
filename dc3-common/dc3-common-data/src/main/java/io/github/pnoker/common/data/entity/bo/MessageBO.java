@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.MessageExt;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -55,7 +55,7 @@ public class MessageBO extends BaseBO implements TenantOwned {
     /**
      * Alarm message template level
      */
-    private AlarmMessageLevelFlagEnum messageLevel;
+    private AlarmMessageLevelEnum messageLevel;
 
     /**
      * Alarm message template content

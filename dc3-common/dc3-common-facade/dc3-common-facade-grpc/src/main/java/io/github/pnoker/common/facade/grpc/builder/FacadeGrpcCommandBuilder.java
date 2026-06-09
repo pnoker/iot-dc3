@@ -23,8 +23,8 @@ import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.CommandExt;
-import io.github.pnoker.common.enums.CallTypeFlagEnum;
-import io.github.pnoker.common.enums.CommandTypeFlagEnum;
+import io.github.pnoker.common.enums.CallTypeEnum;
+import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
@@ -96,12 +96,12 @@ public class FacadeGrpcCommandBuilder {
 
         int commandType = dto.getCommandTypeFlag();
         if (commandType != DefaultConstant.NULL_INT) {
-            Optional.ofNullable(CommandTypeFlagEnum.ofIndex((byte) commandType)).ifPresent(bo::setCommandTypeFlag);
+            Optional.ofNullable(CommandTypeEnum.ofIndex((byte) commandType)).ifPresent(bo::setCommandTypeFlag);
         }
 
         int callType = dto.getCallTypeFlag();
         if (callType != DefaultConstant.NULL_INT) {
-            Optional.ofNullable(CallTypeFlagEnum.ofIndex((byte) callType)).ifPresent(bo::setCallTypeFlag);
+            Optional.ofNullable(CallTypeEnum.ofIndex((byte) callType)).ifPresent(bo::setCallTypeFlag);
         }
 
         Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);

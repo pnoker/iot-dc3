@@ -20,8 +20,8 @@ package io.github.pnoker.common.driver.entity.builder;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.entity.ext.PointExt;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.optional.EnableOptional;
 import io.github.pnoker.common.optional.JsonOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
@@ -64,8 +64,8 @@ public interface PointBuilder {
 
         JsonOptional.ofNullable(entityGrpc.getPointExt())
                 .ifPresent(value -> entityBO.setPointExt(JsonUtil.parseObject(value, PointExt.class)));
-        Optional.ofNullable(RwFlagEnum.ofIndex((byte) entityGrpc.getRwFlag())).ifPresent(entityBO::setRwFlag);
-        Optional.ofNullable(PointTypeFlagEnum.ofIndex((byte) entityGrpc.getPointTypeFlag()))
+        Optional.ofNullable(RwTypeEnum.ofIndex((byte) entityGrpc.getRwFlag())).ifPresent(entityBO::setRwFlag);
+        Optional.ofNullable(PointTypeEnum.ofIndex((byte) entityGrpc.getPointTypeFlag()))
                 .ifPresent(entityBO::setPointTypeFlag);
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
     }

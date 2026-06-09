@@ -23,10 +23,10 @@ import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RuleAlarmEventExt;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
-import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
+import io.github.pnoker.common.enums.AlarmSourceTypeEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +79,7 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
 
     private Long persistEntityAlarm(RuleMatch match) {
         RuleFact fact = match.getFact();
-        AlarmTargetTypeFlagEnum targetType = fact.getAlarmTargetTypeFlag();
+        AlarmTargetTypeEnum targetType = fact.getAlarmTargetTypeFlag();
         Long entityId = fact.getEntityId();
 
         if (!isValidId(entityId)) {
@@ -90,12 +90,12 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
 
         Long driverId = longValue(fact.value("driverId"));
         Long deviceId = longValue(fact.value("deviceId"));
-        Long pointId = AlarmTargetTypeFlagEnum.POINT.equals(targetType) ? entityId
+        Long pointId = AlarmTargetTypeEnum.POINT.equals(targetType) ? entityId
                 : longValue(fact.value("pointId"));
 
-        if (AlarmTargetTypeFlagEnum.DEVICE.equals(targetType) || AlarmTargetTypeFlagEnum.POINT.equals(targetType)) {
+        if (AlarmTargetTypeEnum.DEVICE.equals(targetType) || AlarmTargetTypeEnum.POINT.equals(targetType)) {
             if (!isValidId(deviceId)) {
-                deviceId = AlarmTargetTypeFlagEnum.DEVICE.equals(targetType) ? entityId : DefaultConstant.DEFAULT_ID;
+                deviceId = AlarmTargetTypeEnum.DEVICE.equals(targetType) ? entityId : DefaultConstant.DEFAULT_ID;
             }
         }
 
@@ -106,12 +106,12 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
         entity.setDeviceId(Objects.requireNonNullElse(deviceId, DefaultConstant.DEFAULT_ID));
         entity.setPointId(Objects.requireNonNullElse(pointId, DefaultConstant.DEFAULT_ID));
         entity.setRuleId(match.getRule().getId());
-        entity.setAlarmTypeFlag(AlarmTypeFlagEnum.RULE.getIndex());
-        entity.setAlarmSourceFlag(AlarmSourceFlagEnum.RULE.getIndex());
+        entity.setAlarmTypeFlag(AlarmTypeEnum.RULE.getIndex());
+        entity.setAlarmSourceFlag(AlarmSourceTypeEnum.RULE.getIndex());
         // Severity originates from rule_ext.severity — message_level on the
         // template is for rendering only, not for level routing. Default to P2
         // when the rule does not declare a severity.
-        entity.setAlarmLevelFlag(AlarmLevelResolver.resolve(match.getSeverity(), AlarmMessageLevelFlagEnum.P2)
+        entity.setAlarmLevelFlag(AlarmLevelResolver.resolve(match.getSeverity(), AlarmMessageLevelEnum.P2)
                 .getIndex());
         entity.setAlarmExt(alarmExt(match));
         entity.setExpiredTime(DefaultConstant.DEFAULT_ID);

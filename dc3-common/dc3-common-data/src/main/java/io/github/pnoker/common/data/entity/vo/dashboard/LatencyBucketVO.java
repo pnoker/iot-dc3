@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One bin of the acquisition-to-storage latency histogram. The {@code bin} index is
@@ -38,13 +39,16 @@ import java.io.Serializable;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "One bin of the acquisition-to-storage latency histogram")
 public class LatencyBucketVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "latency bin index: 0=<100ms, 1=100-500ms, 2=500ms-1s, 3=1-5s, 4=5-30s, 5=>=30s")
     private int bin;
 
+    @Schema(description = "sample count in this latency bin")
     private long count;
 
 }

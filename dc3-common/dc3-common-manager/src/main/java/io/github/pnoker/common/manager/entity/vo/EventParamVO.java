@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.EventParamExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotBlank;
@@ -64,7 +64,7 @@ public class EventParamVO extends BaseVO {
     @Schema(description = "param type flag")
 
     @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
-    private PointTypeFlagEnum paramTypeFlag;
+    private PointTypeEnum paramTypeFlag;
 
     @Schema(description = "param extension information (JSON)")
 

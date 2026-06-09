@@ -20,8 +20,8 @@ package io.github.pnoker.common.driver.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.RwTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,12 +58,12 @@ public class PointBO extends BaseBO {
     /**
      * Point data type.
      */
-    private PointTypeFlagEnum pointTypeFlag;
+    private PointTypeEnum pointTypeFlag;
 
     /**
      * Read/write capability of the point.
      */
-    private RwFlagEnum rwFlag;
+    private RwTypeEnum rwFlag;
 
     /**
      * Base offset applied during value conversion.

@@ -45,6 +45,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Resource Tree view object")
 public class ResourceTreeVO extends ResourceVO {
 
+    @Schema(description = "Child resource nodes")
     @ToString.Exclude
     private List<ResourceTreeVO> children = new ArrayList<>();
 

@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.entity.ext.MessageExt;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ public class MessageRenderServiceImpl implements MessageRenderService {
     private final AlarmTemplateRenderer alarmTemplateRenderer;
 
     @Override
-    public MessagePayload render(MessageBO message, NotifyChannelTypeFlagEnum channelTypeFlag,
+    public MessagePayload render(MessageBO message, NotifyChannelTypeEnum channelTypeFlag,
                                  Map<String, Object> variables) {
         MessageExt.Template template = selectTemplate(message, channelTypeFlag);
         if (Objects.isNull(template)) {
@@ -56,7 +56,7 @@ public class MessageRenderServiceImpl implements MessageRenderService {
         return new MessagePayload(channelTypeFlag, template.getPayloadType(), rendered, missingVariables);
     }
 
-    private MessageExt.Template selectTemplate(MessageBO message, NotifyChannelTypeFlagEnum channelTypeFlag) {
+    private MessageExt.Template selectTemplate(MessageBO message, NotifyChannelTypeEnum channelTypeFlag) {
         if (Objects.isNull(message) || Objects.isNull(channelTypeFlag) || Objects.isNull(message.getMessageExt())
                 || Objects.isNull(message.getMessageExt().getContent())
                 || Objects.isNull(message.getMessageExt().getContent().getTemplates())) {
@@ -71,7 +71,7 @@ public class MessageRenderServiceImpl implements MessageRenderService {
         return null;
     }
 
-    private boolean matchesChannel(MessageExt.Template template, NotifyChannelTypeFlagEnum channelTypeFlag) {
+    private boolean matchesChannel(MessageExt.Template template, NotifyChannelTypeEnum channelTypeFlag) {
         if (Objects.isNull(template) || StringUtils.isBlank(template.getChannelType())) {
             return false;
         }

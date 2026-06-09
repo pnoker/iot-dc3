@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of API type flags (e.g. REST, WebSocket).
+ * Enumeration of accrual type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,27 +33,22 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum ApiTypeFlagEnum {
+public enum AccrueTypeEnum {
 
     /**
-     * POST
+     * None
      */
-    POST((byte) 0, "post", "POST"),
+    NONE((byte) 0, "none", "None"),
 
     /**
-     * DELETE
+     * Increment
      */
-    DELETE((byte) 1, "delete", "DELETE"),
+    INCREMENT((byte) 1, "increment", "Increment"),
 
     /**
-     * PUT
+     * Decrement
      */
-    PUT((byte) 2, "put", "PUT"),
-
-    /**
-     * GET
-     */
-    GET((byte) 3, "get", "GET"),
+    DECREMENT((byte) 2, "decrement", "Decrement"),
     ;
 
     /**
@@ -76,10 +71,10 @@ public enum ApiTypeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link ApiTypeFlagEnum}
+     * @return {@link AccrueTypeEnum}
      */
-    public static ApiTypeFlagEnum ofIndex(Byte index) {
-        Optional<ApiTypeFlagEnum> any = Arrays.stream(ApiTypeFlagEnum.values())
+    public static AccrueTypeEnum ofIndex(Byte index) {
+        Optional<AccrueTypeEnum> any = Arrays.stream(AccrueTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -89,10 +84,10 @@ public enum ApiTypeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link ApiTypeFlagEnum}
+     * @return {@link AccrueTypeEnum}
      */
-    public static ApiTypeFlagEnum ofCode(String code) {
-        Optional<ApiTypeFlagEnum> any = Arrays.stream(ApiTypeFlagEnum.values())
+    public static AccrueTypeEnum ofCode(String code) {
+        Optional<AccrueTypeEnum> any = Arrays.stream(AccrueTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -102,9 +97,9 @@ public enum ApiTypeFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link ApiTypeFlagEnum}
+     * @return {@link AccrueTypeEnum}
      */
-    public static ApiTypeFlagEnum ofName(String name) {
+    public static AccrueTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

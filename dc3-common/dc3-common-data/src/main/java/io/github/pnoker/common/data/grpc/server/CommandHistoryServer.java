@@ -29,9 +29,10 @@ import io.github.pnoker.api.center.data.GrpcStringQuery;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
-import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
+import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
+import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -94,16 +95,16 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
     @Override
     public void getByRecordId(GrpcStringQuery request, StreamObserver<GrpcRCommandHistoryDTO> responseObserver) {
         try {
-            CommandHistoryDO recordDO = commandHistoryService.getByRecordId(request.getValue());
+            CommandHistoryVO record = commandHistoryService.getByRecordId(request.getValue());
             GrpcRCommandHistoryDTO.Builder response = GrpcRCommandHistoryDTO.newBuilder();
 
-            if (Objects.nonNull(recordDO)) {
+            if (Objects.nonNull(record)) {
                 response.setResult(GrpcR.newBuilder()
                         .setOk(true)
                         .setCode(ResponseEnum.OK.getCode())
                         .setMessage(ResponseEnum.OK.getRemark())
                         .build());
-                response.setData(toGrpcDTO(recordDO));
+                response.setData(toGrpcDTO(record));
             } else {
                 response.setResult(GrpcR.newBuilder()
                         .setOk(false)
@@ -132,10 +133,11 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
             CommandHistoryQueryVO queryVO = new CommandHistoryQueryVO();
             queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
             queryVO.setCommandId(request.getCommandId() != 0 ? request.getCommandId() : null);
-            queryVO.setStatus(Objects.isNull(request.getStatus()) || request.getStatus().isEmpty() ? null : request.getStatus());
+            queryVO.setStatus(Objects.isNull(request.getStatus()) || request.getStatus().isEmpty()
+                    ? null : PointCommandStatusEnum.ofCode(request.getStatus()));
             queryVO.setPage(GrpcBuilderUtil.buildPagesByGrpcPage(request.getPage()));
 
-            Page<CommandHistoryDO> page = commandHistoryService.list(request.getTenantId(), queryVO);
+            Page<CommandHistoryVO> page = commandHistoryService.list(request.getTenantId(), queryVO);
 
             GrpcPageCommandHistoryDTO.Builder pageDataBuilder = GrpcPageCommandHistoryDTO.newBuilder()
                     .setPage(GrpcPage.newBuilder()
@@ -168,29 +170,29 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
         }
     }
 
-    private GrpcCommandHistoryDTO toGrpcDTO(CommandHistoryDO recordDO) {
+    private GrpcCommandHistoryDTO toGrpcDTO(CommandHistoryVO record) {
         return GrpcCommandHistoryDTO.newBuilder()
-                .setId(Objects.nonNull(recordDO.getId()) ? recordDO.getId() : 0)
-                .setRecordId(Objects.nonNull(recordDO.getRecordId()) ? recordDO.getRecordId() : "")
-                .setTenantId(Objects.nonNull(recordDO.getTenantId()) ? recordDO.getTenantId() : 0)
-                .setDeviceId(Objects.nonNull(recordDO.getDeviceId()) ? recordDO.getDeviceId() : 0)
-                .setCommandId(Objects.nonNull(recordDO.getCommandId()) ? recordDO.getCommandId() : 0)
-                .setCommandCode(Objects.nonNull(recordDO.getCommandCode()) ? recordDO.getCommandCode() : "")
-                .putAllParamValues(toStringMap(recordDO.getParamValues()))
-                .putAllResultValues(toStringMap(recordDO.getResultValues()))
-                .setConfigSnapshot(Objects.nonNull(recordDO.getConfigSnapshot()) ? recordDO.getConfigSnapshot() : "")
-                .setStatus(Objects.nonNull(recordDO.getStatus()) ? recordDO.getStatus() : "")
-                .setErrorCode(Objects.nonNull(recordDO.getErrorCode()) ? recordDO.getErrorCode() : "")
-                .setErrorMessage(Objects.nonNull(recordDO.getErrorMessage()) ? recordDO.getErrorMessage() : "")
-                .setSource(Objects.nonNull(recordDO.getSource()) ? recordDO.getSource() : "")
-                .setSourceUserId(Objects.nonNull(recordDO.getSourceUserId()) ? recordDO.getSourceUserId() : 0)
-                .setOccurTime(toEpochSecond(recordDO.getOccurTime()))
-                .setSendTime(toEpochSecond(recordDO.getSendTime()))
-                .setFinishTime(toEpochSecond(recordDO.getFinishTime()))
-                .setSchemaVersion(Objects.nonNull(recordDO.getSchemaVersion()) ? recordDO.getSchemaVersion() : 0)
-                .setCreateTime(toEpochSecond(recordDO.getCreateTime()))
-                .setOperateTime(toEpochSecond(recordDO.getOperateTime()))
-                .setExpireTime(toEpochSecond(recordDO.getExpireTime()))
+                .setId(Objects.nonNull(record.getId()) ? record.getId() : 0)
+                .setRecordId(Objects.nonNull(record.getRecordId()) ? record.getRecordId() : "")
+                .setTenantId(Objects.nonNull(record.getTenantId()) ? record.getTenantId() : 0)
+                .setDeviceId(Objects.nonNull(record.getDeviceId()) ? record.getDeviceId() : 0)
+                .setCommandId(Objects.nonNull(record.getCommandId()) ? record.getCommandId() : 0)
+                .setCommandCode(Objects.nonNull(record.getCommandCode()) ? record.getCommandCode() : "")
+                .putAllParamValues(toStringMap(record.getParamValues()))
+                .putAllResultValues(toStringMap(record.getResultValues()))
+                .setConfigSnapshot(Objects.nonNull(record.getConfigSnapshot()) ? record.getConfigSnapshot() : "")
+                .setStatus(Objects.nonNull(record.getStatus()) ? record.getStatus().getCode() : "")
+                .setErrorCode(Objects.nonNull(record.getErrorCode()) ? record.getErrorCode() : "")
+                .setErrorMessage(Objects.nonNull(record.getErrorMessage()) ? record.getErrorMessage() : "")
+                .setSource(Objects.nonNull(record.getSource()) ? record.getSource() : "")
+                .setSourceUserId(Objects.nonNull(record.getSourceUserId()) ? record.getSourceUserId() : 0)
+                .setOccurTime(toEpochSecond(record.getOccurTime()))
+                .setSendTime(toEpochSecond(record.getSendTime()))
+                .setFinishTime(toEpochSecond(record.getFinishTime()))
+                .setSchemaVersion(Objects.nonNull(record.getSchemaVersion()) ? record.getSchemaVersion() : 0)
+                .setCreateTime(toEpochSecond(record.getCreateTime()))
+                .setOperateTime(toEpochSecond(record.getOperateTime()))
+                .setExpireTime(toEpochSecond(record.getExpireTime()))
                 .build();
     }
 

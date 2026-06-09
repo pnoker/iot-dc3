@@ -23,7 +23,9 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.data.biz.EventHistoryService;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EventHistoryManager;
+import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
+import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
 import io.github.pnoker.common.entity.common.Pages;
@@ -69,6 +71,8 @@ public class EventHistoryServiceImpl implements EventHistoryService {
     private final AlarmRuleTriggerService alarmRuleTriggerService;
 
     private final EventHistoryManager eventHistoryManager;
+
+    private final EventHistoryBuilder eventHistoryBuilder;
 
     @Override
     public String report(Long tenantId, EventReportVO entityVO) {
@@ -127,22 +131,25 @@ public class EventHistoryServiceImpl implements EventHistoryService {
     }
 
     @Override
-    public EventHistoryDO getByRecordId(Long tenantId, String recordId) {
-        return eventHistoryManager.lambdaQuery()
+    public EventHistoryVO getByRecordId(Long tenantId, String recordId) {
+        EventHistoryDO entityDO = eventHistoryManager.lambdaQuery()
                 .eq(Objects.nonNull(tenantId), EventHistoryDO::getTenantId, tenantId)
                 .eq(EventHistoryDO::getRecordId, recordId)
                 .one();
+        return eventHistoryBuilder.buildVOByDO(entityDO);
     }
 
     @Override
-    public Page<EventHistoryDO> list(Long tenantId, EventHistoryQueryVO queryVO) {
+    public Page<EventHistoryVO> list(Long tenantId, EventHistoryQueryVO queryVO) {
         LambdaQueryWrapper<EventHistoryDO> wrapper = new LambdaQueryWrapper<EventHistoryDO>()
                 .eq(EventHistoryDO::getTenantId, tenantId)
                 .eq(Objects.nonNull(queryVO.getDeviceId()), EventHistoryDO::getDeviceId, queryVO.getDeviceId())
                 .eq(Objects.nonNull(queryVO.getEventId()), EventHistoryDO::getEventId, queryVO.getEventId())
-                .eq(Objects.nonNull(queryVO.getEventTypeFlag()), EventHistoryDO::getEventTypeFlag, queryVO.getEventTypeFlag())
+                .eq(Objects.nonNull(queryVO.getEventTypeFlag()), EventHistoryDO::getEventTypeFlag,
+                        Objects.nonNull(queryVO.getEventTypeFlag()) ? queryVO.getEventTypeFlag().getIndex() : null)
                 .orderByDesc(EventHistoryDO::getOccurTime);
-        return eventHistoryManager.page(queryVO.toPage(), wrapper);
+        Page<EventHistoryDO> page = eventHistoryManager.page(queryVO.toPage(), wrapper);
+        return eventHistoryBuilder.buildVOPageByDOPage(page);
     }
 
     private FacadeEventBO validateEventScope(Long tenantId, Long deviceId, Long eventId, String eventCode) {

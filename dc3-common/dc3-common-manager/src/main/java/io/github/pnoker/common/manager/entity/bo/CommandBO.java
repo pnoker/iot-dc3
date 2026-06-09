@@ -20,8 +20,8 @@ package io.github.pnoker.common.manager.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.CommandExt;
-import io.github.pnoker.common.enums.CallTypeFlagEnum;
-import io.github.pnoker.common.enums.CommandTypeFlagEnum;
+import io.github.pnoker.common.enums.CallTypeEnum;
+import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,9 +47,9 @@ public class CommandBO extends BaseBO implements TenantOwned {
 
     private String commandCode;
 
-    private CommandTypeFlagEnum commandTypeFlag;
+    private CommandTypeEnum commandTypeFlag;
 
-    private CallTypeFlagEnum callTypeFlag;
+    private CallTypeEnum callTypeFlag;
 
     private Integer timeout;
 

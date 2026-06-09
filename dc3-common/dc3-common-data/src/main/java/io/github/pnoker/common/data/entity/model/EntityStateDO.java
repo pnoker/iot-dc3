@@ -55,7 +55,7 @@ public class EntityStateDO implements Serializable {
     private Long id;
 
     /**
-     * Entity type flag (matches EntityTypeFlagEnum: DRIVER=3, DEVICE=6)
+     * Entity type flag (matches EntityTypeEnum: DRIVER=3, DEVICE=6)
      */
     @TableField("entity_type_flag")
     private Byte entityTypeFlag;
@@ -115,7 +115,7 @@ public class EntityStateDO implements Serializable {
     private Long lastAlarmId;
 
     /**
-     * Timeout source (TimeoutSourceFlagEnum), default 0
+     * Timeout source (TimeoutSourceTypeEnum), default 0
      */
     @TableField("timeout_source_flag")
     private Byte timeoutSourceFlag;

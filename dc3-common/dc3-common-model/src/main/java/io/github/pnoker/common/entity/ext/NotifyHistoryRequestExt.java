@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,42 +36,50 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Notification delivery request extension object, embedded inside the notify history VO extension field")
 public class NotifyHistoryRequestExt extends BaseExt {
 
     /**
      * Extended content.
      */
+    @Schema(description = "Rendered notification content carried by the delivery request")
     private Content content;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Rendered notification content, including title, body, template type and channel payload")
     public static class Content {
 
         /**
          * Rendered title.
          */
+        @Schema(description = "Rendered notification title")
         private String title;
 
         /**
          * Rendered plain text or markdown summary.
          */
+        @Schema(description = "Rendered notification body as plain text or markdown summary")
         private String text;
 
         /**
          * Message template type, for example TEXT, MARKDOWN or CARD.
          */
+        @Schema(description = "Message template type, for example TEXT, MARKDOWN or CARD")
         private String templateType;
 
         /**
          * Template variables used during rendering.
          */
+        @Schema(description = "Template variables used during rendering, keyed by variable name")
         private Map<String, Object> variables;
 
         /**
          * Channel request payload after rendering.
          */
+        @Schema(description = "Channel-specific request payload produced after rendering")
         private Map<String, Object> payload;
 
     }

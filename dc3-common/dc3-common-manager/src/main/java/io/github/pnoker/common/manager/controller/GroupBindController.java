@@ -28,7 +28,7 @@ import io.github.pnoker.common.dal.entity.vo.GroupBindVO;
 import io.github.pnoker.common.dal.service.GroupBindService;
 import io.github.pnoker.common.dal.service.GroupService;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.service.DeviceService;
@@ -166,7 +166,7 @@ public class GroupBindController implements BaseController {
     }
 
     private void validateBind(Long tenantId, GroupBindBO entityBO) {
-        EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
+        EntityTypeEnum entityTypeFlag = entityBO.getEntityTypeFlag();
         GroupBO groupBO = requireTenant(tenantId, groupService.getById(entityBO.getGroupId()));
         if (!Objects.equals(groupBO.getGroupTypeFlag(), entityTypeFlag)) {
             throw new NotFoundException("Resource does not exist");
@@ -174,7 +174,7 @@ public class GroupBindController implements BaseController {
         requireEntityTenant(tenantId, entityTypeFlag, entityBO.getEntityId());
     }
 
-    private void requireEntityTenant(Long tenantId, EntityTypeFlagEnum entityTypeFlag, Long entityId) {
+    private void requireEntityTenant(Long tenantId, EntityTypeEnum entityTypeFlag, Long entityId) {
         switch (entityTypeFlag) {
             case DRIVER -> requireTenant(tenantId, driverService.getById(entityId));
             case PROFILE -> requireTenant(tenantId, profileService.getById(entityId));

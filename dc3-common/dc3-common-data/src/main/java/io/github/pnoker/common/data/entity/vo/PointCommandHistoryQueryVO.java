@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.entity.vo;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
+import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,16 +56,17 @@ public class PointCommandHistoryQueryVO implements Serializable {
 
     private Long pointId;
 
-    @Schema(description = "status")
-
-    private String status;
+    @Schema(description = "Command status", example = "success")
+    private PointCommandStatusEnum status;
 
     @Schema(description = "type")
 
     private String type;
 
+    @Schema(description = "Current page number", example = "1")
     private Long page = 1L;
 
+    @Schema(description = "Page size", example = "20")
     private Long size = 20L;
 
     /**

@@ -47,18 +47,15 @@ public class PointCommandWriteVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "device ID")
-
+    @Schema(description = "device ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Device ID can't be empty")
     private Long deviceId;
 
-    @Schema(description = "point ID")
-
+    @Schema(description = "point ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Point ID can't be empty")
     private Long pointId;
 
-    @Schema(description = "value")
-
+    @Schema(description = "value to write to the point", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "Value can't be empty")
     private String value;
 

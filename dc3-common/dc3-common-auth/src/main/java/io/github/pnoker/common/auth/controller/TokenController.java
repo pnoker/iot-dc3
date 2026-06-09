@@ -60,8 +60,9 @@ public class TokenController implements BaseController {
      * @param entityVO {@link TokenQuery}
      * @return
      */
+    // Public endpoint: invoked before login, so no @PreAuthorize. Path is also
+    // permitted in WebFluxSecurityConfig (POST /token/salt).
     @PublicEndpoint
-    @PreAuthorize("@perm.can('token', 'get')")
     @Operation(summary = "生成随机盐值", description = "为令牌认证生成随机salt值，有效期5分钟")
     @PostMapping("/salt")
     public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
@@ -77,8 +78,9 @@ public class TokenController implements BaseController {
      * @param entityVO {@link TokenQuery}
      * @return Token
      */
+    // Public endpoint: invoked during login (before a token exists), so no
+    // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/generate).
     @PublicEndpoint
-    @PreAuthorize("@perm.can('token', 'add')")
     @Operation(summary = "生成认证令牌", description = "为令牌认证生成认证令牌，有效期12小时")
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {

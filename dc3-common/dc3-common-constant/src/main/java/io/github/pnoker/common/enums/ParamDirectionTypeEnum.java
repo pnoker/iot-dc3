@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of alarm message level flags.
+ * Enumeration of parameter direction flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,27 +33,17 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum AlarmMessageLevelFlagEnum {
+public enum ParamDirectionTypeEnum {
 
     /**
-     * P0
+     * Input parameter
      */
-    P0((byte) 0, "p0", "P0"),
+    INPUT((byte) 0, "input", "Input parameter"),
 
     /**
-     * P1
+     * Output parameter
      */
-    P1((byte) 1, "p1", "P1"),
-
-    /**
-     * P2
-     */
-    P2((byte) 2, "p2", "P2"),
-
-    /**
-     * P3
-     */
-    P3((byte) 3, "p3", "P3"),
+    OUTPUT((byte) 1, "output", "Output parameter"),
     ;
 
     /**
@@ -76,10 +66,10 @@ public enum AlarmMessageLevelFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link AlarmMessageLevelFlagEnum}
+     * @return {@link ParamDirectionTypeEnum}
      */
-    public static AlarmMessageLevelFlagEnum ofIndex(Byte index) {
-        Optional<AlarmMessageLevelFlagEnum> any = Arrays.stream(AlarmMessageLevelFlagEnum.values())
+    public static ParamDirectionTypeEnum ofIndex(Byte index) {
+        Optional<ParamDirectionTypeEnum> any = Arrays.stream(ParamDirectionTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -89,10 +79,10 @@ public enum AlarmMessageLevelFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link AlarmMessageLevelFlagEnum}
+     * @return {@link ParamDirectionTypeEnum}
      */
-    public static AlarmMessageLevelFlagEnum ofCode(String code) {
-        Optional<AlarmMessageLevelFlagEnum> any = Arrays.stream(AlarmMessageLevelFlagEnum.values())
+    public static ParamDirectionTypeEnum ofCode(String code) {
+        Optional<ParamDirectionTypeEnum> any = Arrays.stream(ParamDirectionTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -102,9 +92,9 @@ public enum AlarmMessageLevelFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link AlarmMessageLevelFlagEnum}
+     * @return {@link ParamDirectionTypeEnum}
      */
-    public static AlarmMessageLevelFlagEnum ofName(String name) {
+    public static ParamDirectionTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

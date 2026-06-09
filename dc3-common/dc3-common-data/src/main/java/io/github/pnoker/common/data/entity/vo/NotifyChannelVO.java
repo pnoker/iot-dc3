@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.NotifyChannelExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,10 +55,10 @@ public class NotifyChannelVO extends BaseVO {
 
     @Schema(description = "channel type flag")
 
-    private NotifyChannelTypeFlagEnum channelTypeFlag;
+    private NotifyChannelTypeEnum channelTypeFlag;
 
     @Schema(description = "credential ref")
-
+    @ToString.Exclude
     private String credentialRef;
 
     @Schema(description = "channel extension information (JSON)")

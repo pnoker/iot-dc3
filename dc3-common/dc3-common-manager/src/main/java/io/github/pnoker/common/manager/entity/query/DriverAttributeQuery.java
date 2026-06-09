@@ -18,7 +18,7 @@
 package io.github.pnoker.common.manager.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -78,7 +78,7 @@ public class DriverAttributeQuery implements Serializable {
      * Type
      */
     @Schema(description = "attribute type flag")
-    private AttributeTypeFlagEnum attributeTypeFlag;
+    private AttributeTypeEnum attributeTypeFlag;
 
     /**
      * Driver ID

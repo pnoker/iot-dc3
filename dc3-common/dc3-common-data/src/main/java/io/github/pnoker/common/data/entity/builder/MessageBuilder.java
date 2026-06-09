@@ -23,7 +23,7 @@ import io.github.pnoker.common.data.entity.model.MessageDO;
 import io.github.pnoker.common.data.entity.vo.MessageVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.MessageExt;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -97,7 +97,7 @@ public interface MessageBuilder {
         entityDO.setMessageExt(ext);
 
         // AlarmMessageLevel Flag
-        AlarmMessageLevelFlagEnum alarmMessageLevel = entityBO.getMessageLevel();
+        AlarmMessageLevelEnum alarmMessageLevel = entityBO.getMessageLevel();
         Optional.ofNullable(alarmMessageLevel).ifPresent(value -> entityDO.setMessageLevel(value.getIndex()));
 
         // Enable Flag
@@ -139,7 +139,7 @@ public interface MessageBuilder {
 
         // AlarmMessageLevel Flag
         Byte alarmMessageLevel = entityDO.getMessageLevel();
-        entityBO.setMessageLevel(AlarmMessageLevelFlagEnum.ofIndex(alarmMessageLevel));
+        entityBO.setMessageLevel(AlarmMessageLevelEnum.ofIndex(alarmMessageLevel));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

@@ -24,8 +24,8 @@ import io.github.pnoker.api.common.GrpcProfileDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ProfileShareFlagEnum;
-import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.enums.ProfileShareTypeEnum;
+import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.optional.LongOptional;
@@ -55,10 +55,10 @@ public class GrpcProfileBuilder {
         StringOptional.ofNullable(entityGrpc.getProfileName()).ifPresent(builder::profileName);
         StringOptional.ofNullable(entityGrpc.getProfileCode()).ifPresent(builder::profileCode);
         if (entityGrpc.getProfileShareFlag() != DefaultConstant.NULL_INT) {
-            builder.profileShareFlag(ProfileShareFlagEnum.ofIndex((byte) entityGrpc.getProfileShareFlag()));
+            builder.profileShareFlag(ProfileShareTypeEnum.ofIndex((byte) entityGrpc.getProfileShareFlag()));
         }
         if (entityGrpc.getProfileTypeFlag() != DefaultConstant.NULL_INT) {
-            builder.profileTypeFlag(ProfileTypeFlagEnum.ofIndex((byte) entityGrpc.getProfileTypeFlag()));
+            builder.profileTypeFlag(ProfileTypeEnum.ofIndex((byte) entityGrpc.getProfileTypeFlag()));
         }
         if (entityGrpc.getEnableFlag() != DefaultConstant.NULL_INT) {
             builder.enableFlag(EnableFlagEnum.ofIndex((byte) entityGrpc.getEnableFlag()));

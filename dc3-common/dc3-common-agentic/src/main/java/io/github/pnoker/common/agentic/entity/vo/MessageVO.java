@@ -37,32 +37,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Message view object")
 public class MessageVO extends BaseVO {
 
-    @Schema(description = "conversation ID")
-
+    @Schema(description = "Conversation ID")
     private String conversationId;
 
-    @Schema(description = "role")
-
+    @Schema(description = "Message role (e.g. user, assistant, system)", example = "assistant")
     private String role;
 
-    @Schema(description = "content")
-
+    @Schema(description = "Message content")
     private String content;
 
-    @Schema(description = "content extension information (JSON)")
-
+    @Schema(description = "Content extension information (JSON)")
     private AgenticMessageContent contentExt;
 
-    @Schema(description = "model")
-
+    @Schema(description = "Model identifier used to generate the message", example = "gpt-4o")
     private String model;
 
-    @Schema(description = "message index")
-
+    @Schema(description = "Message index within the conversation", example = "0")
     private Long messageIndex;
 
-    @Schema(description = "status")
-
+    @Schema(description = "Message persistence status", example = "OK")
     private AgenticMessageStatusEnum status;
 
 }

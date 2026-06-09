@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of notification channel type flags.
+ * Enumeration of event level flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,73 +33,78 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum NotifyChannelTypeFlagEnum {
+public enum EventLevelEnum {
 
     /**
-     * Feishu bot.
+     * Low level
      */
-    FEISHU_BOT((byte) 0, "feishu_bot", "Feishu Bot"),
+    LOW((byte) 0, "low", "Low level"),
 
     /**
-     * Webhook.
+     * Medium level
      */
-    WEBHOOK((byte) 1, "webhook", "Webhook"),
+    MEDIUM((byte) 1, "medium", "Medium level"),
 
     /**
-     * Email.
+     * High level
      */
-    EMAIL((byte) 2, "email", "Email"),
+    HIGH((byte) 2, "high", "High level"),
+
+    /**
+     * Critical level
+     */
+    CRITICAL((byte) 3, "critical", "Critical level"),
     ;
 
     /**
-     * Index.
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * Code.
+     * Code
      */
     private final String code;
 
     /**
-     * Remark.
+     * Remark
      */
     private final String remark;
 
     /**
-     * Get enum by index.
+     * Get enum by index
      *
      * @param index Index
-     * @return {@link NotifyChannelTypeFlagEnum}
+     * @return {@link EventLevelEnum}
      */
-    public static NotifyChannelTypeFlagEnum ofIndex(Byte index) {
-        Optional<NotifyChannelTypeFlagEnum> any = Arrays.stream(NotifyChannelTypeFlagEnum.values())
+    public static EventLevelEnum ofIndex(Byte index) {
+        Optional<EventLevelEnum> any = Arrays.stream(EventLevelEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
     /**
-     * Get enum by code.
+     * Get enum by code
      *
      * @param code Code
-     * @return {@link NotifyChannelTypeFlagEnum}
+     * @return {@link EventLevelEnum}
      */
-    public static NotifyChannelTypeFlagEnum ofCode(String code) {
-        Optional<NotifyChannelTypeFlagEnum> any = Arrays.stream(NotifyChannelTypeFlagEnum.values())
+    public static EventLevelEnum ofCode(String code) {
+        Optional<EventLevelEnum> any = Arrays.stream(EventLevelEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
     /**
-     * Get enum by name.
+     * Get enum by name
      *
      * @param name Name
-     * @return {@link NotifyChannelTypeFlagEnum}
+     * @return {@link EventLevelEnum}
      */
-    public static NotifyChannelTypeFlagEnum ofName(String name) {
+    public static EventLevelEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

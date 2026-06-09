@@ -23,7 +23,7 @@ import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.DriverExt;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
@@ -92,7 +92,7 @@ public class FacadeGrpcDriverBuilder {
 
         int driverType = dto.getDriverTypeFlag();
         if (driverType != DefaultConstant.NULL_INT) {
-            Optional.ofNullable(DriverTypeFlagEnum.ofIndex((byte) driverType)).ifPresent(bo::setDriverTypeFlag);
+            Optional.ofNullable(DriverTypeEnum.ofIndex((byte) driverType)).ifPresent(bo::setDriverTypeFlag);
         }
 
         Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);

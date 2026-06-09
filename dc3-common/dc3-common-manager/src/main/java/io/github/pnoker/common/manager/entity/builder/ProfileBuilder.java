@@ -21,8 +21,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.ProfileExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ProfileShareFlagEnum;
-import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.enums.ProfileShareTypeEnum;
+import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.model.ProfileDO;
 import io.github.pnoker.common.manager.entity.vo.ProfileVO;
@@ -99,11 +99,11 @@ public interface ProfileBuilder {
         entityDO.setProfileExt(ext);
 
         // ProfileShare Flag
-        ProfileShareFlagEnum profileShareFlag = entityBO.getProfileShareFlag();
+        ProfileShareTypeEnum profileShareFlag = entityBO.getProfileShareFlag();
         Optional.ofNullable(profileShareFlag).ifPresent(value -> entityDO.setProfileShareFlag(value.getIndex()));
 
         // ProfileType Flag
-        ProfileTypeFlagEnum profileTypeFlag = entityBO.getProfileTypeFlag();
+        ProfileTypeEnum profileTypeFlag = entityBO.getProfileTypeFlag();
         Optional.ofNullable(profileTypeFlag).ifPresent(value -> entityDO.setProfileTypeFlag(value.getIndex()));
 
         // Enable Flag
@@ -146,11 +146,11 @@ public interface ProfileBuilder {
 
         // ProfileShare Flag
         Byte profileShareFlag = entityDO.getProfileShareFlag();
-        entityBO.setProfileShareFlag(ProfileShareFlagEnum.ofIndex(profileShareFlag));
+        entityBO.setProfileShareFlag(ProfileShareTypeEnum.ofIndex(profileShareFlag));
 
         // ProfileType Flag
         Byte profileTypeFlag = entityDO.getProfileTypeFlag();
-        entityBO.setProfileTypeFlag(ProfileTypeFlagEnum.ofIndex(profileTypeFlag));
+        entityBO.setProfileTypeFlag(ProfileTypeEnum.ofIndex(profileTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

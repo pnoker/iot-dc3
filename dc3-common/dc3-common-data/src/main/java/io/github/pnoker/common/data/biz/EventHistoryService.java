@@ -18,8 +18,8 @@
 package io.github.pnoker.common.data.biz;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
+import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 
@@ -36,12 +36,12 @@ public interface EventHistoryService {
 
     String report(EventReportDTO entityDTO);
 
-    EventHistoryDO getByRecordId(Long tenantId, String recordId);
+    EventHistoryVO getByRecordId(Long tenantId, String recordId);
 
-    default EventHistoryDO getByRecordId(String recordId) {
+    default EventHistoryVO getByRecordId(String recordId) {
         return getByRecordId(null, recordId);
     }
 
-    Page<EventHistoryDO> list(Long tenantId, EventHistoryQueryVO queryVO);
+    Page<EventHistoryVO> list(Long tenantId, EventHistoryQueryVO queryVO);
 
 }

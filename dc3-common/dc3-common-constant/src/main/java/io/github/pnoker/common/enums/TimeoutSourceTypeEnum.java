@@ -25,91 +25,59 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of point command types.
+ * Enumeration of timeout source flags.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
+ * @version 2026.5.22
+ * @since 2026.5.22
  */
 @Getter
 @AllArgsConstructor
-public enum PointCommandTypeEnum {
+public enum TimeoutSourceTypeEnum {
 
     /**
-     * Read point value command
+     * System
      */
-    READ((byte) 0, "read", "Read point value command"),
+    SYSTEM((byte) 0, "system", "System"),
 
     /**
-     * Read point value batch command
+     * Driver
      */
-    READ_BATCH((byte) 1, "read-batch", "Read point value batch command"),
+    DRIVER((byte) 1, "driver", "Driver"),
 
     /**
-     * Write point value command
+     * Device
      */
-    WRITE((byte) 2, "write", "Write point value command"),
+    DEVICE((byte) 2, "device", "Device"),
 
     /**
-     * Write point value batch command
+     * Profile
      */
-    WRITE_BATCH((byte) 3, "write-batch", "Write point value batch command"),
-
-    /**
-     * Config device command
-     */
-    CONFIG((byte) 4, "config", "Config device command"),
+    PROFILE((byte) 3, "profile", "Profile"),
     ;
 
-    /**
-     * Index
-     */
     @EnumValue
     private final Byte index;
 
-    /**
-     * Code
-     */
     private final String code;
 
-    /**
-     * Remark
-     */
     private final String remark;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link PointCommandTypeEnum}
-     */
-    public static PointCommandTypeEnum ofIndex(Byte index) {
-        Optional<PointCommandTypeEnum> any = Arrays.stream(PointCommandTypeEnum.values())
+    public static TimeoutSourceTypeEnum ofIndex(Byte index) {
+        Optional<TimeoutSourceTypeEnum> any = Arrays.stream(TimeoutSourceTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link PointCommandTypeEnum}
-     */
-    public static PointCommandTypeEnum ofCode(String code) {
-        Optional<PointCommandTypeEnum> any = Arrays.stream(PointCommandTypeEnum.values())
+    public static TimeoutSourceTypeEnum ofCode(String code) {
+        Optional<TimeoutSourceTypeEnum> any = Arrays.stream(TimeoutSourceTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link PointCommandTypeEnum}
-     */
-    public static PointCommandTypeEnum ofName(String name) {
+    public static TimeoutSourceTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

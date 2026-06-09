@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One slice of the event-overview alarm type pie — type tag pulled from
@@ -38,13 +39,16 @@ import java.io.Serializable;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "One slice of the event-overview alarm type pie")
 public class AlertTypeBucketVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "alarm type tag, e.g. driver-offline, device-alarm")
     private String type;
 
+    @Schema(description = "alarm count for this type")
     private long count;
 
 }

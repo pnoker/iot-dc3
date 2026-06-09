@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.ProfileExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ProfileShareFlagEnum;
-import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.enums.ProfileShareTypeEnum;
+import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotBlank;
@@ -69,13 +69,13 @@ public class ProfileVO extends BaseVO {
      * Type
      */
     @Schema(description = "profile share flag")
-    private ProfileShareFlagEnum profileShareFlag;
+    private ProfileShareTypeEnum profileShareFlag;
 
     /**
      * Type
      */
     @Schema(description = "Profile type flag")
-    private ProfileTypeFlagEnum profileTypeFlag;
+    private ProfileTypeEnum profileTypeFlag;
 
     /**
      *

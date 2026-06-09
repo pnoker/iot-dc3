@@ -23,7 +23,9 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
 import io.github.pnoker.common.data.dal.CommandHistoryManager;
+import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
+import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
@@ -33,7 +35,7 @@ import io.github.pnoker.common.entity.dto.CommandCallDTO;
 import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -86,6 +88,8 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
     private final RabbitTemplate rabbitTemplate;
 
     private final CommandHistoryManager commandHistoryManager;
+
+    private final CommandHistoryBuilder commandHistoryBuilder;
 
     private final EntityStateMapper entityStateMapper;
 
@@ -142,29 +146,32 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
     }
 
     @Override
-    public CommandHistoryDO getByRecordId(Long tenantId, String recordId) {
-        return commandHistoryManager.lambdaQuery()
+    public CommandHistoryVO getByRecordId(Long tenantId, String recordId) {
+        CommandHistoryDO entityDO = commandHistoryManager.lambdaQuery()
                 .eq(Objects.nonNull(tenantId), CommandHistoryDO::getTenantId, tenantId)
                 .eq(CommandHistoryDO::getRecordId, recordId)
                 .one();
+        return commandHistoryBuilder.buildVOByDO(entityDO);
     }
 
     @Override
-    public Page<CommandHistoryDO> list(Long tenantId, CommandHistoryQueryVO queryVO) {
+    public Page<CommandHistoryVO> list(Long tenantId, CommandHistoryQueryVO queryVO) {
         LambdaQueryWrapper<CommandHistoryDO> wrapper = new LambdaQueryWrapper<CommandHistoryDO>()
                 .eq(CommandHistoryDO::getTenantId, tenantId)
                 .eq(Objects.nonNull(queryVO.getDeviceId()), CommandHistoryDO::getDeviceId, queryVO.getDeviceId())
                 .eq(Objects.nonNull(queryVO.getCommandId()), CommandHistoryDO::getCommandId, queryVO.getCommandId())
-                .eq(Objects.nonNull(queryVO.getStatus()), CommandHistoryDO::getStatus, queryVO.getStatus())
+                .eq(Objects.nonNull(queryVO.getStatus()), CommandHistoryDO::getStatus,
+                        Objects.nonNull(queryVO.getStatus()) ? queryVO.getStatus().getCode() : null)
                 .orderByDesc(CommandHistoryDO::getOccurTime);
-        return commandHistoryManager.page(queryVO.toPage(), wrapper);
+        Page<CommandHistoryDO> page = commandHistoryManager.page(queryVO.toPage(), wrapper);
+        return commandHistoryBuilder.buildVOPageByDOPage(page);
     }
 
     private void checkDriverOnline(Long tenantId, Long driverId) {
         EntityStateDO driverState = entityStateMapper.selectOne(
                 new LambdaQueryWrapper<EntityStateDO>()
                         .eq(EntityStateDO::getTenantId, tenantId)
-                        .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                        .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
                         .eq(EntityStateDO::getEntityId, driverId));
         if (Objects.isNull(driverState) || !EntityStatusEnum.ONLINE.getIndex().equals(driverState.getStateFlag())) {
             throw new ServiceException("Driver is offline");

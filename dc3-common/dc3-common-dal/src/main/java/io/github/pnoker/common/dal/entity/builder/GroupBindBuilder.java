@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.dal.entity.bo.GroupBindBO;
 import io.github.pnoker.common.dal.entity.model.GroupBindDO;
 import io.github.pnoker.common.dal.entity.vo.GroupBindVO;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
@@ -87,7 +87,7 @@ public interface GroupBindBuilder {
     @AfterMapping
     default void afterProcess(GroupBindDO entityDO, @MappingTarget GroupBindBO entityBO) {
         Byte entityTypeFlag = entityDO.getEntityTypeFlag();
-        entityBO.setEntityTypeFlag(EntityTypeFlagEnum.ofIndex(entityTypeFlag));
+        entityBO.setEntityTypeFlag(EntityTypeEnum.ofIndex(entityTypeFlag));
     }
 
     /**
@@ -110,7 +110,7 @@ public interface GroupBindBuilder {
 
     @AfterMapping
     default void afterProcess(GroupBindBO entityBO, @MappingTarget GroupBindDO entityDO) {
-        EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
+        EntityTypeEnum entityTypeFlag = entityBO.getEntityTypeFlag();
         Optional.ofNullable(entityTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
     }
 

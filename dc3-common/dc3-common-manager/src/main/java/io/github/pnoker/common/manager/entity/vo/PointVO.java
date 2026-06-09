@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotBlank;
@@ -73,14 +73,14 @@ public class PointVO extends BaseVO {
      */
     @Schema(description = "point type flag")
     @NotNull(message = "Point type can't be empty", groups = {Add.class, Update.class})
-    private PointTypeFlagEnum pointTypeFlag;
+    private PointTypeEnum pointTypeFlag;
 
     /**
      *
      */
     @Schema(description = "rw flag")
     @NotNull(message = "Read/write flag can't be empty", groups = {Add.class, Update.class})
-    private RwFlagEnum rwFlag;
+    private RwTypeEnum rwFlag;
 
     /**
      *

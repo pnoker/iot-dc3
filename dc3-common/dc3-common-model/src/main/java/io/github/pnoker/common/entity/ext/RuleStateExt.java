@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,52 +37,62 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "JSON extension object for rule runtime state metadata, embedded inside VO extension fields")
 public class RuleStateExt extends BaseExt {
 
     /**
      * Extended content.
      */
+    @Schema(description = "Extended content holding the rule runtime state snapshot")
     private Content content;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Rule runtime state snapshot captured at the time the state was updated")
     public static class Content {
 
         /**
          * Rule code at the time the state was updated.
          */
+        @Schema(description = "Rule code at the time the state was updated")
         private String ruleCode;
 
         /**
          * Alarm severity at the time the state was updated.
          */
+        @Schema(description = "Alarm severity at the time the state was updated")
         private String severity;
 
         /**
          * Alarm event type at the time the state was updated.
          */
+        @Schema(description = "Alarm event type at the time the state was updated")
         private String eventType;
 
         /**
          * Rule labels at the time the state was updated.
          */
+        @Schema(description = "Rule labels at the time the state was updated")
         private List<String> labels;
 
         /**
          * Latest normalized fact snapshot.
          */
+        @Schema(description = "Latest normalized fact snapshot, keyed by fact name")
         private Map<String, Object> lastFact;
 
         /**
          * Rule match type at the time the state was updated.
          */
+        @Schema(description = "Rule match type at the time the state was updated")
         private String matchType;
 
         /**
          * Runtime metadata that is not part of the matching key.
          */
+        @Schema(description = "Runtime metadata that is not part of the matching key")
         private Map<String, Object> metadata;
 
     }

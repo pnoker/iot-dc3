@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.EventExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EventLevelFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.manager.entity.bo.EventBO;
 import io.github.pnoker.common.manager.entity.model.EventDO;
@@ -104,7 +104,7 @@ public interface EventBuilder {
         }
 
         entityBO.setEventTypeFlag(EventTypeFlagEnum.ofIndex(entityDO.getEventTypeFlag()));
-        entityBO.setEventLevelFlag(EventLevelFlagEnum.ofIndex(entityDO.getEventLevelFlag()));
+        entityBO.setEventLevelFlag(EventLevelEnum.ofIndex(entityDO.getEventLevelFlag()));
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(entityDO.getEnableFlag()));
     }
 

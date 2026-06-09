@@ -31,7 +31,7 @@ import io.github.pnoker.common.dal.entity.model.GroupDO;
 import io.github.pnoker.common.dal.entity.query.GroupQuery;
 import io.github.pnoker.common.dal.service.GroupService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.AssociatedException;
 import io.github.pnoker.common.exception.DeleteException;
@@ -183,17 +183,17 @@ public class GroupServiceImpl implements GroupService {
         return duplicate;
     }
 
-    private void validateGroupType(EntityTypeFlagEnum entityTypeFlag) {
+    private void validateGroupType(EntityTypeEnum entityTypeFlag) {
         if (!isGroupable(entityTypeFlag)) {
             throw new RequestException("Group type is not supported");
         }
     }
 
-    private boolean isGroupable(EntityTypeFlagEnum entityTypeFlag) {
-        return EntityTypeFlagEnum.DRIVER == entityTypeFlag
-                || EntityTypeFlagEnum.PROFILE == entityTypeFlag
-                || EntityTypeFlagEnum.POINT == entityTypeFlag
-                || EntityTypeFlagEnum.DEVICE == entityTypeFlag;
+    private boolean isGroupable(EntityTypeEnum entityTypeFlag) {
+        return EntityTypeEnum.DRIVER == entityTypeFlag
+                || EntityTypeEnum.PROFILE == entityTypeFlag
+                || EntityTypeEnum.POINT == entityTypeFlag
+                || EntityTypeEnum.DEVICE == entityTypeFlag;
     }
 
     private void validateParent(GroupBO entityBO) {

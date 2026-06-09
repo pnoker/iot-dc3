@@ -20,7 +20,7 @@ package io.github.pnoker.common.manager.service.impl;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.constant.common.SymbolConstant;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.manager.constant.TopologyLimits;
 import io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow;
@@ -110,7 +110,7 @@ public class DashboardServiceImpl implements DashboardService {
         if (Objects.isNull(raw))
             return TopologyLimits.UNKNOWN_BUCKET;
         Byte b = raw instanceof Number n ? n.byteValue() : Byte.parseByte(raw.toString());
-        DriverTypeFlagEnum e = DriverTypeFlagEnum.ofIndex(b);
+        DriverTypeEnum e = DriverTypeEnum.ofIndex(b);
         return Objects.isNull(e) ? TopologyLimits.UNKNOWN_BUCKET : e.name();
     }
 

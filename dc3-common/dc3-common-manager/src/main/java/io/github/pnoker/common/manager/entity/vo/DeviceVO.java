@@ -54,7 +54,8 @@ public class DeviceVO extends BaseVO {
      * Device Name
      */
     @NotBlank(message = "Device name can't be empty", groups = {Add.class})
-    @Schema(description = "device name")
+    @Schema(description = "Device name. Unique within a tenant.", example = "Temperature Sensor 01",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid device name format",
             groups = {Add.class, Update.class})
     private String deviceName;
@@ -62,44 +63,46 @@ public class DeviceVO extends BaseVO {
     /**
      * Device ID
      */
-    @Schema(description = "device code")
+    @Schema(description = "Device code. Stable business identifier for the device.", example = "DEV_0001")
     private String deviceCode;
 
     /**
      * Driver ID
      */
-    @Schema(description = "driver ID")
+    @Schema(description = "ID of the driver this device connects through.", example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class, Upload.class})
     private Long driverId;
 
     /**
      *
      */
-    @Schema(description = "device extension information (JSON)")
+    @Schema(description = "Device extension information, serialized as JSON.")
     private DeviceExt deviceExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "signature")
+    @Schema(description = "Signature used for integrity verification.")
     private String signature;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number.", example = "1")
     private Integer version;
 
     /**
      * Profile ID
      */
-    @Schema(description = "profile ID")
+    @Schema(description = "ID of the profile (device template) this device is derived from.", example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Upload.class})
     private Long profileId;
 

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of point type flags.
+ * Enumeration of command type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,47 +33,22 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum PointTypeFlagEnum {
+public enum CommandTypeEnum {
 
     /**
-     * String
+     * Custom command
      */
-    STRING((byte) 0, "string", "String"),
+    CUSTOM((byte) 0, "custom", "Custom command"),
 
     /**
-     * Byte
+     * Config command
      */
-    BYTE((byte) 1, "byte", "Byte"),
+    CONFIG((byte) 1, "config", "Config command"),
 
     /**
-     * Short
+     * Action command
      */
-    SHORT((byte) 2, "short", "Short"),
-
-    /**
-     * Int
-     */
-    INT((byte) 3, "int", "Int"),
-
-    /**
-     * Long
-     */
-    LONG((byte) 4, "long", "Long"),
-
-    /**
-     * Float
-     */
-    FLOAT((byte) 5, "float", "Float"),
-
-    /**
-     * Double
-     */
-    DOUBLE((byte) 6, "double", "Double"),
-
-    /**
-     * Boolean
-     */
-    BOOLEAN((byte) 7, "boolean", "Boolean"),
+    ACTION((byte) 2, "action", "Action command"),
     ;
 
     /**
@@ -96,10 +71,10 @@ public enum PointTypeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link PointTypeFlagEnum}
+     * @return {@link CommandTypeEnum}
      */
-    public static PointTypeFlagEnum ofIndex(Byte index) {
-        Optional<PointTypeFlagEnum> any = Arrays.stream(PointTypeFlagEnum.values())
+    public static CommandTypeEnum ofIndex(Byte index) {
+        Optional<CommandTypeEnum> any = Arrays.stream(CommandTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -109,10 +84,10 @@ public enum PointTypeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link PointTypeFlagEnum}
+     * @return {@link CommandTypeEnum}
      */
-    public static PointTypeFlagEnum ofCode(String code) {
-        Optional<PointTypeFlagEnum> any = Arrays.stream(PointTypeFlagEnum.values())
+    public static CommandTypeEnum ofCode(String code) {
+        Optional<CommandTypeEnum> any = Arrays.stream(CommandTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -122,9 +97,9 @@ public enum PointTypeFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link PointTypeFlagEnum}
+     * @return {@link CommandTypeEnum}
      */
-    public static PointTypeFlagEnum ofName(String name) {
+    public static CommandTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of entity type flags.
+ * Enumeration of alarm message level flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,52 +33,27 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum EntityTypeFlagEnum {
+public enum AlarmMessageLevelEnum {
 
     /**
-     * System
+     * P0
      */
-    SYSTEM((byte) 0, "system", "System"),
+    P0((byte) 0, "p0", "P0"),
 
     /**
-     * User
+     * P1
      */
-    USER((byte) 1, "user", "User"),
+    P1((byte) 1, "p1", "P1"),
 
     /**
-     * Group
+     * P2
      */
-    GROUP((byte) 2, "group", "Group"),
+    P2((byte) 2, "p2", "P2"),
 
     /**
-     * Driver
+     * P3
      */
-    DRIVER((byte) 3, "driver", "Driver"),
-
-    /**
-     * Profile
-     */
-    PROFILE((byte) 4, "profile", "Profile"),
-
-    /**
-     * Point
-     */
-    POINT((byte) 5, "point", "Point"),
-
-    /**
-     * Device
-     */
-    DEVICE((byte) 6, "device", "Device"),
-
-    /**
-     * Command
-     */
-    COMMAND((byte) 7, "command", "Command"),
-
-    /**
-     * Event
-     */
-    EVENT((byte) 8, "event", "Event"),
+    P3((byte) 3, "p3", "P3"),
     ;
 
     /**
@@ -101,10 +76,10 @@ public enum EntityTypeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link EntityTypeFlagEnum}
+     * @return {@link AlarmMessageLevelEnum}
      */
-    public static EntityTypeFlagEnum ofIndex(Byte index) {
-        Optional<EntityTypeFlagEnum> any = Arrays.stream(EntityTypeFlagEnum.values())
+    public static AlarmMessageLevelEnum ofIndex(Byte index) {
+        Optional<AlarmMessageLevelEnum> any = Arrays.stream(AlarmMessageLevelEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -114,10 +89,10 @@ public enum EntityTypeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link EntityTypeFlagEnum}
+     * @return {@link AlarmMessageLevelEnum}
      */
-    public static EntityTypeFlagEnum ofCode(String code) {
-        Optional<EntityTypeFlagEnum> any = Arrays.stream(EntityTypeFlagEnum.values())
+    public static AlarmMessageLevelEnum ofCode(String code) {
+        Optional<AlarmMessageLevelEnum> any = Arrays.stream(AlarmMessageLevelEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -126,10 +101,10 @@ public enum EntityTypeFlagEnum {
     /**
      * Get enum by name
      *
-     * @param name Enum name
-     * @return {@link EntityTypeFlagEnum}
+     * @param name Name
+     * @return {@link AlarmMessageLevelEnum}
      */
-    public static EntityTypeFlagEnum ofName(String name) {
+    public static AlarmMessageLevelEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

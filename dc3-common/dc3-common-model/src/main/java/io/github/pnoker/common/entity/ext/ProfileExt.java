@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Profile/template JSON extension object embedded inside VO extension fields, carrying template-specific extended content")
 public class ProfileExt extends BaseExt {
 
     /**
@@ -42,14 +44,17 @@ public class ProfileExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
+    @Schema(description = "Extended content payload, interpreted according to the type and version fields")
     private Content content;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Extended content payload for the profile/template extension")
     public static class Content {
 
+        @Schema(description = "Placeholder field reserved for profile/template extended content")
         private String keep;
 
     }

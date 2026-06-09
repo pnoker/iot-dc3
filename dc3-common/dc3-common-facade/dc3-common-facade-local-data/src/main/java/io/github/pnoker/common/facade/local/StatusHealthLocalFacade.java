@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
@@ -123,7 +123,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
     private String deviceStatus(Long tenantId, Long deviceId) {
         EntityStateDO state = entityStateManager.lambdaQuery()
                 .eq(EntityStateDO::getTenantId, tenantId)
-                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
+                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DEVICE.getIndex())
                 .eq(EntityStateDO::getEntityId, deviceId)
                 .one();
         if (Objects.isNull(state) || state.getExpireTime().isBefore(LocalDateTime.now())) {
@@ -136,7 +136,7 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
     private String driverStatus(Long tenantId, Long driverId) {
         EntityStateDO state = entityStateManager.lambdaQuery()
                 .eq(EntityStateDO::getTenantId, tenantId)
-                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
                 .eq(EntityStateDO::getEntityId, driverId)
                 .one();
         if (Objects.isNull(state) || state.getExpireTime().isBefore(LocalDateTime.now())) {

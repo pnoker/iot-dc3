@@ -19,7 +19,7 @@ package io.github.pnoker.common.auth.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ExpireFlagEnum;
+import io.github.pnoker.common.enums.ExpireTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,7 +60,7 @@ public class DriverTokenBO extends BaseBO {
     /**
      *
      */
-    private ExpireFlagEnum expireFlag;
+    private ExpireTypeEnum expireFlag;
 
     /**
      *

@@ -19,7 +19,7 @@ package io.github.pnoker.common.facade.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.DriverExt;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -61,7 +61,7 @@ public class FacadeDriverBO extends BaseBO {
 
     @Schema(description = "driver type flag")
 
-    private DriverTypeFlagEnum driverTypeFlag;
+    private DriverTypeEnum driverTypeFlag;
 
     @Schema(description = "driver extension information (JSON)")
 

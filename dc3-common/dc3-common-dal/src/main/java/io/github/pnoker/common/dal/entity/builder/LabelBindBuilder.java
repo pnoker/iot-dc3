@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.dal.entity.bo.LabelBindBO;
 import io.github.pnoker.common.dal.entity.model.LabelBindDO;
 import io.github.pnoker.common.dal.entity.vo.LabelBindVO;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
@@ -88,7 +88,7 @@ public interface LabelBindBuilder {
     default void afterProcess(LabelBindDO entityDO, @MappingTarget LabelBindBO entityBO) {
         // EntityType Flag
         Byte entityTypeFlag = entityDO.getEntityTypeFlag();
-        entityBO.setEntityTypeFlag(EntityTypeFlagEnum.ofIndex(entityTypeFlag));
+        entityBO.setEntityTypeFlag(EntityTypeEnum.ofIndex(entityTypeFlag));
     }
 
     /**
@@ -112,7 +112,7 @@ public interface LabelBindBuilder {
     @AfterMapping
     default void afterProcess(LabelBindBO entityBO, @MappingTarget LabelBindDO entityDO) {
         // EntityType Flag
-        EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
+        EntityTypeEnum entityTypeFlag = entityBO.getEntityTypeFlag();
         Optional.ofNullable(entityTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
     }
 

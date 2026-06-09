@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.EventExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EventLevelFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -69,7 +69,7 @@ public class EventVO extends BaseVO {
     @Schema(description = "event level flag")
 
     @NotNull(message = "Event level can't be empty", groups = {Add.class, Update.class})
-    private EventLevelFlagEnum eventLevelFlag;
+    private EventLevelEnum eventLevelFlag;
 
     @Schema(description = "event extension information (JSON)")
 

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of menu level flags.
+ * Rule runtime state enumeration.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,83 +33,37 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum MenuLevelFlagEnum {
+public enum RuleStatusEnum {
 
-    /**
-     * Root menu
-     */
-    ROOT((byte) 0, "root", "Root menu"),
+    NORMAL((byte) 0, "normal", "Normal"),
 
-    /**
-     * First-level submenu
-     */
-    C1((byte) 1, "c1", "First-level submenu"),
+    FIRING((byte) 1, "firing", "Firing"),
 
-    /**
-     * Second-level submenu
-     */
-    C2((byte) 2, "c2", "Second-level submenu"),
-
-    /**
-     * Third-level submenu
-     */
-    C3((byte) 3, "c3", "Third-level submenu"),
-
-    /**
-     * Fourth-level submenu
-     */
-    C4((byte) 4, "c4", "Fourth-level submenu"),
+    RECOVERED((byte) 2, "recovered", "Recovered"),
     ;
 
-    /**
-     * Index
-     */
     @EnumValue
     private final Byte index;
 
-    /**
-     * Code
-     */
     private final String code;
 
-    /**
-     * Remark
-     */
     private final String remark;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link MenuLevelFlagEnum}
-     */
-    public static MenuLevelFlagEnum ofIndex(Byte index) {
-        Optional<MenuLevelFlagEnum> any = Arrays.stream(MenuLevelFlagEnum.values())
+    public static RuleStatusEnum ofIndex(Byte index) {
+        Optional<RuleStatusEnum> any = Arrays.stream(RuleStatusEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link MenuLevelFlagEnum}
-     */
-    public static MenuLevelFlagEnum ofCode(String code) {
-        Optional<MenuLevelFlagEnum> any = Arrays.stream(MenuLevelFlagEnum.values())
+    public static RuleStatusEnum ofCode(String code) {
+        Optional<RuleStatusEnum> any = Arrays.stream(RuleStatusEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by name
-     *
-     * @param name Enum name
-     * @return {@link MenuLevelFlagEnum}
-     */
-    public static MenuLevelFlagEnum ofName(String name) {
+    public static RuleStatusEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

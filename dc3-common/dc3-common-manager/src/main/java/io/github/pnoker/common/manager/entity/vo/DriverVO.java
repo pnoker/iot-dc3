@@ -20,7 +20,7 @@ package io.github.pnoker.common.manager.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.DriverExt;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -53,7 +53,8 @@ public class DriverVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "Driver name can't be empty", groups = {Add.class})
-    @Schema(description = "driver name")
+    @Schema(description = "Driver name. Unique within a tenant.", example = "Modbus TCP Driver",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid driver name format",
             groups = {Add.class, Update.class})
     private String driverName;
@@ -61,14 +62,15 @@ public class DriverVO extends BaseVO {
     /**
      * Driver ID
      */
-    @Schema(description = "driver code")
+    @Schema(description = "Driver code. Stable routing identifier; must not change once deployed.", example = "dc3-driver-modbus-tcp")
     private String driverCode;
 
     /**
      * Driver service name
      */
     @NotBlank(message = "Service name can't be empty", groups = {Add.class})
-    @Schema(description = "Service name")
+    @Schema(description = "Service name registered for this driver.", example = "dc3-driver-modbus-tcp",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9\\-_#@/.|]{1,31}$", message = "Invalid service name format",
             groups = {Add.class, Update.class})
     private String serviceName;
@@ -79,37 +81,38 @@ public class DriverVO extends BaseVO {
     @NotBlank(message = "Service host can't be empty", groups = {Add.class})
     @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$",
             message = "Invalid service host format", groups = {Add.class, Update.class})
-    @Schema(description = "service host")
+    @Schema(description = "Driver service host (IPv4).", example = "192.168.1.100",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     private String serviceHost;
 
     /**
      * Type
      */
-    @Schema(description = "driver type flag")
-    private DriverTypeFlagEnum driverTypeFlag;
+    @Schema(description = "Driver type flag (e.g. DRIVER_CLIENT, DRIVER_SERVER).", example = "DRIVER_SERVER")
+    private DriverTypeEnum driverTypeFlag;
 
     /**
      *
      */
-    @Schema(description = "driver extension information (JSON)")
+    @Schema(description = "Driver extension information, serialized as JSON.")
     private DriverExt driverExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "signature")
+    @Schema(description = "Signature used for integrity verification.")
     private String signature;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number.", example = "1")
     private Integer version;
 
 }

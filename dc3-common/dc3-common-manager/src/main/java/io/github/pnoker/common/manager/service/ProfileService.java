@@ -18,7 +18,7 @@
 package io.github.pnoker.common.manager.service;
 
 import io.github.pnoker.common.base.service.BaseService;
-import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 
@@ -39,10 +39,10 @@ public interface ProfileService extends BaseService<ProfileBO, ProfileQuery> {
      *
      * @param tenantId Tenant ID
      * @param name     Profile name
-     * @param type     Profile type {@link ProfileTypeFlagEnum}
+     * @param type     Profile type {@link ProfileTypeEnum}
      * @return ProfileBO
      */
-    ProfileBO getByNameAndType(Long tenantId, String name, ProfileTypeFlagEnum type);
+    ProfileBO getByNameAndType(Long tenantId, String name, ProfileTypeEnum type);
 
     /**
      * Query profiles by device ID

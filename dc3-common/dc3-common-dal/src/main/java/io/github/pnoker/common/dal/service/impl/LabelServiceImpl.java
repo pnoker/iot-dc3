@@ -30,7 +30,7 @@ import io.github.pnoker.common.dal.entity.model.LabelDO;
 import io.github.pnoker.common.dal.entity.query.LabelQuery;
 import io.github.pnoker.common.dal.service.LabelService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.AssociatedException;
 import io.github.pnoker.common.exception.DeleteException;
@@ -166,17 +166,17 @@ public class LabelServiceImpl implements LabelService {
         return duplicate;
     }
 
-    private void validateEntityType(EntityTypeFlagEnum entityTypeFlag) {
+    private void validateEntityType(EntityTypeEnum entityTypeFlag) {
         if (!isSupportedEntityType(entityTypeFlag)) {
             throw new RequestException("Label entity type is not supported");
         }
     }
 
-    private boolean isSupportedEntityType(EntityTypeFlagEnum entityTypeFlag) {
-        return EntityTypeFlagEnum.DRIVER == entityTypeFlag
-                || EntityTypeFlagEnum.PROFILE == entityTypeFlag
-                || EntityTypeFlagEnum.POINT == entityTypeFlag
-                || EntityTypeFlagEnum.DEVICE == entityTypeFlag;
+    private boolean isSupportedEntityType(EntityTypeEnum entityTypeFlag) {
+        return EntityTypeEnum.DRIVER == entityTypeFlag
+                || EntityTypeEnum.PROFILE == entityTypeFlag
+                || EntityTypeEnum.POINT == entityTypeFlag
+                || EntityTypeEnum.DEVICE == entityTypeFlag;
     }
 
     /**

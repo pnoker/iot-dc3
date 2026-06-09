@@ -22,7 +22,7 @@ import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcEventDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.EventLevelFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.manager.entity.bo.EventBO;
 import io.github.pnoker.common.manager.entity.query.EventQuery;
@@ -60,7 +60,7 @@ public interface GrpcEventBuilder {
 
         Optional.ofNullable(EventTypeFlagEnum.ofIndex((byte) entityGrpc.getEventTypeFlag()))
                 .ifPresent(entityQuery::eventType);
-        Optional.ofNullable(EventLevelFlagEnum.ofIndex((byte) entityGrpc.getEventLevelFlag()))
+        Optional.ofNullable(EventLevelEnum.ofIndex((byte) entityGrpc.getEventLevelFlag()))
                 .ifPresent(entityQuery::eventLevel);
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
     }

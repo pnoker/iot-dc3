@@ -19,8 +19,8 @@ package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.RuleStateFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.github.pnoker.common.enums.RuleStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -66,7 +66,7 @@ public class RuleStateQuery implements Serializable {
 
     @Schema(description = "alarm target type flag")
 
-    private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
+    private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     @Schema(description = "Associated entity ID")
 
@@ -78,7 +78,7 @@ public class RuleStateQuery implements Serializable {
 
     @Schema(description = "entity state flag")
 
-    private RuleStateFlagEnum entityStateFlag;
+    private RuleStatusEnum entityStateFlag;
 
     @Schema(description = "alarm ID")
 

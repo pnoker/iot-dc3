@@ -24,8 +24,8 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 import io.github.pnoker.common.optional.LongOptional;
@@ -107,12 +107,12 @@ public class FacadeGrpcPointBuilder {
 
         int pointType = dto.getPointTypeFlag();
         if (pointType != DefaultConstant.NULL_INT) {
-            Optional.ofNullable(PointTypeFlagEnum.ofIndex((byte) pointType)).ifPresent(bo::setPointTypeFlag);
+            Optional.ofNullable(PointTypeEnum.ofIndex((byte) pointType)).ifPresent(bo::setPointTypeFlag);
         }
 
         int rw = dto.getRwFlag();
         if (rw != DefaultConstant.NULL_INT) {
-            Optional.ofNullable(RwFlagEnum.ofIndex((byte) rw)).ifPresent(bo::setRwFlag);
+            Optional.ofNullable(RwTypeEnum.ofIndex((byte) rw)).ifPresent(bo::setRwFlag);
         }
 
         Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);

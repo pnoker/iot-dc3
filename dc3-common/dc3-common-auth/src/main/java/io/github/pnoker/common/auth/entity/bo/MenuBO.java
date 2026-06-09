@@ -20,7 +20,7 @@ package io.github.pnoker.common.auth.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.MenuExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.MenuLevelFlagEnum;
+import io.github.pnoker.common.enums.MenuLevelEnum;
 import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -65,7 +65,7 @@ public class MenuBO extends BaseBO {
     /**
      *
      */
-    private MenuLevelFlagEnum menuLevel;
+    private MenuLevelEnum menuLevel;
 
     /**
      *

@@ -25,7 +25,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.event.MetadataEvent;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.AddException;
@@ -334,14 +334,14 @@ public class PointServiceImpl implements PointService {
                         + "and dgb.entity_type_flag = {0} "
                         + "and dgb.entity_id = dp.id "
                         + "and dgb.group_id = {1}",
-                EntityTypeFlagEnum.POINT.getIndex(), entityQuery.getGroupId());
+                EntityTypeEnum.POINT.getIndex(), entityQuery.getGroupId());
         wrapper.exists(FieldUtil.isValidIdField(entityQuery.getLabelId()),
                 "select 1 from dc3_label_bind dlb where dlb.deleted = 0 "
                         + "and dlb.tenant_id = dp.tenant_id "
                         + "and dlb.entity_type_flag = {0} "
                         + "and dlb.entity_id = dp.id "
                         + "and dlb.label_id = {1}",
-                EntityTypeFlagEnum.POINT.getIndex(), entityQuery.getLabelId());
+                EntityTypeEnum.POINT.getIndex(), entityQuery.getLabelId());
         return wrapper.lambda();
     }
 

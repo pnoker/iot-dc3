@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "User social extension object, holding social account information embedded inside user VO extension fields")
 public class UserSocialExt extends BaseExt {
 
     /**
@@ -42,37 +44,44 @@ public class UserSocialExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
+    @Schema(description = "Extended content, distinguished by Type and Version")
     private Content content;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Social account content carrying the user's various social platform identifiers")
     public static class Content {
 
         /**
          * WeChat account.
          */
+        @Schema(description = "WeChat account")
         private String wechat;
 
         /**
          * QQ
          */
+        @Schema(description = "QQ account")
         private String qq;
 
         /**
          * Lark (Feishu) account.
          */
+        @Schema(description = "Lark (Feishu) account")
         private String lark;
 
         /**
          * DingTalk account.
          */
+        @Schema(description = "DingTalk account")
         private String dingTalk;
 
         /**
          * Social home page URL.
          */
+        @Schema(description = "Social home page URL", example = "https://example.com/user/home")
         private String homeUrl;
 
     }

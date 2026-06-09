@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -36,27 +37,32 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Schema(description = "Device statistics rollup returned by the device dashboard endpoint")
 public class DeviceStatsVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Total number of devices for the tenant", example = "128")
     private long total;
 
     /**
      * Counts by enable flag.
      */
+    @Schema(description = "Device counts grouped by enable flag")
     private List<BucketVO> byEnable = new ArrayList<>();
 
     /**
      * Top-N devices grouped by driver_id — key is stringified driver id.
      */
+    @Schema(description = "Top-N device counts grouped by driver id (bucket key is the stringified driver id)")
     private List<BucketVO> byDriver = new ArrayList<>();
 
     /**
      * Top-N profile bindings — key is stringified profile id. Note that one device may
      * bind to multiple profiles, so these counts are bindings, not unique devices.
      */
+    @Schema(description = "Top-N profile binding counts grouped by profile id (bucket key is the stringified profile id); counts are bindings, not unique devices")
     private List<BucketVO> byProfile = new ArrayList<>();
 
 }

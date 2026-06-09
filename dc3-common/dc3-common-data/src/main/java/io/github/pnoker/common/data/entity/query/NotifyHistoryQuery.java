@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -82,7 +82,7 @@ public class NotifyHistoryQuery implements Serializable {
 
     @Schema(description = "channel type flag")
 
-    private NotifyChannelTypeFlagEnum channelTypeFlag;
+    private NotifyChannelTypeEnum channelTypeFlag;
 
     @Schema(description = "target")
 

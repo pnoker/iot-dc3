@@ -43,7 +43,7 @@ import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
 import io.github.pnoker.common.entity.ext.RuleStateExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
-import io.github.pnoker.common.enums.RuleStateFlagEnum;
+import io.github.pnoker.common.enums.RuleStatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -248,7 +248,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         String fingerprint = fingerprint(match, notify, variables);
         RuleStateBO state = loadState(rule, fact, fingerprint);
         boolean isRecovery = StringUtils.equalsIgnoreCase(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY);
-        if (isRecovery && (Objects.isNull(state) || !RuleStateFlagEnum.FIRING.equals(state.getEntityStateFlag()))) {
+        if (isRecovery && (Objects.isNull(state) || !RuleStatusEnum.FIRING.equals(state.getEntityStateFlag()))) {
             log.debug("Skip recovery state transition because no FIRING fingerprint exists, ruleId={}, entityId={}",
                     rule.getId(), fact.getEntityId());
             return null;
@@ -269,10 +269,10 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         state.setEntityStateExt(ruleStateExt(match));
 
         if (isRecovery) {
-            state.setEntityStateFlag(RuleStateFlagEnum.RECOVERED);
+            state.setEntityStateFlag(RuleStatusEnum.RECOVERED);
             state.setLastRecoverTime(now);
         } else {
-            state.setEntityStateFlag(RuleStateFlagEnum.FIRING);
+            state.setEntityStateFlag(RuleStatusEnum.FIRING);
             state.setLastTriggerTime(now);
             if (Objects.isNull(state.getFirstTriggerTime())) {
                 state.setFirstTriggerTime(now);

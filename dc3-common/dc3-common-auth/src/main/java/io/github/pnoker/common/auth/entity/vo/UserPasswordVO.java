@@ -53,7 +53,7 @@ public class UserPasswordVO extends BaseVO {
     @NotBlank(message = "Login password can't be empty", groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$", message = "Invalid login password", groups = {Add.class, Update.class})
     @ToString.Exclude
-    @Schema(description = "login password")
+    @Schema(description = "Login password", requiredMode = Schema.RequiredMode.REQUIRED)
     private String loginPassword;
 
 }

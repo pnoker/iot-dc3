@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of profile type flags.
+ * Enumeration of attribute type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,22 +33,47 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum ProfileTypeFlagEnum {
+public enum AttributeTypeEnum {
 
     /**
-     * System create
+     * String
      */
-    SYSTEM((byte) 0, "system", "System create"),
+    STRING((byte) 0, "string", "String"),
 
     /**
-     * Driver create
+     * Byte
      */
-    DRIVER((byte) 1, "driver", "Driver create"),
+    BYTE((byte) 1, "byte", "Byte"),
 
     /**
-     * User create
+     * Short
      */
-    USER((byte) 2, "user", "User create"),
+    SHORT((byte) 2, "short", "Short"),
+
+    /**
+     * Int
+     */
+    INT((byte) 3, "int", "Int"),
+
+    /**
+     * Long
+     */
+    LONG((byte) 4, "long", "Long"),
+
+    /**
+     * Float
+     */
+    FLOAT((byte) 5, "float", "Float"),
+
+    /**
+     * Double
+     */
+    DOUBLE((byte) 6, "double", "Double"),
+
+    /**
+     * Boolean
+     */
+    BOOLEAN((byte) 7, "boolean", "Boolean"),
     ;
 
     /**
@@ -71,10 +96,10 @@ public enum ProfileTypeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link ProfileTypeFlagEnum}
+     * @return {@link AttributeTypeEnum}
      */
-    public static ProfileTypeFlagEnum ofIndex(Byte index) {
-        Optional<ProfileTypeFlagEnum> any = Arrays.stream(ProfileTypeFlagEnum.values())
+    public static AttributeTypeEnum ofIndex(Byte index) {
+        Optional<AttributeTypeEnum> any = Arrays.stream(AttributeTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -84,10 +109,10 @@ public enum ProfileTypeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link ProfileTypeFlagEnum}
+     * @return {@link AttributeTypeEnum}
      */
-    public static ProfileTypeFlagEnum ofCode(String code) {
-        Optional<ProfileTypeFlagEnum> any = Arrays.stream(ProfileTypeFlagEnum.values())
+    public static AttributeTypeEnum ofCode(String code) {
+        Optional<AttributeTypeEnum> any = Arrays.stream(AttributeTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -97,9 +122,9 @@ public enum ProfileTypeFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link ProfileTypeFlagEnum}
+     * @return {@link AttributeTypeEnum}
      */
-    public static ProfileTypeFlagEnum ofName(String name) {
+    public static AttributeTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

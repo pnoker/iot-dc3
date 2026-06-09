@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.MessageBO;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 
 import java.util.Map;
 
@@ -39,6 +39,6 @@ public interface MessageRenderService {
      * @param variables       rendering variables
      * @return rendered payload
      */
-    MessagePayload render(MessageBO message, NotifyChannelTypeFlagEnum channelTypeFlag, Map<String, Object> variables);
+    MessagePayload render(MessageBO message, NotifyChannelTypeEnum channelTypeFlag, Map<String, Object> variables);
 
 }

@@ -21,7 +21,7 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.EventExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EventLevelFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class EventBO extends BaseBO implements TenantOwned {
 
     private EventTypeFlagEnum eventTypeFlag;
 
-    private EventLevelFlagEnum eventLevelFlag;
+    private EventLevelEnum eventLevelFlag;
 
     private EventExt eventExt;
 

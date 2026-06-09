@@ -20,7 +20,7 @@ package io.github.pnoker.common.manager.entity.builder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.CommandAttributeExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
 import io.github.pnoker.common.manager.entity.model.CommandAttributeDO;
@@ -90,7 +90,7 @@ public interface CommandAttributeBuilder {
         entityDO.setAttributeExt(ext);
 
         // AttributeType Flag
-        AttributeTypeFlagEnum attributeTypeFlag = entityBO.getAttributeTypeFlag();
+        AttributeTypeEnum attributeTypeFlag = entityBO.getAttributeTypeFlag();
         Optional.ofNullable(attributeTypeFlag).ifPresent(value -> entityDO.setAttributeTypeFlag(value.getIndex()));
 
         // Enable Flag
@@ -132,7 +132,7 @@ public interface CommandAttributeBuilder {
 
         // AttributeType Flag
         Byte attributeTypeFlag = entityDO.getAttributeTypeFlag();
-        entityBO.setAttributeTypeFlag(AttributeTypeFlagEnum.ofIndex(attributeTypeFlag));
+        entityBO.setAttributeTypeFlag(AttributeTypeEnum.ofIndex(attributeTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

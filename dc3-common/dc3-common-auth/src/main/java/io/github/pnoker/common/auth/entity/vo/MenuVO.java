@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.MenuExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.MenuLevelFlagEnum;
+import io.github.pnoker.common.enums.MenuLevelEnum;
 import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
@@ -55,21 +55,21 @@ public class MenuVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "Parent menu ID")
+    @Schema(description = "Parent menu ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Menu parent id can't be empty", groups = {Add.class, Update.class})
     private Long parentMenuId;
 
     /**
      * Type
      */
-    @Schema(description = "menu type flag")
+    @Schema(description = "Menu type flag", example = "COMMON")
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
      * Name
      */
     @NotBlank(message = "Menu name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "Menu name")
+    @Schema(description = "Menu name", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid menu name",
             groups = {Add.class, Update.class})
     private String menuName;
@@ -83,13 +83,13 @@ public class MenuVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "menu level")
-    private MenuLevelFlagEnum menuLevel;
+    @Schema(description = "Menu level", example = "ROOT")
+    private MenuLevelEnum menuLevel;
 
     /**
      *
      */
-    @Schema(description = "menu index")
+    @Schema(description = "Menu display index", example = "1")
     private Integer menuIndex;
 
     /**
@@ -101,7 +101,7 @@ public class MenuVO extends BaseVO {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

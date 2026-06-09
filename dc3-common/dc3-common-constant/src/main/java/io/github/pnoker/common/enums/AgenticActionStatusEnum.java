@@ -90,4 +90,31 @@ public enum AgenticActionStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Get enum by code.
+     *
+     * @param code code
+     * @return {@link AgenticActionStatusEnum} or {@code null} if not found
+     */
+    public static AgenticActionStatusEnum ofCode(String code) {
+        Optional<AgenticActionStatusEnum> any = Arrays.stream(AgenticActionStatusEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
+
+    /**
+     * Get enum by name.
+     *
+     * @param name name
+     * @return {@link AgenticActionStatusEnum} or {@code null} if not found
+     */
+    public static AgenticActionStatusEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
 }

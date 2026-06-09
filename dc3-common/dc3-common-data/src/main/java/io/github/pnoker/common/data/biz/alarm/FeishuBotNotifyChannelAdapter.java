@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -51,8 +51,8 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
     }
 
     @Override
-    public NotifyChannelTypeFlagEnum channelType() {
-        return NotifyChannelTypeFlagEnum.FEISHU_BOT;
+    public NotifyChannelTypeEnum channelType() {
+        return NotifyChannelTypeEnum.FEISHU_BOT;
     }
 
     @Override

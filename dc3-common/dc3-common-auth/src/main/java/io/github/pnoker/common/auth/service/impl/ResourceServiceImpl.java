@@ -29,8 +29,8 @@ import io.github.pnoker.common.auth.entity.query.ResourceQuery;
 import io.github.pnoker.common.auth.service.ResourceService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
-import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
+import io.github.pnoker.common.enums.ResourceScopeTypeEnum;
+import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -133,7 +133,7 @@ public class ResourceServiceImpl implements ResourceService {
             List<Byte> typeIndexes = entityQuery.getResourceTypeFlags()
                     .stream()
                     .filter(Objects::nonNull)
-                    .map(ResourceTypeFlagEnum::getIndex)
+                    .map(ResourceTypeEnum::getIndex)
                     .toList();
             if (!typeIndexes.isEmpty()) {
                 wrapper.in(ResourceDO::getResourceTypeFlag, typeIndexes);
@@ -146,7 +146,7 @@ public class ResourceServiceImpl implements ResourceService {
             List<Byte> scopeIndexes = entityQuery.getResourceScopeFlags()
                     .stream()
                     .filter(Objects::nonNull)
-                    .map(ResourceScopeFlagEnum::getIndex)
+                    .map(ResourceScopeTypeEnum::getIndex)
                     .toList();
             if (!scopeIndexes.isEmpty()) {
                 wrapper.in(ResourceDO::getResourceScopeFlag, scopeIndexes);

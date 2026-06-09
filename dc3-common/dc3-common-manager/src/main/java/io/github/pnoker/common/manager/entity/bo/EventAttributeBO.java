@@ -20,7 +20,7 @@ package io.github.pnoker.common.manager.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.EventAttributeExt;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -55,7 +55,7 @@ public class EventAttributeBO extends BaseBO implements TenantOwned {
     /**
      * Type
      */
-    private AttributeTypeFlagEnum attributeTypeFlag;
+    private AttributeTypeEnum attributeTypeFlag;
 
     /**
      *

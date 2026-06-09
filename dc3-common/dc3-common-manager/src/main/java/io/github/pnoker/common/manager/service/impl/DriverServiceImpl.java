@@ -23,7 +23,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -212,14 +212,14 @@ public class DriverServiceImpl implements DriverService {
                         + "and dgb.entity_type_flag = {0} "
                         + "and dgb.entity_id = dc3_driver.id "
                         + "and dgb.group_id = {1}",
-                EntityTypeFlagEnum.DRIVER.getIndex(), entityQuery.getGroupId());
+                EntityTypeEnum.DRIVER.getIndex(), entityQuery.getGroupId());
         wrapper.exists(FieldUtil.isValidIdField(entityQuery.getLabelId()),
                 "select 1 from dc3_label_bind dlb where dlb.deleted = 0 "
                         + "and dlb.tenant_id = dc3_driver.tenant_id "
                         + "and dlb.entity_type_flag = {0} "
                         + "and dlb.entity_id = dc3_driver.id "
                         + "and dlb.label_id = {1}",
-                EntityTypeFlagEnum.DRIVER.getIndex(), entityQuery.getLabelId());
+                EntityTypeEnum.DRIVER.getIndex(), entityQuery.getLabelId());
         return wrapper;
     }
 

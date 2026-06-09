@@ -57,7 +57,7 @@ public class UserQuery implements Serializable {
      * Tenant scope. Populated by the controller from the request context; any value
      * supplied by the client is overwritten so a caller cannot reach across tenants.
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID", example = "1024")
     private Long tenantId;
 
     /**
@@ -75,19 +75,19 @@ public class UserQuery implements Serializable {
     /**
      *
      */
-    @Schema(description = "Phone number")
+    @Schema(description = "Phone number", example = "13800138000")
     private String phone;
 
     /**
      *
      */
-    @Schema(description = "Email address")
+    @Schema(description = "Email address", example = "user@example.com")
     private String email;
 
     /**
      * Enable flag.
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

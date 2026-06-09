@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,37 +36,44 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Notification delivery response extension object, embedded inside the notification history VO extension field")
 public class NotifyHistoryResponseExt extends BaseExt {
 
     /**
      * Extended content.
      */
+    @Schema(description = "Extended content describing the channel provider response of a notification delivery")
     private Content content;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Channel provider response content returned when delivering a notification")
     public static class Content {
 
         /**
          * Provider message ID when the channel returns one.
          */
+        @Schema(description = "Provider-assigned message ID returned by the channel, when available")
         private String providerMessageId;
 
         /**
          * Provider status code.
          */
+        @Schema(description = "Provider status code returned by the channel for this delivery", example = "200")
         private Integer statusCode;
 
         /**
          * Provider status message.
          */
+        @Schema(description = "Provider status message returned by the channel for this delivery")
         private String statusMessage;
 
         /**
          * Provider response payload.
          */
+        @Schema(description = "Raw provider response payload as a key-value map")
         private Map<String, Object> payload;
 
     }

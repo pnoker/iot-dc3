@@ -29,7 +29,7 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
@@ -295,7 +295,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
      * @throws UnSupportException if the value type is unsupported
      */
     private boolean writeItem(Item item, WritePointValue writePointValue) throws JIException {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(writePointValue.getType().getCode());
+        PointTypeEnum valueType = PointTypeEnum.ofCode(writePointValue.getType().getCode());
         if (Objects.isNull(valueType)) {
             throw new UnSupportException("Unsupported type of " + writePointValue.getType());
         }

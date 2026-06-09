@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of command type flags.
+ * Enumeration of profile sharing type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,22 +33,22 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum CommandTypeFlagEnum {
+public enum ProfileShareTypeEnum {
 
     /**
-     * Custom command
+     * Shared profile under tenant
      */
-    CUSTOM((byte) 0, "custom", "Custom command"),
+    TENANT((byte) 0, "tenant", "Shared profile under tenant"),
 
     /**
-     * Config command
+     * Shared profile under driver
      */
-    CONFIG((byte) 1, "config", "Config command"),
+    DRIVER((byte) 1, "driver", "Shared profile under driver"),
 
     /**
-     * Action command
+     * Shared profile under user
      */
-    ACTION((byte) 2, "action", "Action command"),
+    USER((byte) 2, "user", "Shared profile under user"),
     ;
 
     /**
@@ -71,10 +71,10 @@ public enum CommandTypeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link CommandTypeFlagEnum}
+     * @return {@link ProfileShareTypeEnum}
      */
-    public static CommandTypeFlagEnum ofIndex(Byte index) {
-        Optional<CommandTypeFlagEnum> any = Arrays.stream(CommandTypeFlagEnum.values())
+    public static ProfileShareTypeEnum ofIndex(Byte index) {
+        Optional<ProfileShareTypeEnum> any = Arrays.stream(ProfileShareTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -84,10 +84,10 @@ public enum CommandTypeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link CommandTypeFlagEnum}
+     * @return {@link ProfileShareTypeEnum}
      */
-    public static CommandTypeFlagEnum ofCode(String code) {
-        Optional<CommandTypeFlagEnum> any = Arrays.stream(CommandTypeFlagEnum.values())
+    public static ProfileShareTypeEnum ofCode(String code) {
+        Optional<ProfileShareTypeEnum> any = Arrays.stream(ProfileShareTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -97,9 +97,9 @@ public enum CommandTypeFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link CommandTypeFlagEnum}
+     * @return {@link ProfileShareTypeEnum}
      */
-    public static CommandTypeFlagEnum ofName(String name) {
+    public static ProfileShareTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

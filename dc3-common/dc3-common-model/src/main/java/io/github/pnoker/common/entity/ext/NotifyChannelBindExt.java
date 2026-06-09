@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Schema(description = "JSON extension object for notification channel binding metadata")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -40,8 +42,10 @@ public class NotifyChannelBindExt extends BaseExt {
     /**
      * Extended content.
      */
+    @Schema(description = "Extended content holding notification channel binding settings")
     private Content content;
 
+    @Schema(description = "Extended content holding notification channel binding settings")
     @Getter
     @Setter
     @NoArgsConstructor
@@ -51,16 +55,19 @@ public class NotifyChannelBindExt extends BaseExt {
         /**
          * Message levels allowed for this channel binding, for example P0/P1.
          */
+        @Schema(description = "Message levels allowed for this channel binding, for example P0/P1", example = "[\"P0\",\"P1\"]")
         private List<String> levels;
 
         /**
          * Whether recovery notifications should be sent through this binding.
          */
+        @Schema(description = "Whether recovery notifications should be sent through this binding", example = "true")
         private Boolean sendRecovery;
 
         /**
          * Optional per-binding rate limit override.
          */
+        @Schema(description = "Optional per-binding rate limit override, in milliseconds", example = "60000")
         private Long rateLimitOverrideMs;
 
     }

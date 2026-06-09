@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Top event source by alarm count.
@@ -36,15 +37,19 @@ import java.io.Serializable;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "Top event source ranked by alarm count")
 public class AlertTopSourceVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "alert source: device or driver")
     private String source;
 
+    @Schema(description = "source entity ID")
     private long sourceId;
 
+    @Schema(description = "alarm count for this source")
     private long count;
 
 }

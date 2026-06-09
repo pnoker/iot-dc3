@@ -18,8 +18,8 @@
 package io.github.pnoker.common.facade.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.CallTypeFlagEnum;
-import io.github.pnoker.common.enums.CommandTypeFlagEnum;
+import io.github.pnoker.common.enums.CallTypeEnum;
+import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -69,11 +69,11 @@ public class FacadeCommandQuery implements Serializable {
 
     @Schema(description = "command type")
 
-    private CommandTypeFlagEnum commandType;
+    private CommandTypeEnum commandType;
 
     @Schema(description = "call type")
 
-    private CallTypeFlagEnum callType;
+    private CallTypeEnum callType;
 
     @Schema(description = "profile ID")
 

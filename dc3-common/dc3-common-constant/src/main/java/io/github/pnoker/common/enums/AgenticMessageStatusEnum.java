@@ -70,4 +70,31 @@ public enum AgenticMessageStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Get enum by code.
+     *
+     * @param code code
+     * @return {@link AgenticMessageStatusEnum} or {@code null} if not found
+     */
+    public static AgenticMessageStatusEnum ofCode(String code) {
+        Optional<AgenticMessageStatusEnum> any = Arrays.stream(AgenticMessageStatusEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
+
+    /**
+     * Get enum by name.
+     *
+     * @param name name
+     * @return {@link AgenticMessageStatusEnum} or {@code null} if not found
+     */
+    public static AgenticMessageStatusEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
 }

@@ -19,7 +19,7 @@ package io.github.pnoker.common.manager.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EventLevelFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -73,7 +73,7 @@ public class EventQuery implements Serializable {
 
     @Schema(description = "event level")
 
-    private EventLevelFlagEnum eventLevel;
+    private EventLevelEnum eventLevel;
 
     @Schema(description = "profile ID")
 

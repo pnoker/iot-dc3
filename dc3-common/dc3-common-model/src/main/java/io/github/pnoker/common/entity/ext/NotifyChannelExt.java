@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,7 @@ import java.util.Map;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Schema(description = "Notify channel extension object. Holds non-sensitive channel configuration; secrets are referenced by credentialRef.")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -42,8 +44,10 @@ public class NotifyChannelExt extends BaseExt {
     /**
      * Extended content.
      */
+    @Schema(description = "Extended content holding the channel configuration.")
     private Content content;
 
+    @Schema(description = "Extended content for a notify channel.")
     @Getter
     @Setter
     @NoArgsConstructor
@@ -53,26 +57,31 @@ public class NotifyChannelExt extends BaseExt {
         /**
          * Whether channel signing is enabled.
          */
+        @Schema(description = "Whether channel signing is enabled.", example = "true")
         private Boolean signEnabled;
 
         /**
          * Message card version used by card-capable channels.
          */
+        @Schema(description = "Message card version used by card-capable channels.")
         private String cardVersion;
 
         /**
          * Whether this channel allows at-all style mentions.
          */
+        @Schema(description = "Whether this channel allows at-all style mentions.", example = "false")
         private Boolean atAllAllowed;
 
         /**
          * Whether test messages can be sent from the management UI.
          */
+        @Schema(description = "Whether test messages can be sent from the management UI.", example = "true")
         private Boolean testMessageEnabled;
 
         /**
          * Provider-specific non-sensitive options.
          */
+        @Schema(description = "Provider-specific non-sensitive options.")
         private Map<String, Object> options;
 
     }

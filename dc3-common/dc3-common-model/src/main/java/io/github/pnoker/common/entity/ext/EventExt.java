@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,7 @@ import lombok.Setter;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Schema(description = "JSON extension object for event metadata")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,14 +40,17 @@ public class EventExt extends BaseExt {
     /**
      * Extended content.
      */
+    @Schema(description = "Extended content of the event")
     private Content content;
 
+    @Schema(description = "Extended content payload nested in the event extension object")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Content {
 
+        @Schema(description = "Reserved placeholder field for the event extension content")
         private String keep;
 
     }

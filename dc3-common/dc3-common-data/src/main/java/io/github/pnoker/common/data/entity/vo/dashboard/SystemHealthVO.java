@@ -25,6 +25,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Aggregate system health for the dashboard banner.
@@ -43,6 +44,7 @@ import java.util.Map;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "Aggregate system health for the dashboard banner")
 public class SystemHealthVO implements Serializable {
 
     @Serial
@@ -51,21 +53,25 @@ public class SystemHealthVO implements Serializable {
     /**
      * Center service reachability (auth, data, manager).
      */
+    @Schema(description = "center service reachability (auth, data, manager), values are up or down")
     private Map<String, String> center;
 
     /**
      * Infrastructure reachability (database, mq, gateway).
      */
+    @Schema(description = "infrastructure reachability (database, mq, gateway), values are up or down")
     private Map<String, String> infra;
 
     /**
      * Driver population summary.
      */
+    @Schema(description = "driver population summary")
     private FleetSummary drivers;
 
     /**
      * Device population summary.
      */
+    @Schema(description = "device population summary")
     private FleetSummary devices;
 
     /**
@@ -77,13 +83,16 @@ public class SystemHealthVO implements Serializable {
     @Setter
     @ToString
     @NoArgsConstructor
+    @Schema(description = "Population summary: total records and how many reported online")
     public static class FleetSummary implements Serializable {
 
         @Serial
         private static final long serialVersionUID = 1L;
 
+        @Schema(description = "total record count in the database")
         private int total;
 
+        @Schema(description = "count of records that reported ONLINE to the status cache")
         private int online;
 
     }
@@ -91,6 +100,7 @@ public class SystemHealthVO implements Serializable {
     /**
      * Backwards-compat alias — drivers used to be typed as DriverSummary.
      */
+    @Schema(description = "Backwards-compat alias for FleetSummary")
     public static class DriverSummary extends FleetSummary {
 
     }

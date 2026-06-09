@@ -19,8 +19,8 @@ package io.github.pnoker.common.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
-import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
+import io.github.pnoker.common.enums.ResourceScopeTypeEnum;
+import io.github.pnoker.common.enums.ResourceTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -73,17 +73,17 @@ public class ResourceQuery implements Serializable {
     /**
      * Type
      */
-    @Schema(description = "Resource type flag")
-    private ResourceTypeFlagEnum resourceTypeFlag;
+    @Schema(description = "Resource type flag", example = "MENU")
+    private ResourceTypeEnum resourceTypeFlag;
 
     /**
      * Type multi-select — takes precedence over {@link #resourceTypeFlag} when non-empty.
      */
     @Schema(description = "resource type flags")
-    private List<ResourceTypeFlagEnum> resourceTypeFlags;
+    private List<ResourceTypeEnum> resourceTypeFlags;
 
     /**
-     * , : ResourceScopeFlagEnum
+     * , : ResourceScopeTypeEnum
      * <ul>
      * <li>0x01:</li>
      * <li>0x02:</li>
@@ -92,15 +92,15 @@ public class ResourceQuery implements Serializable {
      * </ul>
      *
      */
-    @Schema(description = "Resource scope flag")
-    private ResourceScopeFlagEnum resourceScopeFlag;
+    @Schema(description = "Resource scope flag", example = "LIST")
+    private ResourceScopeTypeEnum resourceScopeFlag;
 
     /**
      * Scope multi-select — takes precedence over {@link #resourceScopeFlag} when
      * non-empty.
      */
     @Schema(description = "resource scope flags")
-    private List<ResourceScopeFlagEnum> resourceScopeFlags;
+    private List<ResourceScopeTypeEnum> resourceScopeFlags;
 
     /**
      * Parent resource id filter (optional).
@@ -111,7 +111,7 @@ public class ResourceQuery implements Serializable {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

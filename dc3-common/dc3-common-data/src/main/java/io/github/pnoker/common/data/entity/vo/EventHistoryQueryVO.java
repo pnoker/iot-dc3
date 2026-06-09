@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.entity.vo;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,9 +53,8 @@ public class EventHistoryQueryVO implements Serializable {
 
     private Long eventId;
 
-    @Schema(description = "event type flag")
-
-    private Byte eventTypeFlag;
+    @Schema(description = "Event type flag", example = "ALERT")
+    private EventTypeFlagEnum eventTypeFlag;
 
     @Schema(description = "Pagination object")
 

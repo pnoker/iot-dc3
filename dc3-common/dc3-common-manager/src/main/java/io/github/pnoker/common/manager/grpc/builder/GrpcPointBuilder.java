@@ -22,8 +22,8 @@ import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.optional.EnableOptional;
@@ -65,9 +65,9 @@ public interface GrpcPointBuilder {
         Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
         entityQuery.page(pages);
 
-        Optional.ofNullable(PointTypeFlagEnum.ofIndex((byte) entityGrpc.getPointTypeFlag()))
+        Optional.ofNullable(PointTypeEnum.ofIndex((byte) entityGrpc.getPointTypeFlag()))
                 .ifPresent(entityQuery::pointTypeFlag);
-        Optional.ofNullable(RwFlagEnum.ofIndex((byte) entityGrpc.getRwFlag())).ifPresent(entityQuery::rwFlag);
+        Optional.ofNullable(RwTypeEnum.ofIndex((byte) entityGrpc.getRwFlag())).ifPresent(entityQuery::rwFlag);
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
     }
 

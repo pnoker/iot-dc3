@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +41,7 @@ import java.util.Map;
 @ToString
 public class MessagePayload {
 
-    private NotifyChannelTypeFlagEnum channelTypeFlag;
+    private NotifyChannelTypeEnum channelTypeFlag;
 
     private String payloadType;
 

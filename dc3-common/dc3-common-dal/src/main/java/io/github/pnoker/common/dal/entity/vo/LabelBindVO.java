@@ -19,7 +19,7 @@ package io.github.pnoker.common.dal.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
@@ -52,7 +52,7 @@ public class LabelBindVO extends BaseVO {
      */
     @Schema(description = "entity type flag")
     @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
-    private EntityTypeFlagEnum entityTypeFlag;
+    private EntityTypeEnum entityTypeFlag;
 
     /**
      * Label ID.

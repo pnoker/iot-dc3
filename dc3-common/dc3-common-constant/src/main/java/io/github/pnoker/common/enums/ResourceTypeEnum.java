@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of alarm source flags.
+ * Enumeration of resource type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,61 +33,93 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum AlarmSourceFlagEnum {
+public enum ResourceTypeEnum {
 
     /**
-     * Rule engine
+     * Driver
      */
-    RULE((byte) 0, "rule", "Rule engine"),
+    DRIVER((byte) 0, "driver", "Driver"),
 
     /**
-     * State timeout
+     * Profile
      */
-    STATE_TIMEOUT((byte) 1, "state-timeout", "State timeout"),
+    PROFILE((byte) 1, "profile", "Profile"),
 
     /**
-     * Device report
+     * Point
      */
-    DEVICE_REPORT((byte) 2, "device-report", "Device report"),
+    POINT((byte) 2, "point", "Point"),
 
     /**
-     * Driver report
+     * Device
      */
-    DRIVER_REPORT((byte) 3, "driver-report", "Driver report"),
+    DEVICE((byte) 3, "device", "Device"),
 
     /**
-     * Event report
+     * Data
      */
-    EVENT_REPORT((byte) 5, "event-report", "Event report"),
+    DATA((byte) 4, "data", "Data"),
 
     /**
-     * System
+     * Menu
      */
-    SYSTEM((byte) 4, "system", "System"),
+    MENU((byte) 5, "menu", "Menu"),
+
+    /**
+     * Api
+     */
+    API((byte) 6, "api", "Api"),
     ;
 
+    /**
+     * Index
+     */
     @EnumValue
     private final Byte index;
 
+    /**
+     * Code
+     */
     private final String code;
 
+    /**
+     * Remark
+     */
     private final String remark;
 
-    public static AlarmSourceFlagEnum ofIndex(Byte index) {
-        Optional<AlarmSourceFlagEnum> any = Arrays.stream(AlarmSourceFlagEnum.values())
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link ResourceTypeEnum}
+     */
+    public static ResourceTypeEnum ofIndex(Byte index) {
+        Optional<ResourceTypeEnum> any = Arrays.stream(ResourceTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    public static AlarmSourceFlagEnum ofCode(String code) {
-        Optional<AlarmSourceFlagEnum> any = Arrays.stream(AlarmSourceFlagEnum.values())
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link ResourceTypeEnum}
+     */
+    public static ResourceTypeEnum ofCode(String code) {
+        Optional<ResourceTypeEnum> any = Arrays.stream(ResourceTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    public static AlarmSourceFlagEnum ofName(String name) {
+    /**
+     * Get enum by name
+     *
+     * @param name Name
+     * @return {@link ResourceTypeEnum}
+     */
+    public static ResourceTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

@@ -38,28 +38,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Model Provider view object")
 public class ModelProviderVO extends BaseVO {
 
-    @Schema(description = "name")
-
+    @Schema(description = "Provider name")
     private String name;
 
-    @Schema(description = "provider type")
-
+    @Schema(description = "Provider type", example = "OPENAI_COMPATIBLE")
     private AgenticModelProviderTypeEnum providerType;
 
-    @Schema(description = "base url")
-
+    @Schema(description = "Provider API base URL", example = "https://api.openai.com/v1")
     private String baseUrl;
 
-    @Schema(description = "Default flag")
-
+    @Schema(description = "Default flag", example = "DEFAULT")
     private DefaultFlagEnum defaultFlag;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
-
+    @Schema(description = "Enable flag", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Tenant ID")
-
+    @Schema(description = "Tenant ID", example = "1024")
     private Long tenantId;
 
 }

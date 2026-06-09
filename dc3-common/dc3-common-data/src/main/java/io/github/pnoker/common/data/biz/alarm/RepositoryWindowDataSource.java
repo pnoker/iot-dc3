@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.bo.WindowAggregateResult;
 import io.github.pnoker.common.entity.query.WindowAggregateRequest;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.WindowModeEnum;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
@@ -51,7 +51,7 @@ import java.util.Objects;
 public class RepositoryWindowDataSource implements WindowDataSource {
 
     private static boolean isPointFact(RuleFact fact) {
-        return Objects.nonNull(fact) && fact.getAlarmTargetTypeFlag() == AlarmTargetTypeFlagEnum.POINT
+        return Objects.nonNull(fact) && fact.getAlarmTargetTypeFlag() == AlarmTargetTypeEnum.POINT
                 && Objects.nonNull(fact.getTenantId()) && Objects.nonNull(fact.getEntityId());
     }
 

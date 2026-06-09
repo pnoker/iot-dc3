@@ -26,7 +26,7 @@ import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.TenantFacade;
@@ -188,7 +188,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         for (FacadeDriverBO d : drivers) {
             EntityStateDO state = entityStateManager.lambdaQuery()
                     .eq(EntityStateDO::getTenantId, tenantId)
-                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
                     .eq(EntityStateDO::getEntityId, d.getId())
                     .one();
             if (Objects.nonNull(state) && !state.getExpireTime().isBefore(now)) {
@@ -227,7 +227,7 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         for (FacadeDeviceBO d : devices) {
             EntityStateDO state = entityStateManager.lambdaQuery()
                     .eq(EntityStateDO::getTenantId, tenantId)
-                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
+                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DEVICE.getIndex())
                     .eq(EntityStateDO::getEntityId, d.getId())
                     .one();
             if (Objects.nonNull(state) && !state.getExpireTime().isBefore(now)) {

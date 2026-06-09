@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Rollup for one driver service_name — how many driver rows are enabled, how many devices
@@ -39,6 +40,7 @@ import java.io.Serializable;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "Health rollup for one driver service name")
 public class ProtocolHealthVO implements Serializable {
 
     @Serial
@@ -47,12 +49,16 @@ public class ProtocolHealthVO implements Serializable {
     /**
      * e.g. {@code dc3-driver-modbus-tcp}; frontend strips the prefix.
      */
+    @Schema(description = "driver service name, e.g. dc3-driver-modbus-tcp")
     private String serviceName;
 
+    @Schema(description = "total driver count for this service")
     private long driverCount;
 
+    @Schema(description = "enabled driver count for this service")
     private long enabledCount;
 
+    @Schema(description = "device count served by this service")
     private long deviceCount;
 
 }

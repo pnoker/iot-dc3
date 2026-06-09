@@ -20,14 +20,25 @@ package io.github.pnoker.common.data.entity.builder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
+import io.github.pnoker.common.enums.EventHistoryAcknowledgeFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
+import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
 /**
  * MapStruct builder converting between event history DO and VO.
+ * <p>
+ * The DO stores type/level/acknowledge flags as database-coded {@code Byte}
+ * columns; the VO exposes the corresponding domain enums. The enum/index
+ * conversion is centralized here (DO -> VO via {@code Enum.ofIndex(...)}) rather
+ * than scattered across services.
  *
  * @author pnoker
  * @version 2026.6.5
@@ -36,7 +47,17 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface EventHistoryBuilder {
 
+    @Mapping(target = "eventTypeFlag", ignore = true)
+    @Mapping(target = "eventLevelFlag", ignore = true)
+    @Mapping(target = "acknowledgeFlag", ignore = true)
     EventHistoryVO buildVOByDO(EventHistoryDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(EventHistoryDO entityDO, @MappingTarget EventHistoryVO entityVO) {
+        entityVO.setEventTypeFlag(EventTypeFlagEnum.ofIndex(entityDO.getEventTypeFlag()));
+        entityVO.setEventLevelFlag(EventLevelEnum.ofIndex(entityDO.getEventLevelFlag()));
+        entityVO.setAcknowledgeFlag(EventHistoryAcknowledgeFlagEnum.ofIndex(entityDO.getAcknowledgeFlag()));
+    }
 
     List<EventHistoryVO> buildVOListByDOList(List<EventHistoryDO> entityDOList);
 

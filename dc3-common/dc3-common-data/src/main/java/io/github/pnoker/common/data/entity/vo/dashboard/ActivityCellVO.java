@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One cell of the day-of-week × hour-of-day activity heatmap. {@code dow} is
@@ -37,15 +38,19 @@ import java.io.Serializable;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "Day-of-week by hour-of-day activity heatmap cell")
 public class ActivityCellVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "day of week, 0=Sunday to 6=Saturday")
     private int dow;
 
+    @Schema(description = "hour of day, 0 to 23")
     private int hour;
 
+    @Schema(description = "sample count in this cell")
     private long count;
 
 }

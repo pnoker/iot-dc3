@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,6 +41,7 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Base JSON extension object with a typed version field, embedded inside VO extension fields")
 public class BaseExt implements Serializable {
 
     @Serial
@@ -48,17 +50,20 @@ public class BaseExt implements Serializable {
     /**
      * Type, used to parse JSON strings.
      */
+    @Schema(description = "Type identifier used to parse the JSON extension string into the proper subtype")
     private String type;
 
     /**
      * Version, used for optimistic locking.
      */
+    @Schema(description = "Version number used for optimistic locking", example = "1")
     @Builder.Default
     private Integer version = 1;
 
     /**
      * Description.
      */
+    @Schema(description = "Description / remark of the extension object")
     private String remark;
 
 }

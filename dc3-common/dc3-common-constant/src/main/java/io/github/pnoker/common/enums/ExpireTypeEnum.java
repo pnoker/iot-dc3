@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of attribute type flags.
+ * Enumeration of expiration flag values (enabled/disabled).
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,47 +33,47 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum AttributeTypeFlagEnum {
+public enum ExpireTypeEnum {
 
     /**
-     * String
+     * Permanent
      */
-    STRING((byte) 0, "string", "String"),
+    PERMANENT((byte) 0, "permanent", "Permanent"),
 
     /**
-     * Byte
+     * One day
      */
-    BYTE((byte) 1, "byte", "Byte"),
+    ONE_DAY((byte) 1, "one-day", "One day"),
 
     /**
-     * Short
+     * One week
      */
-    SHORT((byte) 2, "short", "Short"),
+    ONE_WEEK((byte) 2, "one-week", "One week"),
 
     /**
-     * Int
+     * One month
      */
-    INT((byte) 3, "int", "Int"),
+    ONE_MONTH((byte) 3, "one-month", "One month"),
 
     /**
-     * Long
+     * Three months
      */
-    LONG((byte) 4, "long", "Long"),
+    THREE_MONTHS((byte) 4, "three-months", "Three months"),
 
     /**
-     * Float
+     * Half year
      */
-    FLOAT((byte) 5, "float", "Float"),
+    HALF_YEAR((byte) 5, "half-year", "Half year"),
 
     /**
-     * Double
+     * One year
      */
-    DOUBLE((byte) 6, "double", "Double"),
+    ONE_YEAR((byte) 6, "one-year", "One year"),
 
     /**
-     * Boolean
+     * Custom
      */
-    BOOLEAN((byte) 7, "boolean", "Boolean"),
+    CUSTOM((byte) 7, "custom", "Custom"),
     ;
 
     /**
@@ -96,10 +96,10 @@ public enum AttributeTypeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link AttributeTypeFlagEnum}
+     * @return {@link ExpireTypeEnum}
      */
-    public static AttributeTypeFlagEnum ofIndex(Byte index) {
-        Optional<AttributeTypeFlagEnum> any = Arrays.stream(AttributeTypeFlagEnum.values())
+    public static ExpireTypeEnum ofIndex(Byte index) {
+        Optional<ExpireTypeEnum> any = Arrays.stream(ExpireTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -109,10 +109,10 @@ public enum AttributeTypeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link AttributeTypeFlagEnum}
+     * @return {@link ExpireTypeEnum}
      */
-    public static AttributeTypeFlagEnum ofCode(String code) {
-        Optional<AttributeTypeFlagEnum> any = Arrays.stream(AttributeTypeFlagEnum.values())
+    public static ExpireTypeEnum ofCode(String code) {
+        Optional<ExpireTypeEnum> any = Arrays.stream(ExpireTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -121,10 +121,10 @@ public enum AttributeTypeFlagEnum {
     /**
      * Get enum by name
      *
-     * @param name Name
-     * @return {@link AttributeTypeFlagEnum}
+     * @param name Enum name
+     * @return {@link ExpireTypeEnum}
      */
-    public static AttributeTypeFlagEnum ofName(String name) {
+    public static ExpireTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

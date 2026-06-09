@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,6 +41,7 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "JSON extension object for generic JSON-typed extension data")
 public class JsonExt implements Serializable {
 
     @Serial
@@ -48,22 +50,26 @@ public class JsonExt implements Serializable {
     /**
      * Type, Json
      */
+    @Schema(description = "Type of the JSON extension data")
     private String type;
 
     /**
      * , Json
      */
+    @Schema(description = "JSON content payload of the extension data")
     private String content;
 
     /**
      * ,
      */
     @Builder.Default
+    @Schema(description = "Version of the JSON extension data", example = "1")
     private Integer version = 1;
 
     /**
      * Description
      */
+    @Schema(description = "Remark or description of the JSON extension data")
     private String remark;
 
 }

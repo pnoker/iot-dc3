@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of accrual type flags.
+ * Enumeration of alarm type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,73 +33,56 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum AccrueFlagEnum {
+public enum AlarmTypeEnum {
 
     /**
-     * None
+     * Rule alarm
      */
-    NONE((byte) 0, "none", "None"),
+    RULE((byte) 0, "rule", "Rule alarm"),
 
     /**
-     * Increment
+     * Offline alarm
      */
-    INCREMENT((byte) 1, "increment", "Increment"),
+    OFFLINE((byte) 1, "offline", "Offline alarm"),
 
     /**
-     * Decrement
+     * Fault alarm
      */
-    DECREMENT((byte) 2, "decrement", "Decrement"),
+    FAULT((byte) 2, "fault", "Fault alarm"),
+
+    /**
+     * State flip alarm
+     */
+    STATE_FLIP((byte) 3, "state-flip", "State flip alarm"),
+
+    /**
+     * Report alarm
+     */
+    REPORT((byte) 4, "report", "Report alarm"),
     ;
 
-    /**
-     * Index
-     */
     @EnumValue
     private final Byte index;
 
-    /**
-     * Code
-     */
     private final String code;
 
-    /**
-     * Remark
-     */
     private final String remark;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link AccrueFlagEnum}
-     */
-    public static AccrueFlagEnum ofIndex(Byte index) {
-        Optional<AccrueFlagEnum> any = Arrays.stream(AccrueFlagEnum.values())
+    public static AlarmTypeEnum ofIndex(Byte index) {
+        Optional<AlarmTypeEnum> any = Arrays.stream(AlarmTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link AccrueFlagEnum}
-     */
-    public static AccrueFlagEnum ofCode(String code) {
-        Optional<AccrueFlagEnum> any = Arrays.stream(AccrueFlagEnum.values())
+    public static AlarmTypeEnum ofCode(String code) {
+        Optional<AlarmTypeEnum> any = Arrays.stream(AlarmTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link AccrueFlagEnum}
-     */
-    public static AccrueFlagEnum ofName(String name) {
+    public static AlarmTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

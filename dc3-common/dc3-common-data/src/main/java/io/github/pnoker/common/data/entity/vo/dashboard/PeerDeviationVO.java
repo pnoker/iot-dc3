@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * A device whose alarm rate deviates sharply from its profile peers. The ratio field is
@@ -37,22 +38,28 @@ import java.io.Serializable;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "A device whose alarm rate deviates sharply from its profile peers")
 public class PeerDeviationVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "profile ID the device belongs to")
     private long profileId;
 
+    @Schema(description = "device ID")
     private long deviceId;
 
+    @Schema(description = "alarm count for this device")
     private long alarmCount;
 
+    @Schema(description = "median alarm count across the profile peers")
     private long peerMedian;
 
     /**
      * alarmCount / peerMedian, 2-decimal. 0 means peerMedian was 0 (fresh profile).
      */
+    @Schema(description = "alarmCount divided by peerMedian; 0 means peerMedian was 0")
     private double ratio;
 
 }

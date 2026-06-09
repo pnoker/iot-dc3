@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.bo.LabelBO;
 import io.github.pnoker.common.dal.entity.model.LabelDO;
 import io.github.pnoker.common.dal.entity.vo.LabelVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -92,7 +92,7 @@ public interface LabelBuilder {
     default void afterProcess(LabelDO entityDO, @MappingTarget LabelBO entityBO) {
         // EntityType Flag
         Byte entityTypeFlag = entityDO.getEntityTypeFlag();
-        entityBO.setEntityTypeFlag(EntityTypeFlagEnum.ofIndex(entityTypeFlag));
+        entityBO.setEntityTypeFlag(EntityTypeEnum.ofIndex(entityTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
@@ -126,7 +126,7 @@ public interface LabelBuilder {
         }
 
         // EntityType Flag
-        EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
+        EntityTypeEnum entityTypeFlag = entityBO.getEntityTypeFlag();
         Optional.ofNullable(entityTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
 
         // Enable Flag

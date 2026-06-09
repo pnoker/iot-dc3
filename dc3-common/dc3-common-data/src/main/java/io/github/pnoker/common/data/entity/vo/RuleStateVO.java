@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.constant.common.TimeConstant;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.RuleStateExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.RuleStateFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.github.pnoker.common.enums.RuleStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,7 +55,7 @@ public class RuleStateVO extends BaseVO {
 
     @Schema(description = "alarm target type flag")
 
-    private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
+    private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     @Schema(description = "Associated entity ID")
 
@@ -67,7 +67,7 @@ public class RuleStateVO extends BaseVO {
 
     @Schema(description = "entity state flag")
 
-    private RuleStateFlagEnum entityStateFlag;
+    private RuleStatusEnum entityStateFlag;
 
     @Schema(description = "first trigger time")
 

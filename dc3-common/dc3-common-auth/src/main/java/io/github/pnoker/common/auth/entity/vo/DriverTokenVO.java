@@ -20,7 +20,7 @@ package io.github.pnoker.common.auth.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ExpireFlagEnum;
+import io.github.pnoker.common.enums.ExpireTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -62,13 +62,14 @@ public class DriverTokenVO extends BaseVO {
      * AppKey
      */
     @Schema(description = "driver app key")
+    @ToString.Exclude
     private String driverAppKey;
 
     /**
      *
      */
-    @Schema(description = "expire flag")
-    private ExpireFlagEnum expireFlag;
+    @Schema(description = "Token expiration flag", example = "PERMANENT")
+    private ExpireTypeEnum expireFlag;
 
     /**
      *
@@ -79,7 +80,7 @@ public class DriverTokenVO extends BaseVO {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

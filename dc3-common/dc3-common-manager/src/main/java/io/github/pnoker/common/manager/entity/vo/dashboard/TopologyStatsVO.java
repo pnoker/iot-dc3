@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -36,17 +37,22 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@Schema(description = "Tenant-wide total counts for the topology footer summary")
 public class TopologyStatsVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Total number of drivers for the tenant", example = "16")
     private long driverCount;
 
+    @Schema(description = "Total number of devices for the tenant", example = "128")
     private long deviceCount;
 
+    @Schema(description = "Total number of profiles for the tenant", example = "32")
     private long profileCount;
 
+    @Schema(description = "Total number of points for the tenant", example = "512")
     private long pointCount;
 
     /**
@@ -54,6 +60,7 @@ public class TopologyStatsVO implements Serializable {
      * server computed volumes over a time window (volume mode). null for cardinality mode
      * so the frontend footer can skip it.
      */
+    @Schema(description = "Short human-readable range label (e.g. 24h, 7d); present only in volume mode, null in cardinality mode", example = "24h")
     private String rangeLabel;
 
 }
