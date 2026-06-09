@@ -57,7 +57,7 @@ public class CommandDeadReceiver {
                         .eq(CommandHistoryDO::getRecordId, correlationId)
                         .one();
                 if (Objects.nonNull(recordDO)) {
-                    recordDO.setStatus(PointCommandStatusEnum.DEAD.getCode());
+                    recordDO.setStatus(PointCommandStatusEnum.DEAD);
                     recordDO.setErrorCode("DLX");
                     recordDO.setErrorMessage("Message rejected to dead letter queue");
                     recordDO.setFinishTime(LocalDateTime.now());

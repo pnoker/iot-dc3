@@ -49,10 +49,10 @@ message GrpcCommandHistoryDTO {
   string command_code = 6;
   map<string, string> param_values = 7;
   map<string, string> result_values = 8;
-  string status = 9;
+  int32 status = 9;
   string error_code = 10;
   string error_message = 11;
-  string source = 12;
+  int32 source = 12;
   int64 source_user_id = 13;
   int64 occur_time = 14;
   int64 send_time = 15;
@@ -67,7 +67,7 @@ message GrpcCommandHistoryDTO {
 message GrpcCommandHistoryQuery {
   int64 device_id = 1;
   int64 command_id = 2;
-  string status = 3;
+  int32 status = 3;
   int64 tenant_id = 4;
   GrpcPage page = 5;
 }

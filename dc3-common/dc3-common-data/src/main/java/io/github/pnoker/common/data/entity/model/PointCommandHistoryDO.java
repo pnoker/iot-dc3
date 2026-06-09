@@ -21,6 +21,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
+import io.github.pnoker.common.enums.PointCommandStatusEnum;
+import io.github.pnoker.common.enums.PointCommandTypeEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -58,7 +61,7 @@ public class PointCommandHistoryDO implements Serializable {
     private Long tenantId;
 
     @TableField("type")
-    private String type;
+    private PointCommandTypeEnum type;
 
     @TableField("device_id")
     private Long deviceId;
@@ -73,7 +76,7 @@ public class PointCommandHistoryDO implements Serializable {
     private String responseValue;
 
     @TableField("status")
-    private String status;
+    private PointCommandStatusEnum status;
 
     @TableField("error_code")
     private String errorCode;
@@ -82,7 +85,7 @@ public class PointCommandHistoryDO implements Serializable {
     private String errorMessage;
 
     @TableField("source")
-    private String source;
+    private PointCommandSourceEnum source;
 
     @TableField("source_user_id")
     private Long sourceUserId;

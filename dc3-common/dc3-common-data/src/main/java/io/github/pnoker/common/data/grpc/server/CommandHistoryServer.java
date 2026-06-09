@@ -133,8 +133,8 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
             CommandHistoryQueryVO queryVO = new CommandHistoryQueryVO();
             queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
             queryVO.setCommandId(request.getCommandId() != 0 ? request.getCommandId() : null);
-            queryVO.setStatus(Objects.isNull(request.getStatus()) || request.getStatus().isEmpty()
-                    ? null : PointCommandStatusEnum.ofCode(request.getStatus()));
+            queryVO.setStatus(request.getStatus() != 0
+                    ? PointCommandStatusEnum.ofIndex((byte) request.getStatus()) : null);
             queryVO.setPage(GrpcBuilderUtil.buildPagesByGrpcPage(request.getPage()));
 
             Page<CommandHistoryVO> page = commandHistoryService.list(request.getTenantId(), queryVO);
@@ -181,10 +181,10 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
                 .putAllParamValues(toStringMap(record.getParamValues()))
                 .putAllResultValues(toStringMap(record.getResultValues()))
                 .setConfigSnapshot(Objects.nonNull(record.getConfigSnapshot()) ? record.getConfigSnapshot() : "")
-                .setStatus(Objects.nonNull(record.getStatus()) ? record.getStatus().getCode() : "")
+                .setStatus(Objects.nonNull(record.getStatus()) ? record.getStatus().getIndex() : 0)
                 .setErrorCode(Objects.nonNull(record.getErrorCode()) ? record.getErrorCode() : "")
                 .setErrorMessage(Objects.nonNull(record.getErrorMessage()) ? record.getErrorMessage() : "")
-                .setSource(Objects.nonNull(record.getSource()) ? record.getSource() : "")
+                .setSource(Objects.nonNull(record.getSource()) ? record.getSource().getIndex() : 0)
                 .setSourceUserId(Objects.nonNull(record.getSourceUserId()) ? record.getSourceUserId() : 0)
                 .setOccurTime(toEpochSecond(record.getOccurTime()))
                 .setSendTime(toEpochSecond(record.getSendTime()))

@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.entity.dto;
 
+import io.github.pnoker.common.enums.PointCommandStatusEnum;
+
 import java.time.Instant;
 import java.util.Map;
 
@@ -30,7 +32,7 @@ import java.util.Map;
 public record CommandCallResultDTO(
         String recordId,
         Long tenantId,
-        String status,
+        PointCommandStatusEnum status,
         Map<String, String> resultValues,
         String configSnapshot,
         String errorCode,
@@ -46,7 +48,7 @@ public record CommandCallResultDTO(
     public static class Builder {
         private String recordId;
         private Long tenantId;
-        private String status;
+        private PointCommandStatusEnum status;
         private Map<String, String> resultValues;
         private String configSnapshot;
         private String errorCode;
@@ -64,7 +66,7 @@ public record CommandCallResultDTO(
             return this;
         }
 
-        public Builder status(String status) {
+        public Builder status(PointCommandStatusEnum status) {
             this.status = status;
             return this;
         }

@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.entity.dto;
 
+import io.github.pnoker.common.enums.PointCommandStatusEnum;
+
 import java.time.Instant;
 
 /**
@@ -30,7 +32,7 @@ import java.time.Instant;
 public record PointCommandResultDTO(
         String commandId,
         Long tenantId,
-        String status,
+        PointCommandStatusEnum status,
         String responseValue,
         String errorCode,
         String errorMessage,
@@ -45,7 +47,7 @@ public record PointCommandResultDTO(
     public static class Builder {
         private String commandId;
         private Long tenantId;
-        private String status;
+        private PointCommandStatusEnum status;
         private String responseValue;
         private String errorCode;
         private String errorMessage;
@@ -62,7 +64,7 @@ public record PointCommandResultDTO(
             return this;
         }
 
-        public Builder status(String status) {
+        public Builder status(PointCommandStatusEnum status) {
             this.status = status;
             return this;
         }
