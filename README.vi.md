@@ -2,186 +2,297 @@
   <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
 </p>
 
+> **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
+
 <p align="center">
-	<img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3 Logo">
-<br>
-<a href='https://gitee.com/pnoker/iot-dc3/stargazers'>
-    <img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp' alt='star'/>
-</a>
-<a href='https://gitee.com/pnoker/iot-dc3/members'>
-    <img src='https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp' alt='fork'/>
-</a>
-<br>
-<strong>
-IoT DC3 là nền tảng IoT phân tán, hoàn toàn mã nguồn mở và AI-Ready.
-Nó kết nối thiết bị, thu thập dữ liệu được tổ chức cho AI, và điều phối vòng lặp khép kín — biến trí tuệ thành hành động, không chỉ là phân tích.
-</strong>
+  <img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3">
+</p>
+
+<p align="center">
+  <a href="https://github.com/pnoker/iot-dc3/stargazers">
+    <img src="https://img.shields.io/github/stars/pnoker/iot-dc3?style=flat&logo=github&color=green" alt="GitHub Stars">
+  </a>
+  <a href="https://gitee.com/pnoker/iot-dc3/stargazers">
+    <img src="https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp" alt="Gitee Star">
+  </a>
+  <a href="https://gitee.com/pnoker/iot-dc3/members">
+    <img src="https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp" alt="Gitee Fork">
+  </a>
+  <img src="https://img.shields.io/badge/License-AGPL%203.0-blue" alt="License">
+  <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk" alt="Java 21">
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot" alt="Spring Boot 4">
+</p>
+
+<p align="center">
+  <strong>
+    IoT DC3 là một nền tảng IoT phân tán mã nguồn mở, đang phát triển cho các kịch bản AI.<br>
+    Nền tảng bao phủ kết nối thiết bị, thu thập dữ liệu, quản lý vận hành và phân tích thông minh cho giải pháp IoT công nghiệp.
+  </strong>
+</p>
+
+<p align="center">
+  🔌 <strong>28 module driver kết nối</strong> &nbsp;·&nbsp;
+  🤖 <strong>Tích hợp năng lực AI</strong> &nbsp;·&nbsp;
+  ☁️ <strong>Microservice cloud-native</strong>
 </p>
 
 ---
 
-![iot-dc3-architecture](dc3/images/iot-dc3-architecture-vi.svg)
+## 📸 Xem trước sản phẩm
 
-# 1 Kiến trúc
+<table>
+  <tr>
+    <th width="33%">📸 Tổng quan nền tảng</th>
+    <th width="33%">📸 Quản lý thiết bị</th>
+    <th width="33%">📸 Trò chuyện AI</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="dc3/images/screenshot-overview.png" alt="Dashboard nền tảng" width="100%">
+      <br>
+      <strong>Trang chủ / Dashboard</strong><br>
+      <em>Tổng quan hệ thống · Thống kê thiết bị online · Biểu đồ xu hướng dữ liệu</em>
+    </td>
+    <td align="center">
+      <img src="dc3/images/screenshot-device.png" alt="Trang quản lý thiết bị" width="100%">
+      <br>
+      <strong>Quản lý thiết bị</strong><br>
+      <em>Danh sách thiết bị · Trạng thái online · Tìm kiếm và lọc</em>
+    </td>
+    <td align="center">
+      <img src="dc3/images/screenshot-ai.png" alt="Trang trò chuyện AI" width="100%">
+      <br>
+      <strong>Trò chuyện AI</strong><br>
+      <em>Điều khiển thiết bị bằng ngôn ngữ tự nhiên · Truy vấn dữ liệu · Phân tích thông minh</em>
+    </td>
+  </tr>
+</table>
 
-Kiến trúc được thiết kế để cung cấp năng lực IoT đầu-cuối, bao gồm kết nối thiết bị, dịch vụ dữ liệu, quản lý vận hành
-và tích hợp ứng dụng mở rộng.
+## ✨ Tính năng chính
 
-- **Tầng Driver**: Cung cấp SDK để kết nối thiết bị vật lý qua giao thức tiêu chuẩn hoặc độc quyền, đảm nhiệm thu thập
-  dữ liệu hướng nam và thực thi lệnh điều khiển;
-- **Tầng Dữ liệu**: Cung cấp thu thập, lưu trữ và truy vấn dữ liệu thiết bị một cách tin cậy, phục vụ cả dữ liệu thời
-  gian thực và lịch sử;
-- **Tầng Quản lý**: Đóng vai trò trung tâm hợp tác microservice phân tán, bao gồm đăng ký dịch vụ, quản lý driver/thiết
-  bị, điều phối lệnh và quản trị cấu hình tập trung;
-- **Tầng Ứng dụng**: Hỗ trợ mở dữ liệu, lập lịch tác vụ, cảnh báo/thông báo, quản lý log, tích hợp bên thứ ba và các
-  kịch bản tự động hóa tăng cường bởi AI.
+### 🔌 Kết nối thiết bị đa giao thức
 
-# 2 Mục tiêu
+IoT DC3 tích hợp **28 module driver kết nối**, bao phủ tự động hóa công nghiệp, truyền thông IoT, cầu nối dữ liệu, truyền thông cơ bản, mô phỏng và gỡ lỗi, giúp giảm chi phí kết nối thiết bị và nguồn dữ liệu phổ biến:
 
-- **Khả năng mở rộng**: Hỗ trợ mở rộng ngang bằng Spring Cloud cho khối lượng công việc IoT phân tán, thông lượng cao;
-- **Tính bền vững**: Giảm rủi ro điểm lỗi đơn lẻ nhờ thiết kế chịu lỗi và các node dịch vụ có thể thay thế;
-- **Hiệu năng**: Đáp ứng nhu cầu kết nối thiết bị quy mô lớn và xử lý telemetry;
-- **Khả năng mở rộng phát triển**: Tăng tốc tích hợp giao thức mới và driver tùy biến thông qua SDK và cơ chế đăng ký
-  dịch vụ;
-- **Linh hoạt triển khai**: Vận hành trên private cloud, public cloud và edge, đồng thời giữ tương thích hệ sinh thái
-  Java;
-- **Hiệu quả vận hành**: Đơn giản hóa quy trình onboarding, đăng ký và xác thực quyền;
-- **Bảo mật và đa tenant**: Hỗ trợ mã hóa truyền dữ liệu, tách biệt namespace và cơ chế phân tách theo tenant;
-- **Phân phối cloud-native**: Tối ưu cho Kubernetes và container hóa bằng Docker để triển khai nhất quán;
-- **Tiến hóa AI-Ready**: Sẵn sàng tích hợp tự động hóa thông minh và vận hành dựa trên dữ liệu.
+| Nhóm                               | Module driver                                                                                                                                         |
+|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **Giao thức công nghiệp**        | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
+| 📡 **Giao thức IoT**                | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                           |
+| 🗄️ **Cầu nối dữ liệu**             | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                            |
+| 🔧 **Truyền thông cơ bản và quản trị mạng** | TCP/UDP · Serial · SNMP · CAN                                                                                                                       |
+| 🧪 **Mô phỏng và gỡ lỗi**           | Virtual · Listening Virtual                                                                                                                         |
 
-# 3 Phát triển
+**Driver SDK** hỗ trợ phát triển nhanh driver giao thức tùy chỉnh và đăng ký vào nền tảng runtime.
 
-## 3.1 Phụ thuộc khởi động
+### 🤖 Tích hợp năng lực AI
 
-> Chọn một
->
-> Nếu bạn cần một tập lệnh SQL cơ sở dữ liệu, hãy kết nối trực tiếp với cơ sở dữ liệu đã khởi động trong container để
-> xuất. Stack phụ thuộc cơ bản này sẽ khởi động PostgreSQL và RabbitMQ.
+Agentic Center được xây dựng trên **Spring AI**, đưa mô hình ngôn ngữ lớn vào quy trình vận hành IoT:
+
+- **Điều khiển thiết bị bằng ngôn ngữ tự nhiên** - LLM có thể truy vấn thiết bị, đọc/ghi point và thực thi lệnh thông qua Tool Calling
+- **Phân tích cảnh báo thông minh** - AI hỗ trợ phân tích nguyên nhân và đề xuất cách xử lý
+- **Thông tin chuyên sâu từ dữ liệu** - Truy vấn dữ liệu thiết bị bằng ngôn ngữ tự nhiên và sinh biểu đồ trực quan
+- **Hỗ trợ nhiều mô hình** - Tương thích với nhà cung cấp kiểu OpenAI API và các mô hình phổ biến như GPT, Claude, DeepSeek, Qwen
+- **Bộ nhớ hội thoại** - Hỗ trợ hội thoại nhiều lượt và bộ nhớ ngữ cảnh, được lưu bền vững vào cơ sở dữ liệu
+
+### 🏗️ Microservice cloud-native
+
+Kiến trúc microservice phân tán dựa trên **Spring Boot 4 + Spring Cloud 2025**:
+
+- **Quản trị dịch vụ** - Spring Cloud Gateway làm entrypoint thống nhất, với route tĩnh và biến môi trường linh hoạt
+- **Giao tiếp hiệu quả** - Gọi dịch vụ qua gRPC với tuần tự hóa Protobuf
+- **Mở rộng ngang** - Thiết kế stateless, hỗ trợ mở rộng từng dịch vụ theo tải nghiệp vụ
+- **Khả năng chịu lỗi** - Node dịch vụ có thể thay thế và cô lập lỗi
+
+### 📊 Engine dữ liệu thời gian thực
+
+- **Thu thập dữ liệu** - Driver thu thập telemetry thiết bị và truyền bất đồng bộ qua RabbitMQ
+- **Lưu trữ chuỗi thời gian** - Truy vấn hiệu quả dữ liệu thời gian thực và dữ liệu lịch sử
+- **Rule engine** - Cấu hình rule cảnh báo linh hoạt, hỗ trợ cảnh báo nhiều cấp và thông báo
+- **Truy vết sự kiện** - Lịch sử đầy đủ của lệnh và sự kiện
+
+### 🔐 Bảo mật doanh nghiệp và đa tenant
+
+- **Cách ly tenant** - Cách ly theo tenant trên database, cache và API
+- **Xác thực và phân quyền** - JWT + Spring Security với mô hình RBAC
+- **Mã hóa truyền tải** - Hỗ trợ giao tiếp TLS/SSL
+- **Audit tracking** - Log thao tác người dùng và sự kiện hệ thống
+
+### 🧩 Thân thiện với nhà phát triển
+
+- **Driver SDK** - Bộ công cụ phát triển driver hoàn chỉnh. Xem [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring.html)
+- **Tách frontend và backend** - Frontend Vue 3 + TypeScript, API RESTful + gRPC
+- **Triển khai bằng container** - Khởi động một lệnh với Podman / Docker Compose, thuận tiện để chuyển sang Kubernetes và các nền tảng container khác
+- **Tài liệu đầy đủ** - Tài liệu online, hướng dẫn quickstart và hướng dẫn khắc phục sự cố
+
+## ⚡ Bắt đầu nhanh
+
+### Điều kiện tiên quyết
+
+| Phụ thuộc        | Phiên bản      |
+|------------------|----------------|
+| Java (JDK)       | 21+            |
+| Maven            | 3.9+           |
+| Podman hoặc Docker | Bản ổn định mới nhất |
+
+### Khởi động trong ba bước
+
+**① Clone repository**
 
 ```bash
-# Truy cập toàn cầu với dịch vụ đăng ký container tiêu chuẩn
-podman compose -f dc3/docker-compose-db.yml up -d
-
-# Dịch vụ đăng ký được tối ưu hóa cho người dùng ở Trung Quốc đại lục
-DC3_IMAGE_REGISTRY=registry.cn-beijing.aliyuncs.com/dc3 podman compose -f dc3/docker-compose-db.yml up -d
+git clone https://github.com/pnoker/iot-dc3.git
+cd iot-dc3
 ```
 
-Các lệnh tắt `make` hữu ích:
+**② Khởi động phụ thuộc cơ bản** (PostgreSQL + RabbitMQ)
 
 ```bash
+# Registry toàn cầu
 make dev-db
-make dev-optional
-make dev
-make dev-all
-```
 
-Nếu bạn muốn dùng registry tối ưu cho người dùng ở Trung Quốc đại lục, hãy đặt `REGISTRY=cn`:
-
-```bash
+# Người dùng Trung Quốc đại lục (Alibaba Cloud registry)
 make dev-db REGISTRY=cn
-make dev-all REGISTRY=cn
-make app-all REGISTRY=cn
-make compose-up STACK=optional REGISTRY=cn
-make compose-logs STACK=dev REGISTRY=global
 ```
 
-Lệnh tắt cấp dịch vụ cho kiểm thử frontend và API:
-
-```bash
-# Khởi động các phụ thuộc cơ bản trước
-make dev-db REGISTRY=cn
-
-# Khởi động một dịch vụ, nhiều dịch vụ hoặc nhóm định sẵn
-make up SERVICES=agentic REGISTRY=cn
-make up SERVICES="gateway agentic" REGISTRY=cn
-make up GROUP=core REGISTRY=cn
-make up GROUP=drivers REGISTRY=cn
-
-# Theo dõi log của các dịch vụ đang kiểm thử
-make logs SERVICES="gateway agentic"
-```
-
-### Ghi đè biến môi trường cho Compose
-
-Trước khi thay đổi cổng publish, tag image hoặc tham số observability, nên sao chép tệp mẫu trước:
-
-```bash
-cp .env.example .env
-```
-
-Tệp `.env` ở thư mục gốc được dùng cho nội suy biến trong các file Compose dưới `dc3/`; các biến runtime của ứng dụng
-vẫn nằm trong `dc3/env/dev.env` hoặc `dc3/env/dev.env.sh`.
-
-Compose chỉ truyền các biến được tham chiếu rõ ràng trong file Compose vào container, chẳng hạn registry image, tag
-image, cổng publish, tùy chọn log và cấu hình observability tùy chọn. Provider của Agentic thường được lưu trong cơ sở
-dữ liệu; chỉ cấu hình
-`AGENTIC_FALLBACK_OPENAI_BASE_URL`, `AGENTIC_FALLBACK_OPENAI_API_KEY` và `AGENTIC_FALLBACK_OPENAI_MODEL` khi cần giá trị
-dự phòng
-cho process hoặc container đó.
-
-Xem [`dc3/doc/ENVIRONMENT.md`](dc3/doc/ENVIRONMENT.md) để biết sự khác nhau giữa `.env` ở thư mục gốc và
-`dc3/env/dev.env(.sh)`.
-
-## 3.2 Chuẩn bị
+**③ Nạp biến môi trường local, build và khởi động**
 
 ```bash
 source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-> **Tổng quan module**: Xem [`dc3/doc/MODULES.md`](dc3/doc/MODULES.md) để biết sơ đồ phụ thuộc module và luồng runtime.
+`dc3/env/dev.env.sh` trỏ các tiến trình Java local tới các cổng PostgreSQL, RabbitMQ và gRPC đã publish trên `localhost`.
+Hãy chạy các lệnh `java -jar` bên dưới trong cùng phiên terminal.
 
-> **Hướng dẫn dev cục bộ**: Xem [`dc3/doc/QUICKSTART.md`](dc3/doc/QUICKSTART.md) để biết quy trình thiết lập môi trường
-> local.
-
-> **Khắc phục sự cố**: Xem [`dc3/doc/TROUBLESHOOTING.md`](dc3/doc/TROUBLESHOOTING.md) để biết các vấn đề thường gặp khi
-> build/runtime và cách giải quyết.
-
-## 3.3 Khởi động dịch vụ
-
-> Khởi động theo thứ tự
+Khởi động dịch vụ theo thứ tự:
 
 ```bash
-# Gateway
-java -jar dc3-gateway/target/dc3-gateway.jar
-
-# Auth Center
-java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar
-
-# Data Center
-java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
-
-# Manager Center
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
-
-# Agentic Center
-java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
-
-# Virtual Driver
-java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
-
-# Các driver khác: Listening Virtual Driver, Modbus TCP Driver, MQTT Driver, OPC DA Driver, OPC UA Driver, Siemens S7 Driver
+java -jar dc3-gateway/target/dc3-gateway.jar                          # API Gateway
+java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar        # Auth Center
+java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar  # Manager Center
+java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar        # Data Center
+java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar  # Agentic Center
+java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar  # Virtual Driver cho demo
 ```
 
-# 4 Công nghệ sử dụng
+> 📖 Để thiết lập môi trường local đầy đủ, xem [Quickstart](https://pnoker.github.io/iot-dc3/quickstart/) và
+> [Environment Variables](https://pnoker.github.io/iot-dc3/quickstart/environment.html).
 
-- [Java 21](https://www.java.com)
-- [Spring Boot 3.5.5](https://spring.io/projects/spring-boot)
-- [Spring Cloud 2025.0.0](https://spring.io/projects/spring-cloud)
+<details>
+<summary>🔧 Tùy chọn khởi động khác (phụ thuộc tùy chọn, khởi động từng dịch vụ, biến môi trường)</summary>
 
-# 5 Đóng góp
+**Khởi động hạ tầng tùy chọn** (EMQX, ELK/APM, Prometheus, Grafana, v.v.):
 
-- **Tạo nhánh**: Bắt đầu bằng cách tạo một nhánh mới từ nhánh `main`. Đảm bảo rằng nhánh `main` được cập nhật trước khi
-  tạo nhánh mới;
-- **Đặt tên nhánh**: Tuân theo quy ước đặt tên cho nhánh mới: `feature/your_name/feature_description`. Ví dụ:
-  `feature/pnoker/mqtt_driver`;
-- **Mã và Tài liệu**: Thực hiện các thay đổi của bạn đối với mã hoặc tài liệu trên nhánh mới. Sau khi hoàn thành, commit
-  các thay đổi của bạn;
-- **Pull Request**: Gửi một `Pull Request` (PR) để hợp nhất các thay đổi của bạn vào nhánh `develop`. PR của bạn sẽ được
-  xem xét và hợp nhất bởi người bảo trì.
+```bash
+make dev-optional REGISTRY=cn    # Khởi động phụ thuộc tùy chọn
+make dev-all REGISTRY=cn         # Khởi động toàn bộ phụ thuộc
+```
 
-# 6 Giấy phép
+**Khởi động dịch vụ theo nhu cầu** (phù hợp để test frontend/API):
 
-Nền tảng mã nguồn mở `IoT DC3` được cấp phép theo [Giấy phép AGPL 3.0](./LICENSE-AGPL.txt).
-Xem [LICENSE.txt](./LICENSE.txt) để biết thông báo giấy phép của repository và giải thích về giấy phép thương mại.
+```bash
+make up SERVICES=agentic REGISTRY=cn               # Một dịch vụ
+make up SERVICES="gateway agentic" REGISTRY=cn      # Nhiều dịch vụ
+make up GROUP=core REGISTRY=cn                      # Nhóm dịch vụ core
+make up GROUP=drivers REGISTRY=cn                   # Nhóm driver
+make logs SERVICES="gateway agentic"                # Xem log
+```
+
+**Ghi đè biến môi trường Compose**:
+
+```bash
+cp .env.example .env    # Sao chép file mẫu
+```
+
+File `.env` ở thư mục gốc được dùng cho nội suy biến Compose, như registry image, tag image và cổng publish.
+Biến runtime của ứng dụng được cấu hình trong `dc3/env/dev.env`. Xem [tài liệu biến môi trường](https://pnoker.github.io/iot-dc3/quickstart/environment.html).
+
+</details>
+
+## 🏗️ Tổng quan kiến trúc
+
+![IoT DC3 Architecture](dc3/images/iot-dc3-architecture-vi.svg)
+
+| Tầng                 | Trách nhiệm                                                                                                      |
+|----------------------|------------------------------------------------------------------------------------------------------------------|
+| **Tầng Driver**      | Phát triển driver bằng SDK, kết nối thiết bị qua giao thức tiêu chuẩn/riêng, thu thập dữ liệu hướng nam và thực thi lệnh |
+| **Tầng Dữ liệu**     | Thu thập, lưu trữ và truy vấn dữ liệu thiết bị, phục vụ dữ liệu thời gian thực và lịch sử                         |
+| **Tầng Quản lý**     | Lõi cộng tác microservice: đăng ký dịch vụ, quản lý thiết bị/driver, điều phối lệnh, quản trị cấu hình            |
+| **Tầng Ứng dụng**    | Mở dữ liệu, lập lịch tác vụ, cảnh báo, quản lý log, tích hợp bên thứ ba và tự động hóa AI                         |
+
+> 📖 Để xem đầy đủ phụ thuộc module và luồng runtime, xem [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html).
+
+## 🛠️ Công nghệ sử dụng
+
+| Nhóm                              | Công nghệ                                                    |
+|-----------------------------------|-------------------------------------------------------------|
+| **Ngôn ngữ và framework**          | Java 21 · Spring Boot 4 · Spring Cloud 2025 · Spring AI 2.0 |
+| **Dữ liệu, cache và lập lịch**     | PostgreSQL · Caffeine · MyBatis-Plus · Quartz               |
+| **Messaging và giao tiếp**         | RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf             |
+| **Bảo mật và xác thực**            | Spring Security · JWT · BouncyCastle                        |
+| **Observability**                  | Micrometer · Prometheus · Grafana · ELK                     |
+| **Frontend**                       | Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6   |
+| **Desktop**                        | Tauri 2                                                     |
+| **Triển khai**                     | Podman · Docker Compose                                     |
+
+> 💡 Mã nguồn frontend nằm trong repository [iot-dc3-web](https://github.com/pnoker/iot-dc3-web).
+
+## 📖 Tài liệu và cộng đồng
+
+| Tài nguyên              | Liên kết                                                                       |
+|-------------------------|--------------------------------------------------------------------------------|
+| 📚 Tài liệu online       | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                  |
+| 🚀 Quickstart            | [Quickstart Guide](https://pnoker.github.io/iot-dc3/quickstart/)               |
+| 🏗️ Kiến trúc            | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html) |
+| 🔧 Phát triển driver     | [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring.html) |
+| 🐛 Khắc phục sự cố       | [Troubleshooting](https://pnoker.github.io/iot-dc3/guide/troubleshooting.html) |
+| 📋 Changelog             | [Release Changelog](https://pnoker.github.io/iot-dc3/development/changelog.html) |
+| 🐛 Phản hồi issue        | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                      |
+| 🇨🇳 Gitee mirror         | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                          |
+
+## 🌍 Trường hợp ứng dụng
+
+<table>
+  <tr>
+    <td align="center" width="60">🏭</td>
+    <td><strong>Nhà máy thông minh</strong></td>
+    <td>Giám sát trạng thái thiết bị dây chuyền, thu thập tham số quy trình, bảo trì dự đoán, phân tích OEE</td>
+  </tr>
+  <tr>
+    <td align="center">⚡</td>
+    <td><strong>Giám sát năng lượng</strong></td>
+    <td>Đọc công tơ điện/nước/gas từ xa, phân tích xu hướng năng lượng, cảnh báo bất thường</td>
+  </tr>
+  <tr>
+    <td align="center">🌾</td>
+    <td><strong>Nông nghiệp thông minh</strong></td>
+    <td>Giám sát môi trường nhà kính, điều khiển tưới tự động, cảnh báo sâu bệnh, dự báo sản lượng</td>
+  </tr>
+  <tr>
+    <td align="center">🏙️</td>
+    <td><strong>Thành phố thông minh</strong></td>
+    <td>Quản lý đèn đường, giám sát chất lượng môi trường, vận hành hạ tầng đô thị, giám sát an toàn</td>
+  </tr>
+</table>
+
+## 🤝 Đóng góp
+
+Chúng tôi hoan nghênh mọi hình thức đóng góp. Vui lòng làm theo quy trình sau:
+
+1. **Fork và tạo nhánh** - Tạo nhánh từ `main`, đặt tên theo định dạng `feature/your_name/feature_description`
+   (ví dụ: `feature/pnoker/mqtt_driver`)
+2. **Phát triển và commit** - Hoàn thành thay đổi trên nhánh mới và tuân theo chuẩn [Conventional Commits](https://www.conventionalcommits.org/)
+3. **Tạo PR** - Gửi Pull Request vào nhánh `develop` để maintainer review và merge
+
+## 📄 Giấy phép
+
+IoT DC3 được phát hành mã nguồn mở theo giấy phép [AGPL 3.0](./LICENSE-AGPL.txt).
+
+- ✅ **Học tập cá nhân, nghiên cứu và sử dụng nội bộ** - Miễn phí
+- ✅ **Sửa đổi mã nguồn và open source phần sửa đổi** - Được hoan nghênh
+- ⚠️ **Cung cấp như dịch vụ thương mại cho bên thứ ba mà không open source phần sửa đổi** - Cần giấy phép thương mại
+
+Xem [LICENSE.txt](./LICENSE.txt) để biết chi tiết về giấy phép thương mại.
+
+## ⭐ Lịch sử Star
+
+[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)

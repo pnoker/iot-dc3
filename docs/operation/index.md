@@ -1,30 +1,25 @@
----
-title: 操作手册
----
-
 # 操作手册
 
-通过 Web UI 完成驱动注册、模板编排、设备管理和数据查看的可视化指引。
+本章从用户任务流解释如何使用 IoT DC3：理解核心概念、接入设备、查看数据、下发命令，以及使用 Agentic Center 做 AI 辅助运营。
 
-::: tip
-本章内容来自旧版 dc3-docs（VuePress 1.x）的截图说明。Web UI 后续可能有视觉调整,但功能与流程保持一致;部分截图与最新版本可能存在细节差异,以代码与功能描述为准。
-:::
+如果你还没有启动本地环境，先完成 [快速开始](../quickstart/)。
 
-## 目录
+## 推荐路径
 
-- [驱动](driver.md) — 查看驱动列表/详情,以及驱动关联的设备
-- [模板](template.md) — 创建/编辑设备模板,配置基础信息与位号
-- [设备](device.md) — 新增/导入设备,关联模板与位号,查看设备数据
-- [数据](data.md) — 查看设备对应位号的实时数据
+1. 阅读 [核心概念](concepts.md)，理解驱动、模板、设备、位号和数据之间的关系。
+2. 按 [设备接入流程](device-onboarding.md) 完成一次虚拟驱动或真实驱动接入。
+3. 按 [数据与命令](data-commands.md) 验证点位采集、历史查询和读写命令。
+4. 如需接入大模型，阅读 [AI 辅助运营](agentic.md)。
 
-## 推荐阅读顺序
+## 运行入口
 
-1. 先看 [模板](template.md):理解"如何按设备类型抽象通用配置"
-2. 再看 [设备](device.md):理解"如何把模板实例化为具体设备并接入"
-3. 最后看 [驱动](driver.md) 和 [数据](data.md):查看接入后的状态与数据流
+| 入口 | 用途 |
+|------|------|
+| Gateway API | `http://localhost:8000/api/v3/...`，对外统一 API 入口 |
+| Swagger UI | `http://localhost:8000/swagger-ui.html`，开发环境下查看聚合 API |
+| Center direct API | 各中心服务的直接调试入口，详见 [API 文档](../development/api-documentation.md) |
+| Web UI | 前端源码在独立 `iot-dc3-web` 仓库，后端接口通过 Gateway 访问 |
 
-## 相关文档
+## 旧版截图资料
 
-- [快速开始](../quickstart/) — 起服务、跑 demo
-- [架构总览](../architecture/) — 各组件协作关系
-- [模块清单](../modules/) — 每个 `dc3-*` 子模块的职责
+旧版 Web UI 截图式手册已经归档到 [Superpowers / 旧版操作手册](../superpowers/legacy-operation/)。这些资料保留历史参考价值，但公开操作路径以本章文字流程为准。

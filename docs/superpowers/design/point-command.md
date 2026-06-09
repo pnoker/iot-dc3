@@ -439,7 +439,7 @@ Phase 1（命名一刀切）已完成并发布。旧 HTTP 路径、旧 exchange/
 
 ## 11. 引用
 
-- 物模型设计：[docs/design/thing-model.md](thing-model.md)
+- 物模型设计：[docs/superpowers/design/thing-model.md](thing-model.md)
 - 当前代码定位（Phase 1 后的命名）：
     - `dc3-common-data/.../controller/PointCommandController.java`
     - `dc3-common-data/.../biz/impl/PointCommandServiceImpl.java`

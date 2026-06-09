@@ -1,24 +1,27 @@
-# Environment Variables
+# 环境变量
 
-This project uses two environment-variable scopes. Keep them separate.
+IoT DC3 同时支持 Compose 容器运行和本地源码运行。两类环境变量的读取者不同，不能混用。
 
-## Files
+## 文件区别
 
-| File                 | Reader                                                          | Scope                                                                                          |
-|----------------------|-----------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| `.env.example`       | Template for repository-root `.env`; read by Compose            | Compose interpolation for `dc3/docker-compose*.yml`, plus documented local source-run defaults |
-| `dc3/env/dev.env`    | IDE EnvFile plugins, `docker --env-file`, or `set -a && source` | Local source-run Java processes                                                                |
-| `dc3/env/dev.env.sh` | Shell via `source dc3/env/dev.env.sh`                           | Local source-run Java processes                                                                |
+| 文件 | 读取者 | 用途 |
+|------|--------|------|
+| `.env.example` | Compose 模板 | 复制为根目录 `.env` 后，供 `dc3/docker-compose*.yml` 做变量插值 |
+| `.env` | Compose | 本机未跟踪配置，控制镜像仓库、镜像标签、发布端口等 |
+| `dc3/env/dev.env` | IDE EnvFile 插件或手动复制 | 本地 Java 进程环境变量，不带 `export` |
+| `dc3/env/dev.env.sh` | Shell | 本地 Java 进程环境变量，使用 `source` 加载 |
 
-## Compose Usage
+本地源码运行 Java 服务时，应使用 `dc3/env/dev.env.sh` 或 `dc3/env/dev.env`。根目录 `.env` 主要给 Compose 插值，不会自动注入到所有本地 Java 进程。
 
-Create a local `.env` from the template:
+## Compose 用法
+
+先从模板创建本地 `.env`：
 
 ```bash
 cp .env.example .env
 ```
 
-Run Compose commands from the repository root so Compose can discover `.env`:
+然后在仓库根目录运行 Compose 相关命令：
 
 ```bash
 make dev-all
@@ -26,7 +29,7 @@ make app-all REGISTRY=cn
 podman compose -f dc3/docker-compose-dev.yml config
 ```
 
-The root `.env` is primarily used for Compose interpolation, for example:
+根目录 `.env` 常用于 Compose 插值，例如：
 
 ```yaml
 image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.5}
@@ -34,21 +37,19 @@ ports:
   - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
 ```
 
-Compose does not inject every `.env` variable into every container. A variable is
-passed into a container only when a compose file references it under
-`environment`, `env_file`, or another container setting.
+Compose 不会把 `.env` 中的每个变量都注入到每个容器。只有 compose 文件中通过 `environment`、`env_file` 或其他配置引用的变量才会进入容器。
 
-## Local Source-Run Usage
+## 本地源码运行
 
-For local Java processes started from an IDE or the command line, use:
+从命令行启动 Java 进程前，加载：
 
 ```bash
 source dc3/env/dev.env.sh
 ```
 
-These values point application code at dependencies published on localhost:
+这组变量把应用指向本机已发布端口：
 
-```env
+```bash
 POSTGRES_HOST=localhost
 POSTGRES_PORT=35432
 RABBITMQ_HOST=localhost
@@ -58,189 +59,165 @@ NODE_ENV=dev
 DC3_FACADE_MODE=grpc
 ```
 
-`dc3/env/dev.env` contains the same source-run variables without `export`, which
-is convenient for IDE run configurations.
+如果不加载，本地 Java 进程可能继续使用容器内服务名或默认端口，例如 `dc3-postgres`、`dc3-rabbitmq`、`dc3-center-manager`，从而无法连接本机依赖。
 
-## JetBrains IDEA Usage
+## JetBrains IDEA 用法
 
-`dc3/env/dev.env` is kept for IDE usage and is not a duplicate of root `.env`.
-It intentionally contains only variables needed by local Java processes, while
-root `.env` also contains Compose-only image, port, logging, and observability
-interpolation variables.
+`dc3/env/dev.env` 是给 IDE 使用的文件，内容与 `dev.env.sh` 对齐，但没有 `export`。
 
-Recommended IDEA setup:
+推荐配置：
 
-1. Install the JetBrains EnvFile plugin.
-2. Open the run configuration for the service you want to start.
-3. Enable EnvFile for that run configuration.
-4. Add `dc3/env/dev.env`.
-5. Add only service-specific overrides in the same run configuration when
-   needed, for example `SERVER_PORT`, `GRPC_SERVER_PORT`, `TCP_PORT`,
-   `UDP_PORT`, or `POSTGRES_SCHEMA`.
+1. 安装 JetBrains EnvFile 插件。
+2. 打开目标服务的 Run Configuration。
+3. 启用 EnvFile。
+4. 添加 `dc3/env/dev.env`。
+5. 只在需要时补充服务级覆盖项，例如 `SERVER_PORT`、`GRPC_SERVER_PORT`、`TCP_PORT`、`UDP_PORT`、`POSTGRES_SCHEMA`。
 
-If you do not use the EnvFile plugin, open the run configuration, edit
-`Environment variables`, and paste the key-value pairs from `dc3/env/dev.env`.
+如果不使用 EnvFile 插件，可以把 `dc3/env/dev.env` 中的键值对复制到 Run Configuration 的 `Environment variables`。
 
-Do not point IDEA at `.env.example`; it is a template and is not loaded at
-runtime. Do not use root `.env` as the default IDEA file unless you explicitly
-want Compose-only variables to appear in the local Java process environment.
+不要把 `.env.example` 直接作为 IDEA 环境变量文件。它是 Compose 模板，不是本地 Java 进程运行时配置。
 
-## Variable Reference
+## 变量参考
 
-### Shared Compose Defaults
+### Compose 通用变量
 
-| Variable             | Scope           | Meaning                                                                                                             |
-|----------------------|-----------------|---------------------------------------------------------------------------------------------------------------------|
-| `DC3_IMAGE_REGISTRY` | Compose         | Image registry namespace used by all DC3 images. Use `registry.cn-beijing.aliyuncs.com/dc3` for the China registry. |
-| `DC3_IMAGE_TAG`      | Compose         | Image tag shared by application, database, EMQX, and observability images.                                          |
-| `DC3_LOG_MAX_SIZE`   | Compose         | Maximum size of a single container log file before rotation.                                                        |
-| `DC3_LOG_MAX_FILE`   | Compose         | Number of rotated container log files to keep.                                                                      |
-| `DC3_BIND_HOST`      | Compose         | Host address for published ports. Keep `127.0.0.1` for local-only access; use `0.0.0.0` for LAN access.             |
-| `APM_AGENT_ENABLE`   | Compose/runtime | Enables or disables the Java APM agent in application containers.                                                   |
+| 变量 | 范围 | 说明 |
+|------|------|------|
+| `DC3_IMAGE_REGISTRY` | Compose | DC3 镜像仓库命名空间；中国大陆镜像可用 `registry.cn-beijing.aliyuncs.com/dc3` |
+| `DC3_IMAGE_TAG` | Compose | DC3 应用和依赖镜像默认标签 |
+| `DC3_BIND_HOST` | Compose | 发布端口绑定地址；本机调试建议 `127.0.0.1` |
+| `DC3_LOG_MAX_SIZE` | Compose | 单个容器日志文件轮转大小 |
+| `DC3_LOG_MAX_FILE` | Compose | 保留的日志文件数量 |
+| `APM_AGENT_ENABLE` | Compose / Runtime | 是否启用 Java APM agent |
 
-### Database and RabbitMQ
+### PostgreSQL 和 RabbitMQ
 
-| Variable                       | Scope           | Meaning                                                                                                          |
-|--------------------------------|-----------------|------------------------------------------------------------------------------------------------------------------|
-| `POSTGRES_HOST`                | Runtime         | PostgreSQL host used by local Java processes and containers that pass it through.                                |
-| `POSTGRES_PORT`                | Runtime         | PostgreSQL port seen by the Java process. For local source runs this is usually the published host port `35432`. |
-| `POSTGRES_USERNAME`            | Runtime/Compose | PostgreSQL username used by applications and compose health checks.                                              |
-| `POSTGRES_PASSWORD`            | Runtime         | PostgreSQL password used by applications.                                                                        |
-| `POSTGRES_DB`                  | Runtime/Compose | PostgreSQL database name used by applications and compose health checks.                                         |
-| `POSTGRES_SCHEMA`              | Per-process     | Optional schema override for one service process, for example `dc3_manager` or `dc3_data`.                       |
-| `DC3_POSTGRES_PORT`            | Compose         | Published host port for the PostgreSQL container.                                                                |
-| `RABBITMQ_VIRTUAL_HOST`        | Runtime         | RabbitMQ virtual host used by Spring AMQP.                                                                       |
-| `RABBITMQ_HOST`                | Runtime         | RabbitMQ host used by local Java processes and containers that pass it through.                                  |
-| `RABBITMQ_PORT`                | Runtime         | RabbitMQ AMQP port seen by the Java process. For local source runs this is usually `35672`.                      |
-| `RABBITMQ_USERNAME`            | Runtime         | RabbitMQ username used by applications.                                                                          |
-| `RABBITMQ_PASSWORD`            | Runtime         | RabbitMQ password used by applications.                                                                          |
-| `DC3_RABBITMQ_TLS_PORT`        | Compose         | Published host port for RabbitMQ TLS.                                                                            |
-| `DC3_RABBITMQ_PORT`            | Compose         | Published host port for RabbitMQ AMQP.                                                                           |
-| `DC3_RABBITMQ_MANAGEMENT_PORT` | Compose         | Published host port for the RabbitMQ management UI.                                                              |
+| 变量 | 范围 | 说明 |
+|------|------|------|
+| `POSTGRES_HOST` | Runtime | Java 进程看到的 PostgreSQL 主机；源码运行通常为 `localhost` |
+| `POSTGRES_PORT` | Runtime | Java 进程看到的 PostgreSQL 端口；源码运行通常为 `35432` |
+| `POSTGRES_USERNAME` | Runtime / Compose | PostgreSQL 用户名 |
+| `POSTGRES_PASSWORD` | Runtime | PostgreSQL 密码 |
+| `POSTGRES_DB` | Runtime / Compose | PostgreSQL 数据库名 |
+| `POSTGRES_SCHEMA` | Per-process | 单服务 schema 覆盖，例如 `dc3_manager` 或 `dc3_data` |
+| `DC3_POSTGRES_PORT` | Compose | PostgreSQL 容器发布到宿主机的端口 |
+| `RABBITMQ_HOST` | Runtime | RabbitMQ 主机；源码运行通常为 `localhost` |
+| `RABBITMQ_PORT` | Runtime | RabbitMQ AMQP 端口；源码运行通常为 `35672` |
+| `RABBITMQ_USERNAME` | Runtime | RabbitMQ 用户名 |
+| `RABBITMQ_PASSWORD` | Runtime | RabbitMQ 密码 |
+| `RABBITMQ_VIRTUAL_HOST` | Runtime | RabbitMQ virtual host |
+| `DC3_RABBITMQ_PORT` | Compose | RabbitMQ AMQP 发布端口 |
+| `DC3_RABBITMQ_TLS_PORT` | Compose | RabbitMQ TLS 发布端口 |
+| `DC3_RABBITMQ_MANAGEMENT_PORT` | Compose | RabbitMQ 管理界面发布端口 |
 
-### Application Ports and Runtime Mode
+### 应用端口和运行模式
 
-| Variable                         | Scope       | Meaning                                                                                                                                                               |
-|----------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `DC3_WEB_HTTP_PORT`              | Compose     | Published host HTTP port for `dc3-web` (the nginx frontend).                                                                                                          |
-| `DC3_WEB_HTTPS_PORT`             | Compose     | Published host HTTPS port for `dc3-web`.                                                                                                                              |
-| `DC3_WEB_VERSION`                | Compose     | Image tag for the `dc3-web` frontend (independent of `DC3_IMAGE_TAG` since the UI ships on its own cadence). Defaults to `latest`.                                    |
-| `APP_API_HOST`                   | Runtime     | Backend gateway hostname seen by the `dc3-web` nginx container. Defaults to the `dc3-gateway` compose alias.                                                          |
-| `APP_API_PORT`                   | Runtime     | Backend gateway port seen by the `dc3-web` nginx container. Defaults to `8000`.                                                                                       |
-| `DC3_GATEWAY_PORT`               | Compose     | Published host HTTP port for `dc3-gateway`. Only effective in `docker-compose-dev.yml`; in production `docker-compose.yml` the gateway is reached via `dc3-web` only. |
-| `DC3_AUTH_PORT`                  | Compose     | Published host HTTP port for `dc3-center-auth`.                                                                                                                       |
-| `DC3_AUTH_GRPC_PORT`             | Compose     | Published host gRPC port for `dc3-center-auth`.                                                                                                                       |
-| `DC3_MANAGER_PORT`               | Compose     | Published host HTTP port for `dc3-center-manager`.                                                                                                                    |
-| `DC3_MANAGER_GRPC_PORT`          | Compose     | Published host gRPC port for `dc3-center-manager`.                                                                                                                    |
-| `DC3_DATA_PORT`                  | Compose     | Published host HTTP port for `dc3-center-data`.                                                                                                                       |
-| `DC3_DATA_GRPC_PORT`             | Compose     | Published host gRPC port for `dc3-center-data`.                                                                                                                       |
-| `DC3_AGENTIC_PORT`               | Compose     | Published host HTTP port for `dc3-center-agentic`.                                                                                                                    |
-| `DC3_LISTENING_VIRTUAL_TCP_PORT` | Compose     | Published host TCP port for the listening virtual driver.                                                                                                             |
-| `DC3_LISTENING_VIRTUAL_UDP_PORT` | Compose     | Published host UDP port for the listening virtual driver.                                                                                                             |
-| `SERVER_PORT`                    | Per-process | Spring Boot HTTP port override for one local service process.                                                                                                         |
-| `GRPC_SERVER_PORT`               | Per-process | Spring gRPC server port override for one local center service process.                                                                                                |
-| `TCP_PORT`                       | Per-process | Internal TCP listening port for one listening virtual driver process.                                                                                                 |
-| `UDP_PORT`                       | Per-process | Internal UDP listening port for one listening virtual driver process.                                                                                                 |
-| `NODE_ENV`                       | Runtime     | Active runtime profile group, usually `dev` for local source runs and `test` in compose app stacks.                                                                   |
-| `DC3_FACADE_MODE`                | Runtime     | Cross-service facade transport mode. `grpc` uses remote gRPC calls; local facade modules can override this for single-process modes.                                  |
+| 变量 | 范围 | 说明 |
+|------|------|------|
+| `DC3_WEB_HTTP_PORT` | Compose | `dc3-web` HTTP 发布端口 |
+| `DC3_WEB_HTTPS_PORT` | Compose | `dc3-web` HTTPS 发布端口 |
+| `DC3_WEB_VERSION` | Compose | 前端镜像标签 |
+| `APP_API_HOST` | Runtime | `dc3-web` 容器看到的 Gateway 主机 |
+| `APP_API_PORT` | Runtime | `dc3-web` 容器看到的 Gateway 端口 |
+| `DC3_GATEWAY_PORT` | Compose | Gateway HTTP 发布端口 |
+| `DC3_AUTH_PORT` | Compose | Auth Center HTTP 发布端口 |
+| `DC3_AUTH_GRPC_PORT` | Compose | Auth Center gRPC 发布端口 |
+| `DC3_MANAGER_PORT` | Compose | Manager Center HTTP 发布端口 |
+| `DC3_MANAGER_GRPC_PORT` | Compose | Manager Center gRPC 发布端口 |
+| `DC3_DATA_PORT` | Compose | Data Center HTTP 发布端口 |
+| `DC3_DATA_GRPC_PORT` | Compose | Data Center gRPC 发布端口 |
+| `DC3_AGENTIC_PORT` | Compose | Agentic Center HTTP 发布端口 |
+| `DC3_LISTENING_VIRTUAL_TCP_PORT` | Compose | Listening Virtual 驱动 TCP 发布端口 |
+| `DC3_LISTENING_VIRTUAL_UDP_PORT` | Compose | Listening Virtual 驱动 UDP 发布端口 |
+| `SERVER_PORT` | Per-process | 单个 Spring Boot 进程 HTTP 端口覆盖 |
+| `GRPC_SERVER_PORT` | Per-process | 单个中心服务 gRPC 端口覆盖 |
+| `TCP_PORT` | Per-process | Listening Virtual 驱动内部 TCP 端口 |
+| `UDP_PORT` | Per-process | Listening Virtual 驱动内部 UDP 端口 |
+| `NODE_ENV` | Runtime | Spring profile 分组；源码运行通常为 `dev` |
+| `DC3_FACADE_MODE` | Runtime | 跨服务 facade 模式；开发环境通常为 `grpc` |
 
-### Center Service Discovery and Gateway Routes
+### 中心服务地址和 Gateway 路由
 
-| Variable                       | Scope       | Meaning                                                                       |
-|--------------------------------|-------------|-------------------------------------------------------------------------------|
-| `CENTER_AUTH_HOST`             | Runtime     | Hostname used by local processes to reach Auth Center gRPC/HTTP endpoints.    |
-| `CENTER_MANAGER_HOST`          | Runtime     | Hostname used by local processes to reach Manager Center gRPC/HTTP endpoints. |
-| `CENTER_DATA_HOST`             | Runtime     | Hostname used by local processes to reach Data Center gRPC/HTTP endpoints.    |
-| `CENTER_AGENTIC_HOST`          | Runtime     | Hostname used by local processes to reach Agentic Center HTTP endpoints.      |
-| `GATEWAY_ROUTE_AUTH_TOKEN_URI` | Per-process | Optional gateway route override for Auth token endpoints.                     |
-| `GATEWAY_ROUTE_AUTH_URI`       | Per-process | Optional gateway route override for Auth service endpoints.                   |
-| `GATEWAY_ROUTE_MANAGER_URI`    | Per-process | Optional gateway route override for Manager service endpoints.                |
-| `GATEWAY_ROUTE_DATA_URI`       | Per-process | Optional gateway route override for Data service endpoints.                   |
-| `GATEWAY_ROUTE_AGENTIC_URI`    | Per-process | Optional gateway route override for Agentic service endpoints.                |
+| 变量 | 范围 | 说明 |
+|------|------|------|
+| `CENTER_AUTH_HOST` | Runtime | 本地进程访问 Auth Center 的主机 |
+| `CENTER_MANAGER_HOST` | Runtime | 本地进程访问 Manager Center 的主机 |
+| `CENTER_DATA_HOST` | Runtime | 本地进程访问 Data Center 的主机 |
+| `CENTER_AGENTIC_HOST` | Runtime | 本地进程访问 Agentic Center 的主机 |
+| `GATEWAY_ROUTE_AUTH_TOKEN_URI` | Per-process | Auth token 路由覆盖 |
+| `GATEWAY_ROUTE_AUTH_URI` | Per-process | Auth 服务路由覆盖 |
+| `GATEWAY_ROUTE_MANAGER_URI` | Per-process | Manager 服务路由覆盖 |
+| `GATEWAY_ROUTE_DATA_URI` | Per-process | Data 服务路由覆盖 |
+| `GATEWAY_ROUTE_AGENTIC_URI` | Per-process | Agentic 服务路由覆盖 |
 
-### Agentic and OpenAI-Compatible API
+### Agentic 和 OpenAI-compatible API
 
-| Variable                              | Scope   | Meaning                                                                                                                     |
-|---------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------|
-| `AGENTIC_FALLBACK_OPENAI_BASE_URL`    | Runtime | Fallback OpenAI-compatible API base URL used only when no database model/provider matches.                                  |
-| `AGENTIC_FALLBACK_OPENAI_API_KEY`     | Runtime | Fallback API key. Normal Agentic provider credentials are stored in `dc3_model_provider`.                                   |
-| `AGENTIC_FALLBACK_OPENAI_MODEL`       | Runtime | Fallback chat model name exposed only when no enabled `dc3_model_config` exists.                                            |
-| `AGENTIC_FALLBACK_OPENAI_TEMPERATURE` | Runtime | Fallback sampling temperature for chat completions.                                                                         |
-| `AGENTIC_FALLBACK_OPENAI_MAX_TOKENS`  | Runtime | Fallback maximum output token budget for one model response.                                                                |
-| `AGENTIC_MEMORY_SCHEMA_INIT`          | Runtime | Spring AI JDBC memory schema initialization mode. Keep `never`; DC3 pre-creates `dc3_chat_memory`.                          |
-| `AGENTIC_MEMORY_ENABLED`              | Runtime | Whether Agentic Center should include persisted conversation memory when preparing chat requests.                           |
-| `AGENTIC_TOOL_CALLING_ENABLED`        | Runtime | Whether Agentic Center exposes provider-native tool calling. Default is enabled; disable only for provider troubleshooting. |
-| `AGENTIC_MEMORY_MAX_MESSAGES`         | Runtime | Maximum chat messages retained per conversation window.                                                                     |
-| `AGENTIC_ATTACHMENT_STORAGE_PATH`     | Runtime | Directory used by Agentic Center to store uploaded attachment files.                                                        |
+| 变量 | 范围 | 说明 |
+|------|------|------|
+| `AGENTIC_FALLBACK_OPENAI_BASE_URL` | Runtime | fallback OpenAI-compatible API 地址 |
+| `AGENTIC_FALLBACK_OPENAI_API_KEY` | Runtime | fallback API key |
+| `AGENTIC_FALLBACK_OPENAI_MODEL` | Runtime | fallback 模型名 |
+| `AGENTIC_FALLBACK_OPENAI_TEMPERATURE` | Runtime | fallback 采样温度 |
+| `AGENTIC_FALLBACK_OPENAI_MAX_TOKENS` | Runtime | fallback 最大输出 token |
+| `AGENTIC_MEMORY_SCHEMA_INIT` | Runtime | Spring AI JDBC memory schema 初始化模式 |
+| `AGENTIC_MEMORY_ENABLED` | Runtime | 是否启用持久化会话记忆 |
+| `AGENTIC_TOOL_CALLING_ENABLED` | Runtime | 是否启用工具调用 |
+| `AGENTIC_MEMORY_MAX_MESSAGES` | Runtime | 每个对话窗口保留的最大消息数 |
+| `AGENTIC_ATTACHMENT_STORAGE_PATH` | Runtime | Agentic 附件存储路径 |
 
-### MQTT and Point Processing
+真实 API key 不应写入文档、日志或提交历史。
 
-| Variable               | Scope   | Meaning                                                                                                                                 |
-|------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| `MQTT_BROKER_HOST`     | Runtime | MQTT broker host used by MQTT-enabled services and drivers.                                                                             |
-| `MQTT_BROKER_PORT`     | Runtime | MQTT broker port seen by the Java process. For local source runs this is usually the EMQX published port `31883`.                       |
-| `MQTT_USERNAME`        | Runtime | MQTT username.                                                                                                                          |
-| `MQTT_PASSWORD`        | Runtime | MQTT password.                                                                                                                          |
-| `MQTT_BATCH_SPEED`     | Runtime | MQTT message speed threshold. Below the threshold, messages are handled individually; above it, they are buffered for batch processing. |
-| `MQTT_BATCH_INTERVAL`  | Runtime | MQTT batch scheduler interval in seconds.                                                                                               |
-| `POINT_BATCH_SPEED`    | Runtime | Point-value processing speed threshold for switching between direct and batch handling.                                                 |
-| `POINT_BATCH_INTERVAL` | Runtime | Point-value batch scheduler interval in seconds.                                                                                        |
+### MQTT 和点位处理
+
+| 变量 | 范围 | 说明 |
+|------|------|------|
+| `MQTT_BROKER_HOST` | Runtime | MQTT broker 主机 |
+| `MQTT_BROKER_PORT` | Runtime | MQTT broker 端口；源码运行通常为 EMQX 发布端口 `31883` |
+| `MQTT_USERNAME` | Runtime | MQTT 用户名 |
+| `MQTT_PASSWORD` | Runtime | MQTT 密码 |
+| `MQTT_BATCH_SPEED` | Runtime | MQTT 消息批处理速度阈值 |
+| `MQTT_BATCH_INTERVAL` | Runtime | MQTT 批处理调度间隔 |
+| `POINT_BATCH_SPEED` | Runtime | 点位值处理批处理速度阈值 |
+| `POINT_BATCH_INTERVAL` | Runtime | 点位值批处理调度间隔 |
 
 ### gRPC Facade
 
-| Variable                      | Scope   | Meaning                                                                                        |
-|-------------------------------|---------|------------------------------------------------------------------------------------------------|
-| `DC3_FACADE_GRPC_DEADLINE_MS` | Runtime | Per-request gRPC facade deadline in milliseconds. Set `0` to disable the client-side deadline. |
+| 变量 | 范围 | 说明 |
+|------|------|------|
+| `DC3_FACADE_GRPC_DEADLINE_MS` | Runtime | gRPC facade 单次请求 deadline，设置 `0` 可关闭客户端 deadline |
 
-### Auth and HMAC Signing
+### Auth 和 HMAC 签名
 
-| Variable           | Scope   | Meaning                                                                                                                                                                                                                                    |
-|--------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `AUTH_HMAC_SECRET` | Runtime | Shared HMAC-SHA256 secret for `X-Auth-User` header signing between the gateway and backend services. When empty, signing is disabled and backend services trust the header without verification. Set a strong random string in production. |
+| 变量 | 范围 | 说明 |
+|------|------|------|
+| `AUTH_HMAC_SECRET` | Runtime | Gateway 与后端服务之间用于签名 `X-Auth-User` 的共享 HMAC-SHA256 密钥；生产环境应设置强随机值 |
 
-### Optional and Observability Stacks
+### 可选依赖和可观测栈
 
-| Variable                  | Scope   | Meaning                                        |
-|---------------------------|---------|------------------------------------------------|
-| `DC3_EMQX_WS_PORT`        | Compose | Published host port for EMQX WebSocket.        |
-| `DC3_EMQX_WSS_PORT`       | Compose | Published host port for EMQX secure WebSocket. |
-| `DC3_EMQX_MQTT_PORT`      | Compose | Published host port for EMQX MQTT.             |
-| `DC3_EMQX_MQTTS_PORT`     | Compose | Published host port for EMQX MQTTS.            |
-| `DC3_EMQX_DASHBOARD_PORT` | Compose | Published host port for the EMQX dashboard.    |
-| `GF_SERVER_ROOT_URL`      | Compose | External root URL used by Grafana.             |
-| `DC3_GRAFANA_PORT`        | Compose | Published host port for Grafana.               |
-| `DC3_KIBANA_PORT`         | Compose | Published host port for Kibana.                |
-| `DC3_ES_JAVA_OPTS`        | Compose | JVM heap options for Elasticsearch.            |
-| `DC3_LS_JAVA_OPTS`        | Compose | JVM heap options for Logstash.                 |
+| 变量 | 范围 | 说明 |
+|------|------|------|
+| `DC3_EMQX_WS_PORT` | Compose | EMQX WebSocket 发布端口 |
+| `DC3_EMQX_WSS_PORT` | Compose | EMQX Secure WebSocket 发布端口 |
+| `DC3_EMQX_MQTT_PORT` | Compose | EMQX MQTT 发布端口 |
+| `DC3_EMQX_MQTTS_PORT` | Compose | EMQX MQTTS 发布端口 |
+| `DC3_EMQX_DASHBOARD_PORT` | Compose | EMQX Dashboard 发布端口 |
+| `GF_SERVER_ROOT_URL` | Compose | Grafana 对外 root URL |
+| `DC3_GRAFANA_PORT` | Compose | Grafana 发布端口 |
+| `DC3_KIBANA_PORT` | Compose | Kibana 发布端口 |
+| `DC3_ES_JAVA_OPTS` | Compose | Elasticsearch JVM 参数 |
+| `DC3_LS_JAVA_OPTS` | Compose | Logstash JVM 参数 |
 
-## Alignment Rules
+## 对齐规则
 
-- Compose-only variables stay in `.env.example`.
-  Examples: `DC3_IMAGE_REGISTRY`, `DC3_IMAGE_TAG`, `DC3_BIND_HOST`,
-  `DC3_*_PORT`, `DC3_LOG_MAX_SIZE`, `DC3_LOG_MAX_FILE`.
-- Local source-run variables must match between `.env.example`,
-  `dc3/env/dev.env`, and `dc3/env/dev.env.sh`.
-  Examples: `POSTGRES_HOST`, `RABBITMQ_HOST`, `CENTER_*_HOST`,
-  `AGENTIC_FALLBACK_OPENAI_*`, `AGENTIC_*`, `DC3_FACADE_GRPC_*`, `AUTH_HMAC_SECRET`,
-  `POINT_*`, `MQTT_*`.
-- Per-process variables are documented as commented examples only.
-  Examples: `SERVER_PORT`, `GRPC_SERVER_PORT`, `TCP_PORT`, `UDP_PORT`,
-  `POSTGRES_SCHEMA`.
-- Service-specific host port variables use the `DC3_*_PORT` prefix and describe
-  published host ports. Internal Spring Boot variables keep their native names,
-  such as `SERVER_PORT` and `GRPC_SERVER_PORT`.
+- Compose-only 变量保留在 `.env.example`，例如 `DC3_IMAGE_REGISTRY`、`DC3_IMAGE_TAG`、`DC3_BIND_HOST`、`DC3_*_PORT`。
+- 本地源码运行变量应在 `.env.example`、`dc3/env/dev.env` 和 `dc3/env/dev.env.sh` 中保持一致。
+- Per-process 变量只作为单服务覆盖项使用，不应全局滥用。
+- 服务发布端口变量使用 `DC3_*_PORT`，内部 Spring Boot 变量保留 `SERVER_PORT`、`GRPC_SERVER_PORT` 等原生命名。
 
-## Common Pitfalls
+## 常见误区
 
-- Editing `.env.example` has no runtime effect. Copy it to `.env` first.
-- `dc3/env/dev.env` looks similar to part of root `.env.example`, but it serves
-  a different reader: IDE/source-run processes instead of Compose
-  interpolation.
-- Setting `POSTGRES_HOST=localhost` in root `.env` does not automatically change
-  every app container; the compose service must pass the variable into the
-  container.
-- The app compose stacks intentionally set `NODE_ENV=test` for containers.
-  `NODE_ENV=dev` in `dc3/env/dev.env(.sh)` is for local source runs.
-- `DC3_LISTENING_VIRTUAL_TCP_PORT` and `DC3_LISTENING_VIRTUAL_UDP_PORT` are
-  host-published ports. `TCP_PORT` and `UDP_PORT` are per-process internal
-  application ports for the listening virtual driver.
+- 修改 `.env.example` 不会影响运行；需要先复制为 `.env`。
+- `dc3/env/dev.env` 和根目录 `.env` 用途不同，不要当作同一个文件。
+- 在根目录 `.env` 设置 `POSTGRES_HOST=localhost` 不会自动改变每个容器的运行时环境。
+- Compose 应用栈可以使用与本地源码不同的 `NODE_ENV`。
+- `DC3_LISTENING_VIRTUAL_TCP_PORT` / `DC3_LISTENING_VIRTUAL_UDP_PORT` 是宿主机发布端口；`TCP_PORT` / `UDP_PORT` 是进程内部端口。

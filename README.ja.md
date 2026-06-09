@@ -2,174 +2,297 @@
   <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
 </p>
 
+> **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
+
 <p align="center">
-	<img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3 Logo">
-<br>
-<a href='https://gitee.com/pnoker/iot-dc3/stargazers'>
-    <img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp' alt='star'/>
-</a>
-<a href='https://gitee.com/pnoker/iot-dc3/members'>
-    <img src='https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp' alt='fork'/>
-</a>
-<br>
-<strong>
-IoT DC3は、完全オープンソースのAI-Readyな分散型IoTプラットフォームです。
-デバイスを接続し、AIが活用できる形でデータを収集し、クローズドループを統括します——インテリジェンスを洞察に留めず、行動に変えるのです。
-</strong>
+  <img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3">
+</p>
+
+<p align="center">
+  <a href="https://github.com/pnoker/iot-dc3/stargazers">
+    <img src="https://img.shields.io/github/stars/pnoker/iot-dc3?style=flat&logo=github&color=green" alt="GitHub Stars">
+  </a>
+  <a href="https://gitee.com/pnoker/iot-dc3/stargazers">
+    <img src="https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp" alt="Gitee Star">
+  </a>
+  <a href="https://gitee.com/pnoker/iot-dc3/members">
+    <img src="https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp" alt="Gitee Fork">
+  </a>
+  <img src="https://img.shields.io/badge/License-AGPL%203.0-blue" alt="License">
+  <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk" alt="Java 21">
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot" alt="Spring Boot 4">
+</p>
+
+<p align="center">
+  <strong>
+    IoT DC3 は、AI シナリオに向けて進化するオープンソースの分散型 IoT プラットフォームです。<br>
+    デバイス接続、データ収集、運用管理、インテリジェント分析をカバーし、産業 IoT ソリューションの構築を支援します。
+  </strong>
+</p>
+
+<p align="center">
+  🔌 <strong>28 個の接続ドライバーモジュール</strong> &nbsp;·&nbsp;
+  🤖 <strong>AI 機能統合</strong> &nbsp;·&nbsp;
+  ☁️ <strong>クラウドネイティブマイクロサービス</strong>
 </p>
 
 ---
 
-![iot-dc3-architecture](dc3/images/iot-dc3-architecture-ja.svg)
+## 📸 プロダクトプレビュー
 
-# 1 アーキテクチャ
+<table>
+  <tr>
+    <th width="33%">📸 プラットフォーム概要</th>
+    <th width="33%">📸 デバイス管理</th>
+    <th width="33%">📸 AI チャット</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="dc3/images/screenshot-overview.png" alt="プラットフォームダッシュボード" width="100%">
+      <br>
+      <strong>ホーム / ダッシュボード</strong><br>
+      <em>システム概要 · デバイスオンライン統計 · データトレンドチャート</em>
+    </td>
+    <td align="center">
+      <img src="dc3/images/screenshot-device.png" alt="デバイス管理ページ" width="100%">
+      <br>
+      <strong>デバイス管理</strong><br>
+      <em>デバイス一覧 · オンライン状態 · 検索とフィルタ</em>
+    </td>
+    <td align="center">
+      <img src="dc3/images/screenshot-ai.png" alt="AI チャットページ" width="100%">
+      <br>
+      <strong>AI チャット</strong><br>
+      <em>自然言語によるデバイス操作 · データクエリ · インテリジェント分析</em>
+    </td>
+  </tr>
+</table>
 
-このアーキテクチャは、デバイス接続、データサービス、運用管理、拡張可能なアプリケーション統合までを含む、エンドツーエンドのIoT機能を実現するために設計されています。
+## ✨ 主な機能
 
-- **ドライバー層**: 標準/独自プロトコルを通じて物理デバイスへ接続するSDKを提供し、南向きのデータ収集とコマンド実行を担います。
-- **データ層**: デバイスデータの収集・保存・参照を信頼性高く提供し、リアルタイム/履歴データサービスを支えます。
-- **管理層**: 分散マイクロサービス連携の中核として、サービス登録、デバイス/ドライバー管理、コマンドオーケストレーション、設定ガバナンスを担います。
-- **アプリケーション層**: データ公開、スケジューリング、アラート通知、ログ管理、サードパーティ統合、AI拡張自動化シナリオを実現します。
+### 🔌 マルチプロトコルデバイス接続
 
-# 2 目標
+IoT DC3 は **28 個の接続ドライバーモジュール**を内蔵し、産業オートメーション、IoT 通信、データブリッジ、基本通信、シミュレーションとデバッグのシナリオをカバーします。一般的なデバイスやデータソースの接続コストを下げます。
 
-- **スケーラビリティ**: Spring Cloudにより水平スケールを実現し、高スループットな分散IoTワークロードに対応します。
-- **レジリエンス**: 交換可能なサービスノードと耐障害設計により、単一障害点リスクを最小化します。
-- **パフォーマンス**: 大規模デバイス接続とテレメトリ処理に対応します。
-- **拡張性**: SDKとサービス登録により、新規プロトコルやカスタムドライバー統合を高速化します。
-- **デプロイ柔軟性**: プライベートクラウド、パブリッククラウド、エッジで動作し、Java互換性を維持します。
-- **運用効率**: デバイスのオンボーディング、登録、権限検証を効率化します。
-- **セキュリティとマルチテナンシー**: 暗号化通信、名前空間分離、テナント分離をサポートします。
-- **クラウドネイティブ提供**: Kubernetes最適化とDockerコンテナ化で一貫したデプロイを実現します。
-- **AI-Ready進化**: インテリジェント自動化とデータドリブン運用の統合を可能にします。
+| 分類                         | ドライバーモジュール                                                                                                                                      |
+|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **産業プロトコル**          | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
+| 📡 **IoT プロトコル**         | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                           |
+| 🗄️ **データブリッジ**         | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                            |
+| 🔧 **基本通信とネットワーク管理** | TCP/UDP · Serial · SNMP · CAN                                                                                                                       |
+| 🧪 **シミュレーションとデバッグ** | Virtual · Listening Virtual                                                                                                                         |
 
-# 3 開発
+**Driver SDK** により、カスタムプロトコルドライバーをすばやく開発し、実行中のプラットフォームへ登録できます。
 
-## 3.1 起動依存関係
+### 🤖 AI 機能統合
 
-> いずれかを選択してください
->
-> この基本依存スタックでは PostgreSQL と RabbitMQ を起動します。データベースSQLスクリプトが必要な場合は、コンテナ内で起動したデータベースに直接接続してエクスポートしてください
+**Spring AI** ベースの Agentic Center により、大規模言語モデルを IoT 運用ワークフローへ接続します。
+
+- **自然言語によるデバイス操作** - LLM が Tool Calling を通じてデバイス照会、ポイント読み書き、コマンド実行を行えます
+- **インテリジェントなアラーム分析** - AI が原因分析と対応提案を支援します
+- **データインサイト** - 自然言語でデバイスデータを照会し、可視化チャートを生成します
+- **複数モデル対応** - OpenAI API 互換プロバイダーや GPT、Claude、DeepSeek、Qwen などの主要モデルに対応します
+- **会話メモリ** - 複数ターンの会話とコンテキストメモリをデータベースへ永続化します
+
+### 🏗️ クラウドネイティブマイクロサービス
+
+**Spring Boot 4 + Spring Cloud 2025** を基盤とする分散マイクロサービスアーキテクチャです。
+
+- **サービスガバナンス** - Spring Cloud Gateway を統一入口とし、静的ルーティングと環境変数で柔軟に設定できます
+- **効率的な通信** - gRPC によるサービス間呼び出しと Protobuf シリアライズ
+- **水平スケール** - ステートレス設計により、業務負荷に応じてサービスを個別にスケールできます
+- **レジリエンス** - 交換可能なサービスノードと障害分離
+
+### 📊 リアルタイムデータエンジン
+
+- **データ収集** - ドライバー層がデバイステレメトリを収集し、RabbitMQ 経由で非同期に転送します
+- **時系列ストレージ** - リアルタイムデータと履歴データを効率的にクエリできます
+- **ルールエンジン** - 柔軟なアラームルール、多段階アラーム、通知をサポートします
+- **イベント追跡** - コマンドとイベントの履歴を保持します
+
+### 🔐 エンタープライズセキュリティとマルチテナンシー
+
+- **テナント分離** - データベース、キャッシュ、API パスでテナント単位の分離を行います
+- **認証と認可** - JWT + Spring Security、RBAC 権限モデル
+- **通信暗号化** - TLS/SSL 通信をサポートします
+- **監査追跡** - ユーザー操作とシステムイベントのログを保持します
+
+### 🧩 開発者フレンドリー
+
+- **Driver SDK** - 充実したドライバー開発ツールキットです。[ドライバー開発ガイド](https://pnoker.github.io/iot-dc3/development/driver-authoring.html)を参照してください
+- **フロントエンド / バックエンド分離** - Vue 3 + TypeScript フロントエンド、RESTful + gRPC API
+- **コンテナ化デプロイ** - Podman / Docker Compose でワンコマンド起動でき、Kubernetes などのコンテナプラットフォームへ移行しやすい構成です
+- **ドキュメント整備** - オンラインドキュメント、クイックスタート、トラブルシューティングガイド
+
+## ⚡ クイックスタート
+
+### 前提条件
+
+| 依存関係           | バージョン     |
+|----------------|------------|
+| Java (JDK)     | 21+        |
+| Maven          | 3.9+       |
+| Podman または Docker | 最新安定版      |
+
+### 3 ステップで起動
+
+**① リポジトリをクローン**
 
 ```bash
-# 標準Dockerレジストリサービスによるグローバルアクセス
-podman compose -f dc3/docker-compose-db.yml up -d
-
-# 中国本土のユーザー向けに最適化されたレジストリサービス
-DC3_IMAGE_REGISTRY=registry.cn-beijing.aliyuncs.com/dc3 podman compose -f dc3/docker-compose-db.yml up -d
+git clone https://github.com/pnoker/iot-dc3.git
+cd iot-dc3
 ```
 
-利用しやすい `make` ショートカット:
+**② 基本依存関係を起動**（PostgreSQL + RabbitMQ）
 
 ```bash
+# グローバルレジストリ
 make dev-db
-make dev-optional
-make dev
-make dev-all
-```
 
-中国本土向けのイメージレジストリを使う場合は `REGISTRY=cn` を指定してください:
-
-```bash
+# 中国大陸のユーザー向け（Alibaba Cloud レジストリ）
 make dev-db REGISTRY=cn
-make dev-all REGISTRY=cn
-make app-all REGISTRY=cn
-make compose-up STACK=optional REGISTRY=cn
-make compose-logs STACK=dev REGISTRY=global
 ```
 
-サービスレベルのショートカット（フロントエンド・APIテスト用）:
-
-```bash
-# 最初に基本依存関係を起動
-make dev-db REGISTRY=cn
-
-# 単一サービス、複数サービス、または定義済みグループを起動
-make up SERVICES=agentic REGISTRY=cn
-make up SERVICES="gateway agentic" REGISTRY=cn
-make up GROUP=core REGISTRY=cn
-make up GROUP=drivers REGISTRY=cn
-
-# テスト対象サービスのログを追跡
-make logs SERVICES="gateway agentic"
-```
-
-### Compose 環境変数の上書き
-
-公開ポート、イメージタグ、またはオブザーバビリティ設定を変更する前に、まずテンプレートファイルをコピーしてください:
-
-```bash
-cp .env.example .env
-```
-
-リポジトリ直下の `.env` は `dc3/` 配下の Compose ファイル用の変数展開に使用されます。アプリケーション実行時の環境変数は引き続き
-`dc3/env/dev.env` または `dc3/env/dev.env.sh`
-で管理されます。
-
-Compose は、Compose ファイルで明示的に参照された変数のみをコンテナへ渡します。たとえばイメージレジストリ、イメージタグ、公開ポート、
-ログ設定、任意の監視スタック設定です。Agentic provider は通常データベースに保存されます。フォールバックが必要な場合のみ
-`AGENTIC_FALLBACK_OPENAI_BASE_URL`、`AGENTIC_FALLBACK_OPENAI_API_KEY`、`AGENTIC_FALLBACK_OPENAI_MODEL` を設定してください。
-
-リポジトリ直下の `.env` と `dc3/env/dev.env(.sh)` の違いは [`dc3/doc/ENVIRONMENT.md`](dc3/doc/ENVIRONMENT.md) を参照してください。
-
-## 3.2 準備
+**③ ローカル環境変数を読み込み、ビルドして起動**
 
 ```bash
 source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-> **モジュール概要**: モジュールの依存関係マップとランタイムフロー図は [`dc3/doc/MODULES.md`](dc3/doc/MODULES.md)
-> を参照してください。
+`dc3/env/dev.env.sh` は、ローカル Java プロセスを `localhost` に公開された PostgreSQL、RabbitMQ、gRPC ポートへ接続します。
+以降の `java -jar` コマンドは同じターミナルセッションで実行してください。
 
-> **ローカル開発ガイド**: ワンストップのローカルセットアップ手順は [`dc3/doc/QUICKSTART.md`](dc3/doc/QUICKSTART.md)
-> を参照してください。
-
-> **トラブルシューティング**: よくあるビルド/ランタイムの問題と解決策は [
-`dc3/doc/TROUBLESHOOTING.md`](dc3/doc/TROUBLESHOOTING.md) を参照してください。
-
-## 3.3 サービスの起動
-
-> 順番に起動してください
+順番にサービスを起動します。
 
 ```bash
-# ゲートウェイ
-java -jar dc3-gateway/target/dc3-gateway.jar
-
-# 認証センター
-java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar
-
-# データセンター
-java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
-
-# マネージャーセンター
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
-
-# Agenticセンター
-java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
-
-# 仮想ドライバー
-java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
-
-# その他のドライバー: リスニング仮想ドライバー、Modbus TCPドライバー、MQTTドライバー、OPC DAドライバー、OPC UAドライバー、Siemens S7ドライバー
+java -jar dc3-gateway/target/dc3-gateway.jar                          # API ゲートウェイ
+java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar        # 認証センター
+java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar  # 管理センター
+java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar        # データセンター
+java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar  # AI Agentic Center
+java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar  # デモ用仮想ドライバー
 ```
 
-# 4 技術スタック
+> 📖 詳細なローカル環境構築については、[クイックスタート](https://pnoker.github.io/iot-dc3/quickstart/)と
+> [環境変数](https://pnoker.github.io/iot-dc3/quickstart/environment.html)を参照してください。
 
-- [Java 21](https://www.java.com)
-- [Spring Boot 3.5.5](https://spring.io/projects/spring-boot)
-- [Spring Cloud 2025.0.0](https://spring.io/projects/spring-cloud)
+<details>
+<summary>🔧 その他の起動オプション（任意依存関係、単一サービス起動、環境変数）</summary>
 
-# 5 貢献
+**任意のインフラを起動**（EMQX、ELK/APM、Prometheus、Grafana など）:
 
-- **ブランチ作成**: `main`ブランチから新しいブランチを作成することから始めます。ブランチを作成する前に`main`
-  ブランチが最新であることを確認してください。
-- **ブランチ命名**: 新しいブランチには次の命名規則に従ってください: `feature/your_name/feature_description`。例:
-  `feature/pnoker/mqtt_driver`
-- **コードとドキュメント**: 新しいブランチでコードまたはドキュメントに変更を加えます。完了したら、変更をコミットします。
-- **プルリクエスト**: `develop`ブランチに変更をマージするための`Pull Request`（PR）を提出します。PRはメンテナによってレビューされ、マージされます。
+```bash
+make dev-optional REGISTRY=cn    # 任意依存関係を起動
+make dev-all REGISTRY=cn         # すべての依存関係を起動
+```
 
-# 6 ライセンス
+**必要なサービスだけ起動**（フロントエンド / API テスト向け）:
 
-`IoT DC3`オープンソースプラットフォームは[AGPL 3.0 License](./LICENSE-AGPL.txt)の下でライセンスされています。
-リポジトリのライセンス通知と商用ライセンスの説明は [LICENSE.txt](./LICENSE.txt) を参照してください。
+```bash
+make up SERVICES=agentic REGISTRY=cn               # 単一サービス
+make up SERVICES="gateway agentic" REGISTRY=cn      # 複数サービス
+make up GROUP=core REGISTRY=cn                      # コアサービスグループ
+make up GROUP=drivers REGISTRY=cn                   # ドライバーサービスグループ
+make logs SERVICES="gateway agentic"                # ログを確認
+```
+
+**Compose 環境変数の上書き**:
+
+```bash
+cp .env.example .env    # テンプレートをコピー
+```
+
+ルート `.env` は、イメージレジストリ、イメージタグ、公開ポートなど Compose の変数展開に使われます。
+アプリケーション実行時の変数は `dc3/env/dev.env` で設定します。詳しくは[環境変数ドキュメント](https://pnoker.github.io/iot-dc3/quickstart/environment.html)を参照してください。
+
+</details>
+
+## 🏗️ アーキテクチャ概要
+
+![IoT DC3 Architecture](dc3/images/iot-dc3-architecture-ja.svg)
+
+| 層                  | 役割                                                                                       |
+|--------------------|--------------------------------------------------------------------------------------------|
+| **ドライバー層**      | SDK によるドライバー開発、標準 / 独自プロトコルのデバイス接続、南向きデータ収集とコマンド実行 |
+| **データ層**          | デバイスデータの収集、保存、クエリ。リアルタイムデータと履歴データサービスを支えます           |
+| **管理層**            | マイクロサービス連携の中核。サービス登録、デバイス / ドライバー管理、コマンド編成、設定管理     |
+| **アプリケーション層** | データ公開、タスクスケジューリング、アラーム、ログ管理、サードパーティ統合、AI 自動化           |
+
+> 📖 詳細なモジュール依存関係とランタイムフローについては、[モジュールと依存関係](https://pnoker.github.io/iot-dc3/architecture/modules.html)を参照してください。
+
+## 🛠️ 技術スタック
+
+| 分類                  | 技術                                                          |
+|----------------------|-------------------------------------------------------------|
+| **言語とフレームワーク** | Java 21 · Spring Boot 4 · Spring Cloud 2025 · Spring AI 2.0 |
+| **データ、キャッシュ、スケジューリング** | PostgreSQL · Caffeine · MyBatis-Plus · Quartz               |
+| **メッセージングと通信** | RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf             |
+| **セキュリティと認証**  | Spring Security · JWT · BouncyCastle                        |
+| **可観測性**           | Micrometer · Prometheus · Grafana · ELK                     |
+| **フロントエンド**      | Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6   |
+| **デスクトップ**        | Tauri 2                                                     |
+| **デプロイ**           | Podman · Docker Compose                                     |
+
+> 💡 フロントエンドのソースコードは [iot-dc3-web](https://github.com/pnoker/iot-dc3-web) リポジトリにあります。
+
+## 📖 ドキュメントとコミュニティ
+
+| リソース              | リンク                                                                           |
+|----------------------|--------------------------------------------------------------------------------|
+| 📚 オンラインドキュメント | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                  |
+| 🚀 クイックスタート     | [クイックスタートガイド](https://pnoker.github.io/iot-dc3/quickstart/)          |
+| 🏗️ アーキテクチャ      | [モジュールと依存関係](https://pnoker.github.io/iot-dc3/architecture/modules.html) |
+| 🔧 ドライバー開発       | [ドライバー開発ガイド](https://pnoker.github.io/iot-dc3/development/driver-authoring.html) |
+| 🐛 トラブルシューティング | [よくある問題と解決策](https://pnoker.github.io/iot-dc3/guide/troubleshooting.html) |
+| 📋 変更履歴            | [リリース変更履歴](https://pnoker.github.io/iot-dc3/development/changelog.html) |
+| 🐛 問題報告            | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                      |
+| 🇨🇳 Gitee ミラー       | [Gitee GVP プロジェクト](https://gitee.com/pnoker/iot-dc3)                     |
+
+## 🌍 ユースケース
+
+<table>
+  <tr>
+    <td align="center" width="60">🏭</td>
+    <td><strong>スマートファクトリー</strong></td>
+    <td>生産ライン設備の状態監視、工程パラメータ収集、予知保全、OEE 分析</td>
+  </tr>
+  <tr>
+    <td align="center">⚡</td>
+    <td><strong>エネルギー監視</strong></td>
+    <td>電力 / 水道 / ガスの遠隔検針、エネルギー傾向分析、異常アラーム</td>
+  </tr>
+  <tr>
+    <td align="center">🌾</td>
+    <td><strong>スマート農業</strong></td>
+    <td>温室環境監視、自動灌漑制御、病害虫警告、収量予測</td>
+  </tr>
+  <tr>
+    <td align="center">🏙️</td>
+    <td><strong>スマートシティ</strong></td>
+    <td>街路灯管理、環境品質監視、公共施設運用、安全監視</td>
+  </tr>
+</table>
+
+## 🤝 コントリビューション
+
+あらゆる形のコントリビューションを歓迎します。以下の流れに従ってください。
+
+1. **Fork とブランチ作成** - `main` からブランチを作成し、`feature/your_name/feature_description` 形式で命名します
+   （例: `feature/pnoker/mqtt_driver`）
+2. **開発とコミット** - 新しいブランチで変更を完了し、[Conventional Commits](https://www.conventionalcommits.org/) 仕様に従います
+3. **PR 作成** - `develop` ブランチへ Pull Request を提出し、メンテナーのレビューとマージを受けます
+
+## 📄 ライセンス
+
+IoT DC3 は [AGPL 3.0](./LICENSE-AGPL.txt) ライセンスの下でオープンソースとして公開されています。
+
+- ✅ **個人学習、研究、内部利用** - 無料
+- ✅ **コードを変更し、その変更をオープンソース化すること** - 歓迎します
+- ⚠️ **変更を公開せず第三者向け商用サービスとして提供する場合** - 商用ライセンスが必要です
+
+商用ライセンスの詳細は [LICENSE.txt](./LICENSE.txt) を参照してください。
+
+## ⭐ Star 履歴
+
+[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)

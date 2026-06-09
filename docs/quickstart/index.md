@@ -2,8 +2,9 @@
 
 从源码到运行，一站式本地开发流程。
 
-!!! note "运行目录"
+::: tip 运行目录
 除非特别说明，下文命令都在仓库根目录执行。
+:::
 
 ## 前置依赖
 
@@ -34,13 +35,13 @@ make dev-optional REGISTRY=cn
 
 通常用于 EMQX 等 MQTT broker。
 
-## 3. 加载环境变量（源码运行可选）
+## 3. 加载环境变量（源码运行必需）
 
 ```bash
 source dc3/env/dev.env.sh
 ```
 
-文件中会导出数据库、消息中间件、gRPC 目标、可选 AI 集成等开发默认值。
+文件中会导出数据库、消息中间件、gRPC 目标、可选 AI 集成等开发默认值。源码方式启动 Java 进程时必须加载这组变量，否则服务会继续使用容器内 DNS 名称或默认端口，无法正确连接本机已发布的 PostgreSQL、RabbitMQ 和中心服务。
 
 根目录 `.env.example` 与 `dc3/env/dev.env(.sh)` 的具体区别参见 [环境变量](environment.md)。
 
@@ -64,17 +65,18 @@ make deploy
 仓库已配置：
 
 - 并行构建（`-T 1C`）
-- 打包跳过测试（`-Dmaven.test.skip=true`）
 - 强制 JDK 21、Maven 3.9+
 - Spring Java Format 校验
+
+`make package` 和上面的 Maven 命令都会执行标准打包流程；是否跳过测试以当前 Maven 配置和命令参数为准。
 
 ## 6. 启动服务（推荐顺序）
 
 ```bash
 java -jar dc3-gateway/target/dc3-gateway.jar
 java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar
-java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
 java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
 java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
 java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 ```
@@ -131,7 +133,7 @@ make logs SERVICES="gateway agentic"
 
 1. `make dev-db`
 2. `mvn -s .mvn/settings.xml clean package`
-3. 按 Gateway → Auth → Data → Manager → Agentic → Driver 顺序启动
+3. 按 Gateway → Auth → Manager → Data → Agentic → Driver 顺序启动
 4. 通过 Gateway `http://localhost:8000/api/v3/...` 测试 API
 5. 如需可观测栈，待核心平台稳定后再启动 Grafana / ELK
 

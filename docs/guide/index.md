@@ -2,18 +2,16 @@
 
 部署运维与日常使用的常见话题。
 
-<div class="grid cards" markdown>
+## 目录
 
-- :material-docker: **[镜像与部署](usage.md)**
+| 文档 | 内容 |
+|------|------|
+| [镜像与部署](usage.md) | 容器镜像选择、镜像仓库切换、Compose 编排 |
+| [日志规范](logging.md) | 应用日志格式约定、级别使用、可观测栈对接 |
+| [故障排查](troubleshooting.md) | 常见构建和运行时问题排查 |
 
-  容器镜像选择、镜像仓库切换、Compose 编排
+## 推荐阅读
 
-- :material-text-box-outline: **[日志规范](logging.md)**
-
-  应用日志格式约定、级别使用、可观测栈对接
-
-- :material-bug: **[故障排查](troubleshooting.md)**
-
-  常见构建/运行时问题及解决方案
-
-</div>
+- 本地首次运行先看 [快速开始](../quickstart/)。
+- 需要理解 UI 和 API 任务流先看 [操作手册](../operation/)。
+- 需要排查启动或连接问题时看 [故障排查](troubleshooting.md)。
