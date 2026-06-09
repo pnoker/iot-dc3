@@ -26,7 +26,7 @@ import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
 import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -83,7 +83,7 @@ class NotifyWorkerTest {
                 .notifyHistoryId(50L)
                 .tenantId(7L)
                 .channelId(2L)
-                .channelTypeFlag(NotifyChannelTypeFlagEnum.WEBHOOK.getIndex())
+                .channelTypeFlag(NotifyChannelTypeEnum.WEBHOOK.getIndex())
                 .payloadType("webhook-json")
                 .payload(Map.of("title", "test"))
                 .retryCount(retry)
@@ -97,7 +97,7 @@ class NotifyWorkerTest {
         message = new Message(new byte[0], props);
     }
 
-    private void stubChannel(boolean enabled, NotifyChannelTypeFlagEnum type) {
+    private void stubChannel(boolean enabled, NotifyChannelTypeEnum type) {
         NotifyChannelDO entityDO = new NotifyChannelDO();
         entityDO.setId(2L);
         entityDO.setTenantId(7L);
@@ -114,8 +114,8 @@ class NotifyWorkerTest {
 
     @Test
     void marksHistorySuccessAndAcksOnSuccess() throws Exception {
-        stubChannel(true, NotifyChannelTypeFlagEnum.WEBHOOK);
-        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeFlagEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
+        stubChannel(true, NotifyChannelTypeEnum.WEBHOOK);
+        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
         when(adapter.send(any(), any())).thenReturn(NotifySendResult.success("https://hook", 200, "OK", Map.of()));
 
         worker.onNotifyTask(channel, message, task(0));
@@ -130,8 +130,8 @@ class NotifyWorkerTest {
 
     @Test
     void requeuesAsRetryingOnFirstFailure() throws Exception {
-        stubChannel(true, NotifyChannelTypeFlagEnum.WEBHOOK);
-        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeFlagEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
+        stubChannel(true, NotifyChannelTypeEnum.WEBHOOK);
+        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
         when(adapter.send(any(), any())).thenReturn(NotifySendResult.failed("https://hook", "503"));
 
         worker.onNotifyTask(channel, message, task(0));
@@ -149,8 +149,8 @@ class NotifyWorkerTest {
 
     @Test
     void terminatesAsFailedAfterMaxAttempts() throws Exception {
-        stubChannel(true, NotifyChannelTypeFlagEnum.WEBHOOK);
-        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeFlagEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
+        stubChannel(true, NotifyChannelTypeEnum.WEBHOOK);
+        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
         when(adapter.send(any(), any())).thenReturn(NotifySendResult.failed("https://hook", "503"));
 
         // retry already at MAX_ATTEMPTS - 1; one more failure should terminate.
@@ -165,7 +165,7 @@ class NotifyWorkerTest {
 
     @Test
     void marksHistorySkippedWhenChannelDisabled() throws Exception {
-        stubChannel(false, NotifyChannelTypeFlagEnum.WEBHOOK);
+        stubChannel(false, NotifyChannelTypeEnum.WEBHOOK);
 
         worker.onNotifyTask(channel, message, task(0));
 
@@ -187,12 +187,12 @@ class NotifyWorkerTest {
 
     @Test
     void marksHistoryFailedWhenAdapterMissing() throws Exception {
-        stubChannel(true, NotifyChannelTypeFlagEnum.FEISHU_BOT);
-        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeFlagEnum.FEISHU_BOT)).thenReturn(Optional.empty());
+        stubChannel(true, NotifyChannelTypeEnum.FEISHU_BOT);
+        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeEnum.FEISHU_BOT)).thenReturn(Optional.empty());
 
         worker.onNotifyTask(channel, message, NotifyTaskDTO.builder()
                 .notifyHistoryId(50L).tenantId(7L).channelId(2L)
-                .channelTypeFlag(NotifyChannelTypeFlagEnum.FEISHU_BOT.getIndex())
+                .channelTypeFlag(NotifyChannelTypeEnum.FEISHU_BOT.getIndex())
                 .build());
 
         ArgumentCaptor<NotifyHistoryDO> captor = ArgumentCaptor.forClass(NotifyHistoryDO.class);

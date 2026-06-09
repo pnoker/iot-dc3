@@ -21,7 +21,7 @@ import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.bo.RegisterBO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.grpc.client.DriverClient;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ class DriverRegisterServiceImplTest {
         properties.setTenant("default");
         properties.setClient("client-1");
         properties.setRemark("integration");
-        properties.setType(DriverTypeFlagEnum.DRIVER_CLIENT);
+        properties.setType(DriverTypeEnum.DRIVER_CLIENT);
         service = new DriverRegisterServiceImpl(properties, driverClient);
     }
 
@@ -76,7 +76,7 @@ class DriverRegisterServiceImplTest {
         assertThat(driver.getDriverCode()).isEqualTo("modbus-tcp");
         assertThat(driver.getServiceName()).isEqualTo("dc3-driver-modbus-tcp");
         assertThat(driver.getServiceHost()).isEqualTo("127.0.0.1");
-        assertThat(driver.getDriverTypeFlag()).isEqualTo(DriverTypeFlagEnum.DRIVER_CLIENT);
+        assertThat(driver.getDriverTypeFlag()).isEqualTo(DriverTypeEnum.DRIVER_CLIENT);
     }
 
     @Test

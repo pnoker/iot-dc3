@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.driver.entity.bean;
 
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.EmptyException;
 import io.github.pnoker.common.exception.OutRangeException;
 import io.github.pnoker.common.exception.TypeException;
@@ -33,62 +33,62 @@ class WritePointValueTest {
 
     @Test
     void convertsExactIntegerTypes() {
-        assertThat(writePointValue("12", PointTypeFlagEnum.BYTE).getValue(Byte.class)).isEqualTo((byte) 12);
-        assertThat(writePointValue("1024", PointTypeFlagEnum.SHORT).getValue(Short.class)).isEqualTo((short) 1024);
-        assertThat(writePointValue("42.0", PointTypeFlagEnum.INT).getValue(Integer.class)).isEqualTo(42);
-        assertThat(writePointValue("9999999999", PointTypeFlagEnum.LONG).getValue(Long.class)).isEqualTo(9999999999L);
+        assertThat(writePointValue("12", PointTypeEnum.BYTE).getValue(Byte.class)).isEqualTo((byte) 12);
+        assertThat(writePointValue("1024", PointTypeEnum.SHORT).getValue(Short.class)).isEqualTo((short) 1024);
+        assertThat(writePointValue("42.0", PointTypeEnum.INT).getValue(Integer.class)).isEqualTo(42);
+        assertThat(writePointValue("9999999999", PointTypeEnum.LONG).getValue(Long.class)).isEqualTo(9999999999L);
     }
 
     @Test
     void acceptsPrimitiveTargetClasses() {
-        assertThat(writePointValue("42", PointTypeFlagEnum.INT).getValue(Integer.TYPE)).isEqualTo(42);
-        assertThat(writePointValue("true", PointTypeFlagEnum.BOOLEAN).getValue(Boolean.TYPE)).isEqualTo(true);
+        assertThat(writePointValue("42", PointTypeEnum.INT).getValue(Integer.TYPE)).isEqualTo(42);
+        assertThat(writePointValue("true", PointTypeEnum.BOOLEAN).getValue(Boolean.TYPE)).isEqualTo(true);
     }
 
     @Test
     void convertsFloatingPointTypes() {
-        assertThat(writePointValue("3.14", PointTypeFlagEnum.FLOAT).getValue(Float.class)).isEqualTo(3.14f);
-        assertThat(writePointValue("2.718281828", PointTypeFlagEnum.DOUBLE).getValue(Double.class)).isEqualTo(2.718281828d);
+        assertThat(writePointValue("3.14", PointTypeEnum.FLOAT).getValue(Float.class)).isEqualTo(3.14f);
+        assertThat(writePointValue("2.718281828", PointTypeEnum.DOUBLE).getValue(Double.class)).isEqualTo(2.718281828d);
     }
 
     @Test
     void acceptsEmptyStringForStringPoint() {
-        assertThat(writePointValue("", PointTypeFlagEnum.STRING).getValue(String.class)).isEmpty();
+        assertThat(writePointValue("", PointTypeEnum.STRING).getValue(String.class)).isEmpty();
     }
 
     @Test
     void strictBooleanSupportsTrueFalseAndOneZero() {
-        assertThat(writePointValue("true", PointTypeFlagEnum.BOOLEAN).getValue(Boolean.class)).isTrue();
-        assertThat(writePointValue("0", PointTypeFlagEnum.BOOLEAN).getValue(Boolean.class)).isFalse();
+        assertThat(writePointValue("true", PointTypeEnum.BOOLEAN).getValue(Boolean.class)).isTrue();
+        assertThat(writePointValue("0", PointTypeEnum.BOOLEAN).getValue(Boolean.class)).isFalse();
     }
 
     @Test
     void invalidBooleanThrowsTypeException() {
-        assertThatThrownBy(() -> writePointValue("yes", PointTypeFlagEnum.BOOLEAN).getValue(Boolean.class))
+        assertThatThrownBy(() -> writePointValue("yes", PointTypeEnum.BOOLEAN).getValue(Boolean.class))
                 .isInstanceOf(TypeException.class);
     }
 
     @Test
     void wrongTargetTypeThrowsTypeException() {
-        assertThatThrownBy(() -> writePointValue("1", PointTypeFlagEnum.INT).getValue(Long.class))
+        assertThatThrownBy(() -> writePointValue("1", PointTypeEnum.INT).getValue(Long.class))
                 .isInstanceOf(TypeException.class);
     }
 
     @Test
     void emptyNumericValueThrowsEmptyException() {
-        assertThatThrownBy(() -> writePointValue("", PointTypeFlagEnum.INT).getValue(Integer.class))
+        assertThatThrownBy(() -> writePointValue("", PointTypeEnum.INT).getValue(Integer.class))
                 .isInstanceOf(EmptyException.class);
     }
 
     @Test
     void invalidNumberThrowsTypeException() {
-        assertThatThrownBy(() -> writePointValue("abc", PointTypeFlagEnum.INT).getValue(Integer.class))
+        assertThatThrownBy(() -> writePointValue("abc", PointTypeEnum.INT).getValue(Integer.class))
                 .isInstanceOf(TypeException.class);
     }
 
     @Test
     void outOfRangeThrowsOutRangeException() {
-        assertThatThrownBy(() -> writePointValue("200", PointTypeFlagEnum.BYTE).getValue(Byte.class))
+        assertThatThrownBy(() -> writePointValue("200", PointTypeEnum.BYTE).getValue(Byte.class))
                 .isInstanceOf(OutRangeException.class);
     }
 
@@ -98,7 +98,7 @@ class WritePointValueTest {
                 .isInstanceOf(UnSupportException.class);
     }
 
-    private WritePointValue writePointValue(String value, PointTypeFlagEnum type) {
+    private WritePointValue writePointValue(String value, PointTypeEnum type) {
         return WritePointValue.builder().value(value).type(type).build();
     }
 

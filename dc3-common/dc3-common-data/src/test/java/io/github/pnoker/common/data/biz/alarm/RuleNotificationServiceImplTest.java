@@ -36,11 +36,11 @@ import io.github.pnoker.common.data.entity.model.RuleStateDO;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
 import io.github.pnoker.common.entity.ext.NotifyExt;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
-import io.github.pnoker.common.enums.RuleStateFlagEnum;
+import io.github.pnoker.common.enums.RuleStatusEnum;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -108,7 +108,7 @@ class RuleNotificationServiceImplTest {
         bo.setId(1L);
         bo.setRuleCode("test-rule");
         bo.setRuleName("Test Rule");
-        bo.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
+        bo.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.POINT);
         bo.setNotifyId(10L);
         bo.setMessageId(20L);
         RuleExt ext = new RuleExt();
@@ -121,7 +121,7 @@ class RuleNotificationServiceImplTest {
     }
 
     private static RuleFact fact() {
-        return new RuleFact(7L, AlarmTargetTypeFlagEnum.POINT, 11L, null,
+        return new RuleFact(7L, AlarmTargetTypeEnum.POINT, 11L, null,
                 LocalDateTime.of(2026, 5, 21, 12, 0), Map.of("value", 100));
     }
 
@@ -145,7 +145,7 @@ class RuleNotificationServiceImplTest {
         NotifyChannelBO bo = new NotifyChannelBO();
         bo.setId(id);
         bo.setTenantId(tenantId);
-        bo.setChannelTypeFlag(NotifyChannelTypeFlagEnum.WEBHOOK);
+        bo.setChannelTypeFlag(NotifyChannelTypeEnum.WEBHOOK);
         bo.setEnableFlag(EnableFlagEnum.ENABLE);
         bo.setCredentialRef("secret:test:" + id);
         return bo;
@@ -166,11 +166,11 @@ class RuleNotificationServiceImplTest {
         return bo;
     }
 
-    private static RuleStateBO state(long ruleId, long entityId, RuleStateFlagEnum flag) {
+    private static RuleStateBO state(long ruleId, long entityId, RuleStatusEnum flag) {
         RuleStateBO bo = new RuleStateBO();
         bo.setId(1L);
         bo.setRuleId(ruleId);
-        bo.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
+        bo.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.POINT);
         bo.setEntityId(entityId);
         bo.setFingerprint("7:1:point:11");
         bo.setEntityStateFlag(flag);
@@ -184,11 +184,11 @@ class RuleNotificationServiceImplTest {
 
     // ---------- notify: firing path ----------
 
-    private static RuleStateDO stateDO(long id, RuleStateFlagEnum flag, long triggerCount) {
+    private static RuleStateDO stateDO(long id, RuleStatusEnum flag, long triggerCount) {
         RuleStateDO entity = new RuleStateDO();
         entity.setId(id);
         entity.setRuleId(1L);
-        entity.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT.getIndex());
+        entity.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.POINT.getIndex());
         entity.setEntityId(11L);
         entity.setFingerprint("7:1:point:11");
         entity.setEntityStateFlag(flag.getIndex());
@@ -214,7 +214,7 @@ class RuleNotificationServiceImplTest {
         stubNotifyConfigLoaded(match);
         when(notifyPolicyEngine.decide(any(), any(), any(), any(), any())).thenReturn(NotifyDecision.send());
         when(messageRenderService.render(any(), any(), any()))
-                .thenReturn(new MessagePayload(NotifyChannelTypeFlagEnum.WEBHOOK, "json", Map.of("title", "T"), List.of()));
+                .thenReturn(new MessagePayload(NotifyChannelTypeEnum.WEBHOOK, "json", Map.of("title", "T"), List.of()));
         stubStateBuilder();
         stubHistoryBuilder();
 
@@ -229,7 +229,7 @@ class RuleNotificationServiceImplTest {
         // Verify rule_state save (new row)
         ArgumentCaptor<RuleStateDO> stateCaptor = ArgumentCaptor.forClass(RuleStateDO.class);
         verify(ruleStateManager).save(stateCaptor.capture());
-        assertThat(stateCaptor.getValue().getEntityStateFlag()).isEqualTo(RuleStateFlagEnum.FIRING.getIndex());
+        assertThat(stateCaptor.getValue().getEntityStateFlag()).isEqualTo(RuleStatusEnum.FIRING.getIndex());
         assertThat(stateCaptor.getValue().getTriggerCount()).isEqualTo(1L);
         // Verify PENDING history persisted
         ArgumentCaptor<NotifyHistoryDO> historyCaptor = ArgumentCaptor.forClass(NotifyHistoryDO.class);
@@ -245,14 +245,14 @@ class RuleNotificationServiceImplTest {
         stubNotifyConfigLoaded(match);
         when(notifyPolicyEngine.decide(any(), any(), any(), any(), any())).thenReturn(NotifyDecision.send());
         when(messageRenderService.render(any(), any(), any()))
-                .thenReturn(new MessagePayload(NotifyChannelTypeFlagEnum.WEBHOOK, "json", Map.of(), List.of()));
+                .thenReturn(new MessagePayload(NotifyChannelTypeEnum.WEBHOOK, "json", Map.of(), List.of()));
         stubStateBuilder();
         stubHistoryBuilder();
 
         // Existing FIRING row — subsequent fire
-        RuleStateDO existingDO = stateDO(1L, RuleStateFlagEnum.FIRING, 5L);
+        RuleStateDO existingDO = stateDO(1L, RuleStatusEnum.FIRING, 5L);
         when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existingDO);
-        RuleStateBO existingBO = state(1L, 11L, RuleStateFlagEnum.FIRING);
+        RuleStateBO existingBO = state(1L, 11L, RuleStatusEnum.FIRING);
         existingBO.setTriggerCount(5L);
         when(ruleStateBuilder.buildBOByDO(existingDO)).thenReturn(existingBO);
 
@@ -277,14 +277,14 @@ class RuleNotificationServiceImplTest {
         stubNotifyConfigLoaded(match);
         when(notifyPolicyEngine.decide(any(), any(), any(), any(), any())).thenReturn(NotifyDecision.send());
         when(messageRenderService.render(any(), any(), any()))
-                .thenReturn(new MessagePayload(NotifyChannelTypeFlagEnum.WEBHOOK, "json", Map.of(), List.of()));
+                .thenReturn(new MessagePayload(NotifyChannelTypeEnum.WEBHOOK, "json", Map.of(), List.of()));
         stubStateBuilder();
         stubHistoryBuilder();
 
         // Existing FIRING row — recovery gated
-        RuleStateDO existingDO = stateDO(1L, RuleStateFlagEnum.FIRING, 3L);
+        RuleStateDO existingDO = stateDO(1L, RuleStatusEnum.FIRING, 3L);
         when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(existingDO);
-        RuleStateBO existingBO = state(1L, 11L, RuleStateFlagEnum.FIRING);
+        RuleStateBO existingBO = state(1L, 11L, RuleStatusEnum.FIRING);
         when(ruleStateBuilder.buildBOByDO(existingDO)).thenReturn(existingBO);
 
         when(ruleStateManager.update(any(com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper.class)))
@@ -412,7 +412,7 @@ class RuleNotificationServiceImplTest {
         when(notifyPolicyEngine.decide(any(), any(), any(), any(), any()))
                 .thenReturn(NotifyDecision.send());
         when(messageRenderService.render(any(), any(), any()))
-                .thenReturn(new MessagePayload(NotifyChannelTypeFlagEnum.WEBHOOK, "json", Map.of("title", "T"), List.of()));
+                .thenReturn(new MessagePayload(NotifyChannelTypeEnum.WEBHOOK, "json", Map.of("title", "T"), List.of()));
 
         List<NotifyHistoryBO> histories = service.notifyBatch(List.of(m1, m2));
         // Each match has 1 bind × 1 channel = 1 history; 2 matches = 2 histories
@@ -443,9 +443,9 @@ class RuleNotificationServiceImplTest {
         when(notifyConfigCache.getChannel(30L, 7L)).thenReturn(channel);
         when(notifyPolicyEngine.decide(any(), any(), any(), any(), any())).thenReturn(NotifyDecision.send());
         when(messageRenderService.render(any(), any(), any()))
-                .thenReturn(new MessagePayload(NotifyChannelTypeFlagEnum.WEBHOOK, "json", Map.of(), List.of()));
+                .thenReturn(new MessagePayload(NotifyChannelTypeEnum.WEBHOOK, "json", Map.of(), List.of()));
         // First load: no existing state → will try insert. Reload after exception: now the row exists.
-        RuleStateDO reloadedDO = stateDO(99L, RuleStateFlagEnum.FIRING, 1L);
+        RuleStateDO reloadedDO = stateDO(99L, RuleStatusEnum.FIRING, 1L);
         when(ruleStateManager.getOne(any(LambdaQueryWrapper.class))).thenReturn(null, reloadedDO);
         // Insert throws DuplicateKeyException (another thread inserted first)
         when(ruleStateManager.save(any(RuleStateDO.class))).thenThrow(new DuplicateKeyException("duplicate"));
@@ -502,10 +502,10 @@ class RuleNotificationServiceImplTest {
             RuleStateBO bo = new RuleStateBO();
             bo.setId(entity.getId());
             bo.setRuleId(entity.getRuleId());
-            bo.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
+            bo.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.POINT);
             bo.setEntityId(entity.getEntityId());
             bo.setFingerprint(entity.getFingerprint());
-            bo.setEntityStateFlag(RuleStateFlagEnum.ofIndex(entity.getEntityStateFlag()));
+            bo.setEntityStateFlag(RuleStatusEnum.ofIndex(entity.getEntityStateFlag()));
             bo.setTriggerCount(entity.getTriggerCount());
             bo.setAlarmId(entity.getAlarmId());
             bo.setTenantId(entity.getTenantId());
@@ -533,10 +533,10 @@ class RuleNotificationServiceImplTest {
             RuleStateBO bo = new RuleStateBO();
             bo.setId(entity.getId());
             bo.setRuleId(entity.getRuleId());
-            bo.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
+            bo.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.POINT);
             bo.setEntityId(entity.getEntityId());
             bo.setFingerprint(entity.getFingerprint());
-            bo.setEntityStateFlag(RuleStateFlagEnum.ofIndex(entity.getEntityStateFlag()));
+            bo.setEntityStateFlag(RuleStatusEnum.ofIndex(entity.getEntityStateFlag()));
             bo.setTriggerCount(entity.getTriggerCount());
             bo.setAlarmId(entity.getAlarmId());
             bo.setTenantId(entity.getTenantId());

@@ -18,7 +18,7 @@ package io.github.pnoker.common.driver.entity.bean;
 
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.EmptyException;
 import io.github.pnoker.common.exception.OutRangeException;
 import io.github.pnoker.common.exception.TypeException;
@@ -48,7 +48,7 @@ class ReadPointValueTest {
         point.setId(10L);
     }
 
-    private PointBO pointWithType(PointTypeFlagEnum type) {
+    private PointBO pointWithType(PointTypeEnum type) {
         point.setPointTypeFlag(type);
         point.setBaseValue(BigDecimal.ZERO);
         point.setMultiple(BigDecimal.ONE);
@@ -56,7 +56,7 @@ class ReadPointValueTest {
         return point;
     }
 
-    private PointBO pointWithTypeAndScale(PointTypeFlagEnum type, BigDecimal base, BigDecimal multiple, byte decimal) {
+    private PointBO pointWithTypeAndScale(PointTypeEnum type, BigDecimal base, BigDecimal multiple, byte decimal) {
         point.setPointTypeFlag(type);
         point.setBaseValue(base);
         point.setMultiple(multiple);
@@ -69,7 +69,7 @@ class ReadPointValueTest {
 
         @Test
         void stringValueReturnsRawInput() {
-            pointWithType(PointTypeFlagEnum.STRING);
+            pointWithType(PointTypeEnum.STRING);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "hello world");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("hello world");
@@ -78,7 +78,7 @@ class ReadPointValueTest {
 
         @Test
         void stringNumericTextStillNull() {
-            pointWithType(PointTypeFlagEnum.STRING);
+            pointWithType(PointTypeEnum.STRING);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "42");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("42");
@@ -102,7 +102,7 @@ class ReadPointValueTest {
 
         @Test
         void byteType() {
-            pointWithType(PointTypeFlagEnum.BYTE);
+            pointWithType(PointTypeEnum.BYTE);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "100");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("100");
@@ -111,7 +111,7 @@ class ReadPointValueTest {
 
         @Test
         void shortType() {
-            pointWithType(PointTypeFlagEnum.SHORT);
+            pointWithType(PointTypeEnum.SHORT);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "1000");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("1000");
@@ -120,7 +120,7 @@ class ReadPointValueTest {
 
         @Test
         void intType() {
-            pointWithType(PointTypeFlagEnum.INT);
+            pointWithType(PointTypeEnum.INT);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "42");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("42");
@@ -129,7 +129,7 @@ class ReadPointValueTest {
 
         @Test
         void longType() {
-            pointWithType(PointTypeFlagEnum.LONG);
+            pointWithType(PointTypeEnum.LONG);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "9999999999");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("9999999999");
@@ -138,7 +138,7 @@ class ReadPointValueTest {
 
         @Test
         void floatType() {
-            pointWithType(PointTypeFlagEnum.FLOAT);
+            pointWithType(PointTypeEnum.FLOAT);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "3.14");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("3.14");
@@ -147,7 +147,7 @@ class ReadPointValueTest {
 
         @Test
         void doubleType() {
-            pointWithType(PointTypeFlagEnum.DOUBLE);
+            pointWithType(PointTypeEnum.DOUBLE);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "2.718281828");
 
             // ArithmeticUtil.round with decimal=6 rounds to 6 decimal places
@@ -157,7 +157,7 @@ class ReadPointValueTest {
 
         @Test
         void negativeDouble() {
-            pointWithType(PointTypeFlagEnum.DOUBLE);
+            pointWithType(PointTypeEnum.DOUBLE);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "-42.5");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("-42.5");
@@ -166,7 +166,7 @@ class ReadPointValueTest {
 
         @Test
         void zero() {
-            pointWithType(PointTypeFlagEnum.INT);
+            pointWithType(PointTypeEnum.INT);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "0");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("0");
@@ -179,7 +179,7 @@ class ReadPointValueTest {
 
         @Test
         void trueMapsToOne() {
-            pointWithType(PointTypeFlagEnum.BOOLEAN);
+            pointWithType(PointTypeEnum.BOOLEAN);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "true");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("true");
@@ -188,7 +188,7 @@ class ReadPointValueTest {
 
         @Test
         void falseMapsToZero() {
-            pointWithType(PointTypeFlagEnum.BOOLEAN);
+            pointWithType(PointTypeEnum.BOOLEAN);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "false");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("false");
@@ -197,7 +197,7 @@ class ReadPointValueTest {
 
         @Test
         void oneMapsToTrue() {
-            pointWithType(PointTypeFlagEnum.BOOLEAN);
+            pointWithType(PointTypeEnum.BOOLEAN);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "1");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("true");
@@ -206,7 +206,7 @@ class ReadPointValueTest {
 
         @Test
         void invalidBooleanThrowsTypeException() {
-            pointWithType(PointTypeFlagEnum.BOOLEAN);
+            pointWithType(PointTypeEnum.BOOLEAN);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "yes");
 
             assertThatThrownBy(readPointValue::getFinalValue).isInstanceOf(TypeException.class);
@@ -218,7 +218,7 @@ class ReadPointValueTest {
 
         @Test
         void offsetApplied() {
-            pointWithTypeAndScale(PointTypeFlagEnum.INT, new BigDecimal("10"), BigDecimal.ONE, (byte) 0);
+            pointWithTypeAndScale(PointTypeEnum.INT, new BigDecimal("10"), BigDecimal.ONE, (byte) 0);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "5");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("15");
@@ -227,7 +227,7 @@ class ReadPointValueTest {
 
         @Test
         void multiplierApplied() {
-            pointWithTypeAndScale(PointTypeFlagEnum.DOUBLE, BigDecimal.ZERO, new BigDecimal("2.5"), (byte) 2);
+            pointWithTypeAndScale(PointTypeEnum.DOUBLE, BigDecimal.ZERO, new BigDecimal("2.5"), (byte) 2);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "10");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("25.0");
@@ -236,7 +236,7 @@ class ReadPointValueTest {
 
         @Test
         void linearTransformApplied() {
-            pointWithTypeAndScale(PointTypeFlagEnum.DOUBLE, new BigDecimal("32"), new BigDecimal("1.8"), (byte) 2);
+            pointWithTypeAndScale(PointTypeEnum.DOUBLE, new BigDecimal("32"), new BigDecimal("1.8"), (byte) 2);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "100");
 
             assertThat(readPointValue.getFinalValue()).isEqualTo("212.0");
@@ -256,7 +256,7 @@ class ReadPointValueTest {
 
         @Test
         void outOfRangeByteThrows() {
-            pointWithType(PointTypeFlagEnum.BYTE);
+            pointWithType(PointTypeEnum.BYTE);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "200");
 
             assertThatThrownBy(readPointValue::getFinalValue).isInstanceOf(OutRangeException.class);
@@ -264,7 +264,7 @@ class ReadPointValueTest {
 
         @Test
         void outOfRangeShortThrows() {
-            pointWithType(PointTypeFlagEnum.SHORT);
+            pointWithType(PointTypeEnum.SHORT);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "100000");
 
             assertThatThrownBy(readPointValue::getFinalValue).isInstanceOf(OutRangeException.class);
@@ -272,7 +272,7 @@ class ReadPointValueTest {
 
         @Test
         void invalidNumberForIntThrows() {
-            pointWithType(PointTypeFlagEnum.INT);
+            pointWithType(PointTypeEnum.INT);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "not-a-number");
 
             assertThatThrownBy(readPointValue::getFinalValue).isInstanceOf(TypeException.class);
@@ -284,7 +284,7 @@ class ReadPointValueTest {
 
         @Test
         void numericValueIsAvailableBeforeGetFinalValue() {
-            pointWithType(PointTypeFlagEnum.DOUBLE);
+            pointWithType(PointTypeEnum.DOUBLE);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "3.14");
 
             assertThat(readPointValue.getNumericValue()).isCloseTo(3.14, org.assertj.core.data.Offset.offset(0.001));
@@ -294,7 +294,7 @@ class ReadPointValueTest {
 
         @Test
         void builderValueCalculatesNumericValueWithoutCallOrderDependency() {
-            pointWithType(PointTypeFlagEnum.DOUBLE);
+            pointWithType(PointTypeEnum.DOUBLE);
             ReadPointValue readPointValue = ReadPointValue.builder().device(device).point(point).value("3.14").build();
 
             assertThat(readPointValue.getNumericValue()).isCloseTo(3.14, org.assertj.core.data.Offset.offset(0.001));
@@ -303,7 +303,7 @@ class ReadPointValueTest {
 
         @Test
         void calculateReturnsBothValuesAtOnce() {
-            pointWithType(PointTypeFlagEnum.INT);
+            pointWithType(PointTypeEnum.INT);
             ReadPointValue readPointValue = new ReadPointValue(device, point, "7");
 
             CalculatedPointValue calculated = readPointValue.calculate();

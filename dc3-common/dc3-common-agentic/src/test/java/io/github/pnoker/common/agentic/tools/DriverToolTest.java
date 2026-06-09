@@ -19,7 +19,7 @@ package io.github.pnoker.common.agentic.tools;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
@@ -116,7 +116,7 @@ class DriverToolTest {
         driver.setDriverCode("virtual-edge-acceptance-lab");
         driver.setServiceName("dc3-driver-virtual");
         driver.setServiceHost("dc3-driver-virtual.iot.svc");
-        driver.setDriverTypeFlag(DriverTypeFlagEnum.DRIVER_CLIENT);
+        driver.setDriverTypeFlag(DriverTypeEnum.DRIVER_CLIENT);
         driver.setEnableFlag(EnableFlagEnum.ENABLE);
         driver.setTenantId(11L);
         return driver;

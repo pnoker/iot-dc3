@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,34 +26,34 @@ class AlarmLevelResolverTest {
 
     @Test
     void resolvesUpperCaseSeverityName() {
-        assertThat(AlarmLevelResolver.resolve("P0", AlarmMessageLevelFlagEnum.P2)).isEqualTo(AlarmMessageLevelFlagEnum.P0);
-        assertThat(AlarmLevelResolver.resolve("P1", AlarmMessageLevelFlagEnum.P2)).isEqualTo(AlarmMessageLevelFlagEnum.P1);
-        assertThat(AlarmLevelResolver.resolve("P2", AlarmMessageLevelFlagEnum.P2)).isEqualTo(AlarmMessageLevelFlagEnum.P2);
-        assertThat(AlarmLevelResolver.resolve("P3", AlarmMessageLevelFlagEnum.P2)).isEqualTo(AlarmMessageLevelFlagEnum.P3);
+        assertThat(AlarmLevelResolver.resolve("P0", AlarmMessageLevelEnum.P2)).isEqualTo(AlarmMessageLevelEnum.P0);
+        assertThat(AlarmLevelResolver.resolve("P1", AlarmMessageLevelEnum.P2)).isEqualTo(AlarmMessageLevelEnum.P1);
+        assertThat(AlarmLevelResolver.resolve("P2", AlarmMessageLevelEnum.P2)).isEqualTo(AlarmMessageLevelEnum.P2);
+        assertThat(AlarmLevelResolver.resolve("P3", AlarmMessageLevelEnum.P2)).isEqualTo(AlarmMessageLevelEnum.P3);
     }
 
     @Test
     void resolvesLowerCaseSeverityCode() {
-        assertThat(AlarmLevelResolver.resolve("p0", AlarmMessageLevelFlagEnum.P2)).isEqualTo(AlarmMessageLevelFlagEnum.P0);
-        assertThat(AlarmLevelResolver.resolve("p3", AlarmMessageLevelFlagEnum.P2)).isEqualTo(AlarmMessageLevelFlagEnum.P3);
+        assertThat(AlarmLevelResolver.resolve("p0", AlarmMessageLevelEnum.P2)).isEqualTo(AlarmMessageLevelEnum.P0);
+        assertThat(AlarmLevelResolver.resolve("p3", AlarmMessageLevelEnum.P2)).isEqualTo(AlarmMessageLevelEnum.P3);
     }
 
     @Test
     void normalizesWhitespaceAndMixedCase() {
-        assertThat(AlarmLevelResolver.resolve("  p1  ", AlarmMessageLevelFlagEnum.P2)).isEqualTo(AlarmMessageLevelFlagEnum.P1);
-        assertThat(AlarmLevelResolver.resolve("Critical", AlarmMessageLevelFlagEnum.P2))
+        assertThat(AlarmLevelResolver.resolve("  p1  ", AlarmMessageLevelEnum.P2)).isEqualTo(AlarmMessageLevelEnum.P1);
+        assertThat(AlarmLevelResolver.resolve("Critical", AlarmMessageLevelEnum.P2))
                 .as("unrecognized labels fall back to the supplied default")
-                .isEqualTo(AlarmMessageLevelFlagEnum.P2);
+                .isEqualTo(AlarmMessageLevelEnum.P2);
     }
 
     @Test
     void usesFallbackWhenSeverityIsBlankOrNull() {
-        assertThat(AlarmLevelResolver.resolve(null, AlarmMessageLevelFlagEnum.P2))
-                .isEqualTo(AlarmMessageLevelFlagEnum.P2);
-        assertThat(AlarmLevelResolver.resolve("", AlarmMessageLevelFlagEnum.P3))
-                .isEqualTo(AlarmMessageLevelFlagEnum.P3);
-        assertThat(AlarmLevelResolver.resolve("   ", AlarmMessageLevelFlagEnum.P0))
-                .isEqualTo(AlarmMessageLevelFlagEnum.P0);
+        assertThat(AlarmLevelResolver.resolve(null, AlarmMessageLevelEnum.P2))
+                .isEqualTo(AlarmMessageLevelEnum.P2);
+        assertThat(AlarmLevelResolver.resolve("", AlarmMessageLevelEnum.P3))
+                .isEqualTo(AlarmMessageLevelEnum.P3);
+        assertThat(AlarmLevelResolver.resolve("   ", AlarmMessageLevelEnum.P0))
+                .isEqualTo(AlarmMessageLevelEnum.P0);
     }
 
 }

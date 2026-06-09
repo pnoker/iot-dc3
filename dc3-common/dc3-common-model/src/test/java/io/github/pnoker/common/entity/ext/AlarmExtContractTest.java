@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.junit.jupiter.api.Test;
 
@@ -128,7 +128,7 @@ class AlarmExtContractTest {
                 1L,
                 "temperature-high",
                 "Temperature High",
-                AlarmTargetTypeFlagEnum.POINT,
+                AlarmTargetTypeEnum.POINT,
                 1001L,
                 "P1",
                 "temperature_high",
@@ -139,7 +139,7 @@ class AlarmExtContractTest {
                 JsonUtil.toJsonString(content), RuleAlarmEventExt.Content.class);
 
         assertThat(parsed.getRuleCode()).isEqualTo("temperature-high");
-        assertThat(parsed.getTargetType()).isEqualTo(AlarmTargetTypeFlagEnum.POINT);
+        assertThat(parsed.getTargetType()).isEqualTo(AlarmTargetTypeEnum.POINT);
         assertThat(parsed.getValues()).containsEntry("deviceId", 10);
     }
 

@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.query.DeviceQuery;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
@@ -62,7 +62,7 @@ class DeviceStatusServiceImplTest {
 
     private EntityStateDO onlineState(Long entityId) {
         EntityStateDO state = new EntityStateDO();
-        state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
+        state.setEntityTypeFlag((byte) EntityTypeEnum.DEVICE.getIndex());
         state.setEntityId(entityId);
         state.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         state.setExpireTime(LocalDateTime.now().plusSeconds(60));
@@ -71,7 +71,7 @@ class DeviceStatusServiceImplTest {
 
     private EntityStateDO expiredState(Long entityId) {
         EntityStateDO state = new EntityStateDO();
-        state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
+        state.setEntityTypeFlag((byte) EntityTypeEnum.DEVICE.getIndex());
         state.setEntityId(entityId);
         state.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         state.setExpireTime(LocalDateTime.now().minusSeconds(10));

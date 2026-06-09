@@ -26,10 +26,10 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.driver.bean.PlcS7PointVariable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,17 +68,17 @@ class PlcS7DriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> driverConfig(String host, int port) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("plcType", AttributeBO.builder().value("S1200").type(AttributeTypeFlagEnum.STRING).build());
+        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeEnum.STRING).build());
+        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeEnum.INT).build());
+        m.put("plcType", AttributeBO.builder().value("S1200").type(AttributeTypeEnum.STRING).build());
         return m;
     }
 
     private static Map<String, AttributeBO> pointConfig(int dbNum, int byteOffset, int bitOffset) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("dbNum", AttributeBO.builder().value(String.valueOf(dbNum)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("byteOffset", AttributeBO.builder().value(String.valueOf(byteOffset)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("bitOffset", AttributeBO.builder().value(String.valueOf(bitOffset)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("dbNum", AttributeBO.builder().value(String.valueOf(dbNum)).type(AttributeTypeEnum.INT).build());
+        m.put("byteOffset", AttributeBO.builder().value(String.valueOf(byteOffset)).type(AttributeTypeEnum.INT).build());
+        m.put("bitOffset", AttributeBO.builder().value(String.valueOf(bitOffset)).type(AttributeTypeEnum.INT).build());
         return m;
     }
 
@@ -88,14 +88,14 @@ class PlcS7DriverCustomServiceImplTest {
         return d;
     }
 
-    private static PointBO point(PointTypeFlagEnum type) {
+    private static PointBO point(PointTypeEnum type) {
         PointBO p = new PointBO();
         p.setId(1L);
         p.setPointTypeFlag(type);
         return p;
     }
 
-    private static WritePointValue writePointValue(String value, PointTypeFlagEnum type) {
+    private static WritePointValue writePointValue(String value, PointTypeEnum type) {
         return WritePointValue.builder().value(value).type(type).build();
     }
 
@@ -175,7 +175,7 @@ class PlcS7DriverCustomServiceImplTest {
         when(plc.readInt32("DB1.0")).thenReturn(42);
 
         ReadPointValue r = service.read(driverConfig("h", 102), pointConfig(1, 0, 0),
-                device(10L), point(PointTypeFlagEnum.INT));
+                device(10L), point(PointTypeEnum.INT));
 
         assertThat(r.getValue()).isEqualTo("42");
         verify(plc, times(1)).readInt32("DB1.0");
@@ -187,7 +187,7 @@ class PlcS7DriverCustomServiceImplTest {
         when(plc.readBoolean("DB2.3.5")).thenReturn(true);
 
         ReadPointValue r = service.read(driverConfig("h", 102), pointConfig(2, 3, 5),
-                device(11L), point(PointTypeFlagEnum.BOOLEAN));
+                device(11L), point(PointTypeEnum.BOOLEAN));
 
         assertThat(r.getValue()).isEqualTo("true");
         verify(plc, times(1)).readBoolean("DB2.3.5");
@@ -199,7 +199,7 @@ class PlcS7DriverCustomServiceImplTest {
         when(plc.readFloat32("DB5.10")).thenReturn(3.14f);
 
         ReadPointValue r = service.read(driverConfig("h", 102), pointConfig(5, 10, 0),
-                device(12L), point(PointTypeFlagEnum.FLOAT));
+                device(12L), point(PointTypeEnum.FLOAT));
 
         assertThat(r.getValue()).isEqualTo("3.14");
         verify(plc, times(1)).readFloat32("DB5.10");
@@ -211,7 +211,7 @@ class PlcS7DriverCustomServiceImplTest {
         when(plc.readInt32(anyString())).thenThrow(new RuntimeException("plc offline"));
 
         ReadPointValue r = service.read(driverConfig("h", 102), pointConfig(1, 0, 0),
-                device(13L), point(PointTypeFlagEnum.INT));
+                device(13L), point(PointTypeEnum.INT));
 
         assertThat(r).isNull();
         assertThat(connectionMap()).doesNotContainKey(13L);
@@ -227,8 +227,8 @@ class PlcS7DriverCustomServiceImplTest {
         primeCachedPLC(20L);
 
         Boolean ok = service.write(driverConfig("h", 102), pointConfig(1, 4, 0),
-                device(20L), point(PointTypeFlagEnum.INT),
-                writePointValue("123", PointTypeFlagEnum.INT));
+                device(20L), point(PointTypeEnum.INT),
+                writePointValue("123", PointTypeEnum.INT));
 
         assertThat(ok).isTrue();
         verify(plc).writeInt32("DB1.4", 123);
@@ -239,8 +239,8 @@ class PlcS7DriverCustomServiceImplTest {
         primeCachedPLC(21L);
 
         Boolean ok = service.write(driverConfig("h", 102), pointConfig(3, 8, 0),
-                device(21L), point(PointTypeFlagEnum.FLOAT),
-                writePointValue("2.5", PointTypeFlagEnum.FLOAT));
+                device(21L), point(PointTypeEnum.FLOAT),
+                writePointValue("2.5", PointTypeEnum.FLOAT));
 
         assertThat(ok).isTrue();
         verify(plc).writeFloat32("DB3.8", 2.5f);
@@ -251,8 +251,8 @@ class PlcS7DriverCustomServiceImplTest {
         primeCachedPLC(22L);
 
         Boolean ok = service.write(driverConfig("h", 102), pointConfig(1, 0, 3),
-                device(22L), point(PointTypeFlagEnum.BOOLEAN),
-                writePointValue("true", PointTypeFlagEnum.BOOLEAN));
+                device(22L), point(PointTypeEnum.BOOLEAN),
+                writePointValue("true", PointTypeEnum.BOOLEAN));
 
         assertThat(ok).isTrue();
         verify(plc).writeBoolean("DB1.0.3", true);
@@ -264,8 +264,8 @@ class PlcS7DriverCustomServiceImplTest {
         doThrow(new RuntimeException("plc offline")).when(plc).writeInt32(anyString(), org.mockito.ArgumentMatchers.anyInt());
 
         Boolean ok = service.write(driverConfig("h", 102), pointConfig(1, 0, 0),
-                device(23L), point(PointTypeFlagEnum.INT),
-                writePointValue("1", PointTypeFlagEnum.INT));
+                device(23L), point(PointTypeEnum.INT),
+                writePointValue("1", PointTypeEnum.INT));
 
         assertThat(ok).isFalse();
         assertThat(connectionMap()).doesNotContainKey(23L);

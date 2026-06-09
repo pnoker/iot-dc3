@@ -24,10 +24,10 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.stack.core.UaException;
@@ -72,17 +72,17 @@ class OpcUaDriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> driverConfig(String host, int port, String path) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("path", AttributeBO.builder().value(path).type(AttributeTypeFlagEnum.STRING).build());
+        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeEnum.STRING).build());
+        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeEnum.INT).build());
+        m.put("path", AttributeBO.builder().value(path).type(AttributeTypeEnum.STRING).build());
         return m;
     }
 
     private static Map<String, AttributeBO> pointConfig(int namespace, String tag) {
         Map<String, AttributeBO> m = new HashMap<>();
         m.put("namespace",
-                AttributeBO.builder().value(String.valueOf(namespace)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("tag", AttributeBO.builder().value(tag).type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value(String.valueOf(namespace)).type(AttributeTypeEnum.INT).build());
+        m.put("tag", AttributeBO.builder().value(tag).type(AttributeTypeEnum.STRING).build());
         return m;
     }
 
@@ -92,7 +92,7 @@ class OpcUaDriverCustomServiceImplTest {
         return device;
     }
 
-    private static PointBO point(PointTypeFlagEnum type) {
+    private static PointBO point(PointTypeEnum type) {
         PointBO point = new PointBO();
         point.setId(1L);
         point.setPointTypeFlag(type);
@@ -183,7 +183,7 @@ class OpcUaDriverCustomServiceImplTest {
                     any(Function.class))).thenThrow(new UaException(0L, "endpoint refused"));
 
             assertThatThrownBy(() -> service.read(driverConfig("h", 4840, "/"), pointConfig(2, "tag.x"),
-                    device(1L), point(PointTypeFlagEnum.STRING))).isInstanceOf(ConnectorException.class)
+                    device(1L), point(PointTypeEnum.STRING))).isInstanceOf(ConnectorException.class)
                     .hasMessageContaining("endpoint refused");
             assertThat(connectionMap()).doesNotContainKey(1L);
         }
@@ -220,7 +220,7 @@ class OpcUaDriverCustomServiceImplTest {
         method.setAccessible(true);
 
         Boolean ok = (Boolean) method.invoke(service, client, new NodeId(2, "tag.x"),
-                WritePointValue.builder().value("7").type(PointTypeFlagEnum.INT).build());
+                WritePointValue.builder().value("7").type(PointTypeEnum.INT).build());
 
         assertThat(ok).isTrue();
     }

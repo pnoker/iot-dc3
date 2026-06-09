@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +56,7 @@ class AlarmRulePipelineServiceImplTest {
 
     // ---------- fixtures ----------
 
-    private static RuleFact fact(Long tenantId, AlarmTargetTypeFlagEnum targetType, Long entityId) {
+    private static RuleFact fact(Long tenantId, AlarmTargetTypeEnum targetType, Long entityId) {
         return new RuleFact(tenantId, targetType, entityId, null,
                 LocalDateTime.of(2026, 5, 21, 12, 0), Map.of("value", 100));
     }
@@ -76,7 +77,7 @@ class AlarmRulePipelineServiceImplTest {
 
     @Test
     void processEvaluatesRuleEngineAndNotifies() {
-        RuleFact fact = fact(7L, AlarmTargetTypeFlagEnum.POINT, 11L);
+        RuleFact fact = fact(7L, AlarmTargetTypeEnum.POINT, 11L);
         RuleMatch m = match(fact);
         when(ruleEngine.evaluate(fact)).thenReturn(List.of(m));
         when(ruleNotificationService.notify(m)).thenReturn(List.of(history(1L)));
@@ -90,7 +91,7 @@ class AlarmRulePipelineServiceImplTest {
 
     @Test
     void processReturnsEmptyWhenNoRulesMatch() {
-        RuleFact fact = fact(7L, AlarmTargetTypeFlagEnum.POINT, 11L);
+        RuleFact fact = fact(7L, AlarmTargetTypeEnum.POINT, 11L);
         when(ruleEngine.evaluate(fact)).thenReturn(List.of());
 
         List<NotifyHistoryBO> result = service.process(fact);
@@ -111,13 +112,13 @@ class AlarmRulePipelineServiceImplTest {
 
     @Test
     void processBatchFiltersNullFactsAndFactsWithNullTenantIdOrTargetType() {
-        List<RuleFact> facts = List.of(
+        List<RuleFact> facts = Arrays.asList(
                 null,
-                fact(7L, (AlarmTargetTypeFlagEnum) null, 11L), // null target type
-                fact(null, AlarmTargetTypeFlagEnum.POINT, 11L), // null tenantId
-                fact(7L, AlarmTargetTypeFlagEnum.POINT, 11L));  // valid
+                fact(7L, (AlarmTargetTypeEnum) null, 11L), // null target type
+                fact(null, AlarmTargetTypeEnum.POINT, 11L), // null tenantId
+                fact(7L, AlarmTargetTypeEnum.POINT, 11L));  // valid
 
-        RuleMatch m = match(fact(7L, AlarmTargetTypeFlagEnum.POINT, 11L));
+        RuleMatch m = match(fact(7L, AlarmTargetTypeEnum.POINT, 11L));
         when(ruleEngine.evaluate(any())).thenReturn(List.of(m));
         when(ruleNotificationService.notifyBatch(anyList())).thenReturn(List.of(history(1L)));
 
@@ -133,9 +134,9 @@ class AlarmRulePipelineServiceImplTest {
     @Test
     void processBatchGroupsFactsByRuleCacheKeyAndCallsNotifyBatchOnce() {
         // 3 facts: two share the same group, one is in a different group
-        RuleFact f1 = fact(7L, AlarmTargetTypeFlagEnum.POINT, 11L);
-        RuleFact f2 = fact(7L, AlarmTargetTypeFlagEnum.POINT, 11L); // same group as f1
-        RuleFact f3 = fact(7L, AlarmTargetTypeFlagEnum.POINT, 22L); // different entity
+        RuleFact f1 = fact(7L, AlarmTargetTypeEnum.POINT, 11L);
+        RuleFact f2 = fact(7L, AlarmTargetTypeEnum.POINT, 11L); // same group as f1
+        RuleFact f3 = fact(7L, AlarmTargetTypeEnum.POINT, 22L); // different entity
 
         RuleMatch m1 = match(f1);
         RuleMatch m2 = match(f2);
@@ -158,7 +159,7 @@ class AlarmRulePipelineServiceImplTest {
 
     @Test
     void processBatchReturnsEmptyWhenNoMatchesProduced() {
-        RuleFact fact = fact(7L, AlarmTargetTypeFlagEnum.POINT, 11L);
+        RuleFact fact = fact(7L, AlarmTargetTypeEnum.POINT, 11L);
         when(ruleEngine.evaluate(fact)).thenReturn(List.of());
 
         List<NotifyHistoryBO> result = service.processBatch(List.of(fact));

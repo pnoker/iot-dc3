@@ -21,7 +21,7 @@ import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,18 +47,18 @@ class ZigbeeDriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> driverConfig(String serialPort, int baudRate) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("serialPort", AttributeBO.builder().value(serialPort).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("baudRate", AttributeBO.builder().value(String.valueOf(baudRate)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("serialPort", AttributeBO.builder().value(serialPort).type(AttributeTypeEnum.STRING).build());
+        m.put("baudRate", AttributeBO.builder().value(String.valueOf(baudRate)).type(AttributeTypeEnum.INT).build());
         return m;
     }
 
     private static Map<String, AttributeBO> pointConfig(String nodeIeeeAddress, int endpointId,
                                                         int clusterId, int attributeId) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("nodeIeeeAddress", AttributeBO.builder().value(nodeIeeeAddress).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("endpointId", AttributeBO.builder().value(String.valueOf(endpointId)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("clusterId", AttributeBO.builder().value(String.valueOf(clusterId)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("attributeId", AttributeBO.builder().value(String.valueOf(attributeId)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("nodeIeeeAddress", AttributeBO.builder().value(nodeIeeeAddress).type(AttributeTypeEnum.STRING).build());
+        m.put("endpointId", AttributeBO.builder().value(String.valueOf(endpointId)).type(AttributeTypeEnum.INT).build());
+        m.put("clusterId", AttributeBO.builder().value(String.valueOf(clusterId)).type(AttributeTypeEnum.INT).build());
+        m.put("attributeId", AttributeBO.builder().value(String.valueOf(attributeId)).type(AttributeTypeEnum.INT).build());
         return m;
     }
 

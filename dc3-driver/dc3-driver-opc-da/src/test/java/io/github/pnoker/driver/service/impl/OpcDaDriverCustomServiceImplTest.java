@@ -21,7 +21,7 @@ import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import org.jinterop.dcom.core.JIVariant;
@@ -64,8 +64,8 @@ class OpcDaDriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> pointConfig(String group, String tag) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("group", AttributeBO.builder().value(group).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("tag", AttributeBO.builder().value(tag).type(AttributeTypeFlagEnum.STRING).build());
+        m.put("group", AttributeBO.builder().value(group).type(AttributeTypeEnum.STRING).build());
+        m.put("tag", AttributeBO.builder().value(tag).type(AttributeTypeEnum.STRING).build());
         return m;
     }
 

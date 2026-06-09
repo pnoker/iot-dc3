@@ -18,7 +18,7 @@ package io.github.pnoker.common.driver.entity.bean;
 
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +48,7 @@ class PointValueTest {
 
     @Test
     void numericTypePopulatesNumValue() {
-        point.setPointTypeFlag(PointTypeFlagEnum.DOUBLE);
+        point.setPointTypeFlag(PointTypeEnum.DOUBLE);
         ReadPointValue readPointValue = new ReadPointValue(device, point, "42.5");
         PointValue pv = new PointValue(readPointValue);
 
@@ -61,7 +61,7 @@ class PointValueTest {
 
     @Test
     void stringTypeLeavesNumValueNull() {
-        point.setPointTypeFlag(PointTypeFlagEnum.STRING);
+        point.setPointTypeFlag(PointTypeEnum.STRING);
         ReadPointValue readPointValue = new ReadPointValue(device, point, "hello");
         PointValue pv = new PointValue(readPointValue);
 
@@ -71,7 +71,7 @@ class PointValueTest {
 
     @Test
     void booleanTrueMapsNumValueToOne() {
-        point.setPointTypeFlag(PointTypeFlagEnum.BOOLEAN);
+        point.setPointTypeFlag(PointTypeEnum.BOOLEAN);
         ReadPointValue readPointValue = new ReadPointValue(device, point, "true");
         PointValue pv = new PointValue(readPointValue);
 
@@ -81,7 +81,7 @@ class PointValueTest {
 
     @Test
     void booleanFalseMapsNumValueToZero() {
-        point.setPointTypeFlag(PointTypeFlagEnum.BOOLEAN);
+        point.setPointTypeFlag(PointTypeEnum.BOOLEAN);
         ReadPointValue readPointValue = new ReadPointValue(device, point, "false");
         PointValue pv = new PointValue(readPointValue);
 
@@ -91,7 +91,7 @@ class PointValueTest {
 
     @Test
     void intTypePopulatesNumValue() {
-        point.setPointTypeFlag(PointTypeFlagEnum.INT);
+        point.setPointTypeFlag(PointTypeEnum.INT);
         ReadPointValue readPointValue = new ReadPointValue(device, point, "100");
         PointValue pv = new PointValue(readPointValue);
 

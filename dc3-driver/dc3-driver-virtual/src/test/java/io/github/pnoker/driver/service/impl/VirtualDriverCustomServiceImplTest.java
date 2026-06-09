@@ -25,7 +25,7 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,7 +50,7 @@ class VirtualDriverCustomServiceImplTest {
     @InjectMocks
     private VirtualDriverCustomServiceImpl service;
 
-    private static PointBO pointOfType(PointTypeFlagEnum type) {
+    private static PointBO pointOfType(PointTypeEnum type) {
         PointBO point = new PointBO();
         point.setId(1L);
         point.setPointName("p");
@@ -100,23 +100,23 @@ class VirtualDriverCustomServiceImplTest {
 
     @Test
     void readReturnsConstantStringForStringPoint() {
-        PointBO point = pointOfType(PointTypeFlagEnum.STRING);
+        PointBO point = pointOfType(PointTypeEnum.STRING);
         ReadPointValue readPointValue = service.read(null, null, null, point);
         assertThat(readPointValue.getValue()).isEqualTo("abcd1234");
     }
 
     @Test
     void readProducesParsableBooleanForBooleanPoint() {
-        PointBO point = pointOfType(PointTypeFlagEnum.BOOLEAN);
+        PointBO point = pointOfType(PointTypeEnum.BOOLEAN);
         ReadPointValue readPointValue = service.read(null, null, null, point);
         assertThat(readPointValue.getValue()).isIn("true", "false");
     }
 
     @Test
     void readProducesNumericValueInRangeForOtherPointTypes() {
-        for (PointTypeFlagEnum type : new PointTypeFlagEnum[]{
-                PointTypeFlagEnum.INT, PointTypeFlagEnum.LONG, PointTypeFlagEnum.FLOAT, PointTypeFlagEnum.DOUBLE,
-                PointTypeFlagEnum.BYTE, PointTypeFlagEnum.SHORT
+        for (PointTypeEnum type : new PointTypeEnum[]{
+                PointTypeEnum.INT, PointTypeEnum.LONG, PointTypeEnum.FLOAT, PointTypeEnum.DOUBLE,
+                PointTypeEnum.BYTE, PointTypeEnum.SHORT
         }) {
             PointBO point = pointOfType(type);
             ReadPointValue readPointValue = service.read(null, null, null, point);
@@ -128,7 +128,7 @@ class VirtualDriverCustomServiceImplTest {
     @Test
     void writeReturnsFalseUnconditionally() {
         Boolean result = service.write(null, null, null, null,
-                WritePointValue.builder().value("anything").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("anything").type(PointTypeEnum.STRING).build());
         assertThat(result).isFalse();
         verify(driverSenderService, never()).pointValueSender(org.mockito.ArgumentMatchers.anyList());
     }

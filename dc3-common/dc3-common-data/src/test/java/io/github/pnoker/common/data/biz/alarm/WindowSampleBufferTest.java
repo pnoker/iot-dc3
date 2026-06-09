@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,8 +30,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class WindowSampleBufferTest {
 
-    private static final WindowSampleKey KEY_A = new WindowSampleKey(7L, AlarmTargetTypeFlagEnum.POINT, 11L);
-    private static final WindowSampleKey KEY_B = new WindowSampleKey(7L, AlarmTargetTypeFlagEnum.POINT, 12L);
+    private static final WindowSampleKey KEY_A = new WindowSampleKey(7L, AlarmTargetTypeEnum.POINT, 11L);
+    private static final WindowSampleKey KEY_B = new WindowSampleKey(7L, AlarmTargetTypeEnum.POINT, 12L);
     private AlarmWindowProperties properties;
     private WindowSampleBuffer buffer;
 

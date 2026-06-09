@@ -21,7 +21,7 @@ import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,14 +47,14 @@ class BleDriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> driverConfig(String deviceAddress) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("deviceAddress", AttributeBO.builder().value(deviceAddress).type(AttributeTypeFlagEnum.STRING).build());
+        m.put("deviceAddress", AttributeBO.builder().value(deviceAddress).type(AttributeTypeEnum.STRING).build());
         return m;
     }
 
     private static Map<String, AttributeBO> pointConfig(String serviceUuid, String characteristicUuid) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("serviceUuid", AttributeBO.builder().value(serviceUuid).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("characteristicUuid", AttributeBO.builder().value(characteristicUuid).type(AttributeTypeFlagEnum.STRING).build());
+        m.put("serviceUuid", AttributeBO.builder().value(serviceUuid).type(AttributeTypeEnum.STRING).build());
+        m.put("characteristicUuid", AttributeBO.builder().value(characteristicUuid).type(AttributeTypeEnum.STRING).build());
         return m;
     }
 

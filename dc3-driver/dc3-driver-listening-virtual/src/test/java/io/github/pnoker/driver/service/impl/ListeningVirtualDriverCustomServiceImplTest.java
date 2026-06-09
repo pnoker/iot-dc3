@@ -25,7 +25,7 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.github.pnoker.driver.service.netty.udp.NettyUdpServer;
 import io.netty.channel.Channel;
@@ -157,7 +157,7 @@ class ListeningVirtualDriverCustomServiceImplTest {
         NettyTcpServer.registerDeviceChannel(900L, channel);
 
         Boolean ok = service.write(null, null, device, point,
-                WritePointValue.builder().value("hello").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("hello").type(PointTypeEnum.STRING).build());
 
         assertThat(ok).isTrue();
         verify(channel).writeAndFlush(any(byte[].class));
@@ -176,7 +176,7 @@ class ListeningVirtualDriverCustomServiceImplTest {
         NettyTcpServer.registerDeviceChannel(902L, channel);
 
         Boolean ok = service.write(null, null, device, point,
-                WritePointValue.builder().value("hello").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("hello").type(PointTypeEnum.STRING).build());
 
         assertThat(ok).isFalse();
     }
@@ -187,7 +187,7 @@ class ListeningVirtualDriverCustomServiceImplTest {
         PointBO point = point(2L);
 
         Boolean ok = service.write(null, null, device, point,
-                WritePointValue.builder().value("hello").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("hello").type(PointTypeEnum.STRING).build());
 
         assertThat(ok).isFalse();
         // No channel was registered, so nothing was flushed.

@@ -25,7 +25,7 @@ import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -78,7 +78,7 @@ class EntityStateExpiryScannerTest {
 
     private EntityStateDO deviceState(Long deviceId, Long driverId, byte statusFlag, long leaseVersion, LocalDateTime expireTime) {
         EntityStateDO state = new EntityStateDO();
-        state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
+        state.setEntityTypeFlag((byte) EntityTypeEnum.DEVICE.getIndex());
         state.setEntityId(deviceId);
         state.setParentEntityId(driverId);
         state.setStateFlag(statusFlag);
@@ -125,7 +125,7 @@ class EntityStateExpiryScannerTest {
         scanner.onScanTick(channel, mockMessage(1L));
 
         verify(entityStateMapper).claimExpiredDevices(
-                eq((byte) EntityTypeFlagEnum.DEVICE.getIndex()),
+                eq((byte) EntityTypeEnum.DEVICE.getIndex()),
                 eq((byte) EntityStatusEnum.ONLINE.getIndex()),
                 eq((byte) EntityStatusEnum.MAINTAIN.getIndex()),
                 eq((byte) EntityStatusEnum.FAULT.getIndex()),
@@ -145,11 +145,11 @@ class EntityStateExpiryScannerTest {
 
         stubClaimedDevices(List.of(expired));
         stubLastAlarmUpdate();
-        when(entityAlarmManager.save(any())).thenReturn(true);
+        when(entityAlarmManager.saveBatch(any())).thenReturn(true);
 
         scanner.onScanTick(channel, mockMessage(1L));
 
-        verify(entityAlarmManager).save(any());
+        verify(entityAlarmManager).saveBatch(any());
         verify(alarmRuleTriggerService).processDeviceAlarm(any());
         verify(rabbitTemplate).convertAndSend(anyString(), anyString(), anyString());
     }
