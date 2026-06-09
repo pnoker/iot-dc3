@@ -285,6 +285,26 @@ the SDK runtime.
 - Use grouped validation annotations consistently.
 - Keep validation and exception messages in English.
 
+### OpenAPI / Swagger
+
+REST endpoints are documented with springdoc-openapi (annotations only, no
+hand-maintained spec). See `docs/development/api-documentation.md` for the full
+guide.
+
+- Annotate controllers (`@Tag`, `@Operation`, `@Parameter`) and DTOs
+  (`@Schema` with `example` / `requiredMode` where useful). Keep all doc text
+  English.
+- Each business module owns a `GroupedOpenApi` bean (e.g. `AuthApiGroupConfig`);
+  add one when introducing a new center with its own controller package, plus a
+  gateway aggregation route and `swagger-ui.urls` entry.
+- Shared config (`SpringDocConfig`, `WebFluxSecurityConfig`) lives in
+  `dc3-common-web` and is registered in `AutoConfiguration.imports` — center
+  apps do not scan `io.github.pnoker.common.config`, so a plain `@Configuration`
+  there will not load.
+- Docs are exposed in dev/test/pre and disabled in production (`pro` profile).
+  View aggregated docs at the gateway `:8000/swagger-ui.html`; export with
+  `make openapi` against a running stack.
+
 ### CRUD Verb Convention
 
 The verb on every CRUD-shaped method and HTTP path must reflect the
@@ -340,10 +360,12 @@ Keep persistence, business, and web representations deliberately separated.
 - Do not introduce magic flag constants such as `private static final Byte DEFAULT = 1`. Add or reuse a domain enum
   instead, with `@EnumValue`, `ofIndex(...)`, and clear names.
 - Domain enum suffixes follow strict semantics:
-    - `*FlagEnum` for boolean-like 0/1 toggles (`EnableFlagEnum`, `DefaultFlagEnum`, `ExpireFlagEnum`).
-    - `*StatusEnum` for state-machine values with multiple states (`DeviceStatusEnum`, `DriverStatusEnum`,
+    - `*FlagEnum` for boolean-like 0/1 toggles (`EnableFlagEnum`, `DefaultFlagEnum`, `ConfirmFlagEnum`).
+    - `*StatusEnum` for state-machine values with multiple states (`EntityStatusEnum`, `RuleStatusEnum`,
       `NotifyHistoryStatusEnum`). Do not append `Flag` to a state-machine enum name.
-    - `*TypeEnum` for closed classification sets (`MetadataTypeEnum`, `ResponseEnum`-style code groups).
+    - `*TypeEnum` for closed classification sets, including multi-valued classifications and levels
+      (`MetadataTypeEnum`, `PointTypeEnum`, `EventLevelEnum`, `ExpireTypeEnum`). Multi-valued sets must not
+      use the `*FlagEnum` suffix.
 - Enum constant names use `UPPER_SNAKE_CASE` and stay descriptive — single-letter names like `R`/`W` are not allowed.
   The internal `code` string field on enums uses lowercase tokens (e.g. `"enable"`, `"online"`, `"pending"`) so that
   values are consistent across `*FlagEnum`, `*StatusEnum`, and `*TypeEnum` definitions.
