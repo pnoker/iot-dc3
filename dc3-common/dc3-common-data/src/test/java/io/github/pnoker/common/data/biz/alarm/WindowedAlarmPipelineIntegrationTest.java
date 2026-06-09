@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -80,7 +80,7 @@ class WindowedAlarmPipelineIntegrationTest {
         RuleBO rule = new RuleBO();
         rule.setId(1L);
         rule.setRuleCode("rule");
-        rule.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
+        rule.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.POINT);
         rule.setRuleExt(ext);
         return rule;
     }
@@ -102,14 +102,14 @@ class WindowedAlarmPipelineIntegrationTest {
     private void feed(double value, String calValue) {
         LocalDateTime ts = LocalDateTime.now();
         buffer.append(
-                WindowSampleKey.of(TENANT_ID, AlarmTargetTypeFlagEnum.POINT, POINT_ID),
+                WindowSampleKey.of(TENANT_ID, AlarmTargetTypeEnum.POINT, POINT_ID),
                 new WindowSample(value, calValue, ts));
     }
 
     private RuleFact factOnPoint() {
         // Use a synthetic fact that arrives just after the most recently
         // appended sample, so the evaluator's window includes it.
-        return new RuleFact(TENANT_ID, AlarmTargetTypeFlagEnum.POINT, POINT_ID, null,
+        return new RuleFact(TENANT_ID, AlarmTargetTypeEnum.POINT, POINT_ID, null,
                 LocalDateTime.now().plusNanos(1), Map.of("numValue", 0));
     }
 
@@ -199,7 +199,7 @@ class WindowedAlarmPipelineIntegrationTest {
         assertThat(engine.evaluate(factOnPoint())).isEmpty();
 
         // Build a fact that carries a numValue of 95
-        RuleFact firingFact = new RuleFact(TENANT_ID, AlarmTargetTypeFlagEnum.POINT, POINT_ID, null,
+        RuleFact firingFact = new RuleFact(TENANT_ID, AlarmTargetTypeEnum.POINT, POINT_ID, null,
                 LocalDateTime.now(), Map.of("numValue", 95));
         assertThat(engine.evaluate(firingFact)).hasSize(1);
     }

@@ -22,8 +22,8 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
-import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.enums.TimeoutSourceTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -69,7 +69,7 @@ class DeviceStateServiceImplTest {
 
     private EntityStateDO persisted(byte stateFlag, byte lastStateFlag, long leaseVersion) {
         EntityStateDO state = new EntityStateDO();
-        state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DEVICE.getIndex());
+        state.setEntityTypeFlag((byte) EntityTypeEnum.DEVICE.getIndex());
         state.setEntityId(10L);
         state.setParentEntityId(7L);
         state.setTenantId(100L);
@@ -103,14 +103,14 @@ class DeviceStateServiceImplTest {
 
         verify(entityStateMapper).upsertEntityState(anyLong(),
                 eq(100L),
-                eq((byte) EntityTypeFlagEnum.DEVICE.getIndex()),
+                eq((byte) EntityTypeEnum.DEVICE.getIndex()),
                 eq(10L),
                 eq(7L),
                 eq((byte) EntityStatusEnum.ONLINE.getIndex()),
                 eq((byte) EntityStatusEnum.OFFLINE.getIndex()),
                 any(LocalDateTime.class),
                 eq(25),
-                eq((byte) TimeoutSourceFlagEnum.DRIVER.getIndex()),
+                eq((byte) TimeoutSourceTypeEnum.DRIVER.getIndex()),
                 eq("device-heartbeat"),
                 any());
     }

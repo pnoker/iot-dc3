@@ -25,7 +25,7 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,7 +69,7 @@ class Sl651DriverCustomServiceImplTest {
         device.setDeviceCode("01020304");
         when(deviceMetadata.getCache(10L)).thenReturn(device);
         when(deviceMetadata.getPointConfig(10L)).thenReturn(Map.of(
-                20L, Map.of("index", AttributeBO.builder().value("1").type(AttributeTypeFlagEnum.INT).build())
+                20L, Map.of("index", AttributeBO.builder().value("1").type(AttributeTypeEnum.INT).build())
         ));
         PointBO point = new PointBO();
         point.setId(20L);

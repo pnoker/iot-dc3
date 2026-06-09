@@ -20,8 +20,8 @@ package io.github.pnoker.common.data.biz.alarm;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import io.github.pnoker.common.data.dal.RuleStateManager;
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.RuleStateFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.github.pnoker.common.enums.RuleStatusEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,7 +40,7 @@ class RuleStateLookupTest {
 
     private static final long TENANT_ID = 7L;
     private static final long RULE_ID = 1L;
-    private static final byte TARGET_TYPE = AlarmTargetTypeFlagEnum.POINT.getIndex();
+    private static final byte TARGET_TYPE = AlarmTargetTypeEnum.POINT.getIndex();
     private static final long ENTITY_ID = 11L;
     @Mock
     private RuleStateManager ruleStateManager;
@@ -63,7 +63,7 @@ class RuleStateLookupTest {
         verify(chainWrapper).eq(any(), eq(RULE_ID));
         verify(chainWrapper).eq(any(), eq(TARGET_TYPE));
         verify(chainWrapper).eq(any(), eq(ENTITY_ID));
-        verify(chainWrapper).eq(any(), eq(RuleStateFlagEnum.FIRING.getIndex()));
+        verify(chainWrapper).eq(any(), eq(RuleStatusEnum.FIRING.getIndex()));
     }
 
     @Test

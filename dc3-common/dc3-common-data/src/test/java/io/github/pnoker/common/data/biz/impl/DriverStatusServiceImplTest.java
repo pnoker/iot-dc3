@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.query.DriverQuery;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
@@ -116,7 +116,7 @@ class DriverStatusServiceImplTest {
         when(driverFacade.listByPage(any())).thenReturn(page);
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(onlineState(1L, EntityTypeFlagEnum.DRIVER.getIndex()));
+        when(queryWrapper.one()).thenReturn(onlineState(1L, EntityTypeEnum.DRIVER.getIndex()));
         assertThat(service.getStatusByPage(new DriverQuery()))
                 .containsEntry(1L, EntityStatusEnum.ONLINE.getCode());
     }
@@ -128,7 +128,7 @@ class DriverStatusServiceImplTest {
         when(driverFacade.listByPage(any())).thenReturn(page);
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(expiredState(1L, EntityTypeFlagEnum.DRIVER.getIndex()));
+        when(queryWrapper.one()).thenReturn(expiredState(1L, EntityTypeEnum.DRIVER.getIndex()));
         assertThat(service.getStatusByPage(new DriverQuery()))
                 .containsEntry(1L, EntityStatusEnum.OFFLINE.getCode());
     }
@@ -136,39 +136,39 @@ class DriverStatusServiceImplTest {
     @Test
     void getDeviceOnlineByDriverIdReturnsZeroWhenDriverMissing() {
         when(driverFacade.getById(1L, 7L)).thenReturn(null);
-        assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo("0");
+        assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo(0L);
     }
 
     @Test
     void getDeviceOnlineByDriverIdReturnsZeroWhenNoDevices() {
         when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
         when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of());
-        assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo("0");
+        assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo(0L);
     }
 
     @Test
     void getDeviceOnlineByDriverIdCountsOnlineDevices() {
         when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
         when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L)));
-        EntityStateDO online10 = onlineState(10L, EntityTypeFlagEnum.DEVICE.getIndex());
+        EntityStateDO online10 = onlineState(10L, EntityTypeEnum.DEVICE.getIndex());
         online10.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
-        EntityStateDO expired11 = expiredState(11L, EntityTypeFlagEnum.DEVICE.getIndex());
+        EntityStateDO expired11 = expiredState(11L, EntityTypeEnum.DEVICE.getIndex());
         expired11.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(online10).thenReturn(expired11);
-        assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo("1");
+        assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo(1L);
     }
 
     @Test
     void getDeviceOfflineByDriverIdCountsOfflineAndMissingDevices() {
         when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
         when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L), device(12L)));
-        EntityStateDO online10 = onlineState(10L, EntityTypeFlagEnum.DEVICE.getIndex());
+        EntityStateDO online10 = onlineState(10L, EntityTypeEnum.DEVICE.getIndex());
         online10.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
         when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(online10).thenReturn(null).thenReturn(null);
-        assertThat(service.getDeviceOfflineByDriverId(1L, 7L)).isEqualTo("2");
+        assertThat(service.getDeviceOfflineByDriverId(1L, 7L)).isEqualTo(2L);
     }
 }

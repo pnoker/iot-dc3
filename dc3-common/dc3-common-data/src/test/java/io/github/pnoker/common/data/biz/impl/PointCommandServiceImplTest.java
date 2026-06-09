@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
+import io.github.pnoker.common.data.entity.builder.PointCommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
@@ -26,7 +27,7 @@ import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.data.validator.PointCommandValidator;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
@@ -70,6 +71,9 @@ class PointCommandServiceImplTest {
     private PointCommandHistoryManager pointCommandHistoryManager;
 
     @Mock
+    private PointCommandHistoryBuilder pointCommandHistoryBuilder;
+
+    @Mock
     private EntityStateMapper entityStateMapper;
 
     @Mock
@@ -90,7 +94,7 @@ class PointCommandServiceImplTest {
         point = new FacadePointBO();
         point.setProfileId(5L);
         point.setEnableFlag(EnableFlagEnum.ENABLE);
-        point.setRwFlag(RwFlagEnum.READ_WRITE);
+        point.setRwFlag(RwTypeEnum.READ_WRITE);
         driver = new FacadeDriverBO();
         driver.setId(30L);
         driver.setServiceName("dc3-driver-modbus-tcp");
@@ -264,7 +268,7 @@ class PointCommandServiceImplTest {
         FacadePointBO readOnlyPoint = new FacadePointBO();
         readOnlyPoint.setProfileId(5L);
         readOnlyPoint.setEnableFlag(EnableFlagEnum.ENABLE);
-        readOnlyPoint.setRwFlag(RwFlagEnum.READ_ONLY);
+        readOnlyPoint.setRwFlag(RwTypeEnum.READ_ONLY);
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(readOnlyPoint);
 

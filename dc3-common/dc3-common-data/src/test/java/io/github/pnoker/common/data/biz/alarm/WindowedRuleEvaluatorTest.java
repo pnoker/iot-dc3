@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.WindowModeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +66,7 @@ class WindowedRuleEvaluatorTest {
     }
 
     private static RuleFact fact() {
-        return new RuleFact(7L, AlarmTargetTypeFlagEnum.POINT, 11L, null, LocalDateTime.now(), Map.of());
+        return new RuleFact(7L, AlarmTargetTypeEnum.POINT, 11L, null, LocalDateTime.now(), Map.of());
     }
 
     private static WindowSpec spec(WindowModeEnum mode, int minSamples) {

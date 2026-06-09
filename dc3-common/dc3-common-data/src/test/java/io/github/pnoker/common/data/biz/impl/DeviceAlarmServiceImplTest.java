@@ -21,7 +21,7 @@ import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import org.junit.jupiter.api.Test;
@@ -87,7 +87,7 @@ class DeviceAlarmServiceImplTest {
         assertThat(captor.getValue().getDeviceId()).isEqualTo(10L);
         // Device-reported alarms default to P2 — the rule pipeline writes a
         // separate row with the rule-derived severity if a matching rule fires.
-        assertThat(captor.getValue().getAlarmLevelFlag()).isEqualTo(AlarmMessageLevelFlagEnum.P2.getIndex());
+        assertThat(captor.getValue().getAlarmLevelFlag()).isEqualTo(AlarmMessageLevelEnum.P2.getIndex());
         verify(alarmRuleTriggerService).processDeviceAlarm(dto);
     }
 

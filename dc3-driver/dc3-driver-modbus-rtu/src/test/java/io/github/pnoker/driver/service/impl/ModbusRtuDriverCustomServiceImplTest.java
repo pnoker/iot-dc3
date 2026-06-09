@@ -28,10 +28,10 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
@@ -83,19 +83,19 @@ class ModbusRtuDriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> driverConfig() {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("port", AttributeBO.builder().value("/dev/ttyS0").type(AttributeTypeFlagEnum.STRING).build());
-        m.put("baudRate", AttributeBO.builder().value("9600").type(AttributeTypeFlagEnum.INT).build());
-        m.put("dataBits", AttributeBO.builder().value("8").type(AttributeTypeFlagEnum.INT).build());
-        m.put("stopBits", AttributeBO.builder().value("1").type(AttributeTypeFlagEnum.INT).build());
-        m.put("parity", AttributeBO.builder().value("0").type(AttributeTypeFlagEnum.INT).build());
+        m.put("port", AttributeBO.builder().value("/dev/ttyS0").type(AttributeTypeEnum.STRING).build());
+        m.put("baudRate", AttributeBO.builder().value("9600").type(AttributeTypeEnum.INT).build());
+        m.put("dataBits", AttributeBO.builder().value("8").type(AttributeTypeEnum.INT).build());
+        m.put("stopBits", AttributeBO.builder().value("1").type(AttributeTypeEnum.INT).build());
+        m.put("parity", AttributeBO.builder().value("0").type(AttributeTypeEnum.INT).build());
         return m;
     }
 
     private static Map<String, AttributeBO> pointConfig(int slaveId, int functionCode, int offset) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("slaveId", AttributeBO.builder().value(String.valueOf(slaveId)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("functionCode", AttributeBO.builder().value(String.valueOf(functionCode)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("offset", AttributeBO.builder().value(String.valueOf(offset)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("slaveId", AttributeBO.builder().value(String.valueOf(slaveId)).type(AttributeTypeEnum.INT).build());
+        m.put("functionCode", AttributeBO.builder().value(String.valueOf(functionCode)).type(AttributeTypeEnum.INT).build());
+        m.put("offset", AttributeBO.builder().value(String.valueOf(offset)).type(AttributeTypeEnum.INT).build());
         return m;
     }
 
@@ -105,7 +105,7 @@ class ModbusRtuDriverCustomServiceImplTest {
         return device;
     }
 
-    private static PointBO point(PointTypeFlagEnum type) {
+    private static PointBO point(PointTypeEnum type) {
         PointBO point = new PointBO();
         point.setId(1L);
         point.setPointTypeFlag(type);
@@ -138,9 +138,9 @@ class ModbusRtuDriverCustomServiceImplTest {
         when(modbusMaster.getValue(any(BaseLocator.class))).thenReturn(true, 42);
 
         assertThat(service.read(driverConfig(), pointConfig(1, 1, 0), device(10L),
-                point(PointTypeFlagEnum.BOOLEAN)).getValue()).isEqualTo("true");
+                point(PointTypeEnum.BOOLEAN)).getValue()).isEqualTo("true");
         assertThat(service.read(driverConfig(), pointConfig(1, 3, 0), device(10L),
-                point(PointTypeFlagEnum.INT)).getValue()).isEqualTo("42");
+                point(PointTypeEnum.INT)).getValue()).isEqualTo("42");
 
         verify(modbusFactory, times(1)).createRtuMaster(any(JSerialCommWrapper.class));
     }
@@ -150,7 +150,7 @@ class ModbusRtuDriverCustomServiceImplTest {
         when(modbusFactory.createRtuMaster(any(JSerialCommWrapper.class))).thenReturn(modbusMaster);
 
         assertThatThrownBy(() -> service.read(driverConfig(), pointConfig(1, 99, 0), device(10L),
-                point(PointTypeFlagEnum.INT))).isInstanceOf(UnSupportException.class);
+                point(PointTypeEnum.INT))).isInstanceOf(UnSupportException.class);
         verify(modbusMaster, never()).getValue(any(BaseLocator.class));
     }
 
@@ -160,7 +160,7 @@ class ModbusRtuDriverCustomServiceImplTest {
         when(modbusMaster.getValue(any(BaseLocator.class))).thenThrow(new ModbusTransportException("serial down"));
 
         assertThatThrownBy(() -> service.read(driverConfig(), pointConfig(1, 3, 0), device(20L),
-                point(PointTypeFlagEnum.INT))).isInstanceOf(ReadPointException.class)
+                point(PointTypeEnum.INT))).isInstanceOf(ReadPointException.class)
                 .hasMessageContaining("serial down");
         verify(modbusMaster).destroy();
     }
@@ -171,7 +171,7 @@ class ModbusRtuDriverCustomServiceImplTest {
         doThrow(new ModbusInitException("offline")).when(modbusMaster).init();
 
         assertThatThrownBy(() -> service.read(driverConfig(), pointConfig(1, 1, 0), device(10L),
-                point(PointTypeFlagEnum.INT))).isInstanceOf(ConnectorException.class)
+                point(PointTypeEnum.INT))).isInstanceOf(ConnectorException.class)
                 .hasMessageContaining("offline");
         verify(modbusMaster).destroy();
     }
@@ -181,9 +181,9 @@ class ModbusRtuDriverCustomServiceImplTest {
         when(modbusFactory.createRtuMaster(any(JSerialCommWrapper.class))).thenReturn(modbusMaster);
         when(modbusMaster.getValue(any(BaseLocator.class))).thenReturn(true);
 
-        service.read(driverConfig(), pointConfig(1, 1, 0), device(30L), point(PointTypeFlagEnum.BOOLEAN));
+        service.read(driverConfig(), pointConfig(1, 1, 0), device(30L), point(PointTypeEnum.BOOLEAN));
         service.event(metadataEvent(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE, 30L));
-        service.read(driverConfig(), pointConfig(1, 1, 0), device(30L), point(PointTypeFlagEnum.BOOLEAN));
+        service.read(driverConfig(), pointConfig(1, 1, 0), device(30L), point(PointTypeEnum.BOOLEAN));
 
         verify(modbusFactory, times(2)).createRtuMaster(any(JSerialCommWrapper.class));
         verify(modbusMaster).destroy();

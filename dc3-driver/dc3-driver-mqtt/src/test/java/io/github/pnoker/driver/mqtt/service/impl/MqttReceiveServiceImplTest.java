@@ -27,9 +27,9 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EventLevelFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
@@ -79,7 +79,7 @@ class MqttReceiveServiceImplTest {
         EventAttributeDTO attribute = new EventAttributeDTO();
         attribute.setId(id);
         attribute.setAttributeCode(code);
-        attribute.setAttributeTypeFlag(AttributeTypeFlagEnum.STRING);
+        attribute.setAttributeTypeFlag(AttributeTypeEnum.STRING);
         return attribute;
     }
 
@@ -170,7 +170,7 @@ class MqttReceiveServiceImplTest {
         event.setTenantId(1L);
         event.setEventCode("alarm");
         event.setEventTypeFlag(EventTypeFlagEnum.ALERT);
-        event.setEventLevelFlag(EventLevelFlagEnum.HIGH);
+        event.setEventLevelFlag(EventLevelEnum.HIGH);
         event.setEnableFlag(EnableFlagEnum.ENABLE);
         when(eventFacade.getById(1L, 20L)).thenReturn(event);
 
@@ -215,7 +215,7 @@ class MqttReceiveServiceImplTest {
         event.setTenantId(1L);
         event.setEventCode("alarm");
         event.setEventTypeFlag(EventTypeFlagEnum.ALERT);
-        event.setEventLevelFlag(EventLevelFlagEnum.HIGH);
+        event.setEventLevelFlag(EventLevelEnum.HIGH);
         event.setEnableFlag(EnableFlagEnum.ENABLE);
         when(eventFacade.getById(1L, 20L)).thenReturn(event);
 

@@ -288,6 +288,10 @@ class PointValueServiceImplTest {
                 List.of(pointWithValue, pointWithoutValue)));
         when(pointValueLocalCacheService.selectLatestPointValue(1L, 10L, List.of(20L, 21L)))
                 .thenReturn(Map.of(20L, cached));
+        // Point 21 is not in the local cache, so it is batch-queried from the repository,
+        // which returns nothing -> point 21 becomes a placeholder.
+        when(repositoryService.listLatestPointValues(1L, 10L, List.of(21L)))
+                .thenReturn(List.of());
 
         try (MockedStatic<RepositoryStrategyFactory> factory =
                      Mockito.mockStatic(RepositoryStrategyFactory.class)) {
@@ -310,8 +314,10 @@ class PointValueServiceImplTest {
             assertThat(placeholder.getOperateTime()).isNull();
         }
 
-        verify(repositoryService, never()).selectLatestPointValue(1L, 10L, 20L);
-        verify(repositoryService).selectLatestPointValue(1L, 10L, 21L);
+        // Only the cache-missing point (21) is batch-queried from the repository;
+        // the cached point (20) is never queried.
+        verify(repositoryService).listLatestPointValues(1L, 10L, List.of(21L));
+        verify(repositoryService, never()).listLatestPointValues(1L, 10L, List.of(20L));
     }
 
     @Test

@@ -21,7 +21,7 @@ import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.builder.RuleBuilder;
 import io.github.pnoker.common.data.entity.model.RuleDO;
 import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +50,7 @@ class RuleRegistryTest {
     private RuleRegistry registry;
 
     private static RuleFact fact(long tenantId, long entityId) {
-        return new RuleFact(tenantId, AlarmTargetTypeFlagEnum.POINT, entityId, null, LocalDateTime.now(), Map.of());
+        return new RuleFact(tenantId, AlarmTargetTypeEnum.POINT, entityId, null, LocalDateTime.now(), Map.of());
     }
 
     private static RuleBO rule(long id) {
@@ -124,7 +124,7 @@ class RuleRegistryTest {
         // not trip the underlying lookup either — the engine guards against
         // bad input upstream.
         assertThat(registry.findCandidates(null)).isEmpty();
-        assertThat(registry.findCandidates(new RuleFact(null, AlarmTargetTypeFlagEnum.POINT, 11L,
+        assertThat(registry.findCandidates(new RuleFact(null, AlarmTargetTypeEnum.POINT, 11L,
                 null, LocalDateTime.now(), Map.of()))).isEmpty();
         verify(ruleCandidateLookup, times(0)).findCandidates(any());
     }

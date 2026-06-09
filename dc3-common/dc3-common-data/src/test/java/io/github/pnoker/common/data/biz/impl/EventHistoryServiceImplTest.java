@@ -19,10 +19,11 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EventHistoryManager;
+import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EventLevelFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.EventFacade;
@@ -60,11 +61,14 @@ class EventHistoryServiceImplTest {
     @Mock
     private EventHistoryManager eventHistoryManager;
 
+    @Mock
+    private EventHistoryBuilder eventHistoryBuilder;
+
     private EventHistoryServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        service = new EventHistoryServiceImpl(deviceFacade, eventFacade, alarmRuleTriggerService, eventHistoryManager);
+        service = new EventHistoryServiceImpl(deviceFacade, eventFacade, alarmRuleTriggerService, eventHistoryManager, eventHistoryBuilder);
     }
 
     @Test
@@ -85,7 +89,7 @@ class EventHistoryServiceImplTest {
         event.setProfileId(30L);
         event.setEventCode("overheat");
         event.setEventTypeFlag(EventTypeFlagEnum.ALERT);
-        event.setEventLevelFlag(EventLevelFlagEnum.HIGH);
+        event.setEventLevelFlag(EventLevelEnum.HIGH);
         event.setEnableFlag(EnableFlagEnum.ENABLE);
 
         EventReportVO report = new EventReportVO();

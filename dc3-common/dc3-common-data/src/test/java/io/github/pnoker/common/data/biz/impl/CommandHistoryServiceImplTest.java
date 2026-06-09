@@ -20,6 +20,7 @@ package io.github.pnoker.common.data.biz.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.dal.CommandHistoryManager;
+import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
@@ -77,12 +78,15 @@ class CommandHistoryServiceImplTest {
     @Mock
     private EntityStateMapper entityStateMapper;
 
+    @Mock
+    private CommandHistoryBuilder commandHistoryBuilder;
+
     private CommandHistoryServiceImpl service;
 
     @BeforeEach
     void setUp() {
         service = new CommandHistoryServiceImpl(deviceFacade, driverFacade, commandFacade, rabbitTemplate,
-                commandHistoryManager, entityStateMapper);
+                commandHistoryManager, commandHistoryBuilder, entityStateMapper);
     }
 
     @Test

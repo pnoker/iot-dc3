@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -59,7 +59,7 @@ class RuleEngineImplTest {
         RuleBO bo = new RuleBO();
         bo.setId(id);
         bo.setRuleCode("rule-" + id);
-        bo.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
+        bo.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.POINT);
         RuleExt ext = new RuleExt();
         RuleExt.Content content = new RuleExt.Content();
         content.setSeverity("P1");
@@ -70,7 +70,7 @@ class RuleEngineImplTest {
     }
 
     private static RuleFact fact() {
-        return new RuleFact(7L, AlarmTargetTypeFlagEnum.POINT, 11L, null, LocalDateTime.now(), Map.of("value", 100));
+        return new RuleFact(7L, AlarmTargetTypeEnum.POINT, 11L, null, LocalDateTime.now(), Map.of("value", 100));
     }
 
     @Test
@@ -80,7 +80,7 @@ class RuleEngineImplTest {
 
     @Test
     void returnsEmptyWhenTenantIdMissing() {
-        RuleFact fact = new RuleFact(null, AlarmTargetTypeFlagEnum.POINT, 11L, null, LocalDateTime.now(), Map.of());
+        RuleFact fact = new RuleFact(null, AlarmTargetTypeEnum.POINT, 11L, null, LocalDateTime.now(), Map.of());
         assertThat(engine.evaluate(fact)).isEmpty();
     }
 
@@ -105,7 +105,7 @@ class RuleEngineImplTest {
         when(ruleEvaluator.matches(eq(rule), any())).thenReturn(false);
         when(ruleEvaluator.recovers(eq(rule), any())).thenReturn(true);
         when(ruleStateLookup.hasFiringState(7L, 1L,
-                AlarmTargetTypeFlagEnum.POINT.getIndex(), 11L)).thenReturn(true);
+                AlarmTargetTypeEnum.POINT.getIndex(), 11L)).thenReturn(true);
 
         List<RuleMatch> matches = engine.evaluate(fact());
 

@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.entity.ext.MessageExt;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -35,7 +35,7 @@ class MessageRenderServiceImplTest {
     void rendersStructuredTemplateForSelectedChannel() {
         MessageBO message = message();
 
-        MessagePayload payload = service.render(message, NotifyChannelTypeFlagEnum.FEISHU_BOT, Map.of(
+        MessagePayload payload = service.render(message, NotifyChannelTypeEnum.FEISHU_BOT, Map.of(
                 "severity", "P1",
                 "deviceName", "Line A PLC",
                 "value", 86.5,
@@ -51,7 +51,7 @@ class MessageRenderServiceImplTest {
     void keepsUnknownPlaceholdersAndReportsMissingVariables() {
         MessageBO message = message();
 
-        MessagePayload payload = service.render(message, NotifyChannelTypeFlagEnum.FEISHU_BOT, Map.of(
+        MessagePayload payload = service.render(message, NotifyChannelTypeEnum.FEISHU_BOT, Map.of(
                 "severity", "P1",
                 "deviceName", "Line A PLC"));
 

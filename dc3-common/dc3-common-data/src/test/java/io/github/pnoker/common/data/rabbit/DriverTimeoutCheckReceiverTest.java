@@ -27,7 +27,7 @@ import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,7 +94,7 @@ class DriverTimeoutCheckReceiverTest {
         EntityStateDO state = new EntityStateDO();
         state.setId(9L);
         state.setTenantId(100L);
-        state.setEntityTypeFlag((byte) EntityTypeFlagEnum.DRIVER.getIndex());
+        state.setEntityTypeFlag((byte) EntityTypeEnum.DRIVER.getIndex());
         state.setEntityId(7L);
         state.setParentEntityId(0L);
         state.setStateFlag(statusFlag);

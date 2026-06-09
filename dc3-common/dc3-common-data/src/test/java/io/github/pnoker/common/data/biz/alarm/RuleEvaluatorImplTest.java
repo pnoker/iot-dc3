@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -146,7 +146,7 @@ class RuleEvaluatorImplTest {
     private RuleFact fact(Map<String, Object> values) {
         return new RuleFact(
                 1L,
-                AlarmTargetTypeFlagEnum.POINT,
+                AlarmTargetTypeEnum.POINT,
                 1001L,
                 2001L,
                 LocalDateTime.now(),

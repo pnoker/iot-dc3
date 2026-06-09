@@ -24,10 +24,10 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.driver.service.MqttSendService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -114,11 +114,11 @@ class MqttDriverCustomServiceImplTest {
     void writePublishesWithConfiguredQosWhenAvailable() {
         Map<String, AttributeBO> pointConfig = new HashMap<>();
         pointConfig.put("commandTopic",
-                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeFlagEnum.STRING).build());
-        pointConfig.put("commandQos", AttributeBO.builder().value("1").type(AttributeTypeFlagEnum.INT).build());
+                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeEnum.STRING).build());
+        pointConfig.put("commandQos", AttributeBO.builder().value("1").type(AttributeTypeEnum.INT).build());
 
         Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
-                WritePointValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("23.5").type(PointTypeEnum.STRING).build());
 
         assertThat(ok).isTrue();
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", 1, "23.5");
@@ -129,11 +129,11 @@ class MqttDriverCustomServiceImplTest {
     void writeFallsBackToDefaultQosWhenLookupFails() {
         Map<String, AttributeBO> pointConfig = new HashMap<>();
         pointConfig.put("commandTopic",
-                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeEnum.STRING).build());
         // commandQos missing entirely → service catches NPE and falls back
 
         Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
-                WritePointValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("23.5").type(PointTypeEnum.STRING).build());
 
         assertThat(ok).isTrue();
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", "23.5");
@@ -143,14 +143,14 @@ class MqttDriverCustomServiceImplTest {
     void writeFallsBackToDefaultQosWhenQosTypeIsWrong() {
         Map<String, AttributeBO> pointConfig = new HashMap<>();
         pointConfig.put("commandTopic",
-                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeEnum.STRING).build());
         // commandQos present but as STRING -> AttributeBO.getValue(Integer.class) throws
         // TypeException, service catches and falls back to default-QoS overload.
         pointConfig.put("commandQos",
-                AttributeBO.builder().value("not-a-number").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("not-a-number").type(AttributeTypeEnum.STRING).build());
 
         Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
-                WritePointValue.builder().value("23.5").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("23.5").type(PointTypeEnum.STRING).build());
 
         assertThat(ok).isTrue();
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", "23.5");

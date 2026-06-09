@@ -22,8 +22,8 @@ import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -60,7 +60,7 @@ class RuleAlarmPersistenceServiceImplTest {
         bo.setId(id);
         bo.setRuleCode("rule-" + id);
         bo.setRuleName("rule-" + id);
-        bo.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.POINT);
+        bo.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.POINT);
         RuleExt ext = new RuleExt();
         RuleExt.Content content = new RuleExt.Content();
         content.setSeverity(severity);
@@ -72,13 +72,13 @@ class RuleAlarmPersistenceServiceImplTest {
     }
 
     private static RuleMatch firingMatch(String severity) {
-        RuleFact fact = new RuleFact(7L, AlarmTargetTypeFlagEnum.POINT, 11L, null, LocalDateTime.now(),
+        RuleFact fact = new RuleFact(7L, AlarmTargetTypeEnum.POINT, 11L, null, LocalDateTime.now(),
                 Map.of("driverId", 3L, "deviceId", 5L));
         return RuleMatch.firing(rule(1L, severity), fact);
     }
 
     private static RuleMatch recoveryMatch() {
-        RuleFact fact = new RuleFact(7L, AlarmTargetTypeFlagEnum.POINT, 11L, null, LocalDateTime.now(), Map.of());
+        RuleFact fact = new RuleFact(7L, AlarmTargetTypeEnum.POINT, 11L, null, LocalDateTime.now(), Map.of());
         return RuleMatch.recovery(rule(1L, "P1"), fact);
     }
 
@@ -98,7 +98,7 @@ class RuleAlarmPersistenceServiceImplTest {
         verify(entityAlarmManager).save(captor.capture());
         EntityAlarmDO persisted = captor.getValue();
         // Severity P0 → alarm_level_flag index 0
-        assertThat(persisted.getAlarmLevelFlag()).isEqualTo(AlarmMessageLevelFlagEnum.P0.getIndex());
+        assertThat(persisted.getAlarmLevelFlag()).isEqualTo(AlarmMessageLevelEnum.P0.getIndex());
         assertThat(persisted.getRuleId()).isEqualTo(1L);
         assertThat(persisted.getTenantId()).isEqualTo(7L);
         // The fact gets the new alarm id back so downstream notification persists it
@@ -119,7 +119,7 @@ class RuleAlarmPersistenceServiceImplTest {
 
         ArgumentCaptor<EntityAlarmDO> captor = ArgumentCaptor.forClass(EntityAlarmDO.class);
         verify(entityAlarmManager).save(captor.capture());
-        assertThat(captor.getValue().getAlarmLevelFlag()).isEqualTo(AlarmMessageLevelFlagEnum.P2.getIndex());
+        assertThat(captor.getValue().getAlarmLevelFlag()).isEqualTo(AlarmMessageLevelEnum.P2.getIndex());
     }
 
     @Test

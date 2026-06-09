@@ -24,7 +24,7 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -76,9 +76,9 @@ class NettyServerHandlerTest {
         device.setId(123L);
         when(deviceMetadata.getCache(123L)).thenReturn(device);
         when(deviceMetadata.getPointConfig(123L)).thenReturn(Map.of(1L, Map.of(
-                "key", AttributeBO.builder().value("62").type(AttributeTypeFlagEnum.STRING).build(),
-                "start", AttributeBO.builder().value("23").type(AttributeTypeFlagEnum.INT).build(),
-                "end", AttributeBO.builder().value("28").type(AttributeTypeFlagEnum.INT).build()
+                "key", AttributeBO.builder().value("62").type(AttributeTypeEnum.STRING).build(),
+                "start", AttributeBO.builder().value("23").type(AttributeTypeEnum.INT).build(),
+                "end", AttributeBO.builder().value("28").type(AttributeTypeEnum.INT).build()
         )));
         PointBO point = new PointBO();
         point.setId(1L);
@@ -107,8 +107,8 @@ class NettyServerHandlerTest {
         device.setId(123L);
         when(deviceMetadata.getCache(123L)).thenReturn(device);
         when(deviceMetadata.getPointConfig(123L)).thenReturn(Map.of(1L, Map.of(
-                "key", AttributeBO.builder().value("62").type(AttributeTypeFlagEnum.STRING).build(),
-                "start", AttributeBO.builder().value("23").type(AttributeTypeFlagEnum.INT).build()
+                "key", AttributeBO.builder().value("62").type(AttributeTypeEnum.STRING).build(),
+                "start", AttributeBO.builder().value("23").type(AttributeTypeEnum.INT).build()
         )));
         PointBO point = new PointBO();
         point.setId(1L);

@@ -25,10 +25,10 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.driver.coap.client.CoapClientManager;
 import io.github.pnoker.driver.coap.entity.CoapResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -110,12 +110,12 @@ class CoapDriverCustomServiceImplTest {
     void deviceDeleteReleasesRememberedClient() {
         Map<String, AttributeBO> driverConfig = new HashMap<>();
         driverConfig.put("deviceHost",
-                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeEnum.STRING).build());
         driverConfig.put("devicePort",
-                AttributeBO.builder().value("5683").type(AttributeTypeFlagEnum.INT).build());
+                AttributeBO.builder().value("5683").type(AttributeTypeEnum.INT).build());
         Map<String, AttributeBO> pointConfig = new HashMap<>();
         pointConfig.put("readPath",
-                AttributeBO.builder().value("/sensors/temp").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("/sensors/temp").type(AttributeTypeEnum.STRING).build());
         when(coapClientManager.get(anyString(), anyString())).thenReturn(null);
         service.read(driverConfig, pointConfig, device(1L), point(1L));
 
@@ -128,13 +128,13 @@ class CoapDriverCustomServiceImplTest {
     void readReturnsValueFromCoapGet() {
         Map<String, AttributeBO> driverConfig = new HashMap<>();
         driverConfig.put("deviceHost",
-                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeEnum.STRING).build());
         driverConfig.put("devicePort",
-                AttributeBO.builder().value("5683").type(AttributeTypeFlagEnum.INT).build());
+                AttributeBO.builder().value("5683").type(AttributeTypeEnum.INT).build());
 
         Map<String, AttributeBO> pointConfig = new HashMap<>();
         pointConfig.put("readPath",
-                AttributeBO.builder().value("/sensors/temp").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("/sensors/temp").type(AttributeTypeEnum.STRING).build());
 
         CoapResult mockResponse = CoapResult.builder()
                 .statusCode(69)
@@ -153,13 +153,13 @@ class CoapDriverCustomServiceImplTest {
     void readReturnsNullWhenCoapGetFails() {
         Map<String, AttributeBO> driverConfig = new HashMap<>();
         driverConfig.put("deviceHost",
-                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeEnum.STRING).build());
         driverConfig.put("devicePort",
-                AttributeBO.builder().value("5683").type(AttributeTypeFlagEnum.INT).build());
+                AttributeBO.builder().value("5683").type(AttributeTypeEnum.INT).build());
 
         Map<String, AttributeBO> pointConfig = new HashMap<>();
         pointConfig.put("readPath",
-                AttributeBO.builder().value("/sensors/temp").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("/sensors/temp").type(AttributeTypeEnum.STRING).build());
 
         when(coapClientManager.get(anyString(), anyString())).thenReturn(null);
 
@@ -189,13 +189,13 @@ class CoapDriverCustomServiceImplTest {
     void writeSendsCoapPutAndReturnsTrueOnSuccess() {
         Map<String, AttributeBO> driverConfig = new HashMap<>();
         driverConfig.put("deviceHost",
-                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeEnum.STRING).build());
         driverConfig.put("devicePort",
-                AttributeBO.builder().value("5683").type(AttributeTypeFlagEnum.INT).build());
+                AttributeBO.builder().value("5683").type(AttributeTypeEnum.INT).build());
 
         Map<String, AttributeBO> pointConfig = new HashMap<>();
         pointConfig.put("writePath",
-                AttributeBO.builder().value("/actuators/relay").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("/actuators/relay").type(AttributeTypeEnum.STRING).build());
 
         CoapResult mockResponse = CoapResult.builder()
                 .statusCode(68)
@@ -204,7 +204,7 @@ class CoapDriverCustomServiceImplTest {
         when(coapClientManager.put("coap://192.168.1.10:5683", "/actuators/relay", "ON")).thenReturn(mockResponse);
 
         Boolean result = service.write(driverConfig, pointConfig, device(1L), point(1L),
-                WritePointValue.builder().value("ON").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("ON").type(PointTypeEnum.STRING).build());
 
         assertThat(result).isTrue();
     }
@@ -213,18 +213,18 @@ class CoapDriverCustomServiceImplTest {
     void writeReturnsFalseWhenCoapPutFails() {
         Map<String, AttributeBO> driverConfig = new HashMap<>();
         driverConfig.put("deviceHost",
-                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("192.168.1.10").type(AttributeTypeEnum.STRING).build());
         driverConfig.put("devicePort",
-                AttributeBO.builder().value("5683").type(AttributeTypeFlagEnum.INT).build());
+                AttributeBO.builder().value("5683").type(AttributeTypeEnum.INT).build());
 
         Map<String, AttributeBO> pointConfig = new HashMap<>();
         pointConfig.put("writePath",
-                AttributeBO.builder().value("/actuators/relay").type(AttributeTypeFlagEnum.STRING).build());
+                AttributeBO.builder().value("/actuators/relay").type(AttributeTypeEnum.STRING).build());
 
         when(coapClientManager.put(anyString(), anyString(), anyString())).thenReturn(null);
 
         Boolean result = service.write(driverConfig, pointConfig, device(1L), point(1L),
-                WritePointValue.builder().value("ON").type(PointTypeFlagEnum.STRING).build());
+                WritePointValue.builder().value("ON").type(PointTypeEnum.STRING).build());
 
         assertThat(result).isFalse();
     }

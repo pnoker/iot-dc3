@@ -32,7 +32,7 @@ import io.github.pnoker.common.data.entity.model.MessageDO;
 import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
 import io.github.pnoker.common.data.entity.model.NotifyDO;
 import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -127,7 +127,7 @@ class NotifyConfigCacheTest {
         when(notifyChannelManager.getById(3L)).thenReturn(entity);
         NotifyChannelBO bo = new NotifyChannelBO();
         bo.setTenantId(7L);
-        bo.setChannelTypeFlag(NotifyChannelTypeFlagEnum.FEISHU_BOT);
+        bo.setChannelTypeFlag(NotifyChannelTypeEnum.FEISHU_BOT);
         when(notifyChannelBuilder.buildBOByDO(entity)).thenReturn(bo);
 
         // Same tenant id → return; different tenant id → null even on cache hit.

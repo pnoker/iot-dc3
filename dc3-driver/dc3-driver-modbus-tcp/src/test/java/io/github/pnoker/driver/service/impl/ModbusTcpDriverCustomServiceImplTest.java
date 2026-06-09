@@ -34,11 +34,11 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
@@ -95,18 +95,18 @@ class ModbusTcpDriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> driverConfig(String host, int port) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeFlagEnum.STRING).build());
-        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeFlagEnum.INT).build());
+        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeEnum.STRING).build());
+        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeEnum.INT).build());
         return m;
     }
 
     private static Map<String, AttributeBO> pointConfig(int slaveId, int functionCode, int offset) {
         Map<String, AttributeBO> m = new HashMap<>();
         m.put("slaveId",
-                AttributeBO.builder().value(String.valueOf(slaveId)).type(AttributeTypeFlagEnum.INT).build());
+                AttributeBO.builder().value(String.valueOf(slaveId)).type(AttributeTypeEnum.INT).build());
         m.put("functionCode",
-                AttributeBO.builder().value(String.valueOf(functionCode)).type(AttributeTypeFlagEnum.INT).build());
-        m.put("offset", AttributeBO.builder().value(String.valueOf(offset)).type(AttributeTypeFlagEnum.INT).build());
+                AttributeBO.builder().value(String.valueOf(functionCode)).type(AttributeTypeEnum.INT).build());
+        m.put("offset", AttributeBO.builder().value(String.valueOf(offset)).type(AttributeTypeEnum.INT).build());
         return m;
     }
 
@@ -116,14 +116,14 @@ class ModbusTcpDriverCustomServiceImplTest {
         return device;
     }
 
-    private static PointBO point(PointTypeFlagEnum type) {
+    private static PointBO point(PointTypeEnum type) {
         PointBO point = new PointBO();
         point.setId(1L);
         point.setPointTypeFlag(type);
         return point;
     }
 
-    private static WritePointValue writePointValue(String value, PointTypeFlagEnum type) {
+    private static WritePointValue writePointValue(String value, PointTypeEnum type) {
         return WritePointValue.builder().value(value).type(type).build();
     }
 
@@ -177,27 +177,27 @@ class ModbusTcpDriverCustomServiceImplTest {
     @Test
     void deviceUpdateInvalidatesCachedConnection() throws Exception {
         when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
-        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(123L), point(PointTypeFlagEnum.BOOLEAN));
+        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(123L), point(PointTypeEnum.BOOLEAN));
         service.event(metadataEvent(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE, 123L));
-        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(123L), point(PointTypeFlagEnum.BOOLEAN));
+        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(123L), point(PointTypeEnum.BOOLEAN));
         verify(modbusFactory, times(2)).createTcpMaster(any(IpParameters.class), eq(true));
     }
 
     @Test
     void deviceDeleteInvalidatesCachedConnection() throws Exception {
         when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
-        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(456L), point(PointTypeFlagEnum.BOOLEAN));
+        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(456L), point(PointTypeEnum.BOOLEAN));
         service.event(metadataEvent(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE, 456L));
-        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(456L), point(PointTypeFlagEnum.BOOLEAN));
+        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(456L), point(PointTypeEnum.BOOLEAN));
         verify(modbusFactory, times(2)).createTcpMaster(any(IpParameters.class), eq(true));
     }
 
     @Test
     void pointEventDoesNotTouchConnectionMap() throws Exception {
         when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
-        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(789L), point(PointTypeFlagEnum.BOOLEAN));
+        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(789L), point(PointTypeEnum.BOOLEAN));
         service.event(metadataEvent(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.UPDATE, 999L));
-        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(789L), point(PointTypeFlagEnum.BOOLEAN));
+        service.read(driverConfig("h", 502), pointConfig(1, 1, 0), device(789L), point(PointTypeEnum.BOOLEAN));
         verify(modbusFactory, times(1)).createTcpMaster(any(IpParameters.class), eq(true));
     }
 
@@ -206,8 +206,8 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
         when(modbusMaster.getValue(any(BaseLocator.class))).thenReturn(true);
 
-        service.read(driverConfig("host", 1502), pointConfig(1, 1, 0), device(1L), point(PointTypeFlagEnum.BOOLEAN));
-        service.read(driverConfig("host", 1502), pointConfig(1, 1, 0), device(1L), point(PointTypeFlagEnum.BOOLEAN));
+        service.read(driverConfig("host", 1502), pointConfig(1, 1, 0), device(1L), point(PointTypeEnum.BOOLEAN));
+        service.read(driverConfig("host", 1502), pointConfig(1, 1, 0), device(1L), point(PointTypeEnum.BOOLEAN));
 
         verify(modbusFactory, times(1)).createTcpMaster(any(IpParameters.class), eq(true));
         verify(modbusMaster, times(1)).init();
@@ -219,7 +219,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         doThrow(new ModbusInitException("offline")).when(modbusMaster).init();
 
         assertThatThrownBy(() -> service.read(driverConfig("host", 1502), pointConfig(1, 1, 0), device(7L),
-                point(PointTypeFlagEnum.INT))).isInstanceOf(ConnectorException.class)
+                point(PointTypeEnum.INT))).isInstanceOf(ConnectorException.class)
                 .hasMessageContaining("offline");
         verify(modbusMaster).destroy();
     }
@@ -230,16 +230,16 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusMaster.getValue(any(BaseLocator.class))).thenReturn(true, false, 42, 7);
 
         assertThat(
-                service.read(driverConfig("h", 1), pointConfig(1, 1, 0), device(2L), point(PointTypeFlagEnum.BOOLEAN))
+                service.read(driverConfig("h", 1), pointConfig(1, 1, 0), device(2L), point(PointTypeEnum.BOOLEAN))
                         .getValue())
                 .isEqualTo("true");
         assertThat(
-                service.read(driverConfig("h", 1), pointConfig(1, 2, 0), device(2L), point(PointTypeFlagEnum.BOOLEAN))
+                service.read(driverConfig("h", 1), pointConfig(1, 2, 0), device(2L), point(PointTypeEnum.BOOLEAN))
                         .getValue())
                 .isEqualTo("false");
-        assertThat(service.read(driverConfig("h", 1), pointConfig(1, 3, 0), device(2L), point(PointTypeFlagEnum.INT))
+        assertThat(service.read(driverConfig("h", 1), pointConfig(1, 3, 0), device(2L), point(PointTypeEnum.INT))
                 .getValue()).isEqualTo("42");
-        assertThat(service.read(driverConfig("h", 1), pointConfig(1, 4, 0), device(2L), point(PointTypeFlagEnum.INT))
+        assertThat(service.read(driverConfig("h", 1), pointConfig(1, 4, 0), device(2L), point(PointTypeEnum.INT))
                 .getValue()).isEqualTo("7");
     }
 
@@ -248,7 +248,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
         // Function code 99 is not handled.
         assertThatThrownBy(() -> service.read(driverConfig("h", 1), pointConfig(1, 99, 0),
-                device(2L), point(PointTypeFlagEnum.INT))).isInstanceOf(UnSupportException.class)
+                device(2L), point(PointTypeEnum.INT))).isInstanceOf(UnSupportException.class)
                 .hasMessageContaining("function code");
         verify(modbusMaster, never()).getValue(any(BaseLocator.class));
     }
@@ -259,7 +259,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusMaster.getValue(any(BaseLocator.class))).thenThrow(new ModbusTransportException("rs485 down"));
 
         assertThatThrownBy(() -> service.read(driverConfig("h", 1), pointConfig(1, 3, 0), device(3L),
-                point(PointTypeFlagEnum.INT))).isInstanceOf(ReadPointException.class)
+                point(PointTypeEnum.INT))).isInstanceOf(ReadPointException.class)
                 .hasMessageContaining("rs485 down");
         verify(modbusMaster).destroy();
     }
@@ -273,7 +273,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusMaster.getValue(any(BaseLocator.class))).thenThrow(new ErrorResponseException(null, errorResponse));
 
         assertThatThrownBy(() -> service.read(driverConfig("h", 1), pointConfig(1, 4, 0), device(3L),
-                point(PointTypeFlagEnum.INT))).isInstanceOf(ReadPointException.class)
+                point(PointTypeEnum.INT))).isInstanceOf(ReadPointException.class)
                 .hasMessageContaining("illegal data address");
     }
 
@@ -285,7 +285,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusMaster.send(any(com.serotonin.modbus4j.msg.WriteCoilRequest.class))).thenReturn(response);
 
         Boolean ok = service.write(driverConfig("h", 1), pointConfig(1, 1, 0), device(7L),
-                point(PointTypeFlagEnum.BOOLEAN), writePointValue("true", PointTypeFlagEnum.BOOLEAN));
+                point(PointTypeEnum.BOOLEAN), writePointValue("true", PointTypeEnum.BOOLEAN));
         assertThat(ok).isTrue();
     }
 
@@ -297,7 +297,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusMaster.send(any(com.serotonin.modbus4j.msg.WriteCoilRequest.class))).thenReturn(response);
 
         Boolean ok = service.write(driverConfig("h", 1), pointConfig(1, 1, 0), device(7L),
-                point(PointTypeFlagEnum.BOOLEAN), writePointValue("false", PointTypeFlagEnum.BOOLEAN));
+                point(PointTypeEnum.BOOLEAN), writePointValue("false", PointTypeEnum.BOOLEAN));
         assertThat(ok).isFalse();
     }
 
@@ -308,7 +308,7 @@ class ModbusTcpDriverCustomServiceImplTest {
                 .thenThrow(new ModbusTransportException("transport reset"));
 
         assertThatThrownBy(() -> service.write(driverConfig("h", 1), pointConfig(1, 1, 0), device(7L),
-                point(PointTypeFlagEnum.BOOLEAN), writePointValue("true", PointTypeFlagEnum.BOOLEAN)))
+                point(PointTypeEnum.BOOLEAN), writePointValue("true", PointTypeEnum.BOOLEAN)))
                 .isInstanceOf(WritePointException.class)
                 .hasMessageContaining("transport reset");
         verify(modbusMaster).destroy();
@@ -319,7 +319,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
 
         Boolean ok = service.write(driverConfig("h", 1), pointConfig(1, 3, 0), device(8L),
-                point(PointTypeFlagEnum.FLOAT), writePointValue("3.14", PointTypeFlagEnum.FLOAT));
+                point(PointTypeEnum.FLOAT), writePointValue("3.14", PointTypeEnum.FLOAT));
         assertThat(ok).isTrue();
         verify(modbusMaster).setValue(any(BaseLocator.class), any());
     }
@@ -330,7 +330,7 @@ class ModbusTcpDriverCustomServiceImplTest {
         doThrow(new ModbusTransportException("offline")).when(modbusMaster).setValue(any(BaseLocator.class), any());
 
         assertThatThrownBy(() -> service.write(driverConfig("h", 1), pointConfig(1, 3, 0), device(8L),
-                point(PointTypeFlagEnum.FLOAT), writePointValue("1.0", PointTypeFlagEnum.FLOAT)))
+                point(PointTypeEnum.FLOAT), writePointValue("1.0", PointTypeEnum.FLOAT)))
                 .isInstanceOf(WritePointException.class)
                 .hasMessageContaining("offline");
     }
@@ -367,7 +367,7 @@ class ModbusTcpDriverCustomServiceImplTest {
     void validatePointReportsMissingAttributes() {
         Map<String, AttributeBO> empty = Map.of();
         ValidationReport report = service.validatePoint(empty,
-                point(PointTypeFlagEnum.INT));
+                point(PointTypeEnum.INT));
         assertThat(report.isPassed()).isFalse();
         assertThat(report.getIssues()).hasSize(3);
         assertThat(report.getIssues()).extracting("attributeCode")
@@ -378,7 +378,7 @@ class ModbusTcpDriverCustomServiceImplTest {
     void validatePointReportsInvalidFunctionCode() {
         Map<String, AttributeBO> config = pointConfig(1, 99, 0);
         ValidationReport report = service.validatePoint(config,
-                point(PointTypeFlagEnum.INT));
+                point(PointTypeEnum.INT));
         assertThat(report.isPassed()).isFalse();
         assertThat(report.getIssues()).extracting("attributeCode")
                 .contains("functionCode");
@@ -388,7 +388,7 @@ class ModbusTcpDriverCustomServiceImplTest {
     void validatePointPassesWithValidConfig() {
         Map<String, AttributeBO> config = pointConfig(1, 3, 100);
         ValidationReport report = service.validatePoint(config,
-                point(PointTypeFlagEnum.INT));
+                point(PointTypeEnum.INT));
         assertThat(report.isPassed()).isTrue();
     }
 
@@ -396,7 +396,7 @@ class ModbusTcpDriverCustomServiceImplTest {
     void writeUnsupportedFunctionCodeReturnsFalse() throws Exception {
         when(modbusFactory.createTcpMaster(any(IpParameters.class), eq(true))).thenReturn(modbusMaster);
         Boolean ok = service.write(driverConfig("h", 1), pointConfig(1, 4, 0), device(8L),
-                point(PointTypeFlagEnum.INT), writePointValue("1", PointTypeFlagEnum.INT));
+                point(PointTypeEnum.INT), writePointValue("1", PointTypeEnum.INT));
         assertThat(ok).isFalse();
         verify(modbusMaster, never()).setValue(any(BaseLocator.class), any());
         verify(modbusMaster, never()).send(any(com.serotonin.modbus4j.msg.WriteCoilRequest.class));
