@@ -1,7 +1,7 @@
 {
   "name": "iot-dc3",
   "private": true,
-  "description": "IoT DC3 is a fully open-source distributed Internet of Things (IoT) platform built on Spring Cloud.",
+  "description": "IoT DC3 is a distributed industrial IoT platform for device access, data collection, and AI-assisted operations.",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -10,7 +10,10 @@
   "scripts": {
     "dev": "vitepress dev docs",
     "build": "vitepress build docs",
-    "preview": "vitepress preview docs"
+    "preview": "vitepress preview docs",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "vitepress": "^1.6.4"
