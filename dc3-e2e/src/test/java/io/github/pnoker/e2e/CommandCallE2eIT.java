@@ -194,7 +194,7 @@ class CommandCallE2eIT extends BaseE2eIT {
         CommandCallResultDTO result = CommandCallResultDTO.builder()
                 .recordId(UUID.randomUUID().toString())
                 .tenantId(1L)
-                .status(PointCommandStatusEnum.SUCCESS.getCode())
+                .status(PointCommandStatusEnum.SUCCESS)
                 .resultValues(Map.of("uptime", "3600"))
                 .finishedAt(Instant.now())
                 .schemaVersion(1)
@@ -214,7 +214,7 @@ class CommandCallE2eIT extends BaseE2eIT {
         String json = new String(response.getBody(), StandardCharsets.UTF_8);
         CommandCallResultDTO received = JsonUtil.parseObject(json, CommandCallResultDTO.class);
         assertThat(received.recordId()).isEqualTo(result.recordId());
-        assertThat(received.status()).isEqualTo(PointCommandStatusEnum.SUCCESS.getCode());
+        assertThat(received.status()).isEqualTo(PointCommandStatusEnum.SUCCESS);
         assertThat(received.resultValues()).containsEntry("uptime", "3600");
 
         channel.queueDelete(resultQueue);

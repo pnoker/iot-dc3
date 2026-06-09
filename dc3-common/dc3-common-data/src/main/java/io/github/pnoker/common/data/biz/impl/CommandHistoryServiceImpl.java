@@ -118,8 +118,8 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         recordDO.setCommandId(commandId);
         recordDO.setCommandCode(command.getCommandCode());
         recordDO.setParamValues(Objects.isNull(entityVO.getParamValues()) ? null : JsonUtil.toJsonString(entityVO.getParamValues()));
-        recordDO.setStatus(PointCommandStatusEnum.PENDING.getCode());
-        recordDO.setSource(CommandHistorySourceEnum.HTTP.getCode());
+        recordDO.setStatus(PointCommandStatusEnum.PENDING);
+        recordDO.setSource(CommandHistorySourceEnum.HTTP);
         recordDO.setOccurTime(nowLocal);
         recordDO.setExpireTime(nowLocal.plusSeconds(timeoutSeconds));
         recordDO.setSchemaVersion((short) 1);
@@ -132,13 +132,13 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
                 .commandId(commandId)
                 .commandCode(command.getCommandCode())
                 .paramValues(entityVO.getParamValues())
-                .source(CommandHistorySourceEnum.HTTP.getCode())
+                .source(CommandHistorySourceEnum.HTTP)
                 .occurredAt(now)
                 .expireAt(now.plusSeconds(timeoutSeconds))
                 .schemaVersion(1)
                 .build(), driver.getServiceName(), recordId);
 
-        recordDO.setStatus(PointCommandStatusEnum.SENT.getCode());
+        recordDO.setStatus(PointCommandStatusEnum.SENT);
         recordDO.setSendTime(LocalDateTime.now());
         commandHistoryManager.updateById(recordDO);
 
@@ -160,8 +160,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
                 .eq(CommandHistoryDO::getTenantId, tenantId)
                 .eq(Objects.nonNull(queryVO.getDeviceId()), CommandHistoryDO::getDeviceId, queryVO.getDeviceId())
                 .eq(Objects.nonNull(queryVO.getCommandId()), CommandHistoryDO::getCommandId, queryVO.getCommandId())
-                .eq(Objects.nonNull(queryVO.getStatus()), CommandHistoryDO::getStatus,
-                        Objects.nonNull(queryVO.getStatus()) ? queryVO.getStatus().getCode() : null)
+                .eq(Objects.nonNull(queryVO.getStatus()), CommandHistoryDO::getStatus, queryVO.getStatus())
                 .orderByDesc(CommandHistoryDO::getOccurTime);
         Page<CommandHistoryDO> page = commandHistoryManager.page(queryVO.toPage(), wrapper);
         return commandHistoryBuilder.buildVOPageByDOPage(page);

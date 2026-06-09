@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.entity.dto;
 
+import io.github.pnoker.common.enums.CommandHistorySourceEnum;
+
 import java.time.Instant;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ public record CommandCallDTO(
         Long commandId,
         String commandCode,
         Map<String, String> paramValues,
-        String source,
+        CommandHistorySourceEnum source,
         Long sourceUserId,
         Instant occurredAt,
         Instant expireAt,
@@ -52,7 +54,7 @@ public record CommandCallDTO(
         private Long commandId;
         private String commandCode;
         private Map<String, String> paramValues;
-        private String source;
+        private CommandHistorySourceEnum source;
         private Long sourceUserId;
         private Instant occurredAt;
         private Instant expireAt;
@@ -88,7 +90,7 @@ public record CommandCallDTO(
             return this;
         }
 
-        public Builder source(String source) {
+        public Builder source(CommandHistorySourceEnum source) {
             this.source = source;
             return this;
         }

@@ -105,7 +105,7 @@ class CommandReceiverTest {
 
         ArgumentCaptor<CommandCallResultDTO> captor = ArgumentCaptor.forClass(CommandCallResultDTO.class);
         verify(driverSenderService).commandResultSender(captor.capture());
-        assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.SUCCESS.getCode());
+        assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.SUCCESS);
         assertThat(captor.getValue().resultValues()).containsEntry("result", "ok");
         verify(channel).basicAck(eq(9L), eq(false));
     }
@@ -131,7 +131,7 @@ class CommandReceiverTest {
 
         ArgumentCaptor<CommandCallResultDTO> captor = ArgumentCaptor.forClass(CommandCallResultDTO.class);
         verify(driverSenderService).commandResultSender(captor.capture());
-        assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.FAILED.getCode());
+        assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.FAILED);
         verify(dedupCache, never()).release("record-3");
         verify(channel).basicAck(eq(9L), eq(false));
     }
@@ -145,7 +145,7 @@ class CommandReceiverTest {
         verifyNoInteractions(driverCustomService);
         ArgumentCaptor<CommandCallResultDTO> captor = ArgumentCaptor.forClass(CommandCallResultDTO.class);
         verify(driverSenderService).commandResultSender(captor.capture());
-        assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.DUPLICATE.getCode());
+        assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.DUPLICATE);
         verify(channel).basicAck(eq(9L), eq(false));
     }
 

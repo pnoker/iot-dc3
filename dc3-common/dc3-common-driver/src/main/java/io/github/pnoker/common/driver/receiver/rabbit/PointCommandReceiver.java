@@ -87,7 +87,7 @@ public class PointCommandReceiver {
             // Expire-at pre-check
             if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
                 log.warn("Command already expired: commandId={}, expireAt={}", commandId, entityDTO.expireAt());
-                sendResult(commandId, tenantId, PointCommandStatusEnum.EXPIRED.getCode(),
+                sendResult(commandId, tenantId, PointCommandStatusEnum.EXPIRED,
                         null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
                 return;
             }
@@ -95,7 +95,7 @@ public class PointCommandReceiver {
             // Dedup check
             if (!dedupCache.tryAcquire(commandId)) {
                 log.warn("Duplicate command detected: commandId={}", commandId);
-                sendResult(commandId, tenantId, PointCommandStatusEnum.DUPLICATE.getCode(),
+                sendResult(commandId, tenantId, PointCommandStatusEnum.DUPLICATE,
                         null, "DUPLICATE", "Command already processed", channel, deliveryTag);
                 return;
             }
@@ -125,12 +125,12 @@ public class PointCommandReceiver {
 
             if (Objects.isNull(responseValue) && entityDTO.payload()
                     instanceof PointCommandPayload.WritePayload) {
-                sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED.getCode(),
+                sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED,
                         null, "WRITE_FAILED", "Device write returned false", channel, deliveryTag);
                 return;
             }
 
-            sendResult(commandId, tenantId, PointCommandStatusEnum.SUCCESS.getCode(),
+            sendResult(commandId, tenantId, PointCommandStatusEnum.SUCCESS,
                     responseValue, null, null, channel, deliveryTag);
 
         } catch (Exception e) {
@@ -138,7 +138,7 @@ public class PointCommandReceiver {
                 log.error("Point command failed on redelivery, sending FAILED. deliveryTag={}", deliveryTag, e);
                 String commandId = Objects.nonNull(entityDTO) ? entityDTO.commandId() : null;
                 Long tenantId = Objects.nonNull(entityDTO) ? entityDTO.tenantId() : null;
-                sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED.getCode(),
+                sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED,
                         null, "DRIVER_ERROR", e.getMessage(), channel, deliveryTag);
             } else {
                 log.warn("Point command failed, requeueing. deliveryTag={}", deliveryTag, e);
@@ -162,7 +162,7 @@ public class PointCommandReceiver {
         }
     }
 
-    private void sendResult(String commandId, Long tenantId, String status,
+    private void sendResult(String commandId, Long tenantId, PointCommandStatusEnum status,
                             String responseValue, String errorCode, String errorMessage,
                             Channel channel, long deliveryTag) {
         try {

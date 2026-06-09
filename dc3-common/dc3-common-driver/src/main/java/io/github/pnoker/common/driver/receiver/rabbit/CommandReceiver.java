@@ -91,7 +91,7 @@ public class CommandReceiver {
             // Expire-at pre-check
             if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
                 log.warn("Command already expired: recordId={}, expireAt={}", recordId, entityDTO.expireAt());
-                sendResult(recordId, tenantId, PointCommandStatusEnum.EXPIRED.getCode(),
+                sendResult(recordId, tenantId, PointCommandStatusEnum.EXPIRED,
                         null, null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
                 return;
             }
@@ -99,7 +99,7 @@ public class CommandReceiver {
             // Dedup check
             if (!dedupCache.tryAcquire(recordId)) {
                 log.warn("Duplicate command detected: recordId={}", recordId);
-                sendResult(recordId, tenantId, PointCommandStatusEnum.DUPLICATE.getCode(),
+                sendResult(recordId, tenantId, PointCommandStatusEnum.DUPLICATE,
                         null, null, "DUPLICATE", "Command already processed", channel, deliveryTag);
                 return;
             }
@@ -121,7 +121,7 @@ public class CommandReceiver {
                 return new CommandExecutionResult(resultValues, buildConfigSnapshot(commandConfig));
             });
 
-            sendResult(recordId, tenantId, PointCommandStatusEnum.SUCCESS.getCode(),
+            sendResult(recordId, tenantId, PointCommandStatusEnum.SUCCESS,
                     executionResult.resultValues(), executionResult.configSnapshot(), null, null, channel, deliveryTag);
 
         } catch (Exception e) {
@@ -129,7 +129,7 @@ public class CommandReceiver {
                 log.error("Custom command failed on redelivery, sending FAILED. deliveryTag={}", deliveryTag, e);
                 String recordId = Objects.nonNull(entityDTO) ? entityDTO.recordId() : null;
                 Long tenantId = Objects.nonNull(entityDTO) ? entityDTO.tenantId() : null;
-                sendResult(recordId, tenantId, PointCommandStatusEnum.FAILED.getCode(),
+                sendResult(recordId, tenantId, PointCommandStatusEnum.FAILED,
                         null, null, "DRIVER_ERROR", e.getMessage(), channel, deliveryTag);
             } else {
                 log.warn("Custom command failed, requeueing. deliveryTag={}", deliveryTag, e);
@@ -145,7 +145,7 @@ public class CommandReceiver {
         }
     }
 
-    private void sendResult(String recordId, Long tenantId, String status,
+    private void sendResult(String recordId, Long tenantId, PointCommandStatusEnum status,
                             Map<String, String> resultValues, String configSnapshot,
                             String errorCode, String errorMessage,
                             Channel channel, long deliveryTag) {

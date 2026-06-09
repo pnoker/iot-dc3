@@ -136,7 +136,7 @@ class CommandHistoryServiceImplTest {
         verify(commandHistoryManager).save(recordCaptor.capture());
         CommandHistoryDO savedRecord = recordCaptor.getValue();
         assertThat(savedRecord.getRecordId()).isEqualTo(recordId);
-        assertThat(savedRecord.getStatus()).isEqualTo(PointCommandStatusEnum.SENT.getCode());
+        assertThat(savedRecord.getStatus()).isEqualTo(PointCommandStatusEnum.SENT);
         assertThat(savedRecord.getExpireTime()).isAfterOrEqualTo(beforeLocal.plusSeconds(5));
         assertThat(savedRecord.getExpireTime()).isBeforeOrEqualTo(afterLocal.plusSeconds(5));
 
