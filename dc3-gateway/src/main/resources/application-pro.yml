@@ -18,3 +18,11 @@
 # Production environment configuration
 # Routes and gRPC are inherited from application-gateway.yml (gateway profile)
 # Route URIs can be overridden via GATEWAY_ROUTE_*_URI environment variables
+
+# OpenAPI / Swagger UI are disabled in production. The endpoints simply do not
+# exist here, so the doc-path whitelist in WebFluxSecurityConfig exposes nothing.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

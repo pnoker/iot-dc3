@@ -59,3 +59,11 @@ dc3:
       default-send-topic:
         qos: 1
         name: device
+
+# OpenAPI / Swagger UI are disabled in production. The endpoints simply do not
+# exist here, so the doc-path whitelist in WebFluxSecurityConfig exposes nothing.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

@@ -69,7 +69,11 @@ public interface PermissionProvider {
 
         @Override
         public Mono<Set<String>> listPermissionCodes(Long tenantId, Long userId) {
-            return Mono.just(Set.of());
+            // Grant the wildcard authority so @perm.can(...) passes on services that
+            // have no role/resource data (manager, data, agentic). These services
+            // trust the gateway-authenticated identity; fine-grained authorization
+            // is enforced at the auth center. See PermissionMethods.WILDCARD.
+            return Mono.just(Set.of("*"));
         }
     }
 }

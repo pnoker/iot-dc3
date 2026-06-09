@@ -37,6 +37,39 @@ spring:
       server:
         webflux:
           routes:
+            # ----------------------------------------------------------------
+            # OpenAPI aggregation routes (no authentication).
+            # The gateway's Swagger UI (springdoc.swagger-ui.urls in
+            # application.yml) federates each center's docs. These routes proxy
+            # /v3/api-docs/{svc} to the center's base-path-prefixed doc endpoint
+            # /{svc}/v3/api-docs. No 'Authentic' filter, so docs load without a
+            # token. In production the center docs are disabled (return 404), so
+            # these routes proxy to nothing — no exposure.
+            # ----------------------------------------------------------------
+            - id: api_docs_auth
+              uri: ${GATEWAY_ROUTE_AUTH_URI:http://${CENTER_AUTH_HOST:dc3-center-auth}:8300}
+              predicates:
+                - Path=/v3/api-docs/auth
+              filters:
+                - SetPath=/auth/v3/api-docs
+            - id: api_docs_manager
+              uri: ${GATEWAY_ROUTE_MANAGER_URI:http://${CENTER_MANAGER_HOST:dc3-center-manager}:8400}
+              predicates:
+                - Path=/v3/api-docs/manager
+              filters:
+                - SetPath=/manager/v3/api-docs
+            - id: api_docs_data
+              uri: ${GATEWAY_ROUTE_DATA_URI:http://${CENTER_DATA_HOST:dc3-center-data}:8500}
+              predicates:
+                - Path=/v3/api-docs/data
+              filters:
+                - SetPath=/data/v3/api-docs
+            - id: api_docs_agentic
+              uri: ${GATEWAY_ROUTE_AGENTIC_URI:http://${CENTER_AGENTIC_HOST:dc3-center-agentic}:8600}
+              predicates:
+                - Path=/v3/api-docs/agentic
+              filters:
+                - SetPath=/agentic/v3/api-docs
             # Token route for authentication (no authentication required)
             - id: auth_route_token
               uri: ${GATEWAY_ROUTE_AUTH_TOKEN_URI:http://${CENTER_AUTH_HOST:dc3-center-auth}:8300/}
