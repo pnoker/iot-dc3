@@ -71,7 +71,7 @@ public class NotifyTaskDTO implements Serializable {
     private Long channelId;
 
     /**
-     * Channel type as encoded by NotifyChannelTypeFlagEnum.
+     * Channel type as encoded by NotifyChannelTypeEnum.
      */
     private Byte channelTypeFlag;
 

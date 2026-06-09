@@ -21,8 +21,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.PointCommandHistoryService;
-import io.github.pnoker.common.data.entity.builder.PointCommandHistoryBuilder;
-import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
 import io.github.pnoker.common.entity.R;
@@ -59,16 +57,12 @@ public class PointCommandHistoryController implements BaseController {
 
     private final PointCommandHistoryService pointCommandHistoryService;
 
-    private final PointCommandHistoryBuilder pointCommandHistoryBuilder;
-
     @PreAuthorize("@perm.can('point_command_history', 'get')")
     @Operation(summary = "查询PointCommandHistory", description = "根据条件查询PointCommandHistory")
     @GetMapping("/get_by_command_id")
     public Mono<R<PointCommandHistoryVO>> getByCommandId(@NotBlank @RequestParam String commandId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            PointCommandHistoryDO entityDO = pointCommandHistoryService.getByCommandId(tenantId, commandId);
-            return R.ok(pointCommandHistoryBuilder.buildVOByDO(entityDO));
-        }));
+        return getTenantId().flatMap(tenantId -> async(() ->
+                R.ok(pointCommandHistoryService.getByCommandId(tenantId, commandId))));
     }
 
     @PreAuthorize("@perm.can('point_command_history', 'list')")
@@ -77,8 +71,7 @@ public class PointCommandHistoryController implements BaseController {
     public Mono<R<Page<PointCommandHistoryVO>>> list(@RequestBody(required = false) PointCommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointCommandHistoryQueryVO query = Objects.isNull(queryVO) ? new PointCommandHistoryQueryVO() : queryVO;
-            Page<PointCommandHistoryDO> page = pointCommandHistoryService.list(tenantId, query);
-            return R.ok(pointCommandHistoryBuilder.buildVOPageByDOPage(page));
+            return R.ok(pointCommandHistoryService.list(tenantId, query));
         }));
     }
 

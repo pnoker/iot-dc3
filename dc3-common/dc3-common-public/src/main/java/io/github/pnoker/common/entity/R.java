@@ -19,6 +19,7 @@ package io.github.pnoker.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,6 +37,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(description = "Unified API response wrapper. Every REST endpoint returns this envelope; the business payload is carried in 'data'.")
 public class R<T> implements Serializable {
 
     @Serial
@@ -44,21 +46,25 @@ public class R<T> implements Serializable {
     /**
      * Response status flag
      */
+    @Schema(description = "Whether the request succeeded.", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
     private boolean ok = false;
 
     /**
      * Response status code
      */
+    @Schema(description = "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.", example = "R200", requiredMode = Schema.RequiredMode.REQUIRED)
     private String code = ResponseEnum.OK.getCode();
 
     /**
      * Response message
      */
+    @Schema(description = "Human-readable response message.", example = "Success", requiredMode = Schema.RequiredMode.REQUIRED)
     private String message = ResponseEnum.OK.getRemark();
 
     /**
      * Response data payload
      */
+    @Schema(description = "Business data payload; null for operations that return no body or on failure.")
     @SuppressWarnings("all")
     private T data;
 

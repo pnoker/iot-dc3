@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.ResourceExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
-import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
+import io.github.pnoker.common.enums.ResourceScopeTypeEnum;
+import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
@@ -55,7 +55,7 @@ public class ResourceVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "Parent resource ID")
+    @Schema(description = "Parent resource ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Resource parent id can't be empty", groups = {Add.class, Update.class})
     private Long parentResourceId;
 
@@ -63,7 +63,7 @@ public class ResourceVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "Role name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "Resource name")
+    @Schema(description = "Resource name", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid role name",
             groups = {Add.class, Update.class})
     private String resourceName;
@@ -83,11 +83,11 @@ public class ResourceVO extends BaseVO {
     /**
      * Type
      */
-    @Schema(description = "Resource type flag")
-    private ResourceTypeFlagEnum resourceTypeFlag;
+    @Schema(description = "Resource type flag", example = "MENU")
+    private ResourceTypeEnum resourceTypeFlag;
 
     /**
-     * , : ResourceScopeFlagEnum
+     * , : ResourceScopeTypeEnum
      * <ul>
      * <li>0x01:</li>
      * <li>0x02:</li>
@@ -96,13 +96,13 @@ public class ResourceVO extends BaseVO {
      * </ul>
      *
      */
-    @Schema(description = "Resource scope flag")
-    private ResourceScopeFlagEnum resourceScopeFlag;
+    @Schema(description = "Resource scope flag", example = "LIST")
+    private ResourceScopeTypeEnum resourceScopeFlag;
 
     /**
      * Entity ID
      */
-    @Schema(description = "Associated entity ID")
+    @Schema(description = "Associated entity ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
     private Long entityId;
 
@@ -115,7 +115,7 @@ public class ResourceVO extends BaseVO {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

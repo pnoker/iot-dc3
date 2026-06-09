@@ -29,9 +29,10 @@ import io.github.pnoker.api.center.data.GrpcStringQuery;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.data.biz.EventHistoryService;
-import io.github.pnoker.common.data.entity.model.EventHistoryDO;
+import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
+import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -95,16 +96,16 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
     @Override
     public void getByRecordId(GrpcStringQuery request, StreamObserver<GrpcREventHistoryDTO> responseObserver) {
         try {
-            EventHistoryDO recordDO = eventHistoryService.getByRecordId(request.getValue());
+            EventHistoryVO record = eventHistoryService.getByRecordId(request.getValue());
             GrpcREventHistoryDTO.Builder response = GrpcREventHistoryDTO.newBuilder();
 
-            if (Objects.nonNull(recordDO)) {
+            if (Objects.nonNull(record)) {
                 response.setResult(GrpcR.newBuilder()
                         .setOk(true)
                         .setCode(ResponseEnum.OK.getCode())
                         .setMessage(ResponseEnum.OK.getRemark())
                         .build());
-                response.setData(toGrpcDTO(recordDO));
+                response.setData(toGrpcDTO(record));
             } else {
                 response.setResult(GrpcR.newBuilder()
                         .setOk(false)
@@ -134,11 +135,11 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
             queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
             queryVO.setEventId(request.getEventId() != 0 ? request.getEventId() : null);
             if (request.getEventTypeFlag() != 0) {
-                queryVO.setEventTypeFlag((byte) request.getEventTypeFlag());
+                queryVO.setEventTypeFlag(EventTypeFlagEnum.ofIndex((byte) request.getEventTypeFlag()));
             }
             queryVO.setPage(GrpcBuilderUtil.buildPagesByGrpcPage(request.getPage()));
 
-            Page<EventHistoryDO> page = eventHistoryService.list(request.getTenantId(), queryVO);
+            Page<EventHistoryVO> page = eventHistoryService.list(request.getTenantId(), queryVO);
 
             GrpcPageEventHistoryDTO.Builder pageDataBuilder = GrpcPageEventHistoryDTO.newBuilder()
                     .setPage(GrpcPage.newBuilder()
@@ -171,27 +172,27 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
         }
     }
 
-    private GrpcEventHistoryDTO toGrpcDTO(EventHistoryDO recordDO) {
+    private GrpcEventHistoryDTO toGrpcDTO(EventHistoryVO record) {
         return GrpcEventHistoryDTO.newBuilder()
-                .setId(Objects.nonNull(recordDO.getId()) ? recordDO.getId() : 0)
-                .setRecordId(Objects.nonNull(recordDO.getRecordId()) ? recordDO.getRecordId() : "")
-                .setTenantId(Objects.nonNull(recordDO.getTenantId()) ? recordDO.getTenantId() : 0)
-                .setDeviceId(Objects.nonNull(recordDO.getDeviceId()) ? recordDO.getDeviceId() : 0)
-                .setEventId(Objects.nonNull(recordDO.getEventId()) ? recordDO.getEventId() : 0)
-                .setEventCode(Objects.nonNull(recordDO.getEventCode()) ? recordDO.getEventCode() : "")
-                .setEventTypeFlag(Objects.nonNull(recordDO.getEventTypeFlag()) ? recordDO.getEventTypeFlag() : 0)
-                .setEventLevelFlag(Objects.nonNull(recordDO.getEventLevelFlag()) ? recordDO.getEventLevelFlag() : 0)
-                .putAllParamValues(toStringMap(recordDO.getParamValues()))
-                .setConfigSnapshot(Objects.nonNull(recordDO.getConfigSnapshot()) ? recordDO.getConfigSnapshot() : "")
-                .setMessage(Objects.nonNull(recordDO.getMessage()) ? recordDO.getMessage() : "")
-                .setOccurTime(toEpochSecond(recordDO.getOccurTime()))
-                .setReceiveTime(toEpochSecond(recordDO.getReceiveTime()))
-                .setAcknowledgeFlag(Objects.nonNull(recordDO.getAcknowledgeFlag()) ? recordDO.getAcknowledgeFlag() : 0)
-                .setSchemaVersion(Objects.nonNull(recordDO.getSchemaVersion()) ? recordDO.getSchemaVersion() : 0)
-                .setCreateTime(toEpochSecond(recordDO.getCreateTime()))
-                .setOperateTime(toEpochSecond(recordDO.getOperateTime()))
-                .setAcknowledgeTime(toEpochSecond(recordDO.getAcknowledgeTime()))
-                .setAcknowledgeUserId(Objects.nonNull(recordDO.getAcknowledgeUserId()) ? recordDO.getAcknowledgeUserId() : 0)
+                .setId(Objects.nonNull(record.getId()) ? record.getId() : 0)
+                .setRecordId(Objects.nonNull(record.getRecordId()) ? record.getRecordId() : "")
+                .setTenantId(Objects.nonNull(record.getTenantId()) ? record.getTenantId() : 0)
+                .setDeviceId(Objects.nonNull(record.getDeviceId()) ? record.getDeviceId() : 0)
+                .setEventId(Objects.nonNull(record.getEventId()) ? record.getEventId() : 0)
+                .setEventCode(Objects.nonNull(record.getEventCode()) ? record.getEventCode() : "")
+                .setEventTypeFlag(Objects.nonNull(record.getEventTypeFlag()) ? record.getEventTypeFlag().getIndex() : 0)
+                .setEventLevelFlag(Objects.nonNull(record.getEventLevelFlag()) ? record.getEventLevelFlag().getIndex() : 0)
+                .putAllParamValues(toStringMap(record.getParamValues()))
+                .setConfigSnapshot(Objects.nonNull(record.getConfigSnapshot()) ? record.getConfigSnapshot() : "")
+                .setMessage(Objects.nonNull(record.getMessage()) ? record.getMessage() : "")
+                .setOccurTime(toEpochSecond(record.getOccurTime()))
+                .setReceiveTime(toEpochSecond(record.getReceiveTime()))
+                .setAcknowledgeFlag(Objects.nonNull(record.getAcknowledgeFlag()) ? record.getAcknowledgeFlag().getIndex() : 0)
+                .setSchemaVersion(Objects.nonNull(record.getSchemaVersion()) ? record.getSchemaVersion() : 0)
+                .setCreateTime(toEpochSecond(record.getCreateTime()))
+                .setOperateTime(toEpochSecond(record.getOperateTime()))
+                .setAcknowledgeTime(toEpochSecond(record.getAcknowledgeTime()))
+                .setAcknowledgeUserId(Objects.nonNull(record.getAcknowledgeUserId()) ? record.getAcknowledgeUserId() : 0)
                 .build();
     }
 

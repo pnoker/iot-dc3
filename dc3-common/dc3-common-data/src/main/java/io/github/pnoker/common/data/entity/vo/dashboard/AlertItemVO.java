@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
+import io.github.pnoker.common.enums.AlarmTypeEnum;
+import io.github.pnoker.common.enums.ConfirmFlagEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +27,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One row in the alert list panel on the home page. Source is either {@code device} (with
@@ -38,29 +41,38 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "One row in the home page alert list panel")
 public class AlertItemVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "alert row ID")
     private Long id;
 
+    @Schema(description = "alert source: device or driver")
     private String source;
 
+    @Schema(description = "source entity ID (device ID or driver ID)")
     private Long sourceId;
 
+    @Schema(description = "point ID, present when source is device")
     private Long pointId;
 
-    private Integer alarmTypeFlag;
+    @Schema(description = "Alarm type flag", example = "OFFLINE")
+    private AlarmTypeEnum alarmTypeFlag;
 
-    private Integer confirmFlag;
+    @Schema(description = "Confirm flag", example = "UNCONFIRMED")
+    private ConfirmFlagEnum confirmFlag;
 
+    @Schema(description = "alarm creation time")
     private LocalDateTime createTime;
 
     /**
      * Human-readable message extracted from alarm_ext->>'content'. Populated by the
      * paging / list endpoints; latest(size=N) leaves it null.
      */
+    @Schema(description = "human-readable alarm message")
     private String message;
 
 }

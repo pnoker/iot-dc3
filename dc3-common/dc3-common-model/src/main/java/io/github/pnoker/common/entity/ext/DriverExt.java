@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,7 @@ import lombok.Setter;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Schema(description = "Driver extension object holding driver metadata and configuration content")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -40,14 +42,17 @@ public class DriverExt extends BaseExt {
      * <p>
      * Type Version
      */
+    @Schema(description = "Driver configuration content payload")
     private Content content;
 
+    @Schema(description = "Driver configuration content holding driver-specific settings")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Content {
 
+        @Schema(description = "Reserved configuration value kept for the driver")
         private String keep;
 
     }

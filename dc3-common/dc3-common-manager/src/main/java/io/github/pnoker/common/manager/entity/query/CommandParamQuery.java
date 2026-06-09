@@ -19,8 +19,8 @@ package io.github.pnoker.common.manager.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ParamDirectionFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.ParamDirectionTypeEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,11 +69,11 @@ public class CommandParamQuery implements Serializable {
 
     @Schema(description = "param direction")
 
-    private ParamDirectionFlagEnum paramDirection;
+    private ParamDirectionTypeEnum paramDirection;
 
     @Schema(description = "param type flag")
 
-    private PointTypeFlagEnum paramTypeFlag;
+    private PointTypeEnum paramTypeFlag;
 
     @Schema(description = "command ID")
 

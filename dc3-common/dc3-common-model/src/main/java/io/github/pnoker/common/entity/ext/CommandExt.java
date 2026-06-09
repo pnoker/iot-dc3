@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,7 @@ import lombok.Setter;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Schema(title = "CommandExt", description = "JSON extension object for command metadata")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,14 +40,17 @@ public class CommandExt extends BaseExt {
     /**
      * Extended content.
      */
+    @Schema(description = "Extended content of the command metadata")
     private Content content;
 
+    @Schema(title = "CommandExt.Content", description = "Extended content payload for command metadata")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Content {
 
+        @Schema(description = "Reserved content field for command extension")
         private String keep;
 
     }

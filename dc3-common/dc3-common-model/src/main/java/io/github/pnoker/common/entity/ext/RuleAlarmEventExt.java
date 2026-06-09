@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.entity.ext;
 
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,62 +37,74 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "JSON extension object that carries the rule alarm event context, embedded inside VO extension fields")
 public class RuleAlarmEventExt extends BaseExt {
 
     /**
      * Extended content.
      */
+    @Schema(description = "Extended content holding the rule alarm event snapshot")
     private Content content;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Snapshot of the rule alarm event context captured when the event was created")
     public static class Content {
 
         /**
          * Rule ID at the time the event was created.
          */
+        @Schema(description = "Rule ID at the time the event was created", example = "1024")
         private Long ruleId;
 
         /**
          * Rule code at the time the event was created.
          */
+        @Schema(description = "Rule code at the time the event was created")
         private String ruleCode;
 
         /**
          * Rule name at the time the event was created.
          */
+        @Schema(description = "Rule name at the time the event was created")
         private String ruleName;
 
         /**
          * Target type evaluated by the rule.
          */
-        private AlarmTargetTypeFlagEnum targetType;
+        @Schema(description = "Target type evaluated by the rule", example = "POINT")
+        private AlarmTargetTypeEnum targetType;
 
         /**
          * Target entity ID evaluated by the rule.
          */
+        @Schema(description = "Target entity ID evaluated by the rule", example = "1024")
         private Long entityId;
 
         /**
          * Alarm severity at the time the event was created.
          */
+        @Schema(description = "Alarm severity at the time the event was created")
         private String severity;
 
         /**
          * Business event type produced by the rule.
          */
+        @Schema(description = "Business event type produced by the rule")
         private String eventType;
 
         /**
          * Runtime match type, for example FIRING or RECOVERY.
          */
+        @Schema(description = "Runtime match type, for example FIRING or RECOVERY")
         private String matchType;
 
         /**
          * Normalized fact values used by the rule match.
          */
+        @Schema(description = "Normalized fact values used by the rule match")
         private Map<String, Object> values;
 
     }

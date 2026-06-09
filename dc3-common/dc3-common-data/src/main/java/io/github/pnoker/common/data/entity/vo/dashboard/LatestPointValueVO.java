@@ -28,6 +28,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One row in the dashboard live-data feed — the most recent N point-value entries across
@@ -42,43 +43,54 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "One row in the dashboard live-data feed")
 public class LatestPointValueVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "device ID")
     private Long deviceId;
 
+    @Schema(description = "point ID")
     private Long pointId;
 
+    @Schema(description = "driver ID")
     private Long driverId;
 
     /**
      * Display name for the device, resolved via {@code DeviceFacade}. May be {@code null}
      * when the device has been deleted but historical point values still reference it.
      */
+    @Schema(description = "display name for the device, may be null if the device was deleted")
     private String deviceName;
 
     /**
      * Display name for the point.
      */
+    @Schema(description = "display name for the point")
     private String pointName;
 
     /**
      * Display name for the driver that owns the device.
      */
+    @Schema(description = "display name for the driver that owns the device")
     private String driverName;
 
+    @Schema(description = "raw value")
     private String rawValue;
 
+    @Schema(description = "calculated value")
     private String calValue;
 
     /**
      * Which hypertable the row came from: STRING / INT / LONG / BOOL / FLOAT / DOUBLE /
      * JSON. Lets the UI pick formatting without fetching the point's metadata.
      */
+    @Schema(description = "value type: STRING, INT, LONG, BOOL, FLOAT, DOUBLE or JSON")
     private String valueType;
 
+    @Schema(description = "sample creation time")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
 

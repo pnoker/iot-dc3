@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -80,9 +81,8 @@ public class PointCommandHistoryVO implements Serializable {
 
     private String responseValue;
 
-    @Schema(description = "status")
-
-    private String status;
+    @Schema(description = "Command status", example = "success")
+    private PointCommandStatusEnum status;
 
     @Schema(description = "error code")
 

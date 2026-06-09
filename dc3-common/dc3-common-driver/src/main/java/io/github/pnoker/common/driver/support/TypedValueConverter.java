@@ -19,8 +19,8 @@ package io.github.pnoker.common.driver.support;
 
 import io.github.pnoker.common.driver.entity.bean.CalculatedPointValue;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.EmptyException;
 import io.github.pnoker.common.exception.OutRangeException;
 import io.github.pnoker.common.exception.TypeException;
@@ -61,7 +61,7 @@ public final class TypedValueConverter {
      * @param <T>        target type parameter
      * @return converted value
      */
-    public static <T> T convertAttributeValue(String value, AttributeTypeFlagEnum type, Class<T> targetType) {
+    public static <T> T convertAttributeValue(String value, AttributeTypeEnum type, Class<T> targetType) {
         if (Objects.isNull(type)) {
             throw new UnSupportException("Unsupported attribute type of " + type);
         }
@@ -77,7 +77,7 @@ public final class TypedValueConverter {
      * @param <T>        target type parameter
      * @return converted value
      */
-    public static <T> T convertPointValue(String value, PointTypeFlagEnum type, Class<T> targetType) {
+    public static <T> T convertPointValue(String value, PointTypeEnum type, Class<T> targetType) {
         if (Objects.isNull(type)) {
             throw new UnSupportException("Unsupported point type of " + type);
         }
@@ -96,7 +96,7 @@ public final class TypedValueConverter {
             throw new EmptyException("Point is empty");
         }
 
-        PointTypeFlagEnum pointType = Optional.ofNullable(point.getPointTypeFlag()).orElse(PointTypeFlagEnum.STRING);
+        PointTypeEnum pointType = Optional.ofNullable(point.getPointTypeFlag()).orElse(PointTypeEnum.STRING);
         ScalarType type = scalarType(pointType);
         BigDecimal base = Optional.ofNullable(point.getBaseValue()).orElse(DEFAULT_BASE);
         BigDecimal multiple = Optional.ofNullable(point.getMultiple()).orElse(DEFAULT_MULTIPLE);
@@ -284,7 +284,7 @@ public final class TypedValueConverter {
         }
     }
 
-    private static ScalarType scalarType(AttributeTypeFlagEnum type) {
+    private static ScalarType scalarType(AttributeTypeEnum type) {
         return switch (type) {
             case STRING -> ScalarType.STRING;
             case BYTE -> ScalarType.BYTE;
@@ -297,7 +297,7 @@ public final class TypedValueConverter {
         };
     }
 
-    private static ScalarType scalarType(PointTypeFlagEnum type) {
+    private static ScalarType scalarType(PointTypeEnum type) {
         return switch (type) {
             case STRING -> ScalarType.STRING;
             case BYTE -> ScalarType.BYTE;

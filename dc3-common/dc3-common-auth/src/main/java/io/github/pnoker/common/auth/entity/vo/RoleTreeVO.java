@@ -45,6 +45,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Role Tree view object")
 public class RoleTreeVO extends RoleVO {
 
+    @Schema(description = "Child role nodes")
     @ToString.Exclude
     private List<RoleTreeVO> children = new ArrayList<>();
 

@@ -23,10 +23,10 @@ import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
-import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
+import io.github.pnoker.common.enums.AlarmSourceTypeEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import lombok.RequiredArgsConstructor;
@@ -81,17 +81,17 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
 
         String msg = Objects.nonNull(entityDTO.getMessage()) ? entityDTO.getMessage() : "driver-alarm";
         EntityAlarmDO entity = new EntityAlarmDO();
-        entity.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.DRIVER.getIndex());
+        entity.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.DRIVER.getIndex());
         entity.setEntityId(entityDTO.getDriverId());
         entity.setDriverId(entityDTO.getDriverId());
         entity.setDeviceId(0L);
         entity.setPointId(0L);
         entity.setRuleId(0L);
-        entity.setAlarmTypeFlag(AlarmTypeFlagEnum.REPORT.getIndex());
-        entity.setAlarmSourceFlag(AlarmSourceFlagEnum.DRIVER_REPORT.getIndex());
+        entity.setAlarmTypeFlag(AlarmTypeEnum.REPORT.getIndex());
+        entity.setAlarmSourceFlag(AlarmSourceTypeEnum.DRIVER_REPORT.getIndex());
         // Driver-reported alarms default to P2; rule-driven severity is set when
         // the rule pipeline writes a follow-up entity_alarm row.
-        entity.setAlarmLevelFlag(AlarmMessageLevelFlagEnum.P2.getIndex());
+        entity.setAlarmLevelFlag(AlarmMessageLevelEnum.P2.getIndex());
         entity.setAlarmExt(JsonExt.builder().type("driver-alarm").content(msg).version(1).build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);

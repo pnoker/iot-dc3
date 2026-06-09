@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.EventParamExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.EventParamBO;
 import io.github.pnoker.common.manager.entity.model.EventParamDO;
 import io.github.pnoker.common.manager.entity.vo.EventParamVO;
@@ -99,7 +99,7 @@ public interface EventParamBuilder {
             entityBO.setParamExt(ext);
         }
 
-        entityBO.setParamTypeFlag(PointTypeFlagEnum.ofIndex(entityDO.getParamTypeFlag()));
+        entityBO.setParamTypeFlag(PointTypeEnum.ofIndex(entityDO.getParamTypeFlag()));
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(entityDO.getEnableFlag()));
     }
 

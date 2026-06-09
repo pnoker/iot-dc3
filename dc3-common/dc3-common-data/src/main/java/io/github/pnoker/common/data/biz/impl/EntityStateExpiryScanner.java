@@ -28,12 +28,12 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
-import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
+import io.github.pnoker.common.enums.AlarmSourceTypeEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -121,7 +121,7 @@ public class EntityStateExpiryScanner {
 
     private void scanExpiredDevices() {
         List<EntityStateDO> expired = entityStateMapper.claimExpiredDevices(
-                EntityTypeFlagEnum.DEVICE.getIndex(),
+                EntityTypeEnum.DEVICE.getIndex(),
                 EntityStatusEnum.ONLINE.getIndex(),
                 EntityStatusEnum.MAINTAIN.getIndex(),
                 EntityStatusEnum.FAULT.getIndex(),
@@ -165,16 +165,16 @@ public class EntityStateExpiryScanner {
         String message = String.format("Device heartbeat timed out (last=%s); marked OFFLINE", prevCode);
 
         EntityAlarmDO alarm = new EntityAlarmDO();
-        alarm.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.DEVICE.getIndex());
+        alarm.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.DEVICE.getIndex());
         alarm.setEntityId(scanned.getEntityId());
         alarm.setDriverId(scanned.getParentEntityId());
         alarm.setDeviceId(scanned.getEntityId());
         alarm.setPointId(0L);
         alarm.setRuleId(0L);
         alarm.setRuleStateId(0L);
-        alarm.setAlarmTypeFlag(AlarmTypeFlagEnum.OFFLINE.getIndex());
-        alarm.setAlarmSourceFlag(AlarmSourceFlagEnum.STATE_TIMEOUT.getIndex());
-        alarm.setAlarmLevelFlag(AlarmMessageLevelFlagEnum.P1.getIndex());
+        alarm.setAlarmTypeFlag(AlarmTypeEnum.OFFLINE.getIndex());
+        alarm.setAlarmSourceFlag(AlarmSourceTypeEnum.STATE_TIMEOUT.getIndex());
+        alarm.setAlarmLevelFlag(AlarmMessageLevelEnum.P1.getIndex());
         alarm.setAlarmExt(JsonExt.builder().type("device-offline").content(message).version(1).build());
         alarm.setExpiredTime(0L);
         alarm.setConfirmFlag((byte) 0);
@@ -193,7 +193,7 @@ public class EntityStateExpiryScanner {
                 .eq(EntityStateDO::getTenantId, scanned.getTenantId())
                 .eq(EntityStateDO::getId, scanned.getId())
                 .eq(EntityStateDO::getEntityId, scanned.getEntityId())
-                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DEVICE.getIndex())
+                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DEVICE.getIndex())
                 .eq(EntityStateDO::getLeaseVersion, scanned.getLeaseVersion())
                 .set(EntityStateDO::getLastAlarmId, alarm.getId())
                 .update();

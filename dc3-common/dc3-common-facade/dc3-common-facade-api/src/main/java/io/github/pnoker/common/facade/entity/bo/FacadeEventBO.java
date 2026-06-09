@@ -20,7 +20,7 @@ package io.github.pnoker.common.facade.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.EventExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EventLevelFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -58,7 +58,7 @@ public class FacadeEventBO extends BaseBO {
 
     @Schema(description = "event level flag")
 
-    private EventLevelFlagEnum eventLevelFlag;
+    private EventLevelEnum eventLevelFlag;
 
     @Schema(description = "event extension information (JSON)")
 

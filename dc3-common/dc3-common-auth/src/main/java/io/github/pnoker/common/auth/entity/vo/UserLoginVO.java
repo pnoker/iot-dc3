@@ -52,19 +52,19 @@ public class UserLoginVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "User ID")
+    @Schema(description = "User ID", example = "1024")
     private Long userId;
 
     /**
      * ID
      */
-    @Schema(description = "user password ID")
+    @Schema(description = "User password ID", example = "1024")
     private Long userPasswordId;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

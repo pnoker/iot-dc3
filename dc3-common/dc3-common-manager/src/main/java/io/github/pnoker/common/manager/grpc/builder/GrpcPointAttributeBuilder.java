@@ -21,7 +21,7 @@ import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.ext.PointAttributeExt;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.optional.EnableOptional;
 import io.github.pnoker.common.optional.JsonOptional;
@@ -70,7 +70,7 @@ public interface GrpcPointAttributeBuilder {
 
         JsonOptional.ofNullable(entityGrpc.getAttributeExt())
                 .ifPresent(value -> entityBO.setAttributeExt(JsonUtil.parseObject(value, PointAttributeExt.class)));
-        Optional.ofNullable(AttributeTypeFlagEnum.ofIndex((byte) entityGrpc.getAttributeTypeFlag()))
+        Optional.ofNullable(AttributeTypeEnum.ofIndex((byte) entityGrpc.getAttributeTypeFlag()))
                 .ifPresent(entityBO::setAttributeTypeFlag);
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
     }

@@ -21,8 +21,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.bo.PointConfigByDeviceBO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
@@ -101,11 +101,11 @@ public interface PointBuilder {
         entityDO.setPointExt(ext);
 
         // PointType Flag
-        PointTypeFlagEnum pointTypeFlag = entityBO.getPointTypeFlag();
+        PointTypeEnum pointTypeFlag = entityBO.getPointTypeFlag();
         Optional.ofNullable(pointTypeFlag).ifPresent(value -> entityDO.setPointTypeFlag(value.getIndex()));
 
         // Rw Flag
-        RwFlagEnum rwFlag = entityBO.getRwFlag();
+        RwTypeEnum rwFlag = entityBO.getRwFlag();
         Optional.ofNullable(rwFlag).ifPresent(value -> entityDO.setRwFlag(value.getIndex()));
 
         // Enable Flag
@@ -148,11 +148,11 @@ public interface PointBuilder {
 
         // PointType Flag
         Byte pointTypeFlag = entityDO.getPointTypeFlag();
-        entityBO.setPointTypeFlag(PointTypeFlagEnum.ofIndex(pointTypeFlag));
+        entityBO.setPointTypeFlag(PointTypeEnum.ofIndex(pointTypeFlag));
 
         // Rw Flag
         Byte rwFlag = entityDO.getRwFlag();
-        entityBO.setRwFlag(RwFlagEnum.ofIndex(rwFlag));
+        entityBO.setRwFlag(RwTypeEnum.ofIndex(rwFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

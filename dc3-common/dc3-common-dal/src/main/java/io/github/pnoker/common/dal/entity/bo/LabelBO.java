@@ -20,7 +20,7 @@ package io.github.pnoker.common.dal.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -59,7 +59,7 @@ public class LabelBO extends BaseBO implements TenantOwned {
     /**
      * Entity type flag.
      */
-    private EntityTypeFlagEnum entityTypeFlag;
+    private EntityTypeEnum entityTypeFlag;
 
     /**
      * Enable status flag.

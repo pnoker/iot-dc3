@@ -29,7 +29,7 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ServiceException;
@@ -197,7 +197,7 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
     }
 
     private Object readByType(McPLC plc, MelsecPointVariable variable) {
-        AttributeTypeFlagEnum type = AttributeTypeFlagEnum.ofCode(variable.getType());
+        AttributeTypeEnum type = AttributeTypeEnum.ofCode(variable.getType());
         if (Objects.isNull(type)) {
             throw new IllegalArgumentException("Unknown type: " + variable.getType());
         }
@@ -225,7 +225,7 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
     }
 
     private void writeByType(McPLC plc, MelsecPointVariable variable, String value) {
-        AttributeTypeFlagEnum type = AttributeTypeFlagEnum.ofCode(variable.getType());
+        AttributeTypeEnum type = AttributeTypeEnum.ofCode(variable.getType());
         if (Objects.isNull(type)) {
             throw new IllegalArgumentException("Unknown type: " + variable.getType());
         }

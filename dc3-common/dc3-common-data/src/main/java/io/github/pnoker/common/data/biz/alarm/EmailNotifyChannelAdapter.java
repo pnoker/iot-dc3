@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,8 +35,8 @@ import org.springframework.stereotype.Service;
 public class EmailNotifyChannelAdapter implements NotifyChannelAdapter {
 
     @Override
-    public NotifyChannelTypeFlagEnum channelType() {
-        return NotifyChannelTypeFlagEnum.EMAIL;
+    public NotifyChannelTypeEnum channelType() {
+        return NotifyChannelTypeEnum.EMAIL;
     }
 
     @Override

@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import org.springframework.stereotype.Service;
 
 import java.util.EnumMap;
@@ -35,8 +35,8 @@ import java.util.Optional;
 @Service
 public class NotifyChannelAdapterRegistry {
 
-    private final Map<NotifyChannelTypeFlagEnum, NotifyChannelAdapter> adapters =
-            new EnumMap<>(NotifyChannelTypeFlagEnum.class);
+    private final Map<NotifyChannelTypeEnum, NotifyChannelAdapter> adapters =
+            new EnumMap<>(NotifyChannelTypeEnum.class);
 
     public NotifyChannelAdapterRegistry(List<NotifyChannelAdapter> adapters) {
         for (NotifyChannelAdapter adapter : adapters) {
@@ -50,7 +50,7 @@ public class NotifyChannelAdapterRegistry {
      * @param channelTypeFlag channel type
      * @return adapter
      */
-    public Optional<NotifyChannelAdapter> find(NotifyChannelTypeFlagEnum channelTypeFlag) {
+    public Optional<NotifyChannelAdapter> find(NotifyChannelTypeEnum channelTypeFlag) {
         return Optional.ofNullable(adapters.get(channelTypeFlag));
     }
 

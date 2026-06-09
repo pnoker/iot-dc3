@@ -20,8 +20,8 @@ package io.github.pnoker.common.manager.entity.builder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.CommandExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.CallTypeFlagEnum;
-import io.github.pnoker.common.enums.CommandTypeFlagEnum;
+import io.github.pnoker.common.enums.CallTypeEnum;
+import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.manager.entity.bo.CommandBO;
 import io.github.pnoker.common.manager.entity.model.CommandDO;
@@ -103,8 +103,8 @@ public interface CommandBuilder {
             entityBO.setCommandExt(ext);
         }
 
-        entityBO.setCommandTypeFlag(CommandTypeFlagEnum.ofIndex(entityDO.getCommandTypeFlag()));
-        entityBO.setCallTypeFlag(CallTypeFlagEnum.ofIndex(entityDO.getCallTypeFlag()));
+        entityBO.setCommandTypeFlag(CommandTypeEnum.ofIndex(entityDO.getCommandTypeFlag()));
+        entityBO.setCallTypeFlag(CallTypeEnum.ofIndex(entityDO.getCallTypeFlag()));
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(entityDO.getEnableFlag()));
     }
 

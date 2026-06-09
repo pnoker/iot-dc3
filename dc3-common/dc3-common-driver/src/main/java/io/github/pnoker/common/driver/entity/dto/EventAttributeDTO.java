@@ -19,7 +19,7 @@ package io.github.pnoker.common.driver.entity.dto;
 
 import io.github.pnoker.common.entity.base.BaseDTO;
 import io.github.pnoker.common.entity.ext.EventAttributeExt;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,7 +52,7 @@ public class EventAttributeDTO extends BaseDTO {
     /**
      * Attribute value type.
      */
-    private AttributeTypeFlagEnum attributeTypeFlag;
+    private AttributeTypeEnum attributeTypeFlag;
 
     /**
      * Default value used when no explicit configuration is provided.

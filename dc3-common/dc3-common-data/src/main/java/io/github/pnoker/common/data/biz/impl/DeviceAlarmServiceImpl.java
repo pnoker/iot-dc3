@@ -23,10 +23,10 @@ import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
-import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
+import io.github.pnoker.common.enums.AlarmSourceTypeEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import lombok.RequiredArgsConstructor;
@@ -94,17 +94,17 @@ public class DeviceAlarmServiceImpl implements DeviceAlarmService {
 
         String msg = Objects.nonNull(entityDTO.getMessage()) ? entityDTO.getMessage() : "device-alarm";
         EntityAlarmDO entity = new EntityAlarmDO();
-        entity.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.DEVICE.getIndex());
+        entity.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.DEVICE.getIndex());
         entity.setEntityId(entityDTO.getDeviceId());
         entity.setDriverId(Objects.requireNonNullElse(driverId, 0L));
         entity.setDeviceId(entityDTO.getDeviceId());
         entity.setPointId(0L);
         entity.setRuleId(0L);
-        entity.setAlarmTypeFlag(AlarmTypeFlagEnum.REPORT.getIndex());
-        entity.setAlarmSourceFlag(AlarmSourceFlagEnum.DEVICE_REPORT.getIndex());
+        entity.setAlarmTypeFlag(AlarmTypeEnum.REPORT.getIndex());
+        entity.setAlarmSourceFlag(AlarmSourceTypeEnum.DEVICE_REPORT.getIndex());
         // Device-reported alarms default to P2; rule-driven severity is set when
         // the rule pipeline writes a follow-up entity_alarm row.
-        entity.setAlarmLevelFlag(AlarmMessageLevelFlagEnum.P2.getIndex());
+        entity.setAlarmLevelFlag(AlarmMessageLevelEnum.P2.getIndex());
         entity.setAlarmExt(JsonExt.builder().type("device-alarm").content(msg).version(1).build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);

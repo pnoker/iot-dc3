@@ -21,8 +21,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.CommandParamExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ParamDirectionFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.ParamDirectionTypeEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.CommandParamBO;
 import io.github.pnoker.common.manager.entity.model.CommandParamDO;
 import io.github.pnoker.common.manager.entity.vo.CommandParamVO;
@@ -106,8 +106,8 @@ public interface CommandParamBuilder {
             entityBO.setParamExt(ext);
         }
 
-        entityBO.setParamDirectionFlag(ParamDirectionFlagEnum.ofIndex(entityDO.getParamDirectionFlag()));
-        entityBO.setParamTypeFlag(PointTypeFlagEnum.ofIndex(entityDO.getParamTypeFlag()));
+        entityBO.setParamDirectionFlag(ParamDirectionTypeEnum.ofIndex(entityDO.getParamDirectionFlag()));
+        entityBO.setParamTypeFlag(PointTypeEnum.ofIndex(entityDO.getParamTypeFlag()));
         entityBO.setRequiredFlag(Objects.equals(entityDO.getRequiredFlag(), (byte) 1));
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(entityDO.getEnableFlag()));
     }

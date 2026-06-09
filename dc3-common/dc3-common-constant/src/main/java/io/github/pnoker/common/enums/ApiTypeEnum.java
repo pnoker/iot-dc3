@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of driver type flags.
+ * Enumeration of API type flags (e.g. REST, WebSocket).
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,27 +33,27 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum DriverTypeFlagEnum {
+public enum ApiTypeEnum {
 
     /**
-     * Protocol driver, client mode
+     * POST
      */
-    DRIVER_CLIENT((byte) 0, "driver_client", "Protocol driver, client mode"),
+    POST((byte) 0, "post", "POST"),
 
     /**
-     * Protocol driver, server mode
+     * DELETE
      */
-    DRIVER_SERVER((byte) 1, "driver_server", "Protocol driver, server mode"),
+    DELETE((byte) 1, "delete", "DELETE"),
 
     /**
-     * Gateway driver
+     * PUT
      */
-    GATEWAY((byte) 2, "gateway", "Gateway driver"),
+    PUT((byte) 2, "put", "PUT"),
 
     /**
-     * Connection driver
+     * GET
      */
-    CONNECT((byte) 3, "connect", "Connection driver"),
+    GET((byte) 3, "get", "GET"),
     ;
 
     /**
@@ -76,10 +76,10 @@ public enum DriverTypeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link DriverTypeFlagEnum}
+     * @return {@link ApiTypeEnum}
      */
-    public static DriverTypeFlagEnum ofIndex(Byte index) {
-        Optional<DriverTypeFlagEnum> any = Arrays.stream(DriverTypeFlagEnum.values())
+    public static ApiTypeEnum ofIndex(Byte index) {
+        Optional<ApiTypeEnum> any = Arrays.stream(ApiTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -89,10 +89,10 @@ public enum DriverTypeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link DriverTypeFlagEnum}
+     * @return {@link ApiTypeEnum}
      */
-    public static DriverTypeFlagEnum ofCode(String code) {
-        Optional<DriverTypeFlagEnum> any = Arrays.stream(DriverTypeFlagEnum.values())
+    public static ApiTypeEnum ofCode(String code) {
+        Optional<ApiTypeEnum> any = Arrays.stream(ApiTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -102,9 +102,9 @@ public enum DriverTypeFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link DriverTypeFlagEnum}
+     * @return {@link ApiTypeEnum}
      */
-    public static DriverTypeFlagEnum ofName(String name) {
+    public static ApiTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

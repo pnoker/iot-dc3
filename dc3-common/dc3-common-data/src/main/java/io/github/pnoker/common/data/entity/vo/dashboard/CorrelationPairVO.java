@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Two events that fired within a small time window of each other, enough times to suggest
@@ -38,23 +39,31 @@ import java.io.Serializable;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "Two events that frequently co-occur, suggesting a cascading-failure relationship")
 public class CorrelationPairVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "source of event A: device or driver")
     private String aSource;
 
+    @Schema(description = "source entity ID of event A")
     private long aSourceId;
 
+    @Schema(description = "event type of event A")
     private int aEventType;
 
+    @Schema(description = "source of event B: device or driver")
     private String bSource;
 
+    @Schema(description = "source entity ID of event B")
     private long bSourceId;
 
+    @Schema(description = "event type of event B")
     private int bEventType;
 
+    @Schema(description = "number of times A and B co-occurred")
     private long coCount;
 
 }

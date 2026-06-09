@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class RuleVO extends BaseVO {
      * Alarm target type flag
      */
     @Schema(description = "alarm target type flag")
-    private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
+    private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     /**
      * Rule name

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -37,6 +38,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Schema(description = "One node in the topology Sankey graph")
 public class TopologyNodeVO implements Serializable {
 
     @Serial
@@ -46,30 +48,35 @@ public class TopologyNodeVO implements Serializable {
      * Prefixed id — one of {@code driver:{n}}, {@code device:{n}}, {@code profile:{n}},
      * {@code point:{n}}, {@code others:{layer}:{parentId}}.
      */
+    @Schema(description = "Prefixed id (driver:{n}, device:{n}, profile:{n}, point:{n} or others:{layer}:{parentId})", example = "driver:1024")
     private String id;
 
     /**
      * Human-readable label. For {@code others:*} nodes, {@code "Others (N)"} where N is
      * the count of hidden children.
      */
+    @Schema(description = "Human-readable label; for others:* nodes it is \"Others (N)\" where N is the hidden child count")
     private String name;
 
     /**
      * 1 = driver, 2 = device, 3 = profile, 4 = point. Frontend fixes column x-position
      * from this.
      */
+    @Schema(description = "Sankey column layer: 1=driver, 2=device, 3=profile, 4=point", example = "1")
     private int layer;
 
     /**
      * {@code driver | device | profile | point | others}. Drives node colour + click
      * routing.
      */
+    @Schema(description = "Node type: driver, device, profile, point or others", example = "driver")
     private String type;
 
     /**
      * Only populated on {@code others:*} nodes. List of the actual entities collapsed
      * here — frontend shows these in a drill-in dialog.
      */
+    @Schema(description = "Entities collapsed into this node; populated only on others:* nodes")
     private List<TopologyHiddenChildVO> hiddenChildren;
 
 }

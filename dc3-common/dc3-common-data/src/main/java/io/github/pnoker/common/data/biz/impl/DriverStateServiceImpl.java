@@ -28,8 +28,8 @@ import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
-import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.enums.TimeoutSourceTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -86,14 +86,14 @@ public class DriverStateServiceImpl implements DriverStateService {
         EntityStateDO stateDO = entityStateMapper.upsertEntityState(
                 IdWorker.getId(),
                 entityDTO.getTenantId(),
-                EntityTypeFlagEnum.DRIVER.getIndex(),
+                EntityTypeEnum.DRIVER.getIndex(),
                 entityDTO.getDriverId(),
                 0L,
-                (byte) statusEnum.getIndex(),
-                (byte) EntityStatusEnum.OFFLINE.getIndex(),
+                statusEnum.getIndex(),
+                EntityStatusEnum.OFFLINE.getIndex(),
                 expireTime,
                 STATUS_TIMEOUT_SECONDS,
-                (byte) TimeoutSourceFlagEnum.SYSTEM.getIndex(),
+                TimeoutSourceTypeEnum.SYSTEM.getIndex(),
                 "driver-heartbeat",
                 entityDTO.getStateDescription());
         if (Objects.isNull(stateDO)) {

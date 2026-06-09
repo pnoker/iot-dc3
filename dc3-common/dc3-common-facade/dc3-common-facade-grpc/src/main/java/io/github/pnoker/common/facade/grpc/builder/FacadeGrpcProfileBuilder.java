@@ -24,8 +24,8 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.ProfileExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ProfileShareFlagEnum;
-import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.enums.ProfileShareTypeEnum;
+import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
 import io.github.pnoker.common.facade.entity.query.FacadeProfileQuery;
 import io.github.pnoker.common.optional.LongOptional;
@@ -84,9 +84,9 @@ public class FacadeGrpcProfileBuilder {
         if (dto.getVersion() != DefaultConstant.DEFAULT_INT) {
             bo.setVersion(dto.getVersion());
         }
-        Optional.ofNullable(ProfileShareFlagEnum.ofIndex((byte) dto.getProfileShareFlag()))
+        Optional.ofNullable(ProfileShareTypeEnum.ofIndex((byte) dto.getProfileShareFlag()))
                 .ifPresent(bo::setProfileShareFlag);
-        Optional.ofNullable(ProfileTypeFlagEnum.ofIndex((byte) dto.getProfileTypeFlag()))
+        Optional.ofNullable(ProfileTypeEnum.ofIndex((byte) dto.getProfileTypeFlag()))
                 .ifPresent(bo::setProfileTypeFlag);
         Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);
         StringOptional.ofNullable(dto.getProfileExt())

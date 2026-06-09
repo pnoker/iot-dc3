@@ -29,7 +29,7 @@ import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
@@ -121,7 +121,7 @@ public class NotifyWorker {
             persistTerminal(task, NotifySendResult.skipped(channel.getCredentialRef(), "Notify channel is disabled"));
             return;
         }
-        NotifyChannelTypeFlagEnum type = channel.getChannelTypeFlag();
+        NotifyChannelTypeEnum type = channel.getChannelTypeFlag();
         NotifyChannelAdapter adapter = notifyChannelAdapterRegistry.find(type).orElse(null);
         if (Objects.isNull(adapter)) {
             persistTerminal(task, NotifySendResult.failed(channel.getCredentialRef(),

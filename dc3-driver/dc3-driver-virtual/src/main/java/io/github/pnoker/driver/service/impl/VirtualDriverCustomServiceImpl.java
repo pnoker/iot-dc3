@@ -33,7 +33,7 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
@@ -196,10 +196,10 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
          * is BOOLEAN, generate a random boolean value; - Otherwise, generate a random
          * float between 0 and 100.
          */
-        if (PointTypeFlagEnum.STRING.equals(point.getPointTypeFlag())) {
+        if (PointTypeEnum.STRING.equals(point.getPointTypeFlag())) {
             return new ReadPointValue(device, point, "abcd1234");
         }
-        if (PointTypeFlagEnum.BOOLEAN.equals(point.getPointTypeFlag())) {
+        if (PointTypeEnum.BOOLEAN.equals(point.getPointTypeFlag())) {
             return new ReadPointValue(device, point, String.valueOf(ThreadLocalRandom.current().nextBoolean()));
         }
 

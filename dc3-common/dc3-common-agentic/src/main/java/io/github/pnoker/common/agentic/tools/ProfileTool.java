@@ -21,7 +21,7 @@ import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.facade.api.ProfileFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
@@ -143,18 +143,18 @@ public class ProfileTool {
         return AgenticToolResult.ok("Profiles loaded for device " + deviceId, profiles);
     }
 
-    private ProfileTypeFlagEnum parseProfileType(String value) {
+    private ProfileTypeEnum parseProfileType(String value) {
         if (StringUtils.isBlank(value)) {
             return null;
         }
         String trimmed = value.trim();
         try {
-            return ProfileTypeFlagEnum.ofIndex(Byte.valueOf(trimmed));
+            return ProfileTypeEnum.ofIndex(Byte.valueOf(trimmed));
         } catch (NumberFormatException ignored) {
             // Continue with code/name lookup.
         }
-        ProfileTypeFlagEnum byCode = ProfileTypeFlagEnum.ofCode(trimmed.toLowerCase());
-        return Objects.nonNull(byCode) ? byCode : ProfileTypeFlagEnum.ofName(trimmed.toUpperCase());
+        ProfileTypeEnum byCode = ProfileTypeEnum.ofCode(trimmed.toLowerCase());
+        return Objects.nonNull(byCode) ? byCode : ProfileTypeEnum.ofName(trimmed.toUpperCase());
     }
 
 }

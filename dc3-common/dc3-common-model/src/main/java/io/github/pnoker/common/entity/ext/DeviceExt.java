@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ import java.io.Serializable;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Schema(description = "JSON extension object for device metadata and configuration")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -42,8 +44,10 @@ public class DeviceExt extends BaseExt {
      * <p>
      * Type Version
      */
+    @Schema(description = "Device extension content payload carrying type-specific configuration")
     private Content content;
 
+    @Schema(description = "Device extension content payload carrying type-specific configuration")
     @Getter
     @Setter
     @NoArgsConstructor
@@ -53,6 +57,7 @@ public class DeviceExt extends BaseExt {
         @Serial
         private static final long serialVersionUID = 1L;
 
+        @Schema(description = "Reserved configuration field used to retain custom device data")
         private String keep;
 
     }

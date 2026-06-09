@@ -21,8 +21,8 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.RwTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,12 +58,12 @@ public class PointBO extends BaseBO implements TenantOwned {
     /**
      * Type
      */
-    private PointTypeFlagEnum pointTypeFlag;
+    private PointTypeEnum pointTypeFlag;
 
     /**
      *
      */
-    private RwFlagEnum rwFlag;
+    private RwTypeEnum rwFlag;
 
     /**
      *
@@ -119,8 +119,8 @@ public class PointBO extends BaseBO implements TenantOwned {
      *
      */
     public void setByDefault() {
-        this.pointTypeFlag = PointTypeFlagEnum.STRING;
-        this.rwFlag = RwFlagEnum.READ_ONLY;
+        this.pointTypeFlag = PointTypeEnum.STRING;
+        this.rwFlag = RwTypeEnum.READ_ONLY;
         this.baseValue = BigDecimal.valueOf(0);
         this.multiple = BigDecimal.valueOf(1);
         this.valueDecimal = 6;

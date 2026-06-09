@@ -19,7 +19,7 @@ package io.github.pnoker.common.dal.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -84,7 +84,7 @@ public class GroupQuery implements Serializable {
      * Group type flag.
      */
     @Schema(description = "group type flag")
-    private EntityTypeFlagEnum groupTypeFlag;
+    private EntityTypeEnum groupTypeFlag;
 
     /**
      * Enable status flag.

@@ -21,8 +21,8 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.CommandParamExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ParamDirectionFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.ParamDirectionTypeEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,9 +47,9 @@ public class CommandParamBO extends BaseBO implements TenantOwned {
 
     private String paramCode;
 
-    private ParamDirectionFlagEnum paramDirectionFlag;
+    private ParamDirectionTypeEnum paramDirectionFlag;
 
-    private PointTypeFlagEnum paramTypeFlag;
+    private PointTypeEnum paramTypeFlag;
 
     private Boolean requiredFlag;
 

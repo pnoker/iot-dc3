@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of alarm type flags.
+ * Enumeration of entity type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,56 +33,103 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum AlarmTypeFlagEnum {
+public enum EntityTypeEnum {
 
     /**
-     * Rule alarm
+     * System
      */
-    RULE((byte) 0, "rule", "Rule alarm"),
+    SYSTEM((byte) 0, "system", "System"),
 
     /**
-     * Offline alarm
+     * User
      */
-    OFFLINE((byte) 1, "offline", "Offline alarm"),
+    USER((byte) 1, "user", "User"),
 
     /**
-     * Fault alarm
+     * Group
      */
-    FAULT((byte) 2, "fault", "Fault alarm"),
+    GROUP((byte) 2, "group", "Group"),
 
     /**
-     * State flip alarm
+     * Driver
      */
-    STATE_FLIP((byte) 3, "state-flip", "State flip alarm"),
+    DRIVER((byte) 3, "driver", "Driver"),
 
     /**
-     * Report alarm
+     * Profile
      */
-    REPORT((byte) 4, "report", "Report alarm"),
+    PROFILE((byte) 4, "profile", "Profile"),
+
+    /**
+     * Point
+     */
+    POINT((byte) 5, "point", "Point"),
+
+    /**
+     * Device
+     */
+    DEVICE((byte) 6, "device", "Device"),
+
+    /**
+     * Command
+     */
+    COMMAND((byte) 7, "command", "Command"),
+
+    /**
+     * Event
+     */
+    EVENT((byte) 8, "event", "Event"),
     ;
 
+    /**
+     * Index
+     */
     @EnumValue
     private final Byte index;
 
+    /**
+     * Code
+     */
     private final String code;
 
+    /**
+     * Remark
+     */
     private final String remark;
 
-    public static AlarmTypeFlagEnum ofIndex(Byte index) {
-        Optional<AlarmTypeFlagEnum> any = Arrays.stream(AlarmTypeFlagEnum.values())
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link EntityTypeEnum}
+     */
+    public static EntityTypeEnum ofIndex(Byte index) {
+        Optional<EntityTypeEnum> any = Arrays.stream(EntityTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    public static AlarmTypeFlagEnum ofCode(String code) {
-        Optional<AlarmTypeFlagEnum> any = Arrays.stream(AlarmTypeFlagEnum.values())
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link EntityTypeEnum}
+     */
+    public static EntityTypeEnum ofCode(String code) {
+        Optional<EntityTypeEnum> any = Arrays.stream(EntityTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    public static AlarmTypeFlagEnum ofName(String name) {
+    /**
+     * Get enum by name
+     *
+     * @param name Enum name
+     * @return {@link EntityTypeEnum}
+     */
+    public static EntityTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

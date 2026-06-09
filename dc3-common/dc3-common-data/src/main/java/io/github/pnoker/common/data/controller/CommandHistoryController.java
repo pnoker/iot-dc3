@@ -21,8 +21,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
-import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
-import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
@@ -61,8 +59,6 @@ public class CommandHistoryController implements BaseController {
 
     private final CommandHistoryService commandHistoryService;
 
-    private final CommandHistoryBuilder commandHistoryBuilder;
-
     @PreAuthorize("@perm.can('command_history', 'add')")
     @Operation(summary = "执行CommandHistory调用", description = "执行CommandHistory指令调用")
     @PostMapping("/call")
@@ -79,10 +75,8 @@ public class CommandHistoryController implements BaseController {
     @Operation(summary = "查询CommandHistory", description = "根据条件查询CommandHistory")
     @GetMapping("/get_by_record_id")
     public Mono<R<CommandHistoryVO>> getByRecordId(@NotBlank @RequestParam String recordId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            CommandHistoryDO entityDO = commandHistoryService.getByRecordId(tenantId, recordId);
-            return R.ok(commandHistoryBuilder.buildVOByDO(entityDO));
-        }));
+        return getTenantId().flatMap(tenantId -> async(() ->
+                R.ok(commandHistoryService.getByRecordId(tenantId, recordId))));
     }
 
     @PreAuthorize("@perm.can('command_history', 'list')")
@@ -91,8 +85,7 @@ public class CommandHistoryController implements BaseController {
     public Mono<R<Page<CommandHistoryVO>>> list(@RequestBody(required = false) CommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             CommandHistoryQueryVO query = Objects.isNull(queryVO) ? new CommandHistoryQueryVO() : queryVO;
-            Page<CommandHistoryDO> page = commandHistoryService.list(tenantId, query);
-            return R.ok(commandHistoryBuilder.buildVOPageByDOPage(page));
+            return R.ok(commandHistoryService.list(tenantId, query));
         }));
     }
 

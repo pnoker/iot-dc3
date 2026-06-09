@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of profile sharing type flags.
+ * Enumeration of alarm source flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,73 +33,61 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum ProfileShareFlagEnum {
+public enum AlarmSourceTypeEnum {
 
     /**
-     * Shared profile under tenant
+     * Rule engine
      */
-    TENANT((byte) 0, "tenant", "Shared profile under tenant"),
+    RULE((byte) 0, "rule", "Rule engine"),
 
     /**
-     * Shared profile under driver
+     * State timeout
      */
-    DRIVER((byte) 1, "driver", "Shared profile under driver"),
+    STATE_TIMEOUT((byte) 1, "state-timeout", "State timeout"),
 
     /**
-     * Shared profile under user
+     * Device report
      */
-    USER((byte) 2, "user", "Shared profile under user"),
+    DEVICE_REPORT((byte) 2, "device-report", "Device report"),
+
+    /**
+     * Driver report
+     */
+    DRIVER_REPORT((byte) 3, "driver-report", "Driver report"),
+
+    /**
+     * Event report
+     */
+    EVENT_REPORT((byte) 5, "event-report", "Event report"),
+
+    /**
+     * System
+     */
+    SYSTEM((byte) 4, "system", "System"),
     ;
 
-    /**
-     * Index
-     */
     @EnumValue
     private final Byte index;
 
-    /**
-     * Code
-     */
     private final String code;
 
-    /**
-     * Remark
-     */
     private final String remark;
 
-    /**
-     * Get enum by index
-     *
-     * @param index Index
-     * @return {@link ProfileShareFlagEnum}
-     */
-    public static ProfileShareFlagEnum ofIndex(Byte index) {
-        Optional<ProfileShareFlagEnum> any = Arrays.stream(ProfileShareFlagEnum.values())
+    public static AlarmSourceTypeEnum ofIndex(Byte index) {
+        Optional<AlarmSourceTypeEnum> any = Arrays.stream(AlarmSourceTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by code
-     *
-     * @param code Code
-     * @return {@link ProfileShareFlagEnum}
-     */
-    public static ProfileShareFlagEnum ofCode(String code) {
-        Optional<ProfileShareFlagEnum> any = Arrays.stream(ProfileShareFlagEnum.values())
+    public static AlarmSourceTypeEnum ofCode(String code) {
+        Optional<AlarmSourceTypeEnum> any = Arrays.stream(AlarmSourceTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    /**
-     * Get enum by name
-     *
-     * @param name Name
-     * @return {@link ProfileShareFlagEnum}
-     */
-    public static ProfileShareFlagEnum ofName(String name) {
+    public static AlarmSourceTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of read/write flag values.
+ * Enumeration of permission scope type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,22 +33,32 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum RwFlagEnum {
+public enum ResourceScopeTypeEnum {
 
     /**
-     * Read only
+     * Add
      */
-    READ_ONLY((byte) 0, "r", "Read only"),
+    ADD((byte) 0, "add", "Add"),
 
     /**
-     * Write only
+     * Delete
      */
-    WRITE_ONLY((byte) 1, "w", "Write only"),
+    DELETE((byte) 1, "delete", "Delete"),
 
     /**
-     * Read and Write
+     * Update
      */
-    READ_WRITE((byte) 2, "rw", "Read and Write"),
+    UPDATE((byte) 2, "update", "Update"),
+
+    /**
+     * List
+     */
+    LIST((byte) 3, "list", "List"),
+
+    /**
+     * Get (single entity query)
+     */
+    GET((byte) 4, "get", "Get"),
     ;
 
     /**
@@ -71,10 +81,10 @@ public enum RwFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link RwFlagEnum}
+     * @return {@link ResourceScopeTypeEnum}
      */
-    public static RwFlagEnum ofIndex(Byte index) {
-        Optional<RwFlagEnum> any = Arrays.stream(RwFlagEnum.values())
+    public static ResourceScopeTypeEnum ofIndex(Byte index) {
+        Optional<ResourceScopeTypeEnum> any = Arrays.stream(ResourceScopeTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -84,10 +94,10 @@ public enum RwFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link RwFlagEnum}
+     * @return {@link ResourceScopeTypeEnum}
      */
-    public static RwFlagEnum ofCode(String code) {
-        Optional<RwFlagEnum> any = Arrays.stream(RwFlagEnum.values())
+    public static ResourceScopeTypeEnum ofCode(String code) {
+        Optional<ResourceScopeTypeEnum> any = Arrays.stream(ResourceScopeTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -97,9 +107,9 @@ public enum RwFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link RwFlagEnum}
+     * @return {@link ResourceScopeTypeEnum}
      */
-    public static RwFlagEnum ofName(String name) {
+    public static ResourceScopeTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

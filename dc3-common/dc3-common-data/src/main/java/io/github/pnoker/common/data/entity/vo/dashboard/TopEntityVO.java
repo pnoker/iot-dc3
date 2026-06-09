@@ -25,6 +25,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One entry in a dashboard top-N ranking (e.g. device with the most point-value rows in
@@ -39,6 +40,7 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "One entry in a dashboard top-N ranking")
 public class TopEntityVO implements Serializable {
 
     @Serial
@@ -48,8 +50,10 @@ public class TopEntityVO implements Serializable {
      * Device / point / driver id — the service resolves the human-readable name
      * asynchronously on the frontend via existing getXxxByIds APIs.
      */
+    @Schema(description = "ranked entity ID (device, point or driver)")
     private Long entityId;
 
+    @Schema(description = "ranking count for this entity")
     private long count;
 
 }

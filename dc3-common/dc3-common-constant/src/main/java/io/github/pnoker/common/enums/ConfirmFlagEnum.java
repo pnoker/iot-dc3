@@ -25,25 +25,25 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of call type flags.
+ * Enumeration of alarm confirmation flag values (0/1 toggle).
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.6.0
  * @since 2016.10.1
  */
 @Getter
 @AllArgsConstructor
-public enum CallTypeFlagEnum {
+public enum ConfirmFlagEnum {
 
     /**
-     * Synchronous call
+     * Not yet confirmed
      */
-    SYNC((byte) 0, "sync", "Synchronous call"),
+    UNCONFIRMED((byte) 0, "unconfirmed", "Not yet confirmed"),
 
     /**
-     * Asynchronous call
+     * Confirmed
      */
-    ASYNC((byte) 1, "async", "Asynchronous call"),
+    CONFIRMED((byte) 1, "confirmed", "Confirmed"),
     ;
 
     /**
@@ -66,10 +66,10 @@ public enum CallTypeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link CallTypeFlagEnum}
+     * @return {@link ConfirmFlagEnum}
      */
-    public static CallTypeFlagEnum ofIndex(Byte index) {
-        Optional<CallTypeFlagEnum> any = Arrays.stream(CallTypeFlagEnum.values())
+    public static ConfirmFlagEnum ofIndex(Byte index) {
+        Optional<ConfirmFlagEnum> any = Arrays.stream(ConfirmFlagEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -79,10 +79,10 @@ public enum CallTypeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link CallTypeFlagEnum}
+     * @return {@link ConfirmFlagEnum}
      */
-    public static CallTypeFlagEnum ofCode(String code) {
-        Optional<CallTypeFlagEnum> any = Arrays.stream(CallTypeFlagEnum.values())
+    public static ConfirmFlagEnum ofCode(String code) {
+        Optional<ConfirmFlagEnum> any = Arrays.stream(ConfirmFlagEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -92,9 +92,9 @@ public enum CallTypeFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link CallTypeFlagEnum}
+     * @return {@link ConfirmFlagEnum}
      */
-    public static CallTypeFlagEnum ofName(String name) {
+    public static ConfirmFlagEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

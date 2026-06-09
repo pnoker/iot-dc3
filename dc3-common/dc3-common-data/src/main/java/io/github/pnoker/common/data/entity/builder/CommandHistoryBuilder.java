@@ -20,14 +20,23 @@ package io.github.pnoker.common.data.entity.builder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
+import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * MapStruct builder converting between command history DO and VO.
+ * <p>
+ * The DO stores {@code status} as its lowercase code string (database shape);
+ * the VO exposes the {@link PointCommandStatusEnum}. The code/enum conversion is
+ * centralized here (DO -> VO via {@code ofCode}).
  *
  * @author pnoker
  * @version 2026.6.5
@@ -36,7 +45,15 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface CommandHistoryBuilder {
 
+    @Mapping(target = "status", ignore = true)
     CommandHistoryVO buildVOByDO(CommandHistoryDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(CommandHistoryDO entityDO, @MappingTarget CommandHistoryVO entityVO) {
+        if (Objects.nonNull(entityDO.getStatus())) {
+            entityVO.setStatus(PointCommandStatusEnum.ofCode(entityDO.getStatus()));
+        }
+    }
 
     List<CommandHistoryVO> buildVOListByDOList(List<CommandHistoryDO> entityDOList);
 

@@ -18,9 +18,9 @@
 package io.github.pnoker.common.data.biz;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
+import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 
 /**
  * Business service for custom command call operations.
@@ -33,12 +33,12 @@ public interface CommandHistoryService {
 
     String call(Long tenantId, CommandCallVO entityVO);
 
-    CommandHistoryDO getByRecordId(Long tenantId, String recordId);
+    CommandHistoryVO getByRecordId(Long tenantId, String recordId);
 
-    default CommandHistoryDO getByRecordId(String recordId) {
+    default CommandHistoryVO getByRecordId(String recordId) {
         return getByRecordId(null, recordId);
     }
 
-    Page<CommandHistoryDO> list(Long tenantId, CommandHistoryQueryVO queryVO);
+    Page<CommandHistoryVO> list(Long tenantId, CommandHistoryQueryVO queryVO);
 
 }

@@ -18,6 +18,9 @@
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.enums.EventHistoryAcknowledgeFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
+import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -72,13 +75,11 @@ public class EventHistoryVO implements Serializable {
 
     private String eventCode;
 
-    @Schema(description = "event type flag")
+    @Schema(description = "Event type flag", example = "ALERT")
+    private EventTypeFlagEnum eventTypeFlag;
 
-    private Byte eventTypeFlag;
-
-    @Schema(description = "event level flag")
-
-    private Byte eventLevelFlag;
+    @Schema(description = "Event level flag", example = "HIGH")
+    private EventLevelEnum eventLevelFlag;
 
     @Schema(description = "param values")
 
@@ -100,9 +101,8 @@ public class EventHistoryVO implements Serializable {
 
     private LocalDateTime receiveTime;
 
-    @Schema(description = "acknowledge flag")
-
-    private Byte acknowledgeFlag;
+    @Schema(description = "Acknowledge flag", example = "NO")
+    private EventHistoryAcknowledgeFlagEnum acknowledgeFlag;
 
     @Schema(description = "acknowledge time")
 

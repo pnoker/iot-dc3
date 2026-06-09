@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -80,7 +80,7 @@ public class MessageQuery implements Serializable {
      * Alarm message template level
      */
     @Schema(description = "message level")
-    private AlarmMessageLevelFlagEnum messageLevel;
+    private AlarmMessageLevelEnum messageLevel;
 
     /**
      * Enable flag

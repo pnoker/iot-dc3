@@ -29,7 +29,7 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ReadPointException;
@@ -204,7 +204,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
     private Object readByType(S7PLC plc, PlcS7PointVariable variable) {
         String address = variable.getAddress();
-        AttributeTypeFlagEnum type = AttributeTypeFlagEnum.ofCode(variable.getType());
+        AttributeTypeEnum type = AttributeTypeEnum.ofCode(variable.getType());
         if (Objects.isNull(type)) {
             throw new IllegalArgumentException("Unknown type: " + variable.getType());
         }
@@ -232,7 +232,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
     private void writeByType(S7PLC plc, PlcS7PointVariable variable, String value) {
         String address = variable.getAddress();
-        AttributeTypeFlagEnum type = AttributeTypeFlagEnum.ofCode(variable.getType());
+        AttributeTypeEnum type = AttributeTypeEnum.ofCode(variable.getType());
         if (Objects.isNull(type)) {
             throw new IllegalArgumentException("Unknown type: " + variable.getType());
         }

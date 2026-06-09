@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of alarm target type flags.
+ * Enumeration of menu level flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,27 +33,32 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum AlarmTargetTypeFlagEnum {
+public enum MenuLevelEnum {
 
     /**
-     * Point
+     * Root menu
      */
-    POINT((byte) 0, "point", "Point"),
+    ROOT((byte) 0, "root", "Root menu"),
 
     /**
-     * Device
+     * First-level submenu
      */
-    DEVICE((byte) 1, "device", "Device"),
+    C1((byte) 1, "c1", "First-level submenu"),
 
     /**
-     * Driver
+     * Second-level submenu
      */
-    DRIVER((byte) 2, "driver", "Driver"),
+    C2((byte) 2, "c2", "Second-level submenu"),
 
     /**
-     * Event
+     * Third-level submenu
      */
-    EVENT((byte) 3, "event", "Event"),
+    C3((byte) 3, "c3", "Third-level submenu"),
+
+    /**
+     * Fourth-level submenu
+     */
+    C4((byte) 4, "c4", "Fourth-level submenu"),
     ;
 
     /**
@@ -76,10 +81,10 @@ public enum AlarmTargetTypeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link AlarmTargetTypeFlagEnum}
+     * @return {@link MenuLevelEnum}
      */
-    public static AlarmTargetTypeFlagEnum ofIndex(Byte index) {
-        Optional<AlarmTargetTypeFlagEnum> any = Arrays.stream(AlarmTargetTypeFlagEnum.values())
+    public static MenuLevelEnum ofIndex(Byte index) {
+        Optional<MenuLevelEnum> any = Arrays.stream(MenuLevelEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -89,10 +94,10 @@ public enum AlarmTargetTypeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link AlarmTargetTypeFlagEnum}
+     * @return {@link MenuLevelEnum}
      */
-    public static AlarmTargetTypeFlagEnum ofCode(String code) {
-        Optional<AlarmTargetTypeFlagEnum> any = Arrays.stream(AlarmTargetTypeFlagEnum.values())
+    public static MenuLevelEnum ofCode(String code) {
+        Optional<MenuLevelEnum> any = Arrays.stream(MenuLevelEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -101,10 +106,10 @@ public enum AlarmTargetTypeFlagEnum {
     /**
      * Get enum by name
      *
-     * @param name Name
-     * @return {@link AlarmTargetTypeFlagEnum}
+     * @param name Enum name
+     * @return {@link MenuLevelEnum}
      */
-    public static AlarmTargetTypeFlagEnum ofName(String name) {
+    public static MenuLevelEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

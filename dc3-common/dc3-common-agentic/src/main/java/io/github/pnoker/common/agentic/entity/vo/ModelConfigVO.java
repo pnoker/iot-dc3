@@ -37,56 +37,43 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Model Config view object")
 public class ModelConfigVO extends BaseVO {
 
-    @Schema(description = "model")
-
+    @Schema(description = "Model identifier", example = "gpt-4o")
     private String model;
 
-    @Schema(description = "label")
-
+    @Schema(description = "Human-readable model label", example = "GPT-4o")
     private String label;
 
-    @Schema(description = "provider ID")
-
+    @Schema(description = "Model provider ID", example = "1024")
     private Long providerId;
 
-    @Schema(description = "provider name")
-
+    @Schema(description = "Model provider name")
     private String providerName;
 
-    @Schema(description = "stream")
-
+    @Schema(description = "Whether the model supports streaming responses")
     private Boolean stream;
 
-    @Schema(description = "tool call")
-
+    @Schema(description = "Whether the model supports tool/function calling")
     private Boolean toolCall;
 
-    @Schema(description = "vision")
-
+    @Schema(description = "Whether the model supports vision (image) input")
     private Boolean vision;
 
-    @Schema(description = "reasoning")
-
+    @Schema(description = "Whether the model supports reasoning")
     private Boolean reasoning;
 
-    @Schema(description = "temperature")
-
+    @Schema(description = "Sampling temperature", example = "0.7")
     private Double temperature;
 
-    @Schema(description = "max tokens")
-
+    @Schema(description = "Maximum number of tokens to generate", example = "4096")
     private Integer maxTokens;
 
-    @Schema(description = "Default flag")
-
+    @Schema(description = "Default flag", example = "DEFAULT")
     private DefaultFlagEnum defaultFlag;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
-
+    @Schema(description = "Enable flag", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Tenant ID")
-
+    @Schema(description = "Tenant ID", example = "1024")
     private Long tenantId;
 
 }

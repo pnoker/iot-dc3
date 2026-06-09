@@ -23,7 +23,7 @@ import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.DriverExt;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.optional.EnableOptional;
@@ -67,7 +67,7 @@ public interface GrpcDriverBuilder {
         Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
         entityQuery.page(pages);
 
-        Optional.ofNullable(DriverTypeFlagEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag()))
+        Optional.ofNullable(DriverTypeEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag()))
                 .ifPresent(entityQuery::driverTypeFlag);
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
     }
@@ -137,7 +137,7 @@ public interface GrpcDriverBuilder {
 
         JsonOptional.ofNullable(entityGrpc.getDriverExt())
                 .ifPresent(value -> entityBO.setDriverExt(JsonUtil.parseObject(value, DriverExt.class)));
-        Optional.ofNullable(DriverTypeFlagEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag()))
+        Optional.ofNullable(DriverTypeEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag()))
                 .ifPresent(entityBO::setDriverTypeFlag);
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
     }

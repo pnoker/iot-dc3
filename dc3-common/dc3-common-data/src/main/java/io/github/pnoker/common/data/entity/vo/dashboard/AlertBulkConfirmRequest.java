@@ -26,6 +26,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Bulk confirm/unconfirm request body for the dashboard alert panel.
@@ -39,6 +40,7 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Bulk confirm/unconfirm request for the dashboard alert panel")
 public class AlertBulkConfirmRequest implements Serializable {
 
     @Serial
@@ -48,11 +50,13 @@ public class AlertBulkConfirmRequest implements Serializable {
      * Direction of the bulk operation: true sets confirm_flag to 1, false sets it back
      * to 0. Defaults to true when null.
      */
+    @Schema(description = "direction of the bulk operation: true confirms, false unconfirms; defaults to true when null")
     private Boolean confirm;
 
     /**
      * Targets to act on.
      */
+    @Schema(description = "targets to act on")
     private List<Item> items;
 
     @Getter
@@ -60,6 +64,7 @@ public class AlertBulkConfirmRequest implements Serializable {
     @ToString
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Single alert target for the bulk operation")
     public static class Item implements Serializable {
 
         @Serial
@@ -68,11 +73,13 @@ public class AlertBulkConfirmRequest implements Serializable {
         /**
          * Alert source: {@code device} or {@code driver}.
          */
+        @Schema(description = "alert source: device or driver")
         private String source;
 
         /**
          * Alert row id.
          */
+        @Schema(description = "alert row ID")
         private Long id;
 
     }

@@ -48,19 +48,15 @@ public class SessionQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Pagination object")
-
     private Pages page;
 
-    @Schema(description = "Tenant ID")
-
+    @Schema(description = "Tenant ID", example = "1024")
     private Long tenantId;
 
-    @Schema(description = "User ID")
-
+    @Schema(description = "User ID", example = "1024")
     private Long userId;
 
-    @Schema(description = "conversation ID")
-
+    @Schema(description = "Conversation ID")
     private String conversationId;
 
 }

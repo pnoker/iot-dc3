@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 
 /**
  * Notification channel adapter.
@@ -34,7 +34,7 @@ public interface NotifyChannelAdapter {
      *
      * @return channel type
      */
-    NotifyChannelTypeFlagEnum channelType();
+    NotifyChannelTypeEnum channelType();
 
     /**
      * Send rendered message.

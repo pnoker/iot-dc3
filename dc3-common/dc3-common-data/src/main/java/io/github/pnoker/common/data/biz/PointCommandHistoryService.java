@@ -18,8 +18,8 @@
 package io.github.pnoker.common.data.biz;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryQueryVO;
+import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
 
 /**
  * Business service for point command history queries.
@@ -36,9 +36,9 @@ public interface PointCommandHistoryService {
      * @param commandId unique command identifier
      * @return matching command history row, or null
      */
-    PointCommandHistoryDO getByCommandId(Long tenantId, String commandId);
+    PointCommandHistoryVO getByCommandId(Long tenantId, String commandId);
 
-    default PointCommandHistoryDO getByCommandId(String commandId) {
+    default PointCommandHistoryVO getByCommandId(String commandId) {
         return getByCommandId(null, commandId);
     }
 
@@ -49,6 +49,6 @@ public interface PointCommandHistoryService {
      * @param queryVO  query filters
      * @return paginated command history rows
      */
-    Page<PointCommandHistoryDO> list(Long tenantId, PointCommandHistoryQueryVO queryVO);
+    Page<PointCommandHistoryVO> list(Long tenantId, PointCommandHistoryQueryVO queryVO);
 
 }

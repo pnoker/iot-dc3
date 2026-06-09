@@ -20,7 +20,7 @@ package io.github.pnoker.common.manager.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.CommandAttributeExt;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -72,7 +72,7 @@ public class CommandAttributeVO extends BaseVO {
      * Type
      */
     @Schema(description = "attribute type flag")
-    private AttributeTypeFlagEnum attributeTypeFlag;
+    private AttributeTypeEnum attributeTypeFlag;
 
     /**
      *

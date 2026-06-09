@@ -22,7 +22,7 @@ import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.entity.ext.DriverExt;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.optional.EnableOptional;
 import io.github.pnoker.common.optional.JsonOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
@@ -65,7 +65,7 @@ public interface DriverBuilder {
 
         JsonOptional.ofNullable(entityGrpc.getDriverExt())
                 .ifPresent(value -> entityBO.setDriverExt(JsonUtil.parseObject(value, DriverExt.class)));
-        Optional.ofNullable(DriverTypeFlagEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag()))
+        Optional.ofNullable(DriverTypeEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag()))
                 .ifPresent(entityBO::setDriverTypeFlag);
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
     }

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -35,6 +36,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@Schema(description = "An entity collapsed into an others bucket, retaining enough info to route on click")
 public class TopologyHiddenChildVO implements Serializable {
 
     @Serial
@@ -44,13 +46,16 @@ public class TopologyHiddenChildVO implements Serializable {
      * Prefixed id, same scheme as {@link TopologyNodeVO#getId()} — {@code driver:{n}} /
      * {@code device:{n}} / {@code point:{n}}.
      */
+    @Schema(description = "Prefixed id (driver:{n}, device:{n} or point:{n})", example = "device:1024")
     private String id;
 
+    @Schema(description = "Display name of the collapsed entity")
     private String name;
 
     /**
      * {@code driver | device | point}. Profile layer does not get collapsed.
      */
+    @Schema(description = "Entity type: driver, device or point (the profile layer is never collapsed)", example = "device")
     private String type;
 
 }

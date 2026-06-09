@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of event level flags.
+ * Enumeration of driver type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,27 +33,27 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum EventLevelFlagEnum {
+public enum DriverTypeEnum {
 
     /**
-     * Low level
+     * Protocol driver, client mode
      */
-    LOW((byte) 0, "low", "Low level"),
+    DRIVER_CLIENT((byte) 0, "driver-client", "Protocol driver, client mode"),
 
     /**
-     * Medium level
+     * Protocol driver, server mode
      */
-    MEDIUM((byte) 1, "medium", "Medium level"),
+    DRIVER_SERVER((byte) 1, "driver-server", "Protocol driver, server mode"),
 
     /**
-     * High level
+     * Gateway driver
      */
-    HIGH((byte) 2, "high", "High level"),
+    GATEWAY((byte) 2, "gateway", "Gateway driver"),
 
     /**
-     * Critical level
+     * Connection driver
      */
-    CRITICAL((byte) 3, "critical", "Critical level"),
+    CONNECT((byte) 3, "connect", "Connection driver"),
     ;
 
     /**
@@ -76,10 +76,10 @@ public enum EventLevelFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link EventLevelFlagEnum}
+     * @return {@link DriverTypeEnum}
      */
-    public static EventLevelFlagEnum ofIndex(Byte index) {
-        Optional<EventLevelFlagEnum> any = Arrays.stream(EventLevelFlagEnum.values())
+    public static DriverTypeEnum ofIndex(Byte index) {
+        Optional<DriverTypeEnum> any = Arrays.stream(DriverTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -89,10 +89,10 @@ public enum EventLevelFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link EventLevelFlagEnum}
+     * @return {@link DriverTypeEnum}
      */
-    public static EventLevelFlagEnum ofCode(String code) {
-        Optional<EventLevelFlagEnum> any = Arrays.stream(EventLevelFlagEnum.values())
+    public static DriverTypeEnum ofCode(String code) {
+        Optional<DriverTypeEnum> any = Arrays.stream(DriverTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -102,9 +102,9 @@ public enum EventLevelFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link EventLevelFlagEnum}
+     * @return {@link DriverTypeEnum}
      */
-    public static EventLevelFlagEnum ofName(String name) {
+    public static DriverTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

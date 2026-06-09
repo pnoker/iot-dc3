@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Daily event count for a single day, split by device and driver source.
@@ -36,15 +37,19 @@ import java.io.Serializable;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "Daily event count split by device and driver source")
 public class AlertTrendVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "date of the data point")
     private String date;
 
+    @Schema(description = "device alarm count for the day")
     private long deviceCount;
 
+    @Schema(description = "driver alarm count for the day")
     private long driverCount;
 
 }

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "JSON extension object for resource metadata, embedded inside VO extension fields")
 public class ResourceExt extends BaseExt {
 
     /**
@@ -42,14 +44,17 @@ public class ResourceExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
+    @Schema(description = "Extended content, distinguished by the type and version fields inherited from the base extension")
     private Content content;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Resource extension content payload")
     public static class Content {
 
+        @Schema(description = "Placeholder field reserved for future resource extension content")
         private String keep;
 
     }

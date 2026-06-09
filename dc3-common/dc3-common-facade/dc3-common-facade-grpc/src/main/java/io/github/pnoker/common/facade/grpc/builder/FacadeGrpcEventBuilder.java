@@ -24,7 +24,7 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.EventExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EventLevelFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
 import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
@@ -99,7 +99,7 @@ public class FacadeGrpcEventBuilder {
 
         int eventLevel = dto.getEventLevelFlag();
         if (eventLevel != DefaultConstant.NULL_INT) {
-            Optional.ofNullable(EventLevelFlagEnum.ofIndex((byte) eventLevel)).ifPresent(bo::setEventLevelFlag);
+            Optional.ofNullable(EventLevelEnum.ofIndex((byte) eventLevel)).ifPresent(bo::setEventLevelFlag);
         }
 
         Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);

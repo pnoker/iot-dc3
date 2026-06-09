@@ -19,7 +19,7 @@ package io.github.pnoker.common.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ExpireFlagEnum;
+import io.github.pnoker.common.enums.ExpireTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,7 +57,7 @@ public class DriverTokenQuery implements Serializable {
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID", example = "1024")
     private Long tenantId;
 
     //
@@ -77,13 +77,13 @@ public class DriverTokenQuery implements Serializable {
     /**
      *
      */
-    @Schema(description = "expire flag")
-    private ExpireFlagEnum expireFlag;
+    @Schema(description = "Token expiration flag", example = "PERMANENT")
+    private ExpireTypeEnum expireFlag;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

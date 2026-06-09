@@ -18,7 +18,7 @@
 package io.github.pnoker.common.driver.entity.bo;
 
 import io.github.pnoker.common.driver.support.TypedValueConverter;
-import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,7 +55,7 @@ public class AttributeBO implements Serializable {
     /**
      * Declared attribute type used for conversion.
      */
-    private AttributeTypeFlagEnum type;
+    private AttributeTypeEnum type;
 
     /**
      * Converts the attribute value to the requested Java type.

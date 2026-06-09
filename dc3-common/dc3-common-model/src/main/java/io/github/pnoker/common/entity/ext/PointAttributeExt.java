@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "JSON extension object for point attribute configuration, embedded inside point attribute VO extension fields")
 public class PointAttributeExt extends BaseExt {
 
     /**
@@ -42,14 +44,17 @@ public class PointAttributeExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
+    @Schema(description = "Extended content payload, distinguished by the type and version fields of the base extension")
     private Content content;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Extended content payload for point attribute configuration")
     public static class Content {
 
+        @Schema(description = "Reserved placeholder field for point attribute extension content")
         private String keep;
 
     }

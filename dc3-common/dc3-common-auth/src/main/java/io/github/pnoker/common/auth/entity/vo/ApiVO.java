@@ -20,7 +20,7 @@ package io.github.pnoker.common.auth.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.ApiExt;
-import io.github.pnoker.common.enums.ApiTypeFlagEnum;
+import io.github.pnoker.common.enums.ApiTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
@@ -59,14 +59,14 @@ public class ApiVO extends BaseVO {
     /**
      * ApiType
      */
-    @Schema(description = "API type flag")
-    private ApiTypeFlagEnum apiTypeFlag;
+    @Schema(description = "API type flag", example = "GET")
+    private ApiTypeEnum apiTypeFlag;
 
     /**
      * ApiName
      */
     @NotBlank(message = "API name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "API name")
+    @Schema(description = "API name", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid API name", groups = {Add.class, Update.class})
     private String apiName;
 
@@ -91,7 +91,7 @@ public class ApiVO extends BaseVO {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

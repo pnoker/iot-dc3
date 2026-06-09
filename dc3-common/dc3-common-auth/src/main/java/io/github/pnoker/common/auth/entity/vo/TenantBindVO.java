@@ -48,14 +48,14 @@ public class TenantBindVO extends BaseVO {
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Tenant id can't be empty", groups = {Add.class, Update.class})
     private Long tenantId;
 
     /**
      * ID
      */
-    @Schema(description = "User ID")
+    @Schema(description = "User ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "User id can't be empty", groups = {Add.class, Update.class})
     private Long userId;
 

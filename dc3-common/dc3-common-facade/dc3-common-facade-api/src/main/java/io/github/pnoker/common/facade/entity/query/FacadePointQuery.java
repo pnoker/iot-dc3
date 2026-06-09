@@ -19,8 +19,8 @@ package io.github.pnoker.common.facade.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.RwTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,11 +69,11 @@ public class FacadePointQuery implements Serializable {
 
     @Schema(description = "point type flag")
 
-    private PointTypeFlagEnum pointTypeFlag;
+    private PointTypeEnum pointTypeFlag;
 
     @Schema(description = "rw flag")
 
-    private RwFlagEnum rwFlag;
+    private RwTypeEnum rwFlag;
 
     @Schema(description = "profile ID")
 

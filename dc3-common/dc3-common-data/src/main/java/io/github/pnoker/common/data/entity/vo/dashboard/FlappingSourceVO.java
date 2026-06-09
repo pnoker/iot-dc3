@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * A (source, eventType) pair that fired repeatedly in the window — i.e. is "flapping".
@@ -38,17 +39,22 @@ import java.io.Serializable;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "A source/event-type pair that fired repeatedly in the window (flapping)")
 public class FlappingSourceVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "alert source: device or driver")
     private String source;
 
+    @Schema(description = "source entity ID")
     private long sourceId;
 
+    @Schema(description = "alarm type flag")
     private int alarmTypeFlag;
 
+    @Schema(description = "number of times this source/type fired in the window")
     private long count;
 
 }

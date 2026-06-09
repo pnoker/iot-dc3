@@ -54,7 +54,7 @@ public class UserVO extends BaseVO {
      *
      */
     @NotBlank(message = "Nick name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "User nickname")
+    @Schema(description = "User nickname", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "Invalid nick name", groups = {Add.class, Update.class})
     private String nickName;
@@ -63,7 +63,7 @@ public class UserVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "User name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "Username")
+    @Schema(description = "Username", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid user name",
             groups = {Add.class, Update.class})
     private String userName;
@@ -72,13 +72,13 @@ public class UserVO extends BaseVO {
      *
      */
     @Pattern(regexp = "^1([3-9])\\d{9}$", message = "Invalid phone", groups = {Add.class, Update.class})
-    @Schema(description = "Phone number")
+    @Schema(description = "Phone number", example = "13800138000")
     private String phone;
 
     /**
      *
      */
-    @Schema(description = "Email address")
+    @Schema(description = "Email address", example = "user@example.com")
     @Pattern(regexp = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$", message = "Invalid email",
             groups = {Add.class, Update.class})
     private String email;
@@ -98,7 +98,7 @@ public class UserVO extends BaseVO {
     /**
      * Enable flag.
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

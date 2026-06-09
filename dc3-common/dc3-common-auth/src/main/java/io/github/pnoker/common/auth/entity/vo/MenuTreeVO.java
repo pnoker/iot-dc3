@@ -45,6 +45,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Menu Tree view object")
 public class MenuTreeVO extends MenuVO {
 
+    @Schema(description = "Child menu nodes")
     @ToString.Exclude
     private List<MenuTreeVO> children = new ArrayList<>();
 

@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One cell in the event-overview alarm heatmap (dow × hour). Service layer always returns
@@ -37,6 +38,7 @@ import java.io.Serializable;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "Event-overview alarm heatmap cell (day-of-week by hour-of-day)")
 public class AlertActivityCellVO implements Serializable {
 
     @Serial
@@ -45,16 +47,19 @@ public class AlertActivityCellVO implements Serializable {
     /**
      * Day of week, 0..6 matching Postgres EXTRACT(DOW) (0 = Sunday).
      */
+    @Schema(description = "day of week, 0 to 6 matching Postgres EXTRACT(DOW), 0=Sunday")
     private int dow;
 
     /**
      * Hour of day, 0..23.
      */
+    @Schema(description = "hour of day, 0 to 23")
     private int hour;
 
     /**
      * Alarm count in that cell.
      */
+    @Schema(description = "alarm count in this cell")
     private long count;
 
 }

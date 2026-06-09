@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import okhttp3.MediaType;
@@ -57,8 +57,8 @@ public class WebhookNotifyChannelAdapter implements NotifyChannelAdapter {
     }
 
     @Override
-    public NotifyChannelTypeFlagEnum channelType() {
-        return NotifyChannelTypeFlagEnum.WEBHOOK;
+    public NotifyChannelTypeEnum channelType() {
+        return NotifyChannelTypeEnum.WEBHOOK;
     }
 
     @Override

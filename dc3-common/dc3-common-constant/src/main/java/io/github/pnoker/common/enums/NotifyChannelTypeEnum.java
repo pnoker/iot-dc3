@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of parameter direction flags.
+ * Enumeration of notification channel type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,68 +33,73 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum ParamDirectionFlagEnum {
+public enum NotifyChannelTypeEnum {
 
     /**
-     * Input parameter
+     * Feishu bot.
      */
-    INPUT((byte) 0, "input", "Input parameter"),
+    FEISHU_BOT((byte) 0, "feishu-bot", "Feishu Bot"),
 
     /**
-     * Output parameter
+     * Webhook.
      */
-    OUTPUT((byte) 1, "output", "Output parameter"),
+    WEBHOOK((byte) 1, "webhook", "Webhook"),
+
+    /**
+     * Email.
+     */
+    EMAIL((byte) 2, "email", "Email"),
     ;
 
     /**
-     * Index
+     * Index.
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * Code
+     * Code.
      */
     private final String code;
 
     /**
-     * Remark
+     * Remark.
      */
     private final String remark;
 
     /**
-     * Get enum by index
+     * Get enum by index.
      *
      * @param index Index
-     * @return {@link ParamDirectionFlagEnum}
+     * @return {@link NotifyChannelTypeEnum}
      */
-    public static ParamDirectionFlagEnum ofIndex(Byte index) {
-        Optional<ParamDirectionFlagEnum> any = Arrays.stream(ParamDirectionFlagEnum.values())
+    public static NotifyChannelTypeEnum ofIndex(Byte index) {
+        Optional<NotifyChannelTypeEnum> any = Arrays.stream(NotifyChannelTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
     /**
-     * Get enum by code
+     * Get enum by code.
      *
      * @param code Code
-     * @return {@link ParamDirectionFlagEnum}
+     * @return {@link NotifyChannelTypeEnum}
      */
-    public static ParamDirectionFlagEnum ofCode(String code) {
-        Optional<ParamDirectionFlagEnum> any = Arrays.stream(ParamDirectionFlagEnum.values())
+    public static NotifyChannelTypeEnum ofCode(String code) {
+        Optional<NotifyChannelTypeEnum> any = Arrays.stream(NotifyChannelTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
     /**
-     * Get enum by name
+     * Get enum by name.
      *
      * @param name Name
-     * @return {@link ParamDirectionFlagEnum}
+     * @return {@link NotifyChannelTypeEnum}
      */
-    public static ParamDirectionFlagEnum ofName(String name) {
+    public static NotifyChannelTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

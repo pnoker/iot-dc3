@@ -24,9 +24,11 @@ import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.biz.PointCommandHistoryService;
 import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
+import io.github.pnoker.common.data.entity.builder.PointCommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryQueryVO;
+import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
@@ -34,11 +36,11 @@ import io.github.pnoker.common.data.validator.PointCommandValidator;
 import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
-import io.github.pnoker.common.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
@@ -83,6 +85,8 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     private final RabbitTemplate rabbitTemplate;
 
     private final PointCommandHistoryManager pointCommandHistoryManager;
+
+    private final PointCommandHistoryBuilder pointCommandHistoryBuilder;
 
     private final EntityStateMapper entityStateMapper;
 
@@ -177,30 +181,33 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     }
 
     @Override
-    public PointCommandHistoryDO getByCommandId(Long tenantId, String commandId) {
-        return pointCommandHistoryManager.lambdaQuery()
+    public PointCommandHistoryVO getByCommandId(Long tenantId, String commandId) {
+        PointCommandHistoryDO entityDO = pointCommandHistoryManager.lambdaQuery()
                 .eq(Objects.nonNull(tenantId), PointCommandHistoryDO::getTenantId, tenantId)
                 .eq(PointCommandHistoryDO::getCommandId, commandId)
                 .one();
+        return pointCommandHistoryBuilder.buildVOByDO(entityDO);
     }
 
     @Override
-    public Page<PointCommandHistoryDO> list(Long tenantId, PointCommandHistoryQueryVO queryVO) {
+    public Page<PointCommandHistoryVO> list(Long tenantId, PointCommandHistoryQueryVO queryVO) {
         LambdaQueryWrapper<PointCommandHistoryDO> wrapper = new LambdaQueryWrapper<PointCommandHistoryDO>()
                 .eq(PointCommandHistoryDO::getTenantId, tenantId)
                 .eq(Objects.nonNull(queryVO.getDeviceId()), PointCommandHistoryDO::getDeviceId, queryVO.getDeviceId())
                 .eq(Objects.nonNull(queryVO.getPointId()), PointCommandHistoryDO::getPointId, queryVO.getPointId())
-                .eq(Objects.nonNull(queryVO.getStatus()), PointCommandHistoryDO::getStatus, queryVO.getStatus())
+                .eq(Objects.nonNull(queryVO.getStatus()), PointCommandHistoryDO::getStatus,
+                        Objects.nonNull(queryVO.getStatus()) ? queryVO.getStatus().getCode() : null)
                 .eq(Objects.nonNull(queryVO.getType()), PointCommandHistoryDO::getType, queryVO.getType())
                 .orderByDesc(PointCommandHistoryDO::getOccurTime);
-        return pointCommandHistoryManager.page(queryVO.toPage(), wrapper);
+        Page<PointCommandHistoryDO> page = pointCommandHistoryManager.page(queryVO.toPage(), wrapper);
+        return pointCommandHistoryBuilder.buildVOPageByDOPage(page);
     }
 
     private void checkDriverOnline(Long tenantId, Long driverId) {
         EntityStateDO driverState = entityStateMapper.selectOne(
                 new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<EntityStateDO>()
                         .eq(EntityStateDO::getTenantId, tenantId)
-                        .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                        .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
                         .eq(EntityStateDO::getEntityId, driverId));
         if (Objects.isNull(driverState) || !EntityStatusEnum.ONLINE.getIndex().equals(driverState.getStateFlag())) {
             throw new ServiceException("Driver is offline");
@@ -231,7 +238,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     private void validateWriteScope(Long tenantId, Long deviceId, Long pointId) {
         validateCommandScope(tenantId, deviceId, pointId);
         FacadePointBO point = pointFacade.getById(tenantId, pointId);
-        if (!RwFlagEnum.WRITE_ONLY.equals(point.getRwFlag()) && !RwFlagEnum.READ_WRITE.equals(point.getRwFlag())) {
+        if (!RwTypeEnum.WRITE_ONLY.equals(point.getRwFlag()) && !RwTypeEnum.READ_WRITE.equals(point.getRwFlag())) {
             throw new ServiceException("Point is not writable");
         }
     }
@@ -245,7 +252,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         if (Objects.isNull(commandId) || commandId.isBlank()) {
             return null;
         }
-        PointCommandHistoryDO existing = getByCommandId(commandId);
+        PointCommandHistoryVO existing = getByCommandId(commandId);
         return Objects.nonNull(existing) ? existing.getCommandId() : null;
     }
 

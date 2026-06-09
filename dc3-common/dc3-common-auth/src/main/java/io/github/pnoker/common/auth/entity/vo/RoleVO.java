@@ -53,7 +53,7 @@ public class RoleVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "Parent role ID")
+    @Schema(description = "Parent role ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Role parent id can't be empty", groups = {Add.class, Update.class})
     private Long parentRoleId;
 
@@ -61,7 +61,7 @@ public class RoleVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "Role name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "Role name")
+    @Schema(description = "Role name", example = "admin", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid role name",
             groups = {Add.class, Update.class})
     private String roleName;
@@ -81,7 +81,7 @@ public class RoleVO extends BaseVO {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

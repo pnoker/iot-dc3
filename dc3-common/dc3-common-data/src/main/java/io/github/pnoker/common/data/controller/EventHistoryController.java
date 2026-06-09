@@ -21,8 +21,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.EventHistoryService;
-import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
-import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
@@ -61,8 +59,6 @@ public class EventHistoryController implements BaseController {
 
     private final EventHistoryService eventHistoryService;
 
-    private final EventHistoryBuilder eventHistoryBuilder;
-
     @PreAuthorize("@perm.can('event_history', 'list')")
     @Operation(summary = "事件历史 - report", description = "事件历史 - report")
     @PostMapping("/report")
@@ -79,10 +75,8 @@ public class EventHistoryController implements BaseController {
     @Operation(summary = "查询EventHistory", description = "根据条件查询EventHistory")
     @GetMapping("/get_by_record_id")
     public Mono<R<EventHistoryVO>> getByRecordId(@NotBlank @RequestParam String recordId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            EventHistoryDO entityDO = eventHistoryService.getByRecordId(tenantId, recordId);
-            return R.ok(eventHistoryBuilder.buildVOByDO(entityDO));
-        }));
+        return getTenantId().flatMap(tenantId -> async(() ->
+                R.ok(eventHistoryService.getByRecordId(tenantId, recordId))));
     }
 
     @PreAuthorize("@perm.can('event_history', 'list')")
@@ -91,8 +85,7 @@ public class EventHistoryController implements BaseController {
     public Mono<R<Page<EventHistoryVO>>> list(@RequestBody(required = false) EventHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             EventHistoryQueryVO query = Objects.isNull(queryVO) ? new EventHistoryQueryVO() : queryVO;
-            Page<EventHistoryDO> page = eventHistoryService.list(tenantId, query);
-            return R.ok(eventHistoryBuilder.buildVOPageByDOPage(page));
+            return R.ok(eventHistoryService.list(tenantId, query));
         }));
     }
 

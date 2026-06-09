@@ -19,7 +19,7 @@ package io.github.pnoker.common.driver.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.DriverExt;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -64,7 +64,7 @@ public class DriverBO extends BaseBO {
     /**
      * Driver runtime type.
      */
-    private DriverTypeFlagEnum driverTypeFlag;
+    private DriverTypeEnum driverTypeFlag;
 
     /**
      * Extended driver metadata.

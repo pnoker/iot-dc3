@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of resource type flags.
+ * Enumeration of profile type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,42 +33,22 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum ResourceTypeFlagEnum {
+public enum ProfileTypeEnum {
 
     /**
-     * Driver
+     * System create
      */
-    DRIVER((byte) 0, "driver", "Driver"),
+    SYSTEM((byte) 0, "system", "System create"),
 
     /**
-     * Profile
+     * Driver create
      */
-    PROFILE((byte) 1, "profile", "Profile"),
+    DRIVER((byte) 1, "driver", "Driver create"),
 
     /**
-     * Point
+     * User create
      */
-    POINT((byte) 2, "point", "Point"),
-
-    /**
-     * Device
-     */
-    DEVICE((byte) 3, "device", "Device"),
-
-    /**
-     * Data
-     */
-    DATA((byte) 4, "data", "Data"),
-
-    /**
-     * Menu
-     */
-    MENU((byte) 5, "menu", "Menu"),
-
-    /**
-     * Api
-     */
-    API((byte) 6, "api", "Api"),
+    USER((byte) 2, "user", "User create"),
     ;
 
     /**
@@ -91,10 +71,10 @@ public enum ResourceTypeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link ResourceTypeFlagEnum}
+     * @return {@link ProfileTypeEnum}
      */
-    public static ResourceTypeFlagEnum ofIndex(Byte index) {
-        Optional<ResourceTypeFlagEnum> any = Arrays.stream(ResourceTypeFlagEnum.values())
+    public static ProfileTypeEnum ofIndex(Byte index) {
+        Optional<ProfileTypeEnum> any = Arrays.stream(ProfileTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -104,10 +84,10 @@ public enum ResourceTypeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link ResourceTypeFlagEnum}
+     * @return {@link ProfileTypeEnum}
      */
-    public static ResourceTypeFlagEnum ofCode(String code) {
-        Optional<ResourceTypeFlagEnum> any = Arrays.stream(ResourceTypeFlagEnum.values())
+    public static ProfileTypeEnum ofCode(String code) {
+        Optional<ProfileTypeEnum> any = Arrays.stream(ProfileTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -117,9 +97,9 @@ public enum ResourceTypeFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link ResourceTypeFlagEnum}
+     * @return {@link ProfileTypeEnum}
      */
-    public static ResourceTypeFlagEnum ofName(String name) {
+    public static ProfileTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

@@ -18,7 +18,7 @@
 package io.github.pnoker.common.dal.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -63,7 +63,7 @@ public class GroupBindQuery implements Serializable {
      * Entity type flag.
      */
     @Schema(description = "entity type flag")
-    private EntityTypeFlagEnum entityTypeFlag;
+    private EntityTypeEnum entityTypeFlag;
 
     /**
      * Group ID.

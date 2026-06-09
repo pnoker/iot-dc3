@@ -35,24 +35,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Attachment view object")
 public class AttachmentVO extends BaseVO {
 
-    @Schema(description = "conversation ID")
-
+    @Schema(description = "Conversation ID")
     private String conversationId;
 
-    @Schema(description = "file name")
-
+    @Schema(description = "Attachment file name", example = "report.pdf")
     private String fileName;
 
-    @Schema(description = "content type")
-
+    @Schema(description = "Attachment content type", example = "application/pdf")
     private String contentType;
 
-    @Schema(description = "Page size")
-
+    @Schema(description = "Attachment file size in bytes", example = "10240")
     private Long size;
 
-    @Schema(description = "file path")
-
+    @Schema(description = "Attachment file storage path")
     private String filePath;
 
 }

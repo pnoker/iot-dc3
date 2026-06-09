@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.NotifyHistoryRequestExt;
 import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -68,7 +68,7 @@ public class NotifyHistoryVO extends BaseVO {
 
     @Schema(description = "channel type flag")
 
-    private NotifyChannelTypeFlagEnum channelTypeFlag;
+    private NotifyChannelTypeEnum channelTypeFlag;
 
     @Schema(description = "target")
 

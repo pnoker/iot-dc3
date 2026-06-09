@@ -24,7 +24,7 @@ import io.github.pnoker.common.auth.entity.vo.MenuVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.MenuExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.MenuLevelFlagEnum;
+import io.github.pnoker.common.enums.MenuLevelEnum;
 import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -102,7 +102,7 @@ public interface MenuBuilder {
         Optional.ofNullable(menuTypeFlag).ifPresent(value -> entityDO.setMenuTypeFlag(value.getIndex()));
 
         // MenuLevel Flag
-        MenuLevelFlagEnum menuLevel = entityBO.getMenuLevel();
+        MenuLevelEnum menuLevel = entityBO.getMenuLevel();
         Optional.ofNullable(menuLevel).ifPresent(value -> entityDO.setMenuLevel(value.getIndex()));
 
         // Enable Flag
@@ -149,7 +149,7 @@ public interface MenuBuilder {
 
         // MenuLevel Flag
         Byte menuLevel = entityDO.getMenuLevel();
-        entityBO.setMenuLevel(MenuLevelFlagEnum.ofIndex(menuLevel));
+        entityBO.setMenuLevel(MenuLevelEnum.ofIndex(menuLevel));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

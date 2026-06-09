@@ -21,7 +21,7 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.NotifyChannelExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.NotifyChannelTypeFlagEnum;
+import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,7 +46,7 @@ public class NotifyChannelBO extends BaseBO implements TenantOwned {
 
     private String channelCode;
 
-    private NotifyChannelTypeFlagEnum channelTypeFlag;
+    private NotifyChannelTypeEnum channelTypeFlag;
 
     private String credentialRef;
 

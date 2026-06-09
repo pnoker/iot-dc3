@@ -20,7 +20,7 @@ package io.github.pnoker.common.manager.entity.builder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.DriverExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.model.DriverDO;
@@ -97,7 +97,7 @@ public interface DriverBuilder {
         entityDO.setDriverExt(ext);
 
         // DriverType Flag
-        DriverTypeFlagEnum driverTypeFlag = entityBO.getDriverTypeFlag();
+        DriverTypeEnum driverTypeFlag = entityBO.getDriverTypeFlag();
         Optional.ofNullable(driverTypeFlag).ifPresent(value -> entityDO.setDriverTypeFlag(value.getIndex()));
 
         // Enable Flag
@@ -139,7 +139,7 @@ public interface DriverBuilder {
 
         // DriverType Flag
         Byte driverTypeFlag = entityDO.getDriverTypeFlag();
-        entityBO.setDriverTypeFlag(DriverTypeFlagEnum.ofIndex(driverTypeFlag));
+        entityBO.setDriverTypeFlag(DriverTypeEnum.ofIndex(driverTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

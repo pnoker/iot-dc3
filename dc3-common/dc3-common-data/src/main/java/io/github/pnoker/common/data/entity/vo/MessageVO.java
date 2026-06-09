@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.MessageExt;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -61,7 +61,7 @@ public class MessageVO extends BaseVO {
      * Alarm message template level
      */
     @Schema(description = "message level")
-    private AlarmMessageLevelFlagEnum messageLevel;
+    private AlarmMessageLevelEnum messageLevel;
 
     /**
      * Alarm message template content

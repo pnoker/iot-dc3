@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.bo.GroupBO;
 import io.github.pnoker.common.dal.entity.model.GroupDO;
 import io.github.pnoker.common.dal.entity.vo.GroupVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -92,7 +92,7 @@ public interface GroupBuilder {
     default void afterProcess(GroupDO entityDO, @MappingTarget GroupBO entityBO) {
         // GroupType Flag
         Byte groupTypeFlag = entityDO.getGroupTypeFlag();
-        entityBO.setGroupTypeFlag(EntityTypeFlagEnum.ofIndex(groupTypeFlag));
+        entityBO.setGroupTypeFlag(EntityTypeEnum.ofIndex(groupTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
@@ -126,7 +126,7 @@ public interface GroupBuilder {
         }
 
         // GroupType Flag
-        EntityTypeFlagEnum groupTypeFlag = entityBO.getGroupTypeFlag();
+        EntityTypeEnum groupTypeFlag = entityBO.getGroupTypeFlag();
         Optional.ofNullable(groupTypeFlag).ifPresent(value -> entityDO.setGroupTypeFlag(value.getIndex()));
 
         // Enable Flag

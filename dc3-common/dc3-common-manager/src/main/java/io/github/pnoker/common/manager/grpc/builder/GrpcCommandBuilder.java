@@ -22,8 +22,8 @@ import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcCommandDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.CallTypeFlagEnum;
-import io.github.pnoker.common.enums.CommandTypeFlagEnum;
+import io.github.pnoker.common.enums.CallTypeEnum;
+import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.CommandBO;
 import io.github.pnoker.common.manager.entity.query.CommandQuery;
 import io.github.pnoker.common.optional.EnableOptional;
@@ -58,9 +58,9 @@ public interface GrpcCommandBuilder {
         Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
         entityQuery.page(pages);
 
-        Optional.ofNullable(CommandTypeFlagEnum.ofIndex((byte) entityGrpc.getCommandTypeFlag()))
+        Optional.ofNullable(CommandTypeEnum.ofIndex((byte) entityGrpc.getCommandTypeFlag()))
                 .ifPresent(entityQuery::commandType);
-        Optional.ofNullable(CallTypeFlagEnum.ofIndex((byte) entityGrpc.getCallTypeFlag()))
+        Optional.ofNullable(CallTypeEnum.ofIndex((byte) entityGrpc.getCallTypeFlag()))
                 .ifPresent(entityQuery::callType);
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
     }

@@ -56,7 +56,7 @@ public class RoleQuery implements Serializable {
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID", example = "1024")
     private Long tenantId;
 
     //
@@ -76,7 +76,7 @@ public class RoleQuery implements Serializable {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

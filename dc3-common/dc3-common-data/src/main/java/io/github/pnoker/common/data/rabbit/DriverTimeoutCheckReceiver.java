@@ -26,12 +26,12 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
-import io.github.pnoker.common.enums.AlarmSourceFlagEnum;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
+import io.github.pnoker.common.enums.AlarmSourceTypeEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -83,7 +83,7 @@ public class DriverTimeoutCheckReceiver {
 
             EntityStateDO state = entityStateManager.lambdaQuery()
                     .eq(EntityStateDO::getTenantId, dto.getTenantId())
-                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
                     .eq(EntityStateDO::getEntityId, dto.getDriverId())
                     .one();
 
@@ -125,7 +125,7 @@ public class DriverTimeoutCheckReceiver {
             long newVersion = state.getLeaseVersion() + 1L;
             boolean claimed = entityStateManager.lambdaUpdate()
                     .eq(EntityStateDO::getTenantId, dto.getTenantId())
-                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
                     .eq(EntityStateDO::getEntityId, dto.getDriverId())
                     .eq(EntityStateDO::getLeaseVersion, state.getLeaseVersion())
                     .set(EntityStateDO::getLeaseVersion, newVersion)
@@ -145,16 +145,16 @@ public class DriverTimeoutCheckReceiver {
             String alarmMessage = String.format("Driver heartbeat timed out (last=%s); marked OFFLINE", prevCode);
 
             EntityAlarmDO alarm = new EntityAlarmDO();
-            alarm.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.DRIVER.getIndex());
+            alarm.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.DRIVER.getIndex());
             alarm.setEntityId(dto.getDriverId());
             alarm.setDriverId(dto.getDriverId());
             alarm.setDeviceId(0L);
             alarm.setPointId(0L);
             alarm.setRuleId(0L);
             alarm.setRuleStateId(0L);
-            alarm.setAlarmTypeFlag(AlarmTypeFlagEnum.OFFLINE.getIndex());
-            alarm.setAlarmSourceFlag(AlarmSourceFlagEnum.STATE_TIMEOUT.getIndex());
-            alarm.setAlarmLevelFlag(AlarmMessageLevelFlagEnum.P1.getIndex());
+            alarm.setAlarmTypeFlag(AlarmTypeEnum.OFFLINE.getIndex());
+            alarm.setAlarmSourceFlag(AlarmSourceTypeEnum.STATE_TIMEOUT.getIndex());
+            alarm.setAlarmLevelFlag(AlarmMessageLevelEnum.P1.getIndex());
             alarm.setAlarmExt(JsonExt.builder().type("driver-offline").content(alarmMessage).version(1).build());
             alarm.setExpiredTime(0L);
             alarm.setConfirmFlag((byte) 0);
@@ -164,7 +164,7 @@ public class DriverTimeoutCheckReceiver {
             // Update lastAlarmId on state row
             entityStateManager.lambdaUpdate()
                     .eq(EntityStateDO::getTenantId, dto.getTenantId())
-                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeFlagEnum.DRIVER.getIndex())
+                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
                     .eq(EntityStateDO::getEntityId, dto.getDriverId())
                     .eq(EntityStateDO::getLeaseVersion, newVersion)
                     .set(EntityStateDO::getLastAlarmId, alarm.getId())

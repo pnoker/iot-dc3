@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Rule runtime state enumeration.
+ * Enumeration of read/write flag values.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,37 +33,73 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum RuleStateFlagEnum {
+public enum RwTypeEnum {
 
-    NORMAL((byte) 0, "normal", "Normal"),
+    /**
+     * Read only
+     */
+    READ_ONLY((byte) 0, "r", "Read only"),
 
-    FIRING((byte) 1, "firing", "Firing"),
+    /**
+     * Write only
+     */
+    WRITE_ONLY((byte) 1, "w", "Write only"),
 
-    RECOVERED((byte) 2, "recovered", "Recovered"),
+    /**
+     * Read and Write
+     */
+    READ_WRITE((byte) 2, "rw", "Read and Write"),
     ;
 
+    /**
+     * Index
+     */
     @EnumValue
     private final Byte index;
 
+    /**
+     * Code
+     */
     private final String code;
 
+    /**
+     * Remark
+     */
     private final String remark;
 
-    public static RuleStateFlagEnum ofIndex(Byte index) {
-        Optional<RuleStateFlagEnum> any = Arrays.stream(RuleStateFlagEnum.values())
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link RwTypeEnum}
+     */
+    public static RwTypeEnum ofIndex(Byte index) {
+        Optional<RwTypeEnum> any = Arrays.stream(RwTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
     }
 
-    public static RuleStateFlagEnum ofCode(String code) {
-        Optional<RuleStateFlagEnum> any = Arrays.stream(RuleStateFlagEnum.values())
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link RwTypeEnum}
+     */
+    public static RwTypeEnum ofCode(String code) {
+        Optional<RwTypeEnum> any = Arrays.stream(RwTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
 
-    public static RuleStateFlagEnum ofName(String name) {
+    /**
+     * Get enum by name
+     *
+     * @param name Name
+     * @return {@link RwTypeEnum}
+     */
+    public static RwTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

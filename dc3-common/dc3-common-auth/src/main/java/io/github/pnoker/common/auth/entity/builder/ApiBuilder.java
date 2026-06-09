@@ -23,7 +23,7 @@ import io.github.pnoker.common.auth.entity.model.ApiDO;
 import io.github.pnoker.common.auth.entity.vo.ApiVO;
 import io.github.pnoker.common.entity.ext.ApiExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.ApiTypeFlagEnum;
+import io.github.pnoker.common.enums.ApiTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -96,7 +96,7 @@ public interface ApiBuilder {
         entityDO.setApiExt(ext);
 
         // ApiType Flag
-        ApiTypeFlagEnum apiTypeFlag = entityBO.getApiTypeFlag();
+        ApiTypeEnum apiTypeFlag = entityBO.getApiTypeFlag();
         entityDO.setApiTypeFlag(apiTypeFlag.getIndex());
         Optional.ofNullable(apiTypeFlag).ifPresent(value -> entityDO.setApiTypeFlag(value.getIndex()));
 
@@ -139,7 +139,7 @@ public interface ApiBuilder {
 
         // ApiType Flag
         Byte apiTypeFlag = entityDO.getApiTypeFlag();
-        entityBO.setApiTypeFlag(ApiTypeFlagEnum.ofIndex(apiTypeFlag));
+        entityBO.setApiTypeFlag(ApiTypeEnum.ofIndex(apiTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

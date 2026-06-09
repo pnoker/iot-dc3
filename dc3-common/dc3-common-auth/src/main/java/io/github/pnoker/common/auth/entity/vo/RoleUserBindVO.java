@@ -48,14 +48,14 @@ public class RoleUserBindVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "role ID")
+    @Schema(description = "Role ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Role id can't be empty", groups = {Add.class, Update.class})
     private Long roleId;
 
     /**
      * ID
      */
-    @Schema(description = "User ID")
+    @Schema(description = "User ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "User id can't be empty", groups = {Add.class, Update.class})
     private Long userId;
 

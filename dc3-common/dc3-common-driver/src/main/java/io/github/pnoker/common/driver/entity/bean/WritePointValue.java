@@ -18,7 +18,7 @@
 package io.github.pnoker.common.driver.entity.bean;
 
 import io.github.pnoker.common.driver.support.TypedValueConverter;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,7 +55,7 @@ public class WritePointValue implements Serializable {
     /**
      * Declared point type used to convert the raw string value.
      */
-    private PointTypeFlagEnum type;
+    private PointTypeEnum type;
 
     /**
      * Converts the stored string value to the requested Java type.

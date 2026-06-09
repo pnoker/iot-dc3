@@ -42,24 +42,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Session view object")
 public class SessionVO extends BaseVO {
 
-    @Schema(description = "conversation ID")
-
+    @Schema(description = "Conversation ID")
     private String conversationId;
 
-    @Schema(description = "title")
-
+    @Schema(description = "Session title")
     private String title;
 
-    @Schema(description = "session extension information (JSON)")
-
+    @Schema(description = "Session extension information (JSON)")
     private SessionExt sessionExt;
 
-    @Schema(description = "Tenant ID")
-
+    @Schema(description = "Tenant ID", example = "1024")
     private Long tenantId;
 
-    @Schema(description = "User ID")
-
+    @Schema(description = "User ID", example = "1024")
     private Long userId;
 
 }

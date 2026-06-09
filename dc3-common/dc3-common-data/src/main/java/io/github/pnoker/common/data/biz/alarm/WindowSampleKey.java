@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 
 /**
  * Identity of a window sample buffer. We key on {@code (tenantId, targetType,
@@ -29,9 +29,9 @@ import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
  * @version 2026.5.21
  * @since 2026.5.21
  */
-public record WindowSampleKey(Long tenantId, AlarmTargetTypeFlagEnum targetType, Long entityId) {
+public record WindowSampleKey(Long tenantId, AlarmTargetTypeEnum targetType, Long entityId) {
 
-    public static WindowSampleKey of(Long tenantId, AlarmTargetTypeFlagEnum targetType, Long entityId) {
+    public static WindowSampleKey of(Long tenantId, AlarmTargetTypeEnum targetType, Long entityId) {
         return new WindowSampleKey(tenantId, targetType, entityId);
     }
 

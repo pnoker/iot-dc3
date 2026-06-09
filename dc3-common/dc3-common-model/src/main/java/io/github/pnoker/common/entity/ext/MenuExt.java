@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,7 @@ import java.util.Map;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Schema(description = "JSON extension object for menu configuration metadata, holding extended information related to menus")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -44,8 +46,10 @@ public class MenuExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
+    @Schema(description = "Extended content, distinguished by Type and Version")
     private Content content;
 
+    @Schema(description = "Extended content of the menu, carrying localized titles, icon, link and description")
     @Getter
     @Setter
     @NoArgsConstructor
@@ -58,21 +62,25 @@ public class MenuExt extends BaseExt {
          * Authoritative source for the menu display name. When rendering, the UI picks
          * {@code titles[currentLocale]} with fallback to {@code titles["en"]}.
          */
+        @Schema(description = "Localized titles keyed by locale code (e.g. zh, en); authoritative source for the menu display name, falling back to titles[\"en\"]")
         private Map<String, String> titles;
 
         /**
          * Icon.
          */
+        @Schema(description = "Menu icon identifier")
         private String icon;
 
         /**
          * URL link.
          */
+        @Schema(description = "Menu URL link")
         private String url;
 
         /**
          * Description.
          */
+        @Schema(description = "Description")
         private String remark;
 
     }

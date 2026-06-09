@@ -21,7 +21,7 @@ import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.enums.DriverTypeEnum;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -61,7 +61,7 @@ public class DriverProperties {
      * Driver runtime type.
      */
     @NotNull(message = "Driver type can't be empty")
-    private DriverTypeFlagEnum type = DriverTypeFlagEnum.DRIVER_CLIENT;
+    private DriverTypeEnum type = DriverTypeEnum.DRIVER_CLIENT;
 
     /**
      * Driver display name.

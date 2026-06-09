@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +39,7 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "JSON extension object for message metadata, carrying message-related extended information")
 public class MessageExt extends BaseExt {
 
     /**
@@ -45,22 +47,26 @@ public class MessageExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
+    @Schema(description = "Extended content, distinguished by the inherited type and version fields")
     private Content content;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Extended content holding template variables and channel-specific templates")
     public static class Content {
 
         /**
          * Variables expected by the templates.
          */
+        @Schema(description = "Variables expected by the templates")
         private List<String> variables;
 
         /**
          * Channel-specific templates. Destinations and credentials belong to notification channels.
          */
+        @Schema(description = "Channel-specific templates; destinations and credentials belong to notification channels")
         private List<Template> templates;
 
     }
@@ -69,21 +75,25 @@ public class MessageExt extends BaseExt {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "Channel-specific message template definition")
     public static class Template {
 
         /**
          * Channel type such as FEISHU_BOT, WEBHOOK, or EMAIL.
          */
+        @Schema(description = "Channel type such as FEISHU_BOT, WEBHOOK, or EMAIL", example = "FEISHU_BOT")
         private String channelType;
 
         /**
          * Payload type such as CARD, TEXT, JSON, or HTML.
          */
+        @Schema(description = "Payload type such as CARD, TEXT, JSON, or HTML", example = "CARD")
         private String payloadType;
 
         /**
          * Structured template payload to render.
          */
+        @Schema(description = "Structured template payload to render")
         private Map<String, Object> template;
 
     }

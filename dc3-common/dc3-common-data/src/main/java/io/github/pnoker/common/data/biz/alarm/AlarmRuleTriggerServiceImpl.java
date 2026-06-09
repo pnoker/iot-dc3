@@ -21,7 +21,7 @@ import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,12 +62,12 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
         // triggering fact" intuition intact.
         LocalDateTime ts = factTime(pointValue.getCreateTime());
         windowSampleBuffer.append(
-                WindowSampleKey.of(pointValue.getTenantId(), AlarmTargetTypeFlagEnum.POINT, pointValue.getPointId()),
+                WindowSampleKey.of(pointValue.getTenantId(), AlarmTargetTypeEnum.POINT, pointValue.getPointId()),
                 new WindowSample(pointValue.getNumValue(), pointValue.getCalValue(), ts));
 
         process(new RuleFact(
                 pointValue.getTenantId(),
-                AlarmTargetTypeFlagEnum.POINT,
+                AlarmTargetTypeEnum.POINT,
                 pointValue.getPointId(),
                 null,
                 ts,
@@ -89,11 +89,11 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
             valid.add(pointValue);
             LocalDateTime ts = factTime(pointValue.getCreateTime());
             windowSampleBuffer.append(
-                    WindowSampleKey.of(pointValue.getTenantId(), AlarmTargetTypeFlagEnum.POINT, pointValue.getPointId()),
+                    WindowSampleKey.of(pointValue.getTenantId(), AlarmTargetTypeEnum.POINT, pointValue.getPointId()),
                     new WindowSample(pointValue.getNumValue(), pointValue.getCalValue(), ts));
             facts.add(new RuleFact(
                     pointValue.getTenantId(),
-                    AlarmTargetTypeFlagEnum.POINT,
+                    AlarmTargetTypeEnum.POINT,
                     pointValue.getPointId(),
                     null,
                     ts,
@@ -116,7 +116,7 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
 
         process(new RuleFact(
                 alarm.getTenantId(),
-                AlarmTargetTypeFlagEnum.DEVICE,
+                AlarmTargetTypeEnum.DEVICE,
                 alarm.getDeviceId(),
                 alarm.getAlarmId(),
                 factTime(alarm.getCreateTime()),
@@ -131,7 +131,7 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
 
         process(new RuleFact(
                 alarm.getTenantId(),
-                AlarmTargetTypeFlagEnum.DRIVER,
+                AlarmTargetTypeEnum.DRIVER,
                 alarm.getDriverId(),
                 alarm.getAlarmId(),
                 factTime(alarm.getCreateTime()),
@@ -146,7 +146,7 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
 
         process(new RuleFact(
                 entityDTO.tenantId(),
-                AlarmTargetTypeFlagEnum.EVENT,
+                AlarmTargetTypeEnum.EVENT,
                 entityDTO.deviceId(),
                 null,
                 LocalDateTimeUtil.now(),

@@ -20,7 +20,7 @@ package io.github.pnoker.common.dal.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotBlank;
@@ -60,7 +60,7 @@ public class GroupVO extends BaseVO {
      */
     @Schema(description = "group type flag")
     @NotNull(message = "Group type flag can't be empty", groups = {Add.class, Update.class})
-    private EntityTypeFlagEnum groupTypeFlag;
+    private EntityTypeEnum groupTypeFlag;
 
     /**
      * Group name.

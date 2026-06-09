@@ -24,8 +24,8 @@ import io.github.pnoker.common.auth.entity.vo.ResourceVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.ResourceExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
-import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
+import io.github.pnoker.common.enums.ResourceScopeTypeEnum;
+import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
@@ -98,11 +98,11 @@ public interface ResourceBuilder {
         entityDO.setResourceExt(ext);
 
         // ResourceType Flag
-        ResourceTypeFlagEnum resourceTypeFlag = entityBO.getResourceTypeFlag();
+        ResourceTypeEnum resourceTypeFlag = entityBO.getResourceTypeFlag();
         Optional.ofNullable(resourceTypeFlag).ifPresent(value -> entityDO.setResourceTypeFlag(value.getIndex()));
 
         // ResourceScope Flag
-        ResourceScopeFlagEnum resourceScopeFlag = entityBO.getResourceScopeFlag();
+        ResourceScopeTypeEnum resourceScopeFlag = entityBO.getResourceScopeFlag();
         Optional.ofNullable(resourceScopeFlag).ifPresent(value -> entityDO.setResourceScopeFlag(value.getIndex()));
 
         // Enable Flag
@@ -145,11 +145,11 @@ public interface ResourceBuilder {
 
         // ResourceType Flag
         Byte resourceTypeFlag = entityDO.getResourceTypeFlag();
-        entityBO.setResourceTypeFlag(ResourceTypeFlagEnum.ofIndex(resourceTypeFlag));
+        entityBO.setResourceTypeFlag(ResourceTypeEnum.ofIndex(resourceTypeFlag));
 
         // ResourceScope Flag
         Byte resourceScopeFlag = entityDO.getResourceScopeFlag();
-        entityBO.setResourceScopeFlag(ResourceScopeFlagEnum.ofIndex(resourceScopeFlag));
+        entityBO.setResourceScopeFlag(ResourceScopeTypeEnum.ofIndex(resourceScopeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

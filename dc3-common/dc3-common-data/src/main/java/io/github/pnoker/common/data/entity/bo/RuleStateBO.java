@@ -20,8 +20,8 @@ package io.github.pnoker.common.data.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.RuleStateExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.RuleStateFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.github.pnoker.common.enums.RuleStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,13 +46,13 @@ public class RuleStateBO extends BaseBO implements TenantOwned {
 
     private Long ruleId;
 
-    private AlarmTargetTypeFlagEnum alarmTargetTypeFlag;
+    private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     private Long entityId;
 
     private String fingerprint;
 
-    private RuleStateFlagEnum entityStateFlag;
+    private RuleStatusEnum entityStateFlag;
 
     private LocalDateTime firstTriggerTime;
 

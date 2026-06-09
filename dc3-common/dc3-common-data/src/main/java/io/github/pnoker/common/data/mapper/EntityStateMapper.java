@@ -57,14 +57,14 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
      */
     EntityStateDO upsertEntityState(@Param("id") Long id,
                                     @Param("tenantId") Long tenantId,
-                                    @Param("entityTypeFlag") byte entityTypeFlag,
+                                    @Param("entityTypeFlag") Byte entityTypeFlag,
                                     @Param("entityId") Long entityId,
                                     @Param("parentEntityId") Long parentEntityId,
-                                    @Param("stateFlag") byte stateFlag,
-                                    @Param("initialLastStateFlag") byte initialLastStateFlag,
+                                    @Param("stateFlag") Byte stateFlag,
+                                    @Param("initialLastStateFlag") Byte initialLastStateFlag,
                                     @Param("expireTime") java.time.LocalDateTime expireTime,
                                     @Param("timeoutSeconds") int timeoutSeconds,
-                                    @Param("timeoutSourceFlag") byte timeoutSourceFlag,
+                                    @Param("timeoutSourceFlag") Byte timeoutSourceFlag,
                                     @Param("stateExtType") String stateExtType,
                                     @Param("stateDescription") String stateDescription);
 

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -38,15 +39,19 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@Schema(description = "One edge in the topology Sankey graph")
 public class TopologyLinkVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Prefixed id of the source node", example = "driver:1024")
     private String source;
 
+    @Schema(description = "Prefixed id of the target node", example = "device:2048")
     private String target;
 
+    @Schema(description = "Edge weight: relationship count in cardinality mode, or rolled-up sample count in volume mode", example = "5")
     private long value;
 
 }

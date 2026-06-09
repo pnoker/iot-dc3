@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of expiration flag values (enabled/disabled).
+ * Enumeration of point type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,47 +33,47 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum ExpireFlagEnum {
+public enum PointTypeEnum {
 
     /**
-     * Permanent
+     * String
      */
-    PERMANENT((byte) 0, "permanent", "Permanent"),
+    STRING((byte) 0, "string", "String"),
 
     /**
-     * One day
+     * Byte
      */
-    ONE_DAY((byte) 1, "one_day", "One day"),
+    BYTE((byte) 1, "byte", "Byte"),
 
     /**
-     * One week
+     * Short
      */
-    ONE_WEEK((byte) 2, "one_week", "One week"),
+    SHORT((byte) 2, "short", "Short"),
 
     /**
-     * One month
+     * Int
      */
-    ONE_MONTH((byte) 3, "one_month", "One month"),
+    INT((byte) 3, "int", "Int"),
 
     /**
-     * Three months
+     * Long
      */
-    THREE_MONTHS((byte) 4, "three_months", "Three months"),
+    LONG((byte) 4, "long", "Long"),
 
     /**
-     * Half year
+     * Float
      */
-    HALF_YEAR((byte) 5, "half_year", "Half year"),
+    FLOAT((byte) 5, "float", "Float"),
 
     /**
-     * One year
+     * Double
      */
-    ONE_YEAR((byte) 6, "one_year", "One year"),
+    DOUBLE((byte) 6, "double", "Double"),
 
     /**
-     * Custom
+     * Boolean
      */
-    CUSTOM((byte) 7, "custom", "Custom"),
+    BOOLEAN((byte) 7, "boolean", "Boolean"),
     ;
 
     /**
@@ -96,10 +96,10 @@ public enum ExpireFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link ExpireFlagEnum}
+     * @return {@link PointTypeEnum}
      */
-    public static ExpireFlagEnum ofIndex(Byte index) {
-        Optional<ExpireFlagEnum> any = Arrays.stream(ExpireFlagEnum.values())
+    public static PointTypeEnum ofIndex(Byte index) {
+        Optional<PointTypeEnum> any = Arrays.stream(PointTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -109,10 +109,10 @@ public enum ExpireFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link ExpireFlagEnum}
+     * @return {@link PointTypeEnum}
      */
-    public static ExpireFlagEnum ofCode(String code) {
-        Optional<ExpireFlagEnum> any = Arrays.stream(ExpireFlagEnum.values())
+    public static PointTypeEnum ofCode(String code) {
+        Optional<PointTypeEnum> any = Arrays.stream(PointTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -121,10 +121,10 @@ public enum ExpireFlagEnum {
     /**
      * Get enum by name
      *
-     * @param name Enum name
-     * @return {@link ExpireFlagEnum}
+     * @param name Name
+     * @return {@link PointTypeEnum}
      */
-    public static ExpireFlagEnum ofName(String name) {
+    public static PointTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

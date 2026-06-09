@@ -31,10 +31,10 @@ import io.github.pnoker.common.auth.mapper.ResourceRegistryLockMapper;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.entity.ext.ApiExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.ApiTypeFlagEnum;
+import io.github.pnoker.common.enums.ApiTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
-import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
+import io.github.pnoker.common.enums.ResourceScopeTypeEnum;
+import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,27 +79,27 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return serviceName + SymbolConstant.COLON + methodToTypeFlag(method).name() + SymbolConstant.COLON + path;
     }
 
-    private static ApiTypeFlagEnum methodToTypeFlag(String method) {
+    private static ApiTypeEnum methodToTypeFlag(String method) {
         String m = Objects.requireNonNullElse(method, "").toUpperCase();
         return switch (m) {
-            case "POST" -> ApiTypeFlagEnum.POST;
-            case "DELETE" -> ApiTypeFlagEnum.DELETE;
-            case "PUT" -> ApiTypeFlagEnum.PUT;
-            case "GET" -> ApiTypeFlagEnum.GET;
+            case "POST" -> ApiTypeEnum.POST;
+            case "DELETE" -> ApiTypeEnum.DELETE;
+            case "PUT" -> ApiTypeEnum.PUT;
+            case "GET" -> ApiTypeEnum.GET;
             default -> throw new IllegalArgumentException("Unsupported HTTP method: " + method);
         };
     }
 
-    private static ResourceScopeFlagEnum methodToScopeFlag(Byte apiTypeFlag) {
-        ApiTypeFlagEnum type = ApiTypeFlagEnum.ofIndex(apiTypeFlag);
+    private static ResourceScopeTypeEnum methodToScopeFlag(Byte apiTypeFlag) {
+        ApiTypeEnum type = ApiTypeEnum.ofIndex(apiTypeFlag);
         if (Objects.isNull(type)) {
-            return ResourceScopeFlagEnum.LIST;
+            return ResourceScopeTypeEnum.LIST;
         }
         return switch (type) {
-            case POST -> ResourceScopeFlagEnum.ADD;
-            case DELETE -> ResourceScopeFlagEnum.DELETE;
-            case PUT -> ResourceScopeFlagEnum.UPDATE;
-            case GET -> ResourceScopeFlagEnum.GET;
+            case POST -> ResourceScopeTypeEnum.ADD;
+            case DELETE -> ResourceScopeTypeEnum.DELETE;
+            case PUT -> ResourceScopeTypeEnum.UPDATE;
+            case GET -> ResourceScopeTypeEnum.GET;
         };
     }
 
@@ -186,7 +186,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             apiManager.removeByIds(apiIdsToDelete);
             List<Long> resourceIds = resourceManager
                     .list(Wrappers.<ResourceDO>lambdaQuery()
-                            .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.API.getIndex())
+                            .eq(ResourceDO::getResourceTypeFlag, ResourceTypeEnum.API.getIndex())
                             .in(ResourceDO::getEntityId, apiIdsToDelete))
                     .stream()
                     .map(ResourceDO::getId)
@@ -228,7 +228,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         }
         // Exclude grouping nodes (entity_id=0) so the caller only sees real leaves.
         List<ResourceDO> rows = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
-                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.API.getIndex())
+                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeEnum.API.getIndex())
                 .in(ResourceDO::getEntityId, entityIds)
                 .ne(ResourceDO::getEntityId, 0L));
         Map<Long, ResourceDO> map = new HashMap<>(rows.size());
@@ -283,7 +283,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         resource.setResourceName(api.getApiName());
         resource.setResourceCode(buildResourceCode(api.getServiceName(), api.getApiName()));
         resource.setServiceName(api.getServiceName());
-        resource.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
+        resource.setResourceTypeFlag(ResourceTypeEnum.API.getIndex());
         resource.setResourceScopeFlag(methodToScopeFlag(api.getApiTypeFlag()).getIndex());
         resource.setEntityId(api.getId());
         resource.setResourceExt(new JsonExt());
@@ -369,7 +369,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         resource.setResourceName(api.getApiName());
         resource.setResourceCode(buildResourceCode(api.getServiceName(), api.getApiName()));
         resource.setServiceName(api.getServiceName());
-        resource.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
+        resource.setResourceTypeFlag(ResourceTypeEnum.API.getIndex());
         resource.setResourceScopeFlag(methodToScopeFlag(api.getApiTypeFlag()).getIndex());
         resource.setEntityId(api.getId());
         if (Objects.isNull(resource.getResourceExt())) {
@@ -392,7 +392,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         if (!Objects.equals(resource.getServiceName(), api.getServiceName())) {
             return true;
         }
-        if (!Objects.equals(resource.getResourceTypeFlag(), ResourceTypeFlagEnum.API.getIndex())) {
+        if (!Objects.equals(resource.getResourceTypeFlag(), ResourceTypeEnum.API.getIndex())) {
             return true;
         }
         if (!Objects.equals(resource.getResourceScopeFlag(), methodToScopeFlag(api.getApiTypeFlag()).getIndex())) {
@@ -422,8 +422,8 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         node.setParentResourceId(0L);
         node.setResourceName(serviceName);
         node.setResourceCode(code);
-        node.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
-        node.setResourceScopeFlag(ResourceScopeFlagEnum.LIST.getIndex());
+        node.setResourceTypeFlag(ResourceTypeEnum.API.getIndex());
+        node.setResourceScopeFlag(ResourceScopeTypeEnum.LIST.getIndex());
         node.setEntityId(0L);
         node.setResourceExt(new JsonExt());
         node.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
@@ -465,8 +465,8 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
                 node.setParentResourceId(serviceNodeId);
                 node.setResourceName(group.isEmpty() ? "(ungrouped)" : group);
                 node.setResourceCode(code);
-                node.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
-                node.setResourceScopeFlag(ResourceScopeFlagEnum.LIST.getIndex());
+                node.setResourceTypeFlag(ResourceTypeEnum.API.getIndex());
+                node.setResourceScopeFlag(ResourceScopeTypeEnum.LIST.getIndex());
                 node.setEntityId(0L);
                 node.setResourceExt(new JsonExt());
                 node.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
@@ -508,10 +508,10 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         if (!Objects.equals(node.getResourceCode(), code)) {
             return true;
         }
-        if (!Objects.equals(node.getResourceTypeFlag(), ResourceTypeFlagEnum.API.getIndex())) {
+        if (!Objects.equals(node.getResourceTypeFlag(), ResourceTypeEnum.API.getIndex())) {
             return true;
         }
-        if (!Objects.equals(node.getResourceScopeFlag(), ResourceScopeFlagEnum.LIST.getIndex())) {
+        if (!Objects.equals(node.getResourceScopeFlag(), ResourceScopeTypeEnum.LIST.getIndex())) {
             return true;
         }
         if (!Objects.equals(node.getEntityId(), 0L)) {
@@ -531,8 +531,8 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         node.setParentResourceId(parentResourceId);
         node.setResourceName(name);
         node.setResourceCode(code);
-        node.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
-        node.setResourceScopeFlag(ResourceScopeFlagEnum.LIST.getIndex());
+        node.setResourceTypeFlag(ResourceTypeEnum.API.getIndex());
+        node.setResourceScopeFlag(ResourceScopeTypeEnum.LIST.getIndex());
         node.setEntityId(0L);
         if (Objects.isNull(node.getResourceExt())) {
             node.setResourceExt(new JsonExt());
@@ -628,7 +628,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         String code = MENU_RESOURCE_CODE_PREFIX + Objects.requireNonNullElse(menu.getMenuCode(), "");
         // Prefer lookup by entity_id so a menu_code rename still resolves the mirror.
         ResourceDO existing = resourceManager.getOne(Wrappers.<ResourceDO>lambdaQuery()
-                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.MENU.getIndex())
+                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeEnum.MENU.getIndex())
                 .eq(ResourceDO::getEntityId, menu.getId())
                 .last("LIMIT 1"));
         Long parentResourceId = resolveMenuParentResourceId(menu.getParentMenuId());
@@ -638,8 +638,8 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             mirror.setParentResourceId(parentResourceId);
             mirror.setResourceName(Objects.requireNonNullElse(menu.getMenuName(), ""));
             mirror.setResourceCode(code);
-            mirror.setResourceTypeFlag(ResourceTypeFlagEnum.MENU.getIndex());
-            mirror.setResourceScopeFlag(ResourceScopeFlagEnum.LIST.getIndex());
+            mirror.setResourceTypeFlag(ResourceTypeEnum.MENU.getIndex());
+            mirror.setResourceScopeFlag(ResourceScopeTypeEnum.LIST.getIndex());
             mirror.setEntityId(menu.getId());
             mirror.setResourceExt(new JsonExt());
             mirror.setEnableFlag(Objects.requireNonNullElse(menu.getEnableFlag(), EnableFlagEnum.ENABLE.getIndex()));
@@ -664,7 +664,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             return;
         }
         ResourceDO existing = resourceManager.getOne(Wrappers.<ResourceDO>lambdaQuery()
-                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.MENU.getIndex())
+                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeEnum.MENU.getIndex())
                 .eq(ResourceDO::getEntityId, menuId)
                 .last("LIMIT 1"));
         if (Objects.nonNull(existing)) {
@@ -677,7 +677,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             return 0L;
         }
         ResourceDO parent = resourceManager.getOne(Wrappers.<ResourceDO>lambdaQuery()
-                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.MENU.getIndex())
+                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeEnum.MENU.getIndex())
                 .eq(ResourceDO::getEntityId, parentMenuId)
                 .last("LIMIT 1"));
         return Objects.isNull(parent) ? 0L : parent.getId();

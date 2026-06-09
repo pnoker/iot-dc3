@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -44,15 +45,19 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Schema(description = "Topology payload: a 4-column Sankey graph (Driver to Device to Profile to Point)")
 public class TopologyVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Sankey nodes across the driver, device, profile and point columns")
     private List<TopologyNodeVO> nodes = new ArrayList<>();
 
+    @Schema(description = "Sankey edges connecting the nodes")
     private List<TopologyLinkVO> links = new ArrayList<>();
 
+    @Schema(description = "Tenant-wide total counts used for the footer summary")
     private TopologyStatsVO stats = new TopologyStatsVO();
 
 }

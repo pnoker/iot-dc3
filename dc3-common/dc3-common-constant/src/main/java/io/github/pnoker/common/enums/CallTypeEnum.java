@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Enumeration of permission scope type flags.
+ * Enumeration of call type flags.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,32 +33,17 @@ import java.util.Optional;
  */
 @Getter
 @AllArgsConstructor
-public enum ResourceScopeFlagEnum {
+public enum CallTypeEnum {
 
     /**
-     * Add
+     * Synchronous call
      */
-    ADD((byte) 0, "add", "Add"),
+    SYNC((byte) 0, "sync", "Synchronous call"),
 
     /**
-     * Delete
+     * Asynchronous call
      */
-    DELETE((byte) 1, "delete", "Delete"),
-
-    /**
-     * Update
-     */
-    UPDATE((byte) 2, "update", "Update"),
-
-    /**
-     * List
-     */
-    LIST((byte) 3, "list", "List"),
-
-    /**
-     * Get (single entity query)
-     */
-    GET((byte) 4, "get", "Get"),
+    ASYNC((byte) 1, "async", "Asynchronous call"),
     ;
 
     /**
@@ -81,10 +66,10 @@ public enum ResourceScopeFlagEnum {
      * Get enum by index
      *
      * @param index Index
-     * @return {@link ResourceScopeFlagEnum}
+     * @return {@link CallTypeEnum}
      */
-    public static ResourceScopeFlagEnum ofIndex(Byte index) {
-        Optional<ResourceScopeFlagEnum> any = Arrays.stream(ResourceScopeFlagEnum.values())
+    public static CallTypeEnum ofIndex(Byte index) {
+        Optional<CallTypeEnum> any = Arrays.stream(CallTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
                 .findFirst();
         return any.orElse(null);
@@ -94,10 +79,10 @@ public enum ResourceScopeFlagEnum {
      * Get enum by code
      *
      * @param code Code
-     * @return {@link ResourceScopeFlagEnum}
+     * @return {@link CallTypeEnum}
      */
-    public static ResourceScopeFlagEnum ofCode(String code) {
-        Optional<ResourceScopeFlagEnum> any = Arrays.stream(ResourceScopeFlagEnum.values())
+    public static CallTypeEnum ofCode(String code) {
+        Optional<CallTypeEnum> any = Arrays.stream(CallTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
@@ -107,9 +92,9 @@ public enum ResourceScopeFlagEnum {
      * Get enum by name
      *
      * @param name Name
-     * @return {@link ResourceScopeFlagEnum}
+     * @return {@link CallTypeEnum}
      */
-    public static ResourceScopeFlagEnum ofName(String name) {
+    public static CallTypeEnum ofName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {

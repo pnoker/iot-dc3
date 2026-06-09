@@ -36,36 +36,28 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Model view object")
 public class ModelVO {
 
-    @Schema(description = "model")
-
+    @Schema(description = "Model identifier", example = "gpt-4o")
     private String model;
 
-    @Schema(description = "label")
-
+    @Schema(description = "Human-readable model label", example = "GPT-4o")
     private String label;
 
-    @Schema(description = "stream")
-
+    @Schema(description = "Whether the model supports streaming responses")
     private boolean stream;
 
-    @Schema(description = "tool call")
-
+    @Schema(description = "Whether the model supports tool/function calling")
     private boolean toolCall;
 
-    @Schema(description = "vision")
-
+    @Schema(description = "Whether the model supports vision (image) input")
     private boolean vision;
 
-    @Schema(description = "reasoning")
-
+    @Schema(description = "Whether the model supports reasoning")
     private boolean reasoning;
 
-    @Schema(description = "temperature")
-
+    @Schema(description = "Sampling temperature", example = "0.7")
     private Double temperature;
 
-    @Schema(description = "max tokens")
-
+    @Schema(description = "Maximum number of tokens to generate", example = "4096")
     private Integer maxTokens;
 
 }

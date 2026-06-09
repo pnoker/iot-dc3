@@ -81,6 +81,7 @@ public class PointValueVO implements Serializable {
     /**
      * Whether the latest-value query returned a real sampled value.
      */
+    @Schema(description = "whether the latest-value query returned a real sampled value")
     private Boolean hasLatestValue = Boolean.TRUE;
 
     /**

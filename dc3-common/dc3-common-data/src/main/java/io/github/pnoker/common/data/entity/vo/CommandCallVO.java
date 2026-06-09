@@ -43,8 +43,7 @@ public class CommandCallVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "device ID")
-
+    @Schema(description = "device ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
     private Long deviceId;
 
@@ -56,6 +55,7 @@ public class CommandCallVO implements Serializable {
 
     private String commandCode;
 
+    @Schema(description = "command parameter values")
     private Map<String, String> paramValues;
 
     @Schema(description = "command id_")

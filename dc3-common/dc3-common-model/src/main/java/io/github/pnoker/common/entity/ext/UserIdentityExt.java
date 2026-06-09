@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "User identity extension object, embedded inside user VO extension fields")
 public class UserIdentityExt extends BaseExt {
 
     /**
@@ -42,32 +44,38 @@ public class UserIdentityExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
+    @Schema(description = "Extended content payload, distinguished by the type and version fields")
     private Content content;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(description = "User identity content carrying personal identity details")
     public static class Content {
 
         /**
          * Real name.
          */
+        @Schema(description = "Real name of the user")
         private String realName;
 
         /**
          * Gender.
          */
+        @Schema(description = "Gender of the user")
         private String gender;
 
         /**
          * Nationality.
          */
+        @Schema(description = "Nationality of the user")
         private String nationality;
 
         /**
          * Identification number.
          */
+        @Schema(description = "Identification number of the user")
         private String idNumber;
 
     }

@@ -26,8 +26,8 @@ import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeFlagEnum;
-import io.github.pnoker.common.enums.TimeoutSourceFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.enums.TimeoutSourceTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -86,14 +86,14 @@ public class DeviceStateServiceImpl implements DeviceStateService {
         EntityStateDO stateDO = entityStateMapper.upsertEntityState(
                 IdWorker.getId(),
                 entityDTO.getTenantId(),
-                EntityTypeFlagEnum.DEVICE.getIndex(),
+                EntityTypeEnum.DEVICE.getIndex(),
                 entityDTO.getDeviceId(),
                 entityDTO.getDriverId(),
-                (byte) statusEnum.getIndex(),
-                (byte) EntityStatusEnum.OFFLINE.getIndex(),
+                statusEnum.getIndex(),
+                EntityStatusEnum.OFFLINE.getIndex(),
                 expireTime,
                 (int) ttlSeconds,
-                (byte) TimeoutSourceFlagEnum.DRIVER.getIndex(),
+                TimeoutSourceTypeEnum.DRIVER.getIndex(),
                 "device-heartbeat",
                 entityDTO.getStateDescription());
         if (Objects.isNull(stateDO)) {

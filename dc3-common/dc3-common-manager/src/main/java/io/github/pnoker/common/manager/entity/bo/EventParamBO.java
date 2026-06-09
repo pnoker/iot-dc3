@@ -21,7 +21,7 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.EventParamExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,7 +46,7 @@ public class EventParamBO extends BaseBO implements TenantOwned {
 
     private String paramCode;
 
-    private PointTypeFlagEnum paramTypeFlag;
+    private PointTypeEnum paramTypeFlag;
 
     private EventParamExt paramExt;
 

@@ -20,8 +20,8 @@ package io.github.pnoker.common.auth.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.ResourceExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
-import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
+import io.github.pnoker.common.enums.ResourceScopeTypeEnum;
+import io.github.pnoker.common.enums.ResourceTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -65,10 +65,10 @@ public class ResourceBO extends BaseBO {
     /**
      * Type
      */
-    private ResourceTypeFlagEnum resourceTypeFlag;
+    private ResourceTypeEnum resourceTypeFlag;
 
     /**
-     * , : ResourceScopeFlagEnum
+     * , : ResourceScopeTypeEnum
      * <ul>
      * <li>0x01:</li>
      * <li>0x02:</li>
@@ -77,7 +77,7 @@ public class ResourceBO extends BaseBO {
      * </ul>
      *
      */
-    private ResourceScopeFlagEnum resourceScopeFlag;
+    private ResourceScopeTypeEnum resourceScopeFlag;
 
     /**
      * Entity ID

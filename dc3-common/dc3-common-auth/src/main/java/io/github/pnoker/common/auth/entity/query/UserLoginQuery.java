@@ -64,25 +64,25 @@ public class UserLoginQuery implements Serializable {
     /**
      * ID
      */
-    @Schema(description = "User ID")
+    @Schema(description = "User ID", example = "1024")
     private Long userId;
 
     /**
      * ID
      */
-    @Schema(description = "user password ID")
+    @Schema(description = "User password ID", example = "1024")
     private Long userPasswordId;
 
     /**
      * Tenant scope resolved through user-tenant binding.
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID", example = "1024")
     private Long tenantId;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

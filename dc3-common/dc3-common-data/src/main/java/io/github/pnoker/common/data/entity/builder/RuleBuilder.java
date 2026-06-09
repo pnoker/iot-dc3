@@ -23,7 +23,7 @@ import io.github.pnoker.common.data.entity.model.RuleDO;
 import io.github.pnoker.common.data.entity.vo.RuleVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -97,7 +97,7 @@ public interface RuleBuilder {
         entityDO.setRuleExt(ext);
 
         // AlarmTargetType Flag
-        AlarmTargetTypeFlagEnum alarmTargetTypeFlag = entityBO.getAlarmTargetTypeFlag();
+        AlarmTargetTypeEnum alarmTargetTypeFlag = entityBO.getAlarmTargetTypeFlag();
         Optional.ofNullable(alarmTargetTypeFlag).ifPresent(value -> entityDO.setAlarmTargetTypeFlag(value.getIndex()));
 
         // Enable Flag
@@ -139,7 +139,7 @@ public interface RuleBuilder {
 
         // AlarmTargetType Flag
         Byte alarmTargetTypeFlag = entityDO.getAlarmTargetTypeFlag();
-        entityBO.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.ofIndex(alarmTargetTypeFlag));
+        entityBO.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.ofIndex(alarmTargetTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

@@ -57,13 +57,13 @@ public class TenantBindQuery implements Serializable {
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID", example = "1024")
     private Long tenantId;
 
     /**
      * ID
      */
-    @Schema(description = "User ID")
+    @Schema(description = "User ID", example = "1024")
     private Long userId;
 
 }

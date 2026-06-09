@@ -57,13 +57,13 @@ public class RoleUserBindQuery implements Serializable {
     /**
      * ID
      */
-    @Schema(description = "role ID")
+    @Schema(description = "Role ID", example = "1024")
     private Long roleId;
 
     /**
      * ID
      */
-    @Schema(description = "User ID")
+    @Schema(description = "User ID", example = "1024")
     private Long userId;
 
 }

@@ -39,34 +39,28 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Action view object")
 public class ActionVO extends BaseVO {
 
-    @Schema(description = "action ID")
-
+    @Schema(description = "Action ID")
     private String actionId;
 
-    @Schema(description = "conversation ID")
-
+    @Schema(description = "Conversation ID")
     private String conversationId;
 
-    @Schema(description = "action type")
-
+    @Schema(description = "Action type")
     private String actionType;
 
-    @Schema(description = "title")
-
+    @Schema(description = "Action title")
     private String title;
 
-    @Schema(description = "Description")
-
+    @Schema(description = "Action description")
     private String description;
 
+    @Schema(description = "Action payload data")
     private Map<String, Object> payload;
 
-    @Schema(description = "status")
-
+    @Schema(description = "Action execution status", example = "PENDING")
     private AgenticActionStatusEnum status;
 
-    @Schema(description = "expire time")
-
+    @Schema(description = "Action expire time")
     private LocalDateTime expireTime;
 
 }

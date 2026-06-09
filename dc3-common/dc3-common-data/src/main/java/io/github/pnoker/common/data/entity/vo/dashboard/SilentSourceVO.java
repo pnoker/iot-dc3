@@ -25,6 +25,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * A (device, point) pair that was active within the baseline window but has gone silent
@@ -39,20 +40,25 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @NoArgsConstructor
+@Schema(description = "A device/point pair that was active but has gone silent")
 public class SilentSourceVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "device ID")
     private long deviceId;
 
+    @Schema(description = "point ID")
     private long pointId;
 
+    @Schema(description = "time the last sample was seen")
     private LocalDateTime lastSeen;
 
     /**
      * How many seconds since the last sample, rounded.
      */
+    @Schema(description = "seconds since the last sample, rounded")
     private long silentSeconds;
 
 }

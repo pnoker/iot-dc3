@@ -40,7 +40,7 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
@@ -411,7 +411,7 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      * @throws UnSupportException if the type is unknown
      */
     private int getValueType(String type) {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(type);
+        PointTypeEnum valueType = PointTypeEnum.ofCode(type);
         if (Objects.isNull(valueType)) {
             throw new UnSupportException("Unsupported type of " + type);
         }
@@ -456,7 +456,7 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      */
     private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, WritePointValue writePointValue) {
         try {
-            PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(writePointValue.getType().getCode());
+            PointTypeEnum valueType = PointTypeEnum.ofCode(writePointValue.getType().getCode());
             if (Objects.isNull(valueType)) {
                 throw new UnSupportException("Unsupported type of " + writePointValue.getType());
             }

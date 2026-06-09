@@ -23,8 +23,8 @@ import io.github.pnoker.common.data.entity.model.RuleStateDO;
 import io.github.pnoker.common.data.entity.vo.RuleStateVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RuleStateExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
-import io.github.pnoker.common.enums.RuleStateFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import io.github.pnoker.common.enums.RuleStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -69,11 +69,11 @@ public interface RuleStateBuilder {
         }
         entityDO.setEntityStateExt(ext);
 
-        AlarmTargetTypeFlagEnum alarmTargetTypeFlag = entityBO.getAlarmTargetTypeFlag();
+        AlarmTargetTypeEnum alarmTargetTypeFlag = entityBO.getAlarmTargetTypeFlag();
         Optional.ofNullable(alarmTargetTypeFlag)
                 .ifPresent(value -> entityDO.setAlarmTargetTypeFlag(value.getIndex()));
 
-        RuleStateFlagEnum entityStateFlag = entityBO.getEntityStateFlag();
+        RuleStatusEnum entityStateFlag = entityBO.getEntityStateFlag();
         Optional.ofNullable(entityStateFlag).ifPresent(value -> entityDO.setEntityStateFlag(value.getIndex()));
     }
 
@@ -97,10 +97,10 @@ public interface RuleStateBuilder {
         }
 
         Byte alarmTargetTypeFlag = entityDO.getAlarmTargetTypeFlag();
-        entityBO.setAlarmTargetTypeFlag(AlarmTargetTypeFlagEnum.ofIndex(alarmTargetTypeFlag));
+        entityBO.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.ofIndex(alarmTargetTypeFlag));
 
         Byte entityStateFlag = entityDO.getEntityStateFlag();
-        entityBO.setEntityStateFlag(RuleStateFlagEnum.ofIndex(entityStateFlag));
+        entityBO.setEntityStateFlag(RuleStatusEnum.ofIndex(entityStateFlag));
     }
 
     List<RuleStateBO> buildBOListByDOList(List<RuleStateDO> entityDOList);

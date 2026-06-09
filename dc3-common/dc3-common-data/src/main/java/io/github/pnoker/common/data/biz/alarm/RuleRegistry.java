@@ -22,7 +22,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.builder.RuleBuilder;
 import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
-import io.github.pnoker.common.enums.AlarmTargetTypeFlagEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -112,7 +112,7 @@ public class RuleRegistry {
      * Cache key — combines the three dimensions the lookup actually filters on.
      * Recorded as a record so equals/hashCode follow value semantics.
      */
-    public record RuleCacheKey(Long tenantId, AlarmTargetTypeFlagEnum targetType, Long entityId) {
+    public record RuleCacheKey(Long tenantId, AlarmTargetTypeEnum targetType, Long entityId) {
     }
 
 }

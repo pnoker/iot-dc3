@@ -20,8 +20,8 @@ package io.github.pnoker.common.facade.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.ProfileExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ProfileShareFlagEnum;
-import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.enums.ProfileShareTypeEnum;
+import io.github.pnoker.common.enums.ProfileTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,11 +54,11 @@ public class FacadeProfileBO extends BaseBO {
 
     @Schema(description = "profile share flag")
 
-    private ProfileShareFlagEnum profileShareFlag;
+    private ProfileShareTypeEnum profileShareFlag;
 
     @Schema(description = "Profile type flag")
 
-    private ProfileTypeFlagEnum profileTypeFlag;
+    private ProfileTypeEnum profileTypeFlag;
 
     @Schema(description = "profile extension information (JSON)")
 
