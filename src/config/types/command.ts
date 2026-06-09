@@ -68,6 +68,12 @@ export interface CommandParamRecord extends CommandParamForm {
 export type CommandStatus = 'PENDING' | 'SENT' | 'SUCCESS' | 'FAILED' | 'TIMEOUT' | 'EXPIRED' | 'DEAD' | 'DUPLICATE';
 
 /**
+ * Command source (matches backend CommandHistorySourceEnum constant names).
+ * Backend serializes enums by name, so the wire value is one of these strings.
+ */
+export type CommandSource = 'HTTP' | 'GRPC' | 'AGENTIC';
+
+/**
  * Command call history (dc3_command_history).
  */
 export interface CommandHistoryRecord {
@@ -83,7 +89,7 @@ export interface CommandHistoryRecord {
   errorMessage?: string;
   resultValues?: Record<string, string>;
   configSnapshot?: string;
-  source?: string;
+  source?: CommandSource;
   sourceUserId?: string;
   occurTime?: string;
   sendTime?: string;
