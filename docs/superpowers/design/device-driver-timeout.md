@@ -317,7 +317,7 @@ WHERE s.id = picked.id
 
 心跳本身不写告警表，避免 `dc3_entity_alarm` 被刷爆。只有状态翻转、离线、故障、规则命中等有业务意义的变化才进入告警链路。
 
-`dc3_entity_alarm` 的详细命名和表结构见 [实体告警统一表设计方案](entity-alarm.md)。
+`dc3_entity_alarm` 的详细命名和表结构需要在后续实体告警统一表设计中补齐；当前索引仅保留该主题，不再链接不存在的文档。
 
 ## 和 LocalCacheService 的关系
 

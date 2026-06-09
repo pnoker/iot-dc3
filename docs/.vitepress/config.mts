@@ -20,7 +20,7 @@ import {defineConfig} from 'vitepress'
 export default defineConfig({
     lang: 'zh-CN',
     title: 'IoT DC3',
-    description: '基于 Spring Cloud 的开源分布式物联网平台',
+    description: '面向工业物联网的分布式设备接入、数据采集与 AI 运营平台',
     base: '/iot-dc3/',
     cleanUrls: true,
     lastUpdated: true,
@@ -37,13 +37,12 @@ export default defineConfig({
         nav: [
             {text: '首页', link: '/'},
             {text: '快速开始', link: '/quickstart/'},
-            {text: '使用指南', link: '/guide/'},
             {text: '操作手册', link: '/operation/'},
+            {text: '使用指南', link: '/guide/'},
             {text: '架构', link: '/architecture/'},
-            {text: '项目设计方案', link: '/design/'},
-            {text: '项目待办', link: '/todo/'},
             {text: '开发', link: '/development/'},
             {text: '模块', link: '/modules/'},
+            {text: 'Superpowers', link: '/superpowers/'},
             {
                 text: '社区',
                 items: [
@@ -80,10 +79,10 @@ export default defineConfig({
                     text: '操作手册',
                     items: [
                         {text: '概览', link: '/operation/'},
-                        {text: '驱动', link: '/operation/driver'},
-                        {text: '模板', link: '/operation/template'},
-                        {text: '设备', link: '/operation/device'},
-                        {text: '数据', link: '/operation/data'}
+                        {text: '核心概念', link: '/operation/concepts'},
+                        {text: '设备接入流程', link: '/operation/device-onboarding'},
+                        {text: '数据与命令', link: '/operation/data-commands'},
+                        {text: 'AI 辅助运营', link: '/operation/agentic'}
                     ]
                 }
             ],
@@ -96,38 +95,66 @@ export default defineConfig({
                     ]
                 }
             ],
-            '/design/': [
-                {
-                    text: '项目设计方案',
-                    items: [
-                        {text: '概览', link: '/design/'},
-                        {text: '物模型设计方案', link: '/design/thing-model'},
-                        {text: '位号命令链路重构方案', link: '/design/point-command'},
-                        {text: '设备与驱动超时管理方案', link: '/design/device-driver-timeout'},
-                        {text: '实体告警统一表设计方案', link: '/design/entity-alarm'},
-                        {text: '规则告警链路优化与缺陷修复方案', link: '/design/rule-alarm-optimization'},
-                        {text: '自定义指令调用方案', link: '/design/command-call'},
-                        {text: '事件上报方案', link: '/design/event-report'}
-                    ]
-                }
-            ],
-            '/todo/': [
-                {
-                    text: '项目待办',
-                    items: [
-                        {text: '概览', link: '/todo/'},
-                        {text: '物模型改造设计', link: '/todo/thing-model-refactor'}
-                    ]
-                }
-            ],
             '/development/': [
                 {
                     text: '开发',
                     items: [
                         {text: '概览', link: '/development/'},
                         {text: '驱动开发', link: '/development/driver-authoring'},
+                        {text: 'API 文档', link: '/development/api-documentation'},
                         {text: '测试', link: '/development/testing'},
                         {text: '变更日志', link: '/development/changelog'}
+                    ]
+                }
+            ],
+            '/modules/': [
+                {
+                    text: '模块',
+                    items: [
+                        {text: '模块清单', link: '/modules/'}
+                    ]
+                }
+            ],
+            '/superpowers/': [
+                {
+                    text: 'Superpowers',
+                    items: [
+                        {text: '概览', link: '/superpowers/'},
+                        {text: '文档机制', link: '/superpowers/documentation/'}
+                    ]
+                },
+                {
+                    text: '设计方案',
+                    items: [
+                        {text: '方案索引', link: '/superpowers/design/'},
+                        {text: '物模型', link: '/superpowers/design/thing-model'},
+                        {text: '指令与事件属性', link: '/superpowers/design/command-event-attribute-config'},
+                        {text: '位号命令链路', link: '/superpowers/design/point-command'},
+                        {text: '设备与驱动超时', link: '/superpowers/design/device-driver-timeout'},
+                        {text: '自定义指令调用', link: '/superpowers/design/command-call'},
+                        {text: '事件上报', link: '/superpowers/design/event-report'},
+                        {text: '实体告警统一表', link: '/superpowers/design/entity-alarm'},
+                        {text: '规则告警链路优化', link: '/superpowers/design/rule-alarm-optimization'}
+                    ]
+                },
+                {
+                    text: '分析与策略',
+                    items: [
+                        {text: '分析索引', link: '/superpowers/analysis/'},
+                        {text: '协议库对比分析', link: '/superpowers/analysis/iot-dc3-vs-iot-communication'},
+                        {text: '策略索引', link: '/superpowers/strategy/'},
+                        {text: 'AI 定位草案', link: '/superpowers/strategy/ai-positioning'}
+                    ]
+                },
+                {
+                    text: '计划与归档',
+                    items: [
+                        {text: '待办池', link: '/superpowers/backlog/'},
+                        {text: '旧版操作手册', link: '/superpowers/legacy-operation/'},
+                        {text: '旧版驱动截图', link: '/superpowers/legacy-operation/driver'},
+                        {text: '旧版模板截图', link: '/superpowers/legacy-operation/template'},
+                        {text: '旧版设备截图', link: '/superpowers/legacy-operation/device'},
+                        {text: '旧版数据截图', link: '/superpowers/legacy-operation/data'}
                     ]
                 }
             ],

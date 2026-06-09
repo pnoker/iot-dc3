@@ -1,38 +1,40 @@
-# Troubleshooting FAQ
+# 故障排查
 
-Common local development and runtime issues in IoT DC3 and how to resolve them.
+本页汇总 IoT DC3 本地开发和运行时的常见问题。除非特别说明，命令都在仓库根目录执行。
 
-## 1. Maven build is slow
+## Maven 构建很慢
 
-**Cause**: Parallelism not enabled / JVM heap too small.
+**原因**：并行度未生效或 JVM 堆内存不足。
 
-**Resolution**: Already configured in this repo:
+**处理方式**：仓库已配置默认 Maven 参数：
 
-- `.mvn/maven.config` contains `-T 1C`
-- `.mvn/jvm.config` contains `-Xms512m -Xmx1024m`
+- `.mvn/maven.config` 包含 `-T 1C`
+- `.mvn/jvm.config` 包含 `-Xms512m -Xmx1024m`
 
-If still slow, increase heap or reduce background CPU load.
+如果仍然较慢，可以适当增加 JVM 堆内存，或减少本机后台 CPU 占用。
 
-## 2. Unsupported class file major version / Java version errors
+## Java 版本错误
 
-**Cause**: Project requires JDK 21.
+**现象**：出现 unsupported class file major version 或 Maven Enforcer 报错。
 
-**Resolution**:
+**原因**：项目要求 JDK 21。
+
+**处理方式**：
 
 ```bash
 java -version
 mvn -version
 ```
 
-The build now enforces JDK 21 via `maven-enforcer-plugin`.
+确认 Maven 使用的 Java 版本也是 21。
 
-## 3. Ports already in use
+## 端口被占用
 
-**Symptom**: Application fails to start due to occupied ports (8000/8300/8400/8500/8600/9300/9400/9500).
+**现象**：应用启动失败，提示 `8000`、`8300`、`8400`、`8500`、`8600`、`9300`、`9400`、`9500` 等端口已占用。
 
-**Resolution**: Override ports using environment variables or `.env` values.
+**处理方式**：通过环境变量或根目录 `.env` 覆盖端口。
 
-Common overrides:
+常见变量：
 
 - `SERVER_PORT`
 - `GRPC_SERVER_PORT`
@@ -40,73 +42,93 @@ Common overrides:
 - `DC3_AUTH_PORT`
 - `DC3_MANAGER_PORT`
 - `DC3_DATA_PORT`
+- `DC3_AGENTIC_PORT`
 
-## 4. Database connection failures in dev
+## 数据库连接失败
 
-**Cause**: Postgres container not started / custom .env changed published ports.
+**原因**：PostgreSQL 容器未启动、健康检查未通过，或 `.env` 中发布端口被改过。
 
-**Resolution**:
+**处理方式**：
 
 ```bash
 make compose-ps STACK=db
 make compose-file STACK=db
 ```
 
-Confirm the published port matches the application config.
+确认容器状态和发布端口与应用环境变量一致。源码运行时应先执行：
 
-## 5. RabbitMQ connection failures
+```bash
+source dc3/env/dev.env.sh
+```
 
-**Cause**: Container not ready / wrong virtual host or credentials.
+## RabbitMQ 连接失败
 
-**Resolution**: Wait until healthcheck passes, then restart dependent services.
+**原因**：RabbitMQ 未就绪、虚拟主机或账号密码不一致。
+
+**处理方式**：等待健康检查通过后重启依赖服务，并查看日志：
 
 ```bash
 make compose-logs STACK=db
 ```
 
-## 6. Nacos discovery errors in pre/pro profile
+源码运行时检查 `RABBITMQ_HOST`、`RABBITMQ_PORT`、`RABBITMQ_USERNAME`、`RABBITMQ_PASSWORD` 和 `RABBITMQ_VIRTUAL_HOST`。
 
-**Cause**: Those profiles expect service discovery via Nacos.
+## pre/pro profile 出现 Nacos 错误
 
-**Resolution**: For local source debugging, prefer `dev` profile unless you intentionally test registry behavior.
+**原因**：`pre` / `pro` profile 面向注册中心部署，通常期望 Nacos 可用。
 
-## 7. Gateway returns 401/403
+**处理方式**：本地源码调试优先使用 `dev` profile。只有在验证注册中心部署时才使用 `pre` / `pro`。
 
-**Cause**: Request routed to authenticated endpoints without token.
+## Gateway 返回 401 或 403
 
-**Resolution**: Call token APIs first (`/api/v3/auth/token/...`), then pass the token in subsequent requests.
+**原因**：请求访问了需要认证的接口，但没有携带有效 token。
 
-## 8. Driver cannot register
+**处理方式**：先调用 `/api/v3/auth/token/...` 获取 token，再在后续请求中携带租户、登录名和 token 相关请求头。Swagger UI 的认证方式见 [API 文档](../development/api-documentation.md)。
 
-**Cause**: Manager not running / gRPC target address misconfigured.
+## 驱动无法注册
 
-**Resolution**: Start services in recommended order: Gateway -> Auth -> Data -> Manager -> Driver.
+**原因**：Manager Center 未运行、gRPC 目标地址错误、驱动编码重复或 RabbitMQ 未就绪。
 
-## 9. Docker image build fails in Makefile
+**处理方式**：
 
-**Cause**: `mvn package` failed inside image build.
+1. 按 Gateway -> Auth -> Manager -> Data -> Agentic -> Driver 顺序启动。
+2. 确认本地源码运行已加载 `dc3/env/dev.env.sh`。
+3. 查看 Manager Center 和驱动日志。
+4. 确认 `dc3.driver.code` 唯一且稳定。
 
-**Resolution**:
+## Docker 镜像构建失败
+
+**原因**：镜像构建过程中 Maven 打包失败，或依赖没有提前构建成功。
+
+**处理方式**：
 
 ```bash
 make package
 make build
 ```
 
-## 10. China registry variant used unexpectedly
+先在宿主机确认 Maven 构建通过，再构建镜像。
 
-**Cause**: `REGISTRY` was set to `cn`.
+## 镜像源选择不符合预期
 
-**Resolution**: Use `REGISTRY=global` for Docker Hub images.
+**原因**：`REGISTRY` 被设置为 `cn` 或 `global`。
+
+**处理方式**：
 
 ```bash
 make dev-db REGISTRY=global
+make dev-db REGISTRY=cn
 ```
 
-## 11. Want faster debugging in one JVM
+`global` 使用默认镜像仓库，`cn` 使用中国大陆镜像仓库。
 
-Use `dc3-center-single` to combine Auth/Manager/Data into one process.
+## 希望更快调试
+
+可以使用 `dc3-center-single` 在单 JVM 中运行 Auth、Manager 和 Data 相关能力：
 
 ```bash
+source dc3/env/dev.env.sh
 java -jar dc3-center/dc3-center-single/target/dc3-center-single.jar
 ```
+
+单进程模式适合本地调试，不代表生产部署形态。

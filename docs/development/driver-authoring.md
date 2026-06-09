@@ -1,68 +1,64 @@
-# Authoring a New Driver
+# 驱动开发
 
-This guide walks you through creating a new device driver from scratch using
-[`dc3-driver-virtual`](https://github.com/pnoker/iot-dc3/tree/release/dc3-driver/dc3-driver-virtual) as a template.
-Drivers connect the
-DC3 platform to physical devices via a specific protocol (Modbus, OPC, MQTT, S7, …) and are
-the southbound I/O layer of the system.
+本指南说明如何基于 `dc3-driver-virtual` 创建一个新的协议驱动。驱动是 IoT DC3 的南向 I/O 层，负责通过 Modbus、OPC、MQTT、S7、BACnet 等协议连接物理设备或外部数据源。
 
-If you only want to *use* an existing driver, see [快速开始](../quickstart/index.md) instead.
+如果只是使用已有驱动，请先阅读 [操作手册](../operation/) 和 [快速开始](../quickstart/)。
 
-Unless stated otherwise, run commands from the repository root.
+除非特别说明，命令都在仓库根目录执行。
 
-## What a driver does
+## 驱动职责
 
-A driver is a Spring Boot service that:
+一个驱动本质上是 Spring Boot 服务，通常负责五件事：
 
-1. **Registers** itself with `dc3-center-manager` on startup (driver name, code, attribute
-   schema, point attribute schema). Manager uses this to render the device-config UI.
-2. **Reads** point values from physical devices on a configurable cron and pushes them to
-   `dc3-center-data` via RabbitMQ.
-3. **Writes** values to devices when commands arrive from `dc3-center-data` over RabbitMQ.
-4. **Reports device status** (online / offline / fault / maintain) on a configurable cron.
-5. **Reacts** to metadata change events (device / point added, removed, updated) so it can
-   adjust its in-memory state without restarting.
+1. 启动时向 `dc3-center-manager` 注册驱动名称、驱动编码、设备属性和点位属性。
+2. 按配置周期读取设备点位值，并把数据发送到 `dc3-center-data`。
+3. 接收 Data Center 通过 RabbitMQ 下发的读写命令，并写回设备。
+4. 按配置周期上报设备状态，例如 online、offline、fault、maintain。
+5. 响应 Manager Center 推送的元数据变更事件，例如设备或点位新增、修改、删除。
 
-All five behaviours are exposed through one SPI: `DriverCustomService`. The SDK
-(`dc3-common-driver`) takes care of registration, RabbitMQ wiring, scheduling, and gRPC
-plumbing — your driver only implements the protocol-specific parts.
+这些能力通过 `DriverCustomService` SPI 暴露。`dc3-common-driver` 负责注册、调度、RabbitMQ、gRPC 和运行时编排，驱动实现只需要关注协议逻辑。
 
-## Prerequisites
+## 前置条件
 
-- Java 21 + Maven 3.9+
-- A running `dc3-center-manager`, `dc3-center-data`, `dc3-center-auth`, RabbitMQ, and
-  Postgres. Easiest: `make dev-all`. See [快速开始](../quickstart/index.md).
-- Familiarity with whichever device protocol your driver implements.
-
-## Step 1 — Create the module
-
-Pick a short, descriptive name in kebab-case: `dc3-driver-<protocol>` (e.g. `dc3-driver-bacnet`).
+- Java 21 和 Maven 3.9+。
+- PostgreSQL、RabbitMQ、Auth Center、Manager Center、Data Center 已启动。
+- 本地源码运行已加载环境变量：
 
 ```bash
-cd /path/to/iot-dc3
-cp -r dc3-driver/dc3-driver-virtual dc3-driver/dc3-driver-bacnet
-cd dc3-driver/dc3-driver-bacnet
+source dc3/env/dev.env.sh
 ```
 
-Then rename the Java package and main class to match. The `dc3-driver-virtual` template has
-a single `service/impl/VirtualDriverCustomServiceImpl.java` and a `VirtualDriverApplication.java`.
-Rename both to your driver, and keep the custom service implementation name protocol-specific
-(for example, `BacnetDriverCustomServiceImpl`) so static analysis tools can scan every driver
-module without filtering duplicate fully qualified class names.
+- 熟悉目标设备协议和现场连接参数。
 
-## Step 2 — Wire into the parent POM
+## 1. 创建模块
 
-Add your module to [`dc3-driver/pom.xml`](https://github.com/pnoker/iot-dc3/blob/release/dc3-driver/pom.xml)
-`<modules>`:
+驱动模块命名使用 `dc3-driver-<protocol>`，协议名使用 kebab-case。
+
+```bash
+cp -r dc3-driver/dc3-driver-virtual dc3-driver/dc3-driver-bacnet
+```
+
+然后重命名 Java 包、启动类和自定义服务实现类。`dc3-driver-virtual` 模板中最关键的类是：
+
+| 类 | 说明 |
+|----|------|
+| `VirtualDriverApplication` | Spring Boot 启动类 |
+| `VirtualDriverCustomServiceImpl` | 协议逻辑实现入口 |
+
+新驱动应使用协议专用命名，例如 `BacnetDriverApplication` 和 `BacnetDriverCustomServiceImpl`，避免多个驱动出现重复类名。
+
+## 2. 接入父 POM
+
+在 `dc3-driver/pom.xml` 的 `<modules>` 中增加新模块：
 
 ```xml
 <modules>
   <module>dc3-driver-bacnet</module>
-  <!-- existing entries -->
+  <!-- existing modules -->
 </modules>
 ```
 
-Your module's own `pom.xml` only needs:
+新模块自己的 `pom.xml` 通常只需要继承驱动父模块，并添加协议库依赖：
 
 ```xml
 <parent>
@@ -70,20 +66,20 @@ Your module's own `pom.xml` only needs:
   <artifactId>dc3-driver</artifactId>
   <version>2026.5.22</version>
 </parent>
+
 <artifactId>dc3-driver-bacnet</artifactId>
 <packaging>jar</packaging>
 
 <dependencies>
-  <!-- protocol-specific libraries go here, e.g. bacnet4j -->
+  <!-- protocol-specific libraries, for example bacnet4j -->
 </dependencies>
 ```
 
-The parent already pulls in `dc3-common-driver` and the Spring Boot Maven plugin.
+`dc3-driver` 父模块已经引入 `dc3-common-driver` 和 Spring Boot Maven Plugin。
 
-## Step 3 — Application class
+## 3. 启动类
 
-Drop a single `@SpringBootApplication`-annotated entry point. Same package as your
-protocol-specific `DriverCustomService` implementation so default component scanning picks both up:
+启动类与协议实现类放在同一个包或父包下，确保默认组件扫描可以找到 `DriverCustomService` 实现。
 
 ```java
 @SpringBootApplication
@@ -94,48 +90,46 @@ public class BacnetDriverApplication {
 }
 ```
 
-## Step 4 — `application.yml`
+## 4. 配置 `application.yml`
 
-This is the most important file: the keys under `dc3.driver:` are read by the SDK at startup
-and pushed to Manager during registration. They define the **schema** of attributes that
-operators will fill in when configuring a device or point in the UI.
+`dc3.driver` 是驱动最重要的用户可见配置。SDK 启动时会读取这些配置并注册到 Manager Center，管理侧据此渲染设备和点位配置表单。
 
 ```yaml
 dc3:
   driver:
     tenant: default
-    name: BACnet驱动            # human-readable name
-    code: BacnetDriver          # unique routing key — see "Naming" below
+    name: BACnet Driver
+    code: BacnetDriver
     type: DRIVER_CLIENT
     remark: @project.description@
 
     schedule:
-      read:                     # periodic read of every point
+      read:
         enable: true
-        cron: '0/30 * * * * ?'  # every 30s
-      custom:                   # your DriverCustomService#schedule() callback
+        cron: '0/30 * * * * ?'
+      custom:
         enable: true
         cron: '0/5 * * * * ?'
 
-    driver-attribute:           # per-device config (one row per device)
-      - attribute-name: 主机
+    driver-attribute:
+      - attribute-name: Host
         attribute-code: host
         attribute-type-flag: STRING
         default-value: localhost
         remark: BACnet host
-      - attribute-name: 端口
+      - attribute-name: Port
         attribute-code: port
         attribute-type-flag: INT
         default-value: 47808
         remark: BACnet port
 
-    point-attribute:            # per-point config (one row per point on the device)
-      - attribute-name: 对象类型
+    point-attribute:
+      - attribute-name: Object Type
         attribute-code: objectType
         attribute-type-flag: STRING
         default-value: analog-input
         remark: BACnet object type
-      - attribute-name: 实例号
+      - attribute-name: Instance
         attribute-code: instance
         attribute-type-flag: INT
         default-value: 0
@@ -153,176 +147,146 @@ logging:
     name: dc3/logs/driver/bacnet/${spring.application.name}.log
 ```
 
-You'll also typically copy `application-dev.yml` / `-pre.yml` / `-pro.yml` from
-`dc3-driver-virtual` and adjust the schedule cron. **Never hardcode `localhost`** —
-everything goes through `${ENV:default}` placeholders. See
-[`dc3/env/dev.env.sh`](https://github.com/pnoker/iot-dc3/blob/release/dc3/env/dev.env.sh) for the env-var contract.
+### 属性命名
 
-### Attribute types
+| 字段 | 说明 |
+|------|------|
+| `attribute-name` | 用户界面显示名，驱动元数据要求使用英文 |
+| `attribute-code` | 协议实现读取的稳定 key，例如 `host`、`port` |
+| `attribute-type-flag` | 属性类型，例如 `STRING`、`INT`、`DOUBLE`、`BOOLEAN` |
+| `default-value` | 默认值 |
+| `remark` | 说明文字，建议使用英文 |
 
-`attribute-type-flag` is one of: `STRING`, `INT`, `LONG`, `DOUBLE`, `FLOAT`, `BOOLEAN`,
-`BYTE`, `SHORT`. Pick what makes sense; the value reaches your `read` / `write` methods as
-an `AttributeBO` whose typed accessor (`.getValue(Type)`) handles parsing.
+驱动 metadata 中的 `name`、`attribute-name`、`remark` 属于用户可见元数据，应保持英文，便于多语言 UI 和现场项目复用。
 
-## Step 5 — Implement `DriverCustomService`
+## 5. 实现 `DriverCustomService`
 
-Five methods. Drop your protocol logic in:
+核心协议逻辑放在 `DriverCustomService` 实现中：
 
 ```java
 @Slf4j
 @Service
 public class BacnetDriverCustomServiceImpl implements DriverCustomService {
 
-    @Resource private DriverMetadata driverMetadata;
-    @Resource private DriverSenderService driverSenderService;
+    @Resource
+    private DriverMetadata driverMetadata;
 
-    /** Called once at startup. Open connection pools, init protocol stacks, etc. */
+    @Resource
+    private DriverSenderService driverSenderService;
+
     @Override
-    public void initial() { /* ... */ }
+    public void initial() {
+        // 初始化协议栈、连接池、订阅关系等资源
+    }
 
-    /**
-     * Called on the cron defined by `dc3.driver.schedule.custom.cron`. Use it for anything
-     * that doesn't fit `read` (e.g. heartbeat, status polling, reconnect retries).
-     * Typically you push status updates here:
-     */
     @Override
     public void schedule() {
         driverMetadata.getDeviceIds().forEach(id ->
-            driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+                driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
-    /**
-     * Manager fires this whenever a device or point is added/updated/deleted. Use it to
-     * drop cached protocol clients, rebuild subscriptions, etc.
-     */
     @Override
-    public void event(MetadataEventDTO metadataEvent) { /* ... */ }
+    public void event(MetadataEventDTO metadataEvent) {
+        // 响应设备、点位、模板等元数据变更
+    }
 
-    /**
-     * Read a single point value. Called once per (device, point) on the
-     * `dc3.driver.schedule.read.cron`. driverConfig holds the device-level attributes the
-     * operator filled in; pointConfig holds the per-point attributes.
-     *
-     * Return ReadPointValue with the raw string; the framework will run any configured
-     * scaling / unit conversion before persisting.
-     */
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig,
-                       Map<String, AttributeBO> pointConfig,
-                       DeviceBO device, PointBO point) {
+                               Map<String, AttributeBO> pointConfig,
+                               DeviceBO device,
+                               PointBO point) {
         String host = driverConfig.get("host").getValue(String.class);
-        int port    = driverConfig.get("port").getValue(Integer.class);
-        // ... protocol-specific read, return new ReadPointValue(device, point, "<raw value>")
+        Integer port = driverConfig.get("port").getValue(Integer.class);
+        String objectType = pointConfig.get("objectType").getValue(String.class);
+
+        // 执行协议读取，返回原始字符串值
+        return new ReadPointValue(device, point, "0");
     }
 
-    /**
-     * Write a value to a point. Called when an external command arrives over RabbitMQ.
-     * Return false (or throw) if the protocol does not support writes for this point.
-     */
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig,
                          Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
-        // ... protocol-specific write
+                         DeviceBO device,
+                         PointBO point,
+                         WritePointValue writePointValue) {
+        // 执行协议写入
         return true;
     }
 }
 ```
 
-## Step 6 — Push values & status from the SDK
+## 6. 发送数据和状态
 
-You don't need to write any RabbitMQ or gRPC plumbing. Use the injected
-`DriverSenderService`:
+驱动不需要自己编写 RabbitMQ 或 gRPC 管道。通过 `DriverSenderService` 发送数据、状态和事件：
 
-| Method                                                                    | Purpose                                                                                                                                                                                                         |
-|---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `pointValueSender(PointValue)` / `pointValueSender(List<PointValue>)`     | Push a single (or batch) of values to `dc3-center-data`. Use this for *push-style* drivers (MQTT, OPC subscriptions); polling drivers usually just return `ReadPointValue` from `read` and let the SDK send it. |
-| `deviceStatusSender(deviceId, status)` / `(deviceId, status, ttl, unit)`  | Report a device as ONLINE / OFFLINE / FAULT / MAINTAIN. The TTL drives auto-OFFLINE on silence (default ~25 s if you use the no-TTL overload).                                                                  |
-| `driverEventSender(DriverEventDTO)` / `deviceEventSender(DeviceEventDTO)` | Emit structured driver- or device-scoped events that show up in the dashboard alert feed.                                                                                                                       |
-| `driverAlarmSender(String)` / `deviceAlarmSender(deviceId, String)`       | Quick path for alarm-style events with just a human-readable reason (e.g. `"OPC UA session dropped"`).                                                                                                          |
+| 方法 | 用途 |
+|------|------|
+| `pointValueSender(PointValue)` | 发送单条点位值 |
+| `pointValueSender(List<PointValue>)` | 批量发送点位值 |
+| `deviceStatusSender(deviceId, status)` | 上报设备状态 |
+| `deviceStatusSender(deviceId, status, ttl, unit)` | 上报带 TTL 的设备状态 |
+| `driverEventSender(DriverEventDTO)` | 上报驱动事件 |
+| `deviceEventSender(DeviceEventDTO)` | 上报设备事件 |
+| `driverAlarmSender(String)` | 快速上报驱动告警 |
+| `deviceAlarmSender(deviceId, String)` | 快速上报设备告警 |
 
-Status TTLs: pick a number larger than your `schedule` cron interval. Otherwise the device
-flips to OFFLINE between two heartbeats. For example, with `cron: '0/5 * * * * ?'` (every
-5 s), `25 SECONDS` gives a 5× safety margin.
+状态 TTL 应大于状态上报周期。否则设备可能在两次心跳之间被判定为离线。例如 `cron: '0/5 * * * * ?'` 每 5 秒执行一次，TTL 可设置为 25 秒。
 
-## Step 7 — Driver naming and routing
+## 7. 命名和路由
 
-Three identifiers participate in driver routing:
+驱动路由涉及三个标识：
 
-- **`dc3.driver.code`** (from `application.yml`) — the unique driver-type key Manager uses to
-  reject duplicate registrations. Validated by a strict regex: `^[A-Za-z0-9][...]{1,31}$`.
-- **`dc3.driver.service`** (auto-derived; can be overridden) — the per-instance routing
-  identifier used as the suffix on RabbitMQ command queues (`dc3.q.command.driver.<service>`)
-  and routing keys (`dc3.r.command.driver.<service>`). See
-  [
-  `RabbitConstant`](https://github.com/pnoker/iot-dc3/blob/release/dc3-common/dc3-common-constant/src/main/java/io/github/pnoker/common/constant/driver/RabbitConstant.java).
-- **`spring.application.name`** (`@project.artifactId@`) — controls log filenames and
-  Actuator metadata. Has no routing implication.
+| 标识 | 来源 | 用途 |
+|------|------|------|
+| `dc3.driver.code` | `application.yml` | 驱动类型唯一编码，Manager 用它识别驱动类型 |
+| `dc3.driver.service` | 自动派生或显式覆盖 | 驱动实例路由标识，用于 RabbitMQ 命令队列和 routing key |
+| `spring.application.name` | Maven artifactId | 日志文件、Actuator 元数据等 |
 
-**Pick `dc3.driver.code` once and never change it.** Renaming it after the driver has any
-devices configured against it requires a migration of `dc3_driver`,
-`dc3_driver_attribute`, and the RabbitMQ bindings.
+`dc3.driver.code` 一旦投入使用就不要随意修改。变更驱动编码会影响 Manager 元数据和 RabbitMQ 路由，需要迁移方案。
 
-## Step 8 — Build and run
+## 8. 构建和运行
+
+构建新驱动及其依赖：
 
 ```bash
-# Build everything (runs protobuf-maven-plugin → builds the SDK → builds your driver)
 source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package -pl dc3-driver/dc3-driver-bacnet -am
-
-# Or via the project Makefile
-make package
 ```
 
-Run it standalone (with center services already up via `make dev-db dev-optional`):
+运行驱动：
 
 ```bash
 java -jar dc3-driver/dc3-driver-bacnet/target/dc3-driver-bacnet.jar
 ```
 
-In dev mode the service registers itself with `dc3-center-manager` automatically — watch
-the manager logs for `Driver registered: BacnetDriver`. Once registered, it shows up under
-the **Driver** menu in the UI; you can then create a **Profile**, attach it to **Devices**,
-and bind **Points**.
+开发环境中驱动会自动向 Manager Center 注册。可查看 Manager 和驱动日志确认是否出现类似 `Driver registered: BacnetDriver` 的事件。
 
-## Step 9 — Smoke-test the loop
+## 9. 冒烟验证
 
-1. Create a device via the UI → fill in `host` / `port` (your `driver-attribute` schema).
-2. Bind a point → fill in `objectType` / `instance` (your `point-attribute` schema).
-3. Wait one `dc3.driver.schedule.read.cron` cycle.
-4. Inspect a value either in the **Live values** dashboard, in the database
-   (`select * from dc3_point_value order by create_time desc limit 5;`), or with `curl`
-   against `dc3-gateway` (`/api/v3/data/point_value/...`).
-5. Trigger a write via the UI's **Send command** button — your `write` method should fire.
+1. 在管理侧创建设备，填写驱动属性，例如 `host` 和 `port`。
+2. 绑定点位，填写点位属性，例如 `objectType` 和 `instance`。
+3. 等待一个采集周期。
+4. 在数据页面、Data Center API 或数据库中查看点位值。
+5. 触发写入命令，确认 `write` 方法执行并返回正确结果。
 
-## Common gotchas
+## 常见问题
 
-- **`dc3.driver.code` collides with another driver.** Manager rejects the registration. Pick a
-  unique code; convention is PascalCase ending in `Driver`.
-- **`DriverCustomService` implementation not picked up.** The class needs `@Service` *and* must live in
-  a package scanned from your `@SpringBootApplication` class — i.e. same package or below.
-- **`read` returns null / throws.** The framework logs and skips the point for that cycle;
-  it does *not* fail the whole driver. Don't catch and return null silently — let the
-  exception surface so you see it in logs.
-- **Status flips OFFLINE every cycle.** Your TTL is shorter than the schedule interval.
-  Bump the TTL or shorten the schedule.
-- **Points read but never appear in the dashboard.** The driver is sending values to
-  RabbitMQ, but `dc3-center-data` isn't running, or RabbitMQ credentials are wrong. Check
-  `RABBITMQ_HOST` env vars and the data-center logs.
-- **Hot-reload of metadata.** Don't cache `DeviceBO` / `PointBO` references across calls
-  without listening on `event(...)`. Manager mutates these on the fly.
-- **Heavy protocol library.** If your driver pulls in a fat protocol stack
-  (e.g. `bacnet4j`, `j2mod`), prefer adding it to your driver's `pom.xml`, not to the
-  shared `dc3-common-driver`. Drivers are runnable JARs and should not bloat each other.
+| 问题 | 处理方式 |
+|------|----------|
+| 驱动编码冲突 | 修改 `dc3.driver.code`，保持唯一且稳定 |
+| `DriverCustomService` 未加载 | 确认类有 `@Service`，且位于启动类扫描范围内 |
+| `read` 返回空或异常 | 不要静默吞异常，让日志暴露协议错误；单点失败不应拖垮整个驱动 |
+| 设备频繁离线 | TTL 小于心跳或状态上报周期，增加 TTL 或缩短调度周期 |
+| 点位有读取但无数据 | 检查 RabbitMQ、Data Center 日志和租户上下文 |
+| 元数据变更不生效 | 在 `event(...)` 中更新本地协议客户端、订阅或缓存 |
+| 协议依赖很重 | 只放在具体驱动模块的 `pom.xml`，不要放到 `dc3-common-driver` |
 
-## Reference
+## 参考入口
 
-- SDK base interface: [
-  `DriverCustomService.java`](https://github.com/pnoker/iot-dc3/blob/release/dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/DriverCustomService.java)
-- Sender service: [
-  `DriverSenderService.java`](https://github.com/pnoker/iot-dc3/blob/release/dc3-common/dc3-common-driver/src/main/java/io/github/pnoker/common/driver/service/DriverSenderService.java)
-- Working examples: `dc3-driver-virtual` (simplest), `dc3-driver-modbus-tcp` (TCP polling),
-  `dc3-driver-mqtt` (push-style subscriber), `dc3-driver-listening-virtual` (push-style
-  template), `dc3-driver-opc-ua` (subscription model).
-- Architecture overview: [模块与依赖](../architecture/modules.md)
-- Troubleshooting: [故障排查](../guide/troubleshooting.md)
+- Driver SDK：`dc3-common/dc3-common-driver`
+- 虚拟驱动：`dc3-driver/dc3-driver-virtual`
+- Modbus TCP 示例：`dc3-driver/dc3-driver-modbus-tcp`
+- MQTT 推送示例：`dc3-driver/dc3-driver-mqtt`
+- 监听式推送示例：`dc3-driver/dc3-driver-listening-virtual`
+- [模块与依赖](../architecture/modules.md)
+- [故障排查](../guide/troubleshooting.md)
