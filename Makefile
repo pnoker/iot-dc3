@@ -23,7 +23,7 @@ SHELL := /bin/bash
 	app app-all dev dev-all dev-db dev-optional \
 	compose-build compose-up compose-down compose-ps compose-logs compose-config compose-pull \
 	compose-stop compose-restart compose-refresh compose-reset compose-file \
-	changelog deploy install-hooks tag check-compose check-service-group
+	changelog openapi deploy install-hooks tag check-compose check-service-group
 
 COMPOSE ?= podman compose
 COMPOSE_DIR ?= dc3
@@ -211,6 +211,11 @@ tag:
 
 changelog:
 	@FROM="$(FROM)" TO="$(TO)" VERSION="$(VERSION)" CHANGE_FILE="$(CHANGE_FILE)" dc3/bin/changelog.py
+
+# Export each center's OpenAPI JSON from a running stack (dev/test profile).
+# OPENAPI_BASE overrides the gateway URL; OPENAPI_OUT the output directory.
+openapi:
+	@OPENAPI_BASE="$(OPENAPI_BASE)" dc3/bin/export_openapi.sh $(OPENAPI_OUT)
 
 install-hooks:
 	git config core.hooksPath .githooks
