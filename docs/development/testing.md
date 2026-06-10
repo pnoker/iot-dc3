@@ -1,24 +1,25 @@
 # 测试
 
-本页是 IoT DC3 后端仓库的测试参考。它补充根目录 `AGENTS.md` 的工程规则，以及 [日志规范](../guide/logging.md) 和 [环境变量](../quickstart/environment.md)。
+本页是 IoT DC3 后端仓库的测试参考。它补充根目录 `AGENTS.md` 的工程规则，以及 [日志规范](../guide/logging.md)
+和 [环境变量](../quickstart/environment.md)。
 
 ## 测试金字塔
 
-| 层级 | 目标 | 技术方式 | 说明 |
-|------|------|----------|------|
-| 单元测试 | 快速验证孤立业务逻辑 | JUnit 5、Mockito、AssertJ | 不启动完整 Spring 上下文 |
-| Slice 测试 | 验证 Controller、JSON、持久化切片 | `@WebFluxTest`、`@JsonTest`、MyBatis 相关测试 | 聚焦框架边界 |
-| 集成测试 | 验证真实基础设施和跨模块协作 | Testcontainers、gRPC InProcess、RabbitMQ harness | 使用 PostgreSQL、RabbitMQ、MQTT 等容器 |
-| E2E 测试 | 验证端到端业务链路 | `dc3-e2e`、Testcontainers、rest-assured | 由 `DC3_E2E` 控制启用 |
+| 层级       | 目标                       | 技术方式                                           | 说明                              |
+|----------|--------------------------|------------------------------------------------|---------------------------------|
+| 单元测试     | 快速验证孤立业务逻辑               | JUnit 5、Mockito、AssertJ                        | 不启动完整 Spring 上下文                |
+| Slice 测试 | 验证 Controller、JSON、持久化切片 | `@WebFluxTest`、`@JsonTest`、MyBatis 相关测试        | 聚焦框架边界                          |
+| 集成测试     | 验证真实基础设施和跨模块协作           | Testcontainers、gRPC InProcess、RabbitMQ harness | 使用 PostgreSQL、RabbitMQ、MQTT 等容器 |
+| E2E 测试   | 验证端到端业务链路                | `dc3-e2e`、Testcontainers、rest-assured          | 由 `DC3_E2E` 控制启用                |
 
 ## 覆盖率门槛
 
 聚合覆盖率门槛由 `dc3-coverage/pom.xml` 控制：
 
-| 指标 | 当前门槛 |
-|------|----------|
-| 行覆盖率 | 20% |
-| 分支覆盖率 | 15% |
+| 指标    | 当前门槛 |
+|-------|------|
+| 行覆盖率  | 20%  |
+| 分支覆盖率 | 15%  |
 
 当前门槛相对克制，便于在测试体系扩展过程中持续推进。提高门槛时，应同时提交能够支撑新门槛的测试。
 
@@ -51,14 +52,14 @@
 
 ## 何时必须补测试
 
-| 变更类型 | 要求 |
-|----------|------|
-| Bug 修复 | 增加能复现问题的回归测试 |
-| 新功能或行为变化 | 增加单元测试，并按风险补 slice / integration 测试 |
-| 重构 | 保持现有覆盖，隐式契约应补 contract 测试 |
-| DAL / SQL 变更 | 增加 Testcontainers 测试，并运行 `make test-it` |
-| gRPC proto 变更 | 同步更新服务端、客户端和契约测试 |
-| 纯文档或格式变更 | 不需要 Java 测试，但需要文档构建或格式检查 |
+| 变更类型          | 要求                                      |
+|---------------|-----------------------------------------|
+| Bug 修复        | 增加能复现问题的回归测试                            |
+| 新功能或行为变化      | 增加单元测试，并按风险补 slice / integration 测试     |
+| 重构            | 保持现有覆盖，隐式契约应补 contract 测试               |
+| DAL / SQL 变更  | 增加 Testcontainers 测试，并运行 `make test-it` |
+| gRPC proto 变更 | 同步更新服务端、客户端和契约测试                        |
+| 纯文档或格式变更      | 不需要 Java 测试，但需要文档构建或格式检查                |
 
 ## 时间、随机数和 IO
 
@@ -80,11 +81,11 @@ dc3-common/dc3-common-test/src/main/java/io/github/pnoker/test/containers/
 
 常用容器：
 
-| 容器 | 镜像 | 用途 |
-|------|------|------|
-| PostgreSQL / TimescaleDB | `timescale/timescaledb-ha:pg18` | 数据库和时序表测试 |
-| RabbitMQ | `rabbitmq:3.13-management` | 消息发布、确认和消费测试 |
-| MQTT | `eclipse-mosquitto:2.0` | MQTT 驱动测试 |
+| 容器                       | 镜像                              | 用途           |
+|--------------------------|---------------------------------|--------------|
+| PostgreSQL / TimescaleDB | `timescale/timescaledb-ha:pg18` | 数据库和时序表测试    |
+| RabbitMQ                 | `rabbitmq:3.13-management`      | 消息发布、确认和消费测试 |
+| MQTT                     | `eclipse-mosquitto:2.0`         | MQTT 驱动测试    |
 
 本地复用容器是可选能力，可在支持的环境中创建：
 
@@ -103,9 +104,9 @@ testcontainers.reuse.enable=true
 
 `dc3-common-test` 提供可复用契约测试基类：
 
-| 基类 | 用途 |
-|------|------|
-| `EnumContractTest<E>` | 验证枚举 `getIndex()` 唯一、`ofIndex()` 往返和常量稳定性 |
+| 基类                        | 用途                                                                 |
+|---------------------------|--------------------------------------------------------------------|
+| `EnumContractTest<E>`     | 验证枚举 `getIndex()` 唯一、`ofIndex()` 往返和常量稳定性                          |
 | `SecretFieldContractTest` | 验证 `apiKey`、`password`、`secret`、`token` 等字段不从 `toString()` 或序列化中泄漏 |
 
 新增通用契约测试时，应放在能合理访问目标类型的模块中，避免反向依赖。
@@ -128,11 +129,11 @@ dc3-coverage/target/site/jacoco-aggregate/
 
 ## CI 工作流
 
-| Workflow | 触发 | 主要任务 |
-|----------|------|----------|
-| `ci.yml` | push / PR 到 develop、release、main | 快速编译 |
-| `test.yml` | push / PR 到 develop、release、main | unit、integration、coverage |
-| `e2e.yml` | push 到 develop、release、main 或手动触发 | E2E |
+| Workflow   | 触发                                | 主要任务                      |
+|------------|-----------------------------------|---------------------------|
+| `ci.yml`   | push / PR 到 develop、release、main  | 快速编译                      |
+| `test.yml` | push / PR 到 develop、release、main  | unit、integration、coverage |
+| `e2e.yml`  | push 到 develop、release、main 或手动触发 | E2E                       |
 
 PR 合并前应关注：
 

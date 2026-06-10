@@ -21,16 +21,17 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 
 ## 2. 确认驱动注册
 
-在管理侧查看驱动列表，确认目标驱动处于可用状态。调试时也可以查看 Manager Center 和驱动日志，确认注册请求没有因 gRPC 地址、租户或驱动编码冲突失败。
+在管理侧查看驱动列表，确认目标驱动处于可用状态。调试时也可以查看 Manager Center 和驱动日志，确认注册请求没有因 gRPC
+地址、租户或驱动编码冲突失败。
 
 常见注册失败原因：
 
-| 问题 | 处理方式 |
-|------|----------|
-| Manager Center 未启动 | 先启动 Manager，再重启驱动 |
+| 问题                        | 处理方式                               |
+|---------------------------|------------------------------------|
+| Manager Center 未启动        | 先启动 Manager，再重启驱动                  |
 | `CENTER_MANAGER_HOST` 不正确 | 检查 `dc3/env/dev.env.sh` 或 IDE 环境变量 |
-| 驱动编码重复 | 保持 `dc3.driver.code` 唯一且稳定 |
-| RabbitMQ 未就绪 | 等待健康检查通过后重启驱动 |
+| 驱动编码重复                    | 保持 `dc3.driver.code` 唯一且稳定         |
+| RabbitMQ 未就绪              | 等待健康检查通过后重启驱动                      |
 
 ## 3. 创建模板
 
@@ -38,12 +39,12 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 
 示例：
 
-| 字段 | 示例 |
-|------|------|
-| Profile | `virtual-motor` |
-| Point | `temperature` |
-| Data type | `DOUBLE` |
-| Unit | `celsius` |
+| 字段              | 示例                    |
+|-----------------|-----------------------|
+| Profile         | `virtual-motor`       |
+| Point           | `temperature`         |
+| Data type       | `DOUBLE`              |
+| Unit            | `celsius`             |
 | Point Attribute | 由驱动定义，例如地址、随机值范围或对象标识 |
 
 ## 4. 创建设备

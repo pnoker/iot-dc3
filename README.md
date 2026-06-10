@@ -72,15 +72,16 @@
 
 ### 🔌 Multi-Protocol Device Connectivity
 
-IoT DC3 includes **28 access driver modules** for industrial automation, IoT communication, data bridging, basic communication, and simulation/debugging scenarios, reducing the cost of connecting common devices and data sources:
+IoT DC3 includes **28 access driver modules** for industrial automation, IoT communication, data bridging, basic
+communication, and simulation/debugging scenarios, reducing the cost of connecting common devices and data sources:
 
-| Category                         | Driver Modules                                                                                                                                       |
-|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🏭 **Industrial protocols**       | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **IoT protocols**              | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                           |
-| 🗄️ **Data bridging**             | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                            |
-| 🔧 **Basic communication and NMS** | TCP/UDP · Serial · SNMP · CAN                                                                                                                       |
-| 🧪 **Simulation and debugging**   | Virtual · Listening Virtual                                                                                                                         |
+| Category                           | Driver Modules                                                                                                                                     |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **Industrial protocols**        | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
+| 📡 **IoT protocols**               | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
+| 🗄️ **Data bridging**              | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
+| 🔧 **Basic communication and NMS** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
+| 🧪 **Simulation and debugging**    | Virtual · Listening Virtual                                                                                                                        |
 
 The **Driver SDK** supports fast development of custom protocol drivers and registration into the runtime platform.
 
@@ -88,17 +89,20 @@ The **Driver SDK** supports fast development of custom protocol drivers and regi
 
 The agentic center is built on **Spring AI** and connects large language models into IoT operations workflows:
 
-- **Natural-language device operations** - LLMs can query devices, read/write points, and execute commands through Tool Calling
+- **Natural-language device operations** - LLMs can query devices, read/write points, and execute commands through Tool
+  Calling
 - **Intelligent alarm analysis** - AI assists with root-cause analysis and response suggestions
 - **Data insights** - Query device data in natural language and generate visual charts
-- **Multi-model support** - Compatible with OpenAI API-style providers and mainstream models such as GPT, Claude, DeepSeek, and Qwen
+- **Multi-model support** - Compatible with OpenAI API-style providers and mainstream models such as GPT, Claude,
+  DeepSeek, and Qwen
 - **Conversation memory** - Multi-turn conversations and context memory persisted to the database
 
 ### 🏗️ Cloud-Native Microservices
 
 Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 2025**:
 
-- **Service governance** - Spring Cloud Gateway as the unified entrypoint, with static routes and flexible environment variables
+- **Service governance** - Spring Cloud Gateway as the unified entrypoint, with static routes and flexible environment
+  variables
 - **Efficient communication** - gRPC service calls with Protobuf serialization
 - **Horizontal scaling** - Stateless design for scaling individual services by workload
 - **Resilience** - Replaceable service nodes and fault isolation
@@ -119,20 +123,22 @@ Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 20
 
 ### 🧩 Developer Friendly
 
-- **Driver SDK** - A complete driver development toolkit. See the [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring.html)
+- **Driver SDK** - A complete driver development toolkit. See
+  the [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring.html)
 - **Separated frontend and backend** - Vue 3 + TypeScript frontend, RESTful and gRPC APIs
-- **Containerized deployment** - One-command startup with Podman / Docker Compose, with a path toward Kubernetes and other container platforms
+- **Containerized deployment** - One-command startup with Podman / Docker Compose, with a path toward Kubernetes and
+  other container platforms
 - **Complete documentation** - Online docs, quickstart guide, and troubleshooting guide
 
 ## ⚡ Quick Start
 
 ### Prerequisites
 
-| Dependency       | Version        |
-|------------------|----------------|
-| Java (JDK)       | 21+            |
-| Maven            | 3.9+           |
-| Podman or Docker | Latest stable  |
+| Dependency       | Version       |
+|------------------|---------------|
+| Java (JDK)       | 21+           |
+| Maven            | 3.9+          |
+| Podman or Docker | Latest stable |
 
 ### Start in Three Steps
 
@@ -204,7 +210,8 @@ cp .env.example .env    # Copy the template
 ```
 
 The root `.env` file is used for Compose variable interpolation, such as image registry, image tag, and published ports.
-Application runtime variables are configured in `dc3/env/dev.env`. See the [environment documentation](https://pnoker.github.io/iot-dc3/quickstart/environment.html).
+Application runtime variables are configured in `dc3/env/dev.env`. See
+the [environment documentation](https://pnoker.github.io/iot-dc3/quickstart/environment.html).
 
 </details>
 
@@ -212,42 +219,43 @@ Application runtime variables are configured in `dc3/env/dev.env`. See the [envi
 
 ![IoT DC3 Architecture](dc3/images/iot-dc3-architecture-en.svg)
 
-| Layer                 | Responsibilities                                                                                                      |
-|-----------------------|-----------------------------------------------------------------------------------------------------------------------|
-| **Driver Layer**      | SDK-based driver development, standard/proprietary device access, southbound data collection, and command execution     |
-| **Data Layer**        | Device data collection, storage, and query services for real-time and historical data                                  |
+| Layer                 | Responsibilities                                                                                                                 |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| **Driver Layer**      | SDK-based driver development, standard/proprietary device access, southbound data collection, and command execution              |
+| **Data Layer**        | Device data collection, storage, and query services for real-time and historical data                                            |
 | **Management Layer**  | Microservice collaboration core: service registration, device/driver management, command orchestration, configuration governance |
-| **Application Layer** | Data openness, scheduling, alarms, logging, third-party integration, and AI automation                                 |
+| **Application Layer** | Data openness, scheduling, alarms, logging, third-party integration, and AI automation                                           |
 
-> 📖 For full module dependencies and runtime flow, see [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html).
+> 📖 For full module dependencies and runtime flow,
+> see [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html).
 
 ## 🛠️ Technology Stack
 
-| Category                         | Technologies                                                |
-|----------------------------------|-------------------------------------------------------------|
-| **Language and frameworks**       | Java 21 · Spring Boot 4 · Spring Cloud 2025 · Spring AI 2.0 |
-| **Data, cache, and scheduling**   | PostgreSQL · Caffeine · MyBatis-Plus · Quartz               |
-| **Messaging and communication**   | RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf             |
-| **Security and authentication**   | Spring Security · JWT · BouncyCastle                        |
-| **Observability**                 | Micrometer · Prometheus · Grafana · ELK                     |
-| **Frontend**                      | Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6   |
-| **Desktop**                       | Tauri 2                                                     |
-| **Deployment**                    | Podman · Docker Compose                                     |
+| Category                        | Technologies                                                |
+|---------------------------------|-------------------------------------------------------------|
+| **Language and frameworks**     | Java 21 · Spring Boot 4 · Spring Cloud 2025 · Spring AI 2.0 |
+| **Data, cache, and scheduling** | PostgreSQL · Caffeine · MyBatis-Plus · Quartz               |
+| **Messaging and communication** | RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf             |
+| **Security and authentication** | Spring Security · JWT · BouncyCastle                        |
+| **Observability**               | Micrometer · Prometheus · Grafana · ELK                     |
+| **Frontend**                    | Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6   |
+| **Desktop**                     | Tauri 2                                                     |
+| **Deployment**                  | Podman · Docker Compose                                     |
 
 > 💡 Frontend source code is in the [iot-dc3-web](https://github.com/pnoker/iot-dc3-web) repository.
 
 ## 📖 Documentation and Community
 
-| Resource             | Link                                                                           |
-|----------------------|--------------------------------------------------------------------------------|
-| 📚 Online docs        | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                  |
-| 🚀 Quickstart         | [Quickstart Guide](https://pnoker.github.io/iot-dc3/quickstart/)               |
-| 🏗️ Architecture      | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html) |
+| Resource              | Link                                                                                         |
+|-----------------------|----------------------------------------------------------------------------------------------|
+| 📚 Online docs        | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                                |
+| 🚀 Quickstart         | [Quickstart Guide](https://pnoker.github.io/iot-dc3/quickstart/)                             |
+| 🏗️ Architecture      | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html)       |
 | 🔧 Driver development | [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring.html) |
-| 🐛 Troubleshooting    | [Troubleshooting](https://pnoker.github.io/iot-dc3/guide/troubleshooting.html) |
-| 📋 Changelog          | [Release Changelog](https://pnoker.github.io/iot-dc3/development/changelog.html) |
-| 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                      |
-| 🇨🇳 Gitee mirror      | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                          |
+| 🐛 Troubleshooting    | [Troubleshooting](https://pnoker.github.io/iot-dc3/guide/troubleshooting.html)               |
+| 📋 Changelog          | [Release Changelog](https://pnoker.github.io/iot-dc3/development/changelog.html)             |
+| 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                                    |
+| 🇨🇳 Gitee mirror     | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                                        |
 
 ## 🌍 Use Cases
 
@@ -280,7 +288,8 @@ Contributions of all kinds are welcome. Please follow this workflow:
 
 1. **Fork and branch** - Create a branch from `main`, using the format `feature/your_name/feature_description`
    (for example: `feature/pnoker/mqtt_driver`)
-2. **Develop and commit** - Complete your changes on the new branch and follow the [Conventional Commits](https://www.conventionalcommits.org/) specification
+2. **Develop and commit** - Complete your changes on the new branch and follow
+   the [Conventional Commits](https://www.conventionalcommits.org/) specification
 3. **Open a PR** - Submit a Pull Request to the `develop` branch for maintainer review and merge
 
 ## 📄 License
@@ -289,7 +298,8 @@ IoT DC3 is open source under the [AGPL 3.0](./LICENSE-AGPL.txt) license.
 
 - ✅ **Personal learning, research, and internal use** - Free
 - ✅ **Modify the code and open source your changes** - Welcome
-- ⚠️ **Offering it as a commercial service to third parties without open-sourcing modifications** - Requires a commercial license
+- ⚠️ **Offering it as a commercial service to third parties without open-sourcing modifications** - Requires a
+  commercial license
 
 For commercial licensing details, see [LICENSE.txt](./LICENSE.txt).
 

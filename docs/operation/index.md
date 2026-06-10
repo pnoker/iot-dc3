@@ -13,13 +13,14 @@
 
 ## 运行入口
 
-| 入口 | 用途 |
-|------|------|
-| Gateway API | `http://localhost:8000/api/v3/...`，对外统一 API 入口 |
-| Swagger UI | `http://localhost:8000/swagger-ui.html`，开发环境下查看聚合 API |
+| 入口                | 用途                                                            |
+|-------------------|---------------------------------------------------------------|
+| Gateway API       | `http://localhost:8000/api/v3/...`，对外统一 API 入口                |
+| Swagger UI        | `http://localhost:8000/swagger-ui.html`，开发环境下查看聚合 API         |
 | Center direct API | 各中心服务的直接调试入口，详见 [API 文档](../development/api-documentation.md) |
-| Web UI | 前端源码在独立 `iot-dc3-web` 仓库，后端接口通过 Gateway 访问 |
+| Web UI            | 前端源码在独立 `iot-dc3-web` 仓库，后端接口通过 Gateway 访问                    |
 
 ## 旧版截图资料
 
-旧版 Web UI 截图式手册已经归档到 [Superpowers / 旧版操作手册](../superpowers/legacy-operation/)。这些资料保留历史参考价值，但公开操作路径以本章文字流程为准。
+旧版 Web UI 截图式手册已经归档到 [Superpowers / 旧版操作手册](../superpowers/legacy-operation/)
+。这些资料保留历史参考价值，但公开操作路径以本章文字流程为准。

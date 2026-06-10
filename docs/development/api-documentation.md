@@ -1,8 +1,10 @@
 # API 文档
 
-本页说明 IoT DC3 后端 OpenAPI / Swagger 文档的生成、访问、认证和导出方式。它补充 [测试](testing.md) 与根目录 `AGENTS.md` 中的工程规则。
+本页说明 IoT DC3 后端 OpenAPI / Swagger 文档的生成、访问、认证和导出方式。它补充 [测试](testing.md) 与根目录 `AGENTS.md`
+中的工程规则。
 
-平台在 WebFlux 栈上使用 `springdoc-openapi` `3.0.3`。REST 接口文档由代码注解生成，包括 `@Tag`、`@Operation`、`@Parameter` 和 `@Schema`，不维护独立的手写 API 规格文件。
+平台在 WebFlux 栈上使用 `springdoc-openapi` `3.0.3`。REST 接口文档由代码注解生成，包括 `@Tag`、`@Operation`、`@Parameter` 和
+`@Schema`，不维护独立的手写 API 规格文件。
 
 ## 架构
 
@@ -23,27 +25,29 @@
 
 ## 分组方式
 
-| 机制 | 说明 |
-|------|------|
-| Center 分组 | 每个业务模块提供自己的 `GroupedOpenApi` Bean，只扫描本模块 Controller 包 |
-| 全局元信息 | `dc3-common-web` 中的 `SpringDocConfig` 提供 OpenAPI 标题、版本、联系人、许可证和安全方案 |
-| Gateway 聚合 | Gateway 没有业务 Controller，通过 `springdoc.swagger-ui.urls` 聚合各中心服务文档 |
-| Single 模式 | `dc3-center-single` 同时包含多个业务模块，因此 UI 中会出现多个分组 |
+| 机制         | 说明                                                                  |
+|------------|---------------------------------------------------------------------|
+| Center 分组  | 每个业务模块提供自己的 `GroupedOpenApi` Bean，只扫描本模块 Controller 包               |
+| 全局元信息      | `dc3-common-web` 中的 `SpringDocConfig` 提供 OpenAPI 标题、版本、联系人、许可证和安全方案 |
+| Gateway 聚合 | Gateway 没有业务 Controller，通过 `springdoc.swagger-ui.urls` 聚合各中心服务文档    |
+| Single 模式  | `dc3-center-single` 同时包含多个业务模块，因此 UI 中会出现多个分组                       |
 
-`SpringDocConfig` 和 `WebFluxSecurityConfig` 放在 `dc3-common-web` 的 auto-configuration 中，因为 Center 应用只扫描自身包路径。各业务模块的 `GroupedOpenApi` 放在本模块已扫描包下，由已有初始化逻辑加载。
+`SpringDocConfig` 和 `WebFluxSecurityConfig` 放在 `dc3-common-web` 的 auto-configuration 中，因为 Center
+应用只扫描自身包路径。各业务模块的 `GroupedOpenApi` 放在本模块已扫描包下，由已有初始化逻辑加载。
 
 ## 访问入口
 
-| 目标 | URL |
-|------|-----|
-| Gateway 聚合 UI | `http://<gateway>:8000/swagger-ui.html` |
-| Auth Center 直连 | `http://<auth>:8300/auth/swagger-ui.html` |
+| 目标                | URL                                             |
+|-------------------|-------------------------------------------------|
+| Gateway 聚合 UI     | `http://<gateway>:8000/swagger-ui.html`         |
+| Auth Center 直连    | `http://<auth>:8300/auth/swagger-ui.html`       |
 | Manager Center 直连 | `http://<manager>:8400/manager/swagger-ui.html` |
-| Data Center 直连 | `http://<data>:8500/data/swagger-ui.html` |
+| Data Center 直连    | `http://<data>:8500/data/swagger-ui.html`       |
 | Agentic Center 直连 | `http://<agentic>:8600/agentic/swagger-ui.html` |
-| 单中心 JSON | `http://<center>:<port>/<svc>/v3/api-docs` |
+| 单中心 JSON          | `http://<center>:<port>/<svc>/v3/api-docs`      |
 
-各中心服务的 `spring.webflux.base-path` 会加到文档路径前，例如 `/auth/v3/api-docs`。Gateway 聚合路径 `/v3/api-docs/{svc}` 会隐藏这个差异，便于统一访问。
+各中心服务的 `spring.webflux.base-path` 会加到文档路径前，例如 `/auth/v3/api-docs`。Gateway 聚合路径 `/v3/api-docs/{svc}`
+会隐藏这个差异，便于统一访问。
 
 ## Swagger UI 认证
 
@@ -54,11 +58,11 @@
 3. 调用 `POST /api/v3/auth/token/generate` 获取 token。
 4. 在 Swagger UI 点击 **Authorize**，填写：
 
-| Header | 示例 |
-|--------|------|
-| `X-Auth-Tenant` | `default` |
-| `X-Auth-Login` | `dc3` |
-| `X-Auth-Token` | `{"salt":"...","token":"..."}` |
+| Header          | 示例                             |
+|-----------------|--------------------------------|
+| `X-Auth-Tenant` | `default`                      |
+| `X-Auth-Login`  | `dc3`                          |
+| `X-Auth-Token`  | `{"salt":"...","token":"..."}` |
 
 不要把真实 token、password、api key 写入文档、日志或 issue。
 

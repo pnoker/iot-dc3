@@ -74,11 +74,11 @@
 
 内置 **28 个接入驱动模块**，覆盖工业自动化、物联网通信、数据桥接、基础通信与仿真调试场景，降低常见设备与数据源的接入成本：
 
-| 分类             | 驱动模块                                                                                                                                                 |
-|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 分类             | 驱动模块                                                                                                                                               |
+|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | 🏭 **工业协议**    | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **物联网协议**   | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                         |
-| 🗄️ **数据桥接**   | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                          |
+| 📡 **物联网协议**   | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
+| 🗄️ **数据桥接**   | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
 | 🔧 **基础通信与管理** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
 | 🧪 **仿真与调试**   | Virtual · Listening Virtual                                                                                                                        |
 
@@ -224,16 +224,16 @@ cp .env.example .env    # 复制模板文件
 
 ## 🛠️ 技术栈
 
-| 分类        | 技术                                                          |
-|-----------|-------------------------------------------------------------|
-| **语言与框架** | Java 21 · Spring Boot 4 · Spring Cloud 2025 · Spring AI 2.0 |
+| 分类           | 技术                                                          |
+|--------------|-------------------------------------------------------------|
+| **语言与框架**    | Java 21 · Spring Boot 4 · Spring Cloud 2025 · Spring AI 2.0 |
 | **数据、缓存与调度** | PostgreSQL · Caffeine · MyBatis-Plus · Quartz               |
-| **消息与通信** | RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf             |
-| **安全与认证** | Spring Security · JWT · BouncyCastle                        |
-| **可观测性**  | Micrometer · Prometheus · Grafana · ELK                     |
-| **前端**    | Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6   |
-| **桌面端**   | Tauri 2                                                     |
-| **部署**    | Podman · Docker Compose                                     |
+| **消息与通信**    | RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf             |
+| **安全与认证**    | Spring Security · JWT · BouncyCastle                        |
+| **可观测性**     | Micrometer · Prometheus · Grafana · ELK                     |
+| **前端**       | Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6   |
+| **桌面端**      | Tauri 2                                                     |
+| **部署**       | Podman · Docker Compose                                     |
 
 > 💡 前端源码位于 [iot-dc3-web](https://github.com/pnoker/iot-dc3-web) 仓库。
 

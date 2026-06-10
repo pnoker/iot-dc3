@@ -4,12 +4,12 @@
 
 ## 目录
 
-| 文档 | 内容 |
-|------|------|
-| [驱动开发](driver-authoring.md) | 基于 `dc3-driver-virtual` 模板扩展新协议驱动 |
-| [API 文档](api-documentation.md) | OpenAPI / Swagger 的暴露方式、认证头和导出流程 |
-| [测试](testing.md) | 单元测试、集成测试、E2E 和覆盖率约定 |
-| [变更日志](changelog.md) | 版本演进与重要变更记录 |
+| 文档                             | 内容                                |
+|--------------------------------|-----------------------------------|
+| [驱动开发](driver-authoring.md)    | 基于 `dc3-driver-virtual` 模板扩展新协议驱动 |
+| [API 文档](api-documentation.md) | OpenAPI / Swagger 的暴露方式、认证头和导出流程  |
+| [测试](testing.md)               | 单元测试、集成测试、E2E 和覆盖率约定              |
+| [变更日志](changelog.md)           | 版本演进与重要变更记录                       |
 
 ## 开发约定速览
 

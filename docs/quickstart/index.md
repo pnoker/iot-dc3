@@ -41,7 +41,8 @@ make dev-optional REGISTRY=cn
 source dc3/env/dev.env.sh
 ```
 
-文件中会导出数据库、消息中间件、gRPC 目标、可选 AI 集成等开发默认值。源码方式启动 Java 进程时必须加载这组变量，否则服务会继续使用容器内 DNS 名称或默认端口，无法正确连接本机已发布的 PostgreSQL、RabbitMQ 和中心服务。
+文件中会导出数据库、消息中间件、gRPC 目标、可选 AI 集成等开发默认值。源码方式启动 Java 进程时必须加载这组变量，否则服务会继续使用容器内
+DNS 名称或默认端口，无法正确连接本机已发布的 PostgreSQL、RabbitMQ 和中心服务。
 
 根目录 `.env.example` 与 `dc3/env/dev.env(.sh)` 的具体区别参见 [环境变量](environment.md)。
 

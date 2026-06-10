@@ -83,7 +83,8 @@ make compose-logs STACK=db
 
 **原因**：请求访问了需要认证的接口，但没有携带有效 token。
 
-**处理方式**：先调用 `/api/v3/auth/token/...` 获取 token，再在后续请求中携带租户、登录名和 token 相关请求头。Swagger UI 的认证方式见 [API 文档](../development/api-documentation.md)。
+**处理方式**：先调用 `/api/v3/auth/token/...` 获取 token，再在后续请求中携带租户、登录名和 token 相关请求头。Swagger UI
+的认证方式见 [API 文档](../development/api-documentation.md)。
 
 ## 驱动无法注册
 

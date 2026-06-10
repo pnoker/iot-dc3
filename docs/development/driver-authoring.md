@@ -1,6 +1,7 @@
 # 驱动开发
 
-本指南说明如何基于 `dc3-driver-virtual` 创建一个新的协议驱动。驱动是 IoT DC3 的南向 I/O 层，负责通过 Modbus、OPC、MQTT、S7、BACnet 等协议连接物理设备或外部数据源。
+本指南说明如何基于 `dc3-driver-virtual` 创建一个新的协议驱动。驱动是 IoT DC3 的南向 I/O 层，负责通过
+Modbus、OPC、MQTT、S7、BACnet 等协议连接物理设备或外部数据源。
 
 如果只是使用已有驱动，请先阅读 [操作手册](../operation/) 和 [快速开始](../quickstart/)。
 
@@ -40,10 +41,10 @@ cp -r dc3-driver/dc3-driver-virtual dc3-driver/dc3-driver-bacnet
 
 然后重命名 Java 包、启动类和自定义服务实现类。`dc3-driver-virtual` 模板中最关键的类是：
 
-| 类 | 说明 |
-|----|------|
-| `VirtualDriverApplication` | Spring Boot 启动类 |
-| `VirtualDriverCustomServiceImpl` | 协议逻辑实现入口 |
+| 类                                | 说明              |
+|----------------------------------|-----------------|
+| `VirtualDriverApplication`       | Spring Boot 启动类 |
+| `VirtualDriverCustomServiceImpl` | 协议逻辑实现入口        |
 
 新驱动应使用协议专用命名，例如 `BacnetDriverApplication` 和 `BacnetDriverCustomServiceImpl`，避免多个驱动出现重复类名。
 
@@ -149,13 +150,13 @@ logging:
 
 ### 属性命名
 
-| 字段 | 说明 |
-|------|------|
-| `attribute-name` | 用户界面显示名，驱动元数据要求使用英文 |
-| `attribute-code` | 协议实现读取的稳定 key，例如 `host`、`port` |
+| 字段                    | 说明                                        |
+|-----------------------|-------------------------------------------|
+| `attribute-name`      | 用户界面显示名，驱动元数据要求使用英文                       |
+| `attribute-code`      | 协议实现读取的稳定 key，例如 `host`、`port`            |
 | `attribute-type-flag` | 属性类型，例如 `STRING`、`INT`、`DOUBLE`、`BOOLEAN` |
-| `default-value` | 默认值 |
-| `remark` | 说明文字，建议使用英文 |
+| `default-value`       | 默认值                                       |
+| `remark`              | 说明文字，建议使用英文                               |
 
 驱动 metadata 中的 `name`、`attribute-name`、`remark` 属于用户可见元数据，应保持英文，便于多语言 UI 和现场项目复用。
 
@@ -219,28 +220,29 @@ public class BacnetDriverCustomServiceImpl implements DriverCustomService {
 
 驱动不需要自己编写 RabbitMQ 或 gRPC 管道。通过 `DriverSenderService` 发送数据、状态和事件：
 
-| 方法 | 用途 |
-|------|------|
-| `pointValueSender(PointValue)` | 发送单条点位值 |
-| `pointValueSender(List<PointValue>)` | 批量发送点位值 |
-| `deviceStatusSender(deviceId, status)` | 上报设备状态 |
+| 方法                                                | 用途            |
+|---------------------------------------------------|---------------|
+| `pointValueSender(PointValue)`                    | 发送单条点位值       |
+| `pointValueSender(List<PointValue>)`              | 批量发送点位值       |
+| `deviceStatusSender(deviceId, status)`            | 上报设备状态        |
 | `deviceStatusSender(deviceId, status, ttl, unit)` | 上报带 TTL 的设备状态 |
-| `driverEventSender(DriverEventDTO)` | 上报驱动事件 |
-| `deviceEventSender(DeviceEventDTO)` | 上报设备事件 |
-| `driverAlarmSender(String)` | 快速上报驱动告警 |
-| `deviceAlarmSender(deviceId, String)` | 快速上报设备告警 |
+| `driverEventSender(DriverEventDTO)`               | 上报驱动事件        |
+| `deviceEventSender(DeviceEventDTO)`               | 上报设备事件        |
+| `driverAlarmSender(String)`                       | 快速上报驱动告警      |
+| `deviceAlarmSender(deviceId, String)`             | 快速上报设备告警      |
 
-状态 TTL 应大于状态上报周期。否则设备可能在两次心跳之间被判定为离线。例如 `cron: '0/5 * * * * ?'` 每 5 秒执行一次，TTL 可设置为 25 秒。
+状态 TTL 应大于状态上报周期。否则设备可能在两次心跳之间被判定为离线。例如 `cron: '0/5 * * * * ?'` 每 5 秒执行一次，TTL 可设置为
+25 秒。
 
 ## 7. 命名和路由
 
 驱动路由涉及三个标识：
 
-| 标识 | 来源 | 用途 |
-|------|------|------|
-| `dc3.driver.code` | `application.yml` | 驱动类型唯一编码，Manager 用它识别驱动类型 |
-| `dc3.driver.service` | 自动派生或显式覆盖 | 驱动实例路由标识，用于 RabbitMQ 命令队列和 routing key |
-| `spring.application.name` | Maven artifactId | 日志文件、Actuator 元数据等 |
+| 标识                        | 来源                | 用途                                     |
+|---------------------------|-------------------|----------------------------------------|
+| `dc3.driver.code`         | `application.yml` | 驱动类型唯一编码，Manager 用它识别驱动类型              |
+| `dc3.driver.service`      | 自动派生或显式覆盖         | 驱动实例路由标识，用于 RabbitMQ 命令队列和 routing key |
+| `spring.application.name` | Maven artifactId  | 日志文件、Actuator 元数据等                     |
 
 `dc3.driver.code` 一旦投入使用就不要随意修改。变更驱动编码会影响 Manager 元数据和 RabbitMQ 路由，需要迁移方案。
 
@@ -259,7 +261,8 @@ mvn -s .mvn/settings.xml clean package -pl dc3-driver/dc3-driver-bacnet -am
 java -jar dc3-driver/dc3-driver-bacnet/target/dc3-driver-bacnet.jar
 ```
 
-开发环境中驱动会自动向 Manager Center 注册。可查看 Manager 和驱动日志确认是否出现类似 `Driver registered: BacnetDriver` 的事件。
+开发环境中驱动会自动向 Manager Center 注册。可查看 Manager 和驱动日志确认是否出现类似 `Driver registered: BacnetDriver`
+的事件。
 
 ## 9. 冒烟验证
 
@@ -271,15 +274,15 @@ java -jar dc3-driver/dc3-driver-bacnet/target/dc3-driver-bacnet.jar
 
 ## 常见问题
 
-| 问题 | 处理方式 |
-|------|----------|
-| 驱动编码冲突 | 修改 `dc3.driver.code`，保持唯一且稳定 |
-| `DriverCustomService` 未加载 | 确认类有 `@Service`，且位于启动类扫描范围内 |
-| `read` 返回空或异常 | 不要静默吞异常，让日志暴露协议错误；单点失败不应拖垮整个驱动 |
-| 设备频繁离线 | TTL 小于心跳或状态上报周期，增加 TTL 或缩短调度周期 |
-| 点位有读取但无数据 | 检查 RabbitMQ、Data Center 日志和租户上下文 |
-| 元数据变更不生效 | 在 `event(...)` 中更新本地协议客户端、订阅或缓存 |
-| 协议依赖很重 | 只放在具体驱动模块的 `pom.xml`，不要放到 `dc3-common-driver` |
+| 问题                        | 处理方式                                          |
+|---------------------------|-----------------------------------------------|
+| 驱动编码冲突                    | 修改 `dc3.driver.code`，保持唯一且稳定                  |
+| `DriverCustomService` 未加载 | 确认类有 `@Service`，且位于启动类扫描范围内                   |
+| `read` 返回空或异常             | 不要静默吞异常，让日志暴露协议错误；单点失败不应拖垮整个驱动                |
+| 设备频繁离线                    | TTL 小于心跳或状态上报周期，增加 TTL 或缩短调度周期                |
+| 点位有读取但无数据                 | 检查 RabbitMQ、Data Center 日志和租户上下文              |
+| 元数据变更不生效                  | 在 `event(...)` 中更新本地协议客户端、订阅或缓存               |
+| 协议依赖很重                    | 只放在具体驱动模块的 `pom.xml`，不要放到 `dc3-common-driver` |
 
 ## 参考入口
 
