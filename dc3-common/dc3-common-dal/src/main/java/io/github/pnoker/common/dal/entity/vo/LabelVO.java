@@ -73,14 +73,14 @@ public class LabelVO extends BaseVO {
     /**
      * Entity type flag.
      */
-    @Schema(description = "entity type flag")
+    @Schema(description = "Entity type enum")
     @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeEnum entityTypeFlag;
 
     /**
      * Enable status flag.
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
 }

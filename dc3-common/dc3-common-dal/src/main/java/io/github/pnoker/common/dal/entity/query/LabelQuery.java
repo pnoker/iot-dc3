@@ -71,19 +71,19 @@ public class LabelQuery implements Serializable {
     /**
      * Label color.
      */
-    @Schema(description = "color")
+    @Schema(description = "Label color")
     private String color;
 
     /**
      * Entity type flag.
      */
-    @Schema(description = "entity type flag")
+    @Schema(description = "Entity type enum")
     private EntityTypeEnum entityTypeFlag;
 
     /**
      * Enable status flag.
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
 }

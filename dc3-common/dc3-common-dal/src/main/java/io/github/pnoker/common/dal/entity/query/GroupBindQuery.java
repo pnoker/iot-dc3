@@ -62,7 +62,7 @@ public class GroupBindQuery implements Serializable {
     /**
      * Entity type flag.
      */
-    @Schema(description = "entity type flag")
+    @Schema(description = "Entity type enum")
     private EntityTypeEnum entityTypeFlag;
 
     /**

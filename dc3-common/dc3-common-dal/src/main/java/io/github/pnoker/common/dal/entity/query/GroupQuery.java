@@ -77,19 +77,19 @@ public class GroupQuery implements Serializable {
     /**
      * Group sort position.
      */
-    @Schema(description = "position")
+    @Schema(description = "Group position")
     private Integer position;
 
     /**
      * Group type flag.
      */
-    @Schema(description = "group type flag")
+    @Schema(description = "Group type enum")
     private EntityTypeEnum groupTypeFlag;
 
     /**
      * Enable status flag.
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
 }
