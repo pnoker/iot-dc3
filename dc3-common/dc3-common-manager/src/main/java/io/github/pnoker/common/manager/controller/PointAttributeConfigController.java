@@ -86,7 +86,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'add')")
-    @Operation(summary = "新增PointAttributeConfig", description = "新增一条PointAttributeConfig记录")
+    @Operation(summary = "新增位号属性配置", description = "新增一条位号属性配置记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,7 +104,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'delete')")
-    @Operation(summary = "删除PointAttributeConfig", description = "删除指定ID的PointAttributeConfig")
+    @Operation(summary = "删除位号属性配置", description = "删除指定ID的位号属性配置")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -121,7 +121,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'update')")
-    @Operation(summary = "更新PointAttributeConfig", description = "更新PointAttributeConfig信息")
+    @Operation(summary = "更新位号属性配置", description = "更新位号属性配置信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -140,7 +140,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointAttributeConfigVO {@link PointAttributeConfigVO}
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
-    @Operation(summary = "查询PointAttributeConfig", description = "根据ID查询PointAttributeConfig详细信息")
+    @Operation(summary = "查询位号属性配置", description = "根据ID查询位号属性配置详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<PointAttributeConfigVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -159,7 +159,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
-    @Operation(summary = "查询PointAttributeConfig", description = "根据条件查询PointAttributeConfig")
+    @Operation(summary = "查询位号属性配置", description = "根据属性ID、设备ID和位号ID查询位号属性配置")
     @GetMapping("/get_by_attribute_id_and_device_id_and_point_id")
     public Mono<R<PointAttributeConfigVO>> getByAttributeIdAndDeviceIdAndPointId(
             @NotNull @RequestParam(value = "attribute_id") Long attributeId,
@@ -183,7 +183,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
-    @Operation(summary = "查询PointAttributeConfig列表", description = "根据关联条件查询PointAttributeConfig列表")
+    @Operation(summary = "查询位号属性配置列表", description = "根据设备ID和位号ID查询位号属性配置列表")
     @GetMapping("/list_by_device_id_and_point_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceIdAndPointId(
             @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -204,7 +204,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
-    @Operation(summary = "查询PointAttributeConfig列表", description = "根据关联条件查询PointAttributeConfig列表")
+    @Operation(summary = "查询位号属性配置列表", description = "根据设备ID查询位号属性配置列表")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -224,7 +224,7 @@ public class PointAttributeConfigController implements BaseController {
      * @return Page Of PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
-    @Operation(summary = "查询PointAttributeConfig列表", description = "分页查询PointAttributeConfig列表")
+    @Operation(summary = "查询位号属性配置列表", description = "分页查询位号属性配置列表")
     @PostMapping("/list")
     public Mono<R<Page<PointAttributeConfigVO>>> list(
             @RequestBody(required = false) PointAttributeConfigQuery entityQuery) {

@@ -160,6 +160,7 @@ public class PointController implements BaseController {
      * @return Map(ID, PointVO)
      */
     @PreAuthorize("@perm.can('point', 'list')")
+    @Operation(summary = "批量查询位号", description = "根据位号ID列表批量查询位号信息")
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, PointVO>>> listByIds(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -230,6 +231,7 @@ public class PointController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('point', 'list')")
+    @Operation(summary = "查询位号单位", description = "根据位号ID列表查询位号单位")
     @PostMapping("/unit")
     public Mono<R<Map<Long, String>>> unit(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -252,7 +254,7 @@ public class PointController implements BaseController {
      * @return {@link R}<{@link Set}<{@link Long}>>
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "位号管理 - get point statistics with device", description = "位号管理 - get point statistics with device")
+    @Operation(summary = "查询位号关联设备统计", description = "根据位号ID查询关联设备统计信息")
     @GetMapping("/list_device_statistics_by_point_id")
     public Mono<R<DeviceByPointVO>> getPointStatisticsWithDevice(
             @NotNull @RequestParam(value = "point_id") Long pointId) {
@@ -269,7 +271,7 @@ public class PointController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "位号管理 - get point by device id", description = "位号管理 - get point by device id")
+    @Operation(summary = "统计设备位号数量", description = "根据设备ID统计位号数量")
     @GetMapping("/get_count_by_device_id")
     public Mono<R<Long>> getPointByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -284,7 +286,7 @@ public class PointController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('point', 'get')")
-    @Operation(summary = "位号管理配置", description = "位号管理配置操作")
+    @Operation(summary = "查询设备位号配置", description = "根据设备ID查询位号配置详情")
     @GetMapping("/get_point_config_by_device_id")
     public Mono<R<PointConfigByDeviceVO>> getPointConfigByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {

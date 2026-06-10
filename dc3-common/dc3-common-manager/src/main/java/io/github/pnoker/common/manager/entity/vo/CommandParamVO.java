@@ -62,17 +62,17 @@ public class CommandParamVO extends BaseVO {
     @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
     private String paramCode;
 
-    @Schema(description = "param direction flag")
+    @Schema(description = "Parameter direction enum")
 
     @NotNull(message = "Param direction can't be empty", groups = {Add.class, Update.class})
     private ParamDirectionTypeEnum paramDirectionFlag;
 
-    @Schema(description = "param type flag")
+    @Schema(description = "Parameter type enum")
 
     @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
     private PointTypeEnum paramTypeFlag;
 
-    @Schema(description = "required flag")
+    @Schema(description = "Required flag enum")
 
     private Boolean requiredFlag;
 
@@ -80,7 +80,7 @@ public class CommandParamVO extends BaseVO {
 
     private String defaultValue;
 
-    @Schema(description = "param extension information (JSON)")
+    @Schema(description = "param extension information in JSON format")
 
     private CommandParamExt paramExt;
 
@@ -89,11 +89,11 @@ public class CommandParamVO extends BaseVO {
     @NotNull(message = "Command ID can't be empty", groups = {Add.class, Update.class})
     private Long commandId;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
 
     private String signature;
 

@@ -78,7 +78,7 @@ public class DriverAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute', 'add')")
-    @Operation(summary = "新增DriverAttribute", description = "新增一条DriverAttribute记录")
+    @Operation(summary = "新增驱动属性", description = "新增一条驱动属性记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -96,7 +96,7 @@ public class DriverAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute', 'delete')")
-    @Operation(summary = "删除DriverAttribute", description = "删除指定ID的DriverAttribute")
+    @Operation(summary = "删除驱动属性", description = "删除指定ID的驱动属性")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -113,7 +113,7 @@ public class DriverAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute', 'update')")
-    @Operation(summary = "更新DriverAttribute", description = "更新DriverAttribute信息")
+    @Operation(summary = "更新驱动属性", description = "更新驱动属性信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -132,7 +132,7 @@ public class DriverAttributeController implements BaseController {
      * @return DriverAttributeVO {@link DriverAttributeVO}
      */
     @PreAuthorize("@perm.can('driver_attribute', 'get')")
-    @Operation(summary = "查询DriverAttribute", description = "根据ID查询DriverAttribute详细信息")
+    @Operation(summary = "查询驱动属性", description = "根据ID查询驱动属性详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<DriverAttributeVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -149,7 +149,7 @@ public class DriverAttributeController implements BaseController {
      * @return 驱动属性
      */
     @PreAuthorize("@perm.can('driver_attribute', 'list')")
-    @Operation(summary = "查询DriverAttribute列表", description = "根据关联条件查询DriverAttribute列表")
+    @Operation(summary = "查询驱动属性列表", description = "根据驱动ID查询驱动属性列表")
     @GetMapping("/list_by_driver_id")
     public Mono<R<List<DriverAttributeVO>>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -171,7 +171,7 @@ public class DriverAttributeController implements BaseController {
      * @return Page Of 驱动属性
      */
     @PreAuthorize("@perm.can('driver_attribute', 'list')")
-    @Operation(summary = "查询DriverAttribute列表", description = "分页查询DriverAttribute列表")
+    @Operation(summary = "查询驱动属性列表", description = "分页查询驱动属性列表")
     @PostMapping("/list")
     public Mono<R<Page<DriverAttributeVO>>> list(@RequestBody(required = false) DriverAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

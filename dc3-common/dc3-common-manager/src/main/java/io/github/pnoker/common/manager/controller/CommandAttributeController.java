@@ -78,7 +78,7 @@ public class CommandAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute', 'add')")
-    @Operation(summary = "新增CommandAttribute", description = "新增一条CommandAttribute记录")
+    @Operation(summary = "新增指令属性", description = "新增一条指令属性记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -96,7 +96,7 @@ public class CommandAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute', 'delete')")
-    @Operation(summary = "删除CommandAttribute", description = "删除指定ID的CommandAttribute")
+    @Operation(summary = "删除指令属性", description = "删除指定ID的指令属性")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -113,7 +113,7 @@ public class CommandAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute', 'update')")
-    @Operation(summary = "更新CommandAttribute", description = "更新CommandAttribute信息")
+    @Operation(summary = "更新指令属性", description = "更新指令属性信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -132,7 +132,7 @@ public class CommandAttributeController implements BaseController {
      * @return CommandAttributeVO {@link CommandAttributeVO}
      */
     @PreAuthorize("@perm.can('command_attribute', 'get')")
-    @Operation(summary = "查询CommandAttribute", description = "根据ID查询CommandAttribute详细信息")
+    @Operation(summary = "查询指令属性", description = "根据ID查询指令属性详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<CommandAttributeVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -149,7 +149,7 @@ public class CommandAttributeController implements BaseController {
      * @return 指令属性
      */
     @PreAuthorize("@perm.can('command_attribute', 'list')")
-    @Operation(summary = "查询CommandAttribute列表", description = "根据关联条件查询CommandAttribute列表")
+    @Operation(summary = "查询指令属性列表", description = "根据驱动ID查询指令属性列表")
     @GetMapping("/list_by_driver_id")
     public Mono<R<List<CommandAttributeVO>>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -171,7 +171,7 @@ public class CommandAttributeController implements BaseController {
      * @return Page Of 指令属性
      */
     @PreAuthorize("@perm.can('command_attribute', 'list')")
-    @Operation(summary = "查询CommandAttribute列表", description = "分页查询CommandAttribute列表")
+    @Operation(summary = "查询指令属性列表", description = "分页查询指令属性列表")
     @PostMapping("/list")
     public Mono<R<Page<CommandAttributeVO>>> list(@RequestBody(required = false) CommandAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

@@ -58,7 +58,7 @@ public class DictionaryQuery implements Serializable {
     @Schema(description = "Tenant ID")
     private Long tenantId;
 
-    @Schema(description = "label")
+    @Schema(description = "Dictionary label")
 
     //
 

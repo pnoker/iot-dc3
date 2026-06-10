@@ -48,13 +48,13 @@ public class DeviceByPointVO {
     /**
      *
      */
-    @Schema(description = "count")
+    @Schema(description = "Associated device count")
     private Long count;
 
     /**
      *
      */
-    @Schema(description = "devices")
+    @Schema(description = "Device list")
     private List<DeviceDO> devices;
 
 }

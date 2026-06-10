@@ -86,7 +86,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'add')")
-    @Operation(summary = "新增EventAttributeConfig", description = "新增一条EventAttributeConfig记录")
+    @Operation(summary = "新增事件属性配置", description = "新增一条事件属性配置记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,7 +104,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'delete')")
-    @Operation(summary = "删除EventAttributeConfig", description = "删除指定ID的EventAttributeConfig")
+    @Operation(summary = "删除事件属性配置", description = "删除指定ID的事件属性配置")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -121,7 +121,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'update')")
-    @Operation(summary = "更新EventAttributeConfig", description = "更新EventAttributeConfig信息")
+    @Operation(summary = "更新事件属性配置", description = "更新事件属性配置信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -140,7 +140,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return EventAttributeConfigVO {@link EventAttributeConfigVO}
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
-    @Operation(summary = "查询EventAttributeConfig", description = "根据ID查询EventAttributeConfig详细信息")
+    @Operation(summary = "查询事件属性配置", description = "根据ID查询事件属性配置详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<EventAttributeConfigVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -159,7 +159,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return EventConfig
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
-    @Operation(summary = "查询EventAttributeConfig", description = "根据条件查询EventAttributeConfig")
+    @Operation(summary = "查询事件属性配置", description = "根据属性ID、设备ID和事件ID查询事件属性配置")
     @GetMapping("/get_by_attribute_id_and_device_id_and_event_id")
     public Mono<R<EventAttributeConfigVO>> getByAttributeIdAndDeviceIdAndEventId(
             @NotNull @RequestParam(value = "attribute_id") Long attributeId,
@@ -183,7 +183,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return EventConfig
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "查询EventAttributeConfig列表", description = "根据关联条件查询EventAttributeConfig列表")
+    @Operation(summary = "查询事件属性配置列表", description = "根据设备ID和事件ID查询事件属性配置列表")
     @GetMapping("/list_by_device_id_and_event_id")
     public Mono<R<List<EventAttributeConfigVO>>> listByDeviceIdAndEventId(
             @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -204,7 +204,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return EventConfig
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "查询EventAttributeConfig列表", description = "根据关联条件查询EventAttributeConfig列表")
+    @Operation(summary = "查询事件属性配置列表", description = "根据设备ID查询事件属性配置列表")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<EventAttributeConfigVO>>> listByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -224,7 +224,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return Page Of EventConfig
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "查询EventAttributeConfig列表", description = "分页查询EventAttributeConfig列表")
+    @Operation(summary = "查询事件属性配置列表", description = "分页查询事件属性配置列表")
     @PostMapping("/list")
     public Mono<R<Page<EventAttributeConfigVO>>> list(
             @RequestBody(required = false) EventAttributeConfigQuery entityQuery) {

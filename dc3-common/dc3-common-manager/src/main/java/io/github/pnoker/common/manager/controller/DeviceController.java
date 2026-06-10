@@ -160,6 +160,7 @@ public class DeviceController implements BaseController {
      * @return Map(ID, DeviceVO)
      */
     @PreAuthorize("@perm.can('device', 'list')")
+    @Operation(summary = "批量查询设备", description = "根据设备ID列表批量查询设备信息")
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, DeviceVO>>> listByIds(@RequestBody List<Long> deviceIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {

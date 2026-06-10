@@ -71,7 +71,7 @@ public class EventAttributeVO extends BaseVO {
     /**
      * Type
      */
-    @Schema(description = "attribute type flag")
+    @Schema(description = "Attribute type enum")
     private AttributeTypeEnum attributeTypeFlag;
 
     /**
@@ -90,19 +90,19 @@ public class EventAttributeVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "attribute extension information (JSON)")
+    @Schema(description = "attribute extension information in JSON format")
     private EventAttributeExt attributeExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
     private String signature;
 
     /**

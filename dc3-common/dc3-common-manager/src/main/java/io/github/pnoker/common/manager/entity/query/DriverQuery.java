@@ -89,13 +89,13 @@ public class DriverQuery implements Serializable {
     /**
      * Type
      */
-    @Schema(description = "driver type flag")
+    @Schema(description = "Driver type enum")
     private DriverTypeEnum driverTypeFlag;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
     /**

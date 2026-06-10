@@ -147,6 +147,7 @@ public class DriverController implements BaseController {
      * @return Map(ID, DriverVO)
      */
     @PreAuthorize("@perm.can('driver', 'list')")
+    @Operation(summary = "批量查询驱动", description = "根据驱动ID列表批量查询驱动信息")
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, DriverVO>>> listByIds(@RequestBody Set<Long> driverIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {

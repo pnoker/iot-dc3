@@ -60,14 +60,14 @@ public class DashboardController implements BaseController {
     private final DashboardService dashboardService;
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘统计", description = "查询仪表盘统计数据")
+    @Operation(summary = "查询驱动统计", description = "查询仪表盘驱动统计数据")
     @GetMapping("/driver/stats")
     public Mono<R<DriverStatsVO>> driverStats() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.driverStats(tenantId))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘统计", description = "查询仪表盘统计数据")
+    @Operation(summary = "查询设备统计", description = "查询仪表盘设备统计数据")
     @GetMapping("/device/stats")
     public Mono<R<DeviceStatsVO>> deviceStats(@RequestParam(value = "top_n", defaultValue = "10") int topN) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.deviceStats(tenantId, topN))));
@@ -79,7 +79,7 @@ public class DashboardController implements BaseController {
      * arrays so the frontend never has to reason about missing days.
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "仪表盘 - daily growth", description = "仪表盘 - daily growth")
+    @Operation(summary = "查询资源增长趋势", description = "查询驱动、设备、模板和位号的每日新增趋势")
     @GetMapping("/growth")
     public Mono<R<GrowthVO>> dailyGrowth(@RequestParam(value = "days", defaultValue = "7") int days) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.dailyGrowth(tenantId, days))));
@@ -98,10 +98,10 @@ public class DashboardController implements BaseController {
      * </p>
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘排行", description = "查询仪表盘排行榜")
+    @Operation(summary = "查询拓扑关系", description = "查询驱动、设备、模板和位号的拓扑关系")
     @GetMapping("/topology")
     public Mono<R<TopologyVO>> topology(@RequestParam(value = "mode", defaultValue = "cardinality") String mode,
-                                        @Parameter(description = "range key", required = true)
+                                        @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
                                         @RequestParam(value = "range_key", required = false) String rangeKey) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.topology(tenantId, mode, rangeKey))));
     }
