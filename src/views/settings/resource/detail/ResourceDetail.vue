@@ -27,6 +27,9 @@
               <el-descriptions-item :label="$t('settings.resource.resourceCode')">
                 {{ reactiveData.data.resourceCode }}
               </el-descriptions-item>
+              <el-descriptions-item :label="$t('settings.resource.serviceName')">
+                {{ reactiveData.data.serviceName || '-' }}
+              </el-descriptions-item>
               <el-descriptions-item :label="$t('settings.resource.resourceType')">
                 {{ reactiveData.data.resourceTypeFlag }}
               </el-descriptions-item>

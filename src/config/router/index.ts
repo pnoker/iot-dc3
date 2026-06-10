@@ -59,6 +59,30 @@ const isRouteInMenuTree = (routeName: string, nodes: MenuNode[]): boolean => {
   return false;
 };
 
+const ROUTE_MENU_ALIASES: Record<string, string> = {
+  driverDetail: 'driver',
+  deviceDetail: 'device',
+  deviceEdit: 'device',
+  profileDetail: 'profile',
+  profileEdit: 'profile',
+  settingsUserDetail: 'settingsUser',
+  settingsRoleDetail: 'settingsRole',
+  settingsResourceDetail: 'settingsResource',
+  settingsApiDetail: 'settingsApi',
+  settingsMenuDetail: 'settingsMenu',
+  settingsGroupDetail: 'settingsGroup',
+  settingsLabelDetail: 'settingsLabel',
+  settingsAlarmRuleDetail: 'settingsAlarmRule',
+  settingsAlarmNotifyDetail: 'settingsAlarmNotify',
+  settingsAlarmMessageDetail: 'settingsAlarmMessage',
+  settingsAlarmChannelDetail: 'settingsAlarmChannel',
+  settingsAlarmBindDetail: 'settingsAlarmBind',
+  settingsAlarmStateDetail: 'settingsAlarmState',
+  settingsAlarmHistoryDetail: 'settingsAlarmHistory',
+  settingsModelConfigDetail: 'settingsModelConfig',
+  settingsModelProviderDetail: 'settingsModelProvider',
+};
+
 /**
  * Vue Router instance with authentication guards
  */
@@ -124,7 +148,8 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
     if (!menuStore.loaded) {
       await menuStore.fetchTree();
     }
-    if (menuStore.tree.length > 0 && !isRouteInMenuTree(routeName, menuStore.tree)) {
+    const menuRouteName = ROUTE_MENU_ALIASES[routeName] || routeName;
+    if (!isRouteInMenuTree(menuRouteName, menuStore.tree)) {
       ElMessage.warning(i18n.global.t('error.forbidden'));
       return { name: 'home' };
     }

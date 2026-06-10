@@ -91,9 +91,11 @@ export interface ResourceForm {
   parentResourceId?: number | string;
   resourceName?: string;
   resourceCode?: string;
+  serviceName?: string;
   resourceTypeFlag?: string;
   resourceScopeFlag?: string;
   entityId?: string | number;
+  resourceExt?: Record<string, unknown>;
   enableFlag?: string;
   remark?: string;
   [key: string]: unknown;

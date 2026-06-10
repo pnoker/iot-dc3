@@ -44,6 +44,7 @@
           prop="resourceCode"
           show-overflow-tooltip
         />
+        <el-table-column :label="t('settings.resource.serviceName')" min-width="160" prop="serviceName" />
         <el-table-column :label="t('settings.resource.resourceType')" min-width="120" prop="resourceTypeFlag" />
         <el-table-column :label="t('settings.resource.resourceScope')" min-width="100" prop="resourceScopeFlag" />
         <el-table-column :label="t('settings.resource.entity')" min-width="140">

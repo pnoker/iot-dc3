@@ -150,11 +150,14 @@
   const sidebarItems = computed<SidebarItem[]>(() => {
     const settings = menuStore.findByCode('settings');
     const children = settings?.children || [];
-    if (!children.length) return fallbackItems();
+    if (!children.length) return menuStore.loaded ? [] : fallbackItems();
     const items = children
       .slice()
       .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0))
       .map(mapMenuNode);
+    if (menuStore.loaded) {
+      return items;
+    }
     ensureDirectItem(items, { name: 'settingsGroup', title: t('nav.settingsGroup'), icon: 'Grid' }, [
       'settingsLabel',
       'settingsModel',

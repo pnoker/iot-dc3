@@ -110,7 +110,8 @@ export const useMenuStore = defineStore('menu', {
         this.tree = Array.isArray(res?.data) ? res.data : [];
         this.loaded = true;
       } catch {
-        // network failures leave tree empty → UI falls back to static Home entry.
+        this.tree = [];
+        this.loaded = true;
       } finally {
         this.loading = false;
       }

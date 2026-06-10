@@ -70,7 +70,7 @@
               <li class="user_lang_row" @click.stop>
                 <el-segmented v-model="langModel" :options="langOptions" class="user_lang_seg" size="small" />
               </li>
-              <el-dropdown-item :icon="Setting" command="settings" divided>
+              <el-dropdown-item v-if="settingsEntryName" :icon="Setting" command="settings" divided>
                 {{ t('layout.settings') }}
               </el-dropdown-item>
               <el-dropdown-item :icon="QuestionFilled" command="help">{{ t('layout.about') }}</el-dropdown-item>
@@ -121,6 +121,7 @@
     SETTINGS_FALLBACK_ICON,
   } from '@/config/settingsNav';
   import { useAgenticStore, useAuthStore, useMenuStore } from '@/store';
+  import type { MenuNode } from '@/store/modules/menu';
   import { resolveMenuTitle } from '@/utils/menuUtil';
 
   const { t, locale } = useI18n();
@@ -316,6 +317,18 @@
       .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0));
   });
 
+  const firstRouteableMenuName = (node?: MenuNode): string | undefined => {
+    if (!node) return undefined;
+    if (node.menuExt?.content?.url) return node.menuCode;
+    for (const child of node.children || []) {
+      const hit = firstRouteableMenuName(child);
+      if (hit) return hit;
+    }
+    return undefined;
+  };
+
+  const settingsEntryName = computed(() => firstRouteableMenuName(menuStore.findByCode('settings')));
+
   const handleMenuEnter = (index: string) => {
     if (index.indexOf('/') === 0) {
       const split = index.split('/');
@@ -328,7 +341,9 @@
 
   const handleCommand = async (command: string) => {
     if (command === 'settings') {
-      await router.push({ name: 'settingsUser' });
+      if (settingsEntryName.value) {
+        await router.push({ name: settingsEntryName.value });
+      }
     } else if (command === 'logout') {
       try {
         await authStore.logout();
