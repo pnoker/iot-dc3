@@ -38,12 +38,12 @@ public enum EnableFlagEnum {
     /**
      * Enabled.
      */
-    ENABLE((byte) 0, "enable", "enable"),
+    ENABLE((byte) 0, "enable", "Enabled"),
 
     /**
      * Disabled.
      */
-    DISABLE((byte) 1, "disable", "disable"),
+    DISABLE((byte) 1, "disable", "Disabled"),
     ;
 
     /**

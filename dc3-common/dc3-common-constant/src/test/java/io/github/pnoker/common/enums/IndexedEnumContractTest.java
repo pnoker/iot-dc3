@@ -24,6 +24,7 @@ import org.junit.jupiter.api.TestFactory;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -83,6 +84,52 @@ class IndexedEnumContractTest {
             RuleStatusEnum.class,
             RwTypeEnum.class);
 
+    private static final List<Class<? extends Enum<?>>> CODED_ENUMS = List.of(
+            AccrueTypeEnum.class,
+            AgenticActionStatusEnum.class,
+            AgenticMessageStatusEnum.class,
+            AgenticModelProviderTypeEnum.class,
+            AlarmMessageLevelEnum.class,
+            AlarmSourceTypeEnum.class,
+            AlarmTargetTypeEnum.class,
+            AlarmTypeEnum.class,
+            ApiTypeEnum.class,
+            AttributeTypeEnum.class,
+            AutoConfirmFlagEnum.class,
+            CallTypeEnum.class,
+            CommandHistorySourceEnum.class,
+            CommandTypeEnum.class,
+            ConfirmFlagEnum.class,
+            DefaultFlagEnum.class,
+            DriverTypeEnum.class,
+            EnableFlagEnum.class,
+            EntityStatusEnum.class,
+            EntityTypeEnum.class,
+            EventHistoryAcknowledgeFlagEnum.class,
+            EventLevelEnum.class,
+            EventTypeFlagEnum.class,
+            ExpireTypeEnum.class,
+            MenuLevelEnum.class,
+            MenuTypeFlagEnum.class,
+            MetadataOperateTypeEnum.class,
+            MetadataTypeEnum.class,
+            NotifyChannelTypeEnum.class,
+            NotifyHistoryStatusEnum.class,
+            ParamDirectionTypeEnum.class,
+            PointCommandSourceEnum.class,
+            PointCommandStatusEnum.class,
+            PointCommandTypeEnum.class,
+            PointTypeEnum.class,
+            ProfileShareTypeEnum.class,
+            ProfileTypeEnum.class,
+            ResourceScopeTypeEnum.class,
+            ResourceTypeEnum.class,
+            ResponseEnum.class,
+            RuleStatusEnum.class,
+            RwTypeEnum.class,
+            TimeRangeKeyEnum.class,
+            TimeoutSourceTypeEnum.class);
+
     private static Method method(Class<?> type, String name, Class<?>... parameterTypes) {
         try {
             return type.getMethod(name, parameterTypes);
@@ -114,6 +161,11 @@ class IndexedEnumContractTest {
     @TestFactory
     Stream<DynamicTest> indexedEnumsHonourTheStandardContract() {
         return INDEXED_ENUMS.stream().flatMap(this::contractFor);
+    }
+
+    @TestFactory
+    Stream<DynamicTest> codedEnumsUseConsistentCodesAndRemarks() {
+        return CODED_ENUMS.stream().flatMap(this::codeAndRemarkContractFor);
     }
 
     private Stream<DynamicTest> contractFor(Class<? extends Enum<?>> enumClass) {
@@ -150,5 +202,32 @@ class IndexedEnumContractTest {
                         }));
 
         return Stream.concat(perConstant, rejection);
+    }
+
+    private Stream<DynamicTest> codeAndRemarkContractFor(Class<? extends Enum<?>> enumClass) {
+        Method getCode = method(enumClass, "getCode");
+        Method getRemark = method(enumClass, "getRemark");
+
+        return Stream.of(enumClass.getEnumConstants()).flatMap(constant -> {
+            String name = enumClass.getSimpleName() + SymbolConstant.DOT + constant.name();
+            return Stream.of(
+                    DynamicTest.dynamicTest(name + " has non-blank code", () -> {
+                        String code = (String) getCode.invoke(constant);
+                        assertThat(code).as(name + " code").isNotBlank();
+                    }),
+                    DynamicTest.dynamicTest(name + " uses lowercase code", () -> {
+                        String code = (String) getCode.invoke(constant);
+                        if (ResponseEnum.class.equals(enumClass)) {
+                            return;
+                        }
+                        assertThat(code).as(name + " code").isEqualTo(code.toLowerCase(Locale.ROOT));
+                    }),
+                    DynamicTest.dynamicTest(name + " has human-readable remark", () -> {
+                        String code = (String) getCode.invoke(constant);
+                        String remark = (String) getRemark.invoke(constant);
+                        assertThat(remark).as(name + " remark").isNotBlank();
+                        assertThat(remark).as(name + " remark").isNotEqualTo(code);
+                    }));
+        });
     }
 }

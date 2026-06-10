@@ -38,27 +38,27 @@ public enum AgenticActionStatusEnum {
     /**
      * Waiting for user confirmation.
      */
-    PENDING((byte) 0, "pending", "pending"),
+    PENDING((byte) 0, "pending", "Waiting for user confirmation"),
 
     /**
      * Confirmed by user and claimed for execution.
      */
-    CONFIRMED((byte) 1, "confirmed", "confirmed"),
+    CONFIRMED((byte) 1, "confirmed", "Confirmed by user and claimed for execution"),
 
     /**
      * Rejected by user.
      */
-    REJECTED((byte) 2, "rejected", "rejected"),
+    REJECTED((byte) 2, "rejected", "Rejected by user"),
 
     /**
      * Executed successfully.
      */
-    EXECUTED((byte) 3, "executed", "executed"),
+    EXECUTED((byte) 3, "executed", "Executed successfully"),
 
     /**
      * Execution failed.
      */
-    FAILED((byte) 4, "failed", "failed"),
+    FAILED((byte) 4, "failed", "Execution failed"),
     ;
 
     /**

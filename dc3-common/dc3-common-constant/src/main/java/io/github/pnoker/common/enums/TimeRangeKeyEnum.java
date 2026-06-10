@@ -42,22 +42,22 @@ public enum TimeRangeKeyEnum {
     /**
      * From local midnight of today to now.
      */
-    TODAY("today", "today"),
+    TODAY("today", "Today"),
 
     /**
      * Rolling 24 hours ending now.
      */
-    H24("24h", "last 24 hours"),
+    H24("24h", "Last 24 hours"),
 
     /**
      * Rolling 7 days ending now.
      */
-    D7("7d", "last 7 days"),
+    D7("7d", "Last 7 days"),
 
     /**
      * Rolling 30 days ending now.
      */
-    D30("30d", "last 30 days"),
+    D30("30d", "Last 30 days"),
     ;
 
     private final String code;

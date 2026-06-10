@@ -46,9 +46,9 @@ public enum RwTypeEnum {
     WRITE_ONLY((byte) 1, "w", "Write only"),
 
     /**
-     * Read and Write
+     * Read and write
      */
-    READ_WRITE((byte) 2, "rw", "Read and Write"),
+    READ_WRITE((byte) 2, "rw", "Read and write"),
     ;
 
     /**

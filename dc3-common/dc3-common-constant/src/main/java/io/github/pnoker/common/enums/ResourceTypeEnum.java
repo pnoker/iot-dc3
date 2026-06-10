@@ -66,9 +66,9 @@ public enum ResourceTypeEnum {
     MENU((byte) 5, "menu", "Menu"),
 
     /**
-     * Api
+     * API
      */
-    API((byte) 6, "api", "Api"),
+    API((byte) 6, "api", "API"),
     ;
 
     /**

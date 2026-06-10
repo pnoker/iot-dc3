@@ -38,7 +38,7 @@ public enum AgenticMessageStatusEnum {
     /**
      * Message saved successfully.
      */
-    OK((byte) 0, "ok", "ok"),
+    OK((byte) 0, "ok", "Message saved successfully"),
     ;
 
     /**

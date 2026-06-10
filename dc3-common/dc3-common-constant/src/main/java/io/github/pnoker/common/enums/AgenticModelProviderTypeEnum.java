@@ -38,12 +38,12 @@ public enum AgenticModelProviderTypeEnum {
     /**
      * OpenAI-compatible API provider.
      */
-    OPENAI_COMPATIBLE((byte) 0, "openai-compatible", "openai-compatible"),
+    OPENAI_COMPATIBLE((byte) 0, "openai-compatible", "OpenAI-compatible API provider"),
 
     /**
      * Anthropic API provider.
      */
-    ANTHROPIC((byte) 1, "anthropic", "anthropic"),
+    ANTHROPIC((byte) 1, "anthropic", "Anthropic API provider"),
     ;
 
     /**
