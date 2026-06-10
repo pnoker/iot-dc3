@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,7 +26,6 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One config-change event — a driver/device/profile row whose operate_time differs from

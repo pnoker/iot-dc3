@@ -18,13 +18,13 @@ package io.github.pnoker.common.agentic.entity.vo;
 
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.AgenticActionStatusEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for agentic action API responses.

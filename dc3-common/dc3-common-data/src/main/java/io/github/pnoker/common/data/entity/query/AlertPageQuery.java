@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.data.entity.query;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Request body for {@code POST /dashboard/alert/page}. Replaces the earlier

@@ -25,6 +25,7 @@ import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -35,7 +36,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for point API responses.

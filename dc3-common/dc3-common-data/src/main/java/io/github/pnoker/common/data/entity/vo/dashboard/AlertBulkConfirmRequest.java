@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,6 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Bulk confirm/unconfirm request body for the dashboard alert panel.

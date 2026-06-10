@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.entity.vo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +26,6 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * VO for submitting a custom command call.

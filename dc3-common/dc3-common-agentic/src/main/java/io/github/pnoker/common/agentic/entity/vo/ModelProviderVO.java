@@ -20,10 +20,10 @@ import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for agentic model provider API responses.

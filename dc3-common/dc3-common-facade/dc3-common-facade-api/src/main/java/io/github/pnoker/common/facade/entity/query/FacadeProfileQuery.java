@@ -21,6 +21,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ProfileShareTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +31,6 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level profile/template query.

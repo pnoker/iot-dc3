@@ -23,6 +23,8 @@ import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.entity.R;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,8 +34,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing point command management endpoints.

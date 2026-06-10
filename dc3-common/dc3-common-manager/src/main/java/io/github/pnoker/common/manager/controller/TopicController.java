@@ -24,6 +24,8 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.manager.entity.query.TopicQuery;
 import io.github.pnoker.common.manager.entity.vo.TopicVO;
 import io.github.pnoker.common.manager.service.TopicService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,8 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing topic management endpoints.

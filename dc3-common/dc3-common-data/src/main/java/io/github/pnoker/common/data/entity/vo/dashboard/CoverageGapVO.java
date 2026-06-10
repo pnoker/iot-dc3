@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,7 +27,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Config-vs-reality coverage report — points declared in dc3_point that never produced

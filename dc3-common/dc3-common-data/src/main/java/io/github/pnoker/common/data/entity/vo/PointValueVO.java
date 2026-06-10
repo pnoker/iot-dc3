@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.pnoker.common.constant.common.TimeConstant;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,6 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for point value API responses.

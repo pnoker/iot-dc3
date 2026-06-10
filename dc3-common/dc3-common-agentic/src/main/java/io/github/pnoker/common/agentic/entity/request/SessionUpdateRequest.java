@@ -17,9 +17,9 @@
 package io.github.pnoker.common.agentic.entity.request;
 
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Mutable session fields controlled by the web client.

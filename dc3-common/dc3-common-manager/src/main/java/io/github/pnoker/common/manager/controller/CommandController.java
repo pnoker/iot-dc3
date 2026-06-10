@@ -31,6 +31,9 @@ import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +49,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing command management endpoints.

@@ -22,12 +22,12 @@ import io.github.pnoker.common.entity.ext.CommandExt;
 import io.github.pnoker.common.enums.CallTypeEnum;
 import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level command BO.

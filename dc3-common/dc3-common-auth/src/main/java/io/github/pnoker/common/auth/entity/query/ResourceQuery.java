@@ -21,6 +21,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResourceScopeTypeEnum;
 import io.github.pnoker.common.enums.ResourceTypeEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,7 +32,6 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for resource listing and filtering.

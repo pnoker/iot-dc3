@@ -19,9 +19,9 @@ package io.github.pnoker.common.agentic.entity.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Structured SSE payload for one agentic visualization.

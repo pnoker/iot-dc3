@@ -23,12 +23,12 @@ import io.github.pnoker.common.entity.ext.NotifyHistoryRequestExt;
 import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for notification delivery history API responses.

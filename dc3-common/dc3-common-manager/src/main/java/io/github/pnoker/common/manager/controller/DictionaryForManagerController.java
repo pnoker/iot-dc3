@@ -27,6 +27,8 @@ import io.github.pnoker.common.manager.biz.DictionaryForManagerService;
 import io.github.pnoker.common.manager.entity.builder.DictionaryForManagerBuilder;
 import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
 import io.github.pnoker.common.valid.Parent;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,8 +40,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing dictionary management endpoints for the manager module.

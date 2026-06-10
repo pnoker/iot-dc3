@@ -25,6 +25,9 @@ import io.github.pnoker.common.data.entity.query.AlertPageQuery;
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.TimeRangeUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,9 +43,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Dashboard / home-page aggregate endpoints. All tenant-scoped via

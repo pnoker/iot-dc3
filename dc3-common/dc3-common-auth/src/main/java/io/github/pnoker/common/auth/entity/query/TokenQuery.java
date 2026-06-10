@@ -18,12 +18,12 @@
 package io.github.pnoker.common.auth.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for token validation and generation.

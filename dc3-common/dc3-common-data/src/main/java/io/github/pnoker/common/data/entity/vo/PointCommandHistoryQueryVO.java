@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,7 +30,6 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query view object for point command list API.

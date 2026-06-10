@@ -21,12 +21,12 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.DriverExt;
 import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Facade-level driver BO. Field set matches {@code api.center.manager.DriverApi}.

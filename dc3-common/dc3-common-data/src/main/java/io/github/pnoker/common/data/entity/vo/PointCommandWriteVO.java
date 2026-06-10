@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.entity.vo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,6 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for point command write API requests.

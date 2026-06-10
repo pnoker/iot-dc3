@@ -20,6 +20,7 @@ package io.github.pnoker.common.manager.entity.query;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +30,6 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Query parameters for event param listing and filtering.

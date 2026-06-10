@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.ConfirmFlagEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +28,6 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One row in the alert list panel on the home page. Source is either {@code device} (with

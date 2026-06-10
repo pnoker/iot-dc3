@@ -49,17 +49,16 @@ import java.util.stream.Collectors;
 @Component("perm")
 public class PermissionMethods {
 
-    private final String serviceName;
-
-    public PermissionMethods(@Value("${spring.application.name:unknown}") String serviceName) {
-        this.serviceName = serviceName;
-    }
-
     /**
      * Wildcard authority. It satisfies every check only when explicitly granted through
      * the role-resource data returned by the active {@link PermissionProvider}.
      */
     public static final String WILDCARD = "*";
+    private final String serviceName;
+
+    public PermissionMethods(@Value("${spring.application.name:unknown}") String serviceName) {
+        this.serviceName = serviceName;
+    }
 
     /**
      * Check whether the current user holds the permission

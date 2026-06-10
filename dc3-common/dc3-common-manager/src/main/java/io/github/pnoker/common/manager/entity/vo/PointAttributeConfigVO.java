@@ -23,13 +23,13 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for point attribute configuration API responses.

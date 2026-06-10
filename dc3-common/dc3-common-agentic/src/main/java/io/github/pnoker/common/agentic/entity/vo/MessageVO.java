@@ -19,10 +19,10 @@ package io.github.pnoker.common.agentic.entity.vo;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for agentic message API responses.

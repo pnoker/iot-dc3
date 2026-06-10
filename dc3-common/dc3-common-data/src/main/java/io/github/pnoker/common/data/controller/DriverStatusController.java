@@ -22,6 +22,9 @@ import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DriverStatusService;
 import io.github.pnoker.common.data.entity.query.DriverQuery;
 import io.github.pnoker.common.entity.R;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +39,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Objects;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing driver status management endpoints.

@@ -25,6 +25,9 @@ import io.github.pnoker.common.manager.entity.vo.dashboard.DriverStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.GrowthVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
 import io.github.pnoker.common.manager.service.DashboardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,9 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Manager-side dashboard endpoints. Two read-only GETs that power the home page's driver

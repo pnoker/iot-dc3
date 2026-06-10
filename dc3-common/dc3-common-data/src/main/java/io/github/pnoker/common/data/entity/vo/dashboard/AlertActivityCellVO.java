@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +25,6 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * One cell in the event-overview alarm heatmap (dow × hour). Service layer always returns

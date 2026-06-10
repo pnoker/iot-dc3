@@ -22,13 +22,13 @@ import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Label binding view object (VO) representing the association between labels and

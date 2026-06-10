@@ -21,12 +21,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.NotifyChannelBindExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * View object for notification channel binding API responses.

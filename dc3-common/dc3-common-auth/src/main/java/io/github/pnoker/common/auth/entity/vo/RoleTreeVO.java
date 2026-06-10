@@ -18,6 +18,7 @@
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,6 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Tree-shaped variant of {@link RoleVO} — adds nested children so the frontend's

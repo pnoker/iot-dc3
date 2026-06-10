@@ -24,6 +24,8 @@ import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.dal.entity.vo.DictionaryVO;
 import io.github.pnoker.common.entity.R;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,8 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing auth-related dictionary lookup endpoints.

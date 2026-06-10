@@ -56,6 +56,14 @@ public class SpringDocConfig {
     private static final String SCHEME_LOGIN = "X-Auth-Login";
     private static final String SCHEME_TOKEN = "X-Auth-Token";
 
+    private static SecurityScheme apiKeyHeader(String headerName, String description) {
+        return new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)
+                .in(SecurityScheme.In.HEADER)
+                .name(headerName)
+                .description(description);
+    }
+
     @Bean
     public OpenAPI dc3OpenApi() {
         return new OpenAPI()
@@ -63,11 +71,11 @@ public class SpringDocConfig {
                         .title("IoT DC3 REST API")
                         .description("""
                                 IoT DC3 platform REST API documentation.
-
+                                
                                 Covers all service modules: auth (authentication and authorization),
                                 manager (device/driver/point/profile configuration), data (telemetry,
                                 events, commands, notifications), and agentic (AI chat and tools).
-
+                                
                                 Authentication: obtain a salt and token via /api/v3/auth/token/*, then
                                 use the Authorize button to set X-Auth-Tenant, X-Auth-Login, and
                                 X-Auth-Token. X-Auth-Token is a JSON object {"salt":"...","token":"..."}.
@@ -91,13 +99,5 @@ public class SpringDocConfig {
                         .addList(SCHEME_TENANT)
                         .addList(SCHEME_LOGIN)
                         .addList(SCHEME_TOKEN));
-    }
-
-    private static SecurityScheme apiKeyHeader(String headerName, String description) {
-        return new SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY)
-                .in(SecurityScheme.In.HEADER)
-                .name(headerName)
-                .description(description);
     }
 }
