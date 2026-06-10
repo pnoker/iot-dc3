@@ -149,7 +149,7 @@
 
 <script lang="ts" setup>
   import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
-  import { getCommandHistoryById, listCommandHistory } from '@/api/command';
+  import { getCommandHistoryByRecordId, listCommandHistory } from '@/api/command';
   import { usePagedList } from '@/composables/usePagedList';
   import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
   import { prettyJson } from '@/utils/jsonUtil';
@@ -200,7 +200,7 @@
   const refresh = () => doRefresh();
 
   const openDetail = (row: CommandHistoryRecord) => {
-    getCommandHistoryById(row.recordId)
+    getCommandHistoryByRecordId(row.recordId)
       .then((res) => {
         detailRow.value = res.data || row;
         detailVisible.value = true;

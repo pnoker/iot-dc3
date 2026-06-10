@@ -139,7 +139,7 @@
 
 <script lang="ts" setup>
   import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
-  import { getEventHistoryById, listEventHistory } from '@/api/event';
+  import { getEventHistoryByRecordId, listEventHistory } from '@/api/event';
   import { usePagedList } from '@/composables/usePagedList';
   import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
   import { prettyJson } from '@/utils/jsonUtil';
@@ -191,7 +191,7 @@
   const refresh = () => doRefresh();
 
   const openDetail = (row: EventHistoryRecord) => {
-    getEventHistoryById(row.recordId)
+    getEventHistoryByRecordId(row.recordId)
       .then((res) => {
         detailRow.value = res.data || row;
         detailVisible.value = true;
