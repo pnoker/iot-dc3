@@ -99,7 +99,7 @@ public class UserController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenantMember(tenantId, id);
+            tenantBindService.requireTenantMember(tenantId, id);
             TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, id);
             userService.delete(id);
             if (Objects.nonNull(tenantBind)) {
@@ -117,7 +117,7 @@ public class UserController implements BaseController {
             UserBO entityBO = userBuilder.buildBOByVO(entityVO);
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
-            requireTenantMember(header.getTenantId(), entityBO.getId());
+            tenantBindService.requireTenantMember(header.getTenantId(), entityBO.getId());
             userService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -128,7 +128,7 @@ public class UserController implements BaseController {
     @GetMapping("/get_by_id")
     public Mono<R<UserVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenantMember(tenantId, id);
+            tenantBindService.requireTenantMember(tenantId, id);
             UserBO entityBO = userService.getById(id);
             UserVO entityVO = userBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
@@ -146,7 +146,7 @@ public class UserController implements BaseController {
             if (Objects.isNull(entityBO)) {
                 throw new NotFoundException("Resource does not exist");
             }
-            requireTenantMember(tenantId, entityBO.getId());
+            tenantBindService.requireTenantMember(tenantId, entityBO.getId());
             UserVO entityVO = userBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -165,13 +165,6 @@ public class UserController implements BaseController {
             Page<UserVO> entityPageVO = userBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         }));
-    }
-
-    private void requireTenantMember(Long tenantId, Long userId) {
-        TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, userId);
-        if (Objects.isNull(tenantBind)) {
-            throw new NotFoundException("Resource does not exist");
-        }
     }
 
 }

@@ -20,8 +20,10 @@ package io.github.pnoker.common.auth.service;
 import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.auth.entity.query.TenantBindQuery;
 import io.github.pnoker.common.base.service.BaseService;
+import io.github.pnoker.common.exception.NotFoundException;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Business service for tenant binding operations.
@@ -40,6 +42,30 @@ public interface TenantBindService extends BaseService<TenantBindBO, TenantBindQ
      * @return TenantBind
      */
     TenantBindBO getByTenantIdAndUserId(Long tenantId, Long userId);
+
+    /**
+     * Check whether a user belongs to a tenant.
+     *
+     * @param tenantId Tenant ID
+     * @param userId   User ID
+     * @return true when the user is bound to the tenant
+     */
+    default boolean isTenantMember(Long tenantId, Long userId) {
+        return Objects.nonNull(getByTenantIdAndUserId(tenantId, userId));
+    }
+
+    /**
+     * Fail closed when a requested user is outside the caller's tenant. Returning 404
+     * avoids revealing whether the user exists in another tenant.
+     *
+     * @param tenantId Tenant ID
+     * @param userId   User ID
+     */
+    default void requireTenantMember(Long tenantId, Long userId) {
+        if (!isTenantMember(tenantId, userId)) {
+            throw new NotFoundException("Resource does not exist");
+        }
+    }
 
     /**
      * List active user IDs bound to the given tenant.

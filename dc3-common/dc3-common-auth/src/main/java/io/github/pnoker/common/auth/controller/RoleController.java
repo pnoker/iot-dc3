@@ -44,7 +44,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import io.swagger.v3.oas.annotations.Operation;
@@ -143,38 +142,8 @@ public class RoleController implements BaseController {
             RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
             query.setTenantId(tenantId);
             List<RoleTreeBO> entityBOList = roleService.listTree(query);
-            List<RoleTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
-            for (RoleTreeBO node : entityBOList) {
-                entityVOList.add(toTreeVO(node));
-            }
-            return R.ok(entityVOList);
+            return R.ok(roleBuilder.buildTreeVOListByBOList(entityBOList));
         }));
-    }
-
-    private RoleTreeVO toTreeVO(RoleTreeBO node) {
-        RoleVO flat = roleBuilder.buildVOByBO(node);
-        RoleTreeVO out = new RoleTreeVO();
-        out.setId(flat.getId());
-        out.setParentRoleId(flat.getParentRoleId());
-        out.setRoleName(flat.getRoleName());
-        out.setRoleCode(flat.getRoleCode());
-        out.setRoleExt(flat.getRoleExt());
-        out.setEnableFlag(flat.getEnableFlag());
-        out.setRemark(flat.getRemark());
-        out.setCreatorId(flat.getCreatorId());
-        out.setCreatorName(flat.getCreatorName());
-        out.setCreateTime(flat.getCreateTime());
-        out.setOperatorId(flat.getOperatorId());
-        out.setOperatorName(flat.getOperatorName());
-        out.setOperateTime(flat.getOperateTime());
-        if (Objects.nonNull(node.getChildren())) {
-            List<RoleTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
-            for (RoleTreeBO child : node.getChildren()) {
-                childVOs.add(toTreeVO(child));
-            }
-            out.setChildren(childVOs);
-        }
-        return out;
     }
 
 }

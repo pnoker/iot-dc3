@@ -19,7 +19,9 @@ package io.github.pnoker.common.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.MenuBO;
+import io.github.pnoker.common.auth.entity.bo.MenuTreeBO;
 import io.github.pnoker.common.auth.entity.model.MenuDO;
+import io.github.pnoker.common.auth.entity.vo.MenuTreeVO;
 import io.github.pnoker.common.auth.entity.vo.MenuVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.MenuExt;
@@ -198,6 +200,35 @@ public interface MenuBuilder {
      */
     default Page<MenuVO> buildVOPageByBOPage(Page<MenuBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
+    }
+
+    default List<MenuTreeVO> buildTreeVOListByBOList(List<MenuTreeBO> entityBOList) {
+        return entityBOList.stream().map(this::buildTreeVOByBO).toList();
+    }
+
+    default MenuTreeVO buildTreeVOByBO(MenuTreeBO entityBO) {
+        MenuVO flat = buildVOByBO(entityBO);
+        MenuTreeVO out = new MenuTreeVO();
+        out.setId(flat.getId());
+        out.setParentMenuId(flat.getParentMenuId());
+        out.setMenuTypeFlag(flat.getMenuTypeFlag());
+        out.setMenuName(flat.getMenuName());
+        out.setMenuCode(flat.getMenuCode());
+        out.setMenuLevel(flat.getMenuLevel());
+        out.setMenuIndex(flat.getMenuIndex());
+        out.setMenuExt(flat.getMenuExt());
+        out.setEnableFlag(flat.getEnableFlag());
+        out.setRemark(flat.getRemark());
+        out.setCreatorId(flat.getCreatorId());
+        out.setCreatorName(flat.getCreatorName());
+        out.setCreateTime(flat.getCreateTime());
+        out.setOperatorId(flat.getOperatorId());
+        out.setOperatorName(flat.getOperatorName());
+        out.setOperateTime(flat.getOperateTime());
+        if (Objects.nonNull(entityBO.getChildren())) {
+            out.setChildren(buildTreeVOListByBOList(entityBO.getChildren()));
+        }
+        return out;
     }
 
 }

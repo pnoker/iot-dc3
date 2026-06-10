@@ -19,7 +19,9 @@ package io.github.pnoker.common.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
+import io.github.pnoker.common.auth.entity.bo.RoleTreeBO;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
+import io.github.pnoker.common.auth.entity.vo.RoleTreeVO;
 import io.github.pnoker.common.auth.entity.vo.RoleVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RoleExt;
@@ -177,6 +179,32 @@ public interface RoleBuilder {
      */
     default Page<RoleVO> buildVOPageByBOPage(Page<RoleBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
+    }
+
+    default List<RoleTreeVO> buildTreeVOListByBOList(List<RoleTreeBO> entityBOList) {
+        return entityBOList.stream().map(this::buildTreeVOByBO).toList();
+    }
+
+    default RoleTreeVO buildTreeVOByBO(RoleTreeBO entityBO) {
+        RoleVO flat = buildVOByBO(entityBO);
+        RoleTreeVO out = new RoleTreeVO();
+        out.setId(flat.getId());
+        out.setParentRoleId(flat.getParentRoleId());
+        out.setRoleName(flat.getRoleName());
+        out.setRoleCode(flat.getRoleCode());
+        out.setRoleExt(flat.getRoleExt());
+        out.setEnableFlag(flat.getEnableFlag());
+        out.setRemark(flat.getRemark());
+        out.setCreatorId(flat.getCreatorId());
+        out.setCreatorName(flat.getCreatorName());
+        out.setCreateTime(flat.getCreateTime());
+        out.setOperatorId(flat.getOperatorId());
+        out.setOperatorName(flat.getOperatorName());
+        out.setOperateTime(flat.getOperateTime());
+        if (Objects.nonNull(entityBO.getChildren())) {
+            out.setChildren(buildTreeVOListByBOList(entityBO.getChildren()));
+        }
+        return out;
     }
 
 }

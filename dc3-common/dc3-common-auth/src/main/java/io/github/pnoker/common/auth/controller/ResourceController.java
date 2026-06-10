@@ -44,7 +44,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import io.swagger.v3.oas.annotations.Operation;
@@ -142,41 +141,8 @@ public class ResourceController implements BaseController {
         // Read access to global resource data is open to all authenticated users.
         return async(() -> {
             List<ResourceTreeBO> entityBOList = resourceService.listTree(entityQuery);
-            List<ResourceTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
-            for (ResourceTreeBO node : entityBOList) {
-                entityVOList.add(toTreeVO(node));
-            }
-            return R.ok(entityVOList);
+            return R.ok(resourceBuilder.buildTreeVOListByBOList(entityBOList));
         });
-    }
-
-    private ResourceTreeVO toTreeVO(ResourceTreeBO node) {
-        ResourceVO flat = resourceBuilder.buildVOByBO(node);
-        ResourceTreeVO out = new ResourceTreeVO();
-        out.setId(flat.getId());
-        out.setParentResourceId(flat.getParentResourceId());
-        out.setResourceName(flat.getResourceName());
-        out.setResourceCode(flat.getResourceCode());
-        out.setResourceTypeFlag(flat.getResourceTypeFlag());
-        out.setResourceScopeFlag(flat.getResourceScopeFlag());
-        out.setEntityId(flat.getEntityId());
-        out.setResourceExt(flat.getResourceExt());
-        out.setEnableFlag(flat.getEnableFlag());
-        out.setRemark(flat.getRemark());
-        out.setCreatorId(flat.getCreatorId());
-        out.setCreatorName(flat.getCreatorName());
-        out.setCreateTime(flat.getCreateTime());
-        out.setOperatorId(flat.getOperatorId());
-        out.setOperatorName(flat.getOperatorName());
-        out.setOperateTime(flat.getOperateTime());
-        if (Objects.nonNull(node.getChildren())) {
-            List<ResourceTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
-            for (ResourceTreeBO child : node.getChildren()) {
-                childVOs.add(toTreeVO(child));
-            }
-            out.setChildren(childVOs);
-        }
-        return out;
     }
 
 }

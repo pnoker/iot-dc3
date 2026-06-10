@@ -31,10 +31,7 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.manager.service.DeviceService;
-import io.github.pnoker.common.manager.service.DriverService;
-import io.github.pnoker.common.manager.service.PointService;
-import io.github.pnoker.common.manager.service.ProfileService;
+import io.github.pnoker.common.manager.service.EntityTenantService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotNull;
@@ -75,13 +72,7 @@ public class LabelBindController implements BaseController {
 
     private final LabelService labelService;
 
-    private final DriverService driverService;
-
-    private final ProfileService profileService;
-
-    private final PointService pointService;
-
-    private final DeviceService deviceService;
+    private final EntityTenantService entityTenantService;
 
     /**
      * @param entityVO {@link LabelBindVO}
@@ -171,17 +162,7 @@ public class LabelBindController implements BaseController {
         if (!Objects.equals(labelBO.getEntityTypeFlag(), entityTypeFlag)) {
             throw new NotFoundException("Resource does not exist");
         }
-        requireEntityTenant(tenantId, entityTypeFlag, entityBO.getEntityId());
-    }
-
-    private void requireEntityTenant(Long tenantId, EntityTypeEnum entityTypeFlag, Long entityId) {
-        switch (entityTypeFlag) {
-            case DRIVER -> requireTenant(tenantId, driverService.getById(entityId));
-            case PROFILE -> requireTenant(tenantId, profileService.getById(entityId));
-            case POINT -> requireTenant(tenantId, pointService.getById(entityId));
-            case DEVICE -> requireTenant(tenantId, deviceService.getById(entityId));
-            default -> throw new NotFoundException("Resource does not exist");
-        }
+        entityTenantService.requireEntityTenant(tenantId, entityTypeFlag, entityBO.getEntityId());
     }
 
 }

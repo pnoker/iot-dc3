@@ -19,7 +19,9 @@ package io.github.pnoker.common.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
+import io.github.pnoker.common.auth.entity.bo.ResourceTreeBO;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
+import io.github.pnoker.common.auth.entity.vo.ResourceTreeVO;
 import io.github.pnoker.common.auth.entity.vo.ResourceVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.ResourceExt;
@@ -198,6 +200,36 @@ public interface ResourceBuilder {
      */
     default Page<ResourceVO> buildVOPageByBOPage(Page<ResourceBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
+    }
+
+    default List<ResourceTreeVO> buildTreeVOListByBOList(List<ResourceTreeBO> entityBOList) {
+        return entityBOList.stream().map(this::buildTreeVOByBO).toList();
+    }
+
+    default ResourceTreeVO buildTreeVOByBO(ResourceTreeBO entityBO) {
+        ResourceVO flat = buildVOByBO(entityBO);
+        ResourceTreeVO out = new ResourceTreeVO();
+        out.setId(flat.getId());
+        out.setParentResourceId(flat.getParentResourceId());
+        out.setResourceName(flat.getResourceName());
+        out.setResourceCode(flat.getResourceCode());
+        out.setServiceName(flat.getServiceName());
+        out.setResourceTypeFlag(flat.getResourceTypeFlag());
+        out.setResourceScopeFlag(flat.getResourceScopeFlag());
+        out.setEntityId(flat.getEntityId());
+        out.setResourceExt(flat.getResourceExt());
+        out.setEnableFlag(flat.getEnableFlag());
+        out.setRemark(flat.getRemark());
+        out.setCreatorId(flat.getCreatorId());
+        out.setCreatorName(flat.getCreatorName());
+        out.setCreateTime(flat.getCreateTime());
+        out.setOperatorId(flat.getOperatorId());
+        out.setOperatorName(flat.getOperatorName());
+        out.setOperateTime(flat.getOperateTime());
+        if (Objects.nonNull(entityBO.getChildren())) {
+            out.setChildren(buildTreeVOListByBOList(entityBO.getChildren()));
+        }
+        return out;
     }
 
 }

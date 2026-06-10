@@ -46,7 +46,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -148,11 +147,7 @@ public class MenuController implements BaseController {
         return getUserHeader().flatMap(header -> async(() -> {
             List<MenuTreeBO> entityBOList = menuService.listTree(entityQuery);
             entityBOList = filterByUserMenuResources(entityBOList, header.getUserId(), header.getTenantId());
-            List<MenuTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
-            for (MenuTreeBO node : entityBOList) {
-                entityVOList.add(toTreeVO(node));
-            }
-            return R.ok(entityVOList);
+            return R.ok(menuBuilder.buildTreeVOListByBOList(entityBOList));
         }));
     }
 
@@ -183,35 +178,6 @@ public class MenuController implements BaseController {
         }
         node.setChildren(children);
         return node;
-    }
-
-    private MenuTreeVO toTreeVO(MenuTreeBO node) {
-        MenuVO flat = menuBuilder.buildVOByBO(node);
-        MenuTreeVO out = new MenuTreeVO();
-        out.setId(flat.getId());
-        out.setParentMenuId(flat.getParentMenuId());
-        out.setMenuTypeFlag(flat.getMenuTypeFlag());
-        out.setMenuName(flat.getMenuName());
-        out.setMenuCode(flat.getMenuCode());
-        out.setMenuLevel(flat.getMenuLevel());
-        out.setMenuIndex(flat.getMenuIndex());
-        out.setMenuExt(flat.getMenuExt());
-        out.setEnableFlag(flat.getEnableFlag());
-        out.setRemark(flat.getRemark());
-        out.setCreatorId(flat.getCreatorId());
-        out.setCreatorName(flat.getCreatorName());
-        out.setCreateTime(flat.getCreateTime());
-        out.setOperatorId(flat.getOperatorId());
-        out.setOperatorName(flat.getOperatorName());
-        out.setOperateTime(flat.getOperateTime());
-        if (Objects.nonNull(node.getChildren())) {
-            List<MenuTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
-            for (MenuTreeBO child : node.getChildren()) {
-                childVOs.add(toTreeVO(child));
-            }
-            out.setChildren(childVOs);
-        }
-        return out;
     }
 
 }

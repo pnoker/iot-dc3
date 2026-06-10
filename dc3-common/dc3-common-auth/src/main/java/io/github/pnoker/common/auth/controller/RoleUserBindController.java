@@ -20,7 +20,6 @@ package io.github.pnoker.common.auth.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleUserBindBO;
-import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.common.auth.entity.builder.RoleUserBindBuilder;
@@ -36,7 +35,6 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -90,7 +88,7 @@ public class RoleUserBindController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleUserBindBO entityBO = roleUserBindBuilder.buildBOByVO(entityVO);
             requireTenant(tenantId, roleService.getById(entityBO.getRoleId()));
-            requireTenantMember(tenantId, entityBO.getUserId());
+            tenantBindService.requireTenantMember(tenantId, entityBO.getUserId());
             roleUserBindService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
@@ -103,7 +101,7 @@ public class RoleUserBindController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleUserBindBO entityBO = roleUserBindService.getById(id);
             requireTenant(tenantId, roleService.getById(entityBO.getRoleId()));
-            requireTenantMember(tenantId, entityBO.getUserId());
+            tenantBindService.requireTenantMember(tenantId, entityBO.getUserId());
             roleUserBindService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -128,7 +126,7 @@ public class RoleUserBindController implements BaseController {
                                                 @Parameter(description = "Legacy tenant ID parameter; ignored in favor of authenticated tenant context")
                                                 @RequestParam(value = "tenant_id", required = false) Long ignoredTenantId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenantMember(tenantId, userId);
+            tenantBindService.requireTenantMember(tenantId, userId);
             List<RoleBO> entityBOList = roleUserBindService.listRoleByTenantIdAndUserId(tenantId, userId);
             List<RoleVO> entityVOList = roleBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
@@ -148,13 +146,6 @@ public class RoleUserBindController implements BaseController {
             List<UserVO> entityVOList = userBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));
-    }
-
-    private void requireTenantMember(Long tenantId, Long userId) {
-        TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, userId);
-        if (Objects.isNull(tenantBind)) {
-            throw new NotFoundException("Resource does not exist");
-        }
     }
 
 }

@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
-import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.auth.entity.builder.ResourceBuilder;
 import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.common.auth.entity.builder.RoleResourceBindBuilder;
@@ -36,7 +35,6 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -136,7 +134,7 @@ public class RoleResourceBindController implements BaseController {
     @GetMapping("/list_resource_by_user")
     public Mono<R<List<ResourceVO>>> listResourceByUser(@NotNull @RequestParam(value = "user_id") Long userId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenantMember(tenantId, userId);
+            tenantBindService.requireTenantMember(tenantId, userId);
             List<ResourceBO> entityBOList = roleResourceBindService.listResourceByUserId(userId, tenantId);
             List<ResourceVO> entityVOList = resourceBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
@@ -152,13 +150,6 @@ public class RoleResourceBindController implements BaseController {
             List<RoleVO> entityVOList = roleBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));
-    }
-
-    private void requireTenantMember(Long tenantId, Long userId) {
-        TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, userId);
-        if (Objects.isNull(tenantBind)) {
-            throw new NotFoundException("Resource does not exist");
-        }
     }
 
 }

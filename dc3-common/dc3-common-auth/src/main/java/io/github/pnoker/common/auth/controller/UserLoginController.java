@@ -18,7 +18,6 @@
 package io.github.pnoker.common.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.common.auth.entity.builder.UserLoginBuilder;
 import io.github.pnoker.common.auth.entity.query.UserLoginQuery;
@@ -83,7 +82,7 @@ public class UserLoginController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserLoginVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
-            requireTenantMember(tenantId, entityBO.getUserId());
+            tenantBindService.requireTenantMember(tenantId, entityBO.getUserId());
             userLoginService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
@@ -101,7 +100,7 @@ public class UserLoginController implements BaseController {
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.getById(id);
-            requireTenantMember(tenantId, entityBO.getUserId());
+            tenantBindService.requireTenantMember(tenantId, entityBO.getUserId());
             userLoginService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -124,8 +123,8 @@ public class UserLoginController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
             UserLoginBO current = userLoginService.getById(entityBO.getId());
-            requireTenantMember(tenantId, current.getUserId());
-            requireTenantMember(tenantId, entityBO.getUserId());
+            tenantBindService.requireTenantMember(tenantId, current.getUserId());
+            tenantBindService.requireTenantMember(tenantId, entityBO.getUserId());
             userLoginService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -165,7 +164,7 @@ public class UserLoginController implements BaseController {
     public Mono<R<UserLoginVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserLoginBO entityBO = userLoginService.getById(id);
-            requireTenantMember(tenantId, entityBO.getUserId());
+            tenantBindService.requireTenantMember(tenantId, entityBO.getUserId());
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -188,7 +187,7 @@ public class UserLoginController implements BaseController {
             if (Objects.isNull(entityBO)) {
                 throw new NotFoundException("Resource does not exist");
             }
-            requireTenantMember(tenantId, entityBO.getUserId());
+            tenantBindService.requireTenantMember(tenantId, entityBO.getUserId());
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -229,13 +228,6 @@ public class UserLoginController implements BaseController {
             boolean available = userLoginService.isLoginNameAvailable(name, tenantId);
             return R.ok(available);
         }));
-    }
-
-    private void requireTenantMember(Long tenantId, Long userId) {
-        TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, userId);
-        if (Objects.isNull(tenantBind)) {
-            throw new NotFoundException("Resource does not exist");
-        }
     }
 
 }
