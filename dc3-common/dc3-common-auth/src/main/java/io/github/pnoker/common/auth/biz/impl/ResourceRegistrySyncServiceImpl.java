@@ -321,11 +321,21 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         Map<Long, ResourceDO> resourceByEntityId = loadResourcesByEntityIds(entityIds);
         List<ResourceDO> resourcesToInsert = new ArrayList<>();
         List<ResourceDO> resourcesToUpdate = new ArrayList<>();
+        // Deduplicate by resource_code within the batch so multiple APIs that share
+        // the same permission key map to a single resource row.
+        Set<String> seenResourceKeys = new LinkedHashSet<>();
         for (ApiDO api : apis) {
             Long groupNodeId = groupNodeIds.get(Objects.requireNonNullElse(api.getApiGroup(), ""));
             ResourceDO resourceDO = resourceByEntityId.get(api.getId());
             if (Objects.isNull(resourceDO)) {
-                resourcesToInsert.add(buildLeafResourceDO(api, groupNodeId));
+                ResourceDO leaf = buildLeafResourceDO(api, groupNodeId);
+                String key = leaf.getResourceCode() + "|" + leaf.getServiceName();
+                if (seenResourceKeys.add(key)) {
+                    resourcesToInsert.add(leaf);
+                } else {
+                    log.debug("Skipping duplicate resource_code in sync batch: resourceCode={}, serviceName={}, apiCode={}",
+                            leaf.getResourceCode(), leaf.getServiceName(), api.getApiCode());
+                }
                 continue;
             }
             if (needsLeafResourceUpdate(resourceDO, api, groupNodeId)) {
