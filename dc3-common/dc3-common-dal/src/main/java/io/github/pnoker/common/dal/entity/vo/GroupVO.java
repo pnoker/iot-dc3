@@ -58,7 +58,7 @@ public class GroupVO extends BaseVO {
     /**
      * Group type flag.
      */
-    @Schema(description = "group type flag")
+    @Schema(description = "Group type enum")
     @NotNull(message = "Group type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeEnum groupTypeFlag;
 
@@ -92,7 +92,7 @@ public class GroupVO extends BaseVO {
     /**
      * Enable status flag.
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
 }

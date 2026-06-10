@@ -51,19 +51,19 @@ public class DictionaryVO implements Serializable {
     /**
      * Dictionary type.
      */
-    @Schema(description = "type")
+    @Schema(description = "Dictionary type")
     private String type;
 
     /**
      * Dictionary label name.
      */
-    @Schema(description = "label")
+    @Schema(description = "Dictionary label")
     private String label;
 
     /**
      * Dictionary label value.
      */
-    @Schema(description = "value")
+    @Schema(description = "Dictionary value")
     private String value;
 
     /**
@@ -75,13 +75,13 @@ public class DictionaryVO implements Serializable {
     /**
      * Whether the dictionary node is expanded.
      */
-    @Schema(description = "expand")
+    @Schema(description = "Whether the dictionary node is expanded")
     private boolean expand;
 
     /**
      * Child dictionary nodes.
      */
-    @Schema(description = "children")
+    @Schema(description = "Child dictionary nodes")
     private List<DictionaryVO> children;
 
 }

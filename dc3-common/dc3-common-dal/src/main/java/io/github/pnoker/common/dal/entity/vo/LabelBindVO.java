@@ -50,7 +50,7 @@ public class LabelBindVO extends BaseVO {
     /**
      * Entity type flag.
      */
-    @Schema(description = "entity type flag")
+    @Schema(description = "Entity type enum")
     @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeEnum entityTypeFlag;
 
