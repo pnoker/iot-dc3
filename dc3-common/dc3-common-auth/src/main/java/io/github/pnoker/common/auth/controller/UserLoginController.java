@@ -138,7 +138,7 @@ public class UserLoginController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('user_login', 'list')")
-    @Operation(summary = "用户登录 - rest password", description = "用户登录 - rest password")
+    @Operation(summary = "重置用户登录密码", description = "重置指定用户登录账号的密码")
     @PostMapping("/reset")
     public Mono<R<Boolean>> restPassword(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {

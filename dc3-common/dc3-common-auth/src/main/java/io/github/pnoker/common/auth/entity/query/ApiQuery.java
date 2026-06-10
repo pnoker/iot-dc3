@@ -44,7 +44,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Api query parameters")
+@Schema(description = "API query parameters")
 public class ApiQuery implements Serializable {
 
     @Serial
@@ -65,7 +65,7 @@ public class ApiQuery implements Serializable {
     /**
      * ApiType
      */
-    @Schema(description = "API type flag", example = "GET")
+    @Schema(description = "API method enum", example = "GET")
     private ApiTypeEnum apiTypeFlag;
 
     /**
@@ -89,7 +89,7 @@ public class ApiQuery implements Serializable {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

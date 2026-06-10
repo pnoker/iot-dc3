@@ -77,13 +77,13 @@ public class DriverTokenQuery implements Serializable {
     /**
      *
      */
-    @Schema(description = "Token expiration flag", example = "PERMANENT")
+    @Schema(description = "Token expiration type enum", example = "PERMANENT")
     private ExpireTypeEnum expireFlag;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }
