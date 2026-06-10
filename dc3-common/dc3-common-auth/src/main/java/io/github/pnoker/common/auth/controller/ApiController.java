@@ -23,6 +23,7 @@ import io.github.pnoker.common.auth.entity.builder.ApiBuilder;
 import io.github.pnoker.common.auth.entity.query.ApiQuery;
 import io.github.pnoker.common.auth.entity.vo.ApiVO;
 import io.github.pnoker.common.auth.service.ApiService;
+import io.github.pnoker.common.auth.security.AdminChecker;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
@@ -65,39 +66,41 @@ public class ApiController implements BaseController {
 
     private final ApiService apiService;
 
+    private final AdminChecker adminChecker;
+
     @PreAuthorize("@perm.can('api', 'add')")
     @Operation(summary = "Add API Endpoint", description = "Create an API endpoint record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
-        // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
-        return async(() -> {
+        return getUserHeader().flatMap(header -> async(() -> {
+            adminChecker.assertSystemAdmin(header.getTenantId());
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
             apiService.add(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
-        });
+        }));
     }
 
     @PreAuthorize("@perm.can('api', 'delete')")
     @Operation(summary = "Delete API Endpoint", description = "Delete an API endpoint record by ID")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
-        // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
-        return async(() -> {
+        return getUserHeader().flatMap(header -> async(() -> {
+            adminChecker.assertSystemAdmin(header.getTenantId());
             apiService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     @PreAuthorize("@perm.can('api', 'update')")
     @Operation(summary = "Update API Endpoint", description = "Update an API endpoint record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ApiVO entityVO) {
-        // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
-        return async(() -> {
+        return getUserHeader().flatMap(header -> async(() -> {
+            adminChecker.assertSystemAdmin(header.getTenantId());
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
             apiService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
-        });
+        }));
     }
 
     @PreAuthorize("@perm.can('api', 'get')")

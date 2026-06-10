@@ -25,6 +25,7 @@ import io.github.pnoker.common.auth.entity.query.ResourceQuery;
 import io.github.pnoker.common.auth.entity.vo.ResourceTreeVO;
 import io.github.pnoker.common.auth.entity.vo.ResourceVO;
 import io.github.pnoker.common.auth.service.ResourceService;
+import io.github.pnoker.common.auth.security.AdminChecker;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
@@ -68,12 +69,14 @@ public class ResourceController implements BaseController {
 
     private final ResourceService resourceService;
 
+    private final AdminChecker adminChecker;
+
     @PreAuthorize("@perm.can('resource', 'add')")
     @Operation(summary = "Add Resource", description = "Create a resource record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ResourceVO entityVO) {
-        // TODO: RBAC — restrict to administrator role. Resources are system-global entities managed by platform admins.
         return getUserHeader().flatMap(header -> async(() -> {
+            adminChecker.assertSystemAdmin(header.getTenantId());
             ResourceBO entityBO = resourceBuilder.buildBOByVO(entityVO);
             entityBO.setCreatorId(header.getUserId());
             entityBO.setCreatorName(header.getNickName());
@@ -88,19 +91,19 @@ public class ResourceController implements BaseController {
     @Operation(summary = "Delete Resource", description = "Delete a resource record by ID")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
-        // TODO: RBAC — restrict to administrator role. Resources are system-global entities managed by platform admins.
-        return async(() -> {
+        return getUserHeader().flatMap(header -> async(() -> {
+            adminChecker.assertSystemAdmin(header.getTenantId());
             resourceService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     @PreAuthorize("@perm.can('resource', 'update')")
     @Operation(summary = "Update Resource", description = "Update a resource record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ResourceVO entityVO) {
-        // TODO: RBAC — restrict to administrator role. Resources are system-global entities managed by platform admins.
         return getUserHeader().flatMap(header -> async(() -> {
+            adminChecker.assertSystemAdmin(header.getTenantId());
             ResourceBO entityBO = resourceBuilder.buildBOByVO(entityVO);
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());

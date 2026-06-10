@@ -26,6 +26,7 @@ import io.github.pnoker.common.auth.entity.query.MenuQuery;
 import io.github.pnoker.common.auth.entity.vo.MenuTreeVO;
 import io.github.pnoker.common.auth.entity.vo.MenuVO;
 import io.github.pnoker.common.auth.service.MenuService;
+import io.github.pnoker.common.auth.security.AdminChecker;
 import io.github.pnoker.common.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
@@ -72,14 +73,16 @@ public class MenuController implements BaseController {
 
     private final MenuService menuService;
 
+    private final AdminChecker adminChecker;
+
     private final RoleResourceBindService roleResourceBindService;
 
     @PreAuthorize("@perm.can('menu', 'add')")
     @Operation(summary = "Add Menu", description = "Create a menu record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MenuVO entityVO) {
-        // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
         return getUserHeader().flatMap(header -> async(() -> {
+            adminChecker.assertSystemAdmin(header.getTenantId());
             MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
             entityBO.setCreatorId(header.getUserId());
             entityBO.setCreatorName(header.getNickName());
@@ -94,19 +97,19 @@ public class MenuController implements BaseController {
     @Operation(summary = "Delete Menu", description = "Delete a menu record by ID")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
-        // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
-        return async(() -> {
+        return getUserHeader().flatMap(header -> async(() -> {
+            adminChecker.assertSystemAdmin(header.getTenantId());
             menuService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
-        });
+        }));
     }
 
     @PreAuthorize("@perm.can('menu', 'update')")
     @Operation(summary = "Update Menu", description = "Update a menu record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MenuVO entityVO) {
-        // TODO: RBAC — restrict to administrator role. Menus are system-global entities managed by platform admins.
         return getUserHeader().flatMap(header -> async(() -> {
+            adminChecker.assertSystemAdmin(header.getTenantId());
             MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
