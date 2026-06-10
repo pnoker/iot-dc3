@@ -48,7 +48,7 @@ public class RuleVO extends BaseVO {
     /**
      * Alarm target type flag
      */
-    @Schema(description = "alarm target type flag")
+    @Schema(description = "Alarm target type enum")
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     /**
@@ -84,13 +84,13 @@ public class RuleVO extends BaseVO {
     /**
      * Alarm rule
      */
-    @Schema(description = "rule extension information (JSON)")
+    @Schema(description = "rule extension information in JSON format")
     private RuleExt ruleExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
 }

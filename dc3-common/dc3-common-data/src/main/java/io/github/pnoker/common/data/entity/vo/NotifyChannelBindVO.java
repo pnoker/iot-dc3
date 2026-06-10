@@ -52,11 +52,11 @@ public class NotifyChannelBindVO extends BaseVO {
 
     private Long channelId;
 
-    @Schema(description = "bind extension information (JSON)")
+    @Schema(description = "bind extension information in JSON format")
 
     private NotifyChannelBindExt bindExt;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

@@ -63,7 +63,7 @@ public class PointCommandHistoryVO implements Serializable {
 
     private Long tenantId;
 
-    @Schema(description = "type")
+    @Schema(description = "Point command type")
 
     private PointCommandTypeEnum type;
 
@@ -94,7 +94,7 @@ public class PointCommandHistoryVO implements Serializable {
 
     private String errorMessage;
 
-    @Schema(description = "source")
+    @Schema(description = "Source identifier")
 
     private PointCommandSourceEnum source;
 
@@ -118,7 +118,7 @@ public class PointCommandHistoryVO implements Serializable {
 
     private LocalDateTime expireTime;
 
-    @Schema(description = "schema version")
+    @Schema(description = "Schema version")
 
     private Short schemaVersion;
 

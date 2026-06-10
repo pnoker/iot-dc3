@@ -53,7 +53,7 @@ public class RuleStateVO extends BaseVO {
 
     private Long ruleId;
 
-    @Schema(description = "alarm target type flag")
+    @Schema(description = "Alarm target type enum")
 
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
@@ -61,11 +61,11 @@ public class RuleStateVO extends BaseVO {
 
     private Long entityId;
 
-    @Schema(description = "fingerprint")
+    @Schema(description = "Alarm fingerprint")
 
     private String fingerprint;
 
-    @Schema(description = "entity state flag")
+    @Schema(description = "Entity state enum")
 
     private RuleStatusEnum entityStateFlag;
 
@@ -97,7 +97,7 @@ public class RuleStateVO extends BaseVO {
 
     private Long alarmId;
 
-    @Schema(description = "entity state extension information (JSON)")
+    @Schema(description = "entity state extension information in JSON format")
 
     private RuleStateExt entityStateExt;
 

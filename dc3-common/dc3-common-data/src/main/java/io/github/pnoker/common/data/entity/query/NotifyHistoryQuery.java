@@ -80,15 +80,15 @@ public class NotifyHistoryQuery implements Serializable {
 
     private Long alarmId;
 
-    @Schema(description = "channel type flag")
+    @Schema(description = "Notification channel type enum")
 
     private NotifyChannelTypeEnum channelTypeFlag;
 
-    @Schema(description = "target")
+    @Schema(description = "Notification target")
 
     private String target;
 
-    @Schema(description = "status flag")
+    @Schema(description = "Status enum")
 
     private NotifyHistoryStatusEnum statusFlag;
 

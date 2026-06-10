@@ -66,13 +66,13 @@ public class MessageVO extends BaseVO {
     /**
      * Alarm message template content
      */
-    @Schema(description = "message extension information (JSON)")
+    @Schema(description = "message extension information in JSON format")
     private MessageExt messageExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
 }

@@ -60,7 +60,7 @@ public class EventHistoryController implements BaseController {
     private final EventHistoryService eventHistoryService;
 
     @PreAuthorize("@perm.can('event_history', 'list')")
-    @Operation(summary = "事件历史 - report", description = "事件历史 - report")
+    @Operation(summary = "上报事件历史", description = "上报设备事件并返回事件历史记录ID")
     @PostMapping("/report")
     public Mono<R<String>> report(@Validated @RequestBody EventReportVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -72,7 +72,7 @@ public class EventHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_history', 'get')")
-    @Operation(summary = "查询EventHistory", description = "根据条件查询EventHistory")
+    @Operation(summary = "查询事件历史", description = "根据记录ID查询事件历史详细信息")
     @GetMapping("/get_by_record_id")
     public Mono<R<EventHistoryVO>> getByRecordId(@NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() ->
@@ -80,7 +80,7 @@ public class EventHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_history', 'list')")
-    @Operation(summary = "查询EventHistory列表", description = "分页查询EventHistory列表")
+    @Operation(summary = "查询事件历史列表", description = "分页查询事件历史列表")
     @PostMapping("/list")
     public Mono<R<Page<EventHistoryVO>>> list(@RequestBody(required = false) EventHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

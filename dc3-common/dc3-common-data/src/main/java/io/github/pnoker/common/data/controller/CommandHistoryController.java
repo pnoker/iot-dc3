@@ -60,7 +60,7 @@ public class CommandHistoryController implements BaseController {
     private final CommandHistoryService commandHistoryService;
 
     @PreAuthorize("@perm.can('command_history', 'add')")
-    @Operation(summary = "执行CommandHistory调用", description = "执行CommandHistory指令调用")
+    @Operation(summary = "执行指令调用", description = "执行设备指令调用并返回指令历史记录ID")
     @PostMapping("/call")
     public Mono<R<String>> call(@Validated @RequestBody CommandCallVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -72,7 +72,7 @@ public class CommandHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_history', 'get')")
-    @Operation(summary = "查询CommandHistory", description = "根据条件查询CommandHistory")
+    @Operation(summary = "查询指令历史", description = "根据记录ID查询指令历史详细信息")
     @GetMapping("/get_by_record_id")
     public Mono<R<CommandHistoryVO>> getByRecordId(@NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() ->
@@ -80,7 +80,7 @@ public class CommandHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_history', 'list')")
-    @Operation(summary = "查询CommandHistory列表", description = "分页查询CommandHistory列表")
+    @Operation(summary = "查询指令历史列表", description = "分页查询指令历史列表")
     @PostMapping("/list")
     public Mono<R<Page<CommandHistoryVO>>> list(@RequestBody(required = false) CommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

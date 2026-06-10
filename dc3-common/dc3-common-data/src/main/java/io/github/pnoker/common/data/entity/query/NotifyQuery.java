@@ -79,7 +79,7 @@ public class NotifyQuery implements Serializable {
     /**
      * Auto confirm flag
      */
-    @Schema(description = "auto confirm flag")
+    @Schema(description = "Auto-confirm flag enum")
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
@@ -91,7 +91,7 @@ public class NotifyQuery implements Serializable {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
 }

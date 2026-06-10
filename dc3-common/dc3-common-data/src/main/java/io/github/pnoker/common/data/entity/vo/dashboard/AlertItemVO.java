@@ -59,10 +59,10 @@ public class AlertItemVO implements Serializable {
     @Schema(description = "point ID, present when source is device")
     private Long pointId;
 
-    @Schema(description = "Alarm type flag", example = "OFFLINE")
+    @Schema(description = "Alarm type enum", example = "OFFLINE")
     private AlarmTypeEnum alarmTypeFlag;
 
-    @Schema(description = "Confirm flag", example = "UNCONFIRMED")
+    @Schema(description = "Confirm flag enum", example = "UNCONFIRMED")
     private ConfirmFlagEnum confirmFlag;
 
     @Schema(description = "alarm creation time")

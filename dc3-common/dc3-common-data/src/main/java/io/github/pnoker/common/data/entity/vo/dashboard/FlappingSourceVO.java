@@ -51,7 +51,7 @@ public class FlappingSourceVO implements Serializable {
     @Schema(description = "source entity ID")
     private long sourceId;
 
-    @Schema(description = "alarm type flag")
+    @Schema(description = "Alarm type enum")
     private int alarmTypeFlag;
 
     @Schema(description = "number of times this source/type fired in the window")

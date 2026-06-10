@@ -74,7 +74,7 @@ public class CommandHistoryVO implements Serializable {
 
     private String commandCode;
 
-    @Schema(description = "param values")
+    @Schema(description = "Command parameter values")
 
     private String paramValues;
 
@@ -82,7 +82,7 @@ public class CommandHistoryVO implements Serializable {
 
     private String resultValues;
 
-    @Schema(description = "config snapshot")
+    @Schema(description = "Command configuration snapshot")
 
     private String configSnapshot;
 
@@ -97,7 +97,7 @@ public class CommandHistoryVO implements Serializable {
 
     private String errorMessage;
 
-    @Schema(description = "source")
+    @Schema(description = "Source identifier")
 
     private CommandHistorySourceEnum source;
 
@@ -121,7 +121,7 @@ public class CommandHistoryVO implements Serializable {
 
     private LocalDateTime expireTime;
 
-    @Schema(description = "schema version")
+    @Schema(description = "Schema version")
 
     private Short schemaVersion;
 
