@@ -37,9 +37,9 @@ import java.util.Objects;
  * crafting their own {@code X-Auth-User} header.
  * <p>
  * The shared secret is read from {@code dc3.auth.hmac.secret} (or the {@code
- * AUTH_HMAC_SECRET} environment variable). When neither is set, signing is disabled and a
- * loud warning is emitted at startup — backends fall back to the unverified behaviour, so
- * existing deployments don't break, but production should always set a strong secret.
+ * AUTH_HMAC_SECRET} environment variable). When neither is set in dev/test, signing is
+ * disabled and a loud warning is emitted at startup. Protected environments fail fast
+ * before this signer is created.
  *
  * @author pnoker
  * @version 2025.9.0

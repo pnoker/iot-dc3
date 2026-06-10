@@ -38,7 +38,7 @@ public class HmacAuthProperties {
 
     /**
      * Shared HMAC secret. Must be configured via dc3.auth.hmac.secret property.
-     * When blank, signing is disabled (development only).
+     * When blank, signing is disabled in dev/test only; pre/pro fail fast.
      */
     private String secret;
 

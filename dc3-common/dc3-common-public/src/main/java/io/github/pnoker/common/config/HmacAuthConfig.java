@@ -26,6 +26,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Auto-configuration for the shared {@link HmacAuthSigner} bean. Picked up by every
  * application that depends on {@code dc3-common-public} via its
@@ -40,12 +45,43 @@ import org.springframework.core.env.Environment;
 @EnableConfigurationProperties(HmacAuthProperties.class)
 public class HmacAuthConfig {
 
+    private static final String WEAK_DEFAULT_SECRET = "io.github.pnoker.dc3";
+
     @Bean
     @ConditionalOnMissingBean
     public HmacAuthSigner hmacAuthSigner(HmacAuthProperties properties, Environment environment) {
         String secret = StringUtils.defaultIfBlank(properties.getSecret(),
                 environment.getProperty(EnvironmentConstant.AUTH_HMAC_SECRET_ENV, ""));
+        validateSecret(secret, environment);
         return new HmacAuthSigner(secret);
+    }
+
+    private void validateSecret(String secret, Environment environment) {
+        if (!isProtectedEnvironment(environment)) {
+            return;
+        }
+        if (StringUtils.isBlank(secret)) {
+            throw new IllegalStateException(EnvironmentConstant.AUTH_HMAC_SECRET_PROPERTY + " or "
+                    + EnvironmentConstant.AUTH_HMAC_SECRET_ENV
+                    + " must be configured in pre/pro environments");
+        }
+        if (WEAK_DEFAULT_SECRET.equals(secret)) {
+            throw new IllegalStateException(EnvironmentConstant.AUTH_HMAC_SECRET_PROPERTY
+                    + " must not use the default development secret in pre/pro environments");
+        }
+    }
+
+    private boolean isProtectedEnvironment(Environment environment) {
+        Set<String> names = Arrays.stream(environment.getActiveProfiles())
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(profile -> !profile.isEmpty())
+                .collect(Collectors.toSet());
+        String springEnv = environment.getProperty(EnvironmentConstant.SPRING_ENV);
+        if (StringUtils.isNotBlank(springEnv)) {
+            names.add(springEnv.trim());
+        }
+        return names.contains(EnvironmentConstant.ENV_PRE) || names.contains(EnvironmentConstant.ENV_PRO);
     }
 
 }

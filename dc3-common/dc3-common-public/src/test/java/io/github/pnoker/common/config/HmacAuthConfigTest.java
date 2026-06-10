@@ -83,4 +83,29 @@ class HmacAuthConfigTest {
                 .run(context -> assertThat(context.getBean(HmacAuthSigner.class)).isSameAs(customSigner));
     }
 
+    @Test
+    void hmacAuthSignerFailsFastWithoutSecretInProtectedSpringEnv() {
+        contextRunner.withPropertyValues(EnvironmentConstant.SPRING_ENV + "=pro")
+                .run(context -> assertThat(context).hasFailed());
+    }
+
+    @Test
+    void hmacAuthSignerFailsFastWithWeakDefaultSecretInProtectedSpringEnv() {
+        contextRunner.withPropertyValues(
+                        EnvironmentConstant.SPRING_ENV + "=pre",
+                        EnvironmentConstant.AUTH_HMAC_SECRET_PROPERTY + "=io.github.pnoker.dc3")
+                .run(context -> assertThat(context).hasFailed());
+    }
+
+    @Test
+    void hmacAuthSignerAllowsStrongSecretInProtectedActiveProfile() {
+        contextRunner.withPropertyValues(
+                        "spring.profiles.active=pro",
+                        EnvironmentConstant.AUTH_HMAC_SECRET_PROPERTY + "=strong-secret")
+                .run(context -> {
+                    HmacAuthSigner signer = context.getBean(HmacAuthSigner.class);
+                    assertThat(signer.isEnabled()).isTrue();
+                });
+    }
+
 }
