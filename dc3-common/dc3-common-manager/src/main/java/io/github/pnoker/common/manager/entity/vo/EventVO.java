@@ -61,17 +61,17 @@ public class EventVO extends BaseVO {
 
     private String eventCode;
 
-    @Schema(description = "event type flag")
+    @Schema(description = "Event type enum")
 
     @NotNull(message = "Event type can't be empty", groups = {Add.class, Update.class})
     private EventTypeFlagEnum eventTypeFlag;
 
-    @Schema(description = "event level flag")
+    @Schema(description = "Event level enum")
 
     @NotNull(message = "Event level can't be empty", groups = {Add.class, Update.class})
     private EventLevelEnum eventLevelFlag;
 
-    @Schema(description = "event extension information (JSON)")
+    @Schema(description = "event extension information in JSON format")
 
     private EventExt eventExt;
 
@@ -80,11 +80,11 @@ public class EventVO extends BaseVO {
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
     private Long profileId;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
 
     private String signature;
 

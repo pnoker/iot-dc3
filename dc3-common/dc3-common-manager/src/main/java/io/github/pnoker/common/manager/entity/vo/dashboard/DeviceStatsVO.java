@@ -49,7 +49,7 @@ public class DeviceStatsVO implements Serializable {
     /**
      * Counts by enable flag.
      */
-    @Schema(description = "Device counts grouped by enable flag")
+    @Schema(description = "Device counts grouped by enable status")
     private List<BucketVO> byEnable = new ArrayList<>();
 
     /**

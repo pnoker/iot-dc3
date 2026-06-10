@@ -60,7 +60,7 @@ public class PointConfigByDeviceVO {
     /**
      *
      */
-    @Schema(description = "points")
+    @Schema(description = "Point configuration list")
     private List<PointDO> points;
 
 }

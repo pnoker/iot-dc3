@@ -61,22 +61,22 @@ public class CommandVO extends BaseVO {
 
     private String commandCode;
 
-    @Schema(description = "command type flag")
+    @Schema(description = "Command type enum")
 
     @NotNull(message = "Command type can't be empty", groups = {Add.class, Update.class})
     private CommandTypeEnum commandTypeFlag;
 
-    @Schema(description = "call type flag")
+    @Schema(description = "Command call type enum")
 
     @NotNull(message = "Call type can't be empty", groups = {Add.class, Update.class})
     private CallTypeEnum callTypeFlag;
 
-    @Schema(description = "timeout")
+    @Schema(description = "Command timeout")
 
     @NotNull(message = "Command timeout can't be empty", groups = {Add.class, Update.class})
     private Integer timeout;
 
-    @Schema(description = "command extension information (JSON)")
+    @Schema(description = "command extension information in JSON format")
 
     private CommandExt commandExt;
 
@@ -85,11 +85,11 @@ public class CommandVO extends BaseVO {
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
     private Long profileId;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
 
     private String signature;
 

@@ -88,7 +88,7 @@ public class GroupBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group_bind', 'add')")
-    @Operation(summary = "新增GroupBind", description = "新增一条GroupBind记录")
+    @Operation(summary = "新增分组绑定", description = "新增一条分组绑定记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -105,7 +105,7 @@ public class GroupBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group_bind', 'delete')")
-    @Operation(summary = "删除GroupBind", description = "删除指定ID的GroupBind")
+    @Operation(summary = "删除分组绑定", description = "删除指定ID的分组绑定")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -120,7 +120,7 @@ public class GroupBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group_bind', 'update')")
-    @Operation(summary = "更新GroupBind", description = "更新GroupBind信息")
+    @Operation(summary = "更新分组绑定", description = "更新分组绑定信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -138,7 +138,7 @@ public class GroupBindController implements BaseController {
      * @return GroupBindVO {@link GroupBindVO}
      */
     @PreAuthorize("@perm.can('group_bind', 'get')")
-    @Operation(summary = "查询GroupBind", description = "根据ID查询GroupBind详细信息")
+    @Operation(summary = "查询分组绑定", description = "根据ID查询分组绑定详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<GroupBindVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -153,7 +153,7 @@ public class GroupBindController implements BaseController {
      * @return R Of GroupBindVO Page
      */
     @PreAuthorize("@perm.can('group_bind', 'list')")
-    @Operation(summary = "查询GroupBind列表", description = "分页查询GroupBind列表")
+    @Operation(summary = "查询分组绑定列表", description = "分页查询分组绑定列表")
     @PostMapping("/list")
     public Mono<R<Page<GroupBindVO>>> list(@RequestBody(required = false) GroupBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

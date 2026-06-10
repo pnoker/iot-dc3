@@ -62,7 +62,7 @@ public class TopicQuery implements Serializable {
      *
      */
 
-    @Schema(description = "topic")
+    @Schema(description = "Topic name")
 
     private String topic;
 

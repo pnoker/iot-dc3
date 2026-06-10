@@ -54,7 +54,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "group", description = "Group")
+@Tag(name = "group", description = "分组")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.GROUP_URL_PREFIX)
@@ -70,7 +70,7 @@ public class GroupController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group', 'add')")
-    @Operation(summary = "新增分组绑定", description = "新增一条分组绑定记录")
+    @Operation(summary = "新增分组", description = "新增一条分组记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -86,7 +86,7 @@ public class GroupController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group', 'delete')")
-    @Operation(summary = "删除分组绑定", description = "删除指定ID的分组绑定")
+    @Operation(summary = "删除分组", description = "删除指定ID的分组")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -101,7 +101,7 @@ public class GroupController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group', 'update')")
-    @Operation(summary = "更新分组绑定", description = "更新分组绑定信息")
+    @Operation(summary = "更新分组", description = "更新分组信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -118,7 +118,7 @@ public class GroupController implements BaseController {
      * @return GroupVO {@link GroupVO}
      */
     @PreAuthorize("@perm.can('group', 'get')")
-    @Operation(summary = "查询分组绑定", description = "根据ID查询分组绑定详细信息")
+    @Operation(summary = "查询分组", description = "根据ID查询分组详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<GroupVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -133,7 +133,7 @@ public class GroupController implements BaseController {
      * @return R Of GroupVO Page
      */
     @PreAuthorize("@perm.can('group', 'list')")
-    @Operation(summary = "查询分组绑定列表", description = "分页查询分组绑定列表")
+    @Operation(summary = "查询分组列表", description = "分页查询分组列表")
     @PostMapping("/list")
     public Mono<R<Page<GroupVO>>> list(@RequestBody(required = false) GroupQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

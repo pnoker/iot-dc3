@@ -71,19 +71,19 @@ public class DriverAttributeConfigVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "config extension information (JSON)")
+    @Schema(description = "config extension information in JSON format")
     private JsonExt configExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
     private String signature;
 
     /**

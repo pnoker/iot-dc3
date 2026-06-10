@@ -66,7 +66,7 @@ public class EventParamQuery implements Serializable {
 
     private String paramCode;
 
-    @Schema(description = "param type flag")
+    @Schema(description = "Parameter type enum")
 
     private PointTypeEnum paramTypeFlag;
 
@@ -74,7 +74,7 @@ public class EventParamQuery implements Serializable {
 
     private Long eventId;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

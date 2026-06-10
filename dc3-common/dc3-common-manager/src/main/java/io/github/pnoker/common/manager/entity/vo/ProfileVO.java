@@ -68,31 +68,31 @@ public class ProfileVO extends BaseVO {
     /**
      * Type
      */
-    @Schema(description = "profile share flag")
+    @Schema(description = "Profile share flag enum")
     private ProfileShareTypeEnum profileShareFlag;
 
     /**
      * Type
      */
-    @Schema(description = "Profile type flag")
+    @Schema(description = "Profile type enum")
     private ProfileTypeEnum profileTypeFlag;
 
     /**
      *
      */
-    @Schema(description = "profile extension information (JSON)")
+    @Schema(description = "profile extension information in JSON format")
     private ProfileExt profileExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
     private String signature;
 
     /**

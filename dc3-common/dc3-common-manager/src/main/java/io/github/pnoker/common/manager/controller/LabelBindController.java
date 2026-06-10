@@ -88,7 +88,7 @@ public class LabelBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label_bind', 'add')")
-    @Operation(summary = "新增LabelBind", description = "新增一条LabelBind记录")
+    @Operation(summary = "新增标签绑定", description = "新增一条标签绑定记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -105,7 +105,7 @@ public class LabelBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label_bind', 'delete')")
-    @Operation(summary = "删除LabelBind", description = "删除指定ID的LabelBind")
+    @Operation(summary = "删除标签绑定", description = "删除指定ID的标签绑定")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -120,7 +120,7 @@ public class LabelBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label_bind', 'update')")
-    @Operation(summary = "更新LabelBind", description = "更新LabelBind信息")
+    @Operation(summary = "更新标签绑定", description = "更新标签绑定信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -138,7 +138,7 @@ public class LabelBindController implements BaseController {
      * @return LabelBindVO {@link LabelBindVO}
      */
     @PreAuthorize("@perm.can('label_bind', 'get')")
-    @Operation(summary = "查询LabelBind", description = "根据ID查询LabelBind详细信息")
+    @Operation(summary = "查询标签绑定", description = "根据ID查询标签绑定详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<LabelBindVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -153,7 +153,7 @@ public class LabelBindController implements BaseController {
      * @return R Of LabelBindVO Page
      */
     @PreAuthorize("@perm.can('label_bind', 'list')")
-    @Operation(summary = "查询LabelBind列表", description = "分页查询LabelBind列表")
+    @Operation(summary = "查询标签绑定列表", description = "分页查询标签绑定列表")
     @PostMapping("/list")
     public Mono<R<Page<LabelBindVO>>> list(@RequestBody(required = false) LabelBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

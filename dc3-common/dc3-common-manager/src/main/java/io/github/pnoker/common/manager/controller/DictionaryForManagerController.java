@@ -67,7 +67,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "字典(Manager) - driver dictionary", description = "字典(Manager) - driver dictionary")
+    @Operation(summary = "查询驱动字典", description = "分页查询驱动字典")
     @PostMapping("/driver")
     public Mono<R<Page<DictionaryVO>>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -86,7 +86,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "字典(Manager) - profile dictionary", description = "字典(Manager) - profile dictionary")
+    @Operation(summary = "查询模板字典", description = "分页查询模板字典")
     @PostMapping("/profile")
     public Mono<R<Page<DictionaryVO>>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -105,7 +105,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "字典(Manager) - point dictionary for profile", description = "字典(Manager) - point dictionary for profile")
+    @Operation(summary = "查询模板位号字典", description = "根据模板查询位号字典")
     @PostMapping("/profile_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForProfile(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
@@ -125,7 +125,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "字典(Manager) - point dictionary for device", description = "字典(Manager) - point dictionary for device")
+    @Operation(summary = "查询设备位号字典", description = "根据设备查询位号字典")
     @PostMapping("/device_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForDevice(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
@@ -145,7 +145,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "字典(Manager) - device dictionary", description = "字典(Manager) - device dictionary")
+    @Operation(summary = "查询设备字典", description = "分页查询设备字典")
     @PostMapping("/device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -164,7 +164,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "字典(Manager) - device dictionary for driver", description = "字典(Manager) - device dictionary for driver")
+    @Operation(summary = "查询驱动设备字典", description = "根据驱动查询设备字典")
     @PostMapping("/driver_device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionaryForDriver(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {

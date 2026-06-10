@@ -150,6 +150,7 @@ public class ProfileController implements BaseController {
      * @return Map(ID, ProfileVO)
      */
     @PreAuthorize("@perm.can('profile', 'list')")
+    @Operation(summary = "批量查询模板", description = "根据模板ID列表批量查询模板信息")
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, ProfileVO>>> listByIds(@RequestBody Set<Long> profileIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {

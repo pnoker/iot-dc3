@@ -61,12 +61,12 @@ public class EventParamVO extends BaseVO {
     @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
     private String paramCode;
 
-    @Schema(description = "param type flag")
+    @Schema(description = "Parameter type enum")
 
     @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
     private PointTypeEnum paramTypeFlag;
 
-    @Schema(description = "param extension information (JSON)")
+    @Schema(description = "param extension information in JSON format")
 
     private EventParamExt paramExt;
 
@@ -75,11 +75,11 @@ public class EventParamVO extends BaseVO {
     @NotNull(message = "Event ID can't be empty", groups = {Add.class, Update.class})
     private Long eventId;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
 
     private String signature;
 

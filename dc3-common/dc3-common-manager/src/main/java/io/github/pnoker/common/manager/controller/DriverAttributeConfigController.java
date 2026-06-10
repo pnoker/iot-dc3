@@ -82,7 +82,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'add')")
-    @Operation(summary = "新增DriverAttributeConfig", description = "新增一条DriverAttributeConfig记录")
+    @Operation(summary = "新增驱动属性配置", description = "新增一条驱动属性配置记录")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -100,7 +100,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'delete')")
-    @Operation(summary = "删除DriverAttributeConfig", description = "删除指定ID的DriverAttributeConfig")
+    @Operation(summary = "删除驱动属性配置", description = "删除指定ID的驱动属性配置")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -117,7 +117,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'update')")
-    @Operation(summary = "更新DriverAttributeConfig", description = "更新DriverAttributeConfig信息")
+    @Operation(summary = "更新驱动属性配置", description = "更新驱动属性配置信息")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -136,7 +136,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
-    @Operation(summary = "查询DriverAttributeConfig", description = "根据ID查询DriverAttributeConfig详细信息")
+    @Operation(summary = "查询驱动属性配置", description = "根据ID查询驱动属性配置详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<DriverAttributeConfigVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -154,7 +154,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverConfig
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
-    @Operation(summary = "查询DriverAttributeConfig", description = "根据条件查询DriverAttributeConfig")
+    @Operation(summary = "查询驱动属性配置", description = "根据属性ID和设备ID查询驱动属性配置")
     @GetMapping("/get_by_device_id_and_attribute_id")
     public Mono<R<DriverAttributeConfigVO>> getByDeviceIdAndAttributeId(
             @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -176,7 +176,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverConfig
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
-    @Operation(summary = "查询DriverAttributeConfig列表", description = "根据关联条件查询DriverAttributeConfig列表")
+    @Operation(summary = "查询驱动属性配置列表", description = "根据设备ID查询驱动属性配置列表")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<DriverAttributeConfigVO>>> listByDeviceId(
             @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -195,7 +195,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return Page Of DriverConfig
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
-    @Operation(summary = "查询DriverAttributeConfig列表", description = "分页查询DriverAttributeConfig列表")
+    @Operation(summary = "查询驱动属性配置列表", description = "分页查询驱动属性配置列表")
     @PostMapping("/list")
     public Mono<R<Page<DriverAttributeConfigVO>>> list(
             @RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {

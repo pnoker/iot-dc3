@@ -56,7 +56,7 @@ public class TopicController implements BaseController {
     private final TopicService topicService;
 
     @PreAuthorize("@perm.can('topic', 'list')")
-    @Operation(summary = "主题管理 - query", description = "主题管理 - query")
+    @Operation(summary = "查询主题列表", description = "分页查询主题列表")
     @PostMapping("/list")
     public Mono<R<Page<TopicVO>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

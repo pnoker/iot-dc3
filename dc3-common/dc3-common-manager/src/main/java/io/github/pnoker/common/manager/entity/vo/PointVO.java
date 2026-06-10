@@ -71,14 +71,14 @@ public class PointVO extends BaseVO {
     /**
      * Type
      */
-    @Schema(description = "point type flag")
+    @Schema(description = "Point type enum")
     @NotNull(message = "Point type can't be empty", groups = {Add.class, Update.class})
     private PointTypeEnum pointTypeFlag;
 
     /**
      *
      */
-    @Schema(description = "rw flag")
+    @Schema(description = "Read/write type enum")
     @NotNull(message = "Read/write flag can't be empty", groups = {Add.class, Update.class})
     private RwTypeEnum rwFlag;
 
@@ -91,7 +91,7 @@ public class PointVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "multiple")
+    @Schema(description = "Value multiplier")
     private BigDecimal multiple;
 
     /**
@@ -104,7 +104,7 @@ public class PointVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "unit")
+    @Schema(description = "Point value unit")
     private String unit;
 
     /**
@@ -117,19 +117,19 @@ public class PointVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "point extension information (JSON)")
+    @Schema(description = "point extension information in JSON format")
     private PointExt pointExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
     private String signature;
 
     /**
