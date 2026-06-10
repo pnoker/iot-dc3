@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +52,7 @@ import java.util.Set;
  * @since 2026.6.0
  */
 @Slf4j
+@Hidden
 @RestController
 public class ServiceMcpToolsController {
 
