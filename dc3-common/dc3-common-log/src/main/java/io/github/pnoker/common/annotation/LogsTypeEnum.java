@@ -20,11 +20,14 @@ package io.github.pnoker.common.annotation;
 import lombok.Getter;
 
 /**
- * Enumeration representing different types of log levels used in the DC3 IoT Platform.
- * Provides standardized log levels for consistent logging across the platform: - INFO:
- * General information messages - WARN: Warning messages indicating potential issues -
- * DEBUG: Detailed debug information for development/troubleshooting - ERROR: Error
- * messages for critical issues and failures
+ * Enumeration of log levels used by the DC3 IoT Platform.
+ *
+ * <ul>
+ *   <li>{@link #INFO}: general information messages</li>
+ *   <li>{@link #WARN}: warning messages indicating potential issues</li>
+ *   <li>{@link #DEBUG}: detailed information for development and troubleshooting</li>
+ *   <li>{@link #ERROR}: error messages for failures</li>
+ * </ul>
  *
  * @author pnoker
  * @version 2025.9.0

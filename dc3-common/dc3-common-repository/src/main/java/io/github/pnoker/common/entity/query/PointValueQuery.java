@@ -93,13 +93,13 @@ public class PointValueQuery implements Serializable {
     /**
      * Enable flag to filter active/inactive points
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
     /**
      * Optional lower bound for create_time filtering (time range feature).
      */
-    @Schema(description = "create time from")
+    @Schema(description = "Start time for querying point values")
     private java.time.LocalDateTime createTimeFrom;
 
     /**
@@ -107,7 +107,7 @@ public class PointValueQuery implements Serializable {
      * createTimeFrom = now - rangeHours. Retained for backward compatibility; new callers
      * should set {@link #rangeKey}.
      */
-    @Schema(description = "range hours")
+    @Schema(description = "Fallback rolling time range in hours")
     private Integer rangeHours;
 
     /**
@@ -116,7 +116,7 @@ public class PointValueQuery implements Serializable {
      * {@code 24h}, {@code 7d}, {@code 30d}). Takes precedence over {@link #rangeHours}
      * when both are supplied.
      */
-    @Schema(description = "range key")
+    @Schema(description = "Preset time range key: today, 24h, 7d, or 30d")
     private String rangeKey;
 
 }
