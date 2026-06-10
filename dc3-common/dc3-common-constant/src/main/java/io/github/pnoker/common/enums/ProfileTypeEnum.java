@@ -36,19 +36,19 @@ import java.util.Optional;
 public enum ProfileTypeEnum {
 
     /**
-     * System create
+     * Created by system
      */
-    SYSTEM((byte) 0, "system", "System create"),
+    SYSTEM((byte) 0, "system", "Created by system"),
 
     /**
-     * Driver create
+     * Created by driver
      */
-    DRIVER((byte) 1, "driver", "Driver create"),
+    DRIVER((byte) 1, "driver", "Created by driver"),
 
     /**
-     * User create
+     * Created by user
      */
-    USER((byte) 2, "user", "User create"),
+    USER((byte) 2, "user", "Created by user"),
     ;
 
     /**

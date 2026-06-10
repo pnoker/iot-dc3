@@ -57,6 +57,8 @@ public enum AlarmSourceTypeEnum {
 
     /**
      * Event report
+     *
+     * <p>Index 5 is kept for persisted value compatibility.
      */
     EVENT_REPORT((byte) 5, "event-report", "Event report"),
 

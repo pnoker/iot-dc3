@@ -41,9 +41,9 @@ public enum PointCommandTypeEnum {
     READ((byte) 0, "read", "Read point value command"),
 
     /**
-     * Read point value batch command
+     * Batch read point value command
      */
-    READ_BATCH((byte) 1, "read-batch", "Read point value batch command"),
+    READ_BATCH((byte) 1, "read-batch", "Batch read point value command"),
 
     /**
      * Write point value command
@@ -51,9 +51,9 @@ public enum PointCommandTypeEnum {
     WRITE((byte) 2, "write", "Write point value command"),
 
     /**
-     * Write point value batch command
+     * Batch write point value command
      */
-    WRITE_BATCH((byte) 3, "write-batch", "Write point value batch command"),
+    WRITE_BATCH((byte) 3, "write-batch", "Batch write point value command"),
 
     /**
      * Config device command

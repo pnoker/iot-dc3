@@ -38,12 +38,12 @@ public enum DefaultFlagEnum {
     /**
      * Not the default record.
      */
-    NOT_DEFAULT((byte) 0, "not-default", "not-default"),
+    NOT_DEFAULT((byte) 0, "not-default", "Not default"),
 
     /**
      * Default record.
      */
-    DEFAULT((byte) 1, "default", "default"),
+    DEFAULT((byte) 1, "default", "Default"),
     ;
 
     /**
