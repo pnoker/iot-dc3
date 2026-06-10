@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.entity.query;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
  * @version 2026.5.21
  * @since 2026.5.21
  */
+@Schema(description = "Window aggregation request")
 @Getter
 @Setter
 @Builder
@@ -46,16 +48,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class WindowAggregateRequest {
 
+    @Schema(description = "Tenant ID")
     private Long tenantId;
 
+    @Schema(description = "Device ID")
     private Long deviceId;
 
+    @Schema(description = "Point ID")
     private Long pointId;
 
+    @Schema(description = "Aggregate function: AVG, MIN, MAX, SUM, or COUNT", example = "AVG")
     private String function;
 
+    @Schema(description = "Inclusive start time")
     private LocalDateTime from;
 
+    @Schema(description = "Exclusive end time")
     private LocalDateTime to;
 
 }
