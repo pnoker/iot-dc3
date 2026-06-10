@@ -36,15 +36,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Agentic Visualization response body")
 public class AgenticVisualizationResponse {
 
-    @Schema(description = "object")
+    @Schema(description = "Response object type")
 
     private String object;
 
-    @Schema(description = "visualization")
+    @Schema(description = "Visualization specification")
 
     private AgenticVisualizationSpec visualization;
 
-    @Schema(description = "created")
+    @Schema(description = "Unix timestamp when the response was created")
 
     private Long created;
 

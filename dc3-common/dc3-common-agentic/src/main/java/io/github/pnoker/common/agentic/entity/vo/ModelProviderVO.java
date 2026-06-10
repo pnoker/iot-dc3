@@ -47,10 +47,10 @@ public class ModelProviderVO extends BaseVO {
     @Schema(description = "Provider API base URL", example = "https://api.openai.com/v1")
     private String baseUrl;
 
-    @Schema(description = "Default flag", example = "DEFAULT")
+    @Schema(description = "Default provider flag enum (DEFAULT or NON_DEFAULT)", example = "DEFAULT")
     private DefaultFlagEnum defaultFlag;
 
-    @Schema(description = "Enable flag", example = "ENABLE")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Tenant ID", example = "1024")

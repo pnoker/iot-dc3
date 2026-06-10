@@ -59,7 +59,7 @@ public class AttachmentController implements BaseController {
     private final AttachmentService attachmentService;
 
     @PreAuthorize("@perm.can('attachment', 'list')")
-    @Operation(summary = "AI附件 - upload", description = "AI附件 - upload")
+    @Operation(summary = "上传AI附件", description = "上传指定会话的AI附件")
     @PostMapping("/upload")
     public Mono<R<AttachmentVO>> upload(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                         @RequestPart("file") Mono<FilePart> filePart) {

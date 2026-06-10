@@ -43,29 +43,29 @@ public class ModelProviderRequest {
     @NotNull(message = "Provider ID is required", groups = {Update.class})
     private Long id;
 
-    @Schema(description = "name")
+    @Schema(description = "Provider display name")
 
     @NotBlank(message = "Provider name is required", groups = {Add.class, Update.class})
     private String name;
 
-    @Schema(description = "provider type")
+    @Schema(description = "Provider type")
 
     private String providerType;
 
-    @Schema(description = "base url")
+    @Schema(description = "Provider API base URL")
 
     @NotBlank(message = "Provider base URL is required", groups = {Add.class, Update.class})
     private String baseUrl;
 
-    @Schema(description = "api key")
+    @Schema(description = "Provider API key")
 
     private String apiKey;
 
-    @Schema(description = "Default flag")
+    @Schema(description = "Default provider flag enum (DEFAULT or NON_DEFAULT)")
 
     private DefaultFlagEnum defaultFlag;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

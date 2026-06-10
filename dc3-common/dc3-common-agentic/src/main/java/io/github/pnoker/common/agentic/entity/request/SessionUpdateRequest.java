@@ -33,11 +33,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Session Update request body")
 public class SessionUpdateRequest {
 
-    @Schema(description = "title")
+    @Schema(description = "Title")
 
     private String title;
 
-    @Schema(description = "session extension information (JSON)")
+    @Schema(description = "Session extension information in JSON format")
 
     private SessionExt sessionExt;
 

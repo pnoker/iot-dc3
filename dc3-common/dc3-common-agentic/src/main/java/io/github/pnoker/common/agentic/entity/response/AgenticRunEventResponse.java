@@ -37,39 +37,39 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Agentic Run Event response body")
 public class AgenticRunEventResponse {
 
-    @Schema(description = "object")
+    @Schema(description = "Event object type")
 
     private String object;
 
-    @Schema(description = "type")
+    @Schema(description = "Event type")
 
     private String type;
 
-    @Schema(description = "title")
+    @Schema(description = "Event title")
 
     private String title;
 
-    @Schema(description = "detail")
+    @Schema(description = "Event detail")
 
     private String detail;
 
-    @Schema(description = "name")
+    @Schema(description = "Event name")
 
     private String name;
 
-    @Schema(description = "phase")
+    @Schema(description = "Run phase")
 
     private String phase;
 
-    @Schema(description = "status")
+    @Schema(description = "Run status")
 
     private String status;
 
-    @Schema(description = "code")
+    @Schema(description = "Event code")
 
     private String code;
 
-    @Schema(description = "created")
+    @Schema(description = "Unix timestamp when the event was created")
 
     private Long created;
 

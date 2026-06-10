@@ -67,10 +67,10 @@ public class ModelConfigVO extends BaseVO {
     @Schema(description = "Maximum number of tokens to generate", example = "4096")
     private Integer maxTokens;
 
-    @Schema(description = "Default flag", example = "DEFAULT")
+    @Schema(description = "Default model flag enum (DEFAULT or NON_DEFAULT)", example = "DEFAULT")
     private DefaultFlagEnum defaultFlag;
 
-    @Schema(description = "Enable flag", example = "ENABLE")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Tenant ID", example = "1024")

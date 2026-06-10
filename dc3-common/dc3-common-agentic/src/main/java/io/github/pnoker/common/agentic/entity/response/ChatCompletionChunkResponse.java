@@ -49,19 +49,19 @@ public class ChatCompletionChunkResponse {
 
     private String id;
 
-    @Schema(description = "object")
+    @Schema(description = "OpenAI-compatible chunk object type")
 
     private String object;
 
-    @Schema(description = "created")
+    @Schema(description = "Unix timestamp when the chunk was created")
 
     private long created;
 
-    @Schema(description = "model")
+    @Schema(description = "Model used to generate the response")
 
     private String model;
 
-    @Schema(description = "choices")
+    @Schema(description = "Streaming response choices")
 
     private List<ChunkChoice> choices;
 
@@ -72,15 +72,15 @@ public class ChatCompletionChunkResponse {
     @Builder
     public static class ChunkChoice {
 
-        @Schema(description = "index")
+        @Schema(description = "Choice index")
 
         private int index;
 
-        @Schema(description = "delta")
+        @Schema(description = "Incremental message delta")
 
         private Delta delta;
 
-        @Schema(description = "finish reason")
+        @Schema(description = "Generation finish reason")
 
         @JsonProperty("finish_reason")
         private String finishReason;
@@ -94,15 +94,15 @@ public class ChatCompletionChunkResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Delta {
 
-        @Schema(description = "role")
+        @Schema(description = "Message role")
 
         private String role;
 
-        @Schema(description = "content")
+        @Schema(description = "Incremental message content")
 
         private String content;
 
-        @Schema(description = "reasoning content")
+        @Schema(description = "Incremental reasoning content")
 
         @JsonProperty("reasoning_content")
         private String reasoningContent;

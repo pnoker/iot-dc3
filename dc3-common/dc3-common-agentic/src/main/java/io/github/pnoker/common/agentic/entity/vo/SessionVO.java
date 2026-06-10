@@ -48,7 +48,7 @@ public class SessionVO extends BaseVO {
     @Schema(description = "Session title")
     private String title;
 
-    @Schema(description = "Session extension information (JSON)")
+    @Schema(description = "Session extension information in JSON format")
     private SessionExt sessionExt;
 
     @Schema(description = "Tenant ID", example = "1024")
