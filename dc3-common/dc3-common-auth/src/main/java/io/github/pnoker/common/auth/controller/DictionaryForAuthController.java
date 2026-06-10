@@ -61,7 +61,7 @@ public class DictionaryForAuthController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('dictionary_for_auth', 'get')")
-    @Operation(summary = "字典(Auth) - tenant dictionary", description = "字典(Auth) - tenant dictionary")
+    @Operation(summary = "查询租户字典", description = "查询认证中心可用的租户字典")
     @GetMapping("/tenant")
     public Mono<R<List<DictionaryVO>>> tenantDictionary() {
         return async(() -> {

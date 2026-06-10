@@ -75,13 +75,13 @@ public class RoleVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "Role extension information (JSON)")
+    @Schema(description = "Role extension information in JSON format")
     private RoleExt roleExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

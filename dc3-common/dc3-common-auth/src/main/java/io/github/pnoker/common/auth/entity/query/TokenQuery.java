@@ -43,14 +43,14 @@ public class TokenQuery {
     /**
      * Tenant
      */
-    @Schema(description = "tenant")
+    @Schema(description = "Tenant identifier")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid tenant code")
     private String tenant;
 
     /**
      *
      */
-    @Schema(description = "name")
+    @Schema(description = "Token name")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid username")
     private String name;
 

@@ -70,13 +70,13 @@ public class TenantVO extends BaseVO {
     /**
      * Tenant
      */
-    @Schema(description = "tenant extension information (JSON)")
+    @Schema(description = "tenant extension information in JSON format")
     private TenantExt tenantExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

@@ -62,7 +62,7 @@ public class MenuVO extends BaseVO {
     /**
      * Type
      */
-    @Schema(description = "Menu type flag", example = "COMMON")
+    @Schema(description = "Menu type enum", example = "COMMON")
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
@@ -95,13 +95,13 @@ public class MenuVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "Menu extension information (JSON)")
+    @Schema(description = "Menu extension information in JSON format")
     private MenuExt menuExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

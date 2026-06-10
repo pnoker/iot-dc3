@@ -65,7 +65,7 @@ public class MenuQuery implements Serializable {
     /**
      * Type
      */
-    @Schema(description = "Menu type flag", example = "COMMON")
+    @Schema(description = "Menu type enum", example = "COMMON")
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
@@ -83,7 +83,7 @@ public class MenuQuery implements Serializable {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

@@ -47,7 +47,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(description = "Api view object")
+@Schema(description = "API view object")
 public class ApiVO extends BaseVO {
 
     /**
@@ -59,7 +59,7 @@ public class ApiVO extends BaseVO {
     /**
      * ApiType
      */
-    @Schema(description = "API type flag", example = "GET")
+    @Schema(description = "API method enum", example = "GET")
     private ApiTypeEnum apiTypeFlag;
 
     /**
@@ -85,13 +85,13 @@ public class ApiVO extends BaseVO {
     /**
      * Api
      */
-    @Schema(description = "api extension information (JSON)")
+    @Schema(description = "api extension information in JSON format")
     private ApiExt apiExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

@@ -73,7 +73,7 @@ public class ResourceQuery implements Serializable {
     /**
      * Type
      */
-    @Schema(description = "Resource type flag", example = "MENU")
+    @Schema(description = "Resource type enum", example = "MENU")
     private ResourceTypeEnum resourceTypeFlag;
 
     /**
@@ -92,7 +92,7 @@ public class ResourceQuery implements Serializable {
      * </ul>
      *
      */
-    @Schema(description = "Resource scope flag", example = "LIST")
+    @Schema(description = "Resource scope enum", example = "LIST")
     private ResourceScopeTypeEnum resourceScopeFlag;
 
     /**
@@ -111,7 +111,7 @@ public class ResourceQuery implements Serializable {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled", example = "ENABLE")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }
