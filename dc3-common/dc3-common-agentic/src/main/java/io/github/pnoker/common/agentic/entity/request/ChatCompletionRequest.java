@@ -43,51 +43,51 @@ public class ChatCompletionRequest {
     /**
      * Model identifier (advisory — the actual model is configured server-side).
      */
-    @Schema(description = "model")
+    @Schema(description = "Requested model identifier")
     private String model;
 
     /**
      * Conversation messages in chronological order.
      */
-    @Schema(description = "messages")
+    @Schema(description = "Conversation messages in chronological order")
     private List<ChatMessageDTO> messages;
 
     /**
      * Sampling temperature override (0.0–2.0). Null uses the server default.
      */
-    @Schema(description = "temperature")
+    @Schema(description = "Sampling temperature override")
     private Double temperature;
 
     /**
      * Maximum tokens to generate. Null uses the server default.
      */
-    @Schema(description = "max tokens")
+    @Schema(description = "Maximum generated tokens override")
     private Integer maxTokens;
 
     /**
      * Whether to stream the response as SSE events.
      */
-    @Schema(description = "stream")
+    @Schema(description = "Whether to stream the response as SSE events")
     private Boolean stream;
 
     /**
      * Conversation ID for chat memory correlation. If omitted, a new conversation is
      * started each request.
      */
-    @Schema(description = "conversation ID")
+    @Schema(description = "Conversation ID for chat memory correlation")
     private String conversationId;
 
     /**
      * Uploaded attachment database IDs associated with this request.
      */
-    @Schema(description = "attachments")
+    @Schema(description = "Uploaded attachment IDs associated with this request")
     private List<Long> attachments;
 
     /**
      * Whether the client asked for model reasoning. Current OpenAI-compatible text
      * endpoint treats this as advisory metadata.
      */
-    @Schema(description = "reasoning")
+    @Schema(description = "Whether reasoning output is requested")
     private Boolean reasoning;
 
     public boolean isStream() {

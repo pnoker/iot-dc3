@@ -46,7 +46,7 @@ public class MessageVO extends BaseVO {
     @Schema(description = "Message content")
     private String content;
 
-    @Schema(description = "Content extension information (JSON)")
+    @Schema(description = "Content extension information in JSON format")
     private AgenticMessageContent contentExt;
 
     @Schema(description = "Model identifier used to generate the message", example = "gpt-4o")

@@ -46,53 +46,53 @@ public class ModelConfigRequest {
     @NotNull(message = "Model config ID is required", groups = {Update.class})
     private Long id;
 
-    @Schema(description = "model")
+    @Schema(description = "Model identifier")
 
     @NotBlank(message = "Model is required", groups = {Add.class, Update.class})
     private String model;
 
-    @Schema(description = "label")
+    @Schema(description = "Model display label")
 
     private String label;
 
-    @Schema(description = "provider ID")
+    @Schema(description = "Model provider ID")
 
     @NotNull(message = "Provider is required", groups = {Add.class, Update.class})
     private Long providerId;
 
-    @Schema(description = "stream")
+    @Schema(description = "Whether streaming responses are supported")
 
     private Boolean stream;
 
-    @Schema(description = "tool call")
+    @Schema(description = "Whether tool calls are supported")
 
     private Boolean toolCall;
 
-    @Schema(description = "vision")
+    @Schema(description = "Whether vision input is supported")
 
     private Boolean vision;
 
-    @Schema(description = "reasoning")
+    @Schema(description = "Whether reasoning output is supported")
 
     private Boolean reasoning;
 
     @DecimalMin(value = "0.0", message = "Temperature must be between 0.0 and 2.0",
             groups = {Add.class, Update.class})
-    @Schema(description = "temperature")
+    @Schema(description = "Sampling temperature")
     @DecimalMax(value = "2.0", message = "Temperature must be between 0.0 and 2.0",
             groups = {Add.class, Update.class})
     private Double temperature;
 
-    @Schema(description = "max tokens")
+    @Schema(description = "Maximum generated tokens")
 
     @Min(value = 1, message = "Max tokens must be greater than 0", groups = {Add.class, Update.class})
     private Integer maxTokens;
 
-    @Schema(description = "Default flag")
+    @Schema(description = "Default model flag enum (DEFAULT or NON_DEFAULT)")
 
     private DefaultFlagEnum defaultFlag;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

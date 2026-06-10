@@ -80,7 +80,7 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'get')")
-    @Operation(summary = "AI会话 - get", description = "AI会话 - get")
+    @Operation(summary = "查询AI会话", description = "根据会话ID查询AI会话详细信息")
     @GetMapping("/get_by_conversation_id")
     public Mono<R<SessionVO>> get(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -96,7 +96,7 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'delete')")
-    @Operation(summary = "删除AI会话", description = "删除指定ID的AI会话")
+    @Operation(summary = "删除AI会话", description = "删除指定会话ID的AI会话")
     @DeleteMapping("/delete")
     public Mono<R<Boolean>> delete(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {

@@ -59,7 +59,7 @@ public class ChatController implements BaseController {
      * otherwise returns the OpenAI-compatible JSON response.
      */
     @PreAuthorize("@perm.can('chat', 'list')")
-    @Operation(summary = "AI聊天 - chat completion", description = "AI聊天 - chat completion")
+    @Operation(summary = "创建聊天补全", description = "创建OpenAI兼容的聊天补全，支持流式和非流式响应")
     @PostMapping("/completions")
     public Mono<ResponseEntity<?>> chatCompletion(@RequestBody ChatCompletionRequest request) {
         return getUserHeader().flatMap(header -> {

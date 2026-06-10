@@ -50,23 +50,23 @@ public class ChatCompletionResponse {
 
     private String id;
 
-    @Schema(description = "object")
+    @Schema(description = "OpenAI-compatible response object type")
 
     private String object;
 
-    @Schema(description = "created")
+    @Schema(description = "Unix timestamp when the response was created")
 
     private long created;
 
-    @Schema(description = "model")
+    @Schema(description = "Model used to generate the response")
 
     private String model;
 
-    @Schema(description = "choices")
+    @Schema(description = "Generated response choices")
 
     private List<Choice> choices;
 
-    @Schema(description = "usage")
+    @Schema(description = "Token usage statistics")
 
     private Usage usage;
 
@@ -77,15 +77,15 @@ public class ChatCompletionResponse {
     @Builder
     public static class Choice {
 
-        @Schema(description = "index")
+        @Schema(description = "Choice index")
 
         private int index;
 
-        @Schema(description = "message")
+        @Schema(description = "Generated assistant message")
 
         private Message message;
 
-        @Schema(description = "finish reason")
+        @Schema(description = "Generation finish reason")
 
         private String finishReason;
 
@@ -97,15 +97,15 @@ public class ChatCompletionResponse {
     @AllArgsConstructor
     public static class Message {
 
-        @Schema(description = "role")
+        @Schema(description = "Message role")
 
         private String role;
 
-        @Schema(description = "content")
+        @Schema(description = "Message content")
 
         private String content;
 
-        @Schema(description = "content extension information (JSON)")
+        @Schema(description = "Content extension information in JSON format")
 
         @JsonProperty("content_ext")
         private AgenticMessageContent contentExt;
