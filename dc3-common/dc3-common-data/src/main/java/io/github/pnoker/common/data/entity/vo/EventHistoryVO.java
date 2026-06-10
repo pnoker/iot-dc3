@@ -75,21 +75,21 @@ public class EventHistoryVO implements Serializable {
 
     private String eventCode;
 
-    @Schema(description = "Event type flag", example = "ALERT")
+    @Schema(description = "Event type enum", example = "ALERT")
     private EventTypeFlagEnum eventTypeFlag;
 
-    @Schema(description = "Event level flag", example = "HIGH")
+    @Schema(description = "Event level enum", example = "HIGH")
     private EventLevelEnum eventLevelFlag;
 
-    @Schema(description = "param values")
+    @Schema(description = "Event parameter values")
 
     private String paramValues;
 
-    @Schema(description = "config snapshot")
+    @Schema(description = "Event configuration snapshot")
 
     private String configSnapshot;
 
-    @Schema(description = "message")
+    @Schema(description = "Message content")
 
     private String message;
 
@@ -101,7 +101,7 @@ public class EventHistoryVO implements Serializable {
 
     private LocalDateTime receiveTime;
 
-    @Schema(description = "Acknowledge flag", example = "NO")
+    @Schema(description = "Acknowledge flag enum", example = "NO")
     private EventHistoryAcknowledgeFlagEnum acknowledgeFlag;
 
     @Schema(description = "acknowledge time")
@@ -112,7 +112,7 @@ public class EventHistoryVO implements Serializable {
 
     private Long acknowledgeUserId;
 
-    @Schema(description = "schema version")
+    @Schema(description = "Schema version")
 
     private Short schemaVersion;
 

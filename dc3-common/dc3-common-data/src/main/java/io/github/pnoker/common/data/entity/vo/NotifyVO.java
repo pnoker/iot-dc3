@@ -60,7 +60,7 @@ public class NotifyVO extends BaseVO {
     /**
      * Auto confirm flag
      */
-    @Schema(description = "auto confirm flag")
+    @Schema(description = "Auto-confirm flag enum")
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
@@ -72,13 +72,13 @@ public class NotifyVO extends BaseVO {
     /**
      * Alarm notification template configuration
      */
-    @Schema(description = "notify extension information (JSON)")
+    @Schema(description = "notify extension information in JSON format")
     private NotifyExt notifyExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
 }

@@ -63,6 +63,7 @@ public class DriverStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('driver_status', 'list')")
+    @Operation(summary = "查询驱动状态列表", description = "分页查询驱动状态映射")
     @PostMapping("/list")
     public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -80,7 +81,7 @@ public class DriverStatusController implements BaseController {
      * @return Number of devices currently online
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
-    @Operation(summary = "驱动状态 - get device online by driver id", description = "驱动状态 - get device online by driver id")
+    @Operation(summary = "统计驱动在线设备数", description = "根据驱动ID统计当前在线设备数量")
     @GetMapping("/get_device_online_by_driver_id")
     public Mono<R<Long>> getDeviceOnlineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -96,7 +97,7 @@ public class DriverStatusController implements BaseController {
      * @return Number of devices currently offline
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
-    @Operation(summary = "驱动状态 - get device offline by driver id", description = "驱动状态 - get device offline by driver id")
+    @Operation(summary = "统计驱动离线设备数", description = "根据驱动ID统计当前离线设备数量")
     @GetMapping("/get_device_offline_by_driver_id")
     public Mono<R<Long>> getDeviceOfflineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

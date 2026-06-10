@@ -76,7 +76,7 @@ public class DashboardController implements BaseController {
     private final io.github.pnoker.common.data.biz.SystemHealthService systemHealthService;
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "仪表盘 - today", description = "仪表盘 - today")
+    @Operation(summary = "查询今日统计", description = "查询今日、昨日、累计数量及变化比例")
     @GetMapping("/stats/today")
     public Mono<R<TodayStatsVO>> today() {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -92,14 +92,14 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "仪表盘 - timeseries", description = "仪表盘 - timeseries")
+    @Operation(summary = "查询统计时间序列", description = "按时间粒度查询仪表盘统计时间序列")
     @GetMapping("/stats/timeseries")
     public Mono<R<List<TimeseriesPointVO>>> timeseries(
-            @Parameter(description = "granularity", required = true)
+            @Parameter(description = "Time bucket granularity, for example hour or day")
             @RequestParam(value = "granularity", defaultValue = "hour") String granularity,
-            @Parameter(description = "range hours", required = true)
+            @Parameter(description = "Fallback rolling time range in hours")
             @RequestParam(value = "range_hours", defaultValue = "24") int rangeHours,
-            @Parameter(description = "range key", required = true)
+            @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
             @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.timeseries(tenantId, granularity, effectiveHours))));
@@ -109,11 +109,11 @@ public class DashboardController implements BaseController {
     @Operation(summary = "查询仪表盘排行", description = "查询仪表盘排行榜")
     @GetMapping("/top")
     public Mono<R<List<TopEntityVO>>> top(@RequestParam(value = "dimension", defaultValue = "device") String dimension,
-                                          @Parameter(description = "range hours", required = true)
+                                          @Parameter(description = "Fallback rolling time range in hours")
                                           @RequestParam(value = "range_hours", defaultValue = "24") int rangeHours,
-                                          @Parameter(description = "range key", required = true)
+                                          @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
                                           @RequestParam(value = "range_key", required = false) String rangeKey,
-                                          @Parameter(description = "limit", required = true)
+                                          @Parameter(description = "Maximum number of items to return")
                                           @RequestParam(value = "limit", defaultValue = "10") int limit) {
         int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.top(tenantId, dimension, effectiveHours, limit))));
@@ -134,7 +134,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "分页查询告警列表", description = "分页查询仪表盘告警列表")
     @GetMapping("/alert/latest")
     public Mono<R<List<AlertItemVO>>> alertLatest(@RequestParam(value = "size", defaultValue = "10") int size) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertLatest(tenantId, size))));
@@ -144,9 +144,9 @@ public class DashboardController implements BaseController {
     @Operation(summary = "查询仪表盘延迟", description = "查询仪表盘延迟统计")
     @GetMapping("/stats/latency")
     public Mono<R<List<LatencyBucketVO>>> latencyHistogram(
-            @Parameter(description = "range hours", required = true)
+            @Parameter(description = "Fallback rolling time range in hours")
             @RequestParam(value = "range_hours", defaultValue = "24") int rangeHours,
-            @Parameter(description = "range key", required = true)
+            @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
             @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.latencyHistogram(tenantId, effectiveHours))));
@@ -156,9 +156,9 @@ public class DashboardController implements BaseController {
     @Operation(summary = "查询仪表盘活跃度", description = "查询仪表盘活跃度统计")
     @GetMapping("/stats/activity")
     public Mono<R<List<ActivityCellVO>>> hourlyActivity(
-            @Parameter(description = "range hours", required = true)
+            @Parameter(description = "Fallback rolling time range in hours")
             @RequestParam(value = "range_hours", defaultValue = "168") int rangeHours,
-            @Parameter(description = "range key", required = true)
+            @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
             @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.hourlyActivity(tenantId, effectiveHours))));
@@ -177,7 +177,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'list')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "确认告警", description = "确认指定来源的告警记录")
     @PostMapping("/alert/page")
     public Mono<R<Page<AlertItemVO>>> alertPage(
             @RequestBody(required = false) AlertPageQuery query) {
@@ -193,7 +193,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'list')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "取消确认告警", description = "取消指定来源告警记录的确认状态")
     @PostMapping("/alert/confirm")
     public Mono<R<Boolean>> alertConfirm(@RequestParam String source,
                                          @RequestParam Long id) {
@@ -201,7 +201,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'list')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "批量确认告警", description = "批量确认或取消确认告警记录")
     @PostMapping("/alert/unconfirm")
     public Mono<R<Boolean>> alertUnconfirm(@RequestParam String source,
                                            @RequestParam Long id) {
@@ -213,7 +213,7 @@ public class DashboardController implements BaseController {
      * }. Returns the number of rows actually changed.
      */
     @PreAuthorize("@perm.can('dashboard', 'list')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "查询告警趋势", description = "按时间范围查询告警趋势")
     @PostMapping("/alert/bulk_confirm")
     public Mono<R<Integer>> alertBulkConfirm(
             @RequestBody AlertBulkConfirmRequest body) {
@@ -230,19 +230,19 @@ public class DashboardController implements BaseController {
     @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
     @GetMapping("/alert/trend")
     public Mono<R<List<AlertTrendVO>>> alertTrend(@RequestParam(value = "days", defaultValue = "30") int days,
-                                                  @Parameter(description = "range key", required = true)
+                                                  @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
                                                   @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveDays = resolveEffectiveDays(rangeKey, days);
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertTrend(tenantId, effectiveDays))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘排行", description = "查询仪表盘排行榜")
+    @Operation(summary = "查询告警来源排行", description = "按时间范围查询告警来源排行")
     @GetMapping("/alert/top_sources")
     public Mono<R<List<AlertTopSourceVO>>> alertTopSources(@RequestParam(value = "days", defaultValue = "30") int days,
-                                                           @Parameter(description = "range key", required = true)
+                                                           @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
                                                            @RequestParam(value = "range_key", required = false) String rangeKey,
-                                                           @Parameter(description = "limit", required = true)
+                                                           @Parameter(description = "Maximum number of items to return")
                                                            @RequestParam(value = "limit", defaultValue = "10") int limit) {
         int effectiveDays = resolveEffectiveDays(rangeKey, days);
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertTopSources(tenantId, effectiveDays, limit))));
@@ -269,36 +269,36 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "查询告警活跃度", description = "查询告警活跃度热力分布")
     @GetMapping("/alert/activity")
     public Mono<R<List<AlertActivityCellVO>>> alertActivity(@RequestParam(value = "days", defaultValue = "7") int days,
-                                                            @Parameter(description = "range key", required = true)
+                                                            @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
                                                             @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveDays = resolveEffectiveDays(rangeKey, days);
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertActivity(tenantId, effectiveDays))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "查询告警类型分布", description = "按时间范围查询告警类型分布")
     @GetMapping("/alert/type_distribution")
     public Mono<R<List<AlertTypeBucketVO>>> alertTypeDistribution(
-            @Parameter(description = "days", required = true)
+            @Parameter(description = "Rolling day range")
             @RequestParam(value = "days", defaultValue = "30") int days,
-            @Parameter(description = "range key", required = true)
+            @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
             @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveDays = resolveEffectiveDays(rangeKey, days);
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertTypeDistribution(tenantId, effectiveDays))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "查询告警风暴来源", description = "查询短时间内高频触发的告警来源")
     @GetMapping("/alert/storm_sources")
     public Mono<R<List<AlertTopSourceVO>>> alertStormSources(
-            @Parameter(description = "hours", required = true)
+            @Parameter(description = "Rolling hour range")
             @RequestParam(value = "hours", defaultValue = "1") int hours,
-            @Parameter(description = "min count", required = true)
+            @Parameter(description = "Minimum alert count threshold")
             @RequestParam(value = "min_count", defaultValue = "10") int minCount,
-            @Parameter(description = "limit", required = true)
+            @Parameter(description = "Maximum number of items to return")
             @RequestParam(value = "limit", defaultValue = "10") int limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertStormSources(tenantId, hours, minCount, limit))));
     }
@@ -306,47 +306,47 @@ public class DashboardController implements BaseController {
     // ===== Phase-2 insights =====================================================
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "查询频繁波动告警来源", description = "查询频繁确认和恢复的告警来源")
     @GetMapping("/alert/flapping")
     public Mono<R<List<FlappingSourceVO>>> alertFlapping(@RequestParam(value = "hours", defaultValue = "6") int hours,
-                                                         @Parameter(description = "min count", required = true)
+                                                         @Parameter(description = "Minimum alert count threshold")
                                                          @RequestParam(value = "min_count", defaultValue = "5") int minCount,
-                                                         @Parameter(description = "limit", required = true)
+                                                         @Parameter(description = "Maximum number of items to return")
                                                          @RequestParam(value = "limit", defaultValue = "20") int limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertFlapping(tenantId, hours, minCount, limit))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "查询告警相关性", description = "查询时间窗口内高度相关的告警来源组合")
     @GetMapping("/alert/correlation")
     public Mono<R<List<CorrelationPairVO>>> alertCorrelation(
-            @Parameter(description = "hours", required = true)
+            @Parameter(description = "Rolling hour range")
             @RequestParam(value = "hours", defaultValue = "24") int hours,
-            @Parameter(description = "window sec", required = true)
+            @Parameter(description = "Correlation window in seconds")
             @RequestParam(value = "window_sec", defaultValue = "30") int windowSec,
-            @Parameter(description = "limit", required = true)
+            @Parameter(description = "Maximum number of items to return")
             @RequestParam(value = "limit", defaultValue = "15") int limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertCorrelation(tenantId, hours, windowSec, limit))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "查询同类偏差告警", description = "查询同类对象之间的告警偏差")
     @GetMapping("/alert/peer_deviation")
     public Mono<R<List<PeerDeviationVO>>> alertPeerDeviation(
-            @Parameter(description = "days", required = true)
+            @Parameter(description = "Rolling day range")
             @RequestParam(value = "days", defaultValue = "7") int days) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertPeerDeviation(tenantId, days))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "查询告警积压", description = "查询未确认告警积压情况")
     @GetMapping("/alert/aging")
     public Mono<R<AgingBacklogVO>> alertAging() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertAgingBacklog(tenantId))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询仪表盘告警", description = "查询仪表盘告警数据")
+    @Operation(summary = "查询平均确认时间趋势", description = "查询告警平均确认时间趋势")
     @GetMapping("/alert/mtta")
     public Mono<R<List<MttaTrendVO>>> alertMtta(@RequestParam(value = "days", defaultValue = "30") int days) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertMtta(tenantId, days))));
@@ -360,29 +360,29 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "仪表盘 - change impact", description = "仪表盘 - change impact")
+    @Operation(summary = "查询变更影响", description = "查询配置变更对告警的影响")
     @GetMapping("/alert/change_impact")
     public Mono<R<List<ChangeImpactVO>>> changeImpact(@RequestParam(value = "days", defaultValue = "30") int days,
-                                                      @Parameter(description = "limit", required = true)
+                                                      @Parameter(description = "Maximum number of items to return")
                                                       @RequestParam(value = "limit", defaultValue = "30") int limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.changeImpact(tenantId, days, limit))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "仪表盘 - silent sources", description = "仪表盘 - silent sources")
+    @Operation(summary = "查询静默数据源", description = "查询超过阈值未产生数据的数据源")
     @GetMapping("/silent/sources")
     public Mono<R<List<SilentSourceVO>>> silentSources(
-            @Parameter(description = "baseline days", required = true)
+            @Parameter(description = "Baseline rolling day range")
             @RequestParam(value = "baseline_days", defaultValue = "7") int baselineDays,
-            @Parameter(description = "silent minutes", required = true)
+            @Parameter(description = "Silence threshold in minutes")
             @RequestParam(value = "silent_minutes", defaultValue = "15") int silentMinutes,
-            @Parameter(description = "limit", required = true)
+            @Parameter(description = "Maximum number of items to return")
             @RequestParam(value = "limit", defaultValue = "50") int limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.silentSources(tenantId, baselineDays, silentMinutes, limit))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "仪表盘 - coverage gap", description = "仪表盘 - coverage gap")
+    @Operation(summary = "查询覆盖缺口", description = "查询数据覆盖缺口统计")
     @GetMapping("/coverage/gap")
     public Mono<R<CoverageGapVO>> coverageGap(@RequestParam(value = "limit", defaultValue = "100") int limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.coverageGap(tenantId, limit))));

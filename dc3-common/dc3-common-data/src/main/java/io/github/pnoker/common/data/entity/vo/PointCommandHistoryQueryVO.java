@@ -60,7 +60,7 @@ public class PointCommandHistoryQueryVO implements Serializable {
     @Schema(description = "Command status", example = "SUCCESS")
     private PointCommandStatusEnum status;
 
-    @Schema(description = "type")
+    @Schema(description = "Point command type")
 
     private PointCommandTypeEnum type;
 

@@ -62,7 +62,7 @@ public class RuleStateController implements BaseController {
     private final RuleStateService ruleStateService;
 
     @PreAuthorize("@perm.can('rule_state', 'get')")
-    @Operation(summary = "查询RuleState", description = "根据ID查询RuleState详细信息")
+    @Operation(summary = "查询规则状态", description = "根据ID查询规则状态详细信息")
     @GetMapping("/get_by_id")
     public Mono<R<RuleStateVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -72,7 +72,7 @@ public class RuleStateController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('rule_state', 'list')")
-    @Operation(summary = "查询RuleState列表", description = "分页查询RuleState列表")
+    @Operation(summary = "查询规则状态列表", description = "分页查询规则状态列表")
     @PostMapping("/list")
     public Mono<R<Page<RuleStateVO>>> list(@RequestBody(required = false) RuleStateQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

@@ -61,7 +61,7 @@ public class EntityAlarmQuery implements Serializable {
     /**
      * Alarm target type flag
      */
-    @Schema(description = "alarm target type flag")
+    @Schema(description = "Alarm target type enum")
     private Byte alarmTargetTypeFlag;
 
     /**

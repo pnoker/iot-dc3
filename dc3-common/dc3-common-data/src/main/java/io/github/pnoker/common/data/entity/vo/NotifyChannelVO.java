@@ -53,7 +53,7 @@ public class NotifyChannelVO extends BaseVO {
 
     private String channelCode;
 
-    @Schema(description = "channel type flag")
+    @Schema(description = "Notification channel type enum")
 
     private NotifyChannelTypeEnum channelTypeFlag;
 
@@ -61,11 +61,11 @@ public class NotifyChannelVO extends BaseVO {
     @ToString.Exclude
     private String credentialRef;
 
-    @Schema(description = "channel extension information (JSON)")
+    @Schema(description = "channel extension information in JSON format")
 
     private NotifyChannelExt channelExt;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

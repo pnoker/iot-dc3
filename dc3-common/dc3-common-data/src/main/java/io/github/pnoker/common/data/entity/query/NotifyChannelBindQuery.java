@@ -67,7 +67,7 @@ public class NotifyChannelBindQuery implements Serializable {
 
     private Long channelId;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

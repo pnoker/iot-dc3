@@ -68,11 +68,11 @@ public class NotifyChannelQuery implements Serializable {
 
     private String channelCode;
 
-    @Schema(description = "channel type flag")
+    @Schema(description = "Notification channel type enum")
 
     private NotifyChannelTypeEnum channelTypeFlag;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

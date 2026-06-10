@@ -64,7 +64,7 @@ public class RuleStateQuery implements Serializable {
 
     private Long ruleId;
 
-    @Schema(description = "alarm target type flag")
+    @Schema(description = "Alarm target type enum")
 
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
@@ -72,11 +72,11 @@ public class RuleStateQuery implements Serializable {
 
     private Long entityId;
 
-    @Schema(description = "fingerprint")
+    @Schema(description = "Alarm fingerprint")
 
     private String fingerprint;
 
-    @Schema(description = "entity state flag")
+    @Schema(description = "Entity state enum")
 
     private RuleStatusEnum entityStateFlag;
 

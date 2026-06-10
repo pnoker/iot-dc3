@@ -70,7 +70,7 @@ public class PointValueController implements BaseController {
      * a point in the device
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
-    @Operation(summary = "位号值 - latest", description = "位号值 - latest")
+    @Operation(summary = "查询最新位号值", description = "分页查询设备下各位号的最新值")
     @PostMapping("/latest")
     public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,7 +90,7 @@ public class PointValueController implements BaseController {
      * for a point in the device
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
-    @Operation(summary = "查询PointValue列表", description = "分页查询PointValue列表")
+    @Operation(summary = "查询位号值列表", description = "分页查询位号值历史列表")
     @PostMapping("/list")
     public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -110,11 +110,11 @@ public class PointValueController implements BaseController {
      * @return List of String, where each String is the historical value for the point
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
-    @Operation(summary = "查询PointValue历史", description = "查询PointValue历史记录")
+    @Operation(summary = "查询位号值历史", description = "根据设备ID和位号ID查询位号值历史记录")
     @GetMapping("/list_history_by_device_id_and_point_id")
     public Mono<R<List<String>>> history(@NotNull @RequestParam(name = "device_id") Long deviceId,
                                          @NotNull @RequestParam(name = "point_id") Long pointId,
-                                         @Parameter(description = "count", required = true)
+                                         @Parameter(description = "Maximum number of historical values to return")
                                          @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<String> history = pointValueService.history(tenantId, deviceId, pointId, count);

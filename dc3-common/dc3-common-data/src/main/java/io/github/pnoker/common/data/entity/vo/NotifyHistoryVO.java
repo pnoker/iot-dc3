@@ -66,23 +66,23 @@ public class NotifyHistoryVO extends BaseVO {
 
     private Long alarmId;
 
-    @Schema(description = "channel type flag")
+    @Schema(description = "Notification channel type enum")
 
     private NotifyChannelTypeEnum channelTypeFlag;
 
-    @Schema(description = "target")
+    @Schema(description = "Notification target")
 
     private String target;
 
-    @Schema(description = "status flag")
+    @Schema(description = "Status enum")
 
     private NotifyHistoryStatusEnum statusFlag;
 
-    @Schema(description = "request extension information (JSON)")
+    @Schema(description = "request extension information in JSON format")
 
     private NotifyHistoryRequestExt requestExt;
 
-    @Schema(description = "response extension information (JSON)")
+    @Schema(description = "response extension information in JSON format")
 
     private NotifyHistoryResponseExt responseExt;
 

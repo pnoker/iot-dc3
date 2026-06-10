@@ -58,7 +58,7 @@ public class EventReportVO implements Serializable {
     @Schema(description = "event parameter values")
     private Map<String, String> paramValues;
 
-    @Schema(description = "message")
+    @Schema(description = "Message content")
 
     private String message;
 

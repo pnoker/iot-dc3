@@ -58,7 +58,7 @@ public class CommandCallVO implements Serializable {
     @Schema(description = "command parameter values")
     private Map<String, String> paramValues;
 
-    @Schema(description = "command id_")
+    @Schema(description = "Client command correlation ID")
 
     private String commandId_;
 

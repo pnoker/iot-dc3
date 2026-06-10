@@ -85,13 +85,13 @@ public class RuleQuery implements Serializable {
     /**
      * Alarm target type flag
      */
-    @Schema(description = "alarm target type flag")
+    @Schema(description = "Alarm target type enum")
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
     private EnableFlagEnum enableFlag;
 
 }

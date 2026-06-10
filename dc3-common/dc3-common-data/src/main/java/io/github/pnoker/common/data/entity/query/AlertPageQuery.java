@@ -46,29 +46,29 @@ public class AlertPageQuery implements Serializable {
     /**
      * {@code "device"} / {@code "driver"} / {@code null} (both).
      */
-    @Schema(description = "source")
+    @Schema(description = "Source identifier")
     private String source;
 
-    @Schema(description = "alarm type flag")
+    @Schema(description = "Alarm type enum")
 
     private Integer alarmTypeFlag;
 
     /**
      * 0 = unconfirmed, 1 = confirmed, null = both.
      */
-    @Schema(description = "confirm flag")
+    @Schema(description = "Confirm flag enum")
     private Integer confirmFlag;
 
     /**
      * Legacy integer window; {@code rangeKey} wins when both set.
      */
-    @Schema(description = "range hours")
+    @Schema(description = "Fallback rolling time range in hours")
     private Integer rangeHours;
 
     /**
      * Preset time-range key — resolved server-side via TimeRangeUtil.
      */
-    @Schema(description = "range key")
+    @Schema(description = "Preset time range key: today, 24h, 7d, or 30d")
     private String rangeKey;
 
     /**

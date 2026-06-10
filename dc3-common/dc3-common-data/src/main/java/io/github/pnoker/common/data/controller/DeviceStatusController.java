@@ -63,6 +63,7 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
+    @Operation(summary = "查询设备状态列表", description = "分页查询设备状态映射")
     @PostMapping("/list")
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -80,6 +81,7 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
+    @Operation(summary = "查询驱动下设备状态", description = "根据驱动ID查询设备状态映射")
     @GetMapping("/list_by_driver_id")
     public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -98,6 +100,7 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
+    @Operation(summary = "查询模板下设备状态", description = "根据模板ID查询设备状态映射")
     @GetMapping("/list_by_profile_id")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
             @NotNull @RequestParam(value = "profile_id") Long profileId) {
