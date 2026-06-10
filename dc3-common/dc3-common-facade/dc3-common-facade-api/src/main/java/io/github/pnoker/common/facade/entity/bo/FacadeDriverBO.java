@@ -59,15 +59,15 @@ public class FacadeDriverBO extends BaseBO {
 
     private String serviceHost;
 
-    @Schema(description = "driver type flag")
+    @Schema(description = "Driver type enum")
 
     private DriverTypeEnum driverTypeFlag;
 
-    @Schema(description = "driver extension information (JSON)")
+    @Schema(description = "driver extension information in JSON format")
 
     private DriverExt driverExt;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
@@ -75,7 +75,7 @@ public class FacadeDriverBO extends BaseBO {
 
     private Long tenantId;
 
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
 
     private String signature;
 

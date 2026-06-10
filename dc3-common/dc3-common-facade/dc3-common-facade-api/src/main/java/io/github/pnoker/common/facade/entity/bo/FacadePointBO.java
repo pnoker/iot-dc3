@@ -54,11 +54,11 @@ public class FacadePointBO extends BaseBO {
 
     private String pointCode;
 
-    @Schema(description = "point type flag")
+    @Schema(description = "Point type enum")
 
     private PointTypeEnum pointTypeFlag;
 
-    @Schema(description = "rw flag")
+    @Schema(description = "Read/write type enum")
 
     private RwTypeEnum rwFlag;
 
@@ -66,7 +66,7 @@ public class FacadePointBO extends BaseBO {
 
     private BigDecimal baseValue;
 
-    @Schema(description = "multiple")
+    @Schema(description = "Value multiplier")
 
     private BigDecimal multiple;
 
@@ -74,7 +74,7 @@ public class FacadePointBO extends BaseBO {
 
     private Byte valueDecimal;
 
-    @Schema(description = "unit")
+    @Schema(description = "Point value unit")
 
     private String unit;
 
@@ -82,11 +82,11 @@ public class FacadePointBO extends BaseBO {
 
     private Long profileId;
 
-    @Schema(description = "point extension information (JSON)")
+    @Schema(description = "point extension information in JSON format")
 
     private PointExt pointExt;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
@@ -94,7 +94,7 @@ public class FacadePointBO extends BaseBO {
 
     private Long tenantId;
 
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
 
     private String signature;
 

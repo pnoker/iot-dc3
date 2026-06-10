@@ -54,7 +54,7 @@ public class FacadeSystemHealthBO implements Serializable {
 
     private FleetSummary drivers;
 
-    @Schema(description = "devices")
+    @Schema(description = "Device list")
 
     private FleetSummary devices;
 

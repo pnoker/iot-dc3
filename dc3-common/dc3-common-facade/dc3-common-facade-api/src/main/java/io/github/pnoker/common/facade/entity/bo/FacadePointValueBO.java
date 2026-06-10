@@ -60,7 +60,7 @@ public class FacadePointValueBO {
     /**
      * Processed/calculated value after transformations
      */
-    @Schema(description = "value")
+    @Schema(description = "Point value")
     private String value;
 
     /**

@@ -53,7 +53,7 @@ public class FacadeScannedApiBO {
 
     private String apiName;
 
-    @Schema(description = "title")
+    @Schema(description = "Title")
 
     private String title;
 

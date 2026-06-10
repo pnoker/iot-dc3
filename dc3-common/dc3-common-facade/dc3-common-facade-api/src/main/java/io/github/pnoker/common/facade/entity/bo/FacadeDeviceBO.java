@@ -58,11 +58,11 @@ public class FacadeDeviceBO extends BaseBO {
 
     private Long driverId;
 
-    @Schema(description = "device extension information (JSON)")
+    @Schema(description = "device extension information in JSON format")
 
     private DeviceExt deviceExt;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
@@ -70,7 +70,7 @@ public class FacadeDeviceBO extends BaseBO {
 
     private Long tenantId;
 
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
 
     private String signature;
 

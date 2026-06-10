@@ -52,15 +52,15 @@ public class FacadeEventBO extends BaseBO {
 
     private String eventCode;
 
-    @Schema(description = "event type flag")
+    @Schema(description = "Event type enum")
 
     private EventTypeFlagEnum eventTypeFlag;
 
-    @Schema(description = "event level flag")
+    @Schema(description = "Event level enum")
 
     private EventLevelEnum eventLevelFlag;
 
-    @Schema(description = "event extension information (JSON)")
+    @Schema(description = "event extension information in JSON format")
 
     private EventExt eventExt;
 
@@ -68,7 +68,7 @@ public class FacadeEventBO extends BaseBO {
 
     private Long profileId;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
@@ -76,7 +76,7 @@ public class FacadeEventBO extends BaseBO {
 
     private Long tenantId;
 
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
 
     private String signature;
 

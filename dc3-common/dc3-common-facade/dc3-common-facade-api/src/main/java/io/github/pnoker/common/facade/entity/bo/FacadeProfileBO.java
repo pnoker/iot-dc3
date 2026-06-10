@@ -52,19 +52,19 @@ public class FacadeProfileBO extends BaseBO {
 
     private String profileCode;
 
-    @Schema(description = "profile share flag")
+    @Schema(description = "Profile share flag enum")
 
     private ProfileShareTypeEnum profileShareFlag;
 
-    @Schema(description = "Profile type flag")
+    @Schema(description = "Profile type enum")
 
     private ProfileTypeEnum profileTypeFlag;
 
-    @Schema(description = "profile extension information (JSON)")
+    @Schema(description = "profile extension information in JSON format")
 
     private ProfileExt profileExt;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
@@ -72,7 +72,7 @@ public class FacadeProfileBO extends BaseBO {
 
     private Long tenantId;
 
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
 
     private String signature;
 
