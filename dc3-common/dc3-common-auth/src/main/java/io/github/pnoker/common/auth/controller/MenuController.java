@@ -20,11 +20,13 @@ package io.github.pnoker.common.auth.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.MenuBO;
 import io.github.pnoker.common.auth.entity.bo.MenuTreeBO;
+import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.builder.MenuBuilder;
 import io.github.pnoker.common.auth.entity.query.MenuQuery;
 import io.github.pnoker.common.auth.entity.vo.MenuTreeVO;
 import io.github.pnoker.common.auth.entity.vo.MenuVO;
 import io.github.pnoker.common.auth.service.MenuService;
+import io.github.pnoker.common.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
@@ -47,6 +49,8 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -68,6 +72,8 @@ public class MenuController implements BaseController {
     private final MenuBuilder menuBuilder;
 
     private final MenuService menuService;
+
+    private final RoleResourceBindService roleResourceBindService;
 
     @PreAuthorize("@perm.can('menu', 'add')")
     @Operation(summary = "新增菜单管理", description = "新增一条菜单记录")
@@ -139,15 +145,44 @@ public class MenuController implements BaseController {
     @Operation(summary = "查询菜单管理列表", description = "分页查询菜单管理列表")
     @PostMapping("/list_tree")
     public Mono<R<List<MenuTreeVO>>> listTree(@RequestBody(required = false) MenuQuery entityQuery) {
-        // Read access to global menu data is open to all authenticated users.
-        return async(() -> {
+        return getUserHeader().flatMap(header -> async(() -> {
             List<MenuTreeBO> entityBOList = menuService.listTree(entityQuery);
+            entityBOList = filterByUserMenuResources(entityBOList, header.getUserId(), header.getTenantId());
             List<MenuTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
             for (MenuTreeBO node : entityBOList) {
                 entityVOList.add(toTreeVO(node));
             }
             return R.ok(entityVOList);
-        });
+        }));
+    }
+
+    private List<MenuTreeBO> filterByUserMenuResources(List<MenuTreeBO> nodes, Long userId, Long tenantId) {
+        List<ResourceBO> resources = roleResourceBindService.listResourceByUserId(userId, tenantId);
+        Set<String> visibleMenuCodes = resources.stream()
+                .map(ResourceBO::getResourceCode)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (visibleMenuCodes.contains("*")) {
+            return nodes;
+        }
+        return nodes.stream()
+                .map(node -> retainAccessibleMenuNode(node, visibleMenuCodes))
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private MenuTreeBO retainAccessibleMenuNode(MenuTreeBO node, Set<String> visibleMenuCodes) {
+        List<MenuTreeBO> children = Objects.requireNonNullElse(node.getChildren(), List.<MenuTreeBO>of())
+                .stream()
+                .map(child -> retainAccessibleMenuNode(child, visibleMenuCodes))
+                .filter(Objects::nonNull)
+                .toList();
+        boolean selfVisible = visibleMenuCodes.contains("menu:" + Objects.requireNonNullElse(node.getMenuCode(), ""));
+        if (!selfVisible && children.isEmpty()) {
+            return null;
+        }
+        node.setChildren(children);
+        return node;
     }
 
     private MenuTreeVO toTreeVO(MenuTreeBO node) {

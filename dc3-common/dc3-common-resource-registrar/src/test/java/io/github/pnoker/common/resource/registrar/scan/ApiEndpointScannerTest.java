@@ -21,6 +21,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -122,6 +123,22 @@ class ApiEndpointScannerTest {
         assertThat(scanner.scan()).isEmpty();
     }
 
+    @Test
+    void preAuthorizePermissionIsUsedAsApiNameWhenPresent() {
+        register(ProjectConventionController.class);
+        ApiEndpointScanner scanner = new ApiEndpointScanner(handlerMapping, new ResourceRegistrarProperties());
+
+        List<FacadeScannedApiBO> apis = scanner.scan();
+
+        assertThat(apis).extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath,
+                        FacadeScannedApiBO::getApiName)
+                .containsExactlyInAnyOrder(
+                        org.assertj.core.groups.Tuple.tuple("GET", "/api/convention/get_by_id", "convention:get"),
+                        org.assertj.core.groups.Tuple.tuple("POST", "/api/convention/list", "convention:list"),
+                        org.assertj.core.groups.Tuple.tuple("POST", "/api/convention/update", "convention:update"),
+                        org.assertj.core.groups.Tuple.tuple("POST", "/api/convention/delete", "convention:delete"));
+    }
+
     private void register(Class<?> controllerClass) {
         try {
             Object bean = controllerClass.getDeclaredConstructor().newInstance();
@@ -200,6 +217,34 @@ class ApiEndpointScannerTest {
     static class MethodLessController {
         @RequestMapping
         public String anything() {
+            return "ok";
+        }
+    }
+
+    @RestController
+    @RequestMapping("/api/convention")
+    static class ProjectConventionController {
+        @PreAuthorize("@perm.can('convention', 'get')")
+        @GetMapping("/get_by_id")
+        public String getById() {
+            return "ok";
+        }
+
+        @PreAuthorize("@perm.can('convention', 'list')")
+        @PostMapping("/list")
+        public String list() {
+            return "ok";
+        }
+
+        @PreAuthorize("@perm.can('convention', 'update')")
+        @PostMapping("/update")
+        public String update() {
+            return "ok";
+        }
+
+        @PreAuthorize("@perm.can('convention', 'delete')")
+        @PostMapping("/delete")
+        public String delete() {
             return "ok";
         }
     }

@@ -21,6 +21,7 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
@@ -34,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Walks the WebFlux handler mappings and turns every HTTP endpoint into a
@@ -53,6 +56,9 @@ public class ApiEndpointScanner {
 
     private static final List<String> DEFAULT_EXCLUDES = List.of("/actuator/**", "/error", "/error/**", "/favicon.ico");
 
+    private static final Pattern PERMISSION_CAN_PATTERN = Pattern.compile(
+            "@perm\\.can\\(\\s*['\"]([^'\"]+)['\"]\\s*,\\s*['\"]([^'\"]+)['\"]\\s*\\)");
+
     private final RequestMappingHandlerMapping handlerMapping;
 
     private final ResourceRegistrarProperties properties;
@@ -68,6 +74,11 @@ public class ApiEndpointScanner {
      */
 
     private static String buildApiName(HandlerMethod handler, String httpMethod, boolean isSingleGet) {
+        String protectedApiName = resolvePreAuthorizeApiName(handler);
+        if (Objects.nonNull(protectedApiName)) {
+            return protectedApiName;
+        }
+
         String className = handler.getBeanType().getSimpleName();
         // Strip "Controller" suffix, convert camelCase to snake_case → domain
         String domain = className
@@ -87,6 +98,22 @@ public class ApiEndpointScanner {
             };
         }
         return domain + SymbolConstant.COLON + scope;
+    }
+
+    private static String resolvePreAuthorizeApiName(HandlerMethod handler) {
+        PreAuthorize preAuthorize = handler.getMethodAnnotation(PreAuthorize.class);
+        if (Objects.isNull(preAuthorize)) {
+            preAuthorize = handler.getBeanType().getAnnotation(PreAuthorize.class);
+        }
+        if (Objects.isNull(preAuthorize)) {
+            return null;
+        }
+
+        Matcher matcher = PERMISSION_CAN_PATTERN.matcher(preAuthorize.value());
+        if (!matcher.find()) {
+            return null;
+        }
+        return matcher.group(1) + SymbolConstant.COLON + matcher.group(2);
     }
 
     /**
