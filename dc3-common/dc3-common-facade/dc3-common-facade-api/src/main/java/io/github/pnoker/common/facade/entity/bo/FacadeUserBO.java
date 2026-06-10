@@ -58,11 +58,11 @@ public class FacadeUserBO extends BaseBO {
 
     private String email;
 
-    @Schema(description = "Social extension information (JSON)")
+    @Schema(description = "Social extension information in JSON format")
 
     private String socialExt;
 
-    @Schema(description = "Identity extension information (JSON)")
+    @Schema(description = "Identity extension information in JSON format")
 
     private String identityExt;
 

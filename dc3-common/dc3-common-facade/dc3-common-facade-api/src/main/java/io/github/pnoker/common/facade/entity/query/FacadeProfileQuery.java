@@ -67,15 +67,15 @@ public class FacadeProfileQuery implements Serializable {
 
     private String profileCode;
 
-    @Schema(description = "profile share flag")
+    @Schema(description = "Profile share flag enum")
 
     private ProfileShareTypeEnum profileShareFlag;
 
-    @Schema(description = "Profile type flag")
+    @Schema(description = "Profile type enum")
 
     private ProfileTypeEnum profileTypeFlag;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

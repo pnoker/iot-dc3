@@ -71,7 +71,7 @@ public class FacadeDeviceQuery implements Serializable {
 
     private Long driverId;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

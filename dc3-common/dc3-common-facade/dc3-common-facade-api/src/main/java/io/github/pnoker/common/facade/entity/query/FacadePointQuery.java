@@ -67,11 +67,11 @@ public class FacadePointQuery implements Serializable {
 
     private String pointCode;
 
-    @Schema(description = "point type flag")
+    @Schema(description = "Point type enum")
 
     private PointTypeEnum pointTypeFlag;
 
-    @Schema(description = "rw flag")
+    @Schema(description = "Read/write type enum")
 
     private RwTypeEnum rwFlag;
 
@@ -79,7 +79,7 @@ public class FacadePointQuery implements Serializable {
 
     private Long profileId;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

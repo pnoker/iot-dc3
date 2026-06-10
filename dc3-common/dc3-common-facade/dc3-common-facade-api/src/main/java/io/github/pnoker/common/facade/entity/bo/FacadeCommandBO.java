@@ -52,19 +52,19 @@ public class FacadeCommandBO extends BaseBO {
 
     private String commandCode;
 
-    @Schema(description = "command type flag")
+    @Schema(description = "Command type enum")
 
     private CommandTypeEnum commandTypeFlag;
 
-    @Schema(description = "call type flag")
+    @Schema(description = "Command call type enum")
 
     private CallTypeEnum callTypeFlag;
 
-    @Schema(description = "timeout")
+    @Schema(description = "Command timeout")
 
     private Integer timeout;
 
-    @Schema(description = "command extension information (JSON)")
+    @Schema(description = "command extension information in JSON format")
 
     private CommandExt commandExt;
 
@@ -72,7 +72,7 @@ public class FacadeCommandBO extends BaseBO {
 
     private Long profileId;
 
-    @Schema(description = "Enable flag: 0=enabled, 1=disabled")
+    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
@@ -80,7 +80,7 @@ public class FacadeCommandBO extends BaseBO {
 
     private Long tenantId;
 
-    @Schema(description = "signature")
+    @Schema(description = "Configuration signature")
 
     private String signature;
 
