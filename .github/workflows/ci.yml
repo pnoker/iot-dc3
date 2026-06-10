@@ -29,6 +29,9 @@ jobs:
           cache: maven
           cache-dependency-path: "**/pom.xml"
 
+      - name: Audit controller permissions
+        run: python3 dc3/bin/audit_controller_permissions.py
+
       - name: Compile
         run: |
           set -euo pipefail
