@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.resource.registrar.scan;
 
+import io.github.pnoker.common.annotation.PublicEndpoint;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProperties;
@@ -54,7 +55,8 @@ public class ApiEndpointScanner {
     private static final Set<RequestMethod> SUPPORTED_METHODS = Set.of(RequestMethod.GET, RequestMethod.POST,
             RequestMethod.PUT, RequestMethod.DELETE);
 
-    private static final List<String> DEFAULT_EXCLUDES = List.of("/actuator/**", "/error", "/error/**", "/favicon.ico");
+    private static final List<String> DEFAULT_EXCLUDES = List.of("/actuator/**", "/error", "/error/**", "/favicon.ico",
+            "/mcp_tools");
 
     private static final Pattern PERMISSION_CAN_PATTERN = Pattern.compile(
             "@perm\\.can\\(\\s*['\"]([^'\"]+)['\"]\\s*,\\s*['\"]([^'\"]+)['\"]\\s*\\)");
@@ -138,6 +140,9 @@ public class ApiEndpointScanner {
      * {@code METHOD:path} entries are ignored.
      */
     private void expand(RequestMappingInfo info, HandlerMethod handler, Map<String, FacadeScannedApiBO> out) {
+        if (isPublicEndpoint(handler)) {
+            return;
+        }
         Set<RequestMethod> methods = info.getMethodsCondition().getMethods();
         if (methods.isEmpty()) {
             // Controllers that don't declare a method expose GET by default at the HTTP
@@ -174,6 +179,11 @@ public class ApiEndpointScanner {
                                 .build());
             }
         }
+    }
+
+    private boolean isPublicEndpoint(HandlerMethod handler) {
+        return handler.hasMethodAnnotation(PublicEndpoint.class)
+                || handler.getBeanType().isAnnotationPresent(PublicEndpoint.class);
     }
 
     /**

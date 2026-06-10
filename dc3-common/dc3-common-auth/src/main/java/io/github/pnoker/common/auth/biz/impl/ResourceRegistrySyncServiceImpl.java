@@ -103,6 +103,22 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         };
     }
 
+    private static ResourceScopeTypeEnum apiToScopeFlag(ApiDO api) {
+        ResourceScopeTypeEnum explicitScope = resolveScopeFromApiName(api.getApiName());
+        return Objects.nonNull(explicitScope) ? explicitScope : methodToScopeFlag(api.getApiTypeFlag());
+    }
+
+    private static ResourceScopeTypeEnum resolveScopeFromApiName(String apiName) {
+        if (StringUtils.isBlank(apiName)) {
+            return null;
+        }
+        int idx = apiName.lastIndexOf(SymbolConstant.COLON);
+        if (idx < 0 || idx == apiName.length() - 1) {
+            return null;
+        }
+        return ResourceScopeTypeEnum.ofCode(apiName.substring(idx + 1));
+    }
+
     private static String buildResourceCode(String serviceName, String apiName) {
         return Objects.requireNonNullElse(serviceName, "") + SymbolConstant.COLON
                 + Objects.requireNonNullElse(apiName, "");
@@ -284,7 +300,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         resource.setResourceCode(buildResourceCode(api.getServiceName(), api.getApiName()));
         resource.setServiceName(api.getServiceName());
         resource.setResourceTypeFlag(ResourceTypeEnum.API.getIndex());
-        resource.setResourceScopeFlag(methodToScopeFlag(api.getApiTypeFlag()).getIndex());
+        resource.setResourceScopeFlag(apiToScopeFlag(api).getIndex());
         resource.setEntityId(api.getId());
         resource.setResourceExt(new JsonExt());
         resource.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
@@ -370,7 +386,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         resource.setResourceCode(buildResourceCode(api.getServiceName(), api.getApiName()));
         resource.setServiceName(api.getServiceName());
         resource.setResourceTypeFlag(ResourceTypeEnum.API.getIndex());
-        resource.setResourceScopeFlag(methodToScopeFlag(api.getApiTypeFlag()).getIndex());
+        resource.setResourceScopeFlag(apiToScopeFlag(api).getIndex());
         resource.setEntityId(api.getId());
         if (Objects.isNull(resource.getResourceExt())) {
             resource.setResourceExt(new JsonExt());
@@ -395,7 +411,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         if (!Objects.equals(resource.getResourceTypeFlag(), ResourceTypeEnum.API.getIndex())) {
             return true;
         }
-        if (!Objects.equals(resource.getResourceScopeFlag(), methodToScopeFlag(api.getApiTypeFlag()).getIndex())) {
+        if (!Objects.equals(resource.getResourceScopeFlag(), apiToScopeFlag(api).getIndex())) {
             return true;
         }
         if (!Objects.equals(resource.getEntityId(), api.getId())) {

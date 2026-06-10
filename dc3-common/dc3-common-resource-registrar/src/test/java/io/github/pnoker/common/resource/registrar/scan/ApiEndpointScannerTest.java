@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.resource.registrar.scan;
 
+import io.github.pnoker.common.annotation.PublicEndpoint;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,6 +69,7 @@ class ApiEndpointScannerTest {
     void unsupportedMethodsAndDefaultExcludesAreFilteredOut() {
         register(PatchOnlyController.class);
         register(ActuatorController.class);
+        register(McpToolsController.class);
         ApiEndpointScanner scanner = new ApiEndpointScanner(handlerMapping, new ResourceRegistrarProperties());
 
         List<FacadeScannedApiBO> apis = scanner.scan();
@@ -137,6 +139,14 @@ class ApiEndpointScannerTest {
                         org.assertj.core.groups.Tuple.tuple("POST", "/api/convention/list", "convention:list"),
                         org.assertj.core.groups.Tuple.tuple("POST", "/api/convention/update", "convention:update"),
                         org.assertj.core.groups.Tuple.tuple("POST", "/api/convention/delete", "convention:delete"));
+    }
+
+    @Test
+    void publicEndpointIsExcludedFromRegistration() {
+        register(PublicTokenController.class);
+        ApiEndpointScanner scanner = new ApiEndpointScanner(handlerMapping, new ResourceRegistrarProperties());
+
+        assertThat(scanner.scan()).isEmpty();
     }
 
     private void register(Class<?> controllerClass) {
@@ -213,6 +223,14 @@ class ApiEndpointScannerTest {
     }
 
     @RestController
+    static class McpToolsController {
+        @GetMapping("/mcp_tools")
+        public String tools() {
+            return "ok";
+        }
+    }
+
+    @RestController
     @RequestMapping("/api/methodless")
     static class MethodLessController {
         @RequestMapping
@@ -245,6 +263,16 @@ class ApiEndpointScannerTest {
         @PreAuthorize("@perm.can('convention', 'delete')")
         @PostMapping("/delete")
         public String delete() {
+            return "ok";
+        }
+    }
+
+    @RestController
+    @RequestMapping("/token")
+    static class PublicTokenController {
+        @PublicEndpoint
+        @PostMapping("/generate")
+        public String generate() {
             return "ok";
         }
     }
