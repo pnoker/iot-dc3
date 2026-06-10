@@ -53,6 +53,10 @@ public class CommandHistoryQueryVO implements Serializable {
 
     private Long commandId;
 
+    @Schema(description = "command code")
+
+    private String commandCode;
+
     @Schema(description = "Command status", example = "SUCCESS")
     private PointCommandStatusEnum status;
 

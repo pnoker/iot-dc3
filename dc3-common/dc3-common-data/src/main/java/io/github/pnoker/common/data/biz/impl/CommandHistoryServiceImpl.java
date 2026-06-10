@@ -160,6 +160,8 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
                 .eq(CommandHistoryDO::getTenantId, tenantId)
                 .eq(Objects.nonNull(queryVO.getDeviceId()), CommandHistoryDO::getDeviceId, queryVO.getDeviceId())
                 .eq(Objects.nonNull(queryVO.getCommandId()), CommandHistoryDO::getCommandId, queryVO.getCommandId())
+                .eq(StringUtils.isNotBlank(queryVO.getCommandCode()), CommandHistoryDO::getCommandCode,
+                        queryVO.getCommandCode())
                 .eq(Objects.nonNull(queryVO.getStatus()), CommandHistoryDO::getStatus, queryVO.getStatus())
                 .orderByDesc(CommandHistoryDO::getOccurTime);
         Page<CommandHistoryDO> page = commandHistoryManager.page(queryVO.toPage(), wrapper);

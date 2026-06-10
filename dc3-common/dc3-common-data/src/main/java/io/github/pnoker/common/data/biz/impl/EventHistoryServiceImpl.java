@@ -145,6 +145,8 @@ public class EventHistoryServiceImpl implements EventHistoryService {
                 .eq(EventHistoryDO::getTenantId, tenantId)
                 .eq(Objects.nonNull(queryVO.getDeviceId()), EventHistoryDO::getDeviceId, queryVO.getDeviceId())
                 .eq(Objects.nonNull(queryVO.getEventId()), EventHistoryDO::getEventId, queryVO.getEventId())
+                .eq(StringUtils.isNotBlank(queryVO.getEventCode()), EventHistoryDO::getEventCode,
+                        queryVO.getEventCode())
                 .eq(Objects.nonNull(queryVO.getEventTypeFlag()), EventHistoryDO::getEventTypeFlag,
                         Objects.nonNull(queryVO.getEventTypeFlag()) ? queryVO.getEventTypeFlag().getIndex() : null)
                 .orderByDesc(EventHistoryDO::getOccurTime);

@@ -53,6 +53,10 @@ public class EventHistoryQueryVO implements Serializable {
 
     private Long eventId;
 
+    @Schema(description = "event code")
+
+    private String eventCode;
+
     @Schema(description = "Event type enum", example = "ALERT")
     private EventTypeFlagEnum eventTypeFlag;
 
