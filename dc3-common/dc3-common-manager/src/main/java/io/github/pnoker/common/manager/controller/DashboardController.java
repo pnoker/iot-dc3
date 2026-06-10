@@ -50,7 +50,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2026.5.2
  */
-@Tag(name = "dashboard", description = "仪表盘")
+@Tag(name = "dashboard", description = "Dashboard")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DASHBOARD_URL_PREFIX)
@@ -60,16 +60,16 @@ public class DashboardController implements BaseController {
     private final DashboardService dashboardService;
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询驱动统计", description = "查询仪表盘驱动统计数据")
+    @Operation(summary = "Get Driver Statistics", description = "Get dashboard driver statistics")
     @GetMapping("/driver/stats")
     public Mono<R<DriverStatsVO>> driverStats() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.driverStats(tenantId))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询设备统计", description = "查询仪表盘设备统计数据")
+    @Operation(summary = "Get Device Statistics", description = "Get dashboard device statistics")
     @GetMapping("/device/stats")
-    public Mono<R<DeviceStatsVO>> deviceStats(@RequestParam(value = "top_n", defaultValue = "10") int topN) {
+    public Mono<R<DeviceStatsVO>> deviceStats(@Parameter(description = "Number of top items to return") @RequestParam(value = "top_n", defaultValue = "10") int topN) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.deviceStats(tenantId, topN))));
     }
 
@@ -79,9 +79,9 @@ public class DashboardController implements BaseController {
      * arrays so the frontend never has to reason about missing days.
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询资源增长趋势", description = "查询驱动、设备、模板和位号的每日新增趋势")
+    @Operation(summary = "Get Resource Growth Trend", description = "Get daily growth trends for drivers, devices, profiles, and points")
     @GetMapping("/growth")
-    public Mono<R<GrowthVO>> dailyGrowth(@RequestParam(value = "days", defaultValue = "7") int days) {
+    public Mono<R<GrowthVO>> dailyGrowth(@Parameter(description = "Rolling day range") @RequestParam(value = "days", defaultValue = "7") int days) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.dailyGrowth(tenantId, days))));
     }
 
@@ -98,9 +98,9 @@ public class DashboardController implements BaseController {
      * </p>
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "查询拓扑关系", description = "查询驱动、设备、模板和位号的拓扑关系")
+    @Operation(summary = "Get Topology", description = "Get topology relationships among drivers, devices, profiles, and points")
     @GetMapping("/topology")
-    public Mono<R<TopologyVO>> topology(@RequestParam(value = "mode", defaultValue = "cardinality") String mode,
+    public Mono<R<TopologyVO>> topology(@Parameter(description = "Topology mode") @RequestParam(value = "mode", defaultValue = "cardinality") String mode,
                                         @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
                                         @RequestParam(value = "range_key", required = false) String rangeKey) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.topology(tenantId, mode, rangeKey))));

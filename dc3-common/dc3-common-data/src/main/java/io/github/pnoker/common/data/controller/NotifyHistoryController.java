@@ -50,7 +50,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "notify_history", description = "通知历史")
+@Tag(name = "notify_history", description = "Notification history")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.NOTIFY_HISTORY_URL_PREFIX)
@@ -62,9 +62,9 @@ public class NotifyHistoryController implements BaseController {
     private final NotifyHistoryService notifyHistoryService;
 
     @PreAuthorize("@perm.can('notify_history', 'get')")
-    @Operation(summary = "查询通知历史", description = "根据ID查询通知历史详细信息")
+    @Operation(summary = "Get Notification History Record by ID", description = "Get notification history record details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<NotifyHistoryVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<NotifyHistoryVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyHistoryBO entityBO = requireTenant(tenantId, notifyHistoryService.getById(id));
             return R.ok(notifyHistoryBuilder.buildVOByBO(entityBO));
@@ -72,7 +72,7 @@ public class NotifyHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_history', 'list')")
-    @Operation(summary = "查询通知历史列表", description = "分页查询通知历史列表")
+    @Operation(summary = "List Notification History Records", description = "List notification history records with pagination")
     @PostMapping("/list")
     public Mono<R<Page<NotifyHistoryVO>>> list(@RequestBody(required = false) NotifyHistoryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

@@ -47,7 +47,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "action", description = "AI动作")
+@Tag(name = "action", description = "AI actions")
 @RestController
 @RequestMapping(AgenticConstant.ACTION_URL_PREFIX)
 @RequiredArgsConstructor
@@ -58,9 +58,9 @@ public class ActionController implements BaseController {
     private final ActionService actionService;
 
     @PreAuthorize("@perm.can('action', 'get')")
-    @Operation(summary = "查询待确认AI动作", description = "查询指定会话中待确认的AI动作列表")
+    @Operation(summary = "List Pending AI Actions", description = "List pending AI actions for a conversation")
     @GetMapping("/pending")
-    public Mono<R<List<ActionVO>>> pending(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+    public Mono<R<List<ActionVO>>> pending(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
@@ -72,9 +72,9 @@ public class ActionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('action', 'list')")
-    @Operation(summary = "确认AI动作", description = "确认指定AI动作并返回更新后的动作信息")
+    @Operation(summary = "Confirm AI Action", description = "Confirm an AI action and return the updated action")
     @PostMapping("/confirm")
-    public Mono<R<ActionVO>> confirm(@NotBlank @RequestParam(value = "action_id") String actionId) {
+    public Mono<R<ActionVO>> confirm(@Parameter(description = "AI action ID") @NotBlank @RequestParam(value = "action_id") String actionId) {
         return getUserHeader().flatMap(header -> async(() -> {
             ActionBO actionBO = actionService.confirm(actionId, header);
             ActionVO action = actionBuilder.buildVOByBO(actionBO);
@@ -84,9 +84,9 @@ public class ActionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('action', 'list')")
-    @Operation(summary = "拒绝AI动作", description = "拒绝指定AI动作并返回更新后的动作信息")
+    @Operation(summary = "Reject AI Action", description = "Reject an AI action and return the updated action")
     @PostMapping("/reject")
-    public Mono<R<ActionVO>> reject(@NotBlank @RequestParam(value = "action_id") String actionId) {
+    public Mono<R<ActionVO>> reject(@Parameter(description = "AI action ID") @NotBlank @RequestParam(value = "action_id") String actionId) {
         return getUserHeader().flatMap(header -> async(() -> {
             ActionBO actionBO = actionService.reject(actionId, header);
             ActionVO action = actionBuilder.buildVOByBO(actionBO);

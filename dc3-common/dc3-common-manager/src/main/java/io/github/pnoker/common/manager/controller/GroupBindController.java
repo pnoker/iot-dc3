@@ -59,7 +59,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2026.5.11
  * @since 2026.5.11
  */
-@Tag(name = "group_bind", description = "分组绑定")
+@Tag(name = "group_bind", description = "Group bindings")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.GROUP_BIND_URL_PREFIX)
@@ -79,7 +79,7 @@ public class GroupBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group_bind', 'add')")
-    @Operation(summary = "新增分组绑定", description = "新增一条分组绑定记录")
+    @Operation(summary = "Add Group Binding", description = "Create a group binding record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -96,9 +96,9 @@ public class GroupBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group_bind', 'delete')")
-    @Operation(summary = "删除分组绑定", description = "删除指定ID的分组绑定")
+    @Operation(summary = "Delete Group Binding", description = "Delete a group binding record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, groupBindService.getById(id));
             groupBindService.delete(id);
@@ -111,7 +111,7 @@ public class GroupBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group_bind', 'update')")
-    @Operation(summary = "更新分组绑定", description = "更新分组绑定信息")
+    @Operation(summary = "Update Group Binding", description = "Update a group binding record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -129,9 +129,9 @@ public class GroupBindController implements BaseController {
      * @return GroupBindVO {@link GroupBindVO}
      */
     @PreAuthorize("@perm.can('group_bind', 'get')")
-    @Operation(summary = "查询分组绑定", description = "根据ID查询分组绑定详细信息")
+    @Operation(summary = "Get Group Binding by ID", description = "Get group binding details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<GroupBindVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<GroupBindVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBindBO entityBO = requireTenant(tenantId, groupBindService.getById(id));
             GroupBindVO entityVO = groupBindBuilder.buildVOByBO(entityBO);
@@ -144,7 +144,7 @@ public class GroupBindController implements BaseController {
      * @return R Of GroupBindVO Page
      */
     @PreAuthorize("@perm.can('group_bind', 'list')")
-    @Operation(summary = "查询分组绑定列表", description = "分页查询分组绑定列表")
+    @Operation(summary = "List Group Bindings", description = "List group bindings with pagination")
     @PostMapping("/list")
     public Mono<R<Page<GroupBindVO>>> list(@RequestBody(required = false) GroupBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

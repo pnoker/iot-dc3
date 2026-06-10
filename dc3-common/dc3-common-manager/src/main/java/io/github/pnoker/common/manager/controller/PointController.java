@@ -65,7 +65,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "point", description = "位号")
+@Tag(name = "point", description = "Points")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.POINT_URL_PREFIX)
@@ -89,7 +89,7 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point', 'add')")
-    @Operation(summary = "新增位号管理", description = "新增一条位号记录")
+    @Operation(summary = "Add Point", description = "Create a point record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -107,9 +107,9 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point', 'delete')")
-    @Operation(summary = "删除位号管理", description = "删除指定ID的位号")
+    @Operation(summary = "Delete Point", description = "Delete a point record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointService.getById(id));
             pointService.delete(id);
@@ -124,7 +124,7 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point', 'update')")
-    @Operation(summary = "更新位号管理", description = "更新位号信息")
+    @Operation(summary = "Update Point", description = "Update a point record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -143,9 +143,9 @@ public class PointController implements BaseController {
      * @return PointVO {@link PointVO}
      */
     @PreAuthorize("@perm.can('point', 'get')")
-    @Operation(summary = "查询位号管理", description = "根据ID查询位号管理详细信息")
+    @Operation(summary = "Get Point by ID", description = "Get point details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<PointVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<PointVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointBO entityBO = requireTenant(tenantId, pointService.getById(id));
             PointVO entityVO = pointBuilder.buildVOByBO(entityBO);
@@ -160,7 +160,7 @@ public class PointController implements BaseController {
      * @return Map(ID, PointVO)
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "批量查询位号", description = "根据位号ID列表批量查询位号信息")
+    @Operation(summary = "List Points by IDs", description = "List points by ID list")
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, PointVO>>> listByIds(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -178,9 +178,9 @@ public class PointController implements BaseController {
      * @return Point
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "查询位号列表", description = "根据关联条件查询位号管理列表")
+    @Operation(summary = "List Points by Profile ID", description = "List points by profile ID")
     @GetMapping("/list_by_profile_id")
-    public Mono<R<List<PointVO>>> listByProfileId(@NotNull @RequestParam(value = "profile_id") Long profileId) {
+    public Mono<R<List<PointVO>>> listByProfileId(@Parameter(description = "Profile ID") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.getById(profileId));
             List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByProfileId(profileId, tenantId));
@@ -196,9 +196,9 @@ public class PointController implements BaseController {
      * @return Point Array
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "查询位号列表", description = "根据关联条件查询位号管理列表")
+    @Operation(summary = "List Points by Device ID", description = "List points by device ID")
     @GetMapping("/list_by_device_id")
-    public Mono<R<List<PointVO>>> listByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
+    public Mono<R<List<PointVO>>> listByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByDeviceId(deviceId, tenantId));
@@ -214,7 +214,7 @@ public class PointController implements BaseController {
      * @return Page Of Point
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "查询位号列表", description = "分页查询位号管理列表")
+    @Operation(summary = "List Points", description = "List points with pagination")
     @PostMapping("/list")
     public Mono<R<Page<PointVO>>> list(@RequestBody(required = false) PointQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -231,7 +231,7 @@ public class PointController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "查询位号单位", description = "根据位号ID列表查询位号单位")
+    @Operation(summary = "List Point Units", description = "List point units by point IDs")
     @PostMapping("/unit")
     public Mono<R<Map<Long, String>>> unit(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -254,10 +254,10 @@ public class PointController implements BaseController {
      * @return {@link R}<{@link Set}<{@link Long}>>
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "查询位号关联设备统计", description = "根据位号ID查询关联设备统计信息")
+    @Operation(summary = "Get Point Device Statistics", description = "Get device statistics associated with a point")
     @GetMapping("/list_device_statistics_by_point_id")
     public Mono<R<DeviceByPointVO>> getPointStatisticsWithDevice(
-            @NotNull @RequestParam(value = "point_id") Long pointId) {
+            @Parameter(description = "Point ID") @NotNull @RequestParam(value = "point_id") Long pointId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointService.getById(pointId));
             DeviceByPointBO deviceByPointBO = pointService.getPointStatisticsWithDevice(pointId);
@@ -271,9 +271,9 @@ public class PointController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "统计设备位号数量", description = "根据设备ID统计位号数量")
+    @Operation(summary = "Count Points by Device", description = "Count points scoped by device ID")
     @GetMapping("/get_count_by_device_id")
-    public Mono<R<Long>> getPointByDeviceId(@NotNull @RequestParam(value = "device_id") Long deviceId) {
+    public Mono<R<Long>> getPointByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             Long count = pointService.getPointByDeviceId(deviceId);
@@ -286,10 +286,10 @@ public class PointController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('point', 'get')")
-    @Operation(summary = "查询设备位号配置", description = "根据设备ID查询位号配置详情")
+    @Operation(summary = "Get Device Point Configuration", description = "Get point configuration details by device ID")
     @GetMapping("/get_point_config_by_device_id")
     public Mono<R<PointConfigByDeviceVO>> getPointConfigByDeviceId(
-            @NotNull @RequestParam(value = "device_id") Long deviceId) {
+            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             PointConfigByDeviceBO pointConfigByDeviceBO = pointService.getPointConfigByDeviceId(deviceId);

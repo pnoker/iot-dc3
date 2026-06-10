@@ -56,7 +56,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "event_param", description = "事件参数")
+@Tag(name = "event_param", description = "Event parameters")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.EVENT_PARAM_URL_PREFIX)
@@ -70,7 +70,7 @@ public class EventParamController implements BaseController {
     private final EventService eventService;
 
     @PreAuthorize("@perm.can('event_param', 'add')")
-    @Operation(summary = "新增事件参数", description = "新增一条事件参数记录")
+    @Operation(summary = "Add Event Parameter", description = "Create an event parameter record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -82,9 +82,9 @@ public class EventParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_param', 'delete')")
-    @Operation(summary = "删除事件参数", description = "删除指定ID的事件参数")
+    @Operation(summary = "Delete Event Parameter", description = "Delete an event parameter record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, eventParamService.getById(id));
             eventParamService.delete(id);
@@ -93,7 +93,7 @@ public class EventParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_param', 'update')")
-    @Operation(summary = "更新事件参数", description = "更新事件参数信息")
+    @Operation(summary = "Update Event Parameter", description = "Update an event parameter record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -106,9 +106,9 @@ public class EventParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_param', 'get')")
-    @Operation(summary = "查询事件参数", description = "根据ID查询事件参数详细信息")
+    @Operation(summary = "Get Event Parameter by ID", description = "Get event parameter details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<EventParamVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<EventParamVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             EventParamBO entityBO = requireTenant(tenantId, eventParamService.getById(id));
             EventParamVO entityVO = eventParamBuilder.buildVOByBO(entityBO);
@@ -117,9 +117,9 @@ public class EventParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_param', 'list')")
-    @Operation(summary = "查询事件参数列表", description = "根据事件ID查询事件参数列表")
+    @Operation(summary = "List Event Parameters by Event ID", description = "List event parameters by event ID")
     @GetMapping("/list_by_event_id")
-    public Mono<R<List<EventParamVO>>> listByEventId(@NotNull @RequestParam(value = "event_id") Long eventId) {
+    public Mono<R<List<EventParamVO>>> listByEventId(@Parameter(description = "Event ID") @NotNull @RequestParam(value = "event_id") Long eventId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, eventService.getById(eventId));
             List<EventParamBO> entityBOList = filterTenant(tenantId, eventParamService.listByEventId(eventId));
@@ -129,7 +129,7 @@ public class EventParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_param', 'list')")
-    @Operation(summary = "查询事件参数列表", description = "分页查询事件参数列表")
+    @Operation(summary = "List Event Parameters", description = "List event parameters with pagination")
     @PostMapping("/list")
     public Mono<R<Page<EventParamVO>>> list(@RequestBody(required = false) EventParamQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

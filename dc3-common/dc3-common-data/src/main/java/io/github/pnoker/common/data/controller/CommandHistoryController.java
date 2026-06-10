@@ -50,7 +50,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2026.5.23
  * @since 2026.5.23
  */
-@Tag(name = "command_history", description = "指令历史")
+@Tag(name = "command_history", description = "Command history")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.COMMAND_HISTORY_URL_PREFIX)
@@ -60,7 +60,7 @@ public class CommandHistoryController implements BaseController {
     private final CommandHistoryService commandHistoryService;
 
     @PreAuthorize("@perm.can('command_history', 'add')")
-    @Operation(summary = "执行指令调用", description = "执行设备指令调用并返回指令历史记录ID")
+    @Operation(summary = "Call Command", description = "Execute a device command and return the command history record ID")
     @PostMapping("/call")
     public Mono<R<String>> call(@Validated @RequestBody CommandCallVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -72,15 +72,15 @@ public class CommandHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_history', 'get')")
-    @Operation(summary = "查询指令历史", description = "根据记录ID查询指令历史详细信息")
+    @Operation(summary = "Get Command History by Record ID", description = "Get command history details by record ID")
     @GetMapping("/get_by_record_id")
-    public Mono<R<CommandHistoryVO>> getByRecordId(@NotBlank @RequestParam String recordId) {
+    public Mono<R<CommandHistoryVO>> getByRecordId(@Parameter(description = "Record ID") @NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() ->
                 R.ok(commandHistoryService.getByRecordId(tenantId, recordId))));
     }
 
     @PreAuthorize("@perm.can('command_history', 'list')")
-    @Operation(summary = "查询指令历史列表", description = "分页查询指令历史列表")
+    @Operation(summary = "List Command History Records", description = "List command history records with pagination")
     @PostMapping("/list")
     public Mono<R<Page<CommandHistoryVO>>> list(@RequestBody(required = false) CommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

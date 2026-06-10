@@ -45,7 +45,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "message", description = "消息")
+@Tag(name = "message", description = "Messages")
 @RestController
 @RequestMapping(AgenticConstant.MESSAGE_URL_PREFIX)
 @RequiredArgsConstructor
@@ -56,9 +56,9 @@ public class MessageController implements BaseController {
     private final MessageService messageService;
 
     @PreAuthorize("@perm.can('message', 'list')")
-    @Operation(summary = "查询消息管理列表", description = "分页查询消息管理列表")
+    @Operation(summary = "List Messages", description = "List messages for a conversation")
     @GetMapping("/list")
-    public Mono<R<List<MessageVO>>> list(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+    public Mono<R<List<MessageVO>>> list(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);

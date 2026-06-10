@@ -33,7 +33,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -46,7 +45,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "chat", description = "AI聊天")
+@Tag(name = "chat", description = "AI chat")
 @RestController
 @RequestMapping(AgenticConstant.CHAT_URL_PREFIX)
 @RequiredArgsConstructor
@@ -59,7 +58,7 @@ public class ChatController implements BaseController {
      * otherwise returns the OpenAI-compatible JSON response.
      */
     @PreAuthorize("@perm.can('chat', 'list')")
-    @Operation(summary = "创建聊天补全", description = "创建OpenAI兼容的聊天补全，支持流式和非流式响应")
+    @Operation(summary = "Create Chat Completion", description = "Create an OpenAI-compatible chat completion with streaming and non-streaming responses")
     @PostMapping("/completions")
     public Mono<ResponseEntity<?>> chatCompletion(@RequestBody ChatCompletionRequest request) {
         return getUserHeader().flatMap(header -> {

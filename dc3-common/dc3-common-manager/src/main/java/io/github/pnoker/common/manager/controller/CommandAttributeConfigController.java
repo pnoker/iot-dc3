@@ -62,7 +62,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "command_attribute_config", description = "指令属性配置")
+@Tag(name = "command_attribute_config", description = "Command attribute configurations")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.COMMAND_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -86,7 +86,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'add')")
-    @Operation(summary = "新增指令属性配置", description = "新增一条指令属性配置记录")
+    @Operation(summary = "Add Command Attribute Configuration", description = "Create a command attribute configuration record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,9 +104,9 @@ public class CommandAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'delete')")
-    @Operation(summary = "删除指令属性配置", description = "删除指定ID的指令属性配置")
+    @Operation(summary = "Delete Command Attribute Configuration", description = "Delete a command attribute configuration record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, commandAttributeConfigService.getById(id));
             commandAttributeConfigService.delete(id);
@@ -121,7 +121,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'update')")
-    @Operation(summary = "更新指令属性配置", description = "更新指令属性配置信息")
+    @Operation(summary = "Update Command Attribute Configuration", description = "Update a command attribute configuration record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -140,9 +140,9 @@ public class CommandAttributeConfigController implements BaseController {
      * @return CommandAttributeConfigVO {@link CommandAttributeConfigVO}
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'get')")
-    @Operation(summary = "查询指令属性配置", description = "根据ID查询指令属性配置详细信息")
+    @Operation(summary = "Get Command Attribute Configuration by ID", description = "Get command attribute configuration details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<CommandAttributeConfigVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<CommandAttributeConfigVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             CommandAttributeConfigBO entityBO = requireTenant(tenantId, commandAttributeConfigService.getById(id));
             CommandAttributeConfigVO entityVO = commandAttributeConfigBuilder.buildVOByBO(entityBO);
@@ -159,12 +159,12 @@ public class CommandAttributeConfigController implements BaseController {
      * @return CommandConfig
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'get')")
-    @Operation(summary = "查询指令属性配置", description = "根据属性ID、设备ID和指令ID查询指令属性配置")
+    @Operation(summary = "Get Command Attribute Configuration by Attribute, Device, and Command IDs", description = "Get command attribute configuration details by attribute ID, device ID, and command ID")
     @GetMapping("/get_by_attribute_id_and_device_id_and_command_id")
     public Mono<R<CommandAttributeConfigVO>> getByAttributeIdAndDeviceIdAndCommandId(
-            @NotNull @RequestParam(value = "attribute_id") Long attributeId,
-            @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @NotNull @RequestParam(value = "command_id") Long commandId) {
+            @Parameter(description = "Attribute ID") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
+            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @Parameter(description = "Command ID") @NotNull @RequestParam(value = "command_id") Long commandId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireCommandConfigRelations(tenantId, deviceId, commandId, attributeId);
             CommandAttributeConfigBO entityBO = commandAttributeConfigService
@@ -183,11 +183,11 @@ public class CommandAttributeConfigController implements BaseController {
      * @return CommandConfig
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
-    @Operation(summary = "查询指令属性配置列表", description = "根据设备ID和指令ID查询指令属性配置列表")
+    @Operation(summary = "List Command Attribute Configurations by Device and Command IDs", description = "List command attribute configurations by device ID and command ID")
     @GetMapping("/list_by_device_id_and_command_id")
     public Mono<R<List<CommandAttributeConfigVO>>> listByDeviceIdAndCommandId(
-            @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @NotNull @RequestParam(value = "command_id") Long commandId) {
+            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @Parameter(description = "Command ID") @NotNull @RequestParam(value = "command_id") Long commandId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireCommandConfigRelations(tenantId, deviceId, commandId, null);
             List<CommandAttributeConfigBO> entityBOList = filterTenant(tenantId,
@@ -204,10 +204,10 @@ public class CommandAttributeConfigController implements BaseController {
      * @return CommandConfig
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
-    @Operation(summary = "查询指令属性配置列表", description = "根据设备ID查询指令属性配置列表")
+    @Operation(summary = "List Command Attribute Configurations by Device ID", description = "List command attribute configurations by device ID")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<CommandAttributeConfigVO>>> listByDeviceId(
-            @NotNull @RequestParam(value = "device_id") Long deviceId) {
+            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<CommandAttributeConfigBO> entityBOList = filterTenant(tenantId,
@@ -224,7 +224,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @return Page Of CommandConfig
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
-    @Operation(summary = "查询指令属性配置列表", description = "分页查询指令属性配置列表")
+    @Operation(summary = "List Command Attribute Configurations", description = "List command attribute configurations with pagination")
     @PostMapping("/list")
     public Mono<R<Page<CommandAttributeConfigVO>>> list(
             @RequestBody(required = false) CommandAttributeConfigQuery entityQuery) {

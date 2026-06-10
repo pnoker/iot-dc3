@@ -47,7 +47,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "driver_status", description = "驱动状态")
+@Tag(name = "driver_status", description = "Driver status")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DRIVER_STATUS_URL_PREFIX)
@@ -63,7 +63,7 @@ public class DriverStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('driver_status', 'list')")
-    @Operation(summary = "查询驱动状态列表", description = "分页查询驱动状态映射")
+    @Operation(summary = "List Driver Status", description = "List driver status mappings with pagination")
     @PostMapping("/list")
     public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -81,9 +81,9 @@ public class DriverStatusController implements BaseController {
      * @return Number of devices currently online
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
-    @Operation(summary = "统计驱动在线设备数", description = "根据驱动ID统计当前在线设备数量")
+    @Operation(summary = "Count Online Devices by Driver", description = "Count currently online devices by driver ID")
     @GetMapping("/get_device_online_by_driver_id")
-    public Mono<R<Long>> getDeviceOnlineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Long>> getDeviceOnlineByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             Long result = driverStatusService.getDeviceOnlineByDriverId(tenantId, driverId);
             return R.ok(result);
@@ -97,9 +97,9 @@ public class DriverStatusController implements BaseController {
      * @return Number of devices currently offline
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
-    @Operation(summary = "统计驱动离线设备数", description = "根据驱动ID统计当前离线设备数量")
+    @Operation(summary = "Count Offline Devices by Driver", description = "Count currently offline devices by driver ID")
     @GetMapping("/get_device_offline_by_driver_id")
-    public Mono<R<Long>> getDeviceOfflineByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Long>> getDeviceOfflineByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             Long result = driverStatusService.getDeviceOfflineByDriverId(tenantId, driverId);
             return R.ok(result);

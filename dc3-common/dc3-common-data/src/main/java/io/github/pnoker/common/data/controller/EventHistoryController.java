@@ -50,7 +50,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2026.5.23
  * @since 2026.5.23
  */
-@Tag(name = "event_history", description = "事件历史")
+@Tag(name = "event_history", description = "Event history")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.EVENT_HISTORY_URL_PREFIX)
@@ -60,7 +60,7 @@ public class EventHistoryController implements BaseController {
     private final EventHistoryService eventHistoryService;
 
     @PreAuthorize("@perm.can('event_history', 'list')")
-    @Operation(summary = "上报事件历史", description = "上报设备事件并返回事件历史记录ID")
+    @Operation(summary = "Report Event History", description = "Report a device event and return the event history record ID")
     @PostMapping("/report")
     public Mono<R<String>> report(@Validated @RequestBody EventReportVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -72,15 +72,15 @@ public class EventHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_history', 'get')")
-    @Operation(summary = "查询事件历史", description = "根据记录ID查询事件历史详细信息")
+    @Operation(summary = "Get Event History by Record ID", description = "Get event history details by record ID")
     @GetMapping("/get_by_record_id")
-    public Mono<R<EventHistoryVO>> getByRecordId(@NotBlank @RequestParam String recordId) {
+    public Mono<R<EventHistoryVO>> getByRecordId(@Parameter(description = "Record ID") @NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() ->
                 R.ok(eventHistoryService.getByRecordId(tenantId, recordId))));
     }
 
     @PreAuthorize("@perm.can('event_history', 'list')")
-    @Operation(summary = "查询事件历史列表", description = "分页查询事件历史列表")
+    @Operation(summary = "List Event History Records", description = "List event history records with pagination")
     @PostMapping("/list")
     public Mono<R<Page<EventHistoryVO>>> list(@RequestBody(required = false) EventHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

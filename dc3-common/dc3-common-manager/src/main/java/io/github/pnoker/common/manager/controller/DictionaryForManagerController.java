@@ -39,7 +39,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -49,7 +48,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "dictionary_manager", description = "字典(Manager)")
+@Tag(name = "dictionary_manager", description = "Manager dictionaries")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DICTIONARY_URL_PREFIX)
@@ -67,7 +66,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "查询驱动字典", description = "分页查询驱动字典")
+    @Operation(summary = "List Driver Dictionary", description = "List driver dictionary entries with pagination")
     @PostMapping("/driver")
     public Mono<R<Page<DictionaryVO>>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -86,7 +85,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "查询模板字典", description = "分页查询模板字典")
+    @Operation(summary = "List Profile Dictionary", description = "List profile dictionary entries with pagination")
     @PostMapping("/profile")
     public Mono<R<Page<DictionaryVO>>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -105,7 +104,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "查询模板位号字典", description = "根据模板查询位号字典")
+    @Operation(summary = "List Profile Point Dictionary", description = "List point dictionary entries for a profile")
     @PostMapping("/profile_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForProfile(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
@@ -125,7 +124,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "查询设备位号字典", description = "根据设备查询位号字典")
+    @Operation(summary = "List Device Point Dictionary", description = "List point dictionary entries for a device")
     @PostMapping("/device_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForDevice(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
@@ -145,7 +144,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "查询设备字典", description = "分页查询设备字典")
+    @Operation(summary = "List Device Dictionary", description = "List device dictionary entries with pagination")
     @PostMapping("/device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -164,7 +163,7 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "查询驱动设备字典", description = "根据驱动查询设备字典")
+    @Operation(summary = "List Driver Device Dictionary", description = "List device dictionary entries for a driver")
     @PostMapping("/driver_device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionaryForDriver(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {

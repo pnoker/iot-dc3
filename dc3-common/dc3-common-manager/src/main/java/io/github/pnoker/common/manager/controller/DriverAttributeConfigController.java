@@ -60,7 +60,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "driver_attribute_config", description = "驱动属性配置")
+@Tag(name = "driver_attribute_config", description = "Driver attribute configurations")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -82,7 +82,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'add')")
-    @Operation(summary = "新增驱动属性配置", description = "新增一条驱动属性配置记录")
+    @Operation(summary = "Add Driver Attribute Configuration", description = "Create a driver attribute configuration record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -100,9 +100,9 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'delete')")
-    @Operation(summary = "删除驱动属性配置", description = "删除指定ID的驱动属性配置")
+    @Operation(summary = "Delete Driver Attribute Configuration", description = "Delete a driver attribute configuration record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverAttributeConfigService.getById(id));
             driverAttributeConfigService.delete(id);
@@ -117,7 +117,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'update')")
-    @Operation(summary = "更新驱动属性配置", description = "更新驱动属性配置信息")
+    @Operation(summary = "Update Driver Attribute Configuration", description = "Update a driver attribute configuration record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -136,9 +136,9 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
-    @Operation(summary = "查询驱动属性配置", description = "根据ID查询驱动属性配置详细信息")
+    @Operation(summary = "Get Driver Attribute Configuration by ID", description = "Get driver attribute configuration details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<DriverAttributeConfigVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<DriverAttributeConfigVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeConfigBO entityBO = requireTenant(tenantId, driverAttributeConfigService.getById(id));
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
@@ -154,11 +154,11 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverConfig
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
-    @Operation(summary = "查询驱动属性配置", description = "根据属性ID和设备ID查询驱动属性配置")
+    @Operation(summary = "Get Driver Attribute Configuration by Device and Attribute IDs", description = "Get driver attribute configuration details by device ID and attribute ID")
     @GetMapping("/get_by_device_id_and_attribute_id")
     public Mono<R<DriverAttributeConfigVO>> getByDeviceIdAndAttributeId(
-            @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @NotNull @RequestParam(value = "attribute_id") Long attributeId) {
+            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @Parameter(description = "Attribute ID") @NotNull @RequestParam(value = "attribute_id") Long attributeId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireDriverConfigRelations(tenantId, deviceId, attributeId);
             DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectByAttributeIdAndDeviceId(deviceId,
@@ -176,10 +176,10 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverConfig
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
-    @Operation(summary = "查询驱动属性配置列表", description = "根据设备ID查询驱动属性配置列表")
+    @Operation(summary = "List Driver Attribute Configurations by Device ID", description = "List driver attribute configurations by device ID")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<DriverAttributeConfigVO>>> listByDeviceId(
-            @NotNull @RequestParam(value = "device_id") Long deviceId) {
+            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<DriverAttributeConfigBO> entityBOList = filterTenant(tenantId, driverAttributeConfigService.listByDeviceId(deviceId));
@@ -195,7 +195,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return Page Of DriverConfig
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
-    @Operation(summary = "查询驱动属性配置列表", description = "分页查询驱动属性配置列表")
+    @Operation(summary = "List Driver Attribute Configurations", description = "List driver attribute configurations with pagination")
     @PostMapping("/list")
     public Mono<R<Page<DriverAttributeConfigVO>>> list(
             @RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {

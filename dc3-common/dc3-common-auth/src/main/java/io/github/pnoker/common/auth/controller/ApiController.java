@@ -54,7 +54,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2026.5.17
  * @since 2016.10.1
  */
-@Tag(name = "api", description = "API接口")
+@Tag(name = "api", description = "API endpoints")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.API_URL_PREFIX)
@@ -66,7 +66,7 @@ public class ApiController implements BaseController {
     private final ApiService apiService;
 
     @PreAuthorize("@perm.can('api', 'add')")
-    @Operation(summary = "新增API接口管理", description = "新增一条API接口管理记录")
+    @Operation(summary = "Add API Endpoint", description = "Create an API endpoint record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
         // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
@@ -78,9 +78,9 @@ public class ApiController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('api', 'delete')")
-    @Operation(summary = "删除API接口管理", description = "删除指定ID的API接口管理")
+    @Operation(summary = "Delete API Endpoint", description = "Delete an API endpoint record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
         return async(() -> {
             apiService.delete(id);
@@ -89,7 +89,7 @@ public class ApiController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('api', 'update')")
-    @Operation(summary = "更新API接口管理", description = "更新API接口管理信息")
+    @Operation(summary = "Update API Endpoint", description = "Update an API endpoint record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ApiVO entityVO) {
         // TODO: RBAC — restrict to administrator role. APIs are system-global entities managed by platform admins.
@@ -101,9 +101,9 @@ public class ApiController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('api', 'get')")
-    @Operation(summary = "查询API接口管理", description = "根据ID查询API接口管理详细信息")
+    @Operation(summary = "Get API Endpoint by ID", description = "Get API endpoint details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<ApiVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<ApiVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         // Read access to global API data is open to all authenticated users.
         return async(() -> {
             ApiBO entityBO = apiService.getById(id);
@@ -113,7 +113,7 @@ public class ApiController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('api', 'list')")
-    @Operation(summary = "查询API接口管理列表", description = "分页查询API接口管理列表")
+    @Operation(summary = "List API Endpoints", description = "List API endpoints with pagination")
     @PostMapping("/list")
     public Mono<R<Page<ApiVO>>> list(@RequestBody(required = false) ApiQuery entityQuery) {
         // Read access to global API data is open to all authenticated users.

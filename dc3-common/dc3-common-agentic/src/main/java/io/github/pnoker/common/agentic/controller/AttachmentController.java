@@ -48,7 +48,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "attachment", description = "AI附件")
+@Tag(name = "attachment", description = "AI attachments")
 @RestController
 @RequestMapping(AgenticConstant.ATTACHMENT_URL_PREFIX)
 @RequiredArgsConstructor
@@ -59,9 +59,9 @@ public class AttachmentController implements BaseController {
     private final AttachmentService attachmentService;
 
     @PreAuthorize("@perm.can('attachment', 'list')")
-    @Operation(summary = "上传AI附件", description = "上传指定会话的AI附件")
+    @Operation(summary = "Upload AI Attachment", description = "Upload an AI attachment for a conversation")
     @PostMapping("/upload")
-    public Mono<R<AttachmentVO>> upload(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
+    public Mono<R<AttachmentVO>> upload(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                         @RequestPart("file") Mono<FilePart> filePart) {
         return getUserHeader().flatMap(header -> filePart.flatMap(part -> {
             String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
@@ -75,9 +75,9 @@ public class AttachmentController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('attachment', 'list')")
-    @Operation(summary = "查询附件列表", description = "分页查询AI附件列表")
+    @Operation(summary = "List AI Attachments", description = "List AI attachments for a conversation")
     @GetMapping("/list")
-    public Mono<R<List<AttachmentVO>>> list(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+    public Mono<R<List<AttachmentVO>>> list(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);

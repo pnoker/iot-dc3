@@ -56,7 +56,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "tenant", description = "租户")
+@Tag(name = "tenant", description = "Tenants")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.TENANT_URL_PREFIX)
@@ -74,7 +74,7 @@ public class TenantController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('tenant', 'add')")
-    @Operation(summary = "新增租户管理", description = "新增一条租户记录")
+    @Operation(summary = "Add Tenant", description = "Create a tenant record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody TenantVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -99,9 +99,9 @@ public class TenantController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('tenant', 'delete')")
-    @Operation(summary = "删除租户管理", description = "删除指定ID的租户")
+    @Operation(summary = "Delete Tenant", description = "Delete a tenant record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             TenantBO userTenant = tenantService.getById(tenantId);
             boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
@@ -124,7 +124,7 @@ public class TenantController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('tenant', 'update')")
-    @Operation(summary = "更新租户管理", description = "更新租户信息")
+    @Operation(summary = "Update Tenant", description = "Update a tenant record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody TenantVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -146,9 +146,9 @@ public class TenantController implements BaseController {
      * @return TenantVO {@link TenantVO}
      */
     @PreAuthorize("@perm.can('tenant', 'get')")
-    @Operation(summary = "查询租户管理", description = "根据ID查询租户管理详细信息")
+    @Operation(summary = "Get Tenant by ID", description = "Get tenant details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<TenantVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<TenantVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             TenantBO userTenant = tenantService.getById(tenantId);
             boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
@@ -168,9 +168,9 @@ public class TenantController implements BaseController {
      * @return {@link TenantVO}
      */
     @PreAuthorize("@perm.can('tenant', 'get')")
-    @Operation(summary = "查询租户管理", description = "根据条件查询租户管理")
+    @Operation(summary = "Get Tenant by Code", description = "Get tenant details by code")
     @GetMapping("/get_by_code")
-    public Mono<R<TenantVO>> getByCode(@NotNull @RequestParam(value = "code") String code) {
+    public Mono<R<TenantVO>> getByCode(@Parameter(description = "Code") @NotNull @RequestParam(value = "code") String code) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             TenantBO userTenant = tenantService.getById(tenantId);
             boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
@@ -192,7 +192,7 @@ public class TenantController implements BaseController {
      * @return {@link TenantBO}
      */
     @PreAuthorize("@perm.can('tenant', 'list')")
-    @Operation(summary = "查询租户列表", description = "分页查询租户管理列表")
+    @Operation(summary = "List Tenants", description = "List tenants with pagination")
     @PostMapping("/list")
     public Mono<R<Page<TenantVO>>> list(@RequestBody(required = false) TenantQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

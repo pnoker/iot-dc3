@@ -58,7 +58,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "event_attribute", description = "事件属性")
+@Tag(name = "event_attribute", description = "Event attributes")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.EVENT_ATTRIBUTE_URL_PREFIX)
@@ -72,13 +72,13 @@ public class EventAttributeController implements BaseController {
     private final DriverService driverService;
 
     /**
-     * 事件属性
+     * Create an event attribute.
      *
      * @param entityVO {@link EventAttributeVO}
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute', 'add')")
-    @Operation(summary = "新增事件属性", description = "新增一条事件属性记录")
+    @Operation(summary = "Add Event Attribute", description = "Create an event attribute record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,15 +90,15 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * ID 事件属性
+     * Delete an event attribute by ID.
      *
      * @param id ID
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute', 'delete')")
-    @Operation(summary = "删除事件属性", description = "删除指定ID的事件属性")
+    @Operation(summary = "Delete Event Attribute", description = "Delete an event attribute record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, eventAttributeService.getById(id));
             eventAttributeService.delete(id);
@@ -107,13 +107,13 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * 事件属性
+     * Update an event attribute.
      *
      * @param entityVO {@link EventAttributeVO}
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute', 'update')")
-    @Operation(summary = "更新事件属性", description = "更新事件属性信息")
+    @Operation(summary = "Update Event Attribute", description = "Update an event attribute record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -126,15 +126,15 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * ID 事件属性
+     * Query an event attribute by ID.
      *
      * @param id ID
      * @return EventAttributeVO {@link EventAttributeVO}
      */
     @PreAuthorize("@perm.can('event_attribute', 'get')")
-    @Operation(summary = "查询事件属性", description = "根据ID查询事件属性详细信息")
+    @Operation(summary = "Get Event Attribute by ID", description = "Get event attribute details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<EventAttributeVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<EventAttributeVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             EventAttributeBO entityBO = requireTenant(tenantId, eventAttributeService.getById(id));
             EventAttributeVO entityVO = eventAttributeBuilder.buildVOByBO(entityBO);
@@ -143,15 +143,15 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * Driver ID 事件属性
+     * Query event attributes by driver ID.
      *
      * @param id ID
-     * @return 事件属性
+     * @return event attributes
      */
     @PreAuthorize("@perm.can('event_attribute', 'list')")
-    @Operation(summary = "查询事件属性列表", description = "根据驱动ID查询事件属性列表")
+    @Operation(summary = "List Event Attributes by Driver ID", description = "List event attributes by driver ID")
     @GetMapping("/list_by_driver_id")
-    public Mono<R<List<EventAttributeVO>>> listByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<List<EventAttributeVO>>> listByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             try {
                 requireTenant(tenantId, driverService.getById(driverId));
@@ -165,13 +165,13 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * 事件属性
+     * Query event attributes with pagination.
      *
      * @param entityQuery Dto
-     * @return Page Of 事件属性
+     * @return page of event attributes
      */
     @PreAuthorize("@perm.can('event_attribute', 'list')")
-    @Operation(summary = "查询事件属性列表", description = "分页查询事件属性列表")
+    @Operation(summary = "List Event Attributes", description = "List event attributes with pagination")
     @PostMapping("/list")
     public Mono<R<Page<EventAttributeVO>>> list(@RequestBody(required = false) EventAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

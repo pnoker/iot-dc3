@@ -57,7 +57,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2026.5.17
  * @since 2016.10.1
  */
-@Tag(name = "user", description = "用户")
+@Tag(name = "user", description = "Users")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.USER_PROFILE_URL_PREFIX)
@@ -71,7 +71,7 @@ public class UserController implements BaseController {
     private final TenantBindService tenantBindService;
 
     @PreAuthorize("@perm.can('user', 'add')")
-    @Operation(summary = "新增用户管理", description = "新增一条用户记录")
+    @Operation(summary = "Add User", description = "Create a user record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -95,9 +95,9 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'delete')")
-    @Operation(summary = "删除用户管理", description = "删除指定ID的用户")
+    @Operation(summary = "Delete User", description = "Delete a user record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             tenantBindService.requireTenantMember(tenantId, id);
             TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, id);
@@ -110,7 +110,7 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'update')")
-    @Operation(summary = "更新用户管理", description = "更新用户信息")
+    @Operation(summary = "Update User", description = "Update a user record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserVO entityVO) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -124,9 +124,9 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'get')")
-    @Operation(summary = "查询用户管理", description = "根据ID查询用户管理详细信息")
+    @Operation(summary = "Get User by ID", description = "Get user details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<UserVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<UserVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             tenantBindService.requireTenantMember(tenantId, id);
             UserBO entityBO = userService.getById(id);
@@ -136,9 +136,9 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'get')")
-    @Operation(summary = "查询用户管理", description = "根据条件查询用户管理")
+    @Operation(summary = "Get User by Name", description = "Get user details by name")
     @GetMapping("/get_by_name")
-    public Mono<R<UserVO>> getByName(@NotNull @RequestParam(value = "name") String name) {
+    public Mono<R<UserVO>> getByName(@Parameter(description = "Name") @NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserBO entityBO = userService.getByUserName(name, false);
             // Both "not found" and "wrong tenant" return the same 404 so the
@@ -153,7 +153,7 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'list')")
-    @Operation(summary = "查询用户列表", description = "分页查询用户管理列表")
+    @Operation(summary = "List Users", description = "List users with pagination")
     @PostMapping("/list")
     public Mono<R<Page<UserVO>>> list(@RequestBody(required = false) UserQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

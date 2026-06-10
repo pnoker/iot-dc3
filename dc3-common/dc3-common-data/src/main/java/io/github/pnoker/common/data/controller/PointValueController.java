@@ -51,7 +51,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "point_value", description = "位号值")
+@Tag(name = "point_value", description = "Point values")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_VALUE_URL_PREFIX)
@@ -63,14 +63,14 @@ public class PointValueController implements BaseController {
     private final PointValueService pointValueService;
 
     /**
-     * Query the latest 位号值 for each point in the device
+     * Query the latest point value for each point in the device.
      *
      * @param entityQuery PointValueQuery, including pagination parameters
      * @return Page of PointValueVO, where each PointValueVO contains the latest value for
      * a point in the device
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
-    @Operation(summary = "查询最新位号值", description = "分页查询设备下各位号的最新值")
+    @Operation(summary = "List Latest Point Values", description = "List latest point values for points under a device with pagination")
     @PostMapping("/latest")
     public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -83,14 +83,14 @@ public class PointValueController implements BaseController {
     }
 
     /**
-     * Query the historical 位号值 for each point in the device
+     * Query historical point values for each point in the device.
      *
      * @param entityQuery PointValueQuery, including pagination parameters
      * @return Page of PointValueVO, where each PointValueVO contains the historical value
      * for a point in the device
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
-    @Operation(summary = "查询位号值列表", description = "分页查询位号值历史列表")
+    @Operation(summary = "List Point Values", description = "List point values with pagination")
     @PostMapping("/list")
     public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -103,17 +103,17 @@ public class PointValueController implements BaseController {
     }
 
     /**
-     * Query the historical 位号值 for a specific point in the device
+     * Query historical point values for a specific point in the device.
      *
      * @param deviceId Device ID
      * @param pointId  Point ID
      * @return List of String, where each String is the historical value for the point
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
-    @Operation(summary = "查询位号值历史", description = "根据设备ID和位号ID查询位号值历史记录")
+    @Operation(summary = "List Point Value History by Device and Point", description = "List point value history records by device ID and point ID")
     @GetMapping("/list_history_by_device_id_and_point_id")
-    public Mono<R<List<String>>> history(@NotNull @RequestParam(name = "device_id") Long deviceId,
-                                         @NotNull @RequestParam(name = "point_id") Long pointId,
+    public Mono<R<List<String>>> history(@Parameter(description = "Device ID") @NotNull @RequestParam(name = "device_id") Long deviceId,
+                                         @Parameter(description = "Point ID") @NotNull @RequestParam(name = "point_id") Long pointId,
                                          @Parameter(description = "Maximum number of historical values to return")
                                          @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         return getTenantId().flatMap(tenantId -> async(() -> {

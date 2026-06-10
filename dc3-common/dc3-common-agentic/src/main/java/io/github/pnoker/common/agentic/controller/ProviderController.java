@@ -50,7 +50,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2026.5.10
  * @since 2026.5.10
  */
-@Tag(name = "provider", description = "模型供应商")
+@Tag(name = "provider", description = "Model providers")
 @RestController
 @RequestMapping(AgenticConstant.PROVIDER_URL_PREFIX)
 @RequiredArgsConstructor
@@ -61,14 +61,14 @@ public class ProviderController implements BaseController {
     private final ModelProviderService modelProviderService;
 
     @PreAuthorize("@perm.can('provider', 'list')")
-    @Operation(summary = "查询模型供应商列表", description = "分页查询模型供应商列表")
+    @Operation(summary = "List Model Providers", description = "List model providers")
     @GetMapping("/list")
     public Mono<R<List<ModelProviderVO>>> list() {
         return async(() -> R.ok(modelProviderBuilder.buildVOListByBOList(modelProviderService.list())));
     }
 
     @PreAuthorize("@perm.can('provider', 'add')")
-    @Operation(summary = "新增模型供应商", description = "新增模型供应商")
+    @Operation(summary = "Add Model Provider", description = "Create a model provider record")
     @PostMapping("/config/add")
     public Mono<R<ModelProviderVO>> add(@Validated(Add.class) @RequestBody ModelProviderRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -78,7 +78,7 @@ public class ProviderController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('provider', 'update')")
-    @Operation(summary = "更新模型供应商", description = "更新模型供应商配置")
+    @Operation(summary = "Update Model Provider", description = "Update a model provider configuration")
     @PostMapping("/config/update")
     public Mono<R<ModelProviderVO>> update(@Validated(Update.class) @RequestBody ModelProviderRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -88,9 +88,9 @@ public class ProviderController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('provider', 'delete')")
-    @Operation(summary = "删除模型供应商", description = "删除模型供应商")
+    @Operation(summary = "Delete Model Provider", description = "Delete a model provider record")
     @PostMapping("/config/delete")
-    public Mono<R<Boolean>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<Boolean>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             modelProviderService.delete(id);
             return R.ok(true);

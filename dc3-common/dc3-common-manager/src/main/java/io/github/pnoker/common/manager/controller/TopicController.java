@@ -35,7 +35,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -46,7 +45,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @since 2016.10.1
  */
 
-@Tag(name = "topic", description = "主题")
+@Tag(name = "topic", description = "Topics")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.TOPIC_URL_PREFIX)
@@ -56,7 +55,7 @@ public class TopicController implements BaseController {
     private final TopicService topicService;
 
     @PreAuthorize("@perm.can('topic', 'list')")
-    @Operation(summary = "查询主题列表", description = "分页查询主题列表")
+    @Operation(summary = "List Topics", description = "List topics with pagination")
     @PostMapping("/list")
     public Mono<R<Page<TopicVO>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

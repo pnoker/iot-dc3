@@ -54,7 +54,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "notify_channel", description = "通知通道")
+@Tag(name = "notify_channel", description = "Notification channels")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.NOTIFY_CHANNEL_URL_PREFIX)
@@ -66,7 +66,7 @@ public class NotifyChannelController implements BaseController {
     private final NotifyChannelService notifyChannelService;
 
     @PreAuthorize("@perm.can('notify_channel', 'add')")
-    @Operation(summary = "新增通知通道", description = "新增一条通知通道记录")
+    @Operation(summary = "Add Notification Channel", description = "Create a notification channel record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyChannelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -78,9 +78,9 @@ public class NotifyChannelController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel', 'delete')")
-    @Operation(summary = "删除通知通道", description = "删除指定ID的通知通道")
+    @Operation(summary = "Delete Notification Channel", description = "Delete a notification channel record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, notifyChannelService.getById(id));
             notifyChannelService.delete(id);
@@ -89,7 +89,7 @@ public class NotifyChannelController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel', 'update')")
-    @Operation(summary = "更新通知通道", description = "更新通知通道信息")
+    @Operation(summary = "Update Notification Channel", description = "Update a notification channel record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody NotifyChannelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -102,9 +102,9 @@ public class NotifyChannelController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel', 'get')")
-    @Operation(summary = "查询通知通道", description = "根据ID查询通知通道详细信息")
+    @Operation(summary = "Get Notification Channel by ID", description = "Get notification channel details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<NotifyChannelVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<NotifyChannelVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyChannelBO entityBO = requireTenant(tenantId, notifyChannelService.getById(id));
             return R.ok(notifyChannelBuilder.buildVOByBO(entityBO));
@@ -112,7 +112,7 @@ public class NotifyChannelController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel', 'list')")
-    @Operation(summary = "查询通知通道列表", description = "分页查询通知通道列表")
+    @Operation(summary = "List Notification Channels", description = "List notification channels with pagination")
     @PostMapping("/list")
     public Mono<R<Page<NotifyChannelVO>>> list(@RequestBody(required = false) NotifyChannelQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

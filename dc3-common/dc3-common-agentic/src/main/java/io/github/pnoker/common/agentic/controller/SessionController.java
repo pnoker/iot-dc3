@@ -52,7 +52,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "session", description = "AI会话")
+@Tag(name = "session", description = "AI sessions")
 @Slf4j
 @RestController
 @RequestMapping(AgenticConstant.SESSION_URL_PREFIX)
@@ -64,7 +64,7 @@ public class SessionController implements BaseController {
     private final SessionBuilder sessionBuilder;
 
     @PreAuthorize("@perm.can('session', 'list')")
-    @Operation(summary = "查询会话列表", description = "分页查询AI会话列表")
+    @Operation(summary = "List AI Sessions", description = "List AI sessions with pagination")
     @PostMapping("/list")
     public Mono<R<Page<SessionVO>>> list(@RequestBody(required = false) SessionQuery query) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -79,9 +79,9 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'get')")
-    @Operation(summary = "查询AI会话", description = "根据会话ID查询AI会话详细信息")
+    @Operation(summary = "Get AI Session", description = "Get AI session details by conversation ID")
     @GetMapping("/get_by_conversation_id")
-    public Mono<R<SessionVO>> get(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+    public Mono<R<SessionVO>> get(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.getByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(),
                     header.getUserId(), conversationId));
@@ -95,9 +95,9 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'delete')")
-    @Operation(summary = "删除AI会话", description = "删除指定会话ID的AI会话")
+    @Operation(summary = "Delete AI Session", description = "Delete an AI session by conversation ID")
     @PostMapping("/delete")
-    public Mono<R<Boolean>> delete(@NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+    public Mono<R<Boolean>> delete(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getUserHeader().flatMap(header -> async(() -> {
             sessionService.deleteByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId));
@@ -106,9 +106,9 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'update')")
-    @Operation(summary = "更新AI会话", description = "更新AI会话信息")
+    @Operation(summary = "Update AI Session", description = "Update AI session information")
     @PostMapping("/update")
-    public Mono<R<SessionVO>> update(@NotBlank @RequestParam(value = "conversation_id") String conversationId,
+    public Mono<R<SessionVO>> update(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                      @RequestBody(required = false) SessionUpdateRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.update(AgenticConversationIdUtil.scope(header.getTenantId(),

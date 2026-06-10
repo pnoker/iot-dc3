@@ -56,7 +56,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "command_param", description = "指令参数")
+@Tag(name = "command_param", description = "Command parameters")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.COMMAND_PARAM_URL_PREFIX)
@@ -70,7 +70,7 @@ public class CommandParamController implements BaseController {
     private final CommandService commandService;
 
     @PreAuthorize("@perm.can('command_param', 'add')")
-    @Operation(summary = "新增指令参数", description = "新增一条指令参数记录")
+    @Operation(summary = "Add Command Parameter", description = "Create a command parameter record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -82,9 +82,9 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'delete')")
-    @Operation(summary = "删除指令参数", description = "删除指定ID的指令参数")
+    @Operation(summary = "Delete Command Parameter", description = "Delete a command parameter record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, commandParamService.getById(id));
             commandParamService.delete(id);
@@ -93,7 +93,7 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'update')")
-    @Operation(summary = "更新指令参数", description = "更新指令参数信息")
+    @Operation(summary = "Update Command Parameter", description = "Update a command parameter record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -106,9 +106,9 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'get')")
-    @Operation(summary = "查询指令参数", description = "根据ID查询指令参数详细信息")
+    @Operation(summary = "Get Command Parameter by ID", description = "Get command parameter details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<CommandParamVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<CommandParamVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             CommandParamBO entityBO = requireTenant(tenantId, commandParamService.getById(id));
             CommandParamVO entityVO = commandParamBuilder.buildVOByBO(entityBO);
@@ -117,9 +117,9 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'list')")
-    @Operation(summary = "查询指令参数列表", description = "根据指令ID查询指令参数列表")
+    @Operation(summary = "List Command Parameters by Command ID", description = "List command parameters by command ID")
     @GetMapping("/list_by_command_id")
-    public Mono<R<List<CommandParamVO>>> listByCommandId(@NotNull @RequestParam(value = "command_id") Long commandId) {
+    public Mono<R<List<CommandParamVO>>> listByCommandId(@Parameter(description = "Command ID") @NotNull @RequestParam(value = "command_id") Long commandId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, commandService.getById(commandId));
             List<CommandParamBO> entityBOList = filterTenant(tenantId, commandParamService.listByCommandId(commandId));
@@ -129,7 +129,7 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'list')")
-    @Operation(summary = "查询指令参数列表", description = "分页查询指令参数列表")
+    @Operation(summary = "List Command Parameters", description = "List command parameters with pagination")
     @PostMapping("/list")
     public Mono<R<Page<CommandParamVO>>> list(@RequestBody(required = false) CommandParamQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

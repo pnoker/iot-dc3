@@ -59,7 +59,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2026.5.11
  * @since 2026.5.11
  */
-@Tag(name = "label_bind", description = "标签绑定")
+@Tag(name = "label_bind", description = "Label bindings")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.LABEL_BIND_URL_PREFIX)
@@ -79,7 +79,7 @@ public class LabelBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label_bind', 'add')")
-    @Operation(summary = "新增标签绑定", description = "新增一条标签绑定记录")
+    @Operation(summary = "Add Label Binding", description = "Create a label binding record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -96,9 +96,9 @@ public class LabelBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label_bind', 'delete')")
-    @Operation(summary = "删除标签绑定", description = "删除指定ID的标签绑定")
+    @Operation(summary = "Delete Label Binding", description = "Delete a label binding record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, labelBindService.getById(id));
             labelBindService.delete(id);
@@ -111,7 +111,7 @@ public class LabelBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label_bind', 'update')")
-    @Operation(summary = "更新标签绑定", description = "更新标签绑定信息")
+    @Operation(summary = "Update Label Binding", description = "Update a label binding record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -129,9 +129,9 @@ public class LabelBindController implements BaseController {
      * @return LabelBindVO {@link LabelBindVO}
      */
     @PreAuthorize("@perm.can('label_bind', 'get')")
-    @Operation(summary = "查询标签绑定", description = "根据ID查询标签绑定详细信息")
+    @Operation(summary = "Get Label Binding by ID", description = "Get label binding details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<LabelBindVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<LabelBindVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LabelBindBO entityBO = requireTenant(tenantId, labelBindService.getById(id));
             LabelBindVO entityVO = labelBindBuilder.buildVOByBO(entityBO);
@@ -144,7 +144,7 @@ public class LabelBindController implements BaseController {
      * @return R Of LabelBindVO Page
      */
     @PreAuthorize("@perm.can('label_bind', 'list')")
-    @Operation(summary = "查询标签绑定列表", description = "分页查询标签绑定列表")
+    @Operation(summary = "List Label Bindings", description = "List label bindings with pagination")
     @PostMapping("/list")
     public Mono<R<Page<LabelBindVO>>> list(@RequestBody(required = false) LabelBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

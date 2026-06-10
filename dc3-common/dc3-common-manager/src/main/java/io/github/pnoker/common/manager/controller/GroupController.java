@@ -54,7 +54,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "group", description = "分组")
+@Tag(name = "group", description = "Groups")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.GROUP_URL_PREFIX)
@@ -70,7 +70,7 @@ public class GroupController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group', 'add')")
-    @Operation(summary = "新增分组", description = "新增一条分组记录")
+    @Operation(summary = "Add Group", description = "Create a group record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -86,9 +86,9 @@ public class GroupController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group', 'delete')")
-    @Operation(summary = "删除分组", description = "删除指定ID的分组")
+    @Operation(summary = "Delete Group", description = "Delete a group record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, groupService.getById(id));
             groupService.delete(id);
@@ -101,7 +101,7 @@ public class GroupController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group', 'update')")
-    @Operation(summary = "更新分组", description = "更新分组信息")
+    @Operation(summary = "Update Group", description = "Update a group record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -118,9 +118,9 @@ public class GroupController implements BaseController {
      * @return GroupVO {@link GroupVO}
      */
     @PreAuthorize("@perm.can('group', 'get')")
-    @Operation(summary = "查询分组", description = "根据ID查询分组详细信息")
+    @Operation(summary = "Get Group by ID", description = "Get group details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<GroupVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<GroupVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBO entityBO = requireTenant(tenantId, groupService.getById(id));
             GroupVO entityVO = groupBuilder.buildVOByBO(entityBO);
@@ -133,7 +133,7 @@ public class GroupController implements BaseController {
      * @return R Of GroupVO Page
      */
     @PreAuthorize("@perm.can('group', 'list')")
-    @Operation(summary = "查询分组列表", description = "分页查询分组列表")
+    @Operation(summary = "List Groups", description = "List groups with pagination")
     @PostMapping("/list")
     public Mono<R<Page<GroupVO>>> list(@RequestBody(required = false) GroupQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

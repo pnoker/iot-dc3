@@ -47,7 +47,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "device_status", description = "设备状态")
+@Tag(name = "device_status", description = "Device status")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DEVICE_STATUS_URL_PREFIX)
@@ -63,7 +63,7 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
-    @Operation(summary = "查询设备状态列表", description = "分页查询设备状态映射")
+    @Operation(summary = "List Device Status", description = "List device status mappings with pagination")
     @PostMapping("/list")
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -81,9 +81,9 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
-    @Operation(summary = "查询驱动下设备状态", description = "根据驱动ID查询设备状态映射")
+    @Operation(summary = "List Device Status by Driver", description = "List device status mappings by driver ID")
     @GetMapping("/list_by_driver_id")
-    public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setDriverId(driverId);
@@ -100,10 +100,10 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
-    @Operation(summary = "查询模板下设备状态", description = "根据模板ID查询设备状态映射")
+    @Operation(summary = "List Device Status by Profile", description = "List device status mappings by profile ID")
     @GetMapping("/list_by_profile_id")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
-            @NotNull @RequestParam(value = "profile_id") Long profileId) {
+            @Parameter(description = "Profile ID") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setProfileId(profileId);

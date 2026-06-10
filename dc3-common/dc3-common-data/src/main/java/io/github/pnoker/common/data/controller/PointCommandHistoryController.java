@@ -48,7 +48,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2026.5.23
  * @since 2026.5.23
  */
-@Tag(name = "point_command_history", description = "位号指令历史")
+@Tag(name = "point_command_history", description = "Point command history")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_COMMAND_HISTORY_URL_PREFIX)
@@ -58,15 +58,15 @@ public class PointCommandHistoryController implements BaseController {
     private final PointCommandHistoryService pointCommandHistoryService;
 
     @PreAuthorize("@perm.can('point_command_history', 'get')")
-    @Operation(summary = "查询位号指令历史", description = "根据指令ID查询位号指令历史详细信息")
+    @Operation(summary = "Get Point Command History by Command ID", description = "Get point command history details by command ID")
     @GetMapping("/get_by_command_id")
-    public Mono<R<PointCommandHistoryVO>> getByCommandId(@NotBlank @RequestParam String commandId) {
+    public Mono<R<PointCommandHistoryVO>> getByCommandId(@Parameter(description = "Command ID") @NotBlank @RequestParam String commandId) {
         return getTenantId().flatMap(tenantId -> async(() ->
                 R.ok(pointCommandHistoryService.getByCommandId(tenantId, commandId))));
     }
 
     @PreAuthorize("@perm.can('point_command_history', 'list')")
-    @Operation(summary = "查询位号指令历史列表", description = "分页查询位号指令历史列表")
+    @Operation(summary = "List Point Command History Records", description = "List point command history records with pagination")
     @PostMapping("/list")
     public Mono<R<Page<PointCommandHistoryVO>>> list(@RequestBody(required = false) PointCommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

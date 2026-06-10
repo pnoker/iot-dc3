@@ -54,7 +54,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "notify", description = "通知管理")
+@Tag(name = "notify", description = "Notifications")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.NOTIFY_URL_PREFIX)
@@ -66,7 +66,7 @@ public class NotifyController implements BaseController {
     private final NotifyService notifyService;
 
     @PreAuthorize("@perm.can('notify', 'add')")
-    @Operation(summary = "新增通知管理", description = "新增一条通知记录")
+    @Operation(summary = "Add Notification", description = "Create a notification record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -78,9 +78,9 @@ public class NotifyController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify', 'delete')")
-    @Operation(summary = "删除通知管理", description = "删除指定ID的通知")
+    @Operation(summary = "Delete Notification", description = "Delete a notification record by ID")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, notifyService.getById(id));
             notifyService.delete(id);
@@ -89,7 +89,7 @@ public class NotifyController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify', 'update')")
-    @Operation(summary = "更新通知管理", description = "更新通知信息")
+    @Operation(summary = "Update Notification", description = "Update a notification record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody NotifyVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -102,9 +102,9 @@ public class NotifyController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify', 'get')")
-    @Operation(summary = "查询通知管理", description = "根据ID查询通知管理详细信息")
+    @Operation(summary = "Get Notification by ID", description = "Get notification details by ID")
     @GetMapping("/get_by_id")
-    public Mono<R<NotifyVO>> getById(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<NotifyVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyBO entityBO = requireTenant(tenantId, notifyService.getById(id));
             return R.ok(notifyBuilder.buildVOByBO(entityBO));
@@ -112,7 +112,7 @@ public class NotifyController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify', 'list')")
-    @Operation(summary = "查询通知管理列表", description = "分页查询通知管理列表")
+    @Operation(summary = "List Notifications", description = "List notifications with pagination")
     @PostMapping("/list")
     public Mono<R<Page<NotifyVO>>> list(@RequestBody(required = false) NotifyQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

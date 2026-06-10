@@ -51,7 +51,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "model", description = "AI模型")
+@Tag(name = "model", description = "AI models")
 @RestController
 @RequestMapping(AgenticConstant.MODEL_URL_PREFIX)
 @RequiredArgsConstructor
@@ -62,21 +62,21 @@ public class ModelController implements BaseController {
     private final ModelConfigService modelConfigService;
 
     @PreAuthorize("@perm.can('model', 'list')")
-    @Operation(summary = "查询AI模型配置列表", description = "分页查询AI模型配置列表")
+    @Operation(summary = "List AI Models", description = "List available AI model options")
     @GetMapping("/list")
     public Mono<R<List<ModelVO>>> list() {
         return async(() -> R.ok(modelConfigService.listOptions()));
     }
 
     @PreAuthorize("@perm.can('model', 'list')")
-    @Operation(summary = "查询AI模型配置列表", description = "分页查询AI模型配置列表")
+    @Operation(summary = "List AI Model Configurations", description = "List AI model configurations")
     @GetMapping("/config/list")
     public Mono<R<List<ModelConfigVO>>> listConfigs() {
         return async(() -> R.ok(modelConfigBuilder.buildVOListByBOList(modelConfigService.listConfigs())));
     }
 
     @PreAuthorize("@perm.can('model', 'add')")
-    @Operation(summary = "新增AI模型配置", description = "新增一条AI模型配置记录")
+    @Operation(summary = "Add AI Model Configuration", description = "Create an AI model configuration record")
     @PostMapping("/config/add")
     public Mono<R<ModelConfigVO>> add(@Validated(Add.class) @RequestBody ModelConfigRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -86,7 +86,7 @@ public class ModelController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('model', 'update')")
-    @Operation(summary = "更新AI模型配置", description = "更新AI模型配置信息")
+    @Operation(summary = "Update AI Model Configuration", description = "Update an AI model configuration record")
     @PostMapping("/config/update")
     public Mono<R<ModelConfigVO>> update(@Validated(Update.class) @RequestBody ModelConfigRequest request) {
         return getUserHeader().flatMap(header -> async(() -> {
@@ -96,9 +96,9 @@ public class ModelController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('model', 'delete')")
-    @Operation(summary = "删除AI模型配置", description = "删除指定ID的AI模型配置")
+    @Operation(summary = "Delete AI Model Configuration", description = "Delete an AI model configuration record by ID")
     @PostMapping("/config/delete")
-    public Mono<R<Boolean>> delete(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<Boolean>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             modelConfigService.delete(id);
             return R.ok(true);

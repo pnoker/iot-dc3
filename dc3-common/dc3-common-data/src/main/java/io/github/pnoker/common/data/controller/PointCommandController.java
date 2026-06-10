@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -43,7 +42,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "point_command", description = "位号指令")
+@Tag(name = "point_command", description = "Point commands")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_COMMAND_URL_PREFIX)
@@ -59,7 +58,7 @@ public class PointCommandController implements BaseController {
      * @return commandId for status polling
      */
     @PreAuthorize("@perm.can('point_command', 'list')")
-    @Operation(summary = "下发位号读指令", description = "下发位号读指令并返回指令ID")
+    @Operation(summary = "Send Point Read Command", description = "Send a point read command and return the command ID")
     @PostMapping("/read")
     public Mono<R<String>> read(@Validated @RequestBody PointCommandReadVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -77,7 +76,7 @@ public class PointCommandController implements BaseController {
      * @return commandId for status polling
      */
     @PreAuthorize("@perm.can('point_command', 'list')")
-    @Operation(summary = "下发位号写指令", description = "下发位号写指令并返回指令ID")
+    @Operation(summary = "Send Point Write Command", description = "Send a point write command and return the command ID")
     @PostMapping("/write")
     public Mono<R<String>> write(@Validated @RequestBody PointCommandWriteVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
