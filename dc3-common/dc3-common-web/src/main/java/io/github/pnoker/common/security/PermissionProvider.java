@@ -17,16 +17,14 @@
 
 package io.github.pnoker.common.security;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Set;
 
 /**
  * SPI for checking whether an authenticated user holds a given resource permission.
- * The auth module provides an implementation backed by the role-resource binding system.
- * The default implementation (used when auth module is absent) grants all permissions.
+ * The auth module provides an in-process implementation backed by role-resource bindings.
+ * Other services use {@link FacadePermissionProvider} to query the auth center.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -56,24 +54,18 @@ public interface PermissionProvider {
     Mono<Set<String>> listPermissionCodes(Long tenantId, Long userId);
 
     /**
-     * Permissive default: grants every permission when no auth-specific implementation
-     * is present on the classpath. Replaced by AuthPermissionProvider in full deployments.
+     * Fail-closed default used only when no real auth or facade-backed provider is
+     * present. This keeps the security chain active without silently granting access.
      */
-    @Component
-    @ConditionalOnMissingBean(value = PermissionProvider.class, name = "authPermissionProvider")
     class DefaultPermissionProvider implements PermissionProvider {
         @Override
         public Mono<Boolean> hasPermission(Long tenantId, Long userId, String resourceCode) {
-            return Mono.just(true);
+            return Mono.just(false);
         }
 
         @Override
         public Mono<Set<String>> listPermissionCodes(Long tenantId, Long userId) {
-            // Grant the wildcard authority so @perm.can(...) passes on services that
-            // have no role/resource data (manager, data, agentic). These services
-            // trust the gateway-authenticated identity; fine-grained authorization
-            // is enforced at the auth center. See PermissionMethods.WILDCARD.
-            return Mono.just(Set.of("*"));
+            return Mono.just(Set.of());
         }
     }
 }

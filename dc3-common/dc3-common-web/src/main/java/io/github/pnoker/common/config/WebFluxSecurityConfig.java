@@ -17,12 +17,16 @@
 
 package io.github.pnoker.common.config;
 
+import io.github.pnoker.common.facade.api.PermissionFacade;
+import io.github.pnoker.common.security.FacadePermissionProvider;
 import io.github.pnoker.common.security.GatewayJwtConverter;
 import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
 import io.github.pnoker.common.utils.HmacAuthSigner;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Bean;
@@ -54,13 +58,10 @@ import reactor.core.publisher.Mono;
  * {@code io.github.pnoker.common.config} package.
  * <p>
  * The chain needs a {@link PermissionProvider}. The auth center contributes the
- * real {@code authPermissionProvider} (role/resource backed) via component scan;
- * every other web service (gateway, manager, data, agentic) has none, so this
- * class supplies a permissive {@link PermissionProvider.DefaultPermissionProvider}
- * fallback. That keeps the security chain — and its doc/actuator whitelist —
- * active everywhere. Without it those services fall back to Spring Boot's default
- * reactive security chain, which locks every endpoint (including
- * {@code /actuator/health} and the API docs) behind a generated password.
+ * real {@code authPermissionProvider} (role/resource backed) via component scan.
+ * Other center services use a facade-backed provider that queries the auth center over
+ * gRPC. If neither exists, the default provider fails closed so the chain remains active
+ * without granting any controller permission.
  * <p>
  * Not applied on the API gateway. The gateway is a Spring Cloud Gateway app
  * whose authentication is performed by {@code AuthenticGatewayFilter} (it reads
@@ -76,6 +77,11 @@ import reactor.core.publisher.Mono;
  * @since 2016.10.1
  */
 @AutoConfiguration
+@AutoConfigureAfter(name = {
+        "io.github.pnoker.common.init.AuthInitRunner",
+        "io.github.pnoker.common.facade.grpc.config.GrpcFacadeAutoConfiguration",
+        "io.github.pnoker.common.facade.local.config.LocalFacadeAuthAutoConfiguration"
+})
 @ConditionalOnMissingClass("org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping")
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -95,14 +101,17 @@ public class WebFluxSecurityConfig {
     }
 
     /**
-     * Permissive fallback used by services that do not ship the auth module's
-     * {@code authPermissionProvider}. Backs off automatically when a real
-     * provider is present (see {@link PermissionProvider.DefaultPermissionProvider}'s
-     * {@code @ConditionalOnMissingBean}).
+     * Facade-backed provider for non-auth services. If no facade exists either, return a
+     * fail-closed default provider so method security still returns 403 instead of
+     * falling back to Spring Boot's generated-password security chain.
      */
     @Bean
     @ConditionalOnMissingBean(PermissionProvider.class)
-    public PermissionProvider defaultPermissionProvider() {
+    public PermissionProvider defaultPermissionProvider(ObjectProvider<PermissionFacade> permissionFacadeProvider) {
+        PermissionFacade permissionFacade = permissionFacadeProvider.getIfAvailable();
+        if (permissionFacade != null) {
+            return new FacadePermissionProvider(permissionFacade);
+        }
         return new PermissionProvider.DefaultPermissionProvider();
     }
 

@@ -56,20 +56,19 @@ public class PermissionMethods {
     }
 
     /**
+     * Wildcard authority. It satisfies every check only when explicitly granted through
+     * the role-resource data returned by the active {@link PermissionProvider}.
+     */
+    public static final String WILDCARD = "*";
+
+    /**
      * Check whether the current user holds the permission
      * {@code {spring.application.name}:{domain}:{scope}}.
      *
      * @param domain domain identifier (e.g. "device", "driver", "point")
-     * @param scope  operation scope (e.g. "get", "search", "add", "update", "delete")
+     * @param scope  operation scope (e.g. "get", "list", "add", "update", "delete")
      * @return true if granted
      */
-    /**
-     * Wildcard authority granted by the permissive {@code DefaultPermissionProvider}
-     * (services without the auth module). When present it satisfies every check, so
-     * service-to-service trust works without role data.
-     */
-    public static final String WILDCARD = "*";
-
     public boolean can(String domain, String scope) {
         String resourceCode = serviceName + ":" + domain + ":" + scope;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

@@ -151,17 +151,18 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         if (CollectionUtils.isEmpty(roleIds)) {
             return Collections.emptyList();
         }
-        // Step 2: narrow to the caller's tenant so a stale cross-tenant binding
-        // cannot leak resources outside the current scope.
+        // Step 2: keep only enabled roles, and narrow to the caller's tenant so a
+        // stale cross-tenant binding cannot leak resources outside the current scope.
+        LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
+        roleWrapper.in(RoleDO::getId, roleIds);
+        roleWrapper.eq(RoleDO::getEnableFlag, EnableFlagEnum.ENABLE.getIndex());
         if (Objects.nonNull(tenantId)) {
-            LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
-            roleWrapper.in(RoleDO::getId, roleIds);
             roleWrapper.eq(RoleDO::getTenantId, tenantId);
-            roleWrapper.select(RoleDO::getId);
-            roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
-            if (CollectionUtils.isEmpty(roleIds)) {
-                return Collections.emptyList();
-            }
+        }
+        roleWrapper.select(RoleDO::getId);
+        roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
+        if (CollectionUtils.isEmpty(roleIds)) {
+            return Collections.emptyList();
         }
         // Step 3: role -> resource bindings.
         LambdaQueryWrapper<RoleResourceBindDO> bindWrapper = Wrappers.<RoleResourceBindDO>query().lambda();

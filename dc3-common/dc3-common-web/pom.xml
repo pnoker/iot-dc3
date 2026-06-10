@@ -109,6 +109,10 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-facade-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-public</artifactId>
         </dependency>
 
