@@ -25,6 +25,9 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.TimeUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,9 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller for token validation and management.
@@ -63,6 +63,7 @@ public class TokenController implements BaseController {
     // Public endpoint: invoked before login, so no @PreAuthorize. Path is also
     // permitted in WebFluxSecurityConfig (POST /token/salt).
     @PublicEndpoint
+    @SecurityRequirements
     @Operation(summary = "生成随机盐值", description = "为令牌认证生成随机salt值，有效期5分钟")
     @PostMapping("/salt")
     public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
@@ -81,6 +82,7 @@ public class TokenController implements BaseController {
     // Public endpoint: invoked during login (before a token exists), so no
     // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/generate).
     @PublicEndpoint
+    @SecurityRequirements
     @Operation(summary = "生成认证令牌", description = "为令牌认证生成认证令牌，有效期12小时")
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
