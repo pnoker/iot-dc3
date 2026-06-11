@@ -21,6 +21,7 @@ title: 设计方案
 - [事件上报方案](event-report.md) - 梳理驱动、设备和业务事件的上报链路
 - [实体告警统一表设计](entity-alarm.md) - 统一 point/device/driver 告警记录和规则落库链路的待补充设计
 - [规则告警链路优化](rule-alarm-optimization.md) - 规则缓存、批量判断、状态转换和通知异步化的待补充设计
+- [Gateway MCP 服务设计](mcp-server.md) - 在 Gateway 上构建 MCP Server，将 OpenAPI 接口通过标准 MCP 协议暴露给 AI Agent，复用现有权限体系实现多租户工具过滤
 
 ## 状态说明
 

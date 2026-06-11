@@ -134,7 +134,8 @@ export default defineConfig({
                         {text: '自定义指令调用', link: '/superpowers/design/command-call'},
                         {text: '事件上报', link: '/superpowers/design/event-report'},
                         {text: '实体告警统一表', link: '/superpowers/design/entity-alarm'},
-                        {text: '规则告警链路优化', link: '/superpowers/design/rule-alarm-optimization'}
+                        {text: '规则告警链路优化', link: '/superpowers/design/rule-alarm-optimization'},
+                        {text: 'Gateway MCP 服务', link: '/superpowers/design/mcp-server'}
                     ]
                 },
                 {
