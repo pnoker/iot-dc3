@@ -21,9 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -68,12 +70,16 @@ public class PermissionMethods {
      * @param scope  operation scope (e.g. "get", "list", "add", "update", "delete")
      * @return true if granted
      */
-    public boolean can(String domain, String scope) {
+    public Mono<Boolean> can(String domain, String scope) {
         String resourceCode = serviceName + ":" + domain + ":" + scope;
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            return false;
-        }
+        return ReactiveSecurityContextHolder.getContext()
+                .map(context -> context.getAuthentication())
+                .filter(Objects::nonNull)
+                .map(auth -> hasAuthority(auth, resourceCode))
+                .defaultIfEmpty(false);
+    }
+
+    private boolean hasAuthority(Authentication auth, String resourceCode) {
         Set<String> authorities = auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
@@ -92,11 +98,15 @@ public class PermissionMethods {
      * @param specs varargs of {@code domain:scope} strings
      * @return true if at least one is granted
      */
-    public boolean any(String... specs) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            return false;
-        }
+    public Mono<Boolean> any(String... specs) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(context -> context.getAuthentication())
+                .filter(Objects::nonNull)
+                .map(auth -> hasAnyAuthority(auth, specs))
+                .defaultIfEmpty(false);
+    }
+
+    private boolean hasAnyAuthority(Authentication auth, String... specs) {
         Set<String> authorities = auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());

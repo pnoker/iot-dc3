@@ -18,6 +18,7 @@
 package io.github.pnoker.common.auth.security;
 
 import io.github.pnoker.common.auth.service.RoleResourceBindService;
+import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +76,7 @@ public class AuthPermissionProvider implements PermissionProvider {
         String cacheKey = tenantId + ":" + userId;
         CacheEntry entry = cache.get(cacheKey);
         if (entry != null && entry.isValid()) {
-            return Mono.just(entry.resourceCodes.contains(resourceCode));
+            return Mono.just(entry.hasPermission(resourceCode));
         }
         return Mono.fromCallable(() -> {
             var resources = roleResourceBindService.listResourceByUserId(userId, tenantId);
@@ -84,7 +85,7 @@ public class AuthPermissionProvider implements PermissionProvider {
                     .filter(code -> code != null && !code.isBlank())
                     .collect(Collectors.toSet());
             cache.put(cacheKey, new CacheEntry(codes, CACHE_TTL_MS));
-            return codes.contains(resourceCode);
+            return codes.contains(PermissionMethods.WILDCARD) || codes.contains(resourceCode);
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -99,6 +100,10 @@ public class AuthPermissionProvider implements PermissionProvider {
 
         boolean isValid() {
             return System.currentTimeMillis() < expiresAt;
+        }
+
+        boolean hasPermission(String resourceCode) {
+            return resourceCodes.contains(PermissionMethods.WILDCARD) || resourceCodes.contains(resourceCode);
         }
     }
 }

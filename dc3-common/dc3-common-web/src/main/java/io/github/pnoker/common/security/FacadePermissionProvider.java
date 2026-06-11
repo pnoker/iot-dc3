@@ -42,7 +42,7 @@ public class FacadePermissionProvider implements PermissionProvider {
             return Mono.just(false);
         }
         return listPermissionCodes(tenantId, userId)
-                .map(codes -> codes.contains(resourceCode));
+                .map(codes -> codes.contains(PermissionMethods.WILDCARD) || codes.contains(resourceCode));
     }
 
     @Override

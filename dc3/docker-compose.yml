@@ -24,6 +24,7 @@ x-logging: &default-logging
 x-app-runtime-env: &app-runtime-env
   NODE_ENV: test
   APM_AGENT_ENABLE: ${APM_AGENT_ENABLE:-false}
+  DC3_SECURITY_KEY: ${DC3_SECURITY_KEY:-dc3.security.key.2026.io.github.pnoker}
   AUTH_HMAC_SECRET: ${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
   POSTGRES_HOST: dc3-postgres
   POSTGRES_PORT: "5432"

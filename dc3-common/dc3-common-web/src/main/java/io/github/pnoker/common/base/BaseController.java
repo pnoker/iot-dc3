@@ -23,6 +23,7 @@ import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
+import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
 import io.github.pnoker.common.utils.UserHeaderUtil;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -161,7 +162,8 @@ public interface BaseController {
                     Set<String> authorities = token.getAuthorities().stream()
                             .map(a -> a.getAuthority())
                             .collect(Collectors.toSet());
-                    boolean granted = required.stream().anyMatch(authorities::contains);
+                    boolean granted = authorities.contains(PermissionMethods.WILDCARD)
+                            || required.stream().anyMatch(authorities::contains);
                     if (granted) {
                         return Mono.<Void>empty();
                     }
