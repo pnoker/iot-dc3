@@ -28,3 +28,8 @@ spring:
   rabbitmq:
     publisher-confirm-type: correlated
     publisher-returns: true
+    ssl:
+      enabled: ${RABBITMQ_SSL_ENABLED:false}
+      algorithm: ${RABBITMQ_SSL_ALGORITHM:TLS}
+      validate-server-certificate: ${RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE:false}
+      verify-hostname: ${RABBITMQ_SSL_VERIFY_HOSTNAME:false}

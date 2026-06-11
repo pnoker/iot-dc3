@@ -41,7 +41,17 @@ spring:
     port: ${RABBITMQ_PORT:35672}
     username: ${RABBITMQ_USERNAME:dc3}
     password: ${RABBITMQ_PASSWORD:dc3dc3dc3}
+    ssl:
+      enabled: ${RABBITMQ_SSL_ENABLED:false}
+      algorithm: ${RABBITMQ_SSL_ALGORITHM:TLS}
+      validate-server-certificate: ${RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE:false}
+      verify-hostname: ${RABBITMQ_SSL_VERIFY_HOSTNAME:false}
 ```
+
+To use TLS, set `RABBITMQ_SSL_ENABLED=true` and switch the RabbitMQ port to `5671` in Compose or `35671` for
+local source runs. Server certificate validation is intentionally left to deployment configuration: provide a
+Java truststore and set Spring Boot's native `spring.rabbitmq.ssl.trust-store`, `trust-store-type`, and
+`trust-store-password` properties when `RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE=true`.
 
 ## Build Instructions
 
@@ -61,4 +71,3 @@ mvn -s ../../.mvn/settings.xml clean package
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-
