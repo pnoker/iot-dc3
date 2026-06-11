@@ -1,4 +1,5 @@
 # ===== Build artifacts (Maven / Gradle / general) =====
+.m2/
 target/
 build/
 out/

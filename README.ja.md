@@ -224,7 +224,8 @@ cp .env.example .env    # テンプレートをコピー
 | **アプリケーション層** | データ公開、タスクスケジューリング、アラーム、ログ管理、サードパーティ統合、AI 自動化       |
 
 > 📖
-> 詳細なモジュール依存関係とランタイムフローについては、[モジュールと依存関係](https://pnoker.github.io/iot-dc3/architecture/modules.html)
+>
+詳細なモジュール依存関係とランタイムフローについては、[モジュールと依存関係](https://pnoker.github.io/iot-dc3/architecture/modules.html)
 > を参照してください。
 
 ## 🛠️ 技術スタック

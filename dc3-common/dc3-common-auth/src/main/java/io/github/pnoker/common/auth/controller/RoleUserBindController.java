@@ -123,8 +123,7 @@ public class RoleUserBindController implements BaseController {
     @Operation(summary = "List Roles by User", description = "List roles bound to a user")
     @GetMapping("/list_role_by_user")
     public Mono<R<List<RoleVO>>> listRoleByUser(@Parameter(description = "User ID") @NotNull @RequestParam(value = "user_id") Long userId,
-                                                @Parameter(description = "Legacy tenant ID parameter; ignored in favor of authenticated tenant context")
-                                                @RequestParam(value = "tenant_id", required = false) Long ignoredTenantId) {
+                                                @Parameter(description = "Legacy tenant ID parameter; ignored in favor of authenticated tenant context") @RequestParam(value = "tenant_id", required = false) Long ignoredTenantId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             tenantBindService.requireTenantMember(tenantId, userId);
             List<RoleBO> entityBOList = roleUserBindService.listRoleByTenantIdAndUserId(tenantId, userId);

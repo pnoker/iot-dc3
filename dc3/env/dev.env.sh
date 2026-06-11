@@ -49,6 +49,7 @@ export CENTER_AGENTIC_HOST=localhost
 export NODE_ENV=dev
 export DC3_FACADE_MODE=grpc
 export DC3_FACADE_GRPC_DEADLINE_MS=3000
+export DC3_SECURITY_KEY=dc3.security.key.2026.io.github.pnoker
 export AUTH_HMAC_SECRET=io.github.pnoker.dc3
 export POINT_BATCH_SPEED=100
 export POINT_BATCH_INTERVAL=5
