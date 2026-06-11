@@ -254,6 +254,19 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return map;
     }
 
+    private Map<String, ResourceDO> loadResourcesByCodes(String serviceName) {
+        List<ResourceDO> rows = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
+                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeEnum.API.getIndex())
+                .eq(ResourceDO::getServiceName, serviceName)
+                .ne(ResourceDO::getEntityId, 0L));
+        Map<String, ResourceDO> map = new HashMap<>(rows.size());
+        for (ResourceDO row : rows) {
+            String key = row.getResourceCode() + "|" + row.getServiceName();
+            map.put(key, row);
+        }
+        return map;
+    }
+
     private Map<String, ResourceRegistryScannedApi> indexScanned(List<ResourceRegistryScannedApi> scanned,
                                                                  String serviceName) {
         Map<String, ResourceRegistryScannedApi> map = new LinkedHashMap<>(scanned.size());
@@ -319,6 +332,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         }
         List<Long> entityIds = apis.stream().map(ApiDO::getId).toList();
         Map<Long, ResourceDO> resourceByEntityId = loadResourcesByEntityIds(entityIds);
+        Map<String, ResourceDO> resourceByKey = loadResourcesByCodes(apis.get(0).getServiceName());
         List<ResourceDO> resourcesToInsert = new ArrayList<>();
         List<ResourceDO> resourcesToUpdate = new ArrayList<>();
         // Deduplicate by resource_code within the batch so multiple APIs that share
@@ -330,6 +344,16 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             if (Objects.isNull(resourceDO)) {
                 ResourceDO leaf = buildLeafResourceDO(api, groupNodeId);
                 String key = leaf.getResourceCode() + "|" + leaf.getServiceName();
+                ResourceDO existingByKey = resourceByKey.remove(key);
+                if (Objects.nonNull(existingByKey)) {
+                    applyLeafResourceUpdates(existingByKey, api, groupNodeId);
+                    resourcesToUpdate.add(existingByKey);
+                    if (!seenResourceKeys.add(key)) {
+                        log.debug("Skipping duplicate resource_code in sync batch: resourceCode={}, serviceName={}, apiCode={}",
+                                leaf.getResourceCode(), leaf.getServiceName(), api.getApiCode());
+                    }
+                    continue;
+                }
                 if (seenResourceKeys.add(key)) {
                     resourcesToInsert.add(leaf);
                 } else {
