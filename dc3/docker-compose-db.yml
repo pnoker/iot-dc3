@@ -54,6 +54,11 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_RABBITMQ_TLS_PORT:-35671}:5671"
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_RABBITMQ_PORT:-35672}:5672"
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    environment:
+      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_VIRTUAL_HOST:-dc3}
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME:-dc3}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-dc3dc3dc3}
+      - RABBITMQ_MQTT_EXCHANGE=${RABBITMQ_MQTT_EXCHANGE:-dc3.e.mqtt}
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
       interval: 10s
