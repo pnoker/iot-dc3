@@ -25,8 +25,8 @@ import io.github.pnoker.common.auth.entity.builder.MenuBuilder;
 import io.github.pnoker.common.auth.entity.query.MenuQuery;
 import io.github.pnoker.common.auth.entity.vo.MenuTreeVO;
 import io.github.pnoker.common.auth.entity.vo.MenuVO;
-import io.github.pnoker.common.auth.service.MenuService;
 import io.github.pnoker.common.auth.security.AdminChecker;
+import io.github.pnoker.common.auth.service.MenuService;
 import io.github.pnoker.common.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
@@ -34,6 +34,9 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,9 +54,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller exposing menu management endpoints.

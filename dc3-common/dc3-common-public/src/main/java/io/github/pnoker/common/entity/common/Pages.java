@@ -19,6 +19,7 @@ package io.github.pnoker.common.entity.common;
 
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import io.github.pnoker.common.constant.common.DefaultConstant;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,19 +38,25 @@ import java.util.List;
 
 @Getter
 @Setter
+@Schema(description = "Pagination parameters for data queries")
 public class Pages implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Current page number, starting from 1")
     private long current = 1;
 
+    @Schema(description = "Number of records per page")
     private long size = DefaultConstant.PAGE_SIZE;
 
+    @Schema(description = "Start timestamp for time-range filtering")
     private long startTime;
 
+    @Schema(description = "End timestamp for time-range filtering")
     private long endTime;
 
+    @Schema(description = "Sort order list")
     private List<OrderItem> orders = new ArrayList<>(2);
 
 }

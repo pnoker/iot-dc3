@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.constant.common.TimeConstant;
 import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -53,43 +54,51 @@ public class BaseVO implements Serializable {
     /**
      * Primary key ID
      */
+    @Schema(description = "Primary key ID")
     @NotNull(message = "Primary key ID can't be empty", groups = {Update.class})
     private Long id;
 
     /**
      * Description
      */
+    @Schema(description = "Remark or description")
     private String remark;
 
     /**
      * Creator ID
      */
+    @Schema(description = "Creator user ID")
     private Long creatorId;
 
     /**
      * Creator Name
      */
+    @Schema(description = "Creator username")
     private String creatorName;
 
     /**
      * Create Time
      */
+    @Schema(description = "Record creation timestamp")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
 
     /**
      * Operator ID
      */
+    @Schema(description = "Last operator user ID")
     private Long operatorId;
 
     /**
      * Operator Name
      */
+    @Schema(description = "Last operator username")
     private String operatorName;
 
     /**
      * Operate Time
      */
+    @Schema(description = "Last update timestamp")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime operateTime;
 
