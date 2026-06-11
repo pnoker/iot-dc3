@@ -21,7 +21,7 @@ import { mountListPage } from './_helpers';
 
 const pointMocks = vi.hoisted(() => ({
   listPointByIds: vi.fn(() => Promise.resolve({ data: {} })),
-  getPointUnit: vi.fn(() => Promise.resolve({ data: {} })),
+  listPointUnit: vi.fn(() => Promise.resolve({ data: {} })),
   getPointValueLatest: vi.fn(() => Promise.resolve({ data: {} })),
   listPointValue: vi.fn(() =>
     Promise.resolve({ data: { records: [{ id: 'pv-1', deviceId: 'd-1', pointId: 'pt-1', value: '42' }], total: 1 } })
@@ -32,22 +32,15 @@ const pointMocks = vi.hoisted(() => ({
 vi.mock('@/api/point', () => pointMocks);
 vi.mock('@/api/device', () => ({ listDeviceByIds: vi.fn(() => Promise.resolve({ data: {} })) }));
 vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/views/point/value/tool/PointValueTool.vue', () => ({ default: { template: '<div />' } }));
+vi.mock('@/views/point/value/card/PointValueCard.vue', () => ({ default: { template: '<div />' } }));
+vi.mock('@/views/point/value/edit/PointValueEditForm.vue', () => ({ default: { template: '<div />' } }));
+vi.mock('@/views/point/value/detail/PointValueDetail.vue', () => ({ default: { template: '<div />' } }));
 
 describe('PointValue list view', () => {
-  // PointValue mount triggers four sibling fetches (latest / unit / device /
-  // point) plus an interval store registration — relies on the 30s global
-  // testTimeout in vitest.config.ts instead of the default 5s.
   it('lists point values on mount', async () => {
     const PointValue = (await import('@/views/point/value/PointValue.vue')).default;
-    await mountListPage({
-      component: PointValue,
-      stubs: {
-        pointValueTool: { template: '<div />' },
-        pointValueCard: { template: '<div />' },
-        pointValueEditForm: { template: '<div />' },
-        pointValueDetail: { template: '<div />' },
-      },
-    });
+    await mountListPage({ component: PointValue });
     await flushPromises();
     expect(pointMocks.listPointValue).toHaveBeenCalledTimes(1);
   });

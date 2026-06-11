@@ -17,6 +17,11 @@
 import JSONBigInt from 'json-bigint';
 
 const JSONBigIntStr = JSONBigInt({ storeAsString: true });
+const E2E_CREDENTIALS = {
+  tenant: process.env.E2E_TENANT || 'default',
+  name: process.env.E2E_USERNAME || 'dc3',
+  password: process.env.E2E_PASSWORD || 'dc3dc3dc3',
+};
 
 export function delay(ms) {
   return new Promise((resolve) => {
@@ -46,6 +51,9 @@ export async function login(page, base) {
   await waitPage(page);
   const loginButton = page.getByRole('button', { name: 'Login' });
   if (await loginButton.count()) {
+    await page.getByPlaceholder('Please enter tenant name').fill(E2E_CREDENTIALS.tenant);
+    await page.getByPlaceholder('Please enter username').fill(E2E_CREDENTIALS.name);
+    await page.locator('.login-form input[type="password"]').fill(E2E_CREDENTIALS.password);
     await loginButton.click();
     await page.waitForURL((url) => !url.hash.includes('/login'), { timeout: 15000 }).catch(() => {});
   }

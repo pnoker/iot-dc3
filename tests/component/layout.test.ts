@@ -51,7 +51,8 @@ async function mountLayout() {
   const { useMenuStore } = await import('@/store');
   const menuStore = useMenuStore();
   // Seed the store directly — bootstrap() would otherwise hit the menu API.
-  menuStore.menuTree = sampleMenuTree;
+  menuStore.tree = sampleMenuTree;
+  menuStore.loaded = true;
 
   const router = createRouter({
     history: createMemoryHistory(),

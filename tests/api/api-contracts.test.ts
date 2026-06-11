@@ -176,8 +176,8 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   getPointInfoByDeviceIdAndPointId: ['device-1', 'point-1'],
   listCommandInfoByDeviceIdAndCommandId: ['device-1', 'command-1'],
   listEventInfoByDeviceIdAndEventId: ['device-1', 'event-1'],
-  getCommandHistoryById: ['record-1'],
-  getEventHistoryById: ['record-1'],
+  getCommandHistoryByRecordId: ['record-1'],
+  getEventHistoryByRecordId: ['record-1'],
   // Page-query callers whose names don't match the heuristic prefixes.
   getAgenticSessions: [pageQuery],
   alertPage: [pageQuery],

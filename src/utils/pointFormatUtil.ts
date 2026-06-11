@@ -27,8 +27,11 @@ const POINT_TYPE_KEY: Record<string, string> = {
 
 const RW_FLAG_KEY: Record<string, string> = {
   R: 'status.readOnly',
+  READ_ONLY: 'status.readOnly',
   W: 'status.writeOnly',
+  WRITE_ONLY: 'status.writeOnly',
   RW: 'status.readWrite',
+  READ_WRITE: 'status.readWrite',
 };
 
 // 返回 i18n key 而非翻译后的字符串,让模板用 $t(pointTypeKey(...)) 保持 locale 切换响应式
@@ -37,5 +40,5 @@ export function pointTypeKey(flag?: string): string {
 }
 
 export function rwFlagKey(flag?: string): string {
-  return RW_FLAG_KEY[flag ?? ''] ?? 'status.unknown';
+  return RW_FLAG_KEY[String(flag ?? '').toUpperCase()] ?? 'status.unknown';
 }

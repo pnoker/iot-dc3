@@ -113,9 +113,9 @@ async function expectActiveTab(page, pattern, step) {
 }
 
 async function expectEditDivider(page, pattern, step) {
-  const divider = page.locator('.edit-card-body .el-divider__text:visible').first();
-  await divider.waitFor({ state: 'visible', timeout: 10000 });
-  assertPattern(pattern, (await divider.innerText()).trim(), step, 'edit step');
+  const tab = page.locator('.el-tabs__item.is-active:visible').first();
+  await tab.waitFor({ state: 'visible', timeout: 10000 });
+  assertPattern(pattern, (await tab.innerText()).trim(), step, 'edit tab');
 }
 
 async function discoverIds(page) {
@@ -318,7 +318,7 @@ function buildShots(ids) {
   add(
     'profile-edit-step-1-profile-config',
     'Profile edit step 1 profile config',
-    `/profile/edit?id=${ids.profileId}&active=0`,
+    `/profile/edit?id=${ids.profileId}&active=profileConfig`,
     {
       expectEditDivider: /Profile Info|模板信息配置/,
       ...full,
@@ -327,17 +327,22 @@ function buildShots(ids) {
   add(
     'profile-edit-step-2-point-config',
     'Profile edit step 2 point config',
-    `/profile/edit?id=${ids.profileId}&active=1`,
+    `/profile/edit?id=${ids.profileId}&active=pointConfig`,
     {
       wait: 1200,
       expectEditDivider: /Profile Points|模板位号配置/,
       ...full,
     }
   );
-  add('profile-edit-step-3-complete', 'Profile edit step 3 complete', `/profile/edit?id=${ids.profileId}&active=2`, {
-    expectEditDivider: /Complete|模板配置完成/,
-    ...full,
-  });
+  add(
+    'profile-edit-step-3-command-config',
+    'Profile edit step 3 command config',
+    `/profile/edit?id=${ids.profileId}&active=commandConfig`,
+    {
+      expectEditDivider: /Profile Commands|模板指令配置/,
+      ...full,
+    }
+  );
 
   add('device-list', 'Device list', '/device', full);
   add('device-detail-info', 'Device detail info tab', `/device/detail?id=${ids.deviceId}&active=detail`, {
@@ -367,7 +372,7 @@ function buildShots(ids) {
   add(
     'device-edit-step-1-device-config',
     'Device edit step 1 device config',
-    `/device/edit?id=${ids.deviceId}&active=0`,
+    `/device/edit?id=${ids.deviceId}&active=deviceConfig`,
     {
       expectEditDivider: /Device Info|设备信息配置/,
       ...full,
@@ -376,7 +381,7 @@ function buildShots(ids) {
   add(
     'device-edit-step-2-driver-config',
     'Device edit step 2 driver config',
-    `/device/edit?id=${ids.deviceId}&active=1`,
+    `/device/edit?id=${ids.deviceId}&active=driverConfig`,
     {
       wait: 1200,
       expectEditDivider: /Driver Attributes|驱动属性配置/,
@@ -386,21 +391,22 @@ function buildShots(ids) {
   add(
     'device-edit-step-3-point-config',
     'Device edit step 3 point config',
-    `/device/edit?id=${ids.deviceId}&active=2`,
+    `/device/edit?id=${ids.deviceId}&active=pointConfig`,
     {
       wait: 1400,
       expectEditDivider: /Point Attributes|位号属性配置/,
-      prepare: async (page) => {
-        const card = page.locator('.edit-card-body .things-card.cursor-pointer:visible').first();
-        if (await card.count()) await card.click();
-      },
       ...full,
     }
   );
-  add('device-edit-step-4-complete', 'Device edit step 4 complete', `/device/edit?id=${ids.deviceId}&active=3`, {
-    expectEditDivider: /Complete|设备配置完成/,
-    ...full,
-  });
+  add(
+    'device-edit-step-4-command-config',
+    'Device edit step 4 command config',
+    `/device/edit?id=${ids.deviceId}&active=commandConfig`,
+    {
+      expectEditDivider: /Related Commands|Device Commands|设备指令能力/,
+      ...full,
+    }
+  );
 
   add('point-detail-info', 'Point detail info tab', `/point/detail?id=${ids.pointId}&active=detail`, {
     expectActiveTab: /Point Info|位号信息/,
@@ -411,25 +417,6 @@ function buildShots(ids) {
     expectActiveTab: /Related Devices|关联设备/,
     ...full,
   });
-  add(
-    'point-edit-step-1-point-config',
-    'Point edit step 1 point config',
-    `/point/edit?id=${ids.pointId}&profileId=${ids.pointProfileId}&active=0`,
-    {
-      expectEditDivider: /Point Info|位号信息配置/,
-      ...full,
-    }
-  );
-  add(
-    'point-edit-step-2-complete',
-    'Point edit step 2 complete',
-    `/point/edit?id=${ids.pointId}&profileId=${ids.pointProfileId}&active=1`,
-    {
-      expectEditDivider: /Complete|位号配置完成/,
-      ...full,
-    }
-  );
-
   add('point-value-list', 'Point value list', '/point_value', full);
   add('settings-user-list', 'Settings user list', '/settings/user', full);
   add('settings-user-add-form', 'Settings user add form', '/settings/user', {
@@ -549,8 +536,8 @@ function buildShots(ids) {
     },
   });
 
-  add('settings-model-config-list', 'Settings model config list', '/settings/agentic', full);
-  add('settings-model-config-add-form', 'Settings model config add form', '/settings/agentic', {
+  add('settings-model-config-list', 'Settings model config list', '/settings/model/config', full);
+  add('settings-model-config-add-form', 'Settings model config add form', '/settings/model/config', {
     prepare: async (page) => {
       const dialog = await openAddDialog(page);
       await fillFirstByPlaceholder(dialog, 'gpt-4o-mini', 'gpt-4.1-mini');
@@ -559,8 +546,8 @@ function buildShots(ids) {
       await fillTextarea(dialog, 'Default lightweight model for device triage and event summarization demos.');
     },
   });
-  add('settings-model-provider-list', 'Settings model provider list', '/settings/agentic/provider', full);
-  add('settings-model-provider-add-form', 'Settings model provider add form', '/settings/agentic/provider', {
+  add('settings-model-provider-list', 'Settings model provider list', '/settings/model/provider', full);
+  add('settings-model-provider-add-form', 'Settings model provider add form', '/settings/model/provider', {
     prepare: async (page) => {
       const dialog = await openAddDialog(page);
       await fillFirstByPlaceholder(dialog, 'My Provider', 'OpenAI East China Relay');
@@ -570,27 +557,27 @@ function buildShots(ids) {
     },
   });
 
-  add('settings-event-overview-situation', 'Settings event overview situation', '/settings/event', {
+  add('settings-event-overview-situation', 'Settings alarm overview situation', '/settings/alarm/overview', {
     wait: 1600,
     ...full,
   });
-  add('settings-event-overview-noise', 'Settings event overview noise', '/settings/event', {
+  add('settings-event-overview-noise', 'Settings alarm overview noise', '/settings/alarm/overview', {
     wait: 1600,
     prepare: (page) => clickEventTab(page, 'Noise'),
     ...full,
   });
-  add('settings-event-overview-availability', 'Settings event overview availability', '/settings/event', {
+  add('settings-event-overview-availability', 'Settings alarm overview availability', '/settings/alarm/overview', {
     wait: 1600,
     prepare: (page) => clickEventTab(page, 'Availability'),
     ...full,
   });
-  add('settings-event-overview-sla', 'Settings event overview SLA', '/settings/event', {
+  add('settings-event-overview-sla', 'Settings alarm overview SLA', '/settings/alarm/overview', {
     wait: 1600,
     prepare: (page) => clickEventTab(page, 'SLA'),
     ...full,
   });
-  add('settings-device-event-list', 'Settings device event list', '/settings/event/device', full);
-  add('settings-driver-event-list', 'Settings driver event list', '/settings/event/driver', full);
+  add('settings-device-event-list', 'Settings device alarm list', '/settings/alarm/device', full);
+  add('settings-driver-event-list', 'Settings driver alarm list', '/settings/alarm/driver', full);
   add('settings-about', 'Settings about', '/settings/about', full);
 
   add('ai-assistant-panel', 'AI assistant panel', '/home', {

@@ -18,6 +18,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 const baseURL = process.env.E2E_BASE_URL || 'http://localhost:8080';
 const startServer = process.env.E2E_START_SERVER !== '0';
+const workers = Number(process.env.E2E_WORKERS || 1);
 
 export default defineConfig({
   testDir: './tests/e2e/specs',
@@ -28,7 +29,7 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers,
   reporter: [
     ['list'],
     ['html', { open: 'never', outputFolder: 'playwright-report' }],
@@ -45,7 +46,7 @@ export default defineConfig({
   },
   webServer: startServer
     ? {
-        command: 'pnpm dev',
+        command: 'pnpm run serve:e2e',
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,

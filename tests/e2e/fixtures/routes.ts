@@ -58,11 +58,14 @@ export const protectedRoutes = [
   '/settings/alarm/bind',
   '/settings/alarm/state',
   '/settings/alarm/history',
-  '/settings/agentic',
-  '/settings/agentic/provider',
-  '/settings/event',
-  '/settings/event/device',
-  '/settings/event/driver',
+  '/settings/model/config',
+  '/settings/model/provider',
+  '/settings/alarm/overview',
+  '/settings/alarm/device',
+  '/settings/alarm/driver',
+  '/settings/alarm/point',
+  '/settings/event/history',
+  '/settings/command/history',
   '/settings/about',
 ];
 
@@ -73,7 +76,6 @@ export const protectedRouteProbes = [
   '/profile/detail?id=e2e-auth-probe',
   '/profile/edit?id=e2e-auth-probe',
   '/point/detail?id=e2e-auth-probe',
-  '/point/edit?id=e2e-auth-probe&profileId=e2e-auth-probe',
   '/settings/api/detail?id=e2e-auth-probe',
   '/settings/resource/detail?id=e2e-auth-probe',
   '/settings/menu/detail?id=e2e-auth-probe',
@@ -88,8 +90,8 @@ export const protectedRouteProbes = [
   '/settings/alarm/bind/detail?id=e2e-auth-probe',
   '/settings/alarm/state/detail?id=e2e-auth-probe',
   '/settings/alarm/history/detail?id=e2e-auth-probe',
-  '/settings/agentic/detail?id=e2e-auth-probe',
-  '/settings/agentic/provider/detail?id=e2e-auth-probe',
+  '/settings/model/config/detail?id=e2e-auth-probe',
+  '/settings/model/provider/detail?id=e2e-auth-probe',
 ];
 
 export const publicRoutes = ['/login', '/403', '/404', '/500'];
@@ -106,9 +108,6 @@ export function buildEntityRoutes(routeIds: RouteIds) {
     routes.push(`/profile/edit?id=${routeIds.profileId}`);
   }
   if (routeIds.pointId) routes.push(`/point/detail?id=${routeIds.pointId}`);
-  if (routeIds.pointId && routeIds.pointProfileId) {
-    routes.push(`/point/edit?id=${routeIds.pointId}&profileId=${routeIds.pointProfileId}`);
-  }
   if (routeIds.apiId) routes.push(`/settings/api/detail?id=${routeIds.apiId}`);
   if (routeIds.resourceId) routes.push(`/settings/resource/detail?id=${routeIds.resourceId}`);
   if (routeIds.menuId) routes.push(`/settings/menu/detail?id=${routeIds.menuId}`);
@@ -121,8 +120,12 @@ export function buildEntityRoutes(routeIds: RouteIds) {
   if (routeIds.alarmBindId) routes.push(`/settings/alarm/bind/detail?id=${routeIds.alarmBindId}`);
   if (routeIds.alarmStateId) routes.push(`/settings/alarm/state/detail?id=${routeIds.alarmStateId}`);
   if (routeIds.alarmHistoryId) routes.push(`/settings/alarm/history/detail?id=${routeIds.alarmHistoryId}`);
-  if (routeIds.agenticModelConfigId) routes.push(`/settings/agentic/detail?id=${routeIds.agenticModelConfigId}`);
-  if (routeIds.agenticProviderId) routes.push(`/settings/agentic/provider/detail?id=${routeIds.agenticProviderId}`);
+  if (routeIds.agenticModelConfigId) {
+    routes.push(`/settings/model/config/detail?id=${routeIds.agenticModelConfigId}`);
+  }
+  if (routeIds.agenticProviderId) {
+    routes.push(`/settings/model/provider/detail?id=${routeIds.agenticProviderId}`);
+  }
   if (routeIds.userId) routes.push(`/settings/user/detail?id=${routeIds.userId}`);
   if (routeIds.roleId) routes.push(`/settings/role/detail?id=${routeIds.roleId}`);
   return routes;
@@ -233,7 +236,7 @@ export const interactionPages = [
   { name: 'Alarm Delivery History', route: '/settings/alarm/history', placeholder: 'Search target', value: 'ops' },
   {
     name: 'Agentic Model Config',
-    route: '/settings/agentic',
+    route: '/settings/model/config',
     placeholder: 'gpt-4o-mini',
     value: 'gpt',
     add: true,
@@ -241,12 +244,16 @@ export const interactionPages = [
   },
   {
     name: 'Agentic Provider',
-    route: '/settings/agentic/provider',
+    route: '/settings/model/provider',
     placeholder: 'Provider name',
     value: 'openai',
     add: true,
     enableForm: true,
   },
-  { name: 'Device Event', route: '/settings/event/device', paginate: true },
-  { name: 'Driver Event', route: '/settings/event/driver', paginate: true },
+  { name: 'Alarm Overview', route: '/settings/alarm/overview', paginate: true },
+  { name: 'Device Alarm', route: '/settings/alarm/device', paginate: true },
+  { name: 'Driver Alarm', route: '/settings/alarm/driver', paginate: true },
+  { name: 'Point Alarm', route: '/settings/alarm/point', paginate: true },
+  { name: 'Event History', route: '/settings/event/history', paginate: true },
+  { name: 'Command History', route: '/settings/command/history', paginate: true },
 ];

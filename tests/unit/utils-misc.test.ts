@@ -89,6 +89,7 @@ describe('utils (misc)', () => {
     it('maps point flags to stable i18n keys', () => {
       expect(pointTypeKey('FLOAT')).toBe('dataType.float');
       expect(pointTypeKey('missing')).toBe('status.unknown');
+      expect(rwFlagKey('READ_WRITE')).toBe('status.readWrite');
       expect(rwFlagKey('RW')).toBe('status.readWrite');
       expect(rwFlagKey()).toBe('status.unknown');
     });

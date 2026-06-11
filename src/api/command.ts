@@ -48,6 +48,6 @@ export const listCommandParamByCommandId = (commandId: string) =>
 // Command History Queries
 
 export const getCommandHistoryByRecordId = (recordId: string) =>
-  httpGet<R<CommandHistoryRecord>>(`${endpoints.commandHistory}/get_by_record_id`, { params: { recordId } });
+  httpGet<R<CommandHistoryRecord>>(`${endpoints.commandHistory}/get_by_record_id`, { params: { record_id: recordId } });
 export const listCommandHistory = (query: PageQuery) =>
   httpPost<R<PageResult<CommandHistoryRecord>>>(`${endpoints.commandHistory}/list`, query);

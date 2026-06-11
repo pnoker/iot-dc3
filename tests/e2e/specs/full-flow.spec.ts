@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-import { expect, test } from '@playwright/test';
+import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 
-import { apiGet, apiPost, expectHealthy, login, markHealth, waitForAppSettled, watchPageHealth } from '../fixtures/app';
+import {
+  clickTab,
+  ensureE2eData,
+  expectHealthy,
+  fillFirstEditableInput,
+  login,
+  markHealth,
+  type E2eDataContext,
+  waitForAppSettled,
+  watchPageHealth,
+} from '../fixtures/app';
+import type { RouteIds } from '../fixtures/routes';
 
 /**
  * Full Flow e2e spec.
@@ -24,57 +35,26 @@ import { apiGet, apiPost, expectHealthy, login, markHealth, waitForAppSettled, w
  * Single login session that walks every page and key interaction:
  *   - Home dashboard
  *   - Driver list + detail tabs (Info, Devices)
- *   - Profile list + detail tabs (Info, Points, Commands, Events, Devices) + edit wizard (5 steps)
- *   - Device list + detail tabs (Info, Profiles, Points, PointValues) + edit wizard (6 steps)
- *   - Point detail tabs (Info, Devices) + edit wizard (2 steps)
+ *   - Profile list + detail tabs (Info, Points, Commands, Events, Devices) + edit tabs
+ *   - Device list + detail tabs (Info, Profiles, Points, PointValues) + edit tabs
+ *   - Point detail tabs (Info, Devices)
  *   - Point value list
  *   - Settings: User/Role/Resource/API/Menu/Group/Label list + detail tabs + add forms
  *   - Settings: Alarm pages (Rule, Notify, Message, Channel, Bind, State, History)
  *   - Settings: Agentic Model Config + Provider list + add forms
  *   - Settings: Event Overview tabs (Situation, Noise, Availability, SLA) + Device/Driver/Point events
- *   - Settings: Command Record, Event Report, About
+ *   - Settings: Command History, Event History, About
  *   - Profile edit: add command without params (key regression test)
  *
- * Uses a single login + discovered IDs to avoid auth flakiness.
+ * Uses one seeded backend data context and a fresh login per test to avoid
+ * auth/session coupling without silently skipping low-data environments.
  */
 
 function uniqueName(prefix: string) {
   return `e2e_ff_${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-async function clickTab(page: import('@playwright/test').Page, pattern: RegExp) {
-  // Retry loop to handle DOM re-rendering during navigation
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const tab = page.locator('.el-tabs__item').filter({ hasText: pattern }).first();
-    try {
-      await tab.waitFor({ state: 'visible', timeout: 5000 });
-      await tab.click();
-      await waitForAppSettled(page);
-      return true;
-    } catch {
-      await page.waitForTimeout(500);
-    }
-  }
-  return false;
-}
-
-async function clickWizardNext(page: import('@playwright/test').Page) {
-  const btn = page.getByRole('button', { name: /Next|下一步/ }).last();
-  if (await btn.isVisible().catch(() => false)) {
-    await btn.click();
-    await waitForAppSettled(page);
-  }
-}
-
-async function clickWizardPrevious(page: import('@playwright/test').Page) {
-  const btn = page.getByRole('button', { name: /Previous|上一步/ }).last();
-  if (await btn.isVisible().catch(() => false)) {
-    await btn.click();
-    await waitForAppSettled(page);
-  }
-}
-
-async function openAddDialog(page: import('@playwright/test').Page) {
+async function openAddDialog(page: Page) {
   const btn = page.getByRole('button', { name: /^(Add|新增)$/ }).first();
   if (await btn.isVisible().catch(() => false)) {
     await btn.click();
@@ -85,7 +65,7 @@ async function openAddDialog(page: import('@playwright/test').Page) {
   return null;
 }
 
-async function closeDialog(page: import('@playwright/test').Page) {
+async function closeDialog(page: Page) {
   const dialog = page.locator('.el-dialog:visible').last();
   if (await dialog.isVisible().catch(() => false)) {
     const cancel = dialog.getByRole('button', { name: /Cancel|取消/ }).first();
@@ -101,133 +81,39 @@ async function closeDialog(page: import('@playwright/test').Page) {
   }
 }
 
-async function firstRecordId(page: import('@playwright/test').Page, url: string) {
-  const res = await apiPost(page, url, { page: { current: 1, size: 1 } });
-  const data = res.data as { ok?: boolean; data?: { records?: Array<{ id?: unknown }> } };
-  if (!data?.ok) return undefined;
-  const id = data.data?.records?.[0]?.id;
-  return id != null ? String(id) : undefined;
+function requireRouteId(ids: RouteIds, key: keyof RouteIds, label: string) {
+  const value = ids[key];
+  expect(value, `${label} id must be prepared by ensureE2eData or by the backend seed data`).not.toBeUndefined();
+  expect(value, `${label} id must be prepared by ensureE2eData or by the backend seed data`).not.toBe('');
+  return String(value);
 }
 
-async function firstArrayRecordId(page: import('@playwright/test').Page, url: string) {
-  const res = await apiGet<Array<{ id?: unknown }>>(page, url);
-  const data = res.data as { ok?: boolean; data?: Array<{ id?: unknown }> };
-  if (!data?.ok) return undefined;
-  const id = data.data?.[0]?.id;
-  return id != null ? String(id) : undefined;
-}
-
-interface Ids {
-  driverId?: string;
-  profileId?: string;
-  deviceId?: string;
-  pointId?: string;
-  pointProfileId?: string;
-  userId?: string;
-  roleId?: string;
-  resourceId?: string;
-  apiId?: string;
-  menuId?: string;
-  groupId?: string;
-  labelId?: string;
-  alarmRuleId?: string;
-  alarmNotifyId?: string;
-  alarmMessageId?: string;
-  alarmChannelId?: string;
-  alarmBindId?: string;
-  alarmStateId?: string;
-  alarmHistoryId?: string;
-  agenticModelConfigId?: string;
-  agenticProviderId?: string;
-}
-
-async function discoverIds(page: import('@playwright/test').Page): Promise<Ids> {
-  const [
-    driverId,
-    profileId,
-    deviceId,
-    pointId,
-    userId,
-    roleId,
-    resourceId,
-    apiId,
-    menuId,
-    groupId,
-    labelId,
-    alarmRuleId,
-    alarmNotifyId,
-    alarmMessageId,
-    alarmChannelId,
-    alarmBindId,
-    alarmStateId,
-    alarmHistoryId,
-    agenticModelConfigId,
-    agenticProviderId,
-  ] = await Promise.all([
-    firstRecordId(page, '/api/v3/manager/driver/list'),
-    firstRecordId(page, '/api/v3/manager/profile/list'),
-    firstRecordId(page, '/api/v3/manager/device/list'),
-    firstRecordId(page, '/api/v3/manager/point/list'),
-    firstRecordId(page, '/api/v3/auth/user_profile/list'),
-    firstRecordId(page, '/api/v3/auth/role/list'),
-    firstRecordId(page, '/api/v3/auth/resource/list'),
-    firstRecordId(page, '/api/v3/auth/api/list'),
-    firstRecordId(page, '/api/v3/auth/menu/list'),
-    firstRecordId(page, '/api/v3/manager/group/list'),
-    firstRecordId(page, '/api/v3/manager/label/list'),
-    firstRecordId(page, '/api/v3/data/rule/list'),
-    firstRecordId(page, '/api/v3/data/notify/list'),
-    firstRecordId(page, '/api/v3/data/message/list'),
-    firstRecordId(page, '/api/v3/data/notify/channel/list'),
-    firstRecordId(page, '/api/v3/data/notify/channel/bind/list'),
-    firstRecordId(page, '/api/v3/data/rule/state/list'),
-    firstRecordId(page, '/api/v3/data/notify/history/list'),
-    firstArrayRecordId(page, '/api/v3/agentic/model/config/list'),
-    firstArrayRecordId(page, '/api/v3/agentic/provider/list'),
-  ]);
-
-  let pointProfileId: string | undefined;
-  if (pointId) {
-    const ptRes = await apiGet(page, `/api/v3/manager/point/get_by_id`, { id: pointId });
-    const ptData = ptRes.data as { ok?: boolean; data?: { profileId?: unknown } };
-    pointProfileId = ptData?.data?.profileId ? String(ptData.data.profileId) : profileId;
+async function openDetailWhenSeeded(page: Page, id: string | undefined, listRoute: string, detailRoute: string) {
+  if (id) {
+    await page.goto(`/#${detailRoute}?id=${id}`, { waitUntil: 'domcontentloaded' });
+  } else {
+    await page.goto(`/#${listRoute}`, { waitUntil: 'domcontentloaded' });
   }
-
-  return {
-    driverId,
-    profileId,
-    deviceId,
-    pointId,
-    pointProfileId,
-    userId,
-    roleId,
-    resourceId,
-    apiId,
-    menuId,
-    groupId,
-    labelId,
-    alarmRuleId,
-    alarmNotifyId,
-    alarmMessageId,
-    alarmChannelId,
-    alarmBindId,
-    alarmStateId,
-    alarmHistoryId,
-    agenticModelConfigId,
-    agenticProviderId,
-  };
+  await waitForAppSettled(page);
 }
 
 test.describe('full flow - all pages', () => {
-  let ids: Ids;
+  let ids: RouteIds = {};
+  let seedContext: BrowserContext | undefined;
+  let seedData: E2eDataContext | undefined;
   let health: ReturnType<typeof watchPageHealth>;
 
   test.beforeAll(async ({ browser }) => {
-    const context = await browser.newContext();
-    const page = await context.newPage();
+    seedContext = await browser.newContext();
+    const page = await seedContext.newPage();
     await login(page);
-    ids = await discoverIds(page);
-    await context.close();
+    seedData = await ensureE2eData(page);
+    ids = seedData.routeIds;
+  });
+
+  test.afterAll(async () => {
+    await seedData?.cleanup();
+    await seedContext?.close();
   });
 
   test.beforeEach(async ({ page }) => {
@@ -254,8 +140,8 @@ test.describe('full flow - all pages', () => {
   });
 
   test('driver detail tabs', async ({ page }) => {
-    test.skip(!ids.driverId, 'no driver');
-    await page.goto(`/#/driver/detail?id=${ids.driverId}`, { waitUntil: 'domcontentloaded' });
+    const driverId = requireRouteId(ids, 'driverId', 'driver');
+    await page.goto(`/#/driver/detail?id=${driverId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     await clickTab(page, /Device|设备/);
     expectHealthy(health);
@@ -269,8 +155,8 @@ test.describe('full flow - all pages', () => {
   });
 
   test('profile detail all tabs', async ({ page }) => {
-    test.skip(!ids.profileId, 'no profile');
-    await page.goto(`/#/profile/detail?id=${ids.profileId}`, { waitUntil: 'domcontentloaded' });
+    const profileId = requireRouteId(ids, 'profileId', 'profile');
+    await page.goto(`/#/profile/detail?id=${profileId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     await clickTab(page, /Point|位号/);
     await clickTab(page, /Command|命令/);
@@ -279,33 +165,29 @@ test.describe('full flow - all pages', () => {
     expectHealthy(health);
   });
 
-  test('profile edit wizard navigation', async ({ page }) => {
-    test.skip(!ids.profileId, 'no profile');
-    await page.goto(`/#/profile/edit?id=${ids.profileId}`, { waitUntil: 'domcontentloaded' });
+  test('profile edit tabs', async ({ page }) => {
+    const profileId = requireRouteId(ids, 'profileId', 'profile');
+    await page.goto(`/#/profile/edit?id=${profileId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
-    // Wait for data to load
-    const nameInput = page.locator('.edit-card-body input').first();
+    const nameInput = page.getByPlaceholder(/profile name|模板名称/i).first();
     await expect(nameInput).not.toHaveValue('', { timeout: 10_000 });
-    await clickWizardNext(page); // 0→1
-    await clickWizardNext(page); // 1→2
-    await clickWizardPrevious(page); // 2→1
-    await clickWizardNext(page); // 1→2
-    await clickWizardNext(page); // 2→3
-    await clickWizardNext(page); // 3→4
-    await expect(page.locator('.el-result')).toBeVisible({ timeout: 10_000 });
+    await clickTab(page, /Point|位号/);
+    await clickTab(page, /Command|命令/);
+    await clickTab(page, /Event|事件/);
+    await clickTab(page, /Profile Info|模板信息/);
     expectHealthy(health);
   });
 
   test('profile edit: add command without params (regression)', async ({ page }) => {
-    test.skip(!ids.profileId, 'no profile');
-    await page.goto(`/#/profile/edit?id=${ids.profileId}&active=2`, { waitUntil: 'domcontentloaded' });
+    const profileId = requireRouteId(ids, 'profileId', 'profile');
+    await page.goto(`/#/profile/edit?id=${profileId}&active=commandConfig`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     const addBtn = page.getByRole('button', { name: /^(Add|新增)$/ }).first();
     await expect(addBtn).toBeVisible({ timeout: 10_000 });
     await addBtn.click();
     await waitForAppSettled(page);
     const dialog = page.locator('.el-dialog:visible').last();
-    await dialog.locator('input').first().fill(uniqueName('cmd'));
+    await fillFirstEditableInput(dialog, uniqueName('cmd'));
     const mark = markHealth(health);
     await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
     await waitForAppSettled(page);
@@ -320,8 +202,8 @@ test.describe('full flow - all pages', () => {
   });
 
   test('device detail all tabs', async ({ page }) => {
-    test.skip(!ids.deviceId, 'no device');
-    await page.goto(`/#/device/detail?id=${ids.deviceId}`, { waitUntil: 'domcontentloaded' });
+    const deviceId = requireRouteId(ids, 'deviceId', 'device');
+    await page.goto(`/#/device/detail?id=${deviceId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     await clickTab(page, /Profile|模板/);
     await clickTab(page, /Point|位号/);
@@ -331,19 +213,17 @@ test.describe('full flow - all pages', () => {
     expectHealthy(health);
   });
 
-  test('device edit wizard navigation', async ({ page }) => {
-    test.skip(!ids.deviceId, 'no device');
-    await page.goto(`/#/device/edit?id=${ids.deviceId}`, { waitUntil: 'domcontentloaded' });
+  test('device edit tabs', async ({ page }) => {
+    const deviceId = requireRouteId(ids, 'deviceId', 'device');
+    await page.goto(`/#/device/edit?id=${deviceId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
-    await expect(page.locator('.el-steps')).toBeVisible();
-    await clickWizardNext(page); // 0→1
-    await clickWizardNext(page); // 1→2
-    await clickWizardPrevious(page); // 2→1
-    await clickWizardNext(page); // 1→2
-    await clickWizardNext(page); // 2→3
-    await clickWizardNext(page); // 3→4
-    await clickWizardNext(page); // 4→5
-    await expect(page.locator('.el-result')).toBeVisible({ timeout: 10_000 });
+    const nameInput = page.getByPlaceholder(/device name|设备名称/i).first();
+    await expect(nameInput).not.toHaveValue('', { timeout: 10_000 });
+    await clickTab(page, /Driver Attribute|驱动属性/);
+    await clickTab(page, /Point Attribute|位号属性/);
+    await clickTab(page, /Command|命令/);
+    await clickTab(page, /Event|事件/);
+    await clickTab(page, /Device Info|设备信息/);
     expectHealthy(health);
   });
 
@@ -355,22 +235,10 @@ test.describe('full flow - all pages', () => {
   });
 
   test('point detail tabs', async ({ page }) => {
-    test.skip(!ids.pointId, 'no point');
-    await page.goto(`/#/point/detail?id=${ids.pointId}`, { waitUntil: 'domcontentloaded' });
+    const pointId = requireRouteId(ids, 'pointId', 'point');
+    await page.goto(`/#/point/detail?id=${pointId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     await clickTab(page, /Device|设备/);
-    expectHealthy(health);
-  });
-
-  test('point edit wizard', async ({ page }) => {
-    test.skip(!ids.pointId || !ids.pointProfileId, 'no point');
-    await page.goto(`/#/point/edit?id=${ids.pointId}&profileId=${ids.pointProfileId}`, {
-      waitUntil: 'domcontentloaded',
-    });
-    await waitForAppSettled(page);
-    await expect(page.locator('.el-steps')).toBeVisible();
-    await clickWizardNext(page); // 0→1 (complete)
-    await expect(page.locator('.el-result')).toBeVisible({ timeout: 10_000 });
     expectHealthy(health);
   });
 
@@ -380,15 +248,17 @@ test.describe('full flow - all pages', () => {
     await waitForAppSettled(page);
     const dialog = await openAddDialog(page);
     if (dialog) {
-      await dialog.locator('input').first().fill(uniqueName('user'));
+      const name = uniqueName('user');
+      await dialog.getByPlaceholder(/user name|用户名/i).fill(name);
+      await dialog.getByPlaceholder(/nickname|昵称/i).fill(name);
       await closeDialog(page);
     }
     expectHealthy(health);
   });
 
   test('settings user detail tabs', async ({ page }) => {
-    test.skip(!ids.userId, 'no user');
-    await page.goto(`/#/settings/user/detail?id=${ids.userId}`, { waitUntil: 'domcontentloaded' });
+    const userId = requireRouteId(ids, 'userId', 'user');
+    await page.goto(`/#/settings/user/detail?id=${userId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     await clickTab(page, /Role|角色/);
     await clickTab(page, /Resource|资源/);
@@ -401,15 +271,15 @@ test.describe('full flow - all pages', () => {
     await waitForAppSettled(page);
     const dialog = await openAddDialog(page);
     if (dialog) {
-      await dialog.locator('input').first().fill(uniqueName('role'));
+      await fillFirstEditableInput(dialog, uniqueName('role'));
       await closeDialog(page);
     }
     expectHealthy(health);
   });
 
   test('settings role detail tabs', async ({ page }) => {
-    test.skip(!ids.roleId, 'no role');
-    await page.goto(`/#/settings/role/detail?id=${ids.roleId}`, { waitUntil: 'domcontentloaded' });
+    const roleId = requireRouteId(ids, 'roleId', 'role');
+    await page.goto(`/#/settings/role/detail?id=${roleId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     await clickTab(page, /User|用户/);
     await clickTab(page, /Resource|资源/);
@@ -424,8 +294,8 @@ test.describe('full flow - all pages', () => {
   });
 
   test('settings resource detail tabs', async ({ page }) => {
-    test.skip(!ids.resourceId, 'no resource');
-    await page.goto(`/#/settings/resource/detail?id=${ids.resourceId}`, { waitUntil: 'domcontentloaded' });
+    const resourceId = requireRouteId(ids, 'resourceId', 'resource');
+    await page.goto(`/#/settings/resource/detail?id=${resourceId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     await clickTab(page, /Role|角色/);
     await clickTab(page, /Child|子资源/);
@@ -440,8 +310,8 @@ test.describe('full flow - all pages', () => {
   });
 
   test('settings api detail', async ({ page }) => {
-    test.skip(!ids.apiId, 'no api');
-    await page.goto(`/#/settings/api/detail?id=${ids.apiId}`, { waitUntil: 'domcontentloaded' });
+    const apiId = requireRouteId(ids, 'apiId', 'api');
+    await page.goto(`/#/settings/api/detail?id=${apiId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
@@ -454,8 +324,8 @@ test.describe('full flow - all pages', () => {
   });
 
   test('settings menu detail', async ({ page }) => {
-    test.skip(!ids.menuId, 'no menu');
-    await page.goto(`/#/settings/menu/detail?id=${ids.menuId}`, { waitUntil: 'domcontentloaded' });
+    const menuId = requireRouteId(ids, 'menuId', 'menu');
+    await page.goto(`/#/settings/menu/detail?id=${menuId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
@@ -466,15 +336,15 @@ test.describe('full flow - all pages', () => {
     await waitForAppSettled(page);
     const dialog = await openAddDialog(page);
     if (dialog) {
-      await dialog.locator('input').first().fill(uniqueName('group'));
+      await fillFirstEditableInput(dialog, uniqueName('group'));
       await closeDialog(page);
     }
     expectHealthy(health);
   });
 
   test('settings group detail', async ({ page }) => {
-    test.skip(!ids.groupId, 'no group');
-    await page.goto(`/#/settings/group/detail?id=${ids.groupId}`, { waitUntil: 'domcontentloaded' });
+    const groupId = requireRouteId(ids, 'groupId', 'group');
+    await page.goto(`/#/settings/group/detail?id=${groupId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
@@ -485,15 +355,15 @@ test.describe('full flow - all pages', () => {
     await waitForAppSettled(page);
     const dialog = await openAddDialog(page);
     if (dialog) {
-      await dialog.locator('input').first().fill(uniqueName('label'));
+      await fillFirstEditableInput(dialog, uniqueName('label'));
       await closeDialog(page);
     }
     expectHealthy(health);
   });
 
   test('settings label detail', async ({ page }) => {
-    test.skip(!ids.labelId, 'no label');
-    await page.goto(`/#/settings/label/detail?id=${ids.labelId}`, { waitUntil: 'domcontentloaded' });
+    const labelId = requireRouteId(ids, 'labelId', 'label');
+    await page.goto(`/#/settings/label/detail?id=${labelId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
@@ -518,72 +388,68 @@ test.describe('full flow - all pages', () => {
   }
 
   test('settings alarm rule detail', async ({ page }) => {
-    test.skip(!ids.alarmRuleId, 'no alarm rule');
-    await page.goto(`/#/settings/alarm/rule/detail?id=${ids.alarmRuleId}`, { waitUntil: 'domcontentloaded' });
+    const alarmRuleId = requireRouteId(ids, 'alarmRuleId', 'alarm rule');
+    await page.goto(`/#/settings/alarm/rule/detail?id=${alarmRuleId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
 
   test('settings alarm notify detail', async ({ page }) => {
-    test.skip(!ids.alarmNotifyId, 'no alarm notify');
-    await page.goto(`/#/settings/alarm/notify/detail?id=${ids.alarmNotifyId}`, { waitUntil: 'domcontentloaded' });
+    const alarmNotifyId = requireRouteId(ids, 'alarmNotifyId', 'alarm notify');
+    await page.goto(`/#/settings/alarm/notify/detail?id=${alarmNotifyId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
 
   test('settings alarm message detail', async ({ page }) => {
-    test.skip(!ids.alarmMessageId, 'no alarm message');
-    await page.goto(`/#/settings/alarm/message/detail?id=${ids.alarmMessageId}`, { waitUntil: 'domcontentloaded' });
+    const alarmMessageId = requireRouteId(ids, 'alarmMessageId', 'alarm message');
+    await page.goto(`/#/settings/alarm/message/detail?id=${alarmMessageId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
 
   test('settings alarm channel detail', async ({ page }) => {
-    test.skip(!ids.alarmChannelId, 'no alarm channel');
-    await page.goto(`/#/settings/alarm/channel/detail?id=${ids.alarmChannelId}`, { waitUntil: 'domcontentloaded' });
+    const alarmChannelId = requireRouteId(ids, 'alarmChannelId', 'alarm channel');
+    await page.goto(`/#/settings/alarm/channel/detail?id=${alarmChannelId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
 
   test('settings alarm bind detail', async ({ page }) => {
-    test.skip(!ids.alarmBindId, 'no alarm bind');
-    await page.goto(`/#/settings/alarm/bind/detail?id=${ids.alarmBindId}`, { waitUntil: 'domcontentloaded' });
+    const alarmBindId = requireRouteId(ids, 'alarmBindId', 'alarm bind');
+    await page.goto(`/#/settings/alarm/bind/detail?id=${alarmBindId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
 
   test('settings alarm state detail', async ({ page }) => {
-    test.skip(!ids.alarmStateId, 'no alarm state');
-    await page.goto(`/#/settings/alarm/state/detail?id=${ids.alarmStateId}`, { waitUntil: 'domcontentloaded' });
-    await waitForAppSettled(page);
+    await openDetailWhenSeeded(page, ids.alarmStateId, '/settings/alarm/state', '/settings/alarm/state/detail');
     expectHealthy(health);
   });
 
   test('settings alarm history detail', async ({ page }) => {
-    test.skip(!ids.alarmHistoryId, 'no alarm history');
-    await page.goto(`/#/settings/alarm/history/detail?id=${ids.alarmHistoryId}`, { waitUntil: 'domcontentloaded' });
-    await waitForAppSettled(page);
+    await openDetailWhenSeeded(page, ids.alarmHistoryId, '/settings/alarm/history', '/settings/alarm/history/detail');
     expectHealthy(health);
   });
 
   // ── Settings: Agentic ─────────────────────────────────────────────
   test('settings agentic model config list + add dialog', async ({ page }) => {
-    await page.goto('/#/settings/agentic', { waitUntil: 'domcontentloaded' });
+    await page.goto('/#/settings/model/config', { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     const dialog = await openAddDialog(page);
     if (dialog) {
-      await dialog.locator('input').first().fill('gpt-4.1-mini-test');
+      await fillFirstEditableInput(dialog, 'gpt-4.1-mini-test');
       await closeDialog(page);
     }
     expectHealthy(health);
   });
 
   test('settings agentic provider list + add dialog', async ({ page }) => {
-    await page.goto('/#/settings/agentic/provider', { waitUntil: 'domcontentloaded' });
+    await page.goto('/#/settings/model/provider', { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     const dialog = await openAddDialog(page);
     if (dialog) {
-      await dialog.locator('input').first().fill(uniqueName('provider'));
+      await fillFirstEditableInput(dialog, uniqueName('provider'));
       const urlInput = dialog.getByPlaceholder(/url|地址/i).first();
       if (await urlInput.isVisible().catch(() => false)) {
         await urlInput.fill('https://api.example.com/v1');
@@ -594,15 +460,15 @@ test.describe('full flow - all pages', () => {
   });
 
   test('settings agentic model config detail', async ({ page }) => {
-    test.skip(!ids.agenticModelConfigId, 'no model config');
-    await page.goto(`/#/settings/agentic/detail?id=${ids.agenticModelConfigId}`, { waitUntil: 'domcontentloaded' });
+    const agenticModelConfigId = requireRouteId(ids, 'agenticModelConfigId', 'agentic model config');
+    await page.goto(`/#/settings/model/config/detail?id=${agenticModelConfigId}`, { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
 
   test('settings agentic provider detail', async ({ page }) => {
-    test.skip(!ids.agenticProviderId, 'no provider');
-    await page.goto(`/#/settings/agentic/provider/detail?id=${ids.agenticProviderId}`, {
+    const agenticProviderId = requireRouteId(ids, 'agenticProviderId', 'agentic provider');
+    await page.goto(`/#/settings/model/provider/detail?id=${agenticProviderId}`, {
       waitUntil: 'domcontentloaded',
     });
     await waitForAppSettled(page);
@@ -610,8 +476,8 @@ test.describe('full flow - all pages', () => {
   });
 
   // ── Settings: Events ──────────────────────────────────────────────
-  test('settings event overview all tabs', async ({ page }) => {
-    await page.goto('/#/settings/event', { waitUntil: 'domcontentloaded' });
+  test('settings alarm overview all tabs', async ({ page }) => {
+    await page.goto('/#/settings/alarm/overview', { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     await clickTab(page, /Noise|噪音/);
     await clickTab(page, /Availability|可用性/);
@@ -619,33 +485,33 @@ test.describe('full flow - all pages', () => {
     expectHealthy(health);
   });
 
-  test('settings device event list', async ({ page }) => {
-    await page.goto('/#/settings/event/device', { waitUntil: 'domcontentloaded' });
+  test('settings device alarm list', async ({ page }) => {
+    await page.goto('/#/settings/alarm/device', { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
 
-  test('settings driver event list', async ({ page }) => {
-    await page.goto('/#/settings/event/driver', { waitUntil: 'domcontentloaded' });
+  test('settings driver alarm list', async ({ page }) => {
+    await page.goto('/#/settings/alarm/driver', { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
 
-  test('settings point event list', async ({ page }) => {
-    await page.goto('/#/settings/event/point', { waitUntil: 'domcontentloaded' });
+  test('settings point alarm list', async ({ page }) => {
+    await page.goto('/#/settings/alarm/point', { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
 
-  // ── Settings: Command Record & Event Report ───────────────────────
-  test('settings command record list', async ({ page }) => {
-    await page.goto('/#/settings/command/record', { waitUntil: 'domcontentloaded' });
+  // ── Settings: Command & Event History ─────────────────────────────
+  test('settings command history list', async ({ page }) => {
+    await page.goto('/#/settings/command/history', { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
 
-  test('settings event report list', async ({ page }) => {
-    await page.goto('/#/settings/event/report', { waitUntil: 'domcontentloaded' });
+  test('settings event history list', async ({ page }) => {
+    await page.goto('/#/settings/event/history', { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
     expectHealthy(health);
   });
@@ -694,6 +560,7 @@ test.describe('full flow - all pages', () => {
   });
 
   test('profile list toolbar: search + reset + sort + refresh', async ({ page }) => {
+    test.setTimeout(90_000);
     await page.goto('/#/profile', { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
 

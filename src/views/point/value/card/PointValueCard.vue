@@ -37,9 +37,9 @@
           </div>
           <div :title="$t('pointValue.card.rwType')" class="things-card-header-status">
             <el-tag v-if="!hasLatestValue" effect="plain" type="info">{{ $t('pointValue.card.noLatestValue') }}</el-tag>
-            <el-tag v-if="data.rwFlag === 'R'" effect="plain" type="warning">{{ $t('status.readOnly') }}</el-tag>
-            <el-tag v-else-if="data.rwFlag === 'W'" effect="plain" type="info">{{ $t('status.writeOnly') }}</el-tag>
-            <el-tag v-else-if="data.rwFlag === 'RW'" effect="plain" type="success">{{ $t('status.readWrite') }}</el-tag>
+            <el-tag v-if="isReadOnly" effect="plain" type="warning">{{ $t('status.readOnly') }}</el-tag>
+            <el-tag v-else-if="isWriteOnly" effect="plain" type="info">{{ $t('status.writeOnly') }}</el-tag>
+            <el-tag v-else-if="isReadWrite" effect="plain" type="success">{{ $t('status.readWrite') }}</el-tag>
           </div>
         </div>
         <div class="things-card__body">
@@ -185,7 +185,11 @@
   const displayDelay = computed(() => {
     return typeof props.data?.interval === 'number' ? `${props.data.interval} ms` : '--';
   });
-  const writeDisabled = computed(() => !['W', 'RW'].includes(String(props.data?.rwFlag || '').toUpperCase()));
+  const rwFlag = computed(() => String(props.data?.rwFlag || '').toUpperCase());
+  const isReadOnly = computed(() => ['R', 'READ_ONLY'].includes(rwFlag.value));
+  const isWriteOnly = computed(() => ['W', 'WRITE_ONLY'].includes(rwFlag.value));
+  const isReadWrite = computed(() => ['RW', 'READ_WRITE'].includes(rwFlag.value));
+  const writeDisabled = computed(() => !isWriteOnly.value && !isReadWrite.value);
 
   const displayTime = (value: string | null | undefined) => {
     if (!hasLatestValue.value || !value) {

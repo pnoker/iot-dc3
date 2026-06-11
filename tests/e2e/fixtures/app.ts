@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import JSONBigInt from 'json-bigint';
 import type { RouteIds } from './routes';
 
@@ -43,12 +43,28 @@ interface EntitySeed {
   body: Record<string, unknown>;
 }
 
+interface MenuSeed {
+  code: string;
+  name: string;
+  parentCode: string;
+  icon: string;
+  url: string;
+  level: 'C2' | 'C3';
+  index: number;
+  type?: 'TITLE' | 'COMMON';
+}
+
 export interface E2eDataContext {
   routeIds: RouteIds;
   cleanup: () => Promise<void>;
 }
 
 const JSONBigIntStr = JSONBigInt({ storeAsString: true });
+const E2E_CREDENTIALS = {
+  tenant: process.env.E2E_TENANT || 'default',
+  name: process.env.E2E_USERNAME || 'dc3',
+  password: process.env.E2E_PASSWORD || 'dc3dc3dc3',
+};
 
 export function isBusinessApi(url: string) {
   return url.includes('/api/v3/');
@@ -73,12 +89,40 @@ export async function waitForAppSettled(page: Page) {
   await expect(page.locator('#app *').first()).toBeVisible({ timeout: 10_000 });
 }
 
+export async function clickTab(page: Page, pattern: RegExp | string) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const tab = page.locator('.el-tabs__item').filter({ hasText: pattern }).first();
+    try {
+      await tab.waitFor({ state: 'visible', timeout: 5_000 });
+      await tab.click();
+      await waitForAppSettled(page);
+      return true;
+    } catch {
+      await page.waitForTimeout(250);
+    }
+  }
+  return false;
+}
+
+export async function fillFirstEditableInput(root: Locator, value: string) {
+  const input = root.locator('input:not([readonly]):not([disabled]):not([type="hidden"])').first();
+  await expect(input).toBeVisible({ timeout: 10_000 });
+  await input.fill(value);
+}
+
 export async function login(page: Page) {
   await page.goto('/#/login', { waitUntil: 'domcontentloaded' });
   await waitForAppSettled(page);
 
   const loginButton = page.getByRole('button', { name: 'Login' });
-  if (await loginButton.count()) {
+  const loginFormVisible = await loginButton
+    .waitFor({ state: 'visible', timeout: 10_000 })
+    .then(() => true)
+    .catch(() => false);
+  if (loginFormVisible) {
+    await page.getByPlaceholder('Please enter tenant name').fill(E2E_CREDENTIALS.tenant);
+    await page.getByPlaceholder('Please enter username').fill(E2E_CREDENTIALS.name);
+    await page.locator('.login-form input[type="password"]').fill(E2E_CREDENTIALS.password);
     await loginButton.click();
     // Web-first: assert URL leaves /login. Bounded by expect.timeout in
     // playwright.config.ts (10s). Failure here is a real auth regression.
@@ -91,38 +135,12 @@ export async function login(page: Page) {
 }
 
 /**
- * Logs the current session out via the auth API and clears local storage,
- * then asserts the next protected navigation routes back to /login. Used
- * by the logout spec and as a teardown hook.
+ * Clears the browser session without calling the logout API. E2E specs use
+ * this as a deterministic local auth reset; exercising the server-side token
+ * cancellation belongs in an API/unit contract, not in every route teardown.
  */
 export async function logout(page: Page) {
   await page.evaluate(() => {
-    const decodeStorage = (key: string) => {
-      const raw = localStorage.getItem(key);
-      if (!raw) return undefined;
-      try {
-        return JSON.parse(atob(raw)).content;
-      } catch {
-        return undefined;
-      }
-    };
-    const tenant = decodeStorage('X-Auth-Tenant');
-    const name = decodeStorage('X-Auth-Login');
-    const token = decodeStorage('X-Auth-Token');
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (tenant) headers['X-Auth-Tenant'] = tenant;
-    if (name) headers['X-Auth-Login'] = name;
-    if (token) headers['X-Auth-Token'] = JSON.stringify(token);
-
-    if (tenant && name) {
-      // fire-and-forget — even if the cancel call fails (network blip,
-      // already-expired token), we still want to scrub local storage.
-      void fetch('/api/v3/auth/token/cancel', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ tenant, name }),
-      }).catch(() => undefined);
-    }
     localStorage.removeItem('X-Auth-Tenant');
     localStorage.removeItem('X-Auth-Login');
     localStorage.removeItem('X-Auth-Token');
@@ -261,6 +279,16 @@ async function listByName(page: Page, url: string, nameField: string, name: stri
   return response.data.data?.records?.[0];
 }
 
+async function arrayRecordByName(page: Page, url: string, nameField: string, name: string) {
+  const response = await apiGet<unknown[]>(page, url);
+  const payload = response.data as { ok?: boolean; data?: unknown[] };
+  if (!payload?.ok) return undefined;
+  return payload.data?.find((record) => {
+    if (!record || typeof record !== 'object') return false;
+    return String((record as Record<string, unknown>)[nameField] ?? '') === name;
+  });
+}
+
 function uniqueName(prefix: string) {
   return `e2e_${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -285,6 +313,296 @@ async function createEntity(page: Page, seed: EntitySeed, cleanupStack: Array<()
   });
 
   return createdId;
+}
+
+async function createArrayEntity(page: Page, seed: EntitySeed, cleanupStack: Array<() => Promise<void>>) {
+  const name = String(seed.body[seed.nameField]);
+  const existing = await arrayRecordByName(page, seed.listUrl, seed.nameField, name);
+  if (idOf(existing)) return idOf(existing);
+
+  const add = await apiPost(page, seed.addUrl, seed.body);
+  if (!add.data?.ok) {
+    throw new Error(`Failed to seed ${seed.addUrl}: ${JSON.stringify(add.data)}`);
+  }
+
+  const createdId = idOf(add.data.data) || idOf(await arrayRecordByName(page, seed.listUrl, seed.nameField, name));
+  if (!createdId) {
+    throw new Error(`Seeded ${seed.addUrl} but could not resolve created id for ${name}`);
+  }
+
+  cleanupStack.push(async () => {
+    await apiPost(page, seed.deleteUrl, {}, { id: createdId }).catch(() => undefined);
+  });
+
+  return createdId;
+}
+
+function structuredExt(type: string, content: Record<string, unknown>, remark = '') {
+  return { type, version: 1, remark, content };
+}
+
+const E2E_SETTINGS_MENUS: MenuSeed[] = [
+  {
+    code: 'settingsModel',
+    name: 'Model',
+    parentCode: 'settings',
+    icon: 'Cpu',
+    url: '',
+    level: 'C2',
+    index: 20,
+    type: 'TITLE',
+  },
+  {
+    code: 'settingsModelConfig',
+    name: 'ModelConfig',
+    parentCode: 'settingsModel',
+    icon: 'ChatDotRound',
+    url: '/settings/model/config',
+    level: 'C3',
+    index: 1,
+  },
+  {
+    code: 'settingsModelProvider',
+    name: 'ModelProvider',
+    parentCode: 'settingsModel',
+    icon: 'ChatLineSquare',
+    url: '/settings/model/provider',
+    level: 'C3',
+    index: 2,
+  },
+  {
+    code: 'settingsCommand',
+    name: 'Command',
+    parentCode: 'settings',
+    icon: 'Operation',
+    url: '',
+    level: 'C2',
+    index: 30,
+    type: 'TITLE',
+  },
+  {
+    code: 'settingsCommandHistory',
+    name: 'CommandHistory',
+    parentCode: 'settingsCommand',
+    icon: 'Document',
+    url: '/settings/command/history',
+    level: 'C3',
+    index: 1,
+  },
+  {
+    code: 'settingsEvent',
+    name: 'Event',
+    parentCode: 'settings',
+    icon: 'Bell',
+    url: '',
+    level: 'C2',
+    index: 35,
+    type: 'TITLE',
+  },
+  {
+    code: 'settingsEventHistory',
+    name: 'EventHistory',
+    parentCode: 'settingsEvent',
+    icon: 'Document',
+    url: '/settings/event/history',
+    level: 'C3',
+    index: 1,
+  },
+  {
+    code: 'settingsAlarm',
+    name: 'Alarm',
+    parentCode: 'settings',
+    icon: 'AlarmClock',
+    url: '',
+    level: 'C2',
+    index: 40,
+    type: 'TITLE',
+  },
+  {
+    code: 'settingsAlarmOverview',
+    name: 'AlarmOverview',
+    parentCode: 'settingsAlarm',
+    icon: 'DataLine',
+    url: '/settings/alarm/overview',
+    level: 'C3',
+    index: 1,
+  },
+  {
+    code: 'settingsAlarmRule',
+    name: 'AlarmRule',
+    parentCode: 'settingsAlarm',
+    icon: 'SetUp',
+    url: '/settings/alarm/rule',
+    level: 'C3',
+    index: 2,
+  },
+  {
+    code: 'settingsAlarmNotify',
+    name: 'AlarmNotify',
+    parentCode: 'settingsAlarm',
+    icon: 'Bell',
+    url: '/settings/alarm/notify',
+    level: 'C3',
+    index: 3,
+  },
+  {
+    code: 'settingsAlarmMessage',
+    name: 'AlarmMessage',
+    parentCode: 'settingsAlarm',
+    icon: 'Message',
+    url: '/settings/alarm/message',
+    level: 'C3',
+    index: 4,
+  },
+  {
+    code: 'settingsAlarmChannel',
+    name: 'AlarmChannel',
+    parentCode: 'settingsAlarm',
+    icon: 'Connection',
+    url: '/settings/alarm/channel',
+    level: 'C3',
+    index: 5,
+  },
+  {
+    code: 'settingsAlarmBind',
+    name: 'AlarmBind',
+    parentCode: 'settingsAlarm',
+    icon: 'Link',
+    url: '/settings/alarm/bind',
+    level: 'C3',
+    index: 6,
+  },
+  {
+    code: 'settingsAlarmState',
+    name: 'AlarmState',
+    parentCode: 'settingsAlarm',
+    icon: 'Monitor',
+    url: '/settings/alarm/state',
+    level: 'C3',
+    index: 7,
+  },
+  {
+    code: 'settingsAlarmHistory',
+    name: 'AlarmHistory',
+    parentCode: 'settingsAlarm',
+    icon: 'DocumentChecked',
+    url: '/settings/alarm/history',
+    level: 'C3',
+    index: 8,
+  },
+  {
+    code: 'settingsDeviceAlarm',
+    name: 'DeviceAlarm',
+    parentCode: 'settingsAlarm',
+    icon: 'Management',
+    url: '/settings/alarm/device',
+    level: 'C3',
+    index: 9,
+  },
+  {
+    code: 'settingsDriverAlarm',
+    name: 'DriverAlarm',
+    parentCode: 'settingsAlarm',
+    icon: 'Promotion',
+    url: '/settings/alarm/driver',
+    level: 'C3',
+    index: 10,
+  },
+  {
+    code: 'settingsPointAlarm',
+    name: 'PointAlarm',
+    parentCode: 'settingsAlarm',
+    icon: 'TrendCharts',
+    url: '/settings/alarm/point',
+    level: 'C3',
+    index: 11,
+  },
+  {
+    code: 'settingsGroup',
+    name: 'Group',
+    parentCode: 'settings',
+    icon: 'Grid',
+    url: '/settings/group',
+    level: 'C2',
+    index: 70,
+  },
+  {
+    code: 'settingsLabel',
+    name: 'Label',
+    parentCode: 'settings',
+    icon: 'CollectionTag',
+    url: '/settings/label',
+    level: 'C2',
+    index: 80,
+  },
+];
+
+async function ensureMenuSeed(page: Page, seed: MenuSeed, cleanupStack: Array<() => Promise<void>>) {
+  const existing = await listByName(page, '/api/v3/auth/menu/list', 'menuCode', seed.code);
+  const existingId = idOf(existing);
+  if (existingId) {
+    if (
+      existing &&
+      typeof existing === 'object' &&
+      (existing as { remark?: unknown }).remark === 'created by e2e route fixture'
+    ) {
+      cleanupStack.push(async () => {
+        await apiPost(page, '/api/v3/auth/menu/delete', {}, { id: existingId }).catch(() => undefined);
+      });
+    }
+    return { id: existingId, created: false };
+  }
+
+  const parent = await listByName(page, '/api/v3/auth/menu/list', 'menuCode', seed.parentCode);
+  const parentId = idOf(parent);
+  if (!parentId) {
+    throw new Error(`Cannot seed menu ${seed.code}: missing parent menu ${seed.parentCode}`);
+  }
+
+  const add = await apiPost(page, '/api/v3/auth/menu/add', {
+    parentMenuId: parentId,
+    menuName: seed.name,
+    menuCode: seed.code,
+    menuTypeFlag: seed.type || 'COMMON',
+    menuLevel: seed.level,
+    menuIndex: seed.index,
+    enableFlag: 'ENABLE',
+    remark: 'created by e2e route fixture',
+    menuExt: {
+      content: {
+        titles: { zh: seed.name, en: seed.name },
+        icon: seed.icon,
+        url: seed.url,
+      },
+    },
+  });
+  if (!add.data?.ok) {
+    throw new Error(`Failed to seed menu ${seed.code}: ${JSON.stringify(add.data)}`);
+  }
+
+  const createdId =
+    idOf(add.data.data) || idOf(await listByName(page, '/api/v3/auth/menu/list', 'menuCode', seed.code));
+  if (!createdId) {
+    throw new Error(`Seeded menu ${seed.code} but could not resolve created id`);
+  }
+
+  cleanupStack.push(async () => {
+    await apiPost(page, '/api/v3/auth/menu/delete', {}, { id: createdId }).catch(() => undefined);
+  });
+
+  return { id: createdId, created: true };
+}
+
+async function ensureSettingsMenus(page: Page, cleanupStack: Array<() => Promise<void>>) {
+  let created = false;
+  for (const seed of E2E_SETTINGS_MENUS) {
+    const result = await ensureMenuSeed(page, seed, cleanupStack);
+    created ||= result.created;
+  }
+  if (created) {
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await waitForAppSettled(page);
+  }
 }
 
 async function discoverRouteIds(page: Page): Promise<RouteIds> {
@@ -364,6 +682,7 @@ async function discoverRouteIds(page: Page): Promise<RouteIds> {
 
 export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
   const cleanupStack: Array<() => Promise<void>> = [];
+  await ensureSettingsMenus(page, cleanupStack);
   const discovered = await discoverRouteIds(page);
   const suffix = uniqueName('route');
 
@@ -379,15 +698,45 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
         body: {
           driverName: suffix,
           driverCode: suffix,
-          serviceName: `dc3-e2e-${suffix}`,
+          serviceName: suffix,
           serviceHost: '127.0.0.1',
-          driverTypeFlag: 'CUSTOM',
+          driverTypeFlag: 'DRIVER_CLIENT',
           enableFlag: 'ENABLE',
           remark: 'created by e2e route fixture',
         },
       },
       cleanupStack
     ));
+
+  const driverAttributeResponse = await apiGet<unknown[]>(page, '/api/v3/manager/driver_attribute/list_by_driver_id', {
+    driver_id: driverId,
+  });
+  const driverAttributes =
+    (driverAttributeResponse.data as { ok?: boolean; data?: unknown[] })?.ok === true
+      ? ((driverAttributeResponse.data as { data?: unknown[] }).data ?? [])
+      : [];
+  if (driverAttributes.length === 0) {
+    const attributeName = `e2e_attr_${Date.now().toString(36).slice(-6)}`;
+    await createEntity(
+      page,
+      {
+        listUrl: '/api/v3/manager/driver_attribute/list',
+        addUrl: '/api/v3/manager/driver_attribute/add',
+        deleteUrl: '/api/v3/manager/driver_attribute/delete',
+        nameField: 'attributeName',
+        body: {
+          attributeName,
+          attributeCode: attributeName,
+          attributeTypeFlag: 'STRING',
+          defaultValue: '',
+          driverId,
+          enableFlag: 'ENABLE',
+          remark: 'created by e2e route fixture',
+        },
+      },
+      cleanupStack
+    );
+  }
 
   const profileId =
     discovered.profileId ||
@@ -401,6 +750,8 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
         body: {
           profileName: suffix,
           profileCode: suffix,
+          profileShareFlag: 'TENANT',
+          profileTypeFlag: 'USER',
           enableFlag: 'ENABLE',
           remark: 'created by e2e route fixture',
         },
@@ -442,7 +793,10 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
           pointName: suffix,
           pointCode: suffix,
           pointTypeFlag: 'STRING',
-          rwFlag: 'RW',
+          rwFlag: 'READ_WRITE',
+          baseValue: 0,
+          multiple: 1,
+          valueDecimal: 0,
           profileId,
           unit: '',
           enableFlag: 'ENABLE',
@@ -522,6 +876,240 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
       cleanupStack
     ));
 
+  const groupId =
+    discovered.groupId ||
+    (await createEntity(
+      page,
+      {
+        listUrl: '/api/v3/manager/group/list',
+        addUrl: '/api/v3/manager/group/add',
+        deleteUrl: '/api/v3/manager/group/delete',
+        nameField: 'groupName',
+        body: {
+          parentGroupId: 0,
+          groupName: suffix,
+          groupCode: suffix,
+          groupTypeFlag: 'DEVICE',
+          groupIndex: 999,
+          enableFlag: 'ENABLE',
+          remark: 'created by e2e route fixture',
+        },
+      },
+      cleanupStack
+    ));
+
+  const labelId =
+    discovered.labelId ||
+    (await createEntity(
+      page,
+      {
+        listUrl: '/api/v3/manager/label/list',
+        addUrl: '/api/v3/manager/label/add',
+        deleteUrl: '/api/v3/manager/label/delete',
+        nameField: 'labelName',
+        body: {
+          entityTypeFlag: 'DEVICE',
+          labelName: suffix,
+          labelCode: suffix,
+          labelColor: '#F4F4F5',
+          enableFlag: 'ENABLE',
+          remark: 'created by e2e route fixture',
+        },
+      },
+      cleanupStack
+    ));
+
+  const alarmNotifyId =
+    discovered.alarmNotifyId ||
+    (await createEntity(
+      page,
+      {
+        listUrl: '/api/v3/data/notify/list',
+        addUrl: '/api/v3/data/notify/add',
+        deleteUrl: '/api/v3/data/notify/delete',
+        nameField: 'notifyName',
+        body: {
+          notifyName: suffix,
+          notifyCode: suffix,
+          autoConfirmFlag: 'MANUAL',
+          notifyInterval: 300000,
+          notifyExt: structuredExt('alarm-notify-policy', {
+            dedup: { enabled: true, key: '${tenantId}:${ruleCode}:${entityId}' },
+            rateLimit: { intervalMs: 300000, maxCount: 1 },
+            repeat: { enabled: false },
+            recovery: { enabled: true, sendRecoveryMessage: true, autoConfirmOnRecovery: false },
+          }),
+          enableFlag: 'ENABLE',
+          remark: 'created by e2e route fixture',
+        },
+      },
+      cleanupStack
+    ));
+
+  const alarmMessageId =
+    discovered.alarmMessageId ||
+    (await createEntity(
+      page,
+      {
+        listUrl: '/api/v3/data/message/list',
+        addUrl: '/api/v3/data/message/add',
+        deleteUrl: '/api/v3/data/message/delete',
+        nameField: 'messageName',
+        body: {
+          messageName: suffix,
+          messageCode: suffix,
+          messageLevel: 'P2',
+          messageExt: structuredExt('alarm-message-template', {
+            variables: ['severity', 'device', 'point', 'value', 'unit', 'threshold', 'triggerTime'],
+            templates: [
+              {
+                channelType: 'FEISHU_BOT',
+                payloadType: 'CARD',
+                template: {
+                  title: '${severity} ${device} alarm',
+                  summary: '${point} is ${value}${unit}, threshold ${threshold}${unit}.',
+                },
+              },
+            ],
+          }),
+          enableFlag: 'ENABLE',
+          remark: 'created by e2e route fixture',
+        },
+      },
+      cleanupStack
+    ));
+
+  const alarmChannelId =
+    discovered.alarmChannelId ||
+    (await createEntity(
+      page,
+      {
+        listUrl: '/api/v3/data/notify/channel/list',
+        addUrl: '/api/v3/data/notify/channel/add',
+        deleteUrl: '/api/v3/data/notify/channel/delete',
+        nameField: 'channelName',
+        body: {
+          channelName: suffix,
+          channelCode: suffix,
+          channelTypeFlag: 'FEISHU_BOT',
+          credentialRef: 'secret:feishu:e2e',
+          channelExt: structuredExt('notify-channel', {
+            signEnabled: true,
+            cardVersion: 'interactive-card-v1',
+            atAllAllowed: false,
+            testMessageEnabled: false,
+            options: { locale: 'zh-CN' },
+          }),
+          enableFlag: 'ENABLE',
+          remark: 'created by e2e route fixture',
+        },
+      },
+      cleanupStack
+    ));
+
+  const alarmBindId =
+    discovered.alarmBindId ||
+    (await createEntity(
+      page,
+      {
+        listUrl: '/api/v3/data/notify/channel/bind/list',
+        addUrl: '/api/v3/data/notify/channel/bind/add',
+        deleteUrl: '/api/v3/data/notify/channel/bind/delete',
+        nameField: 'notifyId',
+        body: {
+          notifyId: alarmNotifyId,
+          channelId: alarmChannelId,
+          bindExt: structuredExt('notify-channel-bind', {
+            levels: ['P0', 'P1', 'P2'],
+            sendRecovery: true,
+            rateLimitOverrideMs: 300000,
+          }),
+          enableFlag: 'ENABLE',
+          remark: 'created by e2e route fixture',
+        },
+      },
+      cleanupStack
+    ));
+
+  const alarmRuleId =
+    discovered.alarmRuleId ||
+    (await createEntity(
+      page,
+      {
+        listUrl: '/api/v3/data/rule/list',
+        addUrl: '/api/v3/data/rule/add',
+        deleteUrl: '/api/v3/data/rule/delete',
+        nameField: 'ruleName',
+        body: {
+          ruleName: suffix,
+          ruleCode: suffix,
+          alarmTargetTypeFlag: 'POINT',
+          entityId: pointId,
+          notifyId: alarmNotifyId,
+          messageId: alarmMessageId,
+          ruleExt: structuredExt('alarm-rule', {
+            condition: { field: 'numValue', operator: '>', threshold: 80, unit: '' },
+            window: { mode: 'LAST', minSamples: 1 },
+            recovery: { enabled: true, operator: '<=', threshold: 75, duration: 'PT5M' },
+            severity: 'P2',
+            eventType: 'ALARM',
+            labels: [],
+          }),
+          enableFlag: 'ENABLE',
+          remark: 'created by e2e route fixture',
+        },
+      },
+      cleanupStack
+    ));
+
+  const agenticProviderId =
+    discovered.agenticProviderId ||
+    (await createArrayEntity(
+      page,
+      {
+        listUrl: '/api/v3/agentic/provider/list',
+        addUrl: '/api/v3/agentic/provider/config/add',
+        deleteUrl: '/api/v3/agentic/provider/config/delete',
+        nameField: 'name',
+        body: {
+          name: suffix,
+          providerType: 'openai-compatible',
+          baseUrl: 'https://api.example.com/v1',
+          defaultFlag: 'NOT_DEFAULT',
+          enableFlag: 'ENABLE',
+          remark: 'created by e2e route fixture',
+        },
+      },
+      cleanupStack
+    ));
+
+  const agenticModelConfigId =
+    discovered.agenticModelConfigId ||
+    (await createArrayEntity(
+      page,
+      {
+        listUrl: '/api/v3/agentic/model/config/list',
+        addUrl: '/api/v3/agentic/model/config/add',
+        deleteUrl: '/api/v3/agentic/model/config/delete',
+        nameField: 'model',
+        body: {
+          providerId: agenticProviderId,
+          model: suffix,
+          label: suffix,
+          stream: true,
+          toolCall: true,
+          vision: false,
+          reasoning: false,
+          temperature: 0.2,
+          maxTokens: 1024,
+          defaultFlag: 'NOT_DEFAULT',
+          enableFlag: 'ENABLE',
+          remark: 'created by e2e route fixture',
+        },
+      },
+      cleanupStack
+    ));
+
   const userId =
     discovered.userId ||
     (await createEntity(
@@ -536,7 +1124,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
           nickName: suffix,
           phone: `139${String(Date.now()).slice(-8)}`,
           email: `${suffix}@example.com`,
-          enableFlag: 0,
+          enableFlag: 'ENABLE',
         },
       },
       cleanupStack
@@ -572,17 +1160,17 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
       apiId,
       resourceId,
       menuId,
-      groupId: discovered.groupId,
-      labelId: discovered.labelId,
-      alarmRuleId: discovered.alarmRuleId,
-      alarmNotifyId: discovered.alarmNotifyId,
-      alarmMessageId: discovered.alarmMessageId,
-      alarmChannelId: discovered.alarmChannelId,
-      alarmBindId: discovered.alarmBindId,
+      groupId,
+      labelId,
+      alarmRuleId,
+      alarmNotifyId,
+      alarmMessageId,
+      alarmChannelId,
+      alarmBindId,
       alarmStateId: discovered.alarmStateId,
       alarmHistoryId: discovered.alarmHistoryId,
-      agenticModelConfigId: discovered.agenticModelConfigId,
-      agenticProviderId: discovered.agenticProviderId,
+      agenticModelConfigId,
+      agenticProviderId,
       userId,
       roleId,
     },

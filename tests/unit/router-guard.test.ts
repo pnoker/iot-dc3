@@ -23,28 +23,42 @@ import { setStorage } from '@/utils/storageUtil';
 
 import { seedAuthStorage } from '../fixtures/auth';
 
-// Mock the menu store so the guard doesn't crash calling fetchTree
-vi.mock('@/store/modules/menu', () => ({
-  useMenuStore: vi.fn(() => ({
-    tree: [],
+const menuStoreMocks = vi.hoisted(() => {
+  const fetchTree = vi.fn(() => Promise.resolve());
+  const reset = vi.fn();
+  const tree = [
+    { id: 1, parentMenuId: 0, menuName: 'Home', menuCode: 'home', children: [] },
+    { id: 2, parentMenuId: 0, menuName: 'Settings', menuCode: 'settings', children: [] },
+    { id: 3, parentMenuId: 0, menuName: 'Point Value', menuCode: 'pointValue', children: [] },
+  ];
+  const store = {
+    tree,
     loaded: true,
     loading: false,
-    fetchTree: vi.fn(() => Promise.resolve()),
-    reset: vi.fn(),
-    findByCode: vi.fn(() => undefined),
-  })),
+    fetchTree,
+    reset,
+    findByCode: vi.fn((code: string) => tree.find((node) => node.menuCode === code)),
+  };
+  return { fetchTree, reset, store };
+});
+
+const elementPlusMocks = vi.hoisted(() => ({
+  ElMessage: {
+    warning: vi.fn(),
+  },
 }));
+
+// Mock the menu store with the same shape the guard expects for permission checks.
+vi.mock('@/store/modules/menu', () => ({
+  useMenuStore: vi.fn(() => menuStoreMocks.store),
+}));
+
+vi.mock('element-plus', () => elementPlusMocks);
 
 // CLAUDE.md flags this guard as a recurrent regression hotspot — every branch
 // of `beforeEach` must call next() (or return true / a redirect target).
 // We replace the heavy real route configs with stub records so the router
 // can be instantiated in jsdom without dragging in the entire view tree.
-
-const tokenMocks = vi.hoisted(() => ({
-  checkTokenValid: vi.fn(() => Promise.resolve({ data: true })),
-}));
-
-vi.mock('@/api/token', () => tokenMocks);
 
 const routeStubs = vi.hoisted(() => {
   const stubComponent = { render: () => null };
@@ -65,7 +79,21 @@ const routeStubs = vi.hoisted(() => {
     meta: { title: 'Settings' },
     component: stubComponent,
   };
-  return { common, views, settings, operate: [] as RouteRecordRaw[] };
+  const operate: RouteRecordRaw[] = [
+    {
+      name: 'reports',
+      path: '/reports',
+      meta: { title: 'Reports' },
+      component: stubComponent,
+    },
+    {
+      name: 'pointDetail',
+      path: '/point/detail',
+      meta: { title: 'Point Detail' },
+      component: stubComponent,
+    },
+  ];
+  return { common, views, settings, operate };
 });
 
 const nprogressMock = vi.hoisted(() => ({
@@ -96,6 +124,9 @@ describe('router beforeEach guard', () => {
     setActivePinia(createPinia());
     localStorage.clear();
     document.title = '';
+    elementPlusMocks.ElMessage.warning.mockClear();
+    menuStoreMocks.fetchTree.mockClear();
+    menuStoreMocks.reset.mockClear();
   });
 
   afterEach(() => {
@@ -129,6 +160,25 @@ describe('router beforeEach guard', () => {
     expect(document.title).toBe('Settings');
   });
 
+  it('redirects authenticated users away from routes missing from the menu tree', async () => {
+    seedAuthStorage();
+    const router = await loadRouter();
+
+    await router.push({ name: 'reports' });
+
+    expect(router.currentRoute.value.name).toBe('home');
+    expect(elementPlusMocks.ElMessage.warning).toHaveBeenCalledTimes(1);
+  });
+
+  it('allows point detail through its point value menu alias', async () => {
+    seedAuthStorage();
+    const router = await loadRouter();
+
+    await router.push({ name: 'pointDetail' });
+
+    expect(router.currentRoute.value.name).toBe('pointDetail');
+  });
+
   it('redirects to login when only the token is missing', async () => {
     setStorage(AUTH_HEADERS.TENANT, 'acme');
     setStorage(AUTH_HEADERS.LOGIN, 'alice');
@@ -138,6 +188,20 @@ describe('router beforeEach guard', () => {
     await router.push({ name: 'home' });
 
     expect(router.currentRoute.value.name).toBe('login');
+  });
+
+  it('redirects to login when the stored token payload is incomplete', async () => {
+    setStorage(AUTH_HEADERS.TENANT, 'acme');
+    setStorage(AUTH_HEADERS.LOGIN, 'alice');
+    setStorage(AUTH_HEADERS.TOKEN, { salt: 'salt-only' });
+    const router = await loadRouter();
+
+    await router.push({ name: 'home' });
+
+    expect(router.currentRoute.value.name).toBe('login');
+    expect(localStorage.getItem(AUTH_HEADERS.TENANT)).toBeNull();
+    expect(localStorage.getItem(AUTH_HEADERS.LOGIN)).toBeNull();
+    expect(localStorage.getItem(AUTH_HEADERS.TOKEN)).toBeNull();
   });
 
   it('keeps document.title untouched when the route has no meta.title', async () => {

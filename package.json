@@ -28,6 +28,7 @@
     "prepare": "husky",
     "dev": "vite --host --mode dev",
     "dev:prod": "vite --host --mode production",
+    "serve:e2e": "vite build --mode dev && node scripts/testing/e2e-server.mjs",
     "build": "vite build",
     "build:tauri": "tauri build",
     "preview": "vite preview",

@@ -20,7 +20,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { mountListPage } from './_helpers';
 
 const eventMocks = vi.hoisted(() => ({
-  getEventHistoryById: vi.fn(() => Promise.resolve({ data: {} })),
+  getEventHistoryByRecordId: vi.fn(() => Promise.resolve({ data: {} })),
   listEventHistory: vi.fn(() => Promise.resolve({ data: { records: [], total: 0 } })),
 }));
 

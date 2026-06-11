@@ -59,7 +59,7 @@
         />
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-        <enable-flag-segmented v-model="formData.enableFlag" include-all value-type="number" />
+        <enable-flag-segmented v-model="formData.enableFlag" include-all />
       </el-form-item>
     </template>
     <template #actions>

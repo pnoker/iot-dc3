@@ -16,7 +16,15 @@
 
 import { expect, test } from '@playwright/test';
 
-import { ensureE2eData, expectHealthy, login, markHealth, waitForAppSettled, watchPageHealth } from '../fixtures/app';
+import {
+  ensureE2eData,
+  expectHealthy,
+  fillFirstEditableInput,
+  login,
+  markHealth,
+  waitForAppSettled,
+  watchPageHealth,
+} from '../fixtures/app';
 
 /**
  * Add Entity e2e spec.
@@ -197,9 +205,8 @@ test.describe('add entity via UI forms', () => {
       const dialog = page.locator('.el-dialog:visible').last();
       const name = uniqueName('user');
 
-      // Fill user name (try multiple possible placeholders)
-      const nameInput = dialog.locator('input').first();
-      await nameInput.fill(name);
+      await dialog.getByPlaceholder(/user name|用户名/i).fill(name);
+      await dialog.getByPlaceholder(/nick name|nickname|昵称/i).fill(name);
 
       const mark = markHealth(health);
       await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
@@ -228,8 +235,11 @@ test.describe('add entity via UI forms', () => {
 
       const dialog = page.locator('.el-dialog:visible').last();
       const name = uniqueName('role');
-      const nameInput = dialog.locator('input').first();
-      await nameInput.fill(name);
+      await fillFirstEditableInput(dialog, name);
+      const codeInput = dialog.getByPlaceholder(/role code|角色编码/i).first();
+      if (await codeInput.isVisible().catch(() => false)) {
+        await codeInput.fill(name.toUpperCase());
+      }
 
       const mark = markHealth(health);
       await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
@@ -256,8 +266,11 @@ test.describe('add entity via UI forms', () => {
 
       const dialog = page.locator('.el-dialog:visible').last();
       const name = uniqueName('group');
-      const nameInput = dialog.locator('input').first();
-      await nameInput.fill(name);
+      await dialog.getByPlaceholder(/group name|分组名称/i).fill(name);
+      const codeInput = dialog.getByPlaceholder(/group code|分组编码/i).first();
+      if (await codeInput.isVisible().catch(() => false)) {
+        await codeInput.fill(name);
+      }
 
       const mark = markHealth(health);
       await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
@@ -284,8 +297,11 @@ test.describe('add entity via UI forms', () => {
 
       const dialog = page.locator('.el-dialog:visible').last();
       const name = uniqueName('label');
-      const nameInput = dialog.locator('input').first();
-      await nameInput.fill(name);
+      await dialog.getByPlaceholder(/label name|标签名称/i).fill(name);
+      const codeInput = dialog.getByPlaceholder(/label code|标签编码/i).first();
+      if (await codeInput.isVisible().catch(() => false)) {
+        await codeInput.fill(name);
+      }
 
       const mark = markHealth(health);
       await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
@@ -301,7 +317,7 @@ test.describe('add entity via UI forms', () => {
     const e2eData = await ensureE2eData(page);
 
     try {
-      await page.goto('/#/settings/agentic/provider', { waitUntil: 'domcontentloaded' });
+      await page.goto('/#/settings/model/provider', { waitUntil: 'domcontentloaded' });
       await waitForAppSettled(page);
 
       const addBtn = page.getByRole('button', { name: /Add|新增/ }).first();
@@ -312,8 +328,7 @@ test.describe('add entity via UI forms', () => {
 
       const dialog = page.locator('.el-dialog:visible').last();
       const name = uniqueName('provider');
-      const nameInput = dialog.locator('input').first();
-      await nameInput.fill(name);
+      await fillFirstEditableInput(dialog, name);
 
       // Fill base URL (required)
       const urlInput = dialog.getByPlaceholder(/base.*url|地址/i).first();

@@ -17,27 +17,22 @@
 import { expect, test } from '@playwright/test';
 
 import {
+  clickTab,
   ensureE2eData,
   expectHealthy,
   login,
   markHealth,
   waitForAppSettled,
   watchPageHealth,
-} from '../fixtures/app'; /**
- * Detail Pages e2e spec.
- *
- * Tests that entity detail pages load correctly and their tabs work:
- *   - Device detail: Info, Points, Commands, Events, Data tabs
- *   - Profile detail: Info, Points, Commands, Events, Devices tabs
- *   - Driver detail: Info, Devices tabs
- *   - Point detail: Info, Devices tabs
- */
+} from '../fixtures/app';
 
 /**
  * Detail Pages e2e spec.
  *
  * Tests that entity detail pages load correctly and their tabs work:
- *   - Device detail: Info, Points, Commands, Events, Data tabs
+ *   - Device detail: Info, Points, Commands, Events tabs; Data tab is
+ *     asserted as present but kept lazy because it depends on data-service
+ *     point-value storage rather than manager-service detail data.
  *   - Profile detail: Info, Points, Commands, Events, Devices tabs
  *   - Driver detail: Info, Devices tabs
  *   - Point detail: Info, Devices tabs
@@ -55,23 +50,21 @@ test.describe('detail pages', () => {
     expect(deviceId, 'need a seeded device').toBeDefined();
 
     try {
+      const initialMark = markHealth(health);
       await page.goto(`/#/device/detail?id=${deviceId}`, { waitUntil: 'domcontentloaded' });
       await waitForAppSettled(page);
+      expectHealthy(health, initialMark);
 
-      // Device detail should have tabs
-      const tabs = page.locator('.el-tabs__item');
-      const tabCount = await tabs.count();
-      expect(tabCount, 'device detail should have tabs').toBeGreaterThan(0);
+      await expect(page.locator('.el-tabs__item').filter({ hasText: /Device Info|设备信息/ })).toBeVisible();
+      await expect(page.locator('.el-tabs__item').filter({ hasText: /Related Points|关联位号/ })).toBeVisible();
+      await expect(page.locator('.el-tabs__item').filter({ hasText: /Related Commands|关联指令/ })).toBeVisible();
+      await expect(page.locator('.el-tabs__item').filter({ hasText: /Related Events|关联事件/ })).toBeVisible();
+      await expect(page.locator('.el-tabs__item').filter({ hasText: /Device Data|设备数据/ })).toBeVisible();
 
-      // Click each tab and verify no errors
-      for (let i = 0; i < tabCount; i++) {
-        const tab = tabs.nth(i);
-        if (await tab.isVisible()) {
-          const mark = markHealth(health);
-          await tab.click();
-          await waitForAppSettled(page);
-          expectHealthy(health, mark);
-        }
+      for (const tab of [/Related Points|关联位号/, /Related Commands|关联指令/, /Related Events|关联事件/]) {
+        const mark = markHealth(health);
+        await expect(clickTab(page, tab), `device detail tab ${tab}`).resolves.toBe(true);
+        expectHealthy(health, mark);
       }
     } finally {
       await e2eData.cleanup();

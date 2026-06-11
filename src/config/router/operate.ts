@@ -96,6 +96,21 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: '/point',
+    component: Layout,
+    children: [
+      {
+        name: 'pointDetail',
+        path: '/point/detail',
+        meta: {
+          icon: 'el-icon-s-data',
+          title: 'Point Detail',
+        },
+        component: () => import('@/views/point/detail/PointDetail.vue'),
+      },
+    ],
+  },
+  {
     path: '/settings',
     component: Layout,
     children: [

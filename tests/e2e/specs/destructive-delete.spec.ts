@@ -43,7 +43,7 @@ import {
 interface DeleteCase {
   name: string;
   route: string;
-  placeholder: string;
+  placeholder: RegExp;
   listUrl: string;
   addUrl: string;
   nameField: string;
@@ -56,7 +56,7 @@ const deleteCases: DeleteCase[] = [
   {
     name: 'Profile',
     route: '/profile',
-    placeholder: 'Enter profile name',
+    placeholder: /profile name|模板名称/i,
     listUrl: '/api/v3/manager/profile/list',
     addUrl: '/api/v3/manager/profile/add',
     nameField: 'profileName',
@@ -65,7 +65,7 @@ const deleteCases: DeleteCase[] = [
   {
     name: 'Device',
     route: '/device',
-    placeholder: 'Enter device name',
+    placeholder: /device name|设备名称/i,
     listUrl: '/api/v3/manager/device/list',
     addUrl: '/api/v3/manager/device/add',
     nameField: 'deviceName',
@@ -81,7 +81,7 @@ const deleteCases: DeleteCase[] = [
   {
     name: 'Settings Role',
     route: '/settings/role',
-    placeholder: 'Enter role name',
+    placeholder: /role name|角色名称/i,
     listUrl: '/api/v3/auth/role/list',
     addUrl: '/api/v3/auth/role/add',
     nameField: 'roleName',
@@ -97,7 +97,7 @@ const deleteCases: DeleteCase[] = [
   {
     name: 'Settings Resource',
     route: '/settings/resource',
-    placeholder: 'Enter resource name',
+    placeholder: /resource name|资源名称/i,
     listUrl: '/api/v3/auth/resource/list',
     addUrl: '/api/v3/auth/resource/add',
     nameField: 'resourceName',
@@ -115,7 +115,7 @@ const deleteCases: DeleteCase[] = [
   {
     name: 'Settings Group',
     route: '/settings/group',
-    placeholder: 'Enter group name',
+    placeholder: /group name|分组名称/i,
     listUrl: '/api/v3/manager/group/list',
     addUrl: '/api/v3/manager/group/add',
     nameField: 'groupName',
@@ -131,11 +131,18 @@ const deleteCases: DeleteCase[] = [
   {
     name: 'Settings Label',
     route: '/settings/label',
-    placeholder: 'Enter label name',
+    placeholder: /label name|标签名称/i,
     listUrl: '/api/v3/manager/label/list',
     addUrl: '/api/v3/manager/label/add',
     nameField: 'labelName',
-    seed: (n) => ({ labelName: n, labelCode: n, enableFlag: 'ENABLE', remark: 'e2e destructive' }),
+    seed: (n) => ({
+      entityTypeFlag: 'DEVICE',
+      labelName: n,
+      labelCode: n,
+      labelColor: '#F4F4F5',
+      enableFlag: 'ENABLE',
+      remark: 'e2e destructive',
+    }),
   },
 ];
 
@@ -194,7 +201,9 @@ test.describe('destructive UI delete', () => {
         await page.goto(`/#${testCase.route}`, { waitUntil: 'domcontentloaded' });
         await waitForAppSettled(page);
 
-        await page.getByPlaceholder(testCase.placeholder).first().fill(name);
+        const searchInput = page.getByPlaceholder(testCase.placeholder).first();
+        await expect(searchInput, `${testCase.name} search input should be visible`).toBeVisible({ timeout: 10_000 });
+        await searchInput.fill(name);
 
         const searchMark = markHealth(health);
         await clickButtonIfPresent(page, 'Search');

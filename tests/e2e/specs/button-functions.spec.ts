@@ -16,34 +16,26 @@
 
 import { expect, test } from '@playwright/test';
 
-import { ensureE2eData, expectHealthy, login, markHealth, waitForAppSettled, watchPageHealth } from '../fixtures/app';
+import {
+  clickTab,
+  ensureE2eData,
+  expectHealthy,
+  login,
+  markHealth,
+  waitForAppSettled,
+  watchPageHealth,
+} from '../fixtures/app';
 
 /**
  * Button Functions e2e spec.
  *
  * Tests toolbar and wizard button functions in detail:
  *   - List pages: search, sort, reset, refresh, pagination
- *   - Device edit wizard: reset, previous/next navigation
- *   - Profile edit wizard: reset, previous/next navigation
+ *   - Device edit tabs: reset and tab navigation
+ *   - Profile edit tabs: reset and tab navigation
  *   - Detail pages: tab switching, edit button navigation
  *   - Enable/disable toggle buttons
  */
-
-async function clickNext(page: import('@playwright/test').Page) {
-  const btn = page.getByRole('button', { name: /Next|下一步/ }).last();
-  if (await btn.isVisible().catch(() => false)) {
-    await btn.click();
-    await waitForAppSettled(page);
-  }
-}
-
-async function clickPrevious(page: import('@playwright/test').Page) {
-  const btn = page.getByRole('button', { name: /Previous|上一步/ }).last();
-  if (await btn.isVisible().catch(() => false)) {
-    await btn.click();
-    await waitForAppSettled(page);
-  }
-}
 
 test.describe('list page toolbar buttons', () => {
   test.beforeEach(async ({ page }) => {
@@ -189,7 +181,7 @@ test.describe('list page toolbar buttons', () => {
   });
 });
 
-test.describe('wizard page navigation buttons', () => {
+test.describe('edit page navigation buttons', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
   });
@@ -228,7 +220,7 @@ test.describe('wizard page navigation buttons', () => {
     }
   });
 
-  test('device edit wizard: next and previous buttons work', async ({ page }) => {
+  test('device edit tabs switch without errors', async ({ page }) => {
     const e2eData = await ensureE2eData(page);
     const health = watchPageHealth(page);
     const deviceId = e2eData.routeIds.deviceId;
@@ -238,26 +230,17 @@ test.describe('wizard page navigation buttons', () => {
       await page.goto(`/#/device/edit?id=${deviceId}`, { waitUntil: 'domcontentloaded' });
       await waitForAppSettled(page);
 
-      // Step 0 -> Step 1
-      const s0 = markHealth(health);
-      await clickNext(page);
-      expectHealthy(health, s0);
-
-      // Step 1 -> Step 0 (go back)
-      const s1 = markHealth(health);
-      await clickPrevious(page);
-      expectHealthy(health, s1);
-
-      // Step 0 -> Step 1 -> Step 2
-      await clickNext(page);
-      const s2 = markHealth(health);
-      await clickNext(page);
-      expectHealthy(health, s2);
-
-      // Step 2 -> Step 1 (go back)
-      const s2b = markHealth(health);
-      await clickPrevious(page);
-      expectHealthy(health, s2b);
+      for (const tab of [
+        /Driver Attributes|驱动属性/,
+        /Point Attributes|位号属性/,
+        /Related Commands|Device Commands|指令/,
+        /Related Events|Device Events|事件/,
+        /Device Info|设备信息/,
+      ]) {
+        const mark = markHealth(health);
+        await expect(clickTab(page, tab), `${tab} should be reachable`).resolves.toBe(true);
+        expectHealthy(health, mark);
+      }
     } finally {
       await e2eData.cleanup();
     }
@@ -274,7 +257,7 @@ test.describe('wizard page navigation buttons', () => {
       await waitForAppSettled(page);
 
       // Wait for profile data to load
-      const nameInput = page.locator('.edit-card-body input').first();
+      const nameInput = page.getByPlaceholder(/profile name|模板名称/i).first();
       await expect(nameInput).not.toHaveValue('', { timeout: 10_000 });
 
       const originalName = await nameInput.inputValue();
@@ -295,37 +278,26 @@ test.describe('wizard page navigation buttons', () => {
     }
   });
 
-  test('profile edit wizard: next and previous buttons work', async ({ page }) => {
+  test('profile edit tabs switch without errors', async ({ page }) => {
     const e2eData = await ensureE2eData(page);
     const health = watchPageHealth(page);
     const profileId = e2eData.routeIds.profileId;
     expect(profileId, 'need a seeded profile').toBeDefined();
 
     try {
-      // Jump to step 1 to avoid step 0 form validation requirement
-      await page.goto(`/#/profile/edit?id=${profileId}&active=1`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`/#/profile/edit?id=${profileId}`, { waitUntil: 'domcontentloaded' });
       await waitForAppSettled(page);
 
-      // Step 1 -> Step 2
-      const s0 = markHealth(health);
-      await clickNext(page);
-      expectHealthy(health, s0);
-
-      // Step 2 -> Step 1 (go back)
-      const s1 = markHealth(health);
-      await clickPrevious(page);
-      expectHealthy(health, s1);
-
-      // Step 1 -> Step 2 -> Step 3
-      await clickNext(page);
-      const s3 = markHealth(health);
-      await clickNext(page);
-      expectHealthy(health, s3);
-
-      // Step 3 -> Step 2 (go back)
-      const s3b = markHealth(health);
-      await clickPrevious(page);
-      expectHealthy(health, s3b);
+      for (const tab of [
+        /Related Points|Profile Points|模板位号|关联位号/,
+        /Related Commands|Profile Commands|模板指令|关联指令/,
+        /Related Events|Profile Events|模板事件|关联事件/,
+        /Profile Info|模板信息/,
+      ]) {
+        const mark = markHealth(health);
+        await expect(clickTab(page, tab), `${tab} should be reachable`).resolves.toBe(true);
+        expectHealthy(health, mark);
+      }
     } finally {
       await e2eData.cleanup();
     }
@@ -353,10 +325,7 @@ test.describe('detail page edit button navigation', () => {
         await editBtn.click();
         await waitForAppSettled(page);
 
-        // Should navigate to device edit wizard
-        await expect(page.locator('.el-steps'))
-          .toBeVisible({ timeout: 5_000 })
-          .catch(() => {});
+        await expect(page.locator('.el-tabs__item').filter({ hasText: /Device Info|设备信息/ })).toBeVisible();
         expectHealthy(health, mark);
       }
     } finally {
@@ -380,9 +349,7 @@ test.describe('detail page edit button navigation', () => {
         await editBtn.click();
         await waitForAppSettled(page);
 
-        await expect(page.locator('.el-steps'))
-          .toBeVisible({ timeout: 5_000 })
-          .catch(() => {});
+        await expect(page.locator('.el-tabs__item').filter({ hasText: /Profile Info|模板信息/ })).toBeVisible();
         expectHealthy(health, mark);
       }
     } finally {

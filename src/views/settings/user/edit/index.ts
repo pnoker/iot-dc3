@@ -29,8 +29,21 @@ const createEmptyForm = () => ({
   nickName: '',
   phone: '',
   email: '',
-  enableFlag: 0,
+  enableFlag: 'ENABLE',
 });
+
+const normalizeEnableFlag = (value: unknown) => {
+  if (value === 1 || value === '1' || value === 'DISABLE') return 'DISABLE';
+  return 'ENABLE';
+};
+
+const submitPayload = (form: ReturnType<typeof createEmptyForm>) => {
+  const payload: Record<string, unknown> = { ...form };
+  if (!payload.id) delete payload.id;
+  if (!payload.phone) delete payload.phone;
+  if (!payload.email) delete payload.email;
+  return payload;
+};
 
 export default defineComponent({
   name: 'UserEditForm',
@@ -82,7 +95,7 @@ export default defineComponent({
       const initial = {
         ...createEmptyForm(),
         ...row,
-        enableFlag: Number(row.enableFlag ?? 0),
+        enableFlag: normalizeEnableFlag(row.enableFlag),
       };
       reactiveData.originalForm = { ...initial };
       reactiveData.form = { ...initial };
@@ -99,9 +112,9 @@ export default defineComponent({
       if (!valid) return;
       reactiveData.submitting = true;
       if (reactiveData.mode === 'add') {
-        emit('add-thing', { ...reactiveData.form }, done);
+        emit('add-thing', submitPayload(reactiveData.form), done);
       } else {
-        emit('update-thing', { ...reactiveData.form }, done);
+        emit('update-thing', submitPayload(reactiveData.form), done);
       }
     };
 

@@ -98,6 +98,11 @@ export default (configEnv: ConfigEnv) => {
       },
       open: false,
     },
+    preview: {
+      host: '0.0.0.0',
+      port: Number(env.APP_CLI_PORT) || 8080,
+      proxy,
+    },
     build: {
       outDir: 'dist',
       chunkSizeWarningLimit: 1500,

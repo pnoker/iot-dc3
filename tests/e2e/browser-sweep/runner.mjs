@@ -192,7 +192,7 @@ async function testRowActions(page, watch, pageDef, result) {
 async function testOverviewButtons(page, watch, result) {
   for (const groupIndex of [0, 1]) {
     for (const name of ['All', 'Unconfirmed', 'Today', 'Last 7 days', 'Last 30 days']) {
-      await page.goto(`${BASE}/#/settings/event`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/#/settings/alarm/overview`, { waitUntil: 'domcontentloaded' });
       await waitPage(page);
       const group = page.locator('.event-overview__quick-actions').nth(groupIndex);
       const button = group.getByRole('button', { name }).first();
@@ -273,7 +273,7 @@ async function testDashboardTabsAndButtons(page, watch) {
       await assertClean(`Home stat card ${i + 1}`, watch, mark);
     }
 
-    await page.goto(`${BASE}/#/settings/event`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}/#/settings/alarm/overview`, { waitUntil: 'domcontentloaded' });
     await waitPage(page);
     for (const tab of ['Situation', 'Noise', 'Availability', 'SLA']) {
       const locator = page.locator('.event-overview__tabs .el-tabs__item:visible', { hasText: tab }).first();
@@ -423,7 +423,13 @@ async function interactionTest(page, watch) {
     results.push(result);
   }
 
-  const overview = { name: 'Settings Event Overview', route: '/settings/event', ok: true, actions: [], error: '' };
+  const overview = {
+    name: 'Settings Alarm Overview',
+    route: '/settings/alarm/overview',
+    ok: true,
+    actions: [],
+    error: '',
+  };
   try {
     await testOverviewButtons(page, watch, overview);
   } catch (err) {

@@ -28,11 +28,14 @@ export const baseProtectedRoutes = [
   '/settings/menu',
   '/settings/group',
   '/settings/label',
-  '/settings/agentic',
-  '/settings/agentic/provider',
-  '/settings/event',
-  '/settings/event/device',
-  '/settings/event/driver',
+  '/settings/model/config',
+  '/settings/model/provider',
+  '/settings/alarm/overview',
+  '/settings/alarm/device',
+  '/settings/alarm/driver',
+  '/settings/alarm/point',
+  '/settings/event/history',
+  '/settings/command/history',
   '/settings/about',
 ];
 
@@ -43,12 +46,22 @@ export const protectedRouteProbes = [
   '/profile/detail?id=e2e-auth-probe',
   '/profile/edit?id=e2e-auth-probe',
   '/point/detail?id=e2e-auth-probe',
-  '/point/edit?id=e2e-auth-probe&profileId=e2e-auth-probe',
   '/settings/api/detail?id=e2e-auth-probe',
   '/settings/resource/detail?id=e2e-auth-probe',
   '/settings/menu/detail?id=e2e-auth-probe',
   '/settings/user/detail?id=e2e-auth-probe',
   '/settings/role/detail?id=e2e-auth-probe',
+  '/settings/group/detail?id=e2e-auth-probe',
+  '/settings/label/detail?id=e2e-auth-probe',
+  '/settings/alarm/rule/detail?id=e2e-auth-probe',
+  '/settings/alarm/notify/detail?id=e2e-auth-probe',
+  '/settings/alarm/message/detail?id=e2e-auth-probe',
+  '/settings/alarm/channel/detail?id=e2e-auth-probe',
+  '/settings/alarm/bind/detail?id=e2e-auth-probe',
+  '/settings/alarm/state/detail?id=e2e-auth-probe',
+  '/settings/alarm/history/detail?id=e2e-auth-probe',
+  '/settings/model/config/detail?id=e2e-auth-probe',
+  '/settings/model/provider/detail?id=e2e-auth-probe',
 ];
 
 export function buildEntityRoutes(routeIds) {
@@ -63,12 +76,24 @@ export function buildEntityRoutes(routeIds) {
     routes.push(`/profile/edit?id=${routeIds.profileId}`);
   }
   if (routeIds.pointId) routes.push(`/point/detail?id=${routeIds.pointId}`);
-  if (routeIds.pointId && routeIds.pointProfileId) {
-    routes.push(`/point/edit?id=${routeIds.pointId}&profileId=${routeIds.pointProfileId}`);
-  }
   if (routeIds.apiId) routes.push(`/settings/api/detail?id=${routeIds.apiId}`);
   if (routeIds.resourceId) routes.push(`/settings/resource/detail?id=${routeIds.resourceId}`);
   if (routeIds.menuId) routes.push(`/settings/menu/detail?id=${routeIds.menuId}`);
+  if (routeIds.groupId) routes.push(`/settings/group/detail?id=${routeIds.groupId}`);
+  if (routeIds.labelId) routes.push(`/settings/label/detail?id=${routeIds.labelId}`);
+  if (routeIds.alarmRuleId) routes.push(`/settings/alarm/rule/detail?id=${routeIds.alarmRuleId}`);
+  if (routeIds.alarmNotifyId) routes.push(`/settings/alarm/notify/detail?id=${routeIds.alarmNotifyId}`);
+  if (routeIds.alarmMessageId) routes.push(`/settings/alarm/message/detail?id=${routeIds.alarmMessageId}`);
+  if (routeIds.alarmChannelId) routes.push(`/settings/alarm/channel/detail?id=${routeIds.alarmChannelId}`);
+  if (routeIds.alarmBindId) routes.push(`/settings/alarm/bind/detail?id=${routeIds.alarmBindId}`);
+  if (routeIds.alarmStateId) routes.push(`/settings/alarm/state/detail?id=${routeIds.alarmStateId}`);
+  if (routeIds.alarmHistoryId) routes.push(`/settings/alarm/history/detail?id=${routeIds.alarmHistoryId}`);
+  if (routeIds.agenticModelConfigId) {
+    routes.push(`/settings/model/config/detail?id=${routeIds.agenticModelConfigId}`);
+  }
+  if (routeIds.agenticProviderId) {
+    routes.push(`/settings/model/provider/detail?id=${routeIds.agenticProviderId}`);
+  }
   if (routeIds.userId) routes.push(`/settings/user/detail?id=${routeIds.userId}`);
   if (routeIds.roleId) routes.push(`/settings/role/detail?id=${routeIds.roleId}`);
   return routes;
@@ -177,7 +202,7 @@ export const interactionPages = [
   },
   {
     name: 'Agentic Model Config',
-    route: '/settings/agentic',
+    route: '/settings/model/config',
     placeholder: 'gpt-4o-mini',
     value: 'gpt',
     add: true,
@@ -186,15 +211,19 @@ export const interactionPages = [
   },
   {
     name: 'Agentic Provider',
-    route: '/settings/agentic/provider',
+    route: '/settings/model/provider',
     placeholder: 'Provider name',
     value: 'openai',
     add: true,
     edit: true,
     deleteClick: true,
   },
-  { name: 'Device Event', route: '/settings/event/device', paginate: true },
-  { name: 'Driver Event', route: '/settings/event/driver', paginate: true },
+  { name: 'Alarm Overview', route: '/settings/alarm/overview', paginate: true },
+  { name: 'Device Alarm', route: '/settings/alarm/device', paginate: true },
+  { name: 'Driver Alarm', route: '/settings/alarm/driver', paginate: true },
+  { name: 'Point Alarm', route: '/settings/alarm/point', paginate: true },
+  { name: 'Event History', route: '/settings/event/history', paginate: true },
+  { name: 'Command History', route: '/settings/command/history', paginate: true },
 ];
 
 export function buildDestructiveDeleteCases(routeIds) {
@@ -206,7 +235,14 @@ export function buildDestructiveDeleteCases(routeIds) {
       listUrl: '/api/v3/manager/profile/list',
       addUrl: '/api/v3/manager/profile/add',
       nameField: 'profileName',
-      seed: (name) => ({ profileName: name, profileCode: name, enableFlag: 'ENABLE', remark: 'codex e2e delete' }),
+      seed: (name) => ({
+        profileName: name,
+        profileCode: name,
+        profileShareFlag: 'TENANT',
+        profileTypeFlag: 'USER',
+        enableFlag: 'ENABLE',
+        remark: 'codex e2e delete',
+      }),
     },
     {
       name: 'Device delete',
@@ -236,7 +272,7 @@ export function buildDestructiveDeleteCases(routeIds) {
         nickName: `codex_nick_${suffix}`,
         phone: `139${String(Date.now()).slice(-8)}`,
         email: `codex_${suffix}@test.com`,
-        enableFlag: 0,
+        enableFlag: 'ENABLE',
       }),
     },
     {
@@ -270,7 +306,7 @@ export function buildDestructiveDeleteCases(routeIds) {
         menuIndex: 999,
         enableFlag: 'ENABLE',
         remark: 'codex e2e delete',
-        menuExt: { content: { titles: { zh_CN: name, en_US: name }, icon: 'Menu', url: '/codex' } },
+        menuExt: { content: { titles: { zh: name, en: name }, icon: 'Menu', url: '/codex' } },
       }),
     },
     {
@@ -303,6 +339,7 @@ export function buildDestructiveDeleteCases(routeIds) {
         groupName: name,
         groupCode: name,
         groupTypeFlag: 'DEVICE',
+        groupIndex: 999,
         enableFlag: 'ENABLE',
         remark: 'codex e2e delete',
       }),
@@ -315,8 +352,10 @@ export function buildDestructiveDeleteCases(routeIds) {
       addUrl: '/api/v3/manager/label/add',
       nameField: 'labelName',
       seed: (name) => ({
+        entityTypeFlag: 'DEVICE',
         labelName: name,
         labelCode: name,
+        labelColor: '#F4F4F5',
         enableFlag: 'ENABLE',
         remark: 'codex e2e delete',
       }),

@@ -58,9 +58,9 @@ export async function ensureE2eData(page, routeIds) {
       body: {
         driverName: suffix,
         driverCode: suffix,
-        serviceName: `dc3-e2e-${suffix}`,
+        serviceName: suffix,
         serviceHost: '127.0.0.1',
-        driverTypeFlag: 'CUSTOM',
+        driverTypeFlag: 'DRIVER_CLIENT',
         enableFlag: 'ENABLE',
         remark: 'created by e2e route fixture',
       },
@@ -76,6 +76,8 @@ export async function ensureE2eData(page, routeIds) {
       body: {
         profileName: suffix,
         profileCode: suffix,
+        profileShareFlag: 'TENANT',
+        profileTypeFlag: 'USER',
         enableFlag: 'ENABLE',
         remark: 'created by e2e route fixture',
       },
@@ -109,7 +111,10 @@ export async function ensureE2eData(page, routeIds) {
         pointName: suffix,
         pointCode: suffix,
         pointTypeFlag: 'STRING',
-        rwFlag: 'RW',
+        rwFlag: 'READ_WRITE',
+        baseValue: 0,
+        multiple: 1,
+        valueDecimal: 0,
         profileId,
         unit: '',
         enableFlag: 'ENABLE',
@@ -187,7 +192,7 @@ export async function ensureE2eData(page, routeIds) {
         nickName: suffix,
         phone: `139${String(Date.now()).slice(-8)}`,
         email: `${suffix}@example.com`,
-        enableFlag: 0,
+        enableFlag: 'ENABLE',
       },
     }));
 

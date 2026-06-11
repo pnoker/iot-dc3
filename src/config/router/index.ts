@@ -23,8 +23,6 @@ import commonRouters from './common';
 import operateRouters from './operate';
 import settingsRouters from './settings';
 import viewsRouters from './views';
-import { checkTokenValid } from '@/api/token';
-import type { Login } from '@/config/types';
 import { getStorage, removeStorage } from '@/utils/storageUtil';
 import { isNull } from '@/utils/validationUtil';
 import { AUTH_HEADERS } from '@/config/constant/common';
@@ -65,6 +63,7 @@ const ROUTE_MENU_ALIASES: Record<string, string> = {
   deviceEdit: 'device',
   profileDetail: 'profile',
   profileEdit: 'profile',
+  pointDetail: 'pointValue',
   settingsUserDetail: 'settingsUser',
   settingsRoleDetail: 'settingsRole',
   settingsResourceDetail: 'settingsResource',
@@ -113,22 +112,10 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
     return { name: 'login' };
   }
 
-  // Validate token with server
-  try {
-    const login: Login = {
-      tenant,
-      name: user,
-      salt: tokenData!.salt,
-      token: tokenData!.token,
-    };
-    const validRes = await checkTokenValid(login);
-    if (!validRes?.data) {
-      removeStorage(AUTH_HEADERS.TENANT);
-      removeStorage(AUTH_HEADERS.LOGIN);
-      removeStorage(AUTH_HEADERS.TOKEN);
-      return { name: 'login' };
-    }
-  } catch {
+  // Do not preflight every route with /token/check. A successful login has
+  // already obtained a signed token; protected API calls are still enforced by
+  // the gateway, and the Axios 401 interceptor clears stale credentials.
+  if (isNull(tokenData?.salt) || isNull(tokenData?.token)) {
     removeStorage(AUTH_HEADERS.TENANT);
     removeStorage(AUTH_HEADERS.LOGIN);
     removeStorage(AUTH_HEADERS.TOKEN);

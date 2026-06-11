@@ -156,8 +156,8 @@ only), but new code should prefer the return style.
 ### 5. Auth flow
 
 Login: `generateSalt` → MD5(password) → `generateToken` → store `{tenant, login, {salt, token}}` in localStorage. Every
-request includes `X-Auth-Tenant`, `X-Auth-Login`, `X-Auth-Token` headers. The router guard validates the token on every
-navigation.
+request includes `X-Auth-Tenant`, `X-Auth-Login`, `X-Auth-Token` headers. The router guard only verifies that a complete
+local auth payload exists; backend expiry and invalidation are handled by the Axios 401 interceptor.
 
 ### 6. SCSS and element-plus variables
 
@@ -191,7 +191,8 @@ routes to the appropriate center microservice. Base paths are defined in `src/co
 ### Playwright (E2E)
 
 - Chromium only, 60s timeout, `retain-on-failure` traces/screenshots
-- Auto-starts `pnpm dev` as webServer when `E2E_START_SERVER=1` (default)
+- Auto-starts `pnpm run serve:e2e` as webServer when `E2E_START_SERVER=1` (default). That command builds the app and
+  serves `dist/` through `scripts/testing/e2e-server.mjs`, which proxies `/api` to `http://localhost:8000` by default.
 - Env vars: `E2E_BASE_URL` (default `http://localhost:8080`), `E2E_HEADLESS` (default `true`)
 
 ## Known Issues

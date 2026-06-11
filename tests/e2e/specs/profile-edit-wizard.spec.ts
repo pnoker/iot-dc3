@@ -8,264 +8,210 @@
  *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License or distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
-import { ensureE2eData, expectHealthy, login, markHealth, waitForAppSettled, watchPageHealth } from '../fixtures/app';
+import {
+  apiPost,
+  clickTab,
+  ensureE2eData,
+  expectHealthy,
+  fillFirstEditableInput,
+  login,
+  markHealth,
+  waitForAppSettled,
+  watchPageHealth,
+} from '../fixtures/app';
 
-/**
- * Profile Edit Wizard e2e spec.
- *
- * Covers the 5-step profile configuration wizard:
- *   Step 0 — Profile info (name, enable, remark)
- *   Step 1 — Point config (add/edit/delete points)
- *   Step 2 — Command config (add/edit/delete commands with params)
- *   Step 3 — Event config (add/edit/delete events with params)
- *   Step 4 — Completion screen
- *
- * Key regression: adding a command without params must NOT trigger
- * the "Command has been duplicated" R500 error (double-submit race).
- */
+const PROFILE_TABS = [
+  { active: 'profileConfig', label: /Profile Info|模板信息/ },
+  { active: 'pointConfig', label: /Related Points|Profile Points|模板位号|关联位号/ },
+  { active: 'commandConfig', label: /Related Commands|Profile Commands|模板指令|关联指令/ },
+  { active: 'eventConfig', label: /Related Events|Profile Events|模板事件|关联事件/ },
+] as const;
 
 function uniqueName(prefix: string) {
   return `e2e_pw_${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-/** Wait for the profile name input to be populated (API data loaded) */
-async function waitForProfileData(page: import('@playwright/test').Page) {
-  const nameInput = page.locator('.edit-card-body input').first();
-  await expect(nameInput).not.toHaveValue('', { timeout: 10_000 });
+function profileNameInput(page: Page) {
+  return page.getByPlaceholder(/profile name|模板名称/i).first();
 }
 
-async function clickNext(page: import('@playwright/test').Page) {
-  const nextButtons = page.getByRole('button', { name: /Next|下一步/ });
-  const count = await nextButtons.count();
-  if (count > 0) {
-    await nextButtons.last().click();
-    await waitForAppSettled(page);
-  }
-}
-
-async function clickPrevious(page: import('@playwright/test').Page) {
-  const prevButtons = page.getByRole('button', { name: /Previous|上一步/ });
-  const count = await prevButtons.count();
-  if (count > 0) {
-    await prevButtons.last().click();
-    await waitForAppSettled(page);
-  }
-}
-
-/** Navigate directly to a wizard step using the ?active=N query param */
-async function gotoStep(page: import('@playwright/test').Page, profileId: string, step: number) {
-  await page.goto(`/#/profile/edit?id=${profileId}&active=${step}`, { waitUntil: 'domcontentloaded' });
+async function gotoProfileEdit(page: Page, profileId: string, active = 'profileConfig') {
+  await page.goto(`/#/profile/edit?id=${profileId}&active=${active}`, { waitUntil: 'domcontentloaded' });
   await waitForAppSettled(page);
+  await expect(page.locator('.el-tabs__item')).toHaveCount(PROFILE_TABS.length, { timeout: 10_000 });
 }
 
-test.describe('profile edit wizard', () => {
+async function findCreatedId(page: Page, listUrl: string, nameField: string, name: string) {
+  const response = await apiPost<{ records?: Array<{ id?: unknown }> }>(page, listUrl, {
+    page: { current: 1, size: 1 },
+    [nameField]: name,
+  });
+  if (!response.data?.ok) return undefined;
+  const id = response.data.data?.records?.[0]?.id;
+  return id == null ? undefined : String(id);
+}
+
+test.describe('profile edit tabs', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
   });
 
-  test('loads step 0 and shows profile form fields', async ({ page }) => {
+  test('loads profile info and resets edited values', async ({ page }) => {
     const e2eData = await ensureE2eData(page);
     const health = watchPageHealth(page);
     const profileId = e2eData.routeIds.profileId;
     expect(profileId, 'need a seeded profile').toBeDefined();
 
     try {
-      await page.goto(`/#/profile/edit?id=${profileId}`, { waitUntil: 'domcontentloaded' });
-      await waitForAppSettled(page);
+      await gotoProfileEdit(page, profileId!);
 
-      await expect(page.locator('.el-steps')).toBeVisible();
+      const nameInput = profileNameInput(page);
+      await expect(nameInput).not.toHaveValue('', { timeout: 10_000 });
+      const originalName = await nameInput.inputValue();
+      await nameInput.fill(uniqueName('edited'));
 
       const mark = markHealth(health);
+      await page.getByRole('button', { name: /Reset|重置/ }).click();
+      await waitForAppSettled(page);
+
+      await expect(nameInput).toHaveValue(originalName);
       expectHealthy(health, mark);
     } finally {
       await e2eData.cleanup();
     }
   });
 
-  test('navigates through all wizard steps without errors', async ({ page }) => {
+  test('switches through all tabs without browser or API errors', async ({ page }) => {
     const e2eData = await ensureE2eData(page);
     const health = watchPageHealth(page);
     const profileId = e2eData.routeIds.profileId;
     expect(profileId, 'need a seeded profile').toBeDefined();
 
     try {
-      await page.goto(`/#/profile/edit?id=${profileId}`, { waitUntil: 'domcontentloaded' });
-      await waitForAppSettled(page);
+      await gotoProfileEdit(page, profileId!);
 
-      // Wait for profile data to load before clicking Next on step 0
-      // (step 0 Next triggers profileUpdate which requires a valid form)
-      await waitForProfileData(page);
-
-      // Step 0 -> Step 1
-      const s0 = markHealth(health);
-      await clickNext(page);
-      expectHealthy(health, s0);
-
-      // Step 1 -> Step 2
-      const s1 = markHealth(health);
-      await clickNext(page);
-      expectHealthy(health, s1);
-
-      // Step 2 -> Step 3
-      const s2 = markHealth(health);
-      await clickNext(page);
-      expectHealthy(health, s2);
-
-      // Step 3 -> Step 4 (completion)
-      const s3 = markHealth(health);
-      await clickNext(page);
-      expectHealthy(health, s3);
-
-      await expect(page.locator('.el-result')).toBeVisible();
-
-      await page.getByRole('button', { name: /Return|返回/ }).click();
-      await waitForAppSettled(page);
-    } finally {
-      await e2eData.cleanup();
-    }
-  });
-
-  test('Previous button navigates back through steps', async ({ page }) => {
-    const e2eData = await ensureE2eData(page);
-    const health = watchPageHealth(page);
-    const profileId = e2eData.routeIds.profileId;
-    expect(profileId, 'need a seeded profile').toBeDefined();
-
-    try {
-      await page.goto(`/#/profile/edit?id=${profileId}`, { waitUntil: 'domcontentloaded' });
-      await waitForAppSettled(page);
-      await waitForProfileData(page);
-
-      // Step 0 -> Step 1
-      await clickNext(page);
-
-      // Step 1 -> Step 0
-      const mark = markHealth(health);
-      await clickPrevious(page);
-      expectHealthy(health, mark);
-
-      await expect(page.locator('.el-steps')).toBeVisible();
-    } finally {
-      await e2eData.cleanup();
-    }
-  });
-
-  test('add command without params on step 2 does not trigger duplicate error', async ({ page }) => {
-    const health = watchPageHealth(page);
-    const e2eData = await ensureE2eData(page);
-    const profileId = e2eData.routeIds.profileId;
-    expect(profileId, 'need a seeded profile').toBeDefined();
-
-    try {
-      // Jump directly to step 2 (Command Config) to avoid step 0 validation
-      await gotoStep(page, profileId, 2);
-
-      // Click the Add button on the command config step
-      const addBtn = page.getByRole('button', { name: /Add|新增/ }).first();
-      await expect(addBtn).toBeVisible({ timeout: 10_000 });
-      await addBtn.click();
-      await waitForAppSettled(page);
-
-      // Fill command name (required)
-      const dialog = page.locator('.el-dialog:visible').last();
-      await expect(dialog).toBeVisible();
-      const nameInput = dialog.locator('input').first();
-      await nameInput.fill(uniqueName('cmd'));
-
-      // Submit without adding any params
-      const confirmBtn = dialog.getByRole('button', { name: /Confirm|确定/ });
-      const saveMark = markHealth(health);
-      await confirmBtn.click();
-      await waitForAppSettled(page);
-
-      // The key assertion: no bad API responses (no R500 duplicate error)
-      expectHealthy(health, saveMark);
-    } finally {
-      await e2eData.cleanup();
-    }
-  });
-
-  test('add command with params on step 2 saves successfully', async ({ page }) => {
-    const health = watchPageHealth(page);
-    const e2eData = await ensureE2eData(page);
-    const profileId = e2eData.routeIds.profileId;
-    expect(profileId, 'need a seeded profile').toBeDefined();
-
-    try {
-      await gotoStep(page, profileId, 2);
-
-      await page
-        .getByRole('button', { name: /Add|新增/ })
-        .first()
-        .click();
-      await waitForAppSettled(page);
-
-      const dialog = page.locator('.el-dialog:visible').last();
-      await expect(dialog).toBeVisible();
-      const cmdName = uniqueName('cmdp');
-
-      // Fill command name
-      await dialog.locator('input').first().fill(cmdName);
-
-      // Add a param row
-      const addParamBtn = dialog.getByRole('button', { name: /Add|新增/ });
-      if (await addParamBtn.count()) {
-        await addParamBtn.last().click();
-        await waitForAppSettled(page);
-
-        // Fill param fields in the table
-        const paramRow = dialog.locator('table tbody tr').last();
-        const paramInputs = paramRow.locator('input');
-
-        // paramName
-        if ((await paramInputs.count()) > 0) await paramInputs.nth(0).fill('test_param');
-        // paramCode
-        if ((await paramInputs.count()) > 1) await paramInputs.nth(1).fill('test_code');
+      for (const tab of PROFILE_TABS.slice(1)) {
+        const mark = markHealth(health);
+        await expect(clickTab(page, tab.label), `${tab.active} tab should be reachable`).resolves.toBe(true);
+        expectHealthy(health, mark);
       }
-
-      const saveMark = markHealth(health);
-      await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
-      await waitForAppSettled(page);
-
-      expectHealthy(health, saveMark);
     } finally {
       await e2eData.cleanup();
     }
   });
 
-  test('add event on step 3 saves without errors', async ({ page }) => {
-    const health = watchPageHealth(page);
+  test('opens every tab from the active query parameter', async ({ page }) => {
     const e2eData = await ensureE2eData(page);
+    const health = watchPageHealth(page);
     const profileId = e2eData.routeIds.profileId;
     expect(profileId, 'need a seeded profile').toBeDefined();
 
     try {
-      await gotoStep(page, profileId, 3);
+      for (const tab of PROFILE_TABS) {
+        const mark = markHealth(health);
+        await gotoProfileEdit(page, profileId!, tab.active);
+        await expect(page.locator('.el-tabs__item.is-active').filter({ hasText: tab.label })).toBeVisible();
+        expectHealthy(health, mark);
+      }
+    } finally {
+      await e2eData.cleanup();
+    }
+  });
 
-      await page
-        .getByRole('button', { name: /Add|新增/ })
-        .first()
-        .click();
+  test('adds a command without params and does not duplicate-submit', async ({ page }) => {
+    const e2eData = await ensureE2eData(page);
+    const health = watchPageHealth(page);
+    const profileId = e2eData.routeIds.profileId;
+    expect(profileId, 'need a seeded profile').toBeDefined();
+    const commandName = uniqueName('cmd');
+    let commandId: string | undefined;
+
+    try {
+      await gotoProfileEdit(page, profileId!, 'commandConfig');
+
+      const add = page.getByRole('button', { name: /^(Add|新增)$/ }).first();
+      await expect(add).toBeVisible({ timeout: 10_000 });
+      await add.click();
       await waitForAppSettled(page);
 
       const dialog = page.locator('.el-dialog:visible').last();
       await expect(dialog).toBeVisible();
-      await dialog.locator('input').first().fill(uniqueName('evt'));
+      await fillFirstEditableInput(dialog, commandName);
 
-      const saveMark = markHealth(health);
+      const mark = markHealth(health);
       await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
       await waitForAppSettled(page);
+      expectHealthy(health, mark);
 
-      expectHealthy(health, saveMark);
+      commandId = await findCreatedId(page, '/api/v3/manager/command/list', 'commandName', commandName);
+      expect(commandId, 'created command id').toBeDefined();
     } finally {
+      if (commandId) await apiPost(page, '/api/v3/manager/command/delete', {}, { id: commandId }).catch(() => {});
+      await e2eData.cleanup();
+    }
+  });
+
+  test('adds command params and event definitions from their tabs', async ({ page }) => {
+    const e2eData = await ensureE2eData(page);
+    const health = watchPageHealth(page);
+    const profileId = e2eData.routeIds.profileId;
+    expect(profileId, 'need a seeded profile').toBeDefined();
+    const commandName = uniqueName('cmdp');
+    const eventName = uniqueName('evt');
+    let commandId: string | undefined;
+    let eventId: string | undefined;
+
+    try {
+      await gotoProfileEdit(page, profileId!, 'commandConfig');
+      await page
+        .getByRole('button', { name: /^(Add|新增)$/ })
+        .first()
+        .click();
+      await waitForAppSettled(page);
+      let dialog = page.locator('.el-dialog:visible').last();
+      await fillFirstEditableInput(dialog, commandName);
+      await dialog
+        .getByRole('button', { name: /^(Add|新增)$/ })
+        .last()
+        .click();
+      const paramInputs = dialog.locator('table tbody tr').last().locator('input:not([readonly])');
+      await expect(paramInputs.nth(0)).toBeVisible({ timeout: 10_000 });
+      await paramInputs.nth(0).fill(`${commandName}_param`);
+      await paramInputs.nth(1).fill(`${commandName}_code`);
+
+      let mark = markHealth(health);
+      await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
+      await waitForAppSettled(page);
+      expectHealthy(health, mark);
+      commandId = await findCreatedId(page, '/api/v3/manager/command/list', 'commandName', commandName);
+      expect(commandId, 'created command with params id').toBeDefined();
+
+      await expect(clickTab(page, /Related Events|Profile Events|模板事件|关联事件/)).resolves.toBe(true);
+      await page
+        .getByRole('button', { name: /^(Add|新增)$/ })
+        .first()
+        .click();
+      await waitForAppSettled(page);
+      dialog = page.locator('.el-dialog:visible').last();
+      await fillFirstEditableInput(dialog, eventName);
+
+      mark = markHealth(health);
+      await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
+      await waitForAppSettled(page);
+      expectHealthy(health, mark);
+      eventId = await findCreatedId(page, '/api/v3/manager/event/list', 'eventName', eventName);
+      expect(eventId, 'created event id').toBeDefined();
+    } finally {
+      if (commandId) await apiPost(page, '/api/v3/manager/command/delete', {}, { id: commandId }).catch(() => {});
+      if (eventId) await apiPost(page, '/api/v3/manager/event/delete', {}, { id: eventId }).catch(() => {});
       await e2eData.cleanup();
     }
   });

@@ -86,15 +86,16 @@ test.describe('login form validation', () => {
     await page.goto('/#/login', { waitUntil: 'domcontentloaded' });
     await waitForAppSettled(page);
 
-    // Form pre-fills "dc3dc3dc3" which already passes client-side rules,
-    // so submitting goes straight to the network and triggers the 401.
-    await submitButton(page).click();
+    await passwordInput(page).fill('dc3dc3dc3');
 
-    // Wait for the stubbed 401 to actually fire — proves the click
-    // reached the network, not just timed out client-side.
-    await page.waitForResponse(
+    // Arm the response waiter before clicking. The route is fulfilled
+    // synchronously by Playwright, so waiting after the click can miss
+    // the already completed 401 response.
+    const rejectedLogin = page.waitForResponse(
       (response) => response.url().includes('/api/v3/auth/token/generate') && response.status() === 401
     );
+    await submitButton(page).click();
+    await rejectedLogin;
 
     // The 401 must NOT eject the user from /login (we're already there).
     // The axios interceptor redirects 401 callers from protected routes

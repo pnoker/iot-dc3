@@ -1215,13 +1215,13 @@ exports[`API wrapper contracts > command > getCommandById maps to its transport 
 }
 `;
 
-exports[`API wrapper contracts > command > getCommandHistoryById maps to its transport contract 1`] = `
+exports[`API wrapper contracts > command > getCommandHistoryByRecordId maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/command_history/get_by_id",
+    "api/v3/data/command_history/get_by_record_id",
     {
       "params": {
-        "id": "record-1",
+        "record_id": "record-1",
       },
     },
   ],
@@ -1236,7 +1236,7 @@ exports[`API wrapper contracts > command > has every export covered by the contr
   "deleteCommand",
   "deleteCommandParam",
   "getCommandById",
-  "getCommandHistoryById",
+  "getCommandHistoryByRecordId",
   "listCommand",
   "listCommandByProfileId",
   "listCommandHistory",
@@ -1775,13 +1775,13 @@ exports[`API wrapper contracts > event > getEventById maps to its transport cont
 }
 `;
 
-exports[`API wrapper contracts > event > getEventHistoryById maps to its transport contract 1`] = `
+exports[`API wrapper contracts > event > getEventHistoryByRecordId maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/event_history/get_by_id",
+    "api/v3/data/event_history/get_by_record_id",
     {
       "params": {
-        "id": "record-1",
+        "record_id": "record-1",
       },
     },
   ],
@@ -1796,7 +1796,7 @@ exports[`API wrapper contracts > event > has every export covered by the contrac
   "deleteEvent",
   "deleteEventParam",
   "getEventById",
-  "getEventHistoryById",
+  "getEventHistoryByRecordId",
   "listEvent",
   "listEventByProfileId",
   "listEventHistory",

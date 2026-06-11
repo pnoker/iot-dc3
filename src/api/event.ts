@@ -46,6 +46,6 @@ export const listEventParamByEventId = (eventId: string) =>
 // Event History Queries
 
 export const getEventHistoryByRecordId = (recordId: string) =>
-  httpGet<R<EventHistoryRecord>>(`${endpoints.eventHistory}/get_by_record_id`, { params: { recordId } });
+  httpGet<R<EventHistoryRecord>>(`${endpoints.eventHistory}/get_by_record_id`, { params: { record_id: recordId } });
 export const listEventHistory = (query: PageQuery) =>
   httpPost<R<PageResult<EventHistoryRecord>>>(`${endpoints.eventHistory}/list`, query);

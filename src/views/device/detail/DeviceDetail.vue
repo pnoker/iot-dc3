@@ -45,10 +45,10 @@
             </el-descriptions>
           </detail-card>
         </el-tab-pane>
-        <el-tab-pane :label="$t('device.detail.relatedPoints')" name="point">
+        <el-tab-pane :label="$t('device.detail.relatedPoints')" lazy name="point">
           <point ref="pointViewRef" :device-id="reactiveData.id" :embedded="'device'"></point>
         </el-tab-pane>
-        <el-tab-pane :label="$t('device.detail.relatedCommands')" name="command">
+        <el-tab-pane :label="$t('device.detail.relatedCommands')" lazy name="command">
           <command-list
             v-if="profileId"
             ref="commandViewRef"
@@ -57,11 +57,11 @@
           ></command-list>
           <el-empty v-else :description="$t('common.description')" />
         </el-tab-pane>
-        <el-tab-pane :label="$t('device.detail.relatedEvents')" name="event">
+        <el-tab-pane :label="$t('device.detail.relatedEvents')" lazy name="event">
           <event-list v-if="profileId" ref="eventViewRef" :embedded="'device'" :profile-id="profileId"></event-list>
           <el-empty v-else :description="$t('common.description')" />
         </el-tab-pane>
-        <el-tab-pane :label="$t('device.detail.deviceData')" name="pointValue">
+        <el-tab-pane :label="$t('device.detail.deviceData')" lazy name="pointValue">
           <point-value ref="pointValueViewRef" :device-id="reactiveData.id" :embedded="'device'"></point-value>
         </el-tab-pane>
       </el-tabs>

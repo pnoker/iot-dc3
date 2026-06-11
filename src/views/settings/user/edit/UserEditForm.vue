@@ -63,7 +63,7 @@
         />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
-        <enable-flag-segmented v-model="reactiveData.form.enableFlag" value-type="number" />
+        <enable-flag-segmented v-model="reactiveData.form.enableFlag" />
       </el-form-item>
     </el-form>
     <div class="things-dialog-footer">

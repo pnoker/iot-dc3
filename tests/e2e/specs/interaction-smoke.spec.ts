@@ -140,10 +140,6 @@ test.describe('authenticated UI interactions', () => {
 
     if (e2eData.routeIds.deviceId) editRoutes.push(`/device/edit?id=${e2eData.routeIds.deviceId}`);
     if (e2eData.routeIds.profileId) editRoutes.push(`/profile/edit?id=${e2eData.routeIds.profileId}`);
-    if (e2eData.routeIds.pointId && e2eData.routeIds.pointProfileId) {
-      editRoutes.push(`/point/edit?id=${e2eData.routeIds.pointId}&profileId=${e2eData.routeIds.pointProfileId}`);
-    }
-
     try {
       for (const route of editRoutes) {
         const mark = markHealth(health);

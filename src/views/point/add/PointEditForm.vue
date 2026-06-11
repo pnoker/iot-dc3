@@ -54,9 +54,9 @@
       </el-form-item>
       <el-form-item :label="$t('point.add.rwType')" prop="rwFlag">
         <el-select v-model="reactiveData.formData.rwFlag" :placeholder="$t('point.add.rwTypeRequired')" clearable>
-          <el-option :label="$t('status.readOnly')" value="R" />
-          <el-option :label="$t('status.writeOnly')" value="W" />
-          <el-option :label="$t('status.readWrite')" value="RW" />
+          <el-option :label="$t('status.readOnly')" value="READ_ONLY" />
+          <el-option :label="$t('status.writeOnly')" value="WRITE_ONLY" />
+          <el-option :label="$t('status.readWrite')" value="READ_WRITE" />
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
@@ -149,7 +149,7 @@
 
   const emptyForm = (profileId: string): PointFormData => ({
     pointTypeFlag: 'FLOAT',
-    rwFlag: 'R',
+    rwFlag: 'READ_ONLY',
     baseValue: 0,
     multiple: 1,
     valueDecimal: 3,

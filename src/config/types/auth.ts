@@ -26,7 +26,7 @@ export interface UserForm {
   nickName?: string;
   phone?: string;
   email?: string;
-  enableFlag?: number;
+  enableFlag?: string;
   [key: string]: unknown;
 }
 

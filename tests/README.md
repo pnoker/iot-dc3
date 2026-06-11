@@ -138,9 +138,12 @@ The mandatory policy lives in `docs/frontend-testing-guardrails.md`. In short:
 
 ## E2E Environment
 
-Playwright defaults to `http://localhost:8080` and starts `pnpm dev` unless
-`E2E_START_SERVER=0` is set. Use `E2E_BASE_URL` to point at an already running
-environment.
+Playwright defaults to `http://localhost:8080`, runs with one worker, and starts
+`pnpm run serve:e2e` unless `E2E_START_SERVER=0` is set. The E2E server builds
+the app, serves `dist/`, and proxies `/api` to `http://localhost:8000` by
+default. Use `E2E_BASE_URL` to point at an already running environment,
+`E2E_API_TARGET` to point the local E2E proxy at a different gateway, or
+`E2E_WORKERS=N` to opt into parallelism against an isolated backend dataset.
 
 Use the headed scripts when you want to watch the browser operate:
 

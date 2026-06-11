@@ -34,6 +34,7 @@ import {
   addDriverInfo,
   addEventInfo,
   addPointInfo,
+  getDriverInfoByDeviceIdAndAttributeId,
   listCommandInfoByDeviceId,
   listDriverInfoByDeviceId,
   listEventInfoByDeviceId,
@@ -938,12 +939,19 @@ export default defineComponent({
       }
 
       try {
+        const dirtyAttributes = reactiveData.driverAttributes.filter((attribute) =>
+          driverDirtySet.has(attribute.attributeCode)
+        );
+        if (dirtyAttributes.length < 1) {
+          return true;
+        }
+
         let failedCount = 0;
         await Promise.all(
-          reactiveData.driverAttributes.map((attribute) => {
+          dirtyAttributes.map(async (attribute) => {
             const formItem = reactiveData.driverFormData[attribute.attributeCode];
             if (!formItem) {
-              return Promise.resolve();
+              return;
             }
             const driverInfo = {
               id: formItem.id || undefined,
@@ -952,10 +960,22 @@ export default defineComponent({
               configValue: serializeAttributeValue(formItem.configValue),
             };
 
-            const persist = driverInfo.id ? updateDriverInfo(driverInfo) : addDriverInfo(driverInfo);
-            return persist.catch(() => {
+            try {
+              const res: any = driverInfo.id ? await updateDriverInfo(driverInfo) : await addDriverInfo(driverInfo);
+              let savedId = String(res?.data?.id || formItem.id || '');
+              if (!savedId) {
+                const saved: any = await getDriverInfoByDeviceIdAndAttributeId(reactiveData.id, attribute.id);
+                savedId = String(saved?.data?.id || '');
+              }
+              if (!savedId) {
+                throw new Error(`Saved driver attribute config without id: ${attribute.attributeCode}`);
+              }
+              formItem.id = savedId;
+              reactiveData.oldDriverFormData[attribute.attributeCode] = clone(formItem);
+              driverDirtySet.delete(attribute.attributeCode);
+            } catch {
               failedCount++;
-            });
+            }
           })
         );
         if (failedCount > 0) {
@@ -1355,7 +1375,7 @@ export default defineComponent({
       if (!item) return;
       item.configValue = val;
       const oldVal = reactiveData.oldDriverFormData[attribute.attributeCode]?.configValue;
-      if (val !== oldVal) {
+      if (serializeAttributeValue(val) !== serializeAttributeValue(oldVal)) {
         driverDirtySet.add(attribute.attributeCode);
       } else {
         driverDirtySet.delete(attribute.attributeCode);

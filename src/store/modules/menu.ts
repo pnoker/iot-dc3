@@ -111,7 +111,10 @@ export const useMenuStore = defineStore('menu', {
         this.loaded = true;
       } catch {
         this.tree = [];
-        this.loaded = true;
+        // Keep failed loads retryable. The router will still deny non-public
+        // routes against the empty tree for this navigation, but the next
+        // navigation can recover if the backend/network comes back.
+        this.loaded = false;
       } finally {
         this.loading = false;
       }

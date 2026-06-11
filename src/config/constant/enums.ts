@@ -109,9 +109,9 @@ export const PROFILE_SHARE_OPTIONS: EnumOption[] = [
 
 // Backend: RwTypeEnum
 export const RW_FLAG_OPTIONS: EnumOption[] = [
-  { label: 'R', value: 'R' },
-  { label: 'W', value: 'W' },
-  { label: 'RW', value: 'RW' },
+  { label: 'R', value: 'READ_ONLY' },
+  { label: 'W', value: 'WRITE_ONLY' },
+  { label: 'RW', value: 'READ_WRITE' },
 ];
 
 // Backend: AlarmTypeEnum
