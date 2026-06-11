@@ -19,10 +19,43 @@ SHELL := /usr/bin/bash
 
 PNPM ?= pnpm
 DC3_DIR ?= dc3
-DOCKER_COMPOSE ?= docker compose
+COMPOSE_FILE ?= $(DC3_DIR)/docker-compose.yml
+ENV_FILE ?= $(firstword $(wildcard .env) .env.example)
+
+ifneq ($(wildcard $(ENV_FILE)),)
+include $(ENV_FILE)
+endif
+export
+
+DOCKER_COMPOSE ?= $(shell if docker compose version >/dev/null 2>&1; then printf 'docker compose'; elif podman compose version >/dev/null 2>&1; then printf 'podman compose'; else printf 'docker compose'; fi)
+REGISTRY ?= auto
+DC3_WEB_VERSION ?= latest
+DC3_BIND_HOST ?= 127.0.0.1
+DC3_WEB_HTTP_PORT ?= 8080
+DC3_WEB_HTTPS_PORT ?= 8443
+APP_API_HOST ?= dc3-gateway
+APP_API_PORT ?= 8000
+DC3_LOG_MAX_SIZE ?= 20m
+DC3_LOG_MAX_FILE ?= 20
+
+ifeq ($(REGISTRY),auto)
+DC3_WEB_IMAGE ?= pnoker/dc3-web
+else ifeq ($(REGISTRY),global)
+override DC3_WEB_IMAGE := pnoker/dc3-web
+else ifeq ($(REGISTRY),cn)
+override DC3_WEB_IMAGE := registry.cn-beijing.aliyuncs.com/dc3/dc3-web
+else
+$(error Unsupported REGISTRY '$(REGISTRY)'. Use REGISTRY=auto|global|cn)
+endif
+
+define dc3_compose
+$(DOCKER_COMPOSE) -f "$(COMPOSE_FILE)"
+endef
 
 .PHONY: \
 	help \
+	env \
+	init-env \
 	install \
 	dev \
 	dev-prod \
@@ -50,7 +83,11 @@ DOCKER_COMPOSE ?= docker compose
 	ci \
 	docker-build \
 	docker-up \
-	docker-down
+	docker-down \
+	docker-ps \
+	docker-logs \
+	docker-config \
+	docker-restart
 
 help:
 	@printf '%s\n' \
@@ -81,7 +118,26 @@ help:
 		'make ci           - run lint-check, check, guardrails, test, build' \
 		'make docker-build - build dc3 docker services' \
 		'make docker-up    - start dc3 docker services' \
-		'make docker-down  - stop dc3 docker services'
+		'make docker-down  - stop dc3 docker services' \
+		'make docker-logs  - follow dc3 web logs' \
+		'make env          - print effective Make/Compose defaults'
+
+env:
+	@printf 'ENV_FILE=%s\n' "$(ENV_FILE)"
+	@printf 'DOCKER_COMPOSE=%s\n' "$(DOCKER_COMPOSE)"
+	@printf 'COMPOSE_FILE=%s\n' "$(COMPOSE_FILE)"
+	@printf 'REGISTRY=%s\n' "$(REGISTRY)"
+	@printf 'DC3_WEB_IMAGE=%s\n' "$(DC3_WEB_IMAGE)"
+	@printf 'DC3_WEB_VERSION=%s\n' "$(DC3_WEB_VERSION)"
+	@printf 'DC3_BIND_HOST=%s\n' "$(DC3_BIND_HOST)"
+	@printf 'DC3_WEB_HTTP_PORT=%s\n' "$(DC3_WEB_HTTP_PORT)"
+	@printf 'DC3_WEB_HTTPS_PORT=%s\n' "$(DC3_WEB_HTTPS_PORT)"
+	@printf 'APP_API_HOST=%s\n' "$(APP_API_HOST)"
+	@printf 'APP_API_PORT=%s\n' "$(APP_API_PORT)"
+
+init-env:
+	@test -f .env || cp .env.example .env
+	@printf '%s\n' 'Using .env'
 
 install:
 	$(PNPM) install
@@ -158,10 +214,22 @@ clean:
 ci: lint-check check test-guard test-ci build
 
 docker-build:
-	cd $(DC3_DIR) && $(DOCKER_COMPOSE) build
+	$(call dc3_compose) build
 
 docker-up:
-	cd $(DC3_DIR) && $(DOCKER_COMPOSE) up -d
+	$(call dc3_compose) up -d
 
 docker-down:
-	cd $(DC3_DIR) && $(DOCKER_COMPOSE) down
+	$(call dc3_compose) down
+
+docker-ps:
+	$(call dc3_compose) ps
+
+docker-logs:
+	$(call dc3_compose) logs -f --tail=200
+
+docker-config:
+	$(call dc3_compose) config
+
+docker-restart:
+	$(call dc3_compose) restart

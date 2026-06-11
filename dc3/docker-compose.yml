@@ -20,10 +20,13 @@ services:
     #   DC3_WEB_IMAGE=registry.cn-beijing.aliyuncs.com/dc3/dc3-web \
     #   DC3_WEB_VERSION=2026.5.22 docker compose up
     image: ${DC3_WEB_IMAGE:-pnoker/dc3-web}:${DC3_WEB_VERSION:-latest}
+    build:
+      context: ..
+      dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - '8080:80'
-      - '8443:443'
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_WEB_HTTP_PORT:-8080}:80"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_WEB_HTTPS_PORT:-8443}:443"
     environment:
       - APP_API_HOST=${APP_API_HOST:-dc3-gateway}
       - APP_API_PORT=${APP_API_PORT:-8000}
@@ -34,8 +37,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
-        max-file: '20'
+        max-size: ${DC3_LOG_MAX_SIZE:-20m}
+        max-file: "${DC3_LOG_MAX_FILE:-20}"
     networks:
       dc3net:
         aliases:
