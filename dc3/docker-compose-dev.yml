@@ -21,6 +21,25 @@ x-logging: &default-logging
     max-size: ${DC3_LOG_MAX_SIZE:-10M}
     max-file: "${DC3_LOG_MAX_FILE:-20}"
 
+x-app-runtime-env: &app-runtime-env
+  NODE_ENV: test
+  APM_AGENT_ENABLE: ${APM_AGENT_ENABLE:-false}
+  AUTH_HMAC_SECRET: ${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+  POSTGRES_HOST: dc3-postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_USERNAME: ${POSTGRES_USERNAME:-dc3}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dc3dc3dc3}
+  POSTGRES_DB: ${POSTGRES_DB:-dc3}
+  RABBITMQ_VIRTUAL_HOST: ${RABBITMQ_VIRTUAL_HOST:-dc3}
+  RABBITMQ_HOST: dc3-rabbitmq
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-dc3}
+  RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-dc3dc3dc3}
+  MQTT_BROKER_HOST: dc3-rabbitmq
+  MQTT_BROKER_PORT: "1883"
+  MQTT_USERNAME: ${MQTT_USERNAME:-dc3}
+  MQTT_PASSWORD: ${MQTT_PASSWORD:-dc3dc3dc3}
+
 services:
   gateway:
     build:
@@ -41,9 +60,7 @@ services:
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -71,9 +88,7 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_PORT:-8300}:8300"
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_GRPC_PORT:-9300}:9300"
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
@@ -104,9 +119,7 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MANAGER_PORT:-8400}:8400"
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MANAGER_GRPC_PORT:-9400}:9400"
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
@@ -139,9 +152,7 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DATA_PORT:-8500}:8500"
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DATA_GRPC_PORT:-9500}:9500"
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
@@ -175,19 +186,17 @@ services:
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AGENTIC_PORT:-8600}:8600"
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
-      - AGENTIC_FALLBACK_OPENAI_BASE_URL=${AGENTIC_FALLBACK_OPENAI_BASE_URL:-https://api.openai.com}
-      - AGENTIC_FALLBACK_OPENAI_API_KEY=${AGENTIC_FALLBACK_OPENAI_API_KEY:-}
-      - AGENTIC_FALLBACK_OPENAI_MODEL=${AGENTIC_FALLBACK_OPENAI_MODEL:-gpt-4o}
-      - AGENTIC_FALLBACK_OPENAI_TEMPERATURE=${AGENTIC_FALLBACK_OPENAI_TEMPERATURE:-0.7}
-      - AGENTIC_FALLBACK_OPENAI_MAX_TOKENS=${AGENTIC_FALLBACK_OPENAI_MAX_TOKENS:-2048}
-      - AGENTIC_MEMORY_SCHEMA_INIT=${AGENTIC_MEMORY_SCHEMA_INIT:-never}
-      - AGENTIC_MEMORY_ENABLED=${AGENTIC_MEMORY_ENABLED:-false}
-      - AGENTIC_TOOL_CALLING_ENABLED=${AGENTIC_TOOL_CALLING_ENABLED:-true}
-      - AGENTIC_MEMORY_MAX_MESSAGES=${AGENTIC_MEMORY_MAX_MESSAGES:-50}
-      - AGENTIC_ATTACHMENT_STORAGE_PATH=${AGENTIC_ATTACHMENT_STORAGE_PATH:-dc3/data/agentic/attachments}
+      <<: *app-runtime-env
+      AGENTIC_FALLBACK_OPENAI_BASE_URL: ${AGENTIC_FALLBACK_OPENAI_BASE_URL:-https://api.openai.com}
+      AGENTIC_FALLBACK_OPENAI_API_KEY: ${AGENTIC_FALLBACK_OPENAI_API_KEY:-}
+      AGENTIC_FALLBACK_OPENAI_MODEL: ${AGENTIC_FALLBACK_OPENAI_MODEL:-gpt-4o}
+      AGENTIC_FALLBACK_OPENAI_TEMPERATURE: ${AGENTIC_FALLBACK_OPENAI_TEMPERATURE:-0.7}
+      AGENTIC_FALLBACK_OPENAI_MAX_TOKENS: ${AGENTIC_FALLBACK_OPENAI_MAX_TOKENS:-2048}
+      AGENTIC_MEMORY_SCHEMA_INIT: ${AGENTIC_MEMORY_SCHEMA_INIT:-never}
+      AGENTIC_MEMORY_ENABLED: ${AGENTIC_MEMORY_ENABLED:-false}
+      AGENTIC_TOOL_CALLING_ENABLED: ${AGENTIC_TOOL_CALLING_ENABLED:-true}
+      AGENTIC_MEMORY_MAX_MESSAGES: ${AGENTIC_MEMORY_MAX_MESSAGES:-50}
+      AGENTIC_ATTACHMENT_STORAGE_PATH: ${AGENTIC_ATTACHMENT_STORAGE_PATH:-dc3/data/agentic/attachments}
     container_name: dc3-center-agentic
     hostname: dc3-center-agentic
     volumes:
@@ -218,9 +227,7 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_TCP_PORT:-6270}:6270"
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_UDP_PORT:-6271}:6271"
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
     volumes:
@@ -242,9 +249,7 @@ services:
       manager:
         condition: service_healthy
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
@@ -266,9 +271,7 @@ services:
       manager:
         condition: service_healthy
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-driver-modbus-rtu
     hostname: dc3-driver-modbus-rtu
     volumes:
@@ -290,9 +293,7 @@ services:
       manager:
         condition: service_healthy
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
@@ -314,9 +315,7 @@ services:
       manager:
         condition: service_healthy
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
     volumes:
@@ -338,9 +337,7 @@ services:
       manager:
         condition: service_healthy
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
     volumes:
@@ -362,9 +359,7 @@ services:
       manager:
         condition: service_healthy
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-driver-plcs7
     hostname: dc3-driver-plcs7
     volumes:
@@ -386,9 +381,7 @@ services:
       manager:
         condition: service_healthy
     environment:
-      - NODE_ENV=test
-      - APM_AGENT_ENABLE=${APM_AGENT_ENABLE:-false}
-      - AUTH_HMAC_SECRET=${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+      <<: *app-runtime-env
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
     volumes:

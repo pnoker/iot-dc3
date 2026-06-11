@@ -18,24 +18,51 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: help clean package test test-it test-e2e coverage \
+.PHONY: help env init-env clean package test test-it test-e2e coverage \
 	build up stop down ps logs config pull restart refresh reset print-compose-file \
 	app app-all dev dev-all dev-db dev-optional \
 	compose-build compose-up compose-down compose-ps compose-logs compose-config compose-pull \
 	compose-stop compose-restart compose-refresh compose-reset compose-file \
-	changelog openapi deploy install-hooks tag check-compose check-service-group
+	run changelog openapi deploy install-hooks tag check-compose check-service-group check-run-service
 
-COMPOSE ?= podman compose
+ENV_FILE ?= $(firstword $(wildcard .env) .env.example)
+RUNTIME_ENV_FILE ?= dc3/env/dev.env
+
+ifneq ($(wildcard $(RUNTIME_ENV_FILE)),)
+include $(RUNTIME_ENV_FILE)
+endif
+ifneq ($(wildcard $(ENV_FILE)),)
+include $(ENV_FILE)
+endif
+export
+
+COMPOSE ?= $(shell if docker compose version >/dev/null 2>&1; then printf 'docker compose'; elif podman compose version >/dev/null 2>&1; then printf 'podman compose'; else printf 'docker compose'; fi)
 COMPOSE_DIR ?= dc3
-REGISTRY ?= global
+REGISTRY ?= auto
 STACK ?= dev
 SERVICES ?=
 GROUP ?=
 
 GROUP_SERVICES_center := auth manager data agentic
 GROUP_SERVICES_core := $(GROUP_SERVICES_center) gateway
-GROUP_SERVICES_drivers := listening-virtual modbus-tcp mqtt opc-da opc-ua plcs7 virtual
+GROUP_SERVICES_drivers := listening-virtual modbus-tcp modbus-rtu mqtt opc-da opc-ua plcs7 virtual
 SELECTED_SERVICES := $(strip $(SERVICES) $(GROUP_SERVICES_$(GROUP)))
+
+RUN_SERVICE ?= $(or $(SERVICE),gateway)
+RUN_MODULE_gateway := dc3-gateway
+RUN_MODULE_auth := dc3-center/dc3-center-auth
+RUN_MODULE_manager := dc3-center/dc3-center-manager
+RUN_MODULE_data := dc3-center/dc3-center-data
+RUN_MODULE_agentic := dc3-center/dc3-center-agentic
+RUN_MODULE_listening-virtual := dc3-driver/dc3-driver-listening-virtual
+RUN_MODULE_modbus-tcp := dc3-driver/dc3-driver-modbus-tcp
+RUN_MODULE_modbus-rtu := dc3-driver/dc3-driver-modbus-rtu
+RUN_MODULE_mqtt := dc3-driver/dc3-driver-mqtt
+RUN_MODULE_opc-da := dc3-driver/dc3-driver-opc-da
+RUN_MODULE_opc-ua := dc3-driver/dc3-driver-opc-ua
+RUN_MODULE_plcs7 := dc3-driver/dc3-driver-plcs7
+RUN_MODULE_virtual := dc3-driver/dc3-driver-virtual
+RUN_MODULE := $(RUN_MODULE_$(RUN_SERVICE))
 
 MVN_SETTINGS ?= .mvn/settings.xml
 MVN_SETTINGS_ARG := $(if $(strip $(MVN_SETTINGS)),-s $(MVN_SETTINGS),)
@@ -48,16 +75,18 @@ FROM ?=
 TO ?= HEAD
 VERSION ?=
 
-ifeq ($(REGISTRY),global)
+ifeq ($(REGISTRY),auto)
+DC3_IMAGE_REGISTRY ?= pnoker
+else ifeq ($(REGISTRY),global)
 DEFAULT_IMAGE_REGISTRY := pnoker
+override DC3_IMAGE_REGISTRY := $(DEFAULT_IMAGE_REGISTRY)
 else ifeq ($(REGISTRY),cn)
 DEFAULT_IMAGE_REGISTRY := registry.cn-beijing.aliyuncs.com/dc3
+override DC3_IMAGE_REGISTRY := $(DEFAULT_IMAGE_REGISTRY)
 else
-$(error Unsupported REGISTRY '$(REGISTRY)'. Use REGISTRY=global|cn)
+$(error Unsupported REGISTRY '$(REGISTRY)'. Use REGISTRY=auto|global|cn)
 endif
 
-DC3_IMAGE_REGISTRY ?= $(DEFAULT_IMAGE_REGISTRY)
-COMPOSE_ENV := DC3_IMAGE_REGISTRY="$(DC3_IMAGE_REGISTRY)"
 STACK_SUFFIX := $(if $(filter app,$(STACK)),,-$(STACK))
 
 ifeq ($(origin COMPOSE_FILE), undefined)
@@ -69,7 +98,7 @@ MAKE_COMPOSE_OVERRIDE := COMPOSE_FILE="$(COMPOSE_FILE)"
 endif
 
 define dc3_compose
-$(COMPOSE_ENV) $(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)"
+$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)"
 endef
 
 help:
@@ -81,6 +110,7 @@ help:
 	@printf '  %-24s %s\n' 'make test-it' 'Run integration-test phase'
 	@printf '  %-24s %s\n' 'make test-e2e' 'Run E2E harness'
 	@printf '  %-24s %s\n' 'make coverage' 'Generate aggregated JaCoCo coverage'
+	@printf '  %-24s %s\n' 'make run SERVICE=auth' 'Run one Spring Boot service with env auto-loaded'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Compose:'
 	@printf '  %-24s %s\n' 'make build' 'Build STACK images, optional SERVICES="data gateway" or GROUP=core'
@@ -93,17 +123,36 @@ help:
 	@printf '%s\n' ''
 	@printf '%s\n' 'Variables:'
 	@printf '  %-24s %s\n' 'STACK=dev|app|db|optional' 'Compose stack selector'
-	@printf '  %-24s %s\n' 'REGISTRY=global|cn' 'Image registry selector'
+	@printf '  %-24s %s\n' 'REGISTRY=auto|global|cn' 'Image registry selector; auto uses .env/DC3_IMAGE_REGISTRY'
 	@printf '  %-24s %s\n' 'SERVICES="..."' 'Compose service list, empty means all services'
 	@printf '  %-24s %s\n' 'GROUP=center|core|drivers' 'Predefined service group'
+	@printf '  %-24s %s\n' 'ENV_FILE=.env' 'Make/Compose env file, auto-falls back to .env.example'
+	@printf '  %-24s %s\n' 'RUNTIME_ENV_FILE=...' 'Local source-run env file, defaults to dc3/env/dev.env'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Examples:'
-	@printf '  %s\n' 'make dev-db REGISTRY=cn'
-	@printf '  %s\n' 'make up SERVICES="agentic" REGISTRY=cn'
-	@printf '  %s\n' 'make up SERVICES="gateway agentic" REGISTRY=cn'
-	@printf '  %s\n' 'make up GROUP=core REGISTRY=cn'
-	@printf '  %s\n' 'make up STACK=optional SERVICES="prometheus grafana" REGISTRY=cn'
+	@printf '  %s\n' 'make init-env'
+	@printf '  %s\n' 'make dev-db'
+	@printf '  %s\n' 'make up SERVICES="agentic"'
+	@printf '  %s\n' 'make up SERVICES="gateway agentic"'
+	@printf '  %s\n' 'make up GROUP=core'
+	@printf '  %s\n' 'make up STACK=optional SERVICES="prometheus grafana"'
 	@printf '  %s\n' 'make logs SERVICES="gateway agentic"'
+
+env:
+	@printf 'ENV_FILE=%s\n' "$(ENV_FILE)"
+	@printf 'RUNTIME_ENV_FILE=%s\n' "$(RUNTIME_ENV_FILE)"
+	@printf 'COMPOSE=%s\n' "$(COMPOSE)"
+	@printf 'STACK=%s\n' "$(STACK)"
+	@printf 'COMPOSE_FILE=%s\n' "$(RESOLVED_COMPOSE_FILE)"
+	@printf 'REGISTRY=%s\n' "$(REGISTRY)"
+	@printf 'DC3_IMAGE_REGISTRY=%s\n' "$(DC3_IMAGE_REGISTRY)"
+	@printf 'DC3_IMAGE_TAG=%s\n' "$(DC3_IMAGE_TAG)"
+	@printf 'POSTGRES=%s:%s/%s\n' "$(POSTGRES_HOST)" "$(POSTGRES_PORT)" "$(POSTGRES_DB)"
+	@printf 'RABBITMQ=%s:%s/%s\n' "$(RABBITMQ_HOST)" "$(RABBITMQ_PORT)" "$(RABBITMQ_VIRTUAL_HOST)"
+
+init-env:
+	@test -f .env || cp .env.example .env
+	@printf '%s\n' 'Using .env'
 
 clean:
 	$(MVN) clean
@@ -129,6 +178,13 @@ check-compose:
 check-service-group:
 	@if [ -n "$(GROUP)" ] && [ -z "$(GROUP_SERVICES_$(GROUP))" ]; then \
 		echo "Unsupported GROUP '$(GROUP)'. Use GROUP=center|core|drivers"; \
+		exit 1; \
+	fi
+
+check-run-service:
+	@if [ -z "$(RUN_MODULE)" ]; then \
+		echo "Unsupported SERVICE '$(RUN_SERVICE)'."; \
+		echo "Use SERVICE=gateway|auth|manager|data|agentic|listening-virtual|modbus-tcp|modbus-rtu|mqtt|opc-da|opc-ua|plcs7|virtual"; \
 		exit 1; \
 	fi
 
@@ -170,6 +226,9 @@ refresh: check-compose check-service-group
 reset: check-compose
 	@test "$(CONFIRM_RESET_VOLUMES)" = "true" || (echo "Refusing to delete volumes. Re-run with CONFIRM_RESET_VOLUMES=true" && exit 1)
 	$(call dc3_compose) down -v
+
+run: check-run-service
+	$(MVN) -pl "$(RUN_MODULE)" -am spring-boot:run
 
 dev-db:
 	@$(MAKE) up STACK=db SERVICES= GROUP= REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)

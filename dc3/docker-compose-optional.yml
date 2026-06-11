@@ -147,6 +147,10 @@ services:
   postgres-exporter:
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-postgres-exporter:${DC3_IMAGE_TAG:-2026.5}
     restart: always
+    environment:
+      - DATA_SOURCE_URI=dc3-postgres:5432/${POSTGRES_DB:-dc3}?sslmode=disable
+      - DATA_SOURCE_USER=${POSTGRES_USERNAME:-dc3}
+      - DATA_SOURCE_PASS=${POSTGRES_PASSWORD:-dc3dc3dc3}
     container_name: dc3-postgres-exporter
     hostname: dc3-postgres-exporter
     logging: *default-logging
