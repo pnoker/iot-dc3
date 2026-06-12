@@ -61,7 +61,7 @@ public class ActionController implements BaseController {
     @Operation(summary = "List Pending AI Actions", description = "List pending AI actions for a conversation")
     @GetMapping("/pending")
     public Mono<R<List<ActionVO>>> pending(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
             List<ActionVO> actions = actionBuilder.buildVOListByBOList(actionService.listPending(scopedConversationId,
@@ -75,7 +75,7 @@ public class ActionController implements BaseController {
     @Operation(summary = "Confirm AI Action", description = "Confirm an AI action and return the updated action")
     @PostMapping("/confirm")
     public Mono<R<ActionVO>> confirm(@Parameter(description = "AI action ID") @NotBlank @RequestParam(value = "action_id") String actionId) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             ActionBO actionBO = actionService.confirm(actionId, header);
             ActionVO action = actionBuilder.buildVOByBO(actionBO);
             sanitize(header, action);
@@ -87,7 +87,7 @@ public class ActionController implements BaseController {
     @Operation(summary = "Reject AI Action", description = "Reject an AI action and return the updated action")
     @PostMapping("/reject")
     public Mono<R<ActionVO>> reject(@Parameter(description = "AI action ID") @NotBlank @RequestParam(value = "action_id") String actionId) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             ActionBO actionBO = actionService.reject(actionId, header);
             ActionVO action = actionBuilder.buildVOByBO(actionBO);
             sanitize(header, action);
@@ -95,7 +95,7 @@ public class ActionController implements BaseController {
         }));
     }
 
-    private void sanitize(RequestHeader.UserHeader header, ActionVO action) {
+    private void sanitize(RequestHeader.PrincipalHeader header, ActionVO action) {
         action.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
                 action.getConversationId()));
     }

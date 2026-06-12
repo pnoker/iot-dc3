@@ -42,6 +42,9 @@ import lombok.ToString;
 @Schema(description = "Facade User business object")
 public class FacadeUserBO extends BaseBO {
 
+    @Schema(description = "Principal ID")
+    private Long principalId;
+
     @Schema(description = "User nickname")
 
     private String nickName;

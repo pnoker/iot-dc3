@@ -46,13 +46,13 @@ public class PermissionGrpcFacade implements PermissionFacade {
     private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public Set<String> listPermissionCodes(Long tenantId, Long userId) {
-        if (tenantId == null || userId == null) {
+    public Set<String> listPermissionCodes(Long tenantId, Long principalId) {
+        if (tenantId == null || principalId == null) {
             return Set.of();
         }
         GrpcPermissionQuery request = GrpcPermissionQuery.newBuilder()
                 .setTenantId(tenantId)
-                .setUserId(userId)
+                .setPrincipalId(principalId)
                 .build();
         GrpcRPermissionCodesDTO response = grpcFacadeSupport.call("PermissionFacade.listPermissionCodes",
                 permissionApiBlockingStub, stub -> stub.listPermissionCodes(request));

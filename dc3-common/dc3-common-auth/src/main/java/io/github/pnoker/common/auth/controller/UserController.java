@@ -18,17 +18,24 @@
 package io.github.pnoker.common.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
+import io.github.pnoker.common.auth.dal.PrincipalManager;
+import io.github.pnoker.common.auth.entity.model.PrincipalDO;
+import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.UserBuilder;
 import io.github.pnoker.common.auth.entity.query.UserQuery;
 import io.github.pnoker.common.auth.entity.vo.UserVO;
-import io.github.pnoker.common.auth.service.TenantBindService;
+import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.service.UserService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.MembershipStatusEnum;
+import io.github.pnoker.common.enums.PrincipalSourceTypeEnum;
+import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -68,28 +75,47 @@ public class UserController implements BaseController {
 
     private final UserService userService;
 
-    private final TenantBindService tenantBindService;
+    private final TenantMembershipService tenantMembershipService;
+
+    private final PrincipalManager principalManager;
 
     @PreAuthorize("@perm.can('user', 'add')")
     @Operation(summary = "Add User", description = "Create a user record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             UserBO entityBO = userBuilder.buildBOByVO(entityVO);
+            PrincipalDO principal = new PrincipalDO();
+            principal.setPrincipalType(PrincipalTypeEnum.USER.getValue());
+            principal.setPrincipalName(entityBO.getUserName());
+            principal.setDisplayName(entityBO.getNickName());
+            principal.setSourceType(PrincipalSourceTypeEnum.LOCAL.getValue());
+            principal.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
+            principal.setLockedFlag(EnableFlagEnum.ENABLE.getIndex());
+            principal.setCreatorId(header.getUserId());
+            principal.setCreatorName(header.getNickName());
+            principal.setOperatorId(header.getUserId());
+            principal.setOperatorName(header.getNickName());
+            if (!principalManager.save(principal)) {
+                throw new AddException("Failed to create principal");
+            }
+            entityBO.setPrincipalId(principal.getId());
             entityBO.setCreatorId(header.getUserId());
             entityBO.setCreatorName(header.getNickName());
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             userService.add(entityBO);
             UserBO saved = userService.getByUserName(entityBO.getUserName(), true);
-            TenantBindBO tenantBindBO = new TenantBindBO();
-            tenantBindBO.setTenantId(header.getTenantId());
-            tenantBindBO.setUserId(saved.getId());
-            tenantBindBO.setCreatorId(header.getUserId());
-            tenantBindBO.setCreatorName(header.getNickName());
-            tenantBindBO.setOperatorId(header.getUserId());
-            tenantBindBO.setOperatorName(header.getNickName());
-            tenantBindService.add(tenantBindBO);
+            TenantMembershipDO membership = new TenantMembershipDO();
+            membership.setTenantId(header.getTenantId());
+            membership.setPrincipalId(saved.getPrincipalId());
+            membership.setPrincipalType(PrincipalTypeEnum.USER.getValue());
+            membership.setMembershipStatus(MembershipStatusEnum.ACTIVE.getValue());
+            membership.setCreatorId(header.getUserId());
+            membership.setCreatorName(header.getNickName());
+            membership.setOperatorId(header.getUserId());
+            membership.setOperatorName(header.getNickName());
+            tenantMembershipService.add(membership);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -99,11 +125,13 @@ public class UserController implements BaseController {
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            tenantBindService.requireTenantMember(tenantId, id);
-            TenantBindBO tenantBind = tenantBindService.getByTenantIdAndUserId(tenantId, id);
+            UserBO user = userService.getById(id);
+            tenantMembershipService.requireTenantMember(tenantId, user.getPrincipalId());
+            TenantMembershipDO membership = tenantMembershipService.getByTenantIdAndPrincipalId(tenantId,
+                    user.getPrincipalId());
             userService.delete(id);
-            if (Objects.nonNull(tenantBind)) {
-                tenantBindService.delete(tenantBind.getId());
+            if (Objects.nonNull(membership)) {
+                tenantMembershipService.delete(membership.getId());
             }
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
@@ -113,11 +141,13 @@ public class UserController implements BaseController {
     @Operation(summary = "Update User", description = "Update a user record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             UserBO entityBO = userBuilder.buildBOByVO(entityVO);
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
-            tenantBindService.requireTenantMember(header.getTenantId(), entityBO.getId());
+            UserBO current = userService.getById(entityBO.getId());
+            tenantMembershipService.requireTenantMember(header.getTenantId(), current.getPrincipalId());
+            entityBO.setPrincipalId(current.getPrincipalId());
             userService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
@@ -128,8 +158,8 @@ public class UserController implements BaseController {
     @GetMapping("/get_by_id")
     public Mono<R<UserVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            tenantBindService.requireTenantMember(tenantId, id);
             UserBO entityBO = userService.getById(id);
+            tenantMembershipService.requireTenantMember(tenantId, entityBO.getPrincipalId());
             UserVO entityVO = userBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));
@@ -146,7 +176,7 @@ public class UserController implements BaseController {
             if (Objects.isNull(entityBO)) {
                 throw new NotFoundException("Resource does not exist");
             }
-            tenantBindService.requireTenantMember(tenantId, entityBO.getId());
+            tenantMembershipService.requireTenantMember(tenantId, entityBO.getPrincipalId());
             UserVO entityVO = userBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         }));

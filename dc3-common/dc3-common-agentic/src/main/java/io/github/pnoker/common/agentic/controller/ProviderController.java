@@ -71,7 +71,7 @@ public class ProviderController implements BaseController {
     @Operation(summary = "Add Model Provider", description = "Create a model provider record")
     @PostMapping("/config/add")
     public Mono<R<ModelProviderVO>> add(@Validated(Add.class) @RequestBody ModelProviderRequest request) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             ModelProviderBO entityBO = modelProviderBuilder.buildBOByRequest(request);
             return R.ok(modelProviderBuilder.buildVOByBO(modelProviderService.add(entityBO, header)));
         }));
@@ -81,7 +81,7 @@ public class ProviderController implements BaseController {
     @Operation(summary = "Update Model Provider", description = "Update a model provider configuration")
     @PostMapping("/config/update")
     public Mono<R<ModelProviderVO>> update(@Validated(Update.class) @RequestBody ModelProviderRequest request) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             ModelProviderBO entityBO = modelProviderBuilder.buildBOByRequest(request);
             return R.ok(modelProviderBuilder.buildVOByBO(modelProviderService.update(entityBO, header)));
         }));

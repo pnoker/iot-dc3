@@ -21,8 +21,8 @@ import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -64,13 +64,13 @@ public class AuthenticGatewayFilter implements GatewayFilter {
         // The auth lookups (tenant / user / token) are blocking gRPC calls. Run the whole
         // synchronous block on boundedElastic so the Netty event loop stays free to accept
         // new connections under load. FilterServiceImpl caches the lookups for ~60s.
-        return Mono.fromCallable(() -> resolveUserHeader(request)).subscribeOn(Schedulers.boundedElastic())
+        return Mono.fromCallable(() -> resolvePrincipalHeader(request)).subscribeOn(Schedulers.boundedElastic())
                 .flatMap(userHeader -> {
-                    String userJson = JsonUtil.toJsonString(userHeader);
+                    String principalJson = JsonUtil.toJsonString(userHeader);
                     ServerHttpRequest mutated = request.mutate().headers(headers -> {
-                        headers.set(RequestConstant.Header.X_AUTH_USER, userJson);
+                        headers.set(RequestConstant.Header.X_AUTH_PRINCIPAL, principalJson);
                         if (hmacAuthSigner.isEnabled()) {
-                            headers.set(RequestConstant.Header.X_AUTH_SIGN, hmacAuthSigner.sign(userJson));
+                            headers.set(RequestConstant.Header.X_AUTH_SIGN, hmacAuthSigner.sign(principalJson));
                         } else {
                             // Strip any inbound sign header so a downstream service can't be
                             // tricked into trusting a client-supplied one.
@@ -87,11 +87,11 @@ public class AuthenticGatewayFilter implements GatewayFilter {
                 });
     }
 
-    private RequestHeader.UserHeader resolveUserHeader(ServerHttpRequest request) {
+    private RequestHeader.PrincipalHeader resolvePrincipalHeader(ServerHttpRequest request) {
         FacadeTenantBO tenant = filterService.getTenant(request);
-        FacadeUserLoginBO userLogin = filterService.getUserLogin(request);
-        filterService.checkValid(request, tenant, userLogin);
-        return filterService.getUser(userLogin, tenant);
+        FacadeLocalCredentialBO credential = filterService.getLocalCredential(request);
+        filterService.checkValid(request, tenant, credential);
+        return filterService.getUser(credential, tenant);
     }
 
     private Mono<Void> writeErrorResponse(ServerWebExchange exchange, HttpStatus status, String message) {

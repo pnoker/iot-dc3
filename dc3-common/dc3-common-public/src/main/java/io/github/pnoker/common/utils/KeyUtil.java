@@ -214,18 +214,18 @@ public class KeyUtil {
     /**
      * Generate a JWT token.
      *
-     * @param userName User name
+     * @param subject  token subject, normally principal ID
      * @param salt     Salt
      * @param tenantId Tenant ID
      * @return Token string
      */
-    public static String generateToken(String userName, String salt, Long tenantId) {
+    public static String generateToken(String subject, String salt, Long tenantId) {
         String securityKey = getSecurityKey();
         SecretKey key = io.jsonwebtoken.security.Keys
                 .hmacShaKeyFor(DecodeUtil.stringToByte(securityKey + SymbolConstant.COLON + salt));
         JwtBuilder builder = Jwts.builder()
                 .issuer(securityKey + SymbolConstant.COLON + tenantId)
-                .subject(securityKey + SymbolConstant.COLON + userName)
+                .subject(securityKey + SymbolConstant.COLON + subject)
                 .issuedAt(new Date())
                 .signWith(key, Jwts.SIG.HS256)
                 .expiration(TimeUtil.expireTime(TimeoutConstant.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));
@@ -235,19 +235,19 @@ public class KeyUtil {
     /**
      * Parse and validate a JWT token.
      *
-     * @param userName User name
+     * @param subject  token subject, normally principal ID
      * @param salt     Salt
      * @param token    Token string
      * @param tenantId Tenant ID
      * @return Claims
      */
-    public static Claims parserToken(String userName, String salt, String token, Long tenantId) {
+    public static Claims parserToken(String subject, String salt, String token, Long tenantId) {
         String securityKey = getSecurityKey();
         SecretKey key = io.jsonwebtoken.security.Keys
                 .hmacShaKeyFor(DecodeUtil.stringToByte(securityKey + SymbolConstant.COLON + salt));
         JwtParser parser = Jwts.parser()
                 .requireIssuer(securityKey + SymbolConstant.COLON + tenantId)
-                .requireSubject(securityKey + SymbolConstant.COLON + userName)
+                .requireSubject(securityKey + SymbolConstant.COLON + subject)
                 .verifyWith(key)
                 .build();
         return parser.parseSignedClaims(token).getPayload();

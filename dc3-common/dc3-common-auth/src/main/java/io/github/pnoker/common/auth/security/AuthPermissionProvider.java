@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 /**
  * Production PermissionProvider backed by the role-resource binding system.
- * Caches permission results per user for a short TTL to avoid repeated database queries.
+ * Caches permission results per principal for a short TTL to avoid repeated database queries.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -48,17 +48,17 @@ public class AuthPermissionProvider implements PermissionProvider {
     private final ConcurrentHashMap<String, CacheEntry> cache = new ConcurrentHashMap<>();
 
     @Override
-    public Mono<Set<String>> listPermissionCodes(Long tenantId, Long userId) {
-        if (tenantId == null || userId == null) {
+    public Mono<Set<String>> listPermissionCodes(Long tenantId, Long principalId) {
+        if (tenantId == null || principalId == null) {
             return Mono.just(Set.of());
         }
-        String cacheKey = tenantId + ":" + userId;
+        String cacheKey = tenantId + ":" + principalId;
         CacheEntry entry = cache.get(cacheKey);
         if (entry != null && entry.isValid()) {
             return Mono.just(entry.resourceCodes);
         }
         return Mono.fromCallable(() -> {
-            var resources = roleResourceBindService.listResourceByUserId(userId, tenantId);
+            var resources = roleResourceBindService.listResourceByPrincipalId(principalId, tenantId);
             Set<String> codes = resources.stream()
                     .map(r -> r.getResourceCode())
                     .filter(code -> code != null && !code.isBlank())
@@ -69,17 +69,17 @@ public class AuthPermissionProvider implements PermissionProvider {
     }
 
     @Override
-    public Mono<Boolean> hasPermission(Long tenantId, Long userId, String resourceCode) {
-        if (tenantId == null || userId == null || resourceCode == null) {
+    public Mono<Boolean> hasPermission(Long tenantId, Long principalId, String resourceCode) {
+        if (tenantId == null || principalId == null || resourceCode == null) {
             return Mono.just(false);
         }
-        String cacheKey = tenantId + ":" + userId;
+        String cacheKey = tenantId + ":" + principalId;
         CacheEntry entry = cache.get(cacheKey);
         if (entry != null && entry.isValid()) {
             return Mono.just(entry.hasPermission(resourceCode));
         }
         return Mono.fromCallable(() -> {
-            var resources = roleResourceBindService.listResourceByUserId(userId, tenantId);
+            var resources = roleResourceBindService.listResourceByPrincipalId(principalId, tenantId);
             Set<String> codes = resources.stream()
                     .map(r -> r.getResourceCode())
                     .filter(code -> code != null && !code.isBlank())

@@ -42,18 +42,18 @@ public class AgenticMessageRecorder {
 
     private final MessageService messageService;
 
-    public void persistUserMessage(AgenticPreparedChatRequest prepared, RequestHeader.UserHeader userHeader) {
+    public void persistUserMessage(AgenticPreparedChatRequest prepared, RequestHeader.PrincipalHeader userHeader) {
         messageService.save(prepared.scopedConversationId(), "user", buildUserContent(prepared), prepared.model(),
                 userHeader);
     }
 
     public void persistAssistantMessage(AgenticPreparedChatRequest prepared, String content,
-                                        RequestHeader.UserHeader userHeader) {
+                                        RequestHeader.PrincipalHeader userHeader) {
         persistAssistantMessage(prepared, content, null, userHeader);
     }
 
     public void persistAssistantMessage(AgenticPreparedChatRequest prepared, String content, String reasoningContent,
-                                        RequestHeader.UserHeader userHeader) {
+                                        RequestHeader.PrincipalHeader userHeader) {
         AgenticMessageContent messageContent = buildAssistantContent(prepared, StringUtils.defaultString(content),
                 StringUtils.trimToNull(reasoningContent));
         if (!hasPersistableAssistantContent(messageContent)) {

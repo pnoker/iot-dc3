@@ -18,8 +18,8 @@
 package io.github.pnoker.common.gateway.service;
 
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
@@ -33,10 +33,10 @@ public interface FilterService {
 
     FacadeTenantBO getTenant(ServerHttpRequest request);
 
-    FacadeUserLoginBO getUserLogin(ServerHttpRequest request);
+    FacadeLocalCredentialBO getLocalCredential(ServerHttpRequest request);
 
-    RequestHeader.UserHeader getUser(FacadeUserLoginBO userLogin, FacadeTenantBO tenant);
+    RequestHeader.PrincipalHeader getUser(FacadeLocalCredentialBO credential, FacadeTenantBO tenant);
 
-    void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeUserLoginBO userLogin);
+    void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeLocalCredentialBO credential);
 
 }

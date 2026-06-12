@@ -18,43 +18,78 @@
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.enums.PasswordAlgorithmEnum;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
- * Password hashing utility using bcrypt.
- * Frontend sends {@code MD5(rawPassword)}, server stores {@code bcrypt(MD5(rawPassword))}.
+ * Password hashing utility for server-side raw password handling.
  *
  * @author pnoker
- * @version 2026.5.19
+ * @version 2026.6.12
  * @since 2026.5.19
  */
+@Slf4j
 public class PasswordUtil {
 
-    private static final BCryptPasswordEncoder ENCODER = new BCryptPasswordEncoder(12);
+    private static final BCryptPasswordEncoder BCRYPT_ENCODER = new BCryptPasswordEncoder(12);
 
     private PasswordUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
     /**
-     * Encode a pre-hashed password with bcrypt.
+     * Encode a raw password with Argon2id. If the runtime cannot provide Argon2
+     * support, fall back to bcrypt and let callers persist the resulting algorithm
+     * through {@link #algorithmOfHash(String)}.
      *
-     * @param prehashed the pre-hashed password (MD5 of plaintext)
-     * @return bcrypt hash string
+     * @param rawPassword raw password received over HTTPS
+     * @return password hash string
      */
-    public static String encode(String prehashed) {
-        return ENCODER.encode(prehashed);
+    public static String encode(String rawPassword) {
+        try {
+            return argon2().encode(rawPassword);
+        } catch (RuntimeException | LinkageError e) {
+            log.warn("Argon2id password encoding is unavailable, falling back to bcrypt", e);
+            return BCRYPT_ENCODER.encode(rawPassword);
+        }
     }
 
     /**
-     * Verify a pre-hashed password against a stored bcrypt hash.
+     * Verify a raw password against a stored Argon2id or bcrypt hash.
      *
-     * @param prehashed  the pre-hashed password to verify (MD5 of plaintext)
-     * @param storedHash the bcrypt hash stored in the database
+     * @param rawPassword raw password to verify
+     * @param storedHash  password hash stored in the database
      * @return {@code true} if the password matches
      */
-    public static boolean verify(String prehashed, String storedHash) {
-        return ENCODER.matches(prehashed, storedHash);
+    public static boolean verify(String rawPassword, String storedHash) {
+        if (StringUtils.isAnyBlank(rawPassword, storedHash)) {
+            return false;
+        }
+        PasswordAlgorithmEnum algorithm = algorithmOfHash(storedHash);
+        return switch (algorithm) {
+            case ARGON2ID -> argon2().matches(rawPassword, storedHash);
+            case BCRYPT -> BCRYPT_ENCODER.matches(rawPassword, storedHash);
+        };
+    }
+
+    /**
+     * Resolve the persisted algorithm from a generated password hash.
+     *
+     * @param hash password hash
+     * @return password algorithm
+     */
+    public static PasswordAlgorithmEnum algorithmOfHash(String hash) {
+        if (StringUtils.startsWith(hash, "$argon2")) {
+            return PasswordAlgorithmEnum.ARGON2ID;
+        }
+        return PasswordAlgorithmEnum.BCRYPT;
+    }
+
+    private static Argon2PasswordEncoder argon2() {
+        return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     }
 
 }

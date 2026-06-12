@@ -26,7 +26,7 @@ import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.UserBuilder;
 import io.github.pnoker.common.auth.entity.model.UserDO;
 import io.github.pnoker.common.auth.entity.query.UserQuery;
-import io.github.pnoker.common.auth.service.TenantBindService;
+import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.service.UserService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserManager userManager;
 
-    private final TenantBindService tenantBindService;
+    private final TenantMembershipService tenantMembershipService;
 
     @Override
     public void add(UserBO entityBO) {
@@ -179,6 +179,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserBO getByPrincipalId(Long principalId, boolean throwException) {
+        if (Objects.isNull(principalId)) {
+            if (throwException) {
+                throw new EmptyException("The principal id is empty");
+            }
+            return null;
+        }
+
+        return selectByKey(UserDO::getPrincipalId, principalId, throwException);
+    }
+
+    @Override
     public Page<UserBO> list(UserQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
@@ -199,23 +211,23 @@ public class UserServiceImpl implements UserService {
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getUserName()), UserDO::getUserName, entityQuery.getUserName());
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getPhone()), UserDO::getPhone, entityQuery.getPhone());
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getEmail()), UserDO::getEmail, entityQuery.getEmail());
+        wrapper.eq(Objects.nonNull(entityQuery.getPrincipalId()), UserDO::getPrincipalId, entityQuery.getPrincipalId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), UserDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        // Tenant scope. Users have no tenant_id column — they're associated with
-        // tenants through dc3_tenant_bind. Resolve the bound user_ids for the
-        // controller-supplied tenant and constrain the list to that set.
+        // Tenant scope. Users have no tenant_id column; principals join tenants through
+        // dc3_tenant_membership.
         if (Objects.nonNull(entityQuery.getTenantId())) {
-            List<Long> userIds = tenantBindService.listUserIdsByTenantId(entityQuery.getTenantId());
-            if (CollectionUtils.isEmpty(userIds)) {
+            List<Long> principalIds = tenantMembershipService.listPrincipalIdsByTenantId(entityQuery.getTenantId());
+            if (CollectionUtils.isEmpty(principalIds)) {
                 wrapper.apply("1 = 0");
             } else {
-                wrapper.in(UserDO::getId, userIds);
+                wrapper.in(UserDO::getPrincipalId, principalIds);
             }
         }
         return wrapper;
     }
 
-    private UserBO selectByKey(SFunction<UserDO, ?> key, String value, boolean throwException) {
+    private UserBO selectByKey(SFunction<UserDO, ?> key, Object value, boolean throwException) {
         LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
         wrapper.eq(key, value);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);

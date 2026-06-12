@@ -32,12 +32,12 @@ import java.util.List;
 public interface ActionService {
 
     String createWritePointValueAction(String conversationId, Long deviceId, Long pointId, String value,
-                                       RequestHeader.UserHeader header);
+                                       RequestHeader.PrincipalHeader header);
 
-    List<ActionBO> listPending(String conversationId, RequestHeader.UserHeader header);
+    List<ActionBO> listPending(String conversationId, RequestHeader.PrincipalHeader header);
 
-    ActionBO confirm(String actionId, RequestHeader.UserHeader header);
+    ActionBO confirm(String actionId, RequestHeader.PrincipalHeader header);
 
-    ActionBO reject(String actionId, RequestHeader.UserHeader header);
+    ActionBO reject(String actionId, RequestHeader.PrincipalHeader header);
 
 }

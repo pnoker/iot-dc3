@@ -40,7 +40,7 @@ public interface AgenticChatService {
      * @return OpenAI-compatible SSE stream
      */
     Flux<ServerSentEvent<String>> streamChatCompletion(ChatCompletionRequest request,
-                                                       RequestHeader.UserHeader userHeader);
+                                                       RequestHeader.PrincipalHeader userHeader);
 
     /**
      * Execute a non-streaming chat completion request.
@@ -50,6 +50,6 @@ public interface AgenticChatService {
      * @return OpenAI-compatible JSON response
      */
     Mono<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request,
-                                                RequestHeader.UserHeader userHeader);
+                                                RequestHeader.PrincipalHeader userHeader);
 
 }

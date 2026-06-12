@@ -26,8 +26,8 @@ import java.util.Collection;
 import java.util.Objects;
 
 /**
- * Spring Security Authentication token derived from the Gateway-issued X-Auth-User
- * header. Carries the caller's identity (tenant + user) and the full set of
+ * Spring Security Authentication token derived from the Gateway-issued
+ * X-Auth-Principal header. Carries the caller's identity and the full set of
  * resource-code authorities.
  *
  * @author pnoker
@@ -39,18 +39,18 @@ public class GatewayAuthenticationToken extends AbstractAuthenticationToken {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final RequestHeader.UserHeader userHeader;
+    private final RequestHeader.PrincipalHeader principalHeader;
 
-    public GatewayAuthenticationToken(RequestHeader.UserHeader userHeader,
+    public GatewayAuthenticationToken(RequestHeader.PrincipalHeader principalHeader,
                                       Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
-        this.userHeader = Objects.requireNonNull(userHeader, "userHeader must not be null");
+        this.principalHeader = Objects.requireNonNull(principalHeader, "principalHeader must not be null");
         setAuthenticated(true);
     }
 
     @Override
     public Object getPrincipal() {
-        return userHeader;
+        return principalHeader;
     }
 
     @Override
@@ -58,15 +58,19 @@ public class GatewayAuthenticationToken extends AbstractAuthenticationToken {
         return null;
     }
 
-    public RequestHeader.UserHeader getUserHeader() {
-        return userHeader;
+    public RequestHeader.PrincipalHeader getPrincipalHeader() {
+        return principalHeader;
     }
 
     public Long getTenantId() {
-        return userHeader.getTenantId();
+        return principalHeader.getTenantId();
     }
 
     public Long getUserId() {
-        return userHeader.getUserId();
+        return principalHeader.getPrincipalId();
+    }
+
+    public Long getPrincipalId() {
+        return principalHeader.getPrincipalId();
     }
 }

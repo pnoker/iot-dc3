@@ -36,11 +36,11 @@ public interface PermissionProvider {
      * Check whether the given user holds the named resource permission.
      *
      * @param tenantId     tenant id of the authenticated user
-     * @param userId       user id of the authenticated user
+     * @param principalId  principal id of the authenticated caller
      * @param resourceCode permission code to check (maps to dc3_resource.resource_code)
      * @return Mono of true if the permission is granted
      */
-    Mono<Boolean> hasPermission(Long tenantId, Long userId, String resourceCode);
+    Mono<Boolean> hasPermission(Long tenantId, Long principalId, String resourceCode);
 
     /**
      * Return all resource codes held by the given user within the tenant.
@@ -48,10 +48,10 @@ public interface PermissionProvider {
      * time.
      *
      * @param tenantId tenant scope
-     * @param userId   target user
+     * @param principalId target principal
      * @return Mono of resource code set (never null; empty set when user has no roles)
      */
-    Mono<Set<String>> listPermissionCodes(Long tenantId, Long userId);
+    Mono<Set<String>> listPermissionCodes(Long tenantId, Long principalId);
 
     /**
      * Fail-closed default used only when no real auth or facade-backed provider is
@@ -59,12 +59,12 @@ public interface PermissionProvider {
      */
     class DefaultPermissionProvider implements PermissionProvider {
         @Override
-        public Mono<Boolean> hasPermission(Long tenantId, Long userId, String resourceCode) {
+        public Mono<Boolean> hasPermission(Long tenantId, Long principalId, String resourceCode) {
             return Mono.just(false);
         }
 
         @Override
-        public Mono<Set<String>> listPermissionCodes(Long tenantId, Long userId) {
+        public Mono<Set<String>> listPermissionCodes(Long tenantId, Long principalId) {
             return Mono.just(Set.of());
         }
     }

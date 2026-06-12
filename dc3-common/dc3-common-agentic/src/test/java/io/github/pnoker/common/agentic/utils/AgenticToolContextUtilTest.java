@@ -34,10 +34,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AgenticToolContextUtilTest {
 
-    private static RequestHeader.UserHeader userHeader(Long tenantId, Long userId) {
-        RequestHeader.UserHeader h = new RequestHeader.UserHeader();
+    private static RequestHeader.PrincipalHeader userHeader(Long tenantId, Long userId) {
+        RequestHeader.PrincipalHeader h = new RequestHeader.PrincipalHeader();
         h.setTenantId(tenantId);
-        h.setUserId(userId);
+        h.setPrincipalId(userId);
         return h;
     }
 
@@ -46,40 +46,40 @@ class AgenticToolContextUtilTest {
     }
 
     @Test
-    void requireUserHeaderThrowsWhenAbsent() {
-        assertThatThrownBy(() -> AgenticToolContextUtil.requireUserHeader(toolContext(Map.of())))
+    void requirePrincipalHeaderThrowsWhenAbsent() {
+        assertThatThrownBy(() -> AgenticToolContextUtil.requirePrincipalHeader(toolContext(Map.of())))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
     @Test
-    void requireUserHeaderThrowsWhenTenantIdMissing() {
+    void requirePrincipalHeaderThrowsWhenTenantIdMissing() {
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, userHeader(null, 5L)));
-        assertThatThrownBy(() -> AgenticToolContextUtil.requireUserHeader(ctx))
+        assertThatThrownBy(() -> AgenticToolContextUtil.requirePrincipalHeader(ctx))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
     @Test
-    void requireUserHeaderThrowsWhenUserIdMissing() {
+    void requirePrincipalHeaderThrowsWhenUserIdMissing() {
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, userHeader(1L, null)));
-        assertThatThrownBy(() -> AgenticToolContextUtil.requireUserHeader(ctx))
+        assertThatThrownBy(() -> AgenticToolContextUtil.requirePrincipalHeader(ctx))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
     @Test
-    void requireUserHeaderReturnsHeaderFromToolContextWhenComplete() {
-        RequestHeader.UserHeader header = userHeader(1L, 5L);
+    void requirePrincipalHeaderReturnsHeaderFromToolContextWhenComplete() {
+        RequestHeader.PrincipalHeader header = userHeader(1L, 5L);
         ToolContext ctx = toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header));
-        assertThat(AgenticToolContextUtil.requireUserHeader(ctx)).isSameAs(header);
+        assertThat(AgenticToolContextUtil.requirePrincipalHeader(ctx)).isSameAs(header);
         assertThat(AgenticToolContextUtil.requireTenantId(ctx)).isEqualTo(1L);
         assertThat(AgenticToolContextUtil.requireUserId(ctx)).isEqualTo(5L);
     }
 
     @Test
-    void requireUserHeaderCanBeRebuiltFromScopedIds() {
+    void requirePrincipalHeaderCanBeRebuiltFromScopedIds() {
         ToolContext ctx = toolContext(Map.of(
                 AgenticConstant.ToolContextKey.TENANT_ID, 1L,
                 AgenticConstant.ToolContextKey.USER_ID, 5L));
-        RequestHeader.UserHeader header = AgenticToolContextUtil.requireUserHeader(ctx);
+        RequestHeader.PrincipalHeader header = AgenticToolContextUtil.requirePrincipalHeader(ctx);
         assertThat(header.getTenantId()).isEqualTo(1L);
         assertThat(header.getUserId()).isEqualTo(5L);
     }

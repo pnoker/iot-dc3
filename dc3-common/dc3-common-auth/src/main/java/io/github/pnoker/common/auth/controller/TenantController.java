@@ -77,7 +77,7 @@ public class TenantController implements BaseController {
     @Operation(summary = "Add Tenant", description = "Create a tenant record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody TenantVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             TenantBO userTenant = tenantService.getById(header.getTenantId());
             if (!"default".equals(userTenant.getTenantCode())) {
                 throw new ServiceException("Only system administrators can create tenants");

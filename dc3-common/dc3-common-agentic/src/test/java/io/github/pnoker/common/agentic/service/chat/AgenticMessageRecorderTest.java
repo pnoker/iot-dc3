@@ -44,15 +44,15 @@ class AgenticMessageRecorderTest {
 
     private AgenticMessageRecorder recorder;
 
-    private RequestHeader.UserHeader userHeader;
+    private RequestHeader.PrincipalHeader userHeader;
 
     @BeforeEach
     void setUp() {
         recorder = new AgenticMessageRecorder(messageService);
-        userHeader = new RequestHeader.UserHeader();
+        userHeader = new RequestHeader.PrincipalHeader();
         userHeader.setTenantId(1L);
-        userHeader.setUserId(2L);
-        userHeader.setUserName("admin");
+        userHeader.setPrincipalId(2L);
+        userHeader.setPrincipalName("admin");
     }
 
     @Test

@@ -81,7 +81,7 @@ public class MenuController implements BaseController {
     @Operation(summary = "Add Menu", description = "Create a menu record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MenuVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
             entityBO.setCreatorId(header.getUserId());
@@ -97,7 +97,7 @@ public class MenuController implements BaseController {
     @Operation(summary = "Delete Menu", description = "Delete a menu record by ID")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             menuService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
@@ -108,7 +108,7 @@ public class MenuController implements BaseController {
     @Operation(summary = "Update Menu", description = "Update a menu record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MenuVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
             entityBO.setOperatorId(header.getUserId());
@@ -147,15 +147,15 @@ public class MenuController implements BaseController {
     @Operation(summary = "List Menu Tree", description = "List menus as a permission-filtered tree")
     @PostMapping("/list_tree")
     public Mono<R<List<MenuTreeVO>>> listTree(@RequestBody(required = false) MenuQuery entityQuery) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             List<MenuTreeBO> entityBOList = menuService.listTree(entityQuery);
-            entityBOList = filterByUserMenuResources(entityBOList, header.getUserId(), header.getTenantId());
+            entityBOList = filterByPrincipalMenuResources(entityBOList, header.getPrincipalId(), header.getTenantId());
             return R.ok(menuBuilder.buildTreeVOListByBOList(entityBOList));
         }));
     }
 
-    private List<MenuTreeBO> filterByUserMenuResources(List<MenuTreeBO> nodes, Long userId, Long tenantId) {
-        List<ResourceBO> resources = roleResourceBindService.listResourceByUserId(userId, tenantId);
+    private List<MenuTreeBO> filterByPrincipalMenuResources(List<MenuTreeBO> nodes, Long principalId, Long tenantId) {
+        List<ResourceBO> resources = roleResourceBindService.listResourceByPrincipalId(principalId, tenantId);
         Set<String> visibleMenuCodes = resources.stream()
                 .map(ResourceBO::getResourceCode)
                 .filter(Objects::nonNull)

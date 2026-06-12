@@ -19,7 +19,6 @@ package io.github.pnoker.common.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
-import io.github.pnoker.common.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.dal.entity.builder.DictionaryBuilder;
 import io.github.pnoker.common.utils.MapStructUtil;
@@ -56,28 +55,6 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      */
     default Page<DictionaryBO> buildVOPageByTenantBOPage(Page<TenantBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByTenantBO);
-    }
-
-    //
-
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    default DictionaryBO buildVOByUserLoginBO(UserLoginBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getLoginName()).value(entityBO.getId().toString()).build();
-    }
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<DictionaryBO> buildVOPageByUserLoginBOPage(Page<UserLoginBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByUserLoginBO);
     }
 
 }

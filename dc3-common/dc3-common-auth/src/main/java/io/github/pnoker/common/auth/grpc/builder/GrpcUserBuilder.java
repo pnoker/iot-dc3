@@ -54,6 +54,7 @@ public interface GrpcUserBuilder {
     @Mapping(target = "emailBytes", ignore = true)
     @Mapping(target = "socialExtBytes", ignore = true)
     @Mapping(target = "identityExtBytes", ignore = true)
+    @Mapping(target = "principalId", ignore = true)
     @Mapping(target = "mergeFrom", ignore = true)
     @Mapping(target = "clearField", ignore = true)
     @Mapping(target = "clearOneof", ignore = true)
@@ -73,6 +74,8 @@ public interface GrpcUserBuilder {
                 .ifPresent(value -> entityGrpc.setSocialExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityBO.getIdentityExt())
                 .ifPresent(value -> entityGrpc.setIdentityExt(JsonUtil.toJsonString(value)));
+        Optional.ofNullable(entityBO.getPrincipalId())
+                .ifPresent(entityGrpc::setPrincipalId);
     }
 
 }

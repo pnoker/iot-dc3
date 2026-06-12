@@ -22,7 +22,7 @@ import io.github.pnoker.api.center.auth.ResourceRegistryApiGrpc;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.api.center.auth.UserApiGrpc;
-import io.github.pnoker.api.center.auth.UserLoginApiGrpc;
+import io.github.pnoker.api.center.auth.LocalCredentialApiGrpc;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.api.center.data.StatusHealthApiGrpc;
 import io.github.pnoker.api.center.manager.CommandApiGrpc;
@@ -62,8 +62,9 @@ public class GrpcStubConfig {
     }
 
     @Bean
-    public UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub(GrpcChannelFactory channels) {
-        return UserLoginApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    public LocalCredentialApiGrpc.LocalCredentialApiBlockingStub localCredentialApiBlockingStub(
+            GrpcChannelFactory channels) {
+        return LocalCredentialApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
     }
 
     @Bean

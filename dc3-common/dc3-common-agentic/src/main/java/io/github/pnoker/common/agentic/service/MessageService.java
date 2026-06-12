@@ -33,14 +33,14 @@ import java.util.List;
 public interface MessageService {
 
     MessageBO save(String conversationId, String role, AgenticMessageContent content, String model,
-                   RequestHeader.UserHeader header);
+                   RequestHeader.PrincipalHeader header);
 
-    List<MessageBO> list(String conversationId, RequestHeader.UserHeader header);
+    List<MessageBO> list(String conversationId, RequestHeader.PrincipalHeader header);
 
     /**
      * Load conversation history for chat memory replay. Returns the most recent
      * {@code limit} messages for the scoped conversation, ordered chronologically.
-     * Unlike {@link #list(String, RequestHeader.UserHeader)} this does not depend on
+     * Unlike {@link #list(String, RequestHeader.PrincipalHeader)} this does not depend on
      * the request user header — chat memory is keyed solely by the already
      * tenant/user-scoped conversation ID, and a non-existent conversation simply
      * returns an empty list.

@@ -72,7 +72,7 @@ public class ApiController implements BaseController {
     @Operation(summary = "Add API Endpoint", description = "Create an API endpoint record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
             apiService.add(entityBO);
@@ -84,7 +84,7 @@ public class ApiController implements BaseController {
     @Operation(summary = "Delete API Endpoint", description = "Delete an API endpoint record by ID")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             apiService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
@@ -95,7 +95,7 @@ public class ApiController implements BaseController {
     @Operation(summary = "Update API Endpoint", description = "Update an API endpoint record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ApiVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
             apiService.update(entityBO);

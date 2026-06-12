@@ -39,7 +39,7 @@ public class UserTool {
     @Tool(description = "Get the current user profile. Returns only user ID, username, and nickname.")
     @AgenticToolMetadata(domain = "user", title = "Read current user profile")
     public AgenticToolResult<CurrentUserProfile> getCurrentUserProfile(ToolContext toolContext) {
-        RequestHeader.UserHeader header = AgenticToolContextUtil.requireUserHeader(toolContext);
+        RequestHeader.PrincipalHeader header = AgenticToolContextUtil.requirePrincipalHeader(toolContext);
         Long userId = AgenticToolContextUtil.requireUserId(toolContext);
         log.debug("Agentic tool invoked, tool={}, userId={}", "getCurrentUserProfile", userId);
         return AgenticToolResult.ok("Current user profile loaded",

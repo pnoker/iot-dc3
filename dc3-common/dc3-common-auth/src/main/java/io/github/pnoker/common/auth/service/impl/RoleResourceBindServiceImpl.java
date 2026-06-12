@@ -23,7 +23,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.dal.ResourceManager;
 import io.github.pnoker.common.auth.dal.RoleManager;
 import io.github.pnoker.common.auth.dal.RoleResourceBindManager;
-import io.github.pnoker.common.auth.dal.RoleUserBindManager;
+import io.github.pnoker.common.auth.dal.RolePrincipalBindManager;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
@@ -33,7 +33,7 @@ import io.github.pnoker.common.auth.entity.builder.RoleResourceBindBuilder;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
 import io.github.pnoker.common.auth.entity.model.RoleResourceBindDO;
-import io.github.pnoker.common.auth.entity.model.RoleUserBindDO;
+import io.github.pnoker.common.auth.entity.model.RolePrincipalBindDO;
 import io.github.pnoker.common.auth.entity.query.RoleResourceBindQuery;
 import io.github.pnoker.common.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -79,7 +79,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
     private final RoleManager roleManager;
 
-    private final RoleUserBindManager roleUserBindManager;
+    private final RolePrincipalBindManager rolePrincipalBindManager;
 
     @Override
     public void add(RoleResourceBindBO entityBO) {
@@ -139,26 +139,24 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public List<ResourceBO> listResourceByUserId(Long userId, Long tenantId) {
-        if (Objects.isNull(userId)) {
+    public List<ResourceBO> listResourceByPrincipalId(Long principalId, Long tenantId) {
+        if (Objects.isNull(principalId) || Objects.isNull(tenantId)) {
             return Collections.emptyList();
         }
-        // Step 1: roles the user is bound to.
-        LambdaQueryWrapper<RoleUserBindDO> userWrapper = Wrappers.<RoleUserBindDO>query().lambda();
-        userWrapper.eq(RoleUserBindDO::getUserId, userId);
-        userWrapper.select(RoleUserBindDO::getRoleId);
-        List<Long> roleIds = roleUserBindManager.listObjs(userWrapper, o -> (Long) o);
+        // Step 1: roles the principal is bound to in the current tenant.
+        LambdaQueryWrapper<RolePrincipalBindDO> principalWrapper = Wrappers.<RolePrincipalBindDO>query().lambda();
+        principalWrapper.eq(RolePrincipalBindDO::getTenantId, tenantId);
+        principalWrapper.eq(RolePrincipalBindDO::getPrincipalId, principalId);
+        principalWrapper.select(RolePrincipalBindDO::getRoleId);
+        List<Long> roleIds = rolePrincipalBindManager.listObjs(principalWrapper, o -> (Long) o);
         if (CollectionUtils.isEmpty(roleIds)) {
             return Collections.emptyList();
         }
-        // Step 2: keep only enabled roles, and narrow to the caller's tenant so a
-        // stale cross-tenant binding cannot leak resources outside the current scope.
+        // Step 2: keep only enabled roles within the same tenant.
         LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
         roleWrapper.in(RoleDO::getId, roleIds);
         roleWrapper.eq(RoleDO::getEnableFlag, EnableFlagEnum.ENABLE.getIndex());
-        if (Objects.nonNull(tenantId)) {
-            roleWrapper.eq(RoleDO::getTenantId, tenantId);
-        }
+        roleWrapper.eq(RoleDO::getTenantId, tenantId);
         roleWrapper.select(RoleDO::getId);
         roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
         if (CollectionUtils.isEmpty(roleIds)) {

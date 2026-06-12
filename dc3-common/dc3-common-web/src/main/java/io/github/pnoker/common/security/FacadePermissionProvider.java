@@ -37,20 +37,20 @@ public class FacadePermissionProvider implements PermissionProvider {
     private final PermissionFacade permissionFacade;
 
     @Override
-    public Mono<Boolean> hasPermission(Long tenantId, Long userId, String resourceCode) {
-        if (tenantId == null || userId == null || resourceCode == null) {
+    public Mono<Boolean> hasPermission(Long tenantId, Long principalId, String resourceCode) {
+        if (tenantId == null || principalId == null || resourceCode == null) {
             return Mono.just(false);
         }
-        return listPermissionCodes(tenantId, userId)
+        return listPermissionCodes(tenantId, principalId)
                 .map(codes -> codes.contains(PermissionMethods.WILDCARD) || codes.contains(resourceCode));
     }
 
     @Override
-    public Mono<Set<String>> listPermissionCodes(Long tenantId, Long userId) {
-        if (tenantId == null || userId == null) {
+    public Mono<Set<String>> listPermissionCodes(Long tenantId, Long principalId) {
+        if (tenantId == null || principalId == null) {
             return Mono.just(Set.of());
         }
-        return Mono.fromCallable(() -> permissionFacade.listPermissionCodes(tenantId, userId))
+        return Mono.fromCallable(() -> permissionFacade.listPermissionCodes(tenantId, principalId))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 

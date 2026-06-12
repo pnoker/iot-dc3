@@ -18,10 +18,10 @@
 package io.github.pnoker.common.manager.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.builder.DriverBuilder;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
@@ -33,9 +33,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.util.context.Context;
 
 import java.util.List;
 import java.util.Set;
@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Reactive controller test that exercises DriverController through StepVerifier
- * with the user-header context wired manually. This is intentionally lighter than a
+ * with the principal security context wired manually. This is intentionally lighter than a
  * full {@code @WebFluxTest} — controller-only routing, request validation and
  * filter chain end up covered by the gateway slice and Spring slice tests in
  * later stages.
@@ -68,12 +68,14 @@ class DriverControllerTest {
     private DriverController controller;
 
     private static <T> Mono<T> withTenantContext(Mono<T> mono) {
-        RequestHeader.UserHeader user = new RequestHeader.UserHeader(7L, "Alice", "alice", TENANT_ID);
-        return mono.contextWrite(Context.of(RequestConstant.Key.USER_HEADER, user));
+        RequestHeader.PrincipalHeader user = new RequestHeader.PrincipalHeader(7L, "USER", "Alice", "alice",
+                TENANT_ID, null, null);
+        return mono.contextWrite(ReactiveSecurityContextHolder.withAuthentication(
+                new GatewayAuthenticationToken(user, Set.of())));
     }
 
     private static <T> Mono<T> withMissingHeader(Mono<T> mono) {
-        return mono.contextWrite(Context.empty());
+        return mono;
     }
 
     @BeforeEach

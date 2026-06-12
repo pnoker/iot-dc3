@@ -54,14 +54,14 @@ class PointValueToolTest {
     private ActionService actionService;
 
     private PointValueTool tool;
-    private RequestHeader.UserHeader header;
+    private RequestHeader.PrincipalHeader header;
 
     @BeforeEach
     void setUp() {
         tool = new PointValueTool(pointValueFacade, pointCommandFacade, actionService);
-        header = new RequestHeader.UserHeader();
+        header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
-        header.setUserId(2L);
+        header.setPrincipalId(2L);
     }
 
     @Test

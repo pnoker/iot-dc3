@@ -52,7 +52,7 @@ public class PermissionServer extends PermissionApiGrpc.PermissionApiImplBase {
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         try {
-            roleResourceBindService.listResourceByUserId(request.getUserId(), request.getTenantId())
+            roleResourceBindService.listResourceByPrincipalId(request.getPrincipalId(), request.getTenantId())
                     .stream()
                     .map(ResourceBO::getResourceCode)
                     .filter(Objects::nonNull)
@@ -63,8 +63,8 @@ public class PermissionServer extends PermissionApiGrpc.PermissionApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getRemark());
         } catch (Exception e) {
-            log.warn("listPermissionCodes failed, tenant={}, user={}",
-                    request.getTenantId(), request.getUserId(), e);
+            log.warn("listPermissionCodes failed, tenant={}, principal={}",
+                    request.getTenantId(), request.getPrincipalId(), e);
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.FAILURE.getCode());
             rBuilder.setMessage(ResponseEnum.FAILURE.getRemark());

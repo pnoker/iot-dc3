@@ -75,7 +75,7 @@ public class ResourceController implements BaseController {
     @Operation(summary = "Add Resource", description = "Create a resource record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ResourceVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             ResourceBO entityBO = resourceBuilder.buildBOByVO(entityVO);
             entityBO.setCreatorId(header.getUserId());
@@ -91,7 +91,7 @@ public class ResourceController implements BaseController {
     @Operation(summary = "Delete Resource", description = "Delete a resource record by ID")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             resourceService.delete(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
@@ -102,7 +102,7 @@ public class ResourceController implements BaseController {
     @Operation(summary = "Update Resource", description = "Update a resource record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ResourceVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             ResourceBO entityBO = resourceBuilder.buildBOByVO(entityVO);
             entityBO.setOperatorId(header.getUserId());

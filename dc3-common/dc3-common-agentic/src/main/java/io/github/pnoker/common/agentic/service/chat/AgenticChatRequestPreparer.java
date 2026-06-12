@@ -65,7 +65,7 @@ public class AgenticChatRequestPreparer {
 
     private final AgenticProperties properties;
 
-    public AgenticPreparedChatRequest prepare(ChatCompletionRequest request, RequestHeader.UserHeader userHeader,
+    public AgenticPreparedChatRequest prepare(ChatCompletionRequest request, RequestHeader.PrincipalHeader userHeader,
                                               String mode) {
         validateRequest(request);
 
@@ -107,7 +107,7 @@ public class AgenticChatRequestPreparer {
                 inputTokens, memoryHistory);
     }
 
-    private Map<String, Object> buildToolContext(RequestHeader.UserHeader userHeader, String scopedConversationId,
+    private Map<String, Object> buildToolContext(RequestHeader.PrincipalHeader userHeader, String scopedConversationId,
                                                  AgenticRunTrace runTrace) {
         Map<String, Object> toolContext = new HashMap<>();
         toolContext.put(AgenticConstant.ToolContextKey.TENANT_ID, userHeader.getTenantId());
@@ -229,7 +229,7 @@ public class AgenticChatRequestPreparer {
         return sessionExt;
     }
 
-    private void touchSession(String scopedConversationId, String conversationId, RequestHeader.UserHeader userHeader,
+    private void touchSession(String scopedConversationId, String conversationId, RequestHeader.PrincipalHeader userHeader,
                               SessionExt sessionExt) {
         try {
             sessionService.touch(scopedConversationId, userHeader.getTenantId(), userHeader.getUserId(), sessionExt);

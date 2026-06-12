@@ -43,11 +43,11 @@ public class PermissionLocalFacade implements PermissionFacade {
     private final RoleResourceBindService roleResourceBindService;
 
     @Override
-    public Set<String> listPermissionCodes(Long tenantId, Long userId) {
-        if (tenantId == null || userId == null) {
+    public Set<String> listPermissionCodes(Long tenantId, Long principalId) {
+        if (tenantId == null || principalId == null) {
             return Set.of();
         }
-        return roleResourceBindService.listResourceByUserId(userId, tenantId)
+        return roleResourceBindService.listResourceByPrincipalId(principalId, tenantId)
                 .stream()
                 .map(ResourceBO::getResourceCode)
                 .filter(Objects::nonNull)

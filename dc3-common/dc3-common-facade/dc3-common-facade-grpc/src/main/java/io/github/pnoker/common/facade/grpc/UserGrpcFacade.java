@@ -60,6 +60,18 @@ public class UserGrpcFacade implements UserFacade {
         return facadeGrpcUserBuilder.toFacadeBO(response.getData());
     }
 
+    @Override
+    public FacadeUserBO getByPrincipalId(Long principalId) {
+        GrpcIdQuery request = GrpcIdQuery.newBuilder().setId(principalId).build();
+        GrpcRUserDTO response = grpcFacadeSupport.call("UserFacade.getByPrincipalId", userApiBlockingStub,
+                stub -> stub.getByPrincipalId(request));
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "getByPrincipalId");
+            return null;
+        }
+        return facadeGrpcUserBuilder.toFacadeBO(response.getData());
+    }
+
     private void guardOrThrow(GrpcR result, String op) {
         String code = result.getCode();
         if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {

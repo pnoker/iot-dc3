@@ -61,7 +61,7 @@ public class ChatController implements BaseController {
     @Operation(summary = "Create Chat Completion", description = "Create an OpenAI-compatible chat completion with streaming and non-streaming responses")
     @PostMapping("/completions")
     public Mono<ResponseEntity<?>> chatCompletion(@RequestBody ChatCompletionRequest request) {
-        return getUserHeader().flatMap(header -> {
+        return getPrincipalHeader().flatMap(header -> {
             if (Objects.nonNull(request) && request.isStream()) {
                 return Mono.just(ResponseEntity.ok()
                         .contentType(MediaType.TEXT_EVENT_STREAM)

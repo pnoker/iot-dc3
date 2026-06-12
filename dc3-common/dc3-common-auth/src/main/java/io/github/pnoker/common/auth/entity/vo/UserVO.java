@@ -51,6 +51,12 @@ import lombok.ToString;
 public class UserVO extends BaseVO {
 
     /**
+     * Principal ID.
+     */
+    @Schema(description = "Principal ID")
+    private Long principalId;
+
+    /**
      *
      */
     @NotBlank(message = "Nick name can't be empty", groups = {Add.class, Auth.class})

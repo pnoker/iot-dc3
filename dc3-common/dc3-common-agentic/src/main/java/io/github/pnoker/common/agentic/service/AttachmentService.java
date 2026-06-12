@@ -33,10 +33,10 @@ import java.util.List;
  */
 public interface AttachmentService {
 
-    Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.UserHeader header);
+    Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.PrincipalHeader header);
 
-    List<AttachmentBO> list(String conversationId, RequestHeader.UserHeader header);
+    List<AttachmentBO> list(String conversationId, RequestHeader.PrincipalHeader header);
 
-    String summarize(List<Long> attachmentIds, RequestHeader.UserHeader header);
+    String summarize(List<Long> attachmentIds, RequestHeader.PrincipalHeader header);
 
 }

@@ -29,12 +29,12 @@ import java.util.HexFormat;
 import java.util.Objects;
 
 /**
- * HMAC-SHA256 signer for the {@code X-Auth-User} header.
+ * HMAC-SHA256 signer for the {@code X-Auth-Principal} header.
  * <p>
  * The gateway computes a signature of the user JSON and forwards it as {@code X-Auth-Sign}.
  * Backend services verify the signature before trusting any tenant/user identity claims —
  * without this, any client able to reach a backend port directly can spoof any tenant by
- * crafting their own {@code X-Auth-User} header.
+ * crafting their own {@code X-Auth-Principal} header.
  * <p>
  * The shared secret is read from {@code dc3.auth.hmac.secret} (or the {@code
  * AUTH_HMAC_SECRET} environment variable). When neither is set in dev/test, signing is
@@ -59,14 +59,14 @@ public class HmacAuthSigner {
             this.secret = null;
             this.enabled = false;
             log.warn(
-                    "{} (env {}) is not configured. X-Auth-User header signing is DISABLED. "
-                            + "Backend services will trust the X-Auth-User header without verification, which is unsafe in production. "
+                    "{} (env {}) is not configured. X-Auth-Principal header signing is DISABLED. "
+                            + "Backend services will trust the X-Auth-Principal header without verification, which is unsafe in production. "
                             + "Set a strong shared secret to enable signing.",
                     EnvironmentConstant.AUTH_HMAC_SECRET_PROPERTY, EnvironmentConstant.AUTH_HMAC_SECRET_ENV);
         } else {
             this.secret = secret.getBytes(StandardCharsets.UTF_8);
             this.enabled = true;
-            log.info("X-Auth-User header signing enabled (HMAC-SHA256).");
+            log.info("X-Auth-Principal header signing enabled (HMAC-SHA256).");
         }
     }
 

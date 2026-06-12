@@ -50,4 +50,10 @@ public class UserLocalFacade implements UserFacade {
         return Objects.isNull(bo) ? null : facadeUserBuilder.toFacadeBO(bo);
     }
 
+    @Override
+    public FacadeUserBO getByPrincipalId(Long principalId) {
+        UserBO bo = userService.getByPrincipalId(principalId, false);
+        return Objects.isNull(bo) ? null : facadeUserBuilder.toFacadeBO(bo);
+    }
+
 }

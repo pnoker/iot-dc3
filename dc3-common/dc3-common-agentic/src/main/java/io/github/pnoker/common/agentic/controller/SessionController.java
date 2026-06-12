@@ -67,7 +67,7 @@ public class SessionController implements BaseController {
     @Operation(summary = "List AI Sessions", description = "List AI sessions with pagination")
     @PostMapping("/list")
     public Mono<R<Page<SessionVO>>> list(@RequestBody(required = false) SessionQuery query) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             SessionQuery scopedQuery = Objects.isNull(query) ? new SessionQuery() : query;
             scopedQuery.setTenantId(header.getTenantId());
             scopedQuery.setUserId(header.getUserId());
@@ -82,7 +82,7 @@ public class SessionController implements BaseController {
     @Operation(summary = "Get AI Session", description = "Get AI session details by conversation ID")
     @GetMapping("/get_by_conversation_id")
     public Mono<R<SessionVO>> get(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.getByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(),
                     header.getUserId(), conversationId));
             if (Objects.isNull(session)) {
@@ -98,7 +98,7 @@ public class SessionController implements BaseController {
     @Operation(summary = "Delete AI Session", description = "Delete an AI session by conversation ID")
     @PostMapping("/delete")
     public Mono<R<Boolean>> delete(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             sessionService.deleteByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId));
             return R.ok();
@@ -110,7 +110,7 @@ public class SessionController implements BaseController {
     @PostMapping("/update")
     public Mono<R<SessionVO>> update(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                      @RequestBody(required = false) SessionUpdateRequest request) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.update(AgenticConversationIdUtil.scope(header.getTenantId(),
                     header.getUserId(), conversationId), request);
             if (Objects.isNull(session)) {
@@ -122,7 +122,7 @@ public class SessionController implements BaseController {
         }));
     }
 
-    private void sanitizeSession(RequestHeader.UserHeader header, SessionVO session) {
+    private void sanitizeSession(RequestHeader.PrincipalHeader header, SessionVO session) {
         session.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
                 session.getConversationId()));
         session.setTenantId(null);

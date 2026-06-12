@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Converts the Gateway-issued X-Auth-User header to a
+ * Converts the Gateway-issued X-Auth-Principal header to a
  * {@link GatewayAuthenticationToken}. Extracts identity, verifies the HMAC
  * signature, and eagerly loads the user's full permission set.
  * <p>
@@ -59,12 +59,12 @@ public class GatewayJwtConverter implements ServerAuthenticationConverter {
 
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
-        String user = RequestUtil.getRequestHeader(
-                exchange.getRequest(), RequestConstant.Header.X_AUTH_USER);
+        String principal = RequestUtil.getRequestHeader(
+                exchange.getRequest(), RequestConstant.Header.X_AUTH_PRINCIPAL);
 
-        if (StringUtils.isBlank(user)) {
+        if (StringUtils.isBlank(principal)) {
             if (log.isDebugEnabled()) {
-                log.debug("No X-Auth-User header — proceeding as anonymous");
+                log.debug("No X-Auth-Principal header, proceeding as anonymous");
             }
             return Mono.empty();
         }
@@ -73,51 +73,51 @@ public class GatewayJwtConverter implements ServerAuthenticationConverter {
         if (hmacAuthSigner.isEnabled()) {
             String sign = RequestUtil.getRequestHeader(
                     exchange.getRequest(), RequestConstant.Header.X_AUTH_SIGN);
-            if (!hmacAuthSigner.verify(user, sign)) {
+            if (!hmacAuthSigner.verify(principal, sign)) {
                 log.warn("Rejecting request — invalid HMAC signature, Url: {}",
                         exchange.getRequest().getURI());
                 return Mono.empty();
             }
         }
 
-        RequestHeader.UserHeader userHeader;
+        RequestHeader.PrincipalHeader principalHeader;
         try {
-            userHeader = JsonUtil.parseObject(user, RequestHeader.UserHeader.class);
+            principalHeader = JsonUtil.parseObject(principal, RequestHeader.PrincipalHeader.class);
         } catch (Exception e) {
-            log.warn("Rejecting request — malformed X-Auth-User, Url: {}",
+            log.warn("Rejecting request — malformed X-Auth-Principal, Url: {}",
                     exchange.getRequest().getURI(), e);
             return Mono.empty();
         }
 
-        if (userHeader == null || userHeader.getTenantId() == null
-                || userHeader.getUserId() == null) {
-            log.warn("Rejecting request — invalid user header: {}",
-                    JsonUtil.toJsonString(userHeader));
+        if (principalHeader == null || principalHeader.getTenantId() == null
+                || principalHeader.getPrincipalId() == null) {
+            log.warn("Rejecting request — invalid principal header: {}",
+                    JsonUtil.toJsonString(principalHeader));
             return Mono.empty();
         }
 
-        Long tenantId = userHeader.getTenantId();
-        Long userId = userHeader.getUserId();
+        Long tenantId = principalHeader.getTenantId();
+        Long principalId = principalHeader.getPrincipalId();
 
         // Load authorities reactively — no blocking.
         // On transient failure, fall back to empty authorities (fail closed).
         return permissionProvider
-                .listPermissionCodes(tenantId, userId)
+                .listPermissionCodes(tenantId, principalId)
                 .map(codes -> {
                     Set<GrantedAuthority> authorities = codes.stream()
                             .map(SimpleGrantedAuthority::new)
                             .collect(Collectors.toSet());
                     if (log.isDebugEnabled()) {
-                        log.debug("Gateway authentication, tenant={}, user={}, authorities={}",
-                                tenantId, userId, authorities.size());
+                        log.debug("Gateway authentication, tenant={}, principal={}, authorities={}",
+                                tenantId, principalId, authorities.size());
                     }
-                    return (Authentication) new GatewayAuthenticationToken(userHeader, authorities);
+                    return (Authentication) new GatewayAuthenticationToken(principalHeader, authorities);
                 })
                 .onErrorResume(e -> {
                     log.error("Failed to load permissions, falling back to empty authorities"
-                            + " (tenant={}, user={})", tenantId, userId, e);
+                            + " (tenant={}, principal={})", tenantId, principalId, e);
                     return Mono.just(
-                            new GatewayAuthenticationToken(userHeader, Set.of()));
+                            new GatewayAuthenticationToken(principalHeader, Set.of()));
                 });
     }
 }

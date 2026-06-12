@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.utils;
 
+import io.github.pnoker.common.enums.PasswordAlgorithmEnum;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,9 +25,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PasswordUtilTest {
 
     @Test
-    void encodeProducesBcryptHash() {
+    void encodeProducesSupportedHash() {
         String hash = PasswordUtil.encode("password123");
-        assertThat(hash).startsWith("$2a$");
+        assertThat(PasswordUtil.algorithmOfHash(hash))
+                .isIn(PasswordAlgorithmEnum.ARGON2ID, PasswordAlgorithmEnum.BCRYPT);
     }
 
     @Test
@@ -53,10 +55,17 @@ class PasswordUtilTest {
     }
 
     @Test
-    void fullFlowMd5PrehashToBcrypt() {
+    void fullFlowUsesRawPasswordOnly() {
         String rawPassword = "dc3dc3dc3";
-        String prehashed = DecodeUtil.md5(rawPassword);
-        String stored = PasswordUtil.encode(prehashed);
-        assertThat(PasswordUtil.verify(prehashed, stored)).isTrue();
+        String stored = PasswordUtil.encode(rawPassword);
+        assertThat(PasswordUtil.verify(rawPassword, stored)).isTrue();
+        assertThat(PasswordUtil.verify(DecodeUtil.md5(rawPassword), stored)).isFalse();
+    }
+
+    @Test
+    void verifyMatchesSeedBcryptHashForRawPassword() {
+        String stored = "$2b$12$cSuC2gIZqrti2JLHur5JU.cy9D2kW6KJ5AXTd0nRPJ.cU7gUczhtK";
+        assertThat(PasswordUtil.algorithmOfHash(stored)).isEqualTo(PasswordAlgorithmEnum.BCRYPT);
+        assertThat(PasswordUtil.verify("dc3dc3dc3", stored)).isTrue();
     }
 }

@@ -69,4 +69,14 @@ class UserLocalFacadeTest {
         assertThat(facade.getById(1L)).isSameAs(mapped);
     }
 
+    @Test
+    void getByPrincipalIdMapsThroughBuilderWhenServiceReturnsValue() {
+        UserBO user = new UserBO();
+        FacadeUserBO mapped = new FacadeUserBO();
+        when(userService.getByPrincipalId(100L, false)).thenReturn(user);
+        when(facadeUserBuilder.toFacadeBO(user)).thenReturn(mapped);
+
+        assertThat(facade.getByPrincipalId(100L)).isSameAs(mapped);
+    }
+
 }

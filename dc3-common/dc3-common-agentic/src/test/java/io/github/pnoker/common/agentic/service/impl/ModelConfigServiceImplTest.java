@@ -56,7 +56,7 @@ class ModelConfigServiceImplTest {
     private ModelConfigBuilder modelConfigBuilder;
 
     private ModelConfigServiceImpl service;
-    private RequestHeader.UserHeader header;
+    private RequestHeader.PrincipalHeader header;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -65,10 +65,10 @@ class ModelConfigServiceImplTest {
         injectField("fallbackModel", "gpt-4o");
         injectField("fallbackTemperature", 0.7);
         injectField("fallbackMaxTokens", 2048);
-        header = new RequestHeader.UserHeader();
+        header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
-        header.setUserId(2L);
-        header.setUserName("admin");
+        header.setPrincipalId(2L);
+        header.setPrincipalName("admin");
     }
 
     @Test

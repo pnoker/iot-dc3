@@ -36,7 +36,7 @@ Fields: `ok` (boolean), `code` (String), `message` (String), `data` (T)
 | Class                      | Purpose                                              |
 |----------------------------|------------------------------------------------------|
 | `Pages`                    | Pagination request params (`current`, `size`)        |
-| `RequestHeader.UserHeader` | Tenant/user identity propagated from gateway headers |
+| `RequestHeader.PrincipalHeader` | Tenant/user identity propagated from gateway headers |
 | `Keys`                     | JWT signing key holder                               |
 | `TreeNode`                 | Generic hierarchical data structure                  |
 
@@ -45,7 +45,7 @@ Fields: `ok` (boolean), `code` (String), `message` (String), `data` (T)
 | Utility          | Purpose                                             |
 |------------------|-----------------------------------------------------|
 | `JsonUtil`       | Jackson JSON serialization/deserialization helpers  |
-| `UserHeaderUtil` | Extracts `UserHeader` from reactive WebFlux context |
+| `PrincipalHeaderUtil` | Extracts `PrincipalHeader` from reactive WebFlux context |
 | `HostUtil`       | Resolves host/IP information                        |
 | `ResponseUtil`   | Writes HTTP responses in WebFlux context            |
 

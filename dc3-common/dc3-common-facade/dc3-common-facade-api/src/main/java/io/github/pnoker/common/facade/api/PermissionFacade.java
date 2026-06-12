@@ -29,12 +29,12 @@ import java.util.Set;
 public interface PermissionFacade {
 
     /**
-     * List all resource codes granted to the given user in the tenant.
+     * List all resource codes granted to the given principal in the tenant.
      *
      * @param tenantId tenant scope
-     * @param userId   target user
-     * @return full resource code set; empty when the user has no grants
+     * @param principalId target principal
+     * @return full resource code set; empty when the principal has no grants
      */
-    Set<String> listPermissionCodes(Long tenantId, Long userId);
+    Set<String> listPermissionCodes(Long tenantId, Long principalId);
 
 }

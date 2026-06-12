@@ -23,13 +23,13 @@ import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.facade.api.LocalCredentialFacade;
 import io.github.pnoker.common.facade.api.TenantFacade;
 import io.github.pnoker.common.facade.api.TokenFacade;
 import io.github.pnoker.common.facade.api.UserFacade;
-import io.github.pnoker.common.facade.api.UserLoginFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RequestUtil;
@@ -65,7 +65,7 @@ public class FilterServiceImpl implements FilterService {
     private final Cache<String, Optional<FacadeTenantBO>> tenantCache = Caffeine.newBuilder()
             .expireAfterWrite(AUTH_LOOKUP_TTL).maximumSize(10_000).build();
 
-    private final Cache<String, Optional<FacadeUserLoginBO>> userLoginCache = Caffeine.newBuilder()
+    private final Cache<String, Optional<FacadeLocalCredentialBO>> credentialCache = Caffeine.newBuilder()
             .expireAfterWrite(AUTH_LOOKUP_TTL).maximumSize(10_000).build();
 
     private final Cache<Long, Optional<FacadeUserBO>> userCache = Caffeine.newBuilder()
@@ -73,7 +73,7 @@ public class FilterServiceImpl implements FilterService {
 
     private final TenantFacade tenantFacade;
 
-    private final UserLoginFacade userLoginFacade;
+    private final LocalCredentialFacade localCredentialFacade;
 
     private final UserFacade userFacade;
 
@@ -95,43 +95,45 @@ public class FilterServiceImpl implements FilterService {
     }
 
     @Override
-    public FacadeUserLoginBO getUserLogin(ServerHttpRequest request) {
+    public FacadeLocalCredentialBO getLocalCredential(ServerHttpRequest request) {
         String name = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
         if (StringUtils.isEmpty(name)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        FacadeUserLoginBO userLogin = userLoginCache.get(name, key -> Optional.ofNullable(userLoginFacade.getByName(key)))
+        FacadeLocalCredentialBO credential = credentialCache
+                .get(name, key -> Optional.ofNullable(localCredentialFacade.getByLoginName(key)))
                 .orElse(null);
-        if (Objects.isNull(userLogin) || userLogin.getEnableFlag() != EnableFlagEnum.ENABLE) {
+        if (Objects.isNull(credential) || credential.getEnableFlag() != EnableFlagEnum.ENABLE) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
-        return userLogin;
+        return credential;
     }
 
     @Override
-    public RequestHeader.UserHeader getUser(FacadeUserLoginBO userLogin, FacadeTenantBO tenant) {
-        Long userId = userLogin.getUserId();
-        if (Objects.isNull(userId)) {
+    public RequestHeader.PrincipalHeader getUser(FacadeLocalCredentialBO credential, FacadeTenantBO tenant) {
+        Long principalId = credential.getPrincipalId();
+        if (Objects.isNull(principalId)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        FacadeUserBO user = userCache.get(userId, id -> Optional.ofNullable(userFacade.getById(id)))
+        FacadeUserBO user = userCache.get(principalId, id -> Optional.ofNullable(userFacade.getByPrincipalId(id)))
                 .orElse(null);
-        if (Objects.isNull(user)) {
+        if (Objects.isNull(user) || !principalId.equals(user.getPrincipalId())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        RequestHeader.UserHeader header = new RequestHeader.UserHeader();
-        header.setUserId(user.getId());
-        header.setNickName(user.getNickName());
-        header.setUserName(user.getUserName());
+        RequestHeader.PrincipalHeader header = new RequestHeader.PrincipalHeader();
+        header.setPrincipalId(principalId);
+        header.setPrincipalType("USER");
+        header.setDisplayName(user.getNickName());
+        header.setPrincipalName(user.getUserName());
         header.setTenantId(tenant.getId());
         return header;
     }
 
     @Override
-    public void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeUserLoginBO userLogin) {
+    public void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeLocalCredentialBO credential) {
         String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
         RequestHeader.TokenHeader header;
         try {
@@ -144,7 +146,7 @@ public class FilterServiceImpl implements FilterService {
         }
 
         // Token validity is intentionally NOT cached — it's the freshness check.
-        boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), userLogin.getLoginName(), header.getSalt(),
+        boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), credential.getLoginName(), header.getSalt(),
                 header.getToken());
         if (!valid) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);

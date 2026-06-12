@@ -55,8 +55,9 @@ public class MybatisGenerator {
                 .templateEngine(new FreemarkerTemplateEngine())
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder.addInclude("dc3_api", "dc3_menu", "dc3_resource", "dc3_role",
-                        "dc3_role_resource_bind", "dc3_role_user_bind", "dc3_driver_token", "dc3_tenant", "dc3_tenant_bind",
-                        "dc3_user", "dc3_user_login", "dc3_user_password"))
+                        "dc3_role_resource_bind", "dc3_role_principal_bind", "dc3_driver_token", "dc3_tenant",
+                        "dc3_principal", "dc3_user", "dc3_local_credential", "dc3_tenant_membership",
+                        "dc3_service_account", "dc3_identity_provider", "dc3_external_identity"))
                 .execute();
     }
 

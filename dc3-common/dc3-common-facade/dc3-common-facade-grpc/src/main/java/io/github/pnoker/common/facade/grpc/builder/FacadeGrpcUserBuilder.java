@@ -50,6 +50,7 @@ public class FacadeGrpcUserBuilder {
         StringOptional.ofNullable(dto.getEmail()).ifPresent(bo::setEmail);
         StringOptional.ofNullable(dto.getSocialExt()).ifPresent(bo::setSocialExt);
         StringOptional.ofNullable(dto.getIdentityExt()).ifPresent(bo::setIdentityExt);
+        bo.setPrincipalId(dto.getPrincipalId());
 
         return bo;
     }

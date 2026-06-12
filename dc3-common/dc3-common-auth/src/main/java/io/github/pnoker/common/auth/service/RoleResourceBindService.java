@@ -54,14 +54,14 @@ public interface RoleResourceBindService extends BaseService<RoleResourceBindBO,
     List<ResourceBO> listResourceByRoleId(Long roleId);
 
     /**
-     * List resources reachable by the given user, via dc3_role_user_bind joined onto
-     * dc3_role_resource_bind. Disabled resources are filtered out.
+     * List resources reachable by the given principal via dc3_role_principal_bind.
+     * Disabled roles and resources are filtered out.
      *
-     * @param userId   target user
-     * @param tenantId tenant scope (constrains the user's roles)
-     * @return distinct enabled resources, empty list if the user has no roles
+     * @param principalId target principal
+     * @param tenantId    tenant scope
+     * @return distinct enabled resources, empty list if the principal has no roles
      */
-    List<ResourceBO> listResourceByUserId(Long userId, Long tenantId);
+    List<ResourceBO> listResourceByPrincipalId(Long principalId, Long tenantId);
 
     /**
      * Reverse of {@link #listResourceByRoleId} — given a resource, list the enabled roles

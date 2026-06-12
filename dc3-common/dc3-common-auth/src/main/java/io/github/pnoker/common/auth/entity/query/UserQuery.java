@@ -61,6 +61,12 @@ public class UserQuery implements Serializable {
     private Long tenantId;
 
     /**
+     * Principal ID.
+     */
+    @Schema(description = "Principal ID", example = "1024")
+    private Long principalId;
+
+    /**
      *
      */
     @Schema(description = "User nickname")

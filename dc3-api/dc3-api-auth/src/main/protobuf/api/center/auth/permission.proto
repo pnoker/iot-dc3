@@ -27,9 +27,9 @@ option java_outer_classname = "PermissionProto";
 option objc_class_prefix = "Auth";
 option java_multiple_files = true;
 
-// Service interface for resolving resource permission codes by tenant and user.
+// Service interface for resolving resource permission codes by tenant and principal.
 service PermissionApi {
-  // List all resource codes granted to the user in the tenant.
+  // List all resource codes granted to the principal in the tenant.
   rpc ListPermissionCodes (GrpcPermissionQuery) returns (GrpcRPermissionCodesDTO);
 }
 
@@ -38,8 +38,8 @@ message GrpcPermissionQuery {
   // Tenant scope for role filtering.
   int64 tenant_id = 1;
 
-  // User ID whose role-resource grants should be resolved.
-  int64 user_id = 2;
+  // Principal ID whose role-resource grants should be resolved.
+  int64 principal_id = 2;
 }
 
 // Response wrapper for granted permission codes.

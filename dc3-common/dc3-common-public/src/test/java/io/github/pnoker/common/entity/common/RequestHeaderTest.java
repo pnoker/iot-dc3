@@ -44,8 +44,9 @@ class RequestHeaderTest {
     }
 
     @Test
-    void userHeaderConstructsAndExposesFields() {
-        RequestHeader.UserHeader user = new RequestHeader.UserHeader(7L, "Alice", "alice", 1L);
+    void principalHeaderConstructsAndExposesFields() {
+        RequestHeader.PrincipalHeader user = new RequestHeader.PrincipalHeader(7L, "USER", "Alice", "alice", 1L,
+                null, null);
         assertThat(user.getUserId()).isEqualTo(7L);
         assertThat(user.getNickName()).isEqualTo("Alice");
         assertThat(user.getUserName()).isEqualTo("alice");

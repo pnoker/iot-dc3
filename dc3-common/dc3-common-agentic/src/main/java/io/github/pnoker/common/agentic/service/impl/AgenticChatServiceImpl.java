@@ -63,7 +63,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
 
     @Override
     public Flux<ServerSentEvent<String>> streamChatCompletion(ChatCompletionRequest request,
-                                                              RequestHeader.UserHeader userHeader) {
+                                                              RequestHeader.PrincipalHeader userHeader) {
         return Flux.defer(() -> {
             AgenticPreparedChatRequest prepared = requestPreparer.prepare(request, userHeader, "stream");
             messageRecorder.persistUserMessage(prepared, userHeader);
@@ -121,7 +121,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     }
 
     @Override
-    public Mono<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request, RequestHeader.UserHeader userHeader) {
+    public Mono<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request, RequestHeader.PrincipalHeader userHeader) {
         return Mono.fromCallable(() -> {
             AgenticPreparedChatRequest prepared = requestPreparer.prepare(request, userHeader, "blocking");
             messageRecorder.persistUserMessage(prepared, userHeader);

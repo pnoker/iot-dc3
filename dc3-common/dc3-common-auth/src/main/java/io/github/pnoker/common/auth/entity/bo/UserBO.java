@@ -42,6 +42,11 @@ import lombok.ToString;
 public class UserBO extends BaseBO {
 
     /**
+     * Principal ID.
+     */
+    private Long principalId;
+
+    /**
      *
      */
     private String nickName;

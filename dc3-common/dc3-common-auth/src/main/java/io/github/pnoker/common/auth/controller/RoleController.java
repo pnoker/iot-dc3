@@ -72,7 +72,7 @@ public class RoleController implements BaseController {
     @Operation(summary = "Add Role", description = "Create a role record")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(header.getTenantId());
             entityBO.setCreatorId(header.getUserId());
@@ -99,7 +99,7 @@ public class RoleController implements BaseController {
     @Operation(summary = "Update Role", description = "Update a role record")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody RoleVO entityVO) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(header.getTenantId());
             entityBO.setOperatorId(header.getUserId());

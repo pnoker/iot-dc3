@@ -79,7 +79,7 @@ public class ModelController implements BaseController {
     @Operation(summary = "Add AI Model Configuration", description = "Create an AI model configuration record")
     @PostMapping("/config/add")
     public Mono<R<ModelConfigVO>> add(@Validated(Add.class) @RequestBody ModelConfigRequest request) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             ModelConfigBO entityBO = modelConfigBuilder.buildBOByRequest(request);
             return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.add(entityBO, header)));
         }));
@@ -89,7 +89,7 @@ public class ModelController implements BaseController {
     @Operation(summary = "Update AI Model Configuration", description = "Update an AI model configuration record")
     @PostMapping("/config/update")
     public Mono<R<ModelConfigVO>> update(@Validated(Update.class) @RequestBody ModelConfigRequest request) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             ModelConfigBO entityBO = modelConfigBuilder.buildBOByRequest(request);
             return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.update(entityBO, header)));
         }));

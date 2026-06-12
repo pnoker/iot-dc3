@@ -61,7 +61,7 @@ public class ActionServiceImpl implements ActionService {
 
     @Override
     public String createWritePointValueAction(String conversationId, Long deviceId, Long pointId, String value,
-                                              RequestHeader.UserHeader header) {
+                                              RequestHeader.PrincipalHeader header) {
         ActionBO entityBO = new ActionBO();
         entityBO.setActionId(UUID.randomUUID().toString());
         entityBO.setConversationId(conversationId);
@@ -80,7 +80,7 @@ public class ActionServiceImpl implements ActionService {
     }
 
     @Override
-    public List<ActionBO> listPending(String conversationId, RequestHeader.UserHeader header) {
+    public List<ActionBO> listPending(String conversationId, RequestHeader.PrincipalHeader header) {
         LambdaQueryWrapper<ActionDO> wrapper = scopedWrapper(header)
                 .eq(ActionDO::getConversationId, conversationId)
                 .eq(ActionDO::getStatus, AgenticActionStatusEnum.PENDING)
@@ -91,7 +91,7 @@ public class ActionServiceImpl implements ActionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ActionBO confirm(String actionId, RequestHeader.UserHeader header) {
+    public ActionBO confirm(String actionId, RequestHeader.PrincipalHeader header) {
         ActionDO action = getPending(actionId, header);
         claimPending(action, header, AgenticActionStatusEnum.CONFIRMED, "Agentic action is no longer pending");
 
@@ -121,14 +121,14 @@ public class ActionServiceImpl implements ActionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ActionBO reject(String actionId, RequestHeader.UserHeader header) {
+    public ActionBO reject(String actionId, RequestHeader.PrincipalHeader header) {
         ActionDO action = getPending(actionId, header);
         claimPending(action, header, AgenticActionStatusEnum.REJECTED,
                 "Agentic action is no longer pending");
         return actionBuilder.buildBOByDO(action);
     }
 
-    private ActionDO getPending(String actionId, RequestHeader.UserHeader header) {
+    private ActionDO getPending(String actionId, RequestHeader.PrincipalHeader header) {
         LambdaQueryWrapper<ActionDO> wrapper = scopedWrapper(header)
                 .eq(ActionDO::getActionId, actionId)
                 .last(QueryWrapperConstant.LIMIT_ONE);
@@ -145,7 +145,7 @@ public class ActionServiceImpl implements ActionService {
         return action;
     }
 
-    private void claimPending(ActionDO action, RequestHeader.UserHeader header, AgenticActionStatusEnum nextStatus,
+    private void claimPending(ActionDO action, RequestHeader.PrincipalHeader header, AgenticActionStatusEnum nextStatus,
                               String failureMessage) {
         LocalDateTime now = LocalDateTime.now();
         boolean updated = actionManager.update(Wrappers.<ActionDO>lambdaUpdate()
@@ -165,7 +165,7 @@ public class ActionServiceImpl implements ActionService {
         action.setOperateTime(now);
     }
 
-    private void fillCreateAudit(ActionBO entityBO, RequestHeader.UserHeader header) {
+    private void fillCreateAudit(ActionBO entityBO, RequestHeader.PrincipalHeader header) {
         LocalDateTime now = LocalDateTime.now();
         entityBO.setCreateTime(now);
         entityBO.setOperateTime(now);
@@ -175,7 +175,7 @@ public class ActionServiceImpl implements ActionService {
         entityBO.setOperatorName(header.getUserName());
     }
 
-    private LambdaQueryWrapper<ActionDO> scopedWrapper(RequestHeader.UserHeader header) {
+    private LambdaQueryWrapper<ActionDO> scopedWrapper(RequestHeader.PrincipalHeader header) {
         return Wrappers.<ActionDO>query()
                 .lambda()
                 .eq(ActionDO::getTenantId, header.getTenantId())

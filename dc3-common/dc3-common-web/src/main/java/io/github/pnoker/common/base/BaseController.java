@@ -25,7 +25,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
-import io.github.pnoker.common.utils.UserHeaderUtil;
+import io.github.pnoker.common.utils.PrincipalHeaderUtil;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -53,21 +53,21 @@ import java.util.stream.Collectors;
 public interface BaseController {
 
     /**
-     * Get user header information from request context
+     * Get principal header information from request context.
      *
-     * @return User header information as Mono
+     * @return Principal header information as Mono
      */
-    default Mono<RequestHeader.UserHeader> getUserHeader() {
-        return UserHeaderUtil.getUserHeader();
+    default Mono<RequestHeader.PrincipalHeader> getPrincipalHeader() {
+        return PrincipalHeaderUtil.getPrincipalHeader();
     }
 
     /**
-     * Get tenant ID from user header
+     * Get tenant ID from principal header.
      *
      * @return Tenant ID as Mono
      */
     default Mono<Long> getTenantId() {
-        return UserHeaderUtil.getTenantId();
+        return PrincipalHeaderUtil.getTenantId();
     }
 
     /**
@@ -95,30 +95,30 @@ public interface BaseController {
     }
 
     /**
-     * Get user ID from user header
+     * Get principal ID from principal header.
      *
-     * @return User ID as Mono
+     * @return Principal ID as Mono
      */
     default Mono<Long> getUserId() {
-        return UserHeaderUtil.getUserId();
+        return PrincipalHeaderUtil.getUserId();
     }
 
     /**
-     * Get user nickname from user header
+     * Get principal display name from principal header.
      *
-     * @return User nickname as Mono
+     * @return Principal display name as Mono
      */
     default Mono<String> getNickName() {
-        return UserHeaderUtil.getNickName();
+        return PrincipalHeaderUtil.getNickName();
     }
 
     /**
-     * Get username from user header
+     * Get principal name from principal header.
      *
-     * @return Username as Mono
+     * @return Principal name as Mono
      */
     default Mono<String> getUserName() {
-        return UserHeaderUtil.getUserName();
+        return PrincipalHeaderUtil.getUserName();
     }
 
     /**
@@ -173,9 +173,9 @@ public interface BaseController {
                 // Fallback: SecurityContext not available — use provider directly
                 .switchIfEmpty(Mono.defer(() ->
                         getTenantId().flatMap(tenantId ->
-                                getUserId().flatMap(userId ->
+                                getUserId().flatMap(principalId ->
                                         Flux.fromIterable(required)
-                                                .flatMap(code -> provider.hasPermission(tenantId, userId, code))
+                                                .flatMap(code -> provider.hasPermission(tenantId, principalId, code))
                                                 .any(granted -> granted)
                                                 .flatMap(hasPermission -> {
                                                     if (Boolean.TRUE.equals(hasPermission)) {

@@ -38,6 +38,10 @@ public class AuthConstant {
 
     public static final String USER_PROFILE_URL_PREFIX = "/user_profile";
 
+    public static final String LOCAL_CREDENTIAL_URL_PREFIX = "/local_credential";
+
+    public static final String SERVICE_ACCOUNT_URL_PREFIX = "/service_account";
+
     public static final String TENANT_URL_PREFIX = "/tenant";
 
     public static final String TOKEN_URL_PREFIX = "/token";
@@ -48,13 +52,15 @@ public class AuthConstant {
 
     public static final String RESOURCE_URL_PREFIX = "/resource";
 
-    public static final String ROLE_USER_URL_PREFIX = "/role_user";
+    public static final String ROLE_PRINCIPAL_URL_PREFIX = "/role_principal";
 
     public static final String ROLE_RESOURCE_URL_PREFIX = "/role_resource";
 
     public static final String API_URL_PREFIX = "/api";
 
     public static final String MENU_URL_PREFIX = "/menu";
+
+    public static final String MCP_URL_PREFIX = "/mcp";
 
     /**
      * dc3_resource.resource_code prefix for API leaf resources.

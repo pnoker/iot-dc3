@@ -21,13 +21,13 @@ import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.facade.api.LocalCredentialFacade;
 import io.github.pnoker.common.facade.api.TenantFacade;
 import io.github.pnoker.common.facade.api.TokenFacade;
 import io.github.pnoker.common.facade.api.UserFacade;
-import io.github.pnoker.common.facade.api.UserLoginFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +51,7 @@ class FilterServiceImplTest {
     @Mock
     private TenantFacade tenantFacade;
     @Mock
-    private UserLoginFacade userLoginFacade;
+    private LocalCredentialFacade localCredentialFacade;
     @Mock
     private UserFacade userFacade;
     @Mock
@@ -81,17 +81,18 @@ class FilterServiceImplTest {
         return tenant;
     }
 
-    private static FacadeUserLoginBO userLogin(String name, Long userId, EnableFlagEnum enableFlag) {
-        FacadeUserLoginBO userLogin = new FacadeUserLoginBO();
-        userLogin.setLoginName(name);
-        userLogin.setUserId(userId);
-        userLogin.setEnableFlag(enableFlag);
-        return userLogin;
+    private static FacadeLocalCredentialBO credential(String name, Long principalId, EnableFlagEnum enableFlag) {
+        FacadeLocalCredentialBO credential = new FacadeLocalCredentialBO();
+        credential.setLoginName(name);
+        credential.setPrincipalId(principalId);
+        credential.setEnableFlag(enableFlag);
+        return credential;
     }
 
     private static FacadeUserBO user(Long id, String nickName, String userName) {
         FacadeUserBO user = new FacadeUserBO();
         user.setId(id);
+        user.setPrincipalId(100L);
         user.setNickName(nickName);
         user.setUserName(userName);
         return user;
@@ -122,59 +123,60 @@ class FilterServiceImplTest {
     }
 
     @Test
-    void getUserLoginRequiresEnabledLoginAndCachesLookup() {
-        FacadeUserLoginBO userLogin = userLogin("alice", 7L, EnableFlagEnum.ENABLE);
-        when(userLoginFacade.getByName("alice")).thenReturn(userLogin);
+    void getLocalCredentialRequiresEnabledCredentialAndCachesLookup() {
+        FacadeLocalCredentialBO credential = credential("alice", 100L, EnableFlagEnum.ENABLE);
+        when(localCredentialFacade.getByLoginName("alice")).thenReturn(credential);
         ServerHttpRequest request = request("acme", "alice", null);
 
-        assertThat(filterService.getUserLogin(request)).isSameAs(userLogin);
-        assertThat(filterService.getUserLogin(request)).isSameAs(userLogin);
+        assertThat(filterService.getLocalCredential(request)).isSameAs(credential);
+        assertThat(filterService.getLocalCredential(request)).isSameAs(credential);
 
-        verify(userLoginFacade, times(1)).getByName("alice");
+        verify(localCredentialFacade, times(1)).getByLoginName("alice");
     }
 
     @Test
     void getUserBuildsForwardedHeaderAndCachesUserLookup() {
         FacadeTenantBO tenant = tenant(11L, "acme", EnableFlagEnum.ENABLE);
-        FacadeUserLoginBO userLogin = userLogin("alice", 7L, EnableFlagEnum.ENABLE);
+        FacadeLocalCredentialBO credential = credential("alice", 100L, EnableFlagEnum.ENABLE);
         FacadeUserBO user = user(7L, "Alice", "alice");
-        when(userFacade.getById(7L)).thenReturn(user);
+        when(userFacade.getByPrincipalId(100L)).thenReturn(user);
 
-        RequestHeader.UserHeader header = filterService.getUser(userLogin, tenant);
-        RequestHeader.UserHeader cachedHeader = filterService.getUser(userLogin, tenant);
+        RequestHeader.PrincipalHeader header = filterService.getUser(credential, tenant);
+        RequestHeader.PrincipalHeader cachedHeader = filterService.getUser(credential, tenant);
 
-        assertThat(header.getUserId()).isEqualTo(7L);
-        assertThat(header.getNickName()).isEqualTo("Alice");
-        assertThat(header.getUserName()).isEqualTo("alice");
+        assertThat(header.getPrincipalId()).isEqualTo(100L);
+        assertThat(header.getPrincipalType()).isEqualTo("USER");
+        assertThat(header.getDisplayName()).isEqualTo("Alice");
+        assertThat(header.getPrincipalName()).isEqualTo("alice");
         assertThat(header.getTenantId()).isEqualTo(11L);
-        assertThat(cachedHeader.getUserName()).isEqualTo("alice");
-        verify(userFacade, times(1)).getById(7L);
+        assertThat(cachedHeader.getPrincipalName()).isEqualTo("alice");
+        verify(userFacade, times(1)).getByPrincipalId(100L);
     }
 
     @Test
-    void getUserRejectsLoginWithoutUserIdAndMissingUser() {
+    void getUserRejectsCredentialWithoutPrincipalIdAndMissingUser() {
         FacadeTenantBO tenant = tenant(11L, "acme", EnableFlagEnum.ENABLE);
 
-        assertThatThrownBy(() -> filterService.getUser(userLogin("alice", null, EnableFlagEnum.ENABLE), tenant))
+        assertThatThrownBy(() -> filterService.getUser(credential("alice", null, EnableFlagEnum.ENABLE), tenant))
                 .isInstanceOf(UnAuthorizedException.class);
-        verify(userFacade, never()).getById(null);
+        verify(userFacade, never()).getByPrincipalId(null);
 
-        when(userFacade.getById(7L)).thenReturn(null);
+        when(userFacade.getByPrincipalId(100L)).thenReturn(null);
 
-        assertThatThrownBy(() -> filterService.getUser(userLogin("alice", 7L, EnableFlagEnum.ENABLE), tenant))
+        assertThatThrownBy(() -> filterService.getUser(credential("alice", 100L, EnableFlagEnum.ENABLE), tenant))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
     @Test
     void checkValidParsesHeaderAndDoesNotCacheTokenValidation() {
         FacadeTenantBO tenant = tenant(11L, "acme", EnableFlagEnum.ENABLE);
-        FacadeUserLoginBO userLogin = userLogin("alice", 7L, EnableFlagEnum.ENABLE);
+        FacadeLocalCredentialBO credential = credential("alice", 100L, EnableFlagEnum.ENABLE);
         String tokenHeader = JsonUtil.toJsonString(new RequestHeader.TokenHeader("salt", "token"));
         ServerHttpRequest request = request("acme", "alice", tokenHeader);
         when(tokenFacade.checkValid("acme", "alice", "salt", "token")).thenReturn(true);
 
-        filterService.checkValid(request, tenant, userLogin);
-        filterService.checkValid(request, tenant, userLogin);
+        filterService.checkValid(request, tenant, credential);
+        filterService.checkValid(request, tenant, credential);
 
         verify(tokenFacade, times(2)).checkValid("acme", "alice", "salt", "token");
     }
@@ -182,18 +184,18 @@ class FilterServiceImplTest {
     @Test
     void checkValidRejectsMalformedMissingOrInvalidToken() {
         FacadeTenantBO tenant = tenant(11L, "acme", EnableFlagEnum.ENABLE);
-        FacadeUserLoginBO userLogin = userLogin("alice", 7L, EnableFlagEnum.ENABLE);
+        FacadeLocalCredentialBO credential = credential("alice", 100L, EnableFlagEnum.ENABLE);
 
-        assertThatThrownBy(() -> filterService.checkValid(request("acme", "alice", "{"), tenant, userLogin))
+        assertThatThrownBy(() -> filterService.checkValid(request("acme", "alice", "{"), tenant, credential))
                 .isInstanceOf(UnAuthorizedException.class);
         assertThatThrownBy(() -> filterService.checkValid(request("acme", "alice",
-                JsonUtil.toJsonString(new RequestHeader.TokenHeader("salt", ""))), tenant, userLogin))
+                JsonUtil.toJsonString(new RequestHeader.TokenHeader("salt", ""))), tenant, credential))
                 .isInstanceOf(UnAuthorizedException.class);
 
         when(tokenFacade.checkValid("acme", "alice", "salt", "token")).thenReturn(false);
 
         assertThatThrownBy(() -> filterService.checkValid(request("acme", "alice",
-                JsonUtil.toJsonString(new RequestHeader.TokenHeader("salt", "token"))), tenant, userLogin))
+                JsonUtil.toJsonString(new RequestHeader.TokenHeader("salt", "token"))), tenant, credential))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 

@@ -20,8 +20,8 @@ package io.github.pnoker.common.gateway.filter;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,8 +51,8 @@ class AuthenticGatewayFilterTest {
 
     @Mock
     private FilterService filterService;
-    private RequestHeader.UserHeader user;
-    private FacadeUserLoginBO userLogin;
+    private RequestHeader.PrincipalHeader user;
+    private FacadeLocalCredentialBO credential;
     private FacadeTenantBO tenant;
 
     private static MockServerWebExchange exchange() {
@@ -73,18 +73,19 @@ class AuthenticGatewayFilterTest {
 
     @BeforeEach
     void setUp() {
-        user = new RequestHeader.UserHeader(7L, "Alice", "alice", 1L);
-        userLogin = new FacadeUserLoginBO();
-        userLogin.setLoginName("alice");
+        user = new RequestHeader.PrincipalHeader(100L, "USER", "Alice", "alice", 1L, null, null);
+        credential = new FacadeLocalCredentialBO();
+        credential.setLoginName("alice");
+        credential.setPrincipalId(100L);
         tenant = new FacadeTenantBO();
         tenant.setTenantName("Acme");
     }
 
     @Test
-    void writesXAuthUserAndStripsXAuthSignWhenSigningDisabled() {
+    void writesXAuthPrincipalAndStripsXAuthSignWhenSigningDisabled() {
         when(filterService.getTenant(any())).thenReturn(tenant);
-        when(filterService.getUserLogin(any())).thenReturn(userLogin);
-        when(filterService.getUser(userLogin, tenant)).thenReturn(user);
+        when(filterService.getLocalCredential(any())).thenReturn(credential);
+        when(filterService.getUser(credential, tenant)).thenReturn(user);
 
         AtomicReference<ServerWebExchange> capture = new AtomicReference<>();
         MockServerWebExchange initial = MockServerWebExchange.from(MockServerHttpRequest.get("/foo")
@@ -94,21 +95,22 @@ class AuthenticGatewayFilterTest {
         filter(false).filter(initial, capturingChain(capture)).block();
 
         HttpHeaders forwarded = capture.get().getRequest().getHeaders();
-        assertThat(forwarded.getFirst(RequestConstant.Header.X_AUTH_USER)).contains("\"userName\":\"alice\"");
+        assertThat(forwarded.getFirst(RequestConstant.Header.X_AUTH_PRINCIPAL))
+                .contains("\"principalName\":\"alice\"");
         assertThat(forwarded.getFirst(RequestConstant.Header.X_AUTH_SIGN)).isNull();
     }
 
     @Test
     void writesHmacSignedHeaderWhenSigningEnabled() {
         when(filterService.getTenant(any())).thenReturn(tenant);
-        when(filterService.getUserLogin(any())).thenReturn(userLogin);
-        when(filterService.getUser(userLogin, tenant)).thenReturn(user);
+        when(filterService.getLocalCredential(any())).thenReturn(credential);
+        when(filterService.getUser(credential, tenant)).thenReturn(user);
 
         AtomicReference<ServerWebExchange> capture = new AtomicReference<>();
         filter(true).filter(exchange(), capturingChain(capture)).block();
 
         HttpHeaders forwarded = capture.get().getRequest().getHeaders();
-        String userJson = forwarded.getFirst(RequestConstant.Header.X_AUTH_USER);
+        String userJson = forwarded.getFirst(RequestConstant.Header.X_AUTH_PRINCIPAL);
         String sign = forwarded.getFirst(RequestConstant.Header.X_AUTH_SIGN);
         assertThat(userJson).isNotNull();
         assertThat(sign).matches("[0-9a-f]{64}");
@@ -119,7 +121,7 @@ class AuthenticGatewayFilterTest {
     @Test
     void responsesAreUnauthorizedWhenFilterServiceThrowsUnauthorized() {
         when(filterService.getTenant(any())).thenReturn(tenant);
-        when(filterService.getUserLogin(any())).thenReturn(userLogin);
+        when(filterService.getLocalCredential(any())).thenReturn(credential);
         doThrow(new UnAuthorizedException("token rejected"))
                 .when(filterService).checkValid(any(), any(), any());
 
@@ -149,7 +151,7 @@ class AuthenticGatewayFilterTest {
         when(filterService.getTenant(any())).thenReturn(null);
         // checkValid is the only place that can throw — when getTenant returns null and
         // checkValid does not throw, the filter still tries to build the user header.
-        when(filterService.getUserLogin(any())).thenReturn(null);
+        when(filterService.getLocalCredential(any())).thenReturn(null);
         when(filterService.getUser(null, null)).thenReturn(user);
 
         AtomicReference<ServerWebExchange> capture = new AtomicReference<>();

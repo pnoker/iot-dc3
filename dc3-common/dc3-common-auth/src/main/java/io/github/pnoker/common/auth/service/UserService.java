@@ -60,4 +60,14 @@ public interface UserService extends BaseService<UserBO, UserQuery> {
      */
     UserBO getByEmail(String email, boolean throwException);
 
+    /**
+     * Get user by principal ID.
+     *
+     * @param principalId    principal ID
+     * @param throwException whether to throw exception when user does not exist
+     * @return {@link UserBO} or {@code null} when not found and {@code throwException}
+     * is false
+     */
+    UserBO getByPrincipalId(Long principalId, boolean throwException);
+
 }

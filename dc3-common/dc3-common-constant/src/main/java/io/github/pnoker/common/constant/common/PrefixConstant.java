@@ -61,11 +61,6 @@ public class PrefixConstant {
     public static final String TENANT = "tenant";
 
     /**
-     * Tenant bind prefix: "tenant_bind"
-     */
-    public static final String TENANT_BIND = "tenant_bind";
-
-    /**
      * User prefix: "user"
      */
     public static final String USER = "user";

@@ -53,13 +53,13 @@ class DriverToolTest {
     @Mock
     private StatusHealthFacade statusHealthFacade;
 
-    private RequestHeader.UserHeader header;
+    private RequestHeader.PrincipalHeader header;
 
     @BeforeEach
     void setUp() {
-        header = new RequestHeader.UserHeader();
+        header = new RequestHeader.PrincipalHeader();
         header.setTenantId(11L);
-        header.setUserId(22L);
+        header.setPrincipalId(22L);
     }
 
     @Test

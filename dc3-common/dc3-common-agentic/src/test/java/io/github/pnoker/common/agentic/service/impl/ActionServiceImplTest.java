@@ -57,15 +57,15 @@ class ActionServiceImplTest {
     private PointCommandFacade pointCommandFacade;
 
     private ActionServiceImpl service;
-    private RequestHeader.UserHeader header;
+    private RequestHeader.PrincipalHeader header;
 
     @BeforeEach
     void setUp() {
         service = new ActionServiceImpl(actionManager, actionBuilder, pointCommandFacade);
-        header = new RequestHeader.UserHeader();
+        header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
-        header.setUserId(2L);
-        header.setUserName("admin");
+        header.setPrincipalId(2L);
+        header.setPrincipalName("admin");
     }
 
     @Test

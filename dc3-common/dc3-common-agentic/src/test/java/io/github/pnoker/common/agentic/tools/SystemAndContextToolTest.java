@@ -100,11 +100,11 @@ class SystemAndContextToolTest {
     }
 
     private ToolContext toolContext() {
-        RequestHeader.UserHeader header = new RequestHeader.UserHeader();
+        RequestHeader.PrincipalHeader header = new RequestHeader.PrincipalHeader();
         header.setTenantId(11L);
-        header.setUserId(22L);
-        header.setUserName("ops.engineer");
-        header.setNickName("Ops Engineer");
+        header.setPrincipalId(22L);
+        header.setPrincipalName("ops.engineer");
+        header.setDisplayName("Ops Engineer");
 
         Map<String, Object> values = new HashMap<>();
         values.put(AgenticConstant.ToolContextKey.TENANT_ID, 11L);

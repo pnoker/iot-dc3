@@ -48,7 +48,7 @@ class MessageServiceImplTest {
     private MessageBuilder messageBuilder;
 
     private MessageServiceImpl service;
-    private RequestHeader.UserHeader header;
+    private RequestHeader.PrincipalHeader header;
 
     private static LambdaQueryWrapper<MessageDO> anyMessageQuery() {
         return any();
@@ -57,10 +57,10 @@ class MessageServiceImplTest {
     @BeforeEach
     void setUp() {
         service = new MessageServiceImpl(messageManager, messageBuilder);
-        header = new RequestHeader.UserHeader();
+        header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
-        header.setUserId(2L);
-        header.setUserName("admin");
+        header.setPrincipalId(2L);
+        header.setPrincipalName("admin");
     }
 
     @Test

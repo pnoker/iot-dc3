@@ -30,7 +30,7 @@ import io.github.pnoker.common.auth.entity.vo.RoleResourceBindVO;
 import io.github.pnoker.common.auth.entity.vo.RoleVO;
 import io.github.pnoker.common.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.auth.service.RoleService;
-import io.github.pnoker.common.auth.service.TenantBindService;
+import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
@@ -79,7 +79,7 @@ public class RoleResourceBindController implements BaseController {
 
     private final RoleService roleService;
 
-    private final TenantBindService tenantBindService;
+    private final TenantMembershipService tenantMembershipService;
 
     @PreAuthorize("@perm.can('role_resource_bind', 'add')")
     @Operation(summary = "Add Role-resource Binding", description = "Create a role-resource binding record")
@@ -130,12 +130,12 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
-    @Operation(summary = "List Resources by User", description = "List resources accessible to a user")
-    @GetMapping("/list_resource_by_user")
-    public Mono<R<List<ResourceVO>>> listResourceByUser(@Parameter(description = "User ID") @NotNull @RequestParam(value = "user_id") Long userId) {
+    @Operation(summary = "List Resources by Principal", description = "List resources accessible to a principal")
+    @GetMapping("/list_resource_by_principal")
+    public Mono<R<List<ResourceVO>>> listResourceByPrincipal(@Parameter(description = "Principal ID") @NotNull @RequestParam(value = "principal_id") Long principalId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            tenantBindService.requireTenantMember(tenantId, userId);
-            List<ResourceBO> entityBOList = roleResourceBindService.listResourceByUserId(userId, tenantId);
+            tenantMembershipService.requireTenantMember(tenantId, principalId);
+            List<ResourceBO> entityBOList = roleResourceBindService.listResourceByPrincipalId(principalId, tenantId);
             List<ResourceVO> entityVOList = resourceBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVOList);
         }));

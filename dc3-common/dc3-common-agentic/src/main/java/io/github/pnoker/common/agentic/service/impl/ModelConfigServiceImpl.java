@@ -93,7 +93,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ModelConfigBO add(ModelConfigBO entityBO, RequestHeader.UserHeader header) {
+    public ModelConfigBO add(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
         validate(entityBO);
         ModelConfigBO targetBO = new ModelConfigBO();
         apply(targetBO, entityBO);
@@ -106,7 +106,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ModelConfigBO update(ModelConfigBO entityBO, RequestHeader.UserHeader header) {
+    public ModelConfigBO update(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
         if (Objects.isNull(entityBO) || Objects.isNull(entityBO.getId())) {
             throw new RequestException("Model config ID is required");
         }
@@ -177,7 +177,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         targetBO.setRemark(StringUtils.defaultString(sourceBO.getRemark()));
     }
 
-    private void fillCreateAudit(ModelConfigBO entityBO, RequestHeader.UserHeader header) {
+    private void fillCreateAudit(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
         LocalDateTime now = LocalDateTime.now();
         entityBO.setCreateTime(now);
         entityBO.setOperateTime(now);
@@ -188,7 +188,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         entityBO.setTenantId(header.getTenantId());
     }
 
-    private void fillOperateAudit(ModelConfigBO entityBO, RequestHeader.UserHeader header) {
+    private void fillOperateAudit(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
         entityBO.setOperateTime(LocalDateTime.now());
         entityBO.setOperatorId(header.getUserId());
         entityBO.setOperatorName(header.getUserName());

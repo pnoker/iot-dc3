@@ -63,7 +63,7 @@ public class AttachmentController implements BaseController {
     @PostMapping("/upload")
     public Mono<R<AttachmentVO>> upload(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                         @RequestPart("file") Mono<FilePart> filePart) {
-        return getUserHeader().flatMap(header -> filePart.flatMap(part -> {
+        return getPrincipalHeader().flatMap(header -> filePart.flatMap(part -> {
             String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
             return attachmentService.upload(scopedConversationId, part, header).map(attachmentBO -> {
@@ -78,7 +78,7 @@ public class AttachmentController implements BaseController {
     @Operation(summary = "List AI Attachments", description = "List AI attachments for a conversation")
     @GetMapping("/list")
     public Mono<R<List<AttachmentVO>>> list(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
             List<AttachmentVO> attachments = attachmentBuilder.buildVOListByBOList(attachmentService.list(
@@ -88,7 +88,7 @@ public class AttachmentController implements BaseController {
         }));
     }
 
-    private void sanitize(RequestHeader.UserHeader header, AttachmentVO attachment) {
+    private void sanitize(RequestHeader.PrincipalHeader header, AttachmentVO attachment) {
         attachment.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
                 attachment.getConversationId()));
     }

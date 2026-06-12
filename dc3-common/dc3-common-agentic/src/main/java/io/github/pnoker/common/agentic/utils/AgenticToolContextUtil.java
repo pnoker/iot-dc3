@@ -41,23 +41,23 @@ public class AgenticToolContextUtil {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
-    public static RequestHeader.UserHeader requireUserHeader(ToolContext toolContext) {
+    public static RequestHeader.PrincipalHeader requirePrincipalHeader(ToolContext toolContext) {
         Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.USER_HEADER);
-        if (value instanceof RequestHeader.UserHeader userHeader) {
-            validateUserHeader(userHeader);
+        if (value instanceof RequestHeader.PrincipalHeader userHeader) {
+            validatePrincipalHeader(userHeader);
             return userHeader;
         }
-        RequestHeader.UserHeader userHeader = new RequestHeader.UserHeader();
+        RequestHeader.PrincipalHeader userHeader = new RequestHeader.PrincipalHeader();
         userHeader.setTenantId(getLongContextValue(toolContext, AgenticConstant.ToolContextKey.TENANT_ID));
-        userHeader.setUserId(getLongContextValue(toolContext, AgenticConstant.ToolContextKey.USER_ID));
-        validateUserHeader(userHeader);
+        userHeader.setPrincipalId(getLongContextValue(toolContext, AgenticConstant.ToolContextKey.USER_ID));
+        validatePrincipalHeader(userHeader);
         return userHeader;
     }
 
-    private static void validateUserHeader(RequestHeader.UserHeader userHeader) {
+    private static void validatePrincipalHeader(RequestHeader.PrincipalHeader userHeader) {
         if (Objects.isNull(userHeader) || Objects.isNull(userHeader.getTenantId())
-                || Objects.isNull(userHeader.getUserId())) {
-            throw new UnAuthorizedException("Unable to get agentic user header");
+                || Objects.isNull(userHeader.getPrincipalId())) {
+            throw new UnAuthorizedException("Unable to get agentic principal header");
         }
     }
 
@@ -66,7 +66,7 @@ public class AgenticToolContextUtil {
         if (Objects.nonNull(tenantId)) {
             return tenantId;
         }
-        return requireUserHeader(toolContext).getTenantId();
+        return requirePrincipalHeader(toolContext).getTenantId();
     }
 
     public static Long requireUserId(ToolContext toolContext) {
@@ -74,7 +74,7 @@ public class AgenticToolContextUtil {
         if (Objects.nonNull(userId)) {
             return userId;
         }
-        return requireUserHeader(toolContext).getUserId();
+        return requirePrincipalHeader(toolContext).getUserId();
     }
 
     public static String requireConversationId(ToolContext toolContext) {

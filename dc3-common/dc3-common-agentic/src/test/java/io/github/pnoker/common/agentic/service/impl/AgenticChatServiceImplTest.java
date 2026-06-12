@@ -56,16 +56,16 @@ class AgenticChatServiceImplTest {
 
     private AgenticChatServiceImpl service;
 
-    private RequestHeader.UserHeader userHeader;
+    private RequestHeader.PrincipalHeader userHeader;
 
     @BeforeEach
     void setUp() {
         service = new AgenticChatServiceImpl(requestPreparer, new AgenticChatResponseCodec(new ObjectMapper()),
                 messageRecorder, agenticRuntime);
-        userHeader = new RequestHeader.UserHeader();
+        userHeader = new RequestHeader.PrincipalHeader();
         userHeader.setTenantId(1L);
-        userHeader.setUserId(2L);
-        userHeader.setUserName("admin");
+        userHeader.setPrincipalId(2L);
+        userHeader.setPrincipalName("admin");
     }
 
     @Test

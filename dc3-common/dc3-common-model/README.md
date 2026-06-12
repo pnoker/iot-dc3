@@ -35,7 +35,7 @@ Used with `@Validated(...)` in controllers:
 
 ### Common Entities
 
-- `RequestHeader.UserHeader` — Carries tenant/user ID extracted from gateway-injected headers
+- `RequestHeader.PrincipalHeader` — Carries tenant/user ID extracted from gateway-injected headers
 - `Pages` — Pagination parameters (current page, page size)
 - `TreeNode` — Generic tree structure for hierarchical data
 

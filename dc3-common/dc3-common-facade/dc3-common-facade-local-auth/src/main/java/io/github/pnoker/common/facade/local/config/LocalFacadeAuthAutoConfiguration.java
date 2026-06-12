@@ -18,9 +18,9 @@
 package io.github.pnoker.common.facade.local.config;
 
 import io.github.pnoker.common.facade.local.TenantLocalFacade;
+import io.github.pnoker.common.facade.local.builder.FacadeLocalCredentialBuilder;
 import io.github.pnoker.common.facade.local.builder.FacadeTenantBuilder;
 import io.github.pnoker.common.facade.local.builder.FacadeUserBuilder;
-import io.github.pnoker.common.facade.local.builder.FacadeUserLoginBuilder;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
@@ -45,10 +45,10 @@ import org.springframework.context.annotation.FilterType;
                 classes = {io.github.pnoker.common.facade.local.TenantLocalFacade.class,
                         io.github.pnoker.common.facade.local.TokenLocalFacade.class,
                         io.github.pnoker.common.facade.local.UserLocalFacade.class,
-                        io.github.pnoker.common.facade.local.UserLoginLocalFacade.class,
+                        io.github.pnoker.common.facade.local.LocalCredentialLocalFacade.class,
                         io.github.pnoker.common.facade.local.ResourceRegistryLocalFacade.class,
                         io.github.pnoker.common.facade.local.PermissionLocalFacade.class,
-                        FacadeTenantBuilder.class, FacadeUserBuilder.class, FacadeUserLoginBuilder.class,}))
+                        FacadeTenantBuilder.class, FacadeUserBuilder.class, FacadeLocalCredentialBuilder.class,}))
 public class LocalFacadeAuthAutoConfiguration {
 
     /**

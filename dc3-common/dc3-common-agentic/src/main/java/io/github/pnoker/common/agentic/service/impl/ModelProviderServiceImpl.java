@@ -64,7 +64,7 @@ public class ModelProviderServiceImpl implements ModelProviderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ModelProviderBO add(ModelProviderBO entityBO, RequestHeader.UserHeader header) {
+    public ModelProviderBO add(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
         validate(entityBO);
         ModelProviderBO targetBO = new ModelProviderBO();
         apply(targetBO, entityBO, false);
@@ -77,7 +77,7 @@ public class ModelProviderServiceImpl implements ModelProviderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ModelProviderBO update(ModelProviderBO entityBO, RequestHeader.UserHeader header) {
+    public ModelProviderBO update(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
         if (Objects.isNull(entityBO) || Objects.isNull(entityBO.getId())) {
             throw new RequestException("Provider ID is required");
         }
@@ -128,7 +128,7 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         targetBO.setRemark(StringUtils.defaultString(sourceBO.getRemark()));
     }
 
-    private void fillCreateAudit(ModelProviderBO entityBO, RequestHeader.UserHeader header) {
+    private void fillCreateAudit(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
         LocalDateTime now = LocalDateTime.now();
         entityBO.setCreateTime(now);
         entityBO.setOperateTime(now);
@@ -139,7 +139,7 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         entityBO.setTenantId(header.getTenantId());
     }
 
-    private void fillOperateAudit(ModelProviderBO entityBO, RequestHeader.UserHeader header) {
+    private void fillOperateAudit(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
         entityBO.setOperateTime(LocalDateTime.now());
         entityBO.setOperatorId(header.getUserId());
         entityBO.setOperatorName(header.getUserName());

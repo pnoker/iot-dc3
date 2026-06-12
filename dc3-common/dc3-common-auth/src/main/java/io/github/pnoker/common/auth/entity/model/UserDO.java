@@ -57,6 +57,12 @@ public class UserDO implements Serializable {
     private Long id;
 
     /**
+     * Principal ID.
+     */
+    @TableField("principal_id")
+    private Long principalId;
+
+    /**
      * Username.
      */
     @TableField("user_name")

@@ -60,27 +60,69 @@ public class RequestHeader {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UserHeader {
+    public static class PrincipalHeader {
 
         /**
-         * User ID for identification
+         * Principal ID for authentication, authorization, and audit.
          */
-        private Long userId;
+        private Long principalId;
 
         /**
-         * User nickname or alias
+         * Principal type, for example USER or SERVICE_ACCOUNT.
          */
-        private String nickName;
+        private String principalType;
 
         /**
-         * User account name
+         * Display name.
          */
-        private String userName;
+        private String displayName;
+
+        /**
+         * Principal account name.
+         */
+        private String principalName;
 
         /**
          * Tenant ID for multi-tenant isolation
          */
         private Long tenantId;
+
+        /**
+         * OAuth client ID when the request is delegated through OAuth or MCP.
+         */
+        private String clientId;
+
+        /**
+         * MCP connection ID when the request originates from the MCP runtime.
+         */
+        private Long connectionId;
+
+        /**
+         * Audit accessor. The value is the principal ID, not dc3_user.id.
+         *
+         * @return principal ID
+         */
+        public Long getUserId() {
+            return principalId;
+        }
+
+        /**
+         * Audit display-name accessor.
+         *
+         * @return display name
+         */
+        public String getNickName() {
+            return displayName;
+        }
+
+        /**
+         * Audit account-name accessor.
+         *
+         * @return principal name
+         */
+        public String getUserName() {
+            return principalName;
+        }
 
     }
 

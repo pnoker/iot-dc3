@@ -19,25 +19,24 @@ package io.github.pnoker.common.auth.biz.impl;
 
 import io.github.pnoker.common.auth.biz.TokenService;
 import io.github.pnoker.common.auth.cache.TokenDenylistCache;
+import io.github.pnoker.common.auth.dal.PrincipalManager;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
+import io.github.pnoker.common.auth.entity.bo.LocalCredentialBO;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
-import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
-import io.github.pnoker.common.auth.entity.bo.UserLoginBO;
-import io.github.pnoker.common.auth.entity.bo.UserPasswordBO;
-import io.github.pnoker.common.auth.service.TenantBindService;
+import io.github.pnoker.common.auth.entity.model.PrincipalDO;
+import io.github.pnoker.common.auth.service.LocalCredentialService;
+import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.service.TenantService;
-import io.github.pnoker.common.auth.service.UserLoginService;
-import io.github.pnoker.common.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.KeyUtil;
-import io.github.pnoker.common.utils.PasswordUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -56,11 +55,11 @@ public class TokenServiceImpl implements TokenService {
 
     private final TenantService tenantService;
 
-    private final UserLoginService userLoginService;
+    private final LocalCredentialService localCredentialService;
 
-    private final UserPasswordService userPasswordService;
+    private final TenantMembershipService tenantMembershipService;
 
-    private final TenantBindService tenantBindService;
+    private final PrincipalManager principalManager;
 
     private final TokenDenylistCache tokenDenylistCache;
 
@@ -79,28 +78,24 @@ public class TokenServiceImpl implements TokenService {
         if (Objects.isNull(tenantBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
-        UserLoginBO userLogin = userLoginService.getByLoginName(loginName, false);
-        if (Objects.isNull(userLogin)) {
+        LocalCredentialBO credential = localCredentialService.getByLoginName(loginName, false);
+        if (Objects.isNull(credential)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
-        TenantBindBO tenantBindBO = tenantBindService.getByTenantIdAndUserId(tenantBO.getId(),
-                userLogin.getUserId());
-        if (Objects.isNull(tenantBindBO)) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
-        UserPasswordBO userPasswordBO = userPasswordService.getById(userLogin.getUserPasswordId());
-        if (Objects.isNull(userPasswordBO)) {
+        if (!tenantMembershipService.isTenantMember(tenantBO.getId(), credential.getPrincipalId())) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
         if (StringUtils.isEmpty(salt)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
 
-        String storedHash = userPasswordBO.getLoginPassword();
-        if (!PasswordUtil.verify(password, storedHash)) {
+        if (!localCredentialService.verifyPassword(credential, password)) {
+            localCredentialService.recordFailedLogin(credential.getId());
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
-        return KeyUtil.generateToken(loginName, salt, tenantBO.getId());
+        localCredentialService.recordSuccessfulLogin(credential.getId());
+        markPrincipalLogin(credential.getPrincipalId());
+        return KeyUtil.generateToken(String.valueOf(credential.getPrincipalId()), salt, tenantBO.getId());
     }
 
     @Override
@@ -109,13 +104,16 @@ public class TokenServiceImpl implements TokenService {
         if (Objects.isNull(tenantBO)) {
             return false;
         }
-        UserLoginBO userLogin = userLoginService.getByLoginName(loginName, false);
-        if (Objects.isNull(userLogin)) {
+        LocalCredentialBO credential = localCredentialService.getByLoginName(loginName, false);
+        if (Objects.isNull(credential) || !tenantMembershipService.isTenantMember(tenantBO.getId(),
+                credential.getPrincipalId())) {
             return false;
         }
         long logoutEpochMs = System.currentTimeMillis();
-        tokenDenylistCache.markLogout(loginName, tenantCode, logoutEpochMs);
-        log.info("User logout, loginName={}, tenantCode={}, logoutEpochMs={}", loginName, tenantCode, logoutEpochMs);
+        String principalKey = String.valueOf(credential.getPrincipalId());
+        tokenDenylistCache.markLogout(principalKey, tenantCode, logoutEpochMs);
+        log.info("Principal logout, principalId={}, tenantCode={}, logoutEpochMs={}", principalKey, tenantCode,
+                logoutEpochMs);
         return true;
     }
 
@@ -131,17 +129,18 @@ public class TokenServiceImpl implements TokenService {
             return tokenValid;
         }
 
-        UserLoginBO userLogin = userLoginService.getByLoginName(loginName, false);
-        if (Objects.isNull(userLogin) || Objects.isNull(tenantBindService.getByTenantIdAndUserId(tenantBO.getId(),
-                userLogin.getUserId()))) {
+        LocalCredentialBO credential = localCredentialService.getByLoginName(loginName, false);
+        if (Objects.isNull(credential) || !tenantMembershipService.isTenantMember(tenantBO.getId(),
+                credential.getPrincipalId())) {
             return tokenValid;
         }
 
         try {
-            Claims claims = KeyUtil.parserToken(loginName, salt, token, tenantBO.getId());
+            String principalKey = String.valueOf(credential.getPrincipalId());
+            Claims claims = KeyUtil.parserToken(principalKey, salt, token, tenantBO.getId());
             Date issuedAt = claims.getIssuedAt();
             long issuedAtEpochMs = Objects.nonNull(issuedAt) ? issuedAt.getTime() : 0L;
-            if (tokenDenylistCache.isRevoked(loginName, tenantCode, issuedAtEpochMs)) {
+            if (tokenDenylistCache.isRevoked(principalKey, tenantCode, issuedAtEpochMs)) {
                 tokenValid.setExpireTime(claims.getExpiration());
                 return tokenValid;
             }
@@ -152,6 +151,16 @@ public class TokenServiceImpl implements TokenService {
             log.warn("Token validation failed", e);
             return tokenValid;
         }
+    }
+
+    private void markPrincipalLogin(Long principalId) {
+        PrincipalDO principal = principalManager.getById(principalId);
+        if (Objects.isNull(principal)) {
+            return;
+        }
+        principal.setLastLoginTime(LocalDateTime.now());
+        principal.setOperateTime(null);
+        principalManager.updateById(principal);
     }
 
 }

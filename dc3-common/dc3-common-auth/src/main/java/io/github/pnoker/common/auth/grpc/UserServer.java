@@ -50,11 +50,21 @@ public class UserServer extends UserApiGrpc.UserApiImplBase {
 
     @Override
     public void getById(GrpcIdQuery request, StreamObserver<GrpcRUserDTO> responseObserver) {
+        writeUserResponse(() -> userService.getById(request.getId()), "getById", responseObserver);
+    }
+
+    @Override
+    public void getByPrincipalId(GrpcIdQuery request, StreamObserver<GrpcRUserDTO> responseObserver) {
+        writeUserResponse(() -> userService.getByPrincipalId(request.getId(), false), "getByPrincipalId",
+                responseObserver);
+    }
+
+    private void writeUserResponse(UserLookup lookup, String operation, StreamObserver<GrpcRUserDTO> responseObserver) {
         GrpcRUserDTO.Builder builder = GrpcRUserDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         try {
-            UserBO entityBO = userService.getById(request.getId());
+            UserBO entityBO = lookup.get();
             if (Objects.isNull(entityBO)) {
                 rBuilder.setOk(false);
                 rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -67,7 +77,7 @@ public class UserServer extends UserApiGrpc.UserApiImplBase {
                 builder.setData(grpcUserBuilder.buildGrpcDTOByBO(entityBO));
             }
         } catch (Exception e) {
-            log.warn("getById failed", e);
+            log.warn("{} failed", operation, e);
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.FAILURE.getCode());
             rBuilder.setMessage(ResponseEnum.FAILURE.getRemark());
@@ -76,6 +86,11 @@ public class UserServer extends UserApiGrpc.UserApiImplBase {
         builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
+    }
+
+    @FunctionalInterface
+    private interface UserLookup {
+        UserBO get();
     }
 
 }

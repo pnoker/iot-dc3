@@ -52,7 +52,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MessageBO save(String conversationId, String role, AgenticMessageContent content, String model,
-                          RequestHeader.UserHeader header) {
+                          RequestHeader.PrincipalHeader header) {
         MessageBO entityBO = new MessageBO();
         entityBO.setConversationId(conversationId);
         entityBO.setRole(role);
@@ -69,7 +69,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<MessageBO> list(String conversationId, RequestHeader.UserHeader header) {
+    public List<MessageBO> list(String conversationId, RequestHeader.PrincipalHeader header) {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query()
                 .lambda()
                 .eq(MessageDO::getConversationId, conversationId)
@@ -137,7 +137,7 @@ public class MessageServiceImpl implements MessageService {
         return entityBO;
     }
 
-    private void fillCreateAudit(MessageBO entityBO, RequestHeader.UserHeader header) {
+    private void fillCreateAudit(MessageBO entityBO, RequestHeader.PrincipalHeader header) {
         LocalDateTime now = LocalDateTime.now();
         entityBO.setCreateTime(now);
         entityBO.setOperateTime(now);

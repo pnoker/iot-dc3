@@ -59,7 +59,7 @@ public class MessageController implements BaseController {
     @Operation(summary = "List Messages", description = "List messages for a conversation")
     @GetMapping("/list")
     public Mono<R<List<MessageVO>>> list(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
-        return getUserHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
             List<MessageVO> messages = messageBuilder.buildVOListByBOList(messageService.list(scopedConversationId,
@@ -69,7 +69,7 @@ public class MessageController implements BaseController {
         }));
     }
 
-    private void sanitize(RequestHeader.UserHeader header, MessageVO message) {
+    private void sanitize(RequestHeader.PrincipalHeader header, MessageVO message) {
         message.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
                 message.getConversationId()));
     }

@@ -32,6 +32,9 @@ option java_multiple_files = true;
 service UserApi {
   // Query user information by user ID
   rpc GetById (GrpcIdQuery) returns (GrpcRUserDTO);
+
+  // Query user information by principal ID
+  rpc GetByPrincipalId (GrpcIdQuery) returns (GrpcRUserDTO);
 }
 
 // Request message for querying by user ID
@@ -71,4 +74,7 @@ message GrpcUserDTO {
 
   // Identity-related extension info, stored encrypted
   string identity_ext = 7;
+
+  // Principal ID used for authorization and audit
+  int64 principal_id = 8;
 }

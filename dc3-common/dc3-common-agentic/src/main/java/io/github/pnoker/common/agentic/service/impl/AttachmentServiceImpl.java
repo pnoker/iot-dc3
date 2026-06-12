@@ -64,7 +64,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final AgenticProperties properties;
 
     @Override
-    public Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.UserHeader header) {
+    public Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.PrincipalHeader header) {
         if (StringUtils.isBlank(conversationId) || Objects.isNull(filePart)
                 || StringUtils.isBlank(filePart.filename())) {
             throw new RequestException("Attachment data is required");
@@ -81,7 +81,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private AttachmentBO saveAttachment(String conversationId, FilePart filePart, Path filePath,
-                                        RequestHeader.UserHeader header) throws Exception {
+                                        RequestHeader.PrincipalHeader header) throws Exception {
         long size = Files.size(filePath);
         if (size > MAX_BYTES) {
             Files.deleteIfExists(filePath);
@@ -104,7 +104,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public List<AttachmentBO> list(String conversationId, RequestHeader.UserHeader header) {
+    public List<AttachmentBO> list(String conversationId, RequestHeader.PrincipalHeader header) {
         LambdaQueryWrapper<AttachmentDO> wrapper = Wrappers.<AttachmentDO>query()
                 .lambda()
                 .eq(AttachmentDO::getConversationId, conversationId)
@@ -115,7 +115,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public String summarize(List<Long> attachmentIds, RequestHeader.UserHeader header) {
+    public String summarize(List<Long> attachmentIds, RequestHeader.PrincipalHeader header) {
         if (Objects.isNull(attachmentIds) || attachmentIds.isEmpty()) {
             return "";
         }
@@ -136,7 +136,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         return "Attachment metadata:\n" + summary;
     }
 
-    private Path resolveFilePath(String conversationId, RequestHeader.UserHeader header, String fileName) {
+    private Path resolveFilePath(String conversationId, RequestHeader.PrincipalHeader header, String fileName) {
         Path storageRoot = Paths.get(properties.getAttachmentStoragePath()).toAbsolutePath().normalize();
         Path directory = storageRoot
                 .resolve("tenant_" + safePathPart(String.valueOf(header.getTenantId())))
@@ -178,7 +178,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         return StringUtils.defaultIfBlank(sanitized, "attachment");
     }
 
-    private void fillCreateAudit(AttachmentBO entityBO, RequestHeader.UserHeader header) {
+    private void fillCreateAudit(AttachmentBO entityBO, RequestHeader.PrincipalHeader header) {
         LocalDateTime now = LocalDateTime.now();
         entityBO.setCreateTime(now);
         entityBO.setOperateTime(now);
