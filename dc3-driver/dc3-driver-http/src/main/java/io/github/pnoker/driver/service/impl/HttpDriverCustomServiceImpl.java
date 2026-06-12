@@ -68,8 +68,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class HttpDriverCustomServiceImpl implements DriverCustomService {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final String ATTR_BASE_URL = "baseUrl";
+    private static final String ATTR_BODY_TEMPLATE = "bodyTemplate";
+    private static final String ATTR_METHOD = "method";
+    private static final String ATTR_PATH = "path";
+    private static final String ATTR_RESPONSE_PATH = "responsePath";
+    private static final String ATTR_TIMEOUT = "timeout";
+    private static final String DEFAULT_HTTP_METHOD = "GET";
+    private static final int DEFAULT_TIMEOUT_MS = 5000;
+
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
@@ -132,9 +143,9 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
                                DeviceBO device, PointBO point) {
         WebClient client = getConnector(device.getId(), driverConfig);
         try {
-            String path = getConfigValue(pointConfig, "path", "");
-            String method = getConfigValue(pointConfig, "method", "GET");
-            String responsePath = getConfigValue(pointConfig, "responsePath", "");
+            String path = getConfigValue(pointConfig, ATTR_PATH, "");
+            String method = getConfigValue(pointConfig, ATTR_METHOD, DEFAULT_HTTP_METHOD);
+            String responsePath = getConfigValue(pointConfig, ATTR_RESPONSE_PATH, "");
 
             HttpMethod httpMethod = HttpMethod.valueOf(method.toUpperCase());
             String responseBody = client.method(httpMethod)
@@ -162,9 +173,9 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
                          DeviceBO device, PointBO point, WritePointValue writePointValue) {
         WebClient client = getConnector(device.getId(), driverConfig);
         try {
-            String path = getConfigValue(pointConfig, "path", "");
-            String method = getConfigValue(pointConfig, "method", "GET");
-            String bodyTemplate = getConfigValue(pointConfig, "bodyTemplate", "");
+            String path = getConfigValue(pointConfig, ATTR_PATH, "");
+            String method = getConfigValue(pointConfig, ATTR_METHOD, DEFAULT_HTTP_METHOD);
+            String bodyTemplate = getConfigValue(pointConfig, ATTR_BODY_TEMPLATE, "");
 
             HttpMethod httpMethod = HttpMethod.valueOf(method.toUpperCase());
             String body = bodyTemplate.replace("${value}", writePointValue.getValue(String.class));
@@ -191,8 +202,8 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
      */
     private WebClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         return clientMap.computeIfAbsent(deviceId, id -> {
-            String baseUrl = getConfigValue(driverConfig, "baseUrl", "");
-            int timeout = getConfigIntValue(driverConfig, "timeout", 5000);
+            String baseUrl = getConfigValue(driverConfig, ATTR_BASE_URL, "");
+            int timeout = getConfigIntValue(driverConfig, ATTR_TIMEOUT, DEFAULT_TIMEOUT_MS);
 
             log.debug("Driver connection creating, protocol={}, deviceId={}, baseUrl={}",
                     driverCode, deviceId, baseUrl);
@@ -224,8 +235,7 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
             return json;
         }
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode node = mapper.readTree(json);
+            JsonNode node = OBJECT_MAPPER.readTree(json);
             String[] parts = path.replace("$.", "").split("\\.");
             for (String part : parts) {
                 if (node == null) {
@@ -259,7 +269,7 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
-        checkRequired(driverConfig, "baseUrl", issues);
+        checkRequired(driverConfig, ATTR_BASE_URL, issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
                 .issues(issues).build();
@@ -268,8 +278,8 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
-        checkRequired(pointConfig, "path", issues);
-        checkRequired(pointConfig, "method", issues);
+        checkRequired(pointConfig, ATTR_PATH, issues);
+        checkRequired(pointConfig, ATTR_METHOD, issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
                 .issues(issues).build();
