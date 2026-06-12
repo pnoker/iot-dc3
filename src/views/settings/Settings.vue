@@ -167,6 +167,9 @@
     ensureDirectItem(items, { name: 'settingsLabel', title: t('nav.settingsLabel'), icon: 'CollectionTag' }, [
       'settingsAbout',
     ]);
+    ensureDirectItem(items, { name: 'settingsMcpServer', title: t('nav.settingsMcpServer'), icon: 'Connection' }, [
+      'settingsAbout',
+    ]);
     ensureDirectItem(items, { name: 'settingsAbout', title: t('nav.settingsAbout'), icon: 'InfoFilled' }, []);
     ensureAlarmGroup(items);
     ensureModelGroup(items);

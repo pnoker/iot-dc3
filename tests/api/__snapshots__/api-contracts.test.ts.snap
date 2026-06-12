@@ -2309,6 +2309,146 @@ exports[`API wrapper contracts > label > updateLabel maps to its transport contr
 }
 `;
 
+exports[`API wrapper contracts > mcp > addMcpConnection maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/connection/add",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > mcp > getMcpMetadata maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/metadata",
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > mcp > has every export covered by the contract matrix 1`] = `
+[
+  "addMcpConnection",
+  "getMcpMetadata",
+  "listMcpClient",
+  "listMcpConnection",
+  "listMcpConnectionTool",
+  "listMcpTool",
+  "refreshMcpToolCatalog",
+  "registerMcpClient",
+  "replaceMcpConnectionTools",
+  "revokeMcpConnection",
+]
+`;
+
+exports[`API wrapper contracts > mcp > listMcpClient maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/client/list",
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > mcp > listMcpConnection maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/connection/list",
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > mcp > listMcpConnectionTool maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/connection/tools/list",
+    {
+      "params": {
+        "id": "connection-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > mcp > listMcpTool maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/tool/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > mcp > refreshMcpToolCatalog maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/tool/catalog/refresh",
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > mcp > registerMcpClient maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/client/register",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > mcp > replaceMcpConnectionTools maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/connection/tools/replace",
+    {
+      "connection_id": "connection-1",
+      "tool_ids": [
+        "tool-1",
+        "tool-2",
+      ],
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > mcp > revokeMcpConnection maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/connection/revoke",
+    undefined,
+    {
+      "params": {
+        "id": "connection-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
 exports[`API wrapper contracts > menu > addMenu maps to its transport contract 1`] = `
 {
   "args": [
@@ -2940,6 +3080,89 @@ exports[`API wrapper contracts > role > updateRole maps to its transport contrac
 }
 `;
 
+exports[`API wrapper contracts > rolePrincipalBind > addRolePrincipalBind maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/role_principal/add",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > rolePrincipalBind > deleteRolePrincipalBind maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/role_principal/delete",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > rolePrincipalBind > has every export covered by the contract matrix 1`] = `
+[
+  "addRolePrincipalBind",
+  "deleteRolePrincipalBind",
+  "listRoleByPrincipalId",
+  "listRolePrincipalBind",
+  "listUserByRoleId",
+]
+`;
+
+exports[`API wrapper contracts > rolePrincipalBind > listRoleByPrincipalId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/role_principal/list_role_by_principal",
+    {
+      "params": {
+        "principal_id": "principal-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > rolePrincipalBind > listRolePrincipalBind maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/role_principal/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > rolePrincipalBind > listUserByRoleId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/role_principal/list_user_by_role",
+    {
+      "params": {
+        "role_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
 exports[`API wrapper contracts > roleResourceBind > addRoleResourceBind maps to its transport contract 1`] = `
 {
   "args": [
@@ -2973,11 +3196,25 @@ exports[`API wrapper contracts > roleResourceBind > has every export covered by 
 [
   "addRoleResourceBind",
   "deleteRoleResourceBind",
+  "listResourceByPrincipalId",
   "listResourceByRoleId",
-  "listResourceByUserId",
   "listRoleByResourceId",
   "listRoleResourceBind",
 ]
+`;
+
+exports[`API wrapper contracts > roleResourceBind > listResourceByPrincipalId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/role_resource/list_resource_by_principal",
+    {
+      "params": {
+        "principal_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
 `;
 
 exports[`API wrapper contracts > roleResourceBind > listResourceByRoleId maps to its transport contract 1`] = `
@@ -2987,20 +3224,6 @@ exports[`API wrapper contracts > roleResourceBind > listResourceByRoleId maps to
     {
       "params": {
         "role_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > roleResourceBind > listResourceByUserId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/role_resource/list_resource_by_user",
-    {
-      "params": {
-        "user_id": "id-1",
       },
     },
   ],
@@ -3035,90 +3258,6 @@ exports[`API wrapper contracts > roleResourceBind > listRoleResourceBind maps to
     },
   ],
   "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > roleUserBind > addRoleUserBind maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/role_user/add",
-    {
-      "enableFlag": "ENABLE",
-      "id": "payload-1",
-      "name": "demo",
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > roleUserBind > deleteRoleUserBind maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/role_user/delete",
-    undefined,
-    {
-      "params": {
-        "id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > roleUserBind > has every export covered by the contract matrix 1`] = `
-[
-  "addRoleUserBind",
-  "deleteRoleUserBind",
-  "listRoleByUserId",
-  "listRoleUserBind",
-  "listUserByRoleId",
-]
-`;
-
-exports[`API wrapper contracts > roleUserBind > listRoleByUserId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/role_user/list_role_by_user",
-    {
-      "params": {
-        "tenant_id": 1000,
-        "user_id": "user-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > roleUserBind > listRoleUserBind maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/role_user/list",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > roleUserBind > listUserByRoleId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/auth/role_user/list_user_by_role",
-    {
-      "params": {
-        "role_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
 }
 `;
 

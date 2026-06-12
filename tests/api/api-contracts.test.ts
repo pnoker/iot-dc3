@@ -36,12 +36,13 @@ import * as groupApi from '@/api/group';
 import * as infoApi from '@/api/info';
 import * as labelApi from '@/api/label';
 import * as menuApi from '@/api/menu';
+import * as mcpApi from '@/api/mcp';
 import * as pointApi from '@/api/point';
 import * as profileApi from '@/api/profile';
 import * as resourceApi from '@/api/resource';
 import * as roleApi from '@/api/role';
+import * as rolePrincipalBindApi from '@/api/rolePrincipalBind';
 import * as roleResourceBindApi from '@/api/roleResourceBind';
-import * as roleUserBindApi from '@/api/roleUserBind';
 import * as tokenApi from '@/api/token';
 import * as userApi from '@/api/user';
 import { AUTH_HEADERS } from '@/config/constant/common';
@@ -100,12 +101,13 @@ const modules: Record<string, ApiModule> = {
   info: infoApi,
   label: labelApi,
   menu: menuApi,
+  mcp: mcpApi,
   point: pointApi,
   profile: profileApi,
   resource: resourceApi,
   role: roleApi,
+  rolePrincipalBind: rolePrincipalBindApi,
   roleResourceBind: roleResourceBindApi,
-  roleUserBind: roleUserBindApi,
   token: tokenApi,
   user: userApi,
 };
@@ -128,12 +130,13 @@ const coveredApiSourceFiles = new Set([
   'info',
   'label',
   'menu',
+  'mcp',
   'point',
   'profile',
   'resource',
   'role',
+  'rolePrincipalBind',
   'roleResourceBind',
-  'roleUserBind',
   'token',
   'user',
 ]);
@@ -171,7 +174,11 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   alertUnconfirm: ['driver', 'alert-1'],
   alertBulkConfirm: [[{ source: 'driver', id: 'alert-1' }], true],
   listPointValueHistory: ['1001', '2002', 30],
-  listRoleByUserId: ['user-1', 1000],
+  listRoleByPrincipalId: ['principal-1'],
+  replaceMcpConnectionTools: ['connection-1', ['tool-1', 'tool-2']],
+  listMcpConnectionTool: ['connection-1'],
+  registerMcpClient: [payload],
+  revokeMcpConnection: ['connection-1'],
   getDriverInfoByDeviceIdAndAttributeId: ['device-1', 'attribute-1'],
   getPointInfoByDeviceIdAndPointId: ['device-1', 'point-1'],
   listCommandInfoByDeviceIdAndCommandId: ['device-1', 'command-1'],

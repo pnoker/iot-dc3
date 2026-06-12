@@ -192,6 +192,12 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/agentic/ProviderSettings.vue'),
         },
         {
+          name: 'settingsMcpServer',
+          path: 'mcp',
+          meta: { title: 'MCP Service' },
+          component: () => import('@/views/settings/mcp/McpServer.vue'),
+        },
+        {
           name: 'settingsAbout',
           path: 'about',
           meta: { title: 'About' },
