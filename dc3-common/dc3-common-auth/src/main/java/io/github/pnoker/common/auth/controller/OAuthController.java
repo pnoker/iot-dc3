@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthPro
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -65,13 +66,13 @@ public class OAuthController {
     }
 
     @PostMapping(value = McpConstant.OAUTH2_REGISTER, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Map<String, Object>>> register(
-            @RequestBody Map<String, Object> request,
+    public Mono<ResponseEntity<?>> register(
+            @RequestBody OAuthClientRegistrationRequestDTO request,
             @org.springframework.web.bind.annotation.RequestHeader(
                     value = RequestConstant.Header.X_AUTH_PRINCIPAL, required = false) String principalJson) {
-        return Mono.fromSupplier(() -> ResponseEntity.status(HttpStatus.CREATED)
+        return Mono.<ResponseEntity<?>>fromSupplier(() -> ResponseEntity.status(HttpStatus.CREATED)
                 .body(oauthMcpRuntimeService.registerClient(request, parsePrincipal(principalJson))))
-                .onErrorResume(OAuthProtocolException.class, this::oauthError);
+                .onErrorResume(OAuthProtocolException.class, this::oauthAnyError);
     }
 
     @GetMapping(McpConstant.OAUTH2_AUTHORIZE)
@@ -110,6 +111,10 @@ public class OAuthController {
         body.put(McpConstant.Field.ERROR, exception.getError());
         body.put(McpConstant.Field.ERROR_DESCRIPTION, exception.getDescription());
         return Mono.just(ResponseEntity.status(exception.getStatusCode()).body(body));
+    }
+
+    private Mono<ResponseEntity<?>> oauthAnyError(OAuthProtocolException exception) {
+        return oauthError(exception).map(response -> response);
     }
 
     private Map<String, String> firstValues(MultiValueMap<String, String> values) {

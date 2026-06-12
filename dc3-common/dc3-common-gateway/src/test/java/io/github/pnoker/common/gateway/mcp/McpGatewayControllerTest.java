@@ -17,6 +17,9 @@
 
 package io.github.pnoker.common.gateway.mcp;
 
+import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
+import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,7 +86,8 @@ class McpGatewayControllerTest {
     @Test
     void mcpReturnsBearerChallengeWhenTokenIsInactive() {
         MockServerWebExchange exchange = authorizedExchange();
-        when(mcpGatewayClient.introspect("token")).thenReturn(Mono.just(Map.of("active", false)));
+        when(mcpGatewayClient.introspect("token"))
+                .thenReturn(Mono.just(McpIntrospectResponseDTO.inactive()));
 
         var response = controller.mcp(Map.of("jsonrpc", "2.0", "method", "initialize", "id", 1),
                 exchange).block();
@@ -95,7 +99,7 @@ class McpGatewayControllerTest {
     @Test
     void initializeReturnsMcpServerCapabilitiesForActiveToken() {
         MockServerWebExchange exchange = authorizedExchange();
-        when(mcpGatewayClient.introspect("token")).thenReturn(Mono.just(Map.of("active", true)));
+        when(mcpGatewayClient.introspect("token")).thenReturn(Mono.just(activeContext()));
 
         var response = controller.mcp(Map.of("jsonrpc", "2.0", "method", "initialize", "id", 7),
                 exchange).block();
@@ -110,8 +114,10 @@ class McpGatewayControllerTest {
     @Test
     void toolsListDelegatesToAuthFilteredToolList() {
         MockServerWebExchange exchange = authorizedExchange();
-        Map<String, Object> context = Map.of("active", true, "tenant_id", 1L, "principal_id", 100L);
-        Map<String, Object> tools = Map.of("tools", List.of(Map.of("name", "auth_user_get")));
+        McpIntrospectResponseDTO context = activeContext();
+        McpToolListResponseDTO tools = McpToolListResponseDTO.builder()
+                .tools(List.of(McpToolDefinitionDTO.builder().name("auth_user_get").build()))
+                .build();
         when(mcpGatewayClient.introspect("token")).thenReturn(Mono.just(context));
         when(mcpGatewayClient.listTools(context)).thenReturn(Mono.just(tools));
 
@@ -119,13 +125,13 @@ class McpGatewayControllerTest {
                 exchange).block();
 
         assertThat(response).isNotNull();
-        assertThat(castMap(response.getBody().get("result"))).containsEntry("tools", tools.get("tools"));
+        assertThat(response.getBody().get("result")).isSameAs(tools);
     }
 
     @Test
     void toolsCallPassesArgumentsAndMetaToGatewayClient() {
         MockServerWebExchange exchange = authorizedExchange();
-        Map<String, Object> context = Map.of("active", true, "tenant_id", 1L, "principal_id", 100L);
+        McpIntrospectResponseDTO context = activeContext();
         when(mcpGatewayClient.introspect("token")).thenReturn(Mono.just(context));
         when(mcpGatewayClient.callTool(eq(context), eq("restart_device"), anyMap(), anyMap(), any()))
                 .thenReturn(Mono.just(Map.of("content", List.of(Map.of("type", "text", "text", "{}")))));
@@ -151,6 +157,20 @@ class McpGatewayControllerTest {
         assertThat(arguments.getValue()).containsEntry("deviceId", 3L);
         assertThat(meta.getValue()).containsEntry("confirm_id", "confirm-1")
                 .containsEntry("idempotency_key", "idem-1");
+    }
+
+    private McpIntrospectResponseDTO activeContext() {
+        return McpIntrospectResponseDTO.builder()
+                .active(true)
+                .tenantId(1L)
+                .principalId(100L)
+                .principalType("USER")
+                .principalName("admin")
+                .displayName("Admin")
+                .clientId("dc3_client")
+                .mcpConnectionId(300L)
+                .scope("mcp:tools:list mcp:tools:call")
+                .build();
     }
 
     private MockServerWebExchange authorizedExchange() {

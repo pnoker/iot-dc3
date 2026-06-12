@@ -23,8 +23,11 @@ import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.dto.McpConnectionToolsReplaceRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolCatalogListRequestDTO;
+import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
+import io.github.pnoker.common.entity.dto.OAuthClientRegistrationResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
@@ -42,7 +45,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * RBAC-protected MCP management endpoints used by the settings UI.
@@ -70,7 +72,8 @@ public class McpManagementController implements BaseController {
     @PreAuthorize("@perm.can('mcp', 'add')")
     @Operation(summary = "Register OAuth Client", description = "Register an OAuth client for MCP usage")
     @PostMapping("/client/register")
-    public Mono<R<Map<String, Object>>> registerClient(@RequestBody Map<String, Object> request) {
+    public Mono<R<OAuthClientRegistrationResponseDTO>> registerClient(
+            @RequestBody OAuthClientRegistrationRequestDTO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.registerClient(request,
                 header))));
     }
@@ -111,11 +114,12 @@ public class McpManagementController implements BaseController {
     @PreAuthorize("@perm.can('mcp', 'update')")
     @Operation(summary = "Replace MCP Connection Tools", description = "Replace a connection tool whitelist")
     @PostMapping("/connection/tools/replace")
-    public Mono<R<Boolean>> replaceConnectionTools(@RequestBody Map<String, Object> request) {
+    public Mono<R<Boolean>> replaceConnectionTools(@RequestBody McpConnectionToolsReplaceRequestDTO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
-            Long connectionId = longValue(request.get(McpConstant.Field.CONNECTION_ID_REQUEST));
-            oauthMcpRuntimeService.replaceConnectionTools(connectionId,
-                    toolIds(request.get(McpConstant.Field.TOOL_IDS)), header);
+            McpConnectionToolsReplaceRequestDTO body =
+                    request == null ? new McpConnectionToolsReplaceRequestDTO() : request;
+            oauthMcpRuntimeService.replaceConnectionTools(body.getConnectionId(), toolIds(body.getToolIds()),
+                    header);
             return R.ok(true);
         }));
     }
@@ -138,35 +142,22 @@ public class McpManagementController implements BaseController {
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List MCP Tool Catalog", description = "List MCP tool catalog entries")
     @PostMapping("/tool/list")
-    public Mono<R<List<McpToolRecord>>> listToolCatalog(@RequestBody(required = false) Map<String, Object> request) {
-        Map<String, Object> body = Objects.requireNonNullElse(request, Map.of());
+    public Mono<R<List<McpToolRecord>>> listToolCatalog(
+            @RequestBody(required = false) McpToolCatalogListRequestDTO request) {
+        McpToolCatalogListRequestDTO body = request == null ? new McpToolCatalogListRequestDTO() : request;
         return async(() -> R.ok(oauthMcpRuntimeService.listToolCatalog(
-                Objects.toString(body.get(McpConstant.Field.KEYWORD), ""),
-                Objects.toString(body.get(McpConstant.Field.RISK_LEVEL_META), ""),
-                intValue(body.get(McpConstant.Field.LIMIT))
+                StringUtils.defaultString(body.getKeyword()),
+                StringUtils.defaultString(body.getRiskLevel()),
+                intValue(body.getLimit())
         )));
     }
 
-    private List<String> toolIds(Object value) {
-        if (value instanceof List<?> list) {
-            return list.stream().map(Objects::toString).filter(StringUtils::isNotBlank).toList();
-        }
-        return List.of();
+    private List<String> toolIds(List<String> value) {
+        return value == null ? List.of() : value.stream().filter(StringUtils::isNotBlank).toList();
     }
 
-    private Long longValue(Object value) {
-        if (value instanceof Number number) {
-            return number.longValue();
-        }
-        return Long.valueOf(Objects.toString(value, "0"));
-    }
-
-    private int intValue(Object value) {
-        if (value instanceof Number number) {
-            return number.intValue();
-        }
-        String raw = Objects.toString(value, "0");
-        return StringUtils.isBlank(raw) ? 0 : Integer.parseInt(raw);
+    private int intValue(Integer value) {
+        return value == null ? 0 : value;
     }
 
 }

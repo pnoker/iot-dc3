@@ -19,12 +19,17 @@ package io.github.pnoker.common.auth.controller;
 
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
-import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
-import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.McpConstant;
+import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
+import io.github.pnoker.common.entity.dto.McpAuditResponseDTO;
+import io.github.pnoker.common.entity.dto.McpCatalogRefreshResponseDTO;
+import io.github.pnoker.common.entity.dto.McpIntrospectRequestDTO;
+import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolListRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolResolveRequestDTO;
 import io.github.pnoker.common.utils.HmacAuthSigner;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -59,66 +64,69 @@ public class McpInternalController {
     private final HmacAuthSigner hmacAuthSigner;
 
     @PostMapping(McpConstant.OAUTH2_INTROSPECT)
-    public Mono<ResponseEntity<Map<String, Object>>> introspect(@RequestBody Map<String, Object> request,
-                                                                ServerWebExchange exchange) {
+    public Mono<ResponseEntity<McpIntrospectResponseDTO>> introspect(@RequestBody McpIntrospectRequestDTO request,
+                                                                     ServerWebExchange exchange) {
         return Mono.fromSupplier(() -> {
             requireInternal(exchange);
-            return ResponseEntity.ok(oauthMcpRuntimeService.introspect(
-                    Objects.toString(request.get(McpConstant.Field.TOKEN), "")));
+            String token = request == null ? "" : Objects.toString(request.getToken(), "");
+            return ResponseEntity.ok(oauthMcpRuntimeService.introspect(token));
         });
     }
 
     @PostMapping(McpConstant.INTERNAL_CATALOG_REFRESH)
-    public Mono<ResponseEntity<Map<String, Object>>> refreshCatalog(ServerWebExchange exchange) {
+    public Mono<ResponseEntity<McpCatalogRefreshResponseDTO>> refreshCatalog(ServerWebExchange exchange) {
         return Mono.fromSupplier(() -> {
             requireInternal(exchange);
-            return ResponseEntity.ok(Map.of("changed", oauthMcpRuntimeService.refreshToolCatalog()));
+            return ResponseEntity.ok(McpCatalogRefreshResponseDTO.builder()
+                    .changed(oauthMcpRuntimeService.refreshToolCatalog())
+                    .build());
         });
     }
 
     @PostMapping(McpConstant.INTERNAL_TOOLS_LIST)
-    public Mono<ResponseEntity<Map<String, Object>>> listTools(@RequestBody Map<String, Object> request,
-                                                               ServerWebExchange exchange) {
-        return Mono.fromSupplier(() -> {
+    public Mono<ResponseEntity<?>> listTools(@RequestBody McpToolListRequestDTO request,
+                                             ServerWebExchange exchange) {
+        return Mono.<ResponseEntity<?>>fromSupplier(() -> {
             requireInternal(exchange);
-            Map<String, Object> body = new LinkedHashMap<>();
-            body.put(McpConstant.Field.TOOLS, oauthMcpRuntimeService.listVisibleTools(
-                    longValue(request.get(McpConstant.Field.TENANT_ID)),
-                    longValue(request.get(McpConstant.Field.PRINCIPAL_ID)),
-                    longValue(request.get(McpConstant.Field.MCP_CONNECTION_ID)),
-                    scopes(request.get(McpConstant.Field.SCOPE))
-            ));
-            return ResponseEntity.ok(body);
+            McpToolListRequestDTO body = request == null ? new McpToolListRequestDTO() : request;
+            return ResponseEntity.ok(McpToolListResponseDTO.builder()
+                    .tools(oauthMcpRuntimeService.listVisibleTools(
+                            body.getTenantId(),
+                            body.getPrincipalId(),
+                            body.getMcpConnectionId(),
+                            scopes(body.getScope())
+                    ))
+                    .build());
         }).onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 
     @PostMapping(McpConstant.INTERNAL_TOOLS_RESOLVE)
-    public Mono<ResponseEntity<Map<String, Object>>> resolveTool(@RequestBody Map<String, Object> request,
-                                                                 ServerWebExchange exchange) {
-        return Mono.fromSupplier(() -> {
+    public Mono<ResponseEntity<?>> resolveTool(@RequestBody McpToolResolveRequestDTO request,
+                                               ServerWebExchange exchange) {
+        return Mono.<ResponseEntity<?>>fromSupplier(() -> {
             requireInternal(exchange);
-            McpToolRecord tool = oauthMcpRuntimeService.resolveVisibleTool(
-                    longValue(request.get(McpConstant.Field.TENANT_ID)),
-                    longValue(request.get(McpConstant.Field.PRINCIPAL_ID)),
-                    longValue(request.get(McpConstant.Field.MCP_CONNECTION_ID)),
-                    Objects.toString(request.get(McpConstant.Field.TOOL_NAME_REQUEST), ""),
-                    scopes(request.get(McpConstant.Field.SCOPE))
-            );
-            return ResponseEntity.ok(toolRecord(tool));
+            McpToolResolveRequestDTO body = request == null ? new McpToolResolveRequestDTO() : request;
+            return ResponseEntity.ok(oauthMcpRuntimeService.resolveVisibleTool(
+                    body.getTenantId(),
+                    body.getPrincipalId(),
+                    body.getMcpConnectionId(),
+                    Objects.toString(body.getToolName(), ""),
+                    scopes(body.getScope())
+            ));
         }).onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 
     @PostMapping(McpConstant.INTERNAL_AUDIT)
-    public Mono<ResponseEntity<Map<String, Object>>> audit(@RequestBody McpAuditCommand command,
+    public Mono<ResponseEntity<McpAuditResponseDTO>> audit(@RequestBody McpAuditCommandDTO command,
                                                            ServerWebExchange exchange) {
         return Mono.fromSupplier(() -> {
             requireInternal(exchange);
             oauthMcpRuntimeService.audit(command);
-            return ResponseEntity.ok(Map.of("stored", true));
+            return ResponseEntity.ok(McpAuditResponseDTO.builder().stored(true).build());
         });
     }
 
-    private Mono<ResponseEntity<Map<String, Object>>> oauthError(OAuthProtocolException exception) {
+    private Mono<ResponseEntity<?>> oauthError(OAuthProtocolException exception) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(McpConstant.Field.ERROR, exception.getError());
         body.put(McpConstant.Field.ERROR_DESCRIPTION, exception.getDescription());
@@ -150,27 +158,12 @@ public class McpInternalController {
         }
     }
 
-    private Set<String> scopes(Object value) {
+    private Set<String> scopes(String value) {
         String raw = Objects.toString(value, "");
         if (StringUtils.isBlank(raw)) {
             return Set.of();
         }
         return Set.of(raw.trim().split("[\\s,]+"));
-    }
-
-    private Long longValue(Object value) {
-        if (value instanceof Number number) {
-            return number.longValue();
-        }
-        return Long.valueOf(Objects.toString(value, "0"));
-    }
-
-    private Map<String, Object> toolRecord(McpToolRecord tool) {
-        Map<String, Object> map = JsonUtil.parseObject(JsonUtil.toJsonString(tool),
-                new tools.jackson.core.type.TypeReference<Map<String, Object>>() {
-                });
-        map.values().removeIf(Objects::isNull);
-        return map;
     }
 
 }

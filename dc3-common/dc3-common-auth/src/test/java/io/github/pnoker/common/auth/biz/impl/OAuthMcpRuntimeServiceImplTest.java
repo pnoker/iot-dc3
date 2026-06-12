@@ -25,6 +25,9 @@ import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
+import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
+import io.github.pnoker.common.entity.dto.OAuthClientRegistrationResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +38,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Duration;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,23 +88,24 @@ class OAuthMcpRuntimeServiceImplTest {
 
     @Test
     void publicClientRegistrationPersistsPkceClientWithoutSecret() {
-        Map<String, Object> request = new LinkedHashMap<>();
-        request.put("client_name", "Claude Desktop");
-        request.put("redirect_uris", List.of("http://127.0.0.1/callback"));
-        request.put("scope", "mcp:tools:list mcp:tools:call");
+        OAuthClientRegistrationRequestDTO request = OAuthClientRegistrationRequestDTO.builder()
+                .clientName("Claude Desktop")
+                .redirectUris(List.of("http://127.0.0.1/callback"))
+                .scope("mcp:tools:list mcp:tools:call")
+                .build();
 
         RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
         principal.setPrincipalId(100L);
 
-        Map<String, Object> response = service.registerClient(request, principal);
+        OAuthClientRegistrationResponseDTO response = service.registerClient(request, principal);
 
         ArgumentCaptor<OAuthRegisteredClientRecord> captor =
                 ArgumentCaptor.forClass(OAuthRegisteredClientRecord.class);
         verify(oauthMcpMapper).insertClient(captor.capture());
         OAuthRegisteredClientRecord stored = captor.getValue();
 
-        assertThat(response.get("client_id")).asString().startsWith("dc3_");
-        assertThat(response).doesNotContainKey("client_secret");
+        assertThat(response.getClientId()).startsWith("dc3_");
+        assertThat(response.getClientSecret()).isNull();
         assertThat(stored.getClientType()).isEqualTo("PUBLIC");
         assertThat(stored.getOwnerPrincipalId()).isEqualTo(100L);
         assertThat(stored.getClientAuthMethods()).isEqualTo("none");
@@ -112,24 +115,25 @@ class OAuthMcpRuntimeServiceImplTest {
 
     @Test
     void confidentialClientCredentialsRegistrationRequiresActiveServiceAccount() {
-        Map<String, Object> request = new LinkedHashMap<>();
-        request.put("client_name", "Robot");
-        request.put("client_type", "CONFIDENTIAL");
-        request.put("grant_types", List.of("client_credentials"));
-        request.put("tenant_id", 1L);
-        request.put("service_account_principal_id", 200L);
+        OAuthClientRegistrationRequestDTO request = OAuthClientRegistrationRequestDTO.builder()
+                .clientName("Robot")
+                .clientType("CONFIDENTIAL")
+                .grantTypes(List.of("client_credentials"))
+                .tenantId(1L)
+                .serviceAccountPrincipalId(200L)
+                .build();
 
         when(serviceAccountManager.getOne(any())).thenReturn(new ServiceAccountDO());
 
-        Map<String, Object> response = service.registerClient(request, null);
+        OAuthClientRegistrationResponseDTO response = service.registerClient(request, null);
 
         ArgumentCaptor<OAuthRegisteredClientRecord> captor =
                 ArgumentCaptor.forClass(OAuthRegisteredClientRecord.class);
         verify(oauthMcpMapper).insertClient(captor.capture());
         OAuthRegisteredClientRecord stored = captor.getValue();
 
-        assertThat(response.get("client_secret")).asString().isNotBlank();
-        assertThat(response.get("token_endpoint_auth_method")).isEqualTo("client_secret_basic");
+        assertThat(response.getClientSecret()).isNotBlank();
+        assertThat(response.getTokenEndpointAuthMethod()).isEqualTo("client_secret_basic");
         assertThat(stored.getClientType()).isEqualTo("CONFIDENTIAL");
         assertThat(stored.getServiceAccountPrincipalId()).isEqualTo(200L);
         assertThat(stored.getTenantId()).isEqualTo(1L);
@@ -182,26 +186,19 @@ class OAuthMcpRuntimeServiceImplTest {
         tool.setOpenWorldHint((byte) 0);
         when(oauthMcpMapper.listVisibleTools(1L, 100L, 300L, false)).thenReturn(List.of(tool));
 
-        List<Map<String, Object>> visible = service.listVisibleTools(1L, 100L, 300L,
+        List<McpToolDefinitionDTO> visible = service.listVisibleTools(1L, 100L, 300L,
                 Set.of("mcp:tools:list"));
 
         assertThat(visible).hasSize(1);
-        assertThat(visible.get(0))
-                .containsEntry("name", "auth_user_get")
-                .containsEntry("title", "List users");
-        Map<String, Object> meta = castMap(visible.get(0).get("_meta"));
-        assertThat(meta).containsEntry("permission_code", "auth:user:select")
-                .containsEntry("risk_level", "LOW");
+        assertThat(visible.get(0).getName()).isEqualTo("auth_user_get");
+        assertThat(visible.get(0).getTitle()).isEqualTo("List users");
+        assertThat(visible.get(0).getMeta().getPermissionCode()).isEqualTo("auth:user:select");
+        assertThat(visible.get(0).getMeta().getRiskLevel()).isEqualTo("LOW");
     }
 
     @SuppressWarnings("unchecked")
     private List<String> castList(Object value) {
         return (List<String>) value;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> castMap(Object value) {
-        return (Map<String, Object>) value;
     }
 
 }

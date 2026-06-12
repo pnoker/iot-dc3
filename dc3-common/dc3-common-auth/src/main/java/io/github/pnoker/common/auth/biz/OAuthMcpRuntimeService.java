@@ -17,11 +17,16 @@
 
 package io.github.pnoker.common.auth.biz;
 
-import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
+import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
+import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
+import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
+import io.github.pnoker.common.entity.dto.OAuthClientRegistrationResponseDTO;
 
 import java.net.URI;
 import java.util.List;
@@ -41,7 +46,8 @@ public interface OAuthMcpRuntimeService {
 
     Map<String, Object> jwks();
 
-    Map<String, Object> registerClient(Map<String, Object> request, RequestHeader.PrincipalHeader principalHeader);
+    OAuthClientRegistrationResponseDTO registerClient(OAuthClientRegistrationRequestDTO request,
+                                                      RequestHeader.PrincipalHeader principalHeader);
 
     List<OAuthRegisteredClientRecord> listClients(RequestHeader.PrincipalHeader principalHeader);
 
@@ -49,7 +55,7 @@ public interface OAuthMcpRuntimeService {
 
     Map<String, Object> token(Map<String, String> form, String authorizationHeader);
 
-    Map<String, Object> introspect(String token);
+    McpIntrospectResponseDTO introspect(String token);
 
     Map<String, Object> revoke(Map<String, String> form, String authorizationHeader);
 
@@ -69,11 +75,12 @@ public interface OAuthMcpRuntimeService {
 
     List<String> listConnectionToolIds(Long connectionId, RequestHeader.PrincipalHeader principalHeader);
 
-    List<Map<String, Object>> listVisibleTools(Long tenantId, Long principalId, Long connectionId, Set<String> scopes);
+    List<McpToolDefinitionDTO> listVisibleTools(Long tenantId, Long principalId, Long connectionId,
+                                                Set<String> scopes);
 
-    McpToolRecord resolveVisibleTool(Long tenantId, Long principalId, Long connectionId, String toolName,
-                                     Set<String> scopes);
+    McpToolResolveResponseDTO resolveVisibleTool(Long tenantId, Long principalId, Long connectionId, String toolName,
+                                                 Set<String> scopes);
 
-    void audit(McpAuditCommand command);
+    void audit(McpAuditCommandDTO command);
 
 }

@@ -181,7 +181,13 @@ public class McpConstant {
 
         public static final String CLIENT_ID_CAMEL = "clientId";
 
+        public static final String CLIENT_NAME_META = "client_name";
+
         public static final String CLIENT_NAME = "clientName";
+
+        public static final String CLIENT_SECRET = "client_secret";
+
+        public static final String CLIENT_TYPE = "client_type";
 
         public static final String CLIENT_VERSION = "clientVersion";
 
@@ -212,6 +218,8 @@ public class McpConstant {
         public static final String EXPIRES_IN = "expires_in";
 
         public static final String GRANT_TYPE = "grant_type";
+
+        public static final String GRANT_TYPES = "grant_types";
 
         public static final String IAT = "iat";
 
@@ -251,6 +259,8 @@ public class McpConstant {
 
         public static final String REDIRECT_URI = "redirect_uri";
 
+        public static final String REDIRECT_URIS = "redirect_uris";
+
         public static final String REFRESH_TOKEN = "refresh_token";
 
         public static final String REMOTE_IP = "remoteIp";
@@ -261,6 +271,8 @@ public class McpConstant {
 
         public static final String SCOPE = "scope";
 
+        public static final String SERVICE_ACCOUNT_PRINCIPAL_ID = "service_account_principal_id";
+
         public static final String STATUS = "status";
 
         public static final String SUB = "sub";
@@ -270,6 +282,8 @@ public class McpConstant {
         public static final String TENANT_ID_CAMEL = "tenantId";
 
         public static final String TOKEN = "token";
+
+        public static final String TOKEN_ENDPOINT_AUTH_METHOD = "token_endpoint_auth_method";
 
         public static final String TOKEN_TYPE = "token_type";
 
@@ -288,6 +302,40 @@ public class McpConstant {
         public static final String TRACE_ID = "traceId";
 
         private Field() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
+    /**
+     * MCP tool definition fields exposed by the public JSON-RPC tools/list
+     * method.
+     */
+    public static class ToolDefinition {
+
+        public static final String ADDITIONAL_PROPERTIES = "additionalProperties";
+
+        public static final String ANNOTATIONS = "annotations";
+
+        public static final String DESTRUCTIVE_HINT = "destructiveHint";
+
+        public static final String DESCRIPTION = "description";
+
+        public static final String IDEMPOTENT_HINT = "idempotentHint";
+
+        public static final String INPUT_SCHEMA = "inputSchema";
+
+        public static final String OPEN_WORLD_HINT = "openWorldHint";
+
+        public static final String READ_ONLY_HINT = "readOnlyHint";
+
+        public static final String TITLE = "title";
+
+        public static final String TYPE = "type";
+
+        public static final String TYPE_OBJECT = "object";
+
+        private ToolDefinition() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 

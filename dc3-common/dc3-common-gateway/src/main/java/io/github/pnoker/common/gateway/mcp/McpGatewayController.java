@@ -20,6 +20,14 @@ package io.github.pnoker.common.gateway.mcp;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
+import io.github.pnoker.common.entity.dto.McpAuditResponseDTO;
+import io.github.pnoker.common.entity.dto.McpIntrospectRequestDTO;
+import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolListRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolResolveRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -33,6 +41,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -91,7 +100,7 @@ public class McpGatewayController {
         }
         return mcpGatewayClient.introspect(token)
                 .flatMap(context -> {
-                    if (!Boolean.TRUE.equals(context.get(McpConstant.Field.ACTIVE))) {
+                    if (!context.isActive()) {
                         return Mono.just(challenge());
                     }
                     return dispatch(request, context, exchange);
@@ -103,7 +112,8 @@ public class McpGatewayController {
                 });
     }
 
-    private Mono<ResponseEntity<Map<String, Object>>> dispatch(Map<String, Object> request, Map<String, Object> context,
+    private Mono<ResponseEntity<Map<String, Object>>> dispatch(Map<String, Object> request,
+                                                               McpIntrospectResponseDTO context,
                                                                ServerWebExchange exchange) {
         String method = Objects.toString(request.get(McpConstant.JsonRpc.FIELD_METHOD), "");
         Object id = request.get(McpConstant.JsonRpc.FIELD_ID);
@@ -181,21 +191,6 @@ public class McpGatewayController {
         return map;
     }
 
-    private static Map<String, String> orderedStringMap(Object... values) {
-        Map<String, String> map = new LinkedHashMap<>();
-        for (int i = 0; i < values.length; i += 2) {
-            map.put(String.valueOf(values[i]), Objects.toString(values[i + 1], ""));
-        }
-        return map;
-    }
-
-    private static Long longValue(Object value) {
-        if (value instanceof Number number) {
-            return number.longValue();
-        }
-        return Long.valueOf(Objects.toString(value, "0"));
-    }
-
     /**
      * Internal WebClient facade for auth-center MCP endpoints and backend tool
      * invocation.
@@ -225,33 +220,33 @@ public class McpGatewayController {
         @Value("${dc3.mcp.backend.agentic-url:http://dc3-center-agentic:8600/agentic}")
         private String agenticUrl;
 
-        Mono<Map<String, Object>> introspect(String token) {
+        Mono<McpIntrospectResponseDTO> introspect(String token) {
             return postInternal(authBaseUrl + McpConstant.OAUTH2_INTROSPECT,
-                    Map.of(McpConstant.Field.TOKEN, token));
+                    McpIntrospectRequestDTO.builder().token(token).build(), McpIntrospectResponseDTO.class);
         }
 
-        Mono<Map<String, Object>> listTools(Map<String, Object> context) {
-            return postInternal(authBaseUrl + McpConstant.INTERNAL_TOOLS_LIST, orderedMap(
-                    McpConstant.Field.TENANT_ID, context.get(McpConstant.Field.TENANT_ID),
-                    McpConstant.Field.PRINCIPAL_ID, context.get(McpConstant.Field.PRINCIPAL_ID),
-                    McpConstant.Field.MCP_CONNECTION_ID, context.get(McpConstant.Field.MCP_CONNECTION_ID),
-                    McpConstant.Field.SCOPE, context.get(McpConstant.Field.SCOPE)
-            ));
+        Mono<McpToolListResponseDTO> listTools(McpIntrospectResponseDTO context) {
+            return postInternal(authBaseUrl + McpConstant.INTERNAL_TOOLS_LIST, McpToolListRequestDTO.builder()
+                    .tenantId(context.getTenantId())
+                    .principalId(context.getPrincipalId())
+                    .mcpConnectionId(context.getMcpConnectionId())
+                    .scope(context.getScope())
+                    .build(), McpToolListResponseDTO.class);
         }
 
-        Mono<Map<String, Object>> callTool(Map<String, Object> context, String toolName,
+        Mono<Map<String, Object>> callTool(McpIntrospectResponseDTO context, String toolName,
                                            Map<String, Object> arguments, Map<String, Object> callMeta,
                                            ServerWebExchange exchange) {
             long start = System.nanoTime();
             String traceId = UUID.randomUUID().toString();
-            return postInternal(authBaseUrl + McpConstant.INTERNAL_TOOLS_RESOLVE, orderedMap(
-                    McpConstant.Field.TENANT_ID, context.get(McpConstant.Field.TENANT_ID),
-                    McpConstant.Field.PRINCIPAL_ID, context.get(McpConstant.Field.PRINCIPAL_ID),
-                    McpConstant.Field.MCP_CONNECTION_ID, context.get(McpConstant.Field.MCP_CONNECTION_ID),
-                    McpConstant.Field.SCOPE, context.get(McpConstant.Field.SCOPE),
-                    McpConstant.Field.TOOL_NAME_REQUEST, toolName
-            )).flatMap(tool -> {
-                Map<String, String> controls = controlValues(callMeta, exchange);
+            return postInternal(authBaseUrl + McpConstant.INTERNAL_TOOLS_RESOLVE, McpToolResolveRequestDTO.builder()
+                    .tenantId(context.getTenantId())
+                    .principalId(context.getPrincipalId())
+                    .mcpConnectionId(context.getMcpConnectionId())
+                    .scope(context.getScope())
+                    .toolName(toolName)
+                    .build(), McpToolResolveResponseDTO.class).flatMap(tool -> {
+                McpToolCallControls controls = controlValues(callMeta, exchange);
                 String policyError = policyError(tool, controls);
                 if (StringUtils.isNotBlank(policyError)) {
                     return audit(context, tool, traceId, arguments, controls, McpConstant.Audit.DENIED,
@@ -279,12 +274,13 @@ public class McpGatewayController {
             });
         }
 
-        private Mono<Map<String, Object>> invokeBackend(Map<String, Object> context, Map<String, Object> tool,
+        private Mono<Map<String, Object>> invokeBackend(McpIntrospectResponseDTO context,
+                                                        McpToolResolveResponseDTO tool,
                                                         Map<String, Object> arguments,
-                                                        Map<String, String> controls) {
-            String url = backendBase(Objects.toString(tool.get("serviceName"), ""))
-                    + Objects.toString(tool.get("apiPath"), "");
-            HttpMethod method = HttpMethod.valueOf(Objects.toString(tool.get("httpMethod"), "POST"));
+                                                        McpToolCallControls controls) {
+            String url = backendBase(StringUtils.defaultString(tool.getServiceName()))
+                    + StringUtils.defaultString(tool.getApiPath());
+            HttpMethod method = HttpMethod.valueOf(StringUtils.defaultIfBlank(tool.getHttpMethod(), "POST"));
             WebClient.RequestBodySpec spec = webClientBuilder.build()
                     .method(method)
                     .uri(uriBuilder -> {
@@ -298,36 +294,34 @@ public class McpGatewayController {
                     })
                     .headers(headers -> {
                         headers.addAll(principalHeaders(context));
-                        if (StringUtils.isNotBlank(controls.get(McpConstant.Field.IDEMPOTENCY_KEY))) {
-                            headers.set(RequestConstant.Header.IDEMPOTENCY_KEY,
-                                    controls.get(McpConstant.Field.IDEMPOTENCY_KEY));
+                        if (StringUtils.isNotBlank(controls.idempotencyKey())) {
+                            headers.set(RequestConstant.Header.IDEMPOTENCY_KEY, controls.idempotencyKey());
                         }
-                        if (StringUtils.isNotBlank(controls.get(McpConstant.Field.CONFIRM_ID))) {
-                            headers.set(RequestConstant.Header.X_MCP_CONFIRM_ID,
-                                    controls.get(McpConstant.Field.CONFIRM_ID));
+                        if (StringUtils.isNotBlank(controls.confirmId())) {
+                            headers.set(RequestConstant.Header.X_MCP_CONFIRM_ID, controls.confirmId());
                         }
             });
             if (HttpMethod.GET.equals(method) || HttpMethod.DELETE.equals(method)) {
                 return spec.retrieve()
-                        .bodyToMono(new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {
+                        .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
                         });
             }
             return spec.contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(arguments)
                     .retrieve()
-                    .bodyToMono(new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {
+                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
                     });
         }
 
-        private HttpHeaders principalHeaders(Map<String, Object> context) {
+        private HttpHeaders principalHeaders(McpIntrospectResponseDTO context) {
             RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
-            principal.setPrincipalId(longValue(context.get(McpConstant.Field.PRINCIPAL_ID)));
-            principal.setPrincipalType(Objects.toString(context.get(McpConstant.Field.PRINCIPAL_TYPE), ""));
-            principal.setPrincipalName(Objects.toString(context.get(McpConstant.Field.PRINCIPAL_NAME), ""));
-            principal.setDisplayName(Objects.toString(context.get(McpConstant.Field.DISPLAY_NAME), ""));
-            principal.setTenantId(longValue(context.get(McpConstant.Field.TENANT_ID)));
-            principal.setClientId(Objects.toString(context.get(McpConstant.Field.CLIENT_ID), ""));
-            principal.setConnectionId(longValue(context.get(McpConstant.Field.MCP_CONNECTION_ID)));
+            principal.setPrincipalId(context.getPrincipalId());
+            principal.setPrincipalType(StringUtils.defaultString(context.getPrincipalType()));
+            principal.setPrincipalName(StringUtils.defaultString(context.getPrincipalName()));
+            principal.setDisplayName(StringUtils.defaultString(context.getDisplayName()));
+            principal.setTenantId(context.getTenantId());
+            principal.setClientId(StringUtils.defaultString(context.getClientId()));
+            principal.setConnectionId(context.getMcpConnectionId());
 
             String payload = JsonUtil.toJsonString(principal);
             HttpHeaders headers = new HttpHeaders();
@@ -338,56 +332,54 @@ public class McpGatewayController {
             return headers;
         }
 
-        private Mono<Void> audit(Map<String, Object> context, Map<String, Object> tool, String traceId,
-                                 Map<String, Object> arguments, Map<String, String> controls, String status,
+        private Mono<Void> audit(McpIntrospectResponseDTO context, McpToolResolveResponseDTO tool, String traceId,
+                                 Map<String, Object> arguments, McpToolCallControls controls, String status,
                                  String errorCode, long start, ServerWebExchange exchange) {
             long duration = (System.nanoTime() - start) / 1_000_000;
-            Map<String, Object> command = orderedMap(
-                    McpConstant.Field.TRACE_ID, traceId,
-                    McpConstant.Field.TENANT_ID_CAMEL, context.get(McpConstant.Field.TENANT_ID),
-                    McpConstant.Field.PRINCIPAL_ID_CAMEL, context.get(McpConstant.Field.PRINCIPAL_ID),
-                    McpConstant.Field.PRINCIPAL_TYPE_CAMEL, context.get(McpConstant.Field.PRINCIPAL_TYPE),
-                    McpConstant.Field.CLIENT_ID_CAMEL, context.get(McpConstant.Field.CLIENT_ID),
-                    McpConstant.Field.CONNECTION_ID, context.get(McpConstant.Field.MCP_CONNECTION_ID),
-                    McpConstant.Field.TOOL_ID, tool.get(McpConstant.Field.TOOL_ID),
-                    McpConstant.Field.TOOL_NAME, tool.get(McpConstant.Field.TOOL_NAME),
-                    McpConstant.Field.PERMISSION_CODE, tool.get(McpConstant.Field.PERMISSION_CODE),
-                    McpConstant.Field.RISK_LEVEL, tool.get(McpConstant.Field.RISK_LEVEL),
-                    McpConstant.Field.CONFIRM_ID, controls.get(McpConstant.Field.CONFIRM_ID),
-                    McpConstant.Field.IDEMPOTENCY_KEY, controls.get(McpConstant.Field.IDEMPOTENCY_KEY),
-                    McpConstant.Field.ARGUMENT_DIGEST, DecodeUtil.sha256Base64Url(JsonUtil.toJsonString(arguments)),
-                    McpConstant.Field.STATUS, status,
-                    McpConstant.Field.ERROR_CODE, errorCode,
-                    McpConstant.Field.DURATION_MS, duration,
-                    McpConstant.Field.CLIENT_NAME,
-                    exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.MCP_CLIENT_NAME),
-                    McpConstant.Field.CLIENT_VERSION,
-                    exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.MCP_CLIENT_VERSION),
-                    McpConstant.Field.REMOTE_IP, exchange.getRequest().getRemoteAddress() == null ? ""
-                            : exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
-            );
-            return postInternal(authBaseUrl + McpConstant.INTERNAL_AUDIT, command).then();
+            McpAuditCommandDTO command = McpAuditCommandDTO.builder()
+                    .traceId(traceId)
+                    .tenantId(context.getTenantId())
+                    .principalId(context.getPrincipalId())
+                    .principalType(context.getPrincipalType())
+                    .clientId(context.getClientId())
+                    .connectionId(context.getMcpConnectionId())
+                    .toolId(tool.getToolId())
+                    .toolName(tool.getToolName())
+                    .permissionCode(tool.getPermissionCode())
+                    .riskLevel(tool.getRiskLevel())
+                    .confirmId(controls.confirmId())
+                    .idempotencyKey(controls.idempotencyKey())
+                    .argumentDigest(DecodeUtil.sha256Base64Url(JsonUtil.toJsonString(arguments)))
+                    .status(status)
+                    .errorCode(errorCode)
+                    .durationMs(duration)
+                    .clientName(exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.MCP_CLIENT_NAME))
+                    .clientVersion(exchange.getRequest().getHeaders()
+                            .getFirst(RequestConstant.Header.MCP_CLIENT_VERSION))
+                    .remoteIp(exchange.getRequest().getRemoteAddress() == null ? ""
+                            : exchange.getRequest().getRemoteAddress().getAddress().getHostAddress())
+                    .build();
+            return postInternal(authBaseUrl + McpConstant.INTERNAL_AUDIT, command, McpAuditResponseDTO.class).then();
         }
 
-        private Map<String, String> controlValues(Map<String, Object> callMeta, ServerWebExchange exchange) {
-            return orderedStringMap(
-                    McpConstant.Field.CONFIRM_ID, firstNonBlank(callMeta.get(McpConstant.Field.CONFIRM_ID_META),
+        private McpToolCallControls controlValues(Map<String, Object> callMeta, ServerWebExchange exchange) {
+            return new McpToolCallControls(
+                    firstNonBlank(callMeta.get(McpConstant.Field.CONFIRM_ID_META),
                             exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.MCP_CONFIRM_ID)),
-                    McpConstant.Field.IDEMPOTENCY_KEY, firstNonBlank(
-                            callMeta.get(McpConstant.Field.IDEMPOTENCY_KEY_META),
+                    firstNonBlank(callMeta.get(McpConstant.Field.IDEMPOTENCY_KEY_META),
                             exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.MCP_IDEMPOTENCY_KEY),
                             exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.IDEMPOTENCY_KEY))
             );
         }
 
-        private String policyError(Map<String, Object> tool, Map<String, String> controls) {
-            if (!McpConstant.RiskLevel.HIGH.equals(Objects.toString(tool.get(McpConstant.Field.RISK_LEVEL), ""))) {
+        private String policyError(McpToolResolveResponseDTO tool, McpToolCallControls controls) {
+            if (!McpConstant.RiskLevel.HIGH.equals(tool.getRiskLevel())) {
                 return "";
             }
-            if (StringUtils.isBlank(controls.get(McpConstant.Field.CONFIRM_ID))) {
+            if (StringUtils.isBlank(controls.confirmId())) {
                 return "High risk MCP tool requires confirmation";
             }
-            if (StringUtils.isBlank(controls.get(McpConstant.Field.IDEMPOTENCY_KEY))) {
+            if (StringUtils.isBlank(controls.idempotencyKey())) {
                 return "High risk MCP tool requires an idempotency key";
             }
             return "";
@@ -403,7 +395,7 @@ public class McpGatewayController {
             return "";
         }
 
-        private Mono<Map<String, Object>> postInternal(String url, Map<String, Object> body) {
+        private <T> Mono<T> postInternal(String url, Object body, Class<T> responseType) {
             String path = URI.create(url).getPath();
             return webClientBuilder.build()
                     .post()
@@ -412,8 +404,7 @@ public class McpGatewayController {
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(body)
                     .retrieve()
-                    .bodyToMono(new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {
-                    });
+                    .bodyToMono(responseType);
         }
 
         private void internalHeaders(HttpHeaders headers, String path) {
@@ -444,6 +435,9 @@ public class McpGatewayController {
                 return agenticUrl;
             }
             throw new IllegalArgumentException("Unknown backend service: " + serviceName);
+        }
+
+        private record McpToolCallControls(String confirmId, String idempotencyKey) {
         }
 
     }

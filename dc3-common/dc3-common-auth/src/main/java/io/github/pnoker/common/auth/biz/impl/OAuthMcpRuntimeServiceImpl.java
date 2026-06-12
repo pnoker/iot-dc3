@@ -34,6 +34,12 @@ import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
+import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
+import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
+import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
+import io.github.pnoker.common.entity.dto.OAuthClientRegistrationResponseDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.DecodeUtil;
@@ -161,37 +167,38 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> registerClient(Map<String, Object> request,
-                                               RequestHeader.PrincipalHeader principalHeader) {
-        String clientName = stringValue(request.get("client_name"));
+    public OAuthClientRegistrationResponseDTO registerClient(OAuthClientRegistrationRequestDTO request,
+                                                             RequestHeader.PrincipalHeader principalHeader) {
+        request = Objects.requireNonNullElseGet(request, OAuthClientRegistrationRequestDTO::new);
+        String clientName = stringValue(request.getClientName());
         if (StringUtils.isBlank(clientName)) {
             throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata", "client_name is required");
         }
-        String clientType = StringUtils.defaultIfBlank(stringValue(request.get("client_type")),
+        String clientType = StringUtils.defaultIfBlank(stringValue(request.getClientType()),
                 McpConstant.OAuth.CLIENT_TYPE_PUBLIC).toUpperCase();
         if (!Set.of(McpConstant.OAuth.CLIENT_TYPE_PUBLIC, McpConstant.OAuth.CLIENT_TYPE_CONFIDENTIAL)
                 .contains(clientType)) {
             throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata", "unsupported client_type");
         }
 
-        Set<String> grants = normalizeSet(request.get("grant_types"));
+        Set<String> grants = normalizeSet(request.getGrantTypes());
         if (grants.isEmpty()) {
             grants = McpConstant.OAuth.CLIENT_TYPE_PUBLIC.equals(clientType)
                     ? Set.of(McpConstant.OAuth.GRANT_AUTHORIZATION_CODE)
                     : Set.of(McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS);
         }
-        Set<String> scopes = normalizeSet(request.get(McpConstant.Field.SCOPE));
+        Set<String> scopes = normalizeSet(request.getScope());
         if (scopes.isEmpty()) {
             scopes = Set.of(McpConstant.Scope.TOOLS_LIST, McpConstant.Scope.TOOLS_CALL);
         }
-        Set<String> redirects = normalizeSet(request.get("redirect_uris"));
+        Set<String> redirects = normalizeSet(request.getRedirectUris());
         if (grants.contains(McpConstant.OAuth.GRANT_AUTHORIZATION_CODE) && redirects.isEmpty()) {
             throw oauthError(BAD_REQUEST.value(), "invalid_redirect_uri", "redirect_uris is required");
         }
 
         Long ownerPrincipalId = Objects.nonNull(principalHeader) ? principalHeader.getPrincipalId() : 0L;
-        Long serviceAccountPrincipalId = longValue(request.get("service_account_principal_id"));
-        Long tenantId = longValue(request.get(McpConstant.Field.TENANT_ID));
+        Long serviceAccountPrincipalId = request.getServiceAccountPrincipalId();
+        Long tenantId = request.getTenantId();
         if (grants.contains(McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS)) {
             validateServiceAccountClient(serviceAccountPrincipalId, tenantId);
         }
@@ -226,19 +233,17 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         client.setEnableFlag((byte) 0);
         oauthMcpMapper.insertClient(client);
 
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put(McpConstant.Field.CLIENT_ID, clientId);
-        response.put("client_name", clientName);
-        response.put("client_type", clientType);
-        response.put("grant_types", grants);
-        response.put("redirect_uris", redirects);
-        response.put(McpConstant.Field.SCOPE, String.join(" ", scopes));
-        response.put("token_endpoint_auth_method", McpConstant.OAuth.CLIENT_TYPE_CONFIDENTIAL.equals(clientType)
-                ? McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC : McpConstant.OAuth.AUTH_METHOD_NONE);
-        if (clientSecret != null) {
-            response.put("client_secret", clientSecret);
-        }
-        return response;
+        return OAuthClientRegistrationResponseDTO.builder()
+                .clientId(clientId)
+                .clientName(clientName)
+                .clientType(clientType)
+                .grantTypes(grants)
+                .redirectUris(redirects)
+                .scope(String.join(" ", scopes))
+                .tokenEndpointAuthMethod(McpConstant.OAuth.CLIENT_TYPE_CONFIDENTIAL.equals(clientType)
+                        ? McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC : McpConstant.OAuth.AUTH_METHOD_NONE)
+                .clientSecret(clientSecret)
+                .build();
     }
 
     @Override
@@ -335,13 +340,13 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     @Override
-    public Map<String, Object> introspect(String token) {
+    public McpIntrospectResponseDTO introspect(String token) {
         try {
             Claims claims = parseAccessToken(token);
             String jti = claims.getId();
             OAuthAuthorizationRecord authorization = oauthMcpMapper.selectAuthorizationByAccessTokenJti(jti);
             if (!isActiveAuthorization(authorization, LocalDateTime.now())) {
-                return Map.of(McpConstant.Field.ACTIVE, false);
+                return McpIntrospectResponseDTO.inactive();
             }
             Long tenantId = numberClaim(claims, McpConstant.Field.TENANT_ID);
             Long principalId = Long.valueOf(claims.getSubject());
@@ -349,33 +354,33 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             String clientId = stringValue(claims.get(McpConstant.Field.CLIENT_ID));
             McpConnectionRecord connection = oauthMcpMapper.selectConnectionById(connectionId);
             if (!isUsableConnection(connection, clientId, principalId, tenantId)) {
-                return Map.of(McpConstant.Field.ACTIVE, false);
+                return McpIntrospectResponseDTO.inactive();
             }
             PrincipalDO principal = principalManager.getById(principalId);
             if (principal == null || !enabled(principal.getEnableFlag())
                     || !tenantMembershipService.isTenantMember(tenantId, principalId)) {
-                return Map.of(McpConstant.Field.ACTIVE, false);
+                return McpIntrospectResponseDTO.inactive();
             }
-            return orderedMap(
-                    McpConstant.Field.ACTIVE, true,
-                    McpConstant.Field.ISS, claims.getIssuer(),
-                    McpConstant.Field.AUD, claims.getAudience(),
-                    McpConstant.Field.SUB, claims.getSubject(),
-                    McpConstant.Field.JTI, jti,
-                    McpConstant.Field.EXP, claims.getExpiration().toInstant().getEpochSecond(),
-                    McpConstant.Field.IAT, claims.getIssuedAt().toInstant().getEpochSecond(),
-                    McpConstant.Field.TENANT_ID, tenantId,
-                    McpConstant.Field.PRINCIPAL_ID, principalId,
-                    McpConstant.Field.PRINCIPAL_TYPE, stringValue(claims.get(McpConstant.Field.PRINCIPAL_TYPE)),
-                    McpConstant.Field.PRINCIPAL_NAME, principal.getPrincipalName(),
-                    McpConstant.Field.DISPLAY_NAME, principal.getDisplayName(),
-                    McpConstant.Field.CLIENT_ID, clientId,
-                    McpConstant.Field.MCP_CONNECTION_ID, connectionId,
-                    McpConstant.Field.GRANT_TYPE, stringValue(claims.get(McpConstant.Field.GRANT_TYPE)),
-                    McpConstant.Field.SCOPE, stringValue(claims.get(McpConstant.Field.SCOPE))
-            );
+            return McpIntrospectResponseDTO.builder()
+                    .active(true)
+                    .iss(claims.getIssuer())
+                    .aud(claims.getAudience())
+                    .sub(claims.getSubject())
+                    .jti(jti)
+                    .exp(claims.getExpiration().toInstant().getEpochSecond())
+                    .iat(claims.getIssuedAt().toInstant().getEpochSecond())
+                    .tenantId(tenantId)
+                    .principalId(principalId)
+                    .principalType(stringValue(claims.get(McpConstant.Field.PRINCIPAL_TYPE)))
+                    .principalName(principal.getPrincipalName())
+                    .displayName(principal.getDisplayName())
+                    .clientId(clientId)
+                    .mcpConnectionId(connectionId)
+                    .grantType(stringValue(claims.get(McpConstant.Field.GRANT_TYPE)))
+                    .scope(stringValue(claims.get(McpConstant.Field.SCOPE)))
+                    .build();
         } catch (RuntimeException e) {
-            return Map.of(McpConstant.Field.ACTIVE, false);
+            return McpIntrospectResponseDTO.inactive();
         }
     }
 
@@ -523,7 +528,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     @Override
-    public List<Map<String, Object>> listVisibleTools(Long tenantId, Long principalId, Long connectionId,
+    public List<McpToolDefinitionDTO> listVisibleTools(Long tenantId, Long principalId, Long connectionId,
                                                        Set<String> scopes) {
         if (!scopes.contains(McpConstant.Scope.TOOLS_LIST) && !scopes.contains(McpConstant.Scope.TOOLS_CALL)) {
             throw oauthError(UNAUTHORIZED.value(), "insufficient_scope",
@@ -537,8 +542,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     @Override
-    public McpToolRecord resolveVisibleTool(Long tenantId, Long principalId, Long connectionId, String toolName,
-                                            Set<String> scopes) {
+    public McpToolResolveResponseDTO resolveVisibleTool(Long tenantId, Long principalId, Long connectionId,
+                                                        String toolName, Set<String> scopes) {
         if (!scopes.contains(McpConstant.Scope.TOOLS_CALL)) {
             throw oauthError(UNAUTHORIZED.value(), "insufficient_scope",
                     McpConstant.Scope.TOOLS_CALL + " scope is required");
@@ -550,11 +555,13 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             throw oauthError(UNAUTHORIZED.value(), "access_denied", "tool is not visible for this connection");
         }
         oauthMcpMapper.updateConnectionLastUsed(connectionId, LocalDateTime.now());
-        return tool;
+        return resolvedTool(tool);
     }
 
     @Override
-    public void audit(McpAuditCommand command) {
+    public void audit(McpAuditCommandDTO source) {
+        source = Objects.requireNonNullElseGet(source, McpAuditCommandDTO::new);
+        McpAuditCommand command = auditCommand(source);
         command.setId(IdWorker.getId());
         command.setTraceId(StringUtils.defaultIfBlank(command.getTraceId(), UUID.randomUUID().toString()));
         command.setConfirmId(StringUtils.defaultString(command.getConfirmId()));
@@ -789,24 +796,67 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         return requested;
     }
 
-    private Map<String, Object> toolToMcp(McpToolRecord tool) {
+    private McpToolDefinitionDTO toolToMcp(McpToolRecord tool) {
+        return McpToolDefinitionDTO.builder()
+                .name(tool.getToolName())
+                .title(tool.getToolTitle())
+                .description(StringUtils.defaultIfBlank(tool.getRemark(), tool.getToolTitle()))
+                .inputSchema(mcpInputSchema())
+                .annotations(McpToolDefinitionDTO.Annotations.builder()
+                        .readOnlyHint(one(tool.getReadOnlyHint()))
+                        .destructiveHint(one(tool.getDestructiveHint()))
+                        .idempotentHint(one(tool.getIdempotentHint()))
+                        .openWorldHint(one(tool.getOpenWorldHint()))
+                        .build())
+                .meta(McpToolDefinitionDTO.Metadata.builder()
+                        .toolId(tool.getToolId())
+                        .permissionCode(tool.getPermissionCode())
+                        .riskLevel(tool.getRiskLevel())
+                        .build())
+                .build();
+    }
+
+    private Map<String, Object> mcpInputSchema() {
         return orderedMap(
-                "name", tool.getToolName(),
-                "title", tool.getToolTitle(),
-                "description", StringUtils.defaultIfBlank(tool.getRemark(), tool.getToolTitle()),
-                "inputSchema", orderedMap("type", "object", "additionalProperties", true),
-                "annotations", orderedMap(
-                        "readOnlyHint", one(tool.getReadOnlyHint()),
-                        "destructiveHint", one(tool.getDestructiveHint()),
-                        "idempotentHint", one(tool.getIdempotentHint()),
-                        "openWorldHint", one(tool.getOpenWorldHint())
-                ),
-                McpConstant.Field.META, orderedMap(
-                        McpConstant.Field.TOOL_ID_META, tool.getToolId(),
-                        McpConstant.Field.PERMISSION_CODE_META, tool.getPermissionCode(),
-                        McpConstant.Field.RISK_LEVEL_META, tool.getRiskLevel()
-                )
+                McpConstant.ToolDefinition.TYPE, McpConstant.ToolDefinition.TYPE_OBJECT,
+                McpConstant.ToolDefinition.ADDITIONAL_PROPERTIES, true
         );
+    }
+
+    private McpToolResolveResponseDTO resolvedTool(McpToolRecord tool) {
+        return McpToolResolveResponseDTO.builder()
+                .toolId(tool.getToolId())
+                .toolName(tool.getToolName())
+                .permissionCode(tool.getPermissionCode())
+                .riskLevel(tool.getRiskLevel())
+                .serviceName(tool.getServiceName())
+                .apiPath(tool.getApiPath())
+                .httpMethod(tool.getHttpMethod())
+                .build();
+    }
+
+    private McpAuditCommand auditCommand(McpAuditCommandDTO source) {
+        McpAuditCommand target = new McpAuditCommand();
+        target.setTraceId(source.getTraceId());
+        target.setTenantId(source.getTenantId());
+        target.setPrincipalId(source.getPrincipalId());
+        target.setPrincipalType(source.getPrincipalType());
+        target.setClientId(source.getClientId());
+        target.setConnectionId(source.getConnectionId());
+        target.setToolId(source.getToolId());
+        target.setToolName(source.getToolName());
+        target.setPermissionCode(source.getPermissionCode());
+        target.setRiskLevel(source.getRiskLevel());
+        target.setConfirmId(source.getConfirmId());
+        target.setIdempotencyKey(source.getIdempotencyKey());
+        target.setArgumentDigest(source.getArgumentDigest());
+        target.setStatus(source.getStatus());
+        target.setErrorCode(source.getErrorCode());
+        target.setDurationMs(source.getDurationMs());
+        target.setClientName(source.getClientName());
+        target.setClientVersion(source.getClientVersion());
+        target.setRemoteIp(source.getRemoteIp());
+        return target;
     }
 
     private boolean isActiveCode(OAuthAuthorizationRecord authorization) {
