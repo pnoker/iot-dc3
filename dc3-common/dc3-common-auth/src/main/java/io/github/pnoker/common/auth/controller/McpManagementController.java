@@ -23,6 +23,7 @@ import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
+import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -85,15 +86,16 @@ public class McpManagementController implements BaseController {
     @Operation(summary = "List MCP Connections", description = "List MCP connections owned by the current principal")
     @PostMapping("/connection/list")
     public Mono<R<List<McpConnectionRecord>>> listConnections() {
-        return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listConnections(header))));
+        return getPrincipalHeader()
+                .flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listConnections(header))));
     }
 
     @PreAuthorize("@perm.can('mcp', 'add')")
     @Operation(summary = "Create MCP Connection", description = "Create an MCP connection for an OAuth client")
     @PostMapping("/connection/add")
     public Mono<R<McpConnectionRecord>> createConnection(@RequestBody McpConnectionRecord connection) {
-        return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.createConnection(connection,
-                header))));
+        return getPrincipalHeader()
+                .flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.createConnection(connection, header))));
     }
 
     @PreAuthorize("@perm.can('mcp', 'delete')")
@@ -111,8 +113,9 @@ public class McpManagementController implements BaseController {
     @PostMapping("/connection/tools/replace")
     public Mono<R<Boolean>> replaceConnectionTools(@RequestBody Map<String, Object> request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
-            Long connectionId = longValue(request.get("connection_id"));
-            oauthMcpRuntimeService.replaceConnectionTools(connectionId, toolIds(request.get("tool_ids")), header);
+            Long connectionId = longValue(request.get(McpConstant.Field.CONNECTION_ID_REQUEST));
+            oauthMcpRuntimeService.replaceConnectionTools(connectionId,
+                    toolIds(request.get(McpConstant.Field.TOOL_IDS)), header);
             return R.ok(true);
         }));
     }
@@ -138,9 +141,9 @@ public class McpManagementController implements BaseController {
     public Mono<R<List<McpToolRecord>>> listToolCatalog(@RequestBody(required = false) Map<String, Object> request) {
         Map<String, Object> body = Objects.requireNonNullElse(request, Map.of());
         return async(() -> R.ok(oauthMcpRuntimeService.listToolCatalog(
-                Objects.toString(body.get("keyword"), ""),
-                Objects.toString(body.get("risk_level"), ""),
-                intValue(body.get("limit"))
+                Objects.toString(body.get(McpConstant.Field.KEYWORD), ""),
+                Objects.toString(body.get(McpConstant.Field.RISK_LEVEL_META), ""),
+                intValue(body.get(McpConstant.Field.LIMIT))
         )));
     }
 

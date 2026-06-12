@@ -19,6 +19,7 @@ package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.facade.api.PermissionFacade;
 import io.github.pnoker.common.security.FacadePermissionProvider;
 import io.github.pnoker.common.security.GatewayJwtConverter;
@@ -156,13 +157,13 @@ public class WebFluxSecurityConfig {
                         // /auth base-path; the chain matches the post-strip path /token/salt.
                         .pathMatchers(HttpMethod.POST, "/token/salt").permitAll()
                         .pathMatchers(HttpMethod.POST, "/token/generate").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/.well-known/oauth-authorization-server").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/oauth2/jwks").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/oauth2/token").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/oauth2/revoke").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/oauth2/register").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/oauth2/introspect").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/mcp/internal/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, McpConstant.WELL_KNOWN_AUTHORIZATION_SERVER).permitAll()
+                        .pathMatchers(HttpMethod.GET, McpConstant.OAUTH2_JWKS).permitAll()
+                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_TOKEN).permitAll()
+                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REVOKE).permitAll()
+                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REGISTER).permitAll()
+                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_INTROSPECT).permitAll()
+                        .pathMatchers(HttpMethod.POST, McpConstant.INTERNAL_URL_PREFIX + "/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers("/health/**").permitAll()
                         .pathMatchers("/v3/api-docs/**", "/v3/api-docs.yaml")
@@ -232,7 +233,7 @@ public class WebFluxSecurityConfig {
         try {
             long epochMs = Long.parseLong(timestamp);
             long diffMs = Math.abs(Instant.now().toEpochMilli() - epochMs);
-            return diffMs <= 300_000;
+            return diffMs <= RequestConstant.DEFAULT_INTERNAL_SIGNATURE_TTL_MS;
         } catch (RuntimeException e) {
             return false;
         }

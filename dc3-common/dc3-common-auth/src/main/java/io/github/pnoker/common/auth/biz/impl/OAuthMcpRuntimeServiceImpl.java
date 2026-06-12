@@ -32,8 +32,11 @@ import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
+import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.PrincipalTypeEnum;
+import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PasswordUtil;
 import io.jsonwebtoken.Claims;
@@ -54,8 +57,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -94,14 +95,6 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @RequiredArgsConstructor
 public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
-    private static final String GRANT_AUTHORIZATION_CODE = "authorization_code";
-    private static final String GRANT_CLIENT_CREDENTIALS = "client_credentials";
-    private static final String GRANT_REFRESH_TOKEN = "refresh_token";
-    private static final String CLIENT_TYPE_PUBLIC = "PUBLIC";
-    private static final String CLIENT_TYPE_CONFIDENTIAL = "CONFIDENTIAL";
-    private static final String SCOPE_TOOLS_LIST = "mcp:tools:list";
-    private static final String SCOPE_TOOLS_CALL = "mcp:tools:call";
-    private static final String SCOPE_TOOLS_CALL_HIGH = "mcp:tools:call:high";
     private static final String KID = "dc3-oauth-rsa";
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
@@ -137,19 +130,19 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     public Map<String, Object> authorizationServerMetadata() {
         return orderedMap(
                 "issuer", issuer,
-                "authorization_endpoint", issuer + "/oauth2/authorize",
-                "token_endpoint", issuer + "/oauth2/token",
-                "jwks_uri", issuer + "/oauth2/jwks",
-                "revocation_endpoint", issuer + "/oauth2/revoke",
-                "registration_endpoint", issuer + "/oauth2/register",
-                "response_types_supported", List.of("code"),
-                "grant_types_supported", List.of(GRANT_AUTHORIZATION_CODE, GRANT_CLIENT_CREDENTIALS,
-                        GRANT_REFRESH_TOKEN),
-                "code_challenge_methods_supported", List.of("S256"),
-                "scopes_supported", List.of(SCOPE_TOOLS_LIST, SCOPE_TOOLS_CALL, SCOPE_TOOLS_CALL_HIGH,
-                        "mcp:resources:read"),
-                "token_endpoint_auth_methods_supported", List.of("client_secret_basic", "client_secret_post",
-                        "none")
+                "authorization_endpoint", issuer + McpConstant.OAUTH2_AUTHORIZE,
+                "token_endpoint", issuer + McpConstant.OAUTH2_TOKEN,
+                "jwks_uri", issuer + McpConstant.OAUTH2_JWKS,
+                "revocation_endpoint", issuer + McpConstant.OAUTH2_REVOKE,
+                "registration_endpoint", issuer + McpConstant.OAUTH2_REGISTER,
+                "response_types_supported", List.of(McpConstant.OAuth.RESPONSE_TYPE_CODE),
+                "grant_types_supported", List.of(McpConstant.OAuth.GRANT_AUTHORIZATION_CODE,
+                        McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS,
+                        McpConstant.OAuth.GRANT_REFRESH_TOKEN),
+                "code_challenge_methods_supported", List.of(McpConstant.OAuth.CODE_CHALLENGE_METHOD_S256),
+                "scopes_supported", McpConstant.Scope.SUPPORTED,
+                "token_endpoint_auth_methods_supported", List.of(McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC,
+                        McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_POST, McpConstant.OAuth.AUTH_METHOD_NONE)
         );
     }
 
@@ -161,8 +154,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                 "use", "sig",
                 "kid", KID,
                 "alg", "RS256",
-                "n", base64Url(publicKey.getModulus().toByteArray()),
-                "e", base64Url(publicKey.getPublicExponent().toByteArray())
+                "n", DecodeUtil.base64UrlWithoutLeadingZero(publicKey.getModulus().toByteArray()),
+                "e", DecodeUtil.base64UrlWithoutLeadingZero(publicKey.getPublicExponent().toByteArray())
         )));
     }
 
@@ -174,41 +167,44 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         if (StringUtils.isBlank(clientName)) {
             throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata", "client_name is required");
         }
-        String clientType = StringUtils.defaultIfBlank(stringValue(request.get("client_type")), CLIENT_TYPE_PUBLIC)
-                .toUpperCase();
-        if (!Set.of(CLIENT_TYPE_PUBLIC, CLIENT_TYPE_CONFIDENTIAL).contains(clientType)) {
+        String clientType = StringUtils.defaultIfBlank(stringValue(request.get("client_type")),
+                McpConstant.OAuth.CLIENT_TYPE_PUBLIC).toUpperCase();
+        if (!Set.of(McpConstant.OAuth.CLIENT_TYPE_PUBLIC, McpConstant.OAuth.CLIENT_TYPE_CONFIDENTIAL)
+                .contains(clientType)) {
             throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata", "unsupported client_type");
         }
 
         Set<String> grants = normalizeSet(request.get("grant_types"));
         if (grants.isEmpty()) {
-            grants = CLIENT_TYPE_PUBLIC.equals(clientType) ? Set.of(GRANT_AUTHORIZATION_CODE)
-                    : Set.of(GRANT_CLIENT_CREDENTIALS);
+            grants = McpConstant.OAuth.CLIENT_TYPE_PUBLIC.equals(clientType)
+                    ? Set.of(McpConstant.OAuth.GRANT_AUTHORIZATION_CODE)
+                    : Set.of(McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS);
         }
-        Set<String> scopes = normalizeSet(request.get("scope"));
+        Set<String> scopes = normalizeSet(request.get(McpConstant.Field.SCOPE));
         if (scopes.isEmpty()) {
-            scopes = Set.of(SCOPE_TOOLS_LIST, SCOPE_TOOLS_CALL);
+            scopes = Set.of(McpConstant.Scope.TOOLS_LIST, McpConstant.Scope.TOOLS_CALL);
         }
         Set<String> redirects = normalizeSet(request.get("redirect_uris"));
-        if (grants.contains(GRANT_AUTHORIZATION_CODE) && redirects.isEmpty()) {
+        if (grants.contains(McpConstant.OAuth.GRANT_AUTHORIZATION_CODE) && redirects.isEmpty()) {
             throw oauthError(BAD_REQUEST.value(), "invalid_redirect_uri", "redirect_uris is required");
         }
 
         Long ownerPrincipalId = Objects.nonNull(principalHeader) ? principalHeader.getPrincipalId() : 0L;
         Long serviceAccountPrincipalId = longValue(request.get("service_account_principal_id"));
-        Long tenantId = longValue(request.get("tenant_id"));
-        if (grants.contains(GRANT_CLIENT_CREDENTIALS)) {
+        Long tenantId = longValue(request.get(McpConstant.Field.TENANT_ID));
+        if (grants.contains(McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS)) {
             validateServiceAccountClient(serviceAccountPrincipalId, tenantId);
         }
 
-        String clientId = "dc3_" + UUID.randomUUID().toString().replace("-", "");
+        String clientId = McpConstant.OAuth.CLIENT_ID_PREFIX + UUID.randomUUID().toString().replace("-", "");
         String clientSecret = null;
         String secretHash = "";
-        String authMethods = "none";
-        if (CLIENT_TYPE_CONFIDENTIAL.equals(clientType)) {
+        String authMethods = McpConstant.OAuth.AUTH_METHOD_NONE;
+        if (McpConstant.OAuth.CLIENT_TYPE_CONFIDENTIAL.equals(clientType)) {
             clientSecret = randomToken();
             secretHash = PasswordUtil.encode(clientSecret);
-            authMethods = "client_secret_basic client_secret_post";
+            authMethods = McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC + ' '
+                    + McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_POST;
         }
 
         OAuthRegisteredClientRecord client = new OAuthRegisteredClientRecord();
@@ -225,20 +221,20 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         client.setAuthorizationGrantTypes(String.join(" ", grants));
         client.setRedirectUris(String.join(" ", redirects));
         client.setScopes(String.join(" ", scopes));
-        client.setRequirePkce((byte) (grants.contains(GRANT_AUTHORIZATION_CODE) ? 1 : 0));
+        client.setRequirePkce((byte) (grants.contains(McpConstant.OAuth.GRANT_AUTHORIZATION_CODE) ? 1 : 0));
         client.setRequireConsent((byte) 1);
         client.setEnableFlag((byte) 0);
         oauthMcpMapper.insertClient(client);
 
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("client_id", clientId);
+        response.put(McpConstant.Field.CLIENT_ID, clientId);
         response.put("client_name", clientName);
         response.put("client_type", clientType);
         response.put("grant_types", grants);
         response.put("redirect_uris", redirects);
-        response.put("scope", String.join(" ", scopes));
-        response.put("token_endpoint_auth_method", CLIENT_TYPE_CONFIDENTIAL.equals(clientType)
-                ? "client_secret_basic" : "none");
+        response.put(McpConstant.Field.SCOPE, String.join(" ", scopes));
+        response.put("token_endpoint_auth_method", McpConstant.OAuth.CLIENT_TYPE_CONFIDENTIAL.equals(clientType)
+                ? McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC : McpConstant.OAuth.AUTH_METHOD_NONE);
         if (clientSecret != null) {
             response.put("client_secret", clientSecret);
         }
@@ -257,23 +253,24 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         if (principalHeader == null || principalHeader.getPrincipalId() == null) {
             throw oauthError(UNAUTHORIZED.value(), "login_required", "authenticated principal is required");
         }
-        if (!"code".equals(params.get("response_type"))) {
+        if (!McpConstant.OAuth.RESPONSE_TYPE_CODE.equals(params.get("response_type"))) {
             throw oauthError(BAD_REQUEST.value(), "unsupported_response_type", "only code is supported");
         }
-        OAuthRegisteredClientRecord client = requireClient(params.get("client_id"));
-        requireGrant(client, GRANT_AUTHORIZATION_CODE);
-        String redirectUri = params.get("redirect_uri");
+        OAuthRegisteredClientRecord client = requireClient(params.get(McpConstant.Field.CLIENT_ID));
+        requireGrant(client, McpConstant.OAuth.GRANT_AUTHORIZATION_CODE);
+        String redirectUri = params.get(McpConstant.Field.REDIRECT_URI);
         if (!splitValues(client.getRedirectUris()).contains(redirectUri)) {
             throw oauthError(BAD_REQUEST.value(), "invalid_request", "redirect_uri mismatch");
         }
         if (one(client.getRequirePkce())) {
-            if (!"S256".equals(params.get("code_challenge_method"))
-                    || StringUtils.isBlank(params.get("code_challenge"))) {
+            if (!McpConstant.OAuth.CODE_CHALLENGE_METHOD_S256.equals(
+                    params.get(McpConstant.Field.CODE_CHALLENGE_METHOD))
+                    || StringUtils.isBlank(params.get(McpConstant.Field.CODE_CHALLENGE))) {
                 throw oauthError(BAD_REQUEST.value(), "invalid_request", "PKCE S256 is required");
             }
         }
-        Set<String> scopes = requestedScopes(params.get("scope"), client);
-        Long tenantId = longValue(params.get("tenant_id"));
+        Set<String> scopes = requestedScopes(params.get(McpConstant.Field.SCOPE), client);
+        Long tenantId = longValue(params.get(McpConstant.Field.TENANT_ID));
         if (tenantId == null || tenantId == 0) {
             tenantId = principalHeader.getTenantId();
         }
@@ -281,13 +278,13 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             throw oauthError(BAD_REQUEST.value(), "invalid_request", "principal is not a member of the tenant");
         }
 
-        Long connectionId = longValue(params.get("mcp_connection_id"));
+        Long connectionId = longValue(params.get(McpConstant.Field.MCP_CONNECTION_ID));
         McpConnectionRecord connection = connectionId == null || connectionId == 0
                 ? oauthMcpMapper.selectActiveConnection(client.getClientId(), principalHeader.getPrincipalId(),
-                tenantId, GRANT_AUTHORIZATION_CODE)
+                tenantId, McpConstant.OAuth.GRANT_AUTHORIZATION_CODE)
                 : oauthMcpMapper.selectConnectionById(connectionId);
         validateConnection(connection, client.getClientId(), principalHeader.getPrincipalId(), tenantId,
-                GRANT_AUTHORIZATION_CODE);
+                McpConstant.OAuth.GRANT_AUTHORIZATION_CODE);
 
         String code = randomToken();
         OAuthAuthorizationRecord authorization = new OAuthAuthorizationRecord();
@@ -295,19 +292,20 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         authorization.setRegisteredClientId(client.getId());
         authorization.setClientId(client.getClientId());
         authorization.setPrincipalId(principalHeader.getPrincipalId());
-        authorization.setPrincipalType(StringUtils.defaultIfBlank(principalHeader.getPrincipalType(), "USER"));
+        authorization.setPrincipalType(StringUtils.defaultIfBlank(principalHeader.getPrincipalType(),
+                PrincipalTypeEnum.USER.getValue()));
         authorization.setTenantId(tenantId);
         authorization.setMcpConnectionId(connection.getId());
-        authorization.setAuthorizationGrantType(GRANT_AUTHORIZATION_CODE);
+        authorization.setAuthorizationGrantType(McpConstant.OAuth.GRANT_AUTHORIZATION_CODE);
         authorization.setAuthorizedScopes(String.join(" ", scopes));
         authorization.setStateHash(sha256(params.get("state")));
         authorization.setAuthorizationCodeHash(sha256(code));
         authorization.setAuthorizationCodeIssued(LocalDateTime.now());
         authorization.setAuthorizationCodeExpires(LocalDateTime.now().plus(authorizationCodeTtl));
         authorization.setTokenMetadata(JsonUtil.toJsonString(orderedMap(
-                "redirect_uri", redirectUri,
-                "code_challenge", params.get("code_challenge"),
-                "code_challenge_method", params.get("code_challenge_method")
+                McpConstant.Field.REDIRECT_URI, redirectUri,
+                McpConstant.Field.CODE_CHALLENGE, params.get(McpConstant.Field.CODE_CHALLENGE),
+                McpConstant.Field.CODE_CHALLENGE_METHOD, params.get(McpConstant.Field.CODE_CHALLENGE_METHOD)
         )));
         oauthMcpMapper.insertAuthorization(authorization);
 
@@ -323,14 +321,14 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> token(Map<String, String> form, String authorizationHeader) {
-        String grantType = form.get("grant_type");
-        if (GRANT_AUTHORIZATION_CODE.equals(grantType)) {
+        String grantType = form.get(McpConstant.Field.GRANT_TYPE);
+        if (McpConstant.OAuth.GRANT_AUTHORIZATION_CODE.equals(grantType)) {
             return authorizationCodeToken(form, authorizationHeader);
         }
-        if (GRANT_CLIENT_CREDENTIALS.equals(grantType)) {
+        if (McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS.equals(grantType)) {
             return clientCredentialsToken(form, authorizationHeader);
         }
-        if (GRANT_REFRESH_TOKEN.equals(grantType)) {
+        if (McpConstant.OAuth.GRANT_REFRESH_TOKEN.equals(grantType)) {
             return refreshToken(form, authorizationHeader);
         }
         throw oauthError(BAD_REQUEST.value(), "unsupported_grant_type", "unsupported grant_type");
@@ -343,41 +341,41 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             String jti = claims.getId();
             OAuthAuthorizationRecord authorization = oauthMcpMapper.selectAuthorizationByAccessTokenJti(jti);
             if (!isActiveAuthorization(authorization, LocalDateTime.now())) {
-                return Map.of("active", false);
+                return Map.of(McpConstant.Field.ACTIVE, false);
             }
-            Long tenantId = numberClaim(claims, "tenant_id");
+            Long tenantId = numberClaim(claims, McpConstant.Field.TENANT_ID);
             Long principalId = Long.valueOf(claims.getSubject());
-            Long connectionId = numberClaim(claims, "mcp_connection_id");
-            String clientId = stringValue(claims.get("client_id"));
+            Long connectionId = numberClaim(claims, McpConstant.Field.MCP_CONNECTION_ID);
+            String clientId = stringValue(claims.get(McpConstant.Field.CLIENT_ID));
             McpConnectionRecord connection = oauthMcpMapper.selectConnectionById(connectionId);
             if (!isUsableConnection(connection, clientId, principalId, tenantId)) {
-                return Map.of("active", false);
+                return Map.of(McpConstant.Field.ACTIVE, false);
             }
             PrincipalDO principal = principalManager.getById(principalId);
             if (principal == null || !enabled(principal.getEnableFlag())
                     || !tenantMembershipService.isTenantMember(tenantId, principalId)) {
-                return Map.of("active", false);
+                return Map.of(McpConstant.Field.ACTIVE, false);
             }
             return orderedMap(
-                    "active", true,
-                    "iss", claims.getIssuer(),
-                    "aud", claims.getAudience(),
-                    "sub", claims.getSubject(),
-                    "jti", jti,
-                    "exp", claims.getExpiration().toInstant().getEpochSecond(),
-                    "iat", claims.getIssuedAt().toInstant().getEpochSecond(),
-                    "tenant_id", tenantId,
-                    "principal_id", principalId,
-                    "principal_type", stringValue(claims.get("principal_type")),
-                    "principal_name", principal.getPrincipalName(),
-                    "display_name", principal.getDisplayName(),
-                    "client_id", clientId,
-                    "mcp_connection_id", connectionId,
-                    "grant_type", stringValue(claims.get("grant_type")),
-                    "scope", stringValue(claims.get("scope"))
+                    McpConstant.Field.ACTIVE, true,
+                    McpConstant.Field.ISS, claims.getIssuer(),
+                    McpConstant.Field.AUD, claims.getAudience(),
+                    McpConstant.Field.SUB, claims.getSubject(),
+                    McpConstant.Field.JTI, jti,
+                    McpConstant.Field.EXP, claims.getExpiration().toInstant().getEpochSecond(),
+                    McpConstant.Field.IAT, claims.getIssuedAt().toInstant().getEpochSecond(),
+                    McpConstant.Field.TENANT_ID, tenantId,
+                    McpConstant.Field.PRINCIPAL_ID, principalId,
+                    McpConstant.Field.PRINCIPAL_TYPE, stringValue(claims.get(McpConstant.Field.PRINCIPAL_TYPE)),
+                    McpConstant.Field.PRINCIPAL_NAME, principal.getPrincipalName(),
+                    McpConstant.Field.DISPLAY_NAME, principal.getDisplayName(),
+                    McpConstant.Field.CLIENT_ID, clientId,
+                    McpConstant.Field.MCP_CONNECTION_ID, connectionId,
+                    McpConstant.Field.GRANT_TYPE, stringValue(claims.get(McpConstant.Field.GRANT_TYPE)),
+                    McpConstant.Field.SCOPE, stringValue(claims.get(McpConstant.Field.SCOPE))
             );
         } catch (RuntimeException e) {
-            return Map.of("active", false);
+            return Map.of(McpConstant.Field.ACTIVE, false);
         }
     }
 
@@ -437,16 +435,17 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                                                 RequestHeader.PrincipalHeader principalHeader) {
         requireAuthenticatedPrincipal(principalHeader);
         OAuthRegisteredClientRecord client = requireClient(connection.getClientId());
-        String grantType = StringUtils.defaultIfBlank(connection.getGrantType(), GRANT_AUTHORIZATION_CODE);
+        String grantType = StringUtils.defaultIfBlank(connection.getGrantType(),
+                McpConstant.OAuth.GRANT_AUTHORIZATION_CODE);
         requireGrant(client, grantType);
 
         Long tenantId = Objects.requireNonNullElse(connection.getTenantId(), principalHeader.getTenantId());
         Long principalId = Objects.requireNonNullElse(connection.getPrincipalId(), principalHeader.getPrincipalId());
         String principalType = StringUtils.defaultIfBlank(connection.getPrincipalType(),
-                StringUtils.defaultIfBlank(principalHeader.getPrincipalType(), "USER"));
+                StringUtils.defaultIfBlank(principalHeader.getPrincipalType(), PrincipalTypeEnum.USER.getValue()));
 
-        if (GRANT_CLIENT_CREDENTIALS.equals(grantType)) {
-            if (!"SERVICE_ACCOUNT".equals(principalType)) {
+        if (McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS.equals(grantType)) {
+            if (!PrincipalTypeEnum.SERVICE_ACCOUNT.getValue().equals(principalType)) {
                 throw oauthError(BAD_REQUEST.value(), "invalid_request",
                         "client_credentials connection requires a service account principal");
             }
@@ -467,7 +466,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         }
 
         connection.setId(IdWorker.getId());
-        connection.setConnectionName(StringUtils.defaultIfBlank(connection.getConnectionName(), client.getClientName()));
+        connection.setConnectionName(StringUtils.defaultIfBlank(connection.getConnectionName(),
+                client.getClientName()));
         connection.setClientId(client.getClientId());
         connection.setPrincipalId(principalId);
         connection.setPrincipalType(principalType);
@@ -525,10 +525,11 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     @Override
     public List<Map<String, Object>> listVisibleTools(Long tenantId, Long principalId, Long connectionId,
                                                        Set<String> scopes) {
-        if (!scopes.contains(SCOPE_TOOLS_LIST) && !scopes.contains(SCOPE_TOOLS_CALL)) {
-            throw oauthError(UNAUTHORIZED.value(), "insufficient_scope", "mcp:tools:list scope is required");
+        if (!scopes.contains(McpConstant.Scope.TOOLS_LIST) && !scopes.contains(McpConstant.Scope.TOOLS_CALL)) {
+            throw oauthError(UNAUTHORIZED.value(), "insufficient_scope",
+                    McpConstant.Scope.TOOLS_LIST + " scope is required");
         }
-        boolean allowHighRisk = scopes.contains(SCOPE_TOOLS_CALL_HIGH);
+        boolean allowHighRisk = scopes.contains(McpConstant.Scope.TOOLS_CALL_HIGH);
         return oauthMcpMapper.listVisibleTools(tenantId, principalId, connectionId, allowHighRisk)
                 .stream()
                 .map(this::toolToMcp)
@@ -538,10 +539,11 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     @Override
     public McpToolRecord resolveVisibleTool(Long tenantId, Long principalId, Long connectionId, String toolName,
                                             Set<String> scopes) {
-        if (!scopes.contains(SCOPE_TOOLS_CALL)) {
-            throw oauthError(UNAUTHORIZED.value(), "insufficient_scope", "mcp:tools:call scope is required");
+        if (!scopes.contains(McpConstant.Scope.TOOLS_CALL)) {
+            throw oauthError(UNAUTHORIZED.value(), "insufficient_scope",
+                    McpConstant.Scope.TOOLS_CALL + " scope is required");
         }
-        boolean allowHighRisk = scopes.contains(SCOPE_TOOLS_CALL_HIGH);
+        boolean allowHighRisk = scopes.contains(McpConstant.Scope.TOOLS_CALL_HIGH);
         McpToolRecord tool = oauthMcpMapper.selectVisibleToolByName(tenantId, principalId, connectionId, toolName,
                 allowHighRisk);
         if (tool == null) {
@@ -558,7 +560,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         command.setConfirmId(StringUtils.defaultString(command.getConfirmId()));
         command.setIdempotencyKey(StringUtils.defaultString(command.getIdempotencyKey()));
         command.setArgumentDigest(StringUtils.defaultString(command.getArgumentDigest()));
-        command.setStatus(StringUtils.defaultIfBlank(command.getStatus(), "UNKNOWN"));
+        command.setStatus(StringUtils.defaultIfBlank(command.getStatus(), McpConstant.Audit.UNKNOWN));
         command.setErrorCode(StringUtils.defaultString(command.getErrorCode()));
         command.setDurationMs(Objects.requireNonNullElse(command.getDurationMs(), 0L));
         command.setClientName(StringUtils.defaultString(command.getClientName()));
@@ -576,13 +578,13 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         OAuthRegisteredClientRecord client = requireClient(authorization.getClientId());
         authenticateClient(client, form, authorizationHeader, false);
         Map<String, Object> metadata = parseJsonMap(authorization.getTokenMetadata());
-        if (!Objects.equals(metadata.get("redirect_uri"), form.get("redirect_uri"))) {
+        if (!Objects.equals(metadata.get(McpConstant.Field.REDIRECT_URI), form.get(McpConstant.Field.REDIRECT_URI))) {
             throw oauthError(BAD_REQUEST.value(), "invalid_grant", "redirect_uri mismatch");
         }
         if (one(client.getRequirePkce())) {
             String verifier = form.get("code_verifier");
             if (StringUtils.isBlank(verifier)
-                    || !Objects.equals(metadata.get("code_challenge"), pkceChallenge(verifier))) {
+                    || !Objects.equals(metadata.get(McpConstant.Field.CODE_CHALLENGE), pkceChallenge(verifier))) {
                 throw oauthError(BAD_REQUEST.value(), "invalid_grant", "PKCE verification failed");
             }
         }
@@ -592,23 +594,24 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     private Map<String, Object> clientCredentialsToken(Map<String, String> form, String authorizationHeader) {
         OAuthRegisteredClientRecord client = requireClient(resolveClientId(form, authorizationHeader));
         authenticateClient(client, form, authorizationHeader, true);
-        requireGrant(client, GRANT_CLIENT_CREDENTIALS);
+        requireGrant(client, McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS);
         validateServiceAccountClient(client.getServiceAccountPrincipalId(), client.getTenantId());
         McpConnectionRecord connection = oauthMcpMapper.selectActiveConnection(client.getClientId(),
-                client.getServiceAccountPrincipalId(), client.getTenantId(), GRANT_CLIENT_CREDENTIALS);
+                client.getServiceAccountPrincipalId(), client.getTenantId(),
+                McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS);
         validateConnection(connection, client.getClientId(), client.getServiceAccountPrincipalId(),
-                client.getTenantId(), GRANT_CLIENT_CREDENTIALS);
-        Set<String> scopes = requestedScopes(form.get("scope"), client);
+                client.getTenantId(), McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS);
+        Set<String> scopes = requestedScopes(form.get(McpConstant.Field.SCOPE), client);
 
         OAuthAuthorizationRecord authorization = new OAuthAuthorizationRecord();
         authorization.setId(IdWorker.getId());
         authorization.setRegisteredClientId(client.getId());
         authorization.setClientId(client.getClientId());
         authorization.setPrincipalId(client.getServiceAccountPrincipalId());
-        authorization.setPrincipalType("SERVICE_ACCOUNT");
+        authorization.setPrincipalType(PrincipalTypeEnum.SERVICE_ACCOUNT.getValue());
         authorization.setTenantId(client.getTenantId());
         authorization.setMcpConnectionId(connection.getId());
-        authorization.setAuthorizationGrantType(GRANT_CLIENT_CREDENTIALS);
+        authorization.setAuthorizationGrantType(McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS);
         authorization.setAuthorizedScopes(String.join(" ", scopes));
         authorization.setStateHash("");
         authorization.setAuthorizationCodeHash("");
@@ -618,7 +621,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     private Map<String, Object> refreshToken(Map<String, String> form, String authorizationHeader) {
-        String refreshToken = form.get("refresh_token");
+        String refreshToken = form.get(McpConstant.Field.REFRESH_TOKEN);
         OAuthAuthorizationRecord authorization = oauthMcpMapper.selectAuthorizationByRefreshTokenHash(
                 sha256(refreshToken));
         if (authorization == null || authorization.getRefreshTokenExpires() == null
@@ -635,8 +638,10 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                                                        OAuthRegisteredClientRecord client,
                                                        boolean issueRefreshToken) {
         PrincipalDO principal = principalManager.getById(authorization.getPrincipalId());
-        if (principal == null || !enabled(principal.getEnableFlag())
-                || !tenantMembershipService.isTenantMember(authorization.getTenantId(), authorization.getPrincipalId())) {
+        if (principal == null
+                || !enabled(principal.getEnableFlag())
+                || !tenantMembershipService.isTenantMember(authorization.getTenantId(),
+                        authorization.getPrincipalId())) {
             throw oauthError(BAD_REQUEST.value(), "invalid_grant", "principal is not active for tenant");
         }
         Set<String> scopes = splitValues(authorization.getAuthorizedScopes());
@@ -644,12 +649,12 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         LocalDateTime accessExpires = issued.plus(accessTokenTtl);
         String jti = UUID.randomUUID().toString();
         Map<String, Object> claims = orderedMap(
-                "principal_type", authorization.getPrincipalType(),
-                "tenant_id", authorization.getTenantId(),
-                "client_id", client.getClientId(),
-                "mcp_connection_id", authorization.getMcpConnectionId(),
-                "grant_type", authorization.getAuthorizationGrantType(),
-                "scope", String.join(" ", scopes)
+                McpConstant.Field.PRINCIPAL_TYPE, authorization.getPrincipalType(),
+                McpConstant.Field.TENANT_ID, authorization.getTenantId(),
+                McpConstant.Field.CLIENT_ID, client.getClientId(),
+                McpConstant.Field.MCP_CONNECTION_ID, authorization.getMcpConnectionId(),
+                McpConstant.Field.GRANT_TYPE, authorization.getAuthorizationGrantType(),
+                McpConstant.Field.SCOPE, String.join(" ", scopes)
         );
         String accessToken = Jwts.builder()
                 .header().keyId(KID).and()
@@ -671,12 +676,12 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                 sha256(refreshToken), refreshIssued, refreshExpires, JsonUtil.toJsonString(claims));
 
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("access_token", accessToken);
-        response.put("token_type", "Bearer");
-        response.put("expires_in", accessTokenTtl.toSeconds());
-        response.put("scope", String.join(" ", scopes));
+        response.put(McpConstant.Field.ACCESS_TOKEN, accessToken);
+        response.put(McpConstant.Field.TOKEN_TYPE, McpConstant.OAuth.TOKEN_TYPE_BEARER);
+        response.put(McpConstant.Field.EXPIRES_IN, accessTokenTtl.toSeconds());
+        response.put(McpConstant.Field.SCOPE, String.join(" ", scopes));
         if (issueRefreshToken) {
-            response.put("refresh_token", refreshToken);
+            response.put(McpConstant.Field.REFRESH_TOKEN, refreshToken);
         }
         return response;
     }
@@ -708,7 +713,9 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     private void requireAuthenticatedPrincipal(RequestHeader.PrincipalHeader principalHeader) {
-        if (principalHeader == null || principalHeader.getPrincipalId() == null || principalHeader.getTenantId() == null) {
+        if (principalHeader == null
+                || principalHeader.getPrincipalId() == null
+                || principalHeader.getTenantId() == null) {
             throw oauthError(UNAUTHORIZED.value(), "login_required", "authenticated principal is required");
         }
     }
@@ -750,8 +757,9 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     private void authenticateClient(OAuthRegisteredClientRecord client, Map<String, String> form,
                                     String authorizationHeader, boolean confidentialRequired) {
-        if (CLIENT_TYPE_PUBLIC.equals(client.getClientType())) {
-            if (confidentialRequired || !splitValues(client.getClientAuthMethods()).contains("none")) {
+        if (McpConstant.OAuth.CLIENT_TYPE_PUBLIC.equals(client.getClientType())) {
+            if (confidentialRequired
+                    || !splitValues(client.getClientAuthMethods()).contains(McpConstant.OAuth.AUTH_METHOD_NONE)) {
                 throw oauthError(UNAUTHORIZED.value(), "invalid_client", "confidential client is required");
             }
             return;
@@ -793,10 +801,10 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                         "idempotentHint", one(tool.getIdempotentHint()),
                         "openWorldHint", one(tool.getOpenWorldHint())
                 ),
-                "_meta", orderedMap(
-                        "tool_id", tool.getToolId(),
-                        "permission_code", tool.getPermissionCode(),
-                        "risk_level", tool.getRiskLevel()
+                McpConstant.Field.META, orderedMap(
+                        McpConstant.Field.TOOL_ID_META, tool.getToolId(),
+                        McpConstant.Field.PERMISSION_CODE_META, tool.getPermissionCode(),
+                        McpConstant.Field.RISK_LEVEL_META, tool.getRiskLevel()
                 )
         );
     }
@@ -817,7 +825,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     private String resolveClientId(Map<String, String> form, String authorizationHeader) {
         BasicClientCredentials basic = basicCredentials(authorizationHeader);
-        return basic != null ? basic.clientId() : form.get("client_id");
+        return basic != null ? basic.clientId() : form.get(McpConstant.Field.CLIENT_ID);
     }
 
     private String resolveClientSecret(Map<String, String> form, String authorizationHeader) {
@@ -875,37 +883,18 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     private String randomToken() {
         byte[] bytes = new byte[32];
         SECURE_RANDOM.nextBytes(bytes);
-        return base64Url(bytes);
+        return DecodeUtil.base64Url(bytes);
     }
 
     private String pkceChallenge(String verifier) {
-        return base64Url(sha256Bytes(verifier));
+        return DecodeUtil.sha256Base64Url(verifier);
     }
 
     private String sha256(String value) {
         if (StringUtils.isBlank(value)) {
             return "";
         }
-        return java.util.HexFormat.of().formatHex(sha256Bytes(value));
-    }
-
-    private byte[] sha256Bytes(String value) {
-        try {
-            return MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 is unavailable", e);
-        }
-    }
-
-    private String base64Url(byte[] bytes) {
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(stripLeadingZero(bytes));
-    }
-
-    private byte[] stripLeadingZero(byte[] bytes) {
-        if (bytes.length > 1 && bytes[0] == 0) {
-            return java.util.Arrays.copyOfRange(bytes, 1, bytes.length);
-        }
-        return bytes;
+        return DecodeUtil.sha256Hex(value);
     }
 
     private String urlEncode(String value) {

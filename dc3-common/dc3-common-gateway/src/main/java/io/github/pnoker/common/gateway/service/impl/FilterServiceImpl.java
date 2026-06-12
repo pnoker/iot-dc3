@@ -22,6 +22,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.facade.api.LocalCredentialFacade;
 import io.github.pnoker.common.facade.api.TenantFacade;
@@ -125,7 +126,7 @@ public class FilterServiceImpl implements FilterService {
 
         RequestHeader.PrincipalHeader header = new RequestHeader.PrincipalHeader();
         header.setPrincipalId(principalId);
-        header.setPrincipalType("USER");
+        header.setPrincipalType(PrincipalTypeEnum.USER.getValue());
         header.setDisplayName(user.getNickName());
         header.setPrincipalName(user.getUserName());
         header.setTenantId(tenant.getId());

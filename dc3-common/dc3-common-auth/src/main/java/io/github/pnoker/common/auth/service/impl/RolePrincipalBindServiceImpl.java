@@ -37,6 +37,7 @@ import io.github.pnoker.common.auth.service.RolePrincipalBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -150,7 +151,7 @@ public class RolePrincipalBindServiceImpl implements RolePrincipalBindService {
         }
         LambdaQueryWrapper<RolePrincipalBindDO> wrapper = Wrappers.<RolePrincipalBindDO>query().lambda();
         wrapper.eq(RolePrincipalBindDO::getRoleId, roleId);
-        wrapper.eq(RolePrincipalBindDO::getPrincipalType, "USER");
+        wrapper.eq(RolePrincipalBindDO::getPrincipalType, PrincipalTypeEnum.USER.getValue());
         wrapper.select(RolePrincipalBindDO::getPrincipalId);
         List<Long> principalIds = rolePrincipalBindManager.listObjs(wrapper, o -> (Long) o);
         if (CollectionUtils.isEmpty(principalIds)) {

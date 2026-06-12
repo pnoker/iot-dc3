@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthPro
 import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
@@ -57,16 +58,17 @@ public class McpInternalController {
     private final OAuthMcpRuntimeService oauthMcpRuntimeService;
     private final HmacAuthSigner hmacAuthSigner;
 
-    @PostMapping("/oauth2/introspect")
+    @PostMapping(McpConstant.OAUTH2_INTROSPECT)
     public Mono<ResponseEntity<Map<String, Object>>> introspect(@RequestBody Map<String, Object> request,
                                                                 ServerWebExchange exchange) {
         return Mono.fromSupplier(() -> {
             requireInternal(exchange);
-            return ResponseEntity.ok(oauthMcpRuntimeService.introspect(Objects.toString(request.get("token"), "")));
+            return ResponseEntity.ok(oauthMcpRuntimeService.introspect(
+                    Objects.toString(request.get(McpConstant.Field.TOKEN), "")));
         });
     }
 
-    @PostMapping("/mcp/internal/catalog/refresh")
+    @PostMapping(McpConstant.INTERNAL_CATALOG_REFRESH)
     public Mono<ResponseEntity<Map<String, Object>>> refreshCatalog(ServerWebExchange exchange) {
         return Mono.fromSupplier(() -> {
             requireInternal(exchange);
@@ -74,39 +76,39 @@ public class McpInternalController {
         });
     }
 
-    @PostMapping("/mcp/internal/tools/list")
+    @PostMapping(McpConstant.INTERNAL_TOOLS_LIST)
     public Mono<ResponseEntity<Map<String, Object>>> listTools(@RequestBody Map<String, Object> request,
                                                                ServerWebExchange exchange) {
         return Mono.fromSupplier(() -> {
             requireInternal(exchange);
             Map<String, Object> body = new LinkedHashMap<>();
-            body.put("tools", oauthMcpRuntimeService.listVisibleTools(
-                    longValue(request.get("tenant_id")),
-                    longValue(request.get("principal_id")),
-                    longValue(request.get("mcp_connection_id")),
-                    scopes(request.get("scope"))
+            body.put(McpConstant.Field.TOOLS, oauthMcpRuntimeService.listVisibleTools(
+                    longValue(request.get(McpConstant.Field.TENANT_ID)),
+                    longValue(request.get(McpConstant.Field.PRINCIPAL_ID)),
+                    longValue(request.get(McpConstant.Field.MCP_CONNECTION_ID)),
+                    scopes(request.get(McpConstant.Field.SCOPE))
             ));
             return ResponseEntity.ok(body);
         }).onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 
-    @PostMapping("/mcp/internal/tools/resolve")
+    @PostMapping(McpConstant.INTERNAL_TOOLS_RESOLVE)
     public Mono<ResponseEntity<Map<String, Object>>> resolveTool(@RequestBody Map<String, Object> request,
                                                                  ServerWebExchange exchange) {
         return Mono.fromSupplier(() -> {
             requireInternal(exchange);
             McpToolRecord tool = oauthMcpRuntimeService.resolveVisibleTool(
-                    longValue(request.get("tenant_id")),
-                    longValue(request.get("principal_id")),
-                    longValue(request.get("mcp_connection_id")),
-                    Objects.toString(request.get("tool_name"), ""),
-                    scopes(request.get("scope"))
+                    longValue(request.get(McpConstant.Field.TENANT_ID)),
+                    longValue(request.get(McpConstant.Field.PRINCIPAL_ID)),
+                    longValue(request.get(McpConstant.Field.MCP_CONNECTION_ID)),
+                    Objects.toString(request.get(McpConstant.Field.TOOL_NAME_REQUEST), ""),
+                    scopes(request.get(McpConstant.Field.SCOPE))
             );
             return ResponseEntity.ok(toolRecord(tool));
         }).onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 
-    @PostMapping("/mcp/internal/audit")
+    @PostMapping(McpConstant.INTERNAL_AUDIT)
     public Mono<ResponseEntity<Map<String, Object>>> audit(@RequestBody McpAuditCommand command,
                                                            ServerWebExchange exchange) {
         return Mono.fromSupplier(() -> {
@@ -118,8 +120,8 @@ public class McpInternalController {
 
     private Mono<ResponseEntity<Map<String, Object>>> oauthError(OAuthProtocolException exception) {
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("error", exception.getError());
-        body.put("error_description", exception.getDescription());
+        body.put(McpConstant.Field.ERROR, exception.getError());
+        body.put(McpConstant.Field.ERROR_DESCRIPTION, exception.getDescription());
         return Mono.just(ResponseEntity.status(exception.getStatusCode()).body(body));
     }
 
@@ -142,7 +144,7 @@ public class McpInternalController {
     private boolean fresh(String timestamp) {
         try {
             long diff = Math.abs(Instant.now().toEpochMilli() - Long.parseLong(timestamp));
-            return diff <= 300_000;
+            return diff <= RequestConstant.DEFAULT_INTERNAL_SIGNATURE_TTL_MS;
         } catch (RuntimeException e) {
             return false;
         }

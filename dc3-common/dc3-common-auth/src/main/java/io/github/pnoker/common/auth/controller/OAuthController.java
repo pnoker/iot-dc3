@@ -20,6 +20,7 @@ package io.github.pnoker.common.auth.controller;
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
@@ -53,17 +54,17 @@ public class OAuthController {
 
     private final OAuthMcpRuntimeService oauthMcpRuntimeService;
 
-    @GetMapping("/.well-known/oauth-authorization-server")
+    @GetMapping(McpConstant.WELL_KNOWN_AUTHORIZATION_SERVER)
     public Mono<Map<String, Object>> authorizationServerMetadata() {
         return Mono.fromSupplier(oauthMcpRuntimeService::authorizationServerMetadata);
     }
 
-    @GetMapping("/oauth2/jwks")
+    @GetMapping(McpConstant.OAUTH2_JWKS)
     public Mono<Map<String, Object>> jwks() {
         return Mono.fromSupplier(oauthMcpRuntimeService::jwks);
     }
 
-    @PostMapping(value = "/oauth2/register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = McpConstant.OAUTH2_REGISTER, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> register(
             @RequestBody Map<String, Object> request,
             @org.springframework.web.bind.annotation.RequestHeader(
@@ -73,7 +74,7 @@ public class OAuthController {
                 .onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 
-    @GetMapping("/oauth2/authorize")
+    @GetMapping(McpConstant.OAUTH2_AUTHORIZE)
     public Mono<ResponseEntity<Map<String, Object>>> authorize(
             @RequestParam MultiValueMap<String, String> params,
             @org.springframework.web.bind.annotation.RequestHeader(
@@ -84,7 +85,7 @@ public class OAuthController {
         }).onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 
-    @PostMapping(value = "/oauth2/token", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = McpConstant.OAUTH2_TOKEN, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> token(
             @RequestBody Mono<MultiValueMap<String, String>> body,
             @org.springframework.web.bind.annotation.RequestHeader(
@@ -94,7 +95,7 @@ public class OAuthController {
                 .onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 
-    @PostMapping(value = "/oauth2/revoke", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = McpConstant.OAUTH2_REVOKE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> revoke(
             @RequestBody Mono<MultiValueMap<String, String>> body,
             @org.springframework.web.bind.annotation.RequestHeader(
@@ -106,8 +107,8 @@ public class OAuthController {
 
     private Mono<ResponseEntity<Map<String, Object>>> oauthError(OAuthProtocolException exception) {
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("error", exception.getError());
-        body.put("error_description", exception.getDescription());
+        body.put(McpConstant.Field.ERROR, exception.getError());
+        body.put(McpConstant.Field.ERROR_DESCRIPTION, exception.getDescription());
         return Mono.just(ResponseEntity.status(exception.getStatusCode()).body(body));
     }
 

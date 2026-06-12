@@ -18,7 +18,9 @@
 package io.github.pnoker.common.gateway.mcp;
 
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +43,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,18 +72,17 @@ public class McpGatewayController {
     @Value("${dc3.mcp.authorization-server:http://localhost:8000}")
     private String authorizationServer;
 
-    @GetMapping("/.well-known/oauth-protected-resource")
+    @GetMapping(McpConstant.WELL_KNOWN_PROTECTED_RESOURCE)
     public Mono<Map<String, Object>> protectedResourceMetadata() {
         return Mono.just(orderedMap(
                 "resource", resource,
                 "authorization_servers", List.of(authorizationServer),
-                "bearer_methods_supported", List.of("header"),
-                "scopes_supported", List.of("mcp:tools:list", "mcp:tools:call", "mcp:tools:call:high",
-                        "mcp:resources:read")
+                "bearer_methods_supported", List.of(McpConstant.Server.BEARER_METHOD_HEADER),
+                "scopes_supported", McpConstant.Scope.SUPPORTED
         ));
     }
 
-    @PostMapping(value = "/mcp", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = McpConstant.URL_PREFIX, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> mcp(@RequestBody Map<String, Object> request,
                                                          ServerWebExchange exchange) {
         String token = bearerToken(exchange);
@@ -93,71 +91,78 @@ public class McpGatewayController {
         }
         return mcpGatewayClient.introspect(token)
                 .flatMap(context -> {
-                    if (!Boolean.TRUE.equals(context.get("active"))) {
+                    if (!Boolean.TRUE.equals(context.get(McpConstant.Field.ACTIVE))) {
                         return Mono.just(challenge());
                     }
                     return dispatch(request, context, exchange);
                 })
                 .onErrorResume(e -> {
                     log.warn("MCP request failed", e);
-                    return Mono.just(jsonRpcError(request.get("id"), -32000, "MCP request failed"));
+                    return Mono.just(jsonRpcError(request.get(McpConstant.JsonRpc.FIELD_ID),
+                            McpConstant.JsonRpc.ERROR_INTERNAL, "MCP request failed"));
                 });
     }
 
     private Mono<ResponseEntity<Map<String, Object>>> dispatch(Map<String, Object> request, Map<String, Object> context,
                                                                ServerWebExchange exchange) {
-        String method = Objects.toString(request.get("method"), "");
-        Object id = request.get("id");
-        if ("initialize".equals(method)) {
+        String method = Objects.toString(request.get(McpConstant.JsonRpc.FIELD_METHOD), "");
+        Object id = request.get(McpConstant.JsonRpc.FIELD_ID);
+        if (McpConstant.JsonRpc.METHOD_INITIALIZE.equals(method)) {
             return Mono.just(jsonRpcResult(id, orderedMap(
-                    "protocolVersion", "2025-06-18",
-                    "capabilities", orderedMap("tools", orderedMap("listChanged", true)),
-                    "serverInfo", orderedMap("name", "iot-dc3-gateway", "version", "2026.5.22")
+                    "protocolVersion", McpConstant.Server.PROTOCOL_VERSION,
+                    "capabilities", orderedMap(McpConstant.Server.CAPABILITY_TOOLS,
+                            orderedMap(McpConstant.Server.CAPABILITY_LIST_CHANGED, true)),
+                    "serverInfo", orderedMap("name", McpConstant.Server.NAME, "version", McpConstant.Server.VERSION)
             )));
         }
-        if ("notifications/initialized".equals(method)) {
+        if (McpConstant.JsonRpc.METHOD_NOTIFICATIONS_INITIALIZED.equals(method)) {
             return Mono.just(ResponseEntity.accepted().build());
         }
-        if ("ping".equals(method)) {
+        if (McpConstant.JsonRpc.METHOD_PING.equals(method)) {
             return Mono.just(jsonRpcResult(id, Map.of()));
         }
-        if ("tools/list".equals(method)) {
+        if (McpConstant.JsonRpc.METHOD_TOOLS_LIST.equals(method)) {
             return mcpGatewayClient.listTools(context)
                     .map(result -> jsonRpcResult(id, result));
         }
-        if ("tools/call".equals(method)) {
-            Map<String, Object> params = mapValue(request.get("params"));
-            String toolName = Objects.toString(params.get("name"), "");
-            Map<String, Object> arguments = mapValue(params.get("arguments"));
-            Map<String, Object> callMeta = mapValue(params.get("_meta"));
+        if (McpConstant.JsonRpc.METHOD_TOOLS_CALL.equals(method)) {
+            Map<String, Object> params = mapValue(request.get(McpConstant.Field.PARAMS));
+            String toolName = Objects.toString(params.get(McpConstant.Field.NAME), "");
+            Map<String, Object> arguments = mapValue(params.get(McpConstant.Field.ARGUMENTS));
+            Map<String, Object> callMeta = mapValue(params.get(McpConstant.Field.META));
             return mcpGatewayClient.callTool(context, toolName, arguments, callMeta, exchange)
                     .map(result -> jsonRpcResult(id, result));
         }
-        return Mono.just(jsonRpcError(id, -32601, "Method not found"));
+        return Mono.just(jsonRpcError(id, McpConstant.JsonRpc.ERROR_METHOD_NOT_FOUND, "Method not found"));
     }
 
     private ResponseEntity<Map<String, Object>> challenge() {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .header(HttpHeaders.WWW_AUTHENTICATE,
-                        "Bearer resource_metadata=\"/.well-known/oauth-protected-resource\"")
-                .body(Map.of("error", "invalid_token"));
+                        McpConstant.OAuth.TOKEN_TYPE_BEARER + " resource_metadata=\""
+                                + McpConstant.WELL_KNOWN_PROTECTED_RESOURCE + "\"")
+                .body(Map.of(McpConstant.Field.ERROR, "invalid_token"));
     }
 
     private ResponseEntity<Map<String, Object>> jsonRpcResult(Object id, Object result) {
-        return ResponseEntity.ok(orderedMap("jsonrpc", "2.0", "id", id, "result", result));
+        return ResponseEntity.ok(orderedMap(McpConstant.JsonRpc.FIELD_JSONRPC, McpConstant.JsonRpc.VERSION,
+                McpConstant.JsonRpc.FIELD_ID, id, McpConstant.JsonRpc.FIELD_RESULT, result));
     }
 
     private ResponseEntity<Map<String, Object>> jsonRpcError(Object id, int code, String message) {
-        return ResponseEntity.ok(orderedMap("jsonrpc", "2.0", "id", id,
-                "error", orderedMap("code", code, "message", message)));
+        return ResponseEntity.ok(orderedMap(McpConstant.JsonRpc.FIELD_JSONRPC, McpConstant.JsonRpc.VERSION,
+                McpConstant.JsonRpc.FIELD_ID, id,
+                McpConstant.JsonRpc.FIELD_ERROR, orderedMap(McpConstant.JsonRpc.ERROR_FIELD_CODE, code,
+                        McpConstant.JsonRpc.ERROR_FIELD_MESSAGE, message)));
     }
 
     private String bearerToken(ServerWebExchange exchange) {
         String header = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.isBlank(header) || !header.startsWith("Bearer ")) {
+        String prefix = McpConstant.OAuth.TOKEN_TYPE_BEARER + ' ';
+        if (StringUtils.isBlank(header) || !header.startsWith(prefix)) {
             return "";
         }
-        return header.substring(7);
+        return header.substring(prefix.length());
     }
 
     @SuppressWarnings("unchecked")
@@ -168,12 +173,27 @@ public class McpGatewayController {
         return Map.of();
     }
 
-    private Map<String, Object> orderedMap(Object... values) {
+    private static Map<String, Object> orderedMap(Object... values) {
         Map<String, Object> map = new LinkedHashMap<>();
         for (int i = 0; i < values.length; i += 2) {
             map.put(String.valueOf(values[i]), values[i + 1]);
         }
         return map;
+    }
+
+    private static Map<String, String> orderedStringMap(Object... values) {
+        Map<String, String> map = new LinkedHashMap<>();
+        for (int i = 0; i < values.length; i += 2) {
+            map.put(String.valueOf(values[i]), Objects.toString(values[i + 1], ""));
+        }
+        return map;
+    }
+
+    private static Long longValue(Object value) {
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+        return Long.valueOf(Objects.toString(value, "0"));
     }
 
     /**
@@ -184,6 +204,8 @@ public class McpGatewayController {
     @Component
     @RequiredArgsConstructor
     static class McpGatewayClient {
+
+        private static final String INTERNAL_CALLER = "dc3-gateway";
 
         private final HmacAuthSigner hmacAuthSigner;
         private final WebClient.Builder webClientBuilder;
@@ -204,15 +226,16 @@ public class McpGatewayController {
         private String agenticUrl;
 
         Mono<Map<String, Object>> introspect(String token) {
-            return postInternal(authBaseUrl + "/oauth2/introspect", Map.of("token", token));
+            return postInternal(authBaseUrl + McpConstant.OAUTH2_INTROSPECT,
+                    Map.of(McpConstant.Field.TOKEN, token));
         }
 
         Mono<Map<String, Object>> listTools(Map<String, Object> context) {
-            return postInternal(authBaseUrl + "/mcp/internal/tools/list", orderedMap(
-                    "tenant_id", context.get("tenant_id"),
-                    "principal_id", context.get("principal_id"),
-                    "mcp_connection_id", context.get("mcp_connection_id"),
-                    "scope", context.get("scope")
+            return postInternal(authBaseUrl + McpConstant.INTERNAL_TOOLS_LIST, orderedMap(
+                    McpConstant.Field.TENANT_ID, context.get(McpConstant.Field.TENANT_ID),
+                    McpConstant.Field.PRINCIPAL_ID, context.get(McpConstant.Field.PRINCIPAL_ID),
+                    McpConstant.Field.MCP_CONNECTION_ID, context.get(McpConstant.Field.MCP_CONNECTION_ID),
+                    McpConstant.Field.SCOPE, context.get(McpConstant.Field.SCOPE)
             ));
         }
 
@@ -221,36 +244,38 @@ public class McpGatewayController {
                                            ServerWebExchange exchange) {
             long start = System.nanoTime();
             String traceId = UUID.randomUUID().toString();
-            return postInternal(authBaseUrl + "/mcp/internal/tools/resolve", orderedMap(
-                    "tenant_id", context.get("tenant_id"),
-                    "principal_id", context.get("principal_id"),
-                    "mcp_connection_id", context.get("mcp_connection_id"),
-                    "scope", context.get("scope"),
-                    "tool_name", toolName
+            return postInternal(authBaseUrl + McpConstant.INTERNAL_TOOLS_RESOLVE, orderedMap(
+                    McpConstant.Field.TENANT_ID, context.get(McpConstant.Field.TENANT_ID),
+                    McpConstant.Field.PRINCIPAL_ID, context.get(McpConstant.Field.PRINCIPAL_ID),
+                    McpConstant.Field.MCP_CONNECTION_ID, context.get(McpConstant.Field.MCP_CONNECTION_ID),
+                    McpConstant.Field.SCOPE, context.get(McpConstant.Field.SCOPE),
+                    McpConstant.Field.TOOL_NAME_REQUEST, toolName
             )).flatMap(tool -> {
                 Map<String, String> controls = controlValues(callMeta, exchange);
                 String policyError = policyError(tool, controls);
                 if (StringUtils.isNotBlank(policyError)) {
-                    return audit(context, tool, traceId, arguments, controls, "DENIED", "POLICY_DENIED", start,
-                            exchange)
-                            .thenReturn(orderedMap("isError", true, "content", List.of(orderedMap(
-                                    "type", "text",
-                                    "text", policyError
+                    return audit(context, tool, traceId, arguments, controls, McpConstant.Audit.DENIED,
+                            McpConstant.Audit.POLICY_DENIED, start, exchange)
+                            .thenReturn(orderedMap(McpConstant.ToolResult.IS_ERROR, true,
+                                    McpConstant.ToolResult.CONTENT, List.of(orderedMap(
+                                            McpConstant.ToolResult.TYPE, McpConstant.ToolResult.TYPE_TEXT,
+                                            McpConstant.ToolResult.TEXT, policyError
                             ))));
                 }
                 return invokeBackend(context, tool, arguments, controls)
-                    .flatMap(result -> audit(context, tool, traceId, arguments, controls, "SUCCESS", "", start,
-                            exchange)
-                            .thenReturn(orderedMap("content", List.of(orderedMap(
-                                    "type", "text",
-                                    "text", JsonUtil.toJsonString(result)
-                            )))))
-                    .onErrorResume(e -> audit(context, tool, traceId, arguments, controls, "ERROR",
-                            e.getClass().getSimpleName(), start, exchange)
-                            .thenReturn(orderedMap("isError", true, "content", List.of(orderedMap(
-                                    "type", "text",
-                                    "text", e.getMessage()
-                            )))));
+                        .flatMap(result -> audit(context, tool, traceId, arguments, controls,
+                                McpConstant.Audit.SUCCESS, "", start, exchange)
+                                .thenReturn(orderedMap(McpConstant.ToolResult.CONTENT, List.of(orderedMap(
+                                        McpConstant.ToolResult.TYPE, McpConstant.ToolResult.TYPE_TEXT,
+                                        McpConstant.ToolResult.TEXT, JsonUtil.toJsonString(result)
+                                )))))
+                        .onErrorResume(e -> audit(context, tool, traceId, arguments, controls,
+                                McpConstant.Audit.ERROR, e.getClass().getSimpleName(), start, exchange)
+                                .thenReturn(orderedMap(McpConstant.ToolResult.IS_ERROR, true,
+                                        McpConstant.ToolResult.CONTENT, List.of(orderedMap(
+                                                McpConstant.ToolResult.TYPE, McpConstant.ToolResult.TYPE_TEXT,
+                                                McpConstant.ToolResult.TEXT, e.getMessage()
+                                        )))));
             });
         }
 
@@ -273,16 +298,19 @@ public class McpGatewayController {
                     })
                     .headers(headers -> {
                         headers.addAll(principalHeaders(context));
-                        if (StringUtils.isNotBlank(controls.get("idempotencyKey"))) {
-                            headers.set("Idempotency-Key", controls.get("idempotencyKey"));
+                        if (StringUtils.isNotBlank(controls.get(McpConstant.Field.IDEMPOTENCY_KEY))) {
+                            headers.set(RequestConstant.Header.IDEMPOTENCY_KEY,
+                                    controls.get(McpConstant.Field.IDEMPOTENCY_KEY));
                         }
-                        if (StringUtils.isNotBlank(controls.get("confirmId"))) {
-                            headers.set("X-Mcp-Confirm-Id", controls.get("confirmId"));
+                        if (StringUtils.isNotBlank(controls.get(McpConstant.Field.CONFIRM_ID))) {
+                            headers.set(RequestConstant.Header.X_MCP_CONFIRM_ID,
+                                    controls.get(McpConstant.Field.CONFIRM_ID));
                         }
-                    });
+            });
             if (HttpMethod.GET.equals(method) || HttpMethod.DELETE.equals(method)) {
-                return spec.retrieve().bodyToMono(new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {
-                });
+                return spec.retrieve()
+                        .bodyToMono(new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {
+                        });
             }
             return spec.contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(arguments)
@@ -293,13 +321,13 @@ public class McpGatewayController {
 
         private HttpHeaders principalHeaders(Map<String, Object> context) {
             RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
-            principal.setPrincipalId(longValue(context.get("principal_id")));
-            principal.setPrincipalType(Objects.toString(context.get("principal_type"), ""));
-            principal.setPrincipalName(Objects.toString(context.get("principal_name"), ""));
-            principal.setDisplayName(Objects.toString(context.get("display_name"), ""));
-            principal.setTenantId(longValue(context.get("tenant_id")));
-            principal.setClientId(Objects.toString(context.get("client_id"), ""));
-            principal.setConnectionId(longValue(context.get("mcp_connection_id")));
+            principal.setPrincipalId(longValue(context.get(McpConstant.Field.PRINCIPAL_ID)));
+            principal.setPrincipalType(Objects.toString(context.get(McpConstant.Field.PRINCIPAL_TYPE), ""));
+            principal.setPrincipalName(Objects.toString(context.get(McpConstant.Field.PRINCIPAL_NAME), ""));
+            principal.setDisplayName(Objects.toString(context.get(McpConstant.Field.DISPLAY_NAME), ""));
+            principal.setTenantId(longValue(context.get(McpConstant.Field.TENANT_ID)));
+            principal.setClientId(Objects.toString(context.get(McpConstant.Field.CLIENT_ID), ""));
+            principal.setConnectionId(longValue(context.get(McpConstant.Field.MCP_CONNECTION_ID)));
 
             String payload = JsonUtil.toJsonString(principal);
             HttpHeaders headers = new HttpHeaders();
@@ -315,48 +343,51 @@ public class McpGatewayController {
                                  String errorCode, long start, ServerWebExchange exchange) {
             long duration = (System.nanoTime() - start) / 1_000_000;
             Map<String, Object> command = orderedMap(
-                    "traceId", traceId,
-                    "tenantId", context.get("tenant_id"),
-                    "principalId", context.get("principal_id"),
-                    "principalType", context.get("principal_type"),
-                    "clientId", context.get("client_id"),
-                    "connectionId", context.get("mcp_connection_id"),
-                    "toolId", tool.get("toolId"),
-                    "toolName", tool.get("toolName"),
-                    "permissionCode", tool.get("permissionCode"),
-                    "riskLevel", tool.get("riskLevel"),
-                    "confirmId", controls.get("confirmId"),
-                    "idempotencyKey", controls.get("idempotencyKey"),
-                    "argumentDigest", digest(JsonUtil.toJsonString(arguments)),
-                    "status", status,
-                    "errorCode", errorCode,
-                    "durationMs", duration,
-                    "clientName", exchange.getRequest().getHeaders().getFirst("Mcp-Client-Name"),
-                    "clientVersion", exchange.getRequest().getHeaders().getFirst("Mcp-Client-Version"),
-                    "remoteIp", exchange.getRequest().getRemoteAddress() == null ? ""
+                    McpConstant.Field.TRACE_ID, traceId,
+                    McpConstant.Field.TENANT_ID_CAMEL, context.get(McpConstant.Field.TENANT_ID),
+                    McpConstant.Field.PRINCIPAL_ID_CAMEL, context.get(McpConstant.Field.PRINCIPAL_ID),
+                    McpConstant.Field.PRINCIPAL_TYPE_CAMEL, context.get(McpConstant.Field.PRINCIPAL_TYPE),
+                    McpConstant.Field.CLIENT_ID_CAMEL, context.get(McpConstant.Field.CLIENT_ID),
+                    McpConstant.Field.CONNECTION_ID, context.get(McpConstant.Field.MCP_CONNECTION_ID),
+                    McpConstant.Field.TOOL_ID, tool.get(McpConstant.Field.TOOL_ID),
+                    McpConstant.Field.TOOL_NAME, tool.get(McpConstant.Field.TOOL_NAME),
+                    McpConstant.Field.PERMISSION_CODE, tool.get(McpConstant.Field.PERMISSION_CODE),
+                    McpConstant.Field.RISK_LEVEL, tool.get(McpConstant.Field.RISK_LEVEL),
+                    McpConstant.Field.CONFIRM_ID, controls.get(McpConstant.Field.CONFIRM_ID),
+                    McpConstant.Field.IDEMPOTENCY_KEY, controls.get(McpConstant.Field.IDEMPOTENCY_KEY),
+                    McpConstant.Field.ARGUMENT_DIGEST, DecodeUtil.sha256Base64Url(JsonUtil.toJsonString(arguments)),
+                    McpConstant.Field.STATUS, status,
+                    McpConstant.Field.ERROR_CODE, errorCode,
+                    McpConstant.Field.DURATION_MS, duration,
+                    McpConstant.Field.CLIENT_NAME,
+                    exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.MCP_CLIENT_NAME),
+                    McpConstant.Field.CLIENT_VERSION,
+                    exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.MCP_CLIENT_VERSION),
+                    McpConstant.Field.REMOTE_IP, exchange.getRequest().getRemoteAddress() == null ? ""
                             : exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
             );
-            return postInternal(authBaseUrl + "/mcp/internal/audit", command).then();
+            return postInternal(authBaseUrl + McpConstant.INTERNAL_AUDIT, command).then();
         }
 
         private Map<String, String> controlValues(Map<String, Object> callMeta, ServerWebExchange exchange) {
             return orderedStringMap(
-                    "confirmId", firstNonBlank(callMeta.get("confirm_id"),
-                            exchange.getRequest().getHeaders().getFirst("Mcp-Confirm-Id")),
-                    "idempotencyKey", firstNonBlank(callMeta.get("idempotency_key"),
-                            exchange.getRequest().getHeaders().getFirst("Mcp-Idempotency-Key"),
-                            exchange.getRequest().getHeaders().getFirst("Idempotency-Key"))
+                    McpConstant.Field.CONFIRM_ID, firstNonBlank(callMeta.get(McpConstant.Field.CONFIRM_ID_META),
+                            exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.MCP_CONFIRM_ID)),
+                    McpConstant.Field.IDEMPOTENCY_KEY, firstNonBlank(
+                            callMeta.get(McpConstant.Field.IDEMPOTENCY_KEY_META),
+                            exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.MCP_IDEMPOTENCY_KEY),
+                            exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.IDEMPOTENCY_KEY))
             );
         }
 
         private String policyError(Map<String, Object> tool, Map<String, String> controls) {
-            if (!"HIGH".equals(Objects.toString(tool.get("riskLevel"), ""))) {
+            if (!McpConstant.RiskLevel.HIGH.equals(Objects.toString(tool.get(McpConstant.Field.RISK_LEVEL), ""))) {
                 return "";
             }
-            if (StringUtils.isBlank(controls.get("confirmId"))) {
+            if (StringUtils.isBlank(controls.get(McpConstant.Field.CONFIRM_ID))) {
                 return "High risk MCP tool requires confirmation";
             }
-            if (StringUtils.isBlank(controls.get("idempotencyKey"))) {
+            if (StringUtils.isBlank(controls.get(McpConstant.Field.IDEMPOTENCY_KEY))) {
                 return "High risk MCP tool requires an idempotency key";
             }
             return "";
@@ -389,7 +420,7 @@ public class McpGatewayController {
             if (!hmacAuthSigner.isEnabled()) {
                 return;
             }
-            String caller = "dc3-gateway";
+            String caller = INTERNAL_CALLER;
             String timestamp = String.valueOf(Instant.now().toEpochMilli());
             String nonce = UUID.randomUUID().toString();
             String payload = caller + '\n' + timestamp + '\n' + nonce + '\n' + path;
@@ -413,38 +444,6 @@ public class McpGatewayController {
                 return agenticUrl;
             }
             throw new IllegalArgumentException("Unknown backend service: " + serviceName);
-        }
-
-        private String digest(String value) {
-            try {
-                byte[] hash = MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));
-                return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
-            } catch (Exception e) {
-                return "";
-            }
-        }
-
-        private Long longValue(Object value) {
-            if (value instanceof Number number) {
-                return number.longValue();
-            }
-            return Long.valueOf(Objects.toString(value, "0"));
-        }
-
-        private Map<String, Object> orderedMap(Object... values) {
-            Map<String, Object> map = new LinkedHashMap<>();
-            for (int i = 0; i < values.length; i += 2) {
-                map.put(String.valueOf(values[i]), values[i + 1]);
-            }
-            return map;
-        }
-
-        private Map<String, String> orderedStringMap(Object... values) {
-            Map<String, String> map = new LinkedHashMap<>();
-            for (int i = 0; i < values.length; i += 2) {
-                map.put(String.valueOf(values[i]), Objects.toString(values[i + 1], ""));
-            }
-            return map;
         }
 
     }
