@@ -801,7 +801,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                 .name(tool.getToolName())
                 .title(tool.getToolTitle())
                 .description(StringUtils.defaultIfBlank(tool.getRemark(), tool.getToolTitle()))
-                .inputSchema(mcpInputSchema())
+                .inputSchema(McpConstant.ToolDefinition.DEFAULT_INPUT_SCHEMA)
                 .annotations(McpToolDefinitionDTO.Annotations.builder()
                         .readOnlyHint(one(tool.getReadOnlyHint()))
                         .destructiveHint(one(tool.getDestructiveHint()))
@@ -814,13 +814,6 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                         .riskLevel(tool.getRiskLevel())
                         .build())
                 .build();
-    }
-
-    private Map<String, Object> mcpInputSchema() {
-        return orderedMap(
-                McpConstant.ToolDefinition.TYPE, McpConstant.ToolDefinition.TYPE_OBJECT,
-                McpConstant.ToolDefinition.ADDITIONAL_PROPERTIES, true
-        );
     }
 
     private McpToolResolveResponseDTO resolvedTool(McpToolRecord tool) {
@@ -908,7 +901,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         if (StringUtils.isBlank(value)) {
             return Set.of();
         }
-        String[] parts = value.trim().split("[\\s,]+");
+        String[] parts = value.trim().split(McpConstant.Scope.DELIMITER_REGEX);
         Set<String> out = new HashSet<>();
         for (String part : parts) {
             if (StringUtils.isNotBlank(part)) {

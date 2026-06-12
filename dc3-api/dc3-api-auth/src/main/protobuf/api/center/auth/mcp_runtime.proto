@@ -1,0 +1,179 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package api.common.auth;
+
+import "api/common/r.proto";
+
+option java_package = "io.github.pnoker.api.center.auth";
+option java_outer_classname = "McpRuntimeProto";
+option objc_class_prefix = "Auth";
+option java_multiple_files = true;
+
+// Internal MCP runtime service consumed by gateway through the facade layer.
+service McpRuntimeApi {
+  // Introspect an MCP OAuth access token.
+  rpc Introspect (GrpcMcpIntrospectRequest) returns (GrpcRMcpIntrospectDTO);
+
+  // List tools visible to the principal and MCP connection.
+  rpc ListTools (GrpcMcpToolListRequest) returns (GrpcRMcpToolListDTO);
+
+  // Resolve one visible tool to its backend invocation metadata.
+  rpc ResolveTool (GrpcMcpToolResolveRequest) returns (GrpcRMcpToolResolveDTO);
+
+  // Store one MCP call audit record.
+  rpc Audit (GrpcMcpAuditCommand) returns (GrpcRMcpBoolean);
+}
+
+// Token introspection request.
+message GrpcMcpIntrospectRequest {
+  // OAuth bearer token.
+  string token = 1;
+}
+
+// Token introspection response wrapper.
+message GrpcRMcpIntrospectDTO {
+  // Common result wrapper.
+  GrpcR result = 1;
+
+  // Introspection result.
+  GrpcMcpIntrospectDTO data = 2;
+}
+
+// Token introspection result.
+message GrpcMcpIntrospectDTO {
+  bool active = 1;
+  string iss = 2;
+  repeated string aud = 3;
+  string sub = 4;
+  string jti = 5;
+  int64 exp = 6;
+  int64 iat = 7;
+  int64 tenant_id = 8;
+  int64 principal_id = 9;
+  string principal_type = 10;
+  string principal_name = 11;
+  string display_name = 12;
+  string client_id = 13;
+  int64 mcp_connection_id = 14;
+  string grant_type = 15;
+  string scope = 16;
+}
+
+// Visible tool list request.
+message GrpcMcpToolListRequest {
+  int64 tenant_id = 1;
+  int64 principal_id = 2;
+  int64 mcp_connection_id = 3;
+  string scope = 4;
+}
+
+// Visible tool list response wrapper.
+message GrpcRMcpToolListDTO {
+  // Common result wrapper.
+  GrpcR result = 1;
+
+  // Visible tool definitions.
+  repeated GrpcMcpToolDefinitionDTO tools = 2;
+}
+
+// Public MCP tool definition excluding the static JSON schema envelope.
+message GrpcMcpToolDefinitionDTO {
+  string name = 1;
+  string title = 2;
+  string description = 3;
+  GrpcMcpToolAnnotationsDTO annotations = 4;
+  GrpcMcpToolMetadataDTO meta = 5;
+}
+
+// MCP tool annotations.
+message GrpcMcpToolAnnotationsDTO {
+  bool read_only_hint = 1;
+  bool destructive_hint = 2;
+  bool idempotent_hint = 3;
+  bool open_world_hint = 4;
+}
+
+// MCP tool metadata.
+message GrpcMcpToolMetadataDTO {
+  string tool_id = 1;
+  string permission_code = 2;
+  string risk_level = 3;
+}
+
+// Visible tool resolve request.
+message GrpcMcpToolResolveRequest {
+  int64 tenant_id = 1;
+  int64 principal_id = 2;
+  int64 mcp_connection_id = 3;
+  string scope = 4;
+  string tool_name = 5;
+}
+
+// Visible tool resolve response wrapper.
+message GrpcRMcpToolResolveDTO {
+  // Common result wrapper.
+  GrpcR result = 1;
+
+  // Resolved tool invocation metadata.
+  GrpcMcpToolResolveDTO data = 2;
+}
+
+// Resolved tool invocation metadata.
+message GrpcMcpToolResolveDTO {
+  string tool_id = 1;
+  string tool_name = 2;
+  string permission_code = 3;
+  string risk_level = 4;
+  string service_name = 5;
+  string api_path = 6;
+  string http_method = 7;
+}
+
+// MCP audit insert command.
+message GrpcMcpAuditCommand {
+  string trace_id = 1;
+  int64 tenant_id = 2;
+  int64 principal_id = 3;
+  string principal_type = 4;
+  string client_id = 5;
+  int64 connection_id = 6;
+  string tool_id = 7;
+  string tool_name = 8;
+  string permission_code = 9;
+  string risk_level = 10;
+  string confirm_id = 11;
+  string idempotency_key = 12;
+  string argument_digest = 13;
+  string status = 14;
+  string error_code = 15;
+  int64 duration_ms = 16;
+  string client_name = 17;
+  string client_version = 18;
+  string remote_ip = 19;
+}
+
+// Boolean response wrapper for MCP runtime calls.
+message GrpcRMcpBoolean {
+  // Common result wrapper.
+  GrpcR result = 1;
+
+  // Response data.
+  bool data = 2;
+}

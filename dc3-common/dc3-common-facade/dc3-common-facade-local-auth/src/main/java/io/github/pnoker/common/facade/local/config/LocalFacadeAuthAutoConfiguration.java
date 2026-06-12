@@ -48,6 +48,7 @@ import org.springframework.context.annotation.FilterType;
                         io.github.pnoker.common.facade.local.LocalCredentialLocalFacade.class,
                         io.github.pnoker.common.facade.local.ResourceRegistryLocalFacade.class,
                         io.github.pnoker.common.facade.local.PermissionLocalFacade.class,
+                        io.github.pnoker.common.facade.local.McpRuntimeLocalFacade.class,
                         FacadeTenantBuilder.class, FacadeUserBuilder.class, FacadeLocalCredentialBuilder.class,}))
 public class LocalFacadeAuthAutoConfiguration {
 

@@ -18,16 +18,17 @@
 package io.github.pnoker.common.gateway.mcp;
 
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.github.pnoker.common.constant.service.AuthConstant;
+import io.github.pnoker.common.constant.service.DataConstant;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
-import io.github.pnoker.common.entity.dto.McpAuditResponseDTO;
-import io.github.pnoker.common.entity.dto.McpIntrospectRequestDTO;
 import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
-import io.github.pnoker.common.entity.dto.McpToolListRequestDTO;
 import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
-import io.github.pnoker.common.entity.dto.McpToolResolveRequestDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
+import io.github.pnoker.common.facade.api.McpRuntimeFacade;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -35,14 +36,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,9 +50,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -192,21 +192,17 @@ public class McpGatewayController {
     }
 
     /**
-     * Internal WebClient facade for auth-center MCP endpoints and backend tool
-     * invocation.
+     * Gateway MCP client that resolves auth-center runtime state through the
+     * facade layer and invokes the selected backend HTTP endpoint.
      */
     @Slf4j
     @Component
     @RequiredArgsConstructor
     static class McpGatewayClient {
 
-        private static final String INTERNAL_CALLER = "dc3-gateway";
-
         private final HmacAuthSigner hmacAuthSigner;
+        private final McpRuntimeFacade mcpRuntimeFacade;
         private final WebClient.Builder webClientBuilder;
-
-        @Value("${dc3.mcp.auth-base-url:http://dc3-center-auth:8300/auth}")
-        private String authBaseUrl;
 
         @Value("${dc3.mcp.backend.auth-url:http://dc3-center-auth:8300/auth}")
         private String authUrl;
@@ -221,17 +217,12 @@ public class McpGatewayController {
         private String agenticUrl;
 
         Mono<McpIntrospectResponseDTO> introspect(String token) {
-            return postInternal(authBaseUrl + McpConstant.OAUTH2_INTROSPECT,
-                    McpIntrospectRequestDTO.builder().token(token).build(), McpIntrospectResponseDTO.class);
+            return blocking(() -> mcpRuntimeFacade.introspect(token));
         }
 
         Mono<McpToolListResponseDTO> listTools(McpIntrospectResponseDTO context) {
-            return postInternal(authBaseUrl + McpConstant.INTERNAL_TOOLS_LIST, McpToolListRequestDTO.builder()
-                    .tenantId(context.getTenantId())
-                    .principalId(context.getPrincipalId())
-                    .mcpConnectionId(context.getMcpConnectionId())
-                    .scope(context.getScope())
-                    .build(), McpToolListResponseDTO.class);
+            return blocking(() -> mcpRuntimeFacade.listTools(context.getTenantId(), context.getPrincipalId(),
+                    context.getMcpConnectionId(), context.getScope()));
         }
 
         Mono<Map<String, Object>> callTool(McpIntrospectResponseDTO context, String toolName,
@@ -239,13 +230,8 @@ public class McpGatewayController {
                                            ServerWebExchange exchange) {
             long start = System.nanoTime();
             String traceId = UUID.randomUUID().toString();
-            return postInternal(authBaseUrl + McpConstant.INTERNAL_TOOLS_RESOLVE, McpToolResolveRequestDTO.builder()
-                    .tenantId(context.getTenantId())
-                    .principalId(context.getPrincipalId())
-                    .mcpConnectionId(context.getMcpConnectionId())
-                    .scope(context.getScope())
-                    .toolName(toolName)
-                    .build(), McpToolResolveResponseDTO.class).flatMap(tool -> {
+            return blocking(() -> mcpRuntimeFacade.resolveTool(context.getTenantId(), context.getPrincipalId(),
+                    context.getMcpConnectionId(), context.getScope(), toolName)).flatMap(tool -> {
                 McpToolCallControls controls = controlValues(callMeta, exchange);
                 String policyError = policyError(tool, controls);
                 if (StringUtils.isNotBlank(policyError)) {
@@ -280,7 +266,8 @@ public class McpGatewayController {
                                                         McpToolCallControls controls) {
             String url = backendBase(StringUtils.defaultString(tool.getServiceName()))
                     + StringUtils.defaultString(tool.getApiPath());
-            HttpMethod method = HttpMethod.valueOf(StringUtils.defaultIfBlank(tool.getHttpMethod(), "POST"));
+            HttpMethod method = HttpMethod.valueOf(StringUtils.defaultIfBlank(tool.getHttpMethod(),
+                    HttpMethod.POST.name()));
             WebClient.RequestBodySpec spec = webClientBuilder.build()
                     .method(method)
                     .uri(uriBuilder -> {
@@ -300,7 +287,7 @@ public class McpGatewayController {
                         if (StringUtils.isNotBlank(controls.confirmId())) {
                             headers.set(RequestConstant.Header.X_MCP_CONFIRM_ID, controls.confirmId());
                         }
-            });
+                    });
             if (HttpMethod.GET.equals(method) || HttpMethod.DELETE.equals(method)) {
                 return spec.retrieve()
                         .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
@@ -359,7 +346,10 @@ public class McpGatewayController {
                     .remoteIp(exchange.getRequest().getRemoteAddress() == null ? ""
                             : exchange.getRequest().getRemoteAddress().getAddress().getHostAddress())
                     .build();
-            return postInternal(authBaseUrl + McpConstant.INTERNAL_AUDIT, command, McpAuditResponseDTO.class).then();
+            return blocking(() -> {
+                mcpRuntimeFacade.audit(command);
+                return true;
+            }).then();
         }
 
         private McpToolCallControls controlValues(Map<String, Object> callMeta, ServerWebExchange exchange) {
@@ -395,43 +385,21 @@ public class McpGatewayController {
             return "";
         }
 
-        private <T> Mono<T> postInternal(String url, Object body, Class<T> responseType) {
-            String path = URI.create(url).getPath();
-            return webClientBuilder.build()
-                    .post()
-                    .uri(url)
-                    .headers(headers -> internalHeaders(headers, path))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(body)
-                    .retrieve()
-                    .bodyToMono(responseType);
-        }
-
-        private void internalHeaders(HttpHeaders headers, String path) {
-            if (!hmacAuthSigner.isEnabled()) {
-                return;
-            }
-            String caller = INTERNAL_CALLER;
-            String timestamp = String.valueOf(Instant.now().toEpochMilli());
-            String nonce = UUID.randomUUID().toString();
-            String payload = caller + '\n' + timestamp + '\n' + nonce + '\n' + path;
-            headers.set(RequestConstant.Header.X_INTERNAL_CALLER, caller);
-            headers.set(RequestConstant.Header.X_INTERNAL_TIMESTAMP, timestamp);
-            headers.set(RequestConstant.Header.X_INTERNAL_NONCE, nonce);
-            headers.set(RequestConstant.Header.X_INTERNAL_SIGN, hmacAuthSigner.sign(payload));
+        private <T> Mono<T> blocking(java.util.concurrent.Callable<T> callable) {
+            return Mono.fromCallable(callable).subscribeOn(Schedulers.boundedElastic());
         }
 
         private String backendBase(String serviceName) {
-            if (serviceName.contains("auth")) {
+            if (AuthConstant.SERVICE_NAME.equals(serviceName)) {
                 return authUrl;
             }
-            if (serviceName.contains("manager")) {
+            if (ManagerConstant.SERVICE_NAME.equals(serviceName)) {
                 return managerUrl;
             }
-            if (serviceName.contains("data")) {
+            if (DataConstant.SERVICE_NAME.equals(serviceName)) {
                 return dataUrl;
             }
-            if (serviceName.contains("agentic")) {
+            if (AgenticConstant.SERVICE_NAME.equals(serviceName)) {
                 return agenticUrl;
             }
             throw new IllegalArgumentException("Unknown backend service: " + serviceName);

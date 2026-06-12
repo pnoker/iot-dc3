@@ -20,6 +20,7 @@ package io.github.pnoker.common.constant.service;
 import io.github.pnoker.common.constant.common.BaseConstant;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * MCP and OAuth protocol constants shared by auth, gateway, and web security
@@ -33,8 +34,6 @@ public class McpConstant {
 
     public static final String URL_PREFIX = "/mcp";
 
-    public static final String INTERNAL_URL_PREFIX = URL_PREFIX + "/internal";
-
     public static final String WELL_KNOWN_AUTHORIZATION_SERVER = "/.well-known/oauth-authorization-server";
 
     public static final String WELL_KNOWN_PROTECTED_RESOURCE = "/.well-known/oauth-protected-resource";
@@ -43,8 +42,6 @@ public class McpConstant {
 
     public static final String OAUTH2_AUTHORIZE = OAUTH2_URL_PREFIX + "/authorize";
 
-    public static final String OAUTH2_INTROSPECT = OAUTH2_URL_PREFIX + "/introspect";
-
     public static final String OAUTH2_JWKS = OAUTH2_URL_PREFIX + "/jwks";
 
     public static final String OAUTH2_REGISTER = OAUTH2_URL_PREFIX + "/register";
@@ -52,14 +49,6 @@ public class McpConstant {
     public static final String OAUTH2_REVOKE = OAUTH2_URL_PREFIX + "/revoke";
 
     public static final String OAUTH2_TOKEN = OAUTH2_URL_PREFIX + "/token";
-
-    public static final String INTERNAL_AUDIT = INTERNAL_URL_PREFIX + "/audit";
-
-    public static final String INTERNAL_CATALOG_REFRESH = INTERNAL_URL_PREFIX + "/catalog/refresh";
-
-    public static final String INTERNAL_TOOLS_LIST = INTERNAL_URL_PREFIX + "/tools/list";
-
-    public static final String INTERNAL_TOOLS_RESOLVE = INTERNAL_URL_PREFIX + "/tools/resolve";
 
     private McpConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
@@ -104,6 +93,8 @@ public class McpConstant {
      * MCP OAuth scopes.
      */
     public static class Scope {
+
+        public static final String DELIMITER_REGEX = "[\\s,]+";
 
         public static final String RESOURCES_READ = "mcp:resources:read";
 
@@ -334,6 +325,11 @@ public class McpConstant {
         public static final String TYPE = "type";
 
         public static final String TYPE_OBJECT = "object";
+
+        public static final Map<String, Object> DEFAULT_INPUT_SCHEMA = Map.of(
+                TYPE, TYPE_OBJECT,
+                ADDITIONAL_PROPERTIES, true
+        );
 
         private ToolDefinition() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);

@@ -162,8 +162,6 @@ public class WebFluxSecurityConfig {
                         .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_TOKEN).permitAll()
                         .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REVOKE).permitAll()
                         .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REGISTER).permitAll()
-                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_INTROSPECT).permitAll()
-                        .pathMatchers(HttpMethod.POST, McpConstant.INTERNAL_URL_PREFIX + "/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers("/health/**").permitAll()
                         .pathMatchers("/v3/api-docs/**", "/v3/api-docs.yaml")
