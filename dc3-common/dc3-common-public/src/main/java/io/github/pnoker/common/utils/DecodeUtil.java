@@ -22,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HexFormat;
 
@@ -81,6 +84,40 @@ public class DecodeUtil {
     }
 
     /**
+     * Generate SHA-256 hash bytes of content.
+     *
+     * @param content String to hash
+     * @return SHA-256 hash bytes
+     */
+    public static byte[] sha256(String content) {
+        try {
+            return MessageDigest.getInstance("SHA-256").digest(stringToByte(content));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is unavailable", e);
+        }
+    }
+
+    /**
+     * Generate SHA-256 hash of content.
+     *
+     * @param content String to hash
+     * @return SHA-256 hash string
+     */
+    public static String sha256Hex(String content) {
+        return HexFormat.of().formatHex(sha256(content));
+    }
+
+    /**
+     * Generate URL-safe Base64 encoded SHA-256 hash without padding.
+     *
+     * @param content String to hash and encode
+     * @return URL-safe Base64 SHA-256 hash string
+     */
+    public static String sha256Base64Url(String content) {
+        return base64Url(sha256(content));
+    }
+
+    /**
      * Encode byte array using Base64 encoding
      *
      * @param bytes Byte array to encode
@@ -98,6 +135,26 @@ public class DecodeUtil {
      */
     public static byte[] encode(String content) {
         return encode(stringToByte(content));
+    }
+
+    /**
+     * Encode byte array using URL-safe Base64 without padding.
+     *
+     * @param bytes Byte array to encode
+     * @return URL-safe Base64 encoded string
+     */
+    public static String base64Url(byte[] bytes) {
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    /**
+     * Encode positive integer bytes using URL-safe Base64 without padding.
+     *
+     * @param bytes Positive integer bytes that may contain a sign-extension prefix
+     * @return URL-safe Base64 encoded string
+     */
+    public static String base64UrlWithoutLeadingZero(byte[] bytes) {
+        return base64Url(stripLeadingZero(bytes));
     }
 
     /**
@@ -138,6 +195,13 @@ public class DecodeUtil {
      */
     public static byte[] deHexCode(String content) {
         return HexFormat.of().parseHex(content);
+    }
+
+    private static byte[] stripLeadingZero(byte[] bytes) {
+        if (bytes.length > 1 && bytes[0] == 0) {
+            return Arrays.copyOfRange(bytes, 1, bytes.length);
+        }
+        return bytes;
     }
 
 }

@@ -59,6 +59,18 @@ class DecodeUtilTest {
     }
 
     @Test
+    void sha256HexIsStableForFixedInput() {
+        assertThat(DecodeUtil.sha256Hex("dc3"))
+                .isEqualTo("917e7671d54b7c42b3264f75c6842df96ceae5f30fd9a2d49d9ba930bafb7afd");
+    }
+
+    @Test
+    void sha256Base64UrlIsStableForFixedInput() {
+        assertThat(DecodeUtil.sha256Base64Url("dc3"))
+                .isEqualTo("kX52cdVLfEKzJk91xoQt-Wzq5fMP2aLUnZupMLr7ev0");
+    }
+
+    @Test
     void base64ByteRoundTrip() {
         byte[] payload = {0x01, 0x02, 0x03, 0x04};
         byte[] encoded = DecodeUtil.encode(payload);
@@ -80,6 +92,17 @@ class DecodeUtilTest {
         String encodedAsString = DecodeUtil.byteToString(encoded);
         assertThat(DecodeUtil.byteToString(DecodeUtil.decode(encodedAsString)))
                 .isEqualTo(original);
+    }
+
+    @Test
+    void base64UrlEncodesWithoutPadding() {
+        assertThat(DecodeUtil.base64Url(new byte[]{0x01, 0x02, 0x03, 0x04})).isEqualTo("AQIDBA");
+    }
+
+    @Test
+    void base64UrlWithoutLeadingZeroRemovesSignExtensionOnly() {
+        assertThat(DecodeUtil.base64UrlWithoutLeadingZero(new byte[]{0x00, 0x01, 0x02})).isEqualTo("AQI");
+        assertThat(DecodeUtil.base64UrlWithoutLeadingZero(new byte[]{0x00})).isEqualTo("AA");
     }
 
     @Test

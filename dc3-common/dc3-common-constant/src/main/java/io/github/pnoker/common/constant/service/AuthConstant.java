@@ -60,7 +60,7 @@ public class AuthConstant {
 
     public static final String MENU_URL_PREFIX = "/menu";
 
-    public static final String MCP_URL_PREFIX = "/mcp";
+    public static final String MCP_URL_PREFIX = McpConstant.URL_PREFIX;
 
     /**
      * dc3_resource.resource_code prefix for API leaf resources.

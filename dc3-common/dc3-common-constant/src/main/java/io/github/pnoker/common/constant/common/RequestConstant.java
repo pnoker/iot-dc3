@@ -31,6 +31,11 @@ public class RequestConstant {
      */
     public static final int DEFAULT_MAX_REQUEST_SIZE = 100;
 
+    /**
+     * Default freshness window for signed internal requests, in milliseconds.
+     */
+    public static final long DEFAULT_INTERNAL_SIGNATURE_TTL_MS = 300_000L;
+
     private RequestConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
@@ -80,6 +85,36 @@ public class RequestConstant {
         public static final String X_INTERNAL_NONCE = "X-Internal-Nonce";
 
         public static final String X_INTERNAL_SIGN = "X-Internal-Sign";
+
+        /**
+         * Standard idempotency key header forwarded to backend write endpoints.
+         */
+        public static final String IDEMPOTENCY_KEY = "Idempotency-Key";
+
+        /**
+         * MCP client confirmation identifier accepted at the public gateway endpoint.
+         */
+        public static final String MCP_CONFIRM_ID = "Mcp-Confirm-Id";
+
+        /**
+         * MCP client idempotency key accepted at the public gateway endpoint.
+         */
+        public static final String MCP_IDEMPOTENCY_KEY = "Mcp-Idempotency-Key";
+
+        /**
+         * MCP client name header used for audit attribution.
+         */
+        public static final String MCP_CLIENT_NAME = "Mcp-Client-Name";
+
+        /**
+         * MCP client version header used for audit attribution.
+         */
+        public static final String MCP_CLIENT_VERSION = "Mcp-Client-Version";
+
+        /**
+         * Internal confirmation header forwarded from gateway to backend services.
+         */
+        public static final String X_MCP_CONFIRM_ID = "X-Mcp-Confirm-Id";
 
         private Header() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
