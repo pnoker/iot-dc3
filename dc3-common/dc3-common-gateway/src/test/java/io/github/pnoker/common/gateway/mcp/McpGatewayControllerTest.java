@@ -30,10 +30,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,9 +55,11 @@ class McpGatewayControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new McpGatewayController(mcpGatewayClient);
-        ReflectionTestUtils.setField(controller, "resource", "https://gateway.example/mcp");
-        ReflectionTestUtils.setField(controller, "authorizationServer", "https://gateway.example");
+        McpGatewayProperties properties = new McpGatewayProperties();
+        properties.setResource("https://gateway.example/mcp");
+        properties.setAuthorizationServer("https://gateway.example");
+        properties.setBackendBaseUrls(new LinkedHashMap<>());
+        controller = new McpGatewayController(mcpGatewayClient, properties);
     }
 
     @Test

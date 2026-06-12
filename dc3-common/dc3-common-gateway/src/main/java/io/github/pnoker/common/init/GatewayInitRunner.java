@@ -17,7 +17,9 @@
 
 package io.github.pnoker.common.init;
 
+import io.github.pnoker.common.gateway.mcp.McpGatewayProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -29,6 +31,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @since 2016.10.1
  */
 @AutoConfiguration
+@EnableConfigurationProperties(McpGatewayProperties.class)
 @ComponentScan(basePackages = {"io.github.pnoker.common.gateway"})
 public class GatewayInitRunner {
 

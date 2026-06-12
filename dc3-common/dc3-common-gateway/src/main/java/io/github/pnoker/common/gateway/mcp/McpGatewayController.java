@@ -18,10 +18,6 @@
 package io.github.pnoker.common.gateway.mcp;
 
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.constant.service.DataConstant;
-import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
@@ -35,7 +31,6 @@ import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -75,17 +70,13 @@ public class McpGatewayController {
 
     private final McpGatewayClient mcpGatewayClient;
 
-    @Value("${dc3.mcp.resource:http://localhost:8000/mcp}")
-    private String resource;
-
-    @Value("${dc3.mcp.authorization-server:http://localhost:8000}")
-    private String authorizationServer;
+    private final McpGatewayProperties mcpGatewayProperties;
 
     @GetMapping(McpConstant.WELL_KNOWN_PROTECTED_RESOURCE)
     public Mono<Map<String, Object>> protectedResourceMetadata() {
         return Mono.just(orderedMap(
-                "resource", resource,
-                "authorization_servers", List.of(authorizationServer),
+                "resource", mcpGatewayProperties.getResource(),
+                "authorization_servers", List.of(mcpGatewayProperties.getAuthorizationServer()),
                 "bearer_methods_supported", List.of(McpConstant.Server.BEARER_METHOD_HEADER),
                 "scopes_supported", McpConstant.Scope.SUPPORTED
         ));
@@ -202,19 +193,8 @@ public class McpGatewayController {
 
         private final HmacAuthSigner hmacAuthSigner;
         private final McpRuntimeFacade mcpRuntimeFacade;
+        private final McpGatewayProperties mcpGatewayProperties;
         private final WebClient.Builder webClientBuilder;
-
-        @Value("${dc3.mcp.backend.auth-url:http://dc3-center-auth:8300/auth}")
-        private String authUrl;
-
-        @Value("${dc3.mcp.backend.manager-url:http://dc3-center-manager:8400/manager}")
-        private String managerUrl;
-
-        @Value("${dc3.mcp.backend.data-url:http://dc3-center-data:8500/data}")
-        private String dataUrl;
-
-        @Value("${dc3.mcp.backend.agentic-url:http://dc3-center-agentic:8600/agentic}")
-        private String agenticUrl;
 
         Mono<McpIntrospectResponseDTO> introspect(String token) {
             return blocking(() -> mcpRuntimeFacade.introspect(token));
@@ -390,19 +370,7 @@ public class McpGatewayController {
         }
 
         private String backendBase(String serviceName) {
-            if (AuthConstant.SERVICE_NAME.equals(serviceName)) {
-                return authUrl;
-            }
-            if (ManagerConstant.SERVICE_NAME.equals(serviceName)) {
-                return managerUrl;
-            }
-            if (DataConstant.SERVICE_NAME.equals(serviceName)) {
-                return dataUrl;
-            }
-            if (AgenticConstant.SERVICE_NAME.equals(serviceName)) {
-                return agenticUrl;
-            }
-            throw new IllegalArgumentException("Unknown backend service: " + serviceName);
+            return mcpGatewayProperties.backendBaseUrl(serviceName);
         }
 
         private record McpToolCallControls(String confirmId, String idempotencyKey) {

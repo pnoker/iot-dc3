@@ -19,7 +19,8 @@
 # Each environment profile only needs to override environment-specific settings.
 # Route URIs can be overridden via environment variables:
 #   GATEWAY_ROUTE_AUTH_TOKEN_URI, GATEWAY_ROUTE_AUTH_URI,
-#   GATEWAY_ROUTE_MANAGER_URI, GATEWAY_ROUTE_DATA_URI
+#   GATEWAY_ROUTE_MANAGER_URI, GATEWAY_ROUTE_DATA_URI,
+#   GATEWAY_ROUTE_AGENTIC_URI
 
 spring:
   # gRPC client configuration
@@ -91,3 +92,14 @@ spring:
               filters:
                 - StripPrefix=2
                 - Authentic
+
+dc3:
+  mcp:
+    gateway:
+      resource: ${DC3_MCP_GATEWAY_RESOURCE:http://localhost:8000/mcp}
+      authorization-server: ${DC3_MCP_GATEWAY_AUTHORIZATION_SERVER:http://localhost:8000}
+      backend-base-urls:
+        dc3-center-auth: ${GATEWAY_ROUTE_AUTH_URI:http://${CENTER_AUTH_HOST:dc3-center-auth}:8300}/auth
+        dc3-center-manager: ${GATEWAY_ROUTE_MANAGER_URI:http://${CENTER_MANAGER_HOST:dc3-center-manager}:8400}/manager
+        dc3-center-data: ${GATEWAY_ROUTE_DATA_URI:http://${CENTER_DATA_HOST:dc3-center-data}:8500}/data
+        dc3-center-agentic: ${GATEWAY_ROUTE_AGENTIC_URI:http://${CENTER_AGENTIC_HOST:dc3-center-agentic}:8600}/agentic
