@@ -4,7 +4,7 @@
 
 `dc3-center-auth` is the Authorization Center of the IoT DC3 platform. It provides authentication and authorization
 management for the entire platform including tenant management,
-user login, token validation, and permission control.
+local credential login, token validation, and permission control.
 
 ## Module Information
 
@@ -24,9 +24,9 @@ user login, token validation, and permission control.
 
 - **Token Management**: Issue, validate, and revoke JWT tokens for authenticated users
 - **Tenant Management**: Multi-tenant registration, lookup by tenant code
-- **User Authentication**: User login validation with salt-based encrypted password
+- **User Authentication**: Local credential validation with server-side password hashing
 - **Dictionary Services**: Provide lookup dictionaries for auth-scoped data
-- **gRPC Server**: Exposes `TenantApi`, `UserApi`, `UserLoginApi`, `TokenApi` for inter-service consumption (e.g.,
+- **gRPC Server**: Exposes `TenantApi`, `UserApi`, `LocalCredentialApi`, `TokenApi` for inter-service consumption (e.g.,
   Gateway)
 
 ## REST Endpoints (via Gateway)

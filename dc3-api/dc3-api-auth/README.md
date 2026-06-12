@@ -4,7 +4,7 @@
 
 `dc3-api-auth` provides gRPC service definitions for authentication and authorization in the IoT DC3 platform. It
 defines the interfaces for tenant management, user authentication,
-token validation, and user login operations.
+token validation, and local credential lookup.
 
 ## Module Information
 
@@ -49,6 +49,7 @@ Defines user-related RPC calls and data structures.
 **Service**: `UserApi`
 
 - `SelectById` - Query user information by user ID
+- `SelectByPrincipalId` - Query user information by principal ID
 
 **Key Messages**:
 
@@ -56,19 +57,19 @@ Defines user-related RPC calls and data structures.
 - `GrpcRUserDTO` - Response wrapper containing user information
 - `GrpcUserDTO` - User data structure (nickname, username, phone, email)
 
-### user_login.proto
+### local_credential.proto
 
-Defines user login-related RPC calls and data structures.
+Defines local credential lookup RPC calls and data structures.
 
-**Service**: `UserLoginApi`
+**Service**: `LocalCredentialApi`
 
-- `SelectByName` - Query user login information by login name
+- `GetByLoginName` - Query local credential information by login name
 
 **Key Messages**:
 
-- `GrpcNameQuery` - Request wrapper for name-based queries
-- `GrpcRUserLoginDTO` - Response wrapper containing login information
-- `GrpcUserLoginDTO` - User login data structure (login name, user ID, password ID)
+- `GrpcLoginNameQuery` - Request wrapper for login-name queries
+- `GrpcRLocalCredentialDTO` - Response wrapper containing local credential information
+- `GrpcLocalCredentialDTO` - Local credential data structure (login name, principal ID)
 
 ## Dependencies
 
@@ -96,7 +97,7 @@ This module depends on common proto definitions:
 import "api/common/auth/tenant.proto";
 import "api/common/auth/token.proto";
 import "api/common/auth/user.proto";
-import "api/common/auth/user_login.proto";
+import "api/common/auth/local_credential.proto";
 ```
 
 ### 3. Implement Service
@@ -122,16 +123,16 @@ public class TenantServiceImpl extends TenantApiGrpc.TenantApiImplBase {
 ### Authentication Flow
 
 1. Client queries tenant by code
-2. User login validation via `UserLoginApi`
+2. Local credential lookup via `LocalCredentialApi`
 3. Token validation via `TokenApi`
-4. User information retrieval via `UserApi`
+4. User information retrieval by principal via `UserApi`
 
 ### Security Features
 
-- Encrypted password storage (salt-based)
+- Server-side password hashing
 - Token-based authentication
 - User credential management
-- Login tracking with password IDs
+- Login tracking with principal IDs
 
 ## Data Models
 
@@ -150,11 +151,11 @@ public class TenantServiceImpl extends TenantApiGrpc.TenantApiImplBase {
 - **social_ext**: Encrypted social account information
 - **identity_ext**: Encrypted identity verification data
 
-### User Login Model
+### Login Lookup Model
 
 - **login_name**: Username for authentication
 - **user_id**: Reference to user entity
-- **user_password_id**: Reference to password record
+- **principal_id**: Reference to unified auth principal
 - **enable_flag**: Account status
 
 ## Build Instructions

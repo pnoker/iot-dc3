@@ -20,7 +20,7 @@ IoT DC3 的整体分层与运行时数据流。
 - **gRPC 内部 facade**：中心服务之间通过 gRPC 通信（`DC3_FACADE_MODE=grpc`），统一通过 `*Facade` 接口跨进程调用
 - **MQ 异步解耦**：驱动 → 数据中心走 RabbitMQ 异步消息，避免点位写入阻塞
 - **多租户隔离**：通过 `tenantId` + 命名空间隔离，支持租户级数据/权限隔离
-- **HMAC 网关签名**：网关到后端的 `X-Auth-User` 请求头由 `AUTH_HMAC_SECRET` 签名，防伪造
+- **HMAC 网关签名**：网关到后端的 `X-Auth-Principal` 请求头由 `AUTH_HMAC_SECRET` 签名，防伪造
 
 ## 进一步阅读
 

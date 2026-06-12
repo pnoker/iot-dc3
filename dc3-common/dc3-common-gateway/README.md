@@ -17,7 +17,7 @@ Auth Center before forwarding requests in the `dc3-gateway`.
 | Component                       | Purpose                                                                                   |
 |---------------------------------|-------------------------------------------------------------------------------------------|
 | `AuthenticGatewayFilterFactory` | Spring Cloud Gateway `GatewayFilterFactory` that intercepts requests and validates tokens |
-| `AuthenticGatewayFilter`        | Applies token validation logic; injects tenant/user headers downstream                    |
+| `AuthenticGatewayFilter`        | Applies token validation logic; injects principal headers downstream                      |
 | `FilterServiceImpl`             | Calls Auth Center via gRPC to validate the Bearer token                                   |
 | `GatewayInitRunner`             | Startup runner for gateway-specific initialization                                        |
 
@@ -27,7 +27,7 @@ Auth Center before forwarding requests in the `dc3-gateway`.
 Incoming HTTP request with Authorization: Bearer {token}
   → AuthenticGatewayFilter
     → gRPC: dc3-center-auth / TokenApi.checkTokenValid()
-      ← token valid: inject X-Auth-Tenant-Id, X-Auth-User-Id headers
+      ← token valid: inject signed X-Auth-Principal header
       ← token invalid: return 401 Unauthorized
   → Forward to backend service
 ```
@@ -49,4 +49,3 @@ mvn -s ../../.mvn/settings.xml clean package
 Copyright 2016-present the IoT DC3 original author or authors.
 
 Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

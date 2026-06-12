@@ -26,7 +26,7 @@ _Generated on 2026-05-09._
 - **config**: add AUTH_HMAC_SECRET to all deployment configurations (`edaaab90d`)
 - introduce TenantOwned interface for type-safe tenant filtering (`a08f15904`)
 - **release**: generate changelog from git commits (`8c7a2b024`)
-- **auth**: HMAC-sign X-Auth-User header end to end (`085966276`)
+- **auth**: HMAC-sign X-Auth-Principal header end to end (`085966276`)
 - **facade,data**: add selectByIds bulk lookup and use it in dashboard live feed (`1fd58e688`)
 - **agentic**: add AI agentic center with Spring AI tool-calling (`239334c4b`)
 - **facade**: add PointValue facade with gRPC and local implementations (`8a30c9d13`)
