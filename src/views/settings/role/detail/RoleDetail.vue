@@ -87,7 +87,7 @@
 
   import { getRoleById } from '@/api/role';
   import { listResourceByRoleId } from '@/api/roleResourceBind';
-  import { listUserByRoleId } from '@/api/roleUserBind';
+  import { listUserByRoleId } from '@/api/rolePrincipalBind';
   import { timestampLabel } from '@/utils/dateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';

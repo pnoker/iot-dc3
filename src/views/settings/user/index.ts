@@ -19,7 +19,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import { addUser, deleteUser, listUser, updateUser } from '@/api/user';
-import { addRoleUserBind, deleteRoleUserBind } from '@/api/roleUserBind';
+import { addRolePrincipalBind, deleteRolePrincipalBind } from '@/api/rolePrincipalBind';
 import { usePagedList } from '@/composables/usePagedList';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
@@ -95,11 +95,11 @@ export default defineComponent({
         });
     };
 
-    const onAssignRoles = async (userId: string, addIds: string[], removeBindIds: string[], done: () => void) => {
+    const onAssignRoles = async (principalId: string, addIds: string[], removeBindIds: string[], done: () => void) => {
       try {
         await Promise.all([
-          ...addIds.map((roleId) => addRoleUserBind({ userId, roleId })),
-          ...removeBindIds.map((id) => deleteRoleUserBind(id)),
+          ...addIds.map((roleId) => addRolePrincipalBind({ principalId, principalType: 'USER', roleId })),
+          ...removeBindIds.map((id) => deleteRolePrincipalBind(id)),
         ]);
         successMessage(t('settings.user.assignSaved'));
         done();

@@ -87,8 +87,8 @@
   import type { TabsPaneContext } from 'element-plus';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { listResourceByUserId } from '@/api/roleResourceBind';
-  import { listRoleByUserId } from '@/api/roleUserBind';
+  import { listResourceByPrincipalId } from '@/api/roleResourceBind';
+  import { listRoleByPrincipalId } from '@/api/rolePrincipalBind';
   import { getUserById } from '@/api/user';
   import { timestampLabel } from '@/utils/dateUtil';
 
@@ -111,9 +111,11 @@
     resourcesLoading: false,
   });
 
-  const load = () => {
+  const principalId = () => String(reactiveData.data.principalId || '');
+
+  const load = async () => {
     if (!reactiveData.id) return;
-    getUserById(reactiveData.id)
+    await getUserById(reactiveData.id)
       .then((res: any) => {
         reactiveData.data = res.data || {};
       })
@@ -123,9 +125,9 @@
   };
 
   const loadRoles = () => {
-    if (!reactiveData.id || reactiveData.rolesLoaded) return;
+    if (!principalId() || reactiveData.rolesLoaded) return;
     reactiveData.rolesLoading = true;
-    listRoleByUserId(reactiveData.id)
+    listRoleByPrincipalId(principalId())
       .then((res: any) => {
         reactiveData.roles = (res.data as any[]) || [];
         reactiveData.rolesLoaded = true;
@@ -139,9 +141,9 @@
   };
 
   const loadResources = () => {
-    if (!reactiveData.id || reactiveData.resourcesLoaded) return;
+    if (!principalId() || reactiveData.resourcesLoaded) return;
     reactiveData.resourcesLoading = true;
-    listResourceByUserId(reactiveData.id)
+    listResourceByPrincipalId(principalId())
       .then((res: any) => {
         reactiveData.resources = (res.data as any[]) || [];
         reactiveData.resourcesLoaded = true;
@@ -161,8 +163,8 @@
     if (name === 'resource') loadResources();
   };
 
-  onMounted(() => {
-    load();
+  onMounted(async () => {
+    await load();
     if (reactiveData.active === 'role') loadRoles();
     if (reactiveData.active === 'resource') loadResources();
   });

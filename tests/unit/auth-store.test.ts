@@ -71,7 +71,7 @@ describe('auth store', () => {
   });
 
   describe('login', () => {
-    it('hashes password with salt, persists token, and routes to home', async () => {
+    it('sends the raw password over HTTPS, persists token, and routes to home', async () => {
       const store = useAuthStore();
       await store.login({
         tenant: TEST_CREDENTIALS.tenant,
@@ -79,7 +79,7 @@ describe('auth store', () => {
         password: TEST_CREDENTIALS.password,
       });
 
-      // Salt request first, then token request with hashed password.
+      // Salt request first, then token request with the raw password.
       expect(tokenMocks.generateSalt).toHaveBeenCalledTimes(1);
       expect(tokenMocks.generateSalt).toHaveBeenCalledWith({
         tenant: TEST_CREDENTIALS.tenant,
@@ -91,9 +91,7 @@ describe('auth store', () => {
       expect(tokenPayload.tenant).toBe(TEST_CREDENTIALS.tenant);
       expect(tokenPayload.name).toBe(TEST_CREDENTIALS.name);
       expect(tokenPayload.salt).toBe(TEST_CREDENTIALS.salt);
-      // password must be md5(md5(plain) + salt) — never the plaintext.
-      expect(tokenPayload.password).not.toBe(TEST_CREDENTIALS.password);
-      expect(tokenPayload.password).toMatch(/^[a-f0-9]{32}$/);
+      expect(tokenPayload.password).toBe(TEST_CREDENTIALS.password);
 
       // Storage now holds the credential triple.
       expect(getStorage(AUTH_HEADERS.TENANT)).toBe(TEST_CREDENTIALS.tenant);

@@ -22,6 +22,7 @@
 
 export interface UserForm {
   id?: string;
+  principalId?: string;
   userName?: string;
   nickName?: string;
   phone?: string;
@@ -137,14 +138,84 @@ export interface ApiRecord extends ApiForm {
 
 // ─── Bind payloads ───────────────────────────────────────────────────
 
-export interface RoleUserBindForm {
+export interface RolePrincipalBindForm {
   roleId?: string;
-  userId?: string;
+  principalId?: string;
+  principalType?: 'USER' | 'SERVICE_ACCOUNT' | 'SYSTEM' | string;
   [key: string]: unknown;
 }
 
 export interface RoleResourceBindForm {
   roleId?: string;
   resourceId?: string;
+  [key: string]: unknown;
+}
+
+// ─── MCP / OAuth ────────────────────────────────────────────────────
+
+export interface McpClientRegistrationForm {
+  client_name?: string;
+  client_type?: 'PUBLIC' | 'CONFIDENTIAL' | string;
+  grant_types?: string[];
+  redirect_uris?: string[];
+  scope?: string[];
+  tenant_id?: string;
+  service_account_principal_id?: string;
+  [key: string]: unknown;
+}
+
+export interface OAuthClientRecord {
+  id: string;
+  clientId: string;
+  clientName: string;
+  clientType: string;
+  ownerPrincipalId?: string;
+  serviceAccountPrincipalId?: string;
+  tenantId?: string;
+  authorizationGrantTypes?: string;
+  redirectUris?: string;
+  scopes?: string;
+  enableFlag?: string | number;
+  [key: string]: unknown;
+}
+
+export interface McpConnectionForm {
+  connectionName?: string;
+  clientId?: string;
+  principalId?: string;
+  principalType?: 'USER' | 'SERVICE_ACCOUNT' | string;
+  tenantId?: string;
+  grantType?: 'authorization_code' | 'client_credentials' | string;
+  expireTime?: string;
+  remark?: string;
+  [key: string]: unknown;
+}
+
+export interface McpConnectionRecord extends McpConnectionForm {
+  id: string;
+  enableFlag?: string | number;
+  revokeTime?: string;
+  lastUsedTime?: string;
+}
+
+export interface McpToolRecord {
+  id: string;
+  toolId: string;
+  toolName: string;
+  toolTitle?: string;
+  toolCategory?: string;
+  serviceName?: string;
+  apiCode?: string;
+  permissionCode?: string;
+  httpMethod?: string;
+  apiPath?: string;
+  schemaHash?: string;
+  riskLevel?: 'LOW' | 'MEDIUM' | 'HIGH' | string;
+  readOnlyHint?: number;
+  destructiveHint?: number;
+  idempotentHint?: number;
+  openWorldHint?: number;
+  enableFlag?: string | number;
+  remark?: string;
   [key: string]: unknown;
 }

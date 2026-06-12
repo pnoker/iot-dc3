@@ -27,7 +27,6 @@ import type { Login } from '@/config/types';
 import { getStorage, removeStorage, setStorage } from '@/utils/storageUtil';
 import { failMessage } from '@/utils/notificationUtil';
 import { isNull } from '@/utils/validationUtil';
-import { md5 } from 'js-md5';
 
 interface LoginForm {
   tenant: string;
@@ -81,7 +80,7 @@ export const useAuthStore = defineStore('auth', () => {
         tenant: form.tenant,
         name: form.name,
         salt: salt,
-        password: md5.hex(form.password),
+        password: form.password,
       };
 
       const tokenRes = await generateToken(loginWithPassword);

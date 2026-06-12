@@ -27,9 +27,9 @@ const userMocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/api/user', () => userMocks);
-vi.mock('@/api/roleUserBind', () => ({
-  addRoleUserBind: vi.fn(() => Promise.resolve({ data: true })),
-  deleteRoleUserBind: vi.fn(() => Promise.resolve({ data: true })),
+vi.mock('@/api/rolePrincipalBind', () => ({
+  addRolePrincipalBind: vi.fn(() => Promise.resolve({ data: true })),
+  deleteRolePrincipalBind: vi.fn(() => Promise.resolve({ data: true })),
 }));
 vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
 

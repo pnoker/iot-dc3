@@ -70,8 +70,13 @@ export type {
   ResourceRecord,
   ApiForm,
   ApiRecord,
-  RoleUserBindForm,
+  RolePrincipalBindForm,
   RoleResourceBindForm,
+  McpClientRegistrationForm,
+  OAuthClientRecord,
+  McpConnectionForm,
+  McpConnectionRecord,
+  McpToolRecord,
 } from './auth';
 
 export type {

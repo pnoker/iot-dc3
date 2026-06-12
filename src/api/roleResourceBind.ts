@@ -29,8 +29,8 @@ export const listRoleResourceBind = (query: PageQuery) => httpPost(`${API_AUTH_B
 export const listResourceByRoleId = (roleId: string) =>
   httpGet(`${API_AUTH_BASE}/role_resource/list_resource_by_role`, { params: { role_id: roleId } });
 
-export const listResourceByUserId = (userId: string) =>
-  httpGet(`${API_AUTH_BASE}/role_resource/list_resource_by_user`, { params: { user_id: userId } });
+export const listResourceByPrincipalId = (principalId: string) =>
+  httpGet(`${API_AUTH_BASE}/role_resource/list_resource_by_principal`, { params: { principal_id: principalId } });
 
 export const listRoleByResourceId = (resourceId: string) =>
   httpGet(`${API_AUTH_BASE}/role_resource/list_role_by_resource`, { params: { resource_id: resourceId } });

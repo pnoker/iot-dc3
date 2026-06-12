@@ -17,22 +17,18 @@
 import { httpGet, httpPost } from '@/api/common';
 import { API_AUTH_BASE } from '@/config/constant/api';
 import type { PageQuery } from '@/config/types';
-import type { RoleUserBindForm } from '@/config/types/auth';
+import type { RolePrincipalBindForm } from '@/config/types/auth';
 
-export const addRoleUserBind = (body: RoleUserBindForm) => httpPost(`${API_AUTH_BASE}/role_user/add`, body);
+export const addRolePrincipalBind = (body: RolePrincipalBindForm) =>
+  httpPost(`${API_AUTH_BASE}/role_principal/add`, body);
 
-export const deleteRoleUserBind = (id: string) =>
-  httpPost(`${API_AUTH_BASE}/role_user/delete`, undefined, { params: { id } });
+export const deleteRolePrincipalBind = (id: string) =>
+  httpPost(`${API_AUTH_BASE}/role_principal/delete`, undefined, { params: { id } });
 
-export const listRoleUserBind = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_user/list`, query);
+export const listRolePrincipalBind = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_principal/list`, query);
 
-export const listRoleByUserId = (userId: string, tenantId?: string) => {
-  const params: Record<string, string> = { user_id: userId };
-  if (tenantId) {
-    params.tenant_id = tenantId;
-  }
-  return httpGet(`${API_AUTH_BASE}/role_user/list_role_by_user`, { params });
-};
+export const listRoleByPrincipalId = (principalId: string) =>
+  httpGet(`${API_AUTH_BASE}/role_principal/list_role_by_principal`, { params: { principal_id: principalId } });
 
 export const listUserByRoleId = (roleId: string) =>
-  httpGet(`${API_AUTH_BASE}/role_user/list_user_by_role`, { params: { role_id: roleId } });
+  httpGet(`${API_AUTH_BASE}/role_principal/list_user_by_role`, { params: { role_id: roleId } });

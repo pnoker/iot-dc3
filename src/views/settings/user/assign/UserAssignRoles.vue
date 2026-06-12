@@ -151,7 +151,7 @@
   import type { ElTable } from 'element-plus';
 
   import { listRole } from '@/api/role';
-  import { listRoleByUserId, listRoleUserBind } from '@/api/roleUserBind';
+  import { listRoleByPrincipalId, listRolePrincipalBind } from '@/api/rolePrincipalBind';
 
   interface RoleRow {
     id: string;
@@ -162,7 +162,7 @@
 
   const { t } = useI18n();
   const emit = defineEmits<{
-    (e: 'save', userId: string, addIds: string[], removeBindIds: string[], done: () => void): void;
+    (e: 'save', principalId: string, addIds: string[], removeBindIds: string[], done: () => void): void;
   }>();
 
   const leftTableRef = ref<InstanceType<typeof ElTable>>();
@@ -173,7 +173,7 @@
     loading: false,
     submitting: false,
     user: {} as any,
-    // bindId(RoleUserBind.id) -> roleId lookup; delete endpoint wants bindId
+    // bindId(RolePrincipalBind.id) -> roleId lookup; delete endpoint wants bindId
     bindIdByRoleId: new Map<string, string>(),
     originalRoleIds: [] as string[],
     available: [] as RoleRow[],
@@ -207,10 +207,11 @@
   const load = async () => {
     reactiveData.loading = true;
     try {
+      const principalId = String(reactiveData.user.principalId || '');
       const [allRes, ownRes, bindsRes] = await Promise.all([
         listRole({ page: { size: 1000, current: 1 } }) as Promise<any>,
-        listRoleByUserId(reactiveData.user.id) as Promise<any>,
-        listRoleUserBind({ page: { size: 1000, current: 1 }, userId: reactiveData.user.id }) as Promise<any>,
+        listRoleByPrincipalId(principalId) as Promise<any>,
+        listRolePrincipalBind({ page: { size: 1000, current: 1 }, principalId }) as Promise<any>,
       ]);
 
       const allRoles: RoleRow[] = ((allRes.data?.records as any[]) || []).map(toRow);
@@ -287,7 +288,7 @@
     }
 
     reactiveData.submitting = true;
-    emit('save', String(reactiveData.user.id), addIds, removeBindIds, () => {
+    emit('save', String(reactiveData.user.principalId), addIds, removeBindIds, () => {
       reactiveData.submitting = false;
       reactiveData.visible = false;
     });
