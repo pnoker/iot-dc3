@@ -157,3 +157,62 @@ export const EVENT_LEVEL_OPTIONS: EnumOption[] = [
   { label: 'HIGH', value: 'HIGH' },
   { label: 'CRITICAL', value: 'CRITICAL' },
 ];
+
+// Backend: OAuth registered client type
+export const MCP_CLIENT_TYPES = {
+  PUBLIC: 'PUBLIC',
+  CONFIDENTIAL: 'CONFIDENTIAL',
+} as const;
+
+export const MCP_CLIENT_TYPE_OPTIONS: EnumOption[] = [
+  { label: MCP_CLIENT_TYPES.PUBLIC, value: MCP_CLIENT_TYPES.PUBLIC },
+  { label: MCP_CLIENT_TYPES.CONFIDENTIAL, value: MCP_CLIENT_TYPES.CONFIDENTIAL },
+];
+
+// Backend: OAuth grant type
+export const MCP_GRANT_TYPES = {
+  AUTHORIZATION_CODE: 'authorization_code',
+  CLIENT_CREDENTIALS: 'client_credentials',
+} as const;
+
+export const MCP_GRANT_TYPE_OPTIONS: EnumOption[] = [
+  { label: MCP_GRANT_TYPES.AUTHORIZATION_CODE, value: MCP_GRANT_TYPES.AUTHORIZATION_CODE },
+  { label: MCP_GRANT_TYPES.CLIENT_CREDENTIALS, value: MCP_GRANT_TYPES.CLIENT_CREDENTIALS },
+];
+
+// Backend: PrincipalTypeEnum
+export const MCP_PRINCIPAL_TYPES = {
+  USER: 'USER',
+  SERVICE_ACCOUNT: 'SERVICE_ACCOUNT',
+} as const;
+
+export const MCP_PRINCIPAL_TYPE_OPTIONS: EnumOption[] = [
+  { label: MCP_PRINCIPAL_TYPES.USER, value: MCP_PRINCIPAL_TYPES.USER },
+  { label: MCP_PRINCIPAL_TYPES.SERVICE_ACCOUNT, value: MCP_PRINCIPAL_TYPES.SERVICE_ACCOUNT },
+];
+
+// Backend: McpConstant.Scope
+export const MCP_SCOPES = {
+  TOOLS_LIST: 'mcp:tools:list',
+  TOOLS_CALL: 'mcp:tools:call',
+  TOOLS_CALL_HIGH: 'mcp:tools:call:high',
+} as const;
+
+export const MCP_SCOPE_OPTIONS: EnumOption[] = [
+  { label: MCP_SCOPES.TOOLS_LIST, value: MCP_SCOPES.TOOLS_LIST },
+  { label: MCP_SCOPES.TOOLS_CALL, value: MCP_SCOPES.TOOLS_CALL },
+  { label: MCP_SCOPES.TOOLS_CALL_HIGH, value: MCP_SCOPES.TOOLS_CALL_HIGH },
+];
+
+// Backend: MCP tool risk level
+export const MCP_RISK_LEVELS = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+} as const;
+
+export const MCP_RISK_LEVEL_OPTIONS: EnumOption[] = [
+  { label: MCP_RISK_LEVELS.LOW, value: MCP_RISK_LEVELS.LOW },
+  { label: MCP_RISK_LEVELS.MEDIUM, value: MCP_RISK_LEVELS.MEDIUM },
+  { label: MCP_RISK_LEVELS.HIGH, value: MCP_RISK_LEVELS.HIGH },
+];

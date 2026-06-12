@@ -141,9 +141,7 @@
               </template>
             </el-input>
             <el-select v-model="reactiveData.toolRisk" clearable>
-              <el-option label="LOW" value="LOW" />
-              <el-option label="MEDIUM" value="MEDIUM" />
-              <el-option label="HIGH" value="HIGH" />
+              <el-option v-for="opt in MCP_RISK_LEVEL_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
             </el-select>
             <el-button :icon="Search" @click="loadTools" />
           </div>
@@ -188,12 +186,11 @@
           <el-input v-model="reactiveData.clientForm.client_name" />
         </el-form-item>
         <el-form-item :label="t('settings.mcp.clientType')">
-          <el-segmented v-model="reactiveData.clientForm.client_type" :options="['PUBLIC', 'CONFIDENTIAL']" />
+          <el-segmented v-model="reactiveData.clientForm.client_type" :options="MCP_CLIENT_TYPE_OPTIONS" />
         </el-form-item>
         <el-form-item :label="t('settings.mcp.grantTypes')">
           <el-select v-model="reactiveData.clientGrantTypes" multiple>
-            <el-option label="authorization_code" value="authorization_code" />
-            <el-option label="client_credentials" value="client_credentials" />
+            <el-option v-for="opt in MCP_GRANT_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
           </el-select>
         </el-form-item>
         <el-form-item :label="t('settings.mcp.redirectUris')">
@@ -201,9 +198,7 @@
         </el-form-item>
         <el-form-item :label="t('settings.mcp.scopes')">
           <el-select v-model="reactiveData.clientScopes" multiple>
-            <el-option label="mcp:tools:list" value="mcp:tools:list" />
-            <el-option label="mcp:tools:call" value="mcp:tools:call" />
-            <el-option label="mcp:tools:call:high" value="mcp:tools:call:high" />
+            <el-option v-for="opt in MCP_SCOPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
           </el-select>
         </el-form-item>
         <el-form-item :label="t('settings.mcp.tenantId')">
@@ -244,13 +239,10 @@
           </el-select>
         </el-form-item>
         <el-form-item :label="t('settings.mcp.grantType')">
-          <el-segmented
-            v-model="reactiveData.connectionForm.grantType"
-            :options="['authorization_code', 'client_credentials']"
-          />
+          <el-segmented v-model="reactiveData.connectionForm.grantType" :options="MCP_GRANT_TYPE_OPTIONS" />
         </el-form-item>
         <el-form-item :label="t('settings.mcp.principalType')">
-          <el-segmented v-model="reactiveData.connectionForm.principalType" :options="['USER', 'SERVICE_ACCOUNT']" />
+          <el-segmented v-model="reactiveData.connectionForm.principalType" :options="MCP_PRINCIPAL_TYPE_OPTIONS" />
         </el-form-item>
         <el-form-item :label="t('settings.mcp.principalId')">
           <el-input v-model="reactiveData.connectionForm.principalId" />
@@ -320,6 +312,19 @@
     revokeMcpConnection,
   } from '@/api/mcp';
   import type { McpConnectionForm, McpConnectionRecord, McpToolRecord, OAuthClientRecord } from '@/config/types';
+  import { MCP_SERVER_PATH } from '@/config/constant/api';
+  import {
+    MCP_CLIENT_TYPE_OPTIONS,
+    MCP_CLIENT_TYPES,
+    MCP_GRANT_TYPE_OPTIONS,
+    MCP_GRANT_TYPES,
+    MCP_PRINCIPAL_TYPE_OPTIONS,
+    MCP_PRINCIPAL_TYPES,
+    MCP_RISK_LEVEL_OPTIONS,
+    MCP_RISK_LEVELS,
+    MCP_SCOPE_OPTIONS,
+    MCP_SCOPES,
+  } from '@/config/constant/enums';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
   import { copy } from '@/utils/commonUtil';
@@ -346,27 +351,27 @@
     toolsDrawerVisible: false,
     clientForm: {
       client_name: '',
-      client_type: 'PUBLIC',
+      client_type: MCP_CLIENT_TYPES.PUBLIC,
       tenant_id: '',
       service_account_principal_id: '',
     } as Record<string, any>,
-    clientGrantTypes: ['authorization_code'],
-    clientScopes: ['mcp:tools:list', 'mcp:tools:call'],
+    clientGrantTypes: [MCP_GRANT_TYPES.AUTHORIZATION_CODE],
+    clientScopes: [MCP_SCOPES.TOOLS_LIST, MCP_SCOPES.TOOLS_CALL],
     redirectUrisText: '',
     registeredSecret: '',
     connectionForm: {
       connectionName: '',
       clientId: '',
       principalId: '',
-      principalType: 'USER',
+      principalType: MCP_PRINCIPAL_TYPES.USER,
       tenantId: '',
-      grantType: 'authorization_code',
+      grantType: MCP_GRANT_TYPES.AUTHORIZATION_CODE,
     } as McpConnectionForm,
     selectedConnection: null as McpConnectionRecord | null,
     selectedToolIds: [] as string[],
   });
 
-  const mcpServerUrl = computed(() => `${window.location.origin}/mcp`);
+  const mcpServerUrl = computed(() => `${window.location.origin}${MCP_SERVER_PATH}`);
 
   const splitText = (value: string) =>
     value
@@ -375,8 +380,8 @@
       .filter(Boolean);
 
   const riskTag = (riskLevel?: string) => {
-    if (riskLevel === 'HIGH') return 'danger';
-    if (riskLevel === 'MEDIUM') return 'warning';
+    if (riskLevel === MCP_RISK_LEVELS.HIGH) return 'danger';
+    if (riskLevel === MCP_RISK_LEVELS.MEDIUM) return 'warning';
     return 'success';
   };
 
@@ -414,12 +419,12 @@
   const openClientDialog = () => {
     reactiveData.clientForm = {
       client_name: '',
-      client_type: 'PUBLIC',
+      client_type: MCP_CLIENT_TYPES.PUBLIC,
       tenant_id: '',
       service_account_principal_id: '',
     };
-    reactiveData.clientGrantTypes = ['authorization_code'];
-    reactiveData.clientScopes = ['mcp:tools:list', 'mcp:tools:call'];
+    reactiveData.clientGrantTypes = [MCP_GRANT_TYPES.AUTHORIZATION_CODE];
+    reactiveData.clientScopes = [MCP_SCOPES.TOOLS_LIST, MCP_SCOPES.TOOLS_CALL];
     reactiveData.redirectUrisText = `${window.location.origin}/oauth/callback`;
     reactiveData.registeredSecret = '';
     reactiveData.clientDialogVisible = true;
@@ -450,9 +455,9 @@
       connectionName: '',
       clientId: reactiveData.clients[0]?.clientId || '',
       principalId: '',
-      principalType: 'USER',
+      principalType: MCP_PRINCIPAL_TYPES.USER,
       tenantId: '',
-      grantType: 'authorization_code',
+      grantType: MCP_GRANT_TYPES.AUTHORIZATION_CODE,
     };
     reactiveData.connectionDialogVisible = true;
   };

@@ -29,3 +29,5 @@ export const API_MCP_BASE = 'api/v3/auth/mcp';
 export const API_AGENTIC_BASE = 'api/v3/agentic';
 export const API_DATA_BASE = 'api/v3/data';
 export const API_MANAGER_BASE = 'api/v3/manager';
+
+export const MCP_SERVER_PATH = '/mcp';
