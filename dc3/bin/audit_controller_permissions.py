@@ -39,11 +39,9 @@ METHOD_RE = re.compile(
 
 VALID_SCOPES = {"add", "delete", "update", "get", "list"}
 
-# Kept public by product decision. Token pre-login methods are covered by
-# @PublicEndpoint and do not need to be listed here.
-EXPLICIT_PUBLIC_METHODS = {
-    ("ServiceMcpToolsController", "getMcpTools"),
-}
+# Token pre-login methods are covered by @PublicEndpoint and do not need to be
+# listed here. Runtime MCP tool exposure must not bypass controller security.
+EXPLICIT_PUBLIC_METHODS = set()
 
 
 @dataclass(frozen=True)

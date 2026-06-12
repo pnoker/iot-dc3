@@ -55,8 +55,8 @@ public class ApiEndpointScanner {
     private static final Set<RequestMethod> SUPPORTED_METHODS = Set.of(RequestMethod.GET, RequestMethod.POST,
             RequestMethod.PUT, RequestMethod.DELETE);
 
-    private static final List<String> DEFAULT_EXCLUDES = List.of("/actuator/**", "/error", "/error/**", "/favicon.ico",
-            "/mcp_tools");
+    private static final List<String> DEFAULT_EXCLUDES = List.of("/actuator/**", "/error", "/error/**",
+            "/favicon.ico");
 
     private static final Pattern PERMISSION_CAN_PATTERN = Pattern.compile(
             "@perm\\.can\\(\\s*['\"]([^'\"]+)['\"]\\s*,\\s*['\"]([^'\"]+)['\"]\\s*\\)");

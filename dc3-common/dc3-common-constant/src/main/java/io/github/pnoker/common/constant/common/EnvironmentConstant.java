@@ -86,6 +86,16 @@ public class EnvironmentConstant {
     public static final String AUTH_HMAC_SECRET_ENV = "AUTH_HMAC_SECRET";
 
     /**
+     * API docs public access flag: "dc3.docs.public-enabled"
+     */
+    public static final String DOCS_PUBLIC_ENABLED = "dc3.docs.public-enabled";
+
+    /**
+     * API docs internal signature flag: "dc3.docs.internal-signature-enabled"
+     */
+    public static final String DOCS_INTERNAL_SIGNATURE_ENABLED = "dc3.docs.internal-signature-enabled";
+
+    /**
      * PostgreSQL profile auto-activation configuration key: "dc3.postgres.auto-profile"
      */
     public static final String POSTGRES_AUTO_PROFILE = "dc3.postgres.auto-profile";

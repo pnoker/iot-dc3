@@ -62,6 +62,9 @@ class ApiRouteNamingContractTest {
         if (!route.contains(SymbolConstant.SLASH)) {
             return;
         }
+        if (route.startsWith("/.well-known/")) {
+            return;
+        }
         if (route.contains("/{")) {
             violations.add("%s uses path variable route %s".formatted(source, route));
         }

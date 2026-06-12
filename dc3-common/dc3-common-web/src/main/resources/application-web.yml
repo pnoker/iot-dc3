@@ -67,3 +67,8 @@ springdoc:
     display-request-duration: true
   # Flatten query/path parameter objects (e.g. *Query DTOs) into discrete params.
   default-flat-param-object: true
+
+dc3:
+  docs:
+    public-enabled: true
+    internal-signature-enabled: false

@@ -69,12 +69,22 @@ class ApiEndpointScannerTest {
     void unsupportedMethodsAndDefaultExcludesAreFilteredOut() {
         register(PatchOnlyController.class);
         register(ActuatorController.class);
-        register(McpToolsController.class);
         ApiEndpointScanner scanner = new ApiEndpointScanner(handlerMapping, new ResourceRegistrarProperties());
 
         List<FacadeScannedApiBO> apis = scanner.scan();
 
         assertThat(apis).isEmpty();
+    }
+
+    @Test
+    void mcpToolsPathIsNotDefaultExcluded() {
+        register(McpToolsController.class);
+        ApiEndpointScanner scanner = new ApiEndpointScanner(handlerMapping, new ResourceRegistrarProperties());
+
+        List<FacadeScannedApiBO> apis = scanner.scan();
+
+        assertThat(apis).extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath)
+                .containsExactly(org.assertj.core.groups.Tuple.tuple("GET", "/mcp_tools"));
     }
 
     @Test
