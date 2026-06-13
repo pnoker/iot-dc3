@@ -34,10 +34,34 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/user/User.vue'),
         },
         {
+          name: 'settingsPrincipal',
+          path: 'principal',
+          meta: { title: 'Principals' },
+          component: () => import('@/views/settings/principal/Principal.vue'),
+        },
+        {
+          name: 'settingsTenantMembership',
+          path: 'tenant_membership',
+          meta: { title: 'Tenant Membership' },
+          component: () => import('@/views/settings/tenantMembership/TenantMembership.vue'),
+        },
+        {
+          name: 'settingsLocalCredential',
+          path: 'local_credential',
+          meta: { title: 'Local Credentials' },
+          component: () => import('@/views/settings/localCredential/LocalCredential.vue'),
+        },
+        {
           name: 'settingsRole',
           path: 'role',
           meta: { title: 'Roles' },
           component: () => import('@/views/settings/role/Role.vue'),
+        },
+        {
+          name: 'settingsRolePrincipalBind',
+          path: 'role_principal_bind',
+          meta: { title: 'Role Principal Bind' },
+          component: () => import('@/views/settings/rolePrincipalBind/RolePrincipalBind.vue'),
         },
         {
           name: 'settingsResource',
@@ -190,6 +214,12 @@ const settingsRouter: RouteRecordRaw = {
           path: 'model/provider',
           meta: { title: 'Model Providers' },
           component: () => import('@/views/settings/agentic/ProviderSettings.vue'),
+        },
+        {
+          name: 'settingsServiceAccount',
+          path: 'service_account',
+          meta: { title: 'Service Accounts' },
+          component: () => import('@/views/settings/serviceAccount/ServiceAccount.vue'),
         },
         {
           name: 'settingsMcpServer',

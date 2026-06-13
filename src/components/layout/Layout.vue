@@ -159,7 +159,11 @@
     profileEdit: 'nav.profileEdit',
     settings: 'nav.settings',
     settingsUser: 'nav.settingsUser',
+    settingsPrincipal: 'nav.settingsPrincipal',
+    settingsTenantMembership: 'nav.settingsTenantMembership',
+    settingsLocalCredential: 'nav.settingsLocalCredential',
     settingsRole: 'nav.settingsRole',
+    settingsRolePrincipalBind: 'nav.settingsRolePrincipalBind',
     settingsResource: 'nav.settingsResource',
     settingsApi: 'nav.settingsApi',
     settingsMenu: 'nav.settingsMenu',
@@ -201,6 +205,7 @@
     settingsCommand: 'nav.settingsCommand',
     settingsCommandHistory: 'nav.settingsCommandHistory',
     settingsEventHistory: 'nav.settingsEventHistory',
+    settingsServiceAccount: 'nav.settingsServiceAccount',
     settingsMcpServer: 'nav.settingsMcpServer',
   };
 
@@ -216,7 +221,11 @@
     pointValue: 'TrendCharts',
     settings: 'Setting',
     settingsUser: 'User',
+    settingsPrincipal: 'Avatar',
+    settingsTenantMembership: 'OfficeBuilding',
+    settingsLocalCredential: 'Lock',
     settingsRole: 'UserFilled',
+    settingsRolePrincipalBind: 'Link',
     settingsResource: 'Key',
     settingsApi: 'Link',
     settingsMenu: 'Menu',
@@ -263,6 +272,7 @@
     settingsCommand: 'Operation',
     settingsCommandHistory: 'Document',
     settingsEventHistory: 'Document',
+    settingsServiceAccount: 'Key',
     settingsMcpServer: 'Connection',
   };
 

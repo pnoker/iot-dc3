@@ -138,6 +138,65 @@ export interface ApiRecord extends ApiForm {
 
 // ─── Bind payloads ───────────────────────────────────────────────────
 
+// ─── Local Credential ────────────────────────────────────────────────
+
+export interface LocalCredentialForm {
+  id?: string;
+  principalId?: string;
+  loginName?: string;
+  password?: string;
+  enableFlag?: string;
+  [key: string]: unknown;
+}
+
+export interface LocalCredentialRecord extends LocalCredentialForm {
+  id: string;
+  credentialType?: string;
+  passwordUpdatedTime?: string;
+  passwordExpireTime?: string;
+  failedAttempts?: number;
+  createTime?: string;
+  operateTime?: string;
+}
+
+// ─── Tenant Membership ───────────────────────────────────────────────
+
+export interface TenantMembershipForm {
+  id?: string;
+  tenantId?: string;
+  principalId?: string;
+  principalType?: 'USER' | 'SERVICE_ACCOUNT' | 'SYSTEM' | string;
+  membershipStatus?: 'ACTIVE' | 'SUSPENDED' | 'INVITED' | string;
+  [key: string]: unknown;
+}
+
+export interface TenantMembershipRecord extends TenantMembershipForm {
+  id: string;
+  joinedTime?: string;
+  createTime?: string;
+  operateTime?: string;
+}
+
+// ─── Principal ───────────────────────────────────────────────────────
+
+export interface PrincipalForm {
+  id?: string;
+  principalType?: 'USER' | 'SERVICE_ACCOUNT' | 'SYSTEM' | string;
+  principalName?: string;
+  displayName?: string;
+  sourceType?: string;
+  enableFlag?: string;
+  lockedFlag?: string;
+  [key: string]: unknown;
+}
+
+export interface PrincipalRecord extends PrincipalForm {
+  id: string;
+  lastLoginTime?: string;
+  createTime?: string;
+  operateTime?: string;
+}
+
 export interface RolePrincipalBindForm {
   roleId?: string;
   principalId?: string;
@@ -145,10 +204,37 @@ export interface RolePrincipalBindForm {
   [key: string]: unknown;
 }
 
+export interface RolePrincipalBindRecord extends RolePrincipalBindForm {
+  id: string;
+  createTime?: string;
+  operateTime?: string;
+}
+
 export interface RoleResourceBindForm {
   roleId?: string;
   resourceId?: string;
   [key: string]: unknown;
+}
+
+// ─── Service Account ────────────────────────────────────────────────
+
+export interface ServiceAccountForm {
+  id?: string;
+  principalId?: string;
+  serviceAccountName?: string;
+  ownerPrincipalId?: string;
+  purpose?: string;
+  expireTime?: string;
+  enableFlag?: string;
+  [key: string]: unknown;
+}
+
+export interface ServiceAccountRecord extends ServiceAccountForm {
+  id: string;
+  tenantId?: string;
+  lastUsedTime?: string;
+  createTime?: string;
+  operateTime?: string;
 }
 
 // ─── MCP / OAuth ────────────────────────────────────────────────────

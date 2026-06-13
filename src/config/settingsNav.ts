@@ -29,7 +29,11 @@ export interface SettingsBreadcrumbParent {
 
 export const SETTINGS_TITLE_KEYS: Record<string, string> = {
   settingsUser: 'nav.settingsUser',
+  settingsPrincipal: 'nav.settingsPrincipal',
+  settingsTenantMembership: 'nav.settingsTenantMembership',
+  settingsLocalCredential: 'nav.settingsLocalCredential',
   settingsRole: 'nav.settingsRole',
+  settingsRolePrincipalBind: 'nav.settingsRolePrincipalBind',
   settingsResource: 'nav.settingsResource',
   settingsApi: 'nav.settingsApi',
   settingsMenu: 'nav.settingsMenu',
@@ -54,6 +58,7 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
   settingsCommand: 'nav.settingsCommand',
   settingsCommandHistory: 'nav.settingsCommandHistory',
   settingsEventHistory: 'nav.settingsEventHistory',
+  settingsServiceAccount: 'nav.settingsServiceAccount',
   settingsMcpServer: 'nav.settingsMcpServer',
   settingsAbout: 'nav.settingsAbout',
   settingsUserDetail: 'nav.settingsUserDetail',
@@ -77,7 +82,11 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
 export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settings: 'Setting',
   settingsUser: 'User',
+  settingsPrincipal: 'Avatar',
+  settingsTenantMembership: 'OfficeBuilding',
+  settingsLocalCredential: 'Lock',
   settingsRole: 'UserFilled',
+  settingsRolePrincipalBind: 'Link',
   settingsResource: 'Key',
   settingsApi: 'Link',
   settingsMenu: 'Menu',
@@ -102,6 +111,7 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsCommand: 'Operation',
   settingsCommandHistory: 'Document',
   settingsEventHistory: 'Document',
+  settingsServiceAccount: 'Key',
   settingsMcpServer: 'Connection',
   settingsAbout: 'InfoFilled',
   settingsUserDetail: 'User',
@@ -151,7 +161,11 @@ export const SETTINGS_COMMAND_CHILDREN: SettingsNavNode[] = [
 
 export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
   { name: 'settingsUser', titleKey: 'nav.settingsUser', icon: 'User' },
+  { name: 'settingsPrincipal', titleKey: 'nav.settingsPrincipal', icon: 'Avatar' },
+  { name: 'settingsTenantMembership', titleKey: 'nav.settingsTenantMembership', icon: 'OfficeBuilding' },
+  { name: 'settingsLocalCredential', titleKey: 'nav.settingsLocalCredential', icon: 'Lock' },
   { name: 'settingsRole', titleKey: 'nav.settingsRole', icon: 'UserFilled' },
+  { name: 'settingsRolePrincipalBind', titleKey: 'nav.settingsRolePrincipalBind', icon: 'Link' },
   { name: 'settingsModel', titleKey: 'nav.settingsModel', icon: 'Cpu', children: SETTINGS_MODEL_CHILDREN },
   { name: 'settingsCommand', titleKey: 'nav.settingsCommand', icon: 'Operation', children: SETTINGS_COMMAND_CHILDREN },
   { name: 'settingsEvent', titleKey: 'nav.settingsEvent', icon: 'Bell', children: SETTINGS_EVENT_CHILDREN },
@@ -161,6 +175,7 @@ export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
   { name: 'settingsMenu', titleKey: 'nav.settingsMenu', icon: 'Menu' },
   { name: 'settingsGroup', titleKey: 'nav.settingsGroup', icon: 'Grid' },
   { name: 'settingsLabel', titleKey: 'nav.settingsLabel', icon: 'CollectionTag' },
+  { name: 'settingsServiceAccount', titleKey: 'nav.settingsServiceAccount', icon: 'Key' },
   { name: 'settingsMcpServer', titleKey: 'nav.settingsMcpServer', icon: 'Connection' },
   { name: 'settingsAbout', titleKey: 'nav.settingsAbout', icon: 'InfoFilled' },
 ];

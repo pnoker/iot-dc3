@@ -164,7 +164,42 @@
       'settingsEvent',
       'settingsAbout',
     ]);
+    ensureDirectItem(items, { name: 'settingsPrincipal', title: t('nav.settingsPrincipal'), icon: 'Avatar' }, [
+      'settingsTenantMembership',
+      'settingsRole',
+      'settingsRolePrincipalBind',
+      'settingsResource',
+      'settingsApi',
+      'settingsMenu',
+      'settingsAbout',
+    ]);
+    ensureDirectItem(
+      items,
+      { name: 'settingsTenantMembership', title: t('nav.settingsTenantMembership'), icon: 'OfficeBuilding' },
+      [
+        'settingsLocalCredential',
+        'settingsRole',
+        'settingsRolePrincipalBind',
+        'settingsResource',
+        'settingsApi',
+        'settingsAbout',
+      ]
+    );
+    ensureDirectItem(
+      items,
+      { name: 'settingsLocalCredential', title: t('nav.settingsLocalCredential'), icon: 'Lock' },
+      ['settingsRole', 'settingsRolePrincipalBind', 'settingsResource', 'settingsApi', 'settingsAbout']
+    );
+    ensureDirectItem(
+      items,
+      { name: 'settingsRolePrincipalBind', title: t('nav.settingsRolePrincipalBind'), icon: 'Link' },
+      ['settingsResource', 'settingsApi', 'settingsMenu', 'settingsAbout']
+    );
     ensureDirectItem(items, { name: 'settingsLabel', title: t('nav.settingsLabel'), icon: 'CollectionTag' }, [
+      'settingsAbout',
+    ]);
+    ensureDirectItem(items, { name: 'settingsServiceAccount', title: t('nav.settingsServiceAccount'), icon: 'Key' }, [
+      'settingsMcpServer',
       'settingsAbout',
     ]);
     ensureDirectItem(items, { name: 'settingsMcpServer', title: t('nav.settingsMcpServer'), icon: 'Connection' }, [
