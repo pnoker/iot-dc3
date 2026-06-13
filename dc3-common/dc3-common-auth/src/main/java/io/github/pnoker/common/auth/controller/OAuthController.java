@@ -71,7 +71,7 @@ public class OAuthController {
             @org.springframework.web.bind.annotation.RequestHeader(
                     value = RequestConstant.Header.X_AUTH_PRINCIPAL, required = false) String principalJson) {
         return Mono.<ResponseEntity<?>>fromSupplier(() -> ResponseEntity.status(HttpStatus.CREATED)
-                .body(oauthMcpRuntimeService.registerClient(request, parsePrincipal(principalJson))))
+                        .body(oauthMcpRuntimeService.registerClient(request, parsePrincipal(principalJson))))
                 .onErrorResume(OAuthProtocolException.class, this::oauthAnyError);
     }
 

@@ -19,10 +19,10 @@ package io.github.pnoker.common.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.dal.PrincipalManager;
-import io.github.pnoker.common.auth.entity.model.PrincipalDO;
-import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.UserBuilder;
+import io.github.pnoker.common.auth.entity.model.PrincipalDO;
+import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
 import io.github.pnoker.common.auth.entity.query.UserQuery;
 import io.github.pnoker.common.auth.entity.vo.UserVO;
 import io.github.pnoker.common.auth.service.TenantMembershipService;

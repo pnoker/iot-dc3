@@ -1,14 +1,18 @@
 # 统一主体与服务账号设计方案
 
-> 状态: 方案评审中，作为 MCP/OAuth 建设的前置身份底座。本文定义 DC3 面向全球 IoT 平台的 Principal、User、Service Account、Tenant Membership 和角色绑定模型。
+> 状态: 方案评审中，作为 MCP/OAuth 建设的前置身份底座。本文定义 DC3 面向全球 IoT 平台的 Principal、User、Service
+> Account、Tenant Membership 和角色绑定模型。
 
 ## 背景
 
-当前 DC3 已有 `dc3_tenant`、`dc3_user`、`dc3_tenant_bind`、`dc3_role`、`dc3_role_user_bind`、`dc3_role_resource_bind`、`dc3_resource` 等基础 RBAC 能力。该模型适合传统平台用户权限，但不足以承载 OAuth、MCP、自动化服务账号和企业身份联邦。
+当前 DC3 已有 `dc3_tenant`、`dc3_user`、`dc3_tenant_bind`、`dc3_role`、`dc3_role_user_bind`、`dc3_role_resource_bind`、
+`dc3_resource` 等基础 RBAC 能力。该模型适合传统平台用户权限，但不足以承载 OAuth、MCP、自动化服务账号和企业身份联邦。
 
-核心问题是 `user_id` 只能表达"人类用户"，不能继续扩展成"所有调用主体"。MCP/OAuth 建设前必须先把"谁在操作"抽象成统一 Principal，否则会把人类用户、服务账号、OAuth client 和 MCP connection 混在一起，导致审计、授权和租户隔离后续返工。
+核心问题是 `user_id` 只能表达"人类用户"，不能继续扩展成"所有调用主体"。MCP/OAuth 建设前必须先把"谁在操作"抽象成统一
+Principal，否则会把人类用户、服务账号、OAuth client 和 MCP connection 混在一起，导致审计、授权和租户隔离后续返工。
 
-本方案不支持旧模型，不做运行时双读/双写，不提供旧表到新表的产品化转换链路。最终表结构按本文重建，初始化数据按新模型重新 seed。
+本方案不支持旧模型，不做运行时双读/双写，不提供旧表到新表的产品化转换链路。最终表结构按本文重建，初始化数据按新模型重新
+seed。
 
 ## 推荐结论
 
@@ -38,17 +42,17 @@
 
 ## 概念边界
 
-| 概念 | 含义 | 表 |
-|---|---|---|
-| Principal | 可被认证、授权和审计的调用主体 | `dc3_principal` |
-| User | 人类用户资料 | `dc3_user` + `dc3_principal` |
-| Local Credential | 本地用户名密码登录凭证 | `dc3_local_credential` + `dc3_principal` |
-| Service Account | 机器身份、自动化身份、团队机器人 | `dc3_service_account` + `dc3_principal` |
+| 概念                | 含义                            | 表                                                 |
+|-------------------|-------------------------------|---------------------------------------------------|
+| Principal         | 可被认证、授权和审计的调用主体               | `dc3_principal`                                   |
+| User              | 人类用户资料                        | `dc3_user` + `dc3_principal`                      |
+| Local Credential  | 本地用户名密码登录凭证                   | `dc3_local_credential` + `dc3_principal`          |
+| Service Account   | 机器身份、自动化身份、团队机器人              | `dc3_service_account` + `dc3_principal`           |
 | External Identity | Google/GitHub/OIDC/SAML 等外部身份 | `dc3_identity_provider` + `dc3_external_identity` |
-| OAuth Client | 客户端应用或凭证载体 | `dc3_oauth_registered_client` |
-| MCP Connection | 某主体授权给某 MCP client 的工具暴露边界 | `dc3_mcp_connection` |
-| Tenant Membership | 主体属于哪个租户 | `dc3_tenant_membership` |
-| Role Binding | 主体拥有哪些角色 | `dc3_role_principal_bind` |
+| OAuth Client      | 客户端应用或凭证载体                    | `dc3_oauth_registered_client`                     |
+| MCP Connection    | 某主体授权给某 MCP client 的工具暴露边界    | `dc3_mcp_connection`                              |
+| Tenant Membership | 主体属于哪个租户                      | `dc3_tenant_membership`                           |
+| Role Binding      | 主体拥有哪些角色                      | `dc3_role_principal_bind`                         |
 
 OAuth client 不是业务主体。业务审计中的"谁"必须是 `principal_id`，不是 `client_id`。
 
@@ -214,7 +218,8 @@ CREATE UNIQUE INDEX idx_local_credential_principal_active_unique
     WHERE deleted = 0 AND principal_id <> 0;
 ```
 
-本地登录凭证是全局身份入口，不绑定单个租户。用户登录成功后先解析到唯一 `principal_id`，再从 `dc3_tenant_membership` 中选择当前租户。这样同一个人类用户可以加入多个租户，但任意一次 OAuth access token 只代表一个 `tenant_id`。
+本地登录凭证是全局身份入口，不绑定单个租户。用户登录成功后先解析到唯一 `principal_id`，再从 `dc3_tenant_membership`
+中选择当前租户。这样同一个人类用户可以加入多个租户，但任意一次 OAuth access token 只代表一个 `tenant_id`。
 
 密码安全要求:
 
@@ -430,12 +435,12 @@ CREATE UNIQUE INDEX idx_external_identity_principal_provider_active_unique
 
 后续增强表:
 
-| 表 | 作用 |
-|---|---|
-| `dc3_group` | 租户内用户组/服务组 |
-| `dc3_group_member` | 组成员，成员仍然是 Principal |
-| `dc3_role_group_bind` | 角色绑定到组 |
-| `dc3_scim_sync_job` | SCIM 同步任务、游标、结果和错误摘要 |
+| 表                     | 作用                   |
+|-----------------------|----------------------|
+| `dc3_group`           | 租户内用户组/服务组           |
+| `dc3_group_member`    | 组成员，成员仍然是 Principal  |
+| `dc3_role_group_bind` | 角色绑定到组               |
+| `dc3_scim_sync_job`   | SCIM 同步任务、游标、结果和错误摘要 |
 
 ### Google/GitHub/OIDC 后续接入
 
@@ -464,27 +469,27 @@ Google / GitHub / Enterprise IdP
 
 ### 当前必做页面
 
-| 页面 | 作用 |
-|---|---|
-| Principal 列表 | 查看 USER / SERVICE_ACCOUNT / SYSTEM 主体、状态、最近使用时间 |
-| 用户管理 | 创建本地用户、绑定 Principal、启用/禁用、重置本地凭证 |
-| 本地凭证管理 | 设置登录名、重置密码、强制改密、锁定/解锁、查看失败登录状态 |
-| 租户成员管理 | 将 Principal 加入或移出租户，管理 ACTIVE / SUSPENDED / INVITED 状态 |
-| 服务账号管理 | 创建服务账号、设置负责人、用途、过期时间、启停状态、查看最近使用时间 |
-| 角色主体绑定 | 给 USER 或 SERVICE_ACCOUNT 绑定租户内角色 |
-| 审计视图 | 按 principal_id、principal_type、tenant_id 查询身份和授权变更 |
+| 页面           | 作用                                                     |
+|--------------|--------------------------------------------------------|
+| Principal 列表 | 查看 USER / SERVICE_ACCOUNT / SYSTEM 主体、状态、最近使用时间        |
+| 用户管理         | 创建本地用户、绑定 Principal、启用/禁用、重置本地凭证                       |
+| 本地凭证管理       | 设置登录名、重置密码、强制改密、锁定/解锁、查看失败登录状态                         |
+| 租户成员管理       | 将 Principal 加入或移出租户，管理 ACTIVE / SUSPENDED / INVITED 状态 |
+| 服务账号管理       | 创建服务账号、设置负责人、用途、过期时间、启停状态、查看最近使用时间                     |
+| 角色主体绑定       | 给 USER 或 SERVICE_ACCOUNT 绑定租户内角色                       |
+| 审计视图         | 按 principal_id、principal_type、tenant_id 查询身份和授权变更      |
 
 服务账号页面是 MCP Client Credentials 的前置页面。MCP 页面只能选择已有服务账号或跳转创建，不能在 MCP 表单里临时生成一个弱治理的机器身份。
 
 ### 后续预留页面
 
-| 页面 | 作用 |
-|---|---|
-| 身份源管理 | 配置 Google、GitHub、企业 OIDC/SAML provider |
-| 外部身份绑定 | 查看和解除 external subject 与 Principal 的绑定 |
-| 登录方式管理 | 用户绑定/解绑本地密码、Google、GitHub、企业 IdP |
-| SCIM 同步任务 | 查看同步状态、错误摘要和最近同步时间 |
-| 组管理 | 管理 group、group member、role group bind |
+| 页面        | 作用                                     |
+|-----------|----------------------------------------|
+| 身份源管理     | 配置 Google、GitHub、企业 OIDC/SAML provider |
+| 外部身份绑定    | 查看和解除 external subject 与 Principal 的绑定 |
+| 登录方式管理    | 用户绑定/解绑本地密码、Google、GitHub、企业 IdP       |
+| SCIM 同步任务 | 查看同步状态、错误摘要和最近同步时间                     |
+| 组管理       | 管理 group、group member、role group bind  |
 
 前端路由和菜单可以先预留身份源与外部身份入口，但首版默认隐藏或仅管理员可见。
 
@@ -554,7 +559,8 @@ X-Auth-Sign: <HMAC-SHA256>
 本次身份体系按新模型全量重建，不支持旧逻辑:
 
 1. 建立全新的 `dc3_principal`、`dc3_user`、`dc3_tenant_membership`、`dc3_service_account`、`dc3_role_principal_bind` 等表。
-2. 建立 `dc3_local_credential`、`dc3_identity_provider`、`dc3_external_identity`，本地密码和外部身份都映射到 `principal_id`。
+2. 建立 `dc3_local_credential`、`dc3_identity_provider`、`dc3_external_identity`，本地密码和外部身份都映射到
+   `principal_id`。
 3. 删除产品代码中对 `dc3_tenant_bind`、`dc3_role_user_bind`、旧 token 认证链路的依赖。
 4. 使用新 seed 数据创建默认租户、默认管理员 Principal、默认管理员用户、默认本地凭证、默认角色和资源绑定。
 5. 使用新模型重新创建服务账号和 OAuth client，不从旧 appKey、driver token 或自定义 token 派生。
@@ -599,17 +605,17 @@ dc3-common-auth/
 
 ## 实施步骤
 
-| 步骤 | 任务 | 产出 |
-|---|---|---|
-| 1 | 重建 Identity 标准表 DDL | rebuild SQL |
-| 2 | 新增 Principal / LocalCredential / Membership / ServiceAccount / RolePrincipalBind / IdentityProvider / ExternalIdentity 实体 | DO/BO/VO/Mapper |
-| 3 | 编写新模型初始化 seed | 默认租户、管理员、管理员本地凭证、角色、资源绑定 |
-| 4 | 改造 `PermissionProvider` | `listPermissionCodes(tenantId, principalId)` |
-| 5 | 改造认证上下文 | `PrincipalContext` / `X-Auth-Principal` |
-| 6 | 新增服务账号管理 API | 创建、禁用、过期、轮换、审计 |
-| 7 | 新增身份前端页面 | Principal、用户、本地凭证、租户成员、服务账号、角色主体绑定 |
-| 8 | 删除旧身份链路运行时依赖 | 无 `dc3_role_user_bind` / `dc3_tenant_bind` / `X-Auth-User` |
-| 9 | 接入 OAuth / MCP | access token `sub=principal_id` |
+| 步骤 | 任务                                                                                                                        | 产出                                                         |
+|----|---------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
+| 1  | 重建 Identity 标准表 DDL                                                                                                       | rebuild SQL                                                |
+| 2  | 新增 Principal / LocalCredential / Membership / ServiceAccount / RolePrincipalBind / IdentityProvider / ExternalIdentity 实体 | DO/BO/VO/Mapper                                            |
+| 3  | 编写新模型初始化 seed                                                                                                             | 默认租户、管理员、管理员本地凭证、角色、资源绑定                                   |
+| 4  | 改造 `PermissionProvider`                                                                                                   | `listPermissionCodes(tenantId, principalId)`               |
+| 5  | 改造认证上下文                                                                                                                   | `PrincipalContext` / `X-Auth-Principal`                    |
+| 6  | 新增服务账号管理 API                                                                                                              | 创建、禁用、过期、轮换、审计                                             |
+| 7  | 新增身份前端页面                                                                                                                  | Principal、用户、本地凭证、租户成员、服务账号、角色主体绑定                         |
+| 8  | 删除旧身份链路运行时依赖                                                                                                              | 无 `dc3_role_user_bind` / `dc3_tenant_bind` / `X-Auth-User` |
+| 9  | 接入 OAuth / MCP                                                                                                            | access token `sub=principal_id`                            |
 
 ## 相关资料
 

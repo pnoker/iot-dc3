@@ -47,7 +47,7 @@ public interface PermissionProvider {
      * Used to populate Spring Security {@code GrantedAuthority} set at authentication
      * time.
      *
-     * @param tenantId tenant scope
+     * @param tenantId    tenant scope
      * @param principalId target principal
      * @return Mono of resource code set (never null; empty set when user has no roles)
      */

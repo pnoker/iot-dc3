@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.facade.grpc.config;
 
+import io.github.pnoker.api.center.auth.LocalCredentialApiGrpc;
+import io.github.pnoker.api.center.auth.McpRuntimeApiGrpc;
 import io.github.pnoker.api.center.auth.PermissionApiGrpc;
 import io.github.pnoker.api.center.auth.ResourceRegistryApiGrpc;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.api.center.auth.UserApiGrpc;
-import io.github.pnoker.api.center.auth.LocalCredentialApiGrpc;
-import io.github.pnoker.api.center.auth.McpRuntimeApiGrpc;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.api.center.data.StatusHealthApiGrpc;
 import io.github.pnoker.api.center.manager.CommandApiGrpc;

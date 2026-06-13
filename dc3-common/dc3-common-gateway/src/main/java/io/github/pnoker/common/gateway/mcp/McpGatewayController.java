@@ -72,6 +72,14 @@ public class McpGatewayController {
 
     private final McpGatewayProperties mcpGatewayProperties;
 
+    private static Map<String, Object> orderedMap(Object... values) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (int i = 0; i < values.length; i += 2) {
+            map.put(String.valueOf(values[i]), values[i + 1]);
+        }
+        return map;
+    }
+
     @GetMapping(McpConstant.WELL_KNOWN_PROTECTED_RESOURCE)
     public Mono<Map<String, Object>> protectedResourceMetadata() {
         return Mono.just(orderedMap(
@@ -174,14 +182,6 @@ public class McpGatewayController {
         return Map.of();
     }
 
-    private static Map<String, Object> orderedMap(Object... values) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        for (int i = 0; i < values.length; i += 2) {
-            map.put(String.valueOf(values[i]), values[i + 1]);
-        }
-        return map;
-    }
-
     /**
      * Gateway MCP client that resolves auth-center runtime state through the
      * facade layer and invokes the selected backend HTTP endpoint.
@@ -221,7 +221,7 @@ public class McpGatewayController {
                                     McpConstant.ToolResult.CONTENT, List.of(orderedMap(
                                             McpConstant.ToolResult.TYPE, McpConstant.ToolResult.TYPE_TEXT,
                                             McpConstant.ToolResult.TEXT, policyError
-                            ))));
+                                    ))));
                 }
                 return invokeBackend(context, tool, arguments, controls)
                         .flatMap(result -> audit(context, tool, traceId, arguments, controls,

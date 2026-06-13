@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.biz.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
@@ -642,13 +641,13 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     private Map<String, Object> issueAndPersistTokens(OAuthAuthorizationRecord authorization,
-                                                       OAuthRegisteredClientRecord client,
-                                                       boolean issueRefreshToken) {
+                                                      OAuthRegisteredClientRecord client,
+                                                      boolean issueRefreshToken) {
         PrincipalDO principal = principalManager.getById(authorization.getPrincipalId());
         if (principal == null
                 || !enabled(principal.getEnableFlag())
                 || !tenantMembershipService.isTenantMember(authorization.getTenantId(),
-                        authorization.getPrincipalId())) {
+                authorization.getPrincipalId())) {
             throw oauthError(BAD_REQUEST.value(), "invalid_grant", "principal is not active for tenant");
         }
         Set<String> scopes = splitValues(authorization.getAuthorizedScopes());

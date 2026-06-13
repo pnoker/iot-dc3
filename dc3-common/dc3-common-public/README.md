@@ -33,21 +33,21 @@ Fields: `ok` (boolean), `code` (String), `message` (String), `data` (T)
 
 ### Common Entities
 
-| Class                      | Purpose                                              |
-|----------------------------|------------------------------------------------------|
-| `Pages`                    | Pagination request params (`current`, `size`)        |
+| Class                           | Purpose                                              |
+|---------------------------------|------------------------------------------------------|
+| `Pages`                         | Pagination request params (`current`, `size`)        |
 | `RequestHeader.PrincipalHeader` | Tenant/user identity propagated from gateway headers |
-| `Keys`                     | JWT signing key holder                               |
-| `TreeNode`                 | Generic hierarchical data structure                  |
+| `Keys`                          | JWT signing key holder                               |
+| `TreeNode`                      | Generic hierarchical data structure                  |
 
 ### Utilities
 
-| Utility          | Purpose                                             |
-|------------------|-----------------------------------------------------|
-| `JsonUtil`       | Jackson JSON serialization/deserialization helpers  |
+| Utility               | Purpose                                                  |
+|-----------------------|----------------------------------------------------------|
+| `JsonUtil`            | Jackson JSON serialization/deserialization helpers       |
 | `PrincipalHeaderUtil` | Extracts `PrincipalHeader` from reactive WebFlux context |
-| `HostUtil`       | Resolves host/IP information                        |
-| `ResponseUtil`   | Writes HTTP responses in WebFlux context            |
+| `HostUtil`            | Resolves host/IP information                             |
+| `ResponseUtil`        | Writes HTTP responses in WebFlux context                 |
 
 ### HTTP Client
 

@@ -31,7 +31,7 @@ public interface PermissionFacade {
     /**
      * List all resource codes granted to the given principal in the tenant.
      *
-     * @param tenantId tenant scope
+     * @param tenantId    tenant scope
      * @param principalId target principal
      * @return full resource code set; empty when the principal has no grants
      */
