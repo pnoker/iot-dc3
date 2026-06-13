@@ -30,6 +30,12 @@ import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
+import io.github.pnoker.common.auth.tool.McpOpenApiAggregator;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.ObjectProvider;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -107,6 +113,9 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     private final TenantMembershipService tenantMembershipService;
     private final PrincipalManager principalManager;
     private final ServiceAccountManager serviceAccountManager;
+    private final ObjectProvider<McpOpenApiAggregator> openApiAggregator;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${dc3.oauth.issuer:http://localhost:8300/auth}")
     private String issuer;
@@ -195,9 +204,15 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             throw oauthError(BAD_REQUEST.value(), "invalid_redirect_uri", "redirect_uris is required");
         }
 
-        Long ownerPrincipalId = Objects.nonNull(principalHeader) ? principalHeader.getPrincipalId() : 0L;
+        // The registered client is bound to the authenticated caller's tenant. The request body's
+        // tenant_id is intentionally ignored, so a caller cannot register an OAuth client for a tenant
+        // they do not belong to (which would otherwise let them bind another tenant's service account
+        // and mint cross-tenant tokens). validateServiceAccountClient below is thereby scoped to the
+        // caller's own tenant as well.
+        requireAuthenticatedPrincipal(principalHeader);
+        Long ownerPrincipalId = principalHeader.getPrincipalId();
+        Long tenantId = principalHeader.getTenantId();
         Long serviceAccountPrincipalId = request.getServiceAccountPrincipalId();
-        Long tenantId = request.getTenantId();
         if (grants.contains(McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS)) {
             validateServiceAccountClient(serviceAccountPrincipalId, tenantId);
         }
@@ -404,14 +419,23 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     @Transactional(rollbackFor = Exception.class)
     public int refreshToolCatalog() {
         int changed = 0;
+        // Optional: when dc3.mcp.tool.aggregator.enabled=true, enrich each tool with a real
+        // request schema pulled from the service's OpenAPI spec. Off by default (no-op).
+        McpOpenApiAggregator aggregator = openApiAggregator.getIfAvailable();
+        Map<String, String> schemas = aggregator == null ? Map.of() : aggregator.inputSchemasByApiCode();
         for (McpToolRecord candidate : oauthMcpMapper.listRegistryToolCandidates()) {
+            String schema = schemas.get(candidate.getApiCode());
+            if (schema != null) {
+                candidate.setToolExt("{\"inputSchema\":" + schema + "}");
+            }
             McpToolRecord existing = oauthMcpMapper.selectToolByToolId(candidate.getToolId());
             if (existing == null) {
                 candidate.setId(IdWorker.getId());
                 changed += oauthMcpMapper.insertTool(candidate);
             } else if (!Objects.equals(existing.getSchemaHash(), candidate.getSchemaHash())
                     || !Objects.equals(existing.getPermissionCode(), candidate.getPermissionCode())
-                    || !Objects.equals(existing.getApiPath(), candidate.getApiPath())) {
+                    || !Objects.equals(existing.getApiPath(), candidate.getApiPath())
+                    || !Objects.equals(existing.getToolExt(), candidate.getToolExt())) {
                 candidate.setId(existing.getId());
                 changed += oauthMcpMapper.updateTool(candidate);
             }
@@ -800,7 +824,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                 .name(tool.getToolName())
                 .title(tool.getToolTitle())
                 .description(StringUtils.defaultIfBlank(tool.getRemark(), tool.getToolTitle()))
-                .inputSchema(McpConstant.ToolDefinition.DEFAULT_INPUT_SCHEMA)
+                .inputSchema(inputSchemaOf(tool))
                 .annotations(McpToolDefinitionDTO.Annotations.builder()
                         .readOnlyHint(one(tool.getReadOnlyHint()))
                         .destructiveHint(one(tool.getDestructiveHint()))
@@ -813,6 +837,28 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                         .riskLevel(tool.getRiskLevel())
                         .build())
                 .build();
+    }
+
+    /**
+     * Resolve the input schema for a tool. When the catalog carries one in {@code tool_ext}
+     * (populated by {@link McpOpenApiAggregator} when enabled), surface it; otherwise fall back to
+     * the static default so tools/list never breaks.
+     */
+    private Map<String, Object> inputSchemaOf(McpToolRecord tool) {
+        String ext = tool.getToolExt();
+        if (StringUtils.isBlank(ext)) {
+            return McpConstant.ToolDefinition.DEFAULT_INPUT_SCHEMA;
+        }
+        try {
+            JsonNode node = objectMapper.readTree(ext).path("inputSchema");
+            if (node.isMissingNode() || node.isEmpty()) {
+                return McpConstant.ToolDefinition.DEFAULT_INPUT_SCHEMA;
+            }
+            return objectMapper.convertValue(node, new TypeReference<Map<String, Object>>() {
+            });
+        } catch (Exception e) {
+            return McpConstant.ToolDefinition.DEFAULT_INPUT_SCHEMA;
+        }
     }
 
     private McpToolResolveResponseDTO resolvedTool(McpToolRecord tool) {

@@ -69,4 +69,7 @@ public class McpToolRecord {
 
     private String remark;
 
+    /** JSON envelope, e.g. {"inputSchema": {...}} — populated by the optional OpenAPI aggregator. */
+    private String toolExt;
+
 }

@@ -341,9 +341,7 @@
         AND resource.deleted = 0
         WHERE api.deleted = 0
         AND api.enable_flag = 0
-        AND api.api_code
-        <>
-        ''
+        AND api.api_code != ''
     </select>
 
     <select id="selectToolByToolId"
@@ -361,13 +359,14 @@
         FROM dc3_mcp_tool_catalog
         WHERE deleted = 0
           AND enable_flag = 0
-          AND (#{riskLevel} IS NULL OR #{riskLevel} = '' OR risk_level = #{riskLevel})
+          AND (#{riskLevel}::text IS NULL OR #{riskLevel}::text = ''
+               OR risk_level = #{riskLevel}::text)
           AND (
-            #{keyword} IS NULL
-                OR #{keyword} = ''
-                OR lower(tool_name) LIKE concat('%', lower(#{keyword}), '%')
-                OR lower(tool_title) LIKE concat('%', lower(#{keyword}), '%')
-                OR lower(permission_code) LIKE concat('%', lower(#{keyword}), '%')
+            #{keyword}::text IS NULL
+                OR #{keyword}::text = ''
+                OR lower(tool_name) LIKE concat('%', lower(#{keyword}::text), '%')
+                OR lower(tool_title) LIKE concat('%', lower(#{keyword}::text), '%')
+                OR lower(permission_code) LIKE concat('%', lower(#{keyword}::text), '%')
             )
         ORDER BY tool_category, tool_name
         LIMIT #{limit}
@@ -381,7 +380,8 @@
          open_world_hint, enable_flag, tool_ext, remark, creator_id, creator_name, operator_id, operator_name)
         VALUES (#{id}, #{toolId}, #{toolName}, #{toolTitle}, #{toolCategory}, #{serviceName}, #{apiCode},
                 #{permissionCode}, #{httpMethod}, #{apiPath}, #{schemaHash}, #{riskLevel}, #{readOnlyHint},
-                #{destructiveHint}, #{idempotentHint}, #{openWorldHint}, #{enableFlag}, '{}'::JSON, #{remark},
+                #{destructiveHint}, #{idempotentHint}, #{openWorldHint}, #{enableFlag},
+                COALESCE(NULLIF(#{toolExt}, '')::json, '{}'::json), #{remark},
                 0, 'system', 0, 'system')
     </insert>
 
@@ -402,6 +402,7 @@
             destructive_hint = #{destructiveHint},
             idempotent_hint = #{idempotentHint},
             open_world_hint = #{openWorldHint},
+            tool_ext        = COALESCE(NULLIF(#{toolExt}, '')::json, '{}'::json),
             remark          = #{remark},
             operate_time    = CURRENT_TIMESTAMP
         WHERE id = #{id}
@@ -445,9 +446,7 @@
         AND connection.revoke_time IS NULL
         AND (connection.expire_time IS NULL OR connection.expire_time > CURRENT_TIMESTAMP)
         AND connection.deleted = 0
-        AND (#{allowHighRisk} = TRUE OR tool.risk_level
-        <>
-        'HIGH')
+        AND (#{allowHighRisk} = TRUE OR tool.risk_level != 'HIGH')
         AND (
         tool.permission_code = ''
         OR EXISTS (SELECT 1 FROM perms WHERE resource_code = '*')
@@ -479,9 +478,7 @@
         AND (connection.expire_time IS NULL OR connection.expire_time > CURRENT_TIMESTAMP)
         AND connection.deleted = 0
         AND tool.tool_name = #{toolName}
-        AND (#{allowHighRisk} = TRUE OR tool.risk_level
-        <>
-        'HIGH')
+        AND (#{allowHighRisk} = TRUE OR tool.risk_level != 'HIGH')
         AND (
         tool.permission_code = ''
         OR EXISTS (SELECT 1 FROM perms WHERE resource_code = '*')

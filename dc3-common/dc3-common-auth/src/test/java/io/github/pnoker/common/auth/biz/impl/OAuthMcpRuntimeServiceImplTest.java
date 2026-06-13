@@ -96,6 +96,7 @@ class OAuthMcpRuntimeServiceImplTest {
 
         RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
         principal.setPrincipalId(100L);
+        principal.setTenantId(1L);
 
         OAuthClientRegistrationResponseDTO response = service.registerClient(request, principal);
 
@@ -119,13 +120,16 @@ class OAuthMcpRuntimeServiceImplTest {
                 .clientName("Robot")
                 .clientType("CONFIDENTIAL")
                 .grantTypes(List.of("client_credentials"))
-                .tenantId(1L)
                 .serviceAccountPrincipalId(200L)
                 .build();
 
+        RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
+        principal.setPrincipalId(100L);
+        principal.setTenantId(1L);
+
         when(serviceAccountManager.getOne(any())).thenReturn(new ServiceAccountDO());
 
-        OAuthClientRegistrationResponseDTO response = service.registerClient(request, null);
+        OAuthClientRegistrationResponseDTO response = service.registerClient(request, principal);
 
         ArgumentCaptor<OAuthRegisteredClientRecord> captor =
                 ArgumentCaptor.forClass(OAuthRegisteredClientRecord.class);
@@ -138,6 +142,44 @@ class OAuthMcpRuntimeServiceImplTest {
         assertThat(stored.getServiceAccountPrincipalId()).isEqualTo(200L);
         assertThat(stored.getTenantId()).isEqualTo(1L);
         assertThat(stored.getClientSecretHash()).isNotBlank();
+    }
+
+    @Test
+    void confidentialRegistrationRejectsNullPrincipal() {
+        OAuthClientRegistrationRequestDTO request = OAuthClientRegistrationRequestDTO.builder()
+                .clientName("Robot")
+                .clientType("CONFIDENTIAL")
+                .grantTypes(List.of("client_credentials"))
+                .serviceAccountPrincipalId(200L)
+                .build();
+
+        assertThatThrownBy(() -> service.registerClient(request, null))
+                .isInstanceOf(OAuthMcpRuntimeServiceImpl.OAuthProtocolException.class)
+                .hasMessageContaining("authenticated principal is required");
+    }
+
+    @Test
+    void confidentialRegistrationIgnoresBodyTenantIdAndScopesToCallerTenant() {
+        // Body claims tenantId 99 plus a foreign service account, but the caller is in tenant 1.
+        // The service-account lookup must run against the caller's tenant (1), where none exists,
+        // so the body-supplied tenantId is effectively ignored.
+        OAuthClientRegistrationRequestDTO request = OAuthClientRegistrationRequestDTO.builder()
+                .clientName("Robot")
+                .clientType("CONFIDENTIAL")
+                .grantTypes(List.of("client_credentials"))
+                .tenantId(99L)
+                .serviceAccountPrincipalId(200L)
+                .build();
+
+        RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
+        principal.setPrincipalId(100L);
+        principal.setTenantId(1L);
+
+        when(serviceAccountManager.getOne(any())).thenReturn(null);
+
+        assertThatThrownBy(() -> service.registerClient(request, principal))
+                .isInstanceOf(OAuthMcpRuntimeServiceImpl.OAuthProtocolException.class)
+                .hasMessageContaining("service account is not active");
     }
 
     @Test

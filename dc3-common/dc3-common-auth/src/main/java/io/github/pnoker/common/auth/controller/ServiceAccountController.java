@@ -28,6 +28,7 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -109,6 +110,33 @@ public class ServiceAccountController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             serviceAccountService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+        }));
+    }
+
+    @PreAuthorize("@perm.can('service_account', 'update')")
+    @Operation(summary = "Enable Service Account", description = "Enable a service account by ID")
+    @PostMapping("/enable")
+    public Mono<R<String>> enable(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+        return toggleEnableFlag(id, EnableFlagEnum.ENABLE);
+    }
+
+    @PreAuthorize("@perm.can('service_account', 'update')")
+    @Operation(summary = "Disable Service Account", description = "Disable a service account by ID")
+    @PostMapping("/disable")
+    public Mono<R<String>> disable(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+        return toggleEnableFlag(id, EnableFlagEnum.DISABLE);
+    }
+
+    private Mono<R<String>> toggleEnableFlag(Long id, EnableFlagEnum target) {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
+            // Reuse the full update path so the linked Principal row stays in sync; only the
+            // enable flag flips, every other column is carried from the current record.
+            ServiceAccountBO current = requireTenant(header.getTenantId(), serviceAccountService.getById(id));
+            current.setEnableFlag(target);
+            current.setOperatorId(header.getUserId());
+            current.setOperatorName(header.getNickName());
+            serviceAccountService.update(current);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
     }

@@ -142,7 +142,8 @@ public class WebFluxSecurityConfig {
             HmacAuthSigner hmacAuthSigner,
             Environment environment,
             @Value("${dc3.docs.public-enabled:true}") boolean docsPublicEnabled,
-            @Value("${dc3.docs.internal-signature-enabled:false}") boolean docsInternalSignatureEnabled) {
+            @Value("${dc3.docs.internal-signature-enabled:false}") boolean docsInternalSignatureEnabled,
+            @Value("${dc3.oauth.dcr.enabled:false}") boolean oauthDcrEnabled) {
 
         validateDocsSecurity(environment, hmacAuthSigner, docsInternalSignatureEnabled);
 
@@ -161,7 +162,12 @@ public class WebFluxSecurityConfig {
                         .pathMatchers(HttpMethod.GET, McpConstant.OAUTH2_JWKS).permitAll()
                         .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_TOKEN).permitAll()
                         .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REVOKE).permitAll()
-                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REGISTER).permitAll()
+                        // Dynamic Client Registration (RFC 7591) for external MCP clients. Open in
+                        // dev/test for convenience; in pre/pro it stays closed unless explicitly
+                        // enabled via dc3.oauth.dcr.enabled=true. Admin UI registration is unaffected
+                        // — it goes through the @perm.can('mcp','add')-gated management endpoint.
+                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REGISTER)
+                        .access((authentication, context) -> dcrAccess(environment, oauthDcrEnabled))
                         .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers("/health/**").permitAll()
                         .pathMatchers("/v3/api-docs/**", "/v3/api-docs.yaml")
@@ -212,6 +218,12 @@ public class WebFluxSecurityConfig {
                 && hmacAuthSigner.verify(internalDocsPayload(caller, timestamp, nonce,
                 exchange.getRequest().getPath().pathWithinApplication().value()), sign);
         return Mono.just(new AuthorizationDecision(allowed));
+    }
+
+    private Mono<AuthorizationResult> dcrAccess(Environment environment, boolean dcrEnabled) {
+        // Open in non-protected environments; in pre/pro closed unless explicitly enabled.
+        boolean allow = !isProtectedEnvironment(environment) || dcrEnabled;
+        return Mono.just(new AuthorizationDecision(allow));
     }
 
     private void validateDocsSecurity(Environment environment, HmacAuthSigner hmacAuthSigner,
