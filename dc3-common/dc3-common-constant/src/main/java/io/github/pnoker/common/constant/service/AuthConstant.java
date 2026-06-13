@@ -46,6 +46,8 @@ public class AuthConstant {
 
     public static final String TENANT_MEMBERSHIP_URL_PREFIX = "/tenant_membership";
 
+    public static final String IDENTITY_AUDIT_URL_PREFIX = "/identity_audit";
+
     public static final String TENANT_URL_PREFIX = "/tenant";
 
     public static final String TOKEN_URL_PREFIX = "/token";

@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.bo.PrincipalBO;
 import io.github.pnoker.common.auth.entity.builder.PrincipalBuilder;
 import io.github.pnoker.common.auth.entity.query.PrincipalQuery;
 import io.github.pnoker.common.auth.entity.vo.PrincipalVO;
+import io.github.pnoker.common.auth.service.AuditLogService;
 import io.github.pnoker.common.auth.service.PrincipalService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
@@ -65,6 +66,8 @@ public class PrincipalController implements BaseController {
 
     private final PrincipalService principalService;
 
+    private final AuditLogService auditLogService;
+
     @PreAuthorize("@perm.can('principal', 'get')")
     @Operation(summary = "Get Principal by ID", description = "Get principal details by ID")
     @GetMapping("/get_by_id")
@@ -97,6 +100,8 @@ public class PrincipalController implements BaseController {
     private Mono<R<String>> toggleEnableFlag(Long id, EnableFlagEnum target) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             principalService.setEnableFlag(id, target, header.getUserId(), header.getNickName());
+            auditLogService.log(header, target == EnableFlagEnum.ENABLE ? "ENABLE" : "DISABLE",
+                    "principal", id, null, "SUCCESS", null);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
     }

@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.bo.ServiceAccountBO;
 import io.github.pnoker.common.auth.entity.builder.ServiceAccountBuilder;
 import io.github.pnoker.common.auth.entity.query.ServiceAccountQuery;
 import io.github.pnoker.common.auth.entity.vo.ServiceAccountVO;
+import io.github.pnoker.common.auth.service.AuditLogService;
 import io.github.pnoker.common.auth.service.ServiceAccountService;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.base.BaseController;
@@ -67,6 +68,8 @@ public class ServiceAccountController implements BaseController {
     private final ServiceAccountBuilder serviceAccountBuilder;
 
     private final ServiceAccountService serviceAccountService;
+
+    private final AuditLogService auditLogService;
 
     private final TenantMembershipService tenantMembershipService;
 
@@ -137,6 +140,8 @@ public class ServiceAccountController implements BaseController {
             current.setOperatorId(header.getUserId());
             current.setOperatorName(header.getNickName());
             serviceAccountService.update(current);
+            auditLogService.log(header, target == EnableFlagEnum.ENABLE ? "ENABLE" : "DISABLE",
+                    "service_account", id, current.getServiceAccountName(), "SUCCESS", null);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         }));
     }

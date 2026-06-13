@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.pnoker.common.auth.mapper.IdentityAuditLogMapper">
+
+    <select id="listIdentityAudit"
+            resultType="io.github.pnoker.common.auth.entity.model.IdentityAuditLogDO">
+        SELECT id, tenant_id, principal_id, principal_type, action, resource_type, resource_id,
+               resource_name, status, error_code, detail_ext, create_time
+        FROM dc3_identity_audit_log
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND (#{principalId} IS NULL OR #{principalId} = 0 OR principal_id = #{principalId})
+          AND (#{action} IS NULL OR #{action} = '' OR action = #{action})
+          AND (#{resourceType} IS NULL OR #{resourceType} = '' OR resource_type = #{resourceType})
+          AND (#{resourceId} IS NULL OR #{resourceId} = 0 OR resource_id = #{resourceId})
+          AND (#{status} IS NULL OR #{status} = '' OR status = #{status})
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

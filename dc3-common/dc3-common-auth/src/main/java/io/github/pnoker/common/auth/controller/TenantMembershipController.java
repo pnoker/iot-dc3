@@ -23,6 +23,7 @@ import io.github.pnoker.common.auth.entity.builder.TenantMembershipBuilder;
 import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
 import io.github.pnoker.common.auth.entity.query.TenantMembershipQuery;
 import io.github.pnoker.common.auth.entity.vo.TenantMembershipVO;
+import io.github.pnoker.common.auth.service.AuditLogService;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
@@ -65,6 +66,8 @@ public class TenantMembershipController implements BaseController {
 
     private final TenantMembershipService tenantMembershipService;
 
+    private final AuditLogService auditLogService;
+
     @PreAuthorize("@perm.can('tenant_membership', 'list')")
     @Operation(summary = "List Tenant Memberships", description = "List memberships for the caller's tenant")
     @PostMapping("/list")
@@ -93,6 +96,8 @@ public class TenantMembershipController implements BaseController {
             membershipDO.setOperatorId(header.getUserId());
             membershipDO.setOperatorName(header.getNickName());
             tenantMembershipService.add(membershipDO);
+            auditLogService.log(header, "CREATE", "tenant_membership", membershipDO.getPrincipalId(),
+                    null, "SUCCESS", null);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));
     }
@@ -101,13 +106,15 @@ public class TenantMembershipController implements BaseController {
     @Operation(summary = "Delete Tenant Membership", description = "Remove a principal from a tenant")
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
             // Verify the membership belongs to the caller's tenant before deleting.
+            Long tenantId = header.getTenantId();
             TenantMembershipBO current = tenantMembershipService.getById(id);
             if (!Objects.equals(current.getTenantId(), tenantId)) {
                 throw new NotFoundException("Tenant membership does not exist");
             }
             tenantMembershipService.delete(id);
+            auditLogService.log(header, "DELETE", "tenant_membership", id, null, "SUCCESS", null);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         }));
     }
