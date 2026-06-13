@@ -16,23 +16,26 @@
 
 <template>
   <div class="mcp-page">
-    <div class="mcp-toolbar">
-      <div class="mcp-toolbar__title">{{ t('settings.mcp.title') }}</div>
-      <div class="mcp-toolbar__actions">
-        <el-button :icon="Refresh" :loading="reactiveData.loading" @click="loadAll" />
-        <el-button :icon="Plus" type="primary" @click="openClientDialog">
-          {{ t('settings.mcp.registerClient') }}
-        </el-button>
-        <el-button :icon="LinkIcon" type="primary" @click="openConnectionDialog">
-          {{ t('settings.mcp.addConnection') }}
-        </el-button>
-        <el-button :icon="RefreshRight" :loading="reactiveData.refreshingCatalog" @click="refreshCatalog">
-          {{ t('settings.mcp.refreshCatalog') }}
-        </el-button>
-      </div>
-    </div>
-
-    <blank-card>
+    <el-card class="mcp-overview" shadow="never">
+      <template #header>
+        <div class="mcp-overview__header">
+          <span class="mcp-overview__title">{{ t('settings.mcp.title') }}</span>
+          <div class="mcp-overview__actions">
+            <el-tooltip :content="t('common.refresh')" effect="dark" placement="top">
+              <el-button :icon="Refresh" :loading="reactiveData.loading" circle @click="loadAll" />
+            </el-tooltip>
+            <el-button :icon="Plus" type="primary" @click="openClientDialog">
+              {{ t('settings.mcp.registerClient') }}
+            </el-button>
+            <el-button :icon="LinkIcon" type="primary" @click="openConnectionDialog">
+              {{ t('settings.mcp.addConnection') }}
+            </el-button>
+            <el-button :icon="RefreshRight" :loading="reactiveData.refreshingCatalog" @click="refreshCatalog">
+              {{ t('settings.mcp.refreshCatalog') }}
+            </el-button>
+          </div>
+        </div>
+      </template>
       <el-descriptions :column="2" border>
         <el-descriptions-item :label="t('settings.mcp.serverUrl')">
           <div class="mcp-copy-line">
@@ -55,7 +58,7 @@
           {{ reactiveData.metadata.jwks_uri || '-' }}
         </el-descriptions-item>
       </el-descriptions>
-    </blank-card>
+    </el-card>
 
     <blank-card>
       <el-tabs v-model="reactiveData.active">
@@ -82,8 +85,11 @@
             <el-table-column :label="t('settings.mcp.revokeTime')" min-width="170">
               <template #default="{ row }">{{ timestampLabel(row.revokeTime) }}</template>
             </el-table-column>
-            <el-table-column :label="t('common.operation')" fixed="right" width="190">
+            <el-table-column :label="t('common.operation')" fixed="right" width="260">
               <template #default="{ row }">
+                <el-button link type="primary" @click="openConnectionInfo(row)">
+                  {{ t('settings.mcp.connectionInfo') }}
+                </el-button>
                 <el-button link type="primary" @click="openToolsDrawer(row)">
                   {{ t('settings.mcp.manageTools') }}
                 </el-button>
@@ -202,10 +208,24 @@
           </el-select>
         </el-form-item>
         <el-form-item :label="t('settings.mcp.tenantId')">
-          <el-input v-model="reactiveData.clientForm.tenant_id" />
+          <el-input :model-value="currentTenant" disabled />
         </el-form-item>
         <el-form-item :label="t('settings.mcp.serviceAccountPrincipalId')">
-          <el-input v-model="reactiveData.clientForm.service_account_principal_id" />
+          <el-select
+            v-model="reactiveData.clientForm.service_account_principal_id"
+            filterable
+            :placeholder="t('settings.mcp.serviceAccountPrincipalId')"
+          >
+            <el-option
+              v-for="sa in reactiveData.serviceAccounts"
+              :key="sa.principalId ?? sa.id"
+              :label="`${sa.serviceAccountName} / ${sa.principalId}`"
+              :value="sa.principalId ?? ''"
+            />
+            <template #empty>
+              <el-empty :description="t('settings.mcp.noServiceAccount')" />
+            </template>
+          </el-select>
         </el-form-item>
       </el-form>
       <el-alert
@@ -290,6 +310,33 @@
         />
       </el-table>
     </el-drawer>
+
+    <el-dialog v-model="reactiveData.connectionInfoVisible" :title="t('settings.mcp.connectionInfo')" width="640px">
+      <el-descriptions :column="1" border>
+        <el-descriptions-item :label="t('settings.mcp.serverUrl')">{{ mcpServerUrl }}</el-descriptions-item>
+        <el-descriptions-item :label="t('settings.mcp.clientId')">
+          {{ reactiveData.connectionInfoForm.clientId || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('settings.mcp.issuer')">
+          {{ reactiveData.metadata.issuer || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('settings.mcp.authorizationEndpoint')">
+          {{ reactiveData.metadata.authorization_endpoint || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="t('settings.mcp.tokenEndpoint')">
+          {{ reactiveData.metadata.token_endpoint || '-' }}
+        </el-descriptions-item>
+      </el-descriptions>
+      <div v-for="agent in agentSnippets" :key="agent.name" class="mcp-snippet">
+        <div class="mcp-snippet__head">
+          <span class="mcp-snippet__name">{{ agent.name }}</span>
+          <el-button :icon="DocumentCopy" link type="primary" @click="copy(agent.config, t('settings.mcp.copied'))">
+            {{ t('settings.mcp.copyUrl') }}
+          </el-button>
+        </div>
+        <pre class="mcp-snippet__code">{{ agent.config }}</pre>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -311,7 +358,15 @@
     replaceMcpConnectionTools,
     revokeMcpConnection,
   } from '@/api/mcp';
-  import type { McpConnectionForm, McpConnectionRecord, McpToolRecord, OAuthClientRecord } from '@/config/types';
+  import { listServiceAccount } from '@/api/serviceAccount';
+  import { useAuthStore } from '@/store/modules/auth';
+  import type {
+    McpConnectionForm,
+    McpConnectionRecord,
+    McpToolRecord,
+    OAuthClientRecord,
+    ServiceAccountRecord,
+  } from '@/config/types';
   import { MCP_SERVER_PATH } from '@/config/constant/api';
   import {
     MCP_CLIENT_TYPE_OPTIONS,
@@ -328,10 +383,12 @@
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
   import { copy } from '@/utils/commonUtil';
+  import { isEnabledFlag } from '@/utils/thingModelFormatUtil';
   import { successMessage } from '@/utils/notificationUtil';
   import { timestampLabel } from '@/utils/dateUtil';
 
   const { t } = useI18n();
+  const authStore = useAuthStore();
   const toolTableRef = ref<InstanceType<typeof ElTable>>();
 
   const reactiveData = reactive({
@@ -342,6 +399,7 @@
     submitting: false,
     metadata: {} as Record<string, any>,
     clients: [] as OAuthClientRecord[],
+    serviceAccounts: [] as ServiceAccountRecord[],
     connections: [] as McpConnectionRecord[],
     tools: [] as McpToolRecord[],
     toolKeyword: '',
@@ -349,6 +407,10 @@
     clientDialogVisible: false,
     connectionDialogVisible: false,
     toolsDrawerVisible: false,
+    connectionInfoVisible: false,
+    connectionInfoForm: {
+      clientId: '',
+    } as { clientId: string },
     clientForm: {
       client_name: '',
       client_type: MCP_CLIENT_TYPES.PUBLIC,
@@ -372,6 +434,29 @@
   });
 
   const mcpServerUrl = computed(() => `${window.location.origin}${MCP_SERVER_PATH}`);
+
+  // Ready-to-paste MCP client config snippets for common AI agents. The agents discover OAuth
+  // via the protected-resource metadata, so the snippet only needs the server URL.
+  const agentSnippets = computed(() => {
+    const server = { type: 'http', url: mcpServerUrl.value };
+    return [
+      { name: 'Claude Desktop', config: JSON.stringify({ mcpServers: { dc3: server } }, null, 2) },
+      { name: 'Cursor', config: JSON.stringify({ mcpServers: { dc3: server } }, null, 2) },
+      { name: 'VS Code', config: JSON.stringify({ servers: { dc3: server } }, null, 2) },
+    ];
+  });
+
+  const openConnectionInfo = (row: McpConnectionRecord) => {
+    reactiveData.connectionInfoForm = { clientId: row.clientId || '' };
+    reactiveData.connectionInfoVisible = true;
+  };
+
+  // The registered client is bound to the logged-in tenant; surface it read-only. getTenant is
+  // loosely typed (storage-backed), so coerce to a string for display.
+  const currentTenant = computed(() => {
+    const tenant = authStore.getTenant;
+    return typeof tenant === 'string' && tenant ? tenant : 'default';
+  });
 
   const splitText = (value: string) =>
     value
@@ -402,14 +487,18 @@
   const loadAll = async () => {
     reactiveData.loading = true;
     try {
-      const [metadataRes, clientRes, connectionRes] = await Promise.all([
+      const [metadataRes, clientRes, connectionRes, serviceAccountRes] = await Promise.all([
         getMcpMetadata(),
         listMcpClient(),
         listMcpConnection(),
+        listServiceAccount({ page: { current: 1, size: 1000 } }),
       ]);
       reactiveData.metadata = metadataRes.data || {};
       reactiveData.clients = clientRes.data || [];
       reactiveData.connections = connectionRes.data || [];
+      reactiveData.serviceAccounts = (serviceAccountRes.data?.records || []).filter((sa) =>
+        isEnabledFlag(sa.enableFlag)
+      );
       await loadTools();
     } finally {
       reactiveData.loading = false;
@@ -420,7 +509,6 @@
     reactiveData.clientForm = {
       client_name: '',
       client_type: MCP_CLIENT_TYPES.PUBLIC,
-      tenant_id: '',
       service_account_principal_id: '',
     };
     reactiveData.clientGrantTypes = [MCP_GRANT_TYPES.AUTHORIZATION_CODE];
@@ -533,30 +621,33 @@
     gap: 12px;
   }
 
-  .mcp-toolbar,
+  .mcp-overview__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  .mcp-overview__title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .mcp-overview__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
   .mcp-tool-filter,
   .mcp-drawer-toolbar,
   .mcp-copy-line {
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-
-  .mcp-toolbar {
-    justify-content: space-between;
-  }
-
-  .mcp-toolbar__title {
-    font-size: 18px;
-    font-weight: 600;
-  }
-
-  .mcp-toolbar__actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
   }
 
   .mcp-tool-filter {
@@ -586,15 +677,45 @@
     white-space: nowrap;
   }
 
+  .mcp-snippet {
+    margin-top: 12px;
+  }
+
+  .mcp-snippet__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .mcp-snippet__name {
+    font-weight: 600;
+  }
+
+  .mcp-snippet__code {
+    margin: 0;
+    padding: 10px 12px;
+    max-height: 180px;
+    overflow: auto;
+    background: var(--el-fill-color-light);
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
   @media (max-width: 768px) {
-    .mcp-toolbar,
-    .mcp-tool-filter {
+    .mcp-overview__header {
       align-items: stretch;
       flex-direction: column;
     }
 
-    .mcp-toolbar__actions {
+    .mcp-overview__actions {
       justify-content: flex-start;
+    }
+
+    .mcp-tool-filter {
+      align-items: stretch;
+      flex-direction: column;
     }
 
     .mcp-tool-filter .el-input,
