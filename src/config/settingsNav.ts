@@ -60,6 +60,7 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
   settingsEventHistory: 'nav.settingsEventHistory',
   settingsServiceAccount: 'nav.settingsServiceAccount',
   settingsMcpServer: 'nav.settingsMcpServer',
+  settingsMcpAudit: 'nav.settingsMcpAudit',
   settingsAbout: 'nav.settingsAbout',
   settingsUserDetail: 'nav.settingsUserDetail',
   settingsRoleDetail: 'nav.settingsRoleDetail',
@@ -113,6 +114,7 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsEventHistory: 'Document',
   settingsServiceAccount: 'Key',
   settingsMcpServer: 'Connection',
+  settingsMcpAudit: 'Document',
   settingsAbout: 'InfoFilled',
   settingsUserDetail: 'User',
   settingsRoleDetail: 'UserFilled',
@@ -177,6 +179,7 @@ export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
   { name: 'settingsLabel', titleKey: 'nav.settingsLabel', icon: 'CollectionTag' },
   { name: 'settingsServiceAccount', titleKey: 'nav.settingsServiceAccount', icon: 'Key' },
   { name: 'settingsMcpServer', titleKey: 'nav.settingsMcpServer', icon: 'Connection' },
+  { name: 'settingsMcpAudit', titleKey: 'nav.settingsMcpAudit', icon: 'Document' },
   { name: 'settingsAbout', titleKey: 'nav.settingsAbout', icon: 'InfoFilled' },
 ];
 

@@ -305,3 +305,28 @@ export interface McpToolRecord {
   remark?: string;
   [key: string]: unknown;
 }
+
+export interface McpAuditRecord {
+  id: string;
+  traceId?: string;
+  tenantId?: string;
+  principalId?: string;
+  principalType?: string;
+  clientId?: string;
+  connectionId?: string;
+  toolId?: string;
+  toolName?: string;
+  permissionCode?: string;
+  riskLevel?: 'LOW' | 'MEDIUM' | 'HIGH' | string;
+  confirmId?: string;
+  idempotencyKey?: string;
+  argumentDigest?: string;
+  status?: string;
+  errorCode?: string;
+  durationMs?: number;
+  clientName?: string;
+  clientVersion?: string;
+  remoteIp?: string;
+  createTime?: string;
+  [key: string]: unknown;
+}

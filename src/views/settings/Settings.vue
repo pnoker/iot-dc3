@@ -203,6 +203,10 @@
       'settingsAbout',
     ]);
     ensureDirectItem(items, { name: 'settingsMcpServer', title: t('nav.settingsMcpServer'), icon: 'Connection' }, [
+      'settingsMcpAudit',
+      'settingsAbout',
+    ]);
+    ensureDirectItem(items, { name: 'settingsMcpAudit', title: t('nav.settingsMcpAudit'), icon: 'Document' }, [
       'settingsAbout',
     ]);
     ensureDirectItem(items, { name: 'settingsAbout', title: t('nav.settingsAbout'), icon: 'InfoFilled' }, []);

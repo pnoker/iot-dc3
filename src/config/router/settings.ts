@@ -228,6 +228,12 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/mcp/McpServer.vue'),
         },
         {
+          name: 'settingsMcpAudit',
+          path: 'mcp_audit',
+          meta: { title: 'MCP Audit' },
+          component: () => import('@/views/settings/mcpAudit/McpAudit.vue'),
+        },
+        {
           name: 'settingsAbout',
           path: 'about',
           meta: { title: 'About' },

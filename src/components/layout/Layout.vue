@@ -207,6 +207,7 @@
     settingsEventHistory: 'nav.settingsEventHistory',
     settingsServiceAccount: 'nav.settingsServiceAccount',
     settingsMcpServer: 'nav.settingsMcpServer',
+    settingsMcpAudit: 'nav.settingsMcpAudit',
   };
 
   // Static icon fallback for route names the backend menu tree does not yet
@@ -274,6 +275,7 @@
     settingsEventHistory: 'Document',
     settingsServiceAccount: 'Key',
     settingsMcpServer: 'Connection',
+    settingsMcpAudit: 'Document',
   };
 
   const iconForCode = (code: string): string | undefined => {

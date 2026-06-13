@@ -17,6 +17,7 @@
 import { httpGet, httpPost } from '@/api/common';
 import { API_MCP_BASE } from '@/config/constant/api';
 import type {
+  McpAuditRecord,
   McpClientRegistrationForm,
   McpConnectionForm,
   McpConnectionRecord,
@@ -52,3 +53,13 @@ export const refreshMcpToolCatalog = () => httpPost<R<number>>(`${API_MCP_BASE}/
 
 export const listMcpTool = (query: { keyword?: string; risk_level?: string; limit?: number } = {}) =>
   httpPost<R<McpToolRecord[]>>(`${API_MCP_BASE}/tool/list`, query);
+
+export const listMcpAudit = (
+  params: {
+    principalId?: string;
+    toolId?: string;
+    status?: string;
+    riskLevel?: string;
+    limit?: number;
+  } = {}
+) => httpPost<R<McpAuditRecord[]>>(`${API_MCP_BASE}/audit/list`, undefined, { params });
