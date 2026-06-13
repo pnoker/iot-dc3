@@ -17,7 +17,10 @@
 
 package io.github.pnoker.common.auth.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
 import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
+import io.github.pnoker.common.auth.entity.query.TenantMembershipQuery;
 import io.github.pnoker.common.exception.NotFoundException;
 
 import java.util.List;
@@ -39,6 +42,10 @@ public interface TenantMembershipService {
     TenantMembershipDO getByTenantIdAndPrincipalId(Long tenantId, Long principalId);
 
     List<Long> listPrincipalIdsByTenantId(Long tenantId);
+
+    Page<TenantMembershipBO> list(TenantMembershipQuery entityQuery);
+
+    TenantMembershipBO getById(Long id);
 
     default boolean isTenantMember(Long tenantId, Long principalId) {
         return Objects.nonNull(getByTenantIdAndPrincipalId(tenantId, principalId));

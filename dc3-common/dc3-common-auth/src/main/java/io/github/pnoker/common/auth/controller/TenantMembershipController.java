@@ -1,0 +1,114 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package io.github.pnoker.common.auth.controller;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
+import io.github.pnoker.common.auth.entity.builder.TenantMembershipBuilder;
+import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
+import io.github.pnoker.common.auth.entity.query.TenantMembershipQuery;
+import io.github.pnoker.common.auth.entity.vo.TenantMembershipVO;
+import io.github.pnoker.common.auth.service.TenantMembershipService;
+import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.service.AuthConstant;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.enums.MembershipStatusEnum;
+import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
+
+import java.util.Objects;
+
+/**
+ * REST controller exposing tenant membership management endpoints. Tenant-scoped: list and add are
+ * always pinned to the caller's tenant, and delete verifies ownership before removing.
+ *
+ * @author pnoker
+ * @version 2026.6.13
+ * @since 2026.6.13
+ */
+@Tag(name = "tenant_membership", description = "Tenant memberships")
+@Slf4j
+@RestController
+@RequestMapping(AuthConstant.TENANT_MEMBERSHIP_URL_PREFIX)
+@RequiredArgsConstructor
+public class TenantMembershipController implements BaseController {
+
+    private final TenantMembershipBuilder tenantMembershipBuilder;
+
+    private final TenantMembershipService tenantMembershipService;
+
+    @PreAuthorize("@perm.can('tenant_membership', 'list')")
+    @Operation(summary = "List Tenant Memberships", description = "List memberships for the caller's tenant")
+    @PostMapping("/list")
+    public Mono<R<Page<TenantMembershipVO>>> list(@RequestBody(required = false) TenantMembershipQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            TenantMembershipQuery query = Objects.isNull(entityQuery) ? new TenantMembershipQuery() : entityQuery;
+            query.setTenantId(tenantId);
+            return R.ok(tenantMembershipBuilder.buildVOPageByBOPage(tenantMembershipService.list(query)));
+        }));
+    }
+
+    @PreAuthorize("@perm.can('tenant_membership', 'add')")
+    @Operation(summary = "Add Tenant Membership", description = "Add a principal to the caller's tenant")
+    @PostMapping("/add")
+    public Mono<R<String>> add(@RequestBody TenantMembershipVO entityVO) {
+        return getPrincipalHeader().flatMap(header -> async(() -> {
+            TenantMembershipBO entityBO = tenantMembershipBuilder.buildBOByVO(entityVO);
+            // Pin to the caller's tenant — the body tenant id is ignored.
+            entityBO.setTenantId(header.getTenantId());
+            if (Objects.isNull(entityBO.getMembershipStatus())) {
+                entityBO.setMembershipStatus(MembershipStatusEnum.ACTIVE);
+            }
+            TenantMembershipDO membershipDO = tenantMembershipBuilder.buildDOByBO(entityBO);
+            membershipDO.setCreatorId(header.getUserId());
+            membershipDO.setCreatorName(header.getNickName());
+            membershipDO.setOperatorId(header.getUserId());
+            membershipDO.setOperatorName(header.getNickName());
+            tenantMembershipService.add(membershipDO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
+        }));
+    }
+
+    @PreAuthorize("@perm.can('tenant_membership', 'delete')")
+    @Operation(summary = "Delete Tenant Membership", description = "Remove a principal from a tenant")
+    @PostMapping("/delete")
+    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().flatMap(tenantId -> async(() -> {
+            // Verify the membership belongs to the caller's tenant before deleting.
+            TenantMembershipBO current = tenantMembershipService.getById(id);
+            if (!Objects.equals(current.getTenantId(), tenantId)) {
+                throw new NotFoundException("Tenant membership does not exist");
+            }
+            tenantMembershipService.delete(id);
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
+        }));
+    }
+}

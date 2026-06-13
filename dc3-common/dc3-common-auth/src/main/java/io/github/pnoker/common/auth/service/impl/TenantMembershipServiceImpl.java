@@ -19,13 +19,19 @@ package io.github.pnoker.common.auth.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.dal.TenantMembershipManager;
+import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
+import io.github.pnoker.common.auth.entity.builder.TenantMembershipBuilder;
 import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
+import io.github.pnoker.common.auth.entity.query.TenantMembershipQuery;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -45,6 +51,8 @@ import java.util.Objects;
 public class TenantMembershipServiceImpl implements TenantMembershipService {
 
     private final TenantMembershipManager tenantMembershipManager;
+
+    private final TenantMembershipBuilder tenantMembershipBuilder;
 
     @Override
     public void add(TenantMembershipDO membership) {
@@ -90,6 +98,39 @@ public class TenantMembershipServiceImpl implements TenantMembershipService {
             return List.of();
         }
         return principalIds;
+    }
+
+    @Override
+    public TenantMembershipBO getById(Long id) {
+        TenantMembershipDO entityDO = tenantMembershipManager.getById(id);
+        if (Objects.isNull(entityDO)) {
+            throw new NotFoundException("Tenant membership does not exist");
+        }
+        return tenantMembershipBuilder.buildBOByDO(entityDO);
+    }
+
+    @Override
+    public Page<TenantMembershipBO> list(TenantMembershipQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<TenantMembershipDO> page = tenantMembershipManager.page(PageUtil.page(entityQuery.getPage()),
+                fuzzyQuery(entityQuery));
+        return tenantMembershipBuilder.buildBOPageByDOPage(page);
+    }
+
+    private LambdaQueryWrapper<TenantMembershipDO> fuzzyQuery(TenantMembershipQuery entityQuery) {
+        LambdaQueryWrapper<TenantMembershipDO> wrapper = Wrappers.<TenantMembershipDO>query().lambda();
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), TenantMembershipDO::getTenantId,
+                entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getPrincipalId()), TenantMembershipDO::getPrincipalId,
+                entityQuery.getPrincipalId());
+        wrapper.eq(Objects.nonNull(entityQuery.getPrincipalType()), TenantMembershipDO::getPrincipalType,
+                Objects.isNull(entityQuery.getPrincipalType()) ? null : entityQuery.getPrincipalType().getValue());
+        wrapper.eq(Objects.nonNull(entityQuery.getMembershipStatus()), TenantMembershipDO::getMembershipStatus,
+                Objects.isNull(entityQuery.getMembershipStatus()) ? null
+                        : entityQuery.getMembershipStatus().getValue());
+        return wrapper;
     }
 
 }
