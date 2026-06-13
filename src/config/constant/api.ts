@@ -30,6 +30,7 @@ export const API_SERVICE_ACCOUNT_BASE = 'api/v3/auth/service_account';
 export const API_PRINCIPAL_BASE = 'api/v3/auth/principal';
 export const API_TENANT_MEMBERSHIP_BASE = 'api/v3/auth/tenant_membership';
 export const API_LOCAL_CREDENTIAL_BASE = 'api/v3/auth/local_credential';
+export const API_IDENTITY_AUDIT_BASE = 'api/v3/auth/identity_audit';
 export const API_AGENTIC_BASE = 'api/v3/agentic';
 export const API_DATA_BASE = 'api/v3/data';
 export const API_MANAGER_BASE = 'api/v3/manager';

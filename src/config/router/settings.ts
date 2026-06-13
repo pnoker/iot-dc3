@@ -52,6 +52,12 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/localCredential/LocalCredential.vue'),
         },
         {
+          name: 'settingsIdentityAudit',
+          path: 'identity_audit',
+          meta: { title: 'Identity Audit' },
+          component: () => import('@/views/settings/identityAudit/IdentityAudit.vue'),
+        },
+        {
           name: 'settingsRole',
           path: 'role',
           meta: { title: 'Roles' },

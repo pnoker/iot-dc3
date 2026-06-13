@@ -87,6 +87,7 @@ export type {
   McpConnectionRecord,
   McpToolRecord,
   McpAuditRecord,
+  IdentityAuditRecord,
 } from './auth';
 
 export type {

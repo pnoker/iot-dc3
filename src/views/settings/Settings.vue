@@ -188,6 +188,18 @@
     ensureDirectItem(
       items,
       { name: 'settingsLocalCredential', title: t('nav.settingsLocalCredential'), icon: 'Lock' },
+      [
+        'settingsIdentityAudit',
+        'settingsRole',
+        'settingsRolePrincipalBind',
+        'settingsResource',
+        'settingsApi',
+        'settingsAbout',
+      ]
+    );
+    ensureDirectItem(
+      items,
+      { name: 'settingsIdentityAudit', title: t('nav.settingsIdentityAudit'), icon: 'DocumentChecked' },
       ['settingsRole', 'settingsRolePrincipalBind', 'settingsResource', 'settingsApi', 'settingsAbout']
     );
     ensureDirectItem(

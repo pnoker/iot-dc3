@@ -330,3 +330,18 @@ export interface McpAuditRecord {
   createTime?: string;
   [key: string]: unknown;
 }
+
+export interface IdentityAuditRecord {
+  id: string;
+  tenantId?: string;
+  principalId?: string;
+  principalType?: string;
+  action?: string;
+  resourceType?: string;
+  resourceId?: string;
+  resourceName?: string;
+  status?: string;
+  errorCode?: string;
+  createTime?: string;
+  [key: string]: unknown;
+}
