@@ -18,6 +18,7 @@
 package io.github.pnoker.common.auth.controller;
 
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
+import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
@@ -150,6 +151,21 @@ public class McpManagementController implements BaseController {
                 StringUtils.defaultString(body.getRiskLevel()),
                 intValue(body.getLimit())
         )));
+    }
+
+    @PreAuthorize("@perm.can('mcp', 'list')")
+    @Operation(summary = "List MCP Audit Log", description = "List MCP tool call audit entries for the caller's tenant")
+    @PostMapping("/audit/list")
+    public Mono<R<List<McpAuditCommand>>> listAuditLog(
+            @RequestParam(value = "principalId", required = false) Long principalId,
+            @RequestParam(value = "toolId", required = false) String toolId,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "riskLevel", required = false) String riskLevel,
+            @RequestParam(value = "limit", required = false) Integer limit) {
+        return getTenantId().flatMap(tenantId -> async(() -> R.ok(oauthMcpRuntimeService.listAudit(
+                tenantId, principalId, StringUtils.defaultString(toolId), StringUtils.defaultString(status),
+                StringUtils.defaultString(riskLevel), intValue(limit)
+        ))));
     }
 
     private List<String> toolIds(List<String> value) {

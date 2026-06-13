@@ -451,6 +451,14 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     @Override
+    public List<McpAuditCommand> listAudit(Long tenantId, Long principalId, String toolId, String status,
+                                           String riskLevel, int limit) {
+        int boundedLimit = Math.max(1, Math.min(limit <= 0 ? 200 : limit, 500));
+        return oauthMcpMapper.listAudit(tenantId, principalId, StringUtils.trimToEmpty(toolId),
+                StringUtils.trimToEmpty(status), StringUtils.trimToEmpty(riskLevel), boundedLimit);
+    }
+
+    @Override
     public List<McpConnectionRecord> listConnections(RequestHeader.PrincipalHeader principalHeader) {
         requireAuthenticatedPrincipal(principalHeader);
         return oauthMcpMapper.listConnectionsByPrincipal(principalHeader.getTenantId(),

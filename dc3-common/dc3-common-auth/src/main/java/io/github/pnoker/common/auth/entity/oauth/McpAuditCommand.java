@@ -21,6 +21,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 /**
  * MCP audit insert command.
  *
@@ -72,5 +74,8 @@ public class McpAuditCommand {
     private String clientVersion;
 
     private String remoteIp;
+
+    /** Populated on read-back from dc3_mcp_audit_log.create_time (unused on insert). */
+    private LocalDateTime createTime;
 
 }

@@ -536,4 +536,21 @@
                 #{remoteIp}, '{}'::JSON)
     </insert>
 
+    <select id="listAudit"
+            resultType="io.github.pnoker.common.auth.entity.oauth.McpAuditCommand">
+        SELECT id, trace_id, tenant_id, principal_id, principal_type, client_id, connection_id,
+               tool_id, tool_name, permission_code, risk_level, confirm_id, idempotency_key,
+               argument_digest, status, error_code, duration_ms, client_name, client_version,
+               remote_ip, create_time
+        FROM dc3_mcp_audit_log
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND (#{principalId} IS NULL OR #{principalId} = 0 OR principal_id = #{principalId})
+          AND (#{toolId} IS NULL OR #{toolId} = '' OR tool_id = #{toolId})
+          AND (#{status} IS NULL OR #{status} = '' OR status = #{status})
+          AND (#{riskLevel} IS NULL OR #{riskLevel} = '' OR risk_level = #{riskLevel})
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+
 </mapper>

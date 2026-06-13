@@ -94,6 +94,13 @@ public interface OAuthMcpMapper {
                                         @Param("riskLevel") String riskLevel,
                                         @Param("limit") int limit);
 
+    List<McpAuditCommand> listAudit(@Param("tenantId") Long tenantId,
+                                    @Param("principalId") Long principalId,
+                                    @Param("toolId") String toolId,
+                                    @Param("status") String status,
+                                    @Param("riskLevel") String riskLevel,
+                                    @Param("limit") int limit);
+
     int insertTool(McpToolRecord tool);
 
     int updateTool(McpToolRecord tool);

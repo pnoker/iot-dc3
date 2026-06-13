@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.biz;
 
+import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
@@ -82,5 +83,8 @@ public interface OAuthMcpRuntimeService {
                                                  Set<String> scopes);
 
     void audit(McpAuditCommandDTO command);
+
+    List<McpAuditCommand> listAudit(Long tenantId, Long principalId, String toolId, String status,
+                                    String riskLevel, int limit);
 
 }
