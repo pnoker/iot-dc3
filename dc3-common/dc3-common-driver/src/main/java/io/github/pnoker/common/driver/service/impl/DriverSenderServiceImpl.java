@@ -32,6 +32,7 @@ import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
@@ -61,6 +62,16 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     private final DriverMetadata driverMetadata;
 
     private final RabbitTemplate rabbitTemplate;
+
+    @PostConstruct
+    void init() {
+        rabbitTemplate.setConfirmCallback((correlation, ack, reason) -> {
+            if (!ack && correlation instanceof PointValueCorrelation ctx) {
+                log.warn("Point value publish NACKed: deviceId={}, pointId={}, reason={}",
+                        ctx.deviceId, ctx.pointId, reason);
+            }
+        });
+    }
 
     @Override
     public void driverStateSender(DriverStateDTO entityDTO) {
@@ -155,16 +166,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
 
         String routingKey = RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService();
-        CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
-        correlationData.getFuture().whenComplete((confirm, throwable) -> {
-            if (throwable != null) {
-                log.error("Point value publish failed (exception): deviceId={}, pointId={}",
-                        entityDTO.getDeviceId(), entityDTO.getPointId(), throwable);
-            } else if (confirm != null && !confirm.isAck()) {
-                log.warn("Point value publish NACKed: deviceId={}, pointId={}, reason={}",
-                        entityDTO.getDeviceId(), entityDTO.getPointId(), confirm.getReason());
-            }
-        });
+        CorrelationData correlationData = new PointValueCorrelation(
+                UUID.randomUUID().toString(), entityDTO.getDeviceId(), entityDTO.getPointId());
         try {
             rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE, routingKey, entityDTO, correlationData);
         } catch (AmqpException e) {
@@ -223,6 +226,21 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
         log.info("Report device state: {}, deviceId={}", status.getCode(), deviceId);
         deviceStateSender(deviceState);
+    }
+
+    /**
+     * Carries device/point context through the publisher-confirm callback.
+     */
+    private static class PointValueCorrelation extends CorrelationData {
+
+        final Long deviceId;
+        final Long pointId;
+
+        PointValueCorrelation(String id, Long deviceId, Long pointId) {
+            super(id);
+            this.deviceId = deviceId;
+            this.pointId = pointId;
+        }
     }
 
 }
