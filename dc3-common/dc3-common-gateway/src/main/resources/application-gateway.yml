@@ -53,18 +53,26 @@ spring:
               filters:
                 - PrefixPath=/auth
                 - Authentic
-            # Token route for authentication (no authentication required)
+            # Token route for authentication (no authentication required).
+            # IMPORTANT: This route MUST stay defined BEFORE auth_route. The gateway
+            # matches routes in definition order (first match wins), so the public
+            # /api/v3/auth/token/** path is carved out of the /api/v3/auth/** wildcard
+            # below purely by ordering — do not move this route after auth_route or the
+            # login endpoint will silently require authentication.
             - id: auth_route_token
               uri: ${GATEWAY_ROUTE_AUTH_TOKEN_URI:http://${CENTER_AUTH_HOST:dc3-center-auth}:8300/}
               predicates:
                 - Path=/api/v3/auth/token/**
               filters:
                 - StripPrefix=2
-            # Auth route for identity, tenant, RBAC, and dictionary operations (requires authentication)
+            # Auth route for the full authenticated auth-center surface: identity, tenant,
+            # RBAC, dictionary, OAuth/MCP management, etc. The public /token path above is
+            # excluded only by route ordering; every other auth endpoint requires the
+            # Authentic filter.
             - id: auth_route
               uri: ${GATEWAY_ROUTE_AUTH_URI:http://${CENTER_AUTH_HOST:dc3-center-auth}:8300}
               predicates:
-                - Path=/api/v3/auth/user/**,/api/v3/auth/user_profile/**,/api/v3/auth/local_credential/**,/api/v3/auth/service_account/**,/api/v3/auth/role/**,/api/v3/auth/resource/**,/api/v3/auth/role_principal/**,/api/v3/auth/role_resource/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**,/api/v3/auth/api/**,/api/v3/auth/menu/**
+                - Path=/api/v3/auth/**
               filters:
                 - StripPrefix=2
                 - Authentic

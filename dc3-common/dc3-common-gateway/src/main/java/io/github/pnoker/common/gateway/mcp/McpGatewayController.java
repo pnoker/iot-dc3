@@ -194,7 +194,8 @@ public class McpGatewayController {
         private final HmacAuthSigner hmacAuthSigner;
         private final McpRuntimeFacade mcpRuntimeFacade;
         private final McpGatewayProperties mcpGatewayProperties;
-        private final WebClient.Builder webClientBuilder;
+
+        private final WebClient.Builder webClientBuilder = WebClient.builder();
 
         Mono<McpIntrospectResponseDTO> introspect(String token) {
             return blocking(() -> mcpRuntimeFacade.introspect(token));
