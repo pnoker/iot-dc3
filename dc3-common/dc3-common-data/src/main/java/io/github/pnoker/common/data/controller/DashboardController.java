@@ -216,9 +216,9 @@ public class DashboardController implements BaseController {
     @Operation(summary = "Bulk Confirm Alerts", description = "Apply confirm or unconfirm to a list of alerts (each {source, id}) for the current tenant in one call. Returns the count of rows actually changed.")
     @PostMapping("/alert/bulk_confirm")
     public Mono<R<Integer>> alertBulkConfirm(
-            @RequestBody AlertBulkConfirmRequest body) {
+            @RequestBody AlertBulkConfirmVO body) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            List<AlertBulkConfirmRequest.Item> items = Objects.isNull(body) || Objects.isNull(body.getItems())
+            List<AlertBulkConfirmVO.Item> items = Objects.isNull(body) || Objects.isNull(body.getItems())
                     ? Collections.emptyList()
                     : body.getItems();
             boolean confirm = Objects.isNull(body) || Objects.isNull(body.getConfirm()) || body.getConfirm();

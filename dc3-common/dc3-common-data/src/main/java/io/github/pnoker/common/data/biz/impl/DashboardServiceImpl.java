@@ -189,11 +189,11 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public int bulkConfirmAlert(Long tenantId, List<AlertBulkConfirmRequest.Item> items, boolean confirm) {
+    public int bulkConfirmAlert(Long tenantId, List<AlertBulkConfirmVO.Item> items, boolean confirm) {
         if (Objects.isNull(items) || items.isEmpty())
             return 0;
         int changed = 0;
-        for (AlertBulkConfirmRequest.Item item : items) {
+        for (AlertBulkConfirmVO.Item item : items) {
             if (Objects.isNull(item) || Objects.isNull(item.getSource()) || Objects.isNull(item.getId()))
                 continue;
             String source = item.getSource();

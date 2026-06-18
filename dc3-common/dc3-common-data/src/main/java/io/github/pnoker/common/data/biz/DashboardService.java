@@ -125,7 +125,7 @@ public interface DashboardService {
      * false = set to 0). Returns the number of rows actually changed across all entries.
      */
     int bulkConfirmAlert(Long tenantId,
-                         java.util.List<io.github.pnoker.common.data.entity.vo.dashboard.AlertBulkConfirmRequest.Item> items,
+                         java.util.List<io.github.pnoker.common.data.entity.vo.dashboard.AlertBulkConfirmVO.Item> items,
                          boolean confirm);
 
     /**

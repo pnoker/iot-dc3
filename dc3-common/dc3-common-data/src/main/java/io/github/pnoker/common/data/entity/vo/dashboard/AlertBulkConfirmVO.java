@@ -41,7 +41,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Bulk confirm/unconfirm request for the dashboard alert panel")
-public class AlertBulkConfirmRequest implements Serializable {
+public class AlertBulkConfirmVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
