@@ -29,6 +29,47 @@ const loadGroupRecords = async (): Promise<GroupRecord[]> => {
   return (res.data?.records || []) as GroupRecord[];
 };
 
+/** Build a sorted tree from flat GroupRecord rows. */
+const buildTree = (rows: GroupRecord[]): GroupRecord[] => {
+  const byId = new Map<string, GroupRecord & { children: GroupRecord[] }>();
+  rows.forEach((row) => byId.set(String(row.id), { ...row, children: [] }));
+  const roots: (GroupRecord & { children: GroupRecord[] })[] = [];
+  byId.forEach((node) => {
+    const parentId = node.parentGroupId ? String(node.parentGroupId) : '';
+    const parent = parentId ? byId.get(parentId) : undefined;
+    if (parent) {
+      parent.children = parent.children || [];
+      parent.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  });
+  const sort = (nodes: GroupRecord[]) => {
+    nodes.sort((a, b) => Number(a.groupIndex ?? 0) - Number(b.groupIndex ?? 0));
+    nodes.forEach((node) => sort((node.children as GroupRecord[]) || []));
+  };
+  sort(roots);
+  return roots;
+};
+
+/** Compute set of IDs to exclude: current node + all its descendants (anti-cycle). */
+const computeExcluded = (rows: GroupRecord[], currentId: string): Set<string> => {
+  const ids = new Set<string>();
+  if (!currentId) return ids;
+  const childrenByParent = new Map<string, GroupRecord[]>();
+  rows.forEach((row) => {
+    const parentId = row.parentGroupId ? String(row.parentGroupId) : '';
+    if (!childrenByParent.has(parentId)) childrenByParent.set(parentId, []);
+    childrenByParent.get(parentId)!.push(row);
+  });
+  const visit = (id: string) => {
+    ids.add(id);
+    (childrenByParent.get(id) || []).forEach((c) => visit(String(c.id)));
+  };
+  visit(currentId);
+  return ids;
+};
+
 export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => ({
   name: 'group',
   editable: true,
@@ -83,8 +124,16 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
       kind: 'treeSelect',
       tree: {
         load: loadGroupRecords,
-        props: { label: 'groupName', value: 'id', children: 'children' },
+        props: { label: 'groupName', children: 'children' },
+        nodeKey: 'id',
         checkStrictly: true,
+        transform: (rows: GroupRecord[], form: Record<string, any>) => {
+          const excluded = computeExcluded(rows, String(form.id || ''));
+          const filtered = rows.filter(
+            (row) => row.groupTypeFlag === form.groupTypeFlag && !excluded.has(String(row.id))
+          );
+          return [{ id: 0, groupName: t('settings.group.rootGroup'), children: buildTree(filtered) }];
+        },
       },
     },
     {

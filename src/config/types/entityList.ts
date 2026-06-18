@@ -39,6 +39,10 @@ export interface EntityTreeSource {
   load: () => Promise<unknown[]>;
   props?: { label?: string; value?: string; children?: string };
   checkStrictly?: boolean;
+  /** Synchronous reactive filter/shaping using the live form model. Called on every render. */
+  transform?: (rows: any[], form: Record<string, any>) => unknown[];
+  /** el-tree-select node-key (default 'id') */
+  nodeKey?: string;
 }
 
 export interface EntityFieldConfig {

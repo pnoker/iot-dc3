@@ -216,7 +216,8 @@
               <el-tree-select
                 v-else-if="field.kind === 'treeSelect'"
                 v-model="formModel[field.prop]"
-                :data="treeData[field.prop]"
+                :data="treeOptionsFor(field)"
+                :node-key="field.tree?.nodeKey || 'id'"
                 :props="field.tree?.props"
                 :check-strictly="field.tree?.checkStrictly"
                 :disabled="editing && field.disabledOnEdit"
@@ -290,8 +291,8 @@
     canDelete,
   } = useEntityListPage(props.config);
 
-  // treeSelect data loaded on dialog open
-  const treeData = reactive<Record<string, any[]>>({});
+  // treeSelect: raw rows loaded once on dialog open; transform applied reactively via treeOptionsFor
+  const rawTreeData = reactive<Record<string, any[]>>({});
   let treeLoadGen = 0;
 
   watch(formVisible, async (visible) => {
@@ -301,11 +302,20 @@
       if (field.kind === 'treeSelect' && field.tree) {
         const result = await field.tree.load();
         if (myGen === treeLoadGen) {
-          treeData[field.prop] = result;
+          rawTreeData[field.prop] = result as any[];
         }
       }
     }
   });
+
+  /** Returns tree options for a treeSelect field, applying transform with the live form model. */
+  const treeOptionsFor = (field: {
+    prop: string;
+    tree?: { transform?: (rows: any[], form: Record<string, any>) => unknown[] };
+  }) => {
+    const raw = rawTreeData[field.prop] || [];
+    return field.tree?.transform ? field.tree.transform(raw, formModel) : raw;
+  };
 
   // Get a nested value by dot-path without going through formatCell
   const getCellValue = (row: Record<string, any>, prop: string): any =>
