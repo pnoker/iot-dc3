@@ -354,6 +354,11 @@ Keep persistence, business, and web representations deliberately separated.
   (`EnumValue.getIndex()` for `BO -> DO`, `Enum.ofIndex(...)` for `DO -> BO`) instead of scattering it through services.
 - Controllers should translate web input/output (`VO`, request DTOs, path variables) to and from `BO`; services should
   expose and accept `BO` rather than `VO` for persistent business entities.
+- Read-only projection/aggregation responses (dashboard statistics, health snapshots, topic listings, model-option
+  lists, history query results, etc.) may be returned directly as `VO` from read-only query services without a parallel
+  `BO` — these carry no business behaviour and forcing a duplicate `BO` is over-modeling. The "services expose `BO`"
+  rule applies to persistent business entities and to write-path business inputs (command submission, event reports),
+  which must accept a `BO`; the controller (or transport adapter) converts the inbound `VO`/request into that `BO`.
 - MyBatis-Plus query conditions may use enum values directly when the enum field has `@EnumValue`, for example
   `.eq(EntityDO::getEnableFlag, EnableFlagEnum.ENABLE)`. Plain Java comparisons against `Byte` fields must compare
   with the enum index, preferably centralized in a builder or helper.
