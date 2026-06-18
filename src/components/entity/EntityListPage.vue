@@ -1,0 +1,443 @@
+<!--
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -      https://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
+<template>
+  <div class="entity-list-page">
+    <tool-card
+      :form-model="searchForm"
+      :hide-sort="config.mode === 'tree'"
+      :hide-pagination="config.mode === 'tree'"
+      :page="config.mode === 'tree' ? { total: 0, size: 0, current: 1 } : state.page"
+      @refresh="load"
+      @reset="reset"
+      @search="search"
+      @sort="sort"
+      @size-change="sizeChange"
+      @current-change="currentChange"
+    >
+      <template #filters="{ search: doSearch }">
+        <el-form-item v-for="field in config.searchFields" :key="field.prop" :label="field.label" :prop="field.prop">
+          <enable-flag-segmented
+            v-if="field.kind === 'enableFlag'"
+            v-model="searchForm[field.prop]"
+            :include-all="field.includeAll"
+          />
+          <el-select
+            v-else-if="field.kind === 'select'"
+            v-model="searchForm[field.prop]"
+            :multiple="field.multiple"
+            :placeholder="field.placeholder"
+            collapse-tags
+            clearable
+            filterable
+          >
+            <el-option
+              v-for="option in field.options || []"
+              :key="option.value"
+              :label="option.label"
+              :value="option.value"
+            />
+          </el-select>
+          <el-input
+            v-else
+            v-model="searchForm[field.prop]"
+            :placeholder="field.placeholder"
+            clearable
+            @keyup.enter="doSearch"
+          />
+        </el-form-item>
+      </template>
+      <template #actions>
+        <el-button v-if="config.editable" :icon="Plus" type="success" @click="openAdd">
+          {{ t('common.add') }}
+        </el-button>
+      </template>
+    </tool-card>
+
+    <blank-card>
+      <!-- Tree mode -->
+      <el-table
+        v-if="config.mode === 'tree'"
+        v-loading="state.loading"
+        :data="state.rows"
+        :row-key="config.rowKey || 'id'"
+        :default-expand-all="config.defaultExpandAll"
+        class="entity-list-page__table"
+        stripe
+      >
+        <el-table-column
+          v-for="column in config.columns"
+          :key="column.prop"
+          :fixed="column.fixed"
+          :label="column.label"
+          :min-width="column.minWidth"
+          :width="column.width"
+          :show-overflow-tooltip="column.overflow !== false"
+        >
+          <template #default="{ row }">
+            <enable-tag v-if="column.kind === 'enable'" :value="getCellValue(row, column.prop)" />
+            <span v-else-if="column.kind === 'color'" class="entity-list-page__color-cell">
+              <span
+                class="entity-list-page__swatch"
+                :style="{ background: getCellValue(row, column.prop) || '#F4F4F5' }"
+              />
+              {{ formatCell(row, column) }}
+            </span>
+            <span v-else-if="column.kind === 'icon'" class="entity-list-page__icon-cell">
+              <el-icon v-if="resolveIcon(getCellValue(row, column.prop))">
+                <component :is="resolveIcon(getCellValue(row, column.prop))" />
+              </el-icon>
+              {{ getCellValue(row, column.prop) }}
+            </span>
+            <el-tag v-else-if="column.kind === 'tag'" :type="tagType(getCellValue(row, column.prop))">
+              {{ formatCell(row, column) }}
+            </el-tag>
+            <code v-else-if="column.kind === 'code'" class="entity-list-page__inline-code">
+              {{ formatCell(row, column) }}
+            </code>
+            <span v-else>{{ formatCell(row, column) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('common.operation')" :width="operationWidth" fixed="right">
+          <template #default="{ row }">
+            <el-button v-if="config.detail" link type="primary" @click="openDetail(row)">
+              {{ t('common.detail') }}
+            </el-button>
+            <template v-if="config.extraActions">
+              <el-button
+                v-for="action in config.extraActions"
+                :key="action.key"
+                link
+                :type="action.type || 'primary'"
+                @click="action.onClick(row)"
+              >
+                {{ action.label }}
+              </el-button>
+            </template>
+            <el-button v-if="config.editable && canEdit(row)" link type="primary" @click="openEdit(row)">
+              {{ t('common.edit') }}
+            </el-button>
+            <el-popconfirm
+              v-if="config.editable && canDelete(row)"
+              :cancel-button-text="t('common.cancel')"
+              :confirm-button-text="t('common.confirm')"
+              :title="config.confirmDeleteText || t('common.confirmDelete')"
+              @confirm="remove(row.id)"
+            >
+              <template #reference>
+                <el-button link type="danger">{{ t('common.delete') }}</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+        <template #empty>
+          <el-empty :description="config.emptyText || t('common.empty')" />
+        </template>
+      </el-table>
+
+      <!-- Page mode -->
+      <el-table v-else v-loading="state.loading" :data="state.rows" class="entity-list-page__table" stripe>
+        <el-table-column
+          v-for="column in config.columns"
+          :key="column.prop"
+          :fixed="column.fixed"
+          :label="column.label"
+          :min-width="column.minWidth"
+          :width="column.width"
+          :show-overflow-tooltip="column.overflow !== false"
+        >
+          <template #default="{ row }">
+            <enable-tag v-if="column.kind === 'enable'" :value="getCellValue(row, column.prop)" />
+            <span v-else-if="column.kind === 'color'" class="entity-list-page__color-cell">
+              <span
+                class="entity-list-page__swatch"
+                :style="{ background: getCellValue(row, column.prop) || '#F4F4F5' }"
+              />
+              {{ formatCell(row, column) }}
+            </span>
+            <span v-else-if="column.kind === 'icon'" class="entity-list-page__icon-cell">
+              <el-icon v-if="resolveIcon(getCellValue(row, column.prop))">
+                <component :is="resolveIcon(getCellValue(row, column.prop))" />
+              </el-icon>
+              {{ getCellValue(row, column.prop) }}
+            </span>
+            <el-tag v-else-if="column.kind === 'tag'" :type="tagType(getCellValue(row, column.prop))">
+              {{ formatCell(row, column) }}
+            </el-tag>
+            <code v-else-if="column.kind === 'code'" class="entity-list-page__inline-code">
+              {{ formatCell(row, column) }}
+            </code>
+            <span v-else>{{ formatCell(row, column) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('common.operation')" :width="operationWidth" fixed="right">
+          <template #default="{ row }">
+            <el-button v-if="config.detail" link type="primary" @click="openDetail(row)">
+              {{ t('common.detail') }}
+            </el-button>
+            <template v-if="config.extraActions">
+              <el-button
+                v-for="action in config.extraActions"
+                :key="action.key"
+                link
+                :type="action.type || 'primary'"
+                @click="action.onClick(row)"
+              >
+                {{ action.label }}
+              </el-button>
+            </template>
+            <el-button v-if="config.editable && canEdit(row)" link type="primary" @click="openEdit(row)">
+              {{ t('common.edit') }}
+            </el-button>
+            <el-popconfirm
+              v-if="config.editable && canDelete(row)"
+              :cancel-button-text="t('common.cancel')"
+              :confirm-button-text="t('common.confirm')"
+              :title="config.confirmDeleteText || t('common.confirmDelete')"
+              @confirm="remove(row.id)"
+            >
+              <template #reference>
+                <el-button link type="danger">{{ t('common.delete') }}</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+        <template #empty>
+          <el-empty :description="config.emptyText || t('common.empty')" />
+        </template>
+      </el-table>
+    </blank-card>
+
+    <el-dialog
+      v-model="formVisible"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      :title="dialogTitle"
+      :width="config.dialogWidth || '720px'"
+      class="things-dialog things-dialog--wide"
+      destroy-on-close
+      draggable
+    >
+      <el-form
+        :ref="setFormRef"
+        :model="formModel"
+        :rules="formRules"
+        class="entity-list-page__form"
+        label-position="top"
+      >
+        <el-row :gutter="12">
+          <el-col v-for="field in config.fields" :key="field.prop" :span="field.span || 12">
+            <el-form-item :label="field.label" :prop="field.prop">
+              <el-select
+                v-if="field.kind === 'select'"
+                v-model="formModel[field.prop]"
+                :placeholder="field.placeholder"
+                :disabled="editing && field.disabledOnEdit"
+                clearable
+                filterable
+              >
+                <el-option
+                  v-for="option in field.options || []"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
+                />
+              </el-select>
+              <el-input-number
+                v-else-if="field.kind === 'number'"
+                v-model="formModel[field.prop]"
+                :min="0"
+                :precision="field.precision || 0"
+                :disabled="editing && field.disabledOnEdit"
+                controls-position="right"
+                style="width: 100%"
+              />
+              <enable-flag-segmented
+                v-else-if="field.kind === 'enableFlag'"
+                v-model="formModel[field.prop]"
+                :disabled="editing && field.disabledOnEdit"
+              />
+              <el-input
+                v-else-if="field.kind === 'json' || field.kind === 'textarea'"
+                v-model="formModel[field.prop]"
+                :autosize="{ minRows: field.rows || 4, maxRows: 18 }"
+                :placeholder="field.placeholder"
+                :disabled="editing && field.disabledOnEdit"
+                resize="vertical"
+                type="textarea"
+              />
+              <el-color-picker
+                v-else-if="field.kind === 'color'"
+                v-model="formModel[field.prop]"
+                :disabled="editing && field.disabledOnEdit"
+                show-alpha
+              />
+              <el-tree-select
+                v-else-if="field.kind === 'treeSelect'"
+                v-model="formModel[field.prop]"
+                :data="treeData[field.prop]"
+                :props="field.tree?.props"
+                :check-strictly="field.tree?.checkStrictly"
+                :disabled="editing && field.disabledOnEdit"
+                clearable
+                filterable
+              />
+              <el-input
+                v-else
+                v-model="formModel[field.prop]"
+                :placeholder="field.placeholder"
+                :maxlength="field.maxlength"
+                :show-word-limit="!!field.maxlength"
+                :disabled="editing && field.disabledOnEdit"
+                clearable
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <template #footer>
+        <div class="things-dialog-footer">
+          <el-button @click="formVisible = false">{{ t('common.cancel') }}</el-button>
+          <el-button plain @click="resetForm">{{ t('common.reset') }}</el-button>
+          <el-button :loading="state.saving" type="primary" @click="submit">{{ t('common.confirm') }}</el-button>
+        </div>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+<script lang="ts" setup>
+  import { computed, reactive, watch } from 'vue';
+  import { Plus } from '@element-plus/icons-vue';
+
+  import BlankCard from '@/components/card/blank/BlankCard.vue';
+  import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
+  import EnableTag from '@/components/tag/EnableTag.vue';
+  import { resolveIcon } from '@/config/constant/icons';
+  import type { EntityListConfig } from '@/config/types/entityList';
+  import { useEntityListPage } from '@/composables/useEntityListPage';
+
+  const props = defineProps<{ config: EntityListConfig }>();
+
+  const {
+    t,
+    config,
+    state,
+    searchForm,
+    formVisible,
+    editing,
+    setFormRef,
+    formModel,
+    formRules,
+    dialogTitle,
+    load,
+    search,
+    reset,
+    sort,
+    sizeChange,
+    currentChange,
+    openAdd,
+    openEdit,
+    openDetail,
+    resetForm,
+    submit,
+    remove,
+    formatCell,
+    tagType,
+    canEdit,
+    canDelete,
+  } = useEntityListPage(props.config);
+
+  // treeSelect data loaded on dialog open
+  const treeData = reactive<Record<string, any[]>>({});
+
+  watch(formVisible, async (visible) => {
+    if (!visible) return;
+    for (const field of config.value.fields) {
+      if (field.kind === 'treeSelect' && field.tree) {
+        treeData[field.prop] = await field.tree.load();
+      }
+    }
+  });
+
+  // Get a nested value by dot-path without going through formatCell
+  const getCellValue = (row: Record<string, any>, prop: string): any =>
+    prop.split('.').reduce((obj: any, key) => (obj != null ? obj[key] : undefined), row);
+
+  // Operation column width based on number of visible action buttons
+  const operationWidth = computed(() => {
+    let count = 0;
+    if (props.config.detail) count++;
+    if (props.config.extraActions) count += props.config.extraActions.length;
+    if (props.config.editable) count += 2; // edit + delete
+    if (count <= 1) return 100;
+    if (count <= 3) return 180;
+    if (count === 4) return 260;
+    return 320;
+  });
+</script>
+
+<style lang="scss" scoped>
+  .entity-list-page {
+    min-width: 0;
+
+    &__table {
+      margin-top: 1px;
+      border-radius: 4px;
+    }
+
+    &__form {
+      :deep(.el-input),
+      :deep(.el-select),
+      :deep(.el-input-number),
+      :deep(.el-tree-select),
+      :deep(.el-color-picker) {
+        width: 100%;
+      }
+    }
+
+    &__inline-code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: var(--el-text-color-regular);
+      background: var(--el-fill-color-light);
+      font-size: 12px;
+    }
+
+    &__color-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    &__swatch {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    &__icon-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+</style>

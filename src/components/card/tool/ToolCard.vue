@@ -52,6 +52,7 @@
         </div>
         <div class="tool-card-footer-page">
           <el-pagination
+            v-if="!hidePagination"
             :current-page="+page.current"
             :page-size="+page.size"
             :page-sizes="pageSizes"
@@ -99,6 +100,10 @@
       default: () => [6, 12, 24, 36, 48, 96],
     },
     hideSort: {
+      type: Boolean,
+      default: false,
+    },
+    hidePagination: {
       type: Boolean,
       default: false,
     },
