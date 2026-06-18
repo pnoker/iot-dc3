@@ -22,8 +22,9 @@ import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.data.mapper.PointValueMapper;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.enums.WindowAggregateFunction;
 import io.github.pnoker.common.entity.bo.WindowAggregateResult;
-import io.github.pnoker.common.entity.query.WindowAggregateRequest;
+import io.github.pnoker.common.entity.query.WindowAggregateQuery;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -60,9 +61,9 @@ class PostgresRepositoryServiceImplWindowTest {
     @Test
     void aggregateInWindowDelegatesToMapper() {
         WindowAggregateResult expected = new WindowAggregateResult(BigDecimal.valueOf(82.5), 4L);
-        WindowAggregateRequest req = WindowAggregateRequest.builder()
+        WindowAggregateQuery req = WindowAggregateQuery.builder()
                 .tenantId(7L).deviceId(1L).pointId(11L)
-                .function("AVG")
+                .function(WindowAggregateFunction.AVG)
                 .from(LocalDateTime.now().minusMinutes(5))
                 .to(LocalDateTime.now())
                 .build();
@@ -76,9 +77,9 @@ class PostgresRepositoryServiceImplWindowTest {
 
     @Test
     void aggregateInWindowReturnsEmptyWhenMapperReturnsNull() {
-        WindowAggregateRequest req = WindowAggregateRequest.builder()
+        WindowAggregateQuery req = WindowAggregateQuery.builder()
                 .tenantId(7L).deviceId(1L).pointId(11L)
-                .function("AVG")
+                .function(WindowAggregateFunction.AVG)
                 .from(LocalDateTime.now().minusMinutes(5))
                 .to(LocalDateTime.now())
                 .build();
@@ -95,7 +96,7 @@ class PostgresRepositoryServiceImplWindowTest {
         // Missing from / to / function should never reach the mapper — the
         // alarm pipeline never produces those, but a null guard is cheap.
         assertThat(service.aggregateInWindow(null).sampleCount()).isZero();
-        assertThat(service.aggregateInWindow(WindowAggregateRequest.builder().build()).sampleCount()).isZero();
+        assertThat(service.aggregateInWindow(WindowAggregateQuery.builder().build()).sampleCount()).isZero();
         verify(pointValueMapper, never()).aggregateInWindow(any());
     }
 

@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.entity.bo.WindowAggregateResult;
-import io.github.pnoker.common.entity.query.WindowAggregateRequest;
+import io.github.pnoker.common.entity.query.WindowAggregateQuery;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
@@ -42,7 +42,7 @@ public interface PointValueMapper extends BaseMapper<PointValueDO> {
      * parameter is safe from injection. Returns null aggregate + zero count
      * when the window is empty.
      */
-    WindowAggregateResult aggregateInWindow(@Param("request") WindowAggregateRequest request);
+    WindowAggregateResult aggregateInWindow(@Param("request") WindowAggregateQuery request);
 
     /**
      * Pull raw rows in {@code [from, to)} ordered oldest → newest. Used by

@@ -168,7 +168,7 @@ class RepositoryStrategyFactoryTest {
 
         @Override
         public io.github.pnoker.common.entity.bo.WindowAggregateResult aggregateInWindow(
-                io.github.pnoker.common.entity.query.WindowAggregateRequest request) {
+                io.github.pnoker.common.entity.query.WindowAggregateQuery request) {
             return io.github.pnoker.common.entity.bo.WindowAggregateResult.empty();
         }
 

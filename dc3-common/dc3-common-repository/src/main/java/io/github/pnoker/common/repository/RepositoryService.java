@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.bo.WindowAggregateResult;
 import io.github.pnoker.common.entity.query.PointValueQuery;
-import io.github.pnoker.common.entity.query.WindowAggregateRequest;
+import io.github.pnoker.common.entity.query.WindowAggregateQuery;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -107,7 +107,7 @@ public interface RepositoryService {
      * @param request aggregation parameters
      * @return aggregate value and sample count
      */
-    WindowAggregateResult aggregateInWindow(WindowAggregateRequest request);
+    WindowAggregateResult aggregateInWindow(WindowAggregateQuery request);
 
     /**
      * Pull the raw samples in {@code [from, to)} for the given tenant +

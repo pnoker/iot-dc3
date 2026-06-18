@@ -32,11 +32,11 @@
             resultType="io.github.pnoker.common.entity.bo.WindowAggregateResult">
         SELECT
         <choose>
-            <when test="request.function == 'AVG'">AVG(num_value)</when>
-            <when test="request.function == 'MIN'">MIN(num_value)</when>
-            <when test="request.function == 'MAX'">MAX(num_value)</when>
-            <when test="request.function == 'SUM'">SUM(num_value)</when>
-            <when test="request.function == 'COUNT'">CAST(COUNT(*) AS NUMERIC)</when>
+            <when test="request.function.name() == 'AVG'">AVG(num_value)</when>
+            <when test="request.function.name() == 'MIN'">MIN(num_value)</when>
+            <when test="request.function.name() == 'MAX'">MAX(num_value)</when>
+            <when test="request.function.name() == 'SUM'">SUM(num_value)</when>
+            <when test="request.function.name() == 'COUNT'">CAST(COUNT(*) AS NUMERIC)</when>
             <otherwise>NULL</otherwise>
         </choose>
         AS value,
@@ -47,7 +47,7 @@
         AND point_id = #{request.pointId}
         AND create_time &gt;= #{request.from}
         AND create_time &lt; #{request.to}
-        <if test="request.function == 'AVG' or request.function == 'MIN' or request.function == 'MAX' or request.function == 'SUM'">
+        <if test="request.function.name() == 'AVG' or request.function.name() == 'MIN' or request.function.name() == 'MAX' or request.function.name() == 'SUM'">
             AND num_value IS NOT NULL
         </if>
     </select>

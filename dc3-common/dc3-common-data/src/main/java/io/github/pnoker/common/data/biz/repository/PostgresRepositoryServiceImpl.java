@@ -29,7 +29,7 @@ import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.bo.WindowAggregateResult;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
-import io.github.pnoker.common.entity.query.WindowAggregateRequest;
+import io.github.pnoker.common.entity.query.WindowAggregateQuery;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
@@ -124,7 +124,7 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     @Override
-    public WindowAggregateResult aggregateInWindow(WindowAggregateRequest request) {
+    public WindowAggregateResult aggregateInWindow(WindowAggregateQuery request) {
         if (Objects.isNull(request) || Objects.isNull(request.getFunction())
                 || Objects.isNull(request.getFrom()) || Objects.isNull(request.getTo())) {
             return WindowAggregateResult.empty();

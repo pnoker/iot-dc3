@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.bo.WindowAggregateResult;
-import io.github.pnoker.common.entity.query.WindowAggregateRequest;
+import io.github.pnoker.common.entity.query.WindowAggregateQuery;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.WindowModeEnum;
 import io.github.pnoker.common.repository.RepositoryService;
@@ -77,11 +77,11 @@ public class RepositoryWindowDataSource implements WindowDataSource {
         LocalDateTime to = Objects.requireNonNullElse(fact.getFactTime(), LocalDateTime.now());
         LocalDateTime from = to.minus(spec.duration());
 
-        WindowAggregateRequest req = WindowAggregateRequest.builder()
+        WindowAggregateQuery req = WindowAggregateQuery.builder()
                 .tenantId(fact.getTenantId())
                 .deviceId(deviceId)
                 .pointId(fact.getEntityId())
-                .function(mode.name())
+                .function(mode.toAggregateFunction())
                 .from(from)
                 .to(to)
                 .build();
