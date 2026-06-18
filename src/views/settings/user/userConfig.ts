@@ -90,12 +90,14 @@ export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers)
       prop: 'phone',
       label: t('settings.user.phone'),
       placeholder: t('settings.user.phonePlaceholder'),
+      maxlength: 11,
       rules: [{ pattern: PHONE_PATTERN, message: t('settings.user.phoneFormat'), trigger: 'blur' }],
     },
     {
       prop: 'email',
       label: t('settings.user.email'),
       placeholder: t('settings.user.emailPlaceholder'),
+      maxlength: 128,
       rules: [{ pattern: EMAIL_PATTERN, message: t('settings.user.emailFormat'), trigger: 'blur' }],
     },
     { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag' },
@@ -107,6 +109,12 @@ export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers)
     email: '',
     enableFlag: 'ENABLE',
   }),
+  toPayload: (form) => {
+    const next = { ...form };
+    if (!next.phone) delete next.phone;
+    if (!next.email) delete next.email;
+    return next;
+  },
   list: listUser,
   add: addUser,
   update: updateUser,
