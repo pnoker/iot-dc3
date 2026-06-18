@@ -18,8 +18,15 @@
 package io.github.pnoker.common.resource.registrar.scan;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.lang.reflect.Method;
 
 /**
  * Test helper that returns {@link Operation} instances via reflection over annotated dummy methods,
@@ -50,6 +57,24 @@ class ValidatorFixtures {
      */
     static Operation opValid() {
         return getOperation("valid");
+    }
+
+    /** A handler method whose @RequestBody VO field and @RequestParam both LACK descriptions. */
+    static Method methodWithUndescribedParams() {
+        return getMethod("undescribedParams", BodyMissingSchema.class, Long.class);
+    }
+
+    /** A handler method whose body fields all carry @Schema and whose @RequestParam carries @Parameter. */
+    static Method methodWithFullyDescribedParams() {
+        return getMethod("describedParams", BodyWithSchema.class, Long.class);
+    }
+
+    private static Method getMethod(String name, Class<?>... params) {
+        try {
+            return ValidatorFixtures.class.getDeclaredMethod(name, params);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Fixture method not found: " + name, e);
+        }
     }
 
     // --- annotated dummy methods ---
@@ -101,5 +126,42 @@ class ValidatorFixtures {
             )
     )
     private void valid() {
+    }
+
+    @Operation(description = "Valid operation description exceeding twenty characters",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "false")}))
+    @SuppressWarnings("unused")
+    private void undescribedParams(@RequestBody BodyMissingSchema body,
+                                  @RequestParam("id") Long id) {
+    }
+
+    @Operation(description = "Valid operation description exceeding twenty characters",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "false")}))
+    @SuppressWarnings("unused")
+    private void describedParams(@RequestBody BodyWithSchema body,
+                                @Parameter(description = "Primary key of the target record") @RequestParam("id") Long id) {
+    }
+
+    /** Request body whose field is missing @Schema(description). */
+    static class BodyMissingSchema {
+        @SuppressWarnings("unused")
+        private String deviceName;
+    }
+
+    /** Request body whose field carries @Schema(description). */
+    static class BodyWithSchema {
+        @Schema(description = "Human-readable device name, unique within the tenant")
+        @SuppressWarnings("unused")
+        private String deviceName;
     }
 }

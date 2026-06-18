@@ -18,11 +18,19 @@
 package io.github.pnoker.common.resource.registrar.scan;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +44,8 @@ public class ApiAnnotationValidator {
     private static final int MIN_DESCRIPTION_LENGTH = 20;
     private static final Set<String> RISK_LEVELS = Set.of("HIGH", "MEDIUM", "LOW");
     private static final Set<String> BOOLEAN_KEYS = Set.of("destructive", "idempotent", "openWorld", "hidden");
+    private static final String PROJECT_PACKAGE = "io.github.pnoker";
+    private static final int MAX_BODY_DEPTH = 2;
 
     private static Map<String, String> aiProps(Operation operation) {
         Map<String, String> props = new java.util.LinkedHashMap<>();
@@ -77,5 +87,64 @@ public class ApiAnnotationValidator {
             }
         }
         return defects;
+    }
+
+    /**
+     * Validate one controller handler method: its {@code @Operation} (operation-level checks) plus the
+     * descriptions of its request parameters that the OpenAPI aggregator merges into the MCP inputSchema —
+     * {@code @RequestBody} object fields (via {@code @Schema}) and {@code @RequestParam}/{@code @PathVariable}
+     * params (via {@code @Parameter}). Report-only: returns the defect list, never throws.
+     */
+    public List<String> validate(String apiCode, Method handlerMethod) {
+        if (handlerMethod == null) {
+            List<String> defects = new ArrayList<>();
+            defects.add(apiCode + ": missing handler method");
+            return defects;
+        }
+        List<String> defects = new ArrayList<>(validate(apiCode, handlerMethod.getAnnotation(Operation.class)));
+        java.lang.reflect.Parameter[] parameters = handlerMethod.getParameters();
+        java.lang.annotation.Annotation[][] paramAnnotations = handlerMethod.getParameterAnnotations();
+        for (int i = 0; i < parameters.length; i++) {
+            if (hasAnnotation(paramAnnotations[i], RequestBody.class)) {
+                collectBodyDefects(apiCode, parameters[i].getType(), new HashSet<>(), 0, defects);
+            } else if (hasAnnotation(paramAnnotations[i], RequestParam.class)
+                    || hasAnnotation(paramAnnotations[i], PathVariable.class)) {
+                Parameter doc = parameters[i].getAnnotation(Parameter.class);
+                if (doc == null || StringUtils.isBlank(doc.description())) {
+                    defects.add(apiCode + ": param " + parameters[i].getName() + " missing @Parameter(description)");
+                }
+            }
+        }
+        return defects;
+    }
+
+    private static boolean hasAnnotation(java.lang.annotation.Annotation[] annotations, Class<?> type) {
+        for (java.lang.annotation.Annotation a : annotations) {
+            if (type.isInstance(a)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Walk a request-body type's instance fields, requiring @Schema(description) on each; recurse into nested project types. */
+    private void collectBodyDefects(String apiCode, Class<?> type, Set<Class<?>> visited, int depth, List<String> defects) {
+        if (type == null || depth > MAX_BODY_DEPTH || !visited.add(type)) {
+            return;
+        }
+        for (Field field : type.getDeclaredFields()) {
+            int mods = field.getModifiers();
+            if (java.lang.reflect.Modifier.isStatic(mods) || java.lang.reflect.Modifier.isTransient(mods)) {
+                continue;
+            }
+            Schema schema = field.getAnnotation(Schema.class);
+            if (schema == null || StringUtils.isBlank(schema.description())) {
+                defects.add(apiCode + ": body field " + field.getName() + " missing @Schema(description)");
+            }
+            Class<?> fieldType = field.getType();
+            if (fieldType.getName().startsWith(PROJECT_PACKAGE) && !fieldType.isEnum()) {
+                collectBodyDefects(apiCode, fieldType, visited, depth + 1, defects);
+            }
+        }
     }
 }

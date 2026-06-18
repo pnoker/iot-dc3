@@ -19,6 +19,7 @@ package io.github.pnoker.common.resource.registrar.scan;
 
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,5 +47,19 @@ class ApiAnnotationValidatorTest {
     @Test
     void passesAWellFormedOperation() {
         assertThat(validator.validate("dc3-center-manager:POST:/z", ValidatorFixtures.opValid())).isEmpty();
+    }
+
+    @Test
+    void flagsUndescribedBodyFieldAndRequestParam() {
+        Method method = ValidatorFixtures.methodWithUndescribedParams();
+        List<String> defects = validator.validate("dc3-center-manager:POST:/x", method);
+        assertThat(defects).anyMatch(d -> d.contains("body field") && d.contains("deviceName"));
+        assertThat(defects).anyMatch(d -> d.contains("param") && d.contains("id"));
+    }
+
+    @Test
+    void passesWhenBodyFieldsAndParamsAreDescribed() {
+        Method method = ValidatorFixtures.methodWithFullyDescribedParams();
+        assertThat(validator.validate("dc3-center-manager:POST:/y", method)).isEmpty();
     }
 }
