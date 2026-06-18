@@ -25,6 +25,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.PrincipalHeaderUtil;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import reactor.core.publisher.Flux;
@@ -35,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -131,7 +133,20 @@ public interface BaseController {
      * try/catch around the supplier.
      */
     default <T> Mono<R<T>> async(Supplier<R<T>> supplier) {
-        return Mono.fromCallable(supplier::get).subscribeOn(Schedulers.boundedElastic());
+        return ReactiveSecurityContextHolder.getContext()
+                .map(ctx -> ctx.getAuthentication())
+                .filter(auth -> auth instanceof GatewayAuthenticationToken)
+                .cast(GatewayAuthenticationToken.class)
+                .map(token -> Optional.ofNullable(token.getPrincipalHeader().getTenantId()))
+                .defaultIfEmpty(Optional.empty())
+                .flatMap(tenantId -> Mono.fromCallable(() -> {
+                    tenantId.ifPresent(TenantContextHolder::setTenantId);
+                    try {
+                        return supplier.get();
+                    } finally {
+                        TenantContextHolder.clear();
+                    }
+                }).subscribeOn(Schedulers.boundedElastic()));
     }
 
     /**
