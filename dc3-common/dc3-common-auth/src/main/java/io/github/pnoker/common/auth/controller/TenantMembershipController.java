@@ -20,7 +20,6 @@ package io.github.pnoker.common.auth.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
 import io.github.pnoker.common.auth.entity.builder.TenantMembershipBuilder;
-import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
 import io.github.pnoker.common.auth.entity.query.TenantMembershipQuery;
 import io.github.pnoker.common.auth.entity.vo.TenantMembershipVO;
 import io.github.pnoker.common.auth.service.AuditLogService;
@@ -92,13 +91,12 @@ public class TenantMembershipController implements BaseController {
             if (Objects.isNull(entityBO.getMembershipStatus())) {
                 entityBO.setMembershipStatus(MembershipStatusEnum.ACTIVE);
             }
-            TenantMembershipDO membershipDO = tenantMembershipBuilder.buildDOByBO(entityBO);
-            membershipDO.setCreatorId(header.getUserId());
-            membershipDO.setCreatorName(header.getNickName());
-            membershipDO.setOperatorId(header.getUserId());
-            membershipDO.setOperatorName(header.getNickName());
-            tenantMembershipService.add(membershipDO);
-            auditLogService.log(header, "CREATE", "tenant_membership", membershipDO.getPrincipalId(),
+            entityBO.setCreatorId(header.getUserId());
+            entityBO.setCreatorName(header.getNickName());
+            entityBO.setOperatorId(header.getUserId());
+            entityBO.setOperatorName(header.getNickName());
+            tenantMembershipService.add(entityBO);
+            auditLogService.log(header, "CREATE", "tenant_membership", entityBO.getPrincipalId(),
                     null, "SUCCESS", null);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         }));

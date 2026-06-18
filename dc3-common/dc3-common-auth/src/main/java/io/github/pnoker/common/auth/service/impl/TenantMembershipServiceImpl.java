@@ -55,8 +55,9 @@ public class TenantMembershipServiceImpl implements TenantMembershipService {
     private final TenantMembershipBuilder tenantMembershipBuilder;
 
     @Override
-    public void add(TenantMembershipDO membership) {
-        if (!tenantMembershipManager.save(membership)) {
+    public void add(TenantMembershipBO membership) {
+        TenantMembershipDO entityDO = tenantMembershipBuilder.buildDOByBO(membership);
+        if (!tenantMembershipManager.save(entityDO)) {
             throw new AddException("Failed to create tenant membership");
         }
     }
@@ -72,7 +73,7 @@ public class TenantMembershipServiceImpl implements TenantMembershipService {
     }
 
     @Override
-    public TenantMembershipDO getByTenantIdAndPrincipalId(Long tenantId, Long principalId) {
+    public TenantMembershipBO getByTenantIdAndPrincipalId(Long tenantId, Long principalId) {
         if (Objects.isNull(tenantId) || Objects.isNull(principalId)) {
             return null;
         }
@@ -81,7 +82,8 @@ public class TenantMembershipServiceImpl implements TenantMembershipService {
         wrapper.eq(TenantMembershipDO::getPrincipalId, principalId);
         wrapper.eq(TenantMembershipDO::getMembershipStatus, "ACTIVE");
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        return tenantMembershipManager.getOne(wrapper);
+        TenantMembershipDO entityDO = tenantMembershipManager.getOne(wrapper);
+        return Objects.isNull(entityDO) ? null : tenantMembershipBuilder.buildBOByDO(entityDO);
     }
 
     @Override

@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.dal.PrincipalManager;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.UserBuilder;
 import io.github.pnoker.common.auth.entity.model.PrincipalDO;
-import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
+import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
 import io.github.pnoker.common.auth.entity.query.UserQuery;
 import io.github.pnoker.common.auth.entity.vo.UserVO;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
@@ -106,11 +106,11 @@ public class UserController implements BaseController {
             entityBO.setOperatorName(header.getNickName());
             userService.add(entityBO);
             UserBO saved = userService.getByUserName(entityBO.getUserName(), true);
-            TenantMembershipDO membership = new TenantMembershipDO();
+            TenantMembershipBO membership = new TenantMembershipBO();
             membership.setTenantId(header.getTenantId());
             membership.setPrincipalId(saved.getPrincipalId());
-            membership.setPrincipalType(PrincipalTypeEnum.USER.getValue());
-            membership.setMembershipStatus(MembershipStatusEnum.ACTIVE.getValue());
+            membership.setPrincipalType(PrincipalTypeEnum.USER);
+            membership.setMembershipStatus(MembershipStatusEnum.ACTIVE);
             membership.setCreatorId(header.getUserId());
             membership.setCreatorName(header.getNickName());
             membership.setOperatorId(header.getUserId());
@@ -127,7 +127,7 @@ public class UserController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserBO user = userService.getById(id);
             tenantMembershipService.requireTenantMember(tenantId, user.getPrincipalId());
-            TenantMembershipDO membership = tenantMembershipService.getByTenantIdAndPrincipalId(tenantId,
+            TenantMembershipBO membership = tenantMembershipService.getByTenantIdAndPrincipalId(tenantId,
                     user.getPrincipalId());
             userService.delete(id);
             if (Objects.nonNull(membership)) {

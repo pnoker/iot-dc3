@@ -18,6 +18,8 @@
 package io.github.pnoker.common.auth.service.impl;
 
 import io.github.pnoker.common.auth.dal.IdentityAuditLogManager;
+import io.github.pnoker.common.auth.entity.bo.IdentityAuditLogBO;
+import io.github.pnoker.common.auth.entity.builder.IdentityAuditLogBuilder;
 import io.github.pnoker.common.auth.entity.model.IdentityAuditLogDO;
 import io.github.pnoker.common.auth.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ import java.util.List;
 public class AuditLogServiceImpl implements AuditLogService {
 
     private final IdentityAuditLogManager identityAuditLogManager;
+    private final IdentityAuditLogBuilder identityAuditLogBuilder;
 
     @Override
     public void log(Long tenantId, Long principalId, String principalType, String action,
@@ -63,10 +66,11 @@ public class AuditLogServiceImpl implements AuditLogService {
     }
 
     @Override
-    public List<IdentityAuditLogDO> list(Long tenantId, Long principalId, String action, String resourceType,
+    public List<IdentityAuditLogBO> list(Long tenantId, Long principalId, String action, String resourceType,
                                          Long resourceId, String status, int limit) {
         int bounded = Math.max(1, Math.min(limit <= 0 ? 200 : limit, 500));
-        return identityAuditLogManager.listIdentityAudit(tenantId, principalId, action, resourceType,
-                resourceId, status, bounded);
+        List<IdentityAuditLogDO> entityDOList = identityAuditLogManager.listIdentityAudit(tenantId, principalId,
+                action, resourceType, resourceId, status, bounded);
+        return identityAuditLogBuilder.buildBOListByDOList(entityDOList);
     }
 }

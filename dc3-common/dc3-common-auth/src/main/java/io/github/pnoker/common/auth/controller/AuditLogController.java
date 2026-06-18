@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import io.github.pnoker.common.auth.entity.model.IdentityAuditLogDO;
+import io.github.pnoker.common.auth.entity.builder.IdentityAuditLogBuilder;
+import io.github.pnoker.common.auth.entity.vo.IdentityAuditLogVO;
 import io.github.pnoker.common.auth.service.AuditLogService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
@@ -52,6 +53,7 @@ import java.util.List;
 public class AuditLogController implements BaseController {
 
     private final AuditLogService auditLogService;
+    private final IdentityAuditLogBuilder identityAuditLogBuilder;
 
     @PreAuthorize("@perm.can('audit', 'list')")
     @Operation(summary = "List Identity Audit Log",
@@ -59,16 +61,17 @@ public class AuditLogController implements BaseController {
                     "by principal, action, resource type/id and status, plus a result limit. Admin-only; returns an " +
                     "append-only trail of who changed which identity or permission.")
     @PostMapping("/list")
-    public Mono<R<List<IdentityAuditLogDO>>> list(
-            @Parameter(description = "Principal ID") @RequestParam(value = "principalId", required = false) Long principalId,
+    public Mono<R<List<IdentityAuditLogVO>>> list(
+            @Parameter(description = "Principal ID") @RequestParam(value = "principal_id", required = false) Long principalId,
             @Parameter(description = "Action") @RequestParam(value = "action", required = false) String action,
-            @Parameter(description = "Resource type") @RequestParam(value = "resourceType", required = false) String resourceType,
-            @Parameter(description = "Resource ID") @RequestParam(value = "resourceId", required = false) Long resourceId,
+            @Parameter(description = "Resource type") @RequestParam(value = "resource_type", required = false) String resourceType,
+            @Parameter(description = "Resource ID") @RequestParam(value = "resource_id", required = false) Long resourceId,
             @Parameter(description = "Status") @RequestParam(value = "status", required = false) String status,
             @Parameter(description = "Limit") @RequestParam(value = "limit", required = false) Integer limit) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(auditLogService.list(
-                tenantId, principalId, StringUtils.defaultString(action), StringUtils.defaultString(resourceType),
-                resourceId, StringUtils.defaultString(status), limit == null ? 0 : limit
+        return getTenantId().flatMap(tenantId -> async(() -> R.ok(identityAuditLogBuilder.buildVOListByBOList(
+                auditLogService.list(tenantId, principalId, StringUtils.defaultString(action),
+                        StringUtils.defaultString(resourceType), resourceId, StringUtils.defaultString(status),
+                        limit == null ? 0 : limit)
         ))));
     }
 }

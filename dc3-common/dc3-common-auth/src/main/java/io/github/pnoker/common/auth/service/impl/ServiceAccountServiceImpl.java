@@ -26,7 +26,7 @@ import io.github.pnoker.common.auth.entity.bo.ServiceAccountBO;
 import io.github.pnoker.common.auth.entity.builder.ServiceAccountBuilder;
 import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
-import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
+import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
 import io.github.pnoker.common.auth.entity.query.ServiceAccountQuery;
 import io.github.pnoker.common.auth.service.ServiceAccountService;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
@@ -89,7 +89,7 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
             throw new AddException("Failed to create service account");
         }
 
-        TenantMembershipDO membership = buildMembership(entityBO);
+        TenantMembershipBO membership = buildMembership(entityBO);
         tenantMembershipService.add(membership);
     }
 
@@ -97,7 +97,7 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         ServiceAccountDO current = getDOById(id, true);
-        TenantMembershipDO membership = tenantMembershipService.getByTenantIdAndPrincipalId(current.getTenantId(),
+        TenantMembershipBO membership = tenantMembershipService.getByTenantIdAndPrincipalId(current.getTenantId(),
                 current.getPrincipalId());
         if (!serviceAccountManager.removeById(id)) {
             throw new DeleteException("Failed to remove service account");
@@ -225,12 +225,12 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
         return principal;
     }
 
-    private TenantMembershipDO buildMembership(ServiceAccountBO entityBO) {
-        TenantMembershipDO membership = new TenantMembershipDO();
+    private TenantMembershipBO buildMembership(ServiceAccountBO entityBO) {
+        TenantMembershipBO membership = new TenantMembershipBO();
         membership.setTenantId(entityBO.getTenantId());
         membership.setPrincipalId(entityBO.getPrincipalId());
-        membership.setPrincipalType(PrincipalTypeEnum.SERVICE_ACCOUNT.getValue());
-        membership.setMembershipStatus(MembershipStatusEnum.ACTIVE.getValue());
+        membership.setPrincipalType(PrincipalTypeEnum.SERVICE_ACCOUNT);
+        membership.setMembershipStatus(MembershipStatusEnum.ACTIVE);
         membership.setCreatorId(entityBO.getCreatorId());
         membership.setCreatorName(entityBO.getCreatorName());
         membership.setOperatorId(entityBO.getOperatorId());

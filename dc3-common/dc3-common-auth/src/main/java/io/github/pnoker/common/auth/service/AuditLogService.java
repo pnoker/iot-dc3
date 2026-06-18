@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.auth.service;
 
-import io.github.pnoker.common.auth.entity.model.IdentityAuditLogDO;
+import io.github.pnoker.common.auth.entity.bo.IdentityAuditLogBO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public interface AuditLogService {
     void log(Long tenantId, Long principalId, String principalType, String action,
              String resourceType, Long resourceId, String resourceName, String status, String errorCode);
 
-    List<IdentityAuditLogDO> list(Long tenantId, Long principalId, String action, String resourceType,
+    List<IdentityAuditLogBO> list(Long tenantId, Long principalId, String action, String resourceType,
                                   Long resourceId, String status, int limit);
 
     /**
