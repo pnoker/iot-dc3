@@ -1,0 +1,123 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import type { ComposerTranslation } from 'vue-i18n';
+
+import { addGroup, deleteGroup, listGroup, updateGroup } from '@/api/group';
+import { ENTITY_TYPE_OPTIONS } from '@/config/constant/enums';
+import type { GroupRecord } from '@/config/types/manager';
+import type { EntityListConfig } from '@/config/types/entityList';
+import { nameRules, remarkRules } from '@/utils/formRuleUtil';
+
+const GROUP_PAGE_QUERY = { page: { current: 1, size: 5000, orders: [{ column: 'group_index', asc: true }] } };
+
+const loadGroupRecords = async (): Promise<GroupRecord[]> => {
+  const res = await listGroup(GROUP_PAGE_QUERY);
+  return (res.data?.records || []) as GroupRecord[];
+};
+
+export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => ({
+  name: 'group',
+  editable: true,
+  searchFields: [
+    {
+      prop: 'groupName',
+      label: t('settings.group.groupName'),
+      kind: 'input',
+      placeholder: t('settings.group.groupNamePlaceholder'),
+    },
+    { prop: 'groupTypeFlag', label: t('settings.common.entityType'), kind: 'select', options: ENTITY_TYPE_OPTIONS },
+    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true },
+  ],
+  columns: [
+    { prop: 'groupName', label: t('settings.group.groupName'), minWidth: 160 },
+    { prop: 'groupCode', label: t('settings.group.groupCode'), kind: 'code', minWidth: 150 },
+    { prop: 'groupTypeFlag', label: t('settings.common.entityType'), width: 110 },
+    {
+      prop: 'parentGroupId',
+      label: t('settings.group.parentGroupId'),
+      minWidth: 150,
+      formatter: (row, ctx) => ctx.relations.parentName?.[String(row.parentGroupId)] || '-',
+    },
+    { prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90 },
+    { prop: 'remark', label: t('common.remark'), minWidth: 180 },
+    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
+  ],
+  relations: [
+    {
+      key: 'parentName',
+      load: async () => {
+        const records = await loadGroupRecords();
+        const map: Record<string, string> = {};
+        records.forEach((g) => {
+          map[String(g.id)] = g.groupName || String(g.id);
+        });
+        return map;
+      },
+    },
+  ],
+  fields: [
+    {
+      prop: 'groupTypeFlag',
+      label: t('settings.common.entityType'),
+      kind: 'select',
+      options: ENTITY_TYPE_OPTIONS,
+      required: true,
+    },
+    {
+      prop: 'parentGroupId',
+      label: t('settings.group.parentGroupId'),
+      kind: 'treeSelect',
+      tree: {
+        load: loadGroupRecords,
+        props: { label: 'groupName', value: 'id', children: 'children' },
+        checkStrictly: true,
+      },
+    },
+    {
+      prop: 'groupName',
+      label: t('settings.group.groupName'),
+      placeholder: t('settings.group.groupNamePlaceholder'),
+      maxlength: 32,
+      rules: nameRules(t, t('common.entityGroup')),
+    },
+    {
+      prop: 'groupCode',
+      label: t('settings.group.groupCode'),
+      placeholder: t('settings.group.groupCodePlaceholder'),
+      maxlength: 32,
+    },
+    { prop: 'groupIndex', label: t('settings.group.groupIndex'), kind: 'number' },
+    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag' },
+    { prop: 'remark', label: t('common.remark'), kind: 'textarea', span: 24, maxlength: 300, rules: remarkRules(t) },
+  ],
+  defaultForm: () => ({
+    parentGroupId: null,
+    groupTypeFlag: 'DEVICE',
+    groupName: '',
+    groupCode: '',
+    groupIndex: 0,
+    enableFlag: 'ENABLE',
+    remark: '',
+  }),
+  list: listGroup,
+  add: addGroup,
+  update: updateGroup,
+  remove: deleteGroup,
+  detail: { routeName: 'settingsGroupDetail' },
+  confirmDeleteText: t('settings.group.confirmDelete'),
+  emptyText: t('settings.group.empty'),
+});
