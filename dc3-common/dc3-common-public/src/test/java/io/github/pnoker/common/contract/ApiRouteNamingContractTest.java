@@ -87,14 +87,15 @@ class ApiRouteNamingContractTest {
             return;
         }
 
-        String route = "";
-        if (annotationArgs != null) {
-            Matcher literal = STRING_LITERAL.matcher(annotationArgs);
-            if (literal.find()) {
-                route = literal.group(1);
-            }
+        // No mapping arguments at all -> truly an empty route.
+        if (annotationArgs == null || annotationArgs.isBlank()) {
+            violations.add("%s maps method %s with an empty route".formatted(source, method));
+            return;
         }
-        if (route.isBlank()) {
+        // A route defined via a path constant (e.g. McpConstant.OAUTH2_TOKEN) carries no string
+        // literal; that is a real route, not an empty one. Only flag an explicit blank literal.
+        Matcher literal = STRING_LITERAL.matcher(annotationArgs);
+        if (literal.find() && literal.group(1).isBlank()) {
             violations.add("%s maps method %s with an empty route".formatted(source, method));
         }
     }
