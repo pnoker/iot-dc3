@@ -18,7 +18,6 @@
 package io.github.pnoker.common.manager.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.service.DataConstant;
@@ -27,7 +26,6 @@ import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.model.PointDO;
 import io.github.pnoker.common.manager.entity.query.TopicQuery;
 import io.github.pnoker.common.manager.entity.vo.TopicVO;
-import io.github.pnoker.common.manager.mapper.DeviceMapper;
 import io.github.pnoker.common.manager.service.TopicService;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +42,7 @@ import java.util.Objects;
  */
 
 @Service
-public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implements TopicService {
+public class TopicServiceImpl implements TopicService {
 
     @Override
     public Page<TopicVO> list(TopicQuery topicQuery) {
@@ -62,10 +60,10 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
             deviceIdL = Long.parseLong(parts[parts.length - 1]);
         }
         String dName = topicQuery.getDeviceName();
-        List<DeviceDO> deviceList = lambdaQuery().eq(Objects.nonNull(deviceIdL), DeviceDO::getId, deviceIdL)
+        List<DeviceDO> deviceList = Db.lambdaQuery(DeviceDO.class)
+                .eq(Objects.nonNull(deviceIdL), DeviceDO::getId, deviceIdL)
                 .eq(Objects.nonNull(topicQuery.getTenantId()), DeviceDO::getTenantId, topicQuery.getTenantId())
                 .eq(Objects.nonNull(dName) && !dName.isEmpty(), DeviceDO::getDeviceName, dName)
-                // .eq(DeviceDO::getEnableFlag, 1)
                 .list();
 
         for (DeviceDO device : deviceList) {
@@ -78,8 +76,6 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO> implem
             List<PointDO> points = Db.lambdaQuery(PointDO.class)
                     .eq(PointDO::getProfileId, profileId)
                     .eq(Objects.nonNull(topicQuery.getTenantId()), PointDO::getTenantId, topicQuery.getTenantId())
-                    // .eq(PointDO::getEnableFlag, 1)
-                    .eq(PointDO::getDeleted, 0)
                     .list();
             for (PointDO point : points) {
                 TopicVO topicVO = new TopicVO();

@@ -18,11 +18,8 @@
 package io.github.pnoker.common.manager.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
-import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.query.TopicQuery;
 import io.github.pnoker.common.manager.entity.vo.TopicVO;
-
 
 /**
  * Business service for topic operations.
@@ -31,8 +28,7 @@ import io.github.pnoker.common.manager.entity.vo.TopicVO;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-
-public interface TopicService extends IService<DeviceDO> {
+public interface TopicService {
 
     Page<TopicVO> list(TopicQuery topicQuery);
 
