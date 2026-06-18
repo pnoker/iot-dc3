@@ -15,82 +15,12 @@
   -->
 
 <template>
-  <div>
-    <label-tool
-      :page="reactiveData.page"
-      @add="openAdd"
-      @refresh="refresh"
-      @reset="reset"
-      @search="search"
-      @sort="sort"
-      @size-change="sizeChange"
-      @current-change="currentChange"
-    />
-
-    <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column :label="t('settings.label.labelName')" min-width="160" prop="labelName" />
-        <el-table-column
-          :label="t('settings.label.labelCode')"
-          min-width="150"
-          prop="labelCode"
-          show-overflow-tooltip
-        />
-        <el-table-column :label="t('settings.common.entityType')" prop="entityTypeFlag" width="110" />
-        <el-table-column :label="t('settings.label.labelColor')" width="130">
-          <template #default="{ row }">
-            <span class="label-color">
-              <span :style="{ backgroundColor: row.labelColor || '#F4F4F5' }" class="label-color__swatch" />
-              <span>{{ row.labelColor || '-' }}</span>
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column :label="t('common.enable')" width="90">
-          <template #default="{ row }">
-            <enable-tag :value="row.enableFlag" />
-          </template>
-        </el-table-column>
-        <el-table-column :label="t('common.remark')" min-width="180" prop="remark" show-overflow-tooltip />
-        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
-        <el-table-column :label="t('common.operation')" fixed="right" width="180">
-          <template #default="{ row }">
-            <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
-            <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
-            <el-popconfirm
-              :cancel-button-text="t('common.cancel')"
-              :confirm-button-text="t('common.confirm')"
-              :title="t('settings.label.confirmDelete')"
-              @confirm="remove(row.id)"
-            >
-              <template #reference>
-                <el-button link type="danger">{{ t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <el-empty :description="t('settings.label.empty')" />
-        </template>
-      </el-table>
-    </blank-card>
-
-    <label-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate" />
-  </div>
+  <entity-list-page :config="config" />
 </template>
-
-<script lang="ts" src="./index.ts"></script>
-
-<style lang="scss" scoped>
-  .label-color {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
-    .label-color__swatch {
-      width: 16px;
-      height: 16px;
-      border: 1px solid var(--el-border-color);
-      border-radius: 4px;
-    }
-  }
-</style>
+<script lang="ts" setup>
+  import { useI18n } from 'vue-i18n';
+  import EntityListPage from '@/components/entity/EntityListPage.vue';
+  import { createLabelConfig } from './labelConfig';
+  const { t } = useI18n();
+  const config = createLabelConfig(t);
+</script>
