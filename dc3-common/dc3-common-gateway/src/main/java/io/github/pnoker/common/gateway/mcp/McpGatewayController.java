@@ -30,6 +30,7 @@ import io.github.pnoker.common.facade.api.McpRuntimeFacade;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -82,6 +83,13 @@ public class McpGatewayController {
         return map;
     }
 
+    /**
+     * Publish the RFC 9728 protected-resource metadata that MCP clients fetch to learn
+     * where to obtain bearer tokens and which scopes are accepted.
+     *
+     * @return a metadata map describing the resource, authorization servers, supported bearer methods and scopes
+     */
+    @Operation(summary = "Get Protected Resource Metadata", description = "Return the OAuth 2.0 protected-resource metadata (RFC 9728) advertised at the well-known path, so MCP clients can discover the authorization server, supported bearer transport methods and accepted scopes.")
     @GetMapping(McpConstant.WELL_KNOWN_PROTECTED_RESOURCE)
     public Mono<Map<String, Object>> protectedResourceMetadata() {
         return Mono.just(orderedMap(
@@ -92,6 +100,17 @@ public class McpGatewayController {
         ));
     }
 
+    /**
+     * Handle a single JSON-RPC MCP request (initialize, ping, tools/list, tools/call).
+     * <p>
+     * Requires a valid bearer token; the token is introspected against the auth center
+     * and tool visibility is re-checked before every tools/call.
+     *
+     * @param request JSON-RPC request body carrying the MCP method, id and parameters
+     * @param exchange current server exchange, used to read the Authorization header and client metadata
+     * @return a JSON-RPC result or error entity; 401 with a WWW-Authenticate challenge when the token is missing or inactive
+     */
+    @Operation(summary = "Handle MCP JSON-RPC Request", description = "Process one MCP JSON-RPC request (initialize, ping, tools/list, tools/call) behind the gateway. Validates the bearer token by introspecting it against the auth center, re-checks tool visibility before every tools/call, and returns a JSON-RPC result or error entity, or a 401 challenge when the token is missing or inactive.")
     @PostMapping(value = McpConstant.URL_PREFIX, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> mcp(@RequestBody Map<String, Object> request,
                                                          ServerWebExchange exchange) {
