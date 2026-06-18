@@ -27,7 +27,7 @@ export type EntityFieldKind =
   | 'json'
   | 'color'
   | 'treeSelect';
-export type EntityColumnKind = 'text' | 'tag' | 'code' | 'time' | 'enable' | 'color' | 'icon';
+export type EntityColumnKind = 'text' | 'tag' | 'code' | 'time' | 'enable' | 'color' | 'icon' | 'link';
 export type EntitySearchKind = 'input' | 'select' | 'enableFlag';
 
 export interface EntityOption {
@@ -37,7 +37,7 @@ export interface EntityOption {
 
 export interface EntityTreeSource {
   load: () => Promise<unknown[]>;
-  props?: { label?: string; value?: string; children?: string };
+  props?: { label?: string; value?: string; children?: string; disabled?: string };
   checkStrictly?: boolean;
   /** Synchronous reactive filter/shaping using the live form model. Called on every render. */
   transform?: (rows: any[], form: Record<string, any>) => unknown[];
@@ -76,6 +76,8 @@ export interface EntityColumnConfig {
   overflow?: boolean; // 默认 true
   options?: EntityOption[]; // tag/text 的值→标签映射来源
   formatter?: (row: Record<string, any>, ctx: EntityColumnContext) => string;
+  onClick?: (row: Record<string, any>) => void; // link
+  linkable?: (row: Record<string, any>) => boolean; // link，缺省视为可点击
 }
 
 export interface EntitySearchFieldConfig {
@@ -97,7 +99,7 @@ export interface EntityRowAction {
 
 export interface EntityRelation {
   key: string; // ctx.relations[key]
-  load: () => Promise<Record<string, string>>;
+  load: (rows: any[]) => Promise<Record<string, string>>;
 }
 
 export interface EntityListConfig {

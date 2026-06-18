@@ -106,6 +106,17 @@
             <code v-else-if="column.kind === 'code'" class="entity-list-page__inline-code">
               {{ formatCell(row, column) }}
             </code>
+            <template v-else-if="column.kind === 'link'">
+              <el-button
+                v-if="column.linkable ? column.linkable(row) : true"
+                link
+                type="primary"
+                @click="column.onClick?.(row)"
+              >
+                {{ formatCell(row, column) }}
+              </el-button>
+              <span v-else>{{ formatCell(row, column) }}</span>
+            </template>
             <span v-else>{{ formatCell(row, column) }}</span>
           </template>
         </el-table-column>

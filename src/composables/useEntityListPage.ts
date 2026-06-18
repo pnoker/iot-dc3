@@ -125,11 +125,25 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     return result;
   };
 
-  const loadRelations = () => {
-    if (!config.value.relations || config.value.relations.length === 0) return Promise.resolve();
-    return Promise.all(
+  // Depth-first flatten of a tree (over `children`) so relation loaders can
+  // resolve names for every node, not just the roots.
+  const flattenRows = (rows: Record<string, any>[]): Record<string, any>[] => {
+    const out: Record<string, any>[] = [];
+    const walk = (nodes: Record<string, any>[]) => {
+      for (const node of nodes || []) {
+        out.push(node);
+        if (node.children && node.children.length > 0) walk(node.children);
+      }
+    };
+    walk(rows || []);
+    return out;
+  };
+
+  const loadRelations = async (rows: Record<string, any>[]): Promise<void> => {
+    if (!config.value.relations || config.value.relations.length === 0) return;
+    await Promise.all(
       config.value.relations.map((r) =>
-        r.load().then((result) => {
+        r.load(rows).then((result) => {
           relations[r.key] = result;
         })
       )
@@ -138,25 +152,25 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
 
   const load = () => {
     state.loading = true;
-    Promise.all([
-      config.value
-        .list(query())
-        .then((res: R) => {
-          if (config.value.mode === 'tree') {
-            state.rows = (res.data as Record<string, any>[]) || [];
-          } else {
-            const page = res.data || {};
-            state.rows = page.records || [];
-            state.page.total = Number(page.total || 0);
-          }
-        })
-        .catch(() => {
-          // handled globally
-        }),
-      loadRelations(),
-    ]).finally(() => {
-      state.loading = false;
-    });
+    config.value
+      .list(query())
+      .then((res: R) => {
+        if (config.value.mode === 'tree') {
+          state.rows = (res.data as Record<string, any>[]) || [];
+        } else {
+          const page = res.data || {};
+          state.rows = page.records || [];
+          state.page.total = Number(page.total || 0);
+        }
+        // Relations resolve after rows arrive so loaders can act on them.
+        return loadRelations(config.value.mode === 'tree' ? flattenRows(state.rows) : state.rows);
+      })
+      .catch(() => {
+        // handled globally
+      })
+      .finally(() => {
+        state.loading = false;
+      });
   };
 
   const search = (params: Record<string, any>) => {
