@@ -116,6 +116,102 @@ public class McpOpenApiAggregator {
     }
 
     /**
+     * @return map of {@code dc3-center-<service>:METHOD:/path} -> {@link ToolQuality} parsed from
+     * each operation's summary/description, {@code x-dc3-ai} extension, and merged input schema.
+     */
+    public Map<String, ToolQuality> toolQualityByApiCode() {
+        Map<String, ToolQuality> result = new HashMap<>();
+        Resource[] resources;
+        try {
+            resources = new PathMatchingResourcePatternResolver().getResources(SPECS_LOCATION);
+        } catch (Exception ex) {
+            log.warn("MCP aggregator: cannot resolve static OpenAPI specs at {}: {}", SPECS_LOCATION, ex.getMessage());
+            return result;
+        }
+        for (Resource resource : resources) {
+            String serviceName = serviceNameOf(resource.getFilename());
+            if (serviceName == null) {
+                continue;
+            }
+            try (InputStream in = resource.getInputStream()) {
+                JsonNode root = objectMapper.readTree(in);
+                JsonNode paths = root.path("paths");
+                if (!paths.isObject()) {
+                    continue;
+                }
+                paths.fields().forEachRemaining(pathEntry -> {
+                    JsonNode pathItem = pathEntry.getValue();
+                    if (!pathItem.isObject()) {
+                        return;
+                    }
+                    pathItem.fields().forEachRemaining(opEntry -> {
+                        String method = opEntry.getKey().toUpperCase();
+                        JsonNode operation = opEntry.getValue();
+                        if (!operation.isObject()) {
+                            return;
+                        }
+                        String apiCode = serviceName + ":" + method + ":" + pathEntry.getKey();
+                        result.put(apiCode, toQuality(operation, root));
+                    });
+                });
+            } catch (Exception ex) {
+                log.warn("MCP aggregator: failed to read static OpenAPI spec {}: {}",
+                        resource.getFilename(), ex.getMessage());
+            }
+        }
+        return result;
+    }
+
+    private ToolQuality toQuality(JsonNode operation, JsonNode root) {
+        JsonNode ai = operation.path("x-dc3-ai");
+        String summary = text(operation.path("summary"));
+        String operationDescription = text(operation.path("description"));
+        String aiDescription = ai.isObject() ? text(ai.path("description")) : null;
+        ObjectNode schema = buildOperationSchema(operation, root);
+        String inputSchema = null;
+        if (schema != null) {
+            try {
+                inputSchema = objectMapper.writeValueAsString(schema);
+            } catch (Exception ignore) {
+                // leave schema null on serialization failure
+            }
+        }
+        return ToolQuality.builder()
+                .summary(summary)
+                .description(StringUtils.firstNonBlank(aiDescription, operationDescription))
+                .riskLevel(ai.isObject() ? text(ai.path("riskLevel")) : null)
+                .destructive(boolFlag(ai, "destructive"))
+                .idempotent(boolFlag(ai, "idempotent"))
+                .openWorld(boolFlag(ai, "openWorld"))
+                .hidden(boolFlag(ai, "hidden"))
+                .aiDescription(aiDescription)
+                .inputSchema(inputSchema)
+                .build();
+    }
+
+    private static String text(JsonNode node) {
+        return node.isTextual() && StringUtils.isNotBlank(node.asText()) ? node.asText() : null;
+    }
+
+    /** Parse a declared "true"/"false" flag; null when absent or unparseable. */
+    private static Boolean boolFlag(JsonNode ai, String key) {
+        if (!ai.isObject()) {
+            return null;
+        }
+        String value = text(ai.path(key));
+        if (value == null) {
+            return null;
+        }
+        if ("true".equalsIgnoreCase(value)) {
+            return Boolean.TRUE;
+        }
+        if ("false".equalsIgnoreCase(value)) {
+            return Boolean.FALSE;
+        }
+        return null;
+    }
+
+    /**
      * Expand {@code openapi-<service>.json} to the full {@code dc3-center-<service>} key prefix.
      * Returns {@code null} when the filename does not match the expected pattern.
      */
