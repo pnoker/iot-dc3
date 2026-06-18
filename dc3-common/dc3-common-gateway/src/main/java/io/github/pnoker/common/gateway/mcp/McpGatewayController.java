@@ -106,7 +106,7 @@ public class McpGatewayController {
      * Requires a valid bearer token; the token is introspected against the auth center
      * and tool visibility is re-checked before every tools/call.
      *
-     * @param request JSON-RPC request body carrying the MCP method, id and parameters
+     * @param request  JSON-RPC request body carrying the MCP method, id and parameters
      * @param exchange current server exchange, used to read the Authorization header and client metadata
      * @return a JSON-RPC result or error entity; 401 with a WWW-Authenticate challenge when the token is missing or inactive
      */

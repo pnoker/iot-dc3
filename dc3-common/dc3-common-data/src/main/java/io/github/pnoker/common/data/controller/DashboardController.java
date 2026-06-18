@@ -102,8 +102,8 @@ public class DashboardController implements BaseController {
      * day buckets over a rolling window for the current tenant.
      *
      * @param granularity time bucket granularity for the trend chart (hour or day)
-     * @param rangeHours rolling time window length in hours; used only when range_key is omitted
-     * @param rangeKey preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
+     * @param rangeHours  rolling time window length in hours; used only when range_key is omitted
+     * @param rangeKey    preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
      * @return a list of time-bucketed counts used to render the dashboard trend chart
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
@@ -124,10 +124,10 @@ public class DashboardController implements BaseController {
      * Rank the tenant's devices, points or drivers by activity over a rolling window,
      * returning the top N entries for the chosen dimension.
      *
-     * @param dimension ranking dimension defining what kind of entity to rank (device, point, or driver)
+     * @param dimension  ranking dimension defining what kind of entity to rank (device, point, or driver)
      * @param rangeHours rolling time window length in hours; used only when range_key is omitted
-     * @param rangeKey preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
-     * @param limit maximum number of ranked entries to return
+     * @param rangeKey   preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
+     * @param limit      maximum number of ranked entries to return
      * @return the top N busiest entities for the chosen dimension within the window
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
@@ -188,7 +188,7 @@ public class DashboardController implements BaseController {
      * histogram bands to assess how fresh the ingested readings are.
      *
      * @param rangeHours rolling time window length in hours; used only when range_key is omitted
-     * @param rangeKey preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
+     * @param rangeKey   preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
      * @return latency histogram bands describing ingestion freshness over the window
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
@@ -208,7 +208,7 @@ public class DashboardController implements BaseController {
      * rolling window (default 168 hours / one week) to render the activity heatmap.
      *
      * @param rangeHours rolling time window length in hours (default 168); used only when range_key is omitted
-     * @param rangeKey preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
+     * @param rangeKey   preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
      * @return hour-of-day activity cells used to spot quiet or peak hours
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
@@ -264,7 +264,7 @@ public class DashboardController implements BaseController {
      * Mark a single alert (by source and record id) as acknowledged for the current tenant.
      *
      * @param source alert source scope; one of driver, device, or point
-     * @param id identifier of the alert record within the given source; must belong to the current tenant
+     * @param id     identifier of the alert record within the given source; must belong to the current tenant
      * @return true when the row was actually updated, false otherwise
      */
     @PreAuthorize("@perm.can('dashboard', 'list')")
@@ -280,7 +280,7 @@ public class DashboardController implements BaseController {
      * the current tenant.
      *
      * @param source alert source scope; one of driver, device, or point
-     * @param id identifier of the alert record within the given source; must belong to the current tenant
+     * @param id     identifier of the alert record within the given source; must belong to the current tenant
      * @return true when the row was actually updated, false otherwise
      */
     @PreAuthorize("@perm.can('dashboard', 'list')")
@@ -316,7 +316,7 @@ public class DashboardController implements BaseController {
      * Return daily alert counts over a rolling day range for the current tenant, to
      * visualize whether alert volume is rising or falling.
      *
-     * @param days rolling day range for the trend; one point per day is returned
+     * @param days     rolling day range for the trend; one point per day is returned
      * @param rangeKey preset time range key overriding days; one of today, 24h, 7d, or 30d
      * @return one alert-count data point per day in the resolved range
      */
@@ -335,9 +335,9 @@ public class DashboardController implements BaseController {
      * Rank the tenant's alert sources (driver/device/point) by alert volume over a
      * rolling day range, returning the top N.
      *
-     * @param days rolling day range over which alert volume is counted
+     * @param days     rolling day range over which alert volume is counted
      * @param rangeKey preset time range key overriding days; one of today, 24h, 7d, or 30d
-     * @param limit maximum number of top sources to return
+     * @param limit    maximum number of top sources to return
      * @return the top N alert sources by alert volume within the resolved range
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
@@ -376,7 +376,7 @@ public class DashboardController implements BaseController {
      * Aggregate the tenant's alerts into hour-of-day-by-day cells over a rolling day
      * range, to render the alert heatmap and surface peak alerting hours.
      *
-     * @param days rolling day range spanning the heatmap's day axis
+     * @param days     rolling day range spanning the heatmap's day axis
      * @param rangeKey preset time range key overriding days; one of today, 24h, 7d, or 30d
      * @return hour-of-day-by-day alert-count cells for the heatmap
      */
@@ -394,7 +394,7 @@ public class DashboardController implements BaseController {
      * Bucket the tenant's alerts by alarm type over a rolling day range, to see which
      * alarm categories dominate within the window.
      *
-     * @param days rolling day range over which alerts are bucketed by alarm type
+     * @param days     rolling day range over which alerts are bucketed by alarm type
      * @param rangeKey preset time range key overriding days; one of today, 24h, 7d, or 30d
      * @return alert counts grouped by alarm type over the resolved range
      */
@@ -414,9 +414,9 @@ public class DashboardController implements BaseController {
      * Detect the tenant's alert storms by flagging sources whose alert count inside a
      * short rolling hour window exceeds a threshold.
      *
-     * @param hours rolling detection window length in hours
+     * @param hours    rolling detection window length in hours
      * @param minCount minimum alert count within the window for a source to be flagged as a storm
-     * @param limit maximum number of storm sources to return
+     * @param limit    maximum number of storm sources to return
      * @return the sources flagged as alert storms, ordered by volume
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
@@ -438,9 +438,9 @@ public class DashboardController implements BaseController {
      * Flag the tenant's alert sources that toggle confirm and recovery state repeatedly
      * inside a rolling hour window above a count threshold.
      *
-     * @param hours rolling detection window length in hours
+     * @param hours    rolling detection window length in hours
      * @param minCount minimum confirm/recovery toggle count within the window for a source to be flagged as flapping
-     * @param limit maximum number of flapping sources to return
+     * @param limit    maximum number of flapping sources to return
      * @return the noisy, oscillating alert sources ordered by toggle count
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
@@ -458,9 +458,9 @@ public class DashboardController implements BaseController {
      * Return alert source pairs that fire within a tight time window of each other over a
      * rolling hour range, scored by co-occurrence, to discover alerts sharing a root cause.
      *
-     * @param hours rolling detection window length in hours
+     * @param hours     rolling detection window length in hours
      * @param windowSec maximum gap in seconds between two alerts to count them as co-occurring
-     * @param limit maximum number of correlated source pairs to return
+     * @param limit     maximum number of correlated source pairs to return
      * @return alert source pairs scored by co-occurrence within the time window
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
@@ -535,7 +535,7 @@ public class DashboardController implements BaseController {
      * Correlate the tenant's configuration changes with subsequent alert-volume shifts
      * over a rolling day range, returning the top-impacted items.
      *
-     * @param days rolling day range over which config changes are correlated with alert-volume shifts
+     * @param days  rolling day range over which config changes are correlated with alert-volume shifts
      * @param limit maximum number of impacted items to return
      * @return the top items whose alert volume shifted after configuration changes
      */
@@ -552,9 +552,9 @@ public class DashboardController implements BaseController {
      * Detect the tenant's points or devices that have produced no new data beyond a
      * silence threshold, compared against a baseline day range.
      *
-     * @param baselineDays baseline rolling day range used to learn each entity's expected reporting cadence
+     * @param baselineDays  baseline rolling day range used to learn each entity's expected reporting cadence
      * @param silentMinutes silence threshold in minutes; an entity with no reading for this long is flagged silent
-     * @param limit maximum number of silent sources to return
+     * @param limit         maximum number of silent sources to return
      * @return points or devices that have stopped reporting relative to their learned cadence
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
