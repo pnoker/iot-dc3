@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
+import io.github.pnoker.common.auth.config.OAuthProperties;
 import io.github.pnoker.common.auth.dal.PrincipalManager;
 import io.github.pnoker.common.auth.dal.ServiceAccountManager;
 import io.github.pnoker.common.auth.entity.model.PrincipalDO;
@@ -115,37 +116,18 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     private final PrincipalManager principalManager;
     private final ServiceAccountManager serviceAccountManager;
     private final McpOpenApiAggregator openApiAggregator;
+    private final OAuthProperties oauthProperties;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${dc3.oauth.issuer:http://localhost:8300/auth}")
-    private String issuer;
-
-    @Value("${dc3.oauth.audience:dc3-mcp}")
-    private String audience;
-
-    @Value("${dc3.oauth.authorization-code-ttl:PT5M}")
-    private Duration authorizationCodeTtl;
-
-    @Value("${dc3.oauth.access-token-ttl:PT15M}")
-    private Duration accessTokenTtl;
-
-    @Value("${dc3.oauth.refresh-token-ttl:P30D}")
-    private Duration refreshTokenTtl;
-
     @Value("${dc3.mcp.confirm-ttl:PT5M}")
     private Duration confirmTtl;
-
-    @Value("${dc3.oauth.jwt.private-key:}")
-    private String privateKeyBase64;
-
-    @Value("${dc3.oauth.jwt.public-key:}")
-    private String publicKeyBase64;
 
     private volatile KeyMaterial keyMaterial;
 
     @Override
     public Map<String, Object> authorizationServerMetadata() {
+        String issuer = oauthProperties.getIssuer();
         return orderedMap(
                 "issuer", issuer,
                 "authorization_endpoint", issuer + McpConstant.OAUTH2_AUTHORIZE,
@@ -324,7 +306,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         authorization.setStateHash(sha256(params.get("state")));
         authorization.setAuthorizationCodeHash(sha256(code));
         authorization.setAuthorizationCodeIssued(LocalDateTime.now());
-        authorization.setAuthorizationCodeExpires(LocalDateTime.now().plus(authorizationCodeTtl));
+        authorization.setAuthorizationCodeExpires(LocalDateTime.now().plus(oauthProperties.getAuthorizationCodeTtl()));
         authorization.setTokenMetadata(JsonUtil.toJsonString(orderedMap(
                 McpConstant.Field.REDIRECT_URI, redirectUri,
                 McpConstant.Field.CODE_CHALLENGE, params.get(McpConstant.Field.CODE_CHALLENGE),
@@ -795,7 +777,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         }
         Set<String> scopes = splitValues(authorization.getAuthorizedScopes());
         LocalDateTime issued = LocalDateTime.now();
-        LocalDateTime accessExpires = issued.plus(accessTokenTtl);
+        LocalDateTime accessExpires = issued.plus(oauthProperties.getAccessTokenTtl());
         String jti = UUID.randomUUID().toString();
         Map<String, Object> claims = orderedMap(
                 McpConstant.Field.PRINCIPAL_TYPE, authorization.getPrincipalType(),
@@ -807,8 +789,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         );
         String accessToken = Jwts.builder()
                 .header().keyId(KID).and()
-                .issuer(issuer)
-                .audience().add(audience).and()
+                .issuer(oauthProperties.getIssuer())
+                .audience().add(oauthProperties.getAudience()).and()
                 .id(jti)
                 .subject(String.valueOf(authorization.getPrincipalId()))
                 .issuedAt(asDate(issued))
@@ -820,7 +802,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
         String refreshToken = issueRefreshToken ? randomToken() : "";
         LocalDateTime refreshIssued = issueRefreshToken ? issued : null;
-        LocalDateTime refreshExpires = issueRefreshToken ? issued.plus(refreshTokenTtl) : null;
+        LocalDateTime refreshExpires = issueRefreshToken ? issued.plus(oauthProperties.getRefreshTokenTtl()) : null;
         oauthMcpMapper.activateAuthorizationTokens(authorization.getId(), "", jti, issued, accessExpires,
                 sha256(refreshToken), StringUtils.defaultString(previousRefreshHash), refreshIssued, refreshExpires,
                 JsonUtil.toJsonString(claims));
@@ -828,7 +810,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put(McpConstant.Field.ACCESS_TOKEN, accessToken);
         response.put(McpConstant.Field.TOKEN_TYPE, McpConstant.OAuth.TOKEN_TYPE_BEARER);
-        response.put(McpConstant.Field.EXPIRES_IN, accessTokenTtl.toSeconds());
+        response.put(McpConstant.Field.EXPIRES_IN, oauthProperties.getAccessTokenTtl().toSeconds());
         response.put(McpConstant.Field.SCOPE, String.join(" ", scopes));
         if (issueRefreshToken) {
             response.put(McpConstant.Field.REFRESH_TOKEN, refreshToken);
@@ -838,8 +820,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     private Claims parseAccessToken(String token) {
         return Jwts.parser()
-                .requireIssuer(issuer)
-                .requireAudience(audience)
+                .requireIssuer(oauthProperties.getIssuer())
+                .requireAudience(oauthProperties.getAudience())
                 .verifyWith(keyMaterial().publicKey())
                 .build()
                 .parseSignedClaims(token)
@@ -1171,6 +1153,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     private KeyMaterial loadKeyMaterial() {
         try {
+            String privateKeyBase64 = oauthProperties.getJwt().getPrivateKey();
+            String publicKeyBase64 = oauthProperties.getJwt().getPublicKey();
             if (StringUtils.isNotBlank(privateKeyBase64) || StringUtils.isNotBlank(publicKeyBase64)) {
                 if (StringUtils.isAnyBlank(privateKeyBase64, publicKeyBase64)) {
                     throw new InvalidKeyException("Both OAuth private and public keys must be configured together");
