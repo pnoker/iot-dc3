@@ -126,6 +126,55 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     private volatile KeyMaterial keyMaterial;
 
+    /**
+     * Fill one catalog record's quality fields from the OpenAPI-sourced {@link ToolQuality}, applying
+     * conservative defaults when a field (or the whole quality) is undeclared. {@code readOnly} is
+     * always derived from the HTTP method; {@code hidden} disables the row via enable_flag.
+     */
+    static void applyQuality(McpToolRecord record, ToolQuality quality) {
+        String method = StringUtils.upperCase(StringUtils.trimToEmpty(record.getHttpMethod()));
+        record.setReadOnlyHint(toByte("GET".equals(method)));
+
+        if (quality == null) {
+            record.setRiskLevel("HIGH");
+            record.setDestructiveHint(toByte(true));
+            record.setIdempotentHint(toByte(false));
+            record.setOpenWorldHint(toByte(true));
+            record.setEnableFlag((byte) 0);
+            return;
+        }
+        record.setRiskLevel(normalizeRisk(quality.getRiskLevel()));
+        record.setDestructiveHint(toByte(defaultBool(quality.getDestructive(), true)));
+        record.setIdempotentHint(toByte(defaultBool(quality.getIdempotent(), false)));
+        record.setOpenWorldHint(toByte(defaultBool(quality.getOpenWorld(), true)));
+        if (StringUtils.isNotBlank(quality.getSummary())) {
+            record.setToolTitle(quality.getSummary());
+        }
+        if (StringUtils.isNotBlank(quality.getDescription())) {
+            record.setRemark(quality.getDescription());
+        }
+        if (StringUtils.isNotBlank(quality.getInputSchema())) {
+            record.setToolExt("{\"inputSchema\":" + quality.getInputSchema() + "}");
+        }
+        record.setEnableFlag(Boolean.TRUE.equals(quality.getHidden()) ? (byte) 1 : (byte) 0);
+    }
+
+    private static String normalizeRisk(String declared) {
+        String value = StringUtils.upperCase(StringUtils.trimToEmpty(declared));
+        return switch (value) {
+            case "HIGH", "MEDIUM", "LOW" -> value;
+            default -> "HIGH"; // conservative default for blank/illegal
+        };
+    }
+
+    private static boolean defaultBool(Boolean declared, boolean fallback) {
+        return declared != null ? declared : fallback;
+    }
+
+    private static byte toByte(boolean flag) {
+        return flag ? (byte) 1 : (byte) 0;
+    }
+
     @Override
     public Map<String, Object> authorizationServerMetadata() {
         String issuer = oauthProperties.getIssuer();
@@ -426,55 +475,6 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             }
         }
         return changed;
-    }
-
-    /**
-     * Fill one catalog record's quality fields from the OpenAPI-sourced {@link ToolQuality}, applying
-     * conservative defaults when a field (or the whole quality) is undeclared. {@code readOnly} is
-     * always derived from the HTTP method; {@code hidden} disables the row via enable_flag.
-     */
-    static void applyQuality(McpToolRecord record, ToolQuality quality) {
-        String method = StringUtils.upperCase(StringUtils.trimToEmpty(record.getHttpMethod()));
-        record.setReadOnlyHint(toByte("GET".equals(method)));
-
-        if (quality == null) {
-            record.setRiskLevel("HIGH");
-            record.setDestructiveHint(toByte(true));
-            record.setIdempotentHint(toByte(false));
-            record.setOpenWorldHint(toByte(true));
-            record.setEnableFlag((byte) 0);
-            return;
-        }
-        record.setRiskLevel(normalizeRisk(quality.getRiskLevel()));
-        record.setDestructiveHint(toByte(defaultBool(quality.getDestructive(), true)));
-        record.setIdempotentHint(toByte(defaultBool(quality.getIdempotent(), false)));
-        record.setOpenWorldHint(toByte(defaultBool(quality.getOpenWorld(), true)));
-        if (StringUtils.isNotBlank(quality.getSummary())) {
-            record.setToolTitle(quality.getSummary());
-        }
-        if (StringUtils.isNotBlank(quality.getDescription())) {
-            record.setRemark(quality.getDescription());
-        }
-        if (StringUtils.isNotBlank(quality.getInputSchema())) {
-            record.setToolExt("{\"inputSchema\":" + quality.getInputSchema() + "}");
-        }
-        record.setEnableFlag(Boolean.TRUE.equals(quality.getHidden()) ? (byte) 1 : (byte) 0);
-    }
-
-    private static String normalizeRisk(String declared) {
-        String value = StringUtils.upperCase(StringUtils.trimToEmpty(declared));
-        return switch (value) {
-            case "HIGH", "MEDIUM", "LOW" -> value;
-            default -> "HIGH"; // conservative default for blank/illegal
-        };
-    }
-
-    private static boolean defaultBool(Boolean declared, boolean fallback) {
-        return declared != null ? declared : fallback;
-    }
-
-    private static byte toByte(boolean flag) {
-        return flag ? (byte) 1 : (byte) 0;
     }
 
     @Override

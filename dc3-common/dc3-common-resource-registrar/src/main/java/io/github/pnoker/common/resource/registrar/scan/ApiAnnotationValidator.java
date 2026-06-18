@@ -37,6 +37,21 @@ public class ApiAnnotationValidator {
     private static final Set<String> RISK_LEVELS = Set.of("HIGH", "MEDIUM", "LOW");
     private static final Set<String> BOOLEAN_KEYS = Set.of("destructive", "idempotent", "openWorld", "hidden");
 
+    private static Map<String, String> aiProps(Operation operation) {
+        Map<String, String> props = new java.util.LinkedHashMap<>();
+        for (Extension extension : operation.extensions()) {
+            if (!"x-dc3-ai".equalsIgnoreCase(extension.name())) {
+                continue;
+            }
+            for (ExtensionProperty p : extension.properties()) {
+                if (StringUtils.isNotBlank(p.name())) {
+                    props.put(p.name(), StringUtils.defaultString(p.value()));
+                }
+            }
+        }
+        return props;
+    }
+
     public List<String> validate(String apiCode, Operation operation) {
         List<String> defects = new ArrayList<>();
         if (operation == null) {
@@ -62,20 +77,5 @@ public class ApiAnnotationValidator {
             }
         }
         return defects;
-    }
-
-    private static Map<String, String> aiProps(Operation operation) {
-        Map<String, String> props = new java.util.LinkedHashMap<>();
-        for (Extension extension : operation.extensions()) {
-            if (!"x-dc3-ai".equalsIgnoreCase(extension.name())) {
-                continue;
-            }
-            for (ExtensionProperty p : extension.properties()) {
-                if (StringUtils.isNotBlank(p.name())) {
-                    props.put(p.name(), StringUtils.defaultString(p.value()));
-                }
-            }
-        }
-        return props;
     }
 }

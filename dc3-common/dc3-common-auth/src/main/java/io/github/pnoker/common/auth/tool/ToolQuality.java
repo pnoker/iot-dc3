@@ -33,13 +33,19 @@ import lombok.ToString;
 @ToString
 public class ToolQuality {
 
-    /** Operation summary → MCP tool title. */
+    /**
+     * Operation summary → MCP tool title.
+     */
     private final String summary;
 
-    /** Operation description (or x-dc3-ai.description override when present) → MCP tool description. */
+    /**
+     * Operation description (or x-dc3-ai.description override when present) → MCP tool description.
+     */
     private final String description;
 
-    /** Declared MCP risk level (HIGH/MEDIUM/LOW); null when undeclared. */
+    /**
+     * Declared MCP risk level (HIGH/MEDIUM/LOW); null when undeclared.
+     */
     private final String riskLevel;
 
     private final Boolean destructive;
@@ -48,12 +54,18 @@ public class ToolQuality {
 
     private final Boolean openWorld;
 
-    /** Hidden from tools/list; null treated as false. */
+    /**
+     * Hidden from tools/list; null treated as false.
+     */
     private final Boolean hidden;
 
-    /** AI-facing description override from x-dc3-ai.description; null when absent. */
+    /**
+     * AI-facing description override from x-dc3-ai.description; null when absent.
+     */
     private final String aiDescription;
 
-    /** Merged input JSON Schema string, or null when the operation has no body/params. */
+    /**
+     * Merged input JSON Schema string, or null when the operation has no body/params.
+     */
     private final String inputSchema;
 }

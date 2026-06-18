@@ -333,42 +333,41 @@
 
     <select id="listRegistryToolCandidates"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
-        SELECT NULL::BIGINT AS id,
-        api.api_code AS tool_id,
-        lower(regexp_replace(api.service_name || '_' || api.api_name || '_' ||
-        CASE api.api_type_flag
-        WHEN 0 THEN 'post'
-        WHEN 1 THEN 'delete'
-        WHEN 2 THEN 'put'
-        ELSE 'get'
-        END, '[^a-zA-Z0-9]+', '_', 'g')) AS tool_name,
-        COALESCE(
-        NULLIF((api.api_ext ->> 'content')::json ->> 'title', ''),
-        NULLIF(api.api_name, ''), api.api_code) AS tool_title,
-        api.service_name AS tool_category,
-        api.service_name,
-        api.api_code,
-        resource.resource_code AS permission_code,
-        CASE api.api_type_flag
-        WHEN 0 THEN 'POST'
-        WHEN 1 THEN 'DELETE'
-        WHEN 2 THEN 'PUT'
-        ELSE 'GET'
-        END AS http_method,
-        regexp_replace(api.api_code, '^[^:]+:[^:]+:', '') AS api_path,
-        md5(api.api_code || ':' || api.api_name) AS schema_hash,
-        0 AS enable_flag,
-        COALESCE(
-        NULLIF((api.api_ext ->> 'content')::json ->> 'remark', ''),
-        NULLIF(api.remark, ''), api.api_group) AS remark
+        SELECT NULL::BIGINT AS id, api.api_code AS tool_id,
+               lower(regexp_replace(api.service_name || '_' || api.api_name || '_' ||
+                                    CASE api.api_type_flag
+                                        WHEN 0 THEN 'post'
+                                        WHEN 1 THEN 'delete'
+                                        WHEN 2 THEN 'put'
+                                        ELSE 'get'
+                                        END, '[^a-zA-Z0-9]+', '_', 'g')) AS tool_name,
+               COALESCE(
+                       NULLIF((api.api_ext ->> 'content')::json ->> 'title', ''),
+                       NULLIF(api.api_name, ''), api.api_code)           AS tool_title,
+               api.service_name                                          AS tool_category,
+               api.service_name,
+               api.api_code,
+               resource.resource_code                                    AS permission_code,
+               CASE api.api_type_flag
+                   WHEN 0 THEN 'POST'
+                   WHEN 1 THEN 'DELETE'
+                   WHEN 2 THEN 'PUT'
+                   ELSE 'GET'
+                   END                                                   AS http_method,
+               regexp_replace(api.api_code, '^[^:]+:[^:]+:', '')         AS api_path,
+               md5(api.api_code || ':' || api.api_name)                  AS schema_hash,
+               0                                                         AS enable_flag,
+               COALESCE(
+                       NULLIF((api.api_ext ->> 'content')::json ->> 'remark', ''),
+                       NULLIF(api.remark, ''), api.api_group)            AS remark
         FROM dc3_api api
-        JOIN dc3_resource resource
-        ON resource.entity_id = api.id
-        AND resource.resource_type_flag = 6
-        AND resource.deleted = 0
+                 JOIN dc3_resource resource
+                      ON resource.entity_id = api.id
+                          AND resource.resource_type_flag = 6
+                          AND resource.deleted = 0
         WHERE api.deleted = 0
-        AND api.enable_flag = 0
-        AND api.api_code != ''
+          AND api.enable_flag = 0
+          AND api.api_code != ''
     </select>
 
     <select id="selectToolByToolId"

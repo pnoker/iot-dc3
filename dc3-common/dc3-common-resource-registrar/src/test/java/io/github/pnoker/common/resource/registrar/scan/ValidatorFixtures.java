@@ -54,6 +54,16 @@ class ValidatorFixtures {
 
     // --- annotated dummy methods ---
 
+    private static Operation getOperation(String methodName) {
+        try {
+            return ValidatorFixtures.class
+                    .getDeclaredMethod(methodName)
+                    .getAnnotation(Operation.class);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Fixture method not found: " + methodName, e);
+        }
+    }
+
     @Operation(
             description = "short"
             // no extensions → missing x-dc3-ai
@@ -75,6 +85,8 @@ class ValidatorFixtures {
     private void illegalRiskAndFlag() {
     }
 
+    // --- reflection helper ---
+
     @Operation(
             description = "This is a valid description that exceeds twenty characters",
             extensions = @Extension(
@@ -89,17 +101,5 @@ class ValidatorFixtures {
             )
     )
     private void valid() {
-    }
-
-    // --- reflection helper ---
-
-    private static Operation getOperation(String methodName) {
-        try {
-            return ValidatorFixtures.class
-                    .getDeclaredMethod(methodName)
-                    .getAnnotation(Operation.class);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Fixture method not found: " + methodName, e);
-        }
     }
 }

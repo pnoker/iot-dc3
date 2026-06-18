@@ -63,6 +63,30 @@ public class McpOpenApiAggregator {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private static String text(JsonNode node) {
+        return node.isTextual() && StringUtils.isNotBlank(node.asText()) ? node.asText() : null;
+    }
+
+    /**
+     * Parse a declared "true"/"false" flag; null when absent or unparseable.
+     */
+    private static Boolean boolFlag(JsonNode ai, String key) {
+        if (!ai.isObject()) {
+            return null;
+        }
+        String value = text(ai.path(key));
+        if (value == null) {
+            return null;
+        }
+        if ("true".equalsIgnoreCase(value)) {
+            return Boolean.TRUE;
+        }
+        if ("false".equalsIgnoreCase(value)) {
+            return Boolean.FALSE;
+        }
+        return null;
+    }
+
     /**
      * @return map of {@code dc3-center-<service>:METHOD:/path} -> merged input JSON Schema string.
      */
@@ -187,28 +211,6 @@ public class McpOpenApiAggregator {
                 .aiDescription(aiDescription)
                 .inputSchema(inputSchema)
                 .build();
-    }
-
-    private static String text(JsonNode node) {
-        return node.isTextual() && StringUtils.isNotBlank(node.asText()) ? node.asText() : null;
-    }
-
-    /** Parse a declared "true"/"false" flag; null when absent or unparseable. */
-    private static Boolean boolFlag(JsonNode ai, String key) {
-        if (!ai.isObject()) {
-            return null;
-        }
-        String value = text(ai.path(key));
-        if (value == null) {
-            return null;
-        }
-        if ("true".equalsIgnoreCase(value)) {
-            return Boolean.TRUE;
-        }
-        if ("false".equalsIgnoreCase(value)) {
-            return Boolean.FALSE;
-        }
-        return null;
     }
 
     /**

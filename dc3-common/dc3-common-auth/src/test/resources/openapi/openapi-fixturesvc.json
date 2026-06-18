@@ -9,7 +9,13 @@
       "post": {
         "summary": "Add Device",
         "description": "Create a device under the tenant.",
-        "x-dc3-ai": { "riskLevel": "MEDIUM", "destructive": "false", "idempotent": "false", "openWorld": "false", "hidden": "false" },
+        "x-dc3-ai": {
+          "riskLevel": "MEDIUM",
+          "destructive": "false",
+          "idempotent": "false",
+          "openWorld": "false",
+          "hidden": "false"
+        },
         "requestBody": {
           "content": {
             "application/json": {
