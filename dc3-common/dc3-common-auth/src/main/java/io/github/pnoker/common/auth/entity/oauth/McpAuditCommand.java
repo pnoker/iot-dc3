@@ -75,7 +75,9 @@ public class McpAuditCommand {
 
     private String remoteIp;
 
-    /** Populated on read-back from dc3_mcp_audit_log.create_time (unused on insert). */
+    /**
+     * Populated on read-back from dc3_mcp_audit_log.create_time (unused on insert).
+     */
     private LocalDateTime createTime;
 
 }

@@ -18,7 +18,6 @@
 package io.github.pnoker.common.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.auth.entity.bo.PrincipalBO;
 import io.github.pnoker.common.auth.entity.builder.PrincipalBuilder;
 import io.github.pnoker.common.auth.entity.query.PrincipalQuery;
 import io.github.pnoker.common.auth.entity.vo.PrincipalVO;

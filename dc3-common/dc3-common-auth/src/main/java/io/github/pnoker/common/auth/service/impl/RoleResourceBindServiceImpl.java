@@ -218,7 +218,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
             return resourceBuilder.buildBOListByDOList(collect);
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
     /**
