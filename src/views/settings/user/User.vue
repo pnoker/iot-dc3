@@ -16,57 +16,40 @@
 
 <template>
   <div>
-    <user-tool
-      :page="reactiveData.page"
-      @add="openAdd"
-      @refresh="refresh"
-      @reset="reset"
-      @search="search"
-      @sort="sort"
-      @size-change="sizeChange"
-      @current-change="currentChange"
-    />
-
-    <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column :label="t('settings.user.nickName')" min-width="120" prop="nickName" />
-        <el-table-column :label="t('settings.user.userName')" min-width="140" prop="userName" />
-        <el-table-column :label="t('settings.user.phone')" min-width="140" prop="phone" />
-        <el-table-column :label="t('settings.user.email')" min-width="180" prop="email" show-overflow-tooltip />
-        <el-table-column :label="t('common.enable')" width="90">
-          <template #default="{ row }">
-            <enable-tag :value="row.enableFlag" />
-          </template>
-        </el-table-column>
-        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
-        <el-table-column :label="t('common.operation')" fixed="right" width="310">
-          <template #default="{ row }">
-            <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
-            <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
-            <el-button link type="primary" @click="openAssignRoles(row)">
-              {{ t('settings.user.assignRoles') }}
-            </el-button>
-            <el-popconfirm
-              :cancel-button-text="t('common.cancel')"
-              :confirm-button-text="t('common.confirm')"
-              :title="t('settings.user.confirmDelete')"
-              @confirm="remove(row.id)"
-            >
-              <template #reference>
-                <el-button link type="danger">{{ t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <el-empty :description="t('settings.user.empty')" />
-        </template>
-      </el-table>
-    </blank-card>
-
-    <user-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate" />
+    <entity-list-page :config="config" />
     <user-assign-roles ref="assignRef" @save="onAssignRoles" />
   </div>
 </template>
 
-<script lang="ts" src="./index.ts"></script>
+<script lang="ts" setup>
+  import { ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
+
+  import { addRolePrincipalBind, deleteRolePrincipalBind } from '@/api/rolePrincipalBind';
+  import EntityListPage from '@/components/entity/EntityListPage.vue';
+  import { successMessage } from '@/utils/notificationUtil';
+
+  import UserAssignRoles from './assign/UserAssignRoles.vue';
+  import { createUserConfig } from './userConfig';
+
+  const { t } = useI18n();
+
+  const assignRef = ref<InstanceType<typeof UserAssignRoles>>();
+
+  const openAssignRoles = (row: Record<string, any>) => assignRef.value?.show(row);
+
+  const onAssignRoles = async (principalId: string, addIds: string[], removeBindIds: string[], done: () => void) => {
+    try {
+      await Promise.all([
+        ...addIds.map((roleId) => addRolePrincipalBind({ principalId, principalType: 'USER', roleId })),
+        ...removeBindIds.map((id) => deleteRolePrincipalBind(id)),
+      ]);
+      successMessage(t('settings.user.assignSaved'));
+      done();
+    } catch {
+      // handled globally
+    }
+  };
+
+  const config = createUserConfig(t, { onAssignRoles: openAssignRoles });
+</script>
