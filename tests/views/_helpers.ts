@@ -88,9 +88,13 @@ export async function mountListPage(opts: MountListPageOptions): Promise<VueWrap
         BlankCard: { template: '<section class="blank-card-stub"><slot /></section>' },
         SkeletonCard: { template: '<div class="skeleton-card-stub"><slot /></div>' },
         ToolCard: {
-          props: ['formModel', 'page'],
+          props: ['formModel', 'page', 'hideSort', 'hidePagination'],
           emits: ['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change'],
-          template: '<section class="tool-card-stub"><slot name="filters" /><slot name="actions" /></section>',
+          // Mirror the real ToolCard filters-slot contract (`:search`, `:form-data`)
+          // so engine-driven pages that destructure `{ search }` don't hit an
+          // undefined handler on `@keyup.enter`.
+          template:
+            '<section class="tool-card-stub"><slot name="filters" :form-data="formModel" :search="() => $emit(\'search\', formModel)" /><slot name="actions" /></section>',
         },
         ...(opts.stubs ?? {}),
       },
