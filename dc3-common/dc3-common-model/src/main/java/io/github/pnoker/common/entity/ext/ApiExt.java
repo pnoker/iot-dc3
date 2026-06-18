@@ -72,42 +72,6 @@ public class ApiExt extends BaseExt {
         @Schema(description = "Free-form description remark of the API interface", example = "Returns the latest temperature reading for a device")
         private String remark;
 
-        /**
-         * Declared MCP risk level (LOW / MEDIUM / HIGH); blank when derived automatically.
-         */
-        @Schema(description = "Declared MCP risk level (LOW / MEDIUM / HIGH); blank when derived automatically", example = "MEDIUM")
-        private String riskLevel;
-
-        /**
-         * Declared destructive hint ("true" / "false"); blank when derived.
-         */
-        @Schema(description = "Declared MCP destructive hint (\"true\" / \"false\"); blank when derived automatically", example = "false")
-        private String destructiveHint;
-
-        /**
-         * Declared open-world hint ("true" / "false"); blank when derived.
-         */
-        @Schema(description = "Declared MCP open-world hint (\"true\" / \"false\"); blank when derived automatically", example = "false")
-        private String openWorldHint;
-
-        /**
-         * Declared idempotent hint ("true" / "false"); blank when derived.
-         */
-        @Schema(description = "Declared MCP idempotent hint (\"true\" / \"false\"); blank when derived automatically", example = "true")
-        private String idempotentHint;
-
-        /**
-         * AI-facing description override; blank when the operation text is used.
-         */
-        @Schema(description = "AI-facing MCP tool description override; blank when the operation text is used", example = "Fetch the current temperature for a given device id")
-        private String aiDescription;
-
-        /**
-         * Whether the tool is hidden from tools/list by default ("true" / "false"); blank = visible.
-         */
-        @Schema(description = "Whether the tool is hidden from tools/list by default (\"true\" / \"false\"); blank means visible", example = "false")
-        private String hidden;
-
     }
 
 }

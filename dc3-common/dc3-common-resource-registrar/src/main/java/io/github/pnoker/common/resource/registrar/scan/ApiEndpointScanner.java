@@ -22,8 +22,6 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProperties;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.extensions.Extension;
-import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -176,7 +174,6 @@ public class ApiEndpointScanner {
                 String title = operation != null && StringUtils.isNotBlank(operation.summary())
                         ? operation.summary() : handler.getMethod().getName();
                 String remark = operation != null ? StringUtils.defaultString(operation.description()) : "";
-                Map<String, String> ai = aiMetadata(operation);
                 out.put(key,
                         FacadeScannedApiBO.builder()
                                 .method(method.name())
@@ -185,45 +182,9 @@ public class ApiEndpointScanner {
                                 .title(title)
                                 .remark(remark)
                                 .apiGroup(handler.getBeanType().getSimpleName())
-                                .riskLevel(ai.getOrDefault("riskLevel", ""))
-                                .destructiveHint(ai.getOrDefault("destructive", ""))
-                                .openWorldHint(ai.getOrDefault("openWorld", ""))
-                                .idempotentHint(ai.getOrDefault("idempotent", ""))
-                                .aiDescription(ai.getOrDefault("description", ""))
-                                .hidden(ai.getOrDefault("hidden", ""))
                                 .build());
             }
         }
-    }
-
-    /**
-     * Read AI tool metadata declared on the operation through the standard OpenAPI
-     * {@code x-dc3-ai} extension, e.g.
-     * <pre>
-     * &#64;Operation(summary = "...", extensions = &#64;Extension(name = "x-dc3-ai", properties = {
-     *     &#64;ExtensionProperty(name = "riskLevel", value = "HIGH"),
-     *     &#64;ExtensionProperty(name = "openWorld", value = "true")}))
-     * </pre>
-     * Recognised keys: {@code riskLevel}, {@code destructive}, {@code openWorld},
-     * {@code idempotent}, {@code description}, {@code hidden}. Absent keys stay unset so the
-     * tool catalog falls back to its own derivation.
-     */
-    private Map<String, String> aiMetadata(Operation operation) {
-        if (operation == null) {
-            return Map.of();
-        }
-        Map<String, String> metadata = new LinkedHashMap<>();
-        for (Extension extension : operation.extensions()) {
-            if (!"x-dc3-ai".equalsIgnoreCase(extension.name())) {
-                continue;
-            }
-            for (ExtensionProperty property : extension.properties()) {
-                if (StringUtils.isNotBlank(property.name())) {
-                    metadata.put(property.name(), StringUtils.defaultString(property.value()));
-                }
-            }
-        }
-        return metadata;
     }
 
     private boolean isPublicEndpoint(HandlerMethod handler) {

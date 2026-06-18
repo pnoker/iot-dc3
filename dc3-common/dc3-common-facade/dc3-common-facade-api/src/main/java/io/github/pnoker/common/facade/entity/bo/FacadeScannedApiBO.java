@@ -59,22 +59,4 @@ public class FacadeScannedApiBO {
      */
     private String apiGroup;
 
-
-    private String riskLevel;
-
-
-    private String destructiveHint;
-
-
-    private String openWorldHint;
-
-
-    private String idempotentHint;
-
-
-    private String aiDescription;
-
-
-    private String hidden;
-
 }

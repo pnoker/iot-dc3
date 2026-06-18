@@ -61,12 +61,6 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
                     .title(dto.getTitle())
                     .remark(dto.getRemark())
                     .apiGroup(dto.getApiGroup())
-                    .riskLevel(dto.getRiskLevel())
-                    .destructiveHint(dto.getDestructiveHint())
-                    .openWorldHint(dto.getOpenWorldHint())
-                    .idempotentHint(dto.getIdempotentHint())
-                    .aiDescription(dto.getAiDescription())
-                    .hidden(dto.getHidden())
                     .build());
         }
         return apis;

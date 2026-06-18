@@ -61,12 +61,6 @@ public class ResourceRegistryLocalFacade implements ResourceRegistryFacade {
                     .title(bo.getTitle())
                     .remark(bo.getRemark())
                     .apiGroup(bo.getApiGroup())
-                    .riskLevel(bo.getRiskLevel())
-                    .destructiveHint(bo.getDestructiveHint())
-                    .openWorldHint(bo.getOpenWorldHint())
-                    .idempotentHint(bo.getIdempotentHint())
-                    .aiDescription(bo.getAiDescription())
-                    .hidden(bo.getHidden())
                     .build());
         }
         return out;
