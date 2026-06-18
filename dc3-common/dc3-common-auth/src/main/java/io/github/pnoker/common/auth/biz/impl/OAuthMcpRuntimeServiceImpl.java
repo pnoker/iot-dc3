@@ -159,6 +159,26 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         record.setEnableFlag(Boolean.TRUE.equals(quality.getHidden()) ? (byte) 1 : (byte) 0);
     }
 
+    /**
+     * True when any persisted catalog column differs between the existing row and the freshly-built
+     * candidate — including the quality fields (title/remark/hints) that a JSON-only edit can change
+     * without altering the schema hash. Keeps the catalog in sync with x-dc3-ai/description edits.
+     */
+    static boolean toolChanged(McpToolRecord existing, McpToolRecord candidate) {
+        return !Objects.equals(existing.getSchemaHash(), candidate.getSchemaHash())
+                || !Objects.equals(existing.getPermissionCode(), candidate.getPermissionCode())
+                || !Objects.equals(existing.getApiPath(), candidate.getApiPath())
+                || !Objects.equals(existing.getRiskLevel(), candidate.getRiskLevel())
+                || !Objects.equals(existing.getEnableFlag(), candidate.getEnableFlag())
+                || !Objects.equals(existing.getToolExt(), candidate.getToolExt())
+                || !Objects.equals(existing.getToolTitle(), candidate.getToolTitle())
+                || !Objects.equals(existing.getRemark(), candidate.getRemark())
+                || !Objects.equals(existing.getReadOnlyHint(), candidate.getReadOnlyHint())
+                || !Objects.equals(existing.getDestructiveHint(), candidate.getDestructiveHint())
+                || !Objects.equals(existing.getIdempotentHint(), candidate.getIdempotentHint())
+                || !Objects.equals(existing.getOpenWorldHint(), candidate.getOpenWorldHint());
+    }
+
     private static String normalizeRisk(String declared) {
         String value = StringUtils.upperCase(StringUtils.trimToEmpty(declared));
         return switch (value) {
@@ -464,12 +484,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             if (existing == null) {
                 candidate.setId(IdWorker.getId());
                 changed += oauthMcpMapper.insertTool(candidate);
-            } else if (!Objects.equals(existing.getSchemaHash(), candidate.getSchemaHash())
-                    || !Objects.equals(existing.getPermissionCode(), candidate.getPermissionCode())
-                    || !Objects.equals(existing.getApiPath(), candidate.getApiPath())
-                    || !Objects.equals(existing.getRiskLevel(), candidate.getRiskLevel())
-                    || !Objects.equals(existing.getEnableFlag(), candidate.getEnableFlag())
-                    || !Objects.equals(existing.getToolExt(), candidate.getToolExt())) {
+            } else if (toolChanged(existing, candidate)) {
                 candidate.setId(existing.getId());
                 changed += oauthMcpMapper.updateTool(candidate);
             }

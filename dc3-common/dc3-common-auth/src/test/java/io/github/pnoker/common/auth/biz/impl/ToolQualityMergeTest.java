@@ -74,4 +74,27 @@ class ToolQualityMergeTest {
 
         assertThat(r.getEnableFlag()).isEqualTo((byte) 1); // hidden -> disabled
     }
+
+    @Test
+    void toolChangedDetectsHintOnlyEdit() {
+        McpToolRecord existing = record("GET");
+        OAuthMcpRuntimeServiceImpl.applyQuality(existing, ToolQuality.builder()
+                .riskLevel("LOW").destructive(false).idempotent(true).openWorld(false).hidden(false).build());
+        McpToolRecord candidate = record("GET");
+        OAuthMcpRuntimeServiceImpl.applyQuality(candidate, ToolQuality.builder()
+                .riskLevel("LOW").destructive(true).idempotent(true).openWorld(false).hidden(false).build());
+        // schemaHash/riskLevel/enableFlag/toolExt unchanged; only destructiveHint differs.
+        assertThat(OAuthMcpRuntimeServiceImpl.toolChanged(existing, candidate)).isTrue();
+    }
+
+    @Test
+    void toolChangedIsFalseForIdenticalRecords() {
+        McpToolRecord a = record("GET");
+        OAuthMcpRuntimeServiceImpl.applyQuality(a, ToolQuality.builder().riskLevel("LOW").build());
+        a.setSchemaHash("h");
+        McpToolRecord b = record("GET");
+        OAuthMcpRuntimeServiceImpl.applyQuality(b, ToolQuality.builder().riskLevel("LOW").build());
+        b.setSchemaHash("h");
+        assertThat(OAuthMcpRuntimeServiceImpl.toolChanged(a, b)).isFalse();
+    }
 }
