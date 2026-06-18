@@ -234,6 +234,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     config.value.fields.forEach((field) => {
       value[field.prop] = row[field.prop] ?? value[field.prop];
     });
+    Object.assign(value, config.value.fromRow?.(row) || {});
     assignForm(value);
     formVisible.value = true;
   };
@@ -246,6 +247,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
   };
 
   const payload = () => {
+    if (config.value.toPayload) return config.value.toPayload(formModel);
     const result: Record<string, unknown> = {};
     if (formModel.id) result.id = formModel.id;
     if (formModel.version) result.version = formModel.version;

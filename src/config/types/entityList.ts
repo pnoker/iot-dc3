@@ -117,6 +117,11 @@ export interface EntityListConfig {
   defaultForm: () => Record<string, unknown>;
   relations?: EntityRelation[];
 
+  /** 编辑态打开时注入的派生/额外表单值（覆盖默认的按字段映射值）。 */
+  fromRow?: (row: Record<string, any>) => Record<string, unknown>;
+  /** 由表单构建提交载荷（存在时替代默认的载荷组装）。 */
+  toPayload?: (form: Record<string, any>) => Record<string, unknown>;
+
   list: (query: PageQuery) => Promise<R>;
   add?: (payload: Record<string, unknown>) => Promise<R>;
   update?: (payload: Record<string, unknown>) => Promise<R>;
