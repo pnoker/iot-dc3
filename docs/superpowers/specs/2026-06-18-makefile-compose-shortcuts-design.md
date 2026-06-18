@@ -6,13 +6,14 @@
 
 `iot-dc3/Makefile` 的 compose 类操作受三个维度影响：
 
-| 维度 | 取值 | 作用 |
-|------|------|------|
-| `STACK` | `dev` / `app` / `db` / `optional` | 选哪个 compose 文件 |
-| `REGISTRY` | `auto` / `global` / `cn` | 镜像从哪个仓库拉（global=Docker Hub，cn=阿里云） |
-| `SERVICES` / `GROUP` | 服务过滤 | 操作哪些服务 |
+| 维度                   | 取值                                | 作用                                 |
+|----------------------|-----------------------------------|------------------------------------|
+| `STACK`              | `dev` / `app` / `db` / `optional` | 选哪个 compose 文件                     |
+| `REGISTRY`           | `auto` / `global` / `cn`          | 镜像从哪个仓库拉（global=Docker Hub，cn=阿里云） |
+| `SERVICES` / `GROUP` | 服务过滤                              | 操作哪些服务                             |
 
-但目前只有 `dev-db`、`dev-optional` 两个快捷入口，且都写死、不带 registry 选择。要切换 cn/global 只能 `make dev-db REGISTRY=cn` 手动传环境变量，体验差。
+但目前只有 `dev-db`、`dev-optional` 两个快捷入口，且都写死、不带 registry 选择。要切换 cn/global 只能
+`make dev-db REGISTRY=cn` 手动传环境变量，体验差。
 
 目标：为**所有** compose 操作建立统一的、命令名里就能表达 `stack`+`registry` 的快捷体系，无需手动传环境变量。
 
@@ -28,7 +29,8 @@
 ```
 
 - 不带 registry 后缀 → 沿用现状 `REGISTRY=auto`（读 `.env`）。
-- 生成数量：`11 op × 4 stack` = 44，加 `4 拉镜像 op × 4 stack × 2 registry` = 32，**共 76 个**，全部用 `eval`/`foreach` 自动生成，零手写。
+- 生成数量：`11 op × 4 stack` = 44，加 `4 拉镜像 op × 4 stack × 2 registry` = 32，**共 76 个**，全部用 `eval`/`foreach`
+  自动生成，零手写。
 
 示例：
 
@@ -117,7 +119,8 @@ Compose shortcuts (auto-generated):
 规则：
 
 - **必须**替换被删的 `dev-db` / `dev-optional`（否则文档示例会报 "No rule to make target"）。
-- `make up STACK=db` / `REGISTRY=cn` 这类写法**仍有效**（基础 op 保留），不强制替换；仅在主 README / AGENTS 的"快速开始"处主推新快捷命令。
+- `make up STACK=db` / `REGISTRY=cn` 这类写法**仍有效**（基础 op 保留），不强制替换；仅在主 README / AGENTS 的"快速开始"
+  处主推新快捷命令。
 - `.env.example` 的 `REGISTRY=cn` 注释保留（机制不变）。
 
 ## 非目标（YAGNI）
