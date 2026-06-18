@@ -16,56 +16,40 @@
 
 <template>
   <div>
-    <role-tool
-      :page="reactiveData.page"
-      @add="openAdd"
-      @refresh="refresh"
-      @reset="reset"
-      @search="search"
-      @sort="sort"
-      @size-change="sizeChange"
-      @current-change="currentChange"
-    />
-
-    <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column :label="t('settings.role.roleName')" min-width="160" prop="roleName" />
-        <el-table-column :label="t('settings.role.roleCode')" min-width="160" prop="roleCode" />
-        <el-table-column :label="t('common.enable')" width="90">
-          <template #default="{ row }">
-            <enable-tag :value="row.enableFlag" />
-          </template>
-        </el-table-column>
-        <el-table-column :label="t('common.remark')" min-width="200" prop="remark" show-overflow-tooltip />
-        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
-        <el-table-column :label="t('common.operation')" fixed="right" width="320">
-          <template #default="{ row }">
-            <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
-            <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
-            <el-button link type="primary" @click="openAssignResources(row)">
-              {{ t('settings.role.assignResources') }}
-            </el-button>
-            <el-popconfirm
-              :cancel-button-text="t('common.cancel')"
-              :confirm-button-text="t('common.confirm')"
-              :title="t('settings.role.confirmDelete')"
-              @confirm="remove(row.id)"
-            >
-              <template #reference>
-                <el-button link type="danger">{{ t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <el-empty :description="t('settings.role.empty')" />
-        </template>
-      </el-table>
-    </blank-card>
-
-    <role-edit-form ref="editRef" :tree-data="reactiveData.roleTreeData" @add-thing="onAdd" @update-thing="onUpdate" />
+    <entity-list-page :config="config" />
     <role-assign-resources ref="assignRef" @save="onAssignResources" />
   </div>
 </template>
 
-<script lang="ts" src="./index.ts"></script>
+<script lang="ts" setup>
+  import { ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
+
+  import { addRoleResourceBind, deleteRoleResourceBind } from '@/api/roleResourceBind';
+  import EntityListPage from '@/components/entity/EntityListPage.vue';
+  import { successMessage } from '@/utils/notificationUtil';
+
+  import RoleAssignResources from './assign/RoleAssignResources.vue';
+  import { createRoleConfig } from './roleConfig';
+
+  const { t } = useI18n();
+
+  const assignRef = ref<InstanceType<typeof RoleAssignResources>>();
+
+  const openAssignResources = (row: Record<string, any>) => assignRef.value?.show(row);
+
+  const onAssignResources = async (roleId: string, addIds: string[], removeBindIds: string[], done: () => void) => {
+    try {
+      await Promise.all([
+        ...addIds.map((resourceId) => addRoleResourceBind({ roleId, resourceId })),
+        ...removeBindIds.map((id) => deleteRoleResourceBind(id)),
+      ]);
+      successMessage(t('settings.role.assignSaved'));
+      done();
+    } catch {
+      // handled globally
+    }
+  };
+
+  const config = createRoleConfig(t, { onAssignResources: openAssignResources });
+</script>
