@@ -19,8 +19,8 @@
 
 ```bash
 cd iot-dc3
-make dev-db
-make app
+make up-db
+make up STACK=app
 ```
 
 #### 🐱 China Registry
@@ -29,16 +29,16 @@ make app
 
 ```bash
 cd iot-dc3
-make dev-db REGISTRY=cn
-make app REGISTRY=cn
+make up-db-cn
+make up STACK=app REGISTRY=cn
 ```
 
 > You can also start full workflows or other compose stacks with the same selector, for example:
 
 ```bash
-make dev-all
-make dev-all REGISTRY=cn
-make app-all REGISTRY=cn
+make up-db && make up-optional && make up-dev
+make up-db-cn && make up-optional-cn && make up-dev-cn
+make up-db-cn && make up-optional-cn && make up-app-cn
 make compose-up STACK=optional
 make compose-up STACK=optional REGISTRY=cn
 make compose-logs STACK=dev REGISTRY=global
@@ -47,7 +47,7 @@ make compose-logs STACK=dev REGISTRY=global
 For frontend and API testing, use the service-level shortcuts to start only the modules under test:
 
 ```bash
-make dev-db REGISTRY=cn
+make up-db-cn
 make up SERVICES=agentic REGISTRY=cn
 make up SERVICES="gateway agentic" REGISTRY=cn
 make logs SERVICES="gateway agentic"

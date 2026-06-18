@@ -21,8 +21,8 @@ Use the supported toolchain:
 Start the local dependency stack from the repository root:
 
 ```bash
-make dev-db
-make dev-optional
+make up-db
+make up-optional
 ```
 
 For source-run Java processes, load runtime variables from:

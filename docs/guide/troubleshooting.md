@@ -117,8 +117,8 @@ make build
 **处理方式**：
 
 ```bash
-make dev-db REGISTRY=global
-make dev-db REGISTRY=cn
+make up-db-global
+make up-db-cn
 ```
 
 `global` 使用默认镜像仓库，`cn` 使用中国大陆镜像仓库。

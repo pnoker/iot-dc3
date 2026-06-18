@@ -152,10 +152,10 @@ cd iot-dc3
 
 ```bash
 # Registry toàn cầu
-make dev-db
+make up-db
 
 # Người dùng Trung Quốc đại lục (Alibaba Cloud registry)
-make dev-db REGISTRY=cn
+make up-db-cn
 ```
 
 **③ Nạp biến môi trường local, build và khởi động**
@@ -189,8 +189,8 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar  # Virtual
 **Khởi động hạ tầng tùy chọn** (EMQX, ELK/APM, Prometheus, Grafana, v.v.):
 
 ```bash
-make dev-optional REGISTRY=cn    # Khởi động phụ thuộc tùy chọn
-make dev-all REGISTRY=cn         # Khởi động toàn bộ phụ thuộc
+make up-optional-cn              # Khởi động phụ thuộc tùy chọn
+make up-db-cn && make up-optional-cn && make up-dev-cn  # Khởi động toàn bộ phụ thuộc
 ```
 
 **Khởi động dịch vụ theo nhu cầu** (phù hợp để test frontend/API):

@@ -68,7 +68,7 @@ and takes ~5–8 min; rebuilds with the dependency cache warm take ~1 min.
 
 ```bash
 # Postgres + RabbitMQ
-make dev-db COMPOSE='docker compose'
+make up-db COMPOSE='docker compose'
 
 # Wait until both are healthy (each takes ~10 s)
 for i in {1..30}; do

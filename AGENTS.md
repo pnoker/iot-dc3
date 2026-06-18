@@ -154,9 +154,9 @@ Prefer the root `Makefile` when a target exists. It keeps commands consistent ac
 Common commands:
 
 ```bash
-make dev-db
-make dev-optional
-make dev-all
+make up-db
+make up-optional
+make up-db && make up-optional && make up-dev
 make package
 make changelog
 make install-hooks
@@ -203,8 +203,8 @@ Registry selection is controlled by environment variables and Make arguments, no
 compose files:
 
 ```bash
-make dev REGISTRY=cn
-make app-all REGISTRY=global
+make up STACK=dev REGISTRY=cn
+make up-db-global && make up-optional-global && make up-app-global
 make compose-config STACK=optional REGISTRY=cn
 ```
 

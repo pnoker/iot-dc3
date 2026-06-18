@@ -17,10 +17,10 @@
 
 ```bash
 # 全球镜像源
-make dev-db
+make up-db
 
 # 中国大陆镜像源
-make dev-db REGISTRY=cn
+make up-db-cn
 ```
 
 会拉起 PostgreSQL 与 RabbitMQ。
@@ -28,9 +28,9 @@ make dev-db REGISTRY=cn
 ## 2. （可选）启动可选依赖
 
 ```bash
-make dev-optional
+make up-optional
 # 或
-make dev-optional REGISTRY=cn
+make up-optional-cn
 ```
 
 通常用于 EMQX 等 MQTT broker。
@@ -86,17 +86,17 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 
 ```bash
 # 本地开发栈
-make dev
-make dev REGISTRY=cn
+make up STACK=dev
+make up STACK=dev REGISTRY=cn
 
 # 完整本地环境（db + optional + dev）
-make dev-all
-make dev-all REGISTRY=cn
+make up-db && make up-optional && make up-dev
+make up-db-cn && make up-optional-cn && make up-dev-cn
 
 # 打包镜像应用栈
-make app
-make app REGISTRY=cn
-make app-all REGISTRY=cn
+make up STACK=app
+make up STACK=app REGISTRY=cn
+make up-db-cn && make up-optional-cn && make up-app-cn
 ```
 
 ## 8. 常用维护命令
@@ -115,7 +115,7 @@ make compose-ps STACK=dev
 make compose-restart STACK=dev
 
 # 仅启动选定服务（前端/接口测试）
-make dev-db REGISTRY=cn
+make up-db-cn
 make up SERVICES="gateway agentic" REGISTRY=cn
 make logs SERVICES="gateway agentic"
 ```
@@ -132,7 +132,7 @@ make logs SERVICES="gateway agentic"
 
 ## 10. 推荐本地工作流
 
-1. `make dev-db`
+1. `make up-db`
 2. `mvn -s .mvn/settings.xml clean package`
 3. 按 Gateway → Auth → Manager → Data → Agentic → Driver 顺序启动
 4. 通过 Gateway `http://localhost:8000/api/v3/...` 测试 API

@@ -153,10 +153,10 @@ cd iot-dc3
 
 ```bash
 # Global registry
-make dev-db
+make up-db
 
 # Mainland China users (Alibaba Cloud registry)
-make dev-db REGISTRY=cn
+make up-db-cn
 ```
 
 **③ Load local environment variables, build, and start**
@@ -189,8 +189,8 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar  # Virtual
 **Start optional infrastructure** (EMQX, ELK/APM, Prometheus, Grafana, etc.):
 
 ```bash
-make dev-optional REGISTRY=cn    # Start optional dependencies
-make dev-all REGISTRY=cn         # Start all dependencies
+make up-optional-cn              # Start optional dependencies
+make up-db-cn && make up-optional-cn && make up-dev-cn  # Start all dependencies
 ```
 
 **Start selected services** (useful for frontend/API testing):

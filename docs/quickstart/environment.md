@@ -25,8 +25,8 @@ cp .env.example .env
 然后在仓库根目录运行 Compose 相关命令：
 
 ```bash
-make dev-all
-make app-all REGISTRY=cn
+make up-db && make up-optional && make up-dev
+make up-db-cn && make up-optional-cn && make up-app-cn
 podman compose -f dc3/docker-compose-dev.yml config
 ```
 
