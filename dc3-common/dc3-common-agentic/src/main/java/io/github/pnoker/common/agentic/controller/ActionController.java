@@ -57,6 +57,12 @@ public class ActionController implements BaseController {
 
     private final ActionService actionService;
 
+    /**
+     * List agent tool calls awaiting human approval in the given conversation.
+     *
+     * @param conversationId client-visible id of the conversation whose pending tool calls are listed; scoped to the current tenant and user
+     * @return a list of pending ActionVO entries with tool name and parameters, ready for the user to confirm or reject
+     */
     @PreAuthorize("@perm.can('action', 'get')")
     @Operation(summary = "List Pending Agent Actions", description = "List agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. " +
             "Returns each pending action with its tool name and parameters so the user can confirm or reject before execution.")
@@ -72,6 +78,12 @@ public class ActionController implements BaseController {
         }));
     }
 
+    /**
+     * Approve a pending agent tool call so the assistant may execute it.
+     *
+     * @param actionId id of the pending agent tool call to approve; must belong to the current tenant and be in pending state
+     * @return the ActionVO with its updated confirmed status
+     */
     @PreAuthorize("@perm.can('action', 'list')")
     @Operation(summary = "Confirm Agent Action", description = "Approve a pending agent tool call by id so the assistant may execute it. " +
             "Returns the action with its updated confirmed status; call after the user accepts a proposed tool invocation.")
@@ -85,6 +97,12 @@ public class ActionController implements BaseController {
         }));
     }
 
+    /**
+     * Decline a pending agent tool call so the assistant does not execute it.
+     *
+     * @param actionId id of the pending agent tool call to decline; must belong to the current tenant and be in pending state
+     * @return the ActionVO with its updated rejected status
+     */
     @PreAuthorize("@perm.can('action', 'list')")
     @Operation(summary = "Reject Agent Action", description = "Decline a pending agent tool call by id so the assistant does not execute it. " +
             "Returns the action with its updated rejected status; call when the user denies a proposed tool invocation.")

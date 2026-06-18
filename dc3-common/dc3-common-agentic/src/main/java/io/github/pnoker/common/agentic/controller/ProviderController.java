@@ -60,6 +60,11 @@ public class ProviderController implements BaseController {
 
     private final ModelProviderService modelProviderService;
 
+    /**
+     * List the upstream LLM providers configured for the current tenant.
+     *
+     * @return a list of ModelProviderVO entries with id, name, base URL and capability spec
+     */
     @PreAuthorize("@perm.can('provider', 'list')")
     @Operation(summary = "List Model Providers", description = "List the upstream LLM providers configured for the current tenant. Returns each provider's id, name, base URL and capability spec; use to choose a provider when creating a model configuration.")
     @GetMapping("/list")
@@ -67,6 +72,12 @@ public class ProviderController implements BaseController {
         return async(() -> R.ok(modelProviderBuilder.buildVOListByBOList(modelProviderService.list())));
     }
 
+    /**
+     * Register a new upstream LLM provider for the current tenant.
+     *
+     * @param request provider payload carrying base URL, credentials and capability spec
+     * @return the created ModelProviderVO, referenceable when defining model configurations
+     */
     @PreAuthorize("@perm.can('provider', 'add')")
     @Operation(summary = "Add Model Provider", description = "Register a new upstream LLM provider for the current tenant with its base URL, credentials and capability spec. "
             + "Returns the created provider; reference it afterwards when defining model configurations.")
@@ -78,6 +89,12 @@ public class ProviderController implements BaseController {
         }));
     }
 
+    /**
+     * Update an existing LLM provider for the current tenant.
+     *
+     * @param request provider payload carrying the new base URL, credentials or capability spec
+     * @return the updated ModelProviderVO; the target must belong to the current tenant
+     */
     @PreAuthorize("@perm.can('provider', 'update')")
     @Operation(summary = "Update Model Provider", description = "Update an existing LLM provider for the current tenant, changing its base URL, credentials or capability spec. "
             + "Returns the updated provider; the target must belong to the current tenant.")
@@ -89,6 +106,12 @@ public class ProviderController implements BaseController {
         }));
     }
 
+    /**
+     * Permanently remove an LLM provider from the current tenant by id.
+     *
+     * @param id primary key of the provider to delete; must belong to the current tenant
+     * @return delete-success status (true on success)
+     */
     @PreAuthorize("@perm.can('provider', 'delete')")
     @Operation(summary = "Delete Model Provider", description = "Permanently remove an LLM provider from the current tenant by id. "
             + "Returns true on success; model configurations bound to this provider will no longer resolve, so call only when the provider is unused.")

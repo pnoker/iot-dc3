@@ -58,6 +58,13 @@ public class AttachmentController implements BaseController {
 
     private final AttachmentService attachmentService;
 
+    /**
+     * Upload a file as an attachment to the given AI conversation.
+     *
+     * @param conversationId client-visible id of the conversation to attach the file to; scoped to the current tenant and user
+     * @param filePart       multipart file part carrying the file bytes to upload
+     * @return the stored AttachmentVO metadata; the file then becomes available as context the assistant can reference
+     */
     @PreAuthorize("@perm.can('attachment', 'list')")
     @Operation(summary = "Upload Attachment", description = "Upload a file as an attachment to the given AI conversation for the current tenant and user. " +
             "Returns the stored attachment metadata; the file then becomes available as context the assistant can reference in that conversation.")
@@ -75,6 +82,12 @@ public class AttachmentController implements BaseController {
         }));
     }
 
+    /**
+     * List attachments uploaded to the given AI conversation.
+     *
+     * @param conversationId client-visible id of the conversation whose attachments are listed; scoped to the current tenant and user
+     * @return a list of AttachmentVO metadata entries for files the assistant can reference in that conversation
+     */
     @PreAuthorize("@perm.can('attachment', 'list')")
     @Operation(summary = "List Attachments", description = "List the attachments uploaded to the given AI conversation, scoped to the current tenant and user. " +
             "Returns attachment metadata entries; use to discover files the assistant can reference in that conversation.")

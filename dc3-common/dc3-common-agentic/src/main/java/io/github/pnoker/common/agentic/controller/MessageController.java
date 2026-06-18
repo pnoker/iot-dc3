@@ -55,6 +55,12 @@ public class MessageController implements BaseController {
 
     private final MessageService messageService;
 
+    /**
+     * List the ordered message history of one AI chat session.
+     *
+     * @param conversationId client-visible id of the conversation whose history is retrieved; scoped to the current user and tenant
+     * @return a list of MessageVO turns (user prompts and assistant replies) in chronological order
+     */
     @PreAuthorize("@perm.can('message', 'list')")
     @Operation(summary = "List Session Messages", description = "List the ordered message history of one AI chat session for the current user and tenant. " +
             "Returns each turn (user prompts and assistant replies) in chronological order; use to read or resume a past conversation.")

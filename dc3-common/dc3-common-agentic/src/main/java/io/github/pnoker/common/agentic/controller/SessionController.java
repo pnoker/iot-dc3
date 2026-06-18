@@ -63,6 +63,12 @@ public class SessionController implements BaseController {
 
     private final SessionBuilder sessionBuilder;
 
+    /**
+     * Page through the current user's AI chat sessions for this tenant.
+     *
+     * @param query optional paging and filter criteria; tenant and user scope are forced to the caller
+     * @return a page of SessionVO summaries matching the query
+     */
     @PreAuthorize("@perm.can('session', 'list')")
     @Operation(summary = "List Sessions", description = "Page through the current user's AI chat sessions for this tenant. " +
             "Returns a page of session summaries; use to resume or browse past conversations.")
@@ -79,6 +85,12 @@ public class SessionController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch a single AI chat session by its conversation id.
+     *
+     * @param conversationId client-visible conversation id scoped to the current user and tenant
+     * @return the matched SessionVO; fails when no matching session exists
+     */
     @PreAuthorize("@perm.can('session', 'get')")
     @Operation(summary = "Get Session", description = "Fetch a single AI chat session by its conversation id, scoped to the current user and tenant. " +
             "Returns the session details, or a failure when no matching session exists.")
@@ -96,6 +108,12 @@ public class SessionController implements BaseController {
         }));
     }
 
+    /**
+     * Permanently delete an AI chat session and its message history by conversation id.
+     *
+     * @param conversationId client-visible conversation id scoped to the current user and tenant; identifies the session to delete along with its message history
+     * @return an empty R completing with no body on success (delete cannot be undone)
+     */
     @PreAuthorize("@perm.can('session', 'delete')")
     @Operation(summary = "Delete Session", description = "Permanently delete an AI chat session and its message history by conversation id, scoped to the current user and tenant. " +
             "Use to discard a conversation; this cannot be undone.")
@@ -108,6 +126,13 @@ public class SessionController implements BaseController {
         }));
     }
 
+    /**
+     * Update editable fields of an AI chat session identified by conversation id.
+     *
+     * @param conversationId client-visible conversation id scoped to the current user and tenant; identifies the session to update
+     * @param request        optional session payload carrying the editable fields (e.g. name) to apply
+     * @return the updated SessionVO; fails when the session does not exist
+     */
     @PreAuthorize("@perm.can('session', 'update')")
     @Operation(summary = "Update Session", description = "Update editable fields of an AI chat session identified by conversation id, scoped to the current user and tenant. " +
             "Use to rename or adjust a session; returns the updated session, or a failure when it does not exist.")

@@ -54,8 +54,13 @@ public class ChatController implements BaseController {
     private final AgenticChatService agenticChatService;
 
     /**
-     * Chat completion endpoint. Returns SSE when {@code request.stream == true};
-     * otherwise returns the OpenAI-compatible JSON response.
+     * Submit a chat prompt and receive the assistant reply in OpenAI-compatible format.
+     * <p>
+     * Returns SSE when {@code request.stream == true}; otherwise returns the
+     * OpenAI-compatible JSON response.
+     *
+     * @param request chat completion payload carrying the prompt, conversation context, model selection and stream flag
+     * @return a streaming SSE entity when stream is true, otherwise a JSON entity wrapping the full completion reply in R
      */
     @PreAuthorize("@perm.can('chat', 'list')")
     @Operation(summary = "Create Chat Completion", description = "Submit a chat prompt with conversation context and receive the assistant reply using the OpenAI-compatible completion format. "

@@ -61,6 +61,11 @@ public class ModelController implements BaseController {
 
     private final ModelConfigService modelConfigService;
 
+    /**
+     * List the AI model options available to the current tenant for chat selection.
+     *
+     * @return a list of ModelVO options with model ids and display names
+     */
     @PreAuthorize("@perm.can('model', 'list')")
     @Operation(summary = "List AI Models", description = "List the AI model options available to the current tenant for selection in a chat session." +
             " Returns model ids with display names; use to pick a model before chatting.")
@@ -69,6 +74,11 @@ public class ModelController implements BaseController {
         return async(() -> R.ok(modelConfigService.listOptions()));
     }
 
+    /**
+     * List the stored AI model configurations for the current tenant.
+     *
+     * @return a list of full ModelConfigVO records binding provider, model id and parameters
+     */
     @PreAuthorize("@perm.can('model', 'list')")
     @Operation(summary = "List AI Model Configurations", description = "List the stored AI model configurations for the current tenant, each binding a provider, model id and parameters." +
             " Returns full configuration records for management, unlike the lightweight model options used for chat selection.")
@@ -77,6 +87,12 @@ public class ModelController implements BaseController {
         return async(() -> R.ok(modelConfigBuilder.buildVOListByBOList(modelConfigService.listConfigs())));
     }
 
+    /**
+     * Create an AI model configuration for the current tenant.
+     *
+     * @param request model configuration payload binding a provider, model id and parameters
+     * @return the saved ModelConfigVO, selectable as a model in future sessions
+     */
     @PreAuthorize("@perm.can('model', 'add')")
     @Operation(summary = "Add AI Model Configuration", description = "Create an AI model configuration for the current tenant binding a provider, model id and parameters." +
             " Returns the saved configuration; the assistant can then use it as a selectable model in a session.")
@@ -88,6 +104,12 @@ public class ModelController implements BaseController {
         }));
     }
 
+    /**
+     * Update an existing AI model configuration for the current tenant.
+     *
+     * @param request model configuration payload carrying the new provider, model id or parameters
+     * @return the updated ModelConfigVO; changes apply to future sessions that select this model
+     */
     @PreAuthorize("@perm.can('model', 'update')")
     @Operation(summary = "Update AI Model Configuration", description = "Update an existing AI model configuration's provider, model id or parameters for the current tenant." +
             " Returns the updated configuration; changes apply to future sessions that select this model.")
@@ -99,6 +121,12 @@ public class ModelController implements BaseController {
         }));
     }
 
+    /**
+     * Permanently delete an AI model configuration by id within the current tenant.
+     *
+     * @param id primary key of the model configuration to delete; must belong to the current tenant
+     * @return delete-success status (true on success)
+     */
     @PreAuthorize("@perm.can('model', 'delete')")
     @Operation(summary = "Delete AI Model Configuration", description = "Permanently delete the AI model configuration identified by id within the current tenant." +
             " Returns true on success; the model is no longer selectable in new sessions.")
