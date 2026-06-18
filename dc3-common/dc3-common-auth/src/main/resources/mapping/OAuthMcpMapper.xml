@@ -357,42 +357,6 @@
         END AS http_method,
         regexp_replace(api.api_code, '^[^:]+:[^:]+:', '') AS api_path,
         md5(api.api_code || ':' || api.api_name) AS schema_hash,
-        <!-- Risk level: declared api_ext value wins; otherwise derive from method + name.
-             A real DELETE, or a destructive/physical/bulk-impact POST whose api_name action
-             is delete/purge/clear/reset/command/issue/send/dispatch/import/reboot/execute
-             (DC3 exposes deletes as POST /delete, so the action suffix — not the HTTP method —
-             carries the risk), is HIGH; other POST/PUT is MEDIUM; GET is LOW. -->
-        COALESCE(
-        NULLIF(upper((api.api_ext ->> 'content')::json ->> 'riskLevel'), ''),
-        CASE
-        WHEN api.api_type_flag = 1 THEN 'HIGH'
-        WHEN api.api_type_flag = 0
-        AND api.api_name ~* '(delete|purge|clear|reset|command|issue|send|dispatch|import|reboot|execute)'
-        THEN 'HIGH'
-        WHEN api.api_type_flag IN (0, 2) THEN 'MEDIUM'
-        ELSE 'LOW'
-        END) AS risk_level,
-        CASE WHEN api.api_type_flag = 3 THEN 1 ELSE 0 END AS read_only_hint,
-        <!-- destructive: declared wins; else DELETE or reset/purge/clear POST. -->
-        COALESCE(
-        CASE lower(NULLIF((api.api_ext ->> 'content')::json ->> 'destructiveHint', ''))
-        WHEN 'true' THEN 1 WHEN 'false' THEN 0 ELSE NULL END,
-        CASE
-        WHEN api.api_type_flag = 1 THEN 1
-        WHEN api.api_type_flag = 0 AND api.api_name ~* '(reset|purge|clear|delete)' THEN 1
-        ELSE 0 END) AS destructive_hint,
-        <!-- idempotent: declared wins; else PUT/GET are idempotent, POST/DELETE are not. -->
-        COALESCE(
-        CASE lower(NULLIF((api.api_ext ->> 'content')::json ->> 'idempotentHint', ''))
-        WHEN 'true' THEN 1 WHEN 'false' THEN 0 ELSE NULL END,
-        CASE WHEN api.api_type_flag IN (2, 3) THEN 1 ELSE 0 END) AS idempotent_hint,
-        <!-- open-world: declared wins; else only outward-reaching ops (device command,
-             notification, external call) are open-world, plain DB read/write is not. -->
-        COALESCE(
-        CASE lower(NULLIF((api.api_ext ->> 'content')::json ->> 'openWorldHint', ''))
-        WHEN 'true' THEN 1 WHEN 'false' THEN 0 ELSE NULL END,
-        CASE WHEN api.api_name ~* '(command|issue|send|dispatch|notify|reboot|execute|external)'
-        THEN 1 ELSE 0 END) AS open_world_hint,
         0 AS enable_flag,
         COALESCE(
         NULLIF((api.api_ext ->> 'content')::json ->> 'remark', ''),
