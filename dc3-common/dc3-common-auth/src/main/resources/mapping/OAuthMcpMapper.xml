@@ -429,6 +429,7 @@
             destructive_hint = #{destructiveHint},
             idempotent_hint  = #{idempotentHint},
             open_world_hint  = #{openWorldHint},
+            enable_flag      = #{enableFlag},
             tool_ext         = COALESCE(NULLIF(#{toolExt}, '')::json, '{}'::json),
             remark           = #{remark},
             operate_time     = CURRENT_TIMESTAMP
