@@ -57,7 +57,7 @@ public class AgenticChatResponseCodec {
     private final ObjectMapper objectMapper;
 
     public ChatCompletionResponseVO blockingResponse(AgenticPreparedChatBO prepared, String content,
-                                                   String finishReason) {
+                                                     String finishReason) {
         int completionTokens = AgenticTokenEstimatorUtil.estimate(content);
         int promptTokens = Objects.nonNull(prepared.inputTokens()) ? prepared.inputTokens().getInput() : 0;
         return ChatCompletionResponseVO.builder()

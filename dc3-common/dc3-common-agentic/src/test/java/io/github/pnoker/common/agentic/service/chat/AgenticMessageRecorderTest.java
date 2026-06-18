@@ -118,7 +118,7 @@ class AgenticMessageRecorderTest {
     }
 
     private AgenticPreparedChatBO prepared(AgenticRunTrace runTrace, boolean reasoning,
-                                                List<AgenticMessageContent.Context> contexts) {
+                                           List<AgenticMessageContent.Context> contexts) {
         return new AgenticPreparedChatBO("hello", "tenant:user:conversation", null, "dc3-test-model",
                 Map.of(), null, null, runTrace, true, reasoning, List.of(), contexts,
                 AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());

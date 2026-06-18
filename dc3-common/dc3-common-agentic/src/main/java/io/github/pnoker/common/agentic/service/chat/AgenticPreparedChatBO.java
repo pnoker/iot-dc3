@@ -30,11 +30,11 @@ import java.util.Map;
  * @since 2016.10.1
  */
 public record AgenticPreparedChatBO(String userMessage, String scopedConversationId,
-                                         String requestSystemContext, String model,
-                                         Map<String, Object> toolContext, Double temperature,
-                                         Integer maxTokens,
-                                         AgenticRunTrace runTrace,
-                                         boolean toolCallingEnabled, boolean reasoning,
-                                         List<Long> attachments, List<AgenticMessageContent.Context> contexts,
-                                         AgenticMessageContent.Tokens inputTokens, List<MessageBO> memoryHistory) {
+                                    String requestSystemContext, String model,
+                                    Map<String, Object> toolContext, Double temperature,
+                                    Integer maxTokens,
+                                    AgenticRunTrace runTrace,
+                                    boolean toolCallingEnabled, boolean reasoning,
+                                    List<Long> attachments, List<AgenticMessageContent.Context> contexts,
+                                    AgenticMessageContent.Tokens inputTokens, List<MessageBO> memoryHistory) {
 }

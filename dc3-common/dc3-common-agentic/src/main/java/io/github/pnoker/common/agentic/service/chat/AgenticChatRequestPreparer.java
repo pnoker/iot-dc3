@@ -20,10 +20,10 @@ import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.config.ChatClientConfig;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
+import io.github.pnoker.common.agentic.entity.dto.ChatMessageDTO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.vo.ChatCompletionRequestVO;
-import io.github.pnoker.common.agentic.entity.dto.ChatMessageDTO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.service.SessionService;
@@ -66,7 +66,7 @@ public class AgenticChatRequestPreparer {
     private final AgenticProperties properties;
 
     public AgenticPreparedChatBO prepare(ChatCompletionRequestVO request, RequestHeader.PrincipalHeader userHeader,
-                                              String mode) {
+                                         String mode) {
         validateRequest(request);
 
         String rawUserMessage = extractLastUserMessage(request);

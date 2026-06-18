@@ -50,6 +50,6 @@ public interface AgenticChatService {
      * @return OpenAI-compatible JSON response
      */
     Mono<ChatCompletionResponseVO> chatCompletion(ChatCompletionRequestVO request,
-                                                RequestHeader.PrincipalHeader userHeader);
+                                                  RequestHeader.PrincipalHeader userHeader);
 
 }
