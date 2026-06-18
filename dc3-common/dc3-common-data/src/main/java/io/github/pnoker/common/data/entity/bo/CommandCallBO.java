@@ -15,30 +15,48 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.biz;
+package io.github.pnoker.common.data.entity.bo;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.data.entity.bo.CommandCallBO;
-import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
-import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.util.Map;
 
 /**
- * Business service for custom command call operations.
+ * Business object for submitting a custom command call.
  *
  * @author pnoker
  * @version 2026.5.23
  * @since 2026.5.23
  */
-public interface CommandHistoryService {
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class CommandCallBO {
 
-    String call(Long tenantId, CommandCallBO entityBO);
+    /**
+     * Device ID
+     */
+    private Long deviceId;
 
-    CommandHistoryVO getByRecordId(Long tenantId, String recordId);
+    /**
+     * Command ID being invoked
+     */
+    private Long commandId;
 
-    default CommandHistoryVO getByRecordId(String recordId) {
-        return getByRecordId(null, recordId);
-    }
+    /**
+     * Command code, stable business identifier matching the command definition
+     */
+    private String commandCode;
 
-    Page<CommandHistoryVO> list(Long tenantId, CommandHistoryQueryVO queryVO);
+    /**
+     * Parameter values for this command invocation, keyed by parameter code
+     */
+    private Map<String, String> paramValues;
 
 }

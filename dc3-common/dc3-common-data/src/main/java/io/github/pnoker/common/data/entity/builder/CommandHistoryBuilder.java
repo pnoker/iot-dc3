@@ -18,7 +18,9 @@
 package io.github.pnoker.common.data.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
+import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -38,6 +40,14 @@ import java.util.List;
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface CommandHistoryBuilder {
+
+    /**
+     * Command call request VO to BO
+     *
+     * @param entityVO CommandCallVO
+     * @return CommandCallBO
+     */
+    CommandCallBO buildBOByVO(CommandCallVO entityVO);
 
     CommandHistoryVO buildVOByDO(CommandHistoryDO entityDO);
 

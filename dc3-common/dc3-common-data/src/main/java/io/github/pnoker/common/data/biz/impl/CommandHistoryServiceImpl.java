@@ -24,9 +24,9 @@ import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
 import io.github.pnoker.common.data.dal.CommandHistoryManager;
 import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
+import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
@@ -94,12 +94,12 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
     private final EntityStateMapper entityStateMapper;
 
     @Override
-    public String call(Long tenantId, CommandCallVO entityVO) {
-        FacadeCommandBO command = validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getCommandId(),
-                entityVO.getCommandCode());
+    public String call(Long tenantId, CommandCallBO entityBO) {
+        FacadeCommandBO command = validateCommandScope(tenantId, entityBO.getDeviceId(), entityBO.getCommandId(),
+                entityBO.getCommandCode());
         Long commandId = command.getId();
 
-        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityVO.getDeviceId());
+        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityBO.getDeviceId());
         if (Objects.isNull(driver)) {
             throw new ServiceException("No driver registered for this device");
         }
@@ -114,10 +114,10 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         CommandHistoryDO recordDO = new CommandHistoryDO();
         recordDO.setRecordId(recordId);
         recordDO.setTenantId(tenantId);
-        recordDO.setDeviceId(entityVO.getDeviceId());
+        recordDO.setDeviceId(entityBO.getDeviceId());
         recordDO.setCommandId(commandId);
         recordDO.setCommandCode(command.getCommandCode());
-        recordDO.setParamValues(Objects.isNull(entityVO.getParamValues()) ? null : JsonUtil.toJsonString(entityVO.getParamValues()));
+        recordDO.setParamValues(Objects.isNull(entityBO.getParamValues()) ? null : JsonUtil.toJsonString(entityBO.getParamValues()));
         recordDO.setStatus(PointCommandStatusEnum.PENDING);
         recordDO.setSource(CommandHistorySourceEnum.HTTP);
         recordDO.setOccurTime(nowLocal);
@@ -128,10 +128,10 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         publishCommand(CommandCallDTO.builder()
                 .recordId(recordId)
                 .tenantId(tenantId)
-                .deviceId(entityVO.getDeviceId())
+                .deviceId(entityBO.getDeviceId())
                 .commandId(commandId)
                 .commandCode(command.getCommandCode())
-                .paramValues(entityVO.getParamValues())
+                .paramValues(entityBO.getParamValues())
                 .source(CommandHistorySourceEnum.HTTP)
                 .occurredAt(now)
                 .expireAt(now.plusSeconds(timeoutSeconds))

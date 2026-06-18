@@ -28,8 +28,8 @@ import io.github.pnoker.api.center.data.GrpcRPointValueStringList;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.biz.PointValueService;
-import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
-import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
+import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
+import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -160,7 +160,7 @@ class PointValueServerTest {
                 .setTenantId(1L).setDeviceId(10L).setPointId(20L).build());
         assertThat(response.getResult().getOk()).isTrue();
         assertThat(response.getData()).isTrue();
-        verify(pointCommandService).read(eq(1L), any(PointCommandReadVO.class));
+        verify(pointCommandService).read(eq(1L), any(PointCommandReadBO.class));
     }
 
     @Test
@@ -180,7 +180,7 @@ class PointValueServerTest {
                 .build());
         assertThat(response.getResult().getOk()).isTrue();
         assertThat(response.getData()).isTrue();
-        verify(pointCommandService).write(eq(1L), any(PointCommandWriteVO.class));
+        verify(pointCommandService).write(eq(1L), any(PointCommandWriteBO.class));
     }
 
     @Test

@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.data.biz;
 
-import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
-import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
+import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
+import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 
 /**
  * Business service for point command operations.
@@ -33,38 +33,38 @@ public interface PointCommandService {
      * Submit a read command.
      *
      * @param tenantId current tenant id
-     * @param entityVO PointCommandReadVO
+     * @param entityBO PointCommandReadBO
      * @return generated commandId for status tracking
      */
-    String read(Long tenantId, PointCommandReadVO entityVO);
+    String read(Long tenantId, PointCommandReadBO entityBO);
 
     /**
      * Read command from trusted internal callers.
      *
-     * @param entityVO PointCommandReadVO
+     * @param entityBO PointCommandReadBO
      * @return generated commandId
      */
-    default String read(PointCommandReadVO entityVO) {
-        return read(null, entityVO);
+    default String read(PointCommandReadBO entityBO) {
+        return read(null, entityBO);
     }
 
     /**
      * Submit a write command.
      *
      * @param tenantId current tenant id
-     * @param entityVO PointCommandWriteVO
+     * @param entityBO PointCommandWriteBO
      * @return generated commandId for status tracking
      */
-    String write(Long tenantId, PointCommandWriteVO entityVO);
+    String write(Long tenantId, PointCommandWriteBO entityBO);
 
     /**
      * Write command from trusted internal callers.
      *
-     * @param entityVO PointCommandWriteVO
+     * @param entityBO PointCommandWriteBO
      * @return generated commandId
      */
-    default String write(PointCommandWriteVO entityVO) {
-        return write(null, entityVO);
+    default String write(PointCommandWriteBO entityBO) {
+        return write(null, entityBO);
     }
 
 }

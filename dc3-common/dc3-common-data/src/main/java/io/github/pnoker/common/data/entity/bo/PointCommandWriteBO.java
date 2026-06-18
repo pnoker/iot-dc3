@@ -15,30 +15,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.biz;
+package io.github.pnoker.common.data.entity.bo;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.data.entity.bo.CommandCallBO;
-import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
-import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
- * Business service for custom command call operations.
+ * Business object for submitting a point write command.
  *
  * @author pnoker
- * @version 2026.5.23
- * @since 2026.5.23
+ * @version 2025.9.0
+ * @since 2016.10.1
  */
-public interface CommandHistoryService {
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class PointCommandWriteBO {
 
-    String call(Long tenantId, CommandCallBO entityBO);
+    /**
+     * Device ID to write the point value to
+     */
+    private Long deviceId;
 
-    CommandHistoryVO getByRecordId(Long tenantId, String recordId);
+    /**
+     * Data point ID to write to
+     */
+    private Long pointId;
 
-    default CommandHistoryVO getByRecordId(String recordId) {
-        return getByRecordId(null, recordId);
-    }
+    /**
+     * Value to write to the data point
+     */
+    private String value;
 
-    Page<CommandHistoryVO> list(Long tenantId, CommandHistoryQueryVO queryVO);
+    /**
+     * Optional pre-generated command ID for idempotent submission
+     */
+    private String commandId;
 
 }

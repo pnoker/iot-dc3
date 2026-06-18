@@ -24,10 +24,10 @@ import io.github.pnoker.common.data.biz.EventHistoryService;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EventHistoryManager;
 import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
+import io.github.pnoker.common.data.entity.bo.EventReportBO;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
-import io.github.pnoker.common.data.entity.vo.EventReportVO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -75,9 +75,9 @@ public class EventHistoryServiceImpl implements EventHistoryService {
     private final EventHistoryBuilder eventHistoryBuilder;
 
     @Override
-    public String report(Long tenantId, EventReportVO entityVO) {
-        FacadeEventBO event = validateEventScope(tenantId, entityVO.getDeviceId(), entityVO.getEventId(),
-                entityVO.getEventCode());
+    public String report(Long tenantId, EventReportBO entityBO) {
+        FacadeEventBO event = validateEventScope(tenantId, entityBO.getDeviceId(), entityBO.getEventId(),
+                entityBO.getEventCode());
 
         String recordId = UUID.randomUUID().toString();
         LocalDateTime nowLocal = LocalDateTime.now();
@@ -85,13 +85,13 @@ public class EventHistoryServiceImpl implements EventHistoryService {
         EventHistoryDO recordDO = new EventHistoryDO();
         recordDO.setRecordId(recordId);
         recordDO.setTenantId(tenantId);
-        recordDO.setDeviceId(entityVO.getDeviceId());
+        recordDO.setDeviceId(entityBO.getDeviceId());
         recordDO.setEventId(event.getId());
         recordDO.setEventCode(event.getEventCode());
         recordDO.setEventTypeFlag(event.getEventTypeFlag().getIndex());
         recordDO.setEventLevelFlag(event.getEventLevelFlag().getIndex());
-        recordDO.setParamValues(Objects.isNull(entityVO.getParamValues()) ? null : JsonUtil.toJsonString(entityVO.getParamValues()));
-        recordDO.setMessage(entityVO.getMessage());
+        recordDO.setParamValues(Objects.isNull(entityBO.getParamValues()) ? null : JsonUtil.toJsonString(entityBO.getParamValues()));
+        recordDO.setMessage(entityBO.getMessage());
         recordDO.setOccurTime(nowLocal);
         recordDO.setReceiveTime(nowLocal);
         recordDO.setAcknowledgeFlag(EventHistoryAcknowledgeFlagEnum.NO.getIndex());

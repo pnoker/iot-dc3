@@ -18,8 +18,8 @@
 package io.github.pnoker.common.facade.local;
 
 import io.github.pnoker.common.data.biz.PointCommandService;
-import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
-import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
+import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
+import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,9 +49,9 @@ class PointCommandLocalFacadeTest {
         boolean result = facade.submitRead(1L, 10L, 20L);
         assertThat(result).isTrue();
 
-        ArgumentCaptor<PointCommandReadVO> captor = ArgumentCaptor.forClass(PointCommandReadVO.class);
+        ArgumentCaptor<PointCommandReadBO> captor = ArgumentCaptor.forClass(PointCommandReadBO.class);
         verify(pointCommandService).read(eq(1L), captor.capture());
-        PointCommandReadVO passed = captor.getValue();
+        PointCommandReadBO passed = captor.getValue();
         assertThat(passed.getDeviceId()).isEqualTo(10L);
         assertThat(passed.getPointId()).isEqualTo(20L);
     }
@@ -61,9 +61,9 @@ class PointCommandLocalFacadeTest {
         boolean result = facade.submitWrite(1L, 10L, 20L, "42");
         assertThat(result).isTrue();
 
-        ArgumentCaptor<PointCommandWriteVO> captor = ArgumentCaptor.forClass(PointCommandWriteVO.class);
+        ArgumentCaptor<PointCommandWriteBO> captor = ArgumentCaptor.forClass(PointCommandWriteBO.class);
         verify(pointCommandService).write(eq(1L), captor.capture());
-        PointCommandWriteVO passed = captor.getValue();
+        PointCommandWriteBO passed = captor.getValue();
         assertThat(passed.getDeviceId()).isEqualTo(10L);
         assertThat(passed.getPointId()).isEqualTo(20L);
         assertThat(passed.getValue()).isEqualTo("42");

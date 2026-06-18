@@ -29,8 +29,8 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
-import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
-import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
+import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
+import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.data.validator.PointCommandValidator;
 import io.github.pnoker.common.entity.dto.PointCommandDTO;
@@ -93,30 +93,30 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     private final PointCommandValidator pointCommandValidator;
 
     @Override
-    public String read(Long tenantId, PointCommandReadVO entityVO) {
-        validateCommandScope(tenantId, entityVO.getDeviceId(), entityVO.getPointId());
+    public String read(Long tenantId, PointCommandReadBO entityBO) {
+        validateCommandScope(tenantId, entityBO.getDeviceId(), entityBO.getPointId());
 
         // Idempotency: if caller supplied a commandId that already exists, return it
-        String existing = checkExistingCommand(entityVO.getCommandId());
+        String existing = checkExistingCommand(entityBO.getCommandId());
         if (Objects.nonNull(existing)) {
             return existing;
         }
 
-        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityVO.getDeviceId());
+        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityBO.getDeviceId());
         if (Objects.isNull(driver)) {
             throw new ServiceException("No driver registered for this device");
         }
         checkDriverOnline(tenantId, driver.getId());
 
-        String commandId = resolveCommandId(entityVO.getCommandId());
+        String commandId = resolveCommandId(entityBO.getCommandId());
         LocalDateTime nowLocal = LocalDateTime.now();
 
         PointCommandHistoryDO commandDO = new PointCommandHistoryDO();
         commandDO.setCommandId(commandId);
         commandDO.setTenantId(tenantId);
         commandDO.setType(PointCommandTypeEnum.READ);
-        commandDO.setDeviceId(entityVO.getDeviceId());
-        commandDO.setPointId(entityVO.getPointId());
+        commandDO.setDeviceId(entityBO.getDeviceId());
+        commandDO.setPointId(entityBO.getPointId());
         commandDO.setStatus(PointCommandStatusEnum.PENDING);
         commandDO.setSource(PointCommandSourceEnum.HTTP);
         commandDO.setOccurTime(nowLocal);
@@ -124,8 +124,8 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         commandDO.setSchemaVersion((short) 1);
         pointCommandHistoryManager.save(commandDO);
 
-        publishCommand(PointCommandDTO.ofRead(commandId, tenantId, entityVO.getDeviceId(),
-                entityVO.getPointId()), driver.getServiceName(), commandId);
+        publishCommand(PointCommandDTO.ofRead(commandId, tenantId, entityBO.getDeviceId(),
+                entityBO.getPointId()), driver.getServiceName(), commandId);
 
         commandDO.setStatus(PointCommandStatusEnum.SENT);
         commandDO.setSendTime(LocalDateTime.now());
@@ -135,34 +135,34 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     }
 
     @Override
-    public String write(Long tenantId, PointCommandWriteVO entityVO) {
-        validateWriteScope(tenantId, entityVO.getDeviceId(), entityVO.getPointId());
+    public String write(Long tenantId, PointCommandWriteBO entityBO) {
+        validateWriteScope(tenantId, entityBO.getDeviceId(), entityBO.getPointId());
 
         // Idempotency: if caller supplied a commandId that already exists, return it
-        String existing = checkExistingCommand(entityVO.getCommandId());
+        String existing = checkExistingCommand(entityBO.getCommandId());
         if (Objects.nonNull(existing)) {
             return existing;
         }
 
-        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityVO.getDeviceId());
+        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityBO.getDeviceId());
         if (Objects.isNull(driver)) {
             throw new ServiceException("No driver registered for this device");
         }
         checkDriverOnline(tenantId, driver.getId());
 
-        FacadePointBO point = pointFacade.getById(tenantId, entityVO.getPointId());
-        pointCommandValidator.validateWriteValue(entityVO.getValue(), Objects.nonNull(point) ? point.getPointExt() : null);
+        FacadePointBO point = pointFacade.getById(tenantId, entityBO.getPointId());
+        pointCommandValidator.validateWriteValue(entityBO.getValue(), Objects.nonNull(point) ? point.getPointExt() : null);
 
-        String commandId = resolveCommandId(entityVO.getCommandId());
+        String commandId = resolveCommandId(entityBO.getCommandId());
         LocalDateTime nowLocal = LocalDateTime.now();
 
         PointCommandHistoryDO commandDO = new PointCommandHistoryDO();
         commandDO.setCommandId(commandId);
         commandDO.setTenantId(tenantId);
         commandDO.setType(PointCommandTypeEnum.WRITE);
-        commandDO.setDeviceId(entityVO.getDeviceId());
-        commandDO.setPointId(entityVO.getPointId());
-        commandDO.setRequestValue(entityVO.getValue());
+        commandDO.setDeviceId(entityBO.getDeviceId());
+        commandDO.setPointId(entityBO.getPointId());
+        commandDO.setRequestValue(entityBO.getValue());
         commandDO.setStatus(PointCommandStatusEnum.PENDING);
         commandDO.setSource(PointCommandSourceEnum.HTTP);
         commandDO.setOccurTime(nowLocal);
@@ -170,8 +170,8 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         commandDO.setSchemaVersion((short) 1);
         pointCommandHistoryManager.save(commandDO);
 
-        publishCommand(PointCommandDTO.ofWrite(commandId, tenantId, entityVO.getDeviceId(),
-                entityVO.getPointId(), entityVO.getValue()), driver.getServiceName(), commandId);
+        publishCommand(PointCommandDTO.ofWrite(commandId, tenantId, entityBO.getDeviceId(),
+                entityBO.getPointId(), entityBO.getValue()), driver.getServiceName(), commandId);
 
         commandDO.setStatus(PointCommandStatusEnum.SENT);
         commandDO.setSendTime(LocalDateTime.now());

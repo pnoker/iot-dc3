@@ -18,8 +18,8 @@
 package io.github.pnoker.common.facade.local;
 
 import io.github.pnoker.common.data.biz.PointCommandService;
-import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
-import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
+import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
+import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,20 +45,20 @@ public class PointCommandLocalFacade implements PointCommandFacade {
 
     @Override
     public boolean submitRead(Long tenantId, Long deviceId, Long pointId) {
-        PointCommandReadVO readVO = new PointCommandReadVO();
-        readVO.setDeviceId(deviceId);
-        readVO.setPointId(pointId);
-        pointCommandService.read(tenantId, readVO);
+        PointCommandReadBO readBO = new PointCommandReadBO();
+        readBO.setDeviceId(deviceId);
+        readBO.setPointId(pointId);
+        pointCommandService.read(tenantId, readBO);
         return true;
     }
 
     @Override
     public boolean submitWrite(Long tenantId, Long deviceId, Long pointId, String value) {
-        PointCommandWriteVO writeVO = new PointCommandWriteVO();
-        writeVO.setDeviceId(deviceId);
-        writeVO.setPointId(pointId);
-        writeVO.setValue(value);
-        pointCommandService.write(tenantId, writeVO);
+        PointCommandWriteBO writeBO = new PointCommandWriteBO();
+        writeBO.setDeviceId(deviceId);
+        writeBO.setPointId(pointId);
+        writeBO.setValue(value);
+        pointCommandService.write(tenantId, writeBO);
         return true;
     }
 

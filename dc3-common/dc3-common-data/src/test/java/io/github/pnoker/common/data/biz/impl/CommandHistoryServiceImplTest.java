@@ -23,7 +23,7 @@ import io.github.pnoker.common.data.dal.CommandHistoryManager;
 import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.entity.vo.CommandCallVO;
+import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.CommandCallDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -116,7 +116,7 @@ class CommandHistoryServiceImplTest {
         EntityStateDO driverState = new EntityStateDO();
         driverState.setStateFlag(EntityStatusEnum.ONLINE.getIndex());
 
-        CommandCallVO call = new CommandCallVO();
+        CommandCallBO call = new CommandCallBO();
         call.setDeviceId(deviceId);
         call.setCommandId(commandId);
         call.setParamValues(Map.of("mode", "soft"));
@@ -178,7 +178,7 @@ class CommandHistoryServiceImplTest {
         EntityStateDO driverState = new EntityStateDO();
         driverState.setStateFlag(EntityStatusEnum.ONLINE.getIndex());
 
-        CommandCallVO call = new CommandCallVO();
+        CommandCallBO call = new CommandCallBO();
         call.setDeviceId(deviceId);
         call.setCommandId(commandId);
 
@@ -236,7 +236,7 @@ class CommandHistoryServiceImplTest {
         EntityStateDO driverState = new EntityStateDO();
         driverState.setStateFlag(EntityStatusEnum.ONLINE.getIndex());
 
-        CommandCallVO call = new CommandCallVO();
+        CommandCallBO call = new CommandCallBO();
         call.setDeviceId(deviceId);
         call.setCommandCode("restart");
 

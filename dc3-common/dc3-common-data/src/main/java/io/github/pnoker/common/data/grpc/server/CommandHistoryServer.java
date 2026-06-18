@@ -29,7 +29,7 @@ import io.github.pnoker.api.center.data.GrpcStringQuery;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
-import io.github.pnoker.common.data.entity.vo.CommandCallVO;
+import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
@@ -64,11 +64,11 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
     @Override
     public void callCommand(GrpcCommandCallVO request, StreamObserver<GrpcRString> responseObserver) {
         try {
-            CommandCallVO vo = new CommandCallVO();
-            vo.setDeviceId(request.getDeviceId());
-            vo.setCommandId(request.getCommandId());
-            vo.setParamValues(request.getParamValuesMap());
-            String recordId = commandHistoryService.call(request.getTenantId(), vo);
+            CommandCallBO entityBO = new CommandCallBO();
+            entityBO.setDeviceId(request.getDeviceId());
+            entityBO.setCommandId(request.getCommandId());
+            entityBO.setParamValues(request.getParamValuesMap());
+            String recordId = commandHistoryService.call(request.getTenantId(), entityBO);
 
             responseObserver.onNext(GrpcRString.newBuilder()
                     .setResult(GrpcR.newBuilder()

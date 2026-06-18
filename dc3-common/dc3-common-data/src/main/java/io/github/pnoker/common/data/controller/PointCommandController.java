@@ -20,6 +20,7 @@ package io.github.pnoker.common.data.controller;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.PointCommandService;
+import io.github.pnoker.common.data.entity.builder.PointCommandBuilder;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.entity.R;
@@ -51,6 +52,8 @@ public class PointCommandController implements BaseController {
 
     private final PointCommandService pointCommandService;
 
+    private final PointCommandBuilder pointCommandBuilder;
+
     /**
      * Submit a read command.
      *
@@ -63,7 +66,7 @@ public class PointCommandController implements BaseController {
     @PostMapping("/read")
     public Mono<R<String>> read(@Validated @RequestBody PointCommandReadVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            String commandId = pointCommandService.read(tenantId, entityVO);
+            String commandId = pointCommandService.read(tenantId, pointCommandBuilder.buildBOByVO(entityVO));
             R<String> result = R.ok();
             result.setData(commandId);
             return result;
@@ -82,7 +85,7 @@ public class PointCommandController implements BaseController {
     @PostMapping("/write")
     public Mono<R<String>> write(@Validated @RequestBody PointCommandWriteVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            String commandId = pointCommandService.write(tenantId, entityVO);
+            String commandId = pointCommandService.write(tenantId, pointCommandBuilder.buildBOByVO(entityVO));
             R<String> result = R.ok();
             result.setData(commandId);
             return result;

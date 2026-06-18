@@ -18,8 +18,10 @@
 package io.github.pnoker.common.data.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.data.entity.bo.EventReportBO;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
+import io.github.pnoker.common.data.entity.vo.EventReportVO;
 import io.github.pnoker.common.enums.EventHistoryAcknowledgeFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
@@ -46,6 +48,14 @@ import java.util.List;
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface EventHistoryBuilder {
+
+    /**
+     * Event report request VO to BO
+     *
+     * @param entityVO EventReportVO
+     * @return EventReportBO
+     */
+    EventReportBO buildBOByVO(EventReportVO entityVO);
 
     @Mapping(target = "eventTypeFlag", ignore = true)
     @Mapping(target = "eventLevelFlag", ignore = true)

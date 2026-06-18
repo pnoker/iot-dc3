@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
+import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
@@ -59,13 +60,15 @@ public class CommandHistoryController implements BaseController {
 
     private final CommandHistoryService commandHistoryService;
 
+    private final CommandHistoryBuilder commandHistoryBuilder;
+
     @PreAuthorize("@perm.can('command_history', 'add')")
     @Operation(summary = "Call Command", description = "Send a downward control command to a device for the current tenant and " +
             "record the call in command history. Returns the new history record ID; use it to poll the execution result and response data.")
     @PostMapping("/call")
     public Mono<R<String>> call(@Validated @RequestBody CommandCallVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            String recordId = commandHistoryService.call(tenantId, entityVO);
+            String recordId = commandHistoryService.call(tenantId, commandHistoryBuilder.buildBOByVO(entityVO));
             R<String> result = R.ok();
             result.setData(recordId);
             return result;

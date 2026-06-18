@@ -21,8 +21,8 @@ import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
 import io.github.pnoker.common.data.entity.builder.PointCommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
-import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
+import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
+import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.data.validator.PointCommandValidator;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -107,7 +107,7 @@ class PointCommandServiceImplTest {
         when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(driver);
         mockDriverOnline();
 
-        PointCommandReadVO vo = new PointCommandReadVO();
+        PointCommandReadBO vo = new PointCommandReadBO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
         service.read(1L, vo);
@@ -127,7 +127,7 @@ class PointCommandServiceImplTest {
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
         when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(null);
 
-        PointCommandReadVO vo = new PointCommandReadVO();
+        PointCommandReadBO vo = new PointCommandReadBO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
         assertThatThrownBy(() -> service.read(1L, vo))
@@ -140,7 +140,7 @@ class PointCommandServiceImplTest {
     @Test
     void readRejectsUnknownDevice() {
         when(deviceFacade.getById(1L, 99L)).thenReturn(null);
-        PointCommandReadVO vo = new PointCommandReadVO();
+        PointCommandReadBO vo = new PointCommandReadBO();
         vo.setDeviceId(99L);
         vo.setPointId(20L);
         assertThatThrownBy(() -> service.read(1L, vo))
@@ -152,7 +152,7 @@ class PointCommandServiceImplTest {
     void readRejectsUnknownPoint() {
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 99L)).thenReturn(null);
-        PointCommandReadVO vo = new PointCommandReadVO();
+        PointCommandReadBO vo = new PointCommandReadBO();
         vo.setDeviceId(10L);
         vo.setPointId(99L);
         assertThatThrownBy(() -> service.read(1L, vo))
@@ -167,7 +167,7 @@ class PointCommandServiceImplTest {
         mismatchedDevice.setEnableFlag(EnableFlagEnum.ENABLE);
         when(deviceFacade.getById(1L, 10L)).thenReturn(mismatchedDevice);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
-        PointCommandReadVO vo = new PointCommandReadVO();
+        PointCommandReadBO vo = new PointCommandReadBO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
         assertThatThrownBy(() -> service.read(1L, vo)).isInstanceOf(UnAuthorizedException.class);
@@ -180,7 +180,7 @@ class PointCommandServiceImplTest {
         bareDevice.setEnableFlag(EnableFlagEnum.ENABLE);
         when(deviceFacade.getById(1L, 10L)).thenReturn(bareDevice);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
-        PointCommandReadVO vo = new PointCommandReadVO();
+        PointCommandReadBO vo = new PointCommandReadBO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
         assertThatThrownBy(() -> service.read(1L, vo)).isInstanceOf(UnAuthorizedException.class);
@@ -193,7 +193,7 @@ class PointCommandServiceImplTest {
         when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(driver);
         mockDriverOnline();
 
-        PointCommandWriteVO vo = new PointCommandWriteVO();
+        PointCommandWriteBO vo = new PointCommandWriteBO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
         vo.setValue("42.5");
@@ -213,7 +213,7 @@ class PointCommandServiceImplTest {
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
         when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(null);
-        PointCommandWriteVO vo = new PointCommandWriteVO();
+        PointCommandWriteBO vo = new PointCommandWriteBO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
         vo.setValue("v");
@@ -226,7 +226,7 @@ class PointCommandServiceImplTest {
     @Test
     void writeRejectsUnknownDevice() {
         when(deviceFacade.getById(1L, 99L)).thenReturn(null);
-        PointCommandWriteVO vo = new PointCommandWriteVO();
+        PointCommandWriteBO vo = new PointCommandWriteBO();
         vo.setDeviceId(99L);
         vo.setPointId(20L);
         assertThatThrownBy(() -> service.write(1L, vo)).isInstanceOf(NotFoundException.class);
@@ -239,7 +239,7 @@ class PointCommandServiceImplTest {
         disabledDevice.setEnableFlag(EnableFlagEnum.DISABLE);
         when(deviceFacade.getById(1L, 10L)).thenReturn(disabledDevice);
 
-        PointCommandReadVO vo = new PointCommandReadVO();
+        PointCommandReadBO vo = new PointCommandReadBO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
         assertThatThrownBy(() -> service.read(1L, vo))
@@ -255,7 +255,7 @@ class PointCommandServiceImplTest {
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(disabledPoint);
 
-        PointCommandReadVO vo = new PointCommandReadVO();
+        PointCommandReadBO vo = new PointCommandReadBO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
         assertThatThrownBy(() -> service.read(1L, vo))
@@ -272,7 +272,7 @@ class PointCommandServiceImplTest {
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(readOnlyPoint);
 
-        PointCommandWriteVO vo = new PointCommandWriteVO();
+        PointCommandWriteBO vo = new PointCommandWriteBO();
         vo.setDeviceId(10L);
         vo.setPointId(20L);
         vo.setValue("1.0");

@@ -28,8 +28,8 @@ import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.biz.PointValueService;
-import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
-import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
+import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
+import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -151,10 +151,10 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
     @Override
     public void readCommand(GrpcPointValueCommandQuery request, StreamObserver<GrpcRBoolean> responseObserver) {
         try {
-            PointCommandReadVO vo = new PointCommandReadVO();
-            vo.setDeviceId(request.getDeviceId());
-            vo.setPointId(request.getPointId());
-            pointCommandService.read(request.getTenantId(), vo);
+            PointCommandReadBO entityBO = new PointCommandReadBO();
+            entityBO.setDeviceId(request.getDeviceId());
+            entityBO.setPointId(request.getPointId());
+            pointCommandService.read(request.getTenantId(), entityBO);
 
             responseObserver.onNext(GrpcRBoolean.newBuilder()
                     .setResult(GrpcR.newBuilder()
@@ -183,11 +183,11 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
     @Override
     public void writeCommand(GrpcPointValueWriteCommand request, StreamObserver<GrpcRBoolean> responseObserver) {
         try {
-            PointCommandWriteVO vo = new PointCommandWriteVO();
-            vo.setDeviceId(request.getDeviceId());
-            vo.setPointId(request.getPointId());
-            vo.setValue(request.getValue());
-            pointCommandService.write(request.getTenantId(), vo);
+            PointCommandWriteBO entityBO = new PointCommandWriteBO();
+            entityBO.setDeviceId(request.getDeviceId());
+            entityBO.setPointId(request.getPointId());
+            entityBO.setValue(request.getValue());
+            pointCommandService.write(request.getTenantId(), entityBO);
 
             responseObserver.onNext(GrpcRBoolean.newBuilder()
                     .setResult(GrpcR.newBuilder()

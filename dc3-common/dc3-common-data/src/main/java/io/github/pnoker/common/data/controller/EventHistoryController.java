@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.EventHistoryService;
+import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
@@ -59,12 +60,14 @@ public class EventHistoryController implements BaseController {
 
     private final EventHistoryService eventHistoryService;
 
+    private final EventHistoryBuilder eventHistoryBuilder;
+
     @PreAuthorize("@perm.can('event_history', 'list')")
     @Operation(summary = "Report Device Event", description = "Record a device event (alarm, state change, or status transition) reported by a device for the current tenant and return the new record ID. Use when a device reports an event that must be appended to the audit trail.")
     @PostMapping("/report")
     public Mono<R<String>> report(@Validated @RequestBody EventReportVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            String recordId = eventHistoryService.report(tenantId, entityVO);
+            String recordId = eventHistoryService.report(tenantId, eventHistoryBuilder.buildBOByVO(entityVO));
             R<String> result = R.ok();
             result.setData(recordId);
             return result;

@@ -21,7 +21,7 @@ import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EventHistoryManager;
 import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
-import io.github.pnoker.common.data.entity.vo.EventReportVO;
+import io.github.pnoker.common.data.entity.bo.EventReportBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
@@ -92,7 +92,7 @@ class EventHistoryServiceImplTest {
         event.setEventLevelFlag(EventLevelEnum.HIGH);
         event.setEnableFlag(EnableFlagEnum.ENABLE);
 
-        EventReportVO report = new EventReportVO();
+        EventReportBO report = new EventReportBO();
         report.setDeviceId(deviceId);
         report.setEventCode("overheat");
         report.setParamValues(Map.of("value", "90"));

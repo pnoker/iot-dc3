@@ -29,9 +29,9 @@ import io.github.pnoker.api.center.data.GrpcStringQuery;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.data.biz.EventHistoryService;
+import io.github.pnoker.common.data.entity.bo.EventReportBO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
-import io.github.pnoker.common.data.entity.vo.EventReportVO;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
@@ -64,12 +64,12 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
     @Override
     public void reportEvent(GrpcEventReportVO request, StreamObserver<GrpcRString> responseObserver) {
         try {
-            EventReportVO vo = new EventReportVO();
-            vo.setDeviceId(request.getDeviceId());
-            vo.setEventId(request.getEventId());
-            vo.setParamValues(request.getParamValuesMap());
-            vo.setMessage(request.getMessage());
-            String recordId = eventHistoryService.report(request.getTenantId(), vo);
+            EventReportBO entityBO = new EventReportBO();
+            entityBO.setDeviceId(request.getDeviceId());
+            entityBO.setEventId(request.getEventId());
+            entityBO.setParamValues(request.getParamValuesMap());
+            entityBO.setMessage(request.getMessage());
+            String recordId = eventHistoryService.report(request.getTenantId(), entityBO);
 
             responseObserver.onNext(GrpcRString.newBuilder()
                     .setResult(GrpcR.newBuilder()
