@@ -18,9 +18,9 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: help env init-env clean package \
+.PHONY: help env init-env clean package test test-it test-e2e coverage deploy \
 	build up stop down ps logs config pull restart refresh reset \
-	dev-db dev-optional run changelog openapi install-hooks tag
+	run changelog openapi tag
 
 ENV_FILE ?= $(firstword $(wildcard .env) .env.example)
 RUNTIME_ENV_FILE ?= dc3/env/dev.env
@@ -63,7 +63,9 @@ RUN_MODULE := $(RUN_MODULE_$(RUN_SERVICE))
 
 MVN_SETTINGS ?= .mvn/settings.xml
 MVN_SETTINGS_ARG := $(if $(strip $(MVN_SETTINGS)),-s $(MVN_SETTINGS),)
+MVN_SUB_SETTINGS_ARG := $(if $(strip $(MVN_SETTINGS)),-s ../$(MVN_SETTINGS),)
 MVN := mvn $(MVN_SETTINGS_ARG)
+MVN_SUB := mvn $(MVN_SUB_SETTINGS_ARG)
 
 CHANGE_FILE ?= dc3/doc/CHANGE.md
 FROM ?=
@@ -101,8 +103,11 @@ help:
 	@printf '%s\n' ''
 	@printf '%s\n' 'Common:'
 	@printf '  %-24s %s\n' 'make package' 'Build all Maven modules'
+	@printf '  %-24s %s\n' 'make test' 'Run unit tests'
+	@printf '  %-24s %s\n' 'make test-it' 'Run integration-test phase'
+	@printf '  %-24s %s\n' 'make test-e2e' 'Run E2E harness'
+	@printf '  %-24s %s\n' 'make coverage' 'Generate aggregated JaCoCo coverage'
 	@printf '  %-24s %s\n' 'make run SERVICE=auth' 'Run one Spring Boot service with env auto-loaded'
-	@printf '  %-24s %s\n' 'make install-hooks' 'Enable .githooks commit-msg lint'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Compose:'
 	@printf '  %-24s %s\n' 'make build' 'Build STACK images, optional SERVICES="data gateway" or GROUP=core'
@@ -112,6 +117,12 @@ help:
 	@printf '  %-24s %s\n' 'make ps' 'List STACK containers'
 	@printf '  %-24s %s\n' 'make logs' 'Follow STACK logs'
 	@printf '  %-24s %s\n' 'make config' 'Render compose configuration'
+	@printf '%s\n' ''
+	@printf '%s\n' 'Shortcuts (auto-generated, no env vars needed):'
+	@printf '  %-32s %s\n' 'make <op>-<stack>[-<registry>]' 'e.g. make up-db-cn, make logs-dev, make down-app'
+	@printf '  %-32s %s\n' '  op' 'up down stop ps logs build pull restart refresh config reset'
+	@printf '  %-32s %s\n' '  stack' 'dev app db optional'
+	@printf '  %-32s %s\n' '  registry' 'cn global (only up/pull/build/refresh)'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Variables:'
 	@printf '  %-24s %s\n' 'STACK=dev|app|db|optional' 'Compose stack selector'
@@ -123,7 +134,8 @@ help:
 	@printf '%s\n' ''
 	@printf '%s\n' 'Examples:'
 	@printf '  %s\n' 'make init-env'
-	@printf '  %s\n' 'make dev-db'
+	@printf '  %s\n' 'make up-db'
+	@printf '  %s\n' 'make up-db-cn'
 	@printf '  %s\n' 'make up SERVICES="agentic"'
 	@printf '  %s\n' 'make up SERVICES="gateway agentic"'
 	@printf '  %s\n' 'make up GROUP=core'
@@ -152,6 +164,17 @@ clean:
 package:
 	$(MVN) clean package
 
+test:
+	$(MVN) -B -Dmaven.test.skip=false test
+
+test-it:
+	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify
+
+test-e2e:
+	DC3_E2E=true $(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true -pl dc3-e2e -am -Pe2e verify
+
+coverage:
+	$(MVN) -B -Dmaven.test.skip=false -pl dc3-coverage -am verify
 
 build:
 	$(call dc3_compose) build $(SELECTED_SERVICES)
@@ -192,21 +215,38 @@ reset:
 run:
 	$(MVN) -pl "$(RUN_MODULE)" -am spring-boot:run
 
-dev-db:
-	@$(MAKE) up STACK=db SERVICES= GROUP= REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+# Auto-generated compose shortcuts: <op>-<stack>[-<registry>]
+#   op       : up down stop ps logs build pull restart refresh config reset
+#   stack    : dev app db optional
+#   registry : cn global   (only up/pull/build/refresh)
+# Each shortcut recurses into the base op with STACK/REGISTRY set, so all
+# existing logic (compose-file resolution, reset confirmation, SERVICES/GROUP
+# filtering) is reused. Examples: make up-db-cn  make logs-dev  make down-app
+COMPOSE_OPS          := up down stop ps logs build pull restart refresh config reset
+COMPOSE_REGISTRY_OPS := up pull build refresh
+COMPOSE_STACKS       := dev app db optional
+COMPOSE_REGISTRIES   := cn global
 
-dev-optional:
-	@$(MAKE) up STACK=optional SERVICES= GROUP= REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+define dc3_stack_target
+.PHONY: $(1)-$(2)
+$(1)-$(2):
+	@$$(MAKE) $(1) STACK=$(2) SERVICES='$$(SERVICES)' GROUP='$$(GROUP)' REGISTRY='$$(REGISTRY)' COMPOSE='$$(COMPOSE)' COMPOSE_DIR='$$(COMPOSE_DIR)' $$(MAKE_COMPOSE_OVERRIDE)
+endef
+
+define dc3_stack_registry_target
+.PHONY: $(1)-$(2)-$(3)
+$(1)-$(2)-$(3):
+	@$$(MAKE) $(1) STACK=$(2) SERVICES='$$(SERVICES)' GROUP='$$(GROUP)' REGISTRY=$(3) COMPOSE='$$(COMPOSE)' COMPOSE_DIR='$$(COMPOSE_DIR)' $$(MAKE_COMPOSE_OVERRIDE)
+endef
+
+$(foreach op,$(COMPOSE_OPS),$(foreach st,$(COMPOSE_STACKS),$(eval $(call dc3_stack_target,$(op),$(st)))))
+$(foreach op,$(COMPOSE_REGISTRY_OPS),$(foreach st,$(COMPOSE_STACKS),$(foreach rg,$(COMPOSE_REGISTRIES),$(eval $(call dc3_stack_registry_target,$(op),$(st),$(rg))))))
 
 deploy: package
 	cd dc3-api \
 	&& $(MVN_SUB) clean deploy -P deploy \
 	&& cd ../dc3-common \
 	&& $(MVN_SUB) clean deploy -P deploy
-
-install-hooks:
-	git config core.hooksPath .githooks
-	@printf '%s\n' 'Enabled .githooks (commit-msg lint active for git commit)'
 
 tag:
 	dc3/bin/tag.sh
