@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.response;
+package io.github.pnoker.common.agentic.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
@@ -35,7 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Structured SSE payload describing a single agentic runtime event; streamed to the client during an agentic turn.")
-public class AgenticRunEventResponse {
+public class AgenticRunEventVO {
 
     @Schema(description = "Fixed object type discriminator for agentic run events; always \"agentic.event\".", example = "agentic.event")
 
@@ -73,8 +73,8 @@ public class AgenticRunEventResponse {
 
     private Long created;
 
-    public static AgenticRunEventResponse of(AgenticRunEvent runEvent) {
-        AgenticRunEventResponse response = new AgenticRunEventResponse();
+    public static AgenticRunEventVO of(AgenticRunEvent runEvent) {
+        AgenticRunEventVO response = new AgenticRunEventVO();
         response.setObject(AgenticConstant.RunEvent.OBJECT);
         response.setType(runEvent.type());
         response.setTitle(runEvent.title());

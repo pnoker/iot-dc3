@@ -17,7 +17,7 @@
 package io.github.pnoker.common.agentic.service.impl;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-import io.github.pnoker.common.agentic.entity.vo.ChatCompletionVO;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionRequestVO;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatRequestPreparer;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatResponseCodec;
 import io.github.pnoker.common.agentic.service.chat.AgenticMessageRecorder;
@@ -70,7 +70,7 @@ class AgenticChatServiceImplTest {
 
     @Test
     void streamChatCompletionPersistsStructuredFailureTrace() {
-        ChatCompletionVO request = new ChatCompletionVO();
+        ChatCompletionRequestVO request = new ChatCompletionRequestVO();
         AgenticPreparedChatBO prepared = prepared();
         when(requestPreparer.prepare(request, userHeader, "stream")).thenReturn(prepared);
         when(agenticRuntime.stream(prepared)).thenReturn(Flux.error(new RuntimeException("transport closed")));

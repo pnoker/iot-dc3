@@ -39,7 +39,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "OpenAI-compatible chat completion request body; all fields except messages are optional overrides of server-side defaults.")
-public class ChatCompletionVO {
+public class ChatCompletionRequestVO {
 
     /**
      * Model identifier (advisory — the actual model is configured server-side).

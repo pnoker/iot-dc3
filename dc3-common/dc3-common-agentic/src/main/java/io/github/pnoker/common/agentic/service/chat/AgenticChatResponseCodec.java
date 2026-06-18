@@ -19,10 +19,10 @@ package io.github.pnoker.common.agentic.service.chat;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
-import io.github.pnoker.common.agentic.entity.response.AgenticRunEventResponse;
-import io.github.pnoker.common.agentic.entity.response.AgenticVisualizationResponse;
-import io.github.pnoker.common.agentic.entity.response.ChatCompletionChunkResponse;
-import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
+import io.github.pnoker.common.agentic.entity.vo.AgenticRunEventVO;
+import io.github.pnoker.common.agentic.entity.vo.AgenticVisualizationVO;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionChunkVO;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionResponseVO;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.common.SymbolConstant;
@@ -56,22 +56,22 @@ public class AgenticChatResponseCodec {
 
     private final ObjectMapper objectMapper;
 
-    public ChatCompletionResponse blockingResponse(AgenticPreparedChatBO prepared, String content,
+    public ChatCompletionResponseVO blockingResponse(AgenticPreparedChatBO prepared, String content,
                                                    String finishReason) {
         int completionTokens = AgenticTokenEstimatorUtil.estimate(content);
         int promptTokens = Objects.nonNull(prepared.inputTokens()) ? prepared.inputTokens().getInput() : 0;
-        return ChatCompletionResponse.builder()
+        return ChatCompletionResponseVO.builder()
                 .id(newChatId())
                 .object(AgenticConstant.Chat.COMPLETION_OBJECT)
                 .created(Instant.now().getEpochSecond())
                 .model(prepared.model())
-                .choices(List.of(ChatCompletionResponse.Choice.builder()
+                .choices(List.of(ChatCompletionResponseVO.Choice.builder()
                         .index(0)
-                        .message(new ChatCompletionResponse.Message(AgenticConstant.Chat.ROLE_ASSISTANT, content,
+                        .message(new ChatCompletionResponseVO.Message(AgenticConstant.Chat.ROLE_ASSISTANT, content,
                                 buildResponseContentExt(prepared)))
                         .finishReason(normalizeFinishReason(finishReason))
                         .build()))
-                .usage(new ChatCompletionResponse.Usage(promptTokens, completionTokens,
+                .usage(new ChatCompletionResponseVO.Usage(promptTokens, completionTokens,
                         promptTokens + completionTokens))
                 .build();
     }
@@ -82,14 +82,14 @@ public class AgenticChatResponseCodec {
     }
 
     public String formatFinalChunk(String id, long created, String model, String finishReason) {
-        ChatCompletionChunkResponse chunk = ChatCompletionChunkResponse.builder()
+        ChatCompletionChunkVO chunk = ChatCompletionChunkVO.builder()
                 .id(id)
                 .object(AgenticConstant.Chat.COMPLETION_CHUNK_OBJECT)
                 .created(created)
                 .model(model)
-                .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
+                .choices(List.of(ChatCompletionChunkVO.ChunkChoice.builder()
                         .index(0)
-                        .delta(new ChatCompletionChunkResponse.Delta(null, null, null))
+                        .delta(new ChatCompletionChunkVO.Delta(null, null, null))
                         .finishReason(normalizeFinishReason(finishReason))
                         .build()))
                 .build();
@@ -128,11 +128,11 @@ public class AgenticChatResponseCodec {
     }
 
     public String formatEvent(AgenticRunEvent runEvent) {
-        return toJson(AgenticRunEventResponse.of(runEvent));
+        return toJson(AgenticRunEventVO.of(runEvent));
     }
 
     public String formatVisualization(AgenticVisualizationSpec visualization) {
-        return toJson(AgenticVisualizationResponse.of(visualization, Instant.now().getEpochSecond()));
+        return toJson(AgenticVisualizationVO.of(visualization, Instant.now().getEpochSecond()));
     }
 
     private AgenticMessageContent buildResponseContentExt(AgenticPreparedChatBO prepared) {
@@ -146,14 +146,14 @@ public class AgenticChatResponseCodec {
     }
 
     private String formatChunk(String id, long created, String model, AgenticStreamDelta streamDelta) {
-        ChatCompletionChunkResponse chunk = ChatCompletionChunkResponse.builder()
+        ChatCompletionChunkVO chunk = ChatCompletionChunkVO.builder()
                 .id(id)
                 .object(AgenticConstant.Chat.COMPLETION_CHUNK_OBJECT)
                 .created(created)
                 .model(model)
-                .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
+                .choices(List.of(ChatCompletionChunkVO.ChunkChoice.builder()
                         .index(0)
-                        .delta(new ChatCompletionChunkResponse.Delta(null, StringUtils.trimToNull(streamDelta.content()),
+                        .delta(new ChatCompletionChunkVO.Delta(null, StringUtils.trimToNull(streamDelta.content()),
                                 streamDelta.reasoningContent()))
                         .finishReason(null)
                         .build()))

@@ -16,8 +16,8 @@
  */
 package io.github.pnoker.common.agentic.service;
 
-import io.github.pnoker.common.agentic.entity.vo.ChatCompletionVO;
-import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionRequestVO;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionResponseVO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
@@ -39,7 +39,7 @@ public interface AgenticChatService {
      * @param userHeader authenticated user header
      * @return OpenAI-compatible SSE stream
      */
-    Flux<ServerSentEvent<String>> streamChatCompletion(ChatCompletionVO request,
+    Flux<ServerSentEvent<String>> streamChatCompletion(ChatCompletionRequestVO request,
                                                        RequestHeader.PrincipalHeader userHeader);
 
     /**
@@ -49,7 +49,7 @@ public interface AgenticChatService {
      * @param userHeader authenticated user header
      * @return OpenAI-compatible JSON response
      */
-    Mono<ChatCompletionResponse> chatCompletion(ChatCompletionVO request,
+    Mono<ChatCompletionResponseVO> chatCompletion(ChatCompletionRequestVO request,
                                                 RequestHeader.PrincipalHeader userHeader);
 
 }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.response;
+package io.github.pnoker.common.agentic.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -43,7 +43,7 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "A single SSE chunk returned in an OpenAI-compatible streaming chat completion response.")
-public class ChatCompletionChunkResponse {
+public class ChatCompletionChunkVO {
 
     @Schema(description = "Unique identifier for this streaming completion, shared across all chunks of the same response.", example = "chatcmpl-abc123")
 

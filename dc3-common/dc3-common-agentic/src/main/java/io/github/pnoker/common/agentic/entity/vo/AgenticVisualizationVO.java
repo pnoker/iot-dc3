@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.response;
+package io.github.pnoker.common.agentic.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
@@ -34,7 +34,7 @@ import lombok.Setter;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "SSE payload returned by the agentic engine when a visualization chart has been produced; wraps a visualization specification together with a creation timestamp.")
-public class AgenticVisualizationResponse {
+public class AgenticVisualizationVO {
 
     @Schema(description = "Fixed discriminator identifying this SSE payload as a visualization object; always \"agentic.visualization\".", example = "agentic.visualization")
 
@@ -48,8 +48,8 @@ public class AgenticVisualizationResponse {
 
     private Long created;
 
-    public static AgenticVisualizationResponse of(AgenticVisualizationSpec visualization, long created) {
-        AgenticVisualizationResponse response = new AgenticVisualizationResponse();
+    public static AgenticVisualizationVO of(AgenticVisualizationSpec visualization, long created) {
+        AgenticVisualizationVO response = new AgenticVisualizationVO();
         response.setObject(AgenticConstant.Visualization.OBJECT);
         response.setVisualization(visualization);
         response.setCreated(created);

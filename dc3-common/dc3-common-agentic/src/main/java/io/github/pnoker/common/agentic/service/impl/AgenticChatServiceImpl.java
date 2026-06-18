@@ -17,8 +17,8 @@
 package io.github.pnoker.common.agentic.service.impl;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
-import io.github.pnoker.common.agentic.entity.vo.ChatCompletionVO;
-import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionRequestVO;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionResponseVO;
 import io.github.pnoker.common.agentic.service.AgenticChatService;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatRequestPreparer;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatResponseCodec;
@@ -62,7 +62,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     private final AgenticRuntime agenticRuntime;
 
     @Override
-    public Flux<ServerSentEvent<String>> streamChatCompletion(ChatCompletionVO request,
+    public Flux<ServerSentEvent<String>> streamChatCompletion(ChatCompletionRequestVO request,
                                                               RequestHeader.PrincipalHeader userHeader) {
         return Flux.defer(() -> {
             AgenticPreparedChatBO prepared = requestPreparer.prepare(request, userHeader, "stream");
@@ -121,7 +121,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     }
 
     @Override
-    public Mono<ChatCompletionResponse> chatCompletion(ChatCompletionVO request, RequestHeader.PrincipalHeader userHeader) {
+    public Mono<ChatCompletionResponseVO> chatCompletion(ChatCompletionRequestVO request, RequestHeader.PrincipalHeader userHeader) {
         return Mono.fromCallable(() -> {
             AgenticPreparedChatBO prepared = requestPreparer.prepare(request, userHeader, "blocking");
             messageRecorder.persistUserMessage(prepared, userHeader);

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.agentic.entity.response;
+package io.github.pnoker.common.agentic.entity.vo;
 
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
@@ -24,18 +24,18 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ChatCompletionChunkResponseTest {
+class ChatCompletionChunkVOTest {
 
     @Test
     void serializesOpenAiCompatibleDeltaFields() throws Exception {
-        ChatCompletionChunkResponse response = ChatCompletionChunkResponse.builder()
+        ChatCompletionChunkVO response = ChatCompletionChunkVO.builder()
                 .id("chatcmpl-test")
                 .object("chat.completion.chunk")
                 .created(1L)
                 .model("deepseek-v4-pro")
-                .choices(List.of(ChatCompletionChunkResponse.ChunkChoice.builder()
+                .choices(List.of(ChatCompletionChunkVO.ChunkChoice.builder()
                         .index(0)
-                        .delta(new ChatCompletionChunkResponse.Delta(null, "answer", "thought"))
+                        .delta(new ChatCompletionChunkVO.Delta(null, "answer", "thought"))
                         .finishReason("stop")
                         .build()))
                 .build();
