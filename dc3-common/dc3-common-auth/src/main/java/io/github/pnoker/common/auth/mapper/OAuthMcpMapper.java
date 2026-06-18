@@ -19,6 +19,7 @@ package io.github.pnoker.common.auth.mapper;
 
 import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
+import io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
@@ -49,6 +50,9 @@ public interface OAuthMcpMapper {
 
     OAuthAuthorizationRecord selectAuthorizationByRefreshTokenHash(@Param("refreshHash") String refreshHash);
 
+    OAuthAuthorizationRecord selectAuthorizationByPreviousRefreshTokenHash(
+            @Param("previousRefreshHash") String previousRefreshHash);
+
     int insertAuthorization(OAuthAuthorizationRecord authorization);
 
     int activateAuthorizationTokens(@Param("id") Long id,
@@ -57,6 +61,7 @@ public interface OAuthMcpMapper {
                                     @Param("accessIssued") LocalDateTime accessIssued,
                                     @Param("accessExpires") LocalDateTime accessExpires,
                                     @Param("refreshHash") String refreshHash,
+                                    @Param("previousRefreshHash") String previousRefreshHash,
                                     @Param("refreshIssued") LocalDateTime refreshIssued,
                                     @Param("refreshExpires") LocalDateTime refreshExpires,
                                     @Param("tokenClaims") String tokenClaims);
@@ -131,5 +136,14 @@ public interface OAuthMcpMapper {
                              @Param("operatorName") String operatorName);
 
     int insertAudit(McpAuditCommand command);
+
+    int insertConfirmation(McpToolConfirmationRecord confirmation);
+
+    McpToolConfirmationRecord selectConfirmationByConfirmId(@Param("confirmId") String confirmId);
+
+    McpToolConfirmationRecord selectConsumedByIdempotencyKey(@Param("connectionId") Long connectionId,
+                                                             @Param("idempotencyKey") String idempotencyKey);
+
+    int consumeConfirmation(@Param("id") Long id, @Param("consumedTime") LocalDateTime consumedTime);
 
 }

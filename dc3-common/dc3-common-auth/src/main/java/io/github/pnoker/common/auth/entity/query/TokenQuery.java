@@ -72,4 +72,11 @@ public class TokenQuery {
     @Schema(description = "Authentication token")
     private String token;
 
+    /**
+     * New password, used by the self-service password change flow; {@code password} carries
+     * the current password in that flow.
+     */
+    @Schema(description = "New password for the password change flow")
+    private String newPassword;
+
 }

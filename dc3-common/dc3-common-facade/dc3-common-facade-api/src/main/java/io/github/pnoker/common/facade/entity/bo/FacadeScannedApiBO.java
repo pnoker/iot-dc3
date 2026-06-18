@@ -67,4 +67,28 @@ public class FacadeScannedApiBO {
     @Schema(description = "API grouping label")
     private String apiGroup;
 
+    @Schema(description = "Declared MCP risk level, blank when derived")
+
+    private String riskLevel;
+
+    @Schema(description = "Declared MCP destructive hint, blank when derived")
+
+    private String destructiveHint;
+
+    @Schema(description = "Declared MCP open-world hint, blank when derived")
+
+    private String openWorldHint;
+
+    @Schema(description = "Declared MCP idempotent hint, blank when derived")
+
+    private String idempotentHint;
+
+    @Schema(description = "AI-facing MCP tool description override")
+
+    private String aiDescription;
+
+    @Schema(description = "Whether the MCP tool is hidden from tools/list by default")
+
+    private String hidden;
+
 }

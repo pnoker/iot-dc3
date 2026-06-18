@@ -19,6 +19,7 @@ package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.PasswordChangeRequiredException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -147,6 +148,22 @@ public class ExceptionConfig {
         log.warn("Unauthorized exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage(),
                 exception);
         return Mono.just(R.fail(exception.getMessage()));
+    }
+
+    /**
+     * Handle PasswordChangeRequiredException
+     *
+     * @param exception PasswordChangeRequiredException to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response carrying a distinct response code
+     */
+    @ExceptionHandler(PasswordChangeRequiredException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<R<String>> passwordChangeRequiredException(PasswordChangeRequiredException exception,
+                                                           ServerHttpRequest request) {
+        log.warn("Password change required, path={}, message={}", request.getURI().getRawPath(),
+                exception.getMessage());
+        return Mono.just(R.fail(exception.getResponseEnum(), exception.getMessage()));
     }
 
     /**

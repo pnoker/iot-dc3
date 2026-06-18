@@ -20,6 +20,9 @@ package io.github.pnoker.common.resource.registrar.scan;
 import io.github.pnoker.common.annotation.PublicEndpoint;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProperties;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -63,6 +66,57 @@ class ApiEndpointScannerTest {
             assertThat(api.getApiGroup()).isEqualTo("SampleController");
             assertThat(api.getApiName()).matches("sample:(get|add|update|delete)");
         });
+    }
+
+    @Test
+    void operationAnnotationDrivesTitleAndRemarkWithMethodNameFallback() {
+        register(OperationController.class);
+        ApiEndpointScanner scanner = new ApiEndpointScanner(handlerMapping, new ResourceRegistrarProperties());
+
+        List<FacadeScannedApiBO> apis = scanner.scan();
+
+        FacadeScannedApiBO created = apis.stream()
+                .filter(a -> "POST".equals(a.getMethod()))
+                .findFirst().orElseThrow();
+        assertThat(created.getTitle()).isEqualTo("Add Device");
+        assertThat(created.getRemark()).isEqualTo("Create a new device record");
+
+        FacadeScannedApiBO fetched = apis.stream()
+                .filter(a -> "GET".equals(a.getMethod()))
+                .findFirst().orElseThrow();
+        // No @Operation: title falls back to the handler method name, remark stays blank.
+        assertThat(fetched.getTitle()).isEqualTo("get");
+        assertThat(fetched.getRemark()).isEmpty();
+    }
+
+    @Test
+    void xDc3AiExtensionPopulatesAiMetadataWithBlankDefaults() {
+        register(McpAnnotatedController.class);
+        ApiEndpointScanner scanner = new ApiEndpointScanner(handlerMapping, new ResourceRegistrarProperties());
+
+        List<FacadeScannedApiBO> apis = scanner.scan();
+
+        FacadeScannedApiBO command = apis.stream()
+                .filter(a -> "/api/mcp/command".equals(a.getPath()))
+                .findFirst().orElseThrow();
+        assertThat(command.getRiskLevel()).isEqualTo("HIGH");
+        assertThat(command.getOpenWorldHint()).isEqualTo("true");
+        assertThat(command.getHidden()).isEqualTo("true");
+        // Attributes left at their annotation defaults stay blank, so derivation still applies.
+        assertThat(command.getDestructiveHint()).isEmpty();
+        assertThat(command.getIdempotentHint()).isEmpty();
+        assertThat(command.getAiDescription()).isEmpty();
+
+        FacadeScannedApiBO plain = apis.stream()
+                .filter(a -> "/api/mcp/plain".equals(a.getPath()))
+                .findFirst().orElseThrow();
+        // No x-dc3-ai extension: every AI metadata field is blank so the catalog derives them.
+        assertThat(plain.getRiskLevel()).isEmpty();
+        assertThat(plain.getDestructiveHint()).isEmpty();
+        assertThat(plain.getOpenWorldHint()).isEmpty();
+        assertThat(plain.getIdempotentHint()).isEmpty();
+        assertThat(plain.getAiDescription()).isEmpty();
+        assertThat(plain.getHidden()).isEmpty();
     }
 
     @Test
@@ -193,6 +247,40 @@ class ApiEndpointScannerTest {
         @DeleteMapping("/{id}")
         public String delete(String id) {
             return id;
+        }
+    }
+
+    @RestController
+    @RequestMapping("/api/op")
+    static class OperationController {
+        @Operation(summary = "Add Device", description = "Create a new device record")
+        @PostMapping
+        public String create() {
+            return "ok";
+        }
+
+        @GetMapping("/{id}")
+        public String get(String id) {
+            return id;
+        }
+    }
+
+    @RestController
+    @RequestMapping("/api/mcp")
+    static class McpAnnotatedController {
+        @Operation(summary = "Issue Command", extensions = @Extension(name = "x-dc3-ai", properties = {
+                @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                @ExtensionProperty(name = "openWorld", value = "true"),
+                @ExtensionProperty(name = "hidden", value = "true")
+        }))
+        @PostMapping("/command")
+        public String command() {
+            return "ok";
+        }
+
+        @PostMapping("/plain")
+        public String plain() {
+            return "ok";
         }
     }
 

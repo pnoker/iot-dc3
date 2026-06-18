@@ -21,6 +21,8 @@ import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
 import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
 import io.github.pnoker.common.facade.api.McpRuntimeFacade;
@@ -62,6 +64,11 @@ public class McpRuntimeLocalFacade implements McpRuntimeFacade {
                                                  String toolName) {
         return oauthMcpRuntimeService.resolveVisibleTool(tenantId, principalId, mcpConnectionId, toolName,
                 scopes(scope));
+    }
+
+    @Override
+    public McpToolAuthorizeResponseDTO authorizeToolCall(McpToolAuthorizeRequestDTO request) {
+        return oauthMcpRuntimeService.authorizeToolCall(request);
     }
 
     @Override

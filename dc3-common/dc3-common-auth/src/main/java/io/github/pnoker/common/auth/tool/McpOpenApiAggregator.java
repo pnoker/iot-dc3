@@ -21,60 +21,68 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Aggregates MCP tool input schemas from each center service's OpenAPI spec.
+ * Builds MCP tool input schemas from static OpenAPI specs shipped on the auth classpath
+ * under {@code openapi/openapi-*.json}.
  *
- * <p>Only instantiated when {@code dc3.mcp.tool.aggregator.enabled=true}. It fetches
- * {@code /v3/api-docs} from each configured service, extracts the JSON request-body schema per
- * operation (resolving {@code $ref} shallowly), and keys it by
- * {@code serviceName:METHOD:path} so it lines up with {@code dc3_api.api_code}.
+ * <p>The API contract (paths, parameters, request bodies, {@code @Schema} field docs) is a
+ * compile-time fact that changes rarely, so it is snapshotted to a versioned file rather
+ * than fetched at runtime. This removes the auth service's dependency on every center
+ * service being reachable, and removes any need to expose {@code /v3/api-docs} in
+ * production. Regenerate the snapshots with {@code make openapi} after a contract change.
  *
- * <p>Best-effort: any fetch or parse failure for a service is logged and skipped — the catalog
- * still refreshes from {@code dc3_api}, only without that service's schema enrichment.
+ * <p>Each file is named {@code openapi-<service>.json} where {@code <service>} is the bare
+ * center name ({@code auth}/{@code manager}/{@code data}/{@code agentic}); it is expanded to
+ * the full {@code dc3-center-<service>} so the resulting keys line up with
+ * {@code dc3_api.api_code} ({@code dc3-center-manager:POST:/device/add}).
+ *
+ * <p>Best-effort: a missing directory, an unreadable file, or a parse failure for one
+ * service is logged and skipped — the catalog still builds from {@code dc3_api}, only
+ * without that service's schema enrichment.
  *
  * @author pnoker
- * @version 2026.6.13
+ * @version 2026.6.18
  * @since 2026.6.13
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "dc3.mcp.tool.aggregator", name = "enabled", havingValue = "true")
 public class McpOpenApiAggregator {
 
-    private final McpAggregatorProperties properties;
+    private static final String SPECS_LOCATION = "classpath*:openapi/openapi-*.json";
+    private static final String SERVICE_PREFIX = "dc3-center-";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * @return map of {@code serviceName:METHOD:path} -> JSON Schema string for the request body.
+     * @return map of {@code dc3-center-<service>:METHOD:/path} -> merged input JSON Schema string.
      */
     public Map<String, String> inputSchemasByApiCode() {
         Map<String, String> schemas = new HashMap<>();
-        if (properties.getDocs() == null || properties.getDocs().isEmpty()) {
+        Resource[] resources;
+        try {
+            resources = new PathMatchingResourcePatternResolver().getResources(SPECS_LOCATION);
+        } catch (Exception ex) {
+            log.warn("MCP aggregator: cannot resolve static OpenAPI specs at {}: {}", SPECS_LOCATION,
+                    ex.getMessage());
             return schemas;
         }
-        for (Map.Entry<String, String> entry : properties.getDocs().entrySet()) {
-            String serviceName = entry.getKey();
-            String baseUrl = entry.getValue();
-            try {
-                String spec = WebClient.builder().baseUrl(baseUrl).build()
-                        .get().uri("/v3/api-docs")
-                        .retrieve().bodyToMono(String.class).block();
-                if (StringUtils.isBlank(spec)) {
-                    continue;
-                }
-                JsonNode root = objectMapper.readTree(spec);
+        for (Resource resource : resources) {
+            String serviceName = serviceNameOf(resource.getFilename());
+            if (serviceName == null) {
+                continue;
+            }
+            try (InputStream in = resource.getInputStream()) {
+                JsonNode root = objectMapper.readTree(in);
                 JsonNode paths = root.path("paths");
                 if (paths.isMissingNode() || !paths.isObject()) {
                     continue;
@@ -87,28 +95,97 @@ public class McpOpenApiAggregator {
                     }
                     pathItem.fields().forEachRemaining(opEntry -> {
                         String method = opEntry.getKey().toUpperCase();
-                        JsonNode schema = opEntry.getValue()
-                                .path("requestBody")
-                                .path("content")
-                                .path("application/json")
-                                .path("schema");
-                        if (schema.isMissingNode() || schema.isEmpty()) {
+                        ObjectNode schema = buildOperationSchema(opEntry.getValue(), root);
+                        if (schema == null) {
                             return;
                         }
                         try {
                             schemas.put(serviceName + ":" + method + ":" + path,
-                                    objectMapper.writeValueAsString(resolveRefs(schema, root, 0)));
+                                    objectMapper.writeValueAsString(schema));
                         } catch (Exception ignore) {
                             // skip this operation on serialization failure
                         }
                     });
                 });
             } catch (Exception ex) {
-                log.warn("MCP aggregator: failed to fetch OpenAPI from {} ({}): {}",
-                        serviceName, baseUrl, ex.getMessage());
+                log.warn("MCP aggregator: failed to read static OpenAPI spec {}: {}",
+                        resource.getFilename(), ex.getMessage());
             }
         }
         return schemas;
+    }
+
+    /**
+     * Expand {@code openapi-<service>.json} to the full {@code dc3-center-<service>} key prefix.
+     * Returns {@code null} when the filename does not match the expected pattern.
+     */
+    private String serviceNameOf(String filename) {
+        if (StringUtils.isBlank(filename) || !filename.startsWith("openapi-") || !filename.endsWith(".json")) {
+            return null;
+        }
+        String bare = filename.substring("openapi-".length(), filename.length() - ".json".length());
+        if (bare.isEmpty()) {
+            return null;
+        }
+        return bare.startsWith(SERVICE_PREFIX) ? bare : SERVICE_PREFIX + bare;
+    }
+
+    /**
+     * Build a unified MCP input schema for one operation by merging the JSON request body
+     * (when present) with the operation's query and path {@code parameters}. Returns an
+     * {@code object} schema with merged {@code properties}/{@code required}, or {@code null}
+     * when the operation carries neither a body nor parameters.
+     */
+    ObjectNode buildOperationSchema(JsonNode operation, JsonNode root) {
+        ObjectNode properties = objectMapper.createObjectNode();
+        ArrayNode required = objectMapper.createArrayNode();
+
+        // Request body: only merge object-shaped JSON bodies so their fields become properties.
+        JsonNode bodySchema = operation.path("requestBody").path("content")
+                .path("application/json").path("schema");
+        if (!bodySchema.isMissingNode() && !bodySchema.isEmpty()) {
+            JsonNode resolved = resolveRefs(bodySchema, root, 0);
+            JsonNode bodyProps = resolved.path("properties");
+            if (bodyProps.isObject()) {
+                bodyProps.fields().forEachRemaining(f -> properties.set(f.getKey(), f.getValue()));
+                resolved.path("required").forEach(required::add);
+            }
+        }
+
+        // Query / path parameters: each becomes a property carrying its schema + description.
+        JsonNode parameters = operation.path("parameters");
+        if (parameters.isArray()) {
+            for (JsonNode parameter : parameters) {
+                String in = parameter.path("in").asText("");
+                String name = parameter.path("name").asText("");
+                if (name.isEmpty() || (!"query".equals(in) && !"path".equals(in))) {
+                    continue;
+                }
+                JsonNode paramSchema = resolveRefs(parameter.path("schema"), root, 0);
+                ObjectNode property = paramSchema.isObject()
+                        ? ((ObjectNode) paramSchema).deepCopy() : objectMapper.createObjectNode();
+                String description = parameter.path("description").asText("");
+                if (!description.isEmpty() && !property.has("description")) {
+                    property.put("description", description);
+                }
+                properties.set(name, property);
+                // Path params are always required; query params follow their declared flag.
+                if ("path".equals(in) || parameter.path("required").asBoolean(false)) {
+                    required.add(name);
+                }
+            }
+        }
+
+        if (properties.isEmpty()) {
+            return null;
+        }
+        ObjectNode schema = objectMapper.createObjectNode();
+        schema.put("type", "object");
+        schema.set("properties", properties);
+        if (!required.isEmpty()) {
+            schema.set("required", required);
+        }
+        return schema;
     }
 
     /**

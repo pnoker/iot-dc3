@@ -64,6 +64,12 @@ public class ResourceRegistryGrpcFacade implements ResourceRegistryFacade {
                         .setTitle(Objects.requireNonNullElse(api.getTitle(), ""))
                         .setRemark(Objects.requireNonNullElse(api.getRemark(), ""))
                         .setApiGroup(Objects.requireNonNullElse(api.getApiGroup(), ""))
+                        .setRiskLevel(Objects.requireNonNullElse(api.getRiskLevel(), ""))
+                        .setDestructiveHint(Objects.requireNonNullElse(api.getDestructiveHint(), ""))
+                        .setOpenWorldHint(Objects.requireNonNullElse(api.getOpenWorldHint(), ""))
+                        .setIdempotentHint(Objects.requireNonNullElse(api.getIdempotentHint(), ""))
+                        .setAiDescription(Objects.requireNonNullElse(api.getAiDescription(), ""))
+                        .setHidden(Objects.requireNonNullElse(api.getHidden(), ""))
                         .build());
             }
         }

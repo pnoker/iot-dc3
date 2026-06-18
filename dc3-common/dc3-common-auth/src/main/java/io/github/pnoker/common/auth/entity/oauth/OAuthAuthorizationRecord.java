@@ -72,6 +72,9 @@ public class OAuthAuthorizationRecord {
     @ToString.Exclude
     private String refreshTokenHash;
 
+    @ToString.Exclude
+    private String previousRefreshTokenHash;
+
     private LocalDateTime refreshTokenIssued;
 
     private LocalDateTime refreshTokenExpires;

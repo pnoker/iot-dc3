@@ -72,4 +72,34 @@ public class ResourceRegistryScannedApi {
      */
     private String apiGroup;
 
+    /**
+     * Declared MCP risk level (LOW / MEDIUM / HIGH); blank when derived automatically.
+     */
+    private String riskLevel;
+
+    /**
+     * Declared MCP destructive hint ("true" / "false"); blank when derived.
+     */
+    private String destructiveHint;
+
+    /**
+     * Declared MCP open-world hint ("true" / "false"); blank when derived.
+     */
+    private String openWorldHint;
+
+    /**
+     * Declared MCP idempotent hint ("true" / "false"); blank when derived.
+     */
+    private String idempotentHint;
+
+    /**
+     * AI-facing MCP tool description override; blank when the operation text is used.
+     */
+    private String aiDescription;
+
+    /**
+     * Whether the MCP tool is hidden from tools/list by default ("true" / "false"); blank = visible.
+     */
+    private String hidden;
+
 }

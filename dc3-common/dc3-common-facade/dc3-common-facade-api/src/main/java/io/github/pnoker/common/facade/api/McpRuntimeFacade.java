@@ -19,6 +19,8 @@ package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
 import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
 
@@ -62,6 +64,14 @@ public interface McpRuntimeFacade {
      */
     McpToolResolveResponseDTO resolveTool(Long tenantId, Long principalId, Long mcpConnectionId, String scope,
                                           String toolName);
+
+    /**
+     * Authorize one tool call, enforcing high-risk confirmation and idempotency.
+     *
+     * @param request authorization request
+     * @return authorization decision
+     */
+    McpToolAuthorizeResponseDTO authorizeToolCall(McpToolAuthorizeRequestDTO request);
 
     /**
      * Store one MCP call audit record.

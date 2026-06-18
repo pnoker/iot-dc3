@@ -28,6 +28,8 @@ import io.github.pnoker.common.auth.service.LocalCredentialService;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.service.TenantService;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.PasswordChangeRequiredException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.KeyUtil;
 import io.jsonwebtoken.Claims;
@@ -94,8 +96,31 @@ public class TokenServiceImpl implements TokenService {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
         localCredentialService.recordSuccessfulLogin(credential.getId());
+
+        if (Objects.nonNull(credential.getPasswordExpireTime())
+                && credential.getPasswordExpireTime().isBefore(LocalDateTime.now())) {
+            throw new PasswordChangeRequiredException(ResponseEnum.PASSWORD_EXPIRED);
+        }
+        if (Objects.nonNull(credential.getRequirePasswordChange()) && credential.getRequirePasswordChange() == 1) {
+            throw new PasswordChangeRequiredException(ResponseEnum.PASSWORD_CHANGE_REQUIRED);
+        }
+
         markPrincipalLogin(credential.getPrincipalId());
         return KeyUtil.generateToken(String.valueOf(credential.getPrincipalId()), salt, tenantBO.getId());
+    }
+
+    @Override
+    public void changePassword(String loginName, String currentPassword, String newPassword, String tenantCode) {
+        TenantBO tenantBO = tenantService.getByCode(tenantCode);
+        if (Objects.isNull(tenantBO)) {
+            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+        }
+        LocalCredentialBO credential = localCredentialService.getByLoginName(loginName, false);
+        if (Objects.isNull(credential)
+                || !tenantMembershipService.isTenantMember(tenantBO.getId(), credential.getPrincipalId())) {
+            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+        }
+        localCredentialService.changePassword(loginName, currentPassword, newPassword);
     }
 
     @Override

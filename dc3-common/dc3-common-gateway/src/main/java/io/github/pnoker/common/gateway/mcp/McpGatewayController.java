@@ -22,6 +22,8 @@ import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
 import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
 import io.github.pnoker.common.facade.api.McpRuntimeFacade;
@@ -211,34 +213,53 @@ public class McpGatewayController {
                                            ServerWebExchange exchange) {
             long start = System.nanoTime();
             String traceId = UUID.randomUUID().toString();
+            String argumentDigest = DecodeUtil.sha256Base64Url(JsonUtil.toJsonString(arguments));
             return blocking(() -> mcpRuntimeFacade.resolveTool(context.getTenantId(), context.getPrincipalId(),
                     context.getMcpConnectionId(), context.getScope(), toolName)).flatMap(tool -> {
                 McpToolCallControls controls = controlValues(callMeta, exchange);
-                String policyError = policyError(tool, controls);
-                if (StringUtils.isNotBlank(policyError)) {
-                    return audit(context, tool, traceId, arguments, controls, McpConstant.Audit.DENIED,
-                            McpConstant.Audit.POLICY_DENIED, start, exchange)
-                            .thenReturn(orderedMap(McpConstant.ToolResult.IS_ERROR, true,
-                                    McpConstant.ToolResult.CONTENT, List.of(orderedMap(
+                return blocking(() -> mcpRuntimeFacade.authorizeToolCall(McpToolAuthorizeRequestDTO.builder()
+                        .tenantId(context.getTenantId())
+                        .principalId(context.getPrincipalId())
+                        .mcpConnectionId(context.getMcpConnectionId())
+                        .scope(context.getScope())
+                        .toolName(toolName)
+                        .argumentDigest(argumentDigest)
+                        .confirmId(controls.confirmId())
+                        .idempotencyKey(controls.idempotencyKey())
+                        .build())).flatMap(decision -> {
+                    if (!McpConstant.Confirmation.DECISION_AUTHORIZED.equals(decision.getDecision())) {
+                        return audit(context, tool, traceId, arguments, controls, McpConstant.Audit.DENIED,
+                                McpConstant.Audit.POLICY_DENIED, start, exchange)
+                                .thenReturn(toolError(authorizationMessage(decision)));
+                    }
+                    return invokeBackend(context, tool, arguments, controls)
+                            .flatMap(result -> audit(context, tool, traceId, arguments, controls,
+                                    McpConstant.Audit.SUCCESS, "", start, exchange)
+                                    .thenReturn(orderedMap(McpConstant.ToolResult.CONTENT, List.of(orderedMap(
                                             McpConstant.ToolResult.TYPE, McpConstant.ToolResult.TYPE_TEXT,
-                                            McpConstant.ToolResult.TEXT, policyError
-                                    ))));
-                }
-                return invokeBackend(context, tool, arguments, controls)
-                        .flatMap(result -> audit(context, tool, traceId, arguments, controls,
-                                McpConstant.Audit.SUCCESS, "", start, exchange)
-                                .thenReturn(orderedMap(McpConstant.ToolResult.CONTENT, List.of(orderedMap(
-                                        McpConstant.ToolResult.TYPE, McpConstant.ToolResult.TYPE_TEXT,
-                                        McpConstant.ToolResult.TEXT, JsonUtil.toJsonString(result)
-                                )))))
-                        .onErrorResume(e -> audit(context, tool, traceId, arguments, controls,
-                                McpConstant.Audit.ERROR, e.getClass().getSimpleName(), start, exchange)
-                                .thenReturn(orderedMap(McpConstant.ToolResult.IS_ERROR, true,
-                                        McpConstant.ToolResult.CONTENT, List.of(orderedMap(
-                                                McpConstant.ToolResult.TYPE, McpConstant.ToolResult.TYPE_TEXT,
-                                                McpConstant.ToolResult.TEXT, e.getMessage()
-                                        )))));
+                                            McpConstant.ToolResult.TEXT, JsonUtil.toJsonString(result)
+                                    )))))
+                            .onErrorResume(e -> audit(context, tool, traceId, arguments, controls,
+                                    McpConstant.Audit.ERROR, e.getClass().getSimpleName(), start, exchange)
+                                    .thenReturn(toolError(e.getMessage())));
+                });
             });
+        }
+
+        private Map<String, Object> toolError(String message) {
+            return orderedMap(McpConstant.ToolResult.IS_ERROR, true,
+                    McpConstant.ToolResult.CONTENT, List.of(orderedMap(
+                            McpConstant.ToolResult.TYPE, McpConstant.ToolResult.TYPE_TEXT,
+                            McpConstant.ToolResult.TEXT, StringUtils.defaultString(message)
+                    )));
+        }
+
+        private String authorizationMessage(McpToolAuthorizeResponseDTO decision) {
+            if (McpConstant.Confirmation.DECISION_CONFIRM_REQUIRED.equals(decision.getDecision())
+                    && StringUtils.isNotBlank(decision.getConfirmId())) {
+                return decision.getMessage() + " (confirmId=" + decision.getConfirmId() + ")";
+            }
+            return StringUtils.defaultString(decision.getMessage());
         }
 
         private Mono<Map<String, Object>> invokeBackend(McpIntrospectResponseDTO context,
@@ -341,19 +362,6 @@ public class McpGatewayController {
                             exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.MCP_IDEMPOTENCY_KEY),
                             exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.IDEMPOTENCY_KEY))
             );
-        }
-
-        private String policyError(McpToolResolveResponseDTO tool, McpToolCallControls controls) {
-            if (!McpConstant.RiskLevel.HIGH.equals(tool.getRiskLevel())) {
-                return "";
-            }
-            if (StringUtils.isBlank(controls.confirmId())) {
-                return "High risk MCP tool requires confirmation";
-            }
-            if (StringUtils.isBlank(controls.idempotencyKey())) {
-                return "High risk MCP tool requires an idempotency key";
-            }
-            return "";
         }
 
         private String firstNonBlank(Object... values) {

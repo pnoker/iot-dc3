@@ -68,6 +68,24 @@ message GrpcScannedApiDTO {
   // e.g. "ApiController". Used to cluster sibling endpoints under the same
   // tree node on the permission resource page.
   string api_group = 6;
+
+  // Declared MCP risk level (LOW / MEDIUM / HIGH); empty when derived automatically.
+  string risk_level = 7;
+
+  // Declared MCP destructive hint ("true" / "false"); empty when derived.
+  string destructive_hint = 8;
+
+  // Declared MCP open-world hint ("true" / "false"); empty when derived.
+  string open_world_hint = 9;
+
+  // Declared MCP idempotent hint ("true" / "false"); empty when derived.
+  string idempotent_hint = 10;
+
+  // AI-facing MCP tool description override; empty when the operation text is used.
+  string ai_description = 11;
+
+  // Whether the MCP tool is hidden from tools/list by default ("true" / "false"); empty = visible.
+  string hidden = 12;
 }
 
 // Response wrapper for the sync result.

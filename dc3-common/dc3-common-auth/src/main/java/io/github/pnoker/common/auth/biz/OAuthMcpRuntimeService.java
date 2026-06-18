@@ -24,6 +24,8 @@ import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
 import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
 import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
@@ -81,6 +83,8 @@ public interface OAuthMcpRuntimeService {
 
     McpToolResolveResponseDTO resolveVisibleTool(Long tenantId, Long principalId, Long connectionId, String toolName,
                                                  Set<String> scopes);
+
+    McpToolAuthorizeResponseDTO authorizeToolCall(McpToolAuthorizeRequestDTO request);
 
     void audit(McpAuditCommandDTO command);
 

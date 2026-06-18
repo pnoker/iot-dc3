@@ -20,11 +20,16 @@ package io.github.pnoker.common.auth.biz.impl;
 import io.github.pnoker.common.auth.dal.PrincipalManager;
 import io.github.pnoker.common.auth.dal.ServiceAccountManager;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
+import io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
+import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
+import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
 import io.github.pnoker.common.entity.dto.OAuthClientRegistrationResponseDTO;
@@ -38,6 +43,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +51,8 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -73,6 +81,174 @@ class OAuthMcpRuntimeServiceImplTest {
         ReflectionTestUtils.setField(service, "authorizationCodeTtl", Duration.ofMinutes(5));
         ReflectionTestUtils.setField(service, "accessTokenTtl", Duration.ofMinutes(15));
         ReflectionTestUtils.setField(service, "refreshTokenTtl", Duration.ofDays(30));
+        ReflectionTestUtils.setField(service, "confirmTtl", Duration.ofMinutes(5));
+    }
+
+    private McpToolRecord highRiskTool() {
+        McpToolRecord tool = new McpToolRecord();
+        tool.setToolId("manager:POST:/device/delete");
+        tool.setToolName("manager_device_delete");
+        tool.setPermissionCode("manager:device:delete");
+        tool.setRiskLevel(McpConstant.RiskLevel.HIGH);
+        tool.setServiceName("dc3-center-manager");
+        tool.setApiPath("/device/delete");
+        tool.setHttpMethod("POST");
+        return tool;
+    }
+
+    private McpToolAuthorizeRequestDTO authorizeRequest(String confirmId, String idempotencyKey, String digest) {
+        return McpToolAuthorizeRequestDTO.builder()
+                .tenantId(1L)
+                .principalId(100L)
+                .mcpConnectionId(300L)
+                .scope("mcp:tools:call mcp:tools:call:high")
+                .toolName("manager_device_delete")
+                .argumentDigest(digest)
+                .confirmId(confirmId)
+                .idempotencyKey(idempotencyKey)
+                .build();
+    }
+
+    @Test
+    void authorizeLowRiskToolPassesWithoutConfirmation() {
+        McpToolRecord lowRisk = new McpToolRecord();
+        lowRisk.setToolId("manager:GET:/device/get");
+        lowRisk.setToolName("manager_device_get");
+        lowRisk.setRiskLevel(McpConstant.RiskLevel.LOW);
+        when(oauthMcpMapper.selectVisibleToolByName(1L, 100L, 300L, "manager_device_get", true))
+                .thenReturn(lowRisk);
+
+        McpToolAuthorizeResponseDTO decision = service.authorizeToolCall(McpToolAuthorizeRequestDTO.builder()
+                .tenantId(1L).principalId(100L).mcpConnectionId(300L)
+                .scope("mcp:tools:call mcp:tools:call:high").toolName("manager_device_get").build());
+
+        assertThat(decision.getDecision()).isEqualTo("AUTHORIZED");
+        verify(oauthMcpMapper, never()).insertConfirmation(any());
+    }
+
+    @Test
+    void authorizeHighRiskWithoutConfirmIdIssuesPendingTicket() {
+        when(oauthMcpMapper.selectVisibleToolByName(1L, 100L, 300L, "manager_device_delete", true))
+                .thenReturn(highRiskTool());
+
+        McpToolAuthorizeResponseDTO decision = service.authorizeToolCall(authorizeRequest("", "idem-1", "digest-1"));
+
+        assertThat(decision.getDecision()).isEqualTo("CONFIRM_REQUIRED");
+        assertThat(decision.getConfirmId()).isNotBlank();
+        ArgumentCaptor<McpToolConfirmationRecord> captor = ArgumentCaptor.forClass(McpToolConfirmationRecord.class);
+        verify(oauthMcpMapper).insertConfirmation(captor.capture());
+        McpToolConfirmationRecord ticket = captor.getValue();
+        assertThat(ticket.getStatus()).isEqualTo("PENDING");
+        assertThat(ticket.getToolId()).isEqualTo("manager:POST:/device/delete");
+        assertThat(ticket.getArgumentDigest()).isEqualTo("digest-1");
+        assertThat(ticket.getExpireTime()).isAfter(LocalDateTime.now());
+    }
+
+    @Test
+    void authorizeHighRiskWithUsedIdempotencyKeyIsRejected() {
+        when(oauthMcpMapper.selectVisibleToolByName(1L, 100L, 300L, "manager_device_delete", true))
+                .thenReturn(highRiskTool());
+        when(oauthMcpMapper.selectConsumedByIdempotencyKey(300L, "idem-used"))
+                .thenReturn(new McpToolConfirmationRecord());
+
+        McpToolAuthorizeResponseDTO decision =
+                service.authorizeToolCall(authorizeRequest("", "idem-used", "digest-1"));
+
+        assertThat(decision.getDecision()).isEqualTo("REJECTED");
+        assertThat(decision.getMessage()).contains("idempotency key");
+        verify(oauthMcpMapper, never()).insertConfirmation(any());
+    }
+
+    @Test
+    void authorizeHighRiskWithValidConfirmIdConsumesTicketAndAuthorizes() {
+        when(oauthMcpMapper.selectVisibleToolByName(1L, 100L, 300L, "manager_device_delete", true))
+                .thenReturn(highRiskTool());
+        McpToolConfirmationRecord ticket = new McpToolConfirmationRecord();
+        ticket.setId(900L);
+        ticket.setConfirmId("confirm-ok");
+        ticket.setPrincipalId(100L);
+        ticket.setConnectionId(300L);
+        ticket.setToolId("manager:POST:/device/delete");
+        ticket.setArgumentDigest("digest-1");
+        ticket.setStatus("PENDING");
+        ticket.setExpireTime(LocalDateTime.now().plusMinutes(5));
+        when(oauthMcpMapper.selectConfirmationByConfirmId("confirm-ok")).thenReturn(ticket);
+        when(oauthMcpMapper.consumeConfirmation(eq(900L), any())).thenReturn(1);
+
+        McpToolAuthorizeResponseDTO decision =
+                service.authorizeToolCall(authorizeRequest("confirm-ok", "idem-1", "digest-1"));
+
+        assertThat(decision.getDecision()).isEqualTo("AUTHORIZED");
+        verify(oauthMcpMapper).consumeConfirmation(eq(900L), any());
+    }
+
+    @Test
+    void authorizeHighRiskWithMismatchedDigestIsRejected() {
+        when(oauthMcpMapper.selectVisibleToolByName(1L, 100L, 300L, "manager_device_delete", true))
+                .thenReturn(highRiskTool());
+        McpToolConfirmationRecord ticket = new McpToolConfirmationRecord();
+        ticket.setId(901L);
+        ticket.setConfirmId("confirm-mismatch");
+        ticket.setPrincipalId(100L);
+        ticket.setConnectionId(300L);
+        ticket.setToolId("manager:POST:/device/delete");
+        ticket.setArgumentDigest("original-digest");
+        ticket.setStatus("PENDING");
+        ticket.setExpireTime(LocalDateTime.now().plusMinutes(5));
+        when(oauthMcpMapper.selectConfirmationByConfirmId("confirm-mismatch")).thenReturn(ticket);
+
+        McpToolAuthorizeResponseDTO decision =
+                service.authorizeToolCall(authorizeRequest("confirm-mismatch", "idem-1", "tampered-digest"));
+
+        assertThat(decision.getDecision()).isEqualTo("REJECTED");
+        assertThat(decision.getMessage()).contains("arguments do not match");
+        verify(oauthMcpMapper, never()).consumeConfirmation(any(), any());
+    }
+
+    @Test
+    void authorizeHighRiskWithExpiredConfirmIdIsRejected() {
+        when(oauthMcpMapper.selectVisibleToolByName(1L, 100L, 300L, "manager_device_delete", true))
+                .thenReturn(highRiskTool());
+        McpToolConfirmationRecord ticket = new McpToolConfirmationRecord();
+        ticket.setId(902L);
+        ticket.setConfirmId("confirm-expired");
+        ticket.setPrincipalId(100L);
+        ticket.setConnectionId(300L);
+        ticket.setToolId("manager:POST:/device/delete");
+        ticket.setArgumentDigest("digest-1");
+        ticket.setStatus("PENDING");
+        ticket.setExpireTime(LocalDateTime.now().minusMinutes(1));
+        when(oauthMcpMapper.selectConfirmationByConfirmId("confirm-expired")).thenReturn(ticket);
+
+        McpToolAuthorizeResponseDTO decision =
+                service.authorizeToolCall(authorizeRequest("confirm-expired", "idem-1", "digest-1"));
+
+        assertThat(decision.getDecision()).isEqualTo("REJECTED");
+        assertThat(decision.getMessage()).contains("expired");
+        verify(oauthMcpMapper, never()).consumeConfirmation(any(), any());
+    }
+
+    @Test
+    void authorizeHighRiskReplayOfConsumedConfirmIdIsRejected() {
+        when(oauthMcpMapper.selectVisibleToolByName(1L, 100L, 300L, "manager_device_delete", true))
+                .thenReturn(highRiskTool());
+        McpToolConfirmationRecord ticket = new McpToolConfirmationRecord();
+        ticket.setId(903L);
+        ticket.setConfirmId("confirm-consumed");
+        ticket.setPrincipalId(100L);
+        ticket.setConnectionId(300L);
+        ticket.setToolId("manager:POST:/device/delete");
+        ticket.setArgumentDigest("digest-1");
+        ticket.setStatus("CONSUMED");
+        ticket.setExpireTime(LocalDateTime.now().plusMinutes(5));
+        when(oauthMcpMapper.selectConfirmationByConfirmId("confirm-consumed")).thenReturn(ticket);
+
+        McpToolAuthorizeResponseDTO decision =
+                service.authorizeToolCall(authorizeRequest("confirm-consumed", "idem-1", "digest-1"));
+
+        assertThat(decision.getDecision()).isEqualTo("REJECTED");
+        assertThat(decision.getMessage()).contains("already been used");
+        verify(oauthMcpMapper, never()).consumeConfirmation(any(), any());
     }
 
     @Test
@@ -236,6 +412,41 @@ class OAuthMcpRuntimeServiceImplTest {
         assertThat(visible.get(0).getTitle()).isEqualTo("List users");
         assertThat(visible.get(0).getMeta().getPermissionCode()).isEqualTo("auth:user:select");
         assertThat(visible.get(0).getMeta().getRiskLevel()).isEqualTo("LOW");
+    }
+
+    @Test
+    void refreshTokenReplayOfRotatedTokenRevokesAuthorization() {
+        OAuthAuthorizationRecord replayed = new OAuthAuthorizationRecord();
+        replayed.setAccessTokenJti("jti-leaked");
+        when(oauthMcpMapper.selectAuthorizationByRefreshTokenHash(any())).thenReturn(null);
+        when(oauthMcpMapper.selectAuthorizationByPreviousRefreshTokenHash(any())).thenReturn(replayed);
+
+        Map<String, String> form = Map.of(
+                "grant_type", "refresh_token",
+                "refresh_token", "leaked-old-token"
+        );
+
+        assertThatThrownBy(() -> service.token(form, null))
+                .isInstanceOf(OAuthMcpRuntimeServiceImpl.OAuthProtocolException.class)
+                .hasMessageContaining("refresh token has been revoked");
+        verify(oauthMcpMapper).revokeAuthorizationByAccessTokenJti(eq("jti-leaked"),
+                eq("refresh_token_replayed"), any());
+    }
+
+    @Test
+    void refreshTokenRejectsUnknownTokenWithoutRevocation() {
+        when(oauthMcpMapper.selectAuthorizationByRefreshTokenHash(any())).thenReturn(null);
+        when(oauthMcpMapper.selectAuthorizationByPreviousRefreshTokenHash(any())).thenReturn(null);
+
+        Map<String, String> form = Map.of(
+                "grant_type", "refresh_token",
+                "refresh_token", "never-issued"
+        );
+
+        assertThatThrownBy(() -> service.token(form, null))
+                .isInstanceOf(OAuthMcpRuntimeServiceImpl.OAuthProtocolException.class)
+                .hasMessageContaining("refresh token is invalid or expired");
+        verify(oauthMcpMapper, never()).revokeAuthorizationByAccessTokenJti(any(), any(), any());
     }
 
     @SuppressWarnings("unchecked")

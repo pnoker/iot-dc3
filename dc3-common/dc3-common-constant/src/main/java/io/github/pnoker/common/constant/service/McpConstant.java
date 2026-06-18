@@ -399,6 +399,27 @@ public class McpConstant {
     }
 
     /**
+     * High-risk tool call confirmation ticket constants.
+     */
+    public static class Confirmation {
+
+        public static final String DECISION_AUTHORIZED = "AUTHORIZED";
+
+        public static final String DECISION_CONFIRM_REQUIRED = "CONFIRM_REQUIRED";
+
+        public static final String DECISION_REJECTED = "REJECTED";
+
+        public static final String STATUS_PENDING = "PENDING";
+
+        public static final String STATUS_CONSUMED = "CONSUMED";
+
+        private Confirmation() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+
+    }
+
+    /**
      * Audit statuses emitted by the gateway runtime.
      */
     public static class Audit {

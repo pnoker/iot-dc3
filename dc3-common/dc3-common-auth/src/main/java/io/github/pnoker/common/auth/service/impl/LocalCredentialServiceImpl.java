@@ -36,12 +36,14 @@ import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.EmptyException;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
 import io.github.pnoker.common.utils.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -65,12 +67,14 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
     private static final int MAX_FAILED_ATTEMPTS = 5;
 
     private static final long LOCK_MINUTES = 15;
-
     private final LocalCredentialBuilder localCredentialBuilder;
-
     private final LocalCredentialManager localCredentialManager;
-
     private final TenantMembershipService tenantMembershipService;
+    /**
+     * Password validity in days after a change; {@code 0} (default) means passwords never expire.
+     */
+    @Value("${dc3.auth.password.expire-days:0}")
+    private long passwordExpireDays;
 
     @Override
     public void add(LocalCredentialBO entityBO) {
@@ -177,6 +181,31 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
         credential.setFailedAttempts(0);
         credential.setLockedUntil(null);
         update(credential);
+    }
+
+    @Override
+    public void changePassword(String loginName, String currentPassword, String newPassword) {
+        if (StringUtils.isBlank(newPassword)) {
+            throw new EmptyException("The new password is empty");
+        }
+        LocalCredentialBO credential = getByLoginName(loginName, true);
+        if (!PasswordUtil.verify(currentPassword, credential.getPasswordHash())) {
+            throw new UnAuthorizedException("The current password does not match");
+        }
+        LocalCredentialDO entityDO = getDOById(credential.getId(), true);
+        String hash = PasswordUtil.encode(newPassword);
+        LocalDateTime now = LocalDateTime.now();
+        entityDO.setPasswordHash(hash);
+        entityDO.setPasswordAlgorithm(PasswordUtil.algorithmOfHash(hash).getValue());
+        entityDO.setPasswordUpdatedTime(now);
+        entityDO.setPasswordExpireTime(passwordExpireDays > 0 ? now.plusDays(passwordExpireDays) : null);
+        entityDO.setRequirePasswordChange((byte) 0);
+        entityDO.setFailedAttempts(0);
+        entityDO.setLockedUntil(null);
+        entityDO.setOperateTime(null);
+        if (!localCredentialManager.updateById(entityDO)) {
+            throw new UpdateException("The password change failed");
+        }
     }
 
     @Override

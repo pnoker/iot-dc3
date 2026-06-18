@@ -17,26 +17,15 @@
 
 package io.github.pnoker.common.auth.grpc;
 
-import io.github.pnoker.api.center.auth.GrpcMcpAuditCommand;
-import io.github.pnoker.api.center.auth.GrpcMcpIntrospectDTO;
-import io.github.pnoker.api.center.auth.GrpcMcpIntrospectRequest;
-import io.github.pnoker.api.center.auth.GrpcMcpToolAnnotationsDTO;
-import io.github.pnoker.api.center.auth.GrpcMcpToolDefinitionDTO;
-import io.github.pnoker.api.center.auth.GrpcMcpToolListRequest;
-import io.github.pnoker.api.center.auth.GrpcMcpToolMetadataDTO;
-import io.github.pnoker.api.center.auth.GrpcMcpToolResolveDTO;
-import io.github.pnoker.api.center.auth.GrpcMcpToolResolveRequest;
-import io.github.pnoker.api.center.auth.GrpcRMcpBoolean;
-import io.github.pnoker.api.center.auth.GrpcRMcpIntrospectDTO;
-import io.github.pnoker.api.center.auth.GrpcRMcpToolListDTO;
-import io.github.pnoker.api.center.auth.GrpcRMcpToolResolveDTO;
-import io.github.pnoker.api.center.auth.McpRuntimeApiGrpc;
+import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
 import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
 import io.github.pnoker.common.enums.ResponseEnum;
@@ -113,6 +102,34 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
             response.setResult(protocolFailure(e));
         } catch (Exception e) {
             log.warn("MCP resolve tool failed", e);
+            response.setResult(failure(e));
+        }
+        responseObserver.onNext(response.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void authorizeToolCall(GrpcMcpToolAuthorizeRequest request,
+                                  StreamObserver<GrpcRMcpToolAuthorizeDTO> responseObserver) {
+        GrpcRMcpToolAuthorizeDTO.Builder response = GrpcRMcpToolAuthorizeDTO.newBuilder();
+        try {
+            McpToolAuthorizeResponseDTO decision = oauthMcpRuntimeService.authorizeToolCall(
+                    McpToolAuthorizeRequestDTO.builder()
+                            .tenantId(request.getTenantId())
+                            .principalId(request.getPrincipalId())
+                            .mcpConnectionId(request.getMcpConnectionId())
+                            .scope(request.getScope())
+                            .toolName(request.getToolName())
+                            .argumentDigest(request.getArgumentDigest())
+                            .confirmId(request.getConfirmId())
+                            .idempotencyKey(request.getIdempotencyKey())
+                            .build());
+            response.setResult(ok());
+            response.setData(toGrpc(decision));
+        } catch (OAuthProtocolException e) {
+            response.setResult(protocolFailure(e));
+        } catch (Exception e) {
+            log.warn("MCP authorize tool call failed", e);
             response.setResult(failure(e));
         }
         responseObserver.onNext(response.build());
@@ -201,6 +218,15 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .setServiceName(StringUtils.defaultString(source.getServiceName()))
                 .setApiPath(StringUtils.defaultString(source.getApiPath()))
                 .setHttpMethod(StringUtils.defaultString(source.getHttpMethod()))
+                .build();
+    }
+
+    private GrpcMcpToolAuthorizeDTO toGrpc(McpToolAuthorizeResponseDTO source) {
+        return GrpcMcpToolAuthorizeDTO.newBuilder()
+                .setDecision(StringUtils.defaultString(source.getDecision()))
+                .setConfirmId(StringUtils.defaultString(source.getConfirmId()))
+                .setMessage(StringUtils.defaultString(source.getMessage()))
+                .setRiskLevel(StringUtils.defaultString(source.getRiskLevel()))
                 .build();
     }
 

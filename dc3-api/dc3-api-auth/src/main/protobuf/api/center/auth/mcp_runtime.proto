@@ -37,6 +37,9 @@ service McpRuntimeApi {
   // Resolve one visible tool to its backend invocation metadata.
   rpc ResolveTool (GrpcMcpToolResolveRequest) returns (GrpcRMcpToolResolveDTO);
 
+  // Authorize one tool call, enforcing high-risk confirmation and idempotency.
+  rpc AuthorizeToolCall (GrpcMcpToolAuthorizeRequest) returns (GrpcRMcpToolAuthorizeDTO);
+
   // Store one MCP call audit record.
   rpc Audit (GrpcMcpAuditCommand) returns (GrpcRMcpBoolean);
 }
@@ -144,6 +147,39 @@ message GrpcMcpToolResolveDTO {
   string service_name = 5;
   string api_path = 6;
   string http_method = 7;
+}
+
+// Tool call authorization request.
+message GrpcMcpToolAuthorizeRequest {
+  int64 tenant_id = 1;
+  int64 principal_id = 2;
+  int64 mcp_connection_id = 3;
+  string scope = 4;
+  string tool_name = 5;
+  string argument_digest = 6;
+  string confirm_id = 7;
+  string idempotency_key = 8;
+}
+
+// Tool call authorization response wrapper.
+message GrpcRMcpToolAuthorizeDTO {
+  // Common result wrapper.
+  GrpcR result = 1;
+
+  // Authorization decision.
+  GrpcMcpToolAuthorizeDTO data = 2;
+}
+
+// Tool call authorization decision.
+message GrpcMcpToolAuthorizeDTO {
+  // Decision: AUTHORIZED / CONFIRM_REQUIRED / REJECTED.
+  string decision = 1;
+  // Confirmation ticket ID issued when decision is CONFIRM_REQUIRED.
+  string confirm_id = 2;
+  // Human readable reason or confirmation prompt.
+  string message = 3;
+  // Resolved tool risk level.
+  string risk_level = 4;
 }
 
 // MCP audit insert command.

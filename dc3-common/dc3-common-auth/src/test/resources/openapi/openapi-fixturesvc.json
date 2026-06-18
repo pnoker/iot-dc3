@@ -1,0 +1,49 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "manager",
+    "version": "v1"
+  },
+  "paths": {
+    "/device/add": {
+      "post": {
+        "summary": "Add Device",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "deviceName": {
+                    "type": "string",
+                    "description": "device name"
+                  },
+                  "driverId": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "deviceName"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/device/list_by_ids": {
+      "post": {
+        "summary": "List Devices by IDs",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

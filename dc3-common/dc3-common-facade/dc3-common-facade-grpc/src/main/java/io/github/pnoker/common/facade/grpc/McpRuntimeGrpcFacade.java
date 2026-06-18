@@ -17,24 +17,13 @@
 
 package io.github.pnoker.common.facade.grpc;
 
-import io.github.pnoker.api.center.auth.GrpcMcpAuditCommand;
-import io.github.pnoker.api.center.auth.GrpcMcpIntrospectDTO;
-import io.github.pnoker.api.center.auth.GrpcMcpIntrospectRequest;
-import io.github.pnoker.api.center.auth.GrpcMcpToolAnnotationsDTO;
-import io.github.pnoker.api.center.auth.GrpcMcpToolDefinitionDTO;
-import io.github.pnoker.api.center.auth.GrpcMcpToolListRequest;
-import io.github.pnoker.api.center.auth.GrpcMcpToolMetadataDTO;
-import io.github.pnoker.api.center.auth.GrpcMcpToolResolveDTO;
-import io.github.pnoker.api.center.auth.GrpcMcpToolResolveRequest;
-import io.github.pnoker.api.center.auth.GrpcRMcpBoolean;
-import io.github.pnoker.api.center.auth.GrpcRMcpIntrospectDTO;
-import io.github.pnoker.api.center.auth.GrpcRMcpToolListDTO;
-import io.github.pnoker.api.center.auth.GrpcRMcpToolResolveDTO;
-import io.github.pnoker.api.center.auth.McpRuntimeApiGrpc;
+import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
 import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
@@ -107,10 +96,38 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
     }
 
     @Override
+    public McpToolAuthorizeResponseDTO authorizeToolCall(McpToolAuthorizeRequestDTO request) {
+        request = request == null ? new McpToolAuthorizeRequestDTO() : request;
+        GrpcMcpToolAuthorizeRequest grpcRequest = GrpcMcpToolAuthorizeRequest.newBuilder()
+                .setTenantId(value(request.getTenantId()))
+                .setPrincipalId(value(request.getPrincipalId()))
+                .setMcpConnectionId(value(request.getMcpConnectionId()))
+                .setScope(StringUtils.defaultString(request.getScope()))
+                .setToolName(StringUtils.defaultString(request.getToolName()))
+                .setArgumentDigest(StringUtils.defaultString(request.getArgumentDigest()))
+                .setConfirmId(StringUtils.defaultString(request.getConfirmId()))
+                .setIdempotencyKey(StringUtils.defaultString(request.getIdempotencyKey()))
+                .build();
+        GrpcRMcpToolAuthorizeDTO response = grpcFacadeSupport.call("McpRuntimeFacade.authorizeToolCall",
+                mcpRuntimeApiBlockingStub, stub -> stub.authorizeToolCall(grpcRequest));
+        requireOk("McpRuntimeFacade.authorizeToolCall", response.getResult());
+        return response.hasData() ? toDTO(response.getData()) : new McpToolAuthorizeResponseDTO();
+    }
+
+    @Override
     public void audit(McpAuditCommandDTO command) {
         GrpcRMcpBoolean response = grpcFacadeSupport.call("McpRuntimeFacade.audit", mcpRuntimeApiBlockingStub,
                 stub -> stub.audit(toGrpc(command)));
         requireOk("McpRuntimeFacade.audit", response.getResult());
+    }
+
+    private McpToolAuthorizeResponseDTO toDTO(GrpcMcpToolAuthorizeDTO source) {
+        return McpToolAuthorizeResponseDTO.builder()
+                .decision(source.getDecision())
+                .confirmId(source.getConfirmId())
+                .message(source.getMessage())
+                .riskLevel(source.getRiskLevel())
+                .build();
     }
 
     private McpIntrospectResponseDTO toDTO(GrpcMcpIntrospectDTO source) {

@@ -38,6 +38,17 @@ public interface LocalCredentialService extends BaseService<LocalCredentialBO, L
 
     void resetPassword(Long id, String rawPassword);
 
+    /**
+     * Self-service password change. Verifies the current password, stores the new password
+     * hash, clears the require-password-change flag, refreshes the expiry, and resets the
+     * failed-attempt and lock state. Throws when the current password does not match.
+     *
+     * @param loginName       login name
+     * @param currentPassword current raw password
+     * @param newPassword     new raw password
+     */
+    void changePassword(String loginName, String currentPassword, String newPassword);
+
     void recordSuccessfulLogin(Long id);
 
     void recordFailedLogin(Long id);

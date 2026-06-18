@@ -26,6 +26,8 @@ import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.auth.service.LocalCredentialService;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.service.TenantService;
+import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.PasswordChangeRequiredException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.KeyUtil;
 import io.github.pnoker.common.utils.PasswordUtil;
@@ -174,6 +176,59 @@ class TokenServiceImplTest {
         assertThatThrownBy(() -> tokenService.generateToken(LOGIN, SALT, "wrong", TENANT_CODE))
                 .isInstanceOf(UnAuthorizedException.class);
         verify(localCredentialService).recordFailedLogin(CREDENTIAL_ID);
+    }
+
+    @Test
+    void generateTokenRejectsExpiredPasswordWithoutIssuingToken() {
+        credential.setPasswordExpireTime(java.time.LocalDateTime.now().minusDays(1));
+        when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
+        when(localCredentialService.getByLoginName(LOGIN, false)).thenReturn(credential);
+        when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(true);
+        when(localCredentialService.verifyPassword(credential, RAW_PASSWORD)).thenReturn(true);
+
+        assertThatThrownBy(() -> tokenService.generateToken(LOGIN, SALT, RAW_PASSWORD, TENANT_CODE))
+                .isInstanceOf(PasswordChangeRequiredException.class)
+                .extracting(e -> ((PasswordChangeRequiredException) e).getResponseEnum())
+                .isEqualTo(ResponseEnum.PASSWORD_EXPIRED);
+        verify(localCredentialService).recordSuccessfulLogin(CREDENTIAL_ID);
+        verify(principalManager, never()).updateById(any(PrincipalDO.class));
+    }
+
+    @Test
+    void generateTokenRejectsRequirePasswordChangeWithoutIssuingToken() {
+        credential.setRequirePasswordChange((byte) 1);
+        when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
+        when(localCredentialService.getByLoginName(LOGIN, false)).thenReturn(credential);
+        when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(true);
+        when(localCredentialService.verifyPassword(credential, RAW_PASSWORD)).thenReturn(true);
+
+        assertThatThrownBy(() -> tokenService.generateToken(LOGIN, SALT, RAW_PASSWORD, TENANT_CODE))
+                .isInstanceOf(PasswordChangeRequiredException.class)
+                .extracting(e -> ((PasswordChangeRequiredException) e).getResponseEnum())
+                .isEqualTo(ResponseEnum.PASSWORD_CHANGE_REQUIRED);
+        verify(principalManager, never()).updateById(any(PrincipalDO.class));
+    }
+
+    @Test
+    void changePasswordDelegatesAfterTenantMembershipCheck() {
+        when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
+        when(localCredentialService.getByLoginName(LOGIN, false)).thenReturn(credential);
+        when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(true);
+
+        tokenService.changePassword(LOGIN, RAW_PASSWORD, "new-secret", TENANT_CODE);
+
+        verify(localCredentialService).changePassword(LOGIN, RAW_PASSWORD, "new-secret");
+    }
+
+    @Test
+    void changePasswordRejectsUnboundPrincipal() {
+        when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
+        when(localCredentialService.getByLoginName(LOGIN, false)).thenReturn(credential);
+        when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(false);
+
+        assertThatThrownBy(() -> tokenService.changePassword(LOGIN, RAW_PASSWORD, "new-secret", TENANT_CODE))
+                .isInstanceOf(UnAuthorizedException.class);
+        verify(localCredentialService, never()).changePassword(any(), any(), any());
     }
 
     @Test

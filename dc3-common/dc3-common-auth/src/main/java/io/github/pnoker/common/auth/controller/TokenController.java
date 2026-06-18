@@ -94,6 +94,27 @@ public class TokenController implements BaseController {
     }
 
     /**
+     * Self-service password change. Public because a credential flagged for a mandatory
+     * change or expired password cannot obtain a token until the password is changed.
+     *
+     * @param entityVO {@link TokenQuery} carrying name, tenant, current password and newPassword
+     * @return true when the password was changed
+     */
+    // Public endpoint: invoked during login when no token can be issued yet, so no
+    // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/change_password).
+    @PublicEndpoint
+    @SecurityRequirements
+    @Operation(summary = "Change Password", description = "Change a local credential password during login")
+    @PostMapping("/change_password")
+    public Mono<R<Boolean>> changePassword(@Validated @RequestBody TokenQuery entityVO) {
+        return async(() -> {
+            tokenService.changePassword(entityVO.getName(), entityVO.getPassword(), entityVO.getNewPassword(),
+                    entityVO.getTenant());
+            return R.ok(true, "Password changed");
+        });
+    }
+
+    /**
      * Acknowledge a client-initiated logout for the current token.
      *
      * @param entityVO {@link TokenQuery}

@@ -651,6 +651,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         content.setTitle(spec.getTitle());
         content.setUrl(spec.getPath());
         content.setRemark(spec.getRemark());
+        content.setRiskLevel(spec.getRiskLevel());
+        content.setDestructiveHint(spec.getDestructiveHint());
+        content.setOpenWorldHint(spec.getOpenWorldHint());
+        content.setIdempotentHint(spec.getIdempotentHint());
+        content.setAiDescription(spec.getAiDescription());
+        content.setHidden(spec.getHidden());
         return content;
     }
 
@@ -666,7 +672,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             return Objects.isNull(a) && Objects.isNull(b);
         }
         return Objects.equals(a.getTitle(), b.getTitle()) && Objects.equals(a.getUrl(), b.getUrl())
-                && Objects.equals(a.getRemark(), b.getRemark());
+                && Objects.equals(a.getRemark(), b.getRemark())
+                && Objects.equals(a.getRiskLevel(), b.getRiskLevel())
+                && Objects.equals(a.getDestructiveHint(), b.getDestructiveHint())
+                && Objects.equals(a.getOpenWorldHint(), b.getOpenWorldHint())
+                && Objects.equals(a.getIdempotentHint(), b.getIdempotentHint())
+                && Objects.equals(a.getAiDescription(), b.getAiDescription())
+                && Objects.equals(a.getHidden(), b.getHidden());
     }
 
     @Override

@@ -72,6 +72,42 @@ public class ApiExt extends BaseExt {
         @Schema(description = "Description remark of the API interface")
         private String remark;
 
+        /**
+         * Declared MCP risk level (LOW / MEDIUM / HIGH); blank when derived automatically.
+         */
+        @Schema(description = "Declared MCP risk level, blank when derived")
+        private String riskLevel;
+
+        /**
+         * Declared destructive hint ("true" / "false"); blank when derived.
+         */
+        @Schema(description = "Declared MCP destructive hint, blank when derived")
+        private String destructiveHint;
+
+        /**
+         * Declared open-world hint ("true" / "false"); blank when derived.
+         */
+        @Schema(description = "Declared MCP open-world hint, blank when derived")
+        private String openWorldHint;
+
+        /**
+         * Declared idempotent hint ("true" / "false"); blank when derived.
+         */
+        @Schema(description = "Declared MCP idempotent hint, blank when derived")
+        private String idempotentHint;
+
+        /**
+         * AI-facing description override; blank when the operation text is used.
+         */
+        @Schema(description = "AI-facing MCP tool description override")
+        private String aiDescription;
+
+        /**
+         * Whether the tool is hidden from tools/list by default ("true" / "false"); blank = visible.
+         */
+        @Schema(description = "Whether the MCP tool is hidden from tools/list by default")
+        private String hidden;
+
     }
 
 }

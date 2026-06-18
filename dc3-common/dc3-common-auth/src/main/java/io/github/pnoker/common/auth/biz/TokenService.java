@@ -45,6 +45,18 @@ public interface TokenService {
     String generateToken(String loginName, String salt, String password, String tenantCode);
 
     /**
+     * Self-service password change used during login when a credential is flagged for a
+     * mandatory change or has expired. Validates the tenant membership and current password
+     * before storing the new password; no token is issued, the client re-authenticates after.
+     *
+     * @param loginName       login name
+     * @param currentPassword current raw password
+     * @param newPassword     new raw password
+     * @param tenantCode      tenant code
+     */
+    void changePassword(String loginName, String currentPassword, String newPassword, String tenantCode);
+
+    /**
      * @param loginName  Name
      * @param salt
      * @param token      Token

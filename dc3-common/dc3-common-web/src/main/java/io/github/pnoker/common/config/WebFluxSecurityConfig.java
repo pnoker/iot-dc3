@@ -158,6 +158,7 @@ public class WebFluxSecurityConfig {
                         // /auth base-path; the chain matches the post-strip path /token/salt.
                         .pathMatchers(HttpMethod.POST, "/token/salt").permitAll()
                         .pathMatchers(HttpMethod.POST, "/token/generate").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/token/change_password").permitAll()
                         .pathMatchers(HttpMethod.GET, McpConstant.WELL_KNOWN_AUTHORIZATION_SERVER).permitAll()
                         .pathMatchers(HttpMethod.GET, McpConstant.OAUTH2_JWKS).permitAll()
                         .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_TOKEN).permitAll()

@@ -19,6 +19,9 @@ package io.github.pnoker.common.auth.biz.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.dal.PrincipalManager;
 import io.github.pnoker.common.auth.dal.ServiceAccountManager;
@@ -26,21 +29,19 @@ import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
 import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
+import io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
-import io.github.pnoker.common.auth.tool.McpOpenApiAggregator;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.ObjectProvider;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
+import io.github.pnoker.common.auth.tool.McpOpenApiAggregator;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
 import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
+import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
 import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
@@ -113,7 +114,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     private final TenantMembershipService tenantMembershipService;
     private final PrincipalManager principalManager;
     private final ServiceAccountManager serviceAccountManager;
-    private final ObjectProvider<McpOpenApiAggregator> openApiAggregator;
+    private final McpOpenApiAggregator openApiAggregator;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -131,6 +132,9 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     @Value("${dc3.oauth.refresh-token-ttl:P30D}")
     private Duration refreshTokenTtl;
+
+    @Value("${dc3.mcp.confirm-ttl:PT5M}")
+    private Duration confirmTtl;
 
     @Value("${dc3.oauth.jwt.private-key:}")
     private String privateKeyBase64;
@@ -419,10 +423,10 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     @Transactional(rollbackFor = Exception.class)
     public int refreshToolCatalog() {
         int changed = 0;
-        // Optional: when dc3.mcp.tool.aggregator.enabled=true, enrich each tool with a real
-        // request schema pulled from the service's OpenAPI spec. Off by default (no-op).
-        McpOpenApiAggregator aggregator = openApiAggregator.getIfAvailable();
-        Map<String, String> schemas = aggregator == null ? Map.of() : aggregator.inputSchemasByApiCode();
+        // Enrich each tool with a real input schema derived from the static OpenAPI specs
+        // shipped on the classpath (openapi/openapi-*.json). Empty when no spec is present,
+        // in which case tools keep their name/title without a parameter schema.
+        Map<String, String> schemas = openApiAggregator.inputSchemasByApiCode();
         for (McpToolRecord candidate : oauthMcpMapper.listRegistryToolCandidates()) {
             String schema = schemas.get(candidate.getApiCode());
             if (schema != null) {
@@ -590,6 +594,100 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public McpToolAuthorizeResponseDTO authorizeToolCall(McpToolAuthorizeRequestDTO request) {
+        request = Objects.requireNonNullElseGet(request, McpToolAuthorizeRequestDTO::new);
+        Set<String> scopes = splitValues(request.getScope());
+        // Re-run the full visibility/whitelist/scope check; this is the authoritative gate and
+        // also yields the tool's risk level and stable tool_id.
+        McpToolResolveResponseDTO tool = resolveVisibleTool(request.getTenantId(), request.getPrincipalId(),
+                request.getMcpConnectionId(), request.getToolName(), scopes);
+
+        // Only HIGH-risk tools require platform confirmation; the rest pass straight through.
+        if (!McpConstant.RiskLevel.HIGH.equals(tool.getRiskLevel())) {
+            return authorizeDecision(McpConstant.Confirmation.DECISION_AUTHORIZED, "", "authorized",
+                    tool.getRiskLevel());
+        }
+
+        String confirmId = StringUtils.trimToEmpty(request.getConfirmId());
+        String idempotencyKey = StringUtils.trimToEmpty(request.getIdempotencyKey());
+        String argumentDigest = StringUtils.trimToEmpty(request.getArgumentDigest());
+
+        if (StringUtils.isBlank(confirmId)) {
+            // Reject an idempotency key already consumed by an earlier high-risk call.
+            if (StringUtils.isNotBlank(idempotencyKey)
+                    && oauthMcpMapper.selectConsumedByIdempotencyKey(request.getMcpConnectionId(),
+                    idempotencyKey) != null) {
+                return authorizeDecision(McpConstant.Confirmation.DECISION_REJECTED, "",
+                        "idempotency key has already been used", tool.getRiskLevel());
+            }
+            // Issue a pending confirmation ticket bound to the caller, connection, tool and arguments.
+            String issuedConfirmId = UUID.randomUUID().toString();
+            McpToolConfirmationRecord ticket = new McpToolConfirmationRecord();
+            ticket.setId(IdWorker.getId());
+            ticket.setConfirmId(issuedConfirmId);
+            ticket.setTenantId(request.getTenantId());
+            ticket.setPrincipalId(request.getPrincipalId());
+            ticket.setConnectionId(request.getMcpConnectionId());
+            ticket.setToolId(tool.getToolId());
+            ticket.setArgumentDigest(argumentDigest);
+            ticket.setIdempotencyKey(idempotencyKey);
+            ticket.setRiskLevel(tool.getRiskLevel());
+            ticket.setStatus(McpConstant.Confirmation.STATUS_PENDING);
+            ticket.setExpireTime(LocalDateTime.now().plus(confirmTtl));
+            oauthMcpMapper.insertConfirmation(ticket);
+            return authorizeDecision(McpConstant.Confirmation.DECISION_CONFIRM_REQUIRED, issuedConfirmId,
+                    "High risk tool '" + tool.getToolName() + "' requires confirmation; resend the call with this "
+                            + "confirmId", tool.getRiskLevel());
+        }
+
+        McpToolConfirmationRecord ticket = oauthMcpMapper.selectConfirmationByConfirmId(confirmId);
+        String rejection = confirmationRejection(ticket, request, tool, argumentDigest);
+        if (rejection != null) {
+            return authorizeDecision(McpConstant.Confirmation.DECISION_REJECTED, "", rejection, tool.getRiskLevel());
+        }
+        // Consuming is guarded by status=PENDING in SQL, so a replayed confirmId loses the race.
+        if (oauthMcpMapper.consumeConfirmation(ticket.getId(), LocalDateTime.now()) <= 0) {
+            return authorizeDecision(McpConstant.Confirmation.DECISION_REJECTED, "",
+                    "confirmation has already been used", tool.getRiskLevel());
+        }
+        return authorizeDecision(McpConstant.Confirmation.DECISION_AUTHORIZED, confirmId, "authorized",
+                tool.getRiskLevel());
+    }
+
+    private String confirmationRejection(McpToolConfirmationRecord ticket, McpToolAuthorizeRequestDTO request,
+                                         McpToolResolveResponseDTO tool, String argumentDigest) {
+        if (ticket == null) {
+            return "confirmation does not exist";
+        }
+        if (!McpConstant.Confirmation.STATUS_PENDING.equals(ticket.getStatus())) {
+            return "confirmation has already been used";
+        }
+        if (ticket.getExpireTime() == null || ticket.getExpireTime().isBefore(LocalDateTime.now())) {
+            return "confirmation has expired";
+        }
+        if (!Objects.equals(ticket.getPrincipalId(), request.getPrincipalId())
+                || !Objects.equals(ticket.getConnectionId(), request.getMcpConnectionId())
+                || !Objects.equals(ticket.getToolId(), tool.getToolId())) {
+            return "confirmation does not match the caller";
+        }
+        if (!Objects.equals(StringUtils.trimToEmpty(ticket.getArgumentDigest()), argumentDigest)) {
+            return "confirmation arguments do not match";
+        }
+        return null;
+    }
+
+    private McpToolAuthorizeResponseDTO authorizeDecision(String decision, String confirmId, String message,
+                                                          String riskLevel) {
+        return McpToolAuthorizeResponseDTO.builder()
+                .decision(decision)
+                .confirmId(confirmId)
+                .message(message)
+                .riskLevel(riskLevel)
+                .build();
+    }
+
+    @Override
     public void audit(McpAuditCommandDTO source) {
         source = Objects.requireNonNullElseGet(source, McpAuditCommandDTO::new);
         McpAuditCommand command = auditCommand(source);
@@ -626,7 +724,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                 throw oauthError(BAD_REQUEST.value(), "invalid_grant", "PKCE verification failed");
             }
         }
-        return issueAndPersistTokens(authorization, client, true);
+        return issueAndPersistTokens(authorization, client, true, "");
     }
 
     private Map<String, Object> clientCredentialsToken(Map<String, String> form, String authorizationHeader) {
@@ -655,26 +753,39 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         authorization.setAuthorizationCodeHash("");
         authorization.setTokenMetadata("{}");
         oauthMcpMapper.insertAuthorization(authorization);
-        return issueAndPersistTokens(authorization, client, false);
+        return issueAndPersistTokens(authorization, client, false, "");
     }
 
     private Map<String, Object> refreshToken(Map<String, String> form, String authorizationHeader) {
         String refreshToken = form.get(McpConstant.Field.REFRESH_TOKEN);
-        OAuthAuthorizationRecord authorization = oauthMcpMapper.selectAuthorizationByRefreshTokenHash(
-                sha256(refreshToken));
-        if (authorization == null || authorization.getRefreshTokenExpires() == null
+        String presentedHash = sha256(refreshToken);
+        OAuthAuthorizationRecord authorization = oauthMcpMapper.selectAuthorizationByRefreshTokenHash(presentedHash);
+        if (authorization == null) {
+            // A rotated (previous) refresh token replayed after rotation signals theft per
+            // RFC 9700; revoke the whole authorization so the leaked chain is dead.
+            OAuthAuthorizationRecord replayed =
+                    oauthMcpMapper.selectAuthorizationByPreviousRefreshTokenHash(presentedHash);
+            if (replayed != null) {
+                oauthMcpMapper.revokeAuthorizationByAccessTokenJti(replayed.getAccessTokenJti(),
+                        "refresh_token_replayed", LocalDateTime.now());
+                throw oauthError(BAD_REQUEST.value(), "invalid_grant", "refresh token has been revoked");
+            }
+            throw oauthError(BAD_REQUEST.value(), "invalid_grant", "refresh token is invalid or expired");
+        }
+        if (authorization.getRefreshTokenExpires() == null
                 || authorization.getRefreshTokenExpires().isBefore(LocalDateTime.now())
                 || authorization.getRevokedTime() != null) {
             throw oauthError(BAD_REQUEST.value(), "invalid_grant", "refresh token is invalid or expired");
         }
         OAuthRegisteredClientRecord client = requireClient(authorization.getClientId());
         authenticateClient(client, form, authorizationHeader, false);
-        return issueAndPersistTokens(authorization, client, true);
+        return issueAndPersistTokens(authorization, client, true, presentedHash);
     }
 
     private Map<String, Object> issueAndPersistTokens(OAuthAuthorizationRecord authorization,
                                                       OAuthRegisteredClientRecord client,
-                                                      boolean issueRefreshToken) {
+                                                      boolean issueRefreshToken,
+                                                      String previousRefreshHash) {
         PrincipalDO principal = principalManager.getById(authorization.getPrincipalId());
         if (principal == null
                 || !enabled(principal.getEnableFlag())
@@ -711,7 +822,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         LocalDateTime refreshIssued = issueRefreshToken ? issued : null;
         LocalDateTime refreshExpires = issueRefreshToken ? issued.plus(refreshTokenTtl) : null;
         oauthMcpMapper.activateAuthorizationTokens(authorization.getId(), "", jti, issued, accessExpires,
-                sha256(refreshToken), refreshIssued, refreshExpires, JsonUtil.toJsonString(claims));
+                sha256(refreshToken), StringUtils.defaultString(previousRefreshHash), refreshIssued, refreshExpires,
+                JsonUtil.toJsonString(claims));
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put(McpConstant.Field.ACCESS_TOKEN, accessToken);
@@ -849,8 +961,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     /**
      * Resolve the input schema for a tool. When the catalog carries one in {@code tool_ext}
-     * (populated by {@link McpOpenApiAggregator} when enabled), surface it; otherwise fall back to
-     * the static default so tools/list never breaks.
+     * (populated by {@link McpOpenApiAggregator} from the static OpenAPI specs), surface it;
+     * otherwise fall back to the static default so tools/list never breaks.
      */
     private Map<String, Object> inputSchemaOf(McpToolRecord tool) {
         String ext = tool.getToolExt();
