@@ -18,12 +18,9 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: help env init-env clean package test test-it test-e2e coverage \
-	build up stop down ps logs config pull restart refresh reset print-compose-file \
-	app app-all dev dev-all dev-db dev-optional \
-	compose-build compose-up compose-down compose-ps compose-logs compose-config compose-pull \
-	compose-stop compose-restart compose-refresh compose-reset compose-file \
-	run changelog openapi deploy install-hooks tag check-compose check-service-group check-run-service
+.PHONY: help env init-env clean package \
+	build up stop down ps logs config pull restart refresh reset \
+	dev-db dev-optional run changelog openapi install-hooks tag
 
 ENV_FILE ?= $(firstword $(wildcard .env) .env.example)
 RUNTIME_ENV_FILE ?= dc3/env/dev.env
@@ -66,9 +63,7 @@ RUN_MODULE := $(RUN_MODULE_$(RUN_SERVICE))
 
 MVN_SETTINGS ?= .mvn/settings.xml
 MVN_SETTINGS_ARG := $(if $(strip $(MVN_SETTINGS)),-s $(MVN_SETTINGS),)
-MVN_SUB_SETTINGS_ARG := $(if $(strip $(MVN_SETTINGS)),-s ../$(MVN_SETTINGS),)
 MVN := mvn $(MVN_SETTINGS_ARG)
-MVN_SUB := mvn $(MVN_SUB_SETTINGS_ARG)
 
 CHANGE_FILE ?= dc3/doc/CHANGE.md
 FROM ?=
@@ -106,11 +101,8 @@ help:
 	@printf '%s\n' ''
 	@printf '%s\n' 'Common:'
 	@printf '  %-24s %s\n' 'make package' 'Build all Maven modules'
-	@printf '  %-24s %s\n' 'make test' 'Run unit tests'
-	@printf '  %-24s %s\n' 'make test-it' 'Run integration-test phase'
-	@printf '  %-24s %s\n' 'make test-e2e' 'Run E2E harness'
-	@printf '  %-24s %s\n' 'make coverage' 'Generate aggregated JaCoCo coverage'
 	@printf '  %-24s %s\n' 'make run SERVICE=auth' 'Run one Spring Boot service with env auto-loaded'
+	@printf '  %-24s %s\n' 'make install-hooks' 'Enable .githooks commit-msg lint'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Compose:'
 	@printf '  %-24s %s\n' 'make build' 'Build STACK images, optional SERVICES="data gateway" or GROUP=core'
@@ -160,74 +152,44 @@ clean:
 package:
 	$(MVN) clean package
 
-test:
-	$(MVN) -B -Dmaven.test.skip=false test
 
-test-it:
-	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify
-
-test-e2e:
-	DC3_E2E=true $(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true -pl dc3-e2e -am -Pe2e verify
-
-coverage:
-	$(MVN) -B -Dmaven.test.skip=false -pl dc3-coverage -am verify
-
-check-compose:
-	@test -f "$(RESOLVED_COMPOSE_FILE)" || (echo "Compose file not found: $(RESOLVED_COMPOSE_FILE)" && exit 1)
-
-check-service-group:
-	@if [ -n "$(GROUP)" ] && [ -z "$(GROUP_SERVICES_$(GROUP))" ]; then \
-		echo "Unsupported GROUP '$(GROUP)'. Use GROUP=center|core|drivers"; \
-		exit 1; \
-	fi
-
-check-run-service:
-	@if [ -z "$(RUN_MODULE)" ]; then \
-		echo "Unsupported SERVICE '$(RUN_SERVICE)'."; \
-		echo "Use SERVICE=gateway|auth|manager|data|agentic|listening-virtual|modbus-tcp|modbus-rtu|mqtt|opc-da|opc-ua|plcs7|virtual"; \
-		exit 1; \
-	fi
-
-print-compose-file: check-compose
-	@echo "$(RESOLVED_COMPOSE_FILE)"
-
-config: check-compose
-	$(call dc3_compose) config
-
-build: check-compose check-service-group
+build:
 	$(call dc3_compose) build $(SELECTED_SERVICES)
 
-up: check-compose check-service-group
+up:
 	$(call dc3_compose) up -d $(SELECTED_SERVICES)
 
-stop: check-compose check-service-group
+stop:
 	$(call dc3_compose) stop $(SELECTED_SERVICES)
 
-down: check-compose
+down:
 	$(call dc3_compose) down
 
-ps: check-compose check-service-group
+ps:
 	$(call dc3_compose) ps $(SELECTED_SERVICES)
 
-logs: check-compose check-service-group
+logs:
 	$(call dc3_compose) logs -f --tail=200 $(SELECTED_SERVICES)
 
-pull: check-compose check-service-group
+config:
+	$(call dc3_compose) config
+
+pull:
 	$(call dc3_compose) pull $(SELECTED_SERVICES)
 
-restart: check-compose check-service-group
+restart:
 	$(call dc3_compose) restart $(SELECTED_SERVICES)
 
-refresh: check-compose check-service-group
+refresh:
 	$(call dc3_compose) pull $(SELECTED_SERVICES)
 	$(call dc3_compose) down
 	$(call dc3_compose) up -d $(SELECTED_SERVICES)
 
-reset: check-compose
+reset:
 	@test "$(CONFIRM_RESET_VOLUMES)" = "true" || (echo "Refusing to delete volumes. Re-run with CONFIRM_RESET_VOLUMES=true" && exit 1)
 	$(call dc3_compose) down -v
 
-run: check-run-service
+run:
 	$(MVN) -pl "$(RUN_MODULE)" -am spring-boot:run
 
 dev-db:
@@ -236,34 +198,15 @@ dev-db:
 dev-optional:
 	@$(MAKE) up STACK=optional SERVICES= GROUP= REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
 
-dev:
-	@$(MAKE) up STACK=dev SERVICES= GROUP= REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+deploy: package
+	cd dc3-api \
+	&& $(MVN_SUB) clean deploy -P deploy \
+	&& cd ../dc3-common \
+	&& $(MVN_SUB) clean deploy -P deploy
 
-dev-all:
-	@$(MAKE) dev-db REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
-	@$(MAKE) dev-optional REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
-	@$(MAKE) dev REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
-
-app:
-	@$(MAKE) up STACK=app SERVICES= GROUP= REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
-
-app-all:
-	@$(MAKE) dev-db REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
-	@$(MAKE) dev-optional REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
-	@$(MAKE) app REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
-
-compose-build: build
-compose-up: up
-compose-stop: stop
-compose-down: down
-compose-ps: ps
-compose-logs: logs
-compose-config: config
-compose-pull: pull
-compose-restart: restart
-compose-refresh: refresh
-compose-reset: reset
-compose-file: print-compose-file
+install-hooks:
+	git config core.hooksPath .githooks
+	@printf '%s\n' 'Enabled .githooks (commit-msg lint active for git commit)'
 
 tag:
 	dc3/bin/tag.sh
@@ -276,12 +219,3 @@ changelog:
 openapi:
 	@OPENAPI_BASE="$(OPENAPI_BASE)" dc3/bin/export_openapi.sh $(OPENAPI_OUT)
 
-install-hooks:
-	git config core.hooksPath .githooks
-	chmod +x .githooks/commit-msg dc3/bin/commit_msg_lint.py dc3/bin/changelog.py
-
-deploy: package
-	cd dc3-api \
-	&& $(MVN_SUB) clean deploy -P deploy \
-	&& cd ../dc3-common \
-	&& $(MVN_SUB) clean deploy -P deploy
