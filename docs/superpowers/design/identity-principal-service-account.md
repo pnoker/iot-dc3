@@ -1,7 +1,16 @@
 # 统一主体与服务账号设计方案
 
-> 状态: 方案评审中，作为 MCP/OAuth 建设的前置身份底座。本文定义 DC3 面向全球 IoT 平台的 Principal、User、Service
+> 状态: 已实现并落地（PostgreSQL）。本文定义 DC3 面向全球 IoT 平台的 Principal、User、Service
 > Account、Tenant Membership 和角色绑定模型。
+>
+> 实现注记：(1) 本方案"后端模块建议"中的认证上下文类 `PrincipalContext` 实际由 `RequestHeader.PrincipalHeader`（承载
+> `principalId`/`principalType`/`tenantId` 等）承担，职责一致、命名不同。(2) `IdentityProvider` / `ExternalIdentity`
+> 按方案保持"模型先到位、登录入口先关闭"——已有表/DO/Mapper，暂无 Service/Controller 与外部登录逻辑。(3)
+`dc3_local_credential`
+> 的 `require_password_change` / `password_expire_time` 已在登录链路生效：命中时拒发 token 并引导
+`/token/change_password`
+> 自助改密（响应码 `R20303`/`R20304`，有效期配置 `dc3.auth.password.expire-days`）。(4) MySQL seed 未迁移至本模型，
+> 当前部署目标为 PostgreSQL。
 
 ## 背景
 

@@ -1,7 +1,55 @@
 # Gateway MCP 服务设计方案
 
-> 状态: 方案评审中，核心架构和安全边界已确定。本文记录在 `dc3-gateway` 上构建 MCP (Model Context Protocol)
-> 服务的完整设计，包括技术选型、工具治理、权限控制和生产安全策略。
+> 状态: 已实现并落地。本文记录在 `dc3-gateway` 上构建 MCP (Model Context Protocol)
+> 服务的完整设计，包括技术选型、工具治理、权限控制和生产安全策略。本文后半部分的设计推导（技术选型、推荐结论、实施步骤）保留作为决策记录；
+> 实际代码实现以下方 [实现与本方案的差异（权威）](#实现与本方案的差异权威) 章节为准——当正文与该章节冲突时，以该章节为准。
+
+## 实现与本方案的差异（权威）
+
+落地实现达成了本方案的全部能力目标（统一 `/mcp` 端点、OAuth 2.1、RBAC∩白名单∩风险三重过滤、审计、生产 api-docs
+收口），但实现路径与正文的部分命名/选型不同。以下为权威对照，按此查阅代码：
+
+**模块与技术选型**
+
+- 不存在独立的 `dc3-common-mcp` 模块。MCP 运行时逻辑分布在：`dc3-common-gateway`（`/mcp` 协议端点）、`dc3-common-auth`（OAuth
+  授权服务器 + MCP 运行时服务 + 工具目录）、`dc3-common-model`（DTO）、`dc3-common-facade-*`（gateway↔auth 的 gRPC/local
+  facade）。
+- **未使用** Spring AI MCP Server Starter，`/mcp` JSON-RPC（initialize/ping/tools/list/tools/call）为手写实现。
+- **未使用** Spring Authorization Server，OAuth 五端点 + JWKS + introspection + JWT(RS256) 签发/校验均为手写实现（WebFlux
+  栈，Spring Authorization Server 当前为 servlet-only 故不适用）。
+
+**类名 / 实体对照**（左为正文命名，右为实际实现）
+
+| 正文                                                                                | 实际实现                                                                                                                 |
+|-----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| `dc3-common-mcp` 模块                                                               | `dc3-common-gateway` + `dc3-common-auth` + `dc3-common-model` + `dc3-common-facade-*`                                |
+| `McpAuthWebFilter` / `McpAuthContext`                                             | 内联于 `McpGatewayController`（bearer 解析经 `mcpRuntimeFacade.introspect`，上下文为 `McpIntrospectResponseDTO`）                 |
+| `McpToolAggregator`                                                               | `OAuthMcpRuntimeServiceImpl`（目录构建/刷新）+ `McpOpenApiAggregator`（可选 OpenAPI schema 富化）                                  |
+| `McpToolCallHandler`                                                              | 内联于 `McpGatewayController.McpGatewayClient`（`callTool` / `invokeBackend`）                                            |
+| `McpConnectionDO` / `McpToolCatalogDO` / `McpConnectionToolDO`（`*DO`+`*BO`+`*VO`） | `McpConnectionRecord` / `McpToolRecord` / `McpToolConfirmationRecord`（`entity/oauth`）+ `Mcp*DTO`（`dc3-common-model`） |
+| `McpServerTools.vue`（前端）                                                          | `src/views/settings/mcp/McpServer.vue` + `src/views/settings/mcpAudit/McpAudit.vue`                                  |
+| Identity 侧 `PrincipalContext`                                                     | `RequestHeader.PrincipalHeader`（承载 `principalId` 等转发身份）                                                              |
+
+**本方案首版之外、已额外落地的安全增强**
+
+- **高风险工具平台二次确认 + 幂等**：新增 `dc3_mcp_tool_confirmation` 表与 `AuthorizeToolCall` 流程。HIGH 风险工具
+  `tools/call` 无有效 confirm 时返回 `CONFIRM_REQUIRED`(含 confirmId)，二次调用校验 confirm_id
+  未过期、参数摘要一致、principal/connection/tool 一致并单次消费（消费即幂等）；`idempotency_key` 在 confirm 层去重。取代了早期仅校验
+  confirm_id/idempotency_key 非空的占位逻辑。TTL 配置 `dc3.mcp.confirm-ttl`(默认 PT5M)。
+- **OAuth refresh token 轮换 + 重放检测**（RFC 9700）：`dc3_oauth_authorization` 增 `previous_refresh_token_hash` 列。每次
+  refresh 轮换签发新 refresh token，旧 token 被轮换后再次出现判定为泄露重放 → 吊销整条 authorization。
+- **登录强制改密 / 密码过期**：本地登录校验密码通过后，若 `require_password_change=1` 或 `password_expire_time`
+  已过，返回专用响应码（`R20303`/`R20304`）拒发 token，前端引导走公开端点 `/token/change_password` 自助改密。密码有效期配置
+  `dc3.auth.password.expire-days`(默认 0=不过期)。
+
+**工具目录刷新机制（实际落地：定时 + 进程内事件，未用 RabbitMQ / list_changed）**
+
+- **定时兜底**：`OAuthMcpRuntimeServiceImpl.scheduledRefreshToolCatalog()` 经
+  `@Scheduled(fixedDelayString=${dc3.mcp.tool.refresh-interval:PT5M})` 全量刷新。
+- **事件驱动**：所有中心服务的资源注册经 facade 汇聚到 auth 进程内的 `ResourceRegistrySyncServiceImpl.sync()`；当
+  `dc3_api`/`dc3_resource` 实际变更时发布进程内 `McpToolCatalogChangedEvent`，`OAuthMcpRuntimeServiceImpl` 经
+  `@TransactionalEventListener(AFTER_COMMIT)` 刷新目录。因工具目录与其上游同在 auth 进程，**无需 RabbitMQ 跨进程**；正文"机制
+  2/机制 3（RabbitMQ / notifications/tools/list_changed）"未实现。
 
 ## 背景
 
