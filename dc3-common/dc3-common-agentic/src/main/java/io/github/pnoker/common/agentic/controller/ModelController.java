@@ -18,7 +18,7 @@ package io.github.pnoker.common.agentic.controller;
 
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
-import io.github.pnoker.common.agentic.entity.request.ModelConfigRequest;
+import io.github.pnoker.common.agentic.entity.vo.ModelConfigVO;
 import io.github.pnoker.common.agentic.entity.vo.ModelConfigVO;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.agentic.service.ModelConfigService;
@@ -81,9 +81,9 @@ public class ModelController implements BaseController {
     @Operation(summary = "Add AI Model Configuration", description = "Create an AI model configuration for the current tenant binding a provider, model id and parameters." +
             " Returns the saved configuration; the assistant can then use it as a selectable model in a session.")
     @PostMapping("/config/add")
-    public Mono<R<ModelConfigVO>> add(@Validated(Add.class) @RequestBody ModelConfigRequest request) {
+    public Mono<R<ModelConfigVO>> add(@Validated(Add.class) @RequestBody ModelConfigVO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
-            ModelConfigBO entityBO = modelConfigBuilder.buildBOByRequest(request);
+            ModelConfigBO entityBO = modelConfigBuilder.buildBOByVO(request);
             return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.add(entityBO, header)));
         }));
     }
@@ -92,9 +92,9 @@ public class ModelController implements BaseController {
     @Operation(summary = "Update AI Model Configuration", description = "Update an existing AI model configuration's provider, model id or parameters for the current tenant." +
             " Returns the updated configuration; changes apply to future sessions that select this model.")
     @PostMapping("/config/update")
-    public Mono<R<ModelConfigVO>> update(@Validated(Update.class) @RequestBody ModelConfigRequest request) {
+    public Mono<R<ModelConfigVO>> update(@Validated(Update.class) @RequestBody ModelConfigVO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
-            ModelConfigBO entityBO = modelConfigBuilder.buildBOByRequest(request);
+            ModelConfigBO entityBO = modelConfigBuilder.buildBOByVO(request);
             return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.update(entityBO, header)));
         }));
     }

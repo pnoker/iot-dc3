@@ -17,13 +17,13 @@
 package io.github.pnoker.common.agentic.service.impl;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
-import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionVO;
 import io.github.pnoker.common.agentic.entity.response.ChatCompletionResponse;
 import io.github.pnoker.common.agentic.service.AgenticChatService;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatRequestPreparer;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatResponseCodec;
 import io.github.pnoker.common.agentic.service.chat.AgenticMessageRecorder;
-import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
+import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntime;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntimeResult;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
@@ -62,10 +62,10 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     private final AgenticRuntime agenticRuntime;
 
     @Override
-    public Flux<ServerSentEvent<String>> streamChatCompletion(ChatCompletionRequest request,
+    public Flux<ServerSentEvent<String>> streamChatCompletion(ChatCompletionVO request,
                                                               RequestHeader.PrincipalHeader userHeader) {
         return Flux.defer(() -> {
-            AgenticPreparedChatRequest prepared = requestPreparer.prepare(request, userHeader, "stream");
+            AgenticPreparedChatBO prepared = requestPreparer.prepare(request, userHeader, "stream");
             messageRecorder.persistUserMessage(prepared, userHeader);
 
             String chatId = responseCodec.newChatId();
@@ -121,9 +121,9 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     }
 
     @Override
-    public Mono<ChatCompletionResponse> chatCompletion(ChatCompletionRequest request, RequestHeader.PrincipalHeader userHeader) {
+    public Mono<ChatCompletionResponse> chatCompletion(ChatCompletionVO request, RequestHeader.PrincipalHeader userHeader) {
         return Mono.fromCallable(() -> {
-            AgenticPreparedChatRequest prepared = requestPreparer.prepare(request, userHeader, "blocking");
+            AgenticPreparedChatBO prepared = requestPreparer.prepare(request, userHeader, "blocking");
             messageRecorder.persistUserMessage(prepared, userHeader);
 
             AgenticRuntimeResult result;

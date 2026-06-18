@@ -42,17 +42,17 @@ public class AgenticMessageRecorder {
 
     private final MessageService messageService;
 
-    public void persistUserMessage(AgenticPreparedChatRequest prepared, RequestHeader.PrincipalHeader userHeader) {
+    public void persistUserMessage(AgenticPreparedChatBO prepared, RequestHeader.PrincipalHeader userHeader) {
         messageService.save(prepared.scopedConversationId(), "user", buildUserContent(prepared), prepared.model(),
                 userHeader);
     }
 
-    public void persistAssistantMessage(AgenticPreparedChatRequest prepared, String content,
+    public void persistAssistantMessage(AgenticPreparedChatBO prepared, String content,
                                         RequestHeader.PrincipalHeader userHeader) {
         persistAssistantMessage(prepared, content, null, userHeader);
     }
 
-    public void persistAssistantMessage(AgenticPreparedChatRequest prepared, String content, String reasoningContent,
+    public void persistAssistantMessage(AgenticPreparedChatBO prepared, String content, String reasoningContent,
                                         RequestHeader.PrincipalHeader userHeader) {
         AgenticMessageContent messageContent = buildAssistantContent(prepared, StringUtils.defaultString(content),
                 StringUtils.trimToNull(reasoningContent));
@@ -63,7 +63,7 @@ public class AgenticMessageRecorder {
                 prepared.model(), userHeader);
     }
 
-    private AgenticMessageContent buildUserContent(AgenticPreparedChatRequest prepared) {
+    private AgenticMessageContent buildUserContent(AgenticPreparedChatBO prepared) {
         AgenticMessageContent content = AgenticMessageContent.ofText(prepared.userMessage());
         if (!prepared.attachments().isEmpty()) {
             content.setAttachments(prepared.attachments());
@@ -71,7 +71,7 @@ public class AgenticMessageRecorder {
         return content;
     }
 
-    private AgenticMessageContent buildAssistantContent(AgenticPreparedChatRequest prepared, String text,
+    private AgenticMessageContent buildAssistantContent(AgenticPreparedChatBO prepared, String text,
                                                         String reasoningContent) {
         List<AgenticRunEvent> runEvents = drainRunEvents(prepared);
         List<String> tools = runEvents.stream()
@@ -107,7 +107,7 @@ public class AgenticMessageRecorder {
         return values != null && !values.isEmpty();
     }
 
-    private List<AgenticMessageContent.Trace> buildTraceEvents(AgenticPreparedChatRequest prepared,
+    private List<AgenticMessageContent.Trace> buildTraceEvents(AgenticPreparedChatBO prepared,
                                                                List<AgenticRunEvent> runEvents) {
         List<AgenticMessageContent.Trace> traces = new ArrayList<>();
         if (prepared.reasoning()) {
@@ -124,7 +124,7 @@ public class AgenticMessageRecorder {
                 event.timestamp() / 1000, event.phase(), event.status(), event.code());
     }
 
-    private List<AgenticRunEvent> drainRunEvents(AgenticPreparedChatRequest prepared) {
+    private List<AgenticRunEvent> drainRunEvents(AgenticPreparedChatBO prepared) {
         return prepared.runTrace().drainAndRecordedEvents();
     }
 

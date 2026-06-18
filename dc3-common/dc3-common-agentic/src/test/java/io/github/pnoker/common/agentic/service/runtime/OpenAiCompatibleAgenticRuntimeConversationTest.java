@@ -23,7 +23,7 @@ import com.sun.net.httpserver.HttpServer;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
+import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
 import io.github.pnoker.common.agentic.service.chat.AgenticRunTrace;
 import io.github.pnoker.common.constant.service.AgenticConstant;
@@ -166,14 +166,14 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
         provider.setBaseUrl(server.baseUrl());
         provider.setApiKey("test-api-key");
         when(chatClientFactory.resolveProviderForModel(MODEL)).thenReturn(provider);
-        when(promptBuilder.buildSystemPrompt(any(AgenticPreparedChatRequest.class)))
+        when(promptBuilder.buildSystemPrompt(any(AgenticPreparedChatBO.class)))
                 .thenReturn("You are the IoT DC3 platform assistant.");
         return new OpenAiCompatibleAgenticRuntime(chatClientFactory, promptBuilder,
                 ToolCallbackProvider.from(callback));
     }
 
-    private AgenticPreparedChatRequest prepared(String userMessage) {
-        return new AgenticPreparedChatRequest(userMessage, "11:22:conv-1", null, MODEL,
+    private AgenticPreparedChatBO prepared(String userMessage) {
+        return new AgenticPreparedChatBO(userMessage, "11:22:conv-1", null, MODEL,
                 Map.of(
                         AgenticConstant.ToolContextKey.TENANT_ID, 11L,
                         AgenticConstant.ToolContextKey.USER_ID, 22L,

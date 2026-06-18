@@ -29,7 +29,7 @@ import java.util.Map;
  * @version 2026.5.16
  * @since 2016.10.1
  */
-public record AgenticPreparedChatRequest(String userMessage, String scopedConversationId,
+public record AgenticPreparedChatBO(String userMessage, String scopedConversationId,
                                          String requestSystemContext, String model,
                                          Map<String, Object> toolContext, Double temperature,
                                          Integer maxTokens,

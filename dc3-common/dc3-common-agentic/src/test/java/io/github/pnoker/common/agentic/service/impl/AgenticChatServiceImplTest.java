@@ -17,11 +17,11 @@
 package io.github.pnoker.common.agentic.service.impl;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionVO;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatRequestPreparer;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatResponseCodec;
 import io.github.pnoker.common.agentic.service.chat.AgenticMessageRecorder;
-import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
+import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.chat.AgenticRunTrace;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntime;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -70,8 +70,8 @@ class AgenticChatServiceImplTest {
 
     @Test
     void streamChatCompletionPersistsStructuredFailureTrace() {
-        ChatCompletionRequest request = new ChatCompletionRequest();
-        AgenticPreparedChatRequest prepared = prepared();
+        ChatCompletionVO request = new ChatCompletionVO();
+        AgenticPreparedChatBO prepared = prepared();
         when(requestPreparer.prepare(request, userHeader, "stream")).thenReturn(prepared);
         when(agenticRuntime.stream(prepared)).thenReturn(Flux.error(new RuntimeException("transport closed")));
 
@@ -94,8 +94,8 @@ class AgenticChatServiceImplTest {
         assertThat(prepared.runTrace().recordedEvents().get(0).status()).isEqualTo("failed");
     }
 
-    private AgenticPreparedChatRequest prepared() {
-        return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
+    private AgenticPreparedChatBO prepared() {
+        return new AgenticPreparedChatBO("hello", "tenant:user:conversation", null, "dc3-test-model",
                 Map.of(), null, null, new AgenticRunTrace(), true, false, List.of(), List.of(),
                 AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
     }

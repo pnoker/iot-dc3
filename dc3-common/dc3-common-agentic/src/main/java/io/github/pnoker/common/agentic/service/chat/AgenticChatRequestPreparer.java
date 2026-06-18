@@ -22,8 +22,8 @@ import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
-import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
-import io.github.pnoker.common.agentic.entity.request.ChatMessageDTO;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionVO;
+import io.github.pnoker.common.agentic.entity.dto.ChatMessageDTO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.service.SessionService;
@@ -65,7 +65,7 @@ public class AgenticChatRequestPreparer {
 
     private final AgenticProperties properties;
 
-    public AgenticPreparedChatRequest prepare(ChatCompletionRequest request, RequestHeader.PrincipalHeader userHeader,
+    public AgenticPreparedChatBO prepare(ChatCompletionVO request, RequestHeader.PrincipalHeader userHeader,
                                               String mode) {
         validateRequest(request);
 
@@ -101,7 +101,7 @@ public class AgenticChatRequestPreparer {
 
         touchSession(scopedConversationId, conversationId, userHeader, buildSessionExt(request, model));
 
-        return new AgenticPreparedChatRequest(rawUserMessage, scopedConversationId, requestSystemContext, model,
+        return new AgenticPreparedChatBO(rawUserMessage, scopedConversationId, requestSystemContext, model,
                 toolContext, request.getTemperature(), request.getMaxTokens(), runTrace,
                 toolCallingEnabled, Boolean.TRUE.equals(request.getReasoning()), attachments, contexts,
                 inputTokens, memoryHistory);
@@ -119,7 +119,7 @@ public class AgenticChatRequestPreparer {
         return toolContext;
     }
 
-    private void validateRequest(ChatCompletionRequest request) {
+    private void validateRequest(ChatCompletionVO request) {
         if (Objects.isNull(request)) {
             throw new RequestException("Chat completion request is required");
         }
@@ -135,7 +135,7 @@ public class AgenticChatRequestPreparer {
         }
     }
 
-    private String extractLastUserMessage(ChatCompletionRequest request) {
+    private String extractLastUserMessage(ChatCompletionVO request) {
         return request.getMessages()
                 .stream()
                 .filter(message -> Objects.nonNull(message) && "user".equals(message.getRole()))
@@ -145,7 +145,7 @@ public class AgenticChatRequestPreparer {
                 .orElseThrow(() -> new RequestException("A non-empty user message is required"));
     }
 
-    private String resolveConversationId(ChatCompletionRequest request) {
+    private String resolveConversationId(ChatCompletionVO request) {
         String conversationId = StringUtils.trimToNull(request.getConversationId());
         if (Objects.isNull(conversationId)) {
             throw new RequestException("conversationId is required - clients must generate and reuse "
@@ -216,7 +216,7 @@ public class AgenticChatRequestPreparer {
                 .sum();
     }
 
-    private SessionExt buildSessionExt(ChatCompletionRequest request, String model) {
+    private SessionExt buildSessionExt(ChatCompletionVO request, String model) {
         if (Objects.isNull(request.getReasoning()) && Objects.isNull(request.getTemperature())
                 && Objects.isNull(request.getMaxTokens()) && StringUtils.isBlank(model)) {
             return null;
@@ -240,7 +240,7 @@ public class AgenticChatRequestPreparer {
         }
     }
 
-    private List<Long> normalizeAttachments(ChatCompletionRequest request) {
+    private List<Long> normalizeAttachments(ChatCompletionVO request) {
         if (Objects.isNull(request.getAttachments()) || request.getAttachments().isEmpty()) {
             return List.of();
         }

@@ -35,7 +35,7 @@ class AgenticChatResponseCodecTest {
 
     @Test
     void initialEventsUsesRunEventModelForReasoning() {
-        AgenticPreparedChatRequest prepared = prepared(new AgenticRunTrace(), true);
+        AgenticPreparedChatBO prepared = prepared(new AgenticRunTrace(), true);
 
         List<ServerSentEvent<String>> events = codec.initialEvents(prepared);
 
@@ -52,7 +52,7 @@ class AgenticChatResponseCodecTest {
         AgenticRunTrace runTrace = new AgenticRunTrace();
         runTrace.pendingEvents().offer(new AgenticRunEvent("tool", "searchDevices", "Search devices", "device",
                 1000L, "start", "running", null));
-        AgenticPreparedChatRequest prepared = prepared(runTrace);
+        AgenticPreparedChatBO prepared = prepared(runTrace);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
                 AgenticStreamDelta.empty());
@@ -71,7 +71,7 @@ class AgenticChatResponseCodecTest {
                 1000L, "start", "running", null));
         runTrace.pendingEvents().offer(new AgenticRunEvent("tool", "lookupDeviceById", "Device loaded", "OK",
                 1100L, "result", "success", "OK"));
-        AgenticPreparedChatRequest prepared = prepared(runTrace);
+        AgenticPreparedChatBO prepared = prepared(runTrace);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
                 new AgenticStreamDelta("Device loaded", null));
@@ -87,7 +87,7 @@ class AgenticChatResponseCodecTest {
 
     @Test
     void streamEventsSerializesReasoningContentChunk() {
-        AgenticPreparedChatRequest prepared = prepared(new AgenticRunTrace(), true);
+        AgenticPreparedChatBO prepared = prepared(new AgenticRunTrace(), true);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
                 new AgenticStreamDelta("", "Checking platform data."));
@@ -102,7 +102,7 @@ class AgenticChatResponseCodecTest {
     void streamEventsFlushesVisualizationsBeforeContentChunk() {
         AgenticRunTrace runTrace = new AgenticRunTrace();
         runTrace.recordPendingVisualization(visualization());
-        AgenticPreparedChatRequest prepared = prepared(runTrace);
+        AgenticPreparedChatBO prepared = prepared(runTrace);
 
         List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
                 new AgenticStreamDelta("Analysis ready", null));
@@ -118,7 +118,7 @@ class AgenticChatResponseCodecTest {
     void blockingResponseIncludesStructuredContentExtCharts() {
         AgenticRunTrace runTrace = new AgenticRunTrace();
         runTrace.recordPendingVisualization(visualization());
-        AgenticPreparedChatRequest prepared = prepared(runTrace);
+        AgenticPreparedChatBO prepared = prepared(runTrace);
 
         String json = new ObjectMapper().writeValueAsString(codec.blockingResponse(prepared,
                 "Analysis ready", "stop"));
@@ -128,12 +128,12 @@ class AgenticChatResponseCodecTest {
         assertThat(json).contains("\"type\":\"line\"");
     }
 
-    private AgenticPreparedChatRequest prepared(AgenticRunTrace runTrace) {
+    private AgenticPreparedChatBO prepared(AgenticRunTrace runTrace) {
         return prepared(runTrace, false);
     }
 
-    private AgenticPreparedChatRequest prepared(AgenticRunTrace runTrace, boolean reasoning) {
-        return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
+    private AgenticPreparedChatBO prepared(AgenticRunTrace runTrace, boolean reasoning) {
+        return new AgenticPreparedChatBO("hello", "tenant:user:conversation", null, "dc3-test-model",
                 Map.of(), null, null, runTrace, true, reasoning, List.of(), List.of(),
                 AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
     }

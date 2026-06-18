@@ -25,7 +25,7 @@ import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
-import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
+import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -106,7 +106,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public SessionBO update(String conversationId, SessionUpdateRequest request) {
+    public SessionBO update(String conversationId, SessionVO request) {
         SessionDO entityDO = findByConversationId(conversationId);
         if (Objects.isNull(entityDO) || Objects.isNull(request)) {
             return null;

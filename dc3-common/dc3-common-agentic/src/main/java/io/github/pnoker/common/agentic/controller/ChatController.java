@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
-import io.github.pnoker.common.agentic.entity.request.ChatCompletionRequest;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionVO;
 import io.github.pnoker.common.agentic.service.AgenticChatService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
@@ -61,7 +61,7 @@ public class ChatController implements BaseController {
     @Operation(summary = "Create Chat Completion", description = "Submit a chat prompt with conversation context and receive the assistant reply using the OpenAI-compatible completion format. "
             + "When the request sets stream=true the reply is streamed token by token over SSE; otherwise it returns the full reply as a single JSON response.")
     @PostMapping("/completions")
-    public Mono<ResponseEntity<?>> chatCompletion(@RequestBody ChatCompletionRequest request) {
+    public Mono<ResponseEntity<?>> chatCompletion(@RequestBody ChatCompletionVO request) {
         return getPrincipalHeader().flatMap(header -> {
             if (Objects.nonNull(request) && request.isStream()) {
                 return Mono.just(ResponseEntity.ok()

@@ -19,7 +19,6 @@ package io.github.pnoker.common.agentic.entity.builder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.entity.model.ModelConfigDO;
-import io.github.pnoker.common.agentic.entity.request.ModelConfigRequest;
 import io.github.pnoker.common.agentic.entity.vo.ModelConfigVO;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -47,7 +46,6 @@ public interface ModelConfigBuilder {
 
     List<ModelConfigBO> buildBOListByVOList(List<ModelConfigVO> entityVOList);
 
-    @Mapping(target = "providerName", ignore = true)
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
     @Mapping(target = "creatorName", ignore = true)
@@ -55,8 +53,6 @@ public interface ModelConfigBuilder {
     @Mapping(target = "operatorId", ignore = true)
     @Mapping(target = "operatorName", ignore = true)
     @Mapping(target = "operateTime", ignore = true)
-    ModelConfigBO buildBOByRequest(ModelConfigRequest entityRequest);
-
     @Mapping(target = "defaultFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)

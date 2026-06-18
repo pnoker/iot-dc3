@@ -56,7 +56,7 @@ public class AgenticChatResponseCodec {
 
     private final ObjectMapper objectMapper;
 
-    public ChatCompletionResponse blockingResponse(AgenticPreparedChatRequest prepared, String content,
+    public ChatCompletionResponse blockingResponse(AgenticPreparedChatBO prepared, String content,
                                                    String finishReason) {
         int completionTokens = AgenticTokenEstimatorUtil.estimate(content);
         int promptTokens = Objects.nonNull(prepared.inputTokens()) ? prepared.inputTokens().getInput() : 0;
@@ -96,7 +96,7 @@ public class AgenticChatResponseCodec {
         return toJson(chunk);
     }
 
-    public List<ServerSentEvent<String>> initialEvents(AgenticPreparedChatRequest prepared) {
+    public List<ServerSentEvent<String>> initialEvents(AgenticPreparedChatBO prepared) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
         if (prepared.reasoning()) {
             events.add(ServerSentEvent.<String>builder()
@@ -106,7 +106,7 @@ public class AgenticChatResponseCodec {
         return events;
     }
 
-    public List<ServerSentEvent<String>> streamEvents(AgenticPreparedChatRequest prepared, String chatId, long created,
+    public List<ServerSentEvent<String>> streamEvents(AgenticPreparedChatBO prepared, String chatId, long created,
                                                       AgenticStreamDelta streamDelta) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
         for (AgenticRunEvent event : prepared.runTrace().drainPendingEvents()) {
@@ -135,7 +135,7 @@ public class AgenticChatResponseCodec {
         return toJson(AgenticVisualizationResponse.of(visualization, Instant.now().getEpochSecond()));
     }
 
-    private AgenticMessageContent buildResponseContentExt(AgenticPreparedChatRequest prepared) {
+    private AgenticMessageContent buildResponseContentExt(AgenticPreparedChatBO prepared) {
         List<AgenticVisualizationSpec> visualizations = prepared.runTrace().drainAndRecordedVisualizations();
         if (visualizations.isEmpty()) {
             return null;

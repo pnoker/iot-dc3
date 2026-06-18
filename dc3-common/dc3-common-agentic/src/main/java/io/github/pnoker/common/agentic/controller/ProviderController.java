@@ -18,7 +18,7 @@ package io.github.pnoker.common.agentic.controller;
 
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.entity.builder.ModelProviderBuilder;
-import io.github.pnoker.common.agentic.entity.request.ModelProviderRequest;
+import io.github.pnoker.common.agentic.entity.vo.ModelProviderVO;
 import io.github.pnoker.common.agentic.entity.vo.ModelProviderVO;
 import io.github.pnoker.common.agentic.service.ModelProviderService;
 import io.github.pnoker.common.base.BaseController;
@@ -71,9 +71,9 @@ public class ProviderController implements BaseController {
     @Operation(summary = "Add Model Provider", description = "Register a new upstream LLM provider for the current tenant with its base URL, credentials and capability spec. "
             + "Returns the created provider; reference it afterwards when defining model configurations.")
     @PostMapping("/config/add")
-    public Mono<R<ModelProviderVO>> add(@Validated(Add.class) @RequestBody ModelProviderRequest request) {
+    public Mono<R<ModelProviderVO>> add(@Validated(Add.class) @RequestBody ModelProviderVO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
-            ModelProviderBO entityBO = modelProviderBuilder.buildBOByRequest(request);
+            ModelProviderBO entityBO = modelProviderBuilder.buildBOByVO(request);
             return R.ok(modelProviderBuilder.buildVOByBO(modelProviderService.add(entityBO, header)));
         }));
     }
@@ -82,9 +82,9 @@ public class ProviderController implements BaseController {
     @Operation(summary = "Update Model Provider", description = "Update an existing LLM provider for the current tenant, changing its base URL, credentials or capability spec. "
             + "Returns the updated provider; the target must belong to the current tenant.")
     @PostMapping("/config/update")
-    public Mono<R<ModelProviderVO>> update(@Validated(Update.class) @RequestBody ModelProviderRequest request) {
+    public Mono<R<ModelProviderVO>> update(@Validated(Update.class) @RequestBody ModelProviderVO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
-            ModelProviderBO entityBO = modelProviderBuilder.buildBOByRequest(request);
+            ModelProviderBO entityBO = modelProviderBuilder.buildBOByVO(request);
             return R.ok(modelProviderBuilder.buildVOByBO(modelProviderService.update(entityBO, header)));
         }));
     }

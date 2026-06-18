@@ -112,8 +112,8 @@ class AgenticPromptBuilderTest {
         assertThat(systemPrompt.getValue()).contains("Device, driver, profile, and point metadata lookup");
     }
 
-    private AgenticPreparedChatRequest prepared(boolean toolCallingEnabled) {
-        return new AgenticPreparedChatRequest("show me device status", "tenant:user:conversation",
+    private AgenticPreparedChatBO prepared(boolean toolCallingEnabled) {
+        return new AgenticPreparedChatBO("show me device status", "tenant:user:conversation",
                 null, "dc3-test-model", Map.of(), null, null, new AgenticRunTrace(), toolCallingEnabled,
                 false, List.of(), List.of(), AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
     }

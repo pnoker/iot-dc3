@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
+import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
@@ -42,7 +42,7 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
     private final OpenAiCompatibleAgenticRuntime openAiCompatibleAgenticRuntime;
 
     @Override
-    public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatRequest prepared) {
+    public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatBO prepared) {
         if (openAiCompatibleAgenticRuntime.supports(prepared)) {
             return openAiCompatibleAgenticRuntime.stream(prepared);
         }
@@ -56,7 +56,7 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
     }
 
     @Override
-    public AgenticRuntimeResult call(AgenticPreparedChatRequest prepared) {
+    public AgenticRuntimeResult call(AgenticPreparedChatBO prepared) {
         if (openAiCompatibleAgenticRuntime.supports(prepared)) {
             return openAiCompatibleAgenticRuntime.call(prepared);
         }

@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.pnoker.common.agentic.entity.request;
+package io.github.pnoker.common.agentic.entity.vo;
 
+import io.github.pnoker.common.agentic.entity.dto.ChatMessageDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,7 +39,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Chat Completion request body")
-public class ChatCompletionRequest {
+public class ChatCompletionVO {
 
     /**
      * Model identifier (advisory — the actual model is configured server-side).

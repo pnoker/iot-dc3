@@ -23,7 +23,7 @@ import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
-import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
+import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.exception.RequestException;
 import org.junit.jupiter.api.Test;
@@ -142,7 +142,7 @@ class SessionServiceImplTest {
     @Test
     void updateReturnsNullWhenSessionMissing() {
         when(sessionManager.getOne(anySessionQuery())).thenReturn(null);
-        assertThat(service.update("missing", new SessionUpdateRequest())).isNull();
+        assertThat(service.update("missing", new SessionVO())).isNull();
     }
 
     @Test
@@ -159,7 +159,7 @@ class SessionServiceImplTest {
         when(sessionManager.getOne(anySessionQuery())).thenReturn(existing);
         when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
 
-        SessionUpdateRequest request = new SessionUpdateRequest();
+        SessionVO request = new SessionVO();
         request.setTitle("  New title  ");
         SessionExt sessionExt = new SessionExt();
         sessionExt.setModel("  glm-4  ");
@@ -178,7 +178,7 @@ class SessionServiceImplTest {
         when(sessionManager.getOne(anySessionQuery())).thenReturn(existing);
         when(sessionBuilder.buildBOByDO(existing)).thenReturn(new SessionBO());
 
-        SessionUpdateRequest request = new SessionUpdateRequest();
+        SessionVO request = new SessionVO();
         request.setTitle("   ");
         service.update("conv-1", request);
 
@@ -199,7 +199,7 @@ class SessionServiceImplTest {
         SessionExt patch = new SessionExt();
         patch.setReasoningEnabled(true);
         patch.setMaxTokens(4096);
-        SessionUpdateRequest request = new SessionUpdateRequest();
+        SessionVO request = new SessionVO();
         request.setSessionExt(patch);
         service.update("conv-1", request);
 
@@ -216,7 +216,7 @@ class SessionServiceImplTest {
 
         SessionExt patch = new SessionExt();
         patch.setTemperature(3.0);
-        SessionUpdateRequest request = new SessionUpdateRequest();
+        SessionVO request = new SessionVO();
         request.setSessionExt(patch);
 
         assertThatThrownBy(() -> service.update("conv-1", request))

@@ -60,7 +60,7 @@ class AgenticMessageRecorderTest {
         AgenticRunTrace runTrace = new AgenticRunTrace();
         runTrace.recordPendingEvent(new AgenticRunEvent("tool", "lookupDevice", "Device loaded", "OK",
                 1000L, "result", "success", "OK"));
-        AgenticPreparedChatRequest prepared = prepared(runTrace, false, List.of());
+        AgenticPreparedChatBO prepared = prepared(runTrace, false, List.of());
 
         recorder.persistAssistantMessage(prepared, "", userHeader);
 
@@ -76,7 +76,7 @@ class AgenticMessageRecorderTest {
 
     @Test
     void persistAssistantMessageSavesReasoningOnlyMessage() {
-        AgenticPreparedChatRequest prepared = prepared(new AgenticRunTrace(), true, List.of());
+        AgenticPreparedChatBO prepared = prepared(new AgenticRunTrace(), true, List.of());
 
         recorder.persistAssistantMessage(prepared, "", "查询驱动列表前，先确认租户上下文。", userHeader);
 
@@ -94,7 +94,7 @@ class AgenticMessageRecorderTest {
     void persistAssistantMessageSavesVisualizationOnlyMessage() {
         AgenticRunTrace runTrace = new AgenticRunTrace();
         runTrace.recordPendingVisualization(visualization());
-        AgenticPreparedChatRequest prepared = prepared(runTrace, false, List.of());
+        AgenticPreparedChatBO prepared = prepared(runTrace, false, List.of());
 
         recorder.persistAssistantMessage(prepared, "", userHeader);
 
@@ -110,16 +110,16 @@ class AgenticMessageRecorderTest {
 
     @Test
     void persistAssistantMessageSkipsCompletelyEmptyMessage() {
-        AgenticPreparedChatRequest prepared = prepared(new AgenticRunTrace(), false, List.of());
+        AgenticPreparedChatBO prepared = prepared(new AgenticRunTrace(), false, List.of());
 
         recorder.persistAssistantMessage(prepared, " ", userHeader);
 
         verifyNoInteractions(messageService);
     }
 
-    private AgenticPreparedChatRequest prepared(AgenticRunTrace runTrace, boolean reasoning,
+    private AgenticPreparedChatBO prepared(AgenticRunTrace runTrace, boolean reasoning,
                                                 List<AgenticMessageContent.Context> contexts) {
-        return new AgenticPreparedChatRequest("hello", "tenant:user:conversation", null, "dc3-test-model",
+        return new AgenticPreparedChatBO("hello", "tenant:user:conversation", null, "dc3-test-model",
                 Map.of(), null, null, runTrace, true, reasoning, List.of(), contexts,
                 AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
     }

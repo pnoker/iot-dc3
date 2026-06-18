@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
-import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
+import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
@@ -113,7 +113,7 @@ public class SessionController implements BaseController {
             "Use to rename or adjust a session; returns the updated session, or a failure when it does not exist.")
     @PostMapping("/update")
     public Mono<R<SessionVO>> update(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
-                                     @RequestBody(required = false) SessionUpdateRequest request) {
+                                     @RequestBody(required = false) SessionVO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.update(AgenticConversationIdUtil.scope(header.getTenantId(),
                     header.getUserId(), conversationId), request);

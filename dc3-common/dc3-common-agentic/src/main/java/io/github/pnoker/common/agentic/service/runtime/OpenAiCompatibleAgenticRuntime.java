@@ -43,7 +43,7 @@ import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
+import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
@@ -99,7 +99,7 @@ public class OpenAiCompatibleAgenticRuntime {
         this.toolCallbackProvider = toolCallbackProvider;
     }
 
-    public boolean supports(AgenticPreparedChatRequest prepared) {
+    public boolean supports(AgenticPreparedChatBO prepared) {
         if (Objects.isNull(prepared) || !prepared.toolCallingEnabled()) {
             return false;
         }
@@ -108,7 +108,7 @@ public class OpenAiCompatibleAgenticRuntime {
                 && AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE.equals(provider.getProviderType());
     }
 
-    public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatRequest prepared) {
+    public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatBO prepared) {
         return Flux.create(sink -> {
             try {
                 doStream(prepared, sink);
@@ -119,7 +119,7 @@ public class OpenAiCompatibleAgenticRuntime {
         });
     }
 
-    public AgenticRuntimeResult call(AgenticPreparedChatRequest prepared) {
+    public AgenticRuntimeResult call(AgenticPreparedChatBO prepared) {
         ModelProviderBO provider = requireProvider(prepared);
         OpenAIClient client = createClient(provider);
         Map<String, ToolCallback> callbacks = toolCallbacksByName();
@@ -154,7 +154,7 @@ public class OpenAiCompatibleAgenticRuntime {
                 + AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS);
     }
 
-    private void doStream(AgenticPreparedChatRequest prepared, FluxSink<AgenticRuntimeStreamFrame> sink) {
+    private void doStream(AgenticPreparedChatBO prepared, FluxSink<AgenticRuntimeStreamFrame> sink) {
         ModelProviderBO provider = requireProvider(prepared);
         OpenAIClient client = createClient(provider);
         Map<String, ToolCallback> callbacks = toolCallbacksByName();
@@ -185,7 +185,7 @@ public class OpenAiCompatibleAgenticRuntime {
         }
     }
 
-    private StreamRoundResult streamOneRound(OpenAIClient client, AgenticPreparedChatRequest prepared,
+    private StreamRoundResult streamOneRound(OpenAIClient client, AgenticPreparedChatBO prepared,
                                              List<ChatCompletionMessageParam> messages,
                                              FluxSink<AgenticRuntimeStreamFrame> sink) {
         StringBuilder content = new StringBuilder();
@@ -232,7 +232,7 @@ public class OpenAiCompatibleAgenticRuntime {
                 finishReason);
     }
 
-    private ChatCompletionCreateParams buildRequest(AgenticPreparedChatRequest prepared,
+    private ChatCompletionCreateParams buildRequest(AgenticPreparedChatBO prepared,
                                                     List<ChatCompletionMessageParam> messages,
                                                     boolean includeTools, boolean stream) {
         ChatCompletionCreateParams.Builder builder = ChatCompletionCreateParams.builder()
@@ -253,7 +253,7 @@ public class OpenAiCompatibleAgenticRuntime {
         return builder.build();
     }
 
-    private List<ChatCompletionMessageParam> initialMessages(AgenticPreparedChatRequest prepared) {
+    private List<ChatCompletionMessageParam> initialMessages(AgenticPreparedChatBO prepared) {
         List<ChatCompletionMessageParam> messages = new ArrayList<>();
         String systemPrompt = promptBuilder.buildSystemPrompt(prepared);
         if (StringUtils.isNotBlank(systemPrompt)) {
@@ -354,7 +354,7 @@ public class OpenAiCompatibleAgenticRuntime {
     }
 
     private List<ChatCompletionMessageParam> executeToolCalls(Map<String, ToolCallback> callbacks,
-                                                              AgenticPreparedChatRequest prepared,
+                                                              AgenticPreparedChatBO prepared,
                                                               List<ToolCall> toolCalls) {
         ToolContext toolContext = new ToolContext(prepared.toolContext());
         List<ChatCompletionMessageParam> results = new ArrayList<>();
@@ -450,7 +450,7 @@ public class OpenAiCompatibleAgenticRuntime {
         }
     }
 
-    private ModelProviderBO requireProvider(AgenticPreparedChatRequest prepared) {
+    private ModelProviderBO requireProvider(AgenticPreparedChatBO prepared) {
         ModelProviderBO provider = chatClientFactory.resolveProviderForModel(prepared.model());
         if (Objects.isNull(provider)
                 || !AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE.equals(provider.getProviderType())) {

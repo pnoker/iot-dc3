@@ -55,7 +55,7 @@ public class AgenticPromptBuilder {
         this.toolCallAdvisor = toolCallAdvisor;
     }
 
-    public ChatClient.ChatClientRequestSpec build(AgenticPreparedChatRequest prepared) {
+    public ChatClient.ChatClientRequestSpec build(AgenticPreparedChatBO prepared) {
         ChatClient chatClient = chatClientFactory.getOrCreate(prepared.model());
         ChatClient.ChatClientRequestSpec promptSpec = chatClient.prompt()
                 .user(prepared.userMessage())
@@ -72,7 +72,7 @@ public class AgenticPromptBuilder {
     }
 
     private ChatClient.ChatClientRequestSpec applyToolCallbacks(ChatClient.ChatClientRequestSpec promptSpec,
-                                                                AgenticPreparedChatRequest prepared) {
+                                                                AgenticPreparedChatBO prepared) {
         if (!prepared.toolCallingEnabled()) {
             return promptSpec;
         }
@@ -85,7 +85,7 @@ public class AgenticPromptBuilder {
         return Objects.nonNull(optionsBuilder) ? promptSpec.options(optionsBuilder) : promptSpec;
     }
 
-    public String buildSystemPrompt(AgenticPreparedChatRequest prepared) {
+    public String buildSystemPrompt(AgenticPreparedChatBO prepared) {
         List<String> sections = new ArrayList<>();
         sections.add(ChatClientConfig.BASE_SYSTEM_PROMPT);
         if (prepared.toolCallingEnabled()) {

@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
-import io.github.pnoker.common.agentic.entity.request.SessionUpdateRequest;
+import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 
 /**
  * Service for managing agentic chat sessions with tenant-scoped lifecycle operations.
@@ -76,7 +76,7 @@ public interface SessionService {
      * @param request        mutable fields
      * @return updated session BO or null if the session does not exist
      */
-    SessionBO update(String conversationId, SessionUpdateRequest request);
+    SessionBO update(String conversationId, SessionVO request);
 
     /**
      * Query sessions with pagination.

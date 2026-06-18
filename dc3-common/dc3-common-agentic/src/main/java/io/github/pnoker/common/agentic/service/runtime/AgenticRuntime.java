@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatRequest;
+import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import reactor.core.publisher.Flux;
 
 /**
@@ -28,8 +28,8 @@ import reactor.core.publisher.Flux;
  */
 public interface AgenticRuntime {
 
-    Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatRequest prepared);
+    Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatBO prepared);
 
-    AgenticRuntimeResult call(AgenticPreparedChatRequest prepared);
+    AgenticRuntimeResult call(AgenticPreparedChatBO prepared);
 
 }

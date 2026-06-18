@@ -19,7 +19,7 @@ package io.github.pnoker.common.agentic.entity.builder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.entity.model.ModelProviderDO;
-import io.github.pnoker.common.agentic.entity.request.ModelProviderRequest;
+import io.github.pnoker.common.agentic.entity.vo.ModelProviderVO;
 import io.github.pnoker.common.agentic.entity.vo.ModelProviderVO;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
@@ -59,14 +59,12 @@ public interface ModelProviderBuilder {
     @Mapping(target = "operatorId", ignore = true)
     @Mapping(target = "operatorName", ignore = true)
     @Mapping(target = "operateTime", ignore = true)
-    ModelProviderBO buildBOByRequest(ModelProviderRequest entityRequest);
-
     @AfterMapping
-    default void afterProcess(ModelProviderRequest entityRequest, @MappingTarget ModelProviderBO entityBO) {
+    default void afterProcess(ModelProviderVO entityRequest, @MappingTarget ModelProviderBO entityBO) {
         if (Objects.isNull(entityRequest)) {
             return;
         }
-        entityBO.setProviderType(providerType(entityRequest.getProviderType()));
+        entityBO.setProviderType(entityRequest.getProviderType());
     }
 
     @Mapping(target = "providerType", ignore = true)

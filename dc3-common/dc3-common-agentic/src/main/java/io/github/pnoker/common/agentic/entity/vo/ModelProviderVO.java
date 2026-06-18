@@ -50,10 +50,13 @@ public class ModelProviderVO extends BaseVO {
     @Schema(description = "Default provider flag enum (DEFAULT or NON_DEFAULT)", example = "DEFAULT")
     private DefaultFlagEnum defaultFlag;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Tenant ID", example = "1024")
     private Long tenantId;
+
+    @Schema(description = "Provider API key used for authentication. Write-only: never returned in API responses.", accessMode = Schema.AccessMode.WRITE_ONLY)
+    private String apiKey;
 
 }
