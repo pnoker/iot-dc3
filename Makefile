@@ -20,7 +20,7 @@ SHELL := /bin/bash
 
 .PHONY: help env init-env clean package test test-it test-e2e coverage deploy \
 	build up stop down ps logs config pull restart refresh reset \
-	run changelog openapi tag
+	run changelog openapi tag validate-annotations
 
 ENV_FILE ?= $(firstword $(wildcard .env) .env.example)
 RUNTIME_ENV_FILE ?= dc3/env/dev.env
@@ -166,6 +166,11 @@ package:
 
 test:
 	$(MVN) -B -Dmaven.test.skip=false test
+
+validate-annotations:
+	@echo "Running x-dc3-ai annotation gate (allowlisted service modules)..."
+	$(MVN) -q -pl dc3-common/dc3-common-resource-registrar test -Dtest=ControllerAnnotationGateTest
+	@echo "Allowlist is empty until a service batch adds its own *AnnotationGateTest; add its -pl/-Dtest here."
 
 test-it:
 	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify
