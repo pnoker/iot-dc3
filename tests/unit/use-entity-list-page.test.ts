@@ -133,33 +133,38 @@ describe('useEntityListPage', () => {
     expect((lastCall.page as Record<string, unknown>).current).toBe(1);
   });
 
-  it('parses json field string to object in payload when submitting', async () => {
+  it('parses json field to object and coerces number field in payload when submitting', async () => {
+    const addFn = vi.fn().mockResolvedValue({ ok: true, code: 'ok', message: 'ok', data: null });
     const config = makeEntityListConfig();
-    const { formModel, openAdd } = useEntityListPage(config);
+    // Add a number field alongside the existing json 'extra' field
+    config.fields = [...config.fields, { prop: 'count', label: 'Count', kind: 'number' }];
+    config.defaultForm = () => ({ name: '', extra: '', count: 0 });
+    config.add = addFn;
+
+    const { formModel, openAdd, setFormRef, submit } = useEntityListPage(config);
+
+    // Provide a form ref stub whose validate calls the callback synchronously with valid=true
+    setFormRef({
+      validate: (cb?: (valid: boolean) => void) => {
+        if (cb) cb(true);
+        return Promise.resolve(true);
+      },
+      clearValidate: () => {},
+    });
 
     openAdd();
-
-    formModel['name'] = 'TestName';
     formModel['extra'] = '{"key":"val"}';
+    formModel['count'] = '42';
 
-    // payload() is private; verify via the add mock being called with parsed data.
-    // We call submit() indirectly by invoking the public submit function, which
-    // requires a form ref. Since there is no DOM form, assert payload shape
-    // by reading formModel directly and applying the same parsing the composable does.
-    const jsonValue = formModel['extra'];
-    expect(JSON.parse(String(jsonValue))).toEqual({ key: 'val' });
-  });
+    submit();
+    // Let the async request resolve
+    await Promise.resolve();
+    await Promise.resolve();
 
-  it('converts a number field string value to a number in payload', () => {
-    // Replicate the same coercion logic the composable applies so the unit
-    // assertion stays decoupled from the private payload() method.
-    // kind==='number': result[field.prop] = value === '' || value == null ? undefined : Number(value)
-    const coerce = (value: unknown) => (value === '' || value == null ? undefined : Number(value));
-
-    expect(coerce('42')).toBe(42);
-    expect(coerce(7)).toBe(7);
-    expect(coerce('')).toBeUndefined();
-    expect(coerce(null)).toBeUndefined();
+    expect(addFn).toHaveBeenCalledOnce();
+    const called = addFn.mock.calls[0][0] as Record<string, unknown>;
+    expect(called['extra']).toEqual({ key: 'val' });
+    expect(called['count']).toBe(42);
   });
 
   it('resets state.page.current to 1 on search', async () => {

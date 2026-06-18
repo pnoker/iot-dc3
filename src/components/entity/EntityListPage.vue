@@ -68,13 +68,11 @@
     </tool-card>
 
     <blank-card>
-      <!-- Tree mode -->
       <el-table
-        v-if="config.mode === 'tree'"
         v-loading="state.loading"
         :data="state.rows"
-        :row-key="config.rowKey || 'id'"
-        :default-expand-all="config.defaultExpandAll"
+        :row-key="config.mode === 'tree' ? config.rowKey || 'id' : undefined"
+        :default-expand-all="config.mode === 'tree' && config.defaultExpandAll"
         class="entity-list-page__table"
         stripe
       >
@@ -97,81 +95,9 @@
               {{ formatCell(row, column) }}
             </span>
             <span v-else-if="column.kind === 'icon'" class="entity-list-page__icon-cell">
-              <el-icon v-if="resolveIcon(getCellValue(row, column.prop))">
-                <component :is="resolveIcon(getCellValue(row, column.prop))" />
-              </el-icon>
-              {{ getCellValue(row, column.prop) }}
-            </span>
-            <el-tag v-else-if="column.kind === 'tag'" :type="tagType(getCellValue(row, column.prop))">
-              {{ formatCell(row, column) }}
-            </el-tag>
-            <code v-else-if="column.kind === 'code'" class="entity-list-page__inline-code">
-              {{ formatCell(row, column) }}
-            </code>
-            <span v-else>{{ formatCell(row, column) }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column :label="t('common.operation')" :width="operationWidth" fixed="right">
-          <template #default="{ row }">
-            <el-button v-if="config.detail" link type="primary" @click="openDetail(row)">
-              {{ t('common.detail') }}
-            </el-button>
-            <template v-if="config.extraActions">
-              <el-button
-                v-for="action in config.extraActions"
-                :key="action.key"
-                link
-                :type="action.type || 'primary'"
-                @click="action.onClick(row)"
-              >
-                {{ action.label }}
-              </el-button>
-            </template>
-            <el-button v-if="config.editable && canEdit(row)" link type="primary" @click="openEdit(row)">
-              {{ t('common.edit') }}
-            </el-button>
-            <el-popconfirm
-              v-if="config.editable && canDelete(row)"
-              :cancel-button-text="t('common.cancel')"
-              :confirm-button-text="t('common.confirm')"
-              :title="config.confirmDeleteText || t('common.confirmDelete')"
-              @confirm="remove(row.id)"
-            >
-              <template #reference>
-                <el-button link type="danger">{{ t('common.delete') }}</el-button>
+              <template v-if="cellIcon(row, column.prop)">
+                <el-icon><component :is="cellIcon(row, column.prop)" /></el-icon>
               </template>
-            </el-popconfirm>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <el-empty :description="config.emptyText || t('common.empty')" />
-        </template>
-      </el-table>
-
-      <!-- Page mode -->
-      <el-table v-else v-loading="state.loading" :data="state.rows" class="entity-list-page__table" stripe>
-        <el-table-column
-          v-for="column in config.columns"
-          :key="column.prop"
-          :fixed="column.fixed"
-          :label="column.label"
-          :min-width="column.minWidth"
-          :width="column.width"
-          :show-overflow-tooltip="column.overflow !== false"
-        >
-          <template #default="{ row }">
-            <enable-tag v-if="column.kind === 'enable'" :value="getCellValue(row, column.prop)" />
-            <span v-else-if="column.kind === 'color'" class="entity-list-page__color-cell">
-              <span
-                class="entity-list-page__swatch"
-                :style="{ background: getCellValue(row, column.prop) || '#F4F4F5' }"
-              />
-              {{ formatCell(row, column) }}
-            </span>
-            <span v-else-if="column.kind === 'icon'" class="entity-list-page__icon-cell">
-              <el-icon v-if="resolveIcon(getCellValue(row, column.prop))">
-                <component :is="resolveIcon(getCellValue(row, column.prop))" />
-              </el-icon>
               {{ getCellValue(row, column.prop) }}
             </span>
             <el-tag v-else-if="column.kind === 'tag'" :type="tagType(getCellValue(row, column.prop))">
@@ -366,12 +292,17 @@
 
   // treeSelect data loaded on dialog open
   const treeData = reactive<Record<string, any[]>>({});
+  let treeLoadGen = 0;
 
   watch(formVisible, async (visible) => {
     if (!visible) return;
+    const myGen = ++treeLoadGen;
     for (const field of config.value.fields) {
       if (field.kind === 'treeSelect' && field.tree) {
-        treeData[field.prop] = await field.tree.load();
+        const result = await field.tree.load();
+        if (myGen === treeLoadGen) {
+          treeData[field.prop] = result;
+        }
       }
     }
   });
@@ -380,12 +311,15 @@
   const getCellValue = (row: Record<string, any>, prop: string): any =>
     prop.split('.').reduce((obj: any, key) => (obj != null ? obj[key] : undefined), row);
 
+  // Resolve icon component once per cell to avoid double call in v-if + :is
+  const cellIcon = (row: Record<string, any>, prop: string) => resolveIcon(getCellValue(row, prop));
+
   // Operation column width based on number of visible action buttons
   const operationWidth = computed(() => {
     let count = 0;
-    if (props.config.detail) count++;
-    if (props.config.extraActions) count += props.config.extraActions.length;
-    if (props.config.editable) count += 2; // edit + delete
+    if (config.value.detail) count++;
+    if (config.value.extraActions) count += config.value.extraActions.length;
+    if (config.value.editable) count += 2; // edit + delete
     if (count <= 1) return 100;
     if (count <= 3) return 180;
     if (count === 4) return 260;
