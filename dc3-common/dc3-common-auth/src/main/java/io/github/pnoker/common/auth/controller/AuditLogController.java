@@ -55,6 +55,17 @@ public class AuditLogController implements BaseController {
     private final AuditLogService auditLogService;
     private final IdentityAuditLogBuilder identityAuditLogBuilder;
 
+    /**
+     * List identity and authorization audit entries for the current tenant.
+     *
+     * @param principalId  optional filter by the principal who performed the action
+     * @param action       optional filter by audit action type (e.g. LOGIN, GRANT, REVOKE)
+     * @param resourceType optional filter by the targeted resource type (e.g. USER, ROLE)
+     * @param resourceId   optional filter by the targeted resource id
+     * @param status       optional filter by audit event outcome (e.g. SUCCESS, FAILURE)
+     * @param limit        optional cap on the number of entries returned; 0 or absent means no explicit limit
+     * @return an append-only list of IdentityAuditLogVO matching the filters; admin-only, tenant-scoped
+     */
     @PreAuthorize("@perm.can('audit', 'list')")
     @Operation(summary = "List Identity Audit Log",
             description = "List identity and authorization audit entries for the current tenant, with optional filters " +
@@ -62,12 +73,12 @@ public class AuditLogController implements BaseController {
                     "append-only trail of who changed which identity or permission.")
     @PostMapping("/list")
     public Mono<R<List<IdentityAuditLogVO>>> list(
-            @Parameter(description = "Principal ID") @RequestParam(value = "principal_id", required = false) Long principalId,
-            @Parameter(description = "Action") @RequestParam(value = "action", required = false) String action,
-            @Parameter(description = "Resource type") @RequestParam(value = "resource_type", required = false) String resourceType,
-            @Parameter(description = "Resource ID") @RequestParam(value = "resource_id", required = false) Long resourceId,
-            @Parameter(description = "Status") @RequestParam(value = "status", required = false) String status,
-            @Parameter(description = "Limit") @RequestParam(value = "limit", required = false) Integer limit) {
+            @Parameter(description = "Filter by the identity of the principal (user or service account) who performed the action; must belong to the current tenant.", example = "1024") @RequestParam(value = "principal_id", required = false) Long principalId,
+            @Parameter(description = "Filter by the audit action type, e.g. LOGIN, LOGOUT, GRANT, REVOKE, PASSWORD_CHANGE.", example = "LOGIN") @RequestParam(value = "action", required = false) String action,
+            @Parameter(description = "Filter by the type of resource targeted by the action, e.g. USER, ROLE, PERMISSION.", example = "ROLE") @RequestParam(value = "resource_type", required = false) String resourceType,
+            @Parameter(description = "Filter by the identifier of the targeted resource; combined with resource_type to narrow results.", example = "2048") @RequestParam(value = "resource_id", required = false) Long resourceId,
+            @Parameter(description = "Filter by the outcome status of the audit event, e.g. SUCCESS, FAILURE, DENIED.", example = "SUCCESS") @RequestParam(value = "status", required = false) String status,
+            @Parameter(description = "Maximum number of audit log entries to return; 0 or absent means no explicit limit.", example = "50") @RequestParam(value = "limit", required = false) Integer limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(identityAuditLogBuilder.buildVOListByBOList(
                 auditLogService.list(tenantId, principalId, StringUtils.defaultString(action),
                         StringUtils.defaultString(resourceType), resourceId, StringUtils.defaultString(status),

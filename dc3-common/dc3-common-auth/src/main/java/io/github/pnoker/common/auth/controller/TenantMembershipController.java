@@ -67,6 +67,12 @@ public class TenantMembershipController implements BaseController {
 
     private final AuditLogService auditLogService;
 
+    /**
+     * Page through the memberships of the caller's tenant.
+     *
+     * @param entityQuery optional membership query filters (tenant id is pinned server-side)
+     * @return a page of TenantMembershipVO belonging to the caller's tenant
+     */
     @PreAuthorize("@perm.can('tenant_membership', 'list')")
     @Operation(summary = "List Tenant Memberships", description = "Page through the memberships of the caller's tenant, optionally filtered by query. " +
             "Each row links a principal (user or service account) to the tenant; use to see who belongs to it.")
@@ -79,6 +85,12 @@ public class TenantMembershipController implements BaseController {
         }));
     }
 
+    /**
+     * Attach a principal to the caller's tenant (body tenant id is ignored).
+     *
+     * @param entityVO membership payload to create
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('tenant_membership', 'add')")
     @Operation(summary = "Add Tenant Membership", description = "Attach a principal (user or service account) to the caller's tenant. " +
             "The body tenant id is ignored and the membership is pinned to the caller; defaults to ACTIVE status and records an audit entry.")
@@ -102,6 +114,12 @@ public class TenantMembershipController implements BaseController {
         }));
     }
 
+    /**
+     * Remove a membership record by ID after verifying it belongs to the caller's tenant.
+     *
+     * @param id id of the membership to delete
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('tenant_membership', 'delete')")
     @Operation(summary = "Delete Tenant Membership", description = "Remove a membership record by ID, verifying it belongs to the caller's tenant first. " +
             "Returns 404 if the membership is owned by another tenant; logs a DELETE audit entry on success.")

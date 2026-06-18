@@ -68,6 +68,12 @@ public class ApiController implements BaseController {
 
     private final AdminChecker adminChecker;
 
+    /**
+     * Register a new HTTP API endpoint entry that feeds the permission tree and MCP tool catalog.
+     *
+     * @param entityVO API endpoint payload to create
+     * @return add-success status; restricted to system admins
+     */
     @PreAuthorize("@perm.can('api', 'add')")
     @Operation(summary = "Add API Endpoint", description = "Register a new HTTP API endpoint entry that feeds the permission tree and the MCP tool catalog. Restricted to system admins; returns an add-success result.")
     @PostMapping("/add")
@@ -80,6 +86,12 @@ public class ApiController implements BaseController {
         }));
     }
 
+    /**
+     * Remove a registered API endpoint by its ID so it drops out of the permission tree and tool catalog.
+     *
+     * @param id id of the API endpoint to delete
+     * @return delete-success status; restricted to system admins
+     */
     @PreAuthorize("@perm.can('api', 'delete')")
     @Operation(summary = "Delete API Endpoint", description = "Remove a registered API endpoint by its ID so it no longer appears in the permission tree or tool catalog. Restricted to system admins.")
     @PostMapping("/delete")
@@ -91,6 +103,12 @@ public class ApiController implements BaseController {
         }));
     }
 
+    /**
+     * Modify an existing registered API endpoint's metadata.
+     *
+     * @param entityVO API endpoint payload to update
+     * @return update-success status; restricted to system admins
+     */
     @PreAuthorize("@perm.can('api', 'update')")
     @Operation(summary = "Update API Endpoint", description = "Modify an existing registered API endpoint's metadata. Restricted to system admins; returns an update-success result.")
     @PostMapping("/update")
@@ -103,6 +121,12 @@ public class ApiController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch one registered API endpoint by its ID.
+     *
+     * @param id id of the API endpoint to fetch
+     * @return the matched ApiVO; read access is open to all authenticated users
+     */
     @PreAuthorize("@perm.can('api', 'get')")
     @Operation(summary = "Get API Endpoint by ID", description = "Fetch one registered API endpoint by its ID. Read access is open to all authenticated users; returns the full API endpoint detail.")
     @GetMapping("/get_by_id")
@@ -115,6 +139,12 @@ public class ApiController implements BaseController {
         });
     }
 
+    /**
+     * Page through registered API endpoints with filters from the query body.
+     *
+     * @param entityQuery optional filter criteria; an empty query pages all endpoints
+     * @return a page of ApiVO matching the query; read access is open to all authenticated users
+     */
     @PreAuthorize("@perm.can('api', 'list')")
     @Operation(summary = "List API Endpoints", description = "Page through registered API endpoints with filters from the query body. Read access is open to all authenticated users; returns a page of API endpoints.")
     @PostMapping("/list")

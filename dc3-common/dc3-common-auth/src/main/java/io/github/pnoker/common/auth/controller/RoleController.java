@@ -68,6 +68,12 @@ public class RoleController implements BaseController {
 
     private final RoleService roleService;
 
+    /**
+     * Create a named role that bundles permissions for the current tenant.
+     *
+     * @param entityVO role payload to create
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('role', 'add')")
     @Operation(summary = "Add Role", description = "Create a named permission bundle for the current tenant. A role groups resources (permissions) that can later be assigned to principals; returns the new role ID.")
     @PostMapping("/add")
@@ -84,6 +90,12 @@ public class RoleController implements BaseController {
         }));
     }
 
+    /**
+     * Remove a role by ID, scoped to the current tenant.
+     *
+     * @param id id of the role to delete
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('role', 'delete')")
     @Operation(summary = "Delete Role", description = "Remove a role by ID, scoped to the current tenant. Deleting detaches the role from its bound resources and principals; the caller must own the role.")
     @PostMapping("/delete")
@@ -95,6 +107,12 @@ public class RoleController implements BaseController {
         }));
     }
 
+    /**
+     * Modify a tenant-owned role's attributes after verifying ownership.
+     *
+     * @param entityVO role payload to apply
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('role', 'update')")
     @Operation(summary = "Update Role", description = "Modify a tenant-owned role's attributes such as name and enable flag. Verifies ownership before applying; returns the update result.")
     @PostMapping("/update")
@@ -110,6 +128,12 @@ public class RoleController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch one role of the current tenant by its ID.
+     *
+     * @param id id of the role to retrieve
+     * @return the matched RoleVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('role', 'get')")
     @Operation(summary = "Get Role by ID", description = "Fetch one role of the current tenant by its ID. Returns the role's attributes; use to inspect a role before binding resources or principals.")
     @GetMapping("/get_by_id")
@@ -121,6 +145,12 @@ public class RoleController implements BaseController {
         }));
     }
 
+    /**
+     * Page through roles for the current tenant with optional filters.
+     *
+     * @param entityQuery optional role query filters (tenant id is set server-side)
+     * @return a page of RoleVO matching the query
+     */
     @PreAuthorize("@perm.can('role', 'list')")
     @Operation(summary = "List Roles", description = "Page through roles for the current tenant with filters such as name and enable flag. Returns a page of roles; use for browsing or selecting a role to bind.")
     @PostMapping("/list")
@@ -134,6 +164,12 @@ public class RoleController implements BaseController {
         }));
     }
 
+    /**
+     * Return the tenant's roles as a hierarchical tree.
+     *
+     * @param entityQuery optional role query filters (tenant id is set server-side)
+     * @return a list of RoleTreeVO nodes representing the tenant's role hierarchy
+     */
     @PreAuthorize("@perm.can('role', 'list')")
     @Operation(summary = "List Role Tree", description = "Return the tenant's roles as a hierarchical tree. Use when a nested role grouping is needed for selection or display rather than a flat page.")
     @PostMapping("/list_tree")

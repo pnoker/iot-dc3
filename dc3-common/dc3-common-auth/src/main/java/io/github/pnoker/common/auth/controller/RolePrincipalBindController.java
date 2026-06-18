@@ -83,6 +83,12 @@ public class RolePrincipalBindController implements BaseController {
 
     private final TenantMembershipService tenantMembershipService;
 
+    /**
+     * Assign a role to a principal within the current tenant.
+     *
+     * @param entityVO role-principal binding payload to create
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('role_principal_bind', 'add')")
     @Operation(summary = "Bind Principal to Role", description = "Assign a role to a principal (user or service account) within the current tenant. " +
             "Both the role and the principal must already belong to the tenant; returns an add-success response.")
@@ -99,6 +105,12 @@ public class RolePrincipalBindController implements BaseController {
         }));
     }
 
+    /**
+     * Remove a role-principal binding by record ID after verifying tenant ownership.
+     *
+     * @param id id of the binding to delete
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('role_principal_bind', 'delete')")
     @Operation(summary = "Delete Role-principal Binding", description = "Remove a role-principal binding by its record ID. " +
             "Verifies the binding belongs to the current tenant before deleting; use to revoke a role assignment.")
@@ -114,6 +126,12 @@ public class RolePrincipalBindController implements BaseController {
         }));
     }
 
+    /**
+     * Page through role-principal bindings for the current tenant.
+     *
+     * @param entityQuery optional binding query filters (tenant id is pinned server-side)
+     * @return a page of RolePrincipalBindVO matching the query
+     */
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
     @Operation(summary = "List Role-principal Bindings", description = "Page through role-principal bindings for the current tenant with optional query filters. " +
             "Returns a page of bindings; use to browse which principals hold which roles.")
@@ -126,11 +144,17 @@ public class RolePrincipalBindController implements BaseController {
         }));
     }
 
+    /**
+     * Return the roles assigned to one principal within the current tenant.
+     *
+     * @param principalId id of the principal whose roles are to be listed
+     * @return a list of RoleVO assigned to the principal
+     */
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
     @Operation(summary = "List Roles by Principal", description = "Return the roles assigned to one principal within the current tenant. " +
             "Accepts a principal ID (must be a tenant member); use to see what permissions a user or service account has.")
     @GetMapping("/list_role_by_principal")
-    public Mono<R<List<RoleVO>>> listRoleByPrincipal(@Parameter(description = "Principal ID") @NotNull @RequestParam(value = "principal_id") Long principalId) {
+    public Mono<R<List<RoleVO>>> listRoleByPrincipal(@Parameter(description = "ID of the principal (user or service account) whose roles are to be listed; must be a member of the current tenant.", example = "1024") @NotNull @RequestParam(value = "principal_id") Long principalId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             tenantMembershipService.requireTenantMember(tenantId, principalId);
             List<RoleBO> roles = rolePrincipalBindService.listRoleByTenantIdAndPrincipalId(tenantId, principalId);
@@ -138,11 +162,17 @@ public class RolePrincipalBindController implements BaseController {
         }));
     }
 
+    /**
+     * Return the human users currently bound to a role, filtered to tenant members.
+     *
+     * @param roleId id of the role whose bound users are to be listed
+     * @return a list of UserVO bound to the role within the tenant
+     */
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
     @Operation(summary = "List Users by Role", description = "Return the human users currently bound to a role (the role must belong to the current tenant). " +
             "Results are filtered to tenant members; use to see who holds a given role.")
     @GetMapping("/list_user_by_role")
-    public Mono<R<List<UserVO>>> listUserByRole(@Parameter(description = "Role ID") @NotNull @RequestParam(value = "role_id") Long roleId) {
+    public Mono<R<List<UserVO>>> listUserByRole(@Parameter(description = "ID of the role whose bound users are to be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, roleService.getById(roleId));
             List<UserBO> users = rolePrincipalBindService.listUserByRoleId(roleId)

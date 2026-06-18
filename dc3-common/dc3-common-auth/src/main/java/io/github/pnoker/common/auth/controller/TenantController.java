@@ -68,10 +68,10 @@ public class TenantController implements BaseController {
     private final TenantService tenantService;
 
     /**
-     * Tenant
+     * Create a new tenant as a multi-tenant isolation boundary (system administrators only).
      *
-     * @param entityVO {@link TenantVO}
-     * @return R of String
+     * @param entityVO tenant payload to create
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('tenant', 'add')")
     @Operation(summary = "Add Tenant", description = "Create a new tenant as the multi-tenant isolation boundary that owns its users, devices and data. Restricted to system administrators; returns the new tenant code.")
@@ -93,10 +93,10 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * ID Tenant
+     * Remove a tenant by ID; non-administrators may delete only their own tenant.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the tenant to delete
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('tenant', 'delete')")
     @Operation(summary = "Delete Tenant", description = "Remove a tenant by ID, deleting the isolation boundary and its owned data. Non-administrators may delete only their own tenant.")
@@ -114,14 +114,10 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * ID Tenant
-     * <ol>
-     * <li>: Enable</li>
-     * <li>: Name</li>
-     * </ol>
+     * Modify a tenant's editable attributes; non-administrators may update only their own tenant.
      *
-     * @param entityVO {@link TenantVO}
-     * @return R of String
+     * @param entityVO tenant payload to apply
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('tenant', 'update')")
     @Operation(summary = "Update Tenant", description = "Modify a tenant's editable attributes such as name and enable flag. Non-administrators may update only their own tenant.")
@@ -140,10 +136,10 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * ID Tenant
+     * Fetch one tenant by ID; non-administrators are scoped to their own tenant.
      *
-     * @param id ID
-     * @return TenantVO {@link TenantVO}
+     * @param id id of the tenant to retrieve
+     * @return the matched TenantVO; non-administrators get not-found for any other tenant
      */
     @PreAuthorize("@perm.can('tenant', 'get')")
     @Operation(summary = "Get Tenant by ID", description = "Fetch one tenant by its primary key. Non-administrators are scoped to their own tenant and get a not-found result for any other ID.")
@@ -162,10 +158,10 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * Code Tenant
+     * Look up a tenant by its unique code; non-administrators are scoped to their own tenant.
      *
-     * @param code TenantCode
-     * @return {@link TenantVO}
+     * @param code unique business code of the tenant to retrieve
+     * @return the matched TenantVO, or a no-resource failure when not found or out of scope
      */
     @PreAuthorize("@perm.can('tenant', 'get')")
     @Operation(summary = "Get Tenant by Code", description = "Look up a tenant by its unique tenant code. Non-administrators are scoped to their own tenant and receive a not-found result for any other code.")
@@ -186,10 +182,10 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * Tenant
+     * Page through tenants matching query filters; non-administrators see only their own.
      *
-     * @param entityQuery Tenant
-     * @return {@link TenantBO}
+     * @param entityQuery optional tenant query filters
+     * @return a page of TenantVO visible to the caller
      */
     @PreAuthorize("@perm.can('tenant', 'list')")
     @Operation(summary = "List Tenants", description = "Page through tenants matching the query filters (tenant code, name, enable flag). System administrators see all tenants; others see only their own.")

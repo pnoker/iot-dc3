@@ -81,6 +81,12 @@ public class RoleResourceBindController implements BaseController {
 
     private final TenantMembershipService tenantMembershipService;
 
+    /**
+     * Bind a single resource (permission) to a role under the current tenant.
+     *
+     * @param entityVO role-resource binding payload to create
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('role_resource_bind', 'add')")
     @Operation(summary = "Add Role-Resource Binding", description = "Bind a single resource (permission) to a role under the current tenant. " +
             "The role must belong to the tenant; use to attach an individual permission to a role.")
@@ -94,6 +100,12 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
+    /**
+     * Remove a single role-resource binding by record ID after verifying tenant ownership.
+     *
+     * @param id id of the binding to delete
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('role_resource_bind', 'delete')")
     @Operation(summary = "Delete Role-Resource Binding", description = "Remove a single role-resource binding by its record ID. " +
             "The binding's role must belong to the current tenant; returns the deletion result.")
@@ -107,6 +119,12 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
+    /**
+     * Page through role-resource binding records for the current tenant.
+     *
+     * @param entityQuery optional binding query filters (tenant id is pinned server-side)
+     * @return a page of RoleResourceBindVO matching the query
+     */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(summary = "List Role-Resource Bindings", description = "Page through role-resource binding records for the current tenant. " +
             "Accepts filter criteria; returns a page of bindings showing which resources each role grants.")
@@ -120,6 +138,12 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
+    /**
+     * Return the resources (permissions) granted to a role within the current tenant.
+     *
+     * @param roleId id of the role whose granted resources are to be listed
+     * @return a list of ResourceVO granted to the role
+     */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(summary = "List Resources by Role", description = "Return the full set of resources (permissions) granted to a role. " +
             "The role must belong to the current tenant; use to inspect what a role can do.")
@@ -133,6 +157,12 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
+    /**
+     * Resolve a principal's effective permissions by aggregating resources across its roles.
+     *
+     * @param principalId id of the principal whose effective permissions are to be resolved
+     * @return a deduplicated list of ResourceVO the principal can access within the tenant
+     */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(summary = "List Resources by Principal", description = "Resolve the effective permissions of a principal (user or service account) " +
             "by aggregating resources from every role assigned to it within the current tenant. " +
@@ -147,6 +177,12 @@ public class RoleResourceBindController implements BaseController {
         }));
     }
 
+    /**
+     * Return the roles within the current tenant that grant a given resource (permission).
+     *
+     * @param resourceId id of the resource for which to list the granting roles
+     * @return a list of RoleVO that grant the resource within the tenant
+     */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(summary = "List Roles by Resource", description = "Return the roles within the current tenant that grant a given resource (permission). " +
             "Use to find which roles can perform a specific action.")

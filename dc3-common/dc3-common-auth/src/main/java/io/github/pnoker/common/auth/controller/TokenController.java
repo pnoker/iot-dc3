@@ -57,8 +57,10 @@ public class TokenController implements BaseController {
     private final TokenService tokenService;
 
     /**
-     * @param entityVO {@link TokenQuery}
-     * @return
+     * Generate a random password salt for a user under the given tenant.
+     *
+     * @param entityVO query carrying the user name and tenant used to mint the salt
+     * @return the salt string (expires in 5 minutes), or a failure when the user cannot be resolved
      */
     // Public endpoint: invoked before login, so no @PreAuthorize. Path is also
     // permitted in WebFluxSecurityConfig (POST /token/salt).
@@ -75,10 +77,10 @@ public class TokenController implements BaseController {
     }
 
     /**
-     * Token
+     * Issue an access token for a user after validating name, salt, password and tenant.
      *
-     * @param entityVO {@link TokenQuery}
-     * @return Token
+     * @param entityVO query carrying the user name, salt, password and tenant
+     * @return the access token (valid for 12 hours), or a failure when credentials are invalid
      */
     // Public endpoint: invoked during login (before a token exists), so no
     // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/generate).
@@ -120,7 +122,7 @@ public class TokenController implements BaseController {
     /**
      * Acknowledge a client-initiated logout for the current token.
      *
-     * @param entityVO {@link TokenQuery}
+     * @param entityVO {@link TokenQuery} carrying the name and tenant identifying the token to cancel
      * @return true when the logout was accepted
      */
     @PreAuthorize("@perm.can('token', 'delete')")
@@ -135,10 +137,10 @@ public class TokenController implements BaseController {
     }
 
     /**
-     * Token
+     * Check whether the supplied token for the named user and tenant is still valid.
      *
-     * @param entityVO {@link TokenQuery}
-     * @return ,
+     * @param entityVO query carrying the user name, salt, token and tenant to validate
+     * @return the token validity flag, with a message stating its expiry or expiration time
      */
     @PreAuthorize("@perm.can('token', 'get')")
     @Operation(summary = "Validate Token", description = "Check whether the supplied token for the named user and tenant is still valid. " +

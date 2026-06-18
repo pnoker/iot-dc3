@@ -58,7 +58,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * User Profile Controller (dc3_user)
+ * REST controller exposing user account management endpoints.
  *
  * @author pnoker
  * @version 2026.5.17
@@ -79,6 +79,12 @@ public class UserController implements BaseController {
 
     private final PrincipalManager principalManager;
 
+    /**
+     * Create a user under the current tenant and enroll them as an active tenant member.
+     *
+     * @param entityVO user payload to create
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('user', 'add')")
     @Operation(summary = "Add User", description = "Create a new user under the current tenant and enroll them as an active tenant member. A user authenticates with username and password to access the platform; returns an add-success status.")
     @PostMapping("/add")
@@ -120,6 +126,12 @@ public class UserController implements BaseController {
         }));
     }
 
+    /**
+     * Remove a user and their tenant membership, verified via principal ownership.
+     *
+     * @param id id of the user to delete
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('user', 'delete')")
     @Operation(summary = "Delete User", description = "Remove a user and their tenant membership for the current tenant (verified by ID). Use to revoke a tenant member's access; returns a delete-success status.")
     @PostMapping("/delete")
@@ -137,6 +149,12 @@ public class UserController implements BaseController {
         }));
     }
 
+    /**
+     * Modify an existing user's profile after verifying tenant ownership via principal.
+     *
+     * @param entityVO user payload to apply
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('user', 'update')")
     @Operation(summary = "Update User", description = "Modify an existing user's profile (tenant-scoped, verified by ID). Use to change attributes like nickname or enable flag; returns an update-success status.")
     @PostMapping("/update")
@@ -153,6 +171,12 @@ public class UserController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch one user by ID within the current tenant (ownership checked via principal).
+     *
+     * @param id id of the user to retrieve
+     * @return the matched UserVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('user', 'get')")
     @Operation(summary = "Get User by ID", description = "Fetch one user by ID within the current tenant (ownership checked via principal). Returns the user profile; use when you already hold the numeric ID.")
     @GetMapping("/get_by_id")
@@ -165,6 +189,12 @@ public class UserController implements BaseController {
         }));
     }
 
+    /**
+     * Look up one user by username within the current tenant.
+     *
+     * @param name username (login name) of the user to retrieve
+     * @return the matched UserVO; not-found and wrong-tenant both 404 to avoid leaking name existence
+     */
     @PreAuthorize("@perm.can('user', 'get')")
     @Operation(summary = "Get User by Name", description = "Look up one user by username within the current tenant. Returns a 404 for both not-found and wrong-tenant so name existence is not leaked; use when resolving a login name to a profile.")
     @GetMapping("/get_by_name")
@@ -182,6 +212,12 @@ public class UserController implements BaseController {
         }));
     }
 
+    /**
+     * Page through users for the current tenant with optional filters (tenant scope enforced server-side).
+     *
+     * @param entityQuery optional user query filters (tenant id is overwritten server-side)
+     * @return a page of UserVO matching the query
+     */
     @PreAuthorize("@perm.can('user', 'list')")
     @Operation(summary = "List Users", description = "Page through users for the current tenant with filters from the query body (tenant scope is enforced server-side, not client-supplied). Returns a page of user profiles for browsing or selecting a target user.")
     @PostMapping("/list")

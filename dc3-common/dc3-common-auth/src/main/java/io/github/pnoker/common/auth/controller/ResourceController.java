@@ -71,6 +71,12 @@ public class ResourceController implements BaseController {
 
     private final AdminChecker adminChecker;
 
+    /**
+     * Create a new resource, the permission-grantable unit an endpoint declares.
+     *
+     * @param entityVO resource payload to create (e.g. code such as "device:add")
+     * @return add-success status; restricted to system admins
+     */
     @PreAuthorize("@perm.can('resource', 'add')")
     @Operation(summary = "Add Resource", description = "Create a new resource, the permission-grantable unit an endpoint declares (e.g. \"device:add\"). Restricted to system admins; returns the new resource ID.")
     @PostMapping("/add")
@@ -87,6 +93,12 @@ public class ResourceController implements BaseController {
         }));
     }
 
+    /**
+     * Remove a resource permission unit by ID, severing any role bindings that granted it.
+     *
+     * @param id id of the resource to delete
+     * @return delete-success status; restricted to system admins
+     */
     @PreAuthorize("@perm.can('resource', 'delete')")
     @Operation(summary = "Delete Resource by ID", description = "Remove a resource permission unit by ID. Restricted to system admins; deleting severs any role bindings that granted it.")
     @PostMapping("/delete")
@@ -98,6 +110,12 @@ public class ResourceController implements BaseController {
         }));
     }
 
+    /**
+     * Modify an existing resource's definition (e.g. its code or metadata).
+     *
+     * @param entityVO resource payload to update
+     * @return update-success status; restricted to system admins, the change applies to every bound role
+     */
     @PreAuthorize("@perm.can('resource', 'update')")
     @Operation(summary = "Update Resource", description = "Modify an existing resource's definition (e.g. its code or metadata). Restricted to system admins; the change takes effect for every role bound to this resource.")
     @PostMapping("/update")
@@ -112,6 +130,12 @@ public class ResourceController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch one resource (the permission-grantable unit) by ID.
+     *
+     * @param id id of the resource to fetch
+     * @return the matched ResourceVO; read access is open to all authenticated users
+     */
     @PreAuthorize("@perm.can('resource', 'get')")
     @Operation(summary = "Get Resource by ID", description = "Fetch one resource (the permission-grantable unit) by ID. Read access is open to all authenticated users; use to resolve a permission code before binding it to a role.")
     @GetMapping("/get_by_id")
@@ -124,6 +148,12 @@ public class ResourceController implements BaseController {
         });
     }
 
+    /**
+     * Page through resources (the permission-grantable units) with query filters.
+     *
+     * @param entityQuery optional filter criteria; an empty query pages all resources
+     * @return a page of ResourceVO matching the query; read access is open to all authenticated users
+     */
     @PreAuthorize("@perm.can('resource', 'list')")
     @Operation(summary = "List Resources", description = "Page through resources (the permission-grantable units) with query filters. Read access is open to all authenticated users; returns a page of resources for browsing or selecting a target.")
     @PostMapping("/list")
@@ -137,6 +167,12 @@ public class ResourceController implements BaseController {
         });
     }
 
+    /**
+     * Return resources as a nested tree reflecting the permission hierarchy.
+     *
+     * @param entityQuery optional filter criteria; an empty query returns the full resource tree
+     * @return a tree of ResourceTreeVO mirroring the permission hierarchy; read access is open to all authenticated users
+     */
     @PreAuthorize("@perm.can('resource', 'list')")
     @Operation(summary = "List Resource Tree", description = "Return resources as a nested tree reflecting the permission hierarchy (e.g. resource group -> permission code). Read access is open to all authenticated users; use to render permission pickers or inspect parent/child relationships.")
     @PostMapping("/list_tree")

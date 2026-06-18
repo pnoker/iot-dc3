@@ -67,6 +67,12 @@ public class PrincipalController implements BaseController {
 
     private final AuditLogService auditLogService;
 
+    /**
+     * Fetch one principal (user or service account) by ID.
+     *
+     * @param id id of the principal to fetch
+     * @return the matched PrincipalVO; the principal is the identity roles and permissions bind to
+     */
     @PreAuthorize("@perm.can('principal', 'get')")
     @Operation(summary = "Get Principal by ID", description = "Fetch one principal (user or service account) by ID. " +
             "A principal is the abstract identity that roles and permissions bind to; use to resolve an identity before binding roles or auditing access.")
@@ -75,6 +81,12 @@ public class PrincipalController implements BaseController {
         return async(() -> R.ok(principalBuilder.buildVOByBO(principalService.getById(id))));
     }
 
+    /**
+     * Page through principals (users and service accounts) for the current tenant.
+     *
+     * @param entityQuery optional filter criteria; an empty query pages all principals
+     * @return a page of PrincipalVO matching the query
+     */
     @PreAuthorize("@perm.can('principal', 'list')")
     @Operation(summary = "List Principals", description = "Page through principals (users and service accounts) for the current tenant. " +
             "Accepts a PrincipalQuery body for filtering; returns a page of PrincipalVO entries for browsing or selecting a target identity.")
@@ -84,6 +96,12 @@ public class PrincipalController implements BaseController {
         return async(() -> R.ok(principalBuilder.buildVOPageByBOPage(principalService.list(query))));
     }
 
+    /**
+     * Set a principal's enable flag to ENABLE so the identity can authenticate.
+     *
+     * @param id id of the principal to enable
+     * @return update-success status; an ENABLE audit-log entry is recorded under the acting caller
+     */
     @PreAuthorize("@perm.can('principal', 'update')")
     @Operation(summary = "Enable Principal", description = "Set a principal's enable flag to ENABLE by ID so the identity can authenticate. " +
             "Tenant-scoped; records an ENABLE audit-log entry under the acting caller.")
@@ -92,6 +110,12 @@ public class PrincipalController implements BaseController {
         return toggleEnableFlag(id, EnableFlagEnum.ENABLE);
     }
 
+    /**
+     * Set a principal's enable flag to DISABLE to revoke active access for that identity.
+     *
+     * @param id id of the principal to disable
+     * @return update-success status; a DISABLE audit-log entry is recorded under the acting caller
+     */
     @PreAuthorize("@perm.can('principal', 'update')")
     @Operation(summary = "Disable Principal", description = "Set a principal's enable flag to DISABLE by ID to revoke active access for that identity. " +
             "Tenant-scoped; records a DISABLE audit-log entry under the acting caller.")

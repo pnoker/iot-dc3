@@ -64,6 +64,11 @@ public class McpManagementController implements BaseController {
 
     private final OAuthMcpRuntimeService oauthMcpRuntimeService;
 
+    /**
+     * Fetch the OAuth authorization server metadata for the MCP runtime.
+     *
+     * @return the authorization server metadata (issuer, token and registration endpoints)
+     */
     @PreAuthorize("@perm.can('mcp', 'get')")
     @Operation(summary = "Get MCP OAuth Metadata", description = "Fetch the OAuth authorization server metadata for the MCP runtime, "
             + "including issuer, token and registration endpoints. Use to discover how MCP clients should authenticate.")
@@ -72,6 +77,12 @@ public class McpManagementController implements BaseController {
         return async(() -> R.ok(oauthMcpRuntimeService.authorizationServerMetadata()));
     }
 
+    /**
+     * Register an OAuth client owned by the current principal for MCP access.
+     *
+     * @param request OAuth client registration payload (grant types, redirects, scopes)
+     * @return the registration response carrying the new client id and one-time secret
+     */
     @PreAuthorize("@perm.can('mcp', 'add')")
     @Operation(summary = "Register OAuth Client", description = "Register an OAuth client owned by the current principal for MCP access. "
             + "Returns the client id and secret; the secret is shown only once at registration time.")
@@ -82,6 +93,11 @@ public class McpManagementController implements BaseController {
                 header))));
     }
 
+    /**
+     * List the OAuth clients owned by the current principal.
+     *
+     * @return the principal's client records, without secrets
+     */
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List OAuth Clients", description = "List the OAuth clients the current principal owns. "
             + "Returns client records without secrets; use to pick a client before creating or inspecting a connection.")
@@ -90,6 +106,11 @@ public class McpManagementController implements BaseController {
         return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listClients(header))));
     }
 
+    /**
+     * List the MCP connections owned by the current principal.
+     *
+     * @return the principal's connections, each binding an OAuth client to a tool whitelist
+     */
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List MCP Connections", description = "List the MCP connections owned by the current principal. "
             + "Each connection binds an OAuth client to a tool whitelist; use to review which clients are wired up.")
@@ -99,6 +120,12 @@ public class McpManagementController implements BaseController {
                 .flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listConnections(header))));
     }
 
+    /**
+     * Create an MCP connection linking an OAuth client to an allowed tool set.
+     *
+     * @param connection connection payload binding a registered OAuth client to a tool whitelist
+     * @return the persisted connection record; the client must already be registered
+     */
     @PreAuthorize("@perm.can('mcp', 'add')")
     @Operation(summary = "Create MCP Connection", description = "Create an MCP connection linking an OAuth client to an allowed tool set for the current principal. "
             + "Returns the persisted connection record; the client must already be registered.")
@@ -108,6 +135,12 @@ public class McpManagementController implements BaseController {
                 .flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.createConnection(connection, header))));
     }
 
+    /**
+     * Revoke an MCP connection by id, severing its OAuth client from the tool whitelist.
+     *
+     * @param id id of the MCP connection to revoke; only the owning principal may revoke it
+     * @return true on successful revocation
+     */
     @PreAuthorize("@perm.can('mcp', 'delete')")
     @Operation(summary = "Revoke MCP Connection", description = "Revoke an MCP connection by id, severing its OAuth client from the tool whitelist. "
             + "Only the principal that owns the connection may revoke it; returns true on success.")
@@ -119,6 +152,12 @@ public class McpManagementController implements BaseController {
         }));
     }
 
+    /**
+     * Replace a connection's tool whitelist with the supplied tool ids.
+     *
+     * @param request payload carrying the connection id and the new tool id list
+     * @return true on successful replacement; the previous whitelist is fully overwritten
+     */
     @PreAuthorize("@perm.can('mcp', 'update')")
     @Operation(summary = "Replace MCP Connection Tools", description = "Replace a connection's tool whitelist with the supplied tool ids, scoped to the owning principal. "
             + "The previous whitelist is fully overwritten; returns true on success.")
@@ -133,6 +172,12 @@ public class McpManagementController implements BaseController {
         }));
     }
 
+    /**
+     * List the tool ids a connection is currently allowed to invoke.
+     *
+     * @param id id of the MCP connection whose tool whitelist is listed
+     * @return the connection's effective tool whitelist
+     */
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List MCP Connection Tools", description = "List the tool ids a connection is currently allowed to invoke. "
             + "Use to inspect a connection's effective whitelist before editing or revoking it.")
@@ -142,6 +187,11 @@ public class McpManagementController implements BaseController {
                 header))));
     }
 
+    /**
+     * Rebuild the MCP tool catalog from the registered APIs (dc3_api entries).
+     *
+     * @return the number of tools refreshed in the catalog
+     */
     @PreAuthorize("@perm.can('mcp', 'update')")
     @Operation(summary = "Refresh MCP Tool Catalog", description = "Rebuild the MCP tool catalog from the registered APIs (dc3_api entries). "
             + "Returns the number of tools refreshed; call after API registrations change so the catalog stays current.")
@@ -150,6 +200,12 @@ public class McpManagementController implements BaseController {
         return async(() -> R.ok(oauthMcpRuntimeService.refreshToolCatalog()));
     }
 
+    /**
+     * Page the MCP tool catalog with optional keyword, risk level and limit filters.
+     *
+     * @param request optional catalog filter payload; an empty request lists all tools
+     * @return tool records exposing each tool's schema
+     */
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List MCP Tool Catalog", description = "Page the MCP tool catalog with optional keyword, risk level and limit filters. "
             + "Returns tool records exposing each tool's schema; use to browse tools before whitelisting them on a connection.")
@@ -164,6 +220,16 @@ public class McpManagementController implements BaseController {
         )));
     }
 
+    /**
+     * List MCP tool-call audit entries scoped to the caller's tenant.
+     *
+     * @param principalId optional filter by owning principal id
+     * @param toolId      optional filter by MCP tool id
+     * @param status      optional filter by invocation outcome (SUCCESS, DENIED, POLICY_DENIED, ERROR, UNKNOWN)
+     * @param riskLevel   optional filter by tool risk level (LOW, MEDIUM, HIGH)
+     * @param limit       optional cap on the number of records returned
+     * @return append-only audit records matching the filters
+     */
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List MCP Audit Log", description = "List MCP tool-call audit entries scoped to the caller's tenant, "
             + "filterable by principal, tool, status and risk level. Returns append-only records kept for compliance review.")

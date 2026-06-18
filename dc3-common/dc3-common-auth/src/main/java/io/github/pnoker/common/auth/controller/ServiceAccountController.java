@@ -73,6 +73,12 @@ public class ServiceAccountController implements BaseController {
 
     private final TenantMembershipService tenantMembershipService;
 
+    /**
+     * Create a non-human service account principal under the current tenant.
+     *
+     * @param entityVO service account payload to create
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('service_account', 'add')")
     @Operation(summary = "Add Service Account", description = "Create a non-human service account principal under the current tenant for API/MCP access. "
             + "The named owner principal must already be a tenant member; returns the create result.")
@@ -88,6 +94,12 @@ public class ServiceAccountController implements BaseController {
         }));
     }
 
+    /**
+     * Delete a service account by ID, scoped to the current tenant.
+     *
+     * @param id id of the service account to delete
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('service_account', 'delete')")
     @Operation(summary = "Delete Service Account", description = "Delete a service account by ID, scoped to the current tenant. "
             + "Removes the machine principal so its credentials can no longer authenticate; returns the delete result.")
@@ -100,6 +112,12 @@ public class ServiceAccountController implements BaseController {
         }));
     }
 
+    /**
+     * Update a tenant-scoped service account's editable attributes.
+     *
+     * @param entityVO service account payload to apply
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('service_account', 'update')")
     @Operation(summary = "Update Service Account", description = "Update a tenant-scoped service account's name, purpose, expiry, owner or credential policy. "
             + "Tenant and ID are taken from the existing record; any new owner principal must be a tenant member.")
@@ -120,6 +138,12 @@ public class ServiceAccountController implements BaseController {
         }));
     }
 
+    /**
+     * Set a service account's enable flag to ENABLE so its credentials can authenticate.
+     *
+     * @param id id of the service account to enable
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('service_account', 'update')")
     @Operation(summary = "Enable Service Account", description = "Set a service account's enable flag to ENABLE so its credentials can authenticate again. "
             + "Tenant-scoped and audit-logged as an ENABLE action.")
@@ -128,6 +152,12 @@ public class ServiceAccountController implements BaseController {
         return toggleEnableFlag(id, EnableFlagEnum.ENABLE);
     }
 
+    /**
+     * Set a service account's enable flag to DISABLE to block its credentials from authenticating.
+     *
+     * @param id id of the service account to disable
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('service_account', 'update')")
     @Operation(summary = "Disable Service Account", description = "Set a service account's enable flag to DISABLE to block its credentials from authenticating. "
             + "Tenant-scoped and audit-logged as a DISABLE action.")
@@ -151,6 +181,12 @@ public class ServiceAccountController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch one service account by ID, scoped to the current tenant.
+     *
+     * @param id id of the service account to retrieve
+     * @return the matched ServiceAccountVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('service_account', 'get')")
     @Operation(summary = "Get Service Account by ID", description = "Fetch one service account by ID, scoped to the current tenant. "
             + "Returns the principal, owner, purpose, expiry and enable flag; use to inspect an account before rotating its credentials.")
@@ -162,6 +198,12 @@ public class ServiceAccountController implements BaseController {
         }));
     }
 
+    /**
+     * Page through service accounts for the current tenant with optional filters.
+     *
+     * @param entityQuery optional service account query filters (tenant id is set server-side)
+     * @return a page of ServiceAccountVO matching the query
+     */
     @PreAuthorize("@perm.can('service_account', 'list')")
     @Operation(summary = "List Service Accounts", description = "Page through service accounts for the current tenant with the supplied query filters. "
             + "Returns a page of service accounts; use to browse machine principals or select a target account.")

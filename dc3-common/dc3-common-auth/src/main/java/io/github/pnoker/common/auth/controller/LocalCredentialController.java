@@ -69,6 +69,12 @@ public class LocalCredentialController implements BaseController {
 
     private final TenantMembershipService tenantMembershipService;
 
+    /**
+     * Store a secret credential for a principal under the current tenant.
+     *
+     * @param entityVO local credential payload to create
+     * @return add-success status; the caller must be a tenant member of the target principal
+     */
     @PreAuthorize("@perm.can('local_credential', 'add')")
     @Operation(summary = "Add Local Credential", description = "Store a secret credential (e.g. password or API key) for a principal under the current tenant. " +
             "The caller must be a tenant member of the target principal; returns the new credential record id.")
@@ -83,6 +89,12 @@ public class LocalCredentialController implements BaseController {
         }));
     }
 
+    /**
+     * Remove a stored credential by id, revoking that secret for its principal.
+     *
+     * @param id id of the local credential to delete; its principal must belong to the current tenant
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('local_credential', 'delete')")
     @Operation(summary = "Delete Local Credential", description = "Remove a stored credential by id. The credential's principal must belong to the current tenant; revokes that secret for the principal.")
     @PostMapping("/delete")
@@ -95,6 +107,12 @@ public class LocalCredentialController implements BaseController {
         }));
     }
 
+    /**
+     * Modify an existing credential's metadata without changing its owning principal.
+     *
+     * @param entityVO local credential payload to update; principal id is preserved from the stored record
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('local_credential', 'update')")
     @Operation(summary = "Update Local Credential", description = "Modify an existing credential's metadata. The principal id is preserved from the stored record; use to rotate attributes without changing ownership.")
     @PostMapping("/update")
@@ -111,11 +129,18 @@ public class LocalCredentialController implements BaseController {
         }));
     }
 
+    /**
+     * Replace the raw password of a credential by id with a new value.
+     *
+     * @param id       id of the local credential to reset; its principal must belong to the current tenant
+     * @param password new raw password that satisfies the system password policy
+     * @return true on successful reset
+     */
     @PreAuthorize("@perm.can('local_credential', 'update')")
     @Operation(summary = "Reset Local Credential Password", description = "Replace the raw password of a credential by id with a new value. Use to rotate or recover a principal's stored secret; returns true on success.")
     @PostMapping("/reset_password")
-    public Mono<R<Boolean>> resetPassword(@Parameter(description = "Primary key of the entity to query. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id,
-                                          @Parameter(description = "New raw password") @NotNull @RequestParam(value = "password") String password) {
+    public Mono<R<Boolean>> resetPassword(@Parameter(description = "Primary key of the local credential to reset. The credential's principal must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id,
+                                          @Parameter(description = "New raw password to replace the current one. Must meet the system's password policy.", example = "P@ssw0rd!") @NotNull @RequestParam(value = "password") String password) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LocalCredentialBO entityBO = localCredentialService.getById(id);
             tenantMembershipService.requireTenantMember(tenantId, entityBO.getPrincipalId());
@@ -124,6 +149,12 @@ public class LocalCredentialController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch one credential by id without exposing the raw secret.
+     *
+     * @param id id of the local credential to fetch; its principal must belong to the current tenant
+     * @return the matched LocalCredentialVO (raw secret omitted)
+     */
     @PreAuthorize("@perm.can('local_credential', 'get')")
     @Operation(summary = "Get Local Credential by ID", description = "Fetch one credential by id. The credential's principal must belong to the current tenant; returns the credential view without exposing the raw secret.")
     @GetMapping("/get_by_id")
@@ -135,13 +166,25 @@ public class LocalCredentialController implements BaseController {
         }));
     }
 
+    /**
+     * Test whether a login name is free to register.
+     *
+     * @param name login name to check for availability
+     * @return true when no existing credential currently uses the name
+     */
     @PreAuthorize("@perm.can('local_credential', 'get')")
     @Operation(summary = "Check Login Name Availability", description = "Test whether a login name is free to register. Returns true when no credential currently uses the name; use before creating a new credential to avoid collisions.")
     @GetMapping("/check")
-    public Mono<R<Boolean>> checkLoginNameAvailable(@Parameter(description = "Unique name of the entity to query within the current tenant.", example = "Temperature Sensor 01") @NotNull @RequestParam(value = "name") String name) {
+    public Mono<R<Boolean>> checkLoginNameAvailable(@Parameter(description = "Login name to check for availability. Returns true when no existing credential uses this name.", example = "alice") @NotNull @RequestParam(value = "name") String name) {
         return async(() -> R.ok(localCredentialService.isLoginNameAvailable(name)));
     }
 
+    /**
+     * Page through credentials for the current tenant with query filters.
+     *
+     * @param entityQuery optional filter criteria such as principal and login name; an empty query pages all credentials
+     * @return a page of LocalCredentialVO matching the query
+     */
     @PreAuthorize("@perm.can('local_credential', 'list')")
     @Operation(summary = "List Local Credentials", description = "Page through credentials for the current tenant with query filters such as principal and login name. Returns a page of credential views; use to browse or select a target credential.")
     @PostMapping("/list")
