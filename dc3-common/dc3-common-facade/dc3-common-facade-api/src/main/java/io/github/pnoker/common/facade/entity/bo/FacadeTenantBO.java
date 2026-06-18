@@ -19,7 +19,6 @@ package io.github.pnoker.common.facade.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,18 +38,14 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-@Schema(description = "Facade Tenant business object")
 public class FacadeTenantBO extends BaseBO {
 
-    @Schema(description = "tenant name")
 
     private String tenantName;
 
-    @Schema(description = "tenant code")
 
     private String tenantCode;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 

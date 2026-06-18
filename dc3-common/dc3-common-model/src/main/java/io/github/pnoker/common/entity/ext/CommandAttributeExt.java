@@ -33,7 +33,7 @@ import java.util.Map;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Schema(description = "Command attribute extension. JSON extension object describing the configuration of a single command attribute, including UI rendering, validation rules, security and applicability scope.")
+@Schema(description = "Command attribute extension. JSON extension object describing the configuration of a single command attribute, including UI rendering, validation rules, security and applicability scope.", example = "READ")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -55,7 +55,7 @@ public class CommandAttributeExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Retention strategy for the attribute value, indicating whether and how the value is kept.")
+        @Schema(description = "Retention strategy for the attribute value, indicating whether and how the value is kept.", example = "true")
         private String keep;
 
         @Schema(description = "UI rendering configuration for the attribute.")
@@ -72,67 +72,67 @@ public class CommandAttributeExt extends BaseExt {
 
     }
 
-    @Schema(description = "UI rendering configuration. Describes how the command attribute is displayed and edited in the front-end form.")
+    @Schema(description = "UI rendering configuration. Describes how the command attribute is displayed and edited in the front-end form.", example = "form")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Ui {
 
-        @Schema(description = "Front-end component type used to render the attribute input.")
+        @Schema(description = "Front-end component type used to render the attribute input.", example = "input")
         private String component;
 
-        @Schema(description = "Whether the attribute is required in the UI form.")
+        @Schema(description = "Whether the attribute is required in the UI form.", example = "true")
         private Boolean required;
 
-        @Schema(description = "Placeholder text displayed in the input when empty.")
+        @Schema(description = "Placeholder text displayed in the input when empty.", example = "请输入")
         private String placeholder;
 
         @Schema(description = "Selectable options for the input, each option represented as a key-value map.")
         private List<Map<String, Object>> options;
 
-        @Schema(description = "Group name used to organize related attributes in the UI.")
+        @Schema(description = "Group name used to organize related attributes in the UI.", example = "basic")
         private String group;
 
-        @Schema(description = "Display order of the attribute within its group.")
+        @Schema(description = "Display order of the attribute within its group.", example = "1")
         private Integer order;
 
-        @Schema(description = "Associated variables used during rendering or value substitution.")
+        @Schema(description = "Associated variables used during rendering or value substitution.", example = "${value}")
         private String variables;
 
     }
 
-    @Schema(description = "Validation rules. Constraints applied to the command attribute value.")
+    @Schema(description = "Validation rules. Constraints applied to the command attribute value.", example = "standard")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Validation {
 
-        @Schema(description = "Minimum allowed value or length for the attribute.")
+        @Schema(description = "Minimum allowed value or length for the attribute.", example = "0")
         private String min;
 
-        @Schema(description = "Maximum allowed value or length for the attribute.")
+        @Schema(description = "Maximum allowed value or length for the attribute.", example = "100")
         private String max;
 
-        @Schema(description = "Regular expression that the attribute value must match.")
+        @Schema(description = "Regular expression that the attribute value must match.", example = "^[a-zA-Z0-9_]+$")
         private String regex;
 
     }
 
-    @Schema(description = "Security configuration. Security-related settings for the command attribute.")
+    @Schema(description = "Security configuration. Security-related settings for the command attribute.", example = "basic")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Security {
 
-        @Schema(description = "Whether the attribute value is sensitive and should be masked or protected.")
+        @Schema(description = "Whether the attribute value is sensitive and should be masked or protected.", example = "true")
         private Boolean secret;
 
     }
 
-    @Schema(description = "Applicability scope. Defines the command and call types the attribute applies to.")
+    @Schema(description = "Applicability scope. Defines the command and call types the attribute applies to.", example = "READ")
     @Getter
     @Setter
     @NoArgsConstructor

@@ -151,7 +151,7 @@ public class PointAttributeController implements BaseController {
     @PreAuthorize("@perm.can('point_attribute', 'list')")
     @Operation(summary = "List Point Attributes by Driver ID", description = "Return every point attribute field definition owned by a given driver (tenant-scoped). Use to discover which configurable fields a driver exposes for reading or writing point values; returns an empty list when the driver is not found.")
     @GetMapping("/list_by_driver_id")
-    public Mono<R<List<PointAttributeVO>>> listByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<List<PointAttributeVO>>> listByDriverId(@Parameter(description = "Identifier of the driver whose point attribute field definitions are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             try {
                 requireTenant(tenantId, driverService.getById(driverId));

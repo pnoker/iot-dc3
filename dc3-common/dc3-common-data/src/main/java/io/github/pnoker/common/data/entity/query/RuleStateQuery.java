@@ -52,35 +52,35 @@ public class RuleStateQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
 
     private Long tenantId;
 
-    @Schema(description = "rule ID")
+    @Schema(description = "rule ID", example = "1024")
 
     private Long ruleId;
 
-    @Schema(description = "Alarm target type enum")
+    @Schema(description = "Alarm target type enum", example = "1")
 
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
-    @Schema(description = "Associated entity ID")
+    @Schema(description = "Associated entity ID", example = "2048")
 
     private Long entityId;
 
-    @Schema(description = "Alarm fingerprint")
+    @Schema(description = "Alarm fingerprint", example = "rule_HIGH_TEMP_ALERT_device_1024")
 
     private String fingerprint;
 
-    @Schema(description = "Entity state enum")
+    @Schema(description = "Entity state enum", example = "TRIGGERED")
 
     private RuleStatusEnum entityStateFlag;
 
-    @Schema(description = "alarm ID")
+    @Schema(description = "alarm ID", example = "512")
 
     private Long alarmId;
 

@@ -62,13 +62,13 @@ public class RuleAlarmEventExt extends BaseExt {
         /**
          * Rule code at the time the event was created.
          */
-        @Schema(description = "Rule code at the time the event was created")
+        @Schema(description = "Rule code at the time the event was created", example = "HIGH_TEMP_ALERT")
         private String ruleCode;
 
         /**
          * Rule name at the time the event was created.
          */
-        @Schema(description = "Rule name at the time the event was created")
+        @Schema(description = "Rule name at the time the event was created", example = "High Temperature Alert")
         private String ruleName;
 
         /**
@@ -86,19 +86,19 @@ public class RuleAlarmEventExt extends BaseExt {
         /**
          * Alarm severity at the time the event was created.
          */
-        @Schema(description = "Alarm severity at the time the event was created")
+        @Schema(description = "Alarm severity at the time the event was created", example = "P0")
         private String severity;
 
         /**
          * Business event type produced by the rule.
          */
-        @Schema(description = "Business event type produced by the rule")
+        @Schema(description = "Business event type produced by the rule", example = "TEMP_ALERT")
         private String eventType;
 
         /**
          * Runtime match type, for example FIRING or RECOVERY.
          */
-        @Schema(description = "Runtime match type, for example FIRING or RECOVERY")
+        @Schema(description = "Runtime match type, for example FIRING or RECOVERY", example = "FIRING")
         private String matchType;
 
         /**

@@ -81,15 +81,15 @@ public class EventHistoryVO implements Serializable {
     @Schema(description = "Event level enum", example = "HIGH")
     private EventLevelEnum eventLevelFlag;
 
-    @Schema(description = "Event parameter values")
+    @Schema(description = "Event parameter values", example = "{\"temperature\": \"85\"}")
 
     private String paramValues;
 
-    @Schema(description = "Event configuration snapshot")
+    @Schema(description = "Event configuration snapshot", example = "{\"threshold\": 80}")
 
     private String configSnapshot;
 
-    @Schema(description = "Message content")
+    @Schema(description = "Message content", example = "High temperature alarm triggered: 85°C exceeds 80°C threshold")
 
     private String message;
 
@@ -108,7 +108,7 @@ public class EventHistoryVO implements Serializable {
 
     private LocalDateTime acknowledgeTime;
 
-    @Schema(description = "ID of the user who acknowledged this event. Null if not yet acknowledged.")
+    @Schema(description = "ID of the user who acknowledged this event. Null if not yet acknowledged.", example = "1000")
 
     private Long acknowledgeUserId;
 

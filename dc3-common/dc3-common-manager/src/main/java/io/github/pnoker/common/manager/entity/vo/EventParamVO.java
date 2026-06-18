@@ -56,12 +56,12 @@ public class EventParamVO extends BaseVO {
             groups = {Add.class, Update.class})
     private String paramName;
 
-    @Schema(description = "Event parameter code. Stable business identifier; must not change once deployed.", example = "TEMP_VAL")
+    @Schema(description = "Event parameter code. Stable business identifier; must not change once deployed.", example = "TEMP_VAL", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
     private String paramCode;
 
-    @Schema(description = "Parameter type enum")
+    @Schema(description = "Event parameter data type: STRING, INT, LONG, FLOAT, DOUBLE, or BOOL.", example = "FLOAT", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
     private PointTypeEnum paramTypeFlag;

@@ -17,7 +17,6 @@
 package io.github.pnoker.common.agentic.entity.dto;
 
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +29,6 @@ import lombok.Setter;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Schema(description = "OpenAI-compatible chat message")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -43,13 +41,11 @@ public class ChatMessageDTO {
      * {@link AgenticConstant.Chat#ROLE_ASSISTANT}, or
      * {@link AgenticConstant.Chat#ROLE_TOOL}.
      */
-    @Schema(description = "Message role: system, user, assistant, or tool", example = "user")
     private String role;
 
     /**
      * Message content text.
      */
-    @Schema(description = "Message content text", example = "Show me the latest device status.")
     private String content;
 
 }

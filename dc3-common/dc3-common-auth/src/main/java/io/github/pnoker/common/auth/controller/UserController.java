@@ -168,7 +168,7 @@ public class UserController implements BaseController {
     @PreAuthorize("@perm.can('user', 'get')")
     @Operation(summary = "Get User by Name", description = "Look up one user by username within the current tenant. Returns a 404 for both not-found and wrong-tenant so name existence is not leaked; use when resolving a login name to a profile.")
     @GetMapping("/get_by_name")
-    public Mono<R<UserVO>> getByName(@Parameter(description = "Unique name of the entity to query within the current tenant.", example = "Temperature Sensor 01") @NotNull @RequestParam(value = "name") String name) {
+    public Mono<R<UserVO>> getByName(@Parameter(description = "Username (login name) of the user to look up within the current tenant. Both not-found and wrong-tenant cases return 404 to avoid leaking name existence.", example = "john_doe") @NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserBO entityBO = userService.getByUserName(name, false);
             // Both "not found" and "wrong tenant" return the same 404 so the

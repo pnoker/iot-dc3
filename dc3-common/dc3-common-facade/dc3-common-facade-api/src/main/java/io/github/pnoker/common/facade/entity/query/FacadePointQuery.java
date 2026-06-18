@@ -21,7 +21,6 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.enums.RwTypeEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,52 +44,41 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Facade Point query parameters")
 public class FacadePointQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
 
     private Pages page;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "point name")
 
     private String pointName;
 
-    @Schema(description = "point code")
 
     private String pointCode;
 
-    @Schema(description = "Point type enum")
 
     private PointTypeEnum pointTypeFlag;
 
-    @Schema(description = "Read/write type enum")
 
     private RwTypeEnum rwFlag;
 
-    @Schema(description = "profile ID")
 
     private Long profileId;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 
     /**
      * Device ID — filter points bound to a specific device.
      */
-    @Schema(description = "device ID")
     private Long deviceId;
 
 }

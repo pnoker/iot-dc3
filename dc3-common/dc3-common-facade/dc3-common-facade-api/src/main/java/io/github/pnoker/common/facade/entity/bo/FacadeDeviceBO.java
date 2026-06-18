@@ -20,7 +20,6 @@ package io.github.pnoker.common.facade.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.DeviceExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,42 +42,32 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-@Schema(description = "Facade Device business object")
 public class FacadeDeviceBO extends BaseBO {
 
-    @Schema(description = "device name")
 
     private String deviceName;
 
-    @Schema(description = "device code")
 
     private String deviceCode;
 
-    @Schema(description = "driver ID")
 
     private Long driverId;
 
-    @Schema(description = "device extension information in JSON format")
 
     private DeviceExt deviceExt;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "Configuration signature")
 
     private String signature;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 
-    @Schema(description = "profile ID")
 
     private Long profileId;
 

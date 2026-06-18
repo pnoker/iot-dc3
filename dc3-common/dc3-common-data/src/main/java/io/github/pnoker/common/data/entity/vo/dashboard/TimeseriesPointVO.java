@@ -49,11 +49,11 @@ public class TimeseriesPointVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "time bucket start")
+    @Schema(description = "Start of the time bucket; rendered in the configured timezone.", example = "2026-06-18 10:00:00")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime bucket;
 
-    @Schema(description = "count in this time bucket")
+    @Schema(description = "Number of point values that fall within this time bucket.", example = "128")
     private long count;
 
 }

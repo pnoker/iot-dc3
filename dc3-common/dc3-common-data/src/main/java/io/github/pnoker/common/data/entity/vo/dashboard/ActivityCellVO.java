@@ -44,13 +44,13 @@ public class ActivityCellVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "day of week, 0=Sunday to 6=Saturday")
+    @Schema(description = "Day of week for this heatmap cell; 0=Sunday through 6=Saturday.", example = "3")
     private int dow;
 
-    @Schema(description = "hour of day, 0 to 23")
+    @Schema(description = "Hour of day for this heatmap cell; range 0 to 23.", example = "14")
     private int hour;
 
-    @Schema(description = "sample count in this cell")
+    @Schema(description = "Number of samples aggregated into this day-of-week / hour-of-day cell; non-negative.", example = "128")
     private long count;
 
 }

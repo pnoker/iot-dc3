@@ -48,19 +48,19 @@ public class PointConfigByDeviceVO {
     /**
      *
      */
-    @Schema(description = "un config count")
+    @Schema(description = "Number of points on the device that have not yet been configured.", example = "12")
     private Long unConfigCount;
 
     /**
      *
      */
-    @Schema(description = "config count")
+    @Schema(description = "Number of points on the device that have already been configured.", example = "48")
     private Long configCount;
 
     /**
      *
      */
-    @Schema(description = "Point configuration list")
+    @Schema(description = "Point configurations belonging to the device; tenant-scoped.")
     private List<PointDO> points;
 
 }

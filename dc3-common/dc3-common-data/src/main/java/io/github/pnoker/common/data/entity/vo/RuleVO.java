@@ -48,7 +48,7 @@ public class RuleVO extends BaseVO {
     /**
      * Alarm target type flag
      */
-    @Schema(description = "Alarm target type enum")
+    @Schema(description = "Alarm target type: POINT, DEVICE, DRIVER, or EVENT. Specifies which entity type this rule monitors.", example = "DEVICE")
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     /**
@@ -66,7 +66,7 @@ public class RuleVO extends BaseVO {
     /**
      * Entity ID
      */
-    @Schema(description = "Associated entity ID")
+    @Schema(description = "ID of the entity (point, device, driver, or event) that this rule monitors, as selected by alarmTargetTypeFlag.", example = "2048")
     private Long entityId;
 
     /**

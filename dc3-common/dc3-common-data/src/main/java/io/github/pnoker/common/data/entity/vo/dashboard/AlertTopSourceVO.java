@@ -43,13 +43,13 @@ public class AlertTopSourceVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "alert source: device or driver")
+    @Schema(description = "Alarm source category; one of the supported source types (e.g. device or driver).", example = "device")
     private String source;
 
-    @Schema(description = "source entity ID")
+    @Schema(description = "Identifier of the source entity (device id or driver id) the alarms belong to; must resolve within the current tenant.", example = "1024")
     private long sourceId;
 
-    @Schema(description = "alarm count for this source")
+    @Schema(description = "Number of alarms attributed to this source within the query window.", example = "256")
     private long count;
 
 }

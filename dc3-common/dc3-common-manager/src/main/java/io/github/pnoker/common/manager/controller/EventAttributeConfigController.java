@@ -165,9 +165,9 @@ public class EventAttributeConfigController implements BaseController {
                     "the attribute before returning; use when you need a single attribute's device-specific override.")
     @GetMapping("/get_by_attribute_id_and_device_id_and_event_id")
     public Mono<R<EventAttributeConfigVO>> getByAttributeIdAndDeviceIdAndEventId(
-            @Parameter(description = "Attribute ID") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @Parameter(description = "Event ID") @NotNull @RequestParam(value = "event_id") Long eventId) {
+            @Parameter(description = "Identifier of the event attribute whose configured value is being fetched; its driver must match the device's driver.", example = "1024") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
+            @Parameter(description = "Identifier of the device whose configured value is being fetched; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @Parameter(description = "Identifier of the event whose attribute value is being fetched; its profile must match the device's profile.", example = "1024") @NotNull @RequestParam(value = "event_id") Long eventId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireEventConfigRelations(tenantId, deviceId, eventId, attributeId);
             EventAttributeConfigBO entityBO = eventAttributeConfigService
@@ -189,8 +189,8 @@ public class EventAttributeConfigController implements BaseController {
     @Operation(summary = "List Event Attribute Configurations by Device and Event IDs", description = "Return every event attribute configuration for one device and one event (tenant-scoped). Use to read all configured values the device supplies for that event's attributes; the device's profile must match the event.")
     @GetMapping("/list_by_device_id_and_event_id")
     public Mono<R<List<EventAttributeConfigVO>>> listByDeviceIdAndEventId(
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @Parameter(description = "Event ID") @NotNull @RequestParam(value = "event_id") Long eventId) {
+            @Parameter(description = "Identifier of the device whose configurations are listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @Parameter(description = "Identifier of the event whose configurations are listed; its profile must match the device's profile.", example = "1024") @NotNull @RequestParam(value = "event_id") Long eventId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireEventConfigRelations(tenantId, deviceId, eventId, null);
             List<EventAttributeConfigBO> entityBOList = filterTenant(tenantId,
@@ -210,7 +210,7 @@ public class EventAttributeConfigController implements BaseController {
     @Operation(summary = "List Event Attribute Configurations by Device ID", description = "Return every event attribute configuration for one device across all of its events (tenant-scoped). Use to read the full set of configured event-attribute values a device uses.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<EventAttributeConfigVO>>> listByDeviceId(
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+            @Parameter(description = "Identifier of the device whose configurations are listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<EventAttributeConfigBO> entityBOList = filterTenant(tenantId,

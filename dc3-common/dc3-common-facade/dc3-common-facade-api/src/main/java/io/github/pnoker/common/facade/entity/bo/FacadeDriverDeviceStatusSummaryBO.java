@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.facade.entity.bo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,7 +41,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Schema(description = "Facade Driver Device Status Summary business object")
 public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
 
     public static final String DRIVER_ID = "driverId";
@@ -51,18 +49,14 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
     public static final String OFFLINE = "OFFLINE";
     @Serial
     private static final long serialVersionUID = 1L;
-    @Schema(description = "driver ID")
     private Long driverId;
 
-    @Schema(description = "Total record count")
 
     private int total;
 
-    @Schema(description = "online")
 
     private int online;
 
-    @Schema(description = "offline")
 
     private int offline;
 

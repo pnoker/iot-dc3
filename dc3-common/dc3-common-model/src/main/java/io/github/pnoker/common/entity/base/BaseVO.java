@@ -54,51 +54,51 @@ public class BaseVO implements Serializable {
     /**
      * Primary key ID
      */
-    @Schema(description = "Primary key ID")
+    @Schema(description = "Unique primary key of the record; required on update requests.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Primary key ID can't be empty", groups = {Update.class})
     private Long id;
 
     /**
      * Description
      */
-    @Schema(description = "Remark or description")
+    @Schema(description = "Free-form remark or description for the record.", example = "System auto-configured device")
     private String remark;
 
     /**
      * Creator ID
      */
-    @Schema(description = "Creator user ID")
+    @Schema(description = "Identifier of the user who created the record; server-populated.", example = "1000")
     private Long creatorId;
 
     /**
      * Creator Name
      */
-    @Schema(description = "Creator username")
+    @Schema(description = "Display name of the user who created the record; server-populated.", example = "admin")
     private String creatorName;
 
     /**
      * Create Time
      */
-    @Schema(description = "Record creation timestamp")
+    @Schema(description = "Timestamp when the record was created; server-populated.", example = "2025-09-01 12:00:00")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
 
     /**
      * Operator ID
      */
-    @Schema(description = "Last operator user ID")
+    @Schema(description = "Identifier of the user who last updated the record; server-populated.", example = "1000")
     private Long operatorId;
 
     /**
      * Operator Name
      */
-    @Schema(description = "Last operator username")
+    @Schema(description = "Display name of the user who last updated the record; server-populated.", example = "admin")
     private String operatorName;
 
     /**
      * Operate Time
      */
-    @Schema(description = "Last update timestamp")
+    @Schema(description = "Timestamp when the record was last updated; server-populated.", example = "2025-09-01 12:00:00")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime operateTime;
 

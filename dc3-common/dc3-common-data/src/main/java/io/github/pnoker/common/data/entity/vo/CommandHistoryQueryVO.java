@@ -45,22 +45,22 @@ public class CommandHistoryQueryVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Filter by device ID.", example = "1024")
+    @Schema(description = "Filter by device ID; the device must belong to the current tenant.", example = "1024")
 
     private Long deviceId;
 
-    @Schema(description = "Filter by command definition ID.", example = "4096")
+    @Schema(description = "Filter by command definition ID; the command must belong to the current tenant.", example = "4096")
 
     private Long commandId;
 
-    @Schema(description = "Filter by command code.", example = "READ_HOLDING_REG")
+    @Schema(description = "Filter by exact command code, e.g. a driver-defined read/write opcode.", example = "READ_HOLDING_REG")
 
     private String commandCode;
 
-    @Schema(description = "Command status", example = "SUCCESS")
+    @Schema(description = "Filter by command lifecycle status (PENDING, SENT, SUCCESS, FAILED, TIMEOUT, EXPIRED, DEAD, DUPLICATE).", example = "SUCCESS")
     private PointCommandStatusEnum status;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters (page number, page size).")
 
     private Pages page;
 

@@ -59,7 +59,7 @@ public class MessageController implements BaseController {
     @Operation(summary = "List Session Messages", description = "List the ordered message history of one AI chat session for the current user and tenant. " +
             "Returns each turn (user prompts and assistant replies) in chronological order; use to read or resume a past conversation.")
     @GetMapping("/list")
-    public Mono<R<List<MessageVO>>> list(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+    public Mono<R<List<MessageVO>>> list(@Parameter(description = "Client-visible conversation identifier scoped to the current user and tenant; used to retrieve the full message history of one chat session.", example = "conv-20240101-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);

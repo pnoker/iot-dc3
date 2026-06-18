@@ -45,16 +45,16 @@ public class FlappingSourceVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "alert source: device or driver")
+    @Schema(description = "alert source: device or driver", example = "device")
     private String source;
 
-    @Schema(description = "source entity ID")
+    @Schema(description = "source entity ID", example = "1024")
     private long sourceId;
 
-    @Schema(description = "Alarm type enum")
+    @Schema(description = "Alarm type enum", example = "1")
     private int alarmTypeFlag;
 
-    @Schema(description = "number of times this source/type fired in the window")
+    @Schema(description = "number of times this source/type fired in the window", example = "8")
     private long count;
 
 }

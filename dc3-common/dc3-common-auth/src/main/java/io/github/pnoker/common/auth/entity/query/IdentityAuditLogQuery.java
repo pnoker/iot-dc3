@@ -48,17 +48,24 @@ public class IdentityAuditLogQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination parameters including page number, page size, and time-range filters.")
     private Pages page;
 
+    @Schema(description = "Tenant identifier; restricts audit log results to records belonging to this tenant.", example = "1024")
     private Long tenantId;
 
+    @Schema(description = "Identifier of the principal (user or service account) whose audit log entries are queried; must belong to the current tenant.", example = "2048")
     private Long principalId;
 
+    @Schema(description = "Audit action type to filter by, e.g. LOGIN, LOGOUT, CREATE, UPDATE, DELETE.", example = "LOGIN")
     private String action;
 
+    @Schema(description = "Resource type to filter by, identifying the category of the audited resource, e.g. USER, ROLE, DEVICE.", example = "USER")
     private String resourceType;
 
+    @Schema(description = "Identifier of the specific resource involved in the audited operation.", example = "4096")
     private Long resourceId;
 
+    @Schema(description = "Outcome status of the audited operation to filter by, e.g. SUCCESS, FAILURE.", example = "SUCCESS")
     private String status;
 }

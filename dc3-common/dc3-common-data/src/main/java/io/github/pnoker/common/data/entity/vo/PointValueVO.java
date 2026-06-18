@@ -81,7 +81,7 @@ public class PointValueVO implements Serializable {
     /**
      * Whether the latest-value query returned a real sampled value.
      */
-    @Schema(description = "Whether the latest-value query returned a real sampled value (true) or a fallback placeholder (false).")
+    @Schema(description = "Whether the latest-value query returned a real sampled value (true) or a fallback placeholder (false).", example = "true")
     private Boolean hasLatestValue = Boolean.TRUE;
 
     /**
@@ -93,20 +93,20 @@ public class PointValueVO implements Serializable {
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Identifier of the tenant that owns this point value.", example = "1")
     private Long tenantId;
 
     /**
      * Create Time
      */
-    @Schema(description = "Creation time")
+    @Schema(description = "Timestamp (ISO-8601) when this point value was first created.", example = "2025-09-01T12:00:00")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
 
     /**
      * Operate Time
      */
-    @Schema(description = "Last operation time")
+    @Schema(description = "Timestamp (ISO-8601) of the most recent update or refresh of this point value.", example = "2025-09-01T12:30:00")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime operateTime;
 

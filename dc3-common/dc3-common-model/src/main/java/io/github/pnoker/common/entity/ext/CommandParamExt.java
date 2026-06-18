@@ -50,7 +50,7 @@ public class CommandParamExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved field used to keep extra command param data")
+        @Schema(description = "Free-form string carrying extra command param data not covered by the typed fields", example = "extra metadata")
         private String keep;
 
     }

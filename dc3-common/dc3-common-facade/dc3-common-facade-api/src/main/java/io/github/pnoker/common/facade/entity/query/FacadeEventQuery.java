@@ -21,7 +21,6 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,49 +44,38 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Facade Event query parameters")
 public class FacadeEventQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
 
     private Pages page;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "event name")
 
     private String eventName;
 
-    @Schema(description = "event code")
 
     private String eventCode;
 
-    @Schema(description = "event type")
 
     private EventTypeFlagEnum eventType;
 
-    @Schema(description = "event level")
 
     private EventLevelEnum eventLevel;
 
-    @Schema(description = "profile ID")
 
     private Long profileId;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 
-    @Schema(description = "device ID")
 
     private Long deviceId;
 

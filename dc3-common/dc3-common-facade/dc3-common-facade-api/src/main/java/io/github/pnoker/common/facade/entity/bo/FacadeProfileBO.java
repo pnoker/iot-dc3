@@ -22,7 +22,6 @@ import io.github.pnoker.common.entity.ext.ProfileExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ProfileShareTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,42 +40,32 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-@Schema(description = "Facade Profile business object")
 public class FacadeProfileBO extends BaseBO {
 
-    @Schema(description = "profile name")
 
     private String profileName;
 
-    @Schema(description = "profile code")
 
     private String profileCode;
 
-    @Schema(description = "Profile share flag enum")
 
     private ProfileShareTypeEnum profileShareFlag;
 
-    @Schema(description = "Profile type enum")
 
     private ProfileTypeEnum profileTypeFlag;
 
-    @Schema(description = "profile extension information in JSON format")
 
     private ProfileExt profileExt;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "Configuration signature")
 
     private String signature;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 

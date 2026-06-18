@@ -48,14 +48,14 @@ public class TopicQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     /**
@@ -70,7 +70,7 @@ public class TopicQuery implements Serializable {
      * Device Name
      */
 
-    @Schema(description = "device name")
+    @Schema(description = "Filter by device name. Supports partial matching.", example = "Temperature Sensor 01")
 
     private String deviceName;
 

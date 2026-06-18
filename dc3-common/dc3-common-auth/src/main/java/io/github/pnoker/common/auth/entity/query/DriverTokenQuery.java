@@ -50,14 +50,14 @@ public class DriverTokenQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID", example = "1024")
+    @Schema(description = "Tenant identifier used to scope all query results; only driver tokens belonging to this tenant are returned.", example = "1024")
     private Long tenantId;
 
     //
@@ -65,25 +65,25 @@ public class DriverTokenQuery implements Serializable {
     /**
      * Driver ID
      */
-    @Schema(description = "driver code")
+    @Schema(description = "Filter by driver code. Exact match on the stable business identifier.", example = "dc3-driver-modbus-tcp")
     private String driverCode;
 
     /**
      * AppID
      */
-    @Schema(description = "driver app ID")
+    @Schema(description = "Application identifier of the driver; used to filter tokens issued to a specific driver application.", example = "dc3-app-modbus")
     private String driverAppId;
 
     /**
      *
      */
-    @Schema(description = "Token expiration type enum", example = "PERMANENT")
+    @Schema(description = "Filter by token expiration type; limits results to tokens with the specified validity period.", example = "PERMANENT")
     private ExpireTypeEnum expireFlag;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Filter by token enabled status; returns only tokens that are enabled or disabled.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

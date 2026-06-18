@@ -43,22 +43,22 @@ public class EventReportVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "device ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Identifier of the reporting device; must belong to the current tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
     private Long deviceId;
 
-    @Schema(description = "ID of the event reported from the device.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Identifier of the event definition being reported; must belong to the current tenant.", example = "4096")
 
     private Long eventId;
 
-    @Schema(description = "Event code. Stable business identifier matching the event definition.", example = "HIGH_TEMP_ALARM")
+    @Schema(description = "Stable business code of the event; must match a defined event code.", example = "HIGH_TEMP_ALARM")
 
     private String eventCode;
 
     @Schema(description = "Parameter values submitted with this event report, keyed by parameter code.")
     private Map<String, String> paramValues;
 
-    @Schema(description = "Message content")
+    @Schema(description = "Free-text detail or payload accompanying the event report.", example = "Temperature exceeded the configured threshold")
 
     private String message;
 

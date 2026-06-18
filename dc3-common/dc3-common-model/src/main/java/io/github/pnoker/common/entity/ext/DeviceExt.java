@@ -57,7 +57,7 @@ public class DeviceExt extends BaseExt {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        @Schema(description = "Reserved configuration field used to retain custom device data")
+        @Schema(description = "Reserved configuration field used to retain arbitrary custom device data that does not fit a typed field", example = "custom")
         private String keep;
 
     }

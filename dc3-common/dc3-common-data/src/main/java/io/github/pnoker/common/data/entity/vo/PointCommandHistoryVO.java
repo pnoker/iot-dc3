@@ -51,7 +51,7 @@ public class PointCommandHistoryVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Primary key")
+    @Schema(description = "Primary key", example = "1")
 
     private Long id;
 
@@ -59,11 +59,11 @@ public class PointCommandHistoryVO implements Serializable {
 
     private String commandId;
 
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID", example = "100001")
 
     private Long tenantId;
 
-    @Schema(description = "Point command type")
+    @Schema(description = "Point command type", example = "READ")
 
     private PointCommandTypeEnum type;
 
@@ -75,11 +75,11 @@ public class PointCommandHistoryVO implements Serializable {
 
     private Long pointId;
 
-    @Schema(description = "Command value sent to the data point.")
+    @Schema(description = "Command value sent to the data point.", example = "42")
 
     private String requestValue;
 
-    @Schema(description = "Response value received from the data point after command execution.")
+    @Schema(description = "Response value received from the data point after command execution.", example = "42")
 
     private String responseValue;
 
@@ -90,15 +90,15 @@ public class PointCommandHistoryVO implements Serializable {
 
     private String errorCode;
 
-    @Schema(description = "Human-readable error message if the point command execution failed. Null on success.")
+    @Schema(description = "Human-readable error message if the point command execution failed. Null on success.", example = "Connection timeout after 3000ms")
 
     private String errorMessage;
 
-    @Schema(description = "Source identifier")
+    @Schema(description = "Source identifier", example = "HTTP")
 
     private PointCommandSourceEnum source;
 
-    @Schema(description = "ID of the user who issued this point command.")
+    @Schema(description = "ID of the user who issued this point command.", example = "1000")
 
     private Long sourceUserId;
 

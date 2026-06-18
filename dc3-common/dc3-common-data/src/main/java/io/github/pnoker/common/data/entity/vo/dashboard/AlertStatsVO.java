@@ -44,34 +44,34 @@ public class AlertStatsVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "total alert count")
+    @Schema(description = "total alert count", example = "142")
     private long total;
 
-    @Schema(description = "unconfirmed alert count")
+    @Schema(description = "unconfirmed alert count", example = "23")
     private long unconfirmed;
 
-    @Schema(description = "device alert count")
+    @Schema(description = "device alert count", example = "98")
     private long deviceAlerts;
 
-    @Schema(description = "driver alert count")
+    @Schema(description = "driver alert count", example = "44")
     private long driverAlerts;
 
-    @Schema(description = "unconfirmed device alert count")
+    @Schema(description = "unconfirmed device alert count", example = "15")
     private long deviceUnconfirmed;
 
-    @Schema(description = "unconfirmed driver alert count")
+    @Schema(description = "unconfirmed driver alert count", example = "8")
     private long driverUnconfirmed;
 
-    @Schema(description = "today's device alarm count")
+    @Schema(description = "todayDeviceAlarms count", example = "12")
     private long todayDeviceAlarms;
 
-    @Schema(description = "today's driver alarm count")
+    @Schema(description = "todayDriverAlarms count", example = "5")
     private long todayDriverAlarms;
 
-    @Schema(description = "today's unconfirmed device alarm count")
+    @Schema(description = "todayDeviceUnconfirmed count", example = "3")
     private long todayDeviceUnconfirmed;
 
-    @Schema(description = "today's unconfirmed driver alarm count")
+    @Schema(description = "todayDriverUnconfirmed count", example = "1")
     private long todayDriverUnconfirmed;
 
     @Schema(description = "alert counts bucketed by type")
@@ -94,10 +94,10 @@ public class AlertStatsVO implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        @Schema(description = "bucket key (alarm type)")
+        @Schema(description = "bucket key (alarm type)", example = "driver-offline")
         private String key;
 
-        @Schema(description = "alert count in this bucket")
+        @Schema(description = "alert count in this bucket", example = "42")
         private long count;
 
     }

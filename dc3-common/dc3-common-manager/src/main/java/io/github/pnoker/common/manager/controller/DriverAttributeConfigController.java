@@ -76,10 +76,10 @@ public class DriverAttributeConfigController implements BaseController {
     private final DriverAttributeService driverAttributeService;
 
     /**
-     * DriverConfig
+     * Create the configured value of a driver attribute for a device.
      *
-     * @param entityVO {@link DriverAttributeConfigVO}
-     * @return R of String
+     * @param entityVO driver attribute config payload to create (device, attribute, value)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'add')")
     @Operation(summary = "Add Driver Attribute Configuration", description = "Set the configured value of a driver attribute for a device under the current tenant. " +
@@ -95,10 +95,10 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID DriverConfig
+     * Delete a driver attribute config by ID.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the driver attribute config to delete (must be tenant-owned)
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'delete')")
     @Operation(summary = "Delete Driver Attribute Configuration", description = "Permanently delete a driver attribute config by ID (tenant-scoped). " +
@@ -113,10 +113,10 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * DriverConfig
+     * Update the configured value of an existing driver attribute config.
      *
-     * @param entityVO {@link DriverAttributeConfigVO}
-     * @return R of String
+     * @param entityVO driver attribute config payload to update (must carry an existing id)
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'update')")
     @Operation(summary = "Update Driver Attribute Configuration", description = "Change the configured value of an existing driver attribute config (tenant-scoped). " +
@@ -133,10 +133,10 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID DriverConfig
+     * Fetch a single driver attribute config by ID.
      *
-     * @param id ID
-     * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
+     * @param id id of the driver attribute config to fetch (must be tenant-owned)
+     * @return the matched DriverAttributeConfigVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
     @Operation(summary = "Get Driver Attribute Configuration by ID", description = "Fetch one driver attribute config by ID (tenant-scoped). " +
@@ -151,19 +151,19 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID Device ID DriverConfig
+     * Fetch the configured value of one driver attribute for a specific device.
      *
-     * @param attributeId Attribute ID
-     * @param deviceId    Device ID
-     * @return DriverConfig
+     * @param deviceId    id of the device whose config is read (must be tenant-owned)
+     * @param attributeId id of the driver attribute whose value is read (its driver must match the device's)
+     * @return the matched DriverAttributeConfigVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
     @Operation(summary = "Get Driver Attribute Configuration by Device and Attribute IDs", description = "Fetch the configured value of one driver attribute for a specific device (tenant-scoped). " +
             "The device's driver must match the attribute's driver; use to read a single connection attribute before invoking the driver.")
     @GetMapping("/get_by_device_id_and_attribute_id")
     public Mono<R<DriverAttributeConfigVO>> getByDeviceIdAndAttributeId(
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @Parameter(description = "Attribute ID") @NotNull @RequestParam(value = "attribute_id") Long attributeId) {
+            @Parameter(description = "Identifier of the device whose driver attribute config is being read; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @Parameter(description = "Identifier of the driver attribute whose configured value is being read; its driver must match the device's driver.", example = "2048") @NotNull @RequestParam(value = "attribute_id") Long attributeId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireDriverConfigRelations(tenantId, deviceId, attributeId);
             DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectByAttributeIdAndDeviceId(deviceId,
@@ -175,17 +175,17 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * Device ID DriverConfig
+     * List every driver attribute config for a given device.
      *
-     * @param deviceId Device ID
-     * @return DriverConfig
+     * @param deviceId id of the device whose configs are listed (must be tenant-owned)
+     * @return a list of DriverAttributeConfigVO bound to the device
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
     @Operation(summary = "List Driver Attribute Configurations by Device ID", description = "Return every driver attribute config for a given device (tenant-scoped). " +
             "Use to load all connection attribute values a device applies to its driver in one call.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<DriverAttributeConfigVO>>> listByDeviceId(
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+            @Parameter(description = "Identifier of the device whose driver attribute configs are being listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<DriverAttributeConfigBO> entityBOList = filterTenant(tenantId, driverAttributeConfigService.listByDeviceId(deviceId));
@@ -195,10 +195,10 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * DriverConfig
+     * Page through driver attribute configs with filters.
      *
-     * @param entityQuery DriverConfig Dto
-     * @return Page Of DriverConfig
+     * @param entityQuery query filters (may be null)
+     * @return a page of DriverAttributeConfigVO matching the query
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
     @Operation(summary = "List Driver Attribute Configurations", description = "Page through driver attribute configs for the current tenant with query filters. " +

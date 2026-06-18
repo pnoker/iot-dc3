@@ -63,11 +63,10 @@ public class PointValueController implements BaseController {
     private final PointValueService pointValueService;
 
     /**
-     * Query the latest point value for each point in the device.
+     * Return the most recent reading for each point under a device.
      *
-     * @param entityQuery PointValueQuery, including pagination parameters
-     * @return Page of PointValueVO, where each PointValueVO contains the latest value for
-     * a point in the device
+     * @param entityQuery point value query carrying device scope and pagination parameters
+     * @return a page of PointValueVO, where each entry holds the latest value of one point
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
     @Operation(summary = "List Latest Point Values", description = "Return the most recent reading for each point under a device for the current tenant, " +
@@ -84,11 +83,10 @@ public class PointValueController implements BaseController {
     }
 
     /**
-     * Query historical point values for each point in the device.
+     * Page through stored time-series readings for points under a device.
      *
-     * @param entityQuery PointValueQuery, including pagination parameters
-     * @return Page of PointValueVO, where each PointValueVO contains the historical value
-     * for a point in the device
+     * @param entityQuery point value query carrying device scope and pagination parameters; treated as empty when null
+     * @return a page of PointValueVO matching the query, ordered by collection time
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
     @Operation(summary = "List Point Values", description = "Page through stored time-series readings for points under a device (tenant-scoped). " +
@@ -105,19 +103,20 @@ public class PointValueController implements BaseController {
     }
 
     /**
-     * Query historical point values for a specific point in the device.
+     * Return the most recent time-series values for a single point on a device.
      *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
-     * @return List of String, where each String is the historical value for the point
+     * @param deviceId id of the device whose point history is being queried
+     * @param pointId  id of the point whose history is being queried
+     * @param count    maximum number of historical values to return; defaults to 100 when omitted
+     * @return a list of raw value strings for the point, bounded by count
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
     @Operation(summary = "List Point Value History by Device and Point", description = "Return the most recent time-series values for one point on one device for the current tenant, " +
             "as a list of raw value strings bounded by count (default 100). Use to read a single point's latest history.")
     @GetMapping("/list_history_by_device_id_and_point_id")
-    public Mono<R<List<String>>> history(@Parameter(description = "Device ID") @NotNull @RequestParam(name = "device_id") Long deviceId,
-                                         @Parameter(description = "Point ID") @NotNull @RequestParam(name = "point_id") Long pointId,
-                                         @Parameter(description = "Maximum number of historical values to return")
+    public Mono<R<List<String>>> history(@Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024") @NotNull @RequestParam(name = "device_id") Long deviceId,
+                                         @Parameter(description = "Identifier of the point whose history is being queried; must belong to a profile attached to the device", example = "2048") @NotNull @RequestParam(name = "point_id") Long pointId,
+                                         @Parameter(description = "Maximum number of historical values to return; defaults to 100 when omitted", example = "100")
                                          @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<String> history = pointValueService.history(tenantId, deviceId, pointId, count);

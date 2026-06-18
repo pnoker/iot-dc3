@@ -45,25 +45,25 @@ public class CorrelationPairVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "source of event A: device or driver")
+    @Schema(description = "source of event A: device or driver", example = "device")
     private String aSource;
 
-    @Schema(description = "source entity ID of event A")
+    @Schema(description = "source entity ID of event A", example = "1024")
     private long aSourceId;
 
-    @Schema(description = "event type of event A")
+    @Schema(description = "event type of event A", example = "1")
     private int aEventType;
 
-    @Schema(description = "source of event B: device or driver")
+    @Schema(description = "source of event B: device or driver", example = "driver")
     private String bSource;
 
-    @Schema(description = "source entity ID of event B")
+    @Schema(description = "source entity ID of event B", example = "512")
     private long bSourceId;
 
-    @Schema(description = "event type of event B")
+    @Schema(description = "event type of event B", example = "2")
     private int bEventType;
 
-    @Schema(description = "number of times A and B co-occurred")
+    @Schema(description = "number of times A and B co-occurred", example = "15")
     private long coCount;
 
 }

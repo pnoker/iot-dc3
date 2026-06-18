@@ -71,7 +71,7 @@ public class PointVO extends BaseVO {
     /**
      * Type
      */
-    @Schema(description = "Data point type: MEASUREMENT (read-only sensor value), ATTRIBUTE (readable config), or COMMAND (writable setpoint).", example = "MEASUREMENT", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Value data type held by this point (e.g. STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN).", example = "STRING", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Point type can't be empty", groups = {Add.class, Update.class})
     private PointTypeEnum pointTypeFlag;
 

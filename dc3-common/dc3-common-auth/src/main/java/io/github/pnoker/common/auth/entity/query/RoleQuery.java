@@ -49,14 +49,14 @@ public class RoleQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID", example = "1024")
+    @Schema(description = "Tenant identifier used to scope this query; only roles belonging to this tenant are returned.", example = "1024")
     private Long tenantId;
 
     //
@@ -64,19 +64,19 @@ public class RoleQuery implements Serializable {
     /**
      * Name
      */
-    @Schema(description = "Role name")
+    @Schema(description = "Role display name to filter by; supports partial (fuzzy) matching.", example = "Administrator")
     private String roleName;
 
     /**
      * Code
      */
-    @Schema(description = "Role code")
+    @Schema(description = "Unique role code to filter by; exact match against the role's business identifier.", example = "ROLE_ADMIN")
     private String roleCode;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Activation status of the role; ENABLE returns only active roles, DISABLE returns only inactive roles.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

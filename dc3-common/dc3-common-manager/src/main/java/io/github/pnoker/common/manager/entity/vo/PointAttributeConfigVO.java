@@ -77,7 +77,7 @@ public class PointAttributeConfigVO extends BaseVO {
     /**
      * Point ID
      */
-    @Schema(description = "ID of the data point this configuration is scoped to.", example = "4096")
+    @Schema(description = "ID of the data point this configuration is scoped to; must belong to the current tenant.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Point ID can't be empty", groups = {Add.class, Update.class})
     private Long pointId;
 
@@ -90,7 +90,7 @@ public class PointAttributeConfigVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "Signature used for configuration integrity verification.")
+    @Schema(description = "Signature used for configuration integrity verification.", example = "d41d8cd98f00b204e9800998ecf8427e")
     private String signature;
 
     /**

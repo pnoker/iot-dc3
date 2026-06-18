@@ -50,7 +50,7 @@ public class MenuQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
@@ -59,31 +59,31 @@ public class MenuQuery implements Serializable {
     /**
      * Parent menu id filter (optional).
      */
-    @Schema(description = "Parent menu ID")
+    @Schema(description = "ID of the parent menu entry; omit to query across all levels.", example = "1024")
     private Long parentMenuId;
 
     /**
      * Type
      */
-    @Schema(description = "Menu type enum", example = "COMMON")
+    @Schema(description = "Menu type used to filter results; TITLE for category headings, COMMON for navigable items.", example = "COMMON")
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
      * Name
      */
-    @Schema(description = "Menu name")
+    @Schema(description = "Partial or full display name of the menu entry used as a filter.", example = "Device Management")
     private String menuName;
 
     /**
      * Code, URLMD5
      */
-    @Schema(description = "Menu code")
+    @Schema(description = "Unique code identifying the menu entry (MD5 of the menu URL path).", example = "settingsDeviceList")
     private String menuCode;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Enabled state of the menu entry; ENABLE to include only active items, DISABLE for inactive.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

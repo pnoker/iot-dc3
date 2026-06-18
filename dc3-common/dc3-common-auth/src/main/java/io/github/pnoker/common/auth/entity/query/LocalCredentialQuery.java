@@ -52,14 +52,19 @@ public class LocalCredentialQuery implements Serializable {
 
     private Pages page;
 
+    @Schema(description = "Tenant identifier used to scope credential queries; all results are restricted to this tenant.", example = "1024")
     private Long tenantId;
 
+    @Schema(description = "Identifier of the principal (user) whose local credentials are being queried; must belong to the current tenant.", example = "2048")
     private Long principalId;
 
+    @Schema(description = "Login name of the credential to filter by; supports exact match.", example = "alice")
     private String loginName;
 
+    @Schema(description = "Type of local credential to filter by.", example = "PASSWORD")
     private CredentialTypeEnum credentialType;
 
+    @Schema(description = "Enable/disable status filter for local credentials.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

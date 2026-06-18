@@ -127,7 +127,7 @@ public class EventController implements BaseController {
     @Operation(summary = "List Events by Profile ID", description = "Return every event definition declared on a given profile template (tenant-scoped). " +
             "Use to discover which device-reported occurrences the profile exposes before binding or inspecting a device.")
     @GetMapping("/list_by_profile_id")
-    public Mono<R<List<EventVO>>> listByProfileId(@Parameter(description = "Profile ID") @NotNull @RequestParam(value = "profile_id") Long profileId) {
+    public Mono<R<List<EventVO>>> listByProfileId(@Parameter(description = "Identifier of the profile template whose event definitions should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.getById(profileId));
             List<EventBO> entityBOList = filterTenant(tenantId, eventService.listByProfileId(profileId, tenantId));
@@ -140,7 +140,7 @@ public class EventController implements BaseController {
     @Operation(summary = "List Events by Device ID", description = "Return every event definition available on a given device (tenant-scoped), " +
             "resolved from the device's profile template. Use to see which occurrences a specific device may report.")
     @GetMapping("/list_by_device_id")
-    public Mono<R<List<EventVO>>> listByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+    public Mono<R<List<EventVO>>> listByDeviceId(@Parameter(description = "Identifier of the device whose available event definitions should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<EventBO> entityBOList = filterTenant(tenantId, eventService.listByDeviceId(deviceId, tenantId));

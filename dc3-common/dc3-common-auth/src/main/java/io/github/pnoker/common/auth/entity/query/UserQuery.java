@@ -49,7 +49,7 @@ public class UserQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
@@ -57,43 +57,43 @@ public class UserQuery implements Serializable {
      * Tenant scope. Populated by the controller from the request context; any value
      * supplied by the client is overwritten so a caller cannot reach across tenants.
      */
-    @Schema(description = "Tenant ID", example = "1024")
+    @Schema(description = "Tenant that owns the queried users; populated server-side from the request context — any client-supplied value is overwritten to prevent cross-tenant access.", example = "1024")
     private Long tenantId;
 
     /**
      * Principal ID.
      */
-    @Schema(description = "Principal ID", example = "1024")
+    @Schema(description = "Identifier of the login principal associated with the user; used to filter users by their bound authentication account.", example = "1024")
     private Long principalId;
 
     /**
      *
      */
-    @Schema(description = "User nickname")
+    @Schema(description = "Display nickname of the user; supports partial fuzzy match.", example = "Alice")
     private String nickName;
 
     /**
      * Name
      */
-    @Schema(description = "Username")
+    @Schema(description = "Login username of the user; supports partial fuzzy match.", example = "alice")
     private String userName;
 
     /**
      *
      */
-    @Schema(description = "Phone number", example = "13800138000")
+    @Schema(description = "Mobile phone number registered by the user; used as an optional filter criterion.", example = "13800138000")
     private String phone;
 
     /**
      *
      */
-    @Schema(description = "Email address", example = "user@example.com")
+    @Schema(description = "Email address registered by the user; used as an optional filter criterion.", example = "user@example.com")
     private String email;
 
     /**
      * Enable flag.
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Enable/disable status of the user account; omit to return users regardless of status.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

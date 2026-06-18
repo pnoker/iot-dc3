@@ -43,30 +43,30 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Schema(description = "Chat Completion response body")
+@Schema(description = "OpenAI-compatible non-streaming chat completion response returned by the agentic service.")
 public class ChatCompletionResponse {
 
-    @Schema(description = "Primary key")
+    @Schema(description = "Unique identifier of this completion response, prefixed with 'chatcmpl-'.", example = "chatcmpl-abc123xyz")
 
     private String id;
 
-    @Schema(description = "OpenAI-compatible response object type")
+    @Schema(description = "Object type discriminator; always 'chat.completion' for non-streaming responses.", example = "chat.completion")
 
     private String object;
 
-    @Schema(description = "Unix timestamp when the response was created")
+    @Schema(description = "Unix timestamp (seconds since epoch) when the completion was created.", example = "1718700000")
 
     private long created;
 
-    @Schema(description = "Model used to generate the response")
+    @Schema(description = "Identifier of the model that generated the response.", example = "gpt-4o")
 
     private String model;
 
-    @Schema(description = "Generated response choices")
+    @Schema(description = "List of generated completion choices; contains one entry per requested choice (n parameter).")
 
     private List<Choice> choices;
 
-    @Schema(description = "Token usage statistics")
+    @Schema(description = "Token usage statistics for the request and response.")
 
     private Usage usage;
 
@@ -77,15 +77,15 @@ public class ChatCompletionResponse {
     @Builder
     public static class Choice {
 
-        @Schema(description = "Choice index")
+        @Schema(description = "Zero-based index of this choice within the choices array.", example = "0")
 
         private int index;
 
-        @Schema(description = "Generated assistant message")
+        @Schema(description = "Generated assistant message containing role and content.")
 
         private Message message;
 
-        @Schema(description = "Generation finish reason")
+        @Schema(description = "Reason the model stopped generating tokens; 'stop' means natural end, 'length' means token limit reached.", example = "stop")
 
         private String finishReason;
 
@@ -97,15 +97,15 @@ public class ChatCompletionResponse {
     @AllArgsConstructor
     public static class Message {
 
-        @Schema(description = "Message role")
+        @Schema(description = "Role of the message author; always 'assistant' for generated responses.", example = "assistant")
 
         private String role;
 
-        @Schema(description = "Message content")
+        @Schema(description = "Text content of the assistant's reply; null when content_ext carries structured content.", example = "The temperature sensor reads 23.5 °C.")
 
         private String content;
 
-        @Schema(description = "Content extension information in JSON format")
+        @Schema(description = "Structured content extension carrying multi-part or tool-call message payloads; present when plain text content is insufficient.")
 
         @JsonProperty("content_ext")
         private AgenticMessageContent contentExt;
@@ -118,15 +118,15 @@ public class ChatCompletionResponse {
     @AllArgsConstructor
     public static class Usage {
 
-        @Schema(description = "prompt tokens")
+        @Schema(description = "Number of tokens consumed by the input prompt.", example = "42")
 
         private int promptTokens;
 
-        @Schema(description = "completion tokens")
+        @Schema(description = "Number of tokens generated in the completion response.", example = "128")
 
         private int completionTokens;
 
-        @Schema(description = "total tokens")
+        @Schema(description = "Total tokens used by the request; equals promptTokens + completionTokens.", example = "170")
 
         private int totalTokens;
 

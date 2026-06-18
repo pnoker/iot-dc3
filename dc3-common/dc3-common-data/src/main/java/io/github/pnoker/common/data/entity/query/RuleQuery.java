@@ -52,14 +52,14 @@ public class RuleQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     //
@@ -67,31 +67,31 @@ public class RuleQuery implements Serializable {
     /**
      * Rule name
      */
-    @Schema(description = "rule name")
+    @Schema(description = "Filter by rule name. Supports partial matching.", example = "High Temp Alert")
     private String ruleName;
 
     /**
      * Rule code
      */
-    @Schema(description = "rule code")
+    @Schema(description = "Filter by rule code. Exact match on the stable business identifier.", example = "HIGH_TEMP_ALERT")
     private String ruleCode;
 
     /**
      * Entity ID
      */
-    @Schema(description = "Associated entity ID")
+    @Schema(description = "Associated entity ID", example = "2048")
     private Long entityId;
 
     /**
      * Alarm target type flag
      */
-    @Schema(description = "Alarm target type enum")
+    @Schema(description = "Alarm target type enum", example = "DEVICE")
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

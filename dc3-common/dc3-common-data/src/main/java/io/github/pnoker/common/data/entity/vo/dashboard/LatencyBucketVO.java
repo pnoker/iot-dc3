@@ -45,10 +45,10 @@ public class LatencyBucketVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "latency bin index: 0=<100ms, 1=100-500ms, 2=500ms-1s, 3=1-5s, 4=5-30s, 5=>=30s")
+    @Schema(description = "Latency bin index mapped by the frontend to a range: 0=<100ms, 1=100-500ms, 2=500ms-1s, 3=1-5s, 4=5-30s, 5=>=30s", example = "2")
     private int bin;
 
-    @Schema(description = "sample count in this latency bin")
+    @Schema(description = "Number of samples that fell into this latency bin", example = "128")
     private long count;
 
 }

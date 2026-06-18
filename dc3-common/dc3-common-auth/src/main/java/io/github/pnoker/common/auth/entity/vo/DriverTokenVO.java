@@ -68,7 +68,7 @@ public class DriverTokenVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "Token expiration type enum", example = "PERMANENT")
+    @Schema(description = "Expiration policy applied to this driver token; determines how long the token remains valid before requiring renewal.", example = "PERMANENT")
     private ExpireTypeEnum expireFlag;
 
     /**
@@ -80,7 +80,7 @@ public class DriverTokenVO extends BaseVO {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Whether this driver token is active; disabled tokens are rejected during authentication.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

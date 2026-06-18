@@ -44,22 +44,22 @@ public class PeerDeviationVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "profile ID the device belongs to")
+    @Schema(description = "profile ID the device belongs to", example = "1024")
     private long profileId;
 
     @Schema(description = "device ID")
     private long deviceId;
 
-    @Schema(description = "alarm count for this device")
+    @Schema(description = "alarm count for this device", example = "15")
     private long alarmCount;
 
-    @Schema(description = "median alarm count across the profile peers")
+    @Schema(description = "median alarm count across the profile peers", example = "3")
     private long peerMedian;
 
     /**
      * alarmCount / peerMedian, 2-decimal. 0 means peerMedian was 0 (fresh profile).
      */
-    @Schema(description = "alarmCount divided by peerMedian; 0 means peerMedian was 0")
+    @Schema(description = "alarmCount divided by peerMedian; 0 means peerMedian was 0", example = "5.00")
     private double ratio;
 
 }

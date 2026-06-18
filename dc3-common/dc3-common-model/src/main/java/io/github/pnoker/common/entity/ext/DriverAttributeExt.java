@@ -42,7 +42,7 @@ public class DriverAttributeExt extends BaseExt {
      * <p>
      * Type Version
      */
-    @Schema(description = "Driver attribute extension content")
+    @Schema(description = "Driver attribute extension payload carrying the reserved keep field")
     private Content content;
 
     @Schema(description = "Driver attribute extension content detail")
@@ -52,7 +52,7 @@ public class DriverAttributeExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved extension field")
+        @Schema(description = "Reserved free-form extension field for future driver attribute metadata", example = "reserved")
         private String keep;
 
     }

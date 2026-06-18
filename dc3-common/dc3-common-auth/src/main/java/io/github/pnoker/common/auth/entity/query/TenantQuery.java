@@ -49,7 +49,7 @@ public class TenantQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
@@ -58,19 +58,19 @@ public class TenantQuery implements Serializable {
     /**
      * TenantName
      */
-    @Schema(description = "tenant name")
+    @Schema(description = "Filter by tenant name. Supports partial matching.", example = "Acme Corp")
     private String tenantName;
 
     /**
      * TenantCode
      */
-    @Schema(description = "tenant code")
+    @Schema(description = "Filter by tenant code. Exact match on the stable business identifier.", example = "ACME")
     private String tenantCode;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Filter by tenant enable status; omit to return tenants regardless of status.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

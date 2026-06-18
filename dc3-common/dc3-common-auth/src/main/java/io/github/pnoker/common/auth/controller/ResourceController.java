@@ -90,7 +90,7 @@ public class ResourceController implements BaseController {
     @PreAuthorize("@perm.can('resource', 'delete')")
     @Operation(summary = "Delete Resource by ID", description = "Remove a resource permission unit by ID. Restricted to system admins; deleting severs any role bindings that granted it.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the resource record to delete; deleting it also severs any role bindings that granted this permission.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             resourceService.delete(id);
@@ -115,7 +115,7 @@ public class ResourceController implements BaseController {
     @PreAuthorize("@perm.can('resource', 'get')")
     @Operation(summary = "Get Resource by ID", description = "Fetch one resource (the permission-grantable unit) by ID. Read access is open to all authenticated users; use to resolve a permission code before binding it to a role.")
     @GetMapping("/get_by_id")
-    public Mono<R<ResourceVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<ResourceVO>> getById(@Parameter(description = "Primary key of the resource record to fetch; use to resolve a permission code before binding it to a role.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         // Read access to global resource data is open to all authenticated users.
         return async(() -> {
             ResourceBO entityBO = resourceService.getById(id);

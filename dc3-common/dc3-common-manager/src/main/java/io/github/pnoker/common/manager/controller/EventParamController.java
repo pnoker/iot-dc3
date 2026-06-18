@@ -119,7 +119,7 @@ public class EventParamController implements BaseController {
     @PreAuthorize("@perm.can('event_param', 'list')")
     @Operation(summary = "List Event Parameters by Event ID", description = "Return every parameter declared on a given event (tenant-scoped, event ownership verified). Use to discover which fields a device-reported event exposes.")
     @GetMapping("/list_by_event_id")
-    public Mono<R<List<EventParamVO>>> listByEventId(@Parameter(description = "Event ID") @NotNull @RequestParam(value = "event_id") Long eventId) {
+    public Mono<R<List<EventParamVO>>> listByEventId(@Parameter(description = "Identifier of the event whose parameters are listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "event_id") Long eventId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, eventService.getById(eventId));
             List<EventParamBO> entityBOList = filterTenant(tenantId, eventParamService.listByEventId(eventId));

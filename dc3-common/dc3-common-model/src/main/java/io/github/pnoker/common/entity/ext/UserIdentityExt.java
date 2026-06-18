@@ -57,25 +57,25 @@ public class UserIdentityExt extends BaseExt {
         /**
          * Real name.
          */
-        @Schema(description = "Real name of the user")
+        @Schema(description = "Real (legal) name of the user; free-form text", example = "Zhang San")
         private String realName;
 
         /**
          * Gender.
          */
-        @Schema(description = "Gender of the user")
+        @Schema(description = "Gender of the user; free-form text such as 'male', 'female' or 'other'", example = "male")
         private String gender;
 
         /**
          * Nationality.
          */
-        @Schema(description = "Nationality of the user")
+        @Schema(description = "Nationality of the user; ISO country name or code", example = "China")
         private String nationality;
 
         /**
          * Identification number.
          */
-        @Schema(description = "Identification number of the user")
+        @Schema(description = "Government-issued identification number of the user (e.g. national ID or passport)", example = "110101199001011234")
         private String idNumber;
 
     }

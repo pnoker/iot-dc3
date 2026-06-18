@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * REST controller exposing command attribute management endpoints.
+ * Manages command attribute field definitions declared on profile templates, the configurable fields of a downward control instruction.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -72,10 +72,10 @@ public class CommandAttributeController implements BaseController {
     private final DriverService driverService;
 
     /**
-     * Create a command attribute.
+     * Declare a new command attribute field definition on a profile template for the current tenant.
      *
-     * @param entityVO {@link CommandAttributeVO}
-     * @return R of String
+     * @param entityVO command attribute payload to create (name, type, default value, validation rules)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('command_attribute', 'add')")
     @Operation(summary = "Add Command Attribute", description = "Declare a new command attribute field on a profile template. " +
@@ -156,7 +156,7 @@ public class CommandAttributeController implements BaseController {
     @Operation(summary = "List Command Attributes by Driver ID", description = "Return every command attribute exposed by the commands of devices driven by a given driver (tenant-scoped). " +
             "Use to enumerate which configurable command fields a driver-type adapter can send; returns an empty list when the driver is not found.")
     @GetMapping("/list_by_driver_id")
-    public Mono<R<List<CommandAttributeVO>>> listByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<List<CommandAttributeVO>>> listByDriverId(@Parameter(description = "Identifier of the driver whose command attributes are enumerated; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             try {
                 requireTenant(tenantId, driverService.getById(driverId));

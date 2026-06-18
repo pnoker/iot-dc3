@@ -55,19 +55,19 @@ public class NotifyChannelBindExt extends BaseExt {
         /**
          * Message levels allowed for this channel binding, for example P0/P1.
          */
-        @Schema(description = "Message levels allowed for this channel binding, for example P0/P1", example = "[\"P0\",\"P1\"]")
+        @Schema(description = "Message severity levels routed to this channel binding, e.g. P0/P1; empty means all levels")
         private List<String> levels;
 
         /**
          * Whether recovery notifications should be sent through this binding.
          */
-        @Schema(description = "Whether recovery notifications should be sent through this binding", example = "true")
+        @Schema(description = "Whether recovery notifications are sent through this binding when an alarm clears", example = "true")
         private Boolean sendRecovery;
 
         /**
          * Optional per-binding rate limit override.
          */
-        @Schema(description = "Optional per-binding rate limit override, in milliseconds", example = "60000")
+        @Schema(description = "Optional per-binding rate limit override in milliseconds; null falls back to the channel default", example = "60000")
         private Long rateLimitOverrideMs;
 
     }

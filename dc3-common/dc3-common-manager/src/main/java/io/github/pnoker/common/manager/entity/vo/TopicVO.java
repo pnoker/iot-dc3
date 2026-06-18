@@ -47,15 +47,15 @@ public class TopicVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Topic name")
+    @Schema(description = "MQTT-style topic name used for message routing.", example = "/device/temperature_sensor_01/point/temperature")
 
     private String topic;
 
-    @Schema(description = "Device name for which this topic routes messages.", example = "Temperature Sensor 01")
+    @Schema(description = "Display name of the device this topic routes messages for; scoped to the current tenant.", example = "Temperature Sensor 01")
 
     private String deviceName;
 
-    @Schema(description = "Data point name for which this topic routes messages.", example = "Temperature")
+    @Schema(description = "Display name of the data point this topic routes messages for; scoped to the parent device's tenant.", example = "Temperature")
 
     private String pointName;
 

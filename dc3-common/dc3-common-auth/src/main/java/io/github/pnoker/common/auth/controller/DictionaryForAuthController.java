@@ -55,9 +55,9 @@ public class DictionaryForAuthController implements BaseController {
     private final DictionaryForAuthService dictionaryForAuthService;
 
     /**
-     * Tenant
+     * List tenants as dictionary options for Auth Center selection pickers.
      *
-     * @return
+     * @return the full set of tenant dictionary options (id and display label), unpaged
      */
     @PreAuthorize("@perm.can('dictionary_for_auth', 'get')")
     @Operation(summary = "List Tenant Dictionary", description = "List tenants as dictionary options (id and display label) for Auth Center selection. " +

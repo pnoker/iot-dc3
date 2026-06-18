@@ -68,13 +68,13 @@ public class ProfileVO extends BaseVO {
     /**
      * Type
      */
-    @Schema(description = "Share flag: PRIVATE (tenant only) or PUBLIC (shared across tenants).", example = "PRIVATE")
+    @Schema(description = "Share scope of the profile: TENANT (shared within tenant), DRIVER (shared under driver), or USER (shared under user).", example = "TENANT")
     private ProfileShareTypeEnum profileShareFlag;
 
     /**
      * Type
      */
-    @Schema(description = "Profile type: DEVICE or DRIVER.", example = "DEVICE")
+    @Schema(description = "Origin of the profile: SYSTEM (created by system), DRIVER (created by driver), or USER (created by user).", example = "USER")
     private ProfileTypeEnum profileTypeFlag;
 
     /**

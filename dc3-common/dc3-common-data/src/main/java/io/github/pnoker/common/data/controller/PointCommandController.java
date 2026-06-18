@@ -55,10 +55,10 @@ public class PointCommandController implements BaseController {
     private final PointCommandBuilder pointCommandBuilder;
 
     /**
-     * Submit a read command.
+     * Dispatch a downward read command to fetch the current value of a single point.
      *
-     * @param entityVO PointCommandReadVO
-     * @return commandId for status polling
+     * @param entityVO read-command payload identifying the device and point to read
+     * @return the commandId assigned to the dispatched command, for polling execution status
      */
     @PreAuthorize("@perm.can('point_command', 'list')")
     @Operation(summary = "Send Point Read Command", description = "Dispatch a downward read command to fetch the current value of a single point on the tenant's device " +
@@ -74,10 +74,10 @@ public class PointCommandController implements BaseController {
     }
 
     /**
-     * Submit a write command.
+     * Dispatch a downward write command to push a new value onto a single point.
      *
-     * @param entityVO PointCommandWriteVO
-     * @return commandId for status polling
+     * @param entityVO write-command payload identifying the device, point and value to write
+     * @return the commandId assigned to the dispatched command, for polling delivery status
      */
     @PreAuthorize("@perm.can('point_command', 'list')")
     @Operation(summary = "Send Point Write Command", description = "Dispatch a downward write command to push a new value onto a single point on the tenant's device " +

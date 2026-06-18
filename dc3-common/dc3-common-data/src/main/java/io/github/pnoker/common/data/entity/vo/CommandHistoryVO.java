@@ -74,15 +74,15 @@ public class CommandHistoryVO implements Serializable {
 
     private String commandCode;
 
-    @Schema(description = "Command parameter values")
+    @Schema(description = "Command parameter values", example = "{\"temperature\": \"50\"}")
 
     private String paramValues;
 
-    @Schema(description = "Result values returned from the device after command execution, keyed by parameter code.")
+    @Schema(description = "Result values returned from the device after command execution, keyed by parameter code.", example = "{\"status\": \"00\"}")
 
     private String resultValues;
 
-    @Schema(description = "Command configuration snapshot")
+    @Schema(description = "Command configuration snapshot", example = "{\"timeout\": 3000}")
 
     private String configSnapshot;
 
@@ -101,7 +101,7 @@ public class CommandHistoryVO implements Serializable {
 
     private CommandHistorySourceEnum source;
 
-    @Schema(description = "ID of the user who issued this command.")
+    @Schema(description = "ID of the user who issued this command.", example = "1000")
 
     private Long sourceUserId;
 

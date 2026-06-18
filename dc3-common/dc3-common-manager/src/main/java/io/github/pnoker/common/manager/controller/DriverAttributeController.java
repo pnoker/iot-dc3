@@ -72,10 +72,10 @@ public class DriverAttributeController implements BaseController {
     private final DriverService driverService;
 
     /**
-     * Create a driver attribute.
+     * Create a driver attribute definition for the current tenant.
      *
-     * @param entityVO {@link DriverAttributeVO}
-     * @return R of String
+     * @param entityVO driver attribute payload to create (name, code, type, default value)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('driver_attribute', 'add')")
     @Operation(summary = "Add Driver Attribute", description = "Define a new driver attribute for the current tenant. A driver attribute is a configurable field " +
@@ -91,10 +91,10 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * Delete a driver attribute by ID.
+     * Delete a driver attribute definition by ID.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the driver attribute to delete (must be tenant-owned)
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('driver_attribute', 'delete')")
     @Operation(summary = "Delete Driver Attribute", description = "Permanently delete a driver attribute by ID (tenant-scoped). Removes the attribute definition for its " +
@@ -109,10 +109,10 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * Update a driver attribute.
+     * Update an existing driver attribute definition.
      *
-     * @param entityVO {@link DriverAttributeVO}
-     * @return R of String
+     * @param entityVO driver attribute payload to update (must carry an existing id)
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('driver_attribute', 'update')")
     @Operation(summary = "Update Driver Attribute", description = "Update an existing driver attribute (tenant-scoped). Modifies the field definition's name, code, type, " +
@@ -129,10 +129,10 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * Query a driver attribute by ID.
+     * Fetch a single driver attribute definition by ID.
      *
-     * @param id ID
-     * @return DriverAttributeVO {@link DriverAttributeVO}
+     * @param id id of the driver attribute to fetch (must be tenant-owned)
+     * @return the matched DriverAttributeVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('driver_attribute', 'get')")
     @Operation(summary = "Get Driver Attribute by ID", description = "Fetch one driver attribute by ID (tenant-scoped). Use to inspect a driver's configurable field " +
@@ -147,16 +147,16 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * Query driver attributes by driver ID.
+     * List every driver attribute declared on a given driver.
      *
-     * @param id ID
-     * @return driver attributes
+     * @param driverId id of the driver whose declared attributes are returned (must be tenant-owned)
+     * @return a list of DriverAttributeVO for the driver; an empty list when the driver is not found
      */
     @PreAuthorize("@perm.can('driver_attribute', 'list')")
     @Operation(summary = "List Driver Attributes by Driver ID", description = "Return every driver attribute declared on a given driver (tenant-scoped). Use to discover which " +
             "configurable fields a driver exposes; returns an empty list when the driver does not exist.")
     @GetMapping("/list_by_driver_id")
-    public Mono<R<List<DriverAttributeVO>>> listByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<List<DriverAttributeVO>>> listByDriverId(@Parameter(description = "Identifier of the driver whose declared attributes are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             try {
                 requireTenant(tenantId, driverService.getById(driverId));
@@ -170,10 +170,10 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * Query driver attributes with pagination.
+     * Page through driver attribute definitions with filters.
      *
-     * @param entityQuery Dto
-     * @return page of driver attributes
+     * @param entityQuery query filters such as name, code and driver (may be null)
+     * @return a page of DriverAttributeVO matching the query
      */
     @PreAuthorize("@perm.can('driver_attribute', 'list')")
     @Operation(summary = "List Driver Attributes", description = "Page through driver attributes for the current tenant with filters such as name, code and driver. Returns a " +

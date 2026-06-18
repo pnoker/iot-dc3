@@ -87,8 +87,10 @@ public class DeviceController implements BaseController {
     private final DriverService driverService;
 
     /**
-     * @param entityVO {@link DeviceVO}
-     * @return R of String
+     * Register a new device for the current tenant, then return the add-success status.
+     *
+     * @param entityVO device payload to create
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('device', 'add')")
     @Operation(summary = "Add Device", description = "Register a new IoT device for the current tenant. " +
@@ -104,10 +106,10 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * ID
+     * Delete a device after verifying it belongs to the current tenant, then return the delete-success status.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the device to delete
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('device', 'delete')")
     @Operation(summary = "Delete Device", description = "Permanently delete a device by ID (tenant-scoped). " +
@@ -122,8 +124,10 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * @param entityVO {@link DeviceVO}
-     * @return R of String
+     * Update an existing device after verifying tenant ownership, then return the update-success status.
+     *
+     * @param entityVO device payload to update
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('device', 'update')")
     @Operation(summary = "Update Device", description = "Modify an existing device's attributes such as name, profile, " +
@@ -140,10 +144,10 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * ID Device
+     * Fetch one device by ID after verifying it belongs to the current tenant.
      *
-     * @param id ID
-     * @return DeviceVO {@link DeviceVO}
+     * @param id id of the device to fetch
+     * @return the matched DeviceVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('device', 'get')")
     @Operation(summary = "Get Device by ID", description = "Fetch one device with its bound profile, driver " +
@@ -158,10 +162,10 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * ID Device
+     * Resolve a batch of device IDs to their details, filtered to the current tenant.
      *
-     * @param deviceIds Device ID
-     * @return Map(ID, DeviceVO)
+     * @param deviceIds ids of the devices to resolve
+     * @return a map of id to DeviceVO for the tenant-owned matched ids
      */
     @PreAuthorize("@perm.can('device', 'list')")
     @Operation(summary = "List Devices by IDs", description = "Resolve a batch of device IDs to their details for the current tenant. " +
@@ -177,16 +181,16 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * Profile ID Device
+     * List every device that instantiates a given profile template, filtered to the current tenant.
      *
-     * @param profileId Profile ID
-     * @return Device array
+     * @param profileId id of the profile template to match
+     * @return a list of DeviceVO matching the profile
      */
     @PreAuthorize("@perm.can('device', 'list')")
     @Operation(summary = "List Devices by Profile ID", description = "Return every device that instantiates a given profile template (tenant-scoped). " +
             "Use to find which devices share the same point, command and event definitions.")
     @GetMapping("/list_by_profile_id")
-    public Mono<R<List<DeviceVO>>> listByProfileId(@Parameter(description = "Profile ID") @NotNull @RequestParam(value = "profile_id") Long profileId) {
+    public Mono<R<List<DeviceVO>>> listByProfileId(@Parameter(description = "Identifier of the profile template whose instantiated devices are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.listByProfileId(profileId, tenantId));
             List<DeviceVO> entityVOList = deviceBuilder.buildVOListByBOList(entityBOList);
@@ -195,10 +199,10 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * Device
+     * Page through devices for the current tenant using the supplied query filters.
      *
-     * @param entityQuery
-     * @return R Of DeviceVO Page
+     * @param entityQuery optional query filters (name, profile, driver, enable flag); a new query is used when null
+     * @return a page of DeviceVO matching the query
      */
     @PreAuthorize("@perm.can('device', 'list')")
     @Operation(summary = "List Devices", description = "Page through devices for the current tenant with filters such as name, " +
@@ -215,10 +219,11 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * Device
+     * Bulk-create devices for the current tenant by importing an XLSX file (max 20 MB).
      *
-     * @param entityVO {@link DeviceVO}
-     * @return R of String
+     * @param entityVO device payload carrying the profile and driver context for the import
+     * @param filePart uploaded XLSX file whose rows become devices
+     * @return add-success status once the import completes
      */
     @PreAuthorize("@perm.can('device', 'add')")
     @Operation(summary = "Import Devices", description = "Bulk-create devices for the current tenant by uploading an XLSX file " +
@@ -249,8 +254,10 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * @param entityVO {@link DeviceVO}
-     * @return
+     * Generate and stream the XLSX import template shaped for the supplied profile and driver.
+     *
+     * @param entityVO device payload carrying the profile and driver context for the template
+     * @return a ResponseEntity streaming the generated template XLSX file
      */
     @PreAuthorize("@perm.can('device', 'list')")
     @Operation(summary = "Download Device Import Template", description = "Generate and download the XLSX template used for bulk device import, " +
@@ -266,14 +273,16 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * @param driverId
-     * @return
+     * Count how many tenant-owned devices are driven by the given driver.
+     *
+     * @param driverId id of the driver to count devices for
+     * @return the number of devices driven by the driver
      */
     @PreAuthorize("@perm.can('device', 'list')")
     @Operation(summary = "Count Devices by Driver", description = "Return how many devices for the current tenant are driven by a given driver. " +
             "Use for quick cardinality checks before reconfiguring a driver; the driver must belong to the tenant.")
     @GetMapping("/get_count_by_driver_id")
-    public Mono<R<Integer>> getCountByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Integer>> getCountByDriverId(@Parameter(description = "Identifier of the driver whose device count is returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverService.getById(driverId));
             List<DeviceBO> deviceBOList = filterTenant(tenantId, deviceService.listByDriverId(driverId, tenantId));

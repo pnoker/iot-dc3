@@ -42,10 +42,10 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(description = "Role Tree view object")
+@Schema(description = "Tree-shaped role view object; extends RoleVO with a nested children list for rendering hierarchical role selectors.")
 public class RoleTreeVO extends RoleVO {
 
-    @Schema(description = "Child role nodes")
+    @Schema(description = "Direct child roles in the hierarchy tree; empty list when the role is a leaf node.")
     @ToString.Exclude
     private List<RoleTreeVO> children = new ArrayList<>();
 

@@ -40,7 +40,7 @@ public class EventParamExt extends BaseExt {
     /**
      * Extended content.
      */
-    @Schema(description = "Extended content of the event param")
+    @Schema(description = "Structured event param payload carrying the reserved keep field")
     private Content content;
 
     @Schema(description = "Extended content payload of the event param")
@@ -50,7 +50,7 @@ public class EventParamExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved keep field for the event param content")
+        @Schema(description = "Reserved keep field retained for forward-compatible event param content", example = "reserved")
         private String keep;
 
     }

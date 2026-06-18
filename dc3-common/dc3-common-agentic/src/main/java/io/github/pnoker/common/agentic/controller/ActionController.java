@@ -61,7 +61,7 @@ public class ActionController implements BaseController {
     @Operation(summary = "List Pending Agent Actions", description = "List agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. " +
             "Returns each pending action with its tool name and parameters so the user can confirm or reject before execution.")
     @GetMapping("/pending")
-    public Mono<R<List<ActionVO>>> pending(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+    public Mono<R<List<ActionVO>>> pending(@Parameter(description = "Unique identifier of the agentic conversation whose pending tool calls are to be listed; scoped to the current tenant and user.", example = "conv-20240618-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId);
@@ -76,7 +76,7 @@ public class ActionController implements BaseController {
     @Operation(summary = "Confirm Agent Action", description = "Approve a pending agent tool call by id so the assistant may execute it. " +
             "Returns the action with its updated confirmed status; call after the user accepts a proposed tool invocation.")
     @PostMapping("/confirm")
-    public Mono<R<ActionVO>> confirm(@Parameter(description = "AI action ID") @NotBlank @RequestParam(value = "action_id") String actionId) {
+    public Mono<R<ActionVO>> confirm(@Parameter(description = "Unique identifier of the pending agent tool call to approve; the action must belong to the current tenant and be in pending state.", example = "action-20240618-xyz789") @NotBlank @RequestParam(value = "action_id") String actionId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             ActionBO actionBO = actionService.confirm(actionId, header);
             ActionVO action = actionBuilder.buildVOByBO(actionBO);
@@ -89,7 +89,7 @@ public class ActionController implements BaseController {
     @Operation(summary = "Reject Agent Action", description = "Decline a pending agent tool call by id so the assistant does not execute it. " +
             "Returns the action with its updated rejected status; call when the user denies a proposed tool invocation.")
     @PostMapping("/reject")
-    public Mono<R<ActionVO>> reject(@Parameter(description = "AI action ID") @NotBlank @RequestParam(value = "action_id") String actionId) {
+    public Mono<R<ActionVO>> reject(@Parameter(description = "Unique identifier of the pending agent tool call to decline; the action must belong to the current tenant and be in pending state.", example = "action-20240618-xyz789") @NotBlank @RequestParam(value = "action_id") String actionId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             ActionBO actionBO = actionService.reject(actionId, header);
             ActionVO action = actionBuilder.buildVOByBO(actionBO);

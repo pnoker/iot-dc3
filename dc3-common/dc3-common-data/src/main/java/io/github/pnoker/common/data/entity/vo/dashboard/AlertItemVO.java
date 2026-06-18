@@ -47,16 +47,16 @@ public class AlertItemVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "alert row ID")
+    @Schema(description = "alert row ID", example = "1")
     private Long id;
 
-    @Schema(description = "alert source: device or driver")
+    @Schema(description = "alert source: device or driver", example = "device")
     private String source;
 
-    @Schema(description = "source entity ID (device ID or driver ID)")
+    @Schema(description = "source entity ID (device ID or driver ID)", example = "1024")
     private Long sourceId;
 
-    @Schema(description = "point ID, present when source is device")
+    @Schema(description = "point ID, present when source is device", example = "2048")
     private Long pointId;
 
     @Schema(description = "Alarm type enum", example = "OFFLINE")
@@ -72,7 +72,7 @@ public class AlertItemVO implements Serializable {
      * Human-readable message extracted from alarm_ext->>'content'. Populated by the
      * paging / list endpoints; latest(size=N) leaves it null.
      */
-    @Schema(description = "human-readable alarm message")
+    @Schema(description = "human-readable alarm message", example = "Device Temperature Sensor A1 is offline for more than 5 minutes")
     private String message;
 
 }

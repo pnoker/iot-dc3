@@ -49,25 +49,22 @@ public class PointCommandHistoryQueryVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Filter by device ID.", example = "1024")
-
+    @Schema(description = "Identifier of the device to filter by; must belong to the current tenant.", example = "1024")
     private Long deviceId;
 
-    @Schema(description = "Filter by data point ID.", example = "2048")
-
+    @Schema(description = "Identifier of the data point to filter by; must belong to the current tenant.", example = "2048")
     private Long pointId;
 
-    @Schema(description = "Command status", example = "SUCCESS")
+    @Schema(description = "Lifecycle status of the command to filter by (e.g. pending, success, failed).", example = "SUCCESS")
     private PointCommandStatusEnum status;
 
-    @Schema(description = "Point command type")
-
+    @Schema(description = "Type of the point command to filter by (e.g. read, write).", example = "READ")
     private PointCommandTypeEnum type;
 
-    @Schema(description = "Current page number", example = "1")
+    @Schema(description = "Current page number for pagination, starting at 1.", example = "1")
     private Long page = 1L;
 
-    @Schema(description = "Page size", example = "20")
+    @Schema(description = "Number of records per page.", example = "20")
     private Long size = 20L;
 
     /**

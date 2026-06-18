@@ -21,7 +21,6 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.CallTypeEnum;
 import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,49 +44,38 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Facade Command query parameters")
 public class FacadeCommandQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
 
     private Pages page;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "command name")
 
     private String commandName;
 
-    @Schema(description = "command code")
 
     private String commandCode;
 
-    @Schema(description = "command type")
 
     private CommandTypeEnum commandType;
 
-    @Schema(description = "call type")
 
     private CallTypeEnum callType;
 
-    @Schema(description = "profile ID")
 
     private Long profileId;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 
-    @Schema(description = "device ID")
 
     private Long deviceId;
 

@@ -42,10 +42,10 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(description = "Resource Tree view object")
+@Schema(description = "Tree-shaped resource view object used for hierarchical rendering; each node may carry a nested list of child resource nodes.")
 public class ResourceTreeVO extends ResourceVO {
 
-    @Schema(description = "Child resource nodes")
+    @Schema(description = "Ordered list of direct child resource nodes under this node; empty when the resource is a leaf.")
     @ToString.Exclude
     private List<ResourceTreeVO> children = new ArrayList<>();
 

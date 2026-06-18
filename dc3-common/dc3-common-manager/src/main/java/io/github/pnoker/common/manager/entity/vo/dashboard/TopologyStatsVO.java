@@ -37,7 +37,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-@Schema(description = "Tenant-wide total counts for the topology footer summary")
+@Schema(description = "Tenant-wide total counts for the topology footer summary", example = "1024")
 public class TopologyStatsVO implements Serializable {
 
     @Serial

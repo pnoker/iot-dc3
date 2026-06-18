@@ -49,14 +49,14 @@ public class EventAttributeConfigQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     //
@@ -64,31 +64,31 @@ public class EventAttributeConfigQuery implements Serializable {
     /**
      * ID
      */
-    @Schema(description = "attribute ID")
+    @Schema(description = "Filter by attribute ID.", example = "1024")
     private Long attributeId;
 
     /**
      * Device ID
      */
-    @Schema(description = "device ID")
+    @Schema(description = "Filter by device ID. Returns results scoped to a specific device.", example = "1024")
     private Long deviceId;
 
     /**
      * Event ID
      */
-    @Schema(description = "event ID")
+    @Schema(description = "Filter by event definition ID.", example = "4096")
     private Long eventId;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 
 }

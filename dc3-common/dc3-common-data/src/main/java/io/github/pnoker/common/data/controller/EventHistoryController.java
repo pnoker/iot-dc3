@@ -77,7 +77,7 @@ public class EventHistoryController implements BaseController {
     @PreAuthorize("@perm.can('event_history', 'get')")
     @Operation(summary = "Get Event History by Record ID", description = "Fetch a single device event record by its record ID, tenant-scoped. Returns the event type, payload, and timestamp; use to inspect one specific reported event.")
     @GetMapping("/get_by_record_id")
-    public Mono<R<EventHistoryVO>> getByRecordId(@Parameter(description = "Record ID") @NotBlank @RequestParam String recordId) {
+    public Mono<R<EventHistoryVO>> getByRecordId(@Parameter(description = "Identifier of the event history record to fetch; must belong to the current tenant.", example = "1024") @NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() ->
                 R.ok(eventHistoryService.getByRecordId(tenantId, recordId))));
     }

@@ -50,13 +50,13 @@ public class AlertBulkConfirmVO implements Serializable {
      * Direction of the bulk operation: true sets confirm_flag to 1, false sets it back
      * to 0. Defaults to true when null.
      */
-    @Schema(description = "direction of the bulk operation: true confirms, false unconfirms; defaults to true when null")
+    @Schema(description = "Direction of the bulk operation: true sets confirm_flag to 1 (confirmed), false resets it to 0 (unconfirmed). Defaults to true when null.", example = "true")
     private Boolean confirm;
 
     /**
      * Targets to act on.
      */
-    @Schema(description = "targets to act on")
+    @Schema(description = "Alert targets to apply the bulk operation to; each entry identifies a single alert row in the current tenant scope.")
     private List<Item> items;
 
     @Getter
@@ -73,13 +73,13 @@ public class AlertBulkConfirmVO implements Serializable {
         /**
          * Alert source: {@code device} or {@code driver}.
          */
-        @Schema(description = "alert source: device or driver")
+        @Schema(description = "Alert source classification: \"device\" for device-originated alerts or \"driver\" for driver-originated alerts; must match a value stored in dc3_entity_alert.source.", example = "device")
         private String source;
 
         /**
          * Alert row id.
          */
-        @Schema(description = "alert row ID")
+        @Schema(description = "Primary key of the alert row in dc3_entity_alert to confirm or unconfirm.", example = "1024")
         private Long id;
 
     }

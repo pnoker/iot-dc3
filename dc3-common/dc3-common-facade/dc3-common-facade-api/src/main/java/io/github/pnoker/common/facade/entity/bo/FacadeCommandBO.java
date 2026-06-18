@@ -22,7 +22,6 @@ import io.github.pnoker.common.entity.ext.CommandExt;
 import io.github.pnoker.common.enums.CallTypeEnum;
 import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,50 +40,38 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-@Schema(description = "Facade Command business object")
 public class FacadeCommandBO extends BaseBO {
 
-    @Schema(description = "command name")
 
     private String commandName;
 
-    @Schema(description = "command code")
 
     private String commandCode;
 
-    @Schema(description = "Command type enum")
 
     private CommandTypeEnum commandTypeFlag;
 
-    @Schema(description = "Command call type enum")
 
     private CallTypeEnum callTypeFlag;
 
-    @Schema(description = "Command timeout")
 
     private Integer timeout;
 
-    @Schema(description = "command extension information in JSON format")
 
     private CommandExt commandExt;
 
-    @Schema(description = "profile ID")
 
     private Long profileId;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "Configuration signature")
 
     private String signature;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 

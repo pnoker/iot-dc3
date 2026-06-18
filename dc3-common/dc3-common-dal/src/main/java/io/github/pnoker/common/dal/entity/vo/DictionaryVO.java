@@ -51,37 +51,37 @@ public class DictionaryVO implements Serializable {
     /**
      * Dictionary type.
      */
-    @Schema(description = "Dictionary type")
+    @Schema(description = "Logical grouping code of the dictionary item, e.g. device_type, point_rw.", example = "device_type")
     private String type;
 
     /**
      * Dictionary label name.
      */
-    @Schema(description = "Dictionary label")
+    @Schema(description = "Human-readable display label for the dictionary item.", example = "Modbus TCP")
     private String label;
 
     /**
      * Dictionary label value.
      */
-    @Schema(description = "Dictionary value")
+    @Schema(description = "Stable machine-readable value paired with the label.", example = "MODBUS_TCP")
     private String value;
 
     /**
      * Whether the dictionary item is disabled.
      */
-    @Schema(description = "Whether the entity is disabled")
+    @Schema(description = "Whether the dictionary item is hidden or unavailable for selection.", example = "false")
     private boolean disabled;
 
     /**
      * Whether the dictionary node is expanded.
      */
-    @Schema(description = "Whether the dictionary node is expanded")
+    @Schema(description = "Whether the dictionary node is expanded by default in the tree view.", example = "true")
     private boolean expand;
 
     /**
      * Child dictionary nodes.
      */
-    @Schema(description = "Child dictionary nodes")
+    @Schema(description = "Child dictionary nodes forming the hierarchical tree; empty when this is a leaf item.")
     private List<DictionaryVO> children;
 
 }

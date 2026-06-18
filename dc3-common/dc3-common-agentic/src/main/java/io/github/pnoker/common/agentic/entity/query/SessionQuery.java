@@ -47,16 +47,16 @@ public class SessionQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
     private Pages page;
 
-    @Schema(description = "Tenant ID", example = "1024")
+    @Schema(description = "Tenant identifier used to scope this query; only sessions belonging to the specified tenant are returned.", example = "1024")
     private Long tenantId;
 
-    @Schema(description = "User ID", example = "1024")
+    @Schema(description = "Identifier of the user whose sessions are being queried; filters results to sessions owned by this user within the tenant.", example = "1024")
     private Long userId;
 
-    @Schema(description = "Conversation ID")
+    @Schema(description = "Unique identifier of the conversation to filter sessions by; returns only sessions associated with the specified conversation.", example = "conv-20240101-abc123")
     private String conversationId;
 
 }

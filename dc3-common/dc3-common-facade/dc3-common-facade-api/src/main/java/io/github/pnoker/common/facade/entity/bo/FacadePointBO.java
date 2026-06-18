@@ -22,7 +22,6 @@ import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.enums.RwTypeEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,62 +42,47 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-@Schema(description = "Facade Point business object")
 public class FacadePointBO extends BaseBO {
 
-    @Schema(description = "point name")
 
     private String pointName;
 
-    @Schema(description = "point code")
 
     private String pointCode;
 
-    @Schema(description = "Point type enum")
 
     private PointTypeEnum pointTypeFlag;
 
-    @Schema(description = "Read/write type enum")
 
     private RwTypeEnum rwFlag;
 
-    @Schema(description = "base value")
 
     private BigDecimal baseValue;
 
-    @Schema(description = "Value multiplier")
 
     private BigDecimal multiple;
 
-    @Schema(description = "value decimal")
 
     private Byte valueDecimal;
 
-    @Schema(description = "Point value unit")
 
     private String unit;
 
-    @Schema(description = "profile ID")
 
     private Long profileId;
 
-    @Schema(description = "point extension information in JSON format")
 
     private PointExt pointExt;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "Configuration signature")
 
     private String signature;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 

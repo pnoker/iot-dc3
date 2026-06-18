@@ -45,25 +45,25 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Command query parameters")
+@Schema(description = "Command query parameters", example = "42")
 public class CommandQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
 
     private Long tenantId;
 
-    @Schema(description = "command name")
+    @Schema(description = "Filter by command name. Supports partial matching.", example = "Read Holding Register")
 
     private String commandName;
 
-    @Schema(description = "command code")
+    @Schema(description = "Filter by command code. Exact match on the stable business identifier.", example = "READ_HOLDING_REG")
 
     private String commandCode;
 
@@ -75,19 +75,19 @@ public class CommandQuery implements Serializable {
 
     private CallTypeEnum callType;
 
-    @Schema(description = "profile ID")
+    @Schema(description = "Filter by profile (device template) ID.", example = "2048")
 
     private Long profileId;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
 
     private Integer version;
 
-    @Schema(description = "device ID")
+    @Schema(description = "Filter by device ID. Returns results scoped to a specific device.", example = "1024")
 
     private Long deviceId;
 

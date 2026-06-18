@@ -156,7 +156,7 @@ public class EventAttributeController implements BaseController {
     @Operation(summary = "List Event Attributes by Driver ID", description = "Return every event attribute field definition reachable through a given driver (tenant-scoped). " +
             "Use to discover which device-reported event fields a driver exposes; returns an empty list when the driver is not found.")
     @GetMapping("/list_by_driver_id")
-    public Mono<R<List<EventAttributeVO>>> listByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<List<EventAttributeVO>>> listByDriverId(@Parameter(description = "Identifier of the driver whose reachable event attribute fields should be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             try {
                 requireTenant(tenantId, driverService.getById(driverId));

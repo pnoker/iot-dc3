@@ -49,10 +49,10 @@ public class ChangeImpactVO implements Serializable {
     /**
      * {@code driver} | {@code device} | {@code profile}.
      */
-    @Schema(description = "changed entity kind: driver, device or profile")
+    @Schema(description = "changed entity kind: driver, device or profile", example = "device")
     private String kind;
 
-    @Schema(description = "changed entity ID")
+    @Schema(description = "changed entity ID", example = "1024")
     private long entityId;
 
     @Schema(description = "time the entity was edited")

@@ -43,13 +43,13 @@ public class AlertTrendVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "date of the data point")
+    @Schema(description = "date of the data point", example = "2026-06-18")
     private String date;
 
-    @Schema(description = "device alarm count for the day")
+    @Schema(description = "device alarm count for the day", example = "12")
     private long deviceCount;
 
-    @Schema(description = "driver alarm count for the day")
+    @Schema(description = "driver alarm count for the day", example = "5")
     private long driverCount;
 
 }

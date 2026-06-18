@@ -37,46 +37,46 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(description = "Token query parameters")
+@Schema(description = "Query parameters for token validation, login, and password-change operations.")
 public class TokenQuery {
 
     /**
      * Tenant
      */
-    @Schema(description = "Tenant identifier")
+    @Schema(description = "Tenant code that scopes the authentication request; must match an existing tenant. Format: 2–32 alphanumeric or -_#@/.|characters.", example = "dc3-tenant-01")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid tenant code")
     private String tenant;
 
     /**
      *
      */
-    @Schema(description = "Token name")
+    @Schema(description = "Username of the account being authenticated; must exist within the specified tenant. Format: 2–32 alphanumeric or -_#@/.|characters.", example = "alice")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid username")
     private String name;
 
     /**
      *
      */
-    @Schema(description = "Random salt value")
+    @Schema(description = "Random salt string issued by the server during the login handshake; must be echoed back when submitting credentials.", example = "a3f9c2d1")
     private String salt;
 
     /**
      *
      */
-    @Schema(description = "Password")
+    @Schema(description = "Credential submitted for authentication; typically the password hashed with the server-issued salt during the login handshake.", example = "5f4dcc3b5aa765d61d8327deb882cf99")
     private String password;
 
     /**
      *
      */
-    @Schema(description = "Authentication token")
+    @Schema(description = "JWT or session token to be validated or invalidated; used by token-check and logout endpoints.", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
     private String token;
 
     /**
      * New password, used by the self-service password change flow; {@code password} carries
      * the current password in that flow.
      */
-    @Schema(description = "New password for the password change flow")
+    @Schema(description = "Replacement password for the self-service password change flow; {@code password} must carry the current credential in the same request.", example = "N3wP@ssw0rd!")
     private String newPassword;
 
 }

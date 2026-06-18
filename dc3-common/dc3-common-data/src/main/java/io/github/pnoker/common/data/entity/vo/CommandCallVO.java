@@ -43,11 +43,11 @@ public class CommandCallVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "device ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Identifier of the target device; must belong to the current tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
     private Long deviceId;
 
-    @Schema(description = "ID of the command being invoked.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Identifier of the command being invoked; must reference a command accessible to the current tenant.", example = "4096")
 
     private Long commandId;
 
@@ -58,8 +58,7 @@ public class CommandCallVO implements Serializable {
     @Schema(description = "Parameter values for this command invocation, keyed by parameter code.")
     private Map<String, String> paramValues;
 
-    @Schema(description = "Client command correlation ID")
-
+    @Schema(description = "Client-side correlation ID used to match this call with its asynchronous response.", example = "cmd-req-9f3a7c2d")
     private String commandId_;
 
 }

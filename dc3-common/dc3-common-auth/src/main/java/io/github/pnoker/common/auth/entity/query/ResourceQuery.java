@@ -52,7 +52,7 @@ public class ResourceQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
@@ -61,25 +61,25 @@ public class ResourceQuery implements Serializable {
     /**
      * Name
      */
-    @Schema(description = "Resource name")
+    @Schema(description = "Partial or exact name of the resource used for filtering; case-insensitive match.", example = "Device Management")
     private String resourceName;
 
     /**
      * Code
      */
-    @Schema(description = "Resource permission code")
+    @Schema(description = "Unique permission code of the resource used for filtering; must match the registered code exactly.", example = "device:list")
     private String resourceCode;
 
     /**
      * Type
      */
-    @Schema(description = "Resource type enum", example = "MENU")
+    @Schema(description = "Single resource type filter; ignored when resourceTypeFlags is non-empty.", example = "MENU")
     private ResourceTypeEnum resourceTypeFlag;
 
     /**
      * Type multi-select — takes precedence over {@link #resourceTypeFlag} when non-empty.
      */
-    @Schema(description = "resource type flags")
+    @Schema(description = "Multi-value resource type filter; when non-empty takes precedence over resourceTypeFlag. Allowed values: DRIVER, PROFILE, POINT, DEVICE, DATA, MENU, API.")
     private List<ResourceTypeEnum> resourceTypeFlags;
 
     /**
@@ -92,26 +92,26 @@ public class ResourceQuery implements Serializable {
      * </ul>
      *
      */
-    @Schema(description = "Resource scope enum", example = "LIST")
+    @Schema(description = "Single resource scope type filter; ignored when resourceScopeFlags is non-empty.", example = "LIST")
     private ResourceScopeTypeEnum resourceScopeFlag;
 
     /**
      * Scope multi-select — takes precedence over {@link #resourceScopeFlag} when
      * non-empty.
      */
-    @Schema(description = "resource scope flags")
+    @Schema(description = "Multi-value resource scope filter; when non-empty takes precedence over resourceScopeFlag. Allowed values: ADD, DELETE, UPDATE, LIST, GET.")
     private List<ResourceScopeTypeEnum> resourceScopeFlags;
 
     /**
      * Parent resource id filter (optional).
      */
-    @Schema(description = "Parent resource ID")
+    @Schema(description = "ID of the parent resource; filters results to direct children of this resource node.", example = "1024")
     private Long parentResourceId;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Enable status of the resource; filters to only enabled or only disabled resources.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

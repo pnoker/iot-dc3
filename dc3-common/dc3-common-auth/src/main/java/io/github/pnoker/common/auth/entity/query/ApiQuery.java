@@ -50,7 +50,7 @@ public class ApiQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
@@ -59,37 +59,37 @@ public class ApiQuery implements Serializable {
     /**
      * Owning service name, populated by resource registrar
      */
-    @Schema(description = "Service name")
+    @Schema(description = "Filter by microservice name (e.g. dc3-center-auth).", example = "dc3-center-manager")
     private String serviceName;
 
     /**
      * ApiType
      */
-    @Schema(description = "API method enum", example = "GET")
+    @Schema(description = "HTTP method type of the API endpoint (POST, DELETE, PUT, or GET).", example = "GET")
     private ApiTypeEnum apiTypeFlag;
 
     /**
      * ApiName
      */
-    @Schema(description = "API name")
+    @Schema(description = "Human-readable display name of the API endpoint.", example = "Add Device")
     private String apiName;
 
     /**
      * ApiCode, URLMD5
      */
-    @Schema(description = "API code identifier")
+    @Schema(description = "Unique identifier for the API endpoint, derived from the URL MD5 hash.", example = "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4")
     private String apiCode;
 
     /**
      * API grouping, usually the owning controller simple class name
      */
-    @Schema(description = "API grouping label")
+    @Schema(description = "Grouping label for the API, typically the simple class name of the owning controller.", example = "DeviceController")
     private String apiGroup;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Enable/disable status of the API; only ENABLE records are accessible at runtime.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

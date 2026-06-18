@@ -50,14 +50,14 @@ public class DriverAttributeQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     //
@@ -65,13 +65,13 @@ public class DriverAttributeQuery implements Serializable {
     /**
      * Name
      */
-    @Schema(description = "attribute name")
+    @Schema(description = "Filter by attribute name. Supports partial matching.", example = "Connection Timeout")
     private String attributeName;
 
     /**
      * Code
      */
-    @Schema(description = "attribute code")
+    @Schema(description = "Filter by attribute code. Exact match on the stable business identifier.", example = "CONN_TIMEOUT")
     private String attributeCode;
 
     /**
@@ -83,19 +83,19 @@ public class DriverAttributeQuery implements Serializable {
     /**
      * Driver ID
      */
-    @Schema(description = "driver ID")
+    @Schema(description = "Filter by driver ID. Returns results scoped to a specific driver.", example = "1024")
     private Long driverId;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 
 }

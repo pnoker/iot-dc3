@@ -48,37 +48,37 @@ public class NotifyVO extends BaseVO {
     /**
      * Alarm notification template name
      */
-    @Schema(description = "Notification name. Unique name within a tenant.", example = "Over Temperature Alert", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Notification template name; must be unique within the current tenant.", example = "Over Temperature Alert")
     private String notifyName;
 
     /**
      * Alarm notification template code
      */
-    @Schema(description = "Notification code. Stable business identifier; must not change once deployed.", example = "OVER_TEMP")
+    @Schema(description = "Stable business code identifying this notification template; should not change once deployed.", example = "OVER_TEMP")
     private String notifyCode;
 
     /**
      * Auto confirm flag
      */
-    @Schema(description = "Auto-confirm flag enum")
+    @Schema(description = "Whether alarms raised by this template are auto-confirmed (AUTO) or require manual confirmation (MANUAL).", example = "AUTO")
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
      * Alarm notification interval, milliseconds
      */
-    @Schema(description = "Minimum cooldown interval in seconds between successive notification deliveries. Prevents alert storms.", example = "300")
+    @Schema(description = "Minimum cooldown interval, in seconds, between successive notification deliveries to prevent alert storms.", example = "300")
     private Long notifyInterval;
 
     /**
      * Alarm notification template configuration
      */
-    @Schema(description = "Notification extension information, serialized as JSON for custom delivery logic.")
+    @Schema(description = "Notification extension information, serialized as JSON for custom delivery logic (channels, templates, recipients).")
     private NotifyExt notifyExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
+    @Schema(description = "Whether this notification template is active: ENABLE (0) to enable or DISABLE (1) to disable.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

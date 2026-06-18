@@ -44,16 +44,16 @@ public class SessionExt implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "AI model identifier")
+    @Schema(description = "Identifier of the AI model used for this session (e.g. provider model name).", example = "gpt-4o")
     private String model;
 
-    @Schema(description = "Whether reasoning capability is enabled")
+    @Schema(description = "Whether chain-of-thought / extended reasoning capability is enabled for this session.", example = "false")
     private Boolean reasoningEnabled;
 
-    @Schema(description = "Sampling temperature for response generation")
+    @Schema(description = "Sampling temperature controlling response randomness; higher values increase diversity (typically 0.0–2.0).", example = "0.7")
     private Double temperature;
 
-    @Schema(description = "Maximum token limit for the response")
+    @Schema(description = "Maximum number of tokens the model may generate in a single response.", example = "2048")
     private Integer maxTokens;
 
 }

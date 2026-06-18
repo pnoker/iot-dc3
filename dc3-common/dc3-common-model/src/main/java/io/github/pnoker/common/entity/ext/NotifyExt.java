@@ -98,13 +98,13 @@ public class NotifyExt extends BaseExt {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "Duplicate suppression (deduplication) configuration for notifications")
+    @Schema(description = "Duplicate suppression (deduplication) configuration for notifications", example = "basic")
     public static class Dedup {
 
         @Schema(description = "Whether deduplication is enabled", example = "true")
         private Boolean enabled;
 
-        @Schema(description = "Deduplication key used to group notifications that should be suppressed as duplicates")
+        @Schema(description = "Deduplication key used to group notifications that should be suppressed as duplicates", example = "ruleId")
         private String key;
 
     }
@@ -128,7 +128,7 @@ public class NotifyExt extends BaseExt {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "Notification silence window configuration")
+    @Schema(description = "Notification silence window configuration", example = "basic")
     public static class Silence {
 
         @Schema(description = "Whether silence windows are enabled", example = "true")
@@ -143,7 +143,7 @@ public class NotifyExt extends BaseExt {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "A single silence window definition")
+    @Schema(description = "A single silence window definition", example = "basic")
     public static class Window {
 
         @Schema(description = "Timezone identifier the start/end times are evaluated in", example = "Asia/Shanghai")
@@ -164,7 +164,7 @@ public class NotifyExt extends BaseExt {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "Repeated reminder configuration applied while an alarm is still firing")
+    @Schema(description = "Repeated reminder configuration applied while an alarm is still firing", example = "basic")
     public static class Repeat {
 
         @Schema(description = "Whether repeated reminders are enabled", example = "true")
@@ -182,7 +182,7 @@ public class NotifyExt extends BaseExt {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "Recovery notification configuration")
+    @Schema(description = "Recovery notification configuration", example = "basic")
     public static class Recovery {
 
         @Schema(description = "Whether recovery handling is enabled", example = "true")
@@ -206,7 +206,7 @@ public class NotifyExt extends BaseExt {
         @Schema(description = "Delay after which this escalation is triggered, in milliseconds", example = "600000")
         private Long afterMs;
 
-        @Schema(description = "Message template code used for the escalation notification")
+        @Schema(description = "Message template code used for the escalation notification", example = "ESCALATION_MSG")
         private String messageCode;
 
     }

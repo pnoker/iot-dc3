@@ -18,7 +18,6 @@
 package io.github.pnoker.common.facade.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,33 +38,25 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-@Schema(description = "Facade User business object")
 public class FacadeUserBO extends BaseBO {
 
-    @Schema(description = "Principal ID")
     private Long principalId;
 
-    @Schema(description = "User nickname")
 
     private String nickName;
 
-    @Schema(description = "Username")
 
     private String userName;
 
-    @Schema(description = "Phone number")
 
     private String phone;
 
-    @Schema(description = "Email address")
 
     private String email;
 
-    @Schema(description = "Social extension information in JSON format")
 
     private String socialExt;
 
-    @Schema(description = "Identity extension information in JSON format")
 
     private String identityExt;
 

@@ -63,7 +63,7 @@ public class DriverAttributeVO extends BaseVO {
      * Code
      */
     @NotBlank(message = "Attribute code can't be empty", groups = {Add.class})
-    @Schema(description = "Driver attribute code. Stable business identifier; must not change once deployed.", example = "CONN_TIMEOUT")
+    @Schema(description = "Driver attribute code. Stable business identifier; must not change once deployed.", example = "CONN_TIMEOUT", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid attribute code format",
             groups = {Add.class, Update.class})
     private String attributeCode;
@@ -71,7 +71,7 @@ public class DriverAttributeVO extends BaseVO {
     /**
      * Type
      */
-    @Schema(description = "Attribute type enum")
+    @Schema(description = "Driver attribute data type: STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, or BOOLEAN.", example = "INT")
     private AttributeTypeEnum attributeTypeFlag;
 
     /**

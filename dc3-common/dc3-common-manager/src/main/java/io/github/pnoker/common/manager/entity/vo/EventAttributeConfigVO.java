@@ -77,7 +77,7 @@ public class EventAttributeConfigVO extends BaseVO {
     /**
      * Event ID
      */
-    @Schema(description = "ID of the event this configuration is scoped to.", example = "4096")
+    @Schema(description = "ID of the event this configuration is scoped to; must belong to the current tenant.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Event ID can't be empty", groups = {Add.class, Update.class})
     private Long eventId;
 
@@ -90,7 +90,7 @@ public class EventAttributeConfigVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "Signature used for configuration integrity verification.")
+    @Schema(description = "Signature used for configuration integrity verification.", example = "a1b2c3d4e5f6")
     private String signature;
 
     /**

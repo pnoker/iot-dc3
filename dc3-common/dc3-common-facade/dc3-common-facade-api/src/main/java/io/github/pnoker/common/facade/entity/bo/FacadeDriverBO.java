@@ -21,7 +21,6 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.DriverExt;
 import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,46 +39,35 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-@Schema(description = "Facade Driver business object")
 public class FacadeDriverBO extends BaseBO {
 
-    @Schema(description = "driver name")
 
     private String driverName;
 
-    @Schema(description = "driver code")
 
     private String driverCode;
 
-    @Schema(description = "Service name")
 
     private String serviceName;
 
-    @Schema(description = "service host")
 
     private String serviceHost;
 
-    @Schema(description = "Driver type enum")
 
     private DriverTypeEnum driverTypeFlag;
 
-    @Schema(description = "driver extension information in JSON format")
 
     private DriverExt driverExt;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "Configuration signature")
 
     private String signature;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 

@@ -58,7 +58,7 @@ public class SilentSourceVO implements Serializable {
     /**
      * How many seconds since the last sample, rounded.
      */
-    @Schema(description = "seconds since the last sample, rounded")
+    @Schema(description = "seconds since the last sample, rounded", example = "3600")
     private long silentSeconds;
 
 }

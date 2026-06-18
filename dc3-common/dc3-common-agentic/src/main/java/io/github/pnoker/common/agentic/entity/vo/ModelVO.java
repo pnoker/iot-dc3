@@ -36,28 +36,28 @@ import lombok.Setter;
 @Schema(description = "Model view object")
 public class ModelVO {
 
-    @Schema(description = "Model identifier", example = "gpt-4o")
+    @Schema(description = "Unique model identifier used when invoking the AI provider API.", example = "gpt-4o")
     private String model;
 
-    @Schema(description = "Human-readable model label", example = "GPT-4o")
+    @Schema(description = "Human-readable display name of the model shown in the UI.", example = "GPT-4o")
     private String label;
 
-    @Schema(description = "Whether the model supports streaming responses")
+    @Schema(description = "Whether the model supports streaming token-by-token responses via SSE.", example = "true")
     private boolean stream;
 
-    @Schema(description = "Whether the model supports tool/function calling")
+    @Schema(description = "Whether the model supports tool/function calling for structured action invocation.", example = "true")
     private boolean toolCall;
 
-    @Schema(description = "Whether the model supports vision (image) input")
+    @Schema(description = "Whether the model supports vision (image) input in addition to text.", example = "false")
     private boolean vision;
 
-    @Schema(description = "Whether the model supports reasoning")
+    @Schema(description = "Whether the model supports extended chain-of-thought reasoning before answering.", example = "false")
     private boolean reasoning;
 
-    @Schema(description = "Sampling temperature", example = "0.7")
+    @Schema(description = "Sampling temperature controlling output randomness; higher values produce more creative responses. Valid range is typically 0.0–2.0.", example = "0.7")
     private Double temperature;
 
-    @Schema(description = "Maximum number of tokens to generate", example = "4096")
+    @Schema(description = "Maximum number of tokens the model may generate in a single response. Capped by the model's context window limit.", example = "4096")
     private Integer maxTokens;
 
 }

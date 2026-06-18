@@ -20,7 +20,6 @@ package io.github.pnoker.common.facade.entity.query;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,45 +43,35 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Facade Driver query parameters")
 public class FacadeDriverQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
 
     private Pages page;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "driver name")
 
     private String driverName;
 
-    @Schema(description = "driver code")
 
     private String driverCode;
 
-    @Schema(description = "Service name")
 
     private String serviceName;
 
-    @Schema(description = "service host")
 
     private String serviceHost;
 
-    @Schema(description = "Driver type enum")
 
     private DriverTypeEnum driverTypeFlag;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 

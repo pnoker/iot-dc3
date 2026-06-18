@@ -46,11 +46,11 @@ public class PointCommandReadVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "device ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID of the device to read the point value from.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Device ID can't be empty")
     private Long deviceId;
 
-    @Schema(description = "point ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID of the data point to read.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Point ID can't be empty")
     private Long pointId;
 

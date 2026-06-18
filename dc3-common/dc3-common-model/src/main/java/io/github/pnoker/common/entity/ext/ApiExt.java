@@ -44,7 +44,7 @@ public class ApiExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content, distinguished by Type and Version")
+    @Schema(description = "Extended content of the API interface; discriminated by Type and Version of the parent extension")
     private Content content;
 
     @Schema(description = "Extended content of the API interface")
@@ -57,55 +57,55 @@ public class ApiExt extends BaseExt {
         /**
          * Title.
          */
-        @Schema(description = "Title of the API interface")
+        @Schema(description = "Human-readable title of the API interface", example = "Device Temperature Query")
         private String title;
 
         /**
          * URL link.
          */
-        @Schema(description = "URL link of the API interface")
+        @Schema(description = "URL link of the API interface; must be a valid HTTP(S) endpoint", example = "https://example.com/api/device/temperature")
         private String url;
 
         /**
          * Description.
          */
-        @Schema(description = "Description remark of the API interface")
+        @Schema(description = "Free-form description remark of the API interface", example = "Returns the latest temperature reading for a device")
         private String remark;
 
         /**
          * Declared MCP risk level (LOW / MEDIUM / HIGH); blank when derived automatically.
          */
-        @Schema(description = "Declared MCP risk level, blank when derived")
+        @Schema(description = "Declared MCP risk level (LOW / MEDIUM / HIGH); blank when derived automatically", example = "MEDIUM")
         private String riskLevel;
 
         /**
          * Declared destructive hint ("true" / "false"); blank when derived.
          */
-        @Schema(description = "Declared MCP destructive hint, blank when derived")
+        @Schema(description = "Declared MCP destructive hint (\"true\" / \"false\"); blank when derived automatically", example = "false")
         private String destructiveHint;
 
         /**
          * Declared open-world hint ("true" / "false"); blank when derived.
          */
-        @Schema(description = "Declared MCP open-world hint, blank when derived")
+        @Schema(description = "Declared MCP open-world hint (\"true\" / \"false\"); blank when derived automatically", example = "false")
         private String openWorldHint;
 
         /**
          * Declared idempotent hint ("true" / "false"); blank when derived.
          */
-        @Schema(description = "Declared MCP idempotent hint, blank when derived")
+        @Schema(description = "Declared MCP idempotent hint (\"true\" / \"false\"); blank when derived automatically", example = "true")
         private String idempotentHint;
 
         /**
          * AI-facing description override; blank when the operation text is used.
          */
-        @Schema(description = "AI-facing MCP tool description override")
+        @Schema(description = "AI-facing MCP tool description override; blank when the operation text is used", example = "Fetch the current temperature for a given device id")
         private String aiDescription;
 
         /**
          * Whether the tool is hidden from tools/list by default ("true" / "false"); blank = visible.
          */
-        @Schema(description = "Whether the MCP tool is hidden from tools/list by default")
+        @Schema(description = "Whether the tool is hidden from tools/list by default (\"true\" / \"false\"); blank means visible", example = "false")
         private String hidden;
 
     }

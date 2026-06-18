@@ -51,16 +51,22 @@ public class PrincipalQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination parameters (page number and page size).")
     private Pages page;
 
+    @Schema(description = "Type of principal to filter by; distinguishes human users, service accounts, and system identities.", example = "USER")
     private PrincipalTypeEnum principalType;
 
+    @Schema(description = "Unique login name of the principal; supports partial match.", example = "alice")
     private String principalName;
 
+    @Schema(description = "Human-readable display name of the principal; supports partial match.", example = "Alice Smith")
     private String displayName;
 
+    @Schema(description = "Origin of the principal identity; LOCAL for internally managed, EXTERNAL for federated/IdP, SYSTEM for built-in system identities.", example = "LOCAL")
     private PrincipalSourceTypeEnum sourceType;
 
+    @Schema(description = "Enabled/disabled status filter; returns only principals matching this flag.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

@@ -42,13 +42,13 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Role Resource Bind query parameters")
+@Schema(description = "Query parameters for filtering and paginating role-resource bind records within the current tenant.")
 public class RoleResourceBindQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
@@ -57,13 +57,13 @@ public class RoleResourceBindQuery implements Serializable {
     /**
      * ID
      */
-    @Schema(description = "Role ID", example = "1024")
+    @Schema(description = "Filters results to bindings associated with this role; must belong to the current tenant.", example = "1024")
     private Long roleId;
 
     /**
      * ID
      */
-    @Schema(description = "Resource ID", example = "1024")
+    @Schema(description = "Filters results to bindings associated with this resource; must belong to the current tenant.", example = "2048")
     private Long resourceId;
 
 }

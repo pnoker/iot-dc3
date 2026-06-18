@@ -61,7 +61,7 @@ public class LabelVO extends BaseVO {
     /**
      * Label code.
      */
-    @Schema(description = "Label code. Stable business identifier.", example = "LINE_A")
+    @Schema(description = "Stable business code of the label; optional human-readable identifier distinct from labelName.", example = "LINE_A")
     private String labelCode;
 
     /**
@@ -73,14 +73,14 @@ public class LabelVO extends BaseVO {
     /**
      * Entity type flag.
      */
-    @Schema(description = "Entity type enum")
+    @Schema(description = "Type of the entity this label is attached to (e.g. DEVICE, POINT, DRIVER, PROFILE, COMMAND, EVENT).", example = "DEVICE", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeEnum entityTypeFlag;
 
     /**
      * Enable status flag.
      */
-    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
+    @Schema(description = "Whether the label is active; ENABLE to use it, DISABLE to hide it from selection.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

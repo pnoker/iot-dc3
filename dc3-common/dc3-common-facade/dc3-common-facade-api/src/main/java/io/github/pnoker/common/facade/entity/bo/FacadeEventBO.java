@@ -22,7 +22,6 @@ import io.github.pnoker.common.entity.ext.EventExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,46 +40,35 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-@Schema(description = "Facade Event business object")
 public class FacadeEventBO extends BaseBO {
 
-    @Schema(description = "event name")
 
     private String eventName;
 
-    @Schema(description = "event code")
 
     private String eventCode;
 
-    @Schema(description = "Event type enum")
 
     private EventTypeFlagEnum eventTypeFlag;
 
-    @Schema(description = "Event level enum")
 
     private EventLevelEnum eventLevelFlag;
 
-    @Schema(description = "event extension information in JSON format")
 
     private EventExt eventExt;
 
-    @Schema(description = "profile ID")
 
     private Long profileId;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "Configuration signature")
 
     private String signature;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 

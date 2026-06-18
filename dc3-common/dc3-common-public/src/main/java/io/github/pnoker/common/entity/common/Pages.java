@@ -44,19 +44,19 @@ public class Pages implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Current page number, starting from 1")
+    @Schema(description = "Current page number, starting from 1; ignored when count is disabled", example = "1")
     private long current = 1;
 
-    @Schema(description = "Number of records per page")
+    @Schema(description = "Number of records per page; clamped to the configured page-size limit", example = "10")
     private long size = DefaultConstant.PAGE_SIZE;
 
-    @Schema(description = "Start timestamp for time-range filtering")
+    @Schema(description = "Inclusive start timestamp (epoch milliseconds) for time-range filtering", example = "1717200000000")
     private long startTime;
 
-    @Schema(description = "End timestamp for time-range filtering")
+    @Schema(description = "Inclusive end timestamp (epoch milliseconds) for time-range filtering", example = "1717286400000")
     private long endTime;
 
-    @Schema(description = "Sort order list")
+    @Schema(description = "Sort order items applied to the query results")
     private List<OrderItem> orders = new ArrayList<>(2);
 
 }

@@ -51,14 +51,14 @@ public class PointQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     //
@@ -66,55 +66,55 @@ public class PointQuery implements Serializable {
     /**
      * Name
      */
-    @Schema(description = "point name")
+    @Schema(description = "Filter by data point name. Supports partial matching.", example = "Temperature")
     private String pointName;
 
     /**
      * Code
      */
-    @Schema(description = "point code")
+    @Schema(description = "Filter by data point code. Exact match on the stable business identifier.", example = "TEMP_001")
     private String pointCode;
 
     /**
      * Type
      */
-    @Schema(description = "Point type enum")
+    @Schema(description = "Filter by data point type: MEASUREMENT, ATTRIBUTE, or COMMAND.", example = "MEASUREMENT")
     private PointTypeEnum pointTypeFlag;
 
     /**
      *
      */
-    @Schema(description = "Read/write type enum")
+    @Schema(description = "Filter by read/write capability: READ_ONLY, WRITE_ONLY, or READ_WRITE.", example = "READ_ONLY")
     private RwTypeEnum rwFlag;
 
     /**
      * ID
      */
-    @Schema(description = "profile ID")
+    @Schema(description = "Filter by profile (device template) ID.", example = "2048")
     private Long profileId;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      * Group ID
      */
-    @Schema(description = "group ID")
+    @Schema(description = "Filter by group ID to restrict results to entities in a specific group.", example = "4096")
     private Long groupId;
 
     /**
      * Label ID
      */
-    @Schema(description = "label ID")
+    @Schema(description = "Filter by label ID to restrict results to entities tagged with a specific label.", example = "2048")
     private Long labelId;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 
     //
@@ -122,7 +122,7 @@ public class PointQuery implements Serializable {
     /**
      * Device ID
      */
-    @Schema(description = "device ID")
+    @Schema(description = "Filter by device ID. Returns results scoped to a specific device.", example = "1024")
     private Long deviceId;
 
 }

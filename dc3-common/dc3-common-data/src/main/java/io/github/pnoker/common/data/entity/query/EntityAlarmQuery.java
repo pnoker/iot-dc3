@@ -48,14 +48,14 @@ public class EntityAlarmQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     /**
@@ -67,19 +67,19 @@ public class EntityAlarmQuery implements Serializable {
     /**
      * Driver ID
      */
-    @Schema(description = "driver ID")
+    @Schema(description = "Filter by driver ID. Returns results scoped to a specific driver.", example = "1024")
     private Long driverId;
 
     /**
      * Device ID
      */
-    @Schema(description = "device ID")
+    @Schema(description = "Filter by device ID. Returns results scoped to a specific device.", example = "1024")
     private Long deviceId;
 
     /**
      * Point ID
      */
-    @Schema(description = "point ID")
+    @Schema(description = "Filter by data point ID.", example = "2048")
     private Long pointId;
 
 }

@@ -61,12 +61,12 @@ public class EventVO extends BaseVO {
 
     private String eventCode;
 
-    @Schema(description = "Event type enum")
+    @Schema(description = "Event classification: INFO (informational), ALERT (requires attention), FAULT (malfunction), or LIFECYCLE (state transition).", example = "ALERT", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Event type can't be empty", groups = {Add.class, Update.class})
     private EventTypeFlagEnum eventTypeFlag;
 
-    @Schema(description = "Event level enum")
+    @Schema(description = "Event severity level: LOW, MEDIUM, HIGH, or CRITICAL.", example = "HIGH", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Event level can't be empty", groups = {Add.class, Update.class})
     private EventLevelEnum eventLevelFlag;

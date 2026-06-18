@@ -50,14 +50,14 @@ public class DriverQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     //
@@ -65,43 +65,43 @@ public class DriverQuery implements Serializable {
     /**
      * Name
      */
-    @Schema(description = "driver name")
+    @Schema(description = "Filter by driver name. Supports partial matching.", example = "Modbus TCP")
     private String driverName;
 
     /**
      * Driver ID
      */
-    @Schema(description = "driver code")
+    @Schema(description = "Filter by driver code. Exact match on the stable business identifier.", example = "dc3-driver-modbus-tcp")
     private String driverCode;
 
     /**
      * Driver service name
      */
-    @Schema(description = "Service name")
+    @Schema(description = "Filter by microservice name (e.g. dc3-center-auth).", example = "dc3-center-manager")
     private String serviceName;
 
     /**
      *
      */
-    @Schema(description = "service host")
+    @Schema(description = "Filter by driver service host (IPv4 address).", example = "192.168.1.100")
     private String serviceHost;
 
     /**
      * Type
      */
-    @Schema(description = "Driver type enum")
+    @Schema(description = "Filter by driver type: DRIVER_CLIENT or DRIVER_SERVER.", example = "DRIVER_SERVER")
     private DriverTypeEnum driverTypeFlag;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 
 }

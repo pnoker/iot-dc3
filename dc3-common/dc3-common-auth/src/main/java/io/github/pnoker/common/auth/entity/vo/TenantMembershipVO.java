@@ -44,7 +44,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(description = "Tenant membership view object")
+@Schema(description = "Tenant membership view object", example = "1024")
 public class TenantMembershipVO extends BaseVO {
 
     private Long tenantId;

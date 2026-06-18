@@ -58,7 +58,7 @@ public class GroupVO extends BaseVO {
     /**
      * Group type flag.
      */
-    @Schema(description = "Group type enum")
+    @Schema(description = "Type of entity this group categorizes, e.g. DEVICE, POINT, DRIVER. Required on add/update.", example = "DEVICE", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Group type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeEnum groupTypeFlag;
 

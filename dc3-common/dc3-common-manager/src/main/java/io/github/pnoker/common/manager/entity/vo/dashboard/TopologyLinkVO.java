@@ -45,13 +45,13 @@ public class TopologyLinkVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Prefixed id of the source node", example = "driver:1024")
+    @Schema(description = "Prefixed identifier of the source node, formatted as '<type>:<id>' (e.g. driver, device, profile, point); both endpoints are scoped to the current tenant.", example = "driver:1024")
     private String source;
 
-    @Schema(description = "Prefixed id of the target node", example = "device:2048")
+    @Schema(description = "Prefixed identifier of the target node, formatted as '<type>:<id>' (e.g. driver, device, profile, point); both endpoints are scoped to the current tenant.", example = "device:2048")
     private String target;
 
-    @Schema(description = "Edge weight: relationship count in cardinality mode, or rolled-up sample count in volume mode", example = "5")
+    @Schema(description = "Edge weight: in cardinality mode the number of relationships this edge represents (1 per device for Driver→Device, 1 per profile_bind for Device→Profile, 1 per point for Profile→Point, aggregated into N for '*→others'); in volume mode the rolled-up point_value sample count.", example = "5")
     private long value;
 
 }

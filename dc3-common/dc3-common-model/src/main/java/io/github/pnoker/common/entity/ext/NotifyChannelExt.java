@@ -44,7 +44,7 @@ public class NotifyChannelExt extends BaseExt {
     /**
      * Extended content.
      */
-    @Schema(description = "Extended content holding the channel configuration.")
+    @Schema(description = "Non-sensitive channel configuration payload; provider-specific options and toggle flags.")
     private Content content;
 
     @Schema(description = "Extended content for a notify channel.")
@@ -63,7 +63,7 @@ public class NotifyChannelExt extends BaseExt {
         /**
          * Message card version used by card-capable channels.
          */
-        @Schema(description = "Message card version used by card-capable channels.")
+        @Schema(description = "Message card template version for card-capable channels (e.g. DingTalk interactive cards).", example = "1.0")
         private String cardVersion;
 
         /**
@@ -81,7 +81,7 @@ public class NotifyChannelExt extends BaseExt {
         /**
          * Provider-specific non-sensitive options.
          */
-        @Schema(description = "Provider-specific non-sensitive options.")
+        @Schema(description = "Provider-specific non-sensitive options; keys are provider-defined and values must never contain secrets (use credentialRef for secrets).")
         private Map<String, Object> options;
 
     }

@@ -55,7 +55,7 @@ public class NotifyHistoryResponseExt extends BaseExt {
         /**
          * Provider message ID when the channel returns one.
          */
-        @Schema(description = "Provider-assigned message ID returned by the channel, when available")
+        @Schema(description = "Provider-assigned message ID returned by the channel for this delivery, when available", example = "MSG-20250618-0001")
         private String providerMessageId;
 
         /**
@@ -67,7 +67,7 @@ public class NotifyHistoryResponseExt extends BaseExt {
         /**
          * Provider status message.
          */
-        @Schema(description = "Provider status message returned by the channel for this delivery")
+        @Schema(description = "Provider status message returned by the channel for this delivery", example = "OK")
         private String statusMessage;
 
         /**

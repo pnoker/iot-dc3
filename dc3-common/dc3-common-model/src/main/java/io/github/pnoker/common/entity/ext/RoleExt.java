@@ -44,7 +44,7 @@ public class RoleExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content payload, distinguished by the Type and Version fields of the base extension")
+    @Schema(description = "Role extension payload; its shape is distinguished by the Type and Version fields of the base extension")
     private Content content;
 
     @Getter
@@ -54,7 +54,7 @@ public class RoleExt extends BaseExt {
     @Schema(description = "Extended content payload for role configuration")
     public static class Content {
 
-        @Schema(description = "Reserved placeholder field for role extension content")
+        @Schema(description = "Reserved placeholder for future role extension content; currently unused", example = "null")
         private String keep;
 
     }

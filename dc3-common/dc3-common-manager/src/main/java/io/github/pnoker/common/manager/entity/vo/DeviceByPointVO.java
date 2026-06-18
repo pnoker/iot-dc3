@@ -48,13 +48,13 @@ public class DeviceByPointVO {
     /**
      *
      */
-    @Schema(description = "Associated device count")
+    @Schema(description = "Number of devices associated with the given point; scoped to the current tenant.", example = "1024")
     private Long count;
 
     /**
      *
      */
-    @Schema(description = "Device list")
+    @Schema(description = "Devices bound to the given point; only devices visible to the current tenant are returned.")
     private List<DeviceDO> devices;
 
 }

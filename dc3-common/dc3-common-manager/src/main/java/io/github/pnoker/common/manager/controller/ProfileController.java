@@ -170,7 +170,7 @@ public class ProfileController implements BaseController {
     @PreAuthorize("@perm.can('profile', 'list')")
     @Operation(summary = "List Profiles by Device ID", description = "Return every profile template instantiated by a given device (tenant-scoped). Use to discover which point, command and event definitions a device exposes through its driver.")
     @GetMapping("/list_by_device_id")
-    public Mono<R<List<ProfileVO>>> listByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+    public Mono<R<List<ProfileVO>>> listByDeviceId(@Parameter(description = "Identifier of the device whose instantiated profiles are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.listByDeviceId(deviceId));

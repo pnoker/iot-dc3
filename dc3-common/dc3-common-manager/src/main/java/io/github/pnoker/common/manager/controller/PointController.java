@@ -186,7 +186,7 @@ public class PointController implements BaseController {
     @Operation(summary = "List Points by Profile ID", description = "Return every point defined on a given profile template (tenant-scoped). " +
             "Use to enumerate the measurable channels a device will expose once it instantiates the profile; the profile must belong to the tenant.")
     @GetMapping("/list_by_profile_id")
-    public Mono<R<List<PointVO>>> listByProfileId(@Parameter(description = "Profile ID") @NotNull @RequestParam(value = "profile_id") Long profileId) {
+    public Mono<R<List<PointVO>>> listByProfileId(@Parameter(description = "Identifier of the profile template whose points should be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.getById(profileId));
             List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByProfileId(profileId, tenantId));
@@ -205,7 +205,7 @@ public class PointController implements BaseController {
     @Operation(summary = "List Points by Device ID", description = "Return every point available on a specific device (tenant-scoped). " +
             "These are the channels the bound driver can read or write for that device; the device must belong to the tenant.")
     @GetMapping("/list_by_device_id")
-    public Mono<R<List<PointVO>>> listByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+    public Mono<R<List<PointVO>>> listByDeviceId(@Parameter(description = "Identifier of the device whose available points should be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByDeviceId(deviceId, tenantId));
@@ -267,7 +267,7 @@ public class PointController implements BaseController {
             "Use to gauge the blast radius of editing a point before changing its definition; the point must belong to the tenant.")
     @GetMapping("/list_device_statistics_by_point_id")
     public Mono<R<DeviceByPointVO>> getPointStatisticsWithDevice(
-            @Parameter(description = "Point ID") @NotNull @RequestParam(value = "point_id") Long pointId) {
+            @Parameter(description = "Identifier of the point whose device statistics should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "point_id") Long pointId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointService.getById(pointId));
             DeviceByPointBO deviceByPointBO = pointService.getPointStatisticsWithDevice(pointId);
@@ -284,7 +284,7 @@ public class PointController implements BaseController {
     @Operation(summary = "Count Points by Device", description = "Return the number of points available on a specific device (tenant-scoped). " +
             "Use for quick cardinality checks without fetching full definitions; the device must belong to the tenant.")
     @GetMapping("/get_count_by_device_id")
-    public Mono<R<Long>> getPointByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+    public Mono<R<Long>> getPointByDeviceId(@Parameter(description = "Identifier of the device whose point count should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             Long count = pointService.getPointByDeviceId(deviceId);
@@ -301,7 +301,7 @@ public class PointController implements BaseController {
             "Use to see exactly how each point is configured before issuing reads, writes or commands through the driver.")
     @GetMapping("/get_point_config_by_device_id")
     public Mono<R<PointConfigByDeviceVO>> getPointConfigByDeviceId(
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+            @Parameter(description = "Identifier of the device whose resolved point configuration should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             PointConfigByDeviceBO pointConfigByDeviceBO = pointService.getPointConfigByDeviceId(deviceId);

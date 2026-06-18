@@ -44,7 +44,7 @@ public class ProfileExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content payload, interpreted according to the type and version fields")
+    @Schema(description = "Extended content payload of the profile/template; interpretation is driven by the type and version fields of the parent BaseExt")
     private Content content;
 
     @Getter
@@ -54,7 +54,7 @@ public class ProfileExt extends BaseExt {
     @Schema(description = "Extended content payload for the profile/template extension")
     public static class Content {
 
-        @Schema(description = "Placeholder field reserved for profile/template extended content")
+        @Schema(description = "Placeholder field reserved for profile/template extended content; currently unused and kept for forward compatibility", example = "placeholder")
         private String keep;
 
     }

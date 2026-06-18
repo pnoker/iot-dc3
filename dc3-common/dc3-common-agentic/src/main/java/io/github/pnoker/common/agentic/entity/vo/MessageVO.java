@@ -43,7 +43,7 @@ public class MessageVO extends BaseVO {
     @Schema(description = "Role of the message sender: user (human input), assistant (AI response), or system (instruction).", example = "assistant")
     private String role;
 
-    @Schema(description = "Plain-text message body representing the conversation turn.")
+    @Schema(description = "Plain-text message body representing the conversation turn.", example = "What is the current temperature of device 1024?")
     private String content;
 
     @Schema(description = "Structured content extension including tool calls, citations, or rich media fragments.")

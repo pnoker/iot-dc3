@@ -44,7 +44,7 @@ public class TenantExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content payload, interpreted according to the type and version fields")
+    @Schema(description = "Extended content payload for the tenant; structure is interpreted according to the type and version fields of the extension")
     private Content content;
 
     @Getter
@@ -54,7 +54,7 @@ public class TenantExt extends BaseExt {
     @Schema(description = "Extended content payload of the tenant extension object")
     public static class Content {
 
-        @Schema(description = "Placeholder field reserved for future extended tenant content")
+        @Schema(description = "Placeholder field reserved for future extended tenant content; currently has no business meaning", example = "placeholder")
         private String keep;
 
     }

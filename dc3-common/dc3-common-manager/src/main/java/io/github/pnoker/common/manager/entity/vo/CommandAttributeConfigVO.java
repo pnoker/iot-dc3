@@ -77,7 +77,7 @@ public class CommandAttributeConfigVO extends BaseVO {
     /**
      * Command ID
      */
-    @Schema(description = "ID of the command this configuration is scoped to.", example = "4096")
+    @Schema(description = "Identifier of the command this configuration is scoped to; must belong to the current tenant.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Command ID can't be empty", groups = {Add.class, Update.class})
     private Long commandId;
 

@@ -51,14 +51,14 @@ public class ProfileQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     //
@@ -66,13 +66,13 @@ public class ProfileQuery implements Serializable {
     /**
      * Name
      */
-    @Schema(description = "profile name")
+    @Schema(description = "Filter by profile name. Supports partial matching.", example = "Modbus PLC Template")
     private String profileName;
 
     /**
      * Code
      */
-    @Schema(description = "profile code")
+    @Schema(description = "Filter by profile code. Exact match on the stable business identifier.", example = "PLC_TEMPLATE_V1")
     private String profileCode;
 
     /**
@@ -84,31 +84,31 @@ public class ProfileQuery implements Serializable {
     /**
      * Type
      */
-    @Schema(description = "Profile type enum")
+    @Schema(description = "Filter by profile type: DEVICE or DRIVER.", example = "DEVICE")
     private ProfileTypeEnum profileTypeFlag;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      * Group ID
      */
-    @Schema(description = "group ID")
+    @Schema(description = "Filter by group ID to restrict results to entities in a specific group.", example = "4096")
     private Long groupId;
 
     /**
      * Label ID
      */
-    @Schema(description = "label ID")
+    @Schema(description = "Filter by label ID to restrict results to entities tagged with a specific label.", example = "2048")
     private Long labelId;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 
     //
@@ -116,7 +116,7 @@ public class ProfileQuery implements Serializable {
     /**
      * Device ID
      */
-    @Schema(description = "device ID")
+    @Schema(description = "Filter by device ID. Returns results scoped to a specific device.", example = "1024")
     private Long deviceId;
 
 }

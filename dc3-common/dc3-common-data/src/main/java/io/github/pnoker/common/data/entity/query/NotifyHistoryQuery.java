@@ -52,43 +52,43 @@ public class NotifyHistoryQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
 
     private Long tenantId;
 
-    @Schema(description = "rule ID")
+    @Schema(description = "rule ID", example = "1024")
 
     private Long ruleId;
 
-    @Schema(description = "notify ID")
+    @Schema(description = "notify ID", example = "2048")
 
     private Long notifyId;
 
-    @Schema(description = "message ID")
+    @Schema(description = "message ID", example = "4096")
 
     private Long messageId;
 
-    @Schema(description = "channel ID")
+    @Schema(description = "channel ID", example = "512")
 
     private Long channelId;
 
-    @Schema(description = "alarm ID")
+    @Schema(description = "alarm ID", example = "256")
 
     private Long alarmId;
 
-    @Schema(description = "Notification channel type enum")
+    @Schema(description = "Notification channel type enum", example = "EMAIL")
 
     private NotifyChannelTypeEnum channelTypeFlag;
 
-    @Schema(description = "Notification target")
+    @Schema(description = "Notification target", example = "admin@example.com")
 
     private String target;
 
-    @Schema(description = "Status enum")
+    @Schema(description = "Status enum", example = "SUCCESS")
 
     private NotifyHistoryStatusEnum statusFlag;
 

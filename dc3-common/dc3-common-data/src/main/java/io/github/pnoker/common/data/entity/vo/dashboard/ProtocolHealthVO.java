@@ -52,13 +52,13 @@ public class ProtocolHealthVO implements Serializable {
     @Schema(description = "driver service name, e.g. dc3-driver-modbus-tcp")
     private String serviceName;
 
-    @Schema(description = "total driver count for this service")
+    @Schema(description = "total driver count for this service", example = "5")
     private long driverCount;
 
-    @Schema(description = "enabled driver count for this service")
+    @Schema(description = "enabled driver count for this service", example = "4")
     private long enabledCount;
 
-    @Schema(description = "device count served by this service")
+    @Schema(description = "device count served by this service", example = "120")
     private long deviceCount;
 
 }

@@ -33,18 +33,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Schema(description = "Agentic Visualization response body")
+@Schema(description = "SSE payload returned by the agentic engine when a visualization chart has been produced; wraps a visualization specification together with a creation timestamp.")
 public class AgenticVisualizationResponse {
 
-    @Schema(description = "Response object type")
+    @Schema(description = "Fixed discriminator identifying this SSE payload as a visualization object; always \"agentic.visualization\".", example = "agentic.visualization")
 
     private String object;
 
-    @Schema(description = "Visualization specification")
+    @Schema(description = "Structured visualization specification carrying chart type, data, and rendering options.")
 
     private AgenticVisualizationSpec visualization;
 
-    @Schema(description = "Unix timestamp when the response was created")
+    @Schema(description = "Unix timestamp (milliseconds since epoch) when the visualization response was generated.", example = "1718678400000")
 
     private Long created;
 

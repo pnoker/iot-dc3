@@ -48,19 +48,19 @@ public class MttaTrendVO implements Serializable {
     /**
      * ISO date.
      */
-    @Schema(description = "ISO date of the data point")
+    @Schema(description = "ISO date of the data point", example = "2026-06-18")
     private String date;
 
-    @Schema(description = "50th percentile acknowledge latency in milliseconds")
+    @Schema(description = "50th percentile acknowledge latency in milliseconds", example = "12000")
     private long p50Ms;
 
-    @Schema(description = "95th percentile acknowledge latency in milliseconds")
+    @Schema(description = "95th percentile acknowledge latency in milliseconds", example = "45000")
     private long p95Ms;
 
     /**
      * Count of confirmed events used in the percentile calc for this day.
      */
-    @Schema(description = "count of confirmed events used in the percentile calculation for this day")
+    @Schema(description = "count of confirmed events used in the percentile calculation for this day", example = "28")
     private long confirmedCount;
 
 }

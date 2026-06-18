@@ -61,17 +61,17 @@ public class CommandVO extends BaseVO {
 
     private String commandCode;
 
-    @Schema(description = "Command type: READ (fetch data) or WRITE (send data).", example = "READ")
+    @Schema(description = "Command type: READ (fetch data) or WRITE (send data).", example = "READ", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Command type can't be empty", groups = {Add.class, Update.class})
     private CommandTypeEnum commandTypeFlag;
 
-    @Schema(description = "Command invocation mode: SYNC (wait for response) or ASYNC (fire and forget).", example = "SYNC")
+    @Schema(description = "Command invocation mode: SYNC (wait for response) or ASYNC (fire and forget).", example = "SYNC", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Call type can't be empty", groups = {Add.class, Update.class})
     private CallTypeEnum callTypeFlag;
 
-    @Schema(description = "Command execution timeout in milliseconds. The command is cancelled if no response is received within this period.", example = "3000")
+    @Schema(description = "Command execution timeout in milliseconds. The command is cancelled if no response is received within this period.", example = "3000", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Command timeout can't be empty", groups = {Add.class, Update.class})
     private Integer timeout;

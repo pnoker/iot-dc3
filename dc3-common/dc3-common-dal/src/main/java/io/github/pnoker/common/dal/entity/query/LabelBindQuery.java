@@ -49,14 +49,14 @@ public class LabelBindQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID.
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     // Query fields
@@ -70,13 +70,13 @@ public class LabelBindQuery implements Serializable {
     /**
      * Label ID.
      */
-    @Schema(description = "label ID")
+    @Schema(description = "Filter by label ID to restrict results to entities tagged with a specific label.", example = "2048")
     private Long labelId;
 
     /**
      * Entity ID.
      */
-    @Schema(description = "Associated entity ID")
+    @Schema(description = "Associated entity ID", example = "1000")
     private Long entityId;
 
 }

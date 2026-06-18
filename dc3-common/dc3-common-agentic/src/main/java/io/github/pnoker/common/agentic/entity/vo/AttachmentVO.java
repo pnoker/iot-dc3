@@ -32,22 +32,22 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
-@Schema(description = "Attachment view object")
+@Schema(description = "Attachment response view for an agentic conversation attachment record.")
 public class AttachmentVO extends BaseVO {
 
-    @Schema(description = "ID of the conversation session this attachment belongs to.", example = "conv_xyz789")
+    @Schema(description = "Identifier of the conversation session this attachment belongs to.", example = "1024")
     private String conversationId;
 
-    @Schema(description = "Original file name of the uploaded attachment.", example = "report.pdf")
+    @Schema(description = "Original file name of the uploaded attachment as provided by the client.", example = "report.pdf")
     private String fileName;
 
-    @Schema(description = "MIME content type of the attachment (e.g. application/pdf, image/png).", example = "application/pdf")
+    @Schema(description = "MIME content type of the attachment file (e.g. application/pdf, image/png).", example = "application/pdf")
     private String contentType;
 
     @Schema(description = "File size of the attachment in bytes.", example = "10240")
     private Long size;
 
-    @Schema(description = "Server-side storage path where the attachment file is persisted.")
+    @Schema(description = "Server-side storage path where the attachment file is persisted.", example = "/storage/attachments/2026/report.pdf")
     private String filePath;
 
 }

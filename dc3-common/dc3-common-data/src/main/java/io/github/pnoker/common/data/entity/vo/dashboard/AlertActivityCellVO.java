@@ -47,19 +47,19 @@ public class AlertActivityCellVO implements Serializable {
     /**
      * Day of week, 0..6 matching Postgres EXTRACT(DOW) (0 = Sunday).
      */
-    @Schema(description = "day of week, 0 to 6 matching Postgres EXTRACT(DOW), 0=Sunday")
+    @Schema(description = "Day of week, 0 to 6 matching Postgres EXTRACT(DOW) where 0 = Sunday", example = "3")
     private int dow;
 
     /**
      * Hour of day, 0..23.
      */
-    @Schema(description = "hour of day, 0 to 23")
+    @Schema(description = "Hour of day, 0 to 23", example = "14")
     private int hour;
 
     /**
      * Alarm count in that cell.
      */
-    @Schema(description = "alarm count in this cell")
+    @Schema(description = "Number of alarms aggregated in this day-of-week/hour-of-day cell", example = "12")
     private long count;
 
 }

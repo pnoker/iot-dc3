@@ -50,13 +50,18 @@ public class TenantMembershipQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination parameters (page number and page size).")
     private Pages page;
 
+    @Schema(description = "Filter by tenant identifier; restricts results to memberships belonging to the specified tenant.", example = "1024")
     private Long tenantId;
 
+    @Schema(description = "Filter by principal identifier (user, service account, or system identity) within the tenant.", example = "2048")
     private Long principalId;
 
+    @Schema(description = "Filter by principal classification: USER, SERVICE_ACCOUNT, or SYSTEM.", example = "USER")
     private PrincipalTypeEnum principalType;
 
+    @Schema(description = "Filter by membership lifecycle status: ACTIVE, SUSPENDED, or INVITED.", example = "ACTIVE")
     private MembershipStatusEnum membershipStatus;
 }

@@ -49,14 +49,19 @@ public class RolePrincipalBindQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination parameters (page number and page size).")
     private Pages page;
 
+    @Schema(description = "Tenant that owns the role-principal bindings; filters results to this tenant's scope.", example = "1024")
     private Long tenantId;
 
+    @Schema(description = "Identifier of the role whose principal bindings are being queried; must belong to the current tenant.", example = "2048")
     private Long roleId;
 
+    @Schema(description = "Identifier of the principal (user, service account, or system) bound to the role.", example = "3072")
     private Long principalId;
 
+    @Schema(description = "Type of the principal being filtered; narrows results to bindings of a specific principal classification.", example = "USER")
     private PrincipalTypeEnum principalType;
 
 }

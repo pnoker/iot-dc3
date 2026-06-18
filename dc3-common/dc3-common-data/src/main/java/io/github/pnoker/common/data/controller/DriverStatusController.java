@@ -83,7 +83,7 @@ public class DriverStatusController implements BaseController {
     @PreAuthorize("@perm.can('driver_status', 'get')")
     @Operation(summary = "Count Online Devices by Driver", description = "Count devices currently online under one driver for the current tenant. Pass the driver id; returns a single count.")
     @GetMapping("/get_device_online_by_driver_id")
-    public Mono<R<Long>> getDeviceOnlineByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Long>> getDeviceOnlineByDriverId(@Parameter(description = "Identifier of the driver whose online device count is queried; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             Long result = driverStatusService.getDeviceOnlineByDriverId(tenantId, driverId);
             return R.ok(result);
@@ -99,7 +99,7 @@ public class DriverStatusController implements BaseController {
     @PreAuthorize("@perm.can('driver_status', 'get')")
     @Operation(summary = "Count Offline Devices by Driver", description = "Count devices currently offline under one driver for the current tenant. Pass the driver id; returns a single count.")
     @GetMapping("/get_device_offline_by_driver_id")
-    public Mono<R<Long>> getDeviceOfflineByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Long>> getDeviceOfflineByDriverId(@Parameter(description = "Identifier of the driver whose offline device count is queried; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             Long result = driverStatusService.getDeviceOfflineByDriverId(tenantId, driverId);
             return R.ok(result);

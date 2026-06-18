@@ -46,22 +46,31 @@ import java.time.LocalDateTime;
 @Schema(description = "Service account view object")
 public class ServiceAccountVO extends BaseVO {
 
+    @Schema(description = "Identifier of the service account principal", example = "1024")
     private Long principalId;
 
+    @Schema(description = "Identifier of the owning tenant", example = "1")
     private Long tenantId;
 
+    @Schema(description = "Human-readable name of the service account", example = "data-pipeline-bot")
     private String serviceAccountName;
 
+    @Schema(description = "Identifier of the owning user principal", example = "2048")
     private Long ownerPrincipalId;
 
+    @Schema(description = "Description of the service account's intended use", example = "Token used by the nightly ETL job")
     private String purpose;
 
+    @Schema(description = "Optional expiry timestamp; null means the account never expires", example = "2026-12-31T23:59:59")
     private LocalDateTime expireTime;
 
+    @Schema(description = "Timestamp of the most recent credential use; null if never used", example = "2026-06-18T08:30:00")
     private LocalDateTime lastUsedTime;
 
+    @Schema(description = "Structured credential policy (rotation, scope, etc.) for this service account")
     private JsonExt credentialPolicyExt;
 
+    @Schema(description = "Whether the service account is enabled", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

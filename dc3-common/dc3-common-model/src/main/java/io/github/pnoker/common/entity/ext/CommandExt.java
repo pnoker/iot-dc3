@@ -40,7 +40,7 @@ public class CommandExt extends BaseExt {
     /**
      * Extended content.
      */
-    @Schema(description = "Extended content of the command metadata")
+    @Schema(description = "Extended content payload of the command metadata; carries command-specific attributes such as the reserved keep field")
     private Content content;
 
     @Schema(title = "CommandExt.Content", description = "Extended content payload for command metadata")
@@ -50,7 +50,7 @@ public class CommandExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved content field for command extension")
+        @Schema(description = "Reserved content field for command extension; free-form text used to retain driver- or vendor-specific command metadata", example = "reserved")
         private String keep;
 
     }

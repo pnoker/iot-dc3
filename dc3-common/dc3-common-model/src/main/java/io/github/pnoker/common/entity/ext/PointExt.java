@@ -44,7 +44,7 @@ public class PointExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content of the point, distinguished by the type and version fields")
+    @Schema(description = "Extended content payload of the point; the shape is discriminated by the type and version fields inherited from the owning point's tenant scope")
     private Content content;
 
     @Getter
@@ -54,7 +54,7 @@ public class PointExt extends BaseExt {
     @Schema(description = "Extended content payload for point metadata")
     public static class Content {
 
-        @Schema(description = "Reserved placeholder field for extended point content")
+        @Schema(description = "Reserved placeholder field for extended point content; carries no business meaning and may be null", example = "null")
         private String keep;
 
     }

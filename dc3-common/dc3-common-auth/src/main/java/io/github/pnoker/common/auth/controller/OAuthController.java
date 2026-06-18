@@ -78,7 +78,7 @@ public class OAuthController {
 
     @GetMapping(McpConstant.OAUTH2_AUTHORIZE)
     public Mono<ResponseEntity<Map<String, Object>>> authorize(
-            @Parameter(description = "OAuth authorization request parameters including client_id, redirect_uri, response_type, scope, and state.") @RequestParam MultiValueMap<String, String> params,
+            @Parameter(description = "OAuth 2.1 authorization request parameters. Required fields: client_id, redirect_uri, response_type (must be 'code'), scope, and code_challenge / code_challenge_method (PKCE). Optional: state (recommended for CSRF protection).", example = "client_id=my-client&response_type=code&redirect_uri=https%3A%2F%2Fapp.example.com%2Fcallback&scope=openid&state=xyz&code_challenge=abc123&code_challenge_method=S256") @RequestParam MultiValueMap<String, String> params,
             @org.springframework.web.bind.annotation.RequestHeader(
                     value = RequestConstant.Header.X_AUTH_PRINCIPAL, required = false) String principalJson) {
         return Mono.fromSupplier(() -> {

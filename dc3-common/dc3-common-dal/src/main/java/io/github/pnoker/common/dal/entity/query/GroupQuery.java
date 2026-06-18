@@ -50,14 +50,14 @@ public class GroupQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID.
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     // Query fields
@@ -65,7 +65,7 @@ public class GroupQuery implements Serializable {
     /**
      * Group name.
      */
-    @Schema(description = "group name")
+    @Schema(description = "Filter by group name. Supports partial matching.", example = "Line 1 Devices")
     private String groupName;
 
     /**
@@ -89,7 +89,7 @@ public class GroupQuery implements Serializable {
     /**
      * Enable status flag.
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

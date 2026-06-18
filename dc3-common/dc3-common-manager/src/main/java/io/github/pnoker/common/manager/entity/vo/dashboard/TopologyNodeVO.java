@@ -55,7 +55,7 @@ public class TopologyNodeVO implements Serializable {
      * Human-readable label. For {@code others:*} nodes, {@code "Others (N)"} where N is
      * the count of hidden children.
      */
-    @Schema(description = "Human-readable label; for others:* nodes it is \"Others (N)\" where N is the hidden child count")
+    @Schema(description = "Human-readable label; for others:* nodes it is \"Others (N)\" where N is the hidden child count", example = "Driver Gateway A")
     private String name;
 
     /**

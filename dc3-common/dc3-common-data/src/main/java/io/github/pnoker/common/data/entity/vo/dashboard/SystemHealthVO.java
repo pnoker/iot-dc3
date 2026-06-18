@@ -53,25 +53,25 @@ public class SystemHealthVO implements Serializable {
     /**
      * Center service reachability (auth, data, manager).
      */
-    @Schema(description = "center service reachability (auth, data, manager), values are up or down")
+    @Schema(description = "Reachability of center services (auth, data, manager); each value is \"up\" or \"down\"")
     private Map<String, String> center;
 
     /**
      * Infrastructure reachability (database, mq, gateway).
      */
-    @Schema(description = "infrastructure reachability (database, mq, gateway), values are up or down")
+    @Schema(description = "Reachability of infrastructure dependencies (database, mq, gateway); each value is \"up\" or \"down\"")
     private Map<String, String> infra;
 
     /**
      * Driver population summary.
      */
-    @Schema(description = "driver population summary")
+    @Schema(description = "Driver fleet population summary: total registered drivers and how many reported online")
     private FleetSummary drivers;
 
     /**
      * Device population summary.
      */
-    @Schema(description = "device population summary")
+    @Schema(description = "Device fleet population summary: total registered devices and how many reported online")
     private FleetSummary devices;
 
     /**
@@ -89,10 +89,10 @@ public class SystemHealthVO implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        @Schema(description = "total record count in the database")
+        @Schema(description = "Total record count persisted in the database for this fleet", example = "1024")
         private int total;
 
-        @Schema(description = "count of records that reported ONLINE to the status cache")
+        @Schema(description = "Count of records that reported ONLINE to the status cache", example = "256")
         private int online;
 
     }
@@ -100,7 +100,7 @@ public class SystemHealthVO implements Serializable {
     /**
      * Backwards-compat alias — drivers used to be typed as DriverSummary.
      */
-    @Schema(description = "Backwards-compat alias for FleetSummary")
+    @Schema(description = "Backwards-compat subclass preserved so older clients referencing DriverSummary still deserialize")
     public static class DriverSummary extends FleetSummary {
 
     }

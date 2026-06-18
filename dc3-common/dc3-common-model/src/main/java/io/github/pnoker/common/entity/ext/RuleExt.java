@@ -117,31 +117,31 @@ public class RuleExt extends BaseExt {
         /**
          * Expected string value for status-like rules.
          */
-        @Schema(description = "Expected string value for status-like rules.")
+        @Schema(description = "Expected string value for status-like rules.", example = "ONLINE")
         private String expected;
 
         /**
          * Numeric threshold for threshold rules.
          */
-        @Schema(description = "Numeric threshold for threshold rules.")
+        @Schema(description = "Numeric threshold for threshold rules.", example = "80")
         private BigDecimal threshold;
 
         /**
          * Lower bound for range rules.
          */
-        @Schema(description = "Lower bound for range rules.")
+        @Schema(description = "Lower bound for range rules.", example = "10")
         private BigDecimal low;
 
         /**
          * Upper bound for range rules.
          */
-        @Schema(description = "Upper bound for range rules.")
+        @Schema(description = "Upper bound for range rules.", example = "90")
         private BigDecimal high;
 
         /**
          * Display unit for value comparisons.
          */
-        @Schema(description = "Display unit for value comparisons.")
+        @Schema(description = "Display unit for value comparisons.", example = "°C")
         private String unit;
 
     }
@@ -168,7 +168,7 @@ public class RuleExt extends BaseExt {
         /**
          * Minimum samples required in the window.
          */
-        @Schema(description = "Minimum samples required in the window.")
+        @Schema(description = "Minimum samples required in the window.", example = "3")
         private Integer minSamples;
 
     }
@@ -195,7 +195,7 @@ public class RuleExt extends BaseExt {
         /**
          * Recovery threshold.
          */
-        @Schema(description = "Recovery threshold.")
+        @Schema(description = "Recovery threshold.", example = "60")
         private BigDecimal threshold;
 
         /**

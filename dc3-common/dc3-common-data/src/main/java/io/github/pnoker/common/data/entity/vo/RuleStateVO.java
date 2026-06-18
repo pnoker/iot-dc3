@@ -53,19 +53,19 @@ public class RuleStateVO extends BaseVO {
 
     private Long ruleId;
 
-    @Schema(description = "Alarm target type enum")
+    @Schema(description = "Alarm target type enum", example = "DEVICE")
 
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
-    @Schema(description = "Associated entity ID")
+    @Schema(description = "Associated entity ID", example = "2048")
 
     private Long entityId;
 
-    @Schema(description = "Alarm fingerprint")
+    @Schema(description = "Alarm fingerprint", example = "rule_HIGH_TEMP_ALERT_device_1024")
 
     private String fingerprint;
 
-    @Schema(description = "Entity state enum")
+    @Schema(description = "Entity state enum", example = "TRIGGERED")
 
     private RuleStatusEnum entityStateFlag;
 
@@ -93,7 +93,7 @@ public class RuleStateVO extends BaseVO {
 
     private Long triggerCount;
 
-    @Schema(description = "ID of the active alarm associated with this rule state.")
+    @Schema(description = "ID of the active alarm associated with this rule state.", example = "512")
 
     private Long alarmId;
 

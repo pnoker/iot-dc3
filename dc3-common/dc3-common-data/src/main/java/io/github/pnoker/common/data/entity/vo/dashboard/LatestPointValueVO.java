@@ -49,45 +49,45 @@ public class LatestPointValueVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "device ID")
+    @Schema(description = "device ID", example = "1024")
     private Long deviceId;
 
-    @Schema(description = "point ID")
+    @Schema(description = "point ID", example = "2048")
     private Long pointId;
 
-    @Schema(description = "driver ID")
+    @Schema(description = "driver ID", example = "512")
     private Long driverId;
 
     /**
      * Display name for the device, resolved via {@code DeviceFacade}. May be {@code null}
      * when the device has been deleted but historical point values still reference it.
      */
-    @Schema(description = "display name for the device, may be null if the device was deleted")
+    @Schema(description = "display name for the device, may be null if the device was deleted", example = "Temperature Sensor A1")
     private String deviceName;
 
     /**
      * Display name for the point.
      */
-    @Schema(description = "display name for the point")
+    @Schema(description = "display name for the point", example = "Current Temperature")
     private String pointName;
 
     /**
      * Display name for the driver that owns the device.
      */
-    @Schema(description = "display name for the driver that owns the device")
+    @Schema(description = "display name for the driver that owns the device", example = "Modbus TCP Driver")
     private String driverName;
 
-    @Schema(description = "raw value")
+    @Schema(description = "raw value", example = "12345")
     private String rawValue;
 
-    @Schema(description = "calculated value")
+    @Schema(description = "calculated value", example = "25.5")
     private String calValue;
 
     /**
      * Which hypertable the row came from: STRING / INT / LONG / BOOL / FLOAT / DOUBLE /
      * JSON. Lets the UI pick formatting without fetching the point's metadata.
      */
-    @Schema(description = "value type: STRING, INT, LONG, BOOL, FLOAT, DOUBLE or JSON")
+    @Schema(description = "value type: STRING, INT, LONG, BOOL, FLOAT, DOUBLE or JSON", example = "FLOAT")
     private String valueType;
 
     @Schema(description = "sample creation time")

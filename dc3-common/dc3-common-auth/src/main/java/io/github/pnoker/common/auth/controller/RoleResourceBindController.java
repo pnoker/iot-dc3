@@ -124,7 +124,7 @@ public class RoleResourceBindController implements BaseController {
     @Operation(summary = "List Resources by Role", description = "Return the full set of resources (permissions) granted to a role. " +
             "The role must belong to the current tenant; use to inspect what a role can do.")
     @GetMapping("/list_resource_by_role")
-    public Mono<R<List<ResourceVO>>> listResourceByRole(@Parameter(description = "Role ID") @NotNull @RequestParam(value = "role_id") Long roleId) {
+    public Mono<R<List<ResourceVO>>> listResourceByRole(@Parameter(description = "Identifier of the role whose granted resources are to be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, roleService.getById(roleId));
             List<ResourceBO> entityBOList = roleResourceBindService.listResourceByRoleId(roleId);
@@ -138,7 +138,7 @@ public class RoleResourceBindController implements BaseController {
             "by aggregating resources from every role assigned to it within the current tenant. " +
             "The principal must be a member of the tenant; returns the deduplicated resource list.")
     @GetMapping("/list_resource_by_principal")
-    public Mono<R<List<ResourceVO>>> listResourceByPrincipal(@Parameter(description = "Principal ID") @NotNull @RequestParam(value = "principal_id") Long principalId) {
+    public Mono<R<List<ResourceVO>>> listResourceByPrincipal(@Parameter(description = "Identifier of the principal (user or service account) whose effective permissions are to be resolved; must be a member of the current tenant.", example = "1024") @NotNull @RequestParam(value = "principal_id") Long principalId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             tenantMembershipService.requireTenantMember(tenantId, principalId);
             List<ResourceBO> entityBOList = roleResourceBindService.listResourceByPrincipalId(principalId, tenantId);
@@ -151,7 +151,7 @@ public class RoleResourceBindController implements BaseController {
     @Operation(summary = "List Roles by Resource", description = "Return the roles within the current tenant that grant a given resource (permission). " +
             "Use to find which roles can perform a specific action.")
     @GetMapping("/list_role_by_resource")
-    public Mono<R<List<RoleVO>>> listRoleByResource(@Parameter(description = "Resource ID") @NotNull @RequestParam(value = "resource_id") Long resourceId) {
+    public Mono<R<List<RoleVO>>> listRoleByResource(@Parameter(description = "Identifier of the resource (permission) for which to list the roles that grant it; scoped to the current tenant.", example = "1024") @NotNull @RequestParam(value = "resource_id") Long resourceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<RoleBO> entityBOList = roleResourceBindService.listRoleByResourceId(resourceId, tenantId);
             List<RoleVO> entityVOList = roleBuilder.buildVOListByBOList(entityBOList);

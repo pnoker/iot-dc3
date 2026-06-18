@@ -124,7 +124,7 @@ public class CommandParamController implements BaseController {
     @Operation(summary = "List Command Parameters by Command ID", description = "Return every parameter declared on a given command, tenant-scoped. " +
             "Use to discover the input and output parameters a downward device command accepts or returns when building or validating a command call.")
     @GetMapping("/list_by_command_id")
-    public Mono<R<List<CommandParamVO>>> listByCommandId(@Parameter(description = "Command ID") @NotNull @RequestParam(value = "command_id") Long commandId) {
+    public Mono<R<List<CommandParamVO>>> listByCommandId(@Parameter(description = "Identifier of the command whose parameters are listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "command_id") Long commandId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, commandService.getById(commandId));
             List<CommandParamBO> entityBOList = filterTenant(tenantId, commandParamService.listByCommandId(commandId));

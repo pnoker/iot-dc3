@@ -62,19 +62,19 @@ public class NotifyHistoryVO extends BaseVO {
 
     private Long channelId;
 
-    @Schema(description = "ID of the alarm associated with this notification.")
+    @Schema(description = "ID of the alarm associated with this notification.", example = "512")
 
     private Long alarmId;
 
-    @Schema(description = "Notification channel type enum")
+    @Schema(description = "Notification channel type enum", example = "EMAIL")
 
     private NotifyChannelTypeEnum channelTypeFlag;
 
-    @Schema(description = "Notification target")
+    @Schema(description = "Notification target", example = "admin@example.com")
 
     private String target;
 
-    @Schema(description = "Status enum")
+    @Schema(description = "Status enum", example = "SUCCESS")
 
     private NotifyHistoryStatusEnum statusFlag;
 
@@ -86,7 +86,7 @@ public class NotifyHistoryVO extends BaseVO {
 
     private NotifyHistoryResponseExt responseExt;
 
-    @Schema(description = "Error message if the notification delivery failed. Null on success.")
+    @Schema(description = "Error message if the notification delivery failed. Null on success.", example = "SMTP connection refused")
 
     private String errorMessage;
 

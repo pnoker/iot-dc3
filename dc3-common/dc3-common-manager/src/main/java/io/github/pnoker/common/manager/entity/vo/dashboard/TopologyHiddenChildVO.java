@@ -49,7 +49,7 @@ public class TopologyHiddenChildVO implements Serializable {
     @Schema(description = "Prefixed id (driver:{n}, device:{n} or point:{n})", example = "device:1024")
     private String id;
 
-    @Schema(description = "Display name of the collapsed entity")
+    @Schema(description = "Display name of the collapsed entity", example = "dc3-center-manager")
     private String name;
 
     /**

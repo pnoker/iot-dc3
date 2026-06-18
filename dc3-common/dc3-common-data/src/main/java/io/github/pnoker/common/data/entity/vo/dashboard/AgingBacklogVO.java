@@ -44,22 +44,22 @@ public class AgingBacklogVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "count of unconfirmed alarms aged under 1 hour")
+    @Schema(description = "count of unconfirmed alarms aged under 1 hour", example = "8")
     private long under1h;
 
-    @Schema(description = "count of unconfirmed alarms aged 1 to 6 hours")
+    @Schema(description = "count of unconfirmed alarms aged 1 to 6 hours", example = "3")
     private long h1to6;
 
-    @Schema(description = "count of unconfirmed alarms aged 6 to 24 hours")
+    @Schema(description = "count of unconfirmed alarms aged 6 to 24 hours", example = "2")
     private long h6to24;
 
-    @Schema(description = "count of unconfirmed alarms aged over 24 hours (SLA breach indicator)")
+    @Schema(description = "count of unconfirmed alarms aged over 24 hours (SLA breach indicator)", example = "1")
     private long over24h;
 
     /**
      * Convenience sum — equals the total unconfirmed count.
      */
-    @Schema(description = "convenience sum, equals the total unconfirmed count")
+    @Schema(description = "convenience sum, equals the total unconfirmed count", example = "14")
     private long total;
 
 }

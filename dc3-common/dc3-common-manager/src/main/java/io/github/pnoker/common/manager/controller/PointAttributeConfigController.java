@@ -167,9 +167,9 @@ public class PointAttributeConfigController implements BaseController {
             "Look up by the (attribute, device, point) tuple; returns the configured value for that exact binding.")
     @GetMapping("/get_by_attribute_id_and_device_id_and_point_id")
     public Mono<R<PointAttributeConfigVO>> getByAttributeIdAndDeviceIdAndPointId(
-            @Parameter(description = "Attribute ID") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @Parameter(description = "Point ID") @NotNull @RequestParam(value = "point_id") Long pointId) {
+            @Parameter(description = "Identifier of the point attribute definition whose configured value is being looked up; must belong to the current tenant's driver.", example = "1024") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
+            @Parameter(description = "Identifier of the device the config applies to; must belong to the current tenant and share its profile with the point.", example = "2048") @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @Parameter(description = "Identifier of the data point the config applies to; must belong to the current tenant and share its profile with the device.", example = "3072") @NotNull @RequestParam(value = "point_id") Long pointId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requirePointConfigRelations(tenantId, deviceId, pointId, attributeId);
             PointAttributeConfigBO entityBO = pointAttributeConfigService
@@ -192,8 +192,8 @@ public class PointAttributeConfigController implements BaseController {
             "Use to see all configured attribute values that govern how that point is read or written on the device.")
     @GetMapping("/list_by_device_id_and_point_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceIdAndPointId(
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @Parameter(description = "Point ID") @NotNull @RequestParam(value = "point_id") Long pointId) {
+            @Parameter(description = "Identifier of the device whose point configs are listed; must belong to the current tenant.", example = "2048") @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @Parameter(description = "Identifier of the data point whose attribute configs are listed; must share its profile with the device.", example = "3072") @NotNull @RequestParam(value = "point_id") Long pointId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requirePointConfigRelations(tenantId, deviceId, pointId, null);
             List<PointAttributeConfigBO> entityBOList = filterTenant(tenantId,
@@ -214,7 +214,7 @@ public class PointAttributeConfigController implements BaseController {
             "Returns a flat list; use to review the full configuration surface of a device at once.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceId(
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+            @Parameter(description = "Identifier of the device whose point attribute configs are listed; must belong to the current tenant.", example = "2048") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<PointAttributeConfigBO> entityBOList = filterTenant(tenantId,

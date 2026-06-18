@@ -50,26 +50,26 @@ public class JsonExt implements Serializable {
     /**
      * Type, Json
      */
-    @Schema(description = "Type of the JSON extension data")
+    @Schema(description = "Discriminator of the JSON extension type, e.g. \"Json\".", example = "Json")
     private String type;
 
     /**
      * , Json
      */
-    @Schema(description = "JSON content payload of the extension data")
+    @Schema(description = "Raw JSON content payload serialized as a string.")
     private String content;
 
     /**
      * ,
      */
     @Builder.Default
-    @Schema(description = "Version of the JSON extension data", example = "1")
+    @Schema(description = "Schema version of the JSON extension data, incremented on incompatible changes.", example = "1")
     private Integer version = 1;
 
     /**
      * Description
      */
-    @Schema(description = "Remark or description of the JSON extension data")
+    @Schema(description = "Optional remark or human-readable description of the JSON extension data.")
     private String remark;
 
 }

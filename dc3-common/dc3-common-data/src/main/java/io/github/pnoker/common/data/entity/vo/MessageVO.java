@@ -48,7 +48,7 @@ public class MessageVO extends BaseVO {
     /**
      * Alarm message template title
      */
-    @Schema(description = "Message template name. Unique name within a tenant.", example = "High Temp Alert Message", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Message template name. Unique within the current tenant.", example = "High Temp Alert Message")
     private String messageName;
 
     /**
@@ -60,7 +60,7 @@ public class MessageVO extends BaseVO {
     /**
      * Alarm message template level
      */
-    @Schema(description = "Message severity level: INFO, WARN, CRITICAL, or EMERGENCY.", example = "WARN")
+    @Schema(description = "Message severity level (AlarmMessageLevelEnum).", example = "P2")
     private AlarmMessageLevelEnum messageLevel;
 
     /**

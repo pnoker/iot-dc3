@@ -54,7 +54,7 @@ public class ResourceExt extends BaseExt {
     @Schema(description = "Resource extension content payload")
     public static class Content {
 
-        @Schema(description = "Placeholder field reserved for future resource extension content")
+        @Schema(description = "Placeholder reserved for future resource extension content; ignored by current parsing logic", example = "")
         private String keep;
 
     }

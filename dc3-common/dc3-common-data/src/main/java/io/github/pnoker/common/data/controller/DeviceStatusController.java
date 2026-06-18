@@ -83,7 +83,7 @@ public class DeviceStatusController implements BaseController {
     @PreAuthorize("@perm.can('device_status', 'list')")
     @Operation(summary = "List Device Status by Driver", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the current tenant runs under the given driver. Use to inspect connectivity across the whole fleet a single driver manages; results are a device-id-to-status map.")
     @GetMapping("/list_by_driver_id")
-    public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@Parameter(description = "Identifier of the driver; must belong to the current tenant. Only devices managed by this driver are returned.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setDriverId(driverId);
@@ -103,7 +103,7 @@ public class DeviceStatusController implements BaseController {
     @Operation(summary = "List Device Status by Profile", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the current tenant associates with the given profile. Use to check connectivity of all devices sharing a profile template; results are a device-id-to-status map.")
     @GetMapping("/list_by_profile_id")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
-            @Parameter(description = "Profile ID") @NotNull @RequestParam(value = "profile_id") Long profileId) {
+            @Parameter(description = "Identifier of the profile template; must belong to the current tenant. Only devices bound to this profile are returned.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setProfileId(profileId);

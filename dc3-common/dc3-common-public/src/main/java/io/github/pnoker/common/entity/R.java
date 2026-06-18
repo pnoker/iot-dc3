@@ -46,19 +46,19 @@ public class R<T> implements Serializable {
     /**
      * Response status flag
      */
-    @Schema(description = "Whether the request succeeded.", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Whether the request succeeded.", example = "true")
     private boolean ok = false;
 
     /**
      * Response status code
      */
-    @Schema(description = "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.", example = "R200", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.", example = "R200")
     private String code = ResponseEnum.OK.getCode();
 
     /**
      * Response message
      */
-    @Schema(description = "Human-readable response message.", example = "Success", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Human-readable response message.", example = "Success")
     private String message = ResponseEnum.OK.getRemark();
 
     /**

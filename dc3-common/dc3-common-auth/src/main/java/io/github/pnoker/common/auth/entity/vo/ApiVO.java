@@ -53,33 +53,33 @@ public class ApiVO extends BaseVO {
     /**
      * Owning service name, populated by resource registrar
      */
-    @Schema(description = "Service name")
+    @Schema(description = "Microservice name that owns this API endpoint (e.g. dc3-center-auth).", example = "dc3-center-auth")
     private String serviceName;
 
     /**
      * ApiType
      */
-    @Schema(description = "API method enum", example = "GET")
+    @Schema(description = "HTTP method type of this API endpoint (REST verb classification).", example = "GET")
     private ApiTypeEnum apiTypeFlag;
 
     /**
      * ApiName
      */
     @NotBlank(message = "API name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "API name", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "API endpoint display name. Unique name within a tenant.", example = "Get User by ID", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid API name", groups = {Add.class, Update.class})
     private String apiName;
 
     /**
      * ApiCode, URLMD5
      */
-    @Schema(description = "API code identifier")
+    @Schema(description = "API code. Stable business identifier used for permission matching.", example = "user_get_by_id")
     private String apiCode;
 
     /**
      * API grouping, usually the owning controller simple class name
      */
-    @Schema(description = "API grouping label")
+    @Schema(description = "API group label for organizing endpoints into logical categories in the UI.", example = "User Management")
     private String apiGroup;
 
     /**
@@ -91,7 +91,7 @@ public class ApiVO extends BaseVO {
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

@@ -43,12 +43,16 @@ import lombok.ToString;
 @Schema(description = "Role principal bind view object")
 public class RolePrincipalBindVO extends BaseVO {
 
+    @Schema(description = "Identifier of the tenant this binding belongs to; all related role and principal must share the same tenant.", example = "1024")
     private Long tenantId;
 
+    @Schema(description = "Identifier of the role being bound to the principal; must exist within the current tenant.", example = "2048")
     private Long roleId;
 
+    @Schema(description = "Identifier of the principal (user, service account, or system identity) bound to the role; must belong to the current tenant.", example = "3072")
     private Long principalId;
 
+    @Schema(description = "Type of principal bound to the role, indicating whether it is a human user, service account, or internal system identity.", example = "USER")
     private PrincipalTypeEnum principalType;
 
 }

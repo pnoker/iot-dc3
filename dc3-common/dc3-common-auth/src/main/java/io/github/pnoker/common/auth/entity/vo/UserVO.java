@@ -53,7 +53,7 @@ public class UserVO extends BaseVO {
     /**
      * Principal ID.
      */
-    @Schema(description = "Principal ID")
+    @Schema(description = "ID of the security principal (identity carrier) this user profile extends.", example = "1024")
     private Long principalId;
 
     /**
@@ -104,7 +104,7 @@ public class UserVO extends BaseVO {
     /**
      * Enable flag.
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

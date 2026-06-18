@@ -55,7 +55,7 @@ public class ResourceVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "Parent resource ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID of the parent resource in the hierarchy. Null for top-level resources.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Resource parent id can't be empty", groups = {Add.class, Update.class})
     private Long parentResourceId;
 
@@ -63,7 +63,7 @@ public class ResourceVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "Role name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "Resource name", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Resource display name shown in the permission tree.", example = "Device List API", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid role name",
             groups = {Add.class, Update.class})
     private String resourceName;
@@ -71,19 +71,19 @@ public class ResourceVO extends BaseVO {
     /**
      * Code
      */
-    @Schema(description = "Resource permission code")
+    @Schema(description = "Resource permission code used for access control matching (e.g. device:list).", example = "device:list")
     private String resourceCode;
 
     /**
      * Service name.
      */
-    @Schema(description = "Service name")
+    @Schema(description = "Microservice name that exposes this resource (e.g. dc3-center-manager).", example = "dc3-center-manager")
     private String serviceName;
 
     /**
      * Type
      */
-    @Schema(description = "Resource type enum", example = "MENU")
+    @Schema(description = "Classification of the resource (driver, profile, point, device, data, menu, or API).", example = "API")
     private ResourceTypeEnum resourceTypeFlag;
 
     /**
@@ -96,26 +96,26 @@ public class ResourceVO extends BaseVO {
      * </ul>
      *
      */
-    @Schema(description = "Resource scope enum", example = "LIST")
+    @Schema(description = "Access scope for this resource: ADD, DELETE, UPDATE, LIST, or GET.", example = "GET")
     private ResourceScopeTypeEnum resourceScopeFlag;
 
     /**
      * Entity ID
      */
-    @Schema(description = "Associated entity ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "ID of the entity (API or menu) this resource secures.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
     private Long entityId;
 
     /**
      *
      */
-    @Schema(description = "Resource extension information in JSON format")
+    @Schema(description = "Resource extension information, serialized as JSON for custom permission metadata.")
     private ResourceExt resourceExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)", example = "ENABLE")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

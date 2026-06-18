@@ -47,7 +47,7 @@ public class MessageExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content, distinguished by the inherited type and version fields")
+    @Schema(description = "Extended content payload of the message; the concrete shape is selected by the inherited type and version fields")
     private Content content;
 
     @Getter
@@ -60,13 +60,13 @@ public class MessageExt extends BaseExt {
         /**
          * Variables expected by the templates.
          */
-        @Schema(description = "Variables expected by the templates")
+        @Schema(description = "Placeholder variable names that templates reference and that must be supplied at render time")
         private List<String> variables;
 
         /**
          * Channel-specific templates. Destinations and credentials belong to notification channels.
          */
-        @Schema(description = "Channel-specific templates; destinations and credentials belong to notification channels")
+        @Schema(description = "Channel-specific templates keyed by channel type; note that destinations and credentials are owned by the notification channel, not by the template")
         private List<Template> templates;
 
     }
@@ -81,19 +81,19 @@ public class MessageExt extends BaseExt {
         /**
          * Channel type such as FEISHU_BOT, WEBHOOK, or EMAIL.
          */
-        @Schema(description = "Channel type such as FEISHU_BOT, WEBHOOK, or EMAIL", example = "FEISHU_BOT")
+        @Schema(description = "Notification channel type this template targets, e.g. FEISHU_BOT, WEBHOOK, or EMAIL", example = "FEISHU_BOT")
         private String channelType;
 
         /**
          * Payload type such as CARD, TEXT, JSON, or HTML.
          */
-        @Schema(description = "Payload type such as CARD, TEXT, JSON, or HTML", example = "CARD")
+        @Schema(description = "Rendered payload format produced by this template, e.g. CARD, TEXT, JSON, or HTML", example = "CARD")
         private String payloadType;
 
         /**
          * Structured template payload to render.
          */
-        @Schema(description = "Structured template payload to render")
+        @Schema(description = "Structured template payload to render, whose shape depends on channelType and payloadType")
         private Map<String, Object> template;
 
     }

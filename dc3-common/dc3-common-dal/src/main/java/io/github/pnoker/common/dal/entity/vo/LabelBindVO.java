@@ -50,7 +50,7 @@ public class LabelBindVO extends BaseVO {
     /**
      * Entity type flag.
      */
-    @Schema(description = "Entity type enum")
+    @Schema(description = "Entity type enum", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
     private EntityTypeEnum entityTypeFlag;
 
@@ -64,7 +64,7 @@ public class LabelBindVO extends BaseVO {
     /**
      * Entity ID.
      */
-    @Schema(description = "Associated entity ID")
+    @Schema(description = "Associated entity ID", example = "1000", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
     private Long entityId;
 

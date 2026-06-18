@@ -54,14 +54,14 @@ public class PointValueQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID for multi-tenant data isolation
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     // Query fields
@@ -69,31 +69,31 @@ public class PointValueQuery implements Serializable {
     /**
      * Device ID to filter by specific device
      */
-    @Schema(description = "device ID")
+    @Schema(description = "Filter by device ID. Returns results scoped to a specific device.", example = "1024")
     private Long deviceId;
 
     /**
      * Device name for text-based filtering
      */
-    @Schema(description = "device name")
+    @Schema(description = "Filter by device name. Supports partial matching.", example = "Temperature Sensor 01")
     private String deviceName;
 
     /**
      * Point ID to filter by specific point
      */
-    @Schema(description = "point ID")
+    @Schema(description = "Filter by data point ID.", example = "2048")
     private Long pointId;
 
     /**
      * Point name for text-based filtering
      */
-    @Schema(description = "point name")
+    @Schema(description = "Filter by data point name. Supports partial matching.", example = "Temperature")
     private String pointName;
 
     /**
      * Enable flag to filter active/inactive points
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
@@ -107,7 +107,7 @@ public class PointValueQuery implements Serializable {
      * createTimeFrom = now - rangeHours. Retained for backward compatibility; new callers
      * should set {@link #rangeKey}.
      */
-    @Schema(description = "Fallback rolling time range in hours")
+    @Schema(description = "Fallback rolling time range in hours", example = "24")
     private Integer rangeHours;
 
     /**
@@ -116,7 +116,7 @@ public class PointValueQuery implements Serializable {
      * {@code 24h}, {@code 7d}, {@code 30d}). Takes precedence over {@link #rangeHours}
      * when both are supplied.
      */
-    @Schema(description = "Preset time range key: today, 24h, 7d, or 30d")
+    @Schema(description = "Preset time range key: today, 24h, 7d, or 30d", example = "24h")
     private String rangeKey;
 
 }

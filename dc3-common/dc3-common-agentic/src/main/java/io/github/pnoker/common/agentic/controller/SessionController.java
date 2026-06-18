@@ -83,7 +83,7 @@ public class SessionController implements BaseController {
     @Operation(summary = "Get Session", description = "Fetch a single AI chat session by its conversation id, scoped to the current user and tenant. " +
             "Returns the session details, or a failure when no matching session exists.")
     @GetMapping("/get_by_conversation_id")
-    public Mono<R<SessionVO>> get(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+    public Mono<R<SessionVO>> get(@Parameter(description = "Unique conversation identifier scoped to the current user and tenant; use the value returned when the session was created.", example = "conv-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.getByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(),
                     header.getUserId(), conversationId));
@@ -100,7 +100,7 @@ public class SessionController implements BaseController {
     @Operation(summary = "Delete Session", description = "Permanently delete an AI chat session and its message history by conversation id, scoped to the current user and tenant. " +
             "Use to discard a conversation; this cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<Boolean>> delete(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+    public Mono<R<Boolean>> delete(@Parameter(description = "Unique conversation identifier scoped to the current user and tenant; identifies the session to permanently delete along with its message history.", example = "conv-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             sessionService.deleteByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
                     conversationId));
@@ -112,7 +112,7 @@ public class SessionController implements BaseController {
     @Operation(summary = "Update Session", description = "Update editable fields of an AI chat session identified by conversation id, scoped to the current user and tenant. " +
             "Use to rename or adjust a session; returns the updated session, or a failure when it does not exist.")
     @PostMapping("/update")
-    public Mono<R<SessionVO>> update(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
+    public Mono<R<SessionVO>> update(@Parameter(description = "Unique conversation identifier scoped to the current user and tenant; identifies the session whose editable fields (e.g. name) are to be updated.", example = "conv-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                      @RequestBody(required = false) SessionVO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             SessionBO session = sessionService.update(AgenticConversationIdUtil.scope(header.getTenantId(),

@@ -21,7 +21,6 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ProfileShareTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,53 +44,41 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Facade Profile query parameters")
 public class FacadeProfileQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
 
     private Pages page;
 
-    @Schema(description = "Tenant ID")
 
     private Long tenantId;
 
-    @Schema(description = "profile name")
 
     private String profileName;
 
-    @Schema(description = "profile code")
 
     private String profileCode;
 
-    @Schema(description = "Profile share flag enum")
 
     private ProfileShareTypeEnum profileShareFlag;
 
-    @Schema(description = "Profile type enum")
 
     private ProfileTypeEnum profileTypeFlag;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "group ID")
 
     private Long groupId;
 
-    @Schema(description = "label ID")
 
     private Long labelId;
 
-    @Schema(description = "Version number")
 
     private Integer version;
 
-    @Schema(description = "device ID")
 
     private Long deviceId;
 

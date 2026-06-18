@@ -106,7 +106,7 @@ public class DriverVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "Signature used for integrity verification.")
+    @Schema(description = "Signature used for integrity verification.", example = "a3f5e8d2c1b9")
     private String signature;
 
     /**

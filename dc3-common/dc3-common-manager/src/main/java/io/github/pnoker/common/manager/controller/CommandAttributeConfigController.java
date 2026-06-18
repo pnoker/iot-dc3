@@ -162,9 +162,9 @@ public class CommandAttributeConfigController implements BaseController {
     @Operation(summary = "Get Command Attribute Configuration by Attribute, Device, and Command IDs", description = "Fetch the configured value of one command attribute field by its attribute, device and command IDs. Use when the configuration ID is unknown but the attribute-device-command triple is, scoped to the current tenant.")
     @GetMapping("/get_by_attribute_id_and_device_id_and_command_id")
     public Mono<R<CommandAttributeConfigVO>> getByAttributeIdAndDeviceIdAndCommandId(
-            @Parameter(description = "Attribute ID") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @Parameter(description = "Command ID") @NotNull @RequestParam(value = "command_id") Long commandId) {
+            @Parameter(description = "Identifier of the command attribute field whose configured value is being looked up; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
+            @Parameter(description = "Identifier of the device whose configured command attribute value is being looked up; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @Parameter(description = "Identifier of the command whose attribute configuration is being looked up; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "command_id") Long commandId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireCommandConfigRelations(tenantId, deviceId, commandId, attributeId);
             CommandAttributeConfigBO entityBO = commandAttributeConfigService
@@ -186,8 +186,8 @@ public class CommandAttributeConfigController implements BaseController {
     @Operation(summary = "List Command Attribute Configurations by Device and Command IDs", description = "Return every command attribute configuration set on a specific device for a specific command, scoped to the current tenant. Use to retrieve the full set of values that device will send with that command.")
     @GetMapping("/list_by_device_id_and_command_id")
     public Mono<R<List<CommandAttributeConfigVO>>> listByDeviceIdAndCommandId(
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @Parameter(description = "Command ID") @NotNull @RequestParam(value = "command_id") Long commandId) {
+            @Parameter(description = "Identifier of the device whose command attribute configurations are being listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId,
+            @Parameter(description = "Identifier of the command whose attribute configurations are being listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "command_id") Long commandId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireCommandConfigRelations(tenantId, deviceId, commandId, null);
             List<CommandAttributeConfigBO> entityBOList = filterTenant(tenantId,
@@ -207,7 +207,7 @@ public class CommandAttributeConfigController implements BaseController {
     @Operation(summary = "List Command Attribute Configurations by Device ID", description = "Return every command attribute configuration set on a specific device across all of its commands, scoped to the current tenant. Use to review the full configuration of a device before sending commands.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<CommandAttributeConfigVO>>> listByDeviceId(
-            @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+            @Parameter(description = "Identifier of the device whose command attribute configurations are being listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<CommandAttributeConfigBO> entityBOList = filterTenant(tenantId,

@@ -83,7 +83,7 @@ public class DriverAttributeConfigVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "Signature used for configuration integrity verification.")
+    @Schema(description = "Signature used for configuration integrity verification.", example = "d41d8cd98f00b204e9800998ecf8427e")
     private String signature;
 
     /**

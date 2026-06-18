@@ -48,14 +48,14 @@ public class RoleResourceBindVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "Role ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Identifier of the role to bind; must belong to the current tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Role id can't be empty", groups = {Add.class, Update.class})
     private Long roleId;
 
     /**
      * ID
      */
-    @Schema(description = "Resource ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Identifier of the resource to bind to the role; must belong to the current tenant.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Resource id can't be empty", groups = {Add.class, Update.class})
     private Long resourceId;
 

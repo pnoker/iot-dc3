@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.facade.entity.bo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,7 +39,6 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Schema(description = "Facade System Health business object")
 public class FacadeSystemHealthBO implements Serializable {
 
     @Serial
@@ -50,11 +48,9 @@ public class FacadeSystemHealthBO implements Serializable {
 
     private Map<String, String> infra;
 
-    @Schema(description = "drivers")
 
     private FleetSummary drivers;
 
-    @Schema(description = "Device list")
 
     private FleetSummary devices;
 
@@ -68,11 +64,9 @@ public class FacadeSystemHealthBO implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        @Schema(description = "Total record count")
 
         private int total;
 
-        @Schema(description = "online")
 
         private int online;
 

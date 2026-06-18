@@ -54,7 +54,7 @@ public class PointAttributeExt extends BaseExt {
     @Schema(description = "Extended content payload for point attribute configuration")
     public static class Content {
 
-        @Schema(description = "Reserved placeholder field for point attribute extension content")
+        @Schema(description = "Reserved placeholder string for future point attribute extension content; currently unused")
         private String keep;
 
     }

@@ -45,7 +45,7 @@ import java.util.List;
 @Schema(description = "Menu Tree view object")
 public class MenuTreeVO extends MenuVO {
 
-    @Schema(description = "Child menu nodes")
+    @Schema(description = "Ordered list of direct child menu nodes nested under this menu entry; empty when the node is a leaf.")
     @ToString.Exclude
     private List<MenuTreeVO> children = new ArrayList<>();
 

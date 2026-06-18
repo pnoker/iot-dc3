@@ -57,31 +57,31 @@ public class UserSocialExt extends BaseExt {
         /**
          * WeChat account.
          */
-        @Schema(description = "WeChat account")
+        @Schema(description = "WeChat identifier of the user's linked social account", example = "wechat_user_001")
         private String wechat;
 
         /**
          * QQ
          */
-        @Schema(description = "QQ account")
+        @Schema(description = "QQ identifier of the user's linked social account", example = "123456789")
         private String qq;
 
         /**
          * Lark (Feishu) account.
          */
-        @Schema(description = "Lark (Feishu) account")
+        @Schema(description = "Lark (Feishu) identifier of the user's linked social account", example = "lark_user@example.com")
         private String lark;
 
         /**
          * DingTalk account.
          */
-        @Schema(description = "DingTalk account")
+        @Schema(description = "DingTalk identifier of the user's linked social account", example = "dingtalk_user_001")
         private String dingTalk;
 
         /**
          * Social home page URL.
          */
-        @Schema(description = "Social home page URL", example = "https://example.com/user/home")
+        @Schema(description = "Public home page URL of the user's social profile", example = "https://example.com/user/home")
         private String homeUrl;
 
     }

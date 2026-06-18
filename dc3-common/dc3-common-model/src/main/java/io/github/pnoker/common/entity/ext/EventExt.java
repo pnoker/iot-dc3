@@ -40,7 +40,7 @@ public class EventExt extends BaseExt {
     /**
      * Extended content.
      */
-    @Schema(description = "Extended content of the event")
+    @Schema(description = "Structured payload carrying the event's extension content; serialized as JSON inside the extension object")
     private Content content;
 
     @Schema(description = "Extended content payload nested in the event extension object")
@@ -50,7 +50,7 @@ public class EventExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved placeholder field for the event extension content")
+        @Schema(description = "Reserved placeholder field for the event extension content", example = "reserved")
         private String keep;
 
     }

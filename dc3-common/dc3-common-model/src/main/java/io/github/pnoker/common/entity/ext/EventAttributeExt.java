@@ -55,7 +55,7 @@ public class EventAttributeExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Whether to keep the attribute value persistently")
+        @Schema(description = "Whether to keep the attribute value persistently", example = "true")
         private String keep;
 
         @Schema(description = "UI rendering configuration for the attribute")
@@ -72,29 +72,29 @@ public class EventAttributeExt extends BaseExt {
 
     }
 
-    @Schema(description = "UI rendering configuration for the attribute")
+    @Schema(description = "UI rendering configuration for the attribute", example = "form")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Ui {
 
-        @Schema(description = "UI component type used to render the attribute")
+        @Schema(description = "UI component type used to render the attribute", example = "input")
         private String component;
 
-        @Schema(description = "Whether the attribute is required in the UI form")
+        @Schema(description = "Whether the attribute is required in the UI form", example = "true")
         private Boolean required;
 
-        @Schema(description = "Placeholder text displayed in the input field")
+        @Schema(description = "Placeholder text displayed in the input field", example = "请输入")
         private String placeholder;
 
         @Schema(description = "Selectable options for the attribute, each as a key-value map")
         private List<Map<String, Object>> options;
 
-        @Schema(description = "Group name used to organize the attribute in the UI")
+        @Schema(description = "Group name used to organize the attribute in the UI", example = "basic")
         private String group;
 
-        @Schema(description = "Display order of the attribute within its group")
+        @Schema(description = "Display order of the attribute within its group", example = "1")
         private Integer order;
 
         @Schema(description = "Variables expression used by the UI component")
@@ -102,32 +102,32 @@ public class EventAttributeExt extends BaseExt {
 
     }
 
-    @Schema(description = "Validation rules for the attribute value")
+    @Schema(description = "Validation rules for the attribute value", example = "standard")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Validation {
 
-        @Schema(description = "Minimum allowed value or length for the attribute")
+        @Schema(description = "Minimum allowed value or length for the attribute", example = "0")
         private String min;
 
-        @Schema(description = "Maximum allowed value or length for the attribute")
+        @Schema(description = "Maximum allowed value or length for the attribute", example = "100")
         private String max;
 
-        @Schema(description = "Regular expression the attribute value must match")
+        @Schema(description = "Regular expression the attribute value must match", example = "^[a-zA-Z0-9_]+$")
         private String regex;
 
     }
 
-    @Schema(description = "Security configuration for the attribute")
+    @Schema(description = "Security configuration for the attribute", example = "basic")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Security {
 
-        @Schema(description = "Whether the attribute value is treated as a secret")
+        @Schema(description = "Whether the attribute value is treated as a secret", example = "true")
         private Boolean secret;
 
     }

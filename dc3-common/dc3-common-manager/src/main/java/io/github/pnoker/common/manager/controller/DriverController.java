@@ -70,10 +70,10 @@ public class DriverController implements BaseController {
     private final DriverService driverService;
 
     /**
-     * Driver
+     * Register a new driver protocol adapter for the current tenant, then return the add-success status.
      *
-     * @param entityVO {@link DriverVO}
-     * @return R of String
+     * @param entityVO driver payload to create
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('driver', 'add')")
     @Operation(summary = "Add Driver", description = "Register a new driver protocol adapter for the current tenant. " +
@@ -89,10 +89,10 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * ID Driver
+     * Delete a driver after verifying it belongs to the current tenant, then return the delete-success status.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the driver to delete
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('driver', 'delete')")
     @Operation(summary = "Delete Driver", description = "Permanently delete a driver by ID (tenant-scoped). " +
@@ -107,10 +107,10 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * Driver
+     * Update an existing driver after verifying tenant ownership, then return the update-success status.
      *
-     * @param entityVO {@link DriverVO}
-     * @return R of String
+     * @param entityVO driver payload to update
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('driver', 'update')")
     @Operation(summary = "Update Driver", description = "Update an existing driver's attributes (tenant-scoped). " +
@@ -127,10 +127,10 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * ID Driver
+     * Fetch one driver by ID after verifying it belongs to the current tenant.
      *
-     * @param id ID
-     * @return DriverVO {@link DriverVO}
+     * @param id id of the driver to fetch
+     * @return the matched DriverVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('driver', 'get')")
     @Operation(summary = "Get Driver by ID", description = "Fetch one driver by ID (tenant-scoped). " +
@@ -173,7 +173,7 @@ public class DriverController implements BaseController {
     @Operation(summary = "Get Driver by Service Name", description = "Fetch one driver by its protocol service name (tenant-scoped). " +
             "Use to resolve a driver instance from the service identifier under which it registered with the platform.")
     @GetMapping("/get_by_service_name")
-    public Mono<R<DriverVO>> getByServiceName(@Parameter(description = "Driver service name") @NotNull @RequestParam(value = "service_name") String serviceName) {
+    public Mono<R<DriverVO>> getByServiceName(@Parameter(description = "Unique protocol service name under which the driver registered; must belong to the current tenant.", example = "Modbus-TCP-Driver") @NotNull @RequestParam(value = "service_name") String serviceName) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverBO entityBO = driverService.getByServiceName(serviceName, tenantId);
             DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);

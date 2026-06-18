@@ -48,7 +48,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(description = "Command Param view object")
+@Schema(description = "Command Param view object", example = "42")
 public class CommandParamVO extends BaseVO {
 
     @NotBlank(message = "Param name can't be empty", groups = {Add.class})
@@ -57,17 +57,17 @@ public class CommandParamVO extends BaseVO {
             groups = {Add.class, Update.class})
     private String paramName;
 
-    @Schema(description = "Command parameter code. Stable business identifier; must not change once deployed.", example = "REG_ADDR")
+    @Schema(description = "Command parameter code. Stable business identifier; must not change once deployed.", example = "REG_ADDR", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
     private String paramCode;
 
-    @Schema(description = "Parameter direction: INPUT (sent to device) or OUTPUT (received from device).", example = "INPUT")
+    @Schema(description = "Parameter direction: INPUT (sent to device) or OUTPUT (received from device).", example = "INPUT", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Param direction can't be empty", groups = {Add.class, Update.class})
     private ParamDirectionTypeEnum paramDirectionFlag;
 
-    @Schema(description = "Parameter data type: STRING, INT, LONG, FLOAT, DOUBLE, or BOOL.", example = "INT")
+    @Schema(description = "Parameter data type: STRING, INT, LONG, FLOAT, DOUBLE, or BOOL.", example = "INT", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
     private PointTypeEnum paramTypeFlag;

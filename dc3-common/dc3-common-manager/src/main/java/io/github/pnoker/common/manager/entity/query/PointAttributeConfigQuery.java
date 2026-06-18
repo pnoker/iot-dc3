@@ -49,14 +49,14 @@ public class PointAttributeConfigQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     //
@@ -64,31 +64,31 @@ public class PointAttributeConfigQuery implements Serializable {
     /**
      * ID
      */
-    @Schema(description = "attribute ID")
+    @Schema(description = "Filter by attribute ID.", example = "1024")
     private Long attributeId;
 
     /**
      * Device ID
      */
-    @Schema(description = "device ID")
+    @Schema(description = "Filter by device ID. Returns results scoped to a specific device.", example = "1024")
     private Long deviceId;
 
     /**
      * Point ID
      */
-    @Schema(description = "point ID")
+    @Schema(description = "Filter by data point ID.", example = "2048")
     private Long pointId;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 
 }

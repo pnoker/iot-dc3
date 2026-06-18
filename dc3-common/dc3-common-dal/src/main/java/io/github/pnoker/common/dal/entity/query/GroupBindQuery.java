@@ -49,14 +49,14 @@ public class GroupBindQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID.
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     /**
@@ -68,13 +68,13 @@ public class GroupBindQuery implements Serializable {
     /**
      * Group ID.
      */
-    @Schema(description = "group ID")
+    @Schema(description = "Filter by group ID to restrict results to entities in a specific group.", example = "4096")
     private Long groupId;
 
     /**
      * Entity ID.
      */
-    @Schema(description = "Associated entity ID")
+    @Schema(description = "Associated entity ID", example = "1000")
     private Long entityId;
 
 }

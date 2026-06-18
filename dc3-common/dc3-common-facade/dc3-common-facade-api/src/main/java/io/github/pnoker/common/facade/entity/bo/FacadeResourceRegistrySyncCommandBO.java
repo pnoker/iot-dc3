@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.facade.entity.bo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,18 +39,14 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Facade Resource Registry Sync Command business object")
 public class FacadeResourceRegistrySyncCommandBO {
 
-    @Schema(description = "Service name")
 
     private String serviceName;
 
-    @Schema(description = "delete missing")
 
     private boolean deleteMissing;
 
-    @Schema(description = "apis")
 
     private List<FacadeScannedApiBO> apis;
 

@@ -101,7 +101,7 @@ public class TenantController implements BaseController {
     @PreAuthorize("@perm.can('tenant', 'delete')")
     @Operation(summary = "Delete Tenant", description = "Remove a tenant by ID, deleting the isolation boundary and its owned data. Non-administrators may delete only their own tenant.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the tenant to delete. System administrators may delete any tenant; non-administrators may only delete their own tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             TenantBO userTenant = tenantService.getById(tenantId);
             boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
@@ -148,7 +148,7 @@ public class TenantController implements BaseController {
     @PreAuthorize("@perm.can('tenant', 'get')")
     @Operation(summary = "Get Tenant by ID", description = "Fetch one tenant by its primary key. Non-administrators are scoped to their own tenant and get a not-found result for any other ID.")
     @GetMapping("/get_by_id")
-    public Mono<R<TenantVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<TenantVO>> getById(@Parameter(description = "Primary key of the tenant to retrieve. System administrators may query any tenant; non-administrators may only query their own tenant ID.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             TenantBO userTenant = tenantService.getById(tenantId);
             boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
@@ -170,7 +170,7 @@ public class TenantController implements BaseController {
     @PreAuthorize("@perm.can('tenant', 'get')")
     @Operation(summary = "Get Tenant by Code", description = "Look up a tenant by its unique tenant code. Non-administrators are scoped to their own tenant and receive a not-found result for any other code.")
     @GetMapping("/get_by_code")
-    public Mono<R<TenantVO>> getByCode(@Parameter(description = "Unique business code of the entity to query within the current tenant.", example = "SENSOR_001") @NotNull @RequestParam(value = "code") String code) {
+    public Mono<R<TenantVO>> getByCode(@Parameter(description = "Unique business code assigned to the tenant at creation time. System administrators may query any code; non-administrators receive not-found for codes outside their own tenant.", example = "tenant-001") @NotNull @RequestParam(value = "code") String code) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             TenantBO userTenant = tenantService.getById(tenantId);
             boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());

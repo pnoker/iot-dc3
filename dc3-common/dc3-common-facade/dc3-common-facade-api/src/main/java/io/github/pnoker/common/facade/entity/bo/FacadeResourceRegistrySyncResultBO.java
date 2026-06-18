@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.facade.entity.bo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,22 +37,17 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Facade Resource Registry Sync Result business object")
 public class FacadeResourceRegistrySyncResultBO {
 
-    @Schema(description = "inserted")
 
     private int inserted;
 
-    @Schema(description = "updated")
 
     private int updated;
 
-    @Schema(description = "Logical delete flag: 0=active, 1=deleted")
 
     private int deleted;
 
-    @Schema(description = "unchanged")
 
     private int unchanged;
 

@@ -50,10 +50,10 @@ public class TopEntityVO implements Serializable {
      * Device / point / driver id — the service resolves the human-readable name
      * asynchronously on the frontend via existing getXxxByIds APIs.
      */
-    @Schema(description = "ranked entity ID (device, point or driver)")
+    @Schema(description = "Identifier of the ranked entity (device, point or driver); resolved to a name on the frontend.", example = "1024")
     private Long entityId;
 
-    @Schema(description = "ranking count for this entity")
+    @Schema(description = "Aggregated count driving this entity's ranking within the queried time window.", example = "256")
     private long count;
 
 }

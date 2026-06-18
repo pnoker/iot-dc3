@@ -38,25 +38,25 @@ import lombok.ToString;
 @Schema(description = "Model Provider view object")
 public class ModelProviderVO extends BaseVO {
 
-    @Schema(description = "Provider name")
+    @Schema(description = "Human-readable display name of the model provider.", example = "My OpenAI Provider")
     private String name;
 
-    @Schema(description = "Provider type", example = "OPENAI_COMPATIBLE")
+    @Schema(description = "Protocol type of the provider's API; determines how requests are formatted and sent.", example = "OPENAI_COMPATIBLE")
     private AgenticModelProviderTypeEnum providerType;
 
-    @Schema(description = "Provider API base URL", example = "https://api.openai.com/v1")
+    @Schema(description = "Root URL of the provider's API endpoint; all model requests are sent relative to this base.", example = "https://api.openai.com/v1")
     private String baseUrl;
 
-    @Schema(description = "Default provider flag enum (DEFAULT or NON_DEFAULT)", example = "DEFAULT")
+    @Schema(description = "Indicates whether this provider is the tenant's default selection; only one provider per tenant may be DEFAULT at a time.", example = "NON_DEFAULT")
     private DefaultFlagEnum defaultFlag;
 
-    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
+    @Schema(description = "Lifecycle state of this provider; DISABLE prevents it from being used in model calls.", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Tenant ID", example = "1024")
+    @Schema(description = "Identifier of the tenant that owns this provider; all operations are scoped to this tenant.", example = "1024")
     private Long tenantId;
 
-    @Schema(description = "Provider API key used for authentication. Write-only: never returned in API responses.", accessMode = Schema.AccessMode.WRITE_ONLY)
+    @Schema(description = "API key used to authenticate requests to the provider's endpoint. Write-only: never included in API responses.", accessMode = Schema.AccessMode.WRITE_ONLY)
     private String apiKey;
 
 }

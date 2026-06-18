@@ -171,8 +171,8 @@ public class McpManagementController implements BaseController {
     public Mono<R<List<McpAuditCommand>>> listAuditLog(
             @Parameter(description = "Filter by owning principal ID.", example = "2048") @RequestParam(value = "principal_id", required = false) Long principalId,
             @Parameter(description = "Filter by MCP tool ID.", example = "tool_read_device") @RequestParam(value = "tool_id", required = false) String toolId,
-            @Parameter(description = "Filter by connection status: ACTIVE, REVOKED, or EXPIRED.", example = "ACTIVE") @RequestParam(value = "status", required = false) String status,
-            @Parameter(description = "Filter by risk level: LOW, MEDIUM, HIGH, or CRITICAL.", example = "LOW") @RequestParam(value = "risk_level", required = false) String riskLevel,
+            @Parameter(description = "Filter by audit invocation outcome: SUCCESS, DENIED, POLICY_DENIED, ERROR, or UNKNOWN.", example = "SUCCESS") @RequestParam(value = "status", required = false) String status,
+            @Parameter(description = "Filter by tool risk level: LOW, MEDIUM, or HIGH.", example = "LOW") @RequestParam(value = "risk_level", required = false) String riskLevel,
             @Parameter(description = "Maximum number of records to return.", example = "20") @RequestParam(value = "limit", required = false) Integer limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(oauthMcpRuntimeService.listAudit(
                 tenantId, principalId, StringUtils.defaultString(toolId), StringUtils.defaultString(status),

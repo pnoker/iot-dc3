@@ -42,7 +42,7 @@ public class DriverExt extends BaseExt {
      * <p>
      * Type Version
      */
-    @Schema(description = "Driver configuration content payload")
+    @Schema(description = "Driver configuration content payload; a structured object carrying driver-specific settings, not a scalar value")
     private Content content;
 
     @Schema(description = "Driver configuration content holding driver-specific settings")
@@ -52,7 +52,7 @@ public class DriverExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved configuration value kept for the driver")
+        @Schema(description = "Reserved configuration value retained for the driver; free-form string used to pass driver-specific hints", example = "keep")
         private String keep;
 
     }

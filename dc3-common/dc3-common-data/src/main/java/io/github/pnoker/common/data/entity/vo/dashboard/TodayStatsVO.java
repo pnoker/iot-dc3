@@ -45,16 +45,16 @@ public class TodayStatsVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "count for today")
+    @Schema(description = "count for today", example = "42")
     private long today;
 
-    @Schema(description = "count for yesterday")
+    @Schema(description = "count for yesterday", example = "35")
     private long yesterday;
 
-    @Schema(description = "total count")
+    @Schema(description = "total count", example = "1420")
     private long total;
 
-    @Schema(description = "percent change versus yesterday")
+    @Schema(description = "percent change versus yesterday", example = "20")
     private long percentChange;
 
 }

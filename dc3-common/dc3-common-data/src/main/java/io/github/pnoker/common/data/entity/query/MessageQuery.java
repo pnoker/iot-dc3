@@ -52,14 +52,14 @@ public class MessageQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination object")
+    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
 
     private Pages page;
 
     /**
      * Tenant ID
      */
-    @Schema(description = "Tenant ID")
+    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
     //
@@ -67,25 +67,25 @@ public class MessageQuery implements Serializable {
     /**
      * Alarm message template title
      */
-    @Schema(description = "message name")
+    @Schema(description = "Filter by message template name. Supports partial matching.", example = "High Temp Alert Message")
     private String messageName;
 
     /**
      * Alarm message template code
      */
-    @Schema(description = "message code")
+    @Schema(description = "Filter by message template code. Exact match on the stable business identifier.", example = "HIGH_TEMP_MSG")
     private String messageCode;
 
     /**
      * Alarm message template level
      */
-    @Schema(description = "message level")
+    @Schema(description = "message level", example = "HIGH")
     private AlarmMessageLevelEnum messageLevel;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

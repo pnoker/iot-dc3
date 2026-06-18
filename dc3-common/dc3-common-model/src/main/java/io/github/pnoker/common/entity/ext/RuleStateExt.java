@@ -56,19 +56,19 @@ public class RuleStateExt extends BaseExt {
         /**
          * Rule code at the time the state was updated.
          */
-        @Schema(description = "Rule code at the time the state was updated")
+        @Schema(description = "Rule code at the time the state was updated", example = "HIGH_TEMP_ALERT")
         private String ruleCode;
 
         /**
          * Alarm severity at the time the state was updated.
          */
-        @Schema(description = "Alarm severity at the time the state was updated")
+        @Schema(description = "Alarm severity at the time the state was updated", example = "P0")
         private String severity;
 
         /**
          * Alarm event type at the time the state was updated.
          */
-        @Schema(description = "Alarm event type at the time the state was updated")
+        @Schema(description = "Alarm event type at the time the state was updated", example = "TEMP_ALERT")
         private String eventType;
 
         /**
@@ -86,7 +86,7 @@ public class RuleStateExt extends BaseExt {
         /**
          * Rule match type at the time the state was updated.
          */
-        @Schema(description = "Rule match type at the time the state was updated")
+        @Schema(description = "Rule match type at the time the state was updated", example = "FIRING")
         private String matchType;
 
         /**

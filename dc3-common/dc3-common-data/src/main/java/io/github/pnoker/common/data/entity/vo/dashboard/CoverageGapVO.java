@@ -47,10 +47,10 @@ public class CoverageGapVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "total number of declared points")
+    @Schema(description = "total number of declared points", example = "500")
     private long totalPoints;
 
-    @Schema(description = "number of declared points that never produced a value")
+    @Schema(description = "number of declared points that never produced a value", example = "12")
     private long missingPoints;
 
     @Schema(description = "capped list of offending point/profile ids")
@@ -66,10 +66,10 @@ public class CoverageGapVO implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        @Schema(description = "point ID")
+        @Schema(description = "point ID", example = "2048")
         private long pointId;
 
-        @Schema(description = "profile ID the point belongs to")
+        @Schema(description = "profile ID the point belongs to", example = "1024")
         private long profileId;
 
     }
