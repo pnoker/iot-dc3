@@ -31,7 +31,7 @@ import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
@@ -116,7 +116,7 @@ class PointValueServerTest {
         GrpcRPointValueDTO response = stub.getLastValue(GrpcPointValueQuery.newBuilder()
                 .setTenantId(1L).setDeviceId(10L).setPointId(20L).build());
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
     }
 
     @Test
@@ -126,7 +126,7 @@ class PointValueServerTest {
         GrpcRPointValueDTO response = stub.getLastValue(GrpcPointValueQuery.newBuilder()
                 .setTenantId(1L).setDeviceId(99L).setPointId(20L).build());
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.FAILURE.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.FAILURE.getCode());
         assertThat(response.getResult().getMessage()).contains("Device");
     }
 
@@ -151,7 +151,7 @@ class PointValueServerTest {
                 .setTenantId(1L).setDeviceId(10L).setPointId(99L).setCount(50)
                 .build());
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.FAILURE.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.FAILURE.getCode());
     }
 
     @Test

@@ -18,10 +18,9 @@
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.exception.BusinessException;
 import io.github.pnoker.common.exception.PasswordChangeRequiredException;
-import io.github.pnoker.common.exception.RequestException;
-import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -46,8 +45,9 @@ import java.util.Objects;
  * Global Exception Handler Configuration
  * <p>
  * Global exception handler for reactive web applications using @RestControllerAdvice.
- * Provides centralized exception handling for common exceptions and validation errors,
- * returning standardized error responses.
+ * Every {@link BusinessException} carries an {@link ErrorCode}; this handler reads that
+ * code to align the response body code and the HTTP status, so the two never diverge.
+ * Framework and validation exceptions are mapped to the closest {@link ErrorCode}.
  * </p>
  *
  * @author pnoker
@@ -60,25 +60,51 @@ import java.util.Objects;
 public class ExceptionConfig {
 
     /**
-     * Handle global exceptions
+     * Handle a password-change-required outcome. This is a routable login result, not a
+     * hard failure, so it stays on HTTP 200 while carrying a distinct {@link ErrorCode}
+     * ({@code R4031}/{@code R4032}) the client uses to open the password change flow.
      *
-     * @param exception Exception to handle
+     * @param exception PasswordChangeRequiredException to handle
      * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response carrying a distinct response code
+     */
+    @ExceptionHandler(PasswordChangeRequiredException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<R<String>> passwordChangeRequiredException(PasswordChangeRequiredException exception,
+                                                           ServerHttpRequest request) {
+        log.warn("Password change required, path={}, message={}", request.getURI().getRawPath(),
+                exception.getMessage());
+        return Mono.just(R.fail(exception.getErrorCode(), exception.getMessage()));
+    }
+
+    /**
+     * Handle every {@link BusinessException}: read the carried {@link ErrorCode}, apply its
+     * HTTP status to the response and return an envelope whose body code matches that status.
+     *
+     * @param exception BusinessException to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @param response  ServerHttpResponse to which the carried HTTP status is applied
      * @return Mono containing error response
      */
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Mono<R<String>> globalException(Exception exception, ServerHttpRequest request) {
-        log.error("Global exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage(),
-                exception);
-        return Mono.just(R.fail(exception.getMessage()));
+    @ExceptionHandler(BusinessException.class)
+    public Mono<R<String>> businessException(BusinessException exception, ServerHttpRequest request,
+                                             ServerHttpResponse response) {
+        ErrorCode errorCode = exception.getErrorCode();
+        response.setStatusCode(HttpStatusCode.valueOf(errorCode.getHttpStatus()));
+
+        String path = request.getURI().getRawPath();
+        if (errorCode.getHttpStatus() >= 500) {
+            log.error("Business exception {} on {}: {}", errorCode.getCode(), path, exception.getMessage(), exception);
+        } else {
+            log.warn("Business exception {} on {}: {}", errorCode.getCode(), path, exception.getMessage());
+        }
+        return Mono.just(R.fail(errorCode, exception.getMessage()));
     }
 
     /**
      * Handle Spring's framework-level {@link ResponseStatusException} — e.g. 404 from the
-     * dispatcher when no handler matches a request. These are not application failures,
-     * so they must not surface as 500 ERROR entries. Preserves the original status on the
-     * response and logs at a level appropriate to the status class.
+     * dispatcher when no handler matches a request. Preserves the original status on the
+     * response and maps it to the closest {@link ErrorCode} so the body code stays aligned.
      *
      * @param exception ResponseStatusException raised by the reactive dispatcher or an
      *                  HTTP client
@@ -103,67 +129,8 @@ public class ExceptionConfig {
         }
 
         String reason = exception.getReason();
-        return Mono.just(R.fail(Objects.nonNull(reason) ? reason : status.toString()));
-    }
-
-    /**
-     * Handle RequestException
-     *
-     * @param exception RequestException to handle
-     * @param request   ServerHttpRequest that triggered the exception
-     * @return Mono containing error response
-     */
-    @ExceptionHandler(RequestException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Mono<R<String>> requestException(RequestException exception, ServerHttpRequest request) {
-        log.warn("Request exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage());
-        return Mono.just(R.fail(exception.getMessage()));
-    }
-
-    /**
-     * Handle NotFoundException
-     *
-     * @param exception NotFoundException to handle
-     * @param request   ServerHttpRequest that triggered the exception
-     * @return Mono containing error response
-     */
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Mono<R<String>> notFoundException(NotFoundException exception, ServerHttpRequest request) {
-        log.warn("Not found exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage(),
-                exception);
-        return Mono.just(R.fail(exception.getMessage()));
-    }
-
-    /**
-     * Handle UnAuthorizedException
-     *
-     * @param exception UnAuthorizedException to handle
-     * @param request   ServerHttpRequest that triggered the exception
-     * @return Mono containing error response
-     */
-    @ExceptionHandler(UnAuthorizedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public Mono<R<String>> unAuthorizedException(UnAuthorizedException exception, ServerHttpRequest request) {
-        log.warn("Unauthorized exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage(),
-                exception);
-        return Mono.just(R.fail(exception.getMessage()));
-    }
-
-    /**
-     * Handle PasswordChangeRequiredException
-     *
-     * @param exception PasswordChangeRequiredException to handle
-     * @param request   ServerHttpRequest that triggered the exception
-     * @return Mono containing error response carrying a distinct response code
-     */
-    @ExceptionHandler(PasswordChangeRequiredException.class)
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<R<String>> passwordChangeRequiredException(PasswordChangeRequiredException exception,
-                                                           ServerHttpRequest request) {
-        log.warn("Password change required, path={}, message={}", request.getURI().getRawPath(),
-                exception.getMessage());
-        return Mono.just(R.fail(exception.getResponseEnum(), exception.getMessage()));
+        return Mono.just(R.fail(mapStatusToErrorCode(status.value()),
+                Objects.nonNull(reason) ? reason : status.toString()));
     }
 
     /**
@@ -184,7 +151,39 @@ public class ExceptionConfig {
                     error.getField(), error.getDefaultMessage());
             map.put(error.getField(), error.getDefaultMessage());
         });
-        return Mono.just(R.fail(JsonUtil.toJsonString(map)));
+        return Mono.just(R.fail(ErrorCode.VALIDATION, JsonUtil.toJsonString(map)));
+    }
+
+    /**
+     * Handle global exceptions
+     *
+     * @param exception Exception to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Mono<R<String>> globalException(Exception exception, ServerHttpRequest request) {
+        log.error("Global exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage(),
+                exception);
+        return Mono.just(R.fail(ErrorCode.FAILURE, exception.getMessage()));
+    }
+
+    /**
+     * Map a raw HTTP status to the closest {@link ErrorCode} so framework-raised statuses
+     * still produce a meaningful, aligned body code.
+     *
+     * @param status HTTP status value
+     * @return matching {@link ErrorCode}
+     */
+    private ErrorCode mapStatusToErrorCode(int status) {
+        return switch (status) {
+            case 401 -> ErrorCode.UNAUTHORIZED;
+            case 403 -> ErrorCode.FORBIDDEN;
+            case 404 -> ErrorCode.NOT_FOUND;
+            case 422 -> ErrorCode.VALIDATION;
+            default -> ErrorCode.FAILURE;
+        };
     }
 
 }

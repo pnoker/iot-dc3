@@ -29,7 +29,7 @@ import io.github.pnoker.api.center.manager.GrpcRPageCommandDTO;
 import io.github.pnoker.api.common.GrpcCommandDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.CommandBO;
 import io.github.pnoker.common.manager.entity.query.CommandQuery;
@@ -63,19 +63,15 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
     @Override
     public void listByPage(GrpcPageCommandQuery request, StreamObserver<GrpcRPageCommandDTO> responseObserver) {
         GrpcRPageCommandDTO.Builder builder = GrpcRPageCommandDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         CommandQuery query = grpcCommandBuilder.buildQueryByGrpcQuery(request);
 
         Page<CommandBO> entityPage = commandService.list(query);
         if (Objects.isNull(entityPage)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             GrpcPageCommandDTO.Builder pageCommandBuilder = GrpcPageCommandDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
@@ -94,7 +90,7 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
             builder.setData(pageCommandBuilder);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -102,17 +98,13 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
     @Override
     public void listByIds(GrpcCommandIdsQuery request, StreamObserver<GrpcRCommandListDTO> responseObserver) {
         GrpcRCommandListDTO.Builder builder = GrpcRCommandListDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         List<CommandBO> entityBOList = commandService.listByIds(new HashSet<>(request.getCommandIdsList()));
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             List<GrpcCommandDTO> entityGrpcDTOList = entityBOList.stream()
                     .map(grpcCommandBuilder::buildGrpcDTOByBO)
@@ -121,7 +113,7 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
             builder.addAllData(entityGrpcDTOList);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -129,7 +121,7 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
     @Override
     public void getById(GrpcCommandQuery request, StreamObserver<GrpcRCommandDTO> responseObserver) {
         GrpcRCommandDTO.Builder builder = GrpcRCommandDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         CommandBO entityBO;
         try {
@@ -138,18 +130,14 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
             entityBO = null;
         }
         if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             builder.setData(grpcCommandBuilder.buildGrpcDTOByBO(entityBO));
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

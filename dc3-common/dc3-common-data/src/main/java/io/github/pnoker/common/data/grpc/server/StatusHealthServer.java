@@ -28,13 +28,13 @@ import io.github.pnoker.api.center.data.GrpcSystemHealthDTO;
 import io.github.pnoker.api.center.data.GrpcTenantHealthQuery;
 import io.github.pnoker.api.center.data.StatusHealthApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.data.biz.SystemHealthService;
 import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
-import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
@@ -178,19 +178,11 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
     }
 
     private GrpcR ok() {
-        return GrpcR.newBuilder()
-                .setOk(true)
-                .setCode(ResponseEnum.OK.getCode())
-                .setMessage(ResponseEnum.OK.getRemark())
-                .build();
+        return GrpcRFactory.ok();
     }
 
     private GrpcR noResource() {
-        return GrpcR.newBuilder()
-                .setOk(false)
-                .setCode(ResponseEnum.NO_RESOURCE.getCode())
-                .setMessage(ResponseEnum.NO_RESOURCE.getRemark())
-                .build();
+        return GrpcRFactory.notFound();
     }
 
 }

@@ -28,7 +28,7 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,7 +85,7 @@ public class LocalCredentialController implements BaseController {
             tenantMembershipService.requireTenantMember(header.getTenantId(), entityBO.getPrincipalId());
             fillCreateAudit(entityBO, header);
             localCredentialService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -103,7 +103,7 @@ public class LocalCredentialController implements BaseController {
             LocalCredentialBO entityBO = localCredentialService.getById(id);
             tenantMembershipService.requireTenantMember(tenantId, entityBO.getPrincipalId());
             localCredentialService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -125,7 +125,7 @@ public class LocalCredentialController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             localCredentialService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

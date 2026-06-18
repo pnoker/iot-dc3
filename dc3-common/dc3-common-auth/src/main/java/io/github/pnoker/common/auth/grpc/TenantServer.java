@@ -20,11 +20,11 @@ package io.github.pnoker.common.auth.grpc;
 import io.github.pnoker.api.center.auth.GrpcCodeQuery;
 import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
-import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
 import io.github.pnoker.common.auth.grpc.builder.GrpcTenantBuilder;
 import io.github.pnoker.common.auth.service.TenantService;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,29 +51,20 @@ public class TenantServer extends TenantApiGrpc.TenantApiImplBase {
     @Override
     public void getByCode(GrpcCodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {
         GrpcRTenantDTO.Builder builder = GrpcRTenantDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         try {
             TenantBO entityBO = tenantService.getByCode(request.getCode());
             if (Objects.isNull(entityBO)) {
-                rBuilder.setOk(false);
-                rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+                builder.setResult(GrpcRFactory.notFound());
             } else {
-                rBuilder.setOk(true);
-                rBuilder.setCode(ResponseEnum.OK.getCode());
-                rBuilder.setMessage(ResponseEnum.OK.getRemark());
-
+                builder.setResult(GrpcRFactory.ok());
                 builder.setData(grpcTenantBuilder.buildGrpcDTOByBO(entityBO));
             }
         } catch (Exception e) {
             log.warn("getByCode failed", e);
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(ResponseEnum.FAILURE.getRemark());
+            builder.setResult(GrpcRFactory.fail(ErrorCode.FAILURE));
         }
 
-        builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

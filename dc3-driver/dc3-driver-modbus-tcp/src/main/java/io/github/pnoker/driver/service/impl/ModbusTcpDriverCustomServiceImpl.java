@@ -81,9 +81,10 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      */
     private static final long FAILURE_BACKOFF_MS = 60_000;
     /**
-     * Modbus factory for creating ModbusMaster instances.
+     * Modbus factory for creating ModbusMaster instances. Not {@code final} so tests can
+     * swap in a mock factory; production keeps the single default instance.
      */
-    private static final ModbusFactory modbusFactory = new ModbusFactory();
+    private static ModbusFactory modbusFactory = new ModbusFactory();
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     @Value("${dc3.driver.code}")

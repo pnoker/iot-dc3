@@ -18,7 +18,9 @@
 package io.github.pnoker.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.enums.ResponseCode;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,14 +54,14 @@ public class R<T> implements Serializable {
     /**
      * Response status code
      */
-    @Schema(description = "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.", example = "R200")
-    private String code = ResponseEnum.OK.getCode();
+    @Schema(description = "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.", example = "R200")
+    private String code = SuccessCode.OK.getCode();
 
     /**
      * Response message
      */
     @Schema(description = "Human-readable response message.", example = "Success")
-    private String message = ResponseEnum.OK.getRemark();
+    private String message = SuccessCode.OK.getRemark();
 
     /**
      * Response data payload
@@ -108,10 +110,10 @@ public class R<T> implements Serializable {
      * Create success response with custom code and message
      *
      * @param <T>  Response data type
-     * @param code {@link ResponseEnum} custom response code
+     * @param code {@link ResponseCode} custom response code
      * @return Response with success status and custom code/message
      */
-    public static <T> R<T> ok(ResponseEnum code) {
+    public static <T> R<T> ok(ResponseCode code) {
         return new R<T>().success(code.getCode(), code.getRemark());
     }
 
@@ -119,11 +121,11 @@ public class R<T> implements Serializable {
      * Success response with custom code and message.
      *
      * @param <T>     Object
-     * @param code    {@link ResponseEnum}
+     * @param code    {@link ResponseCode}
      * @param message Success message
      * @return Response
      */
-    public static <T> R<T> ok(ResponseEnum code, String message) {
+    public static <T> R<T> ok(ResponseCode code, String message) {
         return new R<T>().success(code.getCode(), message);
     }
 
@@ -175,10 +177,10 @@ public class R<T> implements Serializable {
      * Failure response with custom code.
      *
      * @param <T>  Object
-     * @param code {@link ResponseEnum}
+     * @param code {@link ResponseCode}
      * @return Response
      */
-    public static <T> R<T> fail(ResponseEnum code) {
+    public static <T> R<T> fail(ResponseCode code) {
         return new R<T>().failure(code.getCode(), code.getRemark());
     }
 
@@ -186,11 +188,11 @@ public class R<T> implements Serializable {
      * Failure response with custom code and message.
      *
      * @param <T>     Object
-     * @param code    {@link ResponseEnum}
+     * @param code    {@link ResponseCode}
      * @param message Failure message
      * @return Response
      */
-    public static <T> R<T> fail(ResponseEnum code, String message) {
+    public static <T> R<T> fail(ResponseCode code, String message) {
         return new R<T>().failure(code.getCode(), message);
     }
 
@@ -224,8 +226,8 @@ public class R<T> implements Serializable {
      */
     private R<T> success() {
         this.ok = true;
-        this.code = ResponseEnum.OK.getCode();
-        this.message = ResponseEnum.OK.getRemark();
+        this.code = SuccessCode.OK.getCode();
+        this.message = SuccessCode.OK.getRemark();
         return this;
     }
 
@@ -237,7 +239,7 @@ public class R<T> implements Serializable {
      */
     private R<T> success(String message) {
         this.ok = true;
-        this.code = ResponseEnum.OK.getCode();
+        this.code = SuccessCode.OK.getCode();
         this.message = message;
         return this;
     }
@@ -263,8 +265,8 @@ public class R<T> implements Serializable {
      */
     private R<T> failure() {
         this.ok = false;
-        this.code = ResponseEnum.FAILURE.getCode();
-        this.message = ResponseEnum.FAILURE.getRemark();
+        this.code = ErrorCode.FAILURE.getCode();
+        this.message = ErrorCode.FAILURE.getRemark();
         return this;
     }
 
@@ -276,7 +278,7 @@ public class R<T> implements Serializable {
      */
     private R<T> failure(String message) {
         this.ok = false;
-        this.code = ResponseEnum.FAILURE.getCode();
+        this.code = ErrorCode.FAILURE.getCode();
         this.message = message;
         return this;
     }

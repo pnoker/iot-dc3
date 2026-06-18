@@ -20,11 +20,11 @@ package io.github.pnoker.common.auth.grpc;
 import io.github.pnoker.api.center.auth.GrpcLoginNameQuery;
 import io.github.pnoker.api.center.auth.GrpcRLocalCredentialDTO;
 import io.github.pnoker.api.center.auth.LocalCredentialApiGrpc;
-import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.auth.entity.bo.LocalCredentialBO;
 import io.github.pnoker.common.auth.grpc.builder.GrpcLocalCredentialBuilder;
 import io.github.pnoker.common.auth.service.LocalCredentialService;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,28 +51,20 @@ public class LocalCredentialServer extends LocalCredentialApiGrpc.LocalCredentia
     @Override
     public void getByLoginName(GrpcLoginNameQuery request, StreamObserver<GrpcRLocalCredentialDTO> responseObserver) {
         GrpcRLocalCredentialDTO.Builder builder = GrpcRLocalCredentialDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         try {
             LocalCredentialBO entityBO = localCredentialService.getByLoginName(request.getLoginName(), false);
             if (Objects.isNull(entityBO)) {
-                rBuilder.setOk(false);
-                rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+                builder.setResult(GrpcRFactory.notFound());
             } else {
-                rBuilder.setOk(true);
-                rBuilder.setCode(ResponseEnum.OK.getCode());
-                rBuilder.setMessage(ResponseEnum.OK.getRemark());
+                builder.setResult(GrpcRFactory.ok());
                 builder.setData(grpcLocalCredentialBuilder.buildGrpcDTOByBO(entityBO));
             }
         } catch (Exception e) {
             log.warn("getByLoginName failed", e);
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(ResponseEnum.FAILURE.getRemark());
+            builder.setResult(GrpcRFactory.fail(ErrorCode.FAILURE));
         }
 
-        builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

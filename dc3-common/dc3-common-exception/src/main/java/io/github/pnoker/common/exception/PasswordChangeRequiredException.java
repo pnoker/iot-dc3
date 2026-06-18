@@ -17,27 +17,32 @@
 
 package io.github.pnoker.common.exception;
 
-import io.github.pnoker.common.enums.ResponseEnum;
-import lombok.Getter;
+import io.github.pnoker.common.enums.ErrorCode;
 
 /**
  * Raised when a local credential may not be used to log in until its password is changed,
  * either because a password change is mandated or because the password has expired. The
- * carried {@link ResponseEnum} lets the web layer return a distinct response code so the
- * client can route the user to the self-service password change flow.
+ * carried {@link ErrorCode} lets the web layer return a distinct response code so the
+ * client can route the user to the self-service password change flow. Unlike other
+ * business exceptions this maps to HTTP 200 (handled in the web layer) because the login
+ * flow treats it as a routable outcome rather than a hard failure.
  *
  * @author pnoker
  * @version 2026.6.17
  * @since 2026.6.17
  */
-@Getter
-public class PasswordChangeRequiredException extends RuntimeException {
+public class PasswordChangeRequiredException extends BusinessException {
 
-    private final ResponseEnum responseEnum;
+    private final ErrorCode errorCode;
 
-    public PasswordChangeRequiredException(ResponseEnum responseEnum) {
-        super(responseEnum.getRemark());
-        this.responseEnum = responseEnum;
+    public PasswordChangeRequiredException(ErrorCode errorCode) {
+        super(errorCode.getRemark(), null);
+        this.errorCode = errorCode;
+    }
+
+    @Override
+    public ErrorCode getErrorCode() {
+        return errorCode;
     }
 
 }

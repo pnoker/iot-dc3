@@ -23,7 +23,7 @@ management, HTTP client configuration, and shared utility functions used across 
 return Mono.just(R.ok(entityVO));
 
 // Success with message
-return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+return Mono.just(R.ok(SuccessCode.ADD));
 
 // Failure with message
 return Mono.just(R.fail(e.getMessage()));

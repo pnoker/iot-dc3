@@ -22,12 +22,12 @@ import io.github.pnoker.api.center.auth.GrpcScannedApiDTO;
 import io.github.pnoker.api.center.auth.GrpcSyncRequest;
 import io.github.pnoker.api.center.auth.GrpcSyncResultDTO;
 import io.github.pnoker.api.center.auth.ResourceRegistryApiGrpc;
-import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.auth.biz.ResourceRegistrySyncService;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistryScannedApi;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncCommand;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncResult;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +75,6 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
     @Override
     public void sync(GrpcSyncRequest request, StreamObserver<GrpcRSyncResult> responseObserver) {
         GrpcRSyncResult.Builder builder = GrpcRSyncResult.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
         try {
             ResourceRegistrySyncCommand command = ResourceRegistrySyncCommand.builder()
                     .serviceName(request.getServiceName())
@@ -84,9 +83,7 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
                     .build();
             ResourceRegistrySyncResult result = resourceRegistrySyncService.sync(command);
 
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            builder.setResult(GrpcRFactory.ok());
             builder.setData(GrpcSyncResultDTO.newBuilder()
                     .setInserted(result.getInserted())
                     .setUpdated(result.getUpdated())
@@ -95,11 +92,10 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
                     .build());
         } catch (Exception e) {
             log.error("Resource registry sync failed for service [{}]", request.getServiceName(), e);
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(Objects.nonNull(e.getMessage()) ? e.getMessage() : ResponseEnum.FAILURE.getRemark());
+            builder.setResult(Objects.nonNull(e.getMessage())
+                    ? GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage())
+                    : GrpcRFactory.fail(ErrorCode.FAILURE));
         }
-        builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

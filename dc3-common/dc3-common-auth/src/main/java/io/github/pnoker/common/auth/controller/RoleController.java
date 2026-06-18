@@ -28,7 +28,7 @@ import io.github.pnoker.common.auth.service.RoleService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,7 +86,7 @@ public class RoleController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             roleService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -103,7 +103,7 @@ public class RoleController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, roleService.getById(id));
             roleService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -124,7 +124,7 @@ public class RoleController implements BaseController {
             entityBO.setOperatorName(header.getNickName());
             requireTenant(header.getTenantId(), roleService.getById(entityBO.getId()));
             roleService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

@@ -25,7 +25,8 @@ import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverQuery;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.manager.biz.DriverRegisterService;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
@@ -160,7 +161,7 @@ class DriverDriverServerTest {
         GrpcRDriverRegisterDTO response = stub.getById(GrpcDriverQuery.newBuilder().setDriverId(7L).build());
 
         assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.OK.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(SuccessCode.OK.getCode());
         assertThat(response.getDriverAttributesCount()).isEqualTo(1);
         assertThat(response.getPointAttributesCount()).isEqualTo(1);
         assertThat(response.getCommandAttributesCount()).isEqualTo(1);
@@ -175,7 +176,7 @@ class DriverDriverServerTest {
         GrpcRDriverRegisterDTO response = stub.getById(GrpcDriverQuery.newBuilder().setDriverId(404L).build());
 
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
     }
 
     @Test
@@ -185,7 +186,7 @@ class DriverDriverServerTest {
         GrpcRDriverRegisterDTO response = stub.getById(GrpcDriverQuery.newBuilder().setDriverId(7L).build());
 
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.FAILURE.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.FAILURE.getCode());
         assertThat(response.getResult().getMessage()).isEqualTo("metadata unavailable");
     }
 }

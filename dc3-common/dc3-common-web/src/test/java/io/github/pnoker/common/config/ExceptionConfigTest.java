@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
@@ -82,24 +83,40 @@ class ExceptionConfigTest {
     }
 
     @Test
-    void requestExceptionMapsToFailEnvelopeWithMessage() {
-        StepVerifier.create(handler.requestException(new RequestException("invalid"), request))
-                .assertNext(env -> assertThat(env.getMessage()).isEqualTo("invalid"))
+    void requestExceptionAlignsBodyCodeAndStatusToValidation() {
+        ServerHttpResponse response = new MockServerHttpResponse();
+        StepVerifier.create(handler.businessException(new RequestException("invalid"), request, response))
+                .assertNext(env -> {
+                    assertThat(env.isOk()).isFalse();
+                    assertThat(env.getMessage()).isEqualTo("invalid");
+                    assertThat(env.getCode()).isEqualTo(ErrorCode.VALIDATION.getCode());
+                })
                 .verifyComplete();
+        assertThat(response.getStatusCode().value()).isEqualTo(422);
     }
 
     @Test
-    void notFoundExceptionMapsToFailEnvelope() {
-        StepVerifier.create(handler.notFoundException(new NotFoundException("not here"), request))
-                .assertNext(env -> assertThat(env.getMessage()).isEqualTo("not here"))
+    void notFoundExceptionAlignsBodyCodeAndStatusToNotFound() {
+        ServerHttpResponse response = new MockServerHttpResponse();
+        StepVerifier.create(handler.businessException(new NotFoundException("not here"), request, response))
+                .assertNext(env -> {
+                    assertThat(env.getMessage()).isEqualTo("not here");
+                    assertThat(env.getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
+                })
                 .verifyComplete();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
-    void unAuthorizedExceptionMapsToFailEnvelope() {
-        StepVerifier.create(handler.unAuthorizedException(new UnAuthorizedException("nope"), request))
-                .assertNext(env -> assertThat(env.getMessage()).isEqualTo("nope"))
+    void unAuthorizedExceptionAlignsBodyCodeAndStatusToUnauthorized() {
+        ServerHttpResponse response = new MockServerHttpResponse();
+        StepVerifier.create(handler.businessException(new UnAuthorizedException("nope"), request, response))
+                .assertNext(env -> {
+                    assertThat(env.getMessage()).isEqualTo("nope");
+                    assertThat(env.getCode()).isEqualTo(ErrorCode.UNAUTHORIZED.getCode());
+                })
                 .verifyComplete();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test

@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.exception;
 
+import io.github.pnoker.common.enums.ErrorCode;
+
 /**
  * Thrown when an authenticated user lacks the required permission for an operation.
  *
@@ -32,5 +34,10 @@ public class AccessDeniedException extends ServiceException {
 
     public AccessDeniedException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    @Override
+    public ErrorCode getErrorCode() {
+        return ErrorCode.FORBIDDEN;
     }
 }

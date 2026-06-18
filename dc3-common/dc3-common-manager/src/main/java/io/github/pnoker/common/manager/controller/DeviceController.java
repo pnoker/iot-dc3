@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.builder.DeviceBuilder;
@@ -101,7 +101,7 @@ public class DeviceController implements BaseController {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             deviceService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -119,7 +119,7 @@ public class DeviceController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(id));
             deviceService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -139,7 +139,7 @@ public class DeviceController implements BaseController {
             entityBO.setTenantId(tenantId);
             requireTenant(tenantId, deviceService.getById(entityBO.getId()));
             deviceService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

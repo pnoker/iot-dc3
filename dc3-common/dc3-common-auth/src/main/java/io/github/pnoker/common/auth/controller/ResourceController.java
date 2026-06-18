@@ -29,7 +29,7 @@ import io.github.pnoker.common.auth.service.ResourceService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -89,7 +89,7 @@ public class ResourceController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             resourceService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -106,7 +106,7 @@ public class ResourceController implements BaseController {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             resourceService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -126,7 +126,7 @@ public class ResourceController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             resourceService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

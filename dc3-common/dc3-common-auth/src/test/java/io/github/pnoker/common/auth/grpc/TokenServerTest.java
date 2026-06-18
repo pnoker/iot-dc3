@@ -22,7 +22,8 @@ import io.github.pnoker.api.center.auth.GrpcRTokenDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.common.auth.biz.TokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -83,7 +84,7 @@ class TokenServerTest {
                 .build());
 
         assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.OK.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(SuccessCode.OK.getCode());
         assertThat(response.getData()).matches("\\d{4}-\\d{2}-\\d{2} .*");
     }
 
@@ -100,7 +101,7 @@ class TokenServerTest {
                 .build());
 
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.TOKEN_INVALID.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.TOKEN_INVALID.getCode());
         assertThat(response.getData()).isEmpty();
     }
 
@@ -116,6 +117,6 @@ class TokenServerTest {
                 .build());
 
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
     }
 }

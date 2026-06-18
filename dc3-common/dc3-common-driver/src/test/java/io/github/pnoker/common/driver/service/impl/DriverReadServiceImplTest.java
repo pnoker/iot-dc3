@@ -26,6 +26,7 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.driver.support.ConnectionBackoff;
 import io.github.pnoker.common.exception.ReadPointException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,6 +70,7 @@ class DriverReadServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        ConnectionBackoff.clear();
         device = new DeviceBO();
         device.setId(10L);
         device.setPointIds(new HashSet<>(java.util.List.of(20L)));

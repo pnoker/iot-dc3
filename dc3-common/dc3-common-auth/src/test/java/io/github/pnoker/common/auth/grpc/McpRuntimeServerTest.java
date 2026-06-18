@@ -31,7 +31,7 @@ import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
 import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -101,7 +101,7 @@ class McpRuntimeServerTest {
                 .build());
 
         assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.OK.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(SuccessCode.OK.getCode());
         assertThat(response.getData().getActive()).isTrue();
         assertThat(response.getData().getTenantId()).isEqualTo(1L);
         assertThat(response.getData().getPrincipalId()).isEqualTo(100L);

@@ -124,7 +124,6 @@ class IndexedEnumContractTest {
             ProfileTypeEnum.class,
             ResourceScopeTypeEnum.class,
             ResourceTypeEnum.class,
-            ResponseEnum.class,
             RuleStatusEnum.class,
             RwTypeEnum.class,
             TimeRangeKeyEnum.class,
@@ -147,8 +146,7 @@ class IndexedEnumContractTest {
         for (Enum<?> constant : constants) {
             taken.add((Byte) getIndex.invoke(constant));
         }
-        // Search in the full Byte range so wide-coded enums like ResponseEnum
-        // (codes around 200, 500, 20301) still find a free slot.
+        // Search in the full Byte range so wide-coded enums still find a free slot.
         for (int candidate = -128; candidate <= 127; candidate++) {
             Byte byteCandidate = (byte) candidate;
             if (!taken.contains(byteCandidate)) {
@@ -217,9 +215,6 @@ class IndexedEnumContractTest {
                     }),
                     DynamicTest.dynamicTest(name + " uses lowercase code", () -> {
                         String code = (String) getCode.invoke(constant);
-                        if (ResponseEnum.class.equals(enumClass)) {
-                            return;
-                        }
                         assertThat(code).as(name + " code").isEqualTo(code.toLowerCase(Locale.ROOT));
                     }),
                     DynamicTest.dynamicTest(name + " has human-readable remark", () -> {

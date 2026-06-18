@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.builder.DriverBuilder;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
@@ -84,7 +84,7 @@ public class DriverController implements BaseController {
             DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             driverService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -102,7 +102,7 @@ public class DriverController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverService.getById(id));
             driverService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -122,7 +122,7 @@ public class DriverController implements BaseController {
             entityBO.setTenantId(tenantId);
             requireTenant(tenantId, driverService.getById(entityBO.getId()));
             driverService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

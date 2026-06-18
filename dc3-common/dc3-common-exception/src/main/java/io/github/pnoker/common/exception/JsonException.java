@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.exception;
 
+import io.github.pnoker.common.enums.ErrorCode;
+
 /**
  * Exception for JSON parsing/serialization failures.
  *
@@ -24,7 +26,7 @@ package io.github.pnoker.common.exception;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public class JsonException extends RuntimeException {
+public class JsonException extends BusinessException {
 
     public JsonException() {
         this(null);
@@ -36,6 +38,11 @@ public class JsonException extends RuntimeException {
 
     public JsonException(String template, Object... params) {
         super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
+    }
+
+    @Override
+    public ErrorCode getErrorCode() {
+        return ErrorCode.FAILURE;
     }
 
 }

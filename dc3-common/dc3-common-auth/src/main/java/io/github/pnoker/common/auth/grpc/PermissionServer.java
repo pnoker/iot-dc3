@@ -20,10 +20,10 @@ package io.github.pnoker.common.auth.grpc;
 import io.github.pnoker.api.center.auth.GrpcPermissionQuery;
 import io.github.pnoker.api.center.auth.GrpcRPermissionCodesDTO;
 import io.github.pnoker.api.center.auth.PermissionApiGrpc;
-import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.service.RoleResourceBindService;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,6 @@ public class PermissionServer extends PermissionApiGrpc.PermissionApiImplBase {
     public void listPermissionCodes(GrpcPermissionQuery request,
                                     StreamObserver<GrpcRPermissionCodesDTO> responseObserver) {
         GrpcRPermissionCodesDTO.Builder builder = GrpcRPermissionCodesDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         try {
             roleResourceBindService.listResourceByPrincipalId(request.getPrincipalId(), request.getTenantId())
@@ -59,18 +58,13 @@ public class PermissionServer extends PermissionApiGrpc.PermissionApiImplBase {
                     .filter(code -> !code.isBlank())
                     .forEach(builder::addCodes);
 
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            builder.setResult(GrpcRFactory.ok());
         } catch (Exception e) {
             log.warn("listPermissionCodes failed, tenant={}, principal={}",
                     request.getTenantId(), request.getPrincipalId(), e);
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(ResponseEnum.FAILURE.getRemark());
+            builder.setResult(GrpcRFactory.fail(ErrorCode.FAILURE));
         }
 
-        builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

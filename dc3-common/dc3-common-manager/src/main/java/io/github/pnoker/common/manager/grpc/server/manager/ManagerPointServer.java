@@ -29,7 +29,7 @@ import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
@@ -63,19 +63,15 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
     @Override
     public void listByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
         GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
 
         Page<PointBO> entityPage = pointService.list(query);
         if (Objects.isNull(entityPage)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
@@ -94,7 +90,7 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
             builder.setData(pagePointBuilder);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -102,17 +98,13 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
     @Override
     public void listByIds(GrpcPointIdsQuery request, StreamObserver<GrpcRPointListDTO> responseObserver) {
         GrpcRPointListDTO.Builder builder = GrpcRPointListDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         List<PointBO> entityBOList = pointService.listByIds(new HashSet<>(request.getPointIdsList()));
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             List<GrpcPointDTO> entityGrpcDTOList = entityBOList.stream()
                     .map(grpcPointBuilder::buildGrpcDTOByBO)
@@ -121,7 +113,7 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
             builder.addAllData(entityGrpcDTOList);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -129,7 +121,7 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
     @Override
     public void getById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
         GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         PointBO entityBO;
         try {
@@ -138,18 +130,14 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
             entityBO = null;
         }
         if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

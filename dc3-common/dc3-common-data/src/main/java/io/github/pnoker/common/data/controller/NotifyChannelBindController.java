@@ -26,7 +26,7 @@ import io.github.pnoker.common.data.entity.query.NotifyChannelBindQuery;
 import io.github.pnoker.common.data.entity.vo.NotifyChannelBindVO;
 import io.github.pnoker.common.data.service.NotifyChannelBindService;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -80,7 +80,7 @@ public class NotifyChannelBindController implements BaseController {
             NotifyChannelBindBO entityBO = notifyChannelBindBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             notifyChannelBindService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -97,7 +97,7 @@ public class NotifyChannelBindController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, notifyChannelBindService.getById(id));
             notifyChannelBindService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -117,7 +117,7 @@ public class NotifyChannelBindController implements BaseController {
             entityBO.setTenantId(tenantId);
             requireTenant(tenantId, notifyChannelBindService.getById(entityBO.getId()));
             notifyChannelBindService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

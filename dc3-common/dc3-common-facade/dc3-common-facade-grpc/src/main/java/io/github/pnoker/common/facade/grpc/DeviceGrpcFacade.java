@@ -28,7 +28,7 @@ import io.github.pnoker.api.center.manager.GrpcRDeviceDTO;
 import io.github.pnoker.api.center.manager.GrpcRDeviceListDTO;
 import io.github.pnoker.api.center.manager.GrpcRPageDeviceDTO;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
@@ -146,7 +146,7 @@ public class DeviceGrpcFacade implements DeviceFacade {
      */
     private void guardOrThrow(GrpcR result, String op) {
         String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
             log.debug("DeviceGrpcFacade.{} => no resource", op);
             return;
         }

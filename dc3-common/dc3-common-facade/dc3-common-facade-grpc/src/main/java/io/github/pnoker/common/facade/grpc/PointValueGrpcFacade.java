@@ -23,7 +23,7 @@ import io.github.pnoker.api.center.data.GrpcRPointValueDTO;
 import io.github.pnoker.api.center.data.GrpcRPointValueStringList;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
@@ -100,7 +100,7 @@ public class PointValueGrpcFacade implements PointValueFacade {
      */
     private void guardOrThrow(GrpcR result, String op) {
         String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
             log.debug("PointValueGrpcFacade.{} => no resource", op);
             return;
         }

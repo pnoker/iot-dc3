@@ -31,7 +31,7 @@ import io.github.pnoker.common.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -95,7 +95,7 @@ public class MenuController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             menuService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -112,7 +112,7 @@ public class MenuController implements BaseController {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             menuService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -132,7 +132,7 @@ public class MenuController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             menuService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 
@@ -181,7 +181,7 @@ public class MenuController implements BaseController {
      */
     @PreAuthorize("@perm.can('menu', 'list')")
     @Operation(summary = "List Menu Tree", description = "Return menus as a nested tree and prune it to the nodes the current principal can access. " +
-                    "A node is retained only when the principal's granted resources include 'menu:<code>' (or the '*' wildcard); use to render the user's settings sidebar.")
+            "A node is retained only when the principal's granted resources include 'menu:<code>' (or the '*' wildcard); use to render the user's settings sidebar.")
     @PostMapping("/list_tree")
     public Mono<R<List<MenuTreeVO>>> listTree(@RequestBody(required = false) MenuQuery entityQuery) {
         return getPrincipalHeader().flatMap(header -> async(() -> {

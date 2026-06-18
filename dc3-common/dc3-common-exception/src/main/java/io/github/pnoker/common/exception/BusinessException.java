@@ -20,29 +20,39 @@ package io.github.pnoker.common.exception;
 import io.github.pnoker.common.enums.ErrorCode;
 
 /**
- * Exception for empty or missing required values.
+ * Base class for all business exceptions.
+ * <p>
+ * Each concrete subclass binds to a fixed {@link ErrorCode} by overriding
+ * {@link #getErrorCode()}. The web layer reads that code to align the response
+ * body code and HTTP status, so a thrown exception alone determines both —
+ * failure semantics no longer collapse to a generic {@code R500}.
+ * <p>
+ * Subclasses keep the project's standard three-constructor shape (no-arg, cause,
+ * template+params); this base provides the matching {@code super(...)} plumbing.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public class EmptyException extends BusinessException {
+public abstract class BusinessException extends RuntimeException {
 
-    public EmptyException() {
-        this(null);
+    protected BusinessException() {
+        super();
     }
 
-    public EmptyException(Throwable cause) {
+    protected BusinessException(Throwable cause) {
         super(cause);
     }
 
-    public EmptyException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
+    protected BusinessException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @Override
-    public ErrorCode getErrorCode() {
-        return ErrorCode.FAILURE;
-    }
+    /**
+     * The fixed error code this exception type maps to.
+     *
+     * @return {@link ErrorCode}
+     */
+    public abstract ErrorCode getErrorCode();
 
 }

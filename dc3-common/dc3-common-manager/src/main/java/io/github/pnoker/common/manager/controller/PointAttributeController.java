@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.entity.builder.PointAttributeBuilder;
@@ -85,7 +85,7 @@ public class PointAttributeController implements BaseController {
             PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             pointAttributeService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -102,7 +102,7 @@ public class PointAttributeController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointAttributeService.getById(id));
             pointAttributeService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -121,7 +121,7 @@ public class PointAttributeController implements BaseController {
             entityBO.setTenantId(tenantId);
             requireTenant(tenantId, pointAttributeService.getById(entityBO.getId()));
             pointAttributeService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

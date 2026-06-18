@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.entity;
 
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.enums.SuccessCode;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,8 +29,8 @@ class RTest {
     void okWithoutArgsReturnsDefaultSuccessEnvelope() {
         R<String> response = R.ok();
         assertThat(response.isOk()).isTrue();
-        assertThat(response.getCode()).isEqualTo(ResponseEnum.OK.getCode());
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.OK.getRemark());
+        assertThat(response.getCode()).isEqualTo(SuccessCode.OK.getCode());
+        assertThat(response.getMessage()).isEqualTo(SuccessCode.OK.getRemark());
         assertThat(response.getData()).isNull();
     }
 
@@ -37,22 +38,22 @@ class RTest {
     void okWithMessageReplacesDefaultMessage() {
         R<String> response = R.ok("custom-message");
         assertThat(response.isOk()).isTrue();
-        assertThat(response.getCode()).isEqualTo(ResponseEnum.OK.getCode());
+        assertThat(response.getCode()).isEqualTo(SuccessCode.OK.getCode());
         assertThat(response.getMessage()).isEqualTo("custom-message");
     }
 
     @Test
-    void okWithResponseEnumUsesEnumCodeAndText() {
-        R<String> response = R.ok(ResponseEnum.OK);
+    void okWithResponseCodeUsesEnumCodeAndText() {
+        R<String> response = R.ok(SuccessCode.OK);
         assertThat(response.isOk()).isTrue();
-        assertThat(response.getCode()).isEqualTo(ResponseEnum.OK.getCode());
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.OK.getRemark());
+        assertThat(response.getCode()).isEqualTo(SuccessCode.OK.getCode());
+        assertThat(response.getMessage()).isEqualTo(SuccessCode.OK.getRemark());
     }
 
     @Test
     void okWithEnumAndCustomMessageRetainsEnumCode() {
-        R<String> response = R.ok(ResponseEnum.OK, "fine");
-        assertThat(response.getCode()).isEqualTo(ResponseEnum.OK.getCode());
+        R<String> response = R.ok(SuccessCode.OK, "fine");
+        assertThat(response.getCode()).isEqualTo(SuccessCode.OK.getCode());
         assertThat(response.getMessage()).isEqualTo("fine");
     }
 
@@ -64,7 +65,7 @@ class RTest {
         R<Integer> response = R.ok(123);
         assertThat(response.getData()).isEqualTo(123);
         assertThat(response.isOk()).isTrue();
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.OK.getRemark());
+        assertThat(response.getMessage()).isEqualTo(SuccessCode.OK.getRemark());
     }
 
     @Test
@@ -78,30 +79,30 @@ class RTest {
     void failWithoutArgsReturnsDefaultFailureEnvelope() {
         R<String> response = R.fail();
         assertThat(response.isOk()).isFalse();
-        assertThat(response.getCode()).isEqualTo(ResponseEnum.FAILURE.getCode());
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.FAILURE.getRemark());
+        assertThat(response.getCode()).isEqualTo(ErrorCode.FAILURE.getCode());
+        assertThat(response.getMessage()).isEqualTo(ErrorCode.FAILURE.getRemark());
     }
 
     @Test
     void failWithMessageReplacesText() {
         R<String> response = R.fail("kaboom");
         assertThat(response.isOk()).isFalse();
-        assertThat(response.getCode()).isEqualTo(ResponseEnum.FAILURE.getCode());
+        assertThat(response.getCode()).isEqualTo(ErrorCode.FAILURE.getCode());
         assertThat(response.getMessage()).isEqualTo("kaboom");
     }
 
     @Test
     void failWithEnumUsesEnumCodeAndText() {
-        R<String> response = R.fail(ResponseEnum.TOKEN_INVALID);
+        R<String> response = R.fail(ErrorCode.TOKEN_INVALID);
         assertThat(response.isOk()).isFalse();
-        assertThat(response.getCode()).isEqualTo(ResponseEnum.TOKEN_INVALID.getCode());
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.TOKEN_INVALID.getRemark());
+        assertThat(response.getCode()).isEqualTo(ErrorCode.TOKEN_INVALID.getCode());
+        assertThat(response.getMessage()).isEqualTo(ErrorCode.TOKEN_INVALID.getRemark());
     }
 
     @Test
     void failWithEnumAndCustomMessageKeepsEnumCode() {
-        R<String> response = R.fail(ResponseEnum.TOKEN_INVALID, "explicit");
-        assertThat(response.getCode()).isEqualTo(ResponseEnum.TOKEN_INVALID.getCode());
+        R<String> response = R.fail(ErrorCode.TOKEN_INVALID, "explicit");
+        assertThat(response.getCode()).isEqualTo(ErrorCode.TOKEN_INVALID.getCode());
         assertThat(response.getMessage()).isEqualTo("explicit");
     }
 
@@ -111,7 +112,7 @@ class RTest {
         R<Integer> response = R.fail(456);
         assertThat(response.getData()).isEqualTo(456);
         assertThat(response.isOk()).isFalse();
-        assertThat(response.getMessage()).isEqualTo(ResponseEnum.FAILURE.getRemark());
+        assertThat(response.getMessage()).isEqualTo(ErrorCode.FAILURE.getRemark());
     }
 
     @Test

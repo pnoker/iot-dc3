@@ -23,11 +23,12 @@ import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.api.common.GrpcEventAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverQuery;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.manager.biz.DriverRegisterService;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
@@ -93,7 +94,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
     @Override
     public void driverRegister(GrpcDriverRegisterDTO request, StreamObserver<GrpcRDriverRegisterDTO> responseObserver) {
         GrpcRDriverRegisterDTO.Builder builder = GrpcRDriverRegisterDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         try {
             //
@@ -137,19 +138,15 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
             List<Long> idList = deviceService.listIdsByDriverId(entityBO.getId(), entityBO.getTenantId());
             builder.addAllDeviceIds(idList);
 
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
         } catch (Exception e) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(e.getMessage());
+            result = GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage());
 
             log.error("Driver register gRPC request failed, tenant={}, client={}, driver={}", request.getTenant(),
                     request.getClient(), request.getDriver(), e);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -157,30 +154,24 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
     @Override
     public void getById(GrpcDriverQuery request, StreamObserver<GrpcRDriverRegisterDTO> responseObserver) {
         GrpcRDriverRegisterDTO.Builder builder = GrpcRDriverRegisterDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         try {
             DriverBO entityBO = driverService.getById(request.getDriverId());
             if (Objects.isNull(entityBO)) {
-                rBuilder.setOk(false);
-                rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+                result = GrpcRFactory.notFound();
             } else {
                 buildMetadataResponse(builder, entityBO);
 
-                rBuilder.setOk(true);
-                rBuilder.setCode(ResponseEnum.OK.getCode());
-                rBuilder.setMessage(ResponseEnum.OK.getRemark());
+                result = GrpcRFactory.ok();
             }
         } catch (Exception e) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(e.getMessage());
+            result = GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage());
 
             log.error("Driver metadata gRPC query failed, driverId={}", request.getDriverId(), e);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

@@ -19,10 +19,10 @@ package io.github.pnoker.common.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.dal.PrincipalManager;
+import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.UserBuilder;
 import io.github.pnoker.common.auth.entity.model.PrincipalDO;
-import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
 import io.github.pnoker.common.auth.entity.query.UserQuery;
 import io.github.pnoker.common.auth.entity.vo.UserVO;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
@@ -34,7 +34,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.MembershipStatusEnum;
 import io.github.pnoker.common.enums.PrincipalSourceTypeEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
@@ -122,7 +122,7 @@ public class UserController implements BaseController {
             membership.setOperatorId(header.getUserId());
             membership.setOperatorName(header.getNickName());
             tenantMembershipService.add(membership);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -145,7 +145,7 @@ public class UserController implements BaseController {
             if (Objects.nonNull(membership)) {
                 tenantMembershipService.delete(membership.getId());
             }
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -167,7 +167,7 @@ public class UserController implements BaseController {
             tenantMembershipService.requireTenantMember(header.getTenantId(), current.getPrincipalId());
             entityBO.setPrincipalId(current.getPrincipalId());
             userService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

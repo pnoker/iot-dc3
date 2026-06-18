@@ -15,34 +15,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.exception;
+package io.github.pnoker.common.enums;
 
-import io.github.pnoker.common.enums.ErrorCode;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
- * Exception for empty or missing required values.
+ * Success response codes returned by the unified API envelope.
+ * <p>
+ * Each value carries the HTTP status the web layer aligns to, so a successful
+ * envelope's {@code code} and HTTP status never diverge. {@link #DELETE} and
+ * {@link #UPDATE} intentionally share {@code R200} with {@link #OK} but keep a
+ * distinct remark for log and debug clarity.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public class EmptyException extends BusinessException {
+@Getter
+@AllArgsConstructor
+public enum SuccessCode implements ResponseCode {
 
-    public EmptyException() {
-        this(null);
-    }
+    OK(200, "R200", "Success"),
+    ADD(201, "R201", "Added successfully"),
+    DELETE(200, "R200", "Deleted successfully"),
+    UPDATE(200, "R200", "Updated successfully"),
+    ;
 
-    public EmptyException(Throwable cause) {
-        super(cause);
-    }
-
-    public EmptyException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
-    }
-
-    @Override
-    public ErrorCode getErrorCode() {
-        return ErrorCode.FAILURE;
-    }
+    private final int httpStatus;
+    private final String code;
+    private final String remark;
 
 }

@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.exception;
 
+import io.github.pnoker.common.enums.ErrorCode;
+
 /**
  * Service Layer Exception
  * <p>
@@ -28,7 +30,7 @@ package io.github.pnoker.common.exception;
  * @version 1.0.0
  * @since 2016.10.1
  */
-public class ServiceException extends RuntimeException {
+public class ServiceException extends BusinessException {
 
     /**
      * Constructs a ServiceException with no detail message.
@@ -56,6 +58,11 @@ public class ServiceException extends RuntimeException {
      */
     public ServiceException(String template, Object... params) {
         super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
+    }
+
+    @Override
+    public ErrorCode getErrorCode() {
+        return ErrorCode.FAILURE;
     }
 
 }

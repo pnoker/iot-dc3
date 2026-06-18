@@ -27,13 +27,13 @@ import io.github.pnoker.api.center.data.GrpcRPageEventHistoryDTO;
 import io.github.pnoker.api.center.data.GrpcRString;
 import io.github.pnoker.api.center.data.GrpcStringQuery;
 import io.github.pnoker.api.common.GrpcPage;
-import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.data.biz.EventHistoryService;
 import io.github.pnoker.common.data.entity.bo.EventReportBO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
-import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.grpc.stub.StreamObserver;
@@ -72,22 +72,14 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
             String recordId = eventHistoryService.report(request.getTenantId(), entityBO);
 
             responseObserver.onNext(GrpcRString.newBuilder()
-                    .setResult(GrpcR.newBuilder()
-                            .setOk(true)
-                            .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getRemark())
-                            .build())
+                    .setResult(GrpcRFactory.ok())
                     .setData(recordId)
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.error("EventHistoryServer.reportEvent failed", e);
             responseObserver.onNext(GrpcRString.newBuilder()
-                    .setResult(GrpcR.newBuilder()
-                            .setOk(false)
-                            .setCode(ResponseEnum.FAILURE.getCode())
-                            .setMessage(e.getMessage())
-                            .build())
+                    .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
         }
@@ -100,29 +92,17 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
             GrpcREventHistoryDTO.Builder response = GrpcREventHistoryDTO.newBuilder();
 
             if (Objects.nonNull(record)) {
-                response.setResult(GrpcR.newBuilder()
-                        .setOk(true)
-                        .setCode(ResponseEnum.OK.getCode())
-                        .setMessage(ResponseEnum.OK.getRemark())
-                        .build());
+                response.setResult(GrpcRFactory.ok());
                 response.setData(toGrpcDTO(record));
             } else {
-                response.setResult(GrpcR.newBuilder()
-                        .setOk(false)
-                        .setCode(ResponseEnum.NO_RESOURCE.getCode())
-                        .setMessage(ResponseEnum.NO_RESOURCE.getRemark())
-                        .build());
+                response.setResult(GrpcRFactory.notFound());
             }
             responseObserver.onNext(response.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.error("EventHistoryServer.getByRecordId failed", e);
             responseObserver.onNext(GrpcREventHistoryDTO.newBuilder()
-                    .setResult(GrpcR.newBuilder()
-                            .setOk(false)
-                            .setCode(ResponseEnum.FAILURE.getCode())
-                            .setMessage(e.getMessage())
-                            .build())
+                    .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
         }
@@ -151,22 +131,14 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
             page.getRecords().forEach(record -> pageDataBuilder.addData(toGrpcDTO(record)));
 
             responseObserver.onNext(GrpcRPageEventHistoryDTO.newBuilder()
-                    .setResult(GrpcR.newBuilder()
-                            .setOk(true)
-                            .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getRemark())
-                            .build())
+                    .setResult(GrpcRFactory.ok())
                     .setData(pageDataBuilder.build())
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.error("EventHistoryServer.listByPage failed", e);
             responseObserver.onNext(GrpcRPageEventHistoryDTO.newBuilder()
-                    .setResult(GrpcR.newBuilder()
-                            .setOk(false)
-                            .setCode(ResponseEnum.FAILURE.getCode())
-                            .setMessage(e.getMessage())
-                            .build())
+                    .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
         }

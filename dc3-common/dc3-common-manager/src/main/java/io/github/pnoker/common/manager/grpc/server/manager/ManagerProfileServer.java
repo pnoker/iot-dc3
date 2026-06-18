@@ -29,7 +29,7 @@ import io.github.pnoker.api.center.manager.GrpcRProfileListDTO;
 import io.github.pnoker.api.center.manager.ProfileApiGrpc;
 import io.github.pnoker.api.common.GrpcProfileDTO;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.query.ProfileQuery;
@@ -64,14 +64,14 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
     @Override
     public void listByPage(GrpcPageProfileQuery request, StreamObserver<GrpcRPageProfileDTO> responseObserver) {
         GrpcRPageProfileDTO.Builder builder = GrpcRPageProfileDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         ProfileQuery query = grpcProfileBuilder.buildQueryByGrpcQuery(request);
         Page<ProfileBO> entityPage = profileService.list(query);
         if (Objects.isNull(entityPage)) {
-            noResource(rBuilder);
+            result = GrpcRFactory.notFound();
         } else {
-            ok(rBuilder);
+            result = GrpcRFactory.ok();
             GrpcPageProfileDTO.Builder pageBuilder = GrpcPageProfileDTO.newBuilder();
             pageBuilder.setPage(grpcProfileBuilder.buildGrpcPage(entityPage));
             List<GrpcProfileDTO> profiles = entityPage.getRecords().stream()
@@ -81,7 +81,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
             builder.setData(pageBuilder);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -89,7 +89,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
     @Override
     public void getByProfileId(GrpcProfileQuery request, StreamObserver<GrpcRProfileDTO> responseObserver) {
         GrpcRProfileDTO.Builder builder = GrpcRProfileDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         ProfileBO profile;
         try {
@@ -98,13 +98,13 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
             profile = null;
         }
         if (Objects.isNull(profile)) {
-            noResource(rBuilder);
+            result = GrpcRFactory.notFound();
         } else {
-            ok(rBuilder);
+            result = GrpcRFactory.ok();
             builder.setData(grpcProfileBuilder.buildGrpcDTOByBO(profile));
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -113,17 +113,17 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
     public void listByProfileIds(GrpcProfileIdsQuery request,
                                  StreamObserver<GrpcRProfileListDTO> responseObserver) {
         GrpcRProfileListDTO.Builder builder = GrpcRProfileListDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         List<ProfileBO> profiles = profileService.listByIds(new HashSet<>(request.getProfileIdsList()));
         if (CollectionUtils.isEmpty(profiles)) {
-            noResource(rBuilder);
+            result = GrpcRFactory.notFound();
         } else {
-            ok(rBuilder);
+            result = GrpcRFactory.ok();
             builder.addAllData(profiles.stream().map(grpcProfileBuilder::buildGrpcDTOByBO).toList());
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -131,31 +131,19 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
     @Override
     public void listByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRProfileListDTO> responseObserver) {
         GrpcRProfileListDTO.Builder builder = GrpcRProfileListDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         List<ProfileBO> profiles = profileService.listByDeviceId(request.getDeviceId());
         if (CollectionUtils.isEmpty(profiles)) {
-            noResource(rBuilder);
+            result = GrpcRFactory.notFound();
         } else {
-            ok(rBuilder);
+            result = GrpcRFactory.ok();
             builder.addAllData(profiles.stream().map(grpcProfileBuilder::buildGrpcDTOByBO).toList());
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
-    }
-
-    private void ok(GrpcR.Builder rBuilder) {
-        rBuilder.setOk(true);
-        rBuilder.setCode(ResponseEnum.OK.getCode());
-        rBuilder.setMessage(ResponseEnum.OK.getRemark());
-    }
-
-    private void noResource(GrpcR.Builder rBuilder) {
-        rBuilder.setOk(false);
-        rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-        rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
     }
 
 }

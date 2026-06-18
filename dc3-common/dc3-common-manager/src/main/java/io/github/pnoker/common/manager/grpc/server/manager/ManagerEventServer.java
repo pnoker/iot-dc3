@@ -29,7 +29,7 @@ import io.github.pnoker.api.center.manager.GrpcRPageEventDTO;
 import io.github.pnoker.api.common.GrpcEventDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.EventBO;
 import io.github.pnoker.common.manager.entity.query.EventQuery;
@@ -63,19 +63,15 @@ public class ManagerEventServer extends EventApiGrpc.EventApiImplBase {
     @Override
     public void listByPage(GrpcPageEventQuery request, StreamObserver<GrpcRPageEventDTO> responseObserver) {
         GrpcRPageEventDTO.Builder builder = GrpcRPageEventDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         EventQuery query = grpcEventBuilder.buildQueryByGrpcQuery(request);
 
         Page<EventBO> entityPage = eventService.list(query);
         if (Objects.isNull(entityPage)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             GrpcPageEventDTO.Builder pageEventBuilder = GrpcPageEventDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
@@ -94,7 +90,7 @@ public class ManagerEventServer extends EventApiGrpc.EventApiImplBase {
             builder.setData(pageEventBuilder);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -102,17 +98,13 @@ public class ManagerEventServer extends EventApiGrpc.EventApiImplBase {
     @Override
     public void listByIds(GrpcEventIdsQuery request, StreamObserver<GrpcREventListDTO> responseObserver) {
         GrpcREventListDTO.Builder builder = GrpcREventListDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         List<EventBO> entityBOList = eventService.listByIds(new HashSet<>(request.getEventIdsList()));
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             List<GrpcEventDTO> entityGrpcDTOList = entityBOList.stream()
                     .map(grpcEventBuilder::buildGrpcDTOByBO)
@@ -121,7 +113,7 @@ public class ManagerEventServer extends EventApiGrpc.EventApiImplBase {
             builder.addAllData(entityGrpcDTOList);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -129,7 +121,7 @@ public class ManagerEventServer extends EventApiGrpc.EventApiImplBase {
     @Override
     public void getById(GrpcEventQuery request, StreamObserver<GrpcREventDTO> responseObserver) {
         GrpcREventDTO.Builder builder = GrpcREventDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         EventBO entityBO;
         try {
@@ -138,18 +130,14 @@ public class ManagerEventServer extends EventApiGrpc.EventApiImplBase {
             entityBO = null;
         }
         if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             builder.setData(grpcEventBuilder.buildGrpcDTOByBO(entityBO));
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

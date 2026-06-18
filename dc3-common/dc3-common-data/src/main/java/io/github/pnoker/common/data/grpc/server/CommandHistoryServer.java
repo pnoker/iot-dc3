@@ -27,13 +27,13 @@ import io.github.pnoker.api.center.data.GrpcRPageCommandHistoryDTO;
 import io.github.pnoker.api.center.data.GrpcRString;
 import io.github.pnoker.api.center.data.GrpcStringQuery;
 import io.github.pnoker.api.common.GrpcPage;
-import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
-import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.grpc.stub.StreamObserver;
@@ -71,22 +71,14 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
             String recordId = commandHistoryService.call(request.getTenantId(), entityBO);
 
             responseObserver.onNext(GrpcRString.newBuilder()
-                    .setResult(GrpcR.newBuilder()
-                            .setOk(true)
-                            .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getRemark())
-                            .build())
+                    .setResult(GrpcRFactory.ok())
                     .setData(recordId)
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.error("CommandHistoryServer.callCommand failed", e);
             responseObserver.onNext(GrpcRString.newBuilder()
-                    .setResult(GrpcR.newBuilder()
-                            .setOk(false)
-                            .setCode(ResponseEnum.FAILURE.getCode())
-                            .setMessage(e.getMessage())
-                            .build())
+                    .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
         }
@@ -99,29 +91,17 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
             GrpcRCommandHistoryDTO.Builder response = GrpcRCommandHistoryDTO.newBuilder();
 
             if (Objects.nonNull(record)) {
-                response.setResult(GrpcR.newBuilder()
-                        .setOk(true)
-                        .setCode(ResponseEnum.OK.getCode())
-                        .setMessage(ResponseEnum.OK.getRemark())
-                        .build());
+                response.setResult(GrpcRFactory.ok());
                 response.setData(toGrpcDTO(record));
             } else {
-                response.setResult(GrpcR.newBuilder()
-                        .setOk(false)
-                        .setCode(ResponseEnum.NO_RESOURCE.getCode())
-                        .setMessage(ResponseEnum.NO_RESOURCE.getRemark())
-                        .build());
+                response.setResult(GrpcRFactory.notFound());
             }
             responseObserver.onNext(response.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.error("CommandHistoryServer.getByRecordId failed", e);
             responseObserver.onNext(GrpcRCommandHistoryDTO.newBuilder()
-                    .setResult(GrpcR.newBuilder()
-                            .setOk(false)
-                            .setCode(ResponseEnum.FAILURE.getCode())
-                            .setMessage(e.getMessage())
-                            .build())
+                    .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
         }
@@ -149,22 +129,14 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
             page.getRecords().forEach(record -> pageDataBuilder.addData(toGrpcDTO(record)));
 
             responseObserver.onNext(GrpcRPageCommandHistoryDTO.newBuilder()
-                    .setResult(GrpcR.newBuilder()
-                            .setOk(true)
-                            .setCode(ResponseEnum.OK.getCode())
-                            .setMessage(ResponseEnum.OK.getRemark())
-                            .build())
+                    .setResult(GrpcRFactory.ok())
                     .setData(pageDataBuilder.build())
                     .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.error("CommandHistoryServer.listByPage failed", e);
             responseObserver.onNext(GrpcRPageCommandHistoryDTO.newBuilder()
-                    .setResult(GrpcR.newBuilder()
-                            .setOk(false)
-                            .setCode(ResponseEnum.FAILURE.getCode())
-                            .setMessage(e.getMessage())
-                            .build())
+                    .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
         }

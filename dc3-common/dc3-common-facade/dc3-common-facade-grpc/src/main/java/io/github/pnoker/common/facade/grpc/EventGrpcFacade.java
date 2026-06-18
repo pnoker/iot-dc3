@@ -26,7 +26,7 @@ import io.github.pnoker.api.center.manager.GrpcREventDTO;
 import io.github.pnoker.api.center.manager.GrpcREventListDTO;
 import io.github.pnoker.api.center.manager.GrpcRPageEventDTO;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
@@ -112,7 +112,7 @@ public class EventGrpcFacade implements EventFacade {
 
     private void guardOrThrow(GrpcR result, String op) {
         String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
             log.debug("EventGrpcFacade.{} => no resource", op);
             return;
         }

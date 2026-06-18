@@ -18,6 +18,7 @@
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
+import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
@@ -148,6 +149,11 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             return DeviceHealthState.offline();
         }
+    }
+
+    @Override
+    public DriverHealthState health() {
+        return Objects.isNull(bluetoothManager) ? DriverHealthState.offline() : DriverHealthState.online();
     }
 
     @Override

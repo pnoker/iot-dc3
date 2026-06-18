@@ -94,6 +94,14 @@ public final class ConnectionBackoff {
     }
 
     /**
+     * Clear all backoff state for every device. Backoff is held in process-wide static
+     * state, so this is required to restore a clean slate between isolated test cases.
+     */
+    public static void clear() {
+        states.clear();
+    }
+
+    /**
      * Immutable snapshot of the backoff state for a single device.
      */
     private static class State {

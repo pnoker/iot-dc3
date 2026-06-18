@@ -29,7 +29,7 @@ import io.github.pnoker.common.dal.service.GroupBindService;
 import io.github.pnoker.common.dal.service.GroupService;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.EntityTypeEnum;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.service.EntityTenantService;
 import io.github.pnoker.common.valid.Add;
@@ -89,7 +89,7 @@ public class GroupBindController implements BaseController {
             entityBO.setTenantId(tenantId);
             validateBind(tenantId, entityBO);
             groupBindService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -106,7 +106,7 @@ public class GroupBindController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, groupBindService.getById(id));
             groupBindService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -126,7 +126,7 @@ public class GroupBindController implements BaseController {
             requireTenant(tenantId, groupBindService.getById(entityBO.getId()));
             validateBind(tenantId, entityBO);
             groupBindService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

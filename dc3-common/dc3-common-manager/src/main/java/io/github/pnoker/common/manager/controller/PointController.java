@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.manager.entity.bo.DeviceByPointBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.bo.PointConfigByDeviceBO;
@@ -97,7 +97,7 @@ public class PointController implements BaseController {
             PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             pointService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -115,7 +115,7 @@ public class PointController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointService.getById(id));
             pointService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -135,7 +135,7 @@ public class PointController implements BaseController {
             entityBO.setTenantId(tenantId);
             requireTenant(tenantId, pointService.getById(entityBO.getId()));
             pointService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

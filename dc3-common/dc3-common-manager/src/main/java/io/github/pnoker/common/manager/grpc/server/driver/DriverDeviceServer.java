@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.api.common.driver.DeviceApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDeviceQuery;
 import io.github.pnoker.api.common.driver.GrpcPageDeviceDTO;
@@ -28,7 +29,6 @@ import io.github.pnoker.api.common.driver.GrpcPageDeviceQuery;
 import io.github.pnoker.api.common.driver.GrpcRDeviceAttachDTO;
 import io.github.pnoker.api.common.driver.GrpcRDeviceDTO;
 import io.github.pnoker.api.common.driver.GrpcRPageDeviceDTO;
-import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
@@ -97,20 +97,16 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     @Override
     public void listByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
         GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
 
         Page<DeviceBO> entityPage = driverInTenant(query.getTenantId(), query.getDriverId())
                 ? deviceService.list(query) : null;
         if (Objects.isNull(entityPage)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             GrpcPageDeviceDTO.Builder pageBuilder = GrpcPageDeviceDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
@@ -129,7 +125,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             builder.setData(pageBuilder);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -137,25 +133,21 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     @Override
     public void getById(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
         GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         DriverBO driverBO = selectDriver(request.getDriverId());
         DeviceBO entityBO = selectDevice(request.getDeviceId());
         if (Objects.isNull(entityBO) || Objects.isNull(driverBO)
                 || !Objects.equals(entityBO.getDriverId(), driverBO.getId())
                 || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             builder.setData(getDeviceAttachDTO(entityBO));
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

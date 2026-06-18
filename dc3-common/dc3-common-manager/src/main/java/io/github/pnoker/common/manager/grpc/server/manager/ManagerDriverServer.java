@@ -30,7 +30,7 @@ import io.github.pnoker.api.center.manager.GrpcRPageDriverDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
@@ -64,19 +64,15 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
     @Override
     public void listByPage(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
         GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         DriverQuery query = grpcDriverBuilder.buildQueryByGrpcQuery(request);
 
         Page<DriverBO> entityPage = driverService.list(query);
         if (Objects.isNull(entityPage)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             GrpcPageDriverDTO.Builder pageBuilder = GrpcPageDriverDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
@@ -95,7 +91,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
             builder.setData(pageBuilder);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -103,22 +99,18 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
     @Override
     public void getByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
         GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         DriverBO entityDO = driverService.getByDeviceId(request.getDeviceId(), null);
         if (Objects.isNull(entityDO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(entityDO));
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -126,17 +118,13 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
     @Override
     public void listByDriverIds(GrpcDriverIdsQuery request, StreamObserver<GrpcRDriverListDTO> responseObserver) {
         GrpcRDriverListDTO.Builder builder = GrpcRDriverListDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         List<DriverBO> entityBOList = driverService.listByIds(new HashSet<>(request.getDriverIdsList()));
         if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             List<GrpcDriverDTO> entityGrpcDTOList = entityBOList.stream()
                     .map(grpcDriverBuilder::buildGrpcDTOByBO)
@@ -145,7 +133,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
             builder.addAllData(entityGrpcDTOList);
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
@@ -153,7 +141,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
     @Override
     public void getByDriverId(GrpcDriverQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
         GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        GrpcR result;
 
         DriverBO driverBO;
         try {
@@ -162,18 +150,14 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
             driverBO = null;
         }
         if (Objects.isNull(driverBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+            result = GrpcRFactory.notFound();
         } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getRemark());
+            result = GrpcRFactory.ok();
 
             builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(driverBO));
         }
 
-        builder.setResult(rBuilder);
+        builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

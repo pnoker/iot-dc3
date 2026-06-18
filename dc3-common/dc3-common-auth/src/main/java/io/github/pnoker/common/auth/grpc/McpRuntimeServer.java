@@ -19,6 +19,7 @@ package io.github.pnoker.common.auth.grpc;
 
 import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
 import io.github.pnoker.common.constant.service.McpConstant;
@@ -28,7 +29,7 @@ import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
 import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -264,11 +265,7 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
     }
 
     private GrpcR ok() {
-        return GrpcR.newBuilder()
-                .setOk(true)
-                .setCode(ResponseEnum.OK.getCode())
-                .setMessage(ResponseEnum.OK.getRemark())
-                .build();
+        return GrpcRFactory.ok();
     }
 
     private GrpcR protocolFailure(OAuthProtocolException exception) {
@@ -280,11 +277,9 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
     }
 
     private GrpcR failure(Exception exception) {
-        return GrpcR.newBuilder()
-                .setOk(false)
-                .setCode(ResponseEnum.FAILURE.getCode())
-                .setMessage(StringUtils.defaultIfBlank(exception.getMessage(), ResponseEnum.FAILURE.getRemark()))
-                .build();
+        return StringUtils.isBlank(exception.getMessage())
+                ? GrpcRFactory.fail(ErrorCode.FAILURE)
+                : GrpcRFactory.fail(ErrorCode.FAILURE, exception.getMessage());
     }
 
 }

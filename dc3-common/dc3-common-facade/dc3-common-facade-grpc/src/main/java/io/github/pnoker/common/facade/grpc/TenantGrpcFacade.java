@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.auth.GrpcCodeQuery;
 import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.TenantFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
@@ -62,7 +62,7 @@ public class TenantGrpcFacade implements TenantFacade {
 
     private void guardOrThrow(GrpcR result, String op) {
         String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
             log.debug("TenantGrpcFacade.{} => no resource", op);
             return;
         }

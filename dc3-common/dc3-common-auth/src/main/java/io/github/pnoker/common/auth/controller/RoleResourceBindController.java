@@ -34,7 +34,7 @@ import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -96,7 +96,7 @@ public class RoleResourceBindController implements BaseController {
             RoleResourceBindBO entityBO = roleResourceBindBuilder.buildBOByVO(entityVO);
             requireTenant(tenantId, roleService.getById(entityBO.getRoleId()));
             roleResourceBindService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -115,7 +115,7 @@ public class RoleResourceBindController implements BaseController {
             RoleResourceBindBO entityBO = roleResourceBindService.getById(id);
             requireTenant(tenantId, roleService.getById(entityBO.getRoleId()));
             roleResourceBindService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 

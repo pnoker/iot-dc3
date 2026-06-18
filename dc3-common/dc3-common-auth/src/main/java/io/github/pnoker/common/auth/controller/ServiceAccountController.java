@@ -30,7 +30,7 @@ import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -90,7 +90,7 @@ public class ServiceAccountController implements BaseController {
             tenantMembershipService.requireTenantMember(header.getTenantId(), entityBO.getOwnerPrincipalId());
             fillCreateAudit(entityBO, header);
             serviceAccountService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -108,7 +108,7 @@ public class ServiceAccountController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             ServiceAccountBO entityBO = requireTenant(tenantId, serviceAccountService.getById(id));
             serviceAccountService.delete(entityBO.getId());
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -134,7 +134,7 @@ public class ServiceAccountController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             serviceAccountService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 
@@ -177,7 +177,7 @@ public class ServiceAccountController implements BaseController {
             serviceAccountService.update(current);
             auditLogService.log(header, target == EnableFlagEnum.ENABLE ? "ENABLE" : "DISABLE",
                     "service_account", id, current.getServiceAccountName(), "SUCCESS", null);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

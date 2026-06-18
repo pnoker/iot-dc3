@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.biz.impl;
 
+import io.github.pnoker.common.auth.config.OAuthProperties;
 import io.github.pnoker.common.auth.dal.PrincipalManager;
 import io.github.pnoker.common.auth.dal.ServiceAccountManager;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
@@ -26,6 +27,7 @@ import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
+import io.github.pnoker.common.auth.tool.McpOpenApiAggregator;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
@@ -71,16 +73,21 @@ class OAuthMcpRuntimeServiceImplTest {
     @Mock
     private ServiceAccountManager serviceAccountManager;
 
+    @Mock
+    private McpOpenApiAggregator openApiAggregator;
+
     @InjectMocks
     private OAuthMcpRuntimeServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(service, "issuer", "https://gateway.example/auth");
-        ReflectionTestUtils.setField(service, "audience", "dc3-mcp");
-        ReflectionTestUtils.setField(service, "authorizationCodeTtl", Duration.ofMinutes(5));
-        ReflectionTestUtils.setField(service, "accessTokenTtl", Duration.ofMinutes(15));
-        ReflectionTestUtils.setField(service, "refreshTokenTtl", Duration.ofDays(30));
+        OAuthProperties oauthProperties = new OAuthProperties();
+        oauthProperties.setIssuer("https://gateway.example/auth");
+        oauthProperties.setAudience("dc3-mcp");
+        oauthProperties.setAuthorizationCodeTtl(Duration.ofMinutes(5));
+        oauthProperties.setAccessTokenTtl(Duration.ofMinutes(15));
+        oauthProperties.setRefreshTokenTtl(Duration.ofDays(30));
+        ReflectionTestUtils.setField(service, "oauthProperties", oauthProperties);
         ReflectionTestUtils.setField(service, "confirmTtl", Duration.ofMinutes(5));
     }
 

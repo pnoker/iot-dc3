@@ -35,7 +35,7 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import io.swagger.v3.oas.annotations.Operation;
@@ -101,7 +101,7 @@ public class RolePrincipalBindController implements BaseController {
             tenantMembershipService.requireTenantMember(header.getTenantId(), entityBO.getPrincipalId());
             fillCreateAudit(entityBO, header);
             rolePrincipalBindService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -122,7 +122,7 @@ public class RolePrincipalBindController implements BaseController {
                 throw new NotFoundException("Resource does not exist");
             }
             rolePrincipalBindService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 

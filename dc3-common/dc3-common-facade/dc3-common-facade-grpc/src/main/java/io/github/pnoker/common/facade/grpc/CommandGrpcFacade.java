@@ -26,7 +26,7 @@ import io.github.pnoker.api.center.manager.GrpcRCommandDTO;
 import io.github.pnoker.api.center.manager.GrpcRCommandListDTO;
 import io.github.pnoker.api.center.manager.GrpcRPageCommandDTO;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.CommandFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
@@ -112,7 +112,7 @@ public class CommandGrpcFacade implements CommandFacade {
 
     private void guardOrThrow(GrpcR result, String op) {
         String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
             log.debug("CommandGrpcFacade.{} => no resource", op);
             return;
         }

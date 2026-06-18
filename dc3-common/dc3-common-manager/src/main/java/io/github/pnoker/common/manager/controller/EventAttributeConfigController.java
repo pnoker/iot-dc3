@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.EventAttributeBO;
@@ -93,7 +93,7 @@ public class EventAttributeConfigController implements BaseController {
             EventAttributeConfigBO entityBO = eventAttributeConfigBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             eventAttributeConfigService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -110,7 +110,7 @@ public class EventAttributeConfigController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, eventAttributeConfigService.getById(id));
             eventAttributeConfigService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -129,7 +129,7 @@ public class EventAttributeConfigController implements BaseController {
             entityBO.setTenantId(tenantId);
             requireTenant(tenantId, eventAttributeConfigService.getById(entityBO.getId()));
             eventAttributeConfigService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

@@ -28,8 +28,8 @@ import io.github.pnoker.common.auth.service.LocalCredentialService;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.service.TenantService;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.enums.RequirePasswordChangeFlagEnum;
-import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.PasswordChangeRequiredException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.KeyUtil;
@@ -100,10 +100,10 @@ public class TokenServiceImpl implements TokenService {
 
         if (Objects.nonNull(credential.getPasswordExpireTime())
                 && credential.getPasswordExpireTime().isBefore(LocalDateTime.now())) {
-            throw new PasswordChangeRequiredException(ResponseEnum.PASSWORD_EXPIRED);
+            throw new PasswordChangeRequiredException(ErrorCode.PASSWORD_EXPIRED);
         }
         if (RequirePasswordChangeFlagEnum.REQUIRED == credential.getRequirePasswordChange()) {
-            throw new PasswordChangeRequiredException(ResponseEnum.PASSWORD_CHANGE_REQUIRED);
+            throw new PasswordChangeRequiredException(ErrorCode.PASSWORD_CHANGE_REQUIRED);
         }
 
         markPrincipalLogin(credential.getPrincipalId());

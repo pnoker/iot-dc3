@@ -24,7 +24,8 @@ import io.github.pnoker.api.center.manager.GrpcDriverQuery;
 import io.github.pnoker.api.center.manager.GrpcRDriverDTO;
 import io.github.pnoker.api.center.manager.GrpcRDriverListDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.common.manager.grpc.server.manager.ManagerDriverServer;
@@ -91,7 +92,7 @@ class ManagerDriverServerTest {
 
         GrpcRDriverDTO response = stub.getByDriverId(GrpcDriverQuery.newBuilder().setDriverId(1L).build());
         assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.OK.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(SuccessCode.OK.getCode());
     }
 
     @Test
@@ -99,7 +100,7 @@ class ManagerDriverServerTest {
         when(driverService.getById(99L)).thenReturn(null);
         GrpcRDriverDTO response = stub.getByDriverId(GrpcDriverQuery.newBuilder().setDriverId(99L).build());
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
     }
 
     @Test
@@ -121,7 +122,7 @@ class ManagerDriverServerTest {
         GrpcRDriverListDTO response = stub.listByDriverIds(
                 GrpcDriverIdsQuery.newBuilder().addDriverIds(99L).build());
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
     }
 
     @Test
@@ -130,7 +131,7 @@ class ManagerDriverServerTest {
         GrpcRDriverListDTO response = stub.listByDriverIds(
                 GrpcDriverIdsQuery.newBuilder().addDriverIds(99L).build());
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
     }
 
     @Test
@@ -139,7 +140,7 @@ class ManagerDriverServerTest {
         when(grpcDriverBuilder.buildQueryByGrpcQuery(org.mockito.ArgumentMatchers.any())).thenReturn(null);
         var response = stub.listByPage(io.github.pnoker.api.center.manager.GrpcPageDriverQuery.newBuilder().build());
         assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ResponseEnum.NO_RESOURCE.getCode());
+        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
     }
 
     @Test

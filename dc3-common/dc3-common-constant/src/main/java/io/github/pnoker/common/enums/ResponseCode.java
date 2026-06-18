@@ -15,34 +15,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.exception;
-
-import io.github.pnoker.common.enums.ErrorCode;
+package io.github.pnoker.common.enums;
 
 /**
- * Exception for empty or missing required values.
+ * Common contract for response codes carried by the unified API envelope.
+ * <p>
+ * Implemented by {@link SuccessCode} and {@link ErrorCode}. The string {@code code}
+ * is the stable wire identifier returned to clients; {@code httpStatus} is the HTTP
+ * status the web layer aligns to, so the body code and transport status never diverge.
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1
  */
-public class EmptyException extends BusinessException {
+public interface ResponseCode {
 
-    public EmptyException() {
-        this(null);
-    }
+    /**
+     * Stable wire code returned to clients, e.g. {@code "R404"}.
+     *
+     * @return response code
+     */
+    String getCode();
 
-    public EmptyException(Throwable cause) {
-        super(cause);
-    }
+    /**
+     * Default human-readable remark for this code.
+     *
+     * @return remark
+     */
+    String getRemark();
 
-    public EmptyException(String template, Object... params) {
-        super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
-    }
-
-    @Override
-    public ErrorCode getErrorCode() {
-        return ErrorCode.FAILURE;
-    }
+    /**
+     * HTTP status this code aligns to.
+     *
+     * @return HTTP status value
+     */
+    int getHttpStatus();
 
 }

@@ -26,7 +26,7 @@ import io.github.pnoker.common.dal.entity.query.GroupQuery;
 import io.github.pnoker.common.dal.entity.vo.GroupVO;
 import io.github.pnoker.common.dal.service.GroupService;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,7 +79,7 @@ public class GroupController implements BaseController {
             GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             groupService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -96,7 +96,7 @@ public class GroupController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, groupService.getById(id));
             groupService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -115,7 +115,7 @@ public class GroupController implements BaseController {
             entityBO.setTenantId(tenantId);
             requireTenant(tenantId, groupService.getById(entityBO.getId()));
             groupService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

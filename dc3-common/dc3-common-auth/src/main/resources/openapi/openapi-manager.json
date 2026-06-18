@@ -11264,7 +11264,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -11417,7 +11417,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -11718,7 +11718,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -11748,7 +11748,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -11994,7 +11994,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -12260,7 +12260,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -12439,7 +12439,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -12607,7 +12607,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -12637,7 +12637,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -12840,7 +12840,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -13055,7 +13055,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -13255,7 +13255,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -13487,7 +13487,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -13751,7 +13751,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -13970,7 +13970,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -14236,7 +14236,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -14516,7 +14516,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -14546,7 +14546,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -14755,7 +14755,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -15021,7 +15021,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -15301,7 +15301,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -15331,7 +15331,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -15477,7 +15477,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -15738,7 +15738,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -15768,7 +15768,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -16060,7 +16060,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -16279,7 +16279,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -16545,7 +16545,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -16826,7 +16826,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -16856,7 +16856,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -16889,7 +16889,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -16919,7 +16919,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -16952,7 +16952,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -16982,7 +16982,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17015,7 +17015,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17133,7 +17133,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17163,7 +17163,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17308,7 +17308,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17338,7 +17338,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17368,7 +17368,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17398,7 +17398,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17428,7 +17428,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17458,7 +17458,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17488,7 +17488,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17521,7 +17521,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17551,7 +17551,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17584,7 +17584,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17614,7 +17614,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17647,7 +17647,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17677,7 +17677,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17710,7 +17710,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17740,7 +17740,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17773,7 +17773,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17803,7 +17803,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17836,7 +17836,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17866,7 +17866,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17896,7 +17896,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17929,7 +17929,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17960,7 +17960,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -17990,7 +17990,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18192,7 +18192,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18272,7 +18272,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18335,7 +18335,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18365,7 +18365,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18398,7 +18398,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18428,7 +18428,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18461,7 +18461,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18491,7 +18491,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18524,7 +18524,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18554,7 +18554,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {
@@ -18587,7 +18587,7 @@
           },
           "code": {
             "type": "string",
-            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see ResponseEnum for the full set.",
+            "description": "Business response code. 'R200' on success, 'R500' on a generic failure; see SuccessCode and ErrorCode for the full set.",
             "example": "R200"
           },
           "message": {

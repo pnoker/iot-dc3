@@ -27,7 +27,7 @@ import io.github.pnoker.common.auth.service.ApiService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -82,7 +82,7 @@ public class ApiController implements BaseController {
             adminChecker.assertSystemAdmin(header.getTenantId());
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
             apiService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -99,7 +99,7 @@ public class ApiController implements BaseController {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             apiService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -117,7 +117,7 @@ public class ApiController implements BaseController {
             adminChecker.assertSystemAdmin(header.getTenantId());
             ApiBO entityBO = apiBuilder.buildBOByVO(entityVO);
             apiService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

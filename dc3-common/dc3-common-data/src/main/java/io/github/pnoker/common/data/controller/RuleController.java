@@ -26,7 +26,7 @@ import io.github.pnoker.common.data.entity.query.RuleQuery;
 import io.github.pnoker.common.data.entity.vo.RuleVO;
 import io.github.pnoker.common.data.service.RuleService;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,7 +79,7 @@ public class RuleController implements BaseController {
             RuleBO entityBO = ruleBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
             ruleService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -96,7 +96,7 @@ public class RuleController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, ruleService.getById(id));
             ruleService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -115,7 +115,7 @@ public class RuleController implements BaseController {
             entityBO.setTenantId(tenantId);
             requireTenant(tenantId, ruleService.getById(entityBO.getId()));
             ruleService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 

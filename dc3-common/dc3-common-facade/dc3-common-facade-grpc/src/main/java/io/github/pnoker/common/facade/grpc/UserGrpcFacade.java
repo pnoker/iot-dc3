@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.auth.GrpcIdQuery;
 import io.github.pnoker.api.center.auth.GrpcRUserDTO;
 import io.github.pnoker.api.center.auth.UserApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.UserFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
@@ -74,7 +74,7 @@ public class UserGrpcFacade implements UserFacade {
 
     private void guardOrThrow(GrpcR result, String op) {
         String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
             log.debug("UserGrpcFacade.{} => no resource", op);
             return;
         }

@@ -30,6 +30,8 @@ import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.driver.bean.PlcS7PointVariable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +47,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -206,14 +209,14 @@ class PlcS7DriverCustomServiceImplTest {
     }
 
     @Test
-    void readReturnsNullWhenPlcThrows() throws Exception {
+    void readThrowsAndInvalidatesConnectionWhenPlcThrows() throws Exception {
         primeCachedPLC(13L);
         when(plc.readInt32(anyString())).thenThrow(new RuntimeException("plc offline"));
 
-        ReadPointValue r = service.read(driverConfig("h", 102), pointConfig(1, 0, 0),
-                device(13L), point(PointTypeEnum.INT));
+        assertThatThrownBy(() -> service.read(driverConfig("h", 102), pointConfig(1, 0, 0),
+                device(13L), point(PointTypeEnum.INT)))
+                .isInstanceOf(ReadPointException.class);
 
-        assertThat(r).isNull();
         assertThat(connectionMap()).doesNotContainKey(13L);
         verify(plc).close();
     }
@@ -259,15 +262,15 @@ class PlcS7DriverCustomServiceImplTest {
     }
 
     @Test
-    void writeReturnsFalseAndInvalidatesConnectionWhenPlcThrows() throws Exception {
+    void writeThrowsAndInvalidatesConnectionWhenPlcThrows() throws Exception {
         primeCachedPLC(23L);
         doThrow(new RuntimeException("plc offline")).when(plc).writeInt32(anyString(), org.mockito.ArgumentMatchers.anyInt());
 
-        Boolean ok = service.write(driverConfig("h", 102), pointConfig(1, 0, 0),
+        assertThatThrownBy(() -> service.write(driverConfig("h", 102), pointConfig(1, 0, 0),
                 device(23L), point(PointTypeEnum.INT),
-                writePointValue("1", PointTypeEnum.INT));
+                writePointValue("1", PointTypeEnum.INT)))
+                .isInstanceOf(WritePointException.class);
 
-        assertThat(ok).isFalse();
         assertThat(connectionMap()).doesNotContainKey(23L);
         verify(plc).close();
     }

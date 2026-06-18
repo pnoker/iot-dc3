@@ -26,8 +26,8 @@ import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.auth.service.LocalCredentialService;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.service.TenantService;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.enums.RequirePasswordChangeFlagEnum;
-import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.PasswordChangeRequiredException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.KeyUtil;
@@ -189,8 +189,8 @@ class TokenServiceImplTest {
 
         assertThatThrownBy(() -> tokenService.generateToken(LOGIN, SALT, RAW_PASSWORD, TENANT_CODE))
                 .isInstanceOf(PasswordChangeRequiredException.class)
-                .extracting(e -> ((PasswordChangeRequiredException) e).getResponseEnum())
-                .isEqualTo(ResponseEnum.PASSWORD_EXPIRED);
+                .extracting(e -> ((PasswordChangeRequiredException) e).getErrorCode())
+                .isEqualTo(ErrorCode.PASSWORD_EXPIRED);
         verify(localCredentialService).recordSuccessfulLogin(CREDENTIAL_ID);
         verify(principalManager, never()).updateById(any(PrincipalDO.class));
     }
@@ -205,8 +205,8 @@ class TokenServiceImplTest {
 
         assertThatThrownBy(() -> tokenService.generateToken(LOGIN, SALT, RAW_PASSWORD, TENANT_CODE))
                 .isInstanceOf(PasswordChangeRequiredException.class)
-                .extracting(e -> ((PasswordChangeRequiredException) e).getResponseEnum())
-                .isEqualTo(ResponseEnum.PASSWORD_CHANGE_REQUIRED);
+                .extracting(e -> ((PasswordChangeRequiredException) e).getErrorCode())
+                .isEqualTo(ErrorCode.PASSWORD_CHANGE_REQUIRED);
         verify(principalManager, never()).updateById(any(PrincipalDO.class));
     }
 

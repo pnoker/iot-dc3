@@ -20,11 +20,11 @@ package io.github.pnoker.common.auth.grpc;
 import io.github.pnoker.api.center.auth.GrpcIdQuery;
 import io.github.pnoker.api.center.auth.GrpcRUserDTO;
 import io.github.pnoker.api.center.auth.UserApiGrpc;
-import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.grpc.builder.GrpcUserBuilder;
 import io.github.pnoker.common.auth.service.UserService;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,29 +61,20 @@ public class UserServer extends UserApiGrpc.UserApiImplBase {
 
     private void writeUserResponse(UserLookup lookup, String operation, StreamObserver<GrpcRUserDTO> responseObserver) {
         GrpcRUserDTO.Builder builder = GrpcRUserDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         try {
             UserBO entityBO = lookup.get();
             if (Objects.isNull(entityBO)) {
-                rBuilder.setOk(false);
-                rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-                rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getRemark());
+                builder.setResult(GrpcRFactory.notFound());
             } else {
-                rBuilder.setOk(true);
-                rBuilder.setCode(ResponseEnum.OK.getCode());
-                rBuilder.setMessage(ResponseEnum.OK.getRemark());
-
+                builder.setResult(GrpcRFactory.ok());
                 builder.setData(grpcUserBuilder.buildGrpcDTOByBO(entityBO));
             }
         } catch (Exception e) {
             log.warn("{} failed", operation, e);
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-            rBuilder.setMessage(ResponseEnum.FAILURE.getRemark());
+            builder.setResult(GrpcRFactory.fail(ErrorCode.FAILURE));
         }
 
-        builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }

@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.auth.GrpcLoginNameQuery;
 import io.github.pnoker.api.center.auth.GrpcRLocalCredentialDTO;
 import io.github.pnoker.api.center.auth.LocalCredentialApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.LocalCredentialFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
@@ -62,7 +62,7 @@ public class LocalCredentialGrpcFacade implements LocalCredentialFacade {
 
     private void guardOrThrow(GrpcR result, String op) {
         String code = result.getCode();
-        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
             log.debug("LocalCredentialGrpcFacade.{} => no resource", op);
             return;
         }

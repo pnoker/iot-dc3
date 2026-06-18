@@ -26,7 +26,8 @@ import io.github.pnoker.common.auth.service.TenantService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.valid.Add;
@@ -88,7 +89,7 @@ public class TenantController implements BaseController {
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
             tenantService.add(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return R.ok(SuccessCode.ADD);
         }));
     }
 
@@ -109,7 +110,7 @@ public class TenantController implements BaseController {
                 throw new ServiceException("Access denied: cannot delete another tenant.");
             }
             tenantService.delete(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return R.ok(SuccessCode.DELETE);
         }));
     }
 
@@ -131,7 +132,7 @@ public class TenantController implements BaseController {
             }
             TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);
             tenantService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return R.ok(SuccessCode.UPDATE);
         }));
     }
 
@@ -172,7 +173,7 @@ public class TenantController implements BaseController {
             boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
             TenantBO select = tenantService.getByCode(code);
             if (Objects.isNull(select)) {
-                return R.fail(ResponseEnum.NO_RESOURCE.getRemark());
+                return R.fail(ErrorCode.NOT_FOUND);
             }
             if (!isSystemAdmin && !Objects.equals(select.getId(), tenantId)) {
                 return R.fail("Resource does not exist");
