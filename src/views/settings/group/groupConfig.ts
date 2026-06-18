@@ -70,6 +70,12 @@ const computeExcluded = (rows: GroupRecord[], currentId: string): Set<string> =>
   return ids;
 };
 
+const normalizeGroupPayload = (payload: Record<string, unknown>) => {
+  const next = { ...payload };
+  if (!next.parentGroupId || String(next.parentGroupId) === '0') next.parentGroupId = null;
+  return next;
+};
+
 export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => ({
   name: 'group',
   editable: true,
@@ -91,7 +97,10 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
       prop: 'parentGroupId',
       label: t('settings.group.parentGroupId'),
       minWidth: 150,
-      formatter: (row, ctx) => ctx.relations.parentName?.[String(row.parentGroupId)] || '-',
+      formatter: (row, ctx) => {
+        if (!row.parentGroupId || String(row.parentGroupId) === '0') return t('settings.group.rootGroup');
+        return ctx.relations.parentName?.[String(row.parentGroupId)] || '-';
+      },
     },
     { prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90 },
     { prop: 'remark', label: t('common.remark'), minWidth: 180 },
@@ -163,8 +172,8 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
     remark: '',
   }),
   list: listGroup,
-  add: addGroup,
-  update: updateGroup,
+  add: (payload) => addGroup(normalizeGroupPayload(payload) as Parameters<typeof addGroup>[0]),
+  update: (payload) => updateGroup(normalizeGroupPayload(payload) as Parameters<typeof updateGroup>[0]),
   remove: deleteGroup,
   detail: { routeName: 'settingsGroupDetail' },
   confirmDeleteText: t('settings.group.confirmDelete'),
