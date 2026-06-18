@@ -65,6 +65,12 @@ public class NotifyController implements BaseController {
 
     private final NotifyService notifyService;
 
+    /**
+     * Create a notification (alert-routing) rule for the current tenant.
+     *
+     * @param entityVO notification rule payload to create
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('notify', 'add')")
     @Operation(summary = "Add Notification Rule", description = "Create a notification (alert-routing) rule for the current tenant that wires alarm triggers to delivery channels. Use to define how and where alerts are dispatched.")
     @PostMapping("/add")
@@ -77,6 +83,12 @@ public class NotifyController implements BaseController {
         }));
     }
 
+    /**
+     * Delete a notification rule owned by the current tenant.
+     *
+     * @param id id of the notification rule to delete
+     * @return delete-success status; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('notify', 'delete')")
     @Operation(summary = "Delete Notification Rule", description = "Delete a notification rule by ID for the current tenant. Ownership is validated before deletion, so cross-tenant records cannot be removed.")
     @PostMapping("/delete")
@@ -88,6 +100,12 @@ public class NotifyController implements BaseController {
         }));
     }
 
+    /**
+     * Update an existing notification rule owned by the current tenant.
+     *
+     * @param entityVO notification rule payload to update
+     * @return update-success status; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('notify', 'update')")
     @Operation(summary = "Update Notification Rule", description = "Update an existing notification rule (routing, severity, enable flag) for the current tenant. Ownership is validated before the update is applied.")
     @PostMapping("/update")
@@ -101,6 +119,12 @@ public class NotifyController implements BaseController {
         }));
     }
 
+    /**
+     * Return a single notification rule owned by the current tenant.
+     *
+     * @param id id of the notification rule to retrieve
+     * @return the matched NotifyVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('notify', 'get')")
     @Operation(summary = "Get Notification Rule by ID", description = "Return a single notification rule for the current tenant. Use to inspect routing, severity and channel bindings for one rule.")
     @GetMapping("/get_by_id")
@@ -111,6 +135,12 @@ public class NotifyController implements BaseController {
         }));
     }
 
+    /**
+     * Page through notification rules owned by the current tenant.
+     *
+     * @param entityQuery optional filter query (pagination, severity, channel); treated as empty when null
+     * @return a page of NotifyVO matching the query
+     */
     @PreAuthorize("@perm.can('notify', 'list')")
     @Operation(summary = "List Notification Rules", description = "Page through notification (alert-routing) rules for the current tenant with optional query filters. Use to enumerate which rules govern alert dispatch.")
     @PostMapping("/list")

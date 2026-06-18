@@ -62,6 +62,13 @@ public class CommandHistoryController implements BaseController {
 
     private final CommandHistoryBuilder commandHistoryBuilder;
 
+    /**
+     * Send a downward control command to a device for the current tenant and record
+     * the call in command history.
+     *
+     * @param entityVO command payload to dispatch to the device (target device, command and parameters)
+     * @return the ID of the newly created command-call history record; use it to poll execution result and response data
+     */
     @PreAuthorize("@perm.can('command_history', 'add')")
     @Operation(summary = "Call Command", description = "Send a downward control command to a device for the current tenant and " +
             "record the call in command history. Returns the new history record ID; use it to poll the execution result and response data.")
@@ -75,15 +82,29 @@ public class CommandHistoryController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch one command-call history record by its record ID (tenant-scoped),
+     * including execution status, timestamps and the device response.
+     *
+     * @param recordId record ID returned by the Call Command endpoint; must resolve to a command-call history entry owned by the current tenant
+     * @return the matched CommandHistoryVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('command_history', 'get')")
     @Operation(summary = "Get Command History by Record ID", description = "Fetch one command-call history record by its record ID " +
             "(tenant-scoped), including execution status, timestamps and the device response. Use to check the outcome of a command issued via Call Command.")
     @GetMapping("/get_by_record_id")
-    public Mono<R<CommandHistoryVO>> getByRecordId(@Parameter(description = "Record ID") @NotBlank @RequestParam String recordId) {
+    public Mono<R<CommandHistoryVO>> getByRecordId(@Parameter(description = "Record ID returned by the Call Command endpoint; must resolve to a command-call history entry owned by the current tenant", example = "cmd_20260523_a1b2c3d4") @NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() ->
                 R.ok(commandHistoryService.getByRecordId(tenantId, recordId))));
     }
 
+    /**
+     * Page through command-call history for the current tenant with filters such as
+     * device, command and execution status over a time window.
+     *
+     * @param queryVO optional query filters (device, command, status, time window); a default empty query is used when null
+     * @return a page of CommandHistoryVO matching the query
+     */
     @PreAuthorize("@perm.can('command_history', 'list')")
     @Operation(summary = "List Command History Records", description = "Page through command-call history for the current tenant with " +
             "filters such as device, command and execution status over a time window. Returns a page of records; use to audit which commands ran and their results.")

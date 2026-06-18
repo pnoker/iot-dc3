@@ -62,6 +62,13 @@ public class EventHistoryController implements BaseController {
 
     private final EventHistoryBuilder eventHistoryBuilder;
 
+    /**
+     * Record a device event (alarm, state change, or status transition) reported by a
+     * device for the current tenant.
+     *
+     * @param entityVO device event payload (event type, payload, device context) to append to the audit trail
+     * @return the ID of the newly created event history record
+     */
     @PreAuthorize("@perm.can('event_history', 'list')")
     @Operation(summary = "Report Device Event", description = "Record a device event (alarm, state change, or status transition) reported by a device for the current tenant and return the new record ID. Use when a device reports an event that must be appended to the audit trail.")
     @PostMapping("/report")
@@ -74,6 +81,12 @@ public class EventHistoryController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch a single device event record by its record ID, tenant-scoped.
+     *
+     * @param recordId identifier of the event history record to fetch; must belong to the current tenant
+     * @return the matched EventHistoryVO with event type, payload and timestamp; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('event_history', 'get')")
     @Operation(summary = "Get Event History by Record ID", description = "Fetch a single device event record by its record ID, tenant-scoped. Returns the event type, payload, and timestamp; use to inspect one specific reported event.")
     @GetMapping("/get_by_record_id")
@@ -82,6 +95,13 @@ public class EventHistoryController implements BaseController {
                 R.ok(eventHistoryService.getByRecordId(tenantId, recordId))));
     }
 
+    /**
+     * Page through device event records (alarms, state changes, status transitions) for
+     * the current tenant, filtered by the query body.
+     *
+     * @param queryVO optional query filters; a default empty query is used when null
+     * @return a page of EventHistoryVO matching the query, ordered by event time
+     */
     @PreAuthorize("@perm.can('event_history', 'list')")
     @Operation(summary = "List Event History Records", description = "Page through device event records (alarms, state changes, status transitions) for the current tenant, filtered by the query body. Use to browse the append-only event audit trail; results are ordered by event time.")
     @PostMapping("/list")

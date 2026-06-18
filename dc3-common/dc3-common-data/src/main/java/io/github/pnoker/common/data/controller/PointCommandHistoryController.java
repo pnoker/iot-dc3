@@ -57,14 +57,26 @@ public class PointCommandHistoryController implements BaseController {
 
     private final PointCommandHistoryService pointCommandHistoryService;
 
+    /**
+     * Return the full audit record for a single point command identified by its command ID.
+     *
+     * @param commandId id of the dispatched point command to look up
+     * @return the matched PointCommandHistoryVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('point_command_history', 'get')")
     @Operation(summary = "Get Point Command History by Command ID", description = "Return the full audit record for a single point command identified by its command ID (tenant-scoped). Use to look up the request value, response value, status, error and timing of one dispatched command.")
     @GetMapping("/get_by_command_id")
-    public Mono<R<PointCommandHistoryVO>> getByCommandId(@Parameter(description = "Command ID") @NotBlank @RequestParam String commandId) {
+    public Mono<R<PointCommandHistoryVO>> getByCommandId(@Parameter(description = "Identifier of the point command to look up; must reference a command dispatched under the current tenant.", example = "1024") @NotBlank @RequestParam String commandId) {
         return getTenantId().flatMap(tenantId -> async(() ->
                 R.ok(pointCommandHistoryService.getByCommandId(tenantId, commandId))));
     }
 
+    /**
+     * Page through the point command audit trail owned by the current tenant.
+     *
+     * @param queryVO optional filter query (device, point, command type, status); treated as empty when null
+     * @return a page of PointCommandHistoryVO matching the query
+     */
     @PreAuthorize("@perm.can('point_command_history', 'list')")
     @Operation(summary = "List Point Command History", description = "Page through the point command audit trail for the current tenant, filterable by device, point, command type and status. Use to review which commands were dispatched to data points and whether each succeeded.")
     @PostMapping("/list")

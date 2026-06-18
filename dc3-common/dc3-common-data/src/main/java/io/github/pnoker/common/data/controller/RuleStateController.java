@@ -61,6 +61,12 @@ public class RuleStateController implements BaseController {
 
     private final RuleStateService ruleStateService;
 
+    /**
+     * Return the runtime state of a single rule owned by the current tenant.
+     *
+     * @param id id of the rule state record to retrieve
+     * @return the matched RuleStateVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('rule_state', 'get')")
     @Operation(summary = "Get Rule State by ID", description = "Return the runtime state of one rule (enabled/disabled, last-fired, counters) for the current tenant. Use to inspect a single rule's execution status.")
     @GetMapping("/get_by_id")
@@ -71,6 +77,12 @@ public class RuleStateController implements BaseController {
         }));
     }
 
+    /**
+     * Page through the runtime states of rules owned by the current tenant.
+     *
+     * @param entityQuery optional filter query (enable flag, rule id, etc.); treated as empty when null
+     * @return a page of RuleStateVO matching the query
+     */
     @PreAuthorize("@perm.can('rule_state', 'list')")
     @Operation(summary = "List Rule States", description = "Page through the runtime states of rules (enabled/disabled, last-fired, counters) for the current tenant. Use to survey which rules are active and how often each has fired.")
     @PostMapping("/list")

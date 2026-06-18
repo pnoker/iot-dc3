@@ -65,9 +65,16 @@ public class NotifyChannelController implements BaseController {
 
     private final NotifyChannelService notifyChannelService;
 
+    /**
+     * Create a notification delivery channel (email, SMS, webhook, or message bus) for
+     * the current tenant.
+     *
+     * @param entityVO notification channel payload (type, endpoint configuration) to create
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('notify_channel', 'add')")
     @Operation(summary = "Add Notification Channel", description = "Create a notification delivery channel (email, SMS, webhook, or message bus) for the current tenant. " +
-            "Returns the new channel ID; the channel must be bound to a rule via NotifyChannelBind before it can dispatch.")
+            "Returns add-success status; the channel must be bound to a rule via NotifyChannelBind before it can dispatch.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyChannelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -78,6 +85,12 @@ public class NotifyChannelController implements BaseController {
         }));
     }
 
+    /**
+     * Delete a notification channel by ID, scoped to the current tenant.
+     *
+     * @param id primary key of the notification channel to delete; must belong to the current tenant
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('notify_channel', 'delete')")
     @Operation(summary = "Delete Notification Channel", description = "Delete a notification channel by ID, scoped to the current tenant. " +
             "Use to retire a delivery channel whose endpoint is no longer valid; existing NotifyHistory records are preserved.")
@@ -90,6 +103,13 @@ public class NotifyChannelController implements BaseController {
         }));
     }
 
+    /**
+     * Update an existing notification channel's endpoint and configuration for the
+     * current tenant.
+     *
+     * @param entityVO notification channel payload with the endpoint/configuration to update; the owning tenant is verified before mutation
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('notify_channel', 'update')")
     @Operation(summary = "Update Notification Channel", description = "Update an existing notification channel's endpoint and configuration for the current tenant. " +
             "Use to rotate webhook URLs, credentials, or recipient lists; the owning tenant is verified before mutation.")
@@ -104,6 +124,13 @@ public class NotifyChannelController implements BaseController {
         }));
     }
 
+    /**
+     * Return a single notification channel with its endpoint configuration, scoped to
+     * the current tenant.
+     *
+     * @param id primary key of the target notification channel; must belong to the current tenant
+     * @return the matched NotifyChannelVO with endpoint configuration; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('notify_channel', 'get')")
     @Operation(summary = "Get Notification Channel by ID", description = "Return a single notification channel with its endpoint configuration, scoped to the current tenant. " +
             "Use to inspect how a rule's alerts will be delivered before binding or firing.")
@@ -115,6 +142,12 @@ public class NotifyChannelController implements BaseController {
         }));
     }
 
+    /**
+     * Page through notification delivery channels owned by the current tenant.
+     *
+     * @param entityQuery optional filter and pagination body; a default empty query is used when null
+     * @return a page of NotifyChannelVO matching the query
+     */
     @PreAuthorize("@perm.can('notify_channel', 'list')")
     @Operation(summary = "List Notification Channels", description = "Page through notification delivery channels owned by the current tenant. " +
             "Use to enumerate available channels for rule binding; results are filtered by the query and returned as a paginated page.")

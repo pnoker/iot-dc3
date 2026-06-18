@@ -57,10 +57,10 @@ public class DeviceStatusController implements BaseController {
     private final DeviceStatusService deviceStatusService;
 
     /**
-     * Query device statuses ONLINE, OFFLINE, MAINTAIN, FAULT
+     * Query the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of the tenant's devices.
      *
-     * @param deviceQuery Device Dto
-     * @return Map String:String
+     * @param deviceQuery optional device filter (driver, profile, other dimensions) and pagination; a default empty query is used when null
+     * @return a map of device id to current status for the matching devices
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
     @Operation(summary = "List Device Status", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of the current tenant's devices as a device-id-to-status map. Use to read live connectivity state; pass a DeviceQuery to filter by driver, profile or other dimensions.")
@@ -75,10 +75,11 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * Query device statuses by driver ID ONLINE, OFFLINE, MAINTAIN, FAULT
+     * Query the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the
+     * tenant runs under a given driver.
      *
-     * @param driverId Driver ID
-     * @return Map String:String
+     * @param driverId identifier of the driver; must belong to the current tenant
+     * @return a map of device id to current status for the devices managed by the driver
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
     @Operation(summary = "List Device Status by Driver", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the current tenant runs under the given driver. Use to inspect connectivity across the whole fleet a single driver manages; results are a device-id-to-status map.")
@@ -94,10 +95,11 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * Query device statuses by profile ID ONLINE, OFFLINE, MAINTAIN, FAULT
+     * Query the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the
+     * tenant associates with a given profile.
      *
-     * @param profileId Profile ID
-     * @return Map String:String
+     * @param profileId identifier of the profile template; must belong to the current tenant
+     * @return a map of device id to current status for the devices bound to the profile
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
     @Operation(summary = "List Device Status by Profile", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the current tenant associates with the given profile. Use to check connectivity of all devices sharing a profile template; results are a device-id-to-status map.")

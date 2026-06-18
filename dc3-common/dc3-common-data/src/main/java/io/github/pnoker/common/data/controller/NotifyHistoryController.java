@@ -61,6 +61,12 @@ public class NotifyHistoryController implements BaseController {
 
     private final NotifyHistoryService notifyHistoryService;
 
+    /**
+     * Return a single dispatched-notification record owned by the current tenant.
+     *
+     * @param id id of the notification history record to retrieve
+     * @return the matched NotifyHistoryVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('notify_history', 'get')")
     @Operation(summary = "Get Notification History by ID", description = "Return a single dispatched-notification record by ID (tenant-scoped). Use to inspect one notification's timestamp, target channel, and delivery status.")
     @GetMapping("/get_by_id")
@@ -71,6 +77,12 @@ public class NotifyHistoryController implements BaseController {
         }));
     }
 
+    /**
+     * Page through notification delivery records owned by the current tenant.
+     *
+     * @param entityQuery optional filter query (channel, delivery status, time range); treated as empty when null
+     * @return a page of NotifyHistoryVO matching the query
+     */
     @PreAuthorize("@perm.can('notify_history', 'list')")
     @Operation(summary = "List Notification History", description = "Page through notifications already dispatched for the current tenant, filterable by channel and delivery status. Use to audit what was sent and whether each channel succeeded.")
     @PostMapping("/list")

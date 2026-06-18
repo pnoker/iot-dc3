@@ -65,6 +65,12 @@ public class RuleController implements BaseController {
 
     private final RuleService ruleService;
 
+    /**
+     * Create an alarm or automation rule for the current tenant.
+     *
+     * @param entityVO rule payload (trigger conditions and actions) to create
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('rule', 'add')")
     @Operation(summary = "Add Rule", description = "Create an alarm or automation rule (trigger conditions plus actions) for the current tenant. Use to register a new rule the engine evaluates against point values or events.")
     @PostMapping("/add")
@@ -77,6 +83,12 @@ public class RuleController implements BaseController {
         }));
     }
 
+    /**
+     * Delete a rule owned by the current tenant.
+     *
+     * @param id id of the rule to delete
+     * @return delete-success status; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('rule', 'delete')")
     @Operation(summary = "Delete Rule", description = "Delete a rule owned by the current tenant by its ID. Tenant ownership is verified before deletion; use to retire a rule that should no longer fire.")
     @PostMapping("/delete")
@@ -88,6 +100,12 @@ public class RuleController implements BaseController {
         }));
     }
 
+    /**
+     * Update the trigger conditions or actions of a rule owned by the current tenant.
+     *
+     * @param entityVO rule payload (trigger conditions and actions) to update
+     * @return update-success status; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('rule', 'update')")
     @Operation(summary = "Update Rule", description = "Update the trigger conditions or actions of a rule owned by the current tenant. Tenant ownership is verified before the change is applied.")
     @PostMapping("/update")
@@ -101,6 +119,12 @@ public class RuleController implements BaseController {
         }));
     }
 
+    /**
+     * Return a single rule's full definition owned by the current tenant.
+     *
+     * @param id id of the rule to retrieve
+     * @return the matched RuleVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('rule', 'get')")
     @Operation(summary = "Get Rule by ID", description = "Return one rule's full definition (conditions, actions, owner) for the current tenant. Use to inspect or edit a specific rule before updating or deleting it.")
     @GetMapping("/get_by_id")
@@ -111,6 +135,12 @@ public class RuleController implements BaseController {
         }));
     }
 
+    /**
+     * Page through alarm and automation rules owned by the current tenant.
+     *
+     * @param entityQuery optional filter query (rule name, enable flag, etc.); treated as empty when null
+     * @return a page of RuleVO matching the query
+     */
     @PreAuthorize("@perm.can('rule', 'list')")
     @Operation(summary = "List Rules", description = "Page through alarm and automation rules owned by the current tenant, filtered by the query body. Use to browse or locate rules for inspection; results are scoped to the caller's tenant.")
     @PostMapping("/list")

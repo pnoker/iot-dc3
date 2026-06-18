@@ -65,6 +65,12 @@ public class MessageController implements BaseController {
 
     private final MessageService messageService;
 
+    /**
+     * Create a new alarm message template scoped to the current tenant.
+     *
+     * @param entityVO message template payload (name, code, level, enabled flag) to create
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('message', 'add')")
     @Operation(summary = "Add Message", description = "Create a new alarm message template scoped to the current tenant. Use to register a reusable message (name, code, level, enabled flag) that alarm rules and notifications can reference.")
     @PostMapping("/add")
@@ -77,6 +83,12 @@ public class MessageController implements BaseController {
         }));
     }
 
+    /**
+     * Delete a tenant-owned alarm message template by its ID.
+     *
+     * @param id primary key of the message template to delete; must belong to the current tenant
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('message', 'delete')")
     @Operation(summary = "Delete Message", description = "Delete a tenant-owned alarm message template by its ID. Returns not-found if the record belongs to another tenant.")
     @PostMapping("/delete")
@@ -88,6 +100,13 @@ public class MessageController implements BaseController {
         }));
     }
 
+    /**
+     * Update the name, code, level or enabled flag of an existing alarm message template
+     * owned by the current tenant.
+     *
+     * @param entityVO message template payload with the fields to update; tenant scope is enforced from the caller, not the body
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('message', 'update')")
     @Operation(summary = "Update Message", description = "Update the name, code, level or enabled flag of an existing alarm message template owned by the current tenant. The tenant scope is enforced from the authenticated caller, not the request body.")
     @PostMapping("/update")
@@ -101,6 +120,13 @@ public class MessageController implements BaseController {
         }));
     }
 
+    /**
+     * Return one alarm message template (name, code, level, enabled flag) by its ID,
+     * restricted to the current tenant.
+     *
+     * @param id primary key of the target message template; must belong to the current tenant
+     * @return the matched MessageVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('message', 'get')")
     @Operation(summary = "Get Message by ID", description = "Return one alarm message template (name, code, level, enabled flag) by its ID, restricted to the current tenant. Use to inspect a single template before updating or deleting it.")
     @GetMapping("/get_by_id")
@@ -111,6 +137,13 @@ public class MessageController implements BaseController {
         }));
     }
 
+    /**
+     * Page through the current tenant's alarm message templates, filterable by name,
+     * code, level and enabled flag.
+     *
+     * @param entityQuery optional filter and pagination body; a default empty query is used when null
+     * @return a page of MessageVO matching the query
+     */
     @PreAuthorize("@perm.can('message', 'list')")
     @Operation(summary = "List Messages", description = "Page through the current tenant's alarm message templates, filterable by name, code, level and enabled flag. Use to browse or locate templates for reuse by alarm rules and notification channels.")
     @PostMapping("/list")

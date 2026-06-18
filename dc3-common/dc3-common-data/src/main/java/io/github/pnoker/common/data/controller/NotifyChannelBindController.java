@@ -65,8 +65,15 @@ public class NotifyChannelBindController implements BaseController {
 
     private final NotifyChannelBindService notifyChannelBindService;
 
+    /**
+     * Bind a delivery channel to a notification rule for the current tenant, so alerts
+     * from that rule route through the channel.
+     *
+     * @param entityVO binding payload identifying the notify rule and the delivery channel to link
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('notify_channel_bind', 'add')")
-    @Operation(summary = "Add Notification Channel Binding", description = "Bind a delivery channel to a notification rule for the current tenant, so alerts from that rule route through the channel. Returns the new binding's ID.")
+    @Operation(summary = "Add Notification Channel Binding", description = "Bind a delivery channel to a notification rule for the current tenant, so alerts from that rule route through the channel. Returns add-success status.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyChannelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -77,6 +84,12 @@ public class NotifyChannelBindController implements BaseController {
         }));
     }
 
+    /**
+     * Delete a notification-to-channel binding by ID, scoped to the current tenant.
+     *
+     * @param id primary key of the binding to delete; must belong to the current tenant
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('notify_channel_bind', 'delete')")
     @Operation(summary = "Delete Notification Channel Binding", description = "Delete a notification-to-channel binding by ID, scoped to the current tenant. Use to stop routing a rule's alerts through a channel; ownership is validated before deletion.")
     @PostMapping("/delete")
@@ -88,6 +101,13 @@ public class NotifyChannelBindController implements BaseController {
         }));
     }
 
+    /**
+     * Update an existing notification-to-channel binding (rule, channel, enable flag) for
+     * the current tenant.
+     *
+     * @param entityVO binding payload with the rule, channel or enable flag to update; ownership is validated before the change is applied
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('notify_channel_bind', 'update')")
     @Operation(summary = "Update Notification Channel Binding", description = "Update an existing notification-to-channel binding (rule, channel, enable flag) for the current tenant. Ownership is validated before the change is applied.")
     @PostMapping("/update")
@@ -101,6 +121,13 @@ public class NotifyChannelBindController implements BaseController {
         }));
     }
 
+    /**
+     * Return the full detail of a single notification-to-channel binding by ID, scoped
+     * to the current tenant.
+     *
+     * @param id primary key of the target binding; must belong to the current tenant
+     * @return the matched NotifyChannelBindVO with rule, channel, enable flag and extension attributes; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('notify_channel_bind', 'get')")
     @Operation(summary = "Get Notification Channel Binding by ID", description = "Return the full detail of a single notification-to-channel binding by ID, scoped to the current tenant. Returns the rule, channel, enable flag and extension attributes.")
     @GetMapping("/get_by_id")
@@ -111,6 +138,13 @@ public class NotifyChannelBindController implements BaseController {
         }));
     }
 
+    /**
+     * Page through notification-to-channel bindings for the current tenant, filterable
+     * by notifyId, channelId and enable flag.
+     *
+     * @param entityQuery optional filter and pagination body; a default empty query is used when null
+     * @return a page of NotifyChannelBindVO matching the query
+     */
     @PreAuthorize("@perm.can('notify_channel_bind', 'list')")
     @Operation(summary = "List Notification Channel Bindings", description = "Page through notification-to-channel bindings for the current tenant, filterable by notifyId, channelId and enable flag. Use to discover which delivery channels a rule fires through.")
     @PostMapping("/list")

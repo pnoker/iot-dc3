@@ -57,10 +57,10 @@ public class DriverStatusController implements BaseController {
     private final DriverStatusService driverStatusService;
 
     /**
-     * Query driver statuses ONLINE, OFFLINE
+     * Query the current ONLINE/OFFLINE status of each driver instance for the tenant.
      *
-     * @param entityQuery Driver and pagination parameters
-     * @return Map String:String
+     * @param entityQuery optional driver filter and pagination; a default empty query is used when null
+     * @return a map of driver id to current ONLINE/OFFLINE status for the matching drivers
      */
     @PreAuthorize("@perm.can('driver_status', 'list')")
     @Operation(summary = "List Driver Status", description = "Return the current ONLINE/OFFLINE status of each driver instance for the current tenant, keyed by driver id. Page through driver and pagination filters; results are tenant-scoped.")
@@ -75,10 +75,10 @@ public class DriverStatusController implements BaseController {
     }
 
     /**
-     * Query the number of devices currently online under the Driver
+     * Count the devices currently online under one driver for the tenant.
      *
-     * @param driverId Driver ID
-     * @return Number of devices currently online
+     * @param driverId identifier of the driver whose online device count is queried; must belong to the current tenant
+     * @return the number of devices currently online under the driver
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
     @Operation(summary = "Count Online Devices by Driver", description = "Count devices currently online under one driver for the current tenant. Pass the driver id; returns a single count.")
@@ -91,10 +91,10 @@ public class DriverStatusController implements BaseController {
     }
 
     /**
-     * Query the number of devices currently offline under the Driver
+     * Count the devices currently offline under one driver for the tenant.
      *
-     * @param driverId Driver ID
-     * @return Number of devices currently offline
+     * @param driverId identifier of the driver whose offline device count is queried; must belong to the current tenant
+     * @return the number of devices currently offline under the driver
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
     @Operation(summary = "Count Offline Devices by Driver", description = "Count devices currently offline under one driver for the current tenant. Pass the driver id; returns a single count.")
