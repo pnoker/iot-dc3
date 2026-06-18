@@ -62,4 +62,13 @@ export const listMcpAudit = (
     riskLevel?: string;
     limit?: number;
   } = {}
-) => httpPost<R<McpAuditRecord[]>>(`${API_MCP_BASE}/audit/list`, undefined, { params });
+) =>
+  httpPost<R<McpAuditRecord[]>>(`${API_MCP_BASE}/audit/list`, undefined, {
+    params: {
+      principal_id: params.principalId,
+      tool_id: params.toolId,
+      status: params.status,
+      risk_level: params.riskLevel,
+      limit: params.limit,
+    },
+  });

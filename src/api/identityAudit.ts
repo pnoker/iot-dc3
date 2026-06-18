@@ -27,4 +27,14 @@ export const listIdentityAudit = (
     status?: string;
     limit?: number;
   } = {}
-) => httpPost<R<IdentityAuditRecord[]>>(`${API_IDENTITY_AUDIT_BASE}/list`, undefined, { params });
+) =>
+  httpPost<R<IdentityAuditRecord[]>>(`${API_IDENTITY_AUDIT_BASE}/list`, undefined, {
+    params: {
+      principal_id: params.principalId,
+      action: params.action,
+      resource_type: params.resourceType,
+      resource_id: params.resourceId,
+      status: params.status,
+      limit: params.limit,
+    },
+  });
