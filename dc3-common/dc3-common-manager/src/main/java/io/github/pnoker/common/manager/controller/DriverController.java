@@ -145,10 +145,10 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * ID Driver
+     * Resolve a set of driver IDs to their details, filtered to the current tenant.
      *
-     * @param driverIds Driver ID
-     * @return Map(ID, DriverVO)
+     * @param driverIds ids of the drivers to resolve
+     * @return a map of id to DriverVO for the tenant-owned matched ids
      */
     @PreAuthorize("@perm.can('driver', 'list')")
     @Operation(summary = "List Drivers by IDs", description = "Return the drivers matching a set of IDs, filtered to the current tenant. " +
@@ -164,10 +164,10 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * SERVICENAME Driver
+     * Fetch one driver by its protocol service name for the current tenant.
      *
-     * @param serviceName Driver service name
-     * @return Driver
+     * @param serviceName protocol service name of the driver to fetch
+     * @return the matched DriverVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('driver', 'get')")
     @Operation(summary = "Get Driver by Service Name", description = "Fetch one driver by its protocol service name (tenant-scoped). " +
@@ -182,10 +182,10 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * Driver
+     * Page through drivers for the current tenant using the supplied query filters.
      *
-     * @param entityQuery Driver Dto
-     * @return Page Of Driver
+     * @param entityQuery optional query filters (name, service name, mode, enable flag); a new query is used when null
+     * @return a page of DriverVO matching the query
      */
     @PreAuthorize("@perm.can('driver', 'list')")
     @Operation(summary = "List Drivers", description = "Page through drivers for the current tenant with filters such as name, service name, mode and enable flag. " +

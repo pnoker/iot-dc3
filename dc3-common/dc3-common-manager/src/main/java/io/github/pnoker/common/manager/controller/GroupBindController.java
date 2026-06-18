@@ -75,8 +75,10 @@ public class GroupBindController implements BaseController {
     private final EntityTenantService entityTenantService;
 
     /**
-     * @param entityVO {@link GroupBindVO}
-     * @return R of String
+     * Attach a tenant entity to a group.
+     *
+     * @param entityVO group binding payload to create (group id, entity id, entity type)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('group_bind', 'add')")
     @Operation(summary = "Add Group Binding", description = "Attach a tenant entity (device, driver, point, etc.) to a group. The entity's type must match the group's type and ownership is tenant-scoped; returns the new binding ID.")
@@ -92,8 +94,10 @@ public class GroupBindController implements BaseController {
     }
 
     /**
-     * @param id ID
-     * @return R of String
+     * Remove a group-to-entity binding by ID.
+     *
+     * @param id id of the group binding to delete (must be tenant-owned)
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('group_bind', 'delete')")
     @Operation(summary = "Delete Group Binding", description = "Remove a group-to-entity binding by ID (tenant-scoped). Detaches the entity from the group without deleting the group or the entity.")
@@ -107,8 +111,10 @@ public class GroupBindController implements BaseController {
     }
 
     /**
-     * @param entityVO {@link GroupBindVO}
-     * @return R of String
+     * Change the group or entity referenced by an existing binding.
+     *
+     * @param entityVO group binding payload to update (must carry an existing id)
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('group_bind', 'update')")
     @Operation(summary = "Update Group Binding", description = "Change the group or entity referenced by an existing binding (tenant-scoped). The new entity's type must still match the target group's type.")
@@ -125,8 +131,10 @@ public class GroupBindController implements BaseController {
     }
 
     /**
-     * @param id ID
-     * @return GroupBindVO {@link GroupBindVO}
+     * Fetch a single group binding by ID.
+     *
+     * @param id id of the group binding to fetch (must be tenant-owned)
+     * @return the matched GroupBindVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('group_bind', 'get')")
     @Operation(summary = "Get Group Binding by ID", description = "Fetch one group binding by ID (tenant-scoped). Returns the group ID, entity type and entity ID of the association; use to inspect a specific link before editing or removing it.")
@@ -140,8 +148,10 @@ public class GroupBindController implements BaseController {
     }
 
     /**
-     * @param entityQuery {@link GroupBindQuery}
-     * @return R Of GroupBindVO Page
+     * Page through group bindings with filters.
+     *
+     * @param entityQuery query filters such as group id, entity type or entity id (may be null)
+     * @return a page of GroupBindVO matching the query
      */
     @PreAuthorize("@perm.can('group_bind', 'list')")
     @Operation(summary = "List Group Bindings", description = "Page through group bindings for the current tenant, optionally filtered by group ID, entity type or entity ID. Returns a page of bindings; use to enumerate the members of a group or the groups an entity belongs to.")

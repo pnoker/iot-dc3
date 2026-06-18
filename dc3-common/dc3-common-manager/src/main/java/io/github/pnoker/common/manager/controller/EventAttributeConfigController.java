@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * REST controller exposing event attribute config management endpoints.
+ * Manages per-device event attribute configuration values that override the defaults declared on a profile template's event attributes.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -80,10 +80,10 @@ public class EventAttributeConfigController implements BaseController {
     private final EventAttributeService eventAttributeService;
 
     /**
-     * EventConfig
+     * Set the configured value of one event attribute field for a specific device and event, overriding the profile template default.
      *
-     * @param entityVO {@link EventAttributeConfigVO}
-     * @return R of String
+     * @param entityVO event attribute config payload to create (attribute, device, event and configured value)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'add')")
     @Operation(summary = "Add Event Attribute Configuration", description = "Set the configured value of one event attribute field for a specific device and event under the current tenant. Use to override the attribute definition declared on the profile template for that device instance; returns the new config ID.")
@@ -98,10 +98,10 @@ public class EventAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID EventConfig
+     * Permanently delete one event attribute configuration by ID, scoped to the current tenant.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the event attribute config to delete; must belong to the current tenant
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'delete')")
     @Operation(summary = "Delete Event Attribute Configuration", description = "Permanently delete one event attribute configuration by ID (tenant-scoped). Removes the device's configured value for that attribute while leaving the attribute definition on the profile template intact; the action cannot be undone.")
@@ -115,10 +115,10 @@ public class EventAttributeConfigController implements BaseController {
     }
 
     /**
-     * EventConfig
+     * Change the configured value of an existing event attribute field for a specific device and event, scoped to the current tenant.
      *
-     * @param entityVO {@link EventAttributeConfigVO}
-     * @return R of String
+     * @param entityVO event attribute config payload carrying the updated value; ownership is verified before applying
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'update')")
     @Operation(summary = "Update Event Attribute Configuration", description = "Change the configured value of an existing event attribute field for a specific device and event under the current tenant. Tenant ownership of the record is verified before applying the update.")
@@ -134,10 +134,10 @@ public class EventAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID EventConfig
+     * Fetch one event attribute configuration by its record ID, scoped to the current tenant.
      *
-     * @param id ID
-     * @return EventAttributeConfigVO {@link EventAttributeConfigVO}
+     * @param id id of the event attribute config to fetch; must belong to the current tenant
+     * @return the matched EventAttributeConfigVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
     @Operation(summary = "Get Event Attribute Configuration by ID", description = "Fetch one event attribute configuration by its record ID (tenant-scoped). Use to inspect the configured value a device uses for a single event attribute field.")
@@ -151,12 +151,12 @@ public class EventAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID, Device ID Event ID EventConfig
+     * Fetch the configured value of one event attribute field by its attribute, device and event IDs, scoped to the current tenant.
      *
-     * @param attributeId Attribute ID
-     * @param deviceId    Device ID
-     * @param eventId     Event ID
-     * @return EventConfig
+     * @param attributeId id of the event attribute whose configured value is being fetched; its driver must match the device's driver
+     * @param deviceId    id of the device whose configured value is being fetched; its profile must match the event's profile
+     * @param eventId     id of the event whose attribute value is being fetched
+     * @return the matched EventAttributeConfigVO; fails if the device/event/attribute triple is invalid or not tenant-owned
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
     @Operation(summary = "Get Event Attribute Configuration by Attribute, Device, and Event IDs",
@@ -179,11 +179,11 @@ public class EventAttributeConfigController implements BaseController {
     }
 
     /**
-     * Device ID Event ID EventConfig
+     * Return every event attribute configuration for one device and one event, scoped to the current tenant.
      *
-     * @param deviceId Device ID
-     * @param eventId  Event ID
-     * @return EventConfig
+     * @param deviceId id of the device whose configurations are listed; its profile must match the event's profile
+     * @param eventId  id of the event whose configurations are listed
+     * @return a list of EventAttributeConfigVO for the device-event pair
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
     @Operation(summary = "List Event Attribute Configurations by Device and Event IDs", description = "Return every event attribute configuration for one device and one event (tenant-scoped). Use to read all configured values the device supplies for that event's attributes; the device's profile must match the event.")
@@ -201,10 +201,10 @@ public class EventAttributeConfigController implements BaseController {
     }
 
     /**
-     * Device ID EventConfig
+     * Return every event attribute configuration for one device across all of its events, scoped to the current tenant.
      *
-     * @param deviceId Device ID
-     * @return EventConfig
+     * @param deviceId id of the device whose configurations are listed; must belong to the current tenant
+     * @return a list of EventAttributeConfigVO set on the device
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
     @Operation(summary = "List Event Attribute Configurations by Device ID", description = "Return every event attribute configuration for one device across all of its events (tenant-scoped). Use to read the full set of configured event-attribute values a device uses.")
@@ -221,10 +221,10 @@ public class EventAttributeConfigController implements BaseController {
     }
 
     /**
-     * EventConfig
+     * Page through event attribute configurations for the current tenant with filters from the query body.
      *
-     * @param entityQuery EventConfig Dto
-     * @return Page Of EventConfig
+     * @param entityQuery optional query filters; null treated as empty
+     * @return a page of EventAttributeConfigVO matching the query
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
     @Operation(summary = "List Event Attribute Configurations", description = "Page through event attribute configurations for the current tenant with filters from the query body. Returns a page of configurations; use for browsing or selecting a target configuration.")

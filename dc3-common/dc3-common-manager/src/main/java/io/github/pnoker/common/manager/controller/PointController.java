@@ -83,10 +83,10 @@ public class PointController implements BaseController {
     private final ProfileService profileService;
 
     /**
-     * Point
+     * Define a new point on a profile template for the current tenant, then return the add-success status.
      *
-     * @param entityVO {@link PointVO}
-     * @return R of String
+     * @param entityVO point payload to create
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('point', 'add')")
     @Operation(summary = "Add Point", description = "Define a new point (a single measurable channel such as a temperature reading) on a profile template for the current tenant. " +
@@ -102,10 +102,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * ID Point
+     * Delete a point after verifying it belongs to the current tenant, then return the delete-success status.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the point to delete
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('point', 'delete')")
     @Operation(summary = "Delete Point", description = "Permanently remove a point from its profile template by ID (tenant-scoped). " +
@@ -120,10 +120,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * Point
+     * Update an existing point after verifying tenant ownership, then return the update-success status.
      *
-     * @param entityVO {@link PointVO}
-     * @return R of String
+     * @param entityVO point payload to update
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('point', 'update')")
     @Operation(summary = "Update Point", description = "Modify the definition of an existing point (name, data type, unit, access mode and similar fields) on its profile template. " +
@@ -140,10 +140,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * ID Point
+     * Fetch one point's definition by ID after verifying it belongs to the current tenant.
      *
-     * @param id ID
-     * @return PointVO {@link PointVO}
+     * @param id id of the point to fetch
+     * @return the matched PointVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('point', 'get')")
     @Operation(summary = "Get Point by ID", description = "Fetch a single point's definition (data type, unit, access mode and metadata) by ID. " +
@@ -158,10 +158,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * ID Point
+     * Resolve a batch of point IDs to their definitions, filtered to the current tenant.
      *
-     * @param pointIds Point ID
-     * @return Map(ID, PointVO)
+     * @param pointIds ids of the points to resolve
+     * @return a map of id to PointVO for the tenant-owned matched ids
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "List Points by IDs", description = "Resolve a batch of point IDs to their definitions for the current tenant. " +
@@ -177,10 +177,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * ID Point
+     * List every point defined on a given profile template, filtered to the current tenant.
      *
-     * @param profileId Point ID
-     * @return Point
+     * @param profileId id of the profile template whose points are returned
+     * @return a list of PointVO defined on the profile
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "List Points by Profile ID", description = "Return every point defined on a given profile template (tenant-scoped). " +
@@ -196,10 +196,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * Device ID Point
+     * List every point available on a given device, filtered to the current tenant.
      *
-     * @param deviceId Device ID
-     * @return Point Array
+     * @param deviceId id of the device whose points are returned
+     * @return a list of PointVO available on the device
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "List Points by Device ID", description = "Return every point available on a specific device (tenant-scoped). " +
@@ -215,10 +215,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * Point
+     * Page through points for the current tenant using the supplied query filters.
      *
-     * @param entityQuery Point Dto
-     * @return Page Of Point
+     * @param entityQuery optional query filters (name, profile); a new query is used when null
+     * @return a page of PointVO matching the query
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "List Points", description = "Page through points for the current tenant with filters such as name and profile. " +
@@ -235,8 +235,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * @param pointIds Point ID
-     * @return Map String:String
+     * Resolve the engineering unit of each point in a batch of IDs, filtered to the current tenant.
+     *
+     * @param pointIds ids of the points whose units should be resolved
+     * @return a map of id to unit string for the tenant-owned matched points; fails when the resolution is empty
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "List Point Units", description = "Resolve the engineering unit (for example Celsius or percent) of each point in a batch of IDs (tenant-scoped). " +
@@ -259,8 +261,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * @param pointId id
-     * @return {@link R}<{@link Set}<{@link Long}>>
+     * Return device-level statistics for a single point after verifying it belongs to the current tenant.
+     *
+     * @param pointId id of the point whose device statistics are returned
+     * @return a DeviceByPointVO carrying the point's device statistics
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "Get Point Device Statistics", description = "Return device-level statistics for a single point, such as how many devices expose it (tenant-scoped). " +
@@ -277,8 +281,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * @param deviceId
-     * @return
+     * Count the points available on a given device after verifying it belongs to the current tenant.
+     *
+     * @param deviceId id of the device whose point count is returned
+     * @return the number of points available on the device
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "Count Points by Device", description = "Return the number of points available on a specific device (tenant-scoped). " +
@@ -293,8 +299,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * @param deviceId
-     * @return
+     * Fetch the resolved point configuration for a device after verifying it belongs to the current tenant.
+     *
+     * @param deviceId id of the device whose resolved point configuration is returned
+     * @return a PointConfigByDeviceVO merging profile template definitions with device instance attribute values
      */
     @PreAuthorize("@perm.can('point', 'get')")
     @Operation(summary = "Get Device Point Configuration", description = "Fetch the resolved point configuration for a device, merging the profile template definitions with the device's per-instance attribute values (tenant-scoped). " +

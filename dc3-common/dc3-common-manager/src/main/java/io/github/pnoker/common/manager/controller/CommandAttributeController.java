@@ -91,10 +91,10 @@ public class CommandAttributeController implements BaseController {
     }
 
     /**
-     * Delete a command attribute by ID.
+     * Permanently delete a command attribute field definition by ID, scoped to the current tenant.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the command attribute to delete; must belong to the current tenant
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('command_attribute', 'delete')")
     @Operation(summary = "Delete Command Attribute", description = "Permanently delete a command attribute field definition by ID (tenant-scoped). " +
@@ -109,10 +109,10 @@ public class CommandAttributeController implements BaseController {
     }
 
     /**
-     * Update a command attribute.
+     * Modify an existing command attribute field definition, scoped to the current tenant.
      *
-     * @param entityVO {@link CommandAttributeVO}
-     * @return R of String
+     * @param entityVO command attribute payload carrying the updated fields; ownership is verified before applying
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('command_attribute', 'update')")
     @Operation(summary = "Update Command Attribute", description = "Modify an existing command attribute field definition (tenant-scoped). " +
@@ -129,10 +129,10 @@ public class CommandAttributeController implements BaseController {
     }
 
     /**
-     * Query a command attribute by ID.
+     * Fetch one command attribute field definition by ID, scoped to the current tenant.
      *
-     * @param id ID
-     * @return CommandAttributeVO {@link CommandAttributeVO}
+     * @param id id of the command attribute to fetch; must belong to the current tenant
+     * @return the matched CommandAttributeVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('command_attribute', 'get')")
     @Operation(summary = "Get Command Attribute by ID", description = "Fetch one command attribute field definition by ID (tenant-scoped). " +
@@ -147,10 +147,10 @@ public class CommandAttributeController implements BaseController {
     }
 
     /**
-     * Query command attributes by driver ID.
+     * Return every command attribute field definition reachable through a given driver, scoped to the current tenant.
      *
-     * @param id ID
-     * @return command attributes
+     * @param driverId id of the driver whose reachable command attribute fields are enumerated; must belong to the current tenant
+     * @return a list of CommandAttributeVO exposed by the driver; empty when the driver is not found
      */
     @PreAuthorize("@perm.can('command_attribute', 'list')")
     @Operation(summary = "List Command Attributes by Driver ID", description = "Return every command attribute exposed by the commands of devices driven by a given driver (tenant-scoped). " +
@@ -170,10 +170,10 @@ public class CommandAttributeController implements BaseController {
     }
 
     /**
-     * Query command attributes with pagination.
+     * Page through command attribute field definitions for the current tenant with query filters.
      *
-     * @param entityQuery Dto
-     * @return page of command attributes
+     * @param entityQuery optional query filters; null treated as empty
+     * @return a page of CommandAttributeVO matching the query
      */
     @PreAuthorize("@perm.can('command_attribute', 'list')")
     @Operation(summary = "List Command Attributes", description = "Page through command attribute field definitions for the current tenant with query filters. " +

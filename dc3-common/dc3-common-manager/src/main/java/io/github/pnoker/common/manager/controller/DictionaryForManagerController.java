@@ -60,10 +60,10 @@ public class DictionaryForManagerController implements BaseController {
     private final DictionaryForManagerService dictionaryForManagerService;
 
     /**
-     * Dictionary
+     * Page through driver dictionary entries for the current tenant.
      *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return R Of DictionaryVO Page
+     * @param entityQuery query filters (may be null)
+     * @return a page of DictionaryVO describing the available drivers
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Driver Dictionary", description = "Page through driver dictionary entries for the current tenant. " +
@@ -80,10 +80,10 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * Dictionary
+     * Page through profile template dictionaries for the current tenant.
      *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return R Of DictionaryVO Page
+     * @param entityQuery query filters (may be null)
+     * @return a page of DictionaryVO describing the available profile templates
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Profile Dictionary", description = "Page through profile template dictionaries for the current tenant. " +
@@ -100,10 +100,10 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * Dictionary
+     * Page through the point dictionaries declared on a given profile template.
      *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return R Of DictionaryVO Page
+     * @param entityQuery query carrying a valid profile parent id (may be null otherwise)
+     * @return a page of DictionaryVO describing the profile's points
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Profile Point Dictionary", description = "Page through the point dictionaries declared on a given profile template. " +
@@ -121,10 +121,10 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * Dictionary
+     * Page through the point dictionaries available on a given device.
      *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return R Of DictionaryVO Page
+     * @param entityQuery query carrying a valid device parent id (may be null otherwise)
+     * @return a page of DictionaryVO describing the device's points
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Device Point Dictionary", description = "Page through the point dictionaries available on a given device. " +
@@ -142,10 +142,10 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * Dictionary
+     * Page through device dictionaries for the current tenant.
      *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return R Of DictionaryVO Page
+     * @param entityQuery query filters (may be null)
+     * @return a page of DictionaryVO describing the available devices
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Device Dictionary", description = "Page through device dictionaries for the current tenant. " +
@@ -162,10 +162,10 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * Dictionary
+     * Page through the device dictionaries managed by a given driver.
      *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return R Of DictionaryVO Page
+     * @param entityQuery query carrying a valid driver parent id (may be null otherwise)
+     * @return a page of DictionaryVO describing the driver's devices
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Driver Device Dictionary", description = "Page through the device dictionaries managed by a given driver. " +

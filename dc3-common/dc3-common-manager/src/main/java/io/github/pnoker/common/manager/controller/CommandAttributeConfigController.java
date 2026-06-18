@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * REST controller exposing command attribute config management endpoints.
+ * Manages per-device command attribute configuration values that override the defaults declared on a profile template's command attributes.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -80,10 +80,10 @@ public class CommandAttributeConfigController implements BaseController {
     private final CommandAttributeService commandAttributeService;
 
     /**
-     * CommandConfig
+     * Set the concrete value of a command attribute field for a specific device and command, overriding the profile template default.
      *
-     * @param entityVO {@link CommandAttributeConfigVO}
-     * @return R of String
+     * @param entityVO command attribute config payload to create (attribute, device, command and configured value)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'add')")
     @Operation(summary = "Add Command Attribute Configuration", description = "Set the concrete value of a command attribute field for a specific device and command under the current tenant. The configured value overrides the field's default declared on the profile template; returns the new configuration ID.")
@@ -98,10 +98,10 @@ public class CommandAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID CommandConfig
+     * Permanently delete one command attribute configuration by ID, scoped to the current tenant.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the command attribute config to delete; must belong to the current tenant
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'delete')")
     @Operation(summary = "Delete Command Attribute Configuration", description = "Permanently delete one command attribute configuration by ID (tenant-scoped). The device reverts to the attribute's default declared on the profile template; the deletion cannot be undone.")
@@ -115,10 +115,10 @@ public class CommandAttributeConfigController implements BaseController {
     }
 
     /**
-     * CommandConfig
+     * Change the configured value of an existing command attribute for a specific device and command, scoped to the current tenant.
      *
-     * @param entityVO {@link CommandAttributeConfigVO}
-     * @return R of String
+     * @param entityVO command attribute config payload carrying the updated value; ownership is verified before applying
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'update')")
     @Operation(summary = "Update Command Attribute Configuration", description = "Change the configured value of an existing command attribute for a specific device and command. Verifies the record belongs to the current tenant before applying the update.")
@@ -134,10 +134,10 @@ public class CommandAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID CommandConfig
+     * Fetch one command attribute configuration by its record ID, scoped to the current tenant.
      *
-     * @param id ID
-     * @return CommandAttributeConfigVO {@link CommandAttributeConfigVO}
+     * @param id id of the command attribute config to fetch; must belong to the current tenant
+     * @return the matched CommandAttributeConfigVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'get')")
     @Operation(summary = "Get Command Attribute Configuration by ID", description = "Fetch one command attribute configuration by its record ID. Use to inspect the value a specific device applies to a command's attribute field, scoped to the current tenant.")
@@ -151,12 +151,12 @@ public class CommandAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID, Device ID Command ID CommandConfig
+     * Fetch the configured value of one command attribute field by its attribute, device and command IDs, scoped to the current tenant.
      *
-     * @param attributeId Attribute ID
-     * @param deviceId    Device ID
-     * @param commandId   Command ID
-     * @return CommandConfig
+     * @param attributeId id of the command attribute whose configured value is looked up
+     * @param deviceId    id of the device whose configured command attribute value is looked up
+     * @param commandId   id of the command whose attribute configuration is looked up
+     * @return the matched CommandAttributeConfigVO; fails if the device/command/attribute triple is invalid or not tenant-owned
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'get')")
     @Operation(summary = "Get Command Attribute Configuration by Attribute, Device, and Command IDs", description = "Fetch the configured value of one command attribute field by its attribute, device and command IDs. Use when the configuration ID is unknown but the attribute-device-command triple is, scoped to the current tenant.")
@@ -176,11 +176,11 @@ public class CommandAttributeConfigController implements BaseController {
     }
 
     /**
-     * Device ID Command ID CommandConfig
+     * Return every command attribute configuration set on a specific device for a specific command, scoped to the current tenant.
      *
-     * @param deviceId  Device ID
-     * @param commandId Command ID
-     * @return CommandConfig
+     * @param deviceId  id of the device whose command attribute configurations are listed
+     * @param commandId id of the command whose attribute configurations are listed
+     * @return a list of CommandAttributeConfigVO for the device-command pair
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
     @Operation(summary = "List Command Attribute Configurations by Device and Command IDs", description = "Return every command attribute configuration set on a specific device for a specific command, scoped to the current tenant. Use to retrieve the full set of values that device will send with that command.")
@@ -198,10 +198,10 @@ public class CommandAttributeConfigController implements BaseController {
     }
 
     /**
-     * Device ID CommandConfig
+     * Return every command attribute configuration set on a specific device across all of its commands, scoped to the current tenant.
      *
-     * @param deviceId Device ID
-     * @return CommandConfig
+     * @param deviceId id of the device whose command attribute configurations are listed
+     * @return a list of CommandAttributeConfigVO set on the device
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
     @Operation(summary = "List Command Attribute Configurations by Device ID", description = "Return every command attribute configuration set on a specific device across all of its commands, scoped to the current tenant. Use to review the full configuration of a device before sending commands.")
@@ -218,10 +218,10 @@ public class CommandAttributeConfigController implements BaseController {
     }
 
     /**
-     * CommandConfig
+     * Page through command attribute configurations for the current tenant with filters from the query body.
      *
-     * @param entityQuery CommandConfig Dto
-     * @return Page Of CommandConfig
+     * @param entityQuery optional query filters; null treated as empty
+     * @return a page of CommandAttributeConfigVO matching the query
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
     @Operation(summary = "List Command Attribute Configurations", description = "Page through command attribute configurations for the current tenant with filters from the query body. Returns a page of configurations; use for browsing or auditing configured command attribute values across devices and commands.")

@@ -66,8 +66,10 @@ public class GroupController implements BaseController {
     private final GroupService groupService;
 
     /**
-     * @param entityVO {@link GroupVO}
-     * @return R of String
+     * Create a group for the current tenant.
+     *
+     * @param entityVO group payload to create (name, group type)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('group', 'add')")
     @Operation(summary = "Add Group", description = "Create a group for the current tenant. A group is a logical grouping of devices, drivers, points or other entities used for batch operations; returns the new group ID.")
@@ -82,8 +84,10 @@ public class GroupController implements BaseController {
     }
 
     /**
-     * @param id ID
-     * @return R of String
+     * Delete a group by ID.
+     *
+     * @param id id of the group to delete (must be tenant-owned)
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('group', 'delete')")
     @Operation(summary = "Delete Group", description = "Permanently delete a group by ID (tenant-scoped). Removes the grouping definition without deleting its member entities; the action cannot be undone.")
@@ -97,8 +101,10 @@ public class GroupController implements BaseController {
     }
 
     /**
-     * @param entityVO {@link GroupVO}
-     * @return R of String
+     * Update an existing group's attributes.
+     *
+     * @param entityVO group payload to update (must carry an existing id)
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('group', 'update')")
     @Operation(summary = "Update Group", description = "Update an existing group's attributes for the current tenant. Validates tenant ownership before applying the change; returns the updated group ID.")
@@ -114,8 +120,10 @@ public class GroupController implements BaseController {
     }
 
     /**
-     * @param id ID
-     * @return GroupVO {@link GroupVO}
+     * Fetch a single group by ID.
+     *
+     * @param id id of the group to fetch (must be tenant-owned)
+     * @return the matched GroupVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('group', 'get')")
     @Operation(summary = "Get Group by ID", description = "Fetch one group by ID for the current tenant. Use to inspect a grouping definition before assigning entities to it or performing batch operations.")
@@ -129,8 +137,10 @@ public class GroupController implements BaseController {
     }
 
     /**
-     * @param entityQuery {@link GroupQuery}
-     * @return R Of GroupVO Page
+     * Page through groups with filters.
+     *
+     * @param entityQuery query filters (may be null)
+     * @return a page of GroupVO matching the query
      */
     @PreAuthorize("@perm.can('group', 'list')")
     @Operation(summary = "List Groups", description = "Page through groups for the current tenant with optional query filters. Returns a page of groups; use for browsing available groupings or selecting a target group.")

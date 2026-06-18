@@ -73,10 +73,10 @@ public class ProfileController implements BaseController {
     private final DeviceService deviceService;
 
     /**
-     * Profile
+     * Register a new profile template for the current tenant, then return the add-success status.
      *
-     * @param entityVO {@link ProfileVO}
-     * @return R of String
+     * @param entityVO profile payload to create
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('profile', 'add')")
     @Operation(summary = "Add Profile", description = "Register a new profile template for the current tenant. A profile is a reusable template bundling points, commands, events and attributes that devices instantiate; returns the new profile ID.")
@@ -91,10 +91,10 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * ID Profile
+     * Delete a profile template after verifying it belongs to the current tenant, then return the delete-success status.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the profile to delete
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('profile', 'delete')")
     @Operation(summary = "Delete Profile", description = "Permanently delete a profile template by ID (tenant-scoped). The profile must belong to the current tenant; deletion cannot be undone.")
@@ -108,10 +108,10 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * Profile
+     * Update an existing profile template after verifying tenant ownership, then return the update-success status.
      *
-     * @param entityVO {@link ProfileVO}
-     * @return R of String
+     * @param entityVO profile payload to update
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('profile', 'update')")
     @Operation(summary = "Update Profile", description = "Modify an existing profile template's metadata (tenant-scoped). Only profile fields in the body change; points, commands, events and attributes are managed on their own endpoints.")
@@ -127,10 +127,10 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * ID Profile
+     * Fetch one profile template by ID after verifying it belongs to the current tenant.
      *
-     * @param id ID
-     * @return ProfileVO {@link ProfileVO}
+     * @param id id of the profile to fetch
+     * @return the matched ProfileVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('profile', 'get')")
     @Operation(summary = "Get Profile by ID", description = "Fetch one profile template by ID (tenant-scoped). Use to inspect a profile's metadata before binding devices or editing its point, command and event definitions.")
@@ -144,10 +144,10 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * ID Profile
+     * Resolve a set of profile IDs to their templates, filtered to the current tenant.
      *
-     * @param profileIds ID
-     * @return Map(ID, ProfileVO)
+     * @param profileIds ids of the profiles to resolve
+     * @return a map of id to ProfileVO for the tenant-owned matched ids
      */
     @PreAuthorize("@perm.can('profile', 'list')")
     @Operation(summary = "List Profiles by IDs", description = "Resolve a set of profile IDs to their profile templates for the current tenant. Returns a map of ID to profile; missing or foreign-tenant IDs are omitted.")
@@ -162,10 +162,10 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * Device ID Profile
+     * List every profile template instantiated by a given device, filtered to the current tenant.
      *
-     * @param deviceId Device ID
-     * @return Profile
+     * @param deviceId id of the device whose profiles are returned
+     * @return a list of ProfileVO instantiated by the device
      */
     @PreAuthorize("@perm.can('profile', 'list')")
     @Operation(summary = "List Profiles by Device ID", description = "Return every profile template instantiated by a given device (tenant-scoped). Use to discover which point, command and event definitions a device exposes through its driver.")
@@ -180,10 +180,10 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * Profile
+     * Page through profile templates for the current tenant using the supplied query filters.
      *
-     * @param entityQuery Profile Dto
-     * @return Page Of Profile
+     * @param entityQuery optional query filters; a new query is used when null
+     * @return a page of ProfileVO matching the query
      */
     @PreAuthorize("@perm.can('profile', 'list')")
     @Operation(summary = "List Profiles", description = "Page through profile templates for the current tenant with the filters in the query body. Returns a page of profiles; use for browsing or selecting a template for a device.")

@@ -59,6 +59,11 @@ public class DashboardController implements BaseController {
 
     private final DashboardService dashboardService;
 
+    /**
+     * Aggregate driver statistics for the dashboard home view.
+     *
+     * @return DriverStatsVO with driver counts grouped by enable status and protocol type
+     */
     @PreAuthorize("@perm.can('dashboard', 'get')")
     @Operation(summary = "Get Driver Statistics", description = "Aggregate driver statistics for the current tenant for the dashboard home view. " +
             "Returns driver counts grouped by enable status and protocol type; use to surface driver distribution across the tenant.")
@@ -67,6 +72,12 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.driverStats(tenantId))));
     }
 
+    /**
+     * Aggregate device statistics for the dashboard home view.
+     *
+     * @param topN number of top devices to return, ranked by point-value volume (clamped server-side)
+     * @return DeviceStatsVO with device counts plus the top-N most active devices
+     */
     @PreAuthorize("@perm.can('dashboard', 'get')")
     @Operation(summary = "Get Device Statistics", description = "Aggregate device statistics for the current tenant for the dashboard home view. " +
             "Returns device counts plus the top-N devices by point-value volume, where N is set by the top_n parameter (default 10); " +
@@ -80,6 +91,9 @@ public class DashboardController implements BaseController {
      * Daily new-row counts for driver / device / point / profile tables over the last
      * {@code days} days. Backs the stat-card sparklines. Returns fixed-length zero-padded
      * arrays so the frontend never has to reason about missing days.
+     *
+     * @param days trailing day window for the trend (output is zero-padded to this length)
+     * @return GrowthVO of fixed-length zero-padded daily counts per resource
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
     @Operation(summary = "Get Resource Growth Trend", description = "Return daily new-row counts for driver, device, point and profile tables over the trailing days window (default 7). " +
@@ -100,6 +114,10 @@ public class DashboardController implements BaseController {
      * pseudo-node with a {@code hiddenChildren} payload the frontend pops in a drill-in
      * dialog.
      * </p>
+     *
+     * @param mode     aggregation mode: cardinality counts relationships per edge (default), volume weights by point-value samples
+     * @param rangeKey preset time window for volume mode (today, 24h, 7d, 30d); ignored in cardinality mode
+     * @return TopologyVO Sankey graph with server-side top-N cropping and others pseudo-nodes
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
     @Operation(summary = "Get Topology", description = "Build the Driver → Device → Profile → Point topology for the current tenant. " +

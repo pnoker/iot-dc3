@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * REST controller exposing event management endpoints.
+ * Manages device-reported event definitions declared on profile templates, the occurrences a device raises at runtime.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -72,6 +72,12 @@ public class EventController implements BaseController {
 
     private final DeviceService deviceService;
 
+    /**
+     * Define a new device-reported event on a profile template for the current tenant.
+     *
+     * @param entityVO event payload to create, carrying its attribute definitions
+     * @return the id of the newly created event
+     */
     @PreAuthorize("@perm.can('event', 'add')")
     @Operation(summary = "Add Event", description = "Define a new device-reported event on a profile template for the current tenant. " +
             "An event is an occurrence or alert a device raises at runtime, with its attribute definitions; returns the new event ID.")
@@ -85,6 +91,12 @@ public class EventController implements BaseController {
         }));
     }
 
+    /**
+     * Permanently delete an event definition by ID, scoped to the current tenant, while preserving reported event history.
+     *
+     * @param id id of the event to delete; must belong to the current tenant
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('event', 'delete')")
     @Operation(summary = "Delete Event", description = "Permanently delete an event definition by ID (tenant-scoped). " +
             "Removes the event and its attribute definitions from the profile template while preserving reported event history; the action cannot be undone.")
@@ -97,6 +109,12 @@ public class EventController implements BaseController {
         }));
     }
 
+    /**
+     * Modify an existing event definition on the profile template, scoped to the current tenant.
+     *
+     * @param entityVO event payload carrying the updated fields; ownership is verified before applying
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('event', 'update')")
     @Operation(summary = "Update Event", description = "Modify an existing event definition on the profile template (tenant-scoped). " +
             "Updates event attributes such as name and configuration; use to refine how a device-reported occurrence is modeled.")
@@ -111,6 +129,12 @@ public class EventController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch one event definition with its attribute definitions, scoped to the current tenant.
+     *
+     * @param id id of the event to fetch; must belong to the current tenant
+     * @return the matched EventVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('event', 'get')")
     @Operation(summary = "Get Event by ID", description = "Fetch one event definition with its attribute definitions (tenant-scoped). " +
             "Use to inspect an event before subscribing to its reported history or adjusting its configuration.")
@@ -123,6 +147,12 @@ public class EventController implements BaseController {
         }));
     }
 
+    /**
+     * Return every event definition declared on a given profile template, scoped to the current tenant.
+     *
+     * @param profileId id of the profile template whose event definitions are returned; must belong to the current tenant
+     * @return a list of EventVO declared on the profile
+     */
     @PreAuthorize("@perm.can('event', 'list')")
     @Operation(summary = "List Events by Profile ID", description = "Return every event definition declared on a given profile template (tenant-scoped). " +
             "Use to discover which device-reported occurrences the profile exposes before binding or inspecting a device.")
@@ -136,6 +166,12 @@ public class EventController implements BaseController {
         }));
     }
 
+    /**
+     * Return every event definition available on a given device, resolved from its profile template, scoped to the current tenant.
+     *
+     * @param deviceId id of the device whose available event definitions are returned; must belong to the current tenant
+     * @return a list of EventVO the device may report
+     */
     @PreAuthorize("@perm.can('event', 'list')")
     @Operation(summary = "List Events by Device ID", description = "Return every event definition available on a given device (tenant-scoped), " +
             "resolved from the device's profile template. Use to see which occurrences a specific device may report.")
@@ -149,6 +185,12 @@ public class EventController implements BaseController {
         }));
     }
 
+    /**
+     * Page through event definitions for the current tenant with filters from the query body.
+     *
+     * @param entityQuery optional query filters; null treated as empty
+     * @return a page of EventVO matching the query
+     */
     @PreAuthorize("@perm.can('event', 'list')")
     @Operation(summary = "List Events", description = "Page through event definitions for the current tenant with filters from the query body. " +
             "Returns a page of events; use for browsing or locating a specific event definition.")

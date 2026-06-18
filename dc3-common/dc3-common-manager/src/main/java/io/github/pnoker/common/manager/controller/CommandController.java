@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * REST controller exposing command management endpoints.
+ * Manages device command definitions declared on profile templates, including the downward control instructions a driver sends to devices.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -72,6 +72,12 @@ public class CommandController implements BaseController {
 
     private final DeviceService deviceService;
 
+    /**
+     * Create a downward control instruction defined on a profile template for the current tenant.
+     *
+     * @param entityVO command payload to create, carrying its parameters and attributes
+     * @return the id of the newly created command
+     */
     @PreAuthorize("@perm.can('command', 'add')")
     @Operation(summary = "Add Command", description = "Create a downward control instruction defined on a profile template for the current tenant. " +
             "A command carries parameters and attributes that the driver sends to a device; returns the new command ID.")
@@ -85,6 +91,12 @@ public class CommandController implements BaseController {
         }));
     }
 
+    /**
+     * Permanently delete a command by ID, scoped to the current tenant.
+     *
+     * @param id id of the command to delete; must belong to the current tenant
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('command', 'delete')")
     @Operation(summary = "Delete Command", description = "Permanently delete a command by ID (tenant-scoped). " +
             "Removes the command definition from its profile template; the action cannot be undone.")
@@ -97,6 +109,12 @@ public class CommandController implements BaseController {
         }));
     }
 
+    /**
+     * Modify an existing command's parameters and attributes, scoped to the current tenant.
+     *
+     * @param entityVO command payload carrying the updated fields; ownership is verified before applying
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('command', 'update')")
     @Operation(summary = "Update Command", description = "Modify an existing command's parameters and attributes (tenant-scoped). " +
             "Ownership is verified before applying changes; returns an update-success response.")
@@ -111,6 +129,12 @@ public class CommandController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch one command with its parameters and attributes, scoped to the current tenant.
+     *
+     * @param id id of the command to fetch; must belong to the current tenant
+     * @return the matched CommandVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('command', 'get')")
     @Operation(summary = "Get Command by ID", description = "Fetch one command with its parameters and attributes (tenant-scoped). " +
             "Use to inspect a command before sending it to a device through the driver.")
@@ -123,11 +147,17 @@ public class CommandController implements BaseController {
         }));
     }
 
+    /**
+     * Return every control command declared on a given profile template, scoped to the current tenant.
+     *
+     * @param profileId id of the profile template whose commands are returned; must belong to the current tenant
+     * @return a list of CommandVO declared on the profile
+     */
     @PreAuthorize("@perm.can('command', 'list')")
     @Operation(summary = "List Commands by Profile ID", description = "Return every control command declared on a given profile template (tenant-scoped). " +
             "Use to enumerate the downward instructions available to all devices that instantiate the profile.")
     @GetMapping("/list_by_profile_id")
-    public Mono<R<List<CommandVO>>> listByProfileId(@Parameter(description = "Profile ID") @NotNull @RequestParam(value = "profile_id") Long profileId) {
+    public Mono<R<List<CommandVO>>> listByProfileId(@Parameter(description = "Identifier of the profile template whose commands are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.getById(profileId));
             List<CommandBO> entityBOList = filterTenant(tenantId, commandService.listByProfileId(profileId, tenantId));
@@ -136,11 +166,17 @@ public class CommandController implements BaseController {
         }));
     }
 
+    /**
+     * Return the control commands a given device can receive, resolved from its bound profile template, scoped to the current tenant.
+     *
+     * @param deviceId id of the device whose receivable commands are returned; must belong to the current tenant
+     * @return a list of CommandVO the device can receive
+     */
     @PreAuthorize("@perm.can('command', 'list')")
     @Operation(summary = "List Commands by Device ID", description = "Return the control commands a given device can receive, resolved from its bound profile template (tenant-scoped). " +
             "Use to discover which downward instructions can be sent to a specific device through its driver.")
     @GetMapping("/list_by_device_id")
-    public Mono<R<List<CommandVO>>> listByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+    public Mono<R<List<CommandVO>>> listByDeviceId(@Parameter(description = "Identifier of the device whose receivable commands are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
             List<CommandBO> entityBOList = filterTenant(tenantId, commandService.listByDeviceId(deviceId, tenantId));
@@ -149,6 +185,12 @@ public class CommandController implements BaseController {
         }));
     }
 
+    /**
+     * Page through control commands for the current tenant with query filters.
+     *
+     * @param entityQuery optional query filters (name, profile, enable flag, etc.); null treated as empty
+     * @return a page of CommandVO matching the query
+     */
     @PreAuthorize("@perm.can('command', 'list')")
     @Operation(summary = "List Commands", description = "Page through control commands for the current tenant with query filters. " +
             "Returns a page of commands; use for browsing commands or selecting one to send to a device.")

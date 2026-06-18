@@ -54,6 +54,12 @@ public class TopicController implements BaseController {
 
     private final TopicService topicService;
 
+    /**
+     * Page through broker topics mapped to their device and point for the current tenant.
+     *
+     * @param topicQuery query filters such as topic name or device name (may be null)
+     * @return a page of TopicVO resolving each message topic to its bound device and point
+     */
     @PreAuthorize("@perm.can('topic', 'list')")
     @Operation(summary = "List Topics", description = "Page through broker topics mapped to their device and point for the current tenant. " +
             "Filter by topic name or device name to resolve which device and point a message topic is bound to; returns a page of topic bindings.")

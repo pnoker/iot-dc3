@@ -80,10 +80,10 @@ public class PointAttributeConfigController implements BaseController {
     private final PointAttributeService pointAttributeService;
 
     /**
-     * PointConfig
+     * Create the configured value of a point attribute for a device-point pair.
      *
-     * @param entityVO {@link PointAttributeConfigVO}
-     * @return R of String
+     * @param entityVO point attribute config payload to create (attribute, device, point, value)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'add')")
     @Operation(summary = "Add Point Attribute Configuration", description = "Set the configured value of a point attribute on a specific device-point pair for the current tenant. " +
@@ -99,10 +99,10 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID PointConfig
+     * Delete a point attribute config by ID.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the point attribute config to delete (must be tenant-owned)
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'delete')")
     @Operation(summary = "Delete Point Attribute Configuration", description = "Permanently delete a point attribute config by ID (tenant-scoped). " +
@@ -117,10 +117,10 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * PointConfig
+     * Update the configured value of an existing point attribute config.
      *
-     * @param entityVO {@link PointAttributeConfigVO}
-     * @return R of String
+     * @param entityVO point attribute config payload to update (must carry an existing id)
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'update')")
     @Operation(summary = "Update Point Attribute Configuration", description = "Change the configured value of an existing point attribute config (tenant-scoped). " +
@@ -137,10 +137,10 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID PointConfig
+     * Fetch a single point attribute config by record ID.
      *
-     * @param id ID
-     * @return PointAttributeConfigVO {@link PointAttributeConfigVO}
+     * @param id id of the point attribute config to fetch (must be tenant-owned)
+     * @return the matched PointAttributeConfigVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
     @Operation(summary = "Get Point Attribute Configuration by ID", description = "Fetch one point attribute config by its record ID (tenant-scoped). " +
@@ -155,12 +155,12 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * ID, Device ID Point ID PointConfig
+     * Fetch the single config that applies one point attribute to a device-point pair.
      *
-     * @param attributeId Attribute ID
-     * @param deviceId    Device ID
-     * @param pointId     Point ID
-     * @return PointConfig
+     * @param attributeId id of the point attribute whose configured value is read (its driver must match the device's)
+     * @param deviceId    id of the device the config applies to (must be tenant-owned)
+     * @param pointId     id of the data point the config applies to (must share its profile with the device)
+     * @return the matched PointAttributeConfigVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
     @Operation(summary = "Get Point Attribute Configuration by Attribute, Device, and Point IDs", description = "Fetch the single config that applies one point attribute to a specific device-point pair. " +
@@ -181,11 +181,11 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * Device ID Point ID PointConfig
+     * List every point attribute config bound to one device-point pair.
      *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
-     * @return PointConfig
+     * @param deviceId id of the device whose configs are listed (must be tenant-owned)
+     * @param pointId  id of the data point whose configs are listed (must share its profile with the device)
+     * @return a list of PointAttributeConfigVO bound to the device-point pair
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
     @Operation(summary = "List Point Attribute Configurations by Device and Point IDs", description = "Return every point attribute config bound to one device-point pair (tenant-scoped). " +
@@ -204,10 +204,10 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * Device ID PointConfig
+     * List every point attribute config for one device across all its points.
      *
-     * @param deviceId Device ID
-     * @return PointConfig
+     * @param deviceId id of the device whose point attribute configs are listed (must be tenant-owned)
+     * @return a list of PointAttributeConfigVO bound to the device
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
     @Operation(summary = "List Point Attribute Configurations by Device ID", description = "Return every point attribute config for one device across all its points (tenant-scoped). " +
@@ -225,10 +225,10 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * PointConfig
+     * Page through point attribute configs with filters.
      *
-     * @param entityQuery PointConfig Dto
-     * @return Page Of PointConfig
+     * @param entityQuery query filters (may be null)
+     * @return a page of PointAttributeConfigVO matching the query
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
     @Operation(summary = "List Point Attribute Configurations", description = "Page through point attribute configs for the current tenant with query filters. " +

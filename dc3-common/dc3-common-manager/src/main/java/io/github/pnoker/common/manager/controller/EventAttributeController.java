@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * REST controller exposing event attribute management endpoints.
+ * Manages event attribute field definitions declared on profile templates, the configurable fields of a device-reported event.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -72,10 +72,10 @@ public class EventAttributeController implements BaseController {
     private final DriverService driverService;
 
     /**
-     * Create an event attribute.
+     * Define a new event attribute field on a profile template for the current tenant.
      *
-     * @param entityVO {@link EventAttributeVO}
-     * @return R of String
+     * @param entityVO event attribute payload to create (name, type, value constraints)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('event_attribute', 'add')")
     @Operation(summary = "Add Event Attribute", description = "Define a new event attribute field on a profile template for the current tenant. " +
@@ -91,10 +91,10 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * Delete an event attribute by ID.
+     * Permanently delete an event attribute field definition by ID, scoped to the current tenant.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the event attribute to delete; must belong to the current tenant
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('event_attribute', 'delete')")
     @Operation(summary = "Delete Event Attribute", description = "Permanently delete an event attribute field definition by ID (tenant-scoped). " +
@@ -109,10 +109,10 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * Update an event attribute.
+     * Modify an existing event attribute field definition, scoped to the current tenant.
      *
-     * @param entityVO {@link EventAttributeVO}
-     * @return R of String
+     * @param entityVO event attribute payload carrying the updated fields; ownership is verified before applying
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('event_attribute', 'update')")
     @Operation(summary = "Update Event Attribute", description = "Modify an existing event attribute field definition on its profile template. " +
@@ -129,10 +129,10 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * Query an event attribute by ID.
+     * Fetch one event attribute field definition by ID, scoped to the current tenant.
      *
-     * @param id ID
-     * @return EventAttributeVO {@link EventAttributeVO}
+     * @param id id of the event attribute to fetch; must belong to the current tenant
+     * @return the matched EventAttributeVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('event_attribute', 'get')")
     @Operation(summary = "Get Event Attribute by ID", description = "Fetch one event attribute field definition by ID (tenant-scoped). " +
@@ -147,10 +147,10 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * Query event attributes by driver ID.
+     * Return every event attribute field definition reachable through a given driver, scoped to the current tenant.
      *
-     * @param driverId Driver ID
-     * @return event attributes
+     * @param driverId id of the driver whose reachable event attribute fields are listed; must belong to the current tenant
+     * @return a list of EventAttributeVO exposed by the driver; empty when the driver is not found
      */
     @PreAuthorize("@perm.can('event_attribute', 'list')")
     @Operation(summary = "List Event Attributes by Driver ID", description = "Return every event attribute field definition reachable through a given driver (tenant-scoped). " +
@@ -170,10 +170,10 @@ public class EventAttributeController implements BaseController {
     }
 
     /**
-     * Query event attributes with pagination.
+     * Page through event attribute field definitions for the current tenant with query filters.
      *
-     * @param entityQuery Dto
-     * @return page of event attributes
+     * @param entityQuery optional query filters; null treated as empty
+     * @return a page of EventAttributeVO matching the query
      */
     @PreAuthorize("@perm.can('event_attribute', 'list')")
     @Operation(summary = "List Event Attributes", description = "Page through event attribute field definitions for the current tenant with filters from the query body. " +

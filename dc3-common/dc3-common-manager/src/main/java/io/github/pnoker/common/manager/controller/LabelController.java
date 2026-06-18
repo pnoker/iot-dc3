@@ -66,8 +66,10 @@ public class LabelController implements BaseController {
     private final LabelService labelService;
 
     /**
-     * @param entityVO {@link LabelVO}
-     * @return R of String
+     * Create a label for the current tenant.
+     *
+     * @param entityVO label payload to create (name, color, entity type)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('label', 'add')")
     @Operation(summary = "Add Label", description = "Create a label for the current tenant. A label is a tag used to filter and organize devices, drivers, points and other entities; returns a success result.")
@@ -82,8 +84,10 @@ public class LabelController implements BaseController {
     }
 
     /**
-     * @param id ID
-     * @return R of String
+     * Delete a label by ID.
+     *
+     * @param id id of the label to delete (must be tenant-owned)
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('label', 'delete')")
     @Operation(summary = "Delete Label", description = "Permanently delete a label by ID (tenant-scoped). The label is removed from the tenant; entities previously tagged with it are unaffected but lose the tag association. This action cannot be undone.")
@@ -97,8 +101,10 @@ public class LabelController implements BaseController {
     }
 
     /**
-     * @param entityVO {@link LabelVO}
-     * @return R of String
+     * Update an existing label's fields.
+     *
+     * @param entityVO label payload to update (must carry an existing id)
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('label', 'update')")
     @Operation(summary = "Update Label", description = "Update an existing label's fields for the current tenant. Ownership is verified before applying the change; returns a success result.")
@@ -114,8 +120,10 @@ public class LabelController implements BaseController {
     }
 
     /**
-     * @param id ID
-     * @return LabelVO {@link LabelVO}
+     * Fetch a single label by ID.
+     *
+     * @param id id of the label to fetch (must be tenant-owned)
+     * @return the matched LabelVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('label', 'get')")
     @Operation(summary = "Get Label by ID", description = "Fetch one label by ID (tenant-scoped). Use to inspect a label's name and color before applying it to or filtering entities.")
@@ -129,8 +137,10 @@ public class LabelController implements BaseController {
     }
 
     /**
-     * @param entityQuery {@link LabelQuery}
-     * @return R Of LabelVO Page
+     * Page through labels with filters.
+     *
+     * @param entityQuery query filters (may be null)
+     * @return a page of LabelVO matching the query
      */
     @PreAuthorize("@perm.can('label', 'list')")
     @Operation(summary = "List Labels", description = "Page through labels for the current tenant with filters from the query body. Returns a page of labels; use to browse available tags or pick one to apply to an entity.")

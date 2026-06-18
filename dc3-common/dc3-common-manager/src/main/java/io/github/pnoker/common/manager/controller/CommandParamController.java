@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * REST controller exposing command param management endpoints.
+ * Manages input and output parameter definitions declared on downward device commands.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -69,6 +69,12 @@ public class CommandParamController implements BaseController {
 
     private final CommandService commandService;
 
+    /**
+     * Define a new input or output parameter on a command for the current tenant.
+     *
+     * @param entityVO command parameter payload to create (name, code, direction, type, default value)
+     * @return add-success status
+     */
     @PreAuthorize("@perm.can('command_param', 'add')")
     @Operation(summary = "Add Command Parameter", description = "Define a new input or output parameter on a command for the current tenant. " +
             "A command parameter declares the name, code, direction, type and default value that a downward device command accepts or returns; returns the new parameter ID.")
@@ -82,6 +88,12 @@ public class CommandParamController implements BaseController {
         }));
     }
 
+    /**
+     * Permanently delete a command parameter by ID, scoped to the current tenant.
+     *
+     * @param id id of the command parameter to delete; must belong to the current tenant
+     * @return delete-success status
+     */
     @PreAuthorize("@perm.can('command_param', 'delete')")
     @Operation(summary = "Delete Command Parameter", description = "Permanently delete a command parameter by ID (tenant-scoped). " +
             "Removes the parameter definition from its parent command; the action cannot be undone.")
@@ -94,6 +106,12 @@ public class CommandParamController implements BaseController {
         }));
     }
 
+    /**
+     * Modify an existing command parameter's name, code, direction, type, required flag or default value, scoped to the current tenant.
+     *
+     * @param entityVO command parameter payload carrying the updated fields; ownership is verified before applying
+     * @return update-success status
+     */
     @PreAuthorize("@perm.can('command_param', 'update')")
     @Operation(summary = "Update Command Parameter", description = "Modify an existing command parameter's name, code, direction, type, required flag or default value. " +
             "Verifies ownership against the current tenant before applying the change.")
@@ -108,6 +126,12 @@ public class CommandParamController implements BaseController {
         }));
     }
 
+    /**
+     * Fetch one command parameter with its direction, type, required flag and default value, scoped to the current tenant.
+     *
+     * @param id id of the command parameter to fetch; must belong to the current tenant
+     * @return the matched CommandParamVO; fails if not found or not tenant-owned
+     */
     @PreAuthorize("@perm.can('command_param', 'get')")
     @Operation(summary = "Get Command Parameter by ID", description = "Fetch one command parameter with its direction, type, required flag and default value. " +
             "Use to inspect what an input or output parameter of a downward device command looks like before issuing or interpreting the command.")
@@ -120,6 +144,12 @@ public class CommandParamController implements BaseController {
         }));
     }
 
+    /**
+     * Return every parameter declared on a given command, scoped to the current tenant.
+     *
+     * @param commandId id of the command whose parameters are listed; must belong to the current tenant
+     * @return a list of CommandParamVO declared on the command
+     */
     @PreAuthorize("@perm.can('command_param', 'list')")
     @Operation(summary = "List Command Parameters by Command ID", description = "Return every parameter declared on a given command, tenant-scoped. " +
             "Use to discover the input and output parameters a downward device command accepts or returns when building or validating a command call.")
@@ -133,6 +163,12 @@ public class CommandParamController implements BaseController {
         }));
     }
 
+    /**
+     * Page through command parameters for the current tenant with filters such as name, code, command and enable flag.
+     *
+     * @param entityQuery optional query filters; null treated as empty
+     * @return a page of CommandParamVO matching the query
+     */
     @PreAuthorize("@perm.can('command_param', 'list')")
     @Operation(summary = "List Command Parameters", description = "Page through command parameters for the current tenant with filters such as name, code, command and enable flag. " +
             "Returns a page of command parameters; use for browsing or auditing parameter definitions across commands.")

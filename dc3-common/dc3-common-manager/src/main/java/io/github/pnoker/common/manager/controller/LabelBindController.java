@@ -75,8 +75,10 @@ public class LabelBindController implements BaseController {
     private final EntityTenantService entityTenantService;
 
     /**
-     * @param entityVO {@link LabelBindVO}
-     * @return R of String
+     * Attach a label to an entity for the current tenant.
+     *
+     * @param entityVO label binding payload to create (label id, entity id, entity type)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('label_bind', 'add')")
     @Operation(summary = "Add Label Binding", description = "Attach a label to an entity (device, driver, etc.) for the current tenant. The label and target entity must share the same entity type and belong to the tenant; returns the add result.")
@@ -92,8 +94,10 @@ public class LabelBindController implements BaseController {
     }
 
     /**
-     * @param id ID
-     * @return R of String
+     * Remove a label binding by ID.
+     *
+     * @param id id of the label binding to delete (must be tenant-owned)
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('label_bind', 'delete')")
     @Operation(summary = "Delete Label Binding", description = "Remove a label binding by ID (tenant-scoped). Deletes only the association, leaving the label and the bound entity intact.")
@@ -107,8 +111,10 @@ public class LabelBindController implements BaseController {
     }
 
     /**
-     * @param entityVO {@link LabelBindVO}
-     * @return R of String
+     * Modify an existing label binding (re-point it to another label or entity).
+     *
+     * @param entityVO label binding payload to update (must carry an existing id)
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('label_bind', 'update')")
     @Operation(summary = "Update Label Binding", description = "Modify an existing label binding for the current tenant, such as re-pointing it to another label or entity. The new label and entity must match the binding's entity type and tenant scope.")
@@ -125,8 +131,10 @@ public class LabelBindController implements BaseController {
     }
 
     /**
-     * @param id ID
-     * @return LabelBindVO {@link LabelBindVO}
+     * Fetch a single label binding by ID.
+     *
+     * @param id id of the label binding to fetch (must be tenant-owned)
+     * @return the matched LabelBindVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('label_bind', 'get')")
     @Operation(summary = "Get Label Binding by ID", description = "Fetch one label binding by ID (tenant-scoped). Use to inspect which label is attached to which entity and its entity type.")
@@ -140,8 +148,10 @@ public class LabelBindController implements BaseController {
     }
 
     /**
-     * @param entityQuery {@link LabelBindQuery}
-     * @return R Of LabelBindVO Page
+     * Page through label bindings with filters.
+     *
+     * @param entityQuery query filters (may be null)
+     * @return a page of LabelBindVO matching the query
      */
     @PreAuthorize("@perm.can('label_bind', 'list')")
     @Operation(summary = "List Label Bindings", description = "Page through label bindings for the current tenant with filters from the query body. Returns a page of bindings; use to discover which entities carry a given label.")

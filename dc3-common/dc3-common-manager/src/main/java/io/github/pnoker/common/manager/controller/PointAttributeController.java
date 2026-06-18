@@ -72,10 +72,10 @@ public class PointAttributeController implements BaseController {
     private final DriverService driverService;
 
     /**
-     * Create a point attribute.
+     * Declare a new point attribute field for the current tenant on a given driver.
      *
-     * @param entityVO {@link PointAttributeVO}
-     * @return R of String
+     * @param entityVO point attribute payload to create (name, code, type, default value)
+     * @return add-success status
      */
     @PreAuthorize("@perm.can('point_attribute', 'add')")
     @Operation(summary = "Add Point Attribute", description = "Declare a new point attribute field for the current tenant on a given driver. A point attribute is a configurable field definition that tells the driver how to read or write a point's value; returns the new attribute ID.")
@@ -90,10 +90,10 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * Delete a point attribute by ID.
+     * Delete a point attribute field definition by ID.
      *
-     * @param id ID
-     * @return R of String
+     * @param id id of the point attribute to delete (must be tenant-owned)
+     * @return delete-success status
      */
     @PreAuthorize("@perm.can('point_attribute', 'delete')")
     @Operation(summary = "Delete Point Attribute", description = "Permanently delete a point attribute field definition by ID (tenant-scoped). Removes the attribute from its driver; the action cannot be undone.")
@@ -107,10 +107,10 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * Update a point attribute.
+     * Update an existing point attribute field definition.
      *
-     * @param entityVO {@link PointAttributeVO}
-     * @return R of String
+     * @param entityVO point attribute payload to update (must carry an existing id)
+     * @return update-success status
      */
     @PreAuthorize("@perm.can('point_attribute', 'update')")
     @Operation(summary = "Update Point Attribute", description = "Modify an existing point attribute field definition by ID (tenant-scoped). Use to change a driver-level field's name, code, type, default value or enable flag; ownership is verified before saving.")
@@ -126,10 +126,10 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * Query a point attribute by ID.
+     * Fetch a single point attribute field definition by ID.
      *
-     * @param id ID
-     * @return PointAttributeVO {@link PointAttributeVO}
+     * @param id id of the point attribute to fetch (must be tenant-owned)
+     * @return the matched PointAttributeVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('point_attribute', 'get')")
     @Operation(summary = "Get Point Attribute by ID", description = "Fetch one point attribute field definition by ID (tenant-scoped). Use to inspect a driver-level field such as its name, code, type, default value and enable flag before editing it.")
@@ -143,10 +143,10 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * Query point attributes by driver ID.
+     * List every point attribute field definition owned by a given driver.
      *
-     * @param id ID
-     * @return Array
+     * @param driverId id of the driver whose point attribute definitions are returned (must be tenant-owned)
+     * @return a list of PointAttributeVO for the driver; an empty list when the driver is not found
      */
     @PreAuthorize("@perm.can('point_attribute', 'list')")
     @Operation(summary = "List Point Attributes by Driver ID", description = "Return every point attribute field definition owned by a given driver (tenant-scoped). Use to discover which configurable fields a driver exposes for reading or writing point values; returns an empty list when the driver is not found.")
@@ -165,10 +165,10 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * Query point attributes with pagination.
+     * Page through point attribute field definitions with filters.
      *
-     * @param entityQuery
-     * @return page of point attributes
+     * @param entityQuery query filters such as name, driver and enable flag (may be null)
+     * @return a page of PointAttributeVO matching the query
      */
     @PreAuthorize("@perm.can('point_attribute', 'list')")
     @Operation(summary = "List Point Attributes", description = "Page through point attribute field definitions for the current tenant with filters such as attribute name, driver and enable flag. Returns a page of point attributes; use for browsing or selecting a target attribute.")
