@@ -1977,6 +1977,32 @@ exports[`API wrapper contracts > group > updateGroup maps to its transport contr
 }
 `;
 
+exports[`API wrapper contracts > identityAudit > has every export covered by the contract matrix 1`] = `
+[
+  "listIdentityAudit",
+]
+`;
+
+exports[`API wrapper contracts > identityAudit > listIdentityAudit maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/identity_audit/list",
+    undefined,
+    {
+      "params": {
+        "action": "CREATE",
+        "limit": 20,
+        "principal_id": "principal-1",
+        "resource_id": "res-1",
+        "resource_type": "role",
+        "status": "SUCCESS",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
 exports[`API wrapper contracts > info > addCommandInfo maps to its transport contract 1`] = `
 {
   "args": [
@@ -2309,6 +2335,91 @@ exports[`API wrapper contracts > label > updateLabel maps to its transport contr
 }
 `;
 
+exports[`API wrapper contracts > localCredential > addLocalCredential maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/local_credential/add",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > localCredential > checkLoginNameAvailable maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/local_credential/check",
+    {
+      "params": {
+        "name": "login-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > localCredential > deleteLocalCredential maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/local_credential/delete",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > localCredential > has every export covered by the contract matrix 1`] = `
+[
+  "addLocalCredential",
+  "checkLoginNameAvailable",
+  "deleteLocalCredential",
+  "listLocalCredential",
+  "resetLocalCredentialPassword",
+]
+`;
+
+exports[`API wrapper contracts > localCredential > listLocalCredential maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/local_credential/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > localCredential > resetLocalCredentialPassword maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/local_credential/reset_password",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+        "password": "secret-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
 exports[`API wrapper contracts > mcp > addMcpConnection maps to its transport contract 1`] = `
 {
   "args": [
@@ -2336,6 +2447,7 @@ exports[`API wrapper contracts > mcp > has every export covered by the contract 
 [
   "addMcpConnection",
   "getMcpMetadata",
+  "listMcpAudit",
   "listMcpClient",
   "listMcpConnection",
   "listMcpConnectionTool",
@@ -2345,6 +2457,25 @@ exports[`API wrapper contracts > mcp > has every export covered by the contract 
   "replaceMcpConnectionTools",
   "revokeMcpConnection",
 ]
+`;
+
+exports[`API wrapper contracts > mcp > listMcpAudit maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/mcp/audit/list",
+    undefined,
+    {
+      "params": {
+        "limit": 20,
+        "principal_id": "principal-1",
+        "risk_level": "LOW",
+        "status": "ACTIVE",
+        "tool_id": "tool-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
 `;
 
 exports[`API wrapper contracts > mcp > listMcpClient maps to its transport contract 1`] = `
@@ -2762,6 +2893,75 @@ exports[`API wrapper contracts > point > writePointValue maps to its transport c
       "enableFlag": "ENABLE",
       "id": "payload-1",
       "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > principal > disablePrincipal maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/principal/disable",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > principal > enablePrincipal maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/principal/enable",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > principal > getPrincipalById maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/principal/get_by_id",
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > principal > has every export covered by the contract matrix 1`] = `
+[
+  "disablePrincipal",
+  "enablePrincipal",
+  "getPrincipalById",
+  "listPrincipal",
+]
+`;
+
+exports[`API wrapper contracts > principal > listPrincipal maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/principal/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
     },
   ],
   "transport": "httpPost",
@@ -3261,6 +3461,121 @@ exports[`API wrapper contracts > roleResourceBind > listRoleResourceBind maps to
 }
 `;
 
+exports[`API wrapper contracts > serviceAccount > addServiceAccount maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/service_account/add",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > serviceAccount > deleteServiceAccount maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/service_account/delete",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > serviceAccount > disableServiceAccount maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/service_account/disable",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > serviceAccount > enableServiceAccount maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/service_account/enable",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > serviceAccount > getServiceAccountById maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/service_account/get_by_id",
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > serviceAccount > has every export covered by the contract matrix 1`] = `
+[
+  "addServiceAccount",
+  "deleteServiceAccount",
+  "disableServiceAccount",
+  "enableServiceAccount",
+  "getServiceAccountById",
+  "listServiceAccount",
+  "updateServiceAccount",
+]
+`;
+
+exports[`API wrapper contracts > serviceAccount > listServiceAccount maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/service_account/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > serviceAccount > updateServiceAccount maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/service_account/update",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
 exports[`API wrapper contracts > stats > dailyGrowth maps to its transport contract 1`] = `
 {
   "args": [
@@ -3466,6 +3781,59 @@ exports[`API wrapper contracts > system > systemHealth maps to its transport con
     "api/v3/data/dashboard/system/health",
   ],
   "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > tenantMembership > addTenantMembership maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/tenant_membership/add",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > tenantMembership > deleteTenantMembership maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/tenant_membership/delete",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > tenantMembership > has every export covered by the contract matrix 1`] = `
+[
+  "addTenantMembership",
+  "deleteTenantMembership",
+  "listTenantMembership",
+]
+`;
+
+exports[`API wrapper contracts > tenantMembership > listTenantMembership maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/tenant_membership/list",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
 }
 `;
 

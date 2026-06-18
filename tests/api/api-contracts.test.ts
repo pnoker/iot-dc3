@@ -45,6 +45,11 @@ import * as rolePrincipalBindApi from '@/api/rolePrincipalBind';
 import * as roleResourceBindApi from '@/api/roleResourceBind';
 import * as tokenApi from '@/api/token';
 import * as userApi from '@/api/user';
+import * as identityAuditApi from '@/api/identityAudit';
+import * as localCredentialApi from '@/api/localCredential';
+import * as principalApi from '@/api/principal';
+import * as serviceAccountApi from '@/api/serviceAccount';
+import * as tenantMembershipApi from '@/api/tenantMembership';
 import { AUTH_HEADERS } from '@/config/constant/common';
 import type { AgenticChatCompletionRequest } from '@/config/types';
 import { setStorage } from '@/utils/storageUtil';
@@ -110,6 +115,11 @@ const modules: Record<string, ApiModule> = {
   roleResourceBind: roleResourceBindApi,
   token: tokenApi,
   user: userApi,
+  identityAudit: identityAuditApi,
+  localCredential: localCredentialApi,
+  principal: principalApi,
+  serviceAccount: serviceAccountApi,
+  tenantMembership: tenantMembershipApi,
 };
 
 const coveredApiSourceFiles = new Set([
@@ -139,6 +149,11 @@ const coveredApiSourceFiles = new Set([
   'roleResourceBind',
   'token',
   'user',
+  'identityAudit',
+  'localCredential',
+  'principal',
+  'serviceAccount',
+  'tenantMembership',
 ]);
 
 const apiSourceFileExclusions = new Set(['common', 'dashboard/index']);
@@ -176,6 +191,7 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   listPointValueHistory: ['1001', '2002', 30],
   listRoleByPrincipalId: ['principal-1'],
   replaceMcpConnectionTools: ['connection-1', ['tool-1', 'tool-2']],
+  listMcpAudit: [{ principalId: 'principal-1', toolId: 'tool-1', status: 'ACTIVE', riskLevel: 'LOW', limit: 20 }],
   listMcpConnectionTool: ['connection-1'],
   registerMcpClient: [payload],
   revokeMcpConnection: ['connection-1'],
@@ -185,6 +201,23 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   listEventInfoByDeviceIdAndEventId: ['device-1', 'event-1'],
   getCommandHistoryByRecordId: ['record-1'],
   getEventHistoryByRecordId: ['record-1'],
+  // Auth wrappers whose enable/disable/reset/check verbs don't match the heuristic.
+  listIdentityAudit: [
+    {
+      principalId: 'principal-1',
+      action: 'CREATE',
+      resourceType: 'role',
+      resourceId: 'res-1',
+      status: 'SUCCESS',
+      limit: 20,
+    },
+  ],
+  resetLocalCredentialPassword: ['id-1', 'secret-1'],
+  checkLoginNameAvailable: ['login-1'],
+  enablePrincipal: ['id-1'],
+  disablePrincipal: ['id-1'],
+  enableServiceAccount: ['id-1'],
+  disableServiceAccount: ['id-1'],
   // Page-query callers whose names don't match the heuristic prefixes.
   getAgenticSessions: [pageQuery],
   alertPage: [pageQuery],
