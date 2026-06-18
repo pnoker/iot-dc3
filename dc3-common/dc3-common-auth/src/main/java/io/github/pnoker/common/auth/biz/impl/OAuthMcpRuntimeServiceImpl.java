@@ -37,6 +37,7 @@ import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.tool.McpOpenApiAggregator;
+import io.github.pnoker.common.auth.tool.ToolQuality;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
@@ -405,15 +406,11 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     @Transactional(rollbackFor = Exception.class)
     public int refreshToolCatalog() {
         int changed = 0;
-        // Enrich each tool with a real input schema derived from the static OpenAPI specs
-        // shipped on the classpath (openapi/openapi-*.json). Empty when no spec is present,
-        // in which case tools keep their name/title without a parameter schema.
-        Map<String, String> schemas = openApiAggregator.inputSchemasByApiCode();
+        // OpenAPI JSON is the single source of tool quality (description, x-dc3-ai flags, inputSchema).
+        // dc3_api/dc3_resource still drive the tool set + permission code; we join by api_code.
+        Map<String, ToolQuality> quality = openApiAggregator.toolQualityByApiCode();
         for (McpToolRecord candidate : oauthMcpMapper.listRegistryToolCandidates()) {
-            String schema = schemas.get(candidate.getApiCode());
-            if (schema != null) {
-                candidate.setToolExt("{\"inputSchema\":" + schema + "}");
-            }
+            applyQuality(candidate, quality.get(candidate.getApiCode()));
             McpToolRecord existing = oauthMcpMapper.selectToolByToolId(candidate.getToolId());
             if (existing == null) {
                 candidate.setId(IdWorker.getId());
@@ -421,12 +418,63 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             } else if (!Objects.equals(existing.getSchemaHash(), candidate.getSchemaHash())
                     || !Objects.equals(existing.getPermissionCode(), candidate.getPermissionCode())
                     || !Objects.equals(existing.getApiPath(), candidate.getApiPath())
+                    || !Objects.equals(existing.getRiskLevel(), candidate.getRiskLevel())
+                    || !Objects.equals(existing.getEnableFlag(), candidate.getEnableFlag())
                     || !Objects.equals(existing.getToolExt(), candidate.getToolExt())) {
                 candidate.setId(existing.getId());
                 changed += oauthMcpMapper.updateTool(candidate);
             }
         }
         return changed;
+    }
+
+    /**
+     * Fill one catalog record's quality fields from the OpenAPI-sourced {@link ToolQuality}, applying
+     * conservative defaults when a field (or the whole quality) is undeclared. {@code readOnly} is
+     * always derived from the HTTP method; {@code hidden} disables the row via enable_flag.
+     */
+    static void applyQuality(McpToolRecord record, ToolQuality quality) {
+        String method = StringUtils.upperCase(StringUtils.trimToEmpty(record.getHttpMethod()));
+        record.setReadOnlyHint(toByte("GET".equals(method)));
+
+        if (quality == null) {
+            record.setRiskLevel("HIGH");
+            record.setDestructiveHint(toByte(true));
+            record.setIdempotentHint(toByte(false));
+            record.setOpenWorldHint(toByte(true));
+            record.setEnableFlag((byte) 0);
+            return;
+        }
+        record.setRiskLevel(normalizeRisk(quality.getRiskLevel()));
+        record.setDestructiveHint(toByte(defaultBool(quality.getDestructive(), true)));
+        record.setIdempotentHint(toByte(defaultBool(quality.getIdempotent(), false)));
+        record.setOpenWorldHint(toByte(defaultBool(quality.getOpenWorld(), true)));
+        if (StringUtils.isNotBlank(quality.getSummary())) {
+            record.setToolTitle(quality.getSummary());
+        }
+        if (StringUtils.isNotBlank(quality.getDescription())) {
+            record.setRemark(quality.getDescription());
+        }
+        if (StringUtils.isNotBlank(quality.getInputSchema())) {
+            record.setToolExt("{\"inputSchema\":" + quality.getInputSchema() + "}");
+        }
+        record.setEnableFlag(Boolean.TRUE.equals(quality.getHidden()) ? (byte) 1 : (byte) 0);
+    }
+
+    private static String normalizeRisk(String declared) {
+        String value = StringUtils.upperCase(StringUtils.trimToEmpty(declared));
+        return switch (value) {
+            case "HIGH", "MEDIUM", "LOW" -> value;
+            default -> "HIGH"; // conservative default for blank/illegal
+        };
+    }
+
+    private static boolean defaultBool(Boolean declared, boolean fallback) {
+        return declared != null ? declared : fallback;
+    }
+
+    private static byte toByte(boolean flag) {
+        return flag ? (byte) 1 : (byte) 0;
     }
 
     @Override
