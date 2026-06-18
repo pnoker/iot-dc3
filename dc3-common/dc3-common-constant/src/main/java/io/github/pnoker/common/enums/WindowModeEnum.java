@@ -105,6 +105,22 @@ public enum WindowModeEnum {
     }
 
     /**
+     * Maps this mode to a {@link WindowAggregateFunction} suitable for
+     * repository-level SQL aggregation. Modes that do not reduce to a scalar
+     * (LAST, ALL, ANY) return {@code null}.
+     */
+    public WindowAggregateFunction toAggregateFunction() {
+        return switch (this) {
+            case AVG -> WindowAggregateFunction.AVG;
+            case MIN -> WindowAggregateFunction.MIN;
+            case MAX -> WindowAggregateFunction.MAX;
+            case SUM -> WindowAggregateFunction.SUM;
+            case COUNT -> WindowAggregateFunction.COUNT;
+            default -> null;
+        };
+    }
+
+    /**
      * Whether the mode requires a non-null window duration. Only LAST is
      * exempt; everything else needs a defined window to bound its scope.
      */
