@@ -24,6 +24,8 @@ import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
@@ -34,8 +36,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -62,7 +62,7 @@ public class OAuthController {
      *
      * @return the authorization server metadata (issuer, token and registration endpoints)
      */
-    @Operation(summary ="Get Authorization Server Metadata", description = "Publish the OAuth 2.1 authorization server metadata at the well-known discovery endpoint so MCP clients can resolve issuer, token and registration URLs.")
+    @Operation(summary = "Get Authorization Server Metadata", description = "Publish the OAuth 2.1 authorization server metadata at the well-known discovery endpoint so MCP clients can resolve issuer, token and registration URLs.")
     @GetMapping(McpConstant.WELL_KNOWN_AUTHORIZATION_SERVER)
     public Mono<Map<String, Object>> authorizationServerMetadata() {
         return Mono.fromSupplier(oauthMcpRuntimeService::authorizationServerMetadata);
@@ -73,7 +73,7 @@ public class OAuthController {
      *
      * @return the JWKS as a map of key descriptors
      */
-    @Operation(summary ="Get JWKS", description = "Publish the JSON Web Key Set (JWKS) so MCP clients and resource servers can verify signatures on issued access and ID tokens.")
+    @Operation(summary = "Get JWKS", description = "Publish the JSON Web Key Set (JWKS) so MCP clients and resource servers can verify signatures on issued access and ID tokens.")
     @GetMapping(McpConstant.OAUTH2_JWKS)
     public Mono<Map<String, Object>> jwks() {
         return Mono.fromSupplier(oauthMcpRuntimeService::jwks);
@@ -86,7 +86,7 @@ public class OAuthController {
      * @param principalJson optional serialized principal header that scopes ownership of the new client
      * @return a 201 response carrying the new client id and one-time secret; OAuth protocol errors map to the spec status
      */
-    @Operation(summary ="Register OAuth Client", description = "Dynamically register an OAuth client for MCP access from a JSON request body, optionally scoped by the X-Auth-Principal header; returns the client id and a one-time secret.")
+    @Operation(summary = "Register OAuth Client", description = "Dynamically register an OAuth client for MCP access from a JSON request body, optionally scoped by the X-Auth-Principal header; returns the client id and a one-time secret.")
     @PostMapping(value = McpConstant.OAUTH2_REGISTER, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<?>> register(
             @RequestBody OAuthClientRegistrationRequestDTO request,
@@ -104,7 +104,7 @@ public class OAuthController {
      * @param principalJson optional serialized principal header identifying the consenting user
      * @return a 302 redirect to the consent or callback location; OAuth protocol errors map to the spec status
      */
-    @Operation(summary ="Authorize", description = "OAuth 2.1 authorization endpoint: validate the authorization request (including PKCE) and redirect the user agent to the consent flow or callback location.")
+    @Operation(summary = "Authorize", description = "OAuth 2.1 authorization endpoint: validate the authorization request (including PKCE) and redirect the user agent to the consent flow or callback location.")
     @GetMapping(McpConstant.OAUTH2_AUTHORIZE)
     public Mono<ResponseEntity<Map<String, Object>>> authorize(
             @Parameter(description = "OAuth 2.1 authorization request parameters. Required fields: client_id, redirect_uri, response_type (must be 'code'), scope, and code_challenge / code_challenge_method (PKCE). Optional: state (recommended for CSRF protection).", example = "client_id=my-client&response_type=code&redirect_uri=https%3A%2F%2Fapp.example.com%2Fcallback&scope=openid&state=xyz&code_challenge=abc123&code_challenge_method=S256") @RequestParam MultiValueMap<String, String> params,
@@ -119,11 +119,11 @@ public class OAuthController {
     /**
      * Exchange an authorization code (or supported grant) for access and refresh tokens.
      *
-     * @param body               form-encoded token request parameters (grant_type, code, redirect_uri, code_verifier, etc.)
+     * @param body                form-encoded token request parameters (grant_type, code, redirect_uri, code_verifier, etc.)
      * @param authorizationHeader optional HTTP Basic client credentials
      * @return a 200 response carrying the token JSON; OAuth protocol errors map to the spec status
      */
-    @Operation(summary ="Issue Token", description = "OAuth 2.1 token endpoint: exchange an authorization code (or other supported grant) for access and refresh tokens using a form-encoded body, optionally authenticating the client via the Authorization header.")
+    @Operation(summary = "Issue Token", description = "OAuth 2.1 token endpoint: exchange an authorization code (or other supported grant) for access and refresh tokens using a form-encoded body, optionally authenticating the client via the Authorization header.")
     @PostMapping(value = McpConstant.OAUTH2_TOKEN, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> token(
             @RequestBody Mono<MultiValueMap<String, String>> body,
@@ -137,11 +137,11 @@ public class OAuthController {
     /**
      * Revoke a previously issued access or refresh token.
      *
-     * @param body               form-encoded revocation parameters (token and token_type_hint)
+     * @param body                form-encoded revocation parameters (token and token_type_hint)
      * @param authorizationHeader optional HTTP Basic client credentials
      * @return a 200 response confirming the revocation; OAuth protocol errors map to the spec status
      */
-    @Operation(summary ="Revoke Token", description = "OAuth 2.1 revocation endpoint: invalidate a previously issued access or refresh token from a form-encoded body, optionally authenticating the client via the Authorization header.")
+    @Operation(summary = "Revoke Token", description = "OAuth 2.1 revocation endpoint: invalidate a previously issued access or refresh token from a form-encoded body, optionally authenticating the client via the Authorization header.")
     @PostMapping(value = McpConstant.OAUTH2_REVOKE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> revoke(
             @RequestBody Mono<MultiValueMap<String, String>> body,
