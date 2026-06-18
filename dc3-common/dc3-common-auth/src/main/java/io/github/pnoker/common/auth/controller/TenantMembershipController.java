@@ -55,7 +55,7 @@ import java.util.Objects;
  * @version 2026.6.13
  * @since 2026.6.13
  */
-@Tag(name = "tenant_membership", description = "Tenant memberships")
+@Tag(name = "tenant_membership", description = "Tenant membership bindings: associate users, service accounts, and roles with tenants for access control within tenant scope")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.TENANT_MEMBERSHIP_URL_PREFIX)
@@ -69,7 +69,8 @@ public class TenantMembershipController implements BaseController {
     private final AuditLogService auditLogService;
 
     @PreAuthorize("@perm.can('tenant_membership', 'list')")
-    @Operation(summary = "List Tenant Memberships", description = "List memberships for the caller's tenant")
+    @Operation(summary = "List Tenant Memberships", description = "Page through the memberships of the caller's tenant, optionally filtered by query. " +
+            "Each row links a principal (user or service account) to the tenant; use to see who belongs to it.")
     @PostMapping("/list")
     public Mono<R<Page<TenantMembershipVO>>> list(@RequestBody(required = false) TenantMembershipQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -80,7 +81,8 @@ public class TenantMembershipController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('tenant_membership', 'add')")
-    @Operation(summary = "Add Tenant Membership", description = "Add a principal to the caller's tenant")
+    @Operation(summary = "Add Tenant Membership", description = "Attach a principal (user or service account) to the caller's tenant. " +
+            "The body tenant id is ignored and the membership is pinned to the caller; defaults to ACTIVE status and records an audit entry.")
     @PostMapping("/add")
     public Mono<R<String>> add(@RequestBody TenantMembershipVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -103,9 +105,10 @@ public class TenantMembershipController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('tenant_membership', 'delete')")
-    @Operation(summary = "Delete Tenant Membership", description = "Remove a principal from a tenant")
+    @Operation(summary = "Delete Tenant Membership", description = "Remove a membership record by ID, verifying it belongs to the caller's tenant first. " +
+            "Returns 404 if the membership is owned by another tenant; logs a DELETE audit entry on success.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             // Verify the membership belongs to the caller's tenant before deleting.
             Long tenantId = header.getTenantId();

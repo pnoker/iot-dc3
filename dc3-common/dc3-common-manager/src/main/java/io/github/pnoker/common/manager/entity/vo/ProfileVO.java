@@ -54,7 +54,7 @@ public class ProfileVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "Profile name can't be empty", groups = {Add.class})
-    @Schema(description = "profile name")
+    @Schema(description = "Profile name. Unique name within a tenant.", example = "Modbus PLC Template", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid profile name format",
             groups = {Add.class, Update.class})
     private String profileName;
@@ -62,43 +62,43 @@ public class ProfileVO extends BaseVO {
     /**
      * Code
      */
-    @Schema(description = "profile code")
+    @Schema(description = "Profile code. Stable business identifier; must not change once deployed.", example = "PLC_TEMPLATE_V1")
     private String profileCode;
 
     /**
      * Type
      */
-    @Schema(description = "Profile share flag enum")
+    @Schema(description = "Share flag: PRIVATE (tenant only) or PUBLIC (shared across tenants).", example = "PRIVATE")
     private ProfileShareTypeEnum profileShareFlag;
 
     /**
      * Type
      */
-    @Schema(description = "Profile type enum")
+    @Schema(description = "Profile type: DEVICE or DRIVER.", example = "DEVICE")
     private ProfileTypeEnum profileTypeFlag;
 
     /**
      *
      */
-    @Schema(description = "profile extension information in JSON format")
+    @Schema(description = "Profile extension information, serialized as JSON for custom configuration metadata.")
     private ProfileExt profileExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "Configuration signature")
+    @Schema(description = "Signature used for configuration integrity verification.")
     private String signature;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 
 }

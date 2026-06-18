@@ -55,7 +55,7 @@ public class PointCommandHistoryVO implements Serializable {
 
     private Long id;
 
-    @Schema(description = "command ID")
+    @Schema(description = "ID of the command definition invoked.", example = "4096")
 
     private String commandId;
 
@@ -67,30 +67,30 @@ public class PointCommandHistoryVO implements Serializable {
 
     private PointCommandTypeEnum type;
 
-    @Schema(description = "device ID")
+    @Schema(description = "ID of the device the point command was sent to.", example = "1024")
 
     private Long deviceId;
 
-    @Schema(description = "point ID")
+    @Schema(description = "ID of the target data point.", example = "2048")
 
     private Long pointId;
 
-    @Schema(description = "request value")
+    @Schema(description = "Command value sent to the data point.")
 
     private String requestValue;
 
-    @Schema(description = "response value")
+    @Schema(description = "Response value received from the data point after command execution.")
 
     private String responseValue;
 
     @Schema(description = "Command status", example = "SUCCESS")
     private PointCommandStatusEnum status;
 
-    @Schema(description = "error code")
+    @Schema(description = "Error code if the point command execution failed. Null on success.", example = "ERR_TIMEOUT")
 
     private String errorCode;
 
-    @Schema(description = "error message")
+    @Schema(description = "Human-readable error message if the point command execution failed. Null on success.")
 
     private String errorMessage;
 
@@ -98,23 +98,23 @@ public class PointCommandHistoryVO implements Serializable {
 
     private PointCommandSourceEnum source;
 
-    @Schema(description = "source user ID")
+    @Schema(description = "ID of the user who issued this point command.")
 
     private Long sourceUserId;
 
-    @Schema(description = "occur time")
+    @Schema(description = "Timestamp when the point command was issued.")
 
     private LocalDateTime occurTime;
 
-    @Schema(description = "send time")
+    @Schema(description = "Timestamp when the point command was dispatched.")
 
     private LocalDateTime sendTime;
 
-    @Schema(description = "finish time")
+    @Schema(description = "Timestamp when the point command execution completed.")
 
     private LocalDateTime finishTime;
 
-    @Schema(description = "expire time")
+    @Schema(description = "Timestamp when the point command expires without a response.")
 
     private LocalDateTime expireTime;
 

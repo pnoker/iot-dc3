@@ -58,7 +58,7 @@ import java.util.Objects;
  * @version 2026.6.12
  * @since 2026.6.12
  */
-@Tag(name = "service_account", description = "Service accounts")
+@Tag(name = "service_account", description = "Service account lifecycle: manage machine-to-machine identities including creation, update, credential rotation, and enablement")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.SERVICE_ACCOUNT_URL_PREFIX)
@@ -74,7 +74,8 @@ public class ServiceAccountController implements BaseController {
     private final TenantMembershipService tenantMembershipService;
 
     @PreAuthorize("@perm.can('service_account', 'add')")
-    @Operation(summary = "Add Service Account", description = "Create a service account principal")
+    @Operation(summary = "Add Service Account", description = "Create a non-human service account principal under the current tenant for API/MCP access. "
+            + "The named owner principal must already be a tenant member; returns the create result.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ServiceAccountVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -88,9 +89,10 @@ public class ServiceAccountController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('service_account', 'delete')")
-    @Operation(summary = "Delete Service Account", description = "Delete a service account by ID")
+    @Operation(summary = "Delete Service Account", description = "Delete a service account by ID, scoped to the current tenant. "
+            + "Removes the machine principal so its credentials can no longer authenticate; returns the delete result.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             ServiceAccountBO entityBO = requireTenant(tenantId, serviceAccountService.getById(id));
             serviceAccountService.delete(entityBO.getId());
@@ -99,7 +101,8 @@ public class ServiceAccountController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('service_account', 'update')")
-    @Operation(summary = "Update Service Account", description = "Update a service account")
+    @Operation(summary = "Update Service Account", description = "Update a tenant-scoped service account's name, purpose, expiry, owner or credential policy. "
+            + "Tenant and ID are taken from the existing record; any new owner principal must be a tenant member.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ServiceAccountVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -118,16 +121,18 @@ public class ServiceAccountController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('service_account', 'update')")
-    @Operation(summary = "Enable Service Account", description = "Enable a service account by ID")
+    @Operation(summary = "Enable Service Account", description = "Set a service account's enable flag to ENABLE so its credentials can authenticate again. "
+            + "Tenant-scoped and audit-logged as an ENABLE action.")
     @PostMapping("/enable")
-    public Mono<R<String>> enable(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> enable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return toggleEnableFlag(id, EnableFlagEnum.ENABLE);
     }
 
     @PreAuthorize("@perm.can('service_account', 'update')")
-    @Operation(summary = "Disable Service Account", description = "Disable a service account by ID")
+    @Operation(summary = "Disable Service Account", description = "Set a service account's enable flag to DISABLE to block its credentials from authenticating. "
+            + "Tenant-scoped and audit-logged as a DISABLE action.")
     @PostMapping("/disable")
-    public Mono<R<String>> disable(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> disable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return toggleEnableFlag(id, EnableFlagEnum.DISABLE);
     }
 
@@ -147,9 +152,10 @@ public class ServiceAccountController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('service_account', 'get')")
-    @Operation(summary = "Get Service Account by ID", description = "Get service account details by ID")
+    @Operation(summary = "Get Service Account by ID", description = "Fetch one service account by ID, scoped to the current tenant. "
+            + "Returns the principal, owner, purpose, expiry and enable flag; use to inspect an account before rotating its credentials.")
     @GetMapping("/get_by_id")
-    public Mono<R<ServiceAccountVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<ServiceAccountVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             ServiceAccountBO entityBO = requireTenant(tenantId, serviceAccountService.getById(id));
             return R.ok(serviceAccountBuilder.buildVOByBO(entityBO));
@@ -157,7 +163,8 @@ public class ServiceAccountController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('service_account', 'list')")
-    @Operation(summary = "List Service Accounts", description = "List service accounts with pagination")
+    @Operation(summary = "List Service Accounts", description = "Page through service accounts for the current tenant with the supplied query filters. "
+            + "Returns a page of service accounts; use to browse machine principals or select a target account.")
     @PostMapping("/list")
     public Mono<R<Page<ServiceAccountVO>>> list(@RequestBody(required = false) ServiceAccountQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

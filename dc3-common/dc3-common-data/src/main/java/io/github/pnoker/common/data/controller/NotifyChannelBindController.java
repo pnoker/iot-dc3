@@ -54,7 +54,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "notify_channel_bind", description = "Notification channel bindings")
+@Tag(name = "notify_channel_bind", description = "Notification-to-channel bindings: route specific notification rules to delivery channels for targeted alert distribution")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.NOTIFY_CHANNEL_BIND_URL_PREFIX)
@@ -66,7 +66,7 @@ public class NotifyChannelBindController implements BaseController {
     private final NotifyChannelBindService notifyChannelBindService;
 
     @PreAuthorize("@perm.can('notify_channel_bind', 'add')")
-    @Operation(summary = "Add Notification Channel Binding", description = "Create a notification channel binding record")
+    @Operation(summary = "Add Notification Channel Binding", description = "Bind a delivery channel to a notification rule for the current tenant, so alerts from that rule route through the channel. Returns the new binding's ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyChannelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -78,9 +78,9 @@ public class NotifyChannelBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel_bind', 'delete')")
-    @Operation(summary = "Delete Notification Channel Binding", description = "Delete a notification channel binding record by ID")
+    @Operation(summary = "Delete Notification Channel Binding", description = "Delete a notification-to-channel binding by ID, scoped to the current tenant. Use to stop routing a rule's alerts through a channel; ownership is validated before deletion.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, notifyChannelBindService.getById(id));
             notifyChannelBindService.delete(id);
@@ -89,7 +89,7 @@ public class NotifyChannelBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel_bind', 'update')")
-    @Operation(summary = "Update Notification Channel Binding", description = "Update a notification channel binding record")
+    @Operation(summary = "Update Notification Channel Binding", description = "Update an existing notification-to-channel binding (rule, channel, enable flag) for the current tenant. Ownership is validated before the change is applied.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody NotifyChannelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -102,9 +102,9 @@ public class NotifyChannelBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel_bind', 'get')")
-    @Operation(summary = "Get Notification Channel Binding by ID", description = "Get notification channel binding details by ID")
+    @Operation(summary = "Get Notification Channel Binding by ID", description = "Return the full detail of a single notification-to-channel binding by ID, scoped to the current tenant. Returns the rule, channel, enable flag and extension attributes.")
     @GetMapping("/get_by_id")
-    public Mono<R<NotifyChannelBindVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<NotifyChannelBindVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyChannelBindBO entityBO = requireTenant(tenantId, notifyChannelBindService.getById(id));
             return R.ok(notifyChannelBindBuilder.buildVOByBO(entityBO));
@@ -112,7 +112,7 @@ public class NotifyChannelBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_channel_bind', 'list')")
-    @Operation(summary = "List Notification Channel Bindings", description = "List notification channel bindings with pagination")
+    @Operation(summary = "List Notification Channel Bindings", description = "Page through notification-to-channel bindings for the current tenant, filterable by notifyId, channelId and enable flag. Use to discover which delivery channels a rule fires through.")
     @PostMapping("/list")
     public Mono<R<Page<NotifyChannelBindVO>>> list(@RequestBody(required = false) NotifyChannelBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

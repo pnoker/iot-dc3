@@ -64,7 +64,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
-@Tag(name = "user", description = "Users")
+@Tag(name = "user", description = "User account lifecycle: create, update, enable, disable, and manage user identities within tenant scope")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.USER_PROFILE_URL_PREFIX)
@@ -80,7 +80,7 @@ public class UserController implements BaseController {
     private final PrincipalManager principalManager;
 
     @PreAuthorize("@perm.can('user', 'add')")
-    @Operation(summary = "Add User", description = "Create a user record")
+    @Operation(summary = "Add User", description = "Create a new user under the current tenant and enroll them as an active tenant member. A user authenticates with username and password to access the platform; returns an add-success status.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -121,9 +121,9 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'delete')")
-    @Operation(summary = "Delete User", description = "Delete a user record by ID")
+    @Operation(summary = "Delete User", description = "Remove a user and their tenant membership for the current tenant (verified by ID). Use to revoke a tenant member's access; returns a delete-success status.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserBO user = userService.getById(id);
             tenantMembershipService.requireTenantMember(tenantId, user.getPrincipalId());
@@ -138,7 +138,7 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'update')")
-    @Operation(summary = "Update User", description = "Update a user record")
+    @Operation(summary = "Update User", description = "Modify an existing user's profile (tenant-scoped, verified by ID). Use to change attributes like nickname or enable flag; returns an update-success status.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -154,9 +154,9 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'get')")
-    @Operation(summary = "Get User by ID", description = "Get user details by ID")
+    @Operation(summary = "Get User by ID", description = "Fetch one user by ID within the current tenant (ownership checked via principal). Returns the user profile; use when you already hold the numeric ID.")
     @GetMapping("/get_by_id")
-    public Mono<R<UserVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<UserVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserBO entityBO = userService.getById(id);
             tenantMembershipService.requireTenantMember(tenantId, entityBO.getPrincipalId());
@@ -166,9 +166,9 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'get')")
-    @Operation(summary = "Get User by Name", description = "Get user details by name")
+    @Operation(summary = "Get User by Name", description = "Look up one user by username within the current tenant. Returns a 404 for both not-found and wrong-tenant so name existence is not leaked; use when resolving a login name to a profile.")
     @GetMapping("/get_by_name")
-    public Mono<R<UserVO>> getByName(@Parameter(description = "Name") @NotNull @RequestParam(value = "name") String name) {
+    public Mono<R<UserVO>> getByName(@Parameter(description = "Unique name of the entity to query within the current tenant.", example = "Temperature Sensor 01") @NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             UserBO entityBO = userService.getByUserName(name, false);
             // Both "not found" and "wrong tenant" return the same 404 so the
@@ -183,7 +183,7 @@ public class UserController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('user', 'list')")
-    @Operation(summary = "List Users", description = "List users with pagination")
+    @Operation(summary = "List Users", description = "Page through users for the current tenant with filters from the query body (tenant scope is enforced server-side, not client-supplied). Returns a page of user profiles for browsing or selecting a target user.")
     @PostMapping("/list")
     public Mono<R<Page<UserVO>>> list(@RequestBody(required = false) UserQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

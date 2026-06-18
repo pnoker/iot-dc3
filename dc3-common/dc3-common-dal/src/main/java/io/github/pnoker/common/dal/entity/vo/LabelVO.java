@@ -53,7 +53,7 @@ public class LabelVO extends BaseVO {
      * Label name.
      */
     @NotBlank(message = "Label name can't be empty", groups = {Add.class})
-    @Schema(description = "label name")
+    @Schema(description = "Label name. Unique name within a tenant.", example = "Production Line A", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid label name format",
             groups = {Add.class, Update.class})
     private String labelName;
@@ -61,13 +61,13 @@ public class LabelVO extends BaseVO {
     /**
      * Label code.
      */
-    @Schema(description = "label code")
+    @Schema(description = "Label code. Stable business identifier.", example = "LINE_A")
     private String labelCode;
 
     /**
      * Label color.
      */
-    @Schema(description = "label color")
+    @Schema(description = "Display color for this label in UI (hex or named color).", example = "#FF6B6B")
     private String labelColor;
 
     /**
@@ -80,7 +80,7 @@ public class LabelVO extends BaseVO {
     /**
      * Enable status flag.
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

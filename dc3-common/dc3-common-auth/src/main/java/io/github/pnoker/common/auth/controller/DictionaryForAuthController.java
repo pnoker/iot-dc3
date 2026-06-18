@@ -43,7 +43,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "dictionary_auth", description = "Auth dictionaries")
+@Tag(name = "dictionary_auth", description = "Authorization dictionaries: manage lookup entries for identity types, permission categories, and other auth-related metadata classifications")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
@@ -60,7 +60,8 @@ public class DictionaryForAuthController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('dictionary_for_auth', 'get')")
-    @Operation(summary = "List Tenant Dictionary", description = "List tenant dictionary entries available in Auth Center")
+    @Operation(summary = "List Tenant Dictionary", description = "List tenants as dictionary options (id and display label) for Auth Center selection. " +
+            "Use to populate tenant pickers such as the membership switcher; returns the full option set without paging.")
     @GetMapping("/tenant")
     public Mono<R<List<DictionaryVO>>> tenantDictionary() {
         return async(() -> {

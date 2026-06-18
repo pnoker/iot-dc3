@@ -48,13 +48,13 @@ public class NotifyVO extends BaseVO {
     /**
      * Alarm notification template name
      */
-    @Schema(description = "notify name")
+    @Schema(description = "Notification name. Unique name within a tenant.", example = "Over Temperature Alert", requiredMode = Schema.RequiredMode.REQUIRED)
     private String notifyName;
 
     /**
      * Alarm notification template code
      */
-    @Schema(description = "notify code")
+    @Schema(description = "Notification code. Stable business identifier; must not change once deployed.", example = "OVER_TEMP")
     private String notifyCode;
 
     /**
@@ -66,19 +66,19 @@ public class NotifyVO extends BaseVO {
     /**
      * Alarm notification interval, milliseconds
      */
-    @Schema(description = "notify interval")
+    @Schema(description = "Minimum cooldown interval in seconds between successive notification deliveries. Prevents alert storms.", example = "300")
     private Long notifyInterval;
 
     /**
      * Alarm notification template configuration
      */
-    @Schema(description = "notify extension information in JSON format")
+    @Schema(description = "Notification extension information, serialized as JSON for custom delivery logic.")
     private NotifyExt notifyExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

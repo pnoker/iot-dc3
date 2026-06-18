@@ -50,7 +50,7 @@ import java.util.List;
  * @version 2026.5.10
  * @since 2026.5.10
  */
-@Tag(name = "provider", description = "Model providers")
+@Tag(name = "provider", description = "AI model provider configuration: manage provider endpoints, authentication credentials, and capability specifications for connecting to LLM services")
 @RestController
 @RequestMapping(AgenticConstant.PROVIDER_URL_PREFIX)
 @RequiredArgsConstructor
@@ -61,14 +61,15 @@ public class ProviderController implements BaseController {
     private final ModelProviderService modelProviderService;
 
     @PreAuthorize("@perm.can('provider', 'list')")
-    @Operation(summary = "List Model Providers", description = "List model providers")
+    @Operation(summary = "List Model Providers", description = "List the upstream LLM providers configured for the current tenant. Returns each provider's id, name, base URL and capability spec; use to choose a provider when creating a model configuration.")
     @GetMapping("/list")
     public Mono<R<List<ModelProviderVO>>> list() {
         return async(() -> R.ok(modelProviderBuilder.buildVOListByBOList(modelProviderService.list())));
     }
 
     @PreAuthorize("@perm.can('provider', 'add')")
-    @Operation(summary = "Add Model Provider", description = "Create a model provider record")
+    @Operation(summary = "Add Model Provider", description = "Register a new upstream LLM provider for the current tenant with its base URL, credentials and capability spec. "
+            + "Returns the created provider; reference it afterwards when defining model configurations.")
     @PostMapping("/config/add")
     public Mono<R<ModelProviderVO>> add(@Validated(Add.class) @RequestBody ModelProviderRequest request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -78,7 +79,8 @@ public class ProviderController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('provider', 'update')")
-    @Operation(summary = "Update Model Provider", description = "Update a model provider configuration")
+    @Operation(summary = "Update Model Provider", description = "Update an existing LLM provider for the current tenant, changing its base URL, credentials or capability spec. "
+            + "Returns the updated provider; the target must belong to the current tenant.")
     @PostMapping("/config/update")
     public Mono<R<ModelProviderVO>> update(@Validated(Update.class) @RequestBody ModelProviderRequest request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -88,9 +90,10 @@ public class ProviderController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('provider', 'delete')")
-    @Operation(summary = "Delete Model Provider", description = "Delete a model provider record")
+    @Operation(summary = "Delete Model Provider", description = "Permanently remove an LLM provider from the current tenant by id. "
+            + "Returns true on success; model configurations bound to this provider will no longer resolve, so call only when the provider is unused.")
     @PostMapping("/config/delete")
-    public Mono<R<Boolean>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<Boolean>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             modelProviderService.delete(id);
             return R.ok(true);

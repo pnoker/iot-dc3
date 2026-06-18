@@ -62,7 +62,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "point_attribute_config", description = "Point attribute configurations")
+@Tag(name = "point_attribute_config", description = "Point attribute configuration values: set and update per-device customization values for data point properties inherited from point attribute definitions")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -86,7 +86,8 @@ public class PointAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'add')")
-    @Operation(summary = "Add Point Attribute Configuration", description = "Create a point attribute configuration record")
+    @Operation(summary = "Add Point Attribute Configuration", description = "Set the configured value of a point attribute on a specific device-point pair for the current tenant. " +
+            "A point attribute config is the concrete value of a field declared on the profile template; returns the new config ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,9 +105,10 @@ public class PointAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'delete')")
-    @Operation(summary = "Delete Point Attribute Configuration", description = "Delete a point attribute configuration record by ID")
+    @Operation(summary = "Delete Point Attribute Configuration", description = "Permanently delete a point attribute config by ID (tenant-scoped). " +
+            "Removes the configured value bound to a device-point pair; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointAttributeConfigService.getById(id));
             pointAttributeConfigService.delete(id);
@@ -121,7 +123,8 @@ public class PointAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'update')")
-    @Operation(summary = "Update Point Attribute Configuration", description = "Update a point attribute configuration record")
+    @Operation(summary = "Update Point Attribute Configuration", description = "Change the configured value of an existing point attribute config (tenant-scoped). " +
+            "Use to revise how a specific device-point pair reads or writes a point attribute through its driver.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -140,9 +143,10 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointAttributeConfigVO {@link PointAttributeConfigVO}
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
-    @Operation(summary = "Get Point Attribute Configuration by ID", description = "Get point attribute configuration details by ID")
+    @Operation(summary = "Get Point Attribute Configuration by ID", description = "Fetch one point attribute config by its record ID (tenant-scoped). " +
+            "Use to inspect the configured value bound to a device-point pair before updating or deleting it.")
     @GetMapping("/get_by_id")
-    public Mono<R<PointAttributeConfigVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<PointAttributeConfigVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointAttributeConfigBO entityBO = requireTenant(tenantId, pointAttributeConfigService.getById(id));
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
@@ -159,7 +163,8 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
-    @Operation(summary = "Get Point Attribute Configuration by Attribute, Device, and Point IDs", description = "Get point attribute configuration details by attribute ID, device ID, and point ID")
+    @Operation(summary = "Get Point Attribute Configuration by Attribute, Device, and Point IDs", description = "Fetch the single config that applies one point attribute to a specific device-point pair. " +
+            "Look up by the (attribute, device, point) tuple; returns the configured value for that exact binding.")
     @GetMapping("/get_by_attribute_id_and_device_id_and_point_id")
     public Mono<R<PointAttributeConfigVO>> getByAttributeIdAndDeviceIdAndPointId(
             @Parameter(description = "Attribute ID") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
@@ -183,7 +188,8 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
-    @Operation(summary = "List Point Attribute Configurations by Device and Point IDs", description = "List point attribute configurations by device ID and point ID")
+    @Operation(summary = "List Point Attribute Configurations by Device and Point IDs", description = "Return every point attribute config bound to one device-point pair (tenant-scoped). " +
+            "Use to see all configured attribute values that govern how that point is read or written on the device.")
     @GetMapping("/list_by_device_id_and_point_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceIdAndPointId(
             @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -204,7 +210,8 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
-    @Operation(summary = "List Point Attribute Configurations by Device ID", description = "List point attribute configurations by device ID")
+    @Operation(summary = "List Point Attribute Configurations by Device ID", description = "Return every point attribute config for one device across all its points (tenant-scoped). " +
+            "Returns a flat list; use to review the full configuration surface of a device at once.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceId(
             @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -224,7 +231,8 @@ public class PointAttributeConfigController implements BaseController {
      * @return Page Of PointConfig
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
-    @Operation(summary = "List Point Attribute Configurations", description = "List point attribute configurations with pagination")
+    @Operation(summary = "List Point Attribute Configurations", description = "Page through point attribute configs for the current tenant with query filters. " +
+            "Returns a page of configs; use for browsing or locating a config when the device or point binding is unknown.")
     @PostMapping("/list")
     public Mono<R<Page<PointAttributeConfigVO>>> list(
             @RequestBody(required = false) PointAttributeConfigQuery entityQuery) {

@@ -57,7 +57,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "event", description = "Events")
+@Tag(name = "event", description = "Device event definitions: manage alarm definitions, state-change notifications, and status events with configurable trigger conditions and severity levels")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.EVENT_URL_PREFIX)
@@ -73,7 +73,8 @@ public class EventController implements BaseController {
     private final DeviceService deviceService;
 
     @PreAuthorize("@perm.can('event', 'add')")
-    @Operation(summary = "Add Event", description = "Create an event record")
+    @Operation(summary = "Add Event", description = "Define a new device-reported event on a profile template for the current tenant. " +
+            "An event is an occurrence or alert a device raises at runtime, with its attribute definitions; returns the new event ID.")
     @PostMapping("/add")
     public Mono<R<Long>> add(@Validated(Add.class) @RequestBody EventVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -85,9 +86,10 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'delete')")
-    @Operation(summary = "Delete Event", description = "Delete an event record by ID")
+    @Operation(summary = "Delete Event", description = "Permanently delete an event definition by ID (tenant-scoped). " +
+            "Removes the event and its attribute definitions from the profile template while preserving reported event history; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, eventService.getById(id));
             eventService.delete(id);
@@ -96,7 +98,8 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'update')")
-    @Operation(summary = "Update Event", description = "Update an event record")
+    @Operation(summary = "Update Event", description = "Modify an existing event definition on the profile template (tenant-scoped). " +
+            "Updates event attributes such as name and configuration; use to refine how a device-reported occurrence is modeled.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -109,9 +112,10 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'get')")
-    @Operation(summary = "Get Event by ID", description = "Get event details by ID")
+    @Operation(summary = "Get Event by ID", description = "Fetch one event definition with its attribute definitions (tenant-scoped). " +
+            "Use to inspect an event before subscribing to its reported history or adjusting its configuration.")
     @GetMapping("/get_by_id")
-    public Mono<R<EventVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<EventVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             EventBO entityBO = requireTenant(tenantId, eventService.getById(id));
             EventVO entityVO = eventBuilder.buildVOByBO(entityBO);
@@ -120,7 +124,8 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'list')")
-    @Operation(summary = "List Events by Profile ID", description = "List events by profile ID")
+    @Operation(summary = "List Events by Profile ID", description = "Return every event definition declared on a given profile template (tenant-scoped). " +
+            "Use to discover which device-reported occurrences the profile exposes before binding or inspecting a device.")
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<EventVO>>> listByProfileId(@Parameter(description = "Profile ID") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -132,7 +137,8 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'list')")
-    @Operation(summary = "List Events by Device ID", description = "List events by device ID")
+    @Operation(summary = "List Events by Device ID", description = "Return every event definition available on a given device (tenant-scoped), " +
+            "resolved from the device's profile template. Use to see which occurrences a specific device may report.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<EventVO>>> listByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -144,7 +150,8 @@ public class EventController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event', 'list')")
-    @Operation(summary = "List Events", description = "List events with pagination")
+    @Operation(summary = "List Events", description = "Page through event definitions for the current tenant with filters from the query body. " +
+            "Returns a page of events; use for browsing or locating a specific event definition.")
     @PostMapping("/list")
     public Mono<R<Page<EventVO>>> list(@RequestBody(required = false) EventQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

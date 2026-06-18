@@ -37,25 +37,25 @@ import lombok.ToString;
 @Schema(description = "Message view object")
 public class MessageVO extends BaseVO {
 
-    @Schema(description = "Conversation ID")
+    @Schema(description = "ID of the conversation session this message belongs to.", example = "conv_xyz789")
     private String conversationId;
 
-    @Schema(description = "Message role (e.g. user, assistant, system)", example = "assistant")
+    @Schema(description = "Role of the message sender: user (human input), assistant (AI response), or system (instruction).", example = "assistant")
     private String role;
 
-    @Schema(description = "Message content")
+    @Schema(description = "Plain-text message body representing the conversation turn.")
     private String content;
 
-    @Schema(description = "Content extension information in JSON format")
+    @Schema(description = "Structured content extension including tool calls, citations, or rich media fragments.")
     private AgenticMessageContent contentExt;
 
-    @Schema(description = "Model identifier used to generate the message", example = "gpt-4o")
+    @Schema(description = "Identifier of the AI model that generated this message (e.g. gpt-4o, claude-3.5-sonnet).", example = "gpt-4o")
     private String model;
 
-    @Schema(description = "Message index within the conversation", example = "0")
+    @Schema(description = "Zero-based ordinal position of this message within the conversation history.", example = "0")
     private Long messageIndex;
 
-    @Schema(description = "Message persistence status", example = "OK")
+    @Schema(description = "Persistence status: OK (stored successfully) or ERROR (storage failed).", example = "OK")
     private AgenticMessageStatusEnum status;
 
 }

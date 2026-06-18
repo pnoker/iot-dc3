@@ -52,12 +52,12 @@ import lombok.ToString;
 public class EventVO extends BaseVO {
 
     @NotBlank(message = "Event name can't be empty", groups = {Add.class})
-    @Schema(description = "event name")
+    @Schema(description = "Event name. Unique name within a tenant for identifying an alarm or status notification.", example = "High Temperature Alarm", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid event name format",
             groups = {Add.class, Update.class})
     private String eventName;
 
-    @Schema(description = "event code")
+    @Schema(description = "Event code. Stable business identifier; must not change once deployed.", example = "HIGH_TEMP_ALARM")
 
     private String eventCode;
 
@@ -71,24 +71,24 @@ public class EventVO extends BaseVO {
     @NotNull(message = "Event level can't be empty", groups = {Add.class, Update.class})
     private EventLevelEnum eventLevelFlag;
 
-    @Schema(description = "event extension information in JSON format")
+    @Schema(description = "Event extension information, serialized as JSON for custom metadata and trigger conditions.")
 
     private EventExt eventExt;
 
-    @Schema(description = "profile ID")
+    @Schema(description = "ID of the profile (device template) this event is defined in.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
     private Long profileId;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Configuration signature")
+    @Schema(description = "Signature used for configuration integrity verification.")
 
     private String signature;
 
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
 
     private Integer version;
 

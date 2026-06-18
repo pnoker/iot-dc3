@@ -56,7 +56,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "event_param", description = "Event parameters")
+@Tag(name = "event_param", description = "Event parameter definitions: manage data payload specifications for device events including name, type, and value mapping")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.EVENT_PARAM_URL_PREFIX)
@@ -70,7 +70,7 @@ public class EventParamController implements BaseController {
     private final EventService eventService;
 
     @PreAuthorize("@perm.can('event_param', 'add')")
-    @Operation(summary = "Add Event Parameter", description = "Create an event parameter record")
+    @Operation(summary = "Add Event Parameter", description = "Declare a new parameter on an event for the current tenant. An event param is a named field an event exposes (with type and extension); returns the new event param ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -82,9 +82,9 @@ public class EventParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_param', 'delete')")
-    @Operation(summary = "Delete Event Parameter", description = "Delete an event parameter record by ID")
+    @Operation(summary = "Delete Event Parameter", description = "Permanently delete an event param by ID (tenant-scoped, ownership verified before deletion). The parameter is removed from its event; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, eventParamService.getById(id));
             eventParamService.delete(id);
@@ -93,7 +93,7 @@ public class EventParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_param', 'update')")
-    @Operation(summary = "Update Event Parameter", description = "Update an event parameter record")
+    @Operation(summary = "Update Event Parameter", description = "Modify an existing event param's name, code, type or extension (tenant-scoped, ownership verified before mutation). Use to correct a parameter declared on an event.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -106,9 +106,9 @@ public class EventParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_param', 'get')")
-    @Operation(summary = "Get Event Parameter by ID", description = "Get event parameter details by ID")
+    @Operation(summary = "Get Event Parameter by ID", description = "Fetch one event param with its name, code, type and extension. Use to inspect a parameter a device-reported event exposes before reading event values.")
     @GetMapping("/get_by_id")
-    public Mono<R<EventParamVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<EventParamVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             EventParamBO entityBO = requireTenant(tenantId, eventParamService.getById(id));
             EventParamVO entityVO = eventParamBuilder.buildVOByBO(entityBO);
@@ -117,7 +117,7 @@ public class EventParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_param', 'list')")
-    @Operation(summary = "List Event Parameters by Event ID", description = "List event parameters by event ID")
+    @Operation(summary = "List Event Parameters by Event ID", description = "Return every parameter declared on a given event (tenant-scoped, event ownership verified). Use to discover which fields a device-reported event exposes.")
     @GetMapping("/list_by_event_id")
     public Mono<R<List<EventParamVO>>> listByEventId(@Parameter(description = "Event ID") @NotNull @RequestParam(value = "event_id") Long eventId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -129,7 +129,7 @@ public class EventParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_param', 'list')")
-    @Operation(summary = "List Event Parameters", description = "List event parameters with pagination")
+    @Operation(summary = "List Event Parameters", description = "Page through event params for the current tenant with filters from the query body. Returns a page of event params; use for browsing or auditing parameter declarations across events.")
     @PostMapping("/list")
     public Mono<R<Page<EventParamVO>>> list(@RequestBody(required = false) EventParamQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

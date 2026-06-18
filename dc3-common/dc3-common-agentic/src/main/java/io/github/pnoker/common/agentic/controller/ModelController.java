@@ -51,7 +51,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "model", description = "AI models")
+@Tag(name = "model", description = "AI model registry: manage model metadata including name, version, capabilities, context limits, and provider associations")
 @RestController
 @RequestMapping(AgenticConstant.MODEL_URL_PREFIX)
 @RequiredArgsConstructor
@@ -62,21 +62,24 @@ public class ModelController implements BaseController {
     private final ModelConfigService modelConfigService;
 
     @PreAuthorize("@perm.can('model', 'list')")
-    @Operation(summary = "List AI Models", description = "List available AI model options")
+    @Operation(summary = "List AI Models", description = "List the AI model options available to the current tenant for selection in a chat session." +
+            " Returns model ids with display names; use to pick a model before chatting.")
     @GetMapping("/list")
     public Mono<R<List<ModelVO>>> list() {
         return async(() -> R.ok(modelConfigService.listOptions()));
     }
 
     @PreAuthorize("@perm.can('model', 'list')")
-    @Operation(summary = "List AI Model Configurations", description = "List AI model configurations")
+    @Operation(summary = "List AI Model Configurations", description = "List the stored AI model configurations for the current tenant, each binding a provider, model id and parameters." +
+            " Returns full configuration records for management, unlike the lightweight model options used for chat selection.")
     @GetMapping("/config/list")
     public Mono<R<List<ModelConfigVO>>> listConfigs() {
         return async(() -> R.ok(modelConfigBuilder.buildVOListByBOList(modelConfigService.listConfigs())));
     }
 
     @PreAuthorize("@perm.can('model', 'add')")
-    @Operation(summary = "Add AI Model Configuration", description = "Create an AI model configuration record")
+    @Operation(summary = "Add AI Model Configuration", description = "Create an AI model configuration for the current tenant binding a provider, model id and parameters." +
+            " Returns the saved configuration; the assistant can then use it as a selectable model in a session.")
     @PostMapping("/config/add")
     public Mono<R<ModelConfigVO>> add(@Validated(Add.class) @RequestBody ModelConfigRequest request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -86,7 +89,8 @@ public class ModelController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('model', 'update')")
-    @Operation(summary = "Update AI Model Configuration", description = "Update an AI model configuration record")
+    @Operation(summary = "Update AI Model Configuration", description = "Update an existing AI model configuration's provider, model id or parameters for the current tenant." +
+            " Returns the updated configuration; changes apply to future sessions that select this model.")
     @PostMapping("/config/update")
     public Mono<R<ModelConfigVO>> update(@Validated(Update.class) @RequestBody ModelConfigRequest request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -96,9 +100,10 @@ public class ModelController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('model', 'delete')")
-    @Operation(summary = "Delete AI Model Configuration", description = "Delete an AI model configuration record by ID")
+    @Operation(summary = "Delete AI Model Configuration", description = "Permanently delete the AI model configuration identified by id within the current tenant." +
+            " Returns true on success; the model is no longer selectable in new sessions.")
     @PostMapping("/config/delete")
-    public Mono<R<Boolean>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<Boolean>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
             modelConfigService.delete(id);
             return R.ok(true);

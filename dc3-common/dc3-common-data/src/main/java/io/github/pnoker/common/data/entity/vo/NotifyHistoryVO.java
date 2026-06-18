@@ -46,23 +46,23 @@ import lombok.ToString;
 @Schema(description = "Notify History view object")
 public class NotifyHistoryVO extends BaseVO {
 
-    @Schema(description = "rule ID")
+    @Schema(description = "ID of the rule that triggered this notification.", example = "1024")
 
     private Long ruleId;
 
-    @Schema(description = "notify ID")
+    @Schema(description = "ID of the notification definition used.", example = "2048")
 
     private Long notifyId;
 
-    @Schema(description = "message ID")
+    @Schema(description = "ID of the message template used for this notification.", example = "4096")
 
     private Long messageId;
 
-    @Schema(description = "channel ID")
+    @Schema(description = "ID of the notification channel through which this notification was delivered.", example = "512")
 
     private Long channelId;
 
-    @Schema(description = "alarm ID")
+    @Schema(description = "ID of the alarm associated with this notification.")
 
     private Long alarmId;
 
@@ -78,19 +78,19 @@ public class NotifyHistoryVO extends BaseVO {
 
     private NotifyHistoryStatusEnum statusFlag;
 
-    @Schema(description = "request extension information in JSON format")
+    @Schema(description = "Request payload sent to the notification channel, serialized as JSON.")
 
     private NotifyHistoryRequestExt requestExt;
 
-    @Schema(description = "response extension information in JSON format")
+    @Schema(description = "Response received from the notification channel, serialized as JSON.")
 
     private NotifyHistoryResponseExt responseExt;
 
-    @Schema(description = "error message")
+    @Schema(description = "Error message if the notification delivery failed. Null on success.")
 
     private String errorMessage;
 
-    @Schema(description = "retry count")
+    @Schema(description = "Number of delivery retries attempted for this notification.", example = "0")
 
     private Integer retryCount;
 

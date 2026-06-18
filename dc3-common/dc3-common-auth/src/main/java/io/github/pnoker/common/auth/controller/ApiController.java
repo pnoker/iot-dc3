@@ -55,7 +55,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
-@Tag(name = "api", description = "API endpoints")
+@Tag(name = "api", description = "API endpoint registry: manage metadata for REST API endpoints including path, method, auth requirements, and documentation references")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.API_URL_PREFIX)
@@ -69,7 +69,7 @@ public class ApiController implements BaseController {
     private final AdminChecker adminChecker;
 
     @PreAuthorize("@perm.can('api', 'add')")
-    @Operation(summary = "Add API Endpoint", description = "Create an API endpoint record")
+    @Operation(summary = "Add API Endpoint", description = "Register a new HTTP API endpoint entry that feeds the permission tree and the MCP tool catalog. Restricted to system admins; returns an add-success result.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -81,9 +81,9 @@ public class ApiController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('api', 'delete')")
-    @Operation(summary = "Delete API Endpoint", description = "Delete an API endpoint record by ID")
+    @Operation(summary = "Delete API Endpoint", description = "Remove a registered API endpoint by its ID so it no longer appears in the permission tree or tool catalog. Restricted to system admins.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             apiService.delete(id);
@@ -92,7 +92,7 @@ public class ApiController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('api', 'update')")
-    @Operation(summary = "Update API Endpoint", description = "Update an API endpoint record")
+    @Operation(summary = "Update API Endpoint", description = "Modify an existing registered API endpoint's metadata. Restricted to system admins; returns an update-success result.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ApiVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -104,9 +104,9 @@ public class ApiController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('api', 'get')")
-    @Operation(summary = "Get API Endpoint by ID", description = "Get API endpoint details by ID")
+    @Operation(summary = "Get API Endpoint by ID", description = "Fetch one registered API endpoint by its ID. Read access is open to all authenticated users; returns the full API endpoint detail.")
     @GetMapping("/get_by_id")
-    public Mono<R<ApiVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<ApiVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         // Read access to global API data is open to all authenticated users.
         return async(() -> {
             ApiBO entityBO = apiService.getById(id);
@@ -116,7 +116,7 @@ public class ApiController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('api', 'list')")
-    @Operation(summary = "List API Endpoints", description = "List API endpoints with pagination")
+    @Operation(summary = "List API Endpoints", description = "Page through registered API endpoints with filters from the query body. Read access is open to all authenticated users; returns a page of API endpoints.")
     @PostMapping("/list")
     public Mono<R<Page<ApiVO>>> list(@RequestBody(required = false) ApiQuery entityQuery) {
         // Read access to global API data is open to all authenticated users.

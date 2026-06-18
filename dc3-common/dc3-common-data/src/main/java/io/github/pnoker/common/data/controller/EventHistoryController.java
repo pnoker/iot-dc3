@@ -50,7 +50,7 @@ import java.util.Objects;
  * @version 2026.5.23
  * @since 2026.5.23
  */
-@Tag(name = "event_history", description = "Event history")
+@Tag(name = "event_history", description = "Device event audit trail: query historical records of device alarms, state changes, and status transitions with timestamps and event payloads")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.EVENT_HISTORY_URL_PREFIX)
@@ -60,7 +60,7 @@ public class EventHistoryController implements BaseController {
     private final EventHistoryService eventHistoryService;
 
     @PreAuthorize("@perm.can('event_history', 'list')")
-    @Operation(summary = "Report Event History", description = "Report a device event and return the event history record ID")
+    @Operation(summary = "Report Device Event", description = "Record a device event (alarm, state change, or status transition) reported by a device for the current tenant and return the new record ID. Use when a device reports an event that must be appended to the audit trail.")
     @PostMapping("/report")
     public Mono<R<String>> report(@Validated @RequestBody EventReportVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -72,7 +72,7 @@ public class EventHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_history', 'get')")
-    @Operation(summary = "Get Event History by Record ID", description = "Get event history details by record ID")
+    @Operation(summary = "Get Event History by Record ID", description = "Fetch a single device event record by its record ID, tenant-scoped. Returns the event type, payload, and timestamp; use to inspect one specific reported event.")
     @GetMapping("/get_by_record_id")
     public Mono<R<EventHistoryVO>> getByRecordId(@Parameter(description = "Record ID") @NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() ->
@@ -80,7 +80,7 @@ public class EventHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('event_history', 'list')")
-    @Operation(summary = "List Event History Records", description = "List event history records with pagination")
+    @Operation(summary = "List Event History Records", description = "Page through device event records (alarms, state changes, status transitions) for the current tenant, filtered by the query body. Use to browse the append-only event audit trail; results are ordered by event time.")
     @PostMapping("/list")
     public Mono<R<Page<EventHistoryVO>>> list(@RequestBody(required = false) EventHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

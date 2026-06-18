@@ -57,7 +57,7 @@ public class PointVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "Point name can't be empty", groups = {Add.class})
-    @Schema(description = "point name")
+    @Schema(description = "Data point name. Unique name within a tenant for identifying a specific measurable or controllable device attribute.", example = "Temperature", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid point name format",
             groups = {Add.class, Update.class})
     private String pointName;
@@ -65,77 +65,77 @@ public class PointVO extends BaseVO {
     /**
      * Code
      */
-    @Schema(description = "point code")
+    @Schema(description = "Data point code. Stable business identifier; must not change once deployed.", example = "TEMP_001")
     private String pointCode;
 
     /**
      * Type
      */
-    @Schema(description = "Point type enum")
+    @Schema(description = "Data point type: MEASUREMENT (read-only sensor value), ATTRIBUTE (readable config), or COMMAND (writable setpoint).", example = "MEASUREMENT", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Point type can't be empty", groups = {Add.class, Update.class})
     private PointTypeEnum pointTypeFlag;
 
     /**
      *
      */
-    @Schema(description = "Read/write type enum")
+    @Schema(description = "Read/write capability: READ_ONLY, WRITE_ONLY, or READ_WRITE.", example = "READ_ONLY", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Read/write flag can't be empty", groups = {Add.class, Update.class})
     private RwTypeEnum rwFlag;
 
     /**
      *
      */
-    @Schema(description = "base value")
+    @Schema(description = "Base value applied before multiplier for raw-to-engineering-unit conversion.", example = "0.0")
     private BigDecimal baseValue;
 
     /**
      *
      */
-    @Schema(description = "Value multiplier")
+    @Schema(description = "Multiplier for raw-to-engineering-unit conversion: engineeringValue = baseValue + rawValue * multiplier.", example = "1.0")
     private BigDecimal multiple;
 
     /**
      *
      */
-    @Schema(description = "value decimal")
+    @Schema(description = "Number of decimal places to retain when formatting the calculated value.", example = "2", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Value decimal can't be empty", groups = {Add.class, Update.class})
     private Byte valueDecimal;
 
     /**
      *
      */
-    @Schema(description = "Point value unit")
+    @Schema(description = "Engineering unit for the point value (e.g. °C, kPa, rpm).", example = "°C")
     private String unit;
 
     /**
      * ID
      */
-    @Schema(description = "profile ID")
+    @Schema(description = "ID of the profile (device template) this data point belongs to.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
     private Long profileId;
 
     /**
      *
      */
-    @Schema(description = "point extension information in JSON format")
+    @Schema(description = "Data point extension information, serialized as JSON for custom attributes and metadata.")
     private PointExt pointExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "Configuration signature")
+    @Schema(description = "Signature used for configuration integrity verification.")
     private String signature;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 
 }

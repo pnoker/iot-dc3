@@ -51,12 +51,12 @@ import lombok.ToString;
 public class EventParamVO extends BaseVO {
 
     @NotBlank(message = "Param name can't be empty", groups = {Add.class})
-    @Schema(description = "param name")
+    @Schema(description = "Event parameter name. Unique name within an event definition.", example = "Temperature Value", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid param name format",
             groups = {Add.class, Update.class})
     private String paramName;
 
-    @Schema(description = "param code")
+    @Schema(description = "Event parameter code. Stable business identifier; must not change once deployed.", example = "TEMP_VAL")
 
     @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
     private String paramCode;
@@ -66,24 +66,24 @@ public class EventParamVO extends BaseVO {
     @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
     private PointTypeEnum paramTypeFlag;
 
-    @Schema(description = "param extension information in JSON format")
+    @Schema(description = "Event parameter extension information, serialized as JSON for custom metadata.")
 
     private EventParamExt paramExt;
 
-    @Schema(description = "event ID")
+    @Schema(description = "ID of the parent event this parameter belongs to.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Event ID can't be empty", groups = {Add.class, Update.class})
     private Long eventId;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Configuration signature")
+    @Schema(description = "Signature used for configuration integrity verification.")
 
     private String signature;
 
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
 
     private Integer version;
 

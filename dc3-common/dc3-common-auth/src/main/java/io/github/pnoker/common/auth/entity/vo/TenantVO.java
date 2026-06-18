@@ -70,7 +70,7 @@ public class TenantVO extends BaseVO {
     /**
      * Tenant
      */
-    @Schema(description = "tenant extension information in JSON format")
+    @Schema(description = "Tenant extension information, serialized as JSON for custom tenant metadata.")
     private TenantExt tenantExt;
 
     /**

@@ -52,7 +52,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "session", description = "AI sessions")
+@Tag(name = "session", description = "Agent conversation sessions: create, manage, and terminate AI agent conversation contexts including message history and tool invocation state")
 @Slf4j
 @RestController
 @RequestMapping(AgenticConstant.SESSION_URL_PREFIX)
@@ -64,7 +64,8 @@ public class SessionController implements BaseController {
     private final SessionBuilder sessionBuilder;
 
     @PreAuthorize("@perm.can('session', 'list')")
-    @Operation(summary = "List AI Sessions", description = "List AI sessions with pagination")
+    @Operation(summary = "List Sessions", description = "Page through the current user's AI chat sessions for this tenant. " +
+            "Returns a page of session summaries; use to resume or browse past conversations.")
     @PostMapping("/list")
     public Mono<R<Page<SessionVO>>> list(@RequestBody(required = false) SessionQuery query) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -79,7 +80,8 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'get')")
-    @Operation(summary = "Get AI Session", description = "Get AI session details by conversation ID")
+    @Operation(summary = "Get Session", description = "Fetch a single AI chat session by its conversation id, scoped to the current user and tenant. " +
+            "Returns the session details, or a failure when no matching session exists.")
     @GetMapping("/get_by_conversation_id")
     public Mono<R<SessionVO>> get(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -95,7 +97,8 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'delete')")
-    @Operation(summary = "Delete AI Session", description = "Delete an AI session by conversation ID")
+    @Operation(summary = "Delete Session", description = "Permanently delete an AI chat session and its message history by conversation id, scoped to the current user and tenant. " +
+            "Use to discard a conversation; this cannot be undone.")
     @PostMapping("/delete")
     public Mono<R<Boolean>> delete(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -106,7 +109,8 @@ public class SessionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('session', 'update')")
-    @Operation(summary = "Update AI Session", description = "Update AI session information")
+    @Operation(summary = "Update Session", description = "Update editable fields of an AI chat session identified by conversation id, scoped to the current user and tenant. " +
+            "Use to rename or adjust a session; returns the updated session, or a failure when it does not exist.")
     @PostMapping("/update")
     public Mono<R<SessionVO>> update(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                      @RequestBody(required = false) SessionUpdateRequest request) {

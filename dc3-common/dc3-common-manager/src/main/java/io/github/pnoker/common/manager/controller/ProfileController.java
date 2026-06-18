@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "profile", description = "Profiles")
+@Tag(name = "profile", description = "Device profile templates: manage reusable configuration bundles that combine driver settings, data point definitions, and command templates for rapid device onboarding")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.PROFILE_URL_PREFIX)
@@ -79,7 +79,7 @@ public class ProfileController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('profile', 'add')")
-    @Operation(summary = "Add Profile", description = "Create a profile record")
+    @Operation(summary = "Add Profile", description = "Register a new profile template for the current tenant. A profile is a reusable template bundling points, commands, events and attributes that devices instantiate; returns the new profile ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -97,9 +97,9 @@ public class ProfileController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('profile', 'delete')")
-    @Operation(summary = "Delete Profile", description = "Delete a profile record by ID")
+    @Operation(summary = "Delete Profile", description = "Permanently delete a profile template by ID (tenant-scoped). The profile must belong to the current tenant; deletion cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, profileService.getById(id));
             profileService.delete(id);
@@ -114,7 +114,7 @@ public class ProfileController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('profile', 'update')")
-    @Operation(summary = "Update Profile", description = "Update a profile record")
+    @Operation(summary = "Update Profile", description = "Modify an existing profile template's metadata (tenant-scoped). Only profile fields in the body change; points, commands, events and attributes are managed on their own endpoints.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ProfileVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -133,9 +133,9 @@ public class ProfileController implements BaseController {
      * @return ProfileVO {@link ProfileVO}
      */
     @PreAuthorize("@perm.can('profile', 'get')")
-    @Operation(summary = "Get Profile by ID", description = "Get profile details by ID")
+    @Operation(summary = "Get Profile by ID", description = "Fetch one profile template by ID (tenant-scoped). Use to inspect a profile's metadata before binding devices or editing its point, command and event definitions.")
     @GetMapping("/get_by_id")
-    public Mono<R<ProfileVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<ProfileVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             ProfileBO entityBO = requireTenant(tenantId, profileService.getById(id));
             ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
@@ -150,7 +150,7 @@ public class ProfileController implements BaseController {
      * @return Map(ID, ProfileVO)
      */
     @PreAuthorize("@perm.can('profile', 'list')")
-    @Operation(summary = "List Profiles by IDs", description = "List profiles by ID list")
+    @Operation(summary = "List Profiles by IDs", description = "Resolve a set of profile IDs to their profile templates for the current tenant. Returns a map of ID to profile; missing or foreign-tenant IDs are omitted.")
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, ProfileVO>>> listByIds(@RequestBody Set<Long> profileIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -168,7 +168,7 @@ public class ProfileController implements BaseController {
      * @return Profile
      */
     @PreAuthorize("@perm.can('profile', 'list')")
-    @Operation(summary = "List Profiles by Device ID", description = "List profiles by device ID")
+    @Operation(summary = "List Profiles by Device ID", description = "Return every profile template instantiated by a given device (tenant-scoped). Use to discover which point, command and event definitions a device exposes through its driver.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<ProfileVO>>> listByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -186,7 +186,7 @@ public class ProfileController implements BaseController {
      * @return Page Of Profile
      */
     @PreAuthorize("@perm.can('profile', 'list')")
-    @Operation(summary = "List Profiles", description = "List profiles with pagination")
+    @Operation(summary = "List Profiles", description = "Page through profile templates for the current tenant with the filters in the query body. Returns a page of profiles; use for browsing or selecting a template for a device.")
     @PostMapping("/list")
     public Mono<R<Page<ProfileVO>>> list(@RequestBody(required = false) ProfileQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

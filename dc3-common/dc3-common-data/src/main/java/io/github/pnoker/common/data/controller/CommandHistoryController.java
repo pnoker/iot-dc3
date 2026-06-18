@@ -50,7 +50,7 @@ import java.util.Objects;
  * @version 2026.5.23
  * @since 2026.5.23
  */
-@Tag(name = "command_history", description = "Command history")
+@Tag(name = "command_history", description = "Command execution audit trail: query historical records of commands sent to devices including execution status, timestamps, and response data")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.COMMAND_HISTORY_URL_PREFIX)
@@ -60,7 +60,8 @@ public class CommandHistoryController implements BaseController {
     private final CommandHistoryService commandHistoryService;
 
     @PreAuthorize("@perm.can('command_history', 'add')")
-    @Operation(summary = "Call Command", description = "Execute a device command and return the command history record ID")
+    @Operation(summary = "Call Command", description = "Send a downward control command to a device for the current tenant and " +
+            "record the call in command history. Returns the new history record ID; use it to poll the execution result and response data.")
     @PostMapping("/call")
     public Mono<R<String>> call(@Validated @RequestBody CommandCallVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -72,7 +73,8 @@ public class CommandHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_history', 'get')")
-    @Operation(summary = "Get Command History by Record ID", description = "Get command history details by record ID")
+    @Operation(summary = "Get Command History by Record ID", description = "Fetch one command-call history record by its record ID " +
+            "(tenant-scoped), including execution status, timestamps and the device response. Use to check the outcome of a command issued via Call Command.")
     @GetMapping("/get_by_record_id")
     public Mono<R<CommandHistoryVO>> getByRecordId(@Parameter(description = "Record ID") @NotBlank @RequestParam String recordId) {
         return getTenantId().flatMap(tenantId -> async(() ->
@@ -80,7 +82,8 @@ public class CommandHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_history', 'list')")
-    @Operation(summary = "List Command History Records", description = "List command history records with pagination")
+    @Operation(summary = "List Command History Records", description = "Page through command-call history for the current tenant with " +
+            "filters such as device, command and execution status over a time window. Returns a page of records; use to audit which commands ran and their results.")
     @PostMapping("/list")
     public Mono<R<Page<CommandHistoryVO>>> list(@RequestBody(required = false) CommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

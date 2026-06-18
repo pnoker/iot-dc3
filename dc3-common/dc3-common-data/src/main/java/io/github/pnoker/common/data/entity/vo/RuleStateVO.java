@@ -49,7 +49,7 @@ import java.time.LocalDateTime;
 @Schema(description = "Rule State view object")
 public class RuleStateVO extends BaseVO {
 
-    @Schema(description = "rule ID")
+    @Schema(description = "ID of the rule whose execution state is recorded.", example = "1024")
 
     private Long ruleId;
 
@@ -69,35 +69,35 @@ public class RuleStateVO extends BaseVO {
 
     private RuleStatusEnum entityStateFlag;
 
-    @Schema(description = "first trigger time")
+    @Schema(description = "Timestamp when the rule first triggered after activation.")
 
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime firstTriggerTime;
 
-    @Schema(description = "last trigger time")
+    @Schema(description = "Timestamp of the most recent rule trigger.")
 
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime lastTriggerTime;
 
-    @Schema(description = "last recover time")
+    @Schema(description = "Timestamp when the rule last transitioned from triggered to recovered state.")
 
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime lastRecoverTime;
 
-    @Schema(description = "last notify time")
+    @Schema(description = "Timestamp when the last notification was dispatched for this rule.")
 
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime lastNotifyTime;
 
-    @Schema(description = "trigger count")
+    @Schema(description = "Cumulative count of times this rule has triggered since activation.", example = "42")
 
     private Long triggerCount;
 
-    @Schema(description = "alarm ID")
+    @Schema(description = "ID of the active alarm associated with this rule state.")
 
     private Long alarmId;
 
-    @Schema(description = "entity state extension information in JSON format")
+    @Schema(description = "Entity state extension information, serialized as JSON for custom runtime metadata.")
 
     private RuleStateExt entityStateExt;
 

@@ -52,52 +52,52 @@ import lombok.ToString;
 public class CommandParamVO extends BaseVO {
 
     @NotBlank(message = "Param name can't be empty", groups = {Add.class})
-    @Schema(description = "param name")
+    @Schema(description = "Command parameter name. Unique name within a command.", example = "Register Address", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid param name format",
             groups = {Add.class, Update.class})
     private String paramName;
 
-    @Schema(description = "param code")
+    @Schema(description = "Command parameter code. Stable business identifier; must not change once deployed.", example = "REG_ADDR")
 
     @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
     private String paramCode;
 
-    @Schema(description = "Parameter direction enum")
+    @Schema(description = "Parameter direction: INPUT (sent to device) or OUTPUT (received from device).", example = "INPUT")
 
     @NotNull(message = "Param direction can't be empty", groups = {Add.class, Update.class})
     private ParamDirectionTypeEnum paramDirectionFlag;
 
-    @Schema(description = "Parameter type enum")
+    @Schema(description = "Parameter data type: STRING, INT, LONG, FLOAT, DOUBLE, or BOOL.", example = "INT")
 
     @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
     private PointTypeEnum paramTypeFlag;
 
-    @Schema(description = "Required flag enum")
+    @Schema(description = "Whether this parameter is REQUIRED or OPTIONAL for command execution.", example = "REQUIRED")
 
     private Boolean requiredFlag;
 
-    @Schema(description = "default value")
+    @Schema(description = "Default value pre-populated when the command is invoked without an explicit value.", example = "0")
 
     private String defaultValue;
 
-    @Schema(description = "param extension information in JSON format")
+    @Schema(description = "Command parameter extension information, serialized as JSON for custom metadata.")
 
     private CommandParamExt paramExt;
 
-    @Schema(description = "command ID")
+    @Schema(description = "ID of the parent command this parameter belongs to.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Command ID can't be empty", groups = {Add.class, Update.class})
     private Long commandId;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
 
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Configuration signature")
+    @Schema(description = "Signature used for configuration integrity verification.")
 
     private String signature;
 
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
 
     private Integer version;
 

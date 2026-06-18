@@ -30,6 +30,7 @@ import io.github.pnoker.common.entity.dto.McpToolCatalogListRequestDTO;
 import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
 import io.github.pnoker.common.entity.dto.OAuthClientRegistrationResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,7 @@ import java.util.Map;
  * @version 2026.6.12
  * @since 2026.6.12
  */
-@Tag(name = "mcp", description = "MCP OAuth management")
+@Tag(name = "mcp", description = "MCP OAuth connections: register clients, exchange tokens, and manage authorization flows for AI agent integration via the Model Context Protocol")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.MCP_URL_PREFIX)
@@ -64,14 +65,16 @@ public class McpManagementController implements BaseController {
     private final OAuthMcpRuntimeService oauthMcpRuntimeService;
 
     @PreAuthorize("@perm.can('mcp', 'get')")
-    @Operation(summary = "Get MCP OAuth Metadata", description = "Get OAuth authorization server metadata")
+    @Operation(summary = "Get MCP OAuth Metadata", description = "Fetch the OAuth authorization server metadata for the MCP runtime, "
+            + "including issuer, token and registration endpoints. Use to discover how MCP clients should authenticate.")
     @GetMapping("/metadata")
     public Mono<R<Map<String, Object>>> metadata() {
         return async(() -> R.ok(oauthMcpRuntimeService.authorizationServerMetadata()));
     }
 
     @PreAuthorize("@perm.can('mcp', 'add')")
-    @Operation(summary = "Register OAuth Client", description = "Register an OAuth client for MCP usage")
+    @Operation(summary = "Register OAuth Client", description = "Register an OAuth client owned by the current principal for MCP access. "
+            + "Returns the client id and secret; the secret is shown only once at registration time.")
     @PostMapping("/client/register")
     public Mono<R<OAuthClientRegistrationResponseDTO>> registerClient(
             @RequestBody OAuthClientRegistrationRequestDTO request) {
@@ -80,14 +83,16 @@ public class McpManagementController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('mcp', 'list')")
-    @Operation(summary = "List OAuth Clients", description = "List OAuth clients owned by the current principal")
+    @Operation(summary = "List OAuth Clients", description = "List the OAuth clients the current principal owns. "
+            + "Returns client records without secrets; use to pick a client before creating or inspecting a connection.")
     @PostMapping("/client/list")
     public Mono<R<List<OAuthRegisteredClientRecord>>> listClients() {
         return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listClients(header))));
     }
 
     @PreAuthorize("@perm.can('mcp', 'list')")
-    @Operation(summary = "List MCP Connections", description = "List MCP connections owned by the current principal")
+    @Operation(summary = "List MCP Connections", description = "List the MCP connections owned by the current principal. "
+            + "Each connection binds an OAuth client to a tool whitelist; use to review which clients are wired up.")
     @PostMapping("/connection/list")
     public Mono<R<List<McpConnectionRecord>>> listConnections() {
         return getPrincipalHeader()
@@ -95,7 +100,8 @@ public class McpManagementController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('mcp', 'add')")
-    @Operation(summary = "Create MCP Connection", description = "Create an MCP connection for an OAuth client")
+    @Operation(summary = "Create MCP Connection", description = "Create an MCP connection linking an OAuth client to an allowed tool set for the current principal. "
+            + "Returns the persisted connection record; the client must already be registered.")
     @PostMapping("/connection/add")
     public Mono<R<McpConnectionRecord>> createConnection(@RequestBody McpConnectionRecord connection) {
         return getPrincipalHeader()
@@ -103,9 +109,10 @@ public class McpManagementController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('mcp', 'delete')")
-    @Operation(summary = "Revoke MCP Connection", description = "Revoke an MCP connection")
+    @Operation(summary = "Revoke MCP Connection", description = "Revoke an MCP connection by id, severing its OAuth client from the tool whitelist. "
+            + "Only the principal that owns the connection may revoke it; returns true on success.")
     @PostMapping("/connection/revoke")
-    public Mono<R<Boolean>> revokeConnection(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<Boolean>> revokeConnection(@Parameter(description = "Primary key of the MCP connection to revoke.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             oauthMcpRuntimeService.revokeConnection(id, header);
             return R.ok(true);
@@ -113,7 +120,8 @@ public class McpManagementController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('mcp', 'update')")
-    @Operation(summary = "Replace MCP Connection Tools", description = "Replace a connection tool whitelist")
+    @Operation(summary = "Replace MCP Connection Tools", description = "Replace a connection's tool whitelist with the supplied tool ids, scoped to the owning principal. "
+            + "The previous whitelist is fully overwritten; returns true on success.")
     @PostMapping("/connection/tools/replace")
     public Mono<R<Boolean>> replaceConnectionTools(@RequestBody McpConnectionToolsReplaceRequestDTO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -126,22 +134,25 @@ public class McpManagementController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('mcp', 'list')")
-    @Operation(summary = "List MCP Connection Tools", description = "List a connection tool whitelist")
+    @Operation(summary = "List MCP Connection Tools", description = "List the tool ids a connection is currently allowed to invoke. "
+            + "Use to inspect a connection's effective whitelist before editing or revoking it.")
     @GetMapping("/connection/tools/list")
-    public Mono<R<List<String>>> listConnectionTools(@NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<List<String>>> listConnectionTools(@Parameter(description = "Primary key of the MCP connection to list tools for.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listConnectionToolIds(id,
                 header))));
     }
 
     @PreAuthorize("@perm.can('mcp', 'update')")
-    @Operation(summary = "Refresh MCP Tool Catalog", description = "Refresh the MCP tool catalog from registered APIs")
+    @Operation(summary = "Refresh MCP Tool Catalog", description = "Rebuild the MCP tool catalog from the registered APIs (dc3_api entries). "
+            + "Returns the number of tools refreshed; call after API registrations change so the catalog stays current.")
     @PostMapping("/tool/catalog/refresh")
     public Mono<R<Integer>> refreshToolCatalog() {
         return async(() -> R.ok(oauthMcpRuntimeService.refreshToolCatalog()));
     }
 
     @PreAuthorize("@perm.can('mcp', 'list')")
-    @Operation(summary = "List MCP Tool Catalog", description = "List MCP tool catalog entries")
+    @Operation(summary = "List MCP Tool Catalog", description = "Page the MCP tool catalog with optional keyword, risk level and limit filters. "
+            + "Returns tool records exposing each tool's schema; use to browse tools before whitelisting them on a connection.")
     @PostMapping("/tool/list")
     public Mono<R<List<McpToolRecord>>> listToolCatalog(
             @RequestBody(required = false) McpToolCatalogListRequestDTO request) {
@@ -154,14 +165,15 @@ public class McpManagementController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('mcp', 'list')")
-    @Operation(summary = "List MCP Audit Log", description = "List MCP tool call audit entries for the caller's tenant")
+    @Operation(summary = "List MCP Audit Log", description = "List MCP tool-call audit entries scoped to the caller's tenant, "
+            + "filterable by principal, tool, status and risk level. Returns append-only records kept for compliance review.")
     @PostMapping("/audit/list")
     public Mono<R<List<McpAuditCommand>>> listAuditLog(
-            @RequestParam(value = "principalId", required = false) Long principalId,
-            @RequestParam(value = "toolId", required = false) String toolId,
-            @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "riskLevel", required = false) String riskLevel,
-            @RequestParam(value = "limit", required = false) Integer limit) {
+            @Parameter(description = "Filter by owning principal ID.", example = "2048") @RequestParam(value = "principalId", required = false) Long principalId,
+            @Parameter(description = "Filter by MCP tool ID.", example = "tool_read_device") @RequestParam(value = "toolId", required = false) String toolId,
+            @Parameter(description = "Filter by connection status: ACTIVE, REVOKED, or EXPIRED.", example = "ACTIVE") @RequestParam(value = "status", required = false) String status,
+            @Parameter(description = "Filter by risk level: LOW, MEDIUM, HIGH, or CRITICAL.", example = "LOW") @RequestParam(value = "riskLevel", required = false) String riskLevel,
+            @Parameter(description = "Maximum number of records to return.", example = "20") @RequestParam(value = "limit", required = false) Integer limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(oauthMcpRuntimeService.listAudit(
                 tenantId, principalId, StringUtils.defaultString(toolId), StringUtils.defaultString(status),
                 StringUtils.defaultString(riskLevel), intValue(limit)

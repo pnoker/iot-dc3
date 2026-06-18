@@ -51,43 +51,43 @@ public class PointValueVO implements Serializable {
     /**
      * Device ID
      */
-    @Schema(description = "device ID")
+    @Schema(description = "ID of the device that produced this value.", example = "1024")
     private Long deviceId;
 
     /**
      * Point ID
      */
-    @Schema(description = "point ID")
+    @Schema(description = "ID of the data point this value belongs to.", example = "2048")
     private Long pointId;
 
     /**
      * Raw value
      */
-    @Schema(description = "raw value")
+    @Schema(description = "Raw value as received directly from the device protocol.", example = "12345")
     private String rawValue;
 
     /**
      * Processed value
      */
-    @Schema(description = "cal value")
+    @Schema(description = "Calculated (engineering) value after applying base value, multiplier, and decimal formatting.", example = "25.5")
     private String calValue;
 
     /**
      * Numeric projection of calValue for aggregation queries.
      */
-    @Schema(description = "num value")
+    @Schema(description = "Numeric representation of the calculated value for sorting and aggregation.", example = "25.5")
     private Double numValue;
 
     /**
      * Whether the latest-value query returned a real sampled value.
      */
-    @Schema(description = "whether the latest-value query returned a real sampled value")
+    @Schema(description = "Whether the latest-value query returned a real sampled value (true) or a fallback placeholder (false).")
     private Boolean hasLatestValue = Boolean.TRUE;
 
     /**
      * Driver ID
      */
-    @Schema(description = "driver ID")
+    @Schema(description = "ID of the driver that collected this value.", example = "512")
     private Long driverId;
 
     /**

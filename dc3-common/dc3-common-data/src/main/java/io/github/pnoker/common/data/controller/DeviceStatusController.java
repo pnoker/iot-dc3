@@ -47,7 +47,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "device_status", description = "Device status")
+@Tag(name = "device_status", description = "Device operational status: query current online, offline, fault, and maintenance states of registered industrial devices")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DEVICE_STATUS_URL_PREFIX)
@@ -63,7 +63,7 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
-    @Operation(summary = "List Device Status", description = "List device status mappings with pagination")
+    @Operation(summary = "List Device Status", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of the current tenant's devices as a device-id-to-status map. Use to read live connectivity state; pass a DeviceQuery to filter by driver, profile or other dimensions.")
     @PostMapping("/list")
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -81,7 +81,7 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
-    @Operation(summary = "List Device Status by Driver", description = "List device status mappings by driver ID")
+    @Operation(summary = "List Device Status by Driver", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the current tenant runs under the given driver. Use to inspect connectivity across the whole fleet a single driver manages; results are a device-id-to-status map.")
     @GetMapping("/list_by_driver_id")
     public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -100,7 +100,7 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
-    @Operation(summary = "List Device Status by Profile", description = "List device status mappings by profile ID")
+    @Operation(summary = "List Device Status by Profile", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the current tenant associates with the given profile. Use to check connectivity of all devices sharing a profile template; results are a device-id-to-status map.")
     @GetMapping("/list_by_profile_id")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
             @Parameter(description = "Profile ID") @NotNull @RequestParam(value = "profile_id") Long profileId) {

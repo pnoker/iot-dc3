@@ -50,53 +50,53 @@ public class CommandAttributeConfigVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "attribute ID")
+    @Schema(description = "ID of the command attribute whose value is being configured.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Command attribute ID can't be empty", groups = {Add.class, Update.class})
     private Long attributeId;
 
     /**
      *
      */
-    @Schema(description = "config value")
+    @Schema(description = "The configured value overriding the attribute default for this specific device.", example = "0x03", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Command attribute config value can't be empty")
     private String configValue;
 
     /**
      * Device ID
      */
-    @Schema(description = "device ID")
+    @Schema(description = "ID of the device this configuration applies to.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Device ID can't be empty", groups = {Add.class, Update.class})
     private Long deviceId;
 
     /**
      *
      */
-    @Schema(description = "config extension information in JSON format")
+    @Schema(description = "Configuration extension information, serialized as JSON for custom metadata.")
     private JsonExt configExt;
 
     /**
      * Command ID
      */
-    @Schema(description = "command ID")
+    @Schema(description = "ID of the command this configuration is scoped to.", example = "4096")
     @NotNull(message = "Command ID can't be empty", groups = {Add.class, Update.class})
     private Long commandId;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "Configuration signature")
+    @Schema(description = "Signature used for configuration integrity verification.")
     private String signature;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 
 }

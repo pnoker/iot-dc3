@@ -54,7 +54,7 @@ public class CommandHistoryVO implements Serializable {
 
     private Long id;
 
-    @Schema(description = "record ID")
+    @Schema(description = "Unique record ID for this command history entry.", example = "123456")
 
     private String recordId;
 
@@ -62,15 +62,15 @@ public class CommandHistoryVO implements Serializable {
 
     private Long tenantId;
 
-    @Schema(description = "device ID")
+    @Schema(description = "ID of the device the command was sent to.", example = "1024")
 
     private Long deviceId;
 
-    @Schema(description = "command ID")
+    @Schema(description = "ID of the command definition invoked.", example = "4096")
 
     private Long commandId;
 
-    @Schema(description = "command code")
+    @Schema(description = "Command code. Stable business identifier for this command.", example = "READ_HOLDING_REG")
 
     private String commandCode;
 
@@ -78,7 +78,7 @@ public class CommandHistoryVO implements Serializable {
 
     private String paramValues;
 
-    @Schema(description = "result values")
+    @Schema(description = "Result values returned from the device after command execution, keyed by parameter code.")
 
     private String resultValues;
 
@@ -89,11 +89,11 @@ public class CommandHistoryVO implements Serializable {
     @Schema(description = "Command status", example = "SUCCESS")
     private PointCommandStatusEnum status;
 
-    @Schema(description = "error code")
+    @Schema(description = "Error code if the command execution failed. Null on success.", example = "ERR_TIMEOUT")
 
     private String errorCode;
 
-    @Schema(description = "error message")
+    @Schema(description = "Human-readable error message if the command execution failed. Null on success.")
 
     private String errorMessage;
 
@@ -101,23 +101,23 @@ public class CommandHistoryVO implements Serializable {
 
     private CommandHistorySourceEnum source;
 
-    @Schema(description = "source user ID")
+    @Schema(description = "ID of the user who issued this command.")
 
     private Long sourceUserId;
 
-    @Schema(description = "occur time")
+    @Schema(description = "Timestamp when the command was issued.")
 
     private LocalDateTime occurTime;
 
-    @Schema(description = "send time")
+    @Schema(description = "Timestamp when the command was dispatched to the device.")
 
     private LocalDateTime sendTime;
 
-    @Schema(description = "finish time")
+    @Schema(description = "Timestamp when the command execution completed (success or failure).")
 
     private LocalDateTime finishTime;
 
-    @Schema(description = "expire time")
+    @Schema(description = "Timestamp when the command expires. If the device does not respond by this time, the command is considered failed.")
 
     private LocalDateTime expireTime;
 

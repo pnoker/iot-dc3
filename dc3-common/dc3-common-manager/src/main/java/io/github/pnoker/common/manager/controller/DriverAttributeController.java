@@ -58,7 +58,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "driver_attribute", description = "Driver attributes")
+@Tag(name = "driver_attribute", description = "Driver attribute definitions: manage configurable properties of protocol drivers including name, type, default value, and validation constraints")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_URL_PREFIX)
@@ -78,7 +78,8 @@ public class DriverAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute', 'add')")
-    @Operation(summary = "Add Driver Attribute", description = "Create a driver attribute record")
+    @Operation(summary = "Add Driver Attribute", description = "Define a new driver attribute for the current tenant. A driver attribute is a configurable field " +
+            "declared on a driver (name, code, type, default value) that driver instances supply a concrete value for; returns the new attribute ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -96,9 +97,10 @@ public class DriverAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute', 'delete')")
-    @Operation(summary = "Delete Driver Attribute", description = "Delete a driver attribute record by ID")
+    @Operation(summary = "Delete Driver Attribute", description = "Permanently delete a driver attribute by ID (tenant-scoped). Removes the attribute definition for its " +
+            "driver; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverAttributeService.getById(id));
             driverAttributeService.delete(id);
@@ -113,7 +115,8 @@ public class DriverAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute', 'update')")
-    @Operation(summary = "Update Driver Attribute", description = "Update a driver attribute record")
+    @Operation(summary = "Update Driver Attribute", description = "Update an existing driver attribute (tenant-scoped). Modifies the field definition's name, code, type, " +
+            "default value or enable flag on its driver.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -132,9 +135,10 @@ public class DriverAttributeController implements BaseController {
      * @return DriverAttributeVO {@link DriverAttributeVO}
      */
     @PreAuthorize("@perm.can('driver_attribute', 'get')")
-    @Operation(summary = "Get Driver Attribute by ID", description = "Get driver attribute details by ID")
+    @Operation(summary = "Get Driver Attribute by ID", description = "Fetch one driver attribute by ID (tenant-scoped). Use to inspect a driver's configurable field " +
+            "definition such as its type and default value before configuring driver attribute values.")
     @GetMapping("/get_by_id")
-    public Mono<R<DriverAttributeVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<DriverAttributeVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeBO entityBO = requireTenant(tenantId, driverAttributeService.getById(id));
             DriverAttributeVO entityVO = driverAttributeBuilder.buildVOByBO(entityBO);
@@ -149,7 +153,8 @@ public class DriverAttributeController implements BaseController {
      * @return driver attributes
      */
     @PreAuthorize("@perm.can('driver_attribute', 'list')")
-    @Operation(summary = "List Driver Attributes by Driver ID", description = "List driver attributes by driver ID")
+    @Operation(summary = "List Driver Attributes by Driver ID", description = "Return every driver attribute declared on a given driver (tenant-scoped). Use to discover which " +
+            "configurable fields a driver exposes; returns an empty list when the driver does not exist.")
     @GetMapping("/list_by_driver_id")
     public Mono<R<List<DriverAttributeVO>>> listByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -171,7 +176,8 @@ public class DriverAttributeController implements BaseController {
      * @return page of driver attributes
      */
     @PreAuthorize("@perm.can('driver_attribute', 'list')")
-    @Operation(summary = "List Driver Attributes", description = "List driver attributes with pagination")
+    @Operation(summary = "List Driver Attributes", description = "Page through driver attributes for the current tenant with filters such as name, code and driver. Returns a " +
+            "page of driver attributes; use for browsing or selecting a target attribute.")
     @PostMapping("/list")
     public Mono<R<Page<DriverAttributeVO>>> list(@RequestBody(required = false) DriverAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

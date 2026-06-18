@@ -54,7 +54,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "group", description = "Groups")
+@Tag(name = "group", description = "Logical group hierarchy: create, update, and manage groups for organizing devices, drivers, and platform resources into hierarchical collections")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.GROUP_URL_PREFIX)
@@ -70,7 +70,7 @@ public class GroupController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group', 'add')")
-    @Operation(summary = "Add Group", description = "Create a group record")
+    @Operation(summary = "Add Group", description = "Create a group for the current tenant. A group is a logical grouping of devices, drivers, points or other entities used for batch operations; returns the new group ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -86,9 +86,9 @@ public class GroupController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group', 'delete')")
-    @Operation(summary = "Delete Group", description = "Delete a group record by ID")
+    @Operation(summary = "Delete Group", description = "Permanently delete a group by ID (tenant-scoped). Removes the grouping definition without deleting its member entities; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, groupService.getById(id));
             groupService.delete(id);
@@ -101,7 +101,7 @@ public class GroupController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group', 'update')")
-    @Operation(summary = "Update Group", description = "Update a group record")
+    @Operation(summary = "Update Group", description = "Update an existing group's attributes for the current tenant. Validates tenant ownership before applying the change; returns the updated group ID.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -118,9 +118,9 @@ public class GroupController implements BaseController {
      * @return GroupVO {@link GroupVO}
      */
     @PreAuthorize("@perm.can('group', 'get')")
-    @Operation(summary = "Get Group by ID", description = "Get group details by ID")
+    @Operation(summary = "Get Group by ID", description = "Fetch one group by ID for the current tenant. Use to inspect a grouping definition before assigning entities to it or performing batch operations.")
     @GetMapping("/get_by_id")
-    public Mono<R<GroupVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<GroupVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBO entityBO = requireTenant(tenantId, groupService.getById(id));
             GroupVO entityVO = groupBuilder.buildVOByBO(entityBO);
@@ -133,7 +133,7 @@ public class GroupController implements BaseController {
      * @return R Of GroupVO Page
      */
     @PreAuthorize("@perm.can('group', 'list')")
-    @Operation(summary = "List Groups", description = "List groups with pagination")
+    @Operation(summary = "List Groups", description = "Page through groups for the current tenant with optional query filters. Returns a page of groups; use for browsing available groupings or selecting a target group.")
     @PostMapping("/list")
     public Mono<R<Page<GroupVO>>> list(@RequestBody(required = false) GroupQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

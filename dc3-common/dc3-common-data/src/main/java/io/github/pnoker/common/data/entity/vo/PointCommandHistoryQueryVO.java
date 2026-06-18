@@ -49,11 +49,11 @@ public class PointCommandHistoryQueryVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "device ID")
+    @Schema(description = "Filter by device ID.", example = "1024")
 
     private Long deviceId;
 
-    @Schema(description = "point ID")
+    @Schema(description = "Filter by data point ID.", example = "2048")
 
     private Long pointId;
 

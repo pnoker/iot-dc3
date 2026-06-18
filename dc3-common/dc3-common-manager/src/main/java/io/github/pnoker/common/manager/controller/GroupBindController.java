@@ -59,7 +59,7 @@ import java.util.Objects;
  * @version 2026.5.11
  * @since 2026.5.11
  */
-@Tag(name = "group_bind", description = "Group bindings")
+@Tag(name = "group_bind", description = "Group membership bindings: associate devices, drivers, and other entities with logical groups for hierarchical organization and bulk operations")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.GROUP_BIND_URL_PREFIX)
@@ -79,7 +79,7 @@ public class GroupBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group_bind', 'add')")
-    @Operation(summary = "Add Group Binding", description = "Create a group binding record")
+    @Operation(summary = "Add Group Binding", description = "Attach a tenant entity (device, driver, point, etc.) to a group. The entity's type must match the group's type and ownership is tenant-scoped; returns the new binding ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -96,9 +96,9 @@ public class GroupBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group_bind', 'delete')")
-    @Operation(summary = "Delete Group Binding", description = "Delete a group binding record by ID")
+    @Operation(summary = "Delete Group Binding", description = "Remove a group-to-entity binding by ID (tenant-scoped). Detaches the entity from the group without deleting the group or the entity.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, groupBindService.getById(id));
             groupBindService.delete(id);
@@ -111,7 +111,7 @@ public class GroupBindController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('group_bind', 'update')")
-    @Operation(summary = "Update Group Binding", description = "Update a group binding record")
+    @Operation(summary = "Update Group Binding", description = "Change the group or entity referenced by an existing binding (tenant-scoped). The new entity's type must still match the target group's type.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -129,9 +129,9 @@ public class GroupBindController implements BaseController {
      * @return GroupBindVO {@link GroupBindVO}
      */
     @PreAuthorize("@perm.can('group_bind', 'get')")
-    @Operation(summary = "Get Group Binding by ID", description = "Get group binding details by ID")
+    @Operation(summary = "Get Group Binding by ID", description = "Fetch one group binding by ID (tenant-scoped). Returns the group ID, entity type and entity ID of the association; use to inspect a specific link before editing or removing it.")
     @GetMapping("/get_by_id")
-    public Mono<R<GroupBindVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<GroupBindVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             GroupBindBO entityBO = requireTenant(tenantId, groupBindService.getById(id));
             GroupBindVO entityVO = groupBindBuilder.buildVOByBO(entityBO);
@@ -144,7 +144,7 @@ public class GroupBindController implements BaseController {
      * @return R Of GroupBindVO Page
      */
     @PreAuthorize("@perm.can('group_bind', 'list')")
-    @Operation(summary = "List Group Bindings", description = "List group bindings with pagination")
+    @Operation(summary = "List Group Bindings", description = "Page through group bindings for the current tenant, optionally filtered by group ID, entity type or entity ID. Returns a page of bindings; use to enumerate the members of a group or the groups an entity belongs to.")
     @PostMapping("/list")
     public Mono<R<Page<GroupBindVO>>> list(@RequestBody(required = false) GroupBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

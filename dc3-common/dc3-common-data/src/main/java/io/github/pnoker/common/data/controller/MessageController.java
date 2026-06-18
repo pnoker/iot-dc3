@@ -54,7 +54,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "message", description = "Messages")
+@Tag(name = "message", description = "Platform messages: query messages exchanged between services and devices over the message bus including data reports, commands, and system notifications")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.MESSAGE_URL_PREFIX)
@@ -66,7 +66,7 @@ public class MessageController implements BaseController {
     private final MessageService messageService;
 
     @PreAuthorize("@perm.can('message', 'add')")
-    @Operation(summary = "Add Message", description = "Create a message record")
+    @Operation(summary = "Add Message", description = "Create a new alarm message template scoped to the current tenant. Use to register a reusable message (name, code, level, enabled flag) that alarm rules and notifications can reference.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MessageVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -78,9 +78,9 @@ public class MessageController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('message', 'delete')")
-    @Operation(summary = "Delete Message", description = "Delete a message record by ID")
+    @Operation(summary = "Delete Message", description = "Delete a tenant-owned alarm message template by its ID. Returns not-found if the record belongs to another tenant.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, messageService.getById(id));
             messageService.delete(id);
@@ -89,7 +89,7 @@ public class MessageController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('message', 'update')")
-    @Operation(summary = "Update Message", description = "Update a message record")
+    @Operation(summary = "Update Message", description = "Update the name, code, level or enabled flag of an existing alarm message template owned by the current tenant. The tenant scope is enforced from the authenticated caller, not the request body.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MessageVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -102,9 +102,9 @@ public class MessageController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('message', 'get')")
-    @Operation(summary = "Get Message by ID", description = "Get message details by ID")
+    @Operation(summary = "Get Message by ID", description = "Return one alarm message template (name, code, level, enabled flag) by its ID, restricted to the current tenant. Use to inspect a single template before updating or deleting it.")
     @GetMapping("/get_by_id")
-    public Mono<R<MessageVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<MessageVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             MessageBO entityBO = requireTenant(tenantId, messageService.getById(id));
             return R.ok(messageBuilder.buildVOByBO(entityBO));
@@ -112,7 +112,7 @@ public class MessageController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('message', 'list')")
-    @Operation(summary = "List Messages", description = "List messages with pagination")
+    @Operation(summary = "List Messages", description = "Page through the current tenant's alarm message templates, filterable by name, code, level and enabled flag. Use to browse or locate templates for reuse by alarm rules and notification channels.")
     @PostMapping("/list")
     public Mono<R<Page<MessageVO>>> list(@RequestBody(required = false) MessageQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

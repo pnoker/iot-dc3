@@ -48,31 +48,31 @@ public class MessageVO extends BaseVO {
     /**
      * Alarm message template title
      */
-    @Schema(description = "message name")
+    @Schema(description = "Message template name. Unique name within a tenant.", example = "High Temp Alert Message", requiredMode = Schema.RequiredMode.REQUIRED)
     private String messageName;
 
     /**
      * Alarm message template code
      */
-    @Schema(description = "message code")
+    @Schema(description = "Message template code. Stable business identifier; must not change once deployed.", example = "HIGH_TEMP_MSG")
     private String messageCode;
 
     /**
      * Alarm message template level
      */
-    @Schema(description = "message level")
+    @Schema(description = "Message severity level: INFO, WARN, CRITICAL, or EMERGENCY.", example = "WARN")
     private AlarmMessageLevelEnum messageLevel;
 
     /**
      * Alarm message template content
      */
-    @Schema(description = "message extension information in JSON format")
+    @Schema(description = "Message template extension information, serialized as JSON for custom formatting and routing.")
     private MessageExt messageExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

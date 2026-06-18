@@ -48,7 +48,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "dictionary_manager", description = "Manager dictionaries")
+@Tag(name = "dictionary_manager", description = "Device-management dictionaries: manage lookup entries for driver types, device categories, point classifications, and other operational metadata")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DICTIONARY_URL_PREFIX)
@@ -66,7 +66,8 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Driver Dictionary", description = "List driver dictionary entries with pagination")
+    @Operation(summary = "List Driver Dictionary", description = "Page through driver dictionary entries for the current tenant. " +
+            "Use to pick a driver (protocol adapter) when registering or reassigning a device; returns a page of driver dictionaries.")
     @PostMapping("/driver")
     public Mono<R<Page<DictionaryVO>>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -85,7 +86,8 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Profile Dictionary", description = "List profile dictionary entries with pagination")
+    @Operation(summary = "List Profile Dictionary", description = "Page through profile template dictionaries for the current tenant. " +
+            "Use to select which profile template a device instantiates; returns a page of profile dictionaries.")
     @PostMapping("/profile")
     public Mono<R<Page<DictionaryVO>>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,7 +106,8 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Profile Point Dictionary", description = "List point dictionary entries for a profile")
+    @Operation(summary = "List Profile Point Dictionary", description = "Page through the point dictionaries declared on a given profile template. " +
+            "Use to discover which measurable channels a profile exposes; the query must carry a valid profile parent id.")
     @PostMapping("/profile_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForProfile(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
@@ -124,7 +127,8 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Device Point Dictionary", description = "List point dictionary entries for a device")
+    @Operation(summary = "List Device Point Dictionary", description = "Page through the point dictionaries available on a given device. " +
+            "Use to pick a target point before reading values or sending commands; the query must carry a valid device parent id.")
     @PostMapping("/device_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForDevice(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
@@ -144,7 +148,8 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Device Dictionary", description = "List device dictionary entries with pagination")
+    @Operation(summary = "List Device Dictionary", description = "Page through device dictionaries for the current tenant. " +
+            "Use to select a target device for value reads, commands or configuration; returns a page of device dictionaries.")
     @PostMapping("/device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -163,7 +168,8 @@ public class DictionaryForManagerController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Driver Device Dictionary", description = "List device dictionary entries for a driver")
+    @Operation(summary = "List Driver Device Dictionary", description = "Page through the device dictionaries managed by a given driver. " +
+            "Use to find which devices a protocol adapter is responsible for; the query must carry a valid driver parent id.")
     @PostMapping("/driver_device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionaryForDriver(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {

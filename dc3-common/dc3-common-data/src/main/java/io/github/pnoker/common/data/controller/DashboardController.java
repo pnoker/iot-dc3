@@ -64,7 +64,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2026.5.2
  */
-@Tag(name = "dashboard", description = "Dashboard")
+@Tag(name = "dashboard", description = "Data monitoring dashboard configuration: manage data-side dashboard layouts, widgets, and visualization preferences for device data monitoring")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DASHBOARD_URL_PREFIX)
@@ -76,7 +76,7 @@ public class DashboardController implements BaseController {
     private final io.github.pnoker.common.data.biz.SystemHealthService systemHealthService;
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Today Statistics", description = "Get today, yesterday, cumulative counts, and change ratios")
+    @Operation(summary = "Get Today Statistics", description = "Return today's, yesterday's and cumulative counts (devices, points, alerts) with day-over-day change ratios for the current tenant. Powers the dashboard headline tiles.")
     @GetMapping("/stats/today")
     public Mono<R<TodayStatsVO>> today() {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -92,7 +92,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Dashboard Time Series", description = "Get dashboard statistics as a time series by granularity")
+    @Operation(summary = "Get Dashboard Time Series", description = "Bucket today's, yesterday's and cumulative device/point/alert counts into hour or day buckets over a rolling window (range_key or range_hours) for the current tenant. Use to render the dashboard trend chart.")
     @GetMapping("/stats/timeseries")
     public Mono<R<List<TimeseriesPointVO>>> timeseries(
             @Parameter(description = "Time bucket granularity, for example hour or day")
@@ -106,7 +106,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Dashboard Ranking", description = "Get dashboard top ranking data")
+    @Operation(summary = "Get Dashboard Ranking", description = "Rank the tenant's devices, points or drivers by activity over a rolling window (range_key or range_hours), returning the top N entries for the chosen dimension. Use to surface the busiest entities.")
     @GetMapping("/top")
     public Mono<R<List<TopEntityVO>>> top(@Parameter(description = "Ranking dimension") @RequestParam(value = "dimension", defaultValue = "device") String dimension,
                                           @Parameter(description = "Fallback rolling time range in hours")
@@ -120,28 +120,28 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Dashboard Live Stream", description = "Get dashboard live stream data")
+    @Operation(summary = "Get Dashboard Live Stream", description = "Return the N most recent point-value readings across the tenant's points, newest first. Use to populate the live feed panel on a user-triggered refresh.")
     @GetMapping("/stream")
     public Mono<R<List<LatestPointValueVO>>> stream(@Parameter(description = "Maximum number of items to return") @RequestParam(value = "size", defaultValue = "20") int size) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.latestStream(tenantId, size))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Alert Statistics", description = "Get dashboard alert statistics")
+    @Operation(summary = "Get Alert Statistics", description = "Return the tenant's current alert totals: total count, unconfirmed count and a breakdown by alarm type. Use to populate the alert summary cards.")
     @GetMapping("/alert/stats")
     public Mono<R<AlertStatsVO>> alertStats() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertStats(tenantId))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "List Latest Alerts", description = "List the latest dashboard alerts limited by size")
+    @Operation(summary = "List Latest Alerts", description = "Return the N most recent alerts for the current tenant, newest first. Use to populate the recent-alerts list; each item carries source, alarm type, message and confirm state.")
     @GetMapping("/alert/latest")
     public Mono<R<List<AlertItemVO>>> alertLatest(@Parameter(description = "Maximum number of items to return") @RequestParam(value = "size", defaultValue = "10") int size) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertLatest(tenantId, size))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Latency Histogram", description = "Get dashboard latency histogram statistics")
+    @Operation(summary = "Get Latency Histogram", description = "Bucket the tenant's point-value collection latencies over a rolling window (range_key or range_hours) into histogram bands. Use to assess how fresh the ingested readings are.")
     @GetMapping("/stats/latency")
     public Mono<R<List<LatencyBucketVO>>> latencyHistogram(
             @Parameter(description = "Fallback rolling time range in hours")
@@ -153,7 +153,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Hourly Activity", description = "Get dashboard hourly activity statistics")
+    @Operation(summary = "Get Hourly Activity", description = "Aggregate the tenant's data-collection activity into hour-of-day cells over a rolling window (default 168 hours / one week). Use to render the activity heatmap and spot quiet or peak hours.")
     @GetMapping("/stats/activity")
     public Mono<R<List<ActivityCellVO>>> hourlyActivity(
             @Parameter(description = "Fallback rolling time range in hours")
@@ -170,14 +170,14 @@ public class DashboardController implements BaseController {
      * tenantId through to match the gRPC facades' tenant filter.
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get System Health", description = "Get dashboard system health status")
+    @Operation(summary = "Get System Health", description = "Return a platform-wide health snapshot: center and infra probe status plus tenant-scoped driver and device fleet summaries. Use to populate the home banner health widget.")
     @GetMapping("/system/health")
     public Mono<R<SystemHealthVO>> systemHealth() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(systemHealthService.snapshot(tenantId))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'list')")
-    @Operation(summary = "List Alerts", description = "List dashboard alert records with pagination")
+    @Operation(summary = "List Alerts", description = "Page through the tenant's alert records with filters for source (driver/device/point), alarm type, confirm flag and a time window. Use to browse or triage the alert history table.")
     @PostMapping("/alert/page")
     public Mono<R<Page<AlertItemVO>>> alertPage(
             @RequestBody(required = false) AlertPageQuery query) {
@@ -193,7 +193,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'list')")
-    @Operation(summary = "Confirm Alert", description = "Confirm an alert for a specific source")
+    @Operation(summary = "Confirm Alert", description = "Mark a single alert (by source and record id) as acknowledged for the current tenant. Returns true when the row was actually updated.")
     @PostMapping("/alert/confirm")
     public Mono<R<Boolean>> alertConfirm(@Parameter(description = "Alert source") @RequestParam String source,
                                          @Parameter(description = "Record ID") @RequestParam Long id) {
@@ -201,7 +201,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'list')")
-    @Operation(summary = "Unconfirm Alert", description = "Remove the confirmation state from an alert for a specific source")
+    @Operation(summary = "Unconfirm Alert", description = "Remove the acknowledgement flag from a single alert (by source and record id) for the current tenant. Returns true when the row was actually updated.")
     @PostMapping("/alert/unconfirm")
     public Mono<R<Boolean>> alertUnconfirm(@Parameter(description = "Alert source") @RequestParam String source,
                                            @Parameter(description = "Record ID") @RequestParam Long id) {
@@ -213,7 +213,7 @@ public class DashboardController implements BaseController {
      * }. Returns the number of rows actually changed.
      */
     @PreAuthorize("@perm.can('dashboard', 'list')")
-    @Operation(summary = "Bulk Confirm Alerts", description = "Bulk confirm or unconfirm alert records")
+    @Operation(summary = "Bulk Confirm Alerts", description = "Apply confirm or unconfirm to a list of alerts (each {source, id}) for the current tenant in one call. Returns the count of rows actually changed.")
     @PostMapping("/alert/bulk_confirm")
     public Mono<R<Integer>> alertBulkConfirm(
             @RequestBody AlertBulkConfirmRequest body) {
@@ -227,7 +227,8 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Alert Trend", description = "Get alert trend by time range")
+    @Operation(summary = "Get Alert Trend", description = "Return daily alert counts over a rolling day range for the current tenant. " +
+            "Use to visualize whether alert volume is rising or falling; each item is one day's count.")
     @GetMapping("/alert/trend")
     public Mono<R<List<AlertTrendVO>>> alertTrend(@Parameter(description = "Rolling day range") @RequestParam(value = "days", defaultValue = "30") int days,
                                                   @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
@@ -237,7 +238,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Top Alert Sources", description = "Get top alert sources by time range")
+    @Operation(summary = "Get Top Alert Sources", description = "Rank the tenant's alert sources (driver/device/point) by alert volume over a rolling day range, returning the top N. Use to find which entities generate the most alerts.")
     @GetMapping("/alert/top_sources")
     public Mono<R<List<AlertTopSourceVO>>> alertTopSources(@Parameter(description = "Rolling day range") @RequestParam(value = "days", defaultValue = "30") int days,
                                                            @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
@@ -269,7 +270,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Alert Activity", description = "Get alert activity heatmap distribution")
+    @Operation(summary = "Get Alert Activity", description = "Aggregate the tenant's alerts into hour-of-day-by-day cells over a rolling day range. Use to render the alert heatmap and surface peak alerting hours.")
     @GetMapping("/alert/activity")
     public Mono<R<List<AlertActivityCellVO>>> alertActivity(@Parameter(description = "Rolling day range") @RequestParam(value = "days", defaultValue = "7") int days,
                                                             @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")
@@ -279,7 +280,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Alert Type Distribution", description = "Get alert type distribution by time range")
+    @Operation(summary = "Get Alert Type Distribution", description = "Bucket the tenant's alerts by alarm type over a rolling day range. Use to see which alarm categories dominate within the window.")
     @GetMapping("/alert/type_distribution")
     public Mono<R<List<AlertTypeBucketVO>>> alertTypeDistribution(
             @Parameter(description = "Rolling day range")
@@ -291,7 +292,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Alert Storm Sources", description = "Get high-frequency alert sources within a short time window")
+    @Operation(summary = "Get Alert Storm Sources", description = "Detect the tenant's alert storms by flagging sources whose alert count inside a short rolling hour window exceeds a threshold. Use to spot bursty or flooding alert producers.")
     @GetMapping("/alert/storm_sources")
     public Mono<R<List<AlertTopSourceVO>>> alertStormSources(
             @Parameter(description = "Rolling hour range")
@@ -306,7 +307,7 @@ public class DashboardController implements BaseController {
     // ===== Phase-2 insights =====================================================
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Flapping Alert Sources", description = "Get alert sources with frequent confirm and recovery changes")
+    @Operation(summary = "Get Flapping Alert Sources", description = "Flag the tenant's alert sources that toggle confirm and recovery state repeatedly inside a rolling hour window above a count threshold. Use to find noisy, oscillating alerts that may need suppression.")
     @GetMapping("/alert/flapping")
     public Mono<R<List<FlappingSourceVO>>> alertFlapping(@Parameter(description = "Rolling hour range") @RequestParam(value = "hours", defaultValue = "6") int hours,
                                                          @Parameter(description = "Minimum alert count threshold")
@@ -317,7 +318,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Alert Correlation", description = "Get highly correlated alert source pairs within a time window")
+    @Operation(summary = "Get Alert Correlation", description = "Return alert source pairs that fire within a tight time window of each other over a rolling hour range, scored by co-occurrence. Use to discover alerts that share an upstream root cause.")
     @GetMapping("/alert/correlation")
     public Mono<R<List<CorrelationPairVO>>> alertCorrelation(
             @Parameter(description = "Rolling hour range")
@@ -330,7 +331,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Peer Deviation Alerts", description = "Get alert deviations among peer entities")
+    @Operation(summary = "Get Peer Deviation Alerts", description = "Compare each peer entity's alert rate against the cohort baseline over a rolling day range and flag statistically significant deviations. Use to catch entities that alert far more than their peers.")
     @GetMapping("/alert/peer_deviation")
     public Mono<R<List<PeerDeviationVO>>> alertPeerDeviation(
             @Parameter(description = "Rolling day range")
@@ -339,28 +340,28 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Alert Aging Backlog", description = "Get unconfirmed alert backlog aging buckets")
+    @Operation(summary = "Get Alert Aging Backlog", description = "Bucket the tenant's currently unconfirmed alerts by elapsed age for the current tenant. Use to surface stale alerts that are still awaiting acknowledgement.")
     @GetMapping("/alert/aging")
     public Mono<R<AgingBacklogVO>> alertAging() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertAgingBacklog(tenantId))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get MTTA Trend", description = "Get mean time to acknowledge trend for alerts")
+    @Operation(summary = "Get MTTA Trend", description = "Return the mean time to acknowledge alerts per day over a rolling day range for the current tenant. Use to track whether the team is getting faster at acknowledging alerts.")
     @GetMapping("/alert/mtta")
     public Mono<R<List<MttaTrendVO>>> alertMtta(@Parameter(description = "Rolling day range") @RequestParam(value = "days", defaultValue = "30") int days) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertMtta(tenantId, days))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Protocol Health", description = "Get protocol-level system health status")
+    @Operation(summary = "Get Protocol Health", description = "Return per-protocol health and connectivity status for the tenant's driver fleet. Use to see which protocols are online, degraded, or offline.")
     @GetMapping("/protocol/health")
     public Mono<R<List<ProtocolHealthVO>>> protocolHealth() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.protocolHealth(tenantId))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Change Impact", description = "Get alert impact caused by configuration changes")
+    @Operation(summary = "Get Change Impact", description = "Correlate the tenant's configuration changes with subsequent alert-volume shifts over a rolling day range, returning the top-impacted items. Use to confirm whether a config edit improved or hurt alert noise.")
     @GetMapping("/alert/change_impact")
     public Mono<R<List<ChangeImpactVO>>> changeImpact(@Parameter(description = "Rolling day range") @RequestParam(value = "days", defaultValue = "30") int days,
                                                       @Parameter(description = "Maximum number of items to return")
@@ -369,7 +370,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Silent Data Sources", description = "Get data sources that have produced no data beyond the threshold")
+    @Operation(summary = "Get Silent Data Sources", description = "Detect the tenant's points or devices that have produced no new data beyond a silence threshold, compared against a baseline day range. Use to catch sensors or devices that have stopped reporting.")
     @GetMapping("/silent/sources")
     public Mono<R<List<SilentSourceVO>>> silentSources(
             @Parameter(description = "Baseline rolling day range")
@@ -382,7 +383,7 @@ public class DashboardController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Coverage Gap", description = "Get data coverage gap statistics")
+    @Operation(summary = "Get Coverage Gap", description = "Summarize the tenant's data-coverage gaps, listing points or devices missing expected recent readings. Use to find blind spots in collection coverage.")
     @GetMapping("/coverage/gap")
     public Mono<R<CoverageGapVO>> coverageGap(@Parameter(description = "Maximum number of items to return") @RequestParam(value = "limit", defaultValue = "100") int limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.coverageGap(tenantId, limit))));

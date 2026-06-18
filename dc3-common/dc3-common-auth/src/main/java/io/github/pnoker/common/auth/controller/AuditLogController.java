@@ -44,7 +44,7 @@ import java.util.List;
  * @version 2026.6.14
  * @since 2026.6.14
  */
-@Tag(name = "identity_audit", description = "Identity audit log")
+@Tag(name = "identity_audit", description = "Identity audit trails: query authentication and authorization event logs for security compliance and forensic analysis")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.IDENTITY_AUDIT_URL_PREFIX)
@@ -55,7 +55,9 @@ public class AuditLogController implements BaseController {
 
     @PreAuthorize("@perm.can('audit', 'list')")
     @Operation(summary = "List Identity Audit Log",
-            description = "List identity/authorization change audit entries for the caller's tenant")
+            description = "List identity and authorization audit entries for the current tenant, with optional filters " +
+                    "by principal, action, resource type/id and status, plus a result limit. Admin-only; returns an " +
+                    "append-only trail of who changed which identity or permission.")
     @PostMapping("/list")
     public Mono<R<List<IdentityAuditLogDO>>> list(
             @Parameter(description = "Principal ID") @RequestParam(value = "principalId", required = false) Long principalId,

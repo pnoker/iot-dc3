@@ -45,15 +45,15 @@ public class CommandHistoryQueryVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "device ID")
+    @Schema(description = "Filter by device ID.", example = "1024")
 
     private Long deviceId;
 
-    @Schema(description = "command ID")
+    @Schema(description = "Filter by command definition ID.", example = "4096")
 
     private Long commandId;
 
-    @Schema(description = "command code")
+    @Schema(description = "Filter by command code.", example = "READ_HOLDING_REG")
 
     private String commandCode;
 

@@ -50,7 +50,7 @@ import reactor.core.publisher.Mono;
  * @version 2025.9.0
  * @since 2026.5.2
  */
-@Tag(name = "dashboard", description = "Dashboard")
+@Tag(name = "dashboard", description = "Manager dashboard configuration: manage device-management dashboard layouts, widgets, and display preferences")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DASHBOARD_URL_PREFIX)
@@ -60,14 +60,17 @@ public class DashboardController implements BaseController {
     private final DashboardService dashboardService;
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Driver Statistics", description = "Get dashboard driver statistics")
+    @Operation(summary = "Get Driver Statistics", description = "Aggregate driver statistics for the current tenant for the dashboard home view. " +
+            "Returns driver counts grouped by enable status and protocol type; use to surface driver distribution across the tenant.")
     @GetMapping("/driver/stats")
     public Mono<R<DriverStatsVO>> driverStats() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.driverStats(tenantId))));
     }
 
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Device Statistics", description = "Get dashboard device statistics")
+    @Operation(summary = "Get Device Statistics", description = "Aggregate device statistics for the current tenant for the dashboard home view. " +
+            "Returns device counts plus the top-N devices by point-value volume, where N is set by the top_n parameter (default 10); " +
+            "use to surface device distribution and the most active devices.")
     @GetMapping("/device/stats")
     public Mono<R<DeviceStatsVO>> deviceStats(@Parameter(description = "Number of top items to return") @RequestParam(value = "top_n", defaultValue = "10") int topN) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.deviceStats(tenantId, topN))));
@@ -79,7 +82,8 @@ public class DashboardController implements BaseController {
      * arrays so the frontend never has to reason about missing days.
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Resource Growth Trend", description = "Get daily growth trends for drivers, devices, profiles, and points")
+    @Operation(summary = "Get Resource Growth Trend", description = "Return daily new-row counts for driver, device, point and profile tables over the trailing days window (default 7). " +
+            "Tenant-scoped and zero-padded to a fixed length per resource so missing days appear as zero; backs the stat-card sparklines.")
     @GetMapping("/growth")
     public Mono<R<GrowthVO>> dailyGrowth(@Parameter(description = "Rolling day range") @RequestParam(value = "days", defaultValue = "7") int days) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.dailyGrowth(tenantId, days))));
@@ -98,7 +102,9 @@ public class DashboardController implements BaseController {
      * </p>
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
-    @Operation(summary = "Get Topology", description = "Get topology relationships among drivers, devices, profiles, and points")
+    @Operation(summary = "Get Topology", description = "Build the Driver → Device → Profile → Point topology for the current tenant. " +
+            "Cardinality mode (default) counts relationships along each edge; the range_key parameter selects a preset time window. " +
+            "Returns a Sankey graph with server-side top-N cropping and others pseudo-nodes carrying hidden children for drill-in.")
     @GetMapping("/topology")
     public Mono<R<TopologyVO>> topology(@Parameter(description = "Topology mode") @RequestParam(value = "mode", defaultValue = "cardinality") String mode,
                                         @Parameter(description = "Preset time range key: today, 24h, 7d, or 30d")

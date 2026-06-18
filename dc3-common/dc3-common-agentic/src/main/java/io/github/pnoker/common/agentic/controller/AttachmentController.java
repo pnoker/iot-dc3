@@ -48,7 +48,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "attachment", description = "AI attachments")
+@Tag(name = "attachment", description = "Agent conversation attachments: manage files, images, and structured data objects associated with AI agent conversation messages")
 @RestController
 @RequestMapping(AgenticConstant.ATTACHMENT_URL_PREFIX)
 @RequiredArgsConstructor
@@ -59,7 +59,8 @@ public class AttachmentController implements BaseController {
     private final AttachmentService attachmentService;
 
     @PreAuthorize("@perm.can('attachment', 'list')")
-    @Operation(summary = "Upload AI Attachment", description = "Upload an AI attachment for a conversation")
+    @Operation(summary = "Upload Attachment", description = "Upload a file as an attachment to the given AI conversation for the current tenant and user. " +
+            "Returns the stored attachment metadata; the file then becomes available as context the assistant can reference in that conversation.")
     @PostMapping("/upload")
     public Mono<R<AttachmentVO>> upload(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                         @RequestPart("file") Mono<FilePart> filePart) {
@@ -75,7 +76,8 @@ public class AttachmentController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('attachment', 'list')")
-    @Operation(summary = "List AI Attachments", description = "List AI attachments for a conversation")
+    @Operation(summary = "List Attachments", description = "List the attachments uploaded to the given AI conversation, scoped to the current tenant and user. " +
+            "Returns attachment metadata entries; use to discover files the assistant can reference in that conversation.")
     @GetMapping("/list")
     public Mono<R<List<AttachmentVO>>> list(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {

@@ -45,7 +45,7 @@ import java.util.Objects;
  * @since 2016.10.1
  */
 
-@Tag(name = "topic", description = "Topics")
+@Tag(name = "topic", description = "Message topic definitions: manage named routing channels for device data and command messages flowing through the platform message bus")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.TOPIC_URL_PREFIX)
@@ -55,7 +55,8 @@ public class TopicController implements BaseController {
     private final TopicService topicService;
 
     @PreAuthorize("@perm.can('topic', 'list')")
-    @Operation(summary = "List Topics", description = "List topics with pagination")
+    @Operation(summary = "List Topics", description = "Page through broker topics mapped to their device and point for the current tenant. " +
+            "Filter by topic name or device name to resolve which device and point a message topic is bound to; returns a page of topic bindings.")
     @PostMapping("/list")
     public Mono<R<Page<TopicVO>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

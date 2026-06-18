@@ -64,7 +64,7 @@ public class PointCommandWriteVO implements Serializable {
      * When provided and already exists, returns the existing command status.
      * When omitted, the server generates a new UUID.
      */
-    @Schema(description = "command ID")
+    @Schema(description = "ID of the write command to invoke.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
     private String commandId;
 
 }

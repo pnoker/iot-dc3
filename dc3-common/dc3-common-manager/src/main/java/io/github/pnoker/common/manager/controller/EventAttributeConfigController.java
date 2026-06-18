@@ -62,7 +62,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "event_attribute_config", description = "Event attribute configurations")
+@Tag(name = "event_attribute_config", description = "Event attribute configuration values: set and update per-device customization values for event properties inherited from event attribute definitions")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.EVENT_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -86,7 +86,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'add')")
-    @Operation(summary = "Add Event Attribute Configuration", description = "Create an event attribute configuration record")
+    @Operation(summary = "Add Event Attribute Configuration", description = "Set the configured value of one event attribute field for a specific device and event under the current tenant. Use to override the attribute definition declared on the profile template for that device instance; returns the new config ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,9 +104,9 @@ public class EventAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'delete')")
-    @Operation(summary = "Delete Event Attribute Configuration", description = "Delete an event attribute configuration record by ID")
+    @Operation(summary = "Delete Event Attribute Configuration", description = "Permanently delete one event attribute configuration by ID (tenant-scoped). Removes the device's configured value for that attribute while leaving the attribute definition on the profile template intact; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, eventAttributeConfigService.getById(id));
             eventAttributeConfigService.delete(id);
@@ -121,7 +121,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'update')")
-    @Operation(summary = "Update Event Attribute Configuration", description = "Update an event attribute configuration record")
+    @Operation(summary = "Update Event Attribute Configuration", description = "Change the configured value of an existing event attribute field for a specific device and event under the current tenant. Tenant ownership of the record is verified before applying the update.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -140,9 +140,9 @@ public class EventAttributeConfigController implements BaseController {
      * @return EventAttributeConfigVO {@link EventAttributeConfigVO}
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
-    @Operation(summary = "Get Event Attribute Configuration by ID", description = "Get event attribute configuration details by ID")
+    @Operation(summary = "Get Event Attribute Configuration by ID", description = "Fetch one event attribute configuration by its record ID (tenant-scoped). Use to inspect the configured value a device uses for a single event attribute field.")
     @GetMapping("/get_by_id")
-    public Mono<R<EventAttributeConfigVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<EventAttributeConfigVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             EventAttributeConfigBO entityBO = requireTenant(tenantId, eventAttributeConfigService.getById(id));
             EventAttributeConfigVO entityVO = eventAttributeConfigBuilder.buildVOByBO(entityBO);
@@ -159,7 +159,10 @@ public class EventAttributeConfigController implements BaseController {
      * @return EventConfig
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
-    @Operation(summary = "Get Event Attribute Configuration by Attribute, Device, and Event IDs", description = "Get event attribute configuration details by attribute ID, device ID, and event ID")
+    @Operation(summary = "Get Event Attribute Configuration by Attribute, Device, and Event IDs",
+            description = "Fetch the configured value of one event attribute field for a specific device, event, " +
+                    "and attribute. Validates that the device's profile matches the event and its driver matches " +
+                    "the attribute before returning; use when you need a single attribute's device-specific override.")
     @GetMapping("/get_by_attribute_id_and_device_id_and_event_id")
     public Mono<R<EventAttributeConfigVO>> getByAttributeIdAndDeviceIdAndEventId(
             @Parameter(description = "Attribute ID") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
@@ -183,7 +186,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return EventConfig
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "List Event Attribute Configurations by Device and Event IDs", description = "List event attribute configurations by device ID and event ID")
+    @Operation(summary = "List Event Attribute Configurations by Device and Event IDs", description = "Return every event attribute configuration for one device and one event (tenant-scoped). Use to read all configured values the device supplies for that event's attributes; the device's profile must match the event.")
     @GetMapping("/list_by_device_id_and_event_id")
     public Mono<R<List<EventAttributeConfigVO>>> listByDeviceIdAndEventId(
             @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -204,7 +207,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return EventConfig
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "List Event Attribute Configurations by Device ID", description = "List event attribute configurations by device ID")
+    @Operation(summary = "List Event Attribute Configurations by Device ID", description = "Return every event attribute configuration for one device across all of its events (tenant-scoped). Use to read the full set of configured event-attribute values a device uses.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<EventAttributeConfigVO>>> listByDeviceId(
             @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -224,7 +227,7 @@ public class EventAttributeConfigController implements BaseController {
      * @return Page Of EventConfig
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "List Event Attribute Configurations", description = "List event attribute configurations with pagination")
+    @Operation(summary = "List Event Attribute Configurations", description = "Page through event attribute configurations for the current tenant with filters from the query body. Returns a page of configurations; use for browsing or selecting a target configuration.")
     @PostMapping("/list")
     public Mono<R<Page<EventAttributeConfigVO>>> list(
             @RequestBody(required = false) EventAttributeConfigQuery entityQuery) {

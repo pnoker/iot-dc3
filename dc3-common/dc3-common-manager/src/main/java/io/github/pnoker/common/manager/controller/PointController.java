@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "point", description = "Points")
+@Tag(name = "point", description = "Data point definitions: manage measurable or controllable attributes of industrial devices including read/write mode, data type, and value range")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.POINT_URL_PREFIX)
@@ -89,7 +89,8 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point', 'add')")
-    @Operation(summary = "Add Point", description = "Create a point record")
+    @Operation(summary = "Add Point", description = "Define a new point (a single measurable channel such as a temperature reading) on a profile template for the current tenant. " +
+            "Points are later attached to devices and read or written through the driver; returns the new point ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -107,9 +108,10 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point', 'delete')")
-    @Operation(summary = "Delete Point", description = "Delete a point record by ID")
+    @Operation(summary = "Delete Point", description = "Permanently remove a point from its profile template by ID (tenant-scoped). " +
+            "The point definition is removed from every device that instantiates the profile; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointService.getById(id));
             pointService.delete(id);
@@ -124,7 +126,8 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point', 'update')")
-    @Operation(summary = "Update Point", description = "Update a point record")
+    @Operation(summary = "Update Point", description = "Modify the definition of an existing point (name, data type, unit, access mode and similar fields) on its profile template. " +
+            "Changes apply to every device that instantiates the profile; tenant ownership is verified before mutating.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -143,9 +146,10 @@ public class PointController implements BaseController {
      * @return PointVO {@link PointVO}
      */
     @PreAuthorize("@perm.can('point', 'get')")
-    @Operation(summary = "Get Point by ID", description = "Get point details by ID")
+    @Operation(summary = "Get Point by ID", description = "Fetch a single point's definition (data type, unit, access mode and metadata) by ID. " +
+            "Tenant-scoped; use to inspect a point before reading its values or binding it to a device.")
     @GetMapping("/get_by_id")
-    public Mono<R<PointVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<PointVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointBO entityBO = requireTenant(tenantId, pointService.getById(id));
             PointVO entityVO = pointBuilder.buildVOByBO(entityBO);
@@ -160,7 +164,8 @@ public class PointController implements BaseController {
      * @return Map(ID, PointVO)
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "List Points by IDs", description = "List points by ID list")
+    @Operation(summary = "List Points by IDs", description = "Resolve a batch of point IDs to their definitions for the current tenant. " +
+            "Returns a map of point ID to point VO; IDs the tenant does not own are filtered out, so callers should treat missing keys as not-found.")
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, PointVO>>> listByIds(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -178,7 +183,8 @@ public class PointController implements BaseController {
      * @return Point
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "List Points by Profile ID", description = "List points by profile ID")
+    @Operation(summary = "List Points by Profile ID", description = "Return every point defined on a given profile template (tenant-scoped). " +
+            "Use to enumerate the measurable channels a device will expose once it instantiates the profile; the profile must belong to the tenant.")
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<PointVO>>> listByProfileId(@Parameter(description = "Profile ID") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -196,7 +202,8 @@ public class PointController implements BaseController {
      * @return Point Array
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "List Points by Device ID", description = "List points by device ID")
+    @Operation(summary = "List Points by Device ID", description = "Return every point available on a specific device (tenant-scoped). " +
+            "These are the channels the bound driver can read or write for that device; the device must belong to the tenant.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<PointVO>>> listByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -214,7 +221,8 @@ public class PointController implements BaseController {
      * @return Page Of Point
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "List Points", description = "List points with pagination")
+    @Operation(summary = "List Points", description = "Page through points for the current tenant with filters such as name and profile. " +
+            "Returns a page of point definitions; use for browsing points or selecting targets for value reads, writes or device binding.")
     @PostMapping("/list")
     public Mono<R<Page<PointVO>>> list(@RequestBody(required = false) PointQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -231,7 +239,8 @@ public class PointController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "List Point Units", description = "List point units by point IDs")
+    @Operation(summary = "List Point Units", description = "Resolve the engineering unit (for example Celsius or percent) of each point in a batch of IDs (tenant-scoped). " +
+            "Returns a map of point ID to unit string; only tenant-owned points are included.")
     @PostMapping("/unit")
     public Mono<R<Map<Long, String>>> unit(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -254,7 +263,8 @@ public class PointController implements BaseController {
      * @return {@link R}<{@link Set}<{@link Long}>>
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "Get Point Device Statistics", description = "Get device statistics associated with a point")
+    @Operation(summary = "Get Point Device Statistics", description = "Return device-level statistics for a single point, such as how many devices expose it (tenant-scoped). " +
+            "Use to gauge the blast radius of editing a point before changing its definition; the point must belong to the tenant.")
     @GetMapping("/list_device_statistics_by_point_id")
     public Mono<R<DeviceByPointVO>> getPointStatisticsWithDevice(
             @Parameter(description = "Point ID") @NotNull @RequestParam(value = "point_id") Long pointId) {
@@ -271,7 +281,8 @@ public class PointController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "Count Points by Device", description = "Count points scoped by device ID")
+    @Operation(summary = "Count Points by Device", description = "Return the number of points available on a specific device (tenant-scoped). " +
+            "Use for quick cardinality checks without fetching full definitions; the device must belong to the tenant.")
     @GetMapping("/get_count_by_device_id")
     public Mono<R<Long>> getPointByDeviceId(@Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -286,7 +297,8 @@ public class PointController implements BaseController {
      * @return
      */
     @PreAuthorize("@perm.can('point', 'get')")
-    @Operation(summary = "Get Device Point Configuration", description = "Get point configuration details by device ID")
+    @Operation(summary = "Get Device Point Configuration", description = "Fetch the resolved point configuration for a device, merging the profile template definitions with the device's per-instance attribute values (tenant-scoped). " +
+            "Use to see exactly how each point is configured before issuing reads, writes or commands through the driver.")
     @GetMapping("/get_point_config_by_device_id")
     public Mono<R<PointConfigByDeviceVO>> getPointConfigByDeviceId(
             @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {

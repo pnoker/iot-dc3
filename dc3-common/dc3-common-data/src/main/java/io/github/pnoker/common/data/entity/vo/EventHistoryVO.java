@@ -55,7 +55,7 @@ public class EventHistoryVO implements Serializable {
 
     private Long id;
 
-    @Schema(description = "record ID")
+    @Schema(description = "Unique record ID for this event history entry.", example = "123456")
 
     private String recordId;
 
@@ -63,15 +63,15 @@ public class EventHistoryVO implements Serializable {
 
     private Long tenantId;
 
-    @Schema(description = "device ID")
+    @Schema(description = "ID of the device that triggered this event.", example = "1024")
 
     private Long deviceId;
 
-    @Schema(description = "event ID")
+    @Schema(description = "ID of the event definition.", example = "4096")
 
     private Long eventId;
 
-    @Schema(description = "event code")
+    @Schema(description = "Event code. Stable business identifier for this event.", example = "HIGH_TEMP_ALARM")
 
     private String eventCode;
 
@@ -93,22 +93,22 @@ public class EventHistoryVO implements Serializable {
 
     private String message;
 
-    @Schema(description = "occur time")
+    @Schema(description = "Timestamp when the event occurred on the device.")
 
     private LocalDateTime occurTime;
 
-    @Schema(description = "receive time")
+    @Schema(description = "Timestamp when the platform received the event report.")
 
     private LocalDateTime receiveTime;
 
     @Schema(description = "Acknowledge flag enum", example = "NO")
     private EventHistoryAcknowledgeFlagEnum acknowledgeFlag;
 
-    @Schema(description = "acknowledge time")
+    @Schema(description = "Timestamp when a user acknowledged this event. Null if not yet acknowledged.")
 
     private LocalDateTime acknowledgeTime;
 
-    @Schema(description = "acknowledge user ID")
+    @Schema(description = "ID of the user who acknowledged this event. Null if not yet acknowledged.")
 
     private Long acknowledgeUserId;
 

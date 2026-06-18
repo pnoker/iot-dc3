@@ -47,7 +47,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "token", description = "Token authentication")
+@Tag(name = "token", description = "Token-based authentication: login, logout, token refresh, and session invalidation for user and service account sessions")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.TOKEN_URL_PREFIX)
@@ -64,7 +64,8 @@ public class TokenController implements BaseController {
     // permitted in WebFluxSecurityConfig (POST /token/salt).
     @PublicEndpoint
     @SecurityRequirements
-    @Operation(summary = "Generate Token Salt", description = "Generate a random salt for token authentication, valid for 5 minutes")
+    @Operation(summary = "Generate Token Salt", description = "Generate a random salt for a user under the given tenant, " +
+            "used to salt the password on the subsequent token-generation call. The salt expires in 5 minutes; returns it as a string.")
     @PostMapping("/salt")
     public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -83,7 +84,8 @@ public class TokenController implements BaseController {
     // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/generate).
     @PublicEndpoint
     @SecurityRequirements
-    @Operation(summary = "Generate Token", description = "Generate an authentication token, valid for 12 hours")
+    @Operation(summary = "Generate Token", description = "Issue an access token for a user by validating name, salt, password and tenant. " +
+            "Call after generating a salt; the returned token authenticates the user for 12 hours.")
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -104,7 +106,8 @@ public class TokenController implements BaseController {
     // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/change_password).
     @PublicEndpoint
     @SecurityRequirements
-    @Operation(summary = "Change Password", description = "Change a local credential password during login")
+    @Operation(summary = "Change Password", description = "Change a user's password using the current password and a new one, scoped to the given tenant. " +
+            "Use during login when a token cannot be issued because the credential is expired or flagged for a mandatory change.")
     @PostMapping("/change_password")
     public Mono<R<Boolean>> changePassword(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -121,7 +124,8 @@ public class TokenController implements BaseController {
      * @return true when the logout was accepted
      */
     @PreAuthorize("@perm.can('token', 'delete')")
-    @Operation(summary = "Cancel Token", description = "Cancel a token authentication session")
+    @Operation(summary = "Cancel Token", description = "Acknowledge a client-initiated logout for the current token of the named user under the given tenant. " +
+            "Requires token:delete permission; returns true when the session is cancelled.")
     @PostMapping("/cancel")
     public Mono<R<Boolean>> cancelToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -137,7 +141,8 @@ public class TokenController implements BaseController {
      * @return ,
      */
     @PreAuthorize("@perm.can('token', 'get')")
-    @Operation(summary = "Validate Token", description = "Validate whether the authentication token is still valid")
+    @Operation(summary = "Validate Token", description = "Check whether the supplied token for the named user and tenant is still valid. " +
+            "Requires token:get permission; returns validity plus the token's expiry time.")
     @PostMapping("/check")
     public Mono<R<Boolean>> checkValid(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {

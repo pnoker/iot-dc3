@@ -54,7 +54,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "rule", description = "Rules")
+@Tag(name = "rule", description = "Data processing rule definitions: manage filtering, transformation, and routing pipelines that process device data streams through the rule engine")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.RULE_URL_PREFIX)
@@ -66,7 +66,7 @@ public class RuleController implements BaseController {
     private final RuleService ruleService;
 
     @PreAuthorize("@perm.can('rule', 'add')")
-    @Operation(summary = "Add Rule", description = "Create a rule record")
+    @Operation(summary = "Add Rule", description = "Create an alarm or automation rule (trigger conditions plus actions) for the current tenant. Use to register a new rule the engine evaluates against point values or events.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RuleVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -78,9 +78,9 @@ public class RuleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('rule', 'delete')")
-    @Operation(summary = "Delete Rule", description = "Delete a rule record by ID")
+    @Operation(summary = "Delete Rule", description = "Delete a rule owned by the current tenant by its ID. Tenant ownership is verified before deletion; use to retire a rule that should no longer fire.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, ruleService.getById(id));
             ruleService.delete(id);
@@ -89,7 +89,7 @@ public class RuleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('rule', 'update')")
-    @Operation(summary = "Update Rule", description = "Update a rule record")
+    @Operation(summary = "Update Rule", description = "Update the trigger conditions or actions of a rule owned by the current tenant. Tenant ownership is verified before the change is applied.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody RuleVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -102,9 +102,9 @@ public class RuleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('rule', 'get')")
-    @Operation(summary = "Get Rule by ID", description = "Get rule details by ID")
+    @Operation(summary = "Get Rule by ID", description = "Return one rule's full definition (conditions, actions, owner) for the current tenant. Use to inspect or edit a specific rule before updating or deleting it.")
     @GetMapping("/get_by_id")
-    public Mono<R<RuleVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<RuleVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RuleBO entityBO = requireTenant(tenantId, ruleService.getById(id));
             return R.ok(ruleBuilder.buildVOByBO(entityBO));
@@ -112,7 +112,7 @@ public class RuleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('rule', 'list')")
-    @Operation(summary = "List Rules", description = "List rules with pagination")
+    @Operation(summary = "List Rules", description = "Page through alarm and automation rules owned by the current tenant, filtered by the query body. Use to browse or locate rules for inspection; results are scoped to the caller's tenant.")
     @PostMapping("/list")
     public Mono<R<Page<RuleVO>>> list(@RequestBody(required = false) RuleQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

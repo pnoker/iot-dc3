@@ -58,7 +58,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "point_attribute", description = "Point attributes")
+@Tag(name = "point_attribute", description = "Point attribute definitions: manage configurable properties of data points including name, type, default value, and validation rules")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_URL_PREFIX)
@@ -78,7 +78,7 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute', 'add')")
-    @Operation(summary = "Add Point Attribute", description = "Create a point attribute record")
+    @Operation(summary = "Add Point Attribute", description = "Declare a new point attribute field for the current tenant on a given driver. A point attribute is a configurable field definition that tells the driver how to read or write a point's value; returns the new attribute ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -96,9 +96,9 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute', 'delete')")
-    @Operation(summary = "Delete Point Attribute", description = "Delete a point attribute record by ID")
+    @Operation(summary = "Delete Point Attribute", description = "Permanently delete a point attribute field definition by ID (tenant-scoped). Removes the attribute from its driver; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, pointAttributeService.getById(id));
             pointAttributeService.delete(id);
@@ -113,7 +113,7 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('point_attribute', 'update')")
-    @Operation(summary = "Update Point Attribute", description = "Update a point attribute record")
+    @Operation(summary = "Update Point Attribute", description = "Modify an existing point attribute field definition by ID (tenant-scoped). Use to change a driver-level field's name, code, type, default value or enable flag; ownership is verified before saving.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -132,9 +132,9 @@ public class PointAttributeController implements BaseController {
      * @return PointAttributeVO {@link PointAttributeVO}
      */
     @PreAuthorize("@perm.can('point_attribute', 'get')")
-    @Operation(summary = "Get Point Attribute by ID", description = "Get point attribute details by ID")
+    @Operation(summary = "Get Point Attribute by ID", description = "Fetch one point attribute field definition by ID (tenant-scoped). Use to inspect a driver-level field such as its name, code, type, default value and enable flag before editing it.")
     @GetMapping("/get_by_id")
-    public Mono<R<PointAttributeVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<PointAttributeVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             PointAttributeBO entityBO = requireTenant(tenantId, pointAttributeService.getById(id));
             PointAttributeVO entityVO = pointAttributeBuilder.buildVOByBO(entityBO);
@@ -149,7 +149,7 @@ public class PointAttributeController implements BaseController {
      * @return Array
      */
     @PreAuthorize("@perm.can('point_attribute', 'list')")
-    @Operation(summary = "List Point Attributes by Driver ID", description = "List point attributes by driver ID")
+    @Operation(summary = "List Point Attributes by Driver ID", description = "Return every point attribute field definition owned by a given driver (tenant-scoped). Use to discover which configurable fields a driver exposes for reading or writing point values; returns an empty list when the driver is not found.")
     @GetMapping("/list_by_driver_id")
     public Mono<R<List<PointAttributeVO>>> listByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -171,7 +171,7 @@ public class PointAttributeController implements BaseController {
      * @return page of point attributes
      */
     @PreAuthorize("@perm.can('point_attribute', 'list')")
-    @Operation(summary = "List Point Attributes", description = "List point attributes with pagination")
+    @Operation(summary = "List Point Attributes", description = "Page through point attribute field definitions for the current tenant with filters such as attribute name, driver and enable flag. Returns a page of point attributes; use for browsing or selecting a target attribute.")
     @PostMapping("/list")
     public Mono<R<Page<PointAttributeVO>>> list(@RequestBody(required = false) PointAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

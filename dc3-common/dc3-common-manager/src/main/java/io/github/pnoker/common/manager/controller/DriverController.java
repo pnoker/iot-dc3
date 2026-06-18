@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "driver", description = "Drivers")
+@Tag(name = "driver", description = "Protocol driver lifecycle: register, configure, schedule, and control industrial protocol adapters that connect physical devices to the platform")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_URL_PREFIX)
@@ -76,7 +76,8 @@ public class DriverController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver', 'add')")
-    @Operation(summary = "Add Driver", description = "Create a driver record")
+    @Operation(summary = "Add Driver", description = "Register a new driver protocol adapter for the current tenant. " +
+            "A driver connects devices to the platform and reads or writes their point values; returns the new driver ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -94,9 +95,10 @@ public class DriverController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver', 'delete')")
-    @Operation(summary = "Delete Driver", description = "Delete a driver record by ID")
+    @Operation(summary = "Delete Driver", description = "Permanently delete a driver by ID (tenant-scoped). " +
+            "Removes the driver adapter; devices bound to it can no longer collect or write point values until reassigned; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverService.getById(id));
             driverService.delete(id);
@@ -111,7 +113,8 @@ public class DriverController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver', 'update')")
-    @Operation(summary = "Update Driver", description = "Update a driver record")
+    @Operation(summary = "Update Driver", description = "Update an existing driver's attributes (tenant-scoped). " +
+            "Modifies the protocol adapter configuration such as service name, mode and enable flag; returns the update result.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -130,9 +133,10 @@ public class DriverController implements BaseController {
      * @return DriverVO {@link DriverVO}
      */
     @PreAuthorize("@perm.can('driver', 'get')")
-    @Operation(summary = "Get Driver by ID", description = "Get driver details by ID")
+    @Operation(summary = "Get Driver by ID", description = "Fetch one driver by ID (tenant-scoped). " +
+            "Use to inspect a protocol adapter before assigning devices, sending commands or reading point values through it.")
     @GetMapping("/get_by_id")
-    public Mono<R<DriverVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<DriverVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverBO entityBO = requireTenant(tenantId, driverService.getById(id));
             DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
@@ -147,7 +151,8 @@ public class DriverController implements BaseController {
      * @return Map(ID, DriverVO)
      */
     @PreAuthorize("@perm.can('driver', 'list')")
-    @Operation(summary = "List Drivers by IDs", description = "List drivers by ID list")
+    @Operation(summary = "List Drivers by IDs", description = "Return the drivers matching a set of IDs, filtered to the current tenant. " +
+            "Returns a map of driver ID to driver; missing or out-of-tenant IDs are silently omitted.")
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, DriverVO>>> listByIds(@RequestBody Set<Long> driverIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -165,7 +170,8 @@ public class DriverController implements BaseController {
      * @return Driver
      */
     @PreAuthorize("@perm.can('driver', 'get')")
-    @Operation(summary = "Get Driver by Service Name", description = "Get driver details by service name")
+    @Operation(summary = "Get Driver by Service Name", description = "Fetch one driver by its protocol service name (tenant-scoped). " +
+            "Use to resolve a driver instance from the service identifier under which it registered with the platform.")
     @GetMapping("/get_by_service_name")
     public Mono<R<DriverVO>> getByServiceName(@Parameter(description = "Driver service name") @NotNull @RequestParam(value = "service_name") String serviceName) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -182,7 +188,8 @@ public class DriverController implements BaseController {
      * @return Page Of Driver
      */
     @PreAuthorize("@perm.can('driver', 'list')")
-    @Operation(summary = "List Drivers", description = "List drivers with pagination")
+    @Operation(summary = "List Drivers", description = "Page through drivers for the current tenant with filters such as name, service name, mode and enable flag. " +
+            "Returns a page of drivers; use for browsing or selecting a target protocol adapter for a device.")
     @PostMapping("/list")
     public Mono<R<Page<DriverVO>>> list(@RequestBody(required = false) DriverQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

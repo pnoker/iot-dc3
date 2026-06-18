@@ -60,7 +60,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "driver_attribute_config", description = "Driver attribute configurations")
+@Tag(name = "driver_attribute_config", description = "Driver attribute configuration values: set and update per-device customization values for driver properties inherited from driver attribute definitions")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -82,7 +82,8 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'add')")
-    @Operation(summary = "Add Driver Attribute Configuration", description = "Create a driver attribute configuration record")
+    @Operation(summary = "Add Driver Attribute Configuration", description = "Set the configured value of a driver attribute for a device under the current tenant. " +
+            "A driver attribute config holds the concrete value of a field declared on the device's driver; returns the new config ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -100,9 +101,10 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'delete')")
-    @Operation(summary = "Delete Driver Attribute Configuration", description = "Delete a driver attribute configuration record by ID")
+    @Operation(summary = "Delete Driver Attribute Configuration", description = "Permanently delete a driver attribute config by ID (tenant-scoped). " +
+            "Removes the configured value for that driver attribute on its device; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, driverAttributeConfigService.getById(id));
             driverAttributeConfigService.delete(id);
@@ -117,7 +119,8 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'update')")
-    @Operation(summary = "Update Driver Attribute Configuration", description = "Update a driver attribute configuration record")
+    @Operation(summary = "Update Driver Attribute Configuration", description = "Change the configured value of an existing driver attribute config (tenant-scoped). " +
+            "Use to reconfigure how a specific device's driver field is set; ownership is verified before the update is applied.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -136,9 +139,10 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
-    @Operation(summary = "Get Driver Attribute Configuration by ID", description = "Get driver attribute configuration details by ID")
+    @Operation(summary = "Get Driver Attribute Configuration by ID", description = "Fetch one driver attribute config by ID (tenant-scoped). " +
+            "Returns the configured value of a single driver attribute field for the device it belongs to.")
     @GetMapping("/get_by_id")
-    public Mono<R<DriverAttributeConfigVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<DriverAttributeConfigVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverAttributeConfigBO entityBO = requireTenant(tenantId, driverAttributeConfigService.getById(id));
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
@@ -154,7 +158,8 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverConfig
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
-    @Operation(summary = "Get Driver Attribute Configuration by Device and Attribute IDs", description = "Get driver attribute configuration details by device ID and attribute ID")
+    @Operation(summary = "Get Driver Attribute Configuration by Device and Attribute IDs", description = "Fetch the configured value of one driver attribute for a specific device (tenant-scoped). " +
+            "The device's driver must match the attribute's driver; use to read a single connection attribute before invoking the driver.")
     @GetMapping("/get_by_device_id_and_attribute_id")
     public Mono<R<DriverAttributeConfigVO>> getByDeviceIdAndAttributeId(
             @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -176,7 +181,8 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverConfig
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
-    @Operation(summary = "List Driver Attribute Configurations by Device ID", description = "List driver attribute configurations by device ID")
+    @Operation(summary = "List Driver Attribute Configurations by Device ID", description = "Return every driver attribute config for a given device (tenant-scoped). " +
+            "Use to load all connection attribute values a device applies to its driver in one call.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<DriverAttributeConfigVO>>> listByDeviceId(
             @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -195,7 +201,8 @@ public class DriverAttributeConfigController implements BaseController {
      * @return Page Of DriverConfig
      */
     @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
-    @Operation(summary = "List Driver Attribute Configurations", description = "List driver attribute configurations with pagination")
+    @Operation(summary = "List Driver Attribute Configurations", description = "Page through driver attribute configs for the current tenant with query filters. " +
+            "Returns a page of configured driver attribute values; use for browsing or selecting a target config.")
     @PostMapping("/list")
     public Mono<R<Page<DriverAttributeConfigVO>>> list(
             @RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {

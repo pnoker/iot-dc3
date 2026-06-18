@@ -54,13 +54,13 @@ public class RuleVO extends BaseVO {
     /**
      * Rule name
      */
-    @Schema(description = "rule name")
+    @Schema(description = "Rule name. Unique name within a tenant for identifying a data processing pipeline rule.", example = "High Temp > 80 Alert", requiredMode = Schema.RequiredMode.REQUIRED)
     private String ruleName;
 
     /**
      * Rule code
      */
-    @Schema(description = "rule code")
+    @Schema(description = "Rule code. Stable business identifier; must not change once deployed.", example = "HIGH_TEMP_ALERT")
     private String ruleCode;
 
     /**
@@ -72,25 +72,25 @@ public class RuleVO extends BaseVO {
     /**
      * Alarm notification template ID
      */
-    @Schema(description = "notify ID")
+    @Schema(description = "ID of the notification rule to invoke when this rule triggers.", example = "1024")
     private Long notifyId;
 
     /**
      * Alarm message template ID
      */
-    @Schema(description = "message ID")
+    @Schema(description = "ID of the message template to use for the alert payload of this rule.", example = "2048")
     private Long messageId;
 
     /**
      * Alarm rule
      */
-    @Schema(description = "rule extension information in JSON format")
+    @Schema(description = "Rule extension information, serialized as JSON for custom conditions and actions.")
     private RuleExt ruleExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

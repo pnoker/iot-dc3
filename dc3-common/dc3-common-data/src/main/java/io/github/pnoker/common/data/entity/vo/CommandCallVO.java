@@ -47,15 +47,15 @@ public class CommandCallVO implements Serializable {
     @NotNull
     private Long deviceId;
 
-    @Schema(description = "command ID")
+    @Schema(description = "ID of the command being invoked.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
 
     private Long commandId;
 
-    @Schema(description = "command code")
+    @Schema(description = "Command code. Stable business identifier matching the command definition.", example = "READ_HOLDING_REG")
 
     private String commandCode;
 
-    @Schema(description = "command parameter values")
+    @Schema(description = "Parameter values for this command invocation, keyed by parameter code.")
     private Map<String, String> paramValues;
 
     @Schema(description = "Client command correlation ID")

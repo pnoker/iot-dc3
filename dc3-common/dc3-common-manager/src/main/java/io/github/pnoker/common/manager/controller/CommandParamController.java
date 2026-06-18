@@ -56,7 +56,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "command_param", description = "Command parameters")
+@Tag(name = "command_param", description = "Command parameter definitions: manage input parameters for device commands including name, data type, and validation rules")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.COMMAND_PARAM_URL_PREFIX)
@@ -70,7 +70,8 @@ public class CommandParamController implements BaseController {
     private final CommandService commandService;
 
     @PreAuthorize("@perm.can('command_param', 'add')")
-    @Operation(summary = "Add Command Parameter", description = "Create a command parameter record")
+    @Operation(summary = "Add Command Parameter", description = "Define a new input or output parameter on a command for the current tenant. " +
+            "A command parameter declares the name, code, direction, type and default value that a downward device command accepts or returns; returns the new parameter ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -82,9 +83,10 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'delete')")
-    @Operation(summary = "Delete Command Parameter", description = "Delete a command parameter record by ID")
+    @Operation(summary = "Delete Command Parameter", description = "Permanently delete a command parameter by ID (tenant-scoped). " +
+            "Removes the parameter definition from its parent command; the action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, commandParamService.getById(id));
             commandParamService.delete(id);
@@ -93,7 +95,8 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'update')")
-    @Operation(summary = "Update Command Parameter", description = "Update a command parameter record")
+    @Operation(summary = "Update Command Parameter", description = "Modify an existing command parameter's name, code, direction, type, required flag or default value. " +
+            "Verifies ownership against the current tenant before applying the change.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandParamVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -106,9 +109,10 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'get')")
-    @Operation(summary = "Get Command Parameter by ID", description = "Get command parameter details by ID")
+    @Operation(summary = "Get Command Parameter by ID", description = "Fetch one command parameter with its direction, type, required flag and default value. " +
+            "Use to inspect what an input or output parameter of a downward device command looks like before issuing or interpreting the command.")
     @GetMapping("/get_by_id")
-    public Mono<R<CommandParamVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<CommandParamVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             CommandParamBO entityBO = requireTenant(tenantId, commandParamService.getById(id));
             CommandParamVO entityVO = commandParamBuilder.buildVOByBO(entityBO);
@@ -117,7 +121,8 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'list')")
-    @Operation(summary = "List Command Parameters by Command ID", description = "List command parameters by command ID")
+    @Operation(summary = "List Command Parameters by Command ID", description = "Return every parameter declared on a given command, tenant-scoped. " +
+            "Use to discover the input and output parameters a downward device command accepts or returns when building or validating a command call.")
     @GetMapping("/list_by_command_id")
     public Mono<R<List<CommandParamVO>>> listByCommandId(@Parameter(description = "Command ID") @NotNull @RequestParam(value = "command_id") Long commandId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -129,7 +134,8 @@ public class CommandParamController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('command_param', 'list')")
-    @Operation(summary = "List Command Parameters", description = "List command parameters with pagination")
+    @Operation(summary = "List Command Parameters", description = "Page through command parameters for the current tenant with filters such as name, code, command and enable flag. " +
+            "Returns a page of command parameters; use for browsing or auditing parameter definitions across commands.")
     @PostMapping("/list")
     public Mono<R<Page<CommandParamVO>>> list(@RequestBody(required = false) CommandParamQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

@@ -48,7 +48,7 @@ import java.util.Objects;
  * @version 2026.5.23
  * @since 2026.5.23
  */
-@Tag(name = "point_command_history", description = "Point command history")
+@Tag(name = "point_command_history", description = "Point command audit trail: query historical records of commands dispatched to device data points including timestamps and execution outcomes")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_COMMAND_HISTORY_URL_PREFIX)
@@ -58,7 +58,7 @@ public class PointCommandHistoryController implements BaseController {
     private final PointCommandHistoryService pointCommandHistoryService;
 
     @PreAuthorize("@perm.can('point_command_history', 'get')")
-    @Operation(summary = "Get Point Command History by Command ID", description = "Get point command history details by command ID")
+    @Operation(summary = "Get Point Command History by Command ID", description = "Return the full audit record for a single point command identified by its command ID (tenant-scoped). Use to look up the request value, response value, status, error and timing of one dispatched command.")
     @GetMapping("/get_by_command_id")
     public Mono<R<PointCommandHistoryVO>> getByCommandId(@Parameter(description = "Command ID") @NotBlank @RequestParam String commandId) {
         return getTenantId().flatMap(tenantId -> async(() ->
@@ -66,7 +66,7 @@ public class PointCommandHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('point_command_history', 'list')")
-    @Operation(summary = "List Point Command History Records", description = "List point command history records with pagination")
+    @Operation(summary = "List Point Command History", description = "Page through the point command audit trail for the current tenant, filterable by device, point, command type and status. Use to review which commands were dispatched to data points and whether each succeeded.")
     @PostMapping("/list")
     public Mono<R<Page<PointCommandHistoryVO>>> list(@RequestBody(required = false) PointCommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

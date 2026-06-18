@@ -51,7 +51,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "point_value", description = "Point values")
+@Tag(name = "point_value", description = "Data point values: query real-time snapshots and historical time-series values collected from industrial device data points")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_VALUE_URL_PREFIX)
@@ -70,7 +70,8 @@ public class PointValueController implements BaseController {
      * a point in the device
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
-    @Operation(summary = "List Latest Point Values", description = "List latest point values for points under a device with pagination")
+    @Operation(summary = "List Latest Point Values", description = "Return the most recent reading for each point under a device for the current tenant, " +
+            "paged by the request query. Use to read near-real-time snapshots; results are ordered by collection time.")
     @PostMapping("/latest")
     public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,7 +91,8 @@ public class PointValueController implements BaseController {
      * for a point in the device
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
-    @Operation(summary = "List Point Values", description = "List point values with pagination")
+    @Operation(summary = "List Point Values", description = "Page through stored time-series readings for points under a device (tenant-scoped). " +
+            "Use to query raw historical values; results are ordered by collection time.")
     @PostMapping("/list")
     public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -110,7 +112,8 @@ public class PointValueController implements BaseController {
      * @return List of String, where each String is the historical value for the point
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
-    @Operation(summary = "List Point Value History by Device and Point", description = "List point value history records by device ID and point ID")
+    @Operation(summary = "List Point Value History by Device and Point", description = "Return the most recent time-series values for one point on one device for the current tenant, " +
+            "as a list of raw value strings bounded by count (default 100). Use to read a single point's latest history.")
     @GetMapping("/list_history_by_device_id_and_point_id")
     public Mono<R<List<String>>> history(@Parameter(description = "Device ID") @NotNull @RequestParam(name = "device_id") Long deviceId,
                                          @Parameter(description = "Point ID") @NotNull @RequestParam(name = "point_id") Long pointId,

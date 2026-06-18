@@ -35,19 +35,19 @@ import lombok.ToString;
 @Schema(description = "Attachment view object")
 public class AttachmentVO extends BaseVO {
 
-    @Schema(description = "Conversation ID")
+    @Schema(description = "ID of the conversation session this attachment belongs to.", example = "conv_xyz789")
     private String conversationId;
 
-    @Schema(description = "Attachment file name", example = "report.pdf")
+    @Schema(description = "Original file name of the uploaded attachment.", example = "report.pdf")
     private String fileName;
 
-    @Schema(description = "Attachment content type", example = "application/pdf")
+    @Schema(description = "MIME content type of the attachment (e.g. application/pdf, image/png).", example = "application/pdf")
     private String contentType;
 
-    @Schema(description = "Attachment file size in bytes", example = "10240")
+    @Schema(description = "File size of the attachment in bytes.", example = "10240")
     private Long size;
 
-    @Schema(description = "Attachment file storage path")
+    @Schema(description = "Server-side storage path where the attachment file is persisted.")
     private String filePath;
 
 }

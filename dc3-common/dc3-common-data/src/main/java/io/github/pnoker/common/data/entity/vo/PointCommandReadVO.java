@@ -59,7 +59,7 @@ public class PointCommandReadVO implements Serializable {
      * When provided and already exists, returns the existing command status.
      * When omitted, the server generates a new UUID.
      */
-    @Schema(description = "command ID")
+    @Schema(description = "ID of the read command to invoke.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
     private String commandId;
 
 }

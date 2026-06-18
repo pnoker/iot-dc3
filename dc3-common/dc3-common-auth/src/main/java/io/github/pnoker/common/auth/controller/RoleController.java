@@ -57,7 +57,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
-@Tag(name = "role", description = "Roles")
+@Tag(name = "role", description = "Role management: create, update, and delete roles that aggregate permissions for assignment to users and service accounts")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.ROLE_URL_PREFIX)
@@ -69,7 +69,7 @@ public class RoleController implements BaseController {
     private final RoleService roleService;
 
     @PreAuthorize("@perm.can('role', 'add')")
-    @Operation(summary = "Add Role", description = "Create a role record")
+    @Operation(summary = "Add Role", description = "Create a named permission bundle for the current tenant. A role groups resources (permissions) that can later be assigned to principals; returns the new role ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -85,9 +85,9 @@ public class RoleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role', 'delete')")
-    @Operation(summary = "Delete Role", description = "Delete a role record by ID")
+    @Operation(summary = "Delete Role", description = "Remove a role by ID, scoped to the current tenant. Deleting detaches the role from its bound resources and principals; the caller must own the role.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, roleService.getById(id));
             roleService.delete(id);
@@ -96,7 +96,7 @@ public class RoleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role', 'update')")
-    @Operation(summary = "Update Role", description = "Update a role record")
+    @Operation(summary = "Update Role", description = "Modify a tenant-owned role's attributes such as name and enable flag. Verifies ownership before applying; returns the update result.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody RoleVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -111,9 +111,9 @@ public class RoleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role', 'get')")
-    @Operation(summary = "Get Role by ID", description = "Get role details by ID")
+    @Operation(summary = "Get Role by ID", description = "Fetch one role of the current tenant by its ID. Returns the role's attributes; use to inspect a role before binding resources or principals.")
     @GetMapping("/get_by_id")
-    public Mono<R<RoleVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<RoleVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleBO entityBO = requireTenant(tenantId, roleService.getById(id));
             RoleVO entityVO = roleBuilder.buildVOByBO(entityBO);
@@ -122,7 +122,7 @@ public class RoleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role', 'list')")
-    @Operation(summary = "List Roles", description = "List roles with pagination")
+    @Operation(summary = "List Roles", description = "Page through roles for the current tenant with filters such as name and enable flag. Returns a page of roles; use for browsing or selecting a role to bind.")
     @PostMapping("/list")
     public Mono<R<Page<RoleVO>>> list(@RequestBody(required = false) RoleQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -135,7 +135,7 @@ public class RoleController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role', 'list')")
-    @Operation(summary = "List Role Tree", description = "List roles as a tenant-scoped tree")
+    @Operation(summary = "List Role Tree", description = "Return the tenant's roles as a hierarchical tree. Use when a nested role grouping is needed for selection or display rather than a flat page.")
     @PostMapping("/list_tree")
     public Mono<R<List<RoleTreeVO>>> listTree(@RequestBody(required = false) RoleQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

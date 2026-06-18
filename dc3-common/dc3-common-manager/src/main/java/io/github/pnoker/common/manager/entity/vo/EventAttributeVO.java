@@ -54,7 +54,7 @@ public class EventAttributeVO extends BaseVO {
      * Name
      */
     @NotBlank(message = "Attribute name can't be empty", groups = {Add.class})
-    @Schema(description = "attribute name")
+    @Schema(description = "Event attribute name. Unique name within a driver for identifying a configurable event property.", example = "Severity Level", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid attribute name format",
             groups = {Add.class, Update.class})
     private String attributeName;
@@ -63,7 +63,7 @@ public class EventAttributeVO extends BaseVO {
      * Code
      */
     @NotBlank(message = "Attribute code can't be empty", groups = {Add.class})
-    @Schema(description = "attribute code")
+    @Schema(description = "Event attribute code. Stable business identifier; must not change once deployed.", example = "SEVERITY")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid attribute code format",
             groups = {Add.class, Update.class})
     private String attributeCode;
@@ -77,38 +77,38 @@ public class EventAttributeVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "default value")
+    @Schema(description = "Default attribute value when no per-device configuration is provided.", example = "WARN")
     private String defaultValue;
 
     /**
      * Driver ID
      */
-    @Schema(description = "driver ID")
+    @Schema(description = "ID of the protocol driver this attribute belongs to.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class})
     private Long driverId;
 
     /**
      *
      */
-    @Schema(description = "attribute extension information in JSON format")
+    @Schema(description = "Event attribute extension information, serialized as JSON for custom metadata.")
     private EventAttributeExt attributeExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     /**
      *
      */
-    @Schema(description = "Configuration signature")
+    @Schema(description = "Signature used for configuration integrity verification.")
     private String signature;
 
     /**
      *
      */
-    @Schema(description = "Version number")
+    @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 
 }

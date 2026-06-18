@@ -45,7 +45,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "chat", description = "AI chat")
+@Tag(name = "chat", description = "AI chat operations: handle real-time chat interactions including message streaming, tool calling, and conversation context management with language models")
 @RestController
 @RequestMapping(AgenticConstant.CHAT_URL_PREFIX)
 @RequiredArgsConstructor
@@ -58,7 +58,8 @@ public class ChatController implements BaseController {
      * otherwise returns the OpenAI-compatible JSON response.
      */
     @PreAuthorize("@perm.can('chat', 'list')")
-    @Operation(summary = "Create Chat Completion", description = "Create an OpenAI-compatible chat completion with streaming and non-streaming responses")
+    @Operation(summary = "Create Chat Completion", description = "Submit a chat prompt with conversation context and receive the assistant reply using the OpenAI-compatible completion format. "
+            + "When the request sets stream=true the reply is streamed token by token over SSE; otherwise it returns the full reply as a single JSON response.")
     @PostMapping("/completions")
     public Mono<ResponseEntity<?>> chatCompletion(@RequestBody ChatCompletionRequest request) {
         return getPrincipalHeader().flatMap(header -> {

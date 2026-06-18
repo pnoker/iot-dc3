@@ -54,7 +54,7 @@ import java.util.Objects;
  * @version 2026.6.13
  * @since 2026.6.13
  */
-@Tag(name = "principal", description = "Principals")
+@Tag(name = "principal", description = "Security principals: manage users and service accounts as identity carriers for authentication, authorization, and access control")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.PRINCIPAL_URL_PREFIX)
@@ -68,14 +68,16 @@ public class PrincipalController implements BaseController {
     private final AuditLogService auditLogService;
 
     @PreAuthorize("@perm.can('principal', 'get')")
-    @Operation(summary = "Get Principal by ID", description = "Get principal details by ID")
+    @Operation(summary = "Get Principal by ID", description = "Fetch one principal (user or service account) by ID. " +
+            "A principal is the abstract identity that roles and permissions bind to; use to resolve an identity before binding roles or auditing access.")
     @GetMapping("/get_by_id")
-    public Mono<R<PrincipalVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<PrincipalVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return async(() -> R.ok(principalBuilder.buildVOByBO(principalService.getById(id))));
     }
 
     @PreAuthorize("@perm.can('principal', 'list')")
-    @Operation(summary = "List Principals", description = "List principals with pagination")
+    @Operation(summary = "List Principals", description = "Page through principals (users and service accounts) for the current tenant. " +
+            "Accepts a PrincipalQuery body for filtering; returns a page of PrincipalVO entries for browsing or selecting a target identity.")
     @PostMapping("/list")
     public Mono<R<Page<PrincipalVO>>> list(@RequestBody(required = false) PrincipalQuery entityQuery) {
         PrincipalQuery query = Objects.isNull(entityQuery) ? new PrincipalQuery() : entityQuery;
@@ -83,16 +85,18 @@ public class PrincipalController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('principal', 'update')")
-    @Operation(summary = "Enable Principal", description = "Enable a principal by ID")
+    @Operation(summary = "Enable Principal", description = "Set a principal's enable flag to ENABLE by ID so the identity can authenticate. " +
+            "Tenant-scoped; records an ENABLE audit-log entry under the acting caller.")
     @PostMapping("/enable")
-    public Mono<R<String>> enable(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> enable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return toggleEnableFlag(id, EnableFlagEnum.ENABLE);
     }
 
     @PreAuthorize("@perm.can('principal', 'update')")
-    @Operation(summary = "Disable Principal", description = "Disable a principal by ID")
+    @Operation(summary = "Disable Principal", description = "Set a principal's enable flag to DISABLE by ID to revoke active access for that identity. " +
+            "Tenant-scoped; records a DISABLE audit-log entry under the acting caller.")
     @PostMapping("/disable")
-    public Mono<R<String>> disable(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> disable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return toggleEnableFlag(id, EnableFlagEnum.DISABLE);
     }
 

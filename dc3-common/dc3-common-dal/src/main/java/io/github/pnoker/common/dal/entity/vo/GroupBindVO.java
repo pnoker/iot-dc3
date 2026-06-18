@@ -57,7 +57,7 @@ public class GroupBindVO extends BaseVO {
     /**
      * Group ID.
      */
-    @Schema(description = "group ID")
+    @Schema(description = "ID of the group to bind.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Group ID can't be empty", groups = {Add.class, Update.class})
     private Long groupId;
 

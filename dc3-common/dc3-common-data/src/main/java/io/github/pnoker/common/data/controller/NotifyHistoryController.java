@@ -50,7 +50,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "notify_history", description = "Notification history")
+@Tag(name = "notify_history", description = "Notification delivery history: query alert dispatch records including timestamps, target channels, and delivery status for audit and troubleshooting")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.NOTIFY_HISTORY_URL_PREFIX)
@@ -62,9 +62,9 @@ public class NotifyHistoryController implements BaseController {
     private final NotifyHistoryService notifyHistoryService;
 
     @PreAuthorize("@perm.can('notify_history', 'get')")
-    @Operation(summary = "Get Notification History Record by ID", description = "Get notification history record details by ID")
+    @Operation(summary = "Get Notification History by ID", description = "Return a single dispatched-notification record by ID (tenant-scoped). Use to inspect one notification's timestamp, target channel, and delivery status.")
     @GetMapping("/get_by_id")
-    public Mono<R<NotifyHistoryVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<NotifyHistoryVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyHistoryBO entityBO = requireTenant(tenantId, notifyHistoryService.getById(id));
             return R.ok(notifyHistoryBuilder.buildVOByBO(entityBO));
@@ -72,7 +72,7 @@ public class NotifyHistoryController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify_history', 'list')")
-    @Operation(summary = "List Notification History Records", description = "List notification history records with pagination")
+    @Operation(summary = "List Notification History", description = "Page through notifications already dispatched for the current tenant, filterable by channel and delivery status. Use to audit what was sent and whether each channel succeeded.")
     @PostMapping("/list")
     public Mono<R<Page<NotifyHistoryVO>>> list(@RequestBody(required = false) NotifyHistoryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

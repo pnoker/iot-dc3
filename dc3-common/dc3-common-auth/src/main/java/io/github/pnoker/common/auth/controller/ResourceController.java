@@ -58,7 +58,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
-@Tag(name = "resource", description = "Resources")
+@Tag(name = "resource", description = "Protected resource registry: manage API endpoints, menu items, and other securable artifacts that require permission to access")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.RESOURCE_URL_PREFIX)
@@ -72,7 +72,7 @@ public class ResourceController implements BaseController {
     private final AdminChecker adminChecker;
 
     @PreAuthorize("@perm.can('resource', 'add')")
-    @Operation(summary = "Add Resource", description = "Create a resource record")
+    @Operation(summary = "Add Resource", description = "Create a new resource, the permission-grantable unit an endpoint declares (e.g. \"device:add\"). Restricted to system admins; returns the new resource ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ResourceVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -88,9 +88,9 @@ public class ResourceController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('resource', 'delete')")
-    @Operation(summary = "Delete Resource", description = "Delete a resource record by ID")
+    @Operation(summary = "Delete Resource by ID", description = "Remove a resource permission unit by ID. Restricted to system admins; deleting severs any role bindings that granted it.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             adminChecker.assertSystemAdmin(header.getTenantId());
             resourceService.delete(id);
@@ -99,7 +99,7 @@ public class ResourceController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('resource', 'update')")
-    @Operation(summary = "Update Resource", description = "Update a resource record")
+    @Operation(summary = "Update Resource", description = "Modify an existing resource's definition (e.g. its code or metadata). Restricted to system admins; the change takes effect for every role bound to this resource.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ResourceVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -113,9 +113,9 @@ public class ResourceController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('resource', 'get')")
-    @Operation(summary = "Get Resource by ID", description = "Get resource details by ID")
+    @Operation(summary = "Get Resource by ID", description = "Fetch one resource (the permission-grantable unit) by ID. Read access is open to all authenticated users; use to resolve a permission code before binding it to a role.")
     @GetMapping("/get_by_id")
-    public Mono<R<ResourceVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<ResourceVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         // Read access to global resource data is open to all authenticated users.
         return async(() -> {
             ResourceBO entityBO = resourceService.getById(id);
@@ -125,7 +125,7 @@ public class ResourceController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('resource', 'list')")
-    @Operation(summary = "List Resources", description = "List resources with pagination")
+    @Operation(summary = "List Resources", description = "Page through resources (the permission-grantable units) with query filters. Read access is open to all authenticated users; returns a page of resources for browsing or selecting a target.")
     @PostMapping("/list")
     public Mono<R<Page<ResourceVO>>> list(@RequestBody(required = false) ResourceQuery entityQuery) {
         // Read access to global resource data is open to all authenticated users.
@@ -138,7 +138,7 @@ public class ResourceController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('resource', 'list')")
-    @Operation(summary = "List Resource Tree", description = "List resources as a tree")
+    @Operation(summary = "List Resource Tree", description = "Return resources as a nested tree reflecting the permission hierarchy (e.g. resource group -> permission code). Read access is open to all authenticated users; use to render permission pickers or inspect parent/child relationships.")
     @PostMapping("/list_tree")
     public Mono<R<List<ResourceTreeVO>>> listTree(@RequestBody(required = false) ResourceQuery entityQuery) {
         // Read access to global resource data is open to all authenticated users.

@@ -64,7 +64,7 @@ import java.util.Objects;
  * @version 2026.6.12
  * @since 2016.10.1
  */
-@Tag(name = "role_principal_bind", description = "Role-principal bindings")
+@Tag(name = "role_principal_bind", description = "Role-to-principal bindings: assign roles to users or service accounts, enabling or revoking permission sets for principals")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.ROLE_PRINCIPAL_URL_PREFIX)
@@ -84,7 +84,8 @@ public class RolePrincipalBindController implements BaseController {
     private final TenantMembershipService tenantMembershipService;
 
     @PreAuthorize("@perm.can('role_principal_bind', 'add')")
-    @Operation(summary = "Add Role-principal Binding", description = "Create a role-principal binding record")
+    @Operation(summary = "Bind Principal to Role", description = "Assign a role to a principal (user or service account) within the current tenant. " +
+            "Both the role and the principal must already belong to the tenant; returns an add-success response.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RolePrincipalBindVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -99,9 +100,10 @@ public class RolePrincipalBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_principal_bind', 'delete')")
-    @Operation(summary = "Delete Role-principal Binding", description = "Delete a role-principal binding record by ID")
+    @Operation(summary = "Delete Role-principal Binding", description = "Remove a role-principal binding by its record ID. " +
+            "Verifies the binding belongs to the current tenant before deleting; use to revoke a role assignment.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RolePrincipalBindBO entityBO = rolePrincipalBindService.getById(id);
             if (!Objects.equals(tenantId, entityBO.getTenantId())) {
@@ -113,7 +115,8 @@ public class RolePrincipalBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
-    @Operation(summary = "List Role-principal Bindings", description = "List role-principal bindings with pagination")
+    @Operation(summary = "List Role-principal Bindings", description = "Page through role-principal bindings for the current tenant with optional query filters. " +
+            "Returns a page of bindings; use to browse which principals hold which roles.")
     @PostMapping("/list")
     public Mono<R<Page<RolePrincipalBindVO>>> list(@RequestBody(required = false) RolePrincipalBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -124,7 +127,8 @@ public class RolePrincipalBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
-    @Operation(summary = "List Roles by Principal", description = "List roles bound to a principal")
+    @Operation(summary = "List Roles by Principal", description = "Return the roles assigned to one principal within the current tenant. " +
+            "Accepts a principal ID (must be a tenant member); use to see what permissions a user or service account has.")
     @GetMapping("/list_role_by_principal")
     public Mono<R<List<RoleVO>>> listRoleByPrincipal(@Parameter(description = "Principal ID") @NotNull @RequestParam(value = "principal_id") Long principalId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -135,7 +139,8 @@ public class RolePrincipalBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
-    @Operation(summary = "List Users by Role", description = "List human users bound to a role")
+    @Operation(summary = "List Users by Role", description = "Return the human users currently bound to a role (the role must belong to the current tenant). " +
+            "Results are filtered to tenant members; use to see who holds a given role.")
     @GetMapping("/list_user_by_role")
     public Mono<R<List<UserVO>>> listUserByRole(@Parameter(description = "Role ID") @NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

@@ -85,7 +85,7 @@ public class ApiVO extends BaseVO {
     /**
      * Api
      */
-    @Schema(description = "api extension information in JSON format")
+    @Schema(description = "API extension information, serialized as JSON for custom endpoint metadata.")
     private ApiExt apiExt;
 
     /**

@@ -49,19 +49,19 @@ public class DriverTokenVO extends BaseVO {
     /**
      * Driver ID
      */
-    @Schema(description = "driver code")
+    @Schema(description = "Driver code. Stable routing identifier for the driver this token authenticates.", example = "dc3-driver-modbus-tcp")
     private String driverCode;
 
     /**
      * AppID
      */
-    @Schema(description = "driver app ID")
+    @Schema(description = "Application ID issued to the driver during registration; used as the client identifier in token exchange.", example = "app_abc123")
     private String driverAppId;
 
     /**
      * AppKey
      */
-    @Schema(description = "driver app key")
+    @Schema(description = "Application key (secret) issued to the driver; used as the client secret in token exchange.", example = "sk-xxxx")
     @ToString.Exclude
     private String driverAppKey;
 
@@ -74,7 +74,7 @@ public class DriverTokenVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "expire time")
+    @Schema(description = "Token expiration timestamp. After this time the token is invalid and must be refreshed.", example = "2026-12-31T23:59:59")
     private LocalDateTime expireTime;
 
     /**

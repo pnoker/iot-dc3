@@ -45,7 +45,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "message", description = "Messages")
+@Tag(name = "message", description = "Agent conversation messages: manage messages exchanged between AI agents and language models within conversation sessions including user prompts and assistant responses")
 @RestController
 @RequestMapping(AgenticConstant.MESSAGE_URL_PREFIX)
 @RequiredArgsConstructor
@@ -56,7 +56,8 @@ public class MessageController implements BaseController {
     private final MessageService messageService;
 
     @PreAuthorize("@perm.can('message', 'list')")
-    @Operation(summary = "List Messages", description = "List messages for a conversation")
+    @Operation(summary = "List Session Messages", description = "List the ordered message history of one AI chat session for the current user and tenant. " +
+            "Returns each turn (user prompts and assistant replies) in chronological order; use to read or resume a past conversation.")
     @GetMapping("/list")
     public Mono<R<List<MessageVO>>> list(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {

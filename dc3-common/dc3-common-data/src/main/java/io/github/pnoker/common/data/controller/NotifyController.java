@@ -54,7 +54,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "notify", description = "Notifications")
+@Tag(name = "notify", description = "Notification rule definitions: manage alert rules that trigger on device events, data thresholds, and status changes with configurable severity and routing")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.NOTIFY_URL_PREFIX)
@@ -66,7 +66,7 @@ public class NotifyController implements BaseController {
     private final NotifyService notifyService;
 
     @PreAuthorize("@perm.can('notify', 'add')")
-    @Operation(summary = "Add Notification", description = "Create a notification record")
+    @Operation(summary = "Add Notification Rule", description = "Create a notification (alert-routing) rule for the current tenant that wires alarm triggers to delivery channels. Use to define how and where alerts are dispatched.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -78,9 +78,9 @@ public class NotifyController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify', 'delete')")
-    @Operation(summary = "Delete Notification", description = "Delete a notification record by ID")
+    @Operation(summary = "Delete Notification Rule", description = "Delete a notification rule by ID for the current tenant. Ownership is validated before deletion, so cross-tenant records cannot be removed.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, notifyService.getById(id));
             notifyService.delete(id);
@@ -89,7 +89,7 @@ public class NotifyController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify', 'update')")
-    @Operation(summary = "Update Notification", description = "Update a notification record")
+    @Operation(summary = "Update Notification Rule", description = "Update an existing notification rule (routing, severity, enable flag) for the current tenant. Ownership is validated before the update is applied.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody NotifyVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -102,9 +102,9 @@ public class NotifyController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify', 'get')")
-    @Operation(summary = "Get Notification by ID", description = "Get notification details by ID")
+    @Operation(summary = "Get Notification Rule by ID", description = "Return a single notification rule for the current tenant. Use to inspect routing, severity and channel bindings for one rule.")
     @GetMapping("/get_by_id")
-    public Mono<R<NotifyVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<NotifyVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             NotifyBO entityBO = requireTenant(tenantId, notifyService.getById(id));
             return R.ok(notifyBuilder.buildVOByBO(entityBO));
@@ -112,7 +112,7 @@ public class NotifyController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('notify', 'list')")
-    @Operation(summary = "List Notifications", description = "List notifications with pagination")
+    @Operation(summary = "List Notification Rules", description = "Page through notification (alert-routing) rules for the current tenant with optional query filters. Use to enumerate which rules govern alert dispatch.")
     @PostMapping("/list")
     public Mono<R<Page<NotifyVO>>> list(@RequestBody(required = false) NotifyQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

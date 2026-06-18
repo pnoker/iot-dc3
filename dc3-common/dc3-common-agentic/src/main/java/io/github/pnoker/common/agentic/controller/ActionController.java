@@ -47,7 +47,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "action", description = "AI actions")
+@Tag(name = "action", description = "Agent action definitions: manage AI agent tool definitions including parameter schemas, execution handlers, and result formats for agentic workflow orchestration")
 @RestController
 @RequestMapping(AgenticConstant.ACTION_URL_PREFIX)
 @RequiredArgsConstructor
@@ -58,7 +58,8 @@ public class ActionController implements BaseController {
     private final ActionService actionService;
 
     @PreAuthorize("@perm.can('action', 'get')")
-    @Operation(summary = "List Pending AI Actions", description = "List pending AI actions for a conversation")
+    @Operation(summary = "List Pending Agent Actions", description = "List agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. " +
+            "Returns each pending action with its tool name and parameters so the user can confirm or reject before execution.")
     @GetMapping("/pending")
     public Mono<R<List<ActionVO>>> pending(@Parameter(description = "Conversation ID") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -72,7 +73,8 @@ public class ActionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('action', 'list')")
-    @Operation(summary = "Confirm AI Action", description = "Confirm an AI action and return the updated action")
+    @Operation(summary = "Confirm Agent Action", description = "Approve a pending agent tool call by id so the assistant may execute it. " +
+            "Returns the action with its updated confirmed status; call after the user accepts a proposed tool invocation.")
     @PostMapping("/confirm")
     public Mono<R<ActionVO>> confirm(@Parameter(description = "AI action ID") @NotBlank @RequestParam(value = "action_id") String actionId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -84,7 +86,8 @@ public class ActionController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('action', 'list')")
-    @Operation(summary = "Reject AI Action", description = "Reject an AI action and return the updated action")
+    @Operation(summary = "Reject Agent Action", description = "Decline a pending agent tool call by id so the assistant does not execute it. " +
+            "Returns the action with its updated rejected status; call when the user denies a proposed tool invocation.")
     @PostMapping("/reject")
     public Mono<R<ActionVO>> reject(@Parameter(description = "AI action ID") @NotBlank @RequestParam(value = "action_id") String actionId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {

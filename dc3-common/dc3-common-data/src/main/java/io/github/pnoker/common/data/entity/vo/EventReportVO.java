@@ -47,15 +47,15 @@ public class EventReportVO implements Serializable {
     @NotNull
     private Long deviceId;
 
-    @Schema(description = "event ID")
+    @Schema(description = "ID of the event reported from the device.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
 
     private Long eventId;
 
-    @Schema(description = "event code")
+    @Schema(description = "Event code. Stable business identifier matching the event definition.", example = "HIGH_TEMP_ALARM")
 
     private String eventCode;
 
-    @Schema(description = "event parameter values")
+    @Schema(description = "Parameter values submitted with this event report, keyed by parameter code.")
     private Map<String, String> paramValues;
 
     @Schema(description = "Message content")

@@ -62,7 +62,7 @@ import java.util.Objects;
  * @version 2026.5.17
  * @since 2016.10.1
  */
-@Tag(name = "role_resource_bind", description = "Role-resource bindings")
+@Tag(name = "role_resource_bind", description = "Role-to-resource permission bindings: grant or revoke access to specific API endpoints, menus, and secured artifacts for roles")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.ROLE_RESOURCE_URL_PREFIX)
@@ -82,7 +82,8 @@ public class RoleResourceBindController implements BaseController {
     private final TenantMembershipService tenantMembershipService;
 
     @PreAuthorize("@perm.can('role_resource_bind', 'add')")
-    @Operation(summary = "Add Role-resource Binding", description = "Create a role-resource binding record")
+    @Operation(summary = "Add Role-Resource Binding", description = "Bind a single resource (permission) to a role under the current tenant. " +
+            "The role must belong to the tenant; use to attach an individual permission to a role.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleResourceBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -94,9 +95,10 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'delete')")
-    @Operation(summary = "Delete Role-resource Binding", description = "Delete a role-resource binding record by ID")
+    @Operation(summary = "Delete Role-Resource Binding", description = "Remove a single role-resource binding by its record ID. " +
+            "The binding's role must belong to the current tenant; returns the deletion result.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             RoleResourceBindBO entityBO = roleResourceBindService.getById(id);
             requireTenant(tenantId, roleService.getById(entityBO.getRoleId()));
@@ -106,7 +108,8 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
-    @Operation(summary = "List Role-resource Bindings", description = "List role-resource bindings with pagination")
+    @Operation(summary = "List Role-Resource Bindings", description = "Page through role-resource binding records for the current tenant. " +
+            "Accepts filter criteria; returns a page of bindings showing which resources each role grants.")
     @PostMapping("/list")
     public Mono<R<Page<RoleResourceBindVO>>> list(@RequestBody(required = false) RoleResourceBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -118,7 +121,8 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
-    @Operation(summary = "List Resources by Role", description = "List resources bound to a role")
+    @Operation(summary = "List Resources by Role", description = "Return the full set of resources (permissions) granted to a role. " +
+            "The role must belong to the current tenant; use to inspect what a role can do.")
     @GetMapping("/list_resource_by_role")
     public Mono<R<List<ResourceVO>>> listResourceByRole(@Parameter(description = "Role ID") @NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -130,7 +134,9 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
-    @Operation(summary = "List Resources by Principal", description = "List resources accessible to a principal")
+    @Operation(summary = "List Resources by Principal", description = "Resolve the effective permissions of a principal (user or service account) " +
+            "by aggregating resources from every role assigned to it within the current tenant. " +
+            "The principal must be a member of the tenant; returns the deduplicated resource list.")
     @GetMapping("/list_resource_by_principal")
     public Mono<R<List<ResourceVO>>> listResourceByPrincipal(@Parameter(description = "Principal ID") @NotNull @RequestParam(value = "principal_id") Long principalId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -142,7 +148,8 @@ public class RoleResourceBindController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
-    @Operation(summary = "List Roles by Resource", description = "List roles bound to a resource")
+    @Operation(summary = "List Roles by Resource", description = "Return the roles within the current tenant that grant a given resource (permission). " +
+            "Use to find which roles can perform a specific action.")
     @GetMapping("/list_role_by_resource")
     public Mono<R<List<RoleVO>>> listRoleByResource(@Parameter(description = "Resource ID") @NotNull @RequestParam(value = "resource_id") Long resourceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

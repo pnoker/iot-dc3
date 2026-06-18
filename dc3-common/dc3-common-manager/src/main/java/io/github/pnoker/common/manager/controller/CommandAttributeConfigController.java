@@ -62,7 +62,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "command_attribute_config", description = "Command attribute configurations")
+@Tag(name = "command_attribute_config", description = "Command attribute configuration values: set and update per-device customization values for command properties inherited from command attribute definitions")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.COMMAND_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -86,7 +86,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'add')")
-    @Operation(summary = "Add Command Attribute Configuration", description = "Create a command attribute configuration record")
+    @Operation(summary = "Add Command Attribute Configuration", description = "Set the concrete value of a command attribute field for a specific device and command under the current tenant. The configured value overrides the field's default declared on the profile template; returns the new configuration ID.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,9 +104,9 @@ public class CommandAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'delete')")
-    @Operation(summary = "Delete Command Attribute Configuration", description = "Delete a command attribute configuration record by ID")
+    @Operation(summary = "Delete Command Attribute Configuration", description = "Permanently delete one command attribute configuration by ID (tenant-scoped). The device reverts to the attribute's default declared on the profile template; the deletion cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, commandAttributeConfigService.getById(id));
             commandAttributeConfigService.delete(id);
@@ -121,7 +121,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'update')")
-    @Operation(summary = "Update Command Attribute Configuration", description = "Update a command attribute configuration record")
+    @Operation(summary = "Update Command Attribute Configuration", description = "Change the configured value of an existing command attribute for a specific device and command. Verifies the record belongs to the current tenant before applying the update.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -140,9 +140,9 @@ public class CommandAttributeConfigController implements BaseController {
      * @return CommandAttributeConfigVO {@link CommandAttributeConfigVO}
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'get')")
-    @Operation(summary = "Get Command Attribute Configuration by ID", description = "Get command attribute configuration details by ID")
+    @Operation(summary = "Get Command Attribute Configuration by ID", description = "Fetch one command attribute configuration by its record ID. Use to inspect the value a specific device applies to a command's attribute field, scoped to the current tenant.")
     @GetMapping("/get_by_id")
-    public Mono<R<CommandAttributeConfigVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<CommandAttributeConfigVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             CommandAttributeConfigBO entityBO = requireTenant(tenantId, commandAttributeConfigService.getById(id));
             CommandAttributeConfigVO entityVO = commandAttributeConfigBuilder.buildVOByBO(entityBO);
@@ -159,7 +159,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @return CommandConfig
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'get')")
-    @Operation(summary = "Get Command Attribute Configuration by Attribute, Device, and Command IDs", description = "Get command attribute configuration details by attribute ID, device ID, and command ID")
+    @Operation(summary = "Get Command Attribute Configuration by Attribute, Device, and Command IDs", description = "Fetch the configured value of one command attribute field by its attribute, device and command IDs. Use when the configuration ID is unknown but the attribute-device-command triple is, scoped to the current tenant.")
     @GetMapping("/get_by_attribute_id_and_device_id_and_command_id")
     public Mono<R<CommandAttributeConfigVO>> getByAttributeIdAndDeviceIdAndCommandId(
             @Parameter(description = "Attribute ID") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
@@ -183,7 +183,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @return CommandConfig
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
-    @Operation(summary = "List Command Attribute Configurations by Device and Command IDs", description = "List command attribute configurations by device ID and command ID")
+    @Operation(summary = "List Command Attribute Configurations by Device and Command IDs", description = "Return every command attribute configuration set on a specific device for a specific command, scoped to the current tenant. Use to retrieve the full set of values that device will send with that command.")
     @GetMapping("/list_by_device_id_and_command_id")
     public Mono<R<List<CommandAttributeConfigVO>>> listByDeviceIdAndCommandId(
             @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -204,7 +204,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @return CommandConfig
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
-    @Operation(summary = "List Command Attribute Configurations by Device ID", description = "List command attribute configurations by device ID")
+    @Operation(summary = "List Command Attribute Configurations by Device ID", description = "Return every command attribute configuration set on a specific device across all of its commands, scoped to the current tenant. Use to review the full configuration of a device before sending commands.")
     @GetMapping("/list_by_device_id")
     public Mono<R<List<CommandAttributeConfigVO>>> listByDeviceId(
             @Parameter(description = "Device ID") @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -224,7 +224,7 @@ public class CommandAttributeConfigController implements BaseController {
      * @return Page Of CommandConfig
      */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
-    @Operation(summary = "List Command Attribute Configurations", description = "List command attribute configurations with pagination")
+    @Operation(summary = "List Command Attribute Configurations", description = "Page through command attribute configurations for the current tenant with filters from the query body. Returns a page of configurations; use for browsing or auditing configured command attribute values across devices and commands.")
     @PostMapping("/list")
     public Mono<R<Page<CommandAttributeConfigVO>>> list(
             @RequestBody(required = false) CommandAttributeConfigQuery entityQuery) {

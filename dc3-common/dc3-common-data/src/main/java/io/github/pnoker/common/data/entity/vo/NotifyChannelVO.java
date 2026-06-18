@@ -45,11 +45,11 @@ import lombok.ToString;
 @Schema(description = "Notify Channel view object")
 public class NotifyChannelVO extends BaseVO {
 
-    @Schema(description = "channel name")
+    @Schema(description = "Notification channel name. Unique name within a tenant.", example = "SMS Alert Channel", requiredMode = Schema.RequiredMode.REQUIRED)
 
     private String channelName;
 
-    @Schema(description = "channel code")
+    @Schema(description = "Notification channel code. Stable business identifier; must not change once deployed.", example = "SMS_CHANNEL")
 
     private String channelCode;
 
@@ -57,15 +57,15 @@ public class NotifyChannelVO extends BaseVO {
 
     private NotifyChannelTypeEnum channelTypeFlag;
 
-    @Schema(description = "credential ref")
+    @Schema(description = "Credential reference pointing to the authentication configuration for this channel (e.g. SMS gateway API key).", example = "cred_sms_001")
     @ToString.Exclude
     private String credentialRef;
 
-    @Schema(description = "channel extension information in JSON format")
+    @Schema(description = "Notification channel extension information, serialized as JSON for custom delivery configuration.")
 
     private NotifyChannelExt channelExt;
 
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
 
     private EnableFlagEnum enableFlag;
 

@@ -47,7 +47,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "driver_status", description = "Driver status")
+@Tag(name = "driver_status", description = "Driver operational status: query current connected, disconnected, and error states of protocol driver instances")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DRIVER_STATUS_URL_PREFIX)
@@ -63,7 +63,7 @@ public class DriverStatusController implements BaseController {
      * @return Map String:String
      */
     @PreAuthorize("@perm.can('driver_status', 'list')")
-    @Operation(summary = "List Driver Status", description = "List driver status mappings with pagination")
+    @Operation(summary = "List Driver Status", description = "Return the current ONLINE/OFFLINE status of each driver instance for the current tenant, keyed by driver id. Page through driver and pagination filters; results are tenant-scoped.")
     @PostMapping("/list")
     public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -81,7 +81,7 @@ public class DriverStatusController implements BaseController {
      * @return Number of devices currently online
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
-    @Operation(summary = "Count Online Devices by Driver", description = "Count currently online devices by driver ID")
+    @Operation(summary = "Count Online Devices by Driver", description = "Count devices currently online under one driver for the current tenant. Pass the driver id; returns a single count.")
     @GetMapping("/get_device_online_by_driver_id")
     public Mono<R<Long>> getDeviceOnlineByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -97,7 +97,7 @@ public class DriverStatusController implements BaseController {
      * @return Number of devices currently offline
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
-    @Operation(summary = "Count Offline Devices by Driver", description = "Count currently offline devices by driver ID")
+    @Operation(summary = "Count Offline Devices by Driver", description = "Count devices currently offline under one driver for the current tenant. Pass the driver id; returns a single count.")
     @GetMapping("/get_device_offline_by_driver_id")
     public Mono<R<Long>> getDeviceOfflineByDriverId(@Parameter(description = "Driver ID") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

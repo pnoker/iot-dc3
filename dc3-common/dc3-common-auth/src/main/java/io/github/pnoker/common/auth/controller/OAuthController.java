@@ -34,6 +34,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -77,7 +78,7 @@ public class OAuthController {
 
     @GetMapping(McpConstant.OAUTH2_AUTHORIZE)
     public Mono<ResponseEntity<Map<String, Object>>> authorize(
-            @RequestParam MultiValueMap<String, String> params,
+            @Parameter(description = "OAuth authorization request parameters including client_id, redirect_uri, response_type, scope, and state.") @RequestParam MultiValueMap<String, String> params,
             @org.springframework.web.bind.annotation.RequestHeader(
                     value = RequestConstant.Header.X_AUTH_PRINCIPAL, required = false) String principalJson) {
         return Mono.fromSupplier(() -> {

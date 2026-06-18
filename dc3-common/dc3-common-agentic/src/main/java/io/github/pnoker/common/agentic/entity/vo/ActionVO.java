@@ -39,28 +39,28 @@ import java.util.Map;
 @Schema(description = "Action view object")
 public class ActionVO extends BaseVO {
 
-    @Schema(description = "Action ID")
+    @Schema(description = "Unique identifier for the agent action execution instance.", example = "act_abc123")
     private String actionId;
 
-    @Schema(description = "Conversation ID")
+    @Schema(description = "ID of the conversation session this action belongs to.", example = "conv_xyz789")
     private String conversationId;
 
-    @Schema(description = "Action type")
+    @Schema(description = "Action type classification: TOOL_CALL, FUNCTION_CALL, or SYSTEM_ACTION.", example = "TOOL_CALL")
     private String actionType;
 
-    @Schema(description = "Action title")
+    @Schema(description = "Human-readable title summarizing the action intent.", example = "Query device temperature")
     private String title;
 
-    @Schema(description = "Action description")
+    @Schema(description = "Detailed description of what the action performs and its expected outcome.")
     private String description;
 
-    @Schema(description = "Action payload data")
+    @Schema(description = "Action payload including tool name, parameters, and metadata passed to the execution handler.")
     private Map<String, Object> payload;
 
-    @Schema(description = "Action execution status", example = "PENDING")
+    @Schema(description = "Action lifecycle status: PENDING, INVOKING, COMPLETED, FAILED, or CANCELLED.", example = "PENDING")
     private AgenticActionStatusEnum status;
 
-    @Schema(description = "Action expire time")
+    @Schema(description = "Timestamp after which the action is automatically cancelled if not completed.")
     private LocalDateTime expireTime;
 
 }

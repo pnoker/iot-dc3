@@ -52,7 +52,7 @@ public class GroupVO extends BaseVO {
     /**
      * Parent group ID.
      */
-    @Schema(description = "parent group ID")
+    @Schema(description = "ID of the parent group in the hierarchy. Null for root-level groups.", example = "1024")
     private Long parentGroupId;
 
     /**
@@ -66,7 +66,7 @@ public class GroupVO extends BaseVO {
      * Group name.
      */
     @NotBlank(message = "Group name can't be empty", groups = {Add.class})
-    @Schema(description = "group name")
+    @Schema(description = "Group name. Unique name within a tenant.", example = "Line 1 Devices", requiredMode = Schema.RequiredMode.REQUIRED)
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid group name format",
             groups = {Add.class, Update.class})
     private String groupName;
@@ -74,25 +74,25 @@ public class GroupVO extends BaseVO {
     /**
      * Group code.
      */
-    @Schema(description = "group code")
+    @Schema(description = "Group code. Stable business identifier.", example = "LINE_1")
     private String groupCode;
 
     /**
      * Group level.
      */
-    @Schema(description = "group level")
+    @Schema(description = "Hierarchical depth level of this group. Root groups are level 0.", example = "1")
     private Byte groupLevel;
 
     /**
      * Group index/order.
      */
-    @Schema(description = "group index")
+    @Schema(description = "Display ordering index among sibling groups.", example = "0")
     private Integer groupIndex;
 
     /**
      * Enable status flag.
      */
-    @Schema(description = "Enable flag enum (ENABLE or DISABLE)")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
 }

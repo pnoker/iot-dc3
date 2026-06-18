@@ -51,11 +51,11 @@ public class TopicVO implements Serializable {
 
     private String topic;
 
-    @Schema(description = "device name")
+    @Schema(description = "Device name for which this topic routes messages.", example = "Temperature Sensor 01")
 
     private String deviceName;
 
-    @Schema(description = "point name")
+    @Schema(description = "Data point name for which this topic routes messages.", example = "Temperature")
 
     private String pointName;
 

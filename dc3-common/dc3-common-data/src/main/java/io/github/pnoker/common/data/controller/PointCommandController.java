@@ -42,7 +42,7 @@ import reactor.core.publisher.Mono;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "point_command", description = "Point commands")
+@Tag(name = "point_command", description = "Point-level command dispatch: send commands to individual device data points and track their execution status in real time")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.POINT_COMMAND_URL_PREFIX)
@@ -58,7 +58,8 @@ public class PointCommandController implements BaseController {
      * @return commandId for status polling
      */
     @PreAuthorize("@perm.can('point_command', 'list')")
-    @Operation(summary = "Send Point Read Command", description = "Send a point read command and return the command ID")
+    @Operation(summary = "Send Point Read Command", description = "Dispatch a downward read command to fetch the current value of a single point on the tenant's device " +
+            "and return its command ID. Poll the command history with the returned ID to track execution status; the optional commandId makes submission idempotent.")
     @PostMapping("/read")
     public Mono<R<String>> read(@Validated @RequestBody PointCommandReadVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -76,7 +77,8 @@ public class PointCommandController implements BaseController {
      * @return commandId for status polling
      */
     @PreAuthorize("@perm.can('point_command', 'list')")
-    @Operation(summary = "Send Point Write Command", description = "Send a point write command and return the command ID")
+    @Operation(summary = "Send Point Write Command", description = "Dispatch a downward write command to push a new value onto a single point on the tenant's device " +
+            "and return its command ID. Poll the command history with the returned ID to confirm whether the write reached the device; the optional commandId makes submission idempotent.")
     @PostMapping("/write")
     public Mono<R<String>> write(@Validated @RequestBody PointCommandWriteVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

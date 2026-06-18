@@ -54,7 +54,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "label", description = "Labels")
+@Tag(name = "label", description = "Label definitions: create, update, and manage labels for categorizing and tagging devices, drivers, and other platform entities with flexible key-value metadata")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.LABEL_URL_PREFIX)
@@ -70,7 +70,7 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label', 'add')")
-    @Operation(summary = "Add Label", description = "Create a label record")
+    @Operation(summary = "Add Label", description = "Create a label for the current tenant. A label is a tag used to filter and organize devices, drivers, points and other entities; returns a success result.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -86,9 +86,9 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label', 'delete')")
-    @Operation(summary = "Delete Label", description = "Delete a label record by ID")
+    @Operation(summary = "Delete Label", description = "Permanently delete a label by ID (tenant-scoped). The label is removed from the tenant; entities previously tagged with it are unaffected but lose the tag association. This action cannot be undone.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, labelService.getById(id));
             labelService.delete(id);
@@ -101,7 +101,7 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PreAuthorize("@perm.can('label', 'update')")
-    @Operation(summary = "Update Label", description = "Update a label record")
+    @Operation(summary = "Update Label", description = "Update an existing label's fields for the current tenant. Ownership is verified before applying the change; returns a success result.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -118,9 +118,9 @@ public class LabelController implements BaseController {
      * @return LabelVO {@link LabelVO}
      */
     @PreAuthorize("@perm.can('label', 'get')")
-    @Operation(summary = "Get Label by ID", description = "Get label details by ID")
+    @Operation(summary = "Get Label by ID", description = "Fetch one label by ID (tenant-scoped). Use to inspect a label's name and color before applying it to or filtering entities.")
     @GetMapping("/get_by_id")
-    public Mono<R<LabelVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<LabelVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LabelBO entityBO = requireTenant(tenantId, labelService.getById(id));
             LabelVO entityVO = labelBuilder.buildVOByBO(entityBO);
@@ -133,7 +133,7 @@ public class LabelController implements BaseController {
      * @return R Of LabelVO Page
      */
     @PreAuthorize("@perm.can('label', 'list')")
-    @Operation(summary = "List Labels", description = "List labels with pagination")
+    @Operation(summary = "List Labels", description = "Page through labels for the current tenant with filters from the query body. Returns a page of labels; use to browse available tags or pick one to apply to an entity.")
     @PostMapping("/list")
     public Mono<R<Page<LabelVO>>> list(@RequestBody(required = false) LabelQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

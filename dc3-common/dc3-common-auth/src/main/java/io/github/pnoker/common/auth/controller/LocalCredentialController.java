@@ -56,7 +56,7 @@ import java.util.Objects;
  * @version 2026.6.12
  * @since 2026.6.12
  */
-@Tag(name = "local_credential", description = "Local credentials")
+@Tag(name = "local_credential", description = "Local credential management: create, update, verify, and rotate username/password credentials for user authentication")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.LOCAL_CREDENTIAL_URL_PREFIX)
@@ -70,7 +70,8 @@ public class LocalCredentialController implements BaseController {
     private final TenantMembershipService tenantMembershipService;
 
     @PreAuthorize("@perm.can('local_credential', 'add')")
-    @Operation(summary = "Add Local Credential", description = "Create a local credential for a principal")
+    @Operation(summary = "Add Local Credential", description = "Store a secret credential (e.g. password or API key) for a principal under the current tenant. " +
+            "The caller must be a tenant member of the target principal; returns the new credential record id.")
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LocalCredentialVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -83,9 +84,9 @@ public class LocalCredentialController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('local_credential', 'delete')")
-    @Operation(summary = "Delete Local Credential", description = "Delete a local credential by ID")
+    @Operation(summary = "Delete Local Credential", description = "Remove a stored credential by id. The credential's principal must belong to the current tenant; revokes that secret for the principal.")
     @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LocalCredentialBO entityBO = localCredentialService.getById(id);
             tenantMembershipService.requireTenantMember(tenantId, entityBO.getPrincipalId());
@@ -95,7 +96,7 @@ public class LocalCredentialController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('local_credential', 'update')")
-    @Operation(summary = "Update Local Credential", description = "Update a local credential")
+    @Operation(summary = "Update Local Credential", description = "Modify an existing credential's metadata. The principal id is preserved from the stored record; use to rotate attributes without changing ownership.")
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody LocalCredentialVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -111,9 +112,9 @@ public class LocalCredentialController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('local_credential', 'update')")
-    @Operation(summary = "Reset Local Credential Password", description = "Reset a local credential password")
+    @Operation(summary = "Reset Local Credential Password", description = "Replace the raw password of a credential by id with a new value. Use to rotate or recover a principal's stored secret; returns true on success.")
     @PostMapping("/reset_password")
-    public Mono<R<Boolean>> resetPassword(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id,
+    public Mono<R<Boolean>> resetPassword(@Parameter(description = "Primary key of the entity to query. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id,
                                           @Parameter(description = "New raw password") @NotNull @RequestParam(value = "password") String password) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LocalCredentialBO entityBO = localCredentialService.getById(id);
@@ -124,9 +125,9 @@ public class LocalCredentialController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('local_credential', 'get')")
-    @Operation(summary = "Get Local Credential by ID", description = "Get local credential details by ID")
+    @Operation(summary = "Get Local Credential by ID", description = "Fetch one credential by id. The credential's principal must belong to the current tenant; returns the credential view without exposing the raw secret.")
     @GetMapping("/get_by_id")
-    public Mono<R<LocalCredentialVO>> getById(@Parameter(description = "Record ID") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<R<LocalCredentialVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             LocalCredentialBO entityBO = localCredentialService.getById(id);
             tenantMembershipService.requireTenantMember(tenantId, entityBO.getPrincipalId());
@@ -135,14 +136,14 @@ public class LocalCredentialController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('local_credential', 'get')")
-    @Operation(summary = "Check Login Name Availability", description = "Check whether a login name is available")
+    @Operation(summary = "Check Login Name Availability", description = "Test whether a login name is free to register. Returns true when no credential currently uses the name; use before creating a new credential to avoid collisions.")
     @GetMapping("/check")
-    public Mono<R<Boolean>> checkLoginNameAvailable(@Parameter(description = "Name") @NotNull @RequestParam(value = "name") String name) {
+    public Mono<R<Boolean>> checkLoginNameAvailable(@Parameter(description = "Unique name of the entity to query within the current tenant.", example = "Temperature Sensor 01") @NotNull @RequestParam(value = "name") String name) {
         return async(() -> R.ok(localCredentialService.isLoginNameAvailable(name)));
     }
 
     @PreAuthorize("@perm.can('local_credential', 'list')")
-    @Operation(summary = "List Local Credentials", description = "List local credentials with pagination")
+    @Operation(summary = "List Local Credentials", description = "Page through credentials for the current tenant with query filters such as principal and login name. Returns a page of credential views; use to browse or select a target credential.")
     @PostMapping("/list")
     public Mono<R<Page<LocalCredentialVO>>> list(@RequestBody(required = false) LocalCredentialQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
