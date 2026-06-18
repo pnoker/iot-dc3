@@ -24,6 +24,7 @@ import io.github.pnoker.common.auth.entity.vo.LocalCredentialVO;
 import io.github.pnoker.common.enums.CredentialTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PasswordAlgorithmEnum;
+import io.github.pnoker.common.enums.RequirePasswordChangeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
@@ -55,6 +56,7 @@ public interface LocalCredentialBuilder {
     @Mapping(target = "credentialType", ignore = true)
     @Mapping(target = "passwordAlgorithm", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "requirePasswordChange", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     LocalCredentialDO buildDOByBO(LocalCredentialBO entityBO);
 
@@ -69,11 +71,15 @@ public interface LocalCredentialBuilder {
         if (Objects.nonNull(entityBO.getEnableFlag())) {
             entityDO.setEnableFlag(entityBO.getEnableFlag().getIndex());
         }
+        if (Objects.nonNull(entityBO.getRequirePasswordChange())) {
+            entityDO.setRequirePasswordChange(entityBO.getRequirePasswordChange().getIndex());
+        }
     }
 
     @Mapping(target = "credentialType", ignore = true)
     @Mapping(target = "passwordAlgorithm", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "requirePasswordChange", ignore = true)
     @Mapping(target = "rawPassword", ignore = true)
     LocalCredentialBO buildBOByDO(LocalCredentialDO entityDO);
 
@@ -82,6 +88,7 @@ public interface LocalCredentialBuilder {
         entityBO.setCredentialType(CredentialTypeEnum.ofValue(entityDO.getCredentialType()));
         entityBO.setPasswordAlgorithm(PasswordAlgorithmEnum.ofValue(entityDO.getPasswordAlgorithm()));
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(entityDO.getEnableFlag()));
+        entityBO.setRequirePasswordChange(RequirePasswordChangeFlagEnum.ofIndex(entityDO.getRequirePasswordChange()));
     }
 
     List<LocalCredentialBO> buildBOListByDOList(List<LocalCredentialDO> entityDOList);

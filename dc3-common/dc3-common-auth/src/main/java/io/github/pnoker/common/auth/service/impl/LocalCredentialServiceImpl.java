@@ -31,6 +31,7 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.CredentialTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.RequirePasswordChangeFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -177,7 +178,7 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
         }
         LocalCredentialBO credential = getById(id);
         credential.setRawPassword(rawPassword);
-        credential.setRequirePasswordChange((byte) 1);
+        credential.setRequirePasswordChange(RequirePasswordChangeFlagEnum.REQUIRED);
         credential.setFailedAttempts(0);
         credential.setLockedUntil(null);
         update(credential);
@@ -273,7 +274,8 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
         entityBO.setPasswordAlgorithm(PasswordUtil.algorithmOfHash(hash));
         entityBO.setPasswordUpdatedTime(LocalDateTime.now());
         entityBO.setFailedAttempts(Objects.requireNonNullElse(entityBO.getFailedAttempts(), 0));
-        entityBO.setRequirePasswordChange(Objects.requireNonNullElse(entityBO.getRequirePasswordChange(), (byte) 1));
+        entityBO.setRequirePasswordChange(Objects.requireNonNullElse(entityBO.getRequirePasswordChange(),
+                RequirePasswordChangeFlagEnum.REQUIRED));
         entityBO.setEnableFlag(Objects.requireNonNullElse(entityBO.getEnableFlag(), EnableFlagEnum.ENABLE));
     }
 
@@ -300,7 +302,7 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
             entityBO.setFailedAttempts(current.getFailedAttempts());
         }
         if (Objects.isNull(entityBO.getRequirePasswordChange())) {
-            entityBO.setRequirePasswordChange(current.getRequirePasswordChange());
+            entityBO.setRequirePasswordChange(RequirePasswordChangeFlagEnum.ofIndex(current.getRequirePasswordChange()));
         }
         if (Objects.isNull(entityBO.getEnableFlag())) {
             entityBO.setEnableFlag(EnableFlagEnum.ofIndex(current.getEnableFlag()));

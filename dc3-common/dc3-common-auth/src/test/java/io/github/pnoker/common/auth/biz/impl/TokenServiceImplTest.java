@@ -26,6 +26,7 @@ import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.auth.service.LocalCredentialService;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.service.TenantService;
+import io.github.pnoker.common.enums.RequirePasswordChangeFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.PasswordChangeRequiredException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
@@ -196,7 +197,7 @@ class TokenServiceImplTest {
 
     @Test
     void generateTokenRejectsRequirePasswordChangeWithoutIssuingToken() {
-        credential.setRequirePasswordChange((byte) 1);
+        credential.setRequirePasswordChange(RequirePasswordChangeFlagEnum.REQUIRED);
         when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
         when(localCredentialService.getByLoginName(LOGIN, false)).thenReturn(credential);
         when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(true);

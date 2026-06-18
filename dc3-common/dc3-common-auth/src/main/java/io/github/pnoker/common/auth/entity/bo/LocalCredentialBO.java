@@ -22,6 +22,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.CredentialTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PasswordAlgorithmEnum;
+import io.github.pnoker.common.enums.RequirePasswordChangeFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -70,7 +71,7 @@ public class LocalCredentialBO extends BaseBO {
 
     private LocalDateTime lockedUntil;
 
-    private Byte requirePasswordChange;
+    private RequirePasswordChangeFlagEnum requirePasswordChange;
 
     private EnableFlagEnum enableFlag;
 
