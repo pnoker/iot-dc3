@@ -15,48 +15,12 @@
   -->
 
 <template>
-  <div>
-    <api-tool
-      :page="reactiveData.page"
-      @refresh="refresh"
-      @reset="reset"
-      @search="search"
-      @sort="sort"
-      @size-change="sizeChange"
-      @current-change="currentChange"
-    />
-
-    <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column :label="t('settings.api.apiName')" min-width="160" prop="apiName" />
-        <el-table-column :label="t('settings.api.apiCode')" min-width="200" prop="apiCode" show-overflow-tooltip />
-        <el-table-column :label="t('settings.api.apiGroup')" min-width="160" prop="apiGroup" />
-        <el-table-column :label="t('settings.api.serviceName')" min-width="160" prop="serviceName" />
-        <el-table-column :label="t('settings.api.apiType')" min-width="100" prop="apiTypeFlag" />
-        <el-table-column :label="t('common.enable')" width="90">
-          <template #default="{ row }">
-            <enable-tag :value="row.enableFlag" />
-          </template>
-        </el-table-column>
-        <el-table-column :label="t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
-        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="180" />
-        <el-table-column
-          :formatter="timestampColumn"
-          :label="t('common.operationTime')"
-          prop="operateTime"
-          width="180"
-        />
-        <el-table-column :label="t('common.operation')" fixed="right" width="120">
-          <template #default="{ row }">
-            <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <el-empty :description="t('settings.api.empty')" />
-        </template>
-      </el-table>
-    </blank-card>
-  </div>
+  <entity-list-page :config="config" />
 </template>
-
-<script lang="ts" src="./index.ts"></script>
+<script lang="ts" setup>
+  import { useI18n } from 'vue-i18n';
+  import EntityListPage from '@/components/entity/EntityListPage.vue';
+  import { createApiConfig } from './apiConfig';
+  const { t } = useI18n();
+  const config = createApiConfig(t);
+</script>
