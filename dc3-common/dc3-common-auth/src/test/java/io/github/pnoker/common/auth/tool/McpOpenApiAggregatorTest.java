@@ -22,8 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -84,25 +82,6 @@ class McpOpenApiAggregatorTest {
         assertThat(schema).isNotNull();
         assertThat(schema.get("properties").has("id")).isTrue();
         assertThat(schema.get("required")).extracting(JsonNode::asText).containsExactly("id");
-    }
-
-    @Test
-    void loadsStaticSpecFromClasspathWithFullServiceNameKeys() throws Exception {
-        Map<String, String> schemas = aggregator.inputSchemasByApiCode();
-
-        // Keys expand the file's bare service name to dc3-center-<service> to match api_code.
-        String addKey = "dc3-center-fixturesvc:POST:/device/add";
-        String listKey = "dc3-center-fixturesvc:POST:/device/list_by_ids";
-        assertThat(schemas).containsKeys(addKey, listKey);
-
-        JsonNode add = mapper.readTree(schemas.get(addKey));
-        assertThat(add.get("properties").has("deviceName")).isTrue();
-        assertThat(add.get("properties").has("driverId")).isTrue();
-        assertThat(add.get("required")).extracting(JsonNode::asText).containsExactly("deviceName");
-
-        // A body-less POST that only declares a query param still yields a schema.
-        JsonNode list = mapper.readTree(schemas.get(listKey));
-        assertThat(list.get("properties").has("page")).isTrue();
     }
 
     @Test

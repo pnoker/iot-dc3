@@ -88,58 +88,6 @@ public class McpOpenApiAggregator {
     }
 
     /**
-     * @return map of {@code dc3-center-<service>:METHOD:/path} -> merged input JSON Schema string.
-     */
-    public Map<String, String> inputSchemasByApiCode() {
-        Map<String, String> schemas = new HashMap<>();
-        Resource[] resources;
-        try {
-            resources = new PathMatchingResourcePatternResolver().getResources(SPECS_LOCATION);
-        } catch (Exception ex) {
-            log.warn("MCP aggregator: cannot resolve static OpenAPI specs at {}: {}", SPECS_LOCATION,
-                    ex.getMessage());
-            return schemas;
-        }
-        for (Resource resource : resources) {
-            String serviceName = serviceNameOf(resource.getFilename());
-            if (serviceName == null) {
-                continue;
-            }
-            try (InputStream in = resource.getInputStream()) {
-                JsonNode root = objectMapper.readTree(in);
-                JsonNode paths = root.path("paths");
-                if (paths.isMissingNode() || !paths.isObject()) {
-                    continue;
-                }
-                paths.fields().forEachRemaining(pathEntry -> {
-                    String path = pathEntry.getKey();
-                    JsonNode pathItem = pathEntry.getValue();
-                    if (!pathItem.isObject()) {
-                        return;
-                    }
-                    pathItem.fields().forEachRemaining(opEntry -> {
-                        String method = opEntry.getKey().toUpperCase();
-                        ObjectNode schema = buildOperationSchema(opEntry.getValue(), root);
-                        if (schema == null) {
-                            return;
-                        }
-                        try {
-                            schemas.put(serviceName + ":" + method + ":" + path,
-                                    objectMapper.writeValueAsString(schema));
-                        } catch (Exception ignore) {
-                            // skip this operation on serialization failure
-                        }
-                    });
-                });
-            } catch (Exception ex) {
-                log.warn("MCP aggregator: failed to read static OpenAPI spec {}: {}",
-                        resource.getFilename(), ex.getMessage());
-            }
-        }
-        return schemas;
-    }
-
-    /**
      * @return map of {@code dc3-center-<service>:METHOD:/path} -> {@link ToolQuality} parsed from
      * each operation's summary/description, {@code x-dc3-ai} extension, and merged input schema.
      */
