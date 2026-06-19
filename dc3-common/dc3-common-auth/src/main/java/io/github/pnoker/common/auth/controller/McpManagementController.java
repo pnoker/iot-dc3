@@ -18,17 +18,20 @@
 package io.github.pnoker.common.auth.controller;
 
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
-import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
-import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
-import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
-import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
+import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
+import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
+import io.github.pnoker.common.auth.entity.vo.McpConnectionToolsReplaceVO;
+import io.github.pnoker.common.auth.entity.vo.McpConnectionVO;
+import io.github.pnoker.common.auth.entity.vo.McpToolCatalogQueryVO;
+import io.github.pnoker.common.auth.entity.vo.McpToolVO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.dto.McpConnectionToolsReplaceRequestDTO;
-import io.github.pnoker.common.entity.dto.McpToolCatalogListRequestDTO;
 import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
 import io.github.pnoker.common.entity.dto.OAuthClientRegistrationResponseDTO;
+import io.github.pnoker.common.valid.Add;
+import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -102,7 +106,7 @@ public class McpManagementController implements BaseController {
     @Operation(summary = "List OAuth Clients", description = "List the OAuth clients the current principal owns. "
             + "Returns client records without secrets; use to pick a client before creating or inspecting a connection.")
     @PostMapping("/client/list")
-    public Mono<R<List<OAuthRegisteredClientRecord>>> listClients() {
+    public Mono<R<List<OAuthClientVO>>> listClients() {
         return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listClients(header))));
     }
 
@@ -115,7 +119,7 @@ public class McpManagementController implements BaseController {
     @Operation(summary = "List MCP Connections", description = "List the MCP connections owned by the current principal. "
             + "Each connection binds an OAuth client to a tool whitelist; use to review which clients are wired up.")
     @PostMapping("/connection/list")
-    public Mono<R<List<McpConnectionRecord>>> listConnections() {
+    public Mono<R<List<McpConnectionVO>>> listConnections() {
         return getPrincipalHeader()
                 .flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listConnections(header))));
     }
@@ -130,7 +134,8 @@ public class McpManagementController implements BaseController {
     @Operation(summary = "Create MCP Connection", description = "Create an MCP connection linking an OAuth client to an allowed tool set for the current principal. "
             + "Returns the persisted connection record; the client must already be registered.")
     @PostMapping("/connection/add")
-    public Mono<R<McpConnectionRecord>> createConnection(@RequestBody McpConnectionRecord connection) {
+    public Mono<R<McpConnectionVO>> createConnection(
+            @Validated(Add.class) @RequestBody McpConnectionAddVO connection) {
         return getPrincipalHeader()
                 .flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.createConnection(connection, header))));
     }
@@ -162,10 +167,11 @@ public class McpManagementController implements BaseController {
     @Operation(summary = "Replace MCP Connection Tools", description = "Replace a connection's tool whitelist with the supplied tool ids, scoped to the owning principal. "
             + "The previous whitelist is fully overwritten; returns true on success.")
     @PostMapping("/connection/tools/replace")
-    public Mono<R<Boolean>> replaceConnectionTools(@RequestBody McpConnectionToolsReplaceRequestDTO request) {
+    public Mono<R<Boolean>> replaceConnectionTools(
+            @Validated(Update.class) @RequestBody McpConnectionToolsReplaceVO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
-            McpConnectionToolsReplaceRequestDTO body =
-                    request == null ? new McpConnectionToolsReplaceRequestDTO() : request;
+            McpConnectionToolsReplaceVO body =
+                    request == null ? new McpConnectionToolsReplaceVO() : request;
             oauthMcpRuntimeService.replaceConnectionTools(body.getConnectionId(), toolIds(body.getToolIds()),
                     header);
             return R.ok(true);
@@ -210,9 +216,9 @@ public class McpManagementController implements BaseController {
     @Operation(summary = "List MCP Tool Catalog", description = "Page the MCP tool catalog with optional keyword, risk level and limit filters. "
             + "Returns tool records exposing each tool's schema; use to browse tools before whitelisting them on a connection.")
     @PostMapping("/tool/list")
-    public Mono<R<List<McpToolRecord>>> listToolCatalog(
-            @RequestBody(required = false) McpToolCatalogListRequestDTO request) {
-        McpToolCatalogListRequestDTO body = request == null ? new McpToolCatalogListRequestDTO() : request;
+    public Mono<R<List<McpToolVO>>> listToolCatalog(
+            @RequestBody(required = false) McpToolCatalogQueryVO request) {
+        McpToolCatalogQueryVO body = request == null ? new McpToolCatalogQueryVO() : request;
         return async(() -> R.ok(oauthMcpRuntimeService.listToolCatalog(
                 StringUtils.defaultString(body.getKeyword()),
                 StringUtils.defaultString(body.getRiskLevel()),
@@ -234,11 +240,11 @@ public class McpManagementController implements BaseController {
     @Operation(summary = "List MCP Audit Log", description = "List MCP tool-call audit entries scoped to the caller's tenant, "
             + "filterable by principal, tool, status and risk level. Returns append-only records kept for compliance review.")
     @PostMapping("/audit/list")
-    public Mono<R<List<McpAuditCommand>>> listAuditLog(
-            @Parameter(description = "Filter by owning principal ID.", example = "2048") @RequestParam(value = "principal_id", required = false) Long principalId,
-            @Parameter(description = "Filter by MCP tool ID.", example = "tool_read_device") @RequestParam(value = "tool_id", required = false) String toolId,
+    public Mono<R<List<McpAuditVO>>> listAuditLog(
+            @Parameter(description = "Filter by owning principal ID.", example = "2048") @RequestParam(value = "principalId", required = false) Long principalId,
+            @Parameter(description = "Filter by MCP tool ID.", example = "tool_read_device") @RequestParam(value = "toolId", required = false) String toolId,
             @Parameter(description = "Filter by audit invocation outcome: SUCCESS, DENIED, POLICY_DENIED, ERROR, or UNKNOWN.", example = "SUCCESS") @RequestParam(value = "status", required = false) String status,
-            @Parameter(description = "Filter by tool risk level: LOW, MEDIUM, or HIGH.", example = "LOW") @RequestParam(value = "risk_level", required = false) String riskLevel,
+            @Parameter(description = "Filter by tool risk level: LOW, MEDIUM, or HIGH.", example = "LOW") @RequestParam(value = "riskLevel", required = false) String riskLevel,
             @Parameter(description = "Maximum number of records to return.", example = "20") @RequestParam(value = "limit", required = false) Integer limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(oauthMcpRuntimeService.listAudit(
                 tenantId, principalId, StringUtils.defaultString(toolId), StringUtils.defaultString(status),

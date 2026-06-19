@@ -26,6 +26,10 @@ import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.config.OAuthProperties;
 import io.github.pnoker.common.auth.dal.PrincipalManager;
 import io.github.pnoker.common.auth.dal.ServiceAccountManager;
+import io.github.pnoker.common.auth.entity.builder.McpAuditBuilder;
+import io.github.pnoker.common.auth.entity.builder.McpConnectionBuilder;
+import io.github.pnoker.common.auth.entity.builder.McpToolBuilder;
+import io.github.pnoker.common.auth.entity.builder.OAuthClientBuilder;
 import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
 import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
@@ -34,6 +38,11 @@ import io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
+import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
+import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
+import io.github.pnoker.common.auth.entity.vo.McpConnectionVO;
+import io.github.pnoker.common.auth.entity.vo.McpToolVO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.tool.McpOpenApiAggregator;
@@ -118,6 +127,10 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     private final ServiceAccountManager serviceAccountManager;
     private final McpOpenApiAggregator openApiAggregator;
     private final OAuthProperties oauthProperties;
+    private final OAuthClientBuilder oauthClientBuilder;
+    private final McpConnectionBuilder mcpConnectionBuilder;
+    private final McpToolBuilder mcpToolBuilder;
+    private final McpAuditBuilder mcpAuditBuilder;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -321,9 +334,10 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     @Override
-    public List<OAuthRegisteredClientRecord> listClients(RequestHeader.PrincipalHeader principalHeader) {
+    public List<OAuthClientVO> listClients(RequestHeader.PrincipalHeader principalHeader) {
         requireAuthenticatedPrincipal(principalHeader);
-        return oauthMcpMapper.listClientsByOwner(principalHeader.getPrincipalId(), principalHeader.getTenantId());
+        return oauthClientBuilder.buildVOListByRecordList(
+                oauthMcpMapper.listClientsByOwner(principalHeader.getPrincipalId(), principalHeader.getTenantId()));
     }
 
     @Override
@@ -497,32 +511,36 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     @Override
-    public List<McpToolRecord> listToolCatalog(String keyword, String riskLevel, int limit) {
+    public List<McpToolVO> listToolCatalog(String keyword, String riskLevel, int limit) {
         int boundedLimit = Math.max(1, Math.min(limit <= 0 ? 200 : limit, 500));
-        return oauthMcpMapper.listToolCatalog(StringUtils.trimToEmpty(keyword), StringUtils.trimToEmpty(riskLevel),
-                boundedLimit);
+        return mcpToolBuilder.buildVOListByRecordList(
+                oauthMcpMapper.listToolCatalog(StringUtils.trimToEmpty(keyword), StringUtils.trimToEmpty(riskLevel),
+                        boundedLimit));
     }
 
     @Override
-    public List<McpAuditCommand> listAudit(Long tenantId, Long principalId, String toolId, String status,
-                                           String riskLevel, int limit) {
+    public List<McpAuditVO> listAudit(Long tenantId, Long principalId, String toolId, String status,
+                                      String riskLevel, int limit) {
         int boundedLimit = Math.max(1, Math.min(limit <= 0 ? 200 : limit, 500));
-        return oauthMcpMapper.listAudit(tenantId, principalId, StringUtils.trimToEmpty(toolId),
-                StringUtils.trimToEmpty(status), StringUtils.trimToEmpty(riskLevel), boundedLimit);
+        return mcpAuditBuilder.buildVOListByRecordList(
+                oauthMcpMapper.listAudit(tenantId, principalId, StringUtils.trimToEmpty(toolId),
+                        StringUtils.trimToEmpty(status), StringUtils.trimToEmpty(riskLevel), boundedLimit));
     }
 
     @Override
-    public List<McpConnectionRecord> listConnections(RequestHeader.PrincipalHeader principalHeader) {
+    public List<McpConnectionVO> listConnections(RequestHeader.PrincipalHeader principalHeader) {
         requireAuthenticatedPrincipal(principalHeader);
-        return oauthMcpMapper.listConnectionsByPrincipal(principalHeader.getTenantId(),
-                principalHeader.getPrincipalId());
+        return mcpConnectionBuilder.buildVOListByRecordList(
+                oauthMcpMapper.listConnectionsByPrincipal(principalHeader.getTenantId(),
+                        principalHeader.getPrincipalId()));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public McpConnectionRecord createConnection(McpConnectionRecord connection,
-                                                RequestHeader.PrincipalHeader principalHeader) {
+    public McpConnectionVO createConnection(McpConnectionAddVO entityVO,
+                                            RequestHeader.PrincipalHeader principalHeader) {
         requireAuthenticatedPrincipal(principalHeader);
+        McpConnectionRecord connection = mcpConnectionBuilder.buildRecordByAddVO(entityVO);
         OAuthRegisteredClientRecord client = requireClient(connection.getClientId());
         String grantType = StringUtils.defaultIfBlank(connection.getGrantType(),
                 McpConstant.OAuth.GRANT_AUTHORIZATION_CODE);
@@ -565,7 +583,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         connection.setEnableFlag((byte) 0);
         connection.setRemark(StringUtils.defaultString(connection.getRemark()));
         oauthMcpMapper.insertConnection(connection);
-        return connection;
+        return mcpConnectionBuilder.buildVOByRecord(connection);
     }
 
     @Override

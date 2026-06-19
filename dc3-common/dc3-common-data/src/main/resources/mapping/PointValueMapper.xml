@@ -28,7 +28,7 @@
       the window.
     -->
     <select id="aggregateInWindow"
-            parameterType="io.github.pnoker.common.entity.query.WindowAggregateRequest"
+            parameterType="io.github.pnoker.common.entity.query.WindowAggregateQuery"
             resultType="io.github.pnoker.common.entity.bo.WindowAggregateResult">
         SELECT
         <choose>

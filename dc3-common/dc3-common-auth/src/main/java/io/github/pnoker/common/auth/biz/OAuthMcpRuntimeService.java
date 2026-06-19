@@ -17,10 +17,11 @@
 
 package io.github.pnoker.common.auth.biz;
 
-import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
-import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
-import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
-import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
+import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
+import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
+import io.github.pnoker.common.auth.entity.vo.McpConnectionVO;
+import io.github.pnoker.common.auth.entity.vo.McpToolVO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
 import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
@@ -52,7 +53,7 @@ public interface OAuthMcpRuntimeService {
     OAuthClientRegistrationResponseDTO registerClient(OAuthClientRegistrationRequestDTO request,
                                                       RequestHeader.PrincipalHeader principalHeader);
 
-    List<OAuthRegisteredClientRecord> listClients(RequestHeader.PrincipalHeader principalHeader);
+    List<OAuthClientVO> listClients(RequestHeader.PrincipalHeader principalHeader);
 
     URI authorize(Map<String, String> params, RequestHeader.PrincipalHeader principalHeader);
 
@@ -64,12 +65,12 @@ public interface OAuthMcpRuntimeService {
 
     int refreshToolCatalog();
 
-    List<McpToolRecord> listToolCatalog(String keyword, String riskLevel, int limit);
+    List<McpToolVO> listToolCatalog(String keyword, String riskLevel, int limit);
 
-    List<McpConnectionRecord> listConnections(RequestHeader.PrincipalHeader principalHeader);
+    List<McpConnectionVO> listConnections(RequestHeader.PrincipalHeader principalHeader);
 
-    McpConnectionRecord createConnection(McpConnectionRecord connection,
-                                         RequestHeader.PrincipalHeader principalHeader);
+    McpConnectionVO createConnection(McpConnectionAddVO connection,
+                                     RequestHeader.PrincipalHeader principalHeader);
 
     void revokeConnection(Long connectionId, RequestHeader.PrincipalHeader principalHeader);
 
@@ -88,7 +89,7 @@ public interface OAuthMcpRuntimeService {
 
     void audit(McpAuditCommandDTO command);
 
-    List<McpAuditCommand> listAudit(Long tenantId, Long principalId, String toolId, String status,
-                                    String riskLevel, int limit);
+    List<McpAuditVO> listAudit(Long tenantId, Long principalId, String toolId, String status,
+                               String riskLevel, int limit);
 
 }

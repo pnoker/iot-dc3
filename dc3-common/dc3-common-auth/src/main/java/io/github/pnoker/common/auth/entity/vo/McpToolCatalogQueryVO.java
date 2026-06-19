@@ -15,12 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.entity.dto;
+package io.github.pnoker.common.auth.entity.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.pnoker.common.constant.service.McpConstant;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,30 +27,33 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
 
 /**
- * MCP connection tool whitelist replacement request.
+ * Query view object for paging the MCP tool catalog.
  *
  * @author pnoker
- * @version 2026.6.12
- * @since 2026.6.12
+ * @version 2026.6.19
+ * @since 2026.6.19
  */
 @Getter
 @Setter
-@Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class McpConnectionToolsReplaceRequestDTO implements Serializable {
+@ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(description = "MCP tool catalog query")
+public class McpToolCatalogQueryVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @JsonProperty(McpConstant.Field.CONNECTION_ID_REQUEST)
-    private Long connectionId;
+    @Schema(description = "Fuzzy keyword over tool id, name and title.", example = "device")
+    private String keyword;
 
-    @JsonProperty(McpConstant.Field.TOOL_IDS)
-    private List<String> toolIds;
+    @Schema(description = "Filter by tool risk level: LOW, MEDIUM or HIGH.", example = "LOW")
+    private String riskLevel;
+
+    @Schema(description = "Maximum number of records to return.", example = "200")
+    private Integer limit;
 
 }

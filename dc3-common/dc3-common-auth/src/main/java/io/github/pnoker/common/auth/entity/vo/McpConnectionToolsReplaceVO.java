@@ -15,12 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.entity.dto;
+package io.github.pnoker.common.auth.entity.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.pnoker.common.constant.service.McpConstant;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,30 +29,32 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
- * MCP tool catalog list filter request.
+ * Request view object for replacing an MCP connection's tool whitelist.
  *
  * @author pnoker
- * @version 2026.6.12
- * @since 2026.6.12
+ * @version 2026.6.19
+ * @since 2026.6.19
  */
 @Getter
 @Setter
-@Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class McpToolCatalogListRequestDTO implements Serializable {
+@ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(description = "MCP connection tools replace request")
+public class McpConnectionToolsReplaceVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String keyword;
+    @NotNull(message = "Connection id can't be empty", groups = {Update.class})
+    @Schema(description = "Primary key of the MCP connection to update.", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Long connectionId;
 
-    @JsonProperty(McpConstant.Field.RISK_LEVEL_META)
-    private String riskLevel;
-
-    private Integer limit;
+    @Schema(description = "New tool id whitelist; fully overwrites the previous one.", example = "[\"tool_read_device\"]")
+    private List<String> toolIds;
 
 }
