@@ -34,13 +34,15 @@
                detail_ext,
                create_time
         FROM dc3_identity_audit_log
-        WHERE deleted = 0
-          AND tenant_id = #{tenantId}
-          AND (#{principalId} IS NULL OR #{principalId} = 0 OR principal_id = #{principalId})
-          AND (#{action} IS NULL OR #{action} = '' OR action = #{action})
-          AND (#{resourceType} IS NULL OR #{resourceType} = '' OR resource_type = #{resourceType})
-          AND (#{resourceId} IS NULL OR #{resourceId} = 0 OR resource_id = #{resourceId})
-          AND (#{status} IS NULL OR #{status} = '' OR status = #{status})
+        <where>
+            deleted = 0
+            AND tenant_id = #{tenantId}
+            <if test="principalId != null and principalId != 0">AND principal_id = #{principalId}</if>
+            <if test="action != null and action != ''">AND action = #{action}</if>
+            <if test="resourceType != null and resourceType != ''">AND resource_type = #{resourceType}</if>
+            <if test="resourceId != null and resourceId != 0">AND resource_id = #{resourceId}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
         ORDER BY create_time DESC
         LIMIT #{limit}
     </select>
