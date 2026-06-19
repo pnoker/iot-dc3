@@ -22,6 +22,9 @@ import io.github.pnoker.common.auth.entity.bo.PrincipalBO;
 import io.github.pnoker.common.auth.entity.query.PrincipalQuery;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Read-only business service for principals. Principals themselves are created transitively
  * (USER via user management, SERVICE_ACCOUNT via service-account management, SYSTEM at boot), so
@@ -36,6 +39,12 @@ public interface PrincipalService {
     PrincipalBO getById(Long id);
 
     Page<PrincipalBO> list(PrincipalQuery entityQuery);
+
+    /**
+     * Batch-resolve principals by their IDs, used to turn principalId references in other
+     * lists into display names. Returns only the matched rows; unknown IDs are skipped.
+     */
+    List<PrincipalBO> listByIds(Collection<Long> ids);
 
     void setEnableFlag(Long id, EnableFlagEnum target, Long operatorId, String operatorName);
 }

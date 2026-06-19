@@ -87,6 +87,8 @@ public interface PrincipalBuilder {
 
     List<PrincipalBO> buildBOListByDOList(List<PrincipalDO> entityDOList);
 
+    List<PrincipalVO> buildVOListByBOList(List<PrincipalBO> entityBOList);
+
     default Page<PrincipalBO> buildBOPageByDOPage(Page<PrincipalDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }

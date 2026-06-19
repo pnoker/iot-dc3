@@ -35,6 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -65,6 +68,14 @@ public class PrincipalServiceImpl implements PrincipalService {
         }
         Page<PrincipalDO> page = principalManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
         return principalBuilder.buildBOPageByDOPage(page);
+    }
+
+    @Override
+    public List<PrincipalBO> listByIds(Collection<Long> ids) {
+        if (Objects.isNull(ids) || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return principalBuilder.buildBOListByDOList(principalManager.listByIds(ids));
     }
 
     @Override

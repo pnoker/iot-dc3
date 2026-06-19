@@ -45,6 +45,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -108,6 +110,27 @@ public class PrincipalController implements BaseController {
     public Mono<R<Page<PrincipalVO>>> list(@RequestBody(required = false) PrincipalQuery entityQuery) {
         PrincipalQuery query = Objects.isNull(entityQuery) ? new PrincipalQuery() : entityQuery;
         return async(() -> R.ok(principalBuilder.buildVOPageByBOPage(principalService.list(query))));
+    }
+
+    /**
+     * Batch-resolve principals by their IDs in one call.
+     *
+     * @param ids principal ids to resolve
+     * @return the matching PrincipalVO entries (principalName / displayName) for name display
+     */
+    @PreAuthorize("@perm.can('principal', 'list')")
+    @Operation(summary = "List Principals by IDs", description = "Batch-resolve principals by their IDs in one call. " +
+            "Accepts a list of principal IDs and returns the matching PrincipalVO entries (principalName / displayName), " +
+            "so callers can render principalId references from other lists as human-readable names.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
+    @PostMapping("/list_by_ids")
+    public Mono<R<List<PrincipalVO>>> listByIds(@RequestBody Collection<Long> ids) {
+        return async(() -> R.ok(principalBuilder.buildVOListByBOList(principalService.listByIds(ids))));
     }
 
     /**
