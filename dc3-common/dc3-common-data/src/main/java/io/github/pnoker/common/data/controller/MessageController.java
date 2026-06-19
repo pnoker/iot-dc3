@@ -31,6 +31,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +74,13 @@ public class MessageController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('message', 'add')")
-    @Operation(summary = "Add Message", description = "Create a new alarm message template scoped to the current tenant. Use to register a reusable message (name, code, level, enabled flag) that alarm rules and notifications can reference.")
+    @Operation(summary = "Add Message", description = "Create a new alarm message template scoped to the current tenant. Use to register a reusable message (name, code, level, enabled flag) that alarm rules and notifications can reference.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MessageVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,7 +98,13 @@ public class MessageController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('message', 'delete')")
-    @Operation(summary = "Delete Message", description = "Delete a tenant-owned alarm message template by its ID. Returns not-found if the record belongs to another tenant.")
+    @Operation(summary = "Delete Message", description = "Delete a tenant-owned alarm message template by its ID. Returns not-found if the record belongs to another tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -108,7 +122,13 @@ public class MessageController implements BaseController {
      * @return update-success status
      */
     @PreAuthorize("@perm.can('message', 'update')")
-    @Operation(summary = "Update Message", description = "Update the name, code, level or enabled flag of an existing alarm message template owned by the current tenant. The tenant scope is enforced from the authenticated caller, not the request body.")
+    @Operation(summary = "Update Message", description = "Update the name, code, level or enabled flag of an existing alarm message template owned by the current tenant. The tenant scope is enforced from the authenticated caller, not the request body.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MessageVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -128,7 +148,13 @@ public class MessageController implements BaseController {
      * @return the matched MessageVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('message', 'get')")
-    @Operation(summary = "Get Message by ID", description = "Return one alarm message template (name, code, level, enabled flag) by its ID, restricted to the current tenant. Use to inspect a single template before updating or deleting it.")
+    @Operation(summary = "Get Message by ID", description = "Return one alarm message template (name, code, level, enabled flag) by its ID, restricted to the current tenant. Use to inspect a single template before updating or deleting it.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<MessageVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -145,7 +171,13 @@ public class MessageController implements BaseController {
      * @return a page of MessageVO matching the query
      */
     @PreAuthorize("@perm.can('message', 'list')")
-    @Operation(summary = "List Messages", description = "Page through the current tenant's alarm message templates, filterable by name, code, level and enabled flag. Use to browse or locate templates for reuse by alarm rules and notification channels.")
+    @Operation(summary = "List Messages", description = "Page through the current tenant's alarm message templates, filterable by name, code, level and enabled flag. Use to browse or locate templates for reuse by alarm rules and notification channels.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<MessageVO>>> list(@RequestBody(required = false) MessageQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

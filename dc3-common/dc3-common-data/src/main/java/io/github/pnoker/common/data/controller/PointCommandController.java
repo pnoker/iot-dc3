@@ -25,6 +25,8 @@ import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +64,13 @@ public class PointCommandController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_command', 'list')")
     @Operation(summary = "Send Point Read Command", description = "Dispatch a downward read command to fetch the current value of a single point on the tenant's device " +
-            "and return its command ID. Poll the command history with the returned ID to track execution status; the optional commandId makes submission idempotent.")
+            "and return its command ID. Poll the command history with the returned ID to track execution status; the optional commandId makes submission idempotent.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "true")
+            }))
     @PostMapping("/read")
     public Mono<R<String>> read(@Validated @RequestBody PointCommandReadVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -81,7 +89,13 @@ public class PointCommandController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_command', 'list')")
     @Operation(summary = "Send Point Write Command", description = "Dispatch a downward write command to push a new value onto a single point on the tenant's device " +
-            "and return its command ID. Poll the command history with the returned ID to confirm whether the write reached the device; the optional commandId makes submission idempotent.")
+            "and return its command ID. Poll the command history with the returned ID to confirm whether the write reached the device; the optional commandId makes submission idempotent.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "true")
+            }))
     @PostMapping("/write")
     public Mono<R<String>> write(@Validated @RequestBody PointCommandWriteVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

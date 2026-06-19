@@ -28,6 +28,8 @@ import io.github.pnoker.common.data.service.RuleStateService;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +70,13 @@ public class RuleStateController implements BaseController {
      * @return the matched RuleStateVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('rule_state', 'get')")
-    @Operation(summary = "Get Rule State by ID", description = "Return the runtime state of one rule (enabled/disabled, last-fired, counters) for the current tenant. Use to inspect a single rule's execution status.")
+    @Operation(summary = "Get Rule State by ID", description = "Return the runtime state of one rule (enabled/disabled, last-fired, counters) for the current tenant. Use to inspect a single rule's execution status.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<RuleStateVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -84,7 +92,13 @@ public class RuleStateController implements BaseController {
      * @return a page of RuleStateVO matching the query
      */
     @PreAuthorize("@perm.can('rule_state', 'list')")
-    @Operation(summary = "List Rule States", description = "Page through the runtime states of rules (enabled/disabled, last-fired, counters) for the current tenant. Use to survey which rules are active and how often each has fired.")
+    @Operation(summary = "List Rule States", description = "Page through the runtime states of rules (enabled/disabled, last-fired, counters) for the current tenant. Use to survey which rules are active and how often each has fired.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<RuleStateVO>>> list(@RequestBody(required = false) RuleStateQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

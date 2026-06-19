@@ -68,7 +68,7 @@ public class NotifyChannelQuery implements Serializable {
 
     private String channelCode;
 
-    @Schema(description = "Notification channel type enum")
+    @Schema(description = "Filter by notification channel type (e.g. EMAIL, SMS, WEBHOOK, MESSAGE_BUS). Exact match.")
 
     private NotifyChannelTypeEnum channelTypeFlag;
 

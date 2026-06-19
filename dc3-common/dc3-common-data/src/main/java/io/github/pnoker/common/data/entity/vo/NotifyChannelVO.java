@@ -53,7 +53,7 @@ public class NotifyChannelVO extends BaseVO {
 
     private String channelCode;
 
-    @Schema(description = "Notification channel type enum")
+    @Schema(description = "Notification channel type (e.g. EMAIL, SMS, WEBHOOK, MESSAGE_BUS).")
 
     private NotifyChannelTypeEnum channelTypeFlag;
 

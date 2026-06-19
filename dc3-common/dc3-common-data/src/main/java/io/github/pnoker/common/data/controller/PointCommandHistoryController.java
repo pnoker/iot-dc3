@@ -26,6 +26,8 @@ import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +66,13 @@ public class PointCommandHistoryController implements BaseController {
      * @return the matched PointCommandHistoryVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('point_command_history', 'get')")
-    @Operation(summary = "Get Point Command History by Command ID", description = "Return the full audit record for a single point command identified by its command ID (tenant-scoped). Use to look up the request value, response value, status, error and timing of one dispatched command.")
+    @Operation(summary = "Get Point Command History by Command ID", description = "Return the full audit record for a single point command identified by its command ID (tenant-scoped). Use to look up the request value, response value, status, error and timing of one dispatched command.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_command_id")
     public Mono<R<PointCommandHistoryVO>> getByCommandId(@Parameter(description = "Identifier of the point command to look up; must reference a command dispatched under the current tenant.", example = "1024") @NotBlank @RequestParam String commandId) {
         return getTenantId().flatMap(tenantId -> async(() ->
@@ -78,7 +86,13 @@ public class PointCommandHistoryController implements BaseController {
      * @return a page of PointCommandHistoryVO matching the query
      */
     @PreAuthorize("@perm.can('point_command_history', 'list')")
-    @Operation(summary = "List Point Command History", description = "Page through the point command audit trail for the current tenant, filterable by device, point, command type and status. Use to review which commands were dispatched to data points and whether each succeeded.")
+    @Operation(summary = "List Point Command History", description = "Page through the point command audit trail for the current tenant, filterable by device, point, command type and status. Use to review which commands were dispatched to data points and whether each succeeded.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<PointCommandHistoryVO>>> list(@RequestBody(required = false) PointCommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {

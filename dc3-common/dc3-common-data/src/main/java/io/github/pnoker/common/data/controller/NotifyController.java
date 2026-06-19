@@ -31,6 +31,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +74,13 @@ public class NotifyController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('notify', 'add')")
-    @Operation(summary = "Add Notification Rule", description = "Create a notification (alert-routing) rule for the current tenant that wires alarm triggers to delivery channels. Use to define how and where alerts are dispatched.")
+    @Operation(summary = "Add Notification Rule", description = "Create a notification (alert-routing) rule for the current tenant that wires alarm triggers to delivery channels. Use to define how and where alerts are dispatched.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,7 +98,13 @@ public class NotifyController implements BaseController {
      * @return delete-success status; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('notify', 'delete')")
-    @Operation(summary = "Delete Notification Rule", description = "Delete a notification rule by ID for the current tenant. Ownership is validated before deletion, so cross-tenant records cannot be removed.")
+    @Operation(summary = "Delete Notification Rule", description = "Delete a notification rule by ID for the current tenant. Ownership is validated before deletion, so cross-tenant records cannot be removed.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -107,7 +121,13 @@ public class NotifyController implements BaseController {
      * @return update-success status; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('notify', 'update')")
-    @Operation(summary = "Update Notification Rule", description = "Update an existing notification rule (routing, severity, enable flag) for the current tenant. Ownership is validated before the update is applied.")
+    @Operation(summary = "Update Notification Rule", description = "Update an existing notification rule (routing, severity, enable flag) for the current tenant. Ownership is validated before the update is applied.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody NotifyVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -126,7 +146,13 @@ public class NotifyController implements BaseController {
      * @return the matched NotifyVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('notify', 'get')")
-    @Operation(summary = "Get Notification Rule by ID", description = "Return a single notification rule for the current tenant. Use to inspect routing, severity and channel bindings for one rule.")
+    @Operation(summary = "Get Notification Rule by ID", description = "Return a single notification rule for the current tenant. Use to inspect routing, severity and channel bindings for one rule.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<NotifyVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -142,7 +168,13 @@ public class NotifyController implements BaseController {
      * @return a page of NotifyVO matching the query
      */
     @PreAuthorize("@perm.can('notify', 'list')")
-    @Operation(summary = "List Notification Rules", description = "Page through notification (alert-routing) rules for the current tenant with optional query filters. Use to enumerate which rules govern alert dispatch.")
+    @Operation(summary = "List Notification Rules", description = "Page through notification (alert-routing) rules for the current tenant with optional query filters. Use to enumerate which rules govern alert dispatch.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<NotifyVO>>> list(@RequestBody(required = false) NotifyQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

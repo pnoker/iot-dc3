@@ -60,27 +60,27 @@ public class NotifyHistoryQuery implements Serializable {
 
     private Long tenantId;
 
-    @Schema(description = "rule ID", example = "1024")
+    @Schema(description = "Filter by alarm rule ID that triggered the notification. Exact match.", example = "1024")
 
     private Long ruleId;
 
-    @Schema(description = "notify ID", example = "2048")
+    @Schema(description = "Filter by notification definition ID. Exact match.", example = "2048")
 
     private Long notifyId;
 
-    @Schema(description = "message ID", example = "4096")
+    @Schema(description = "Filter by message template ID used for the notification. Exact match.", example = "4096")
 
     private Long messageId;
 
-    @Schema(description = "channel ID", example = "512")
+    @Schema(description = "Filter by delivery channel ID. Exact match.", example = "512")
 
     private Long channelId;
 
-    @Schema(description = "alarm ID", example = "256")
+    @Schema(description = "Filter by associated alarm ID. Exact match.", example = "256")
 
     private Long alarmId;
 
-    @Schema(description = "Notification channel type enum", example = "EMAIL")
+    @Schema(description = "Filter by notification channel type (e.g. EMAIL, SMS, WEBHOOK). Exact match.", example = "EMAIL")
 
     private NotifyChannelTypeEnum channelTypeFlag;
 
@@ -88,7 +88,7 @@ public class NotifyHistoryQuery implements Serializable {
 
     private String target;
 
-    @Schema(description = "Status enum", example = "SUCCESS")
+    @Schema(description = "Filter by notification delivery status. Exact match.", example = "SUCCESS")
 
     private NotifyHistoryStatusEnum statusFlag;
 

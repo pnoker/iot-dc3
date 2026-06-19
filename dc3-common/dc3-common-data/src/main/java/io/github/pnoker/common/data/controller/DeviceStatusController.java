@@ -24,6 +24,8 @@ import io.github.pnoker.common.data.entity.query.DeviceQuery;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +65,13 @@ public class DeviceStatusController implements BaseController {
      * @return a map of device id to current status for the matching devices
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
-    @Operation(summary = "List Device Status", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of the current tenant's devices as a device-id-to-status map. Use to read live connectivity state; pass a DeviceQuery to filter by driver, profile or other dimensions.")
+    @Operation(summary = "List Device Status", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of the current tenant's devices as a device-id-to-status map. Use to read live connectivity state; pass a DeviceQuery to filter by driver, profile or other dimensions.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -82,7 +90,13 @@ public class DeviceStatusController implements BaseController {
      * @return a map of device id to current status for the devices managed by the driver
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
-    @Operation(summary = "List Device Status by Driver", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the current tenant runs under the given driver. Use to inspect connectivity across the whole fleet a single driver manages; results are a device-id-to-status map.")
+    @Operation(summary = "List Device Status by Driver", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the current tenant runs under the given driver. Use to inspect connectivity across the whole fleet a single driver manages; results are a device-id-to-status map.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_driver_id")
     public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@Parameter(description = "Identifier of the driver; must belong to the current tenant. Only devices managed by this driver are returned.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -102,7 +116,13 @@ public class DeviceStatusController implements BaseController {
      * @return a map of device id to current status for the devices bound to the profile
      */
     @PreAuthorize("@perm.can('device_status', 'list')")
-    @Operation(summary = "List Device Status by Profile", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the current tenant associates with the given profile. Use to check connectivity of all devices sharing a profile template; results are a device-id-to-status map.")
+    @Operation(summary = "List Device Status by Profile", description = "Return the current status (ONLINE, OFFLINE, MAINTAIN, FAULT) of every device the current tenant associates with the given profile. Use to check connectivity of all devices sharing a profile template; results are a device-id-to-status map.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_profile_id")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
             @Parameter(description = "Identifier of the profile template; must belong to the current tenant. Only devices bound to this profile are returned.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {

@@ -79,7 +79,7 @@ public class MessageQuery implements Serializable {
     /**
      * Alarm message template level
      */
-    @Schema(description = "message level", example = "HIGH")
+    @Schema(description = "Filter by message severity level (AlarmMessageLevelEnum). Exact match.", example = "HIGH")
     private AlarmMessageLevelEnum messageLevel;
 
     /**

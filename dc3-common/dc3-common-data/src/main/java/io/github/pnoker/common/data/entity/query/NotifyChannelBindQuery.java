@@ -59,11 +59,11 @@ public class NotifyChannelBindQuery implements Serializable {
 
     private Long tenantId;
 
-    @Schema(description = "notify ID", example = "2048")
+    @Schema(description = "Filter by notification rule ID. Exact match.", example = "2048")
 
     private Long notifyId;
 
-    @Schema(description = "channel ID", example = "512")
+    @Schema(description = "Filter by notification channel ID. Exact match.", example = "512")
 
     private Long channelId;
 

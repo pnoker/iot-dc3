@@ -31,6 +31,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +74,13 @@ public class RuleController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('rule', 'add')")
-    @Operation(summary = "Add Rule", description = "Create an alarm or automation rule (trigger conditions plus actions) for the current tenant. Use to register a new rule the engine evaluates against point values or events.")
+    @Operation(summary = "Add Rule", description = "Create an alarm or automation rule (trigger conditions plus actions) for the current tenant. Use to register a new rule the engine evaluates against point values or events.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RuleVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,7 +98,13 @@ public class RuleController implements BaseController {
      * @return delete-success status; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('rule', 'delete')")
-    @Operation(summary = "Delete Rule", description = "Delete a rule owned by the current tenant by its ID. Tenant ownership is verified before deletion; use to retire a rule that should no longer fire.")
+    @Operation(summary = "Delete Rule", description = "Delete a rule owned by the current tenant by its ID. Tenant ownership is verified before deletion; use to retire a rule that should no longer fire.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -107,7 +121,13 @@ public class RuleController implements BaseController {
      * @return update-success status; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('rule', 'update')")
-    @Operation(summary = "Update Rule", description = "Update the trigger conditions or actions of a rule owned by the current tenant. Tenant ownership is verified before the change is applied.")
+    @Operation(summary = "Update Rule", description = "Update the trigger conditions or actions of a rule owned by the current tenant. Tenant ownership is verified before the change is applied.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody RuleVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -126,7 +146,13 @@ public class RuleController implements BaseController {
      * @return the matched RuleVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('rule', 'get')")
-    @Operation(summary = "Get Rule by ID", description = "Return one rule's full definition (conditions, actions, owner) for the current tenant. Use to inspect or edit a specific rule before updating or deleting it.")
+    @Operation(summary = "Get Rule by ID", description = "Return one rule's full definition (conditions, actions, owner) for the current tenant. Use to inspect or edit a specific rule before updating or deleting it.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<RuleVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -142,7 +168,13 @@ public class RuleController implements BaseController {
      * @return a page of RuleVO matching the query
      */
     @PreAuthorize("@perm.can('rule', 'list')")
-    @Operation(summary = "List Rules", description = "Page through alarm and automation rules owned by the current tenant, filtered by the query body. Use to browse or locate rules for inspection; results are scoped to the caller's tenant.")
+    @Operation(summary = "List Rules", description = "Page through alarm and automation rules owned by the current tenant, filtered by the query body. Use to browse or locate rules for inspection; results are scoped to the caller's tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<RuleVO>>> list(@RequestBody(required = false) RuleQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

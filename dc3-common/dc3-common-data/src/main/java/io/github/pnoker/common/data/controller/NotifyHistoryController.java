@@ -28,6 +28,8 @@ import io.github.pnoker.common.data.service.NotifyHistoryService;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +70,13 @@ public class NotifyHistoryController implements BaseController {
      * @return the matched NotifyHistoryVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('notify_history', 'get')")
-    @Operation(summary = "Get Notification History by ID", description = "Return a single dispatched-notification record by ID (tenant-scoped). Use to inspect one notification's timestamp, target channel, and delivery status.")
+    @Operation(summary = "Get Notification History by ID", description = "Return a single dispatched-notification record by ID (tenant-scoped). Use to inspect one notification's timestamp, target channel, and delivery status.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<NotifyHistoryVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -84,7 +92,13 @@ public class NotifyHistoryController implements BaseController {
      * @return a page of NotifyHistoryVO matching the query
      */
     @PreAuthorize("@perm.can('notify_history', 'list')")
-    @Operation(summary = "List Notification History", description = "Page through notifications already dispatched for the current tenant, filterable by channel and delivery status. Use to audit what was sent and whether each channel succeeded.")
+    @Operation(summary = "List Notification History", description = "Page through notifications already dispatched for the current tenant, filterable by channel and delivery status. Use to audit what was sent and whether each channel succeeded.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<NotifyHistoryVO>>> list(@RequestBody(required = false) NotifyHistoryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

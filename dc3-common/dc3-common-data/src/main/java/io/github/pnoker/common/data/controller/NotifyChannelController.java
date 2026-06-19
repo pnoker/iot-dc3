@@ -31,6 +31,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -74,7 +76,13 @@ public class NotifyChannelController implements BaseController {
      */
     @PreAuthorize("@perm.can('notify_channel', 'add')")
     @Operation(summary = "Add Notification Channel", description = "Create a notification delivery channel (email, SMS, webhook, or message bus) for the current tenant. " +
-            "Returns add-success status; the channel must be bound to a rule via NotifyChannelBind before it can dispatch.")
+            "Returns add-success status; the channel must be bound to a rule via NotifyChannelBind before it can dispatch.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyChannelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -93,7 +101,13 @@ public class NotifyChannelController implements BaseController {
      */
     @PreAuthorize("@perm.can('notify_channel', 'delete')")
     @Operation(summary = "Delete Notification Channel", description = "Delete a notification channel by ID, scoped to the current tenant. " +
-            "Use to retire a delivery channel whose endpoint is no longer valid; existing NotifyHistory records are preserved.")
+            "Use to retire a delivery channel whose endpoint is no longer valid; existing NotifyHistory records are preserved.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -112,7 +126,13 @@ public class NotifyChannelController implements BaseController {
      */
     @PreAuthorize("@perm.can('notify_channel', 'update')")
     @Operation(summary = "Update Notification Channel", description = "Update an existing notification channel's endpoint and configuration for the current tenant. " +
-            "Use to rotate webhook URLs, credentials, or recipient lists; the owning tenant is verified before mutation.")
+            "Use to rotate webhook URLs, credentials, or recipient lists; the owning tenant is verified before mutation.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody NotifyChannelVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -133,7 +153,13 @@ public class NotifyChannelController implements BaseController {
      */
     @PreAuthorize("@perm.can('notify_channel', 'get')")
     @Operation(summary = "Get Notification Channel by ID", description = "Return a single notification channel with its endpoint configuration, scoped to the current tenant. " +
-            "Use to inspect how a rule's alerts will be delivered before binding or firing.")
+            "Use to inspect how a rule's alerts will be delivered before binding or firing.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<NotifyChannelVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -150,7 +176,13 @@ public class NotifyChannelController implements BaseController {
      */
     @PreAuthorize("@perm.can('notify_channel', 'list')")
     @Operation(summary = "List Notification Channels", description = "Page through notification delivery channels owned by the current tenant. " +
-            "Use to enumerate available channels for rule binding; results are filtered by the query and returned as a paginated page.")
+            "Use to enumerate available channels for rule binding; results are filtered by the query and returned as a paginated page.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<NotifyChannelVO>>> list(@RequestBody(required = false) NotifyChannelQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

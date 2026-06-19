@@ -66,15 +66,15 @@ public class NotifyHistoryVO extends BaseVO {
 
     private Long alarmId;
 
-    @Schema(description = "Notification channel type enum", example = "EMAIL")
+    @Schema(description = "Channel type used to deliver this notification (e.g. EMAIL, SMS, WEBHOOK).", example = "EMAIL")
 
     private NotifyChannelTypeEnum channelTypeFlag;
 
-    @Schema(description = "Notification target", example = "admin@example.com")
+    @Schema(description = "Notification target address or identifier (e.g. email address, phone number, webhook URL).", example = "admin@example.com")
 
     private String target;
 
-    @Schema(description = "Status enum", example = "SUCCESS")
+    @Schema(description = "Delivery status of this notification record (e.g. SUCCESS, FAILED, PENDING).", example = "SUCCESS")
 
     private NotifyHistoryStatusEnum statusFlag;
 

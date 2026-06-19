@@ -24,6 +24,8 @@ import io.github.pnoker.common.data.entity.query.DriverQuery;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +65,13 @@ public class DriverStatusController implements BaseController {
      * @return a map of driver id to current ONLINE/OFFLINE status for the matching drivers
      */
     @PreAuthorize("@perm.can('driver_status', 'list')")
-    @Operation(summary = "List Driver Status", description = "Return the current ONLINE/OFFLINE status of each driver instance for the current tenant, keyed by driver id. Page through driver and pagination filters; results are tenant-scoped.")
+    @Operation(summary = "List Driver Status", description = "Return the current ONLINE/OFFLINE status of each driver instance for the current tenant, keyed by driver id. Page through driver and pagination filters; results are tenant-scoped.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -81,7 +89,13 @@ public class DriverStatusController implements BaseController {
      * @return the number of devices currently online under the driver
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
-    @Operation(summary = "Count Online Devices by Driver", description = "Count devices currently online under one driver for the current tenant. Pass the driver id; returns a single count.")
+    @Operation(summary = "Count Online Devices by Driver", description = "Count devices currently online under one driver for the current tenant. Pass the driver id; returns a single count.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_device_online_by_driver_id")
     public Mono<R<Long>> getDeviceOnlineByDriverId(@Parameter(description = "Identifier of the driver whose online device count is queried; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -97,7 +111,13 @@ public class DriverStatusController implements BaseController {
      * @return the number of devices currently offline under the driver
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
-    @Operation(summary = "Count Offline Devices by Driver", description = "Count devices currently offline under one driver for the current tenant. Pass the driver id; returns a single count.")
+    @Operation(summary = "Count Offline Devices by Driver", description = "Count devices currently offline under one driver for the current tenant. Pass the driver id; returns a single count.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_device_offline_by_driver_id")
     public Mono<R<Long>> getDeviceOfflineByDriverId(@Parameter(description = "Identifier of the driver whose offline device count is queried; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

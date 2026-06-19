@@ -28,6 +28,8 @@ import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +72,13 @@ public class PointValueController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
     @Operation(summary = "List Latest Point Values", description = "Return the most recent reading for each point under a device for the current tenant, " +
-            "paged by the request query. Use to read near-real-time snapshots; results are ordered by collection time.")
+            "paged by the request query. Use to read near-real-time snapshots; results are ordered by collection time.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/latest")
     public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,7 +98,13 @@ public class PointValueController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
     @Operation(summary = "List Point Values", description = "Page through stored time-series readings for points under a device (tenant-scoped). " +
-            "Use to query raw historical values; results are ordered by collection time.")
+            "Use to query raw historical values; results are ordered by collection time.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -112,7 +126,13 @@ public class PointValueController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_value', 'list')")
     @Operation(summary = "List Point Value History by Device and Point", description = "Return the most recent time-series values for one point on one device for the current tenant, " +
-            "as a list of raw value strings bounded by count (default 100). Use to read a single point's latest history.")
+            "as a list of raw value strings bounded by count (default 100). Use to read a single point's latest history.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_history_by_device_id_and_point_id")
     public Mono<R<List<String>>> history(@Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024") @NotNull @RequestParam(name = "device_id") Long deviceId,
                                          @Parameter(description = "Identifier of the point whose history is being queried; must belong to a profile attached to the device", example = "2048") @NotNull @RequestParam(name = "point_id") Long pointId,

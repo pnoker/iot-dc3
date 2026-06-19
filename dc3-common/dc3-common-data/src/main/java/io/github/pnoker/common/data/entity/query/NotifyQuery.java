@@ -85,7 +85,7 @@ public class NotifyQuery implements Serializable {
     /**
      * Alarm notification interval, milliseconds
      */
-    @Schema(description = "notify interval", example = "60000")
+    @Schema(description = "Filter by notification cooldown interval in milliseconds. Exact match.", example = "60000")
     private Long notifyInterval;
 
     /**
