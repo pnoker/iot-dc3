@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.entity.dto;
+package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pnoker.common.constant.service.McpConstant;
@@ -45,7 +45,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "OAuth dynamic client registration request for MCP clients")
-public class OAuthClientRegistrationRequestDTO implements Serializable {
+public class OAuthClientRegistrationRequestVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

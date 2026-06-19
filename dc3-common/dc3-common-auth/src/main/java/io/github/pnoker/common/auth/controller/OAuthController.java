@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthPro
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -112,7 +112,7 @@ public class OAuthController {
             }))
     @PostMapping(value = McpConstant.OAUTH2_REGISTER, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<?>> register(
-            @RequestBody OAuthClientRegistrationRequestDTO request,
+            @RequestBody OAuthClientRegistrationRequestVO request,
             @org.springframework.web.bind.annotation.RequestHeader(
                     value = RequestConstant.Header.X_AUTH_PRINCIPAL, required = false) String principalJson) {
         return Mono.<ResponseEntity<?>>fromSupplier(() -> ResponseEntity.status(HttpStatus.CREATED)

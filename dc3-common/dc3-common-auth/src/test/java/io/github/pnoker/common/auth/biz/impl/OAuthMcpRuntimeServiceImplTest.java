@@ -33,8 +33,8 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
 import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
-import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
-import io.github.pnoker.common.entity.dto.OAuthClientRegistrationResponseDTO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -271,7 +271,7 @@ class OAuthMcpRuntimeServiceImplTest {
 
     @Test
     void publicClientRegistrationPersistsPkceClientWithoutSecret() {
-        OAuthClientRegistrationRequestDTO request = OAuthClientRegistrationRequestDTO.builder()
+        OAuthClientRegistrationRequestVO request = OAuthClientRegistrationRequestVO.builder()
                 .clientName("Claude Desktop")
                 .redirectUris(List.of("http://127.0.0.1/callback"))
                 .scope("mcp:tools:list mcp:tools:call")
@@ -281,7 +281,7 @@ class OAuthMcpRuntimeServiceImplTest {
         principal.setPrincipalId(100L);
         principal.setTenantId(1L);
 
-        OAuthClientRegistrationResponseDTO response = service.registerClient(request, principal);
+        OAuthClientRegistrationResponseVO response = service.registerClient(request, principal);
 
         ArgumentCaptor<OAuthRegisteredClientRecord> captor =
                 ArgumentCaptor.forClass(OAuthRegisteredClientRecord.class);
@@ -299,7 +299,7 @@ class OAuthMcpRuntimeServiceImplTest {
 
     @Test
     void confidentialClientCredentialsRegistrationRequiresActiveServiceAccount() {
-        OAuthClientRegistrationRequestDTO request = OAuthClientRegistrationRequestDTO.builder()
+        OAuthClientRegistrationRequestVO request = OAuthClientRegistrationRequestVO.builder()
                 .clientName("Robot")
                 .clientType("CONFIDENTIAL")
                 .grantTypes(List.of("client_credentials"))
@@ -312,7 +312,7 @@ class OAuthMcpRuntimeServiceImplTest {
 
         when(serviceAccountManager.getOne(any())).thenReturn(new ServiceAccountDO());
 
-        OAuthClientRegistrationResponseDTO response = service.registerClient(request, principal);
+        OAuthClientRegistrationResponseVO response = service.registerClient(request, principal);
 
         ArgumentCaptor<OAuthRegisteredClientRecord> captor =
                 ArgumentCaptor.forClass(OAuthRegisteredClientRecord.class);
@@ -329,7 +329,7 @@ class OAuthMcpRuntimeServiceImplTest {
 
     @Test
     void confidentialRegistrationRejectsNullPrincipal() {
-        OAuthClientRegistrationRequestDTO request = OAuthClientRegistrationRequestDTO.builder()
+        OAuthClientRegistrationRequestVO request = OAuthClientRegistrationRequestVO.builder()
                 .clientName("Robot")
                 .clientType("CONFIDENTIAL")
                 .grantTypes(List.of("client_credentials"))
@@ -346,7 +346,7 @@ class OAuthMcpRuntimeServiceImplTest {
         // Body claims tenantId 99 plus a foreign service account, but the caller is in tenant 1.
         // The service-account lookup must run against the caller's tenant (1), where none exists,
         // so the body-supplied tenantId is effectively ignored.
-        OAuthClientRegistrationRequestDTO request = OAuthClientRegistrationRequestDTO.builder()
+        OAuthClientRegistrationRequestVO request = OAuthClientRegistrationRequestVO.builder()
                 .clientName("Robot")
                 .clientType("CONFIDENTIAL")
                 .grantTypes(List.of("client_credentials"))

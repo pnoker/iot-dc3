@@ -55,8 +55,8 @@ import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
 import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
-import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
-import io.github.pnoker.common.entity.dto.OAuthClientRegistrationResponseDTO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.DecodeUtil;
@@ -248,9 +248,9 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public OAuthClientRegistrationResponseDTO registerClient(OAuthClientRegistrationRequestDTO request,
+    public OAuthClientRegistrationResponseVO registerClient(OAuthClientRegistrationRequestVO request,
                                                              RequestHeader.PrincipalHeader principalHeader) {
-        request = Objects.requireNonNullElseGet(request, OAuthClientRegistrationRequestDTO::new);
+        request = Objects.requireNonNullElseGet(request, OAuthClientRegistrationRequestVO::new);
         String clientName = stringValue(request.getClientName());
         if (StringUtils.isBlank(clientName)) {
             throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata", "client_name is required");
@@ -320,7 +320,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         client.setEnableFlag((byte) 0);
         oauthMcpMapper.insertClient(client);
 
-        return OAuthClientRegistrationResponseDTO.builder()
+        return OAuthClientRegistrationResponseVO.builder()
                 .clientId(clientId)
                 .clientName(clientName)
                 .clientType(clientType)

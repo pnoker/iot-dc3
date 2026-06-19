@@ -28,8 +28,8 @@ import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.dto.OAuthClientRegistrationRequestDTO;
-import io.github.pnoker.common.entity.dto.OAuthClientRegistrationResponseDTO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -106,8 +106,8 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
     @PostMapping("/client/register")
-    public Mono<R<OAuthClientRegistrationResponseDTO>> registerClient(
-            @RequestBody OAuthClientRegistrationRequestDTO request) {
+    public Mono<R<OAuthClientRegistrationResponseVO>> registerClient(
+            @RequestBody OAuthClientRegistrationRequestVO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.registerClient(request,
                 header))));
     }
