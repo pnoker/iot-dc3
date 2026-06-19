@@ -11,7 +11,8 @@
 2. `身份审计`（顶部）与 `MCP 审计`（底部）同类却分隔。
 3. `服务账号 / MCP 服务 / MCP 审计` 散落末尾，无归组。
 4. `资源管理` 与 `服务账号` 共用 `Key` 图标。
-5. 目录与菜单归属错位：`views/settings/event/` 下的 `Overview/DeviceEvent/DriverEvent/PointEvent.vue` 在菜单上全挂 `Alarm` 分组。
+5. 目录与菜单归属错位：`views/settings/event/` 下的 `Overview/DeviceEvent/DriverEvent/PointEvent.vue` 在菜单上全挂
+   `Alarm` 分组。
 6. Alarm 分组臃肿（11 子项）：混了配置类、监测类、实体告警三类。
 
 ### 1.2 目标菜单树（已采纳）
@@ -54,12 +55,14 @@
 `src/config/i18n/locales/{zh,en}.ts`（`nav.*` 新增分组 key）
 `src/views/settings/Layout.vue`（nameMap + icon fallback）
 `src/views/settings/Settings.vue`（硬编码菜单码引用）
-seed SQL `dc3-docker/dc3/dependencies/postgres/iot-dc3-auth.sql`（`dc3_menu`：新增分组行 + 调整子项 `parent_menu_id` / `menu_index`）
+seed SQL `iot-dc3/dc3/dependencies/postgres/initdb/02-iot-dc3-auth.sql`（`dc3_menu`：新增分组行 + 调整子项
+`parent_menu_id` / `menu_index`）
 Podman 运行库（对 `dc3_auth.dc3_menu` 执行同等更新）
 
 ### 1.4 已定决策点
 
-- **D1 目录归位**：`views/settings/event/` 下的告警实体组件（Overview/DeviceEvent/DriverEvent/PointEvent）物理移动到 `views/settings/alarm/`，目录与菜单对齐；同步修正 import 与 router 引用。
+- **D1 目录归位**：`views/settings/event/` 下的告警实体组件（Overview/DeviceEvent/DriverEvent/PointEvent）物理移动到
+  `views/settings/alarm/`，目录与菜单对齐；同步修正 import 与 router 引用。
 - **D2 图标去重**：`服务账号` 改用与 `资源`(`Key`) 不同的图标（如 `Postcard`/`Avatar`）。
 
 ## 二、布局家族化
@@ -83,15 +86,19 @@ EntityListConfig 类型                      ← 由 AlarmEntityConfig 扩展
 `EntityListConfig` 在 alarm 配置基础上扩展：
 
 - `searchFields: FieldConfig[]`：支持多搜索字段（input/select/enableFlag），替代单 keyword+filter。
-- `rowActions`：内置 `detail/edit/delete` + `extraActions[]`（如 assignRoles/assignResources）；操作列宽度按动作数自动取档（1→100 / 2-3→180 / 4+→260-310）。
+- `rowActions`：内置 `detail/edit/delete` + `extraActions[]`（如
+  assignRoles/assignResources）；操作列宽度按动作数自动取档（1→100 / 2-3→180 / 4+→260-310）。
 - `detail`：`{ mode: 'route'|'drawer'|'none', routeName? }`；`editMode: 'dialog'|'route'`。
 
 ### 2.3 推广批次（由简到繁，每批独立验证）
 
-> 进度（2026-06-18）：引擎三件套（`config/types/entityList.ts` + `composables/useEntityListPage.ts` + `components/entity/EntityListPage.vue`）已落地；批 1～3 全部完成。详见 `docs/superpowers/plans/2026-06-18-settings-entity-list-engine.md`。
+> 进度（2026-06-18）：引擎三件套（`config/types/entityList.ts` + `composables/useEntityListPage.ts` +
+> `components/entity/EntityListPage.vue`）已落地；批 1～3 全部完成。详见
+> `docs/superpowers/plans/2026-06-18-settings-entity-list-engine.md`。
 
 1. ✅ Label / Group（动作少）—— 验证引擎正确性。引擎增强：treeSelect 表单感知（同类型过滤 + 排除自身/子孙）。
-2. ✅ Resource / Menu / Api（Api 只读，验证 `editable=false`）。引擎增强：树模式列表、行感知 relations（实体名解析）、`link` 列、`menuExt` 嵌套列 + 图标列、`fromRow`/`toPayload` 表单↔载荷钩子。
+2. ✅ Resource / Menu / Api（Api 只读，验证 `editable=false`）。引擎增强：树模式列表、行感知 relations（实体名解析）、`link` 列、
+   `menuExt` 嵌套列 + 图标列、`fromRow`/`toPayload` 表单↔载荷钩子。
 3. ✅ User / Role（带 assignRoles/assignResources + 路由 tabs 详情，详情页/分配组件保持原样，引擎仅负责跳转/打开）。
 4. ⏳ alarm 自身回迁到新引擎，删除 alarm 专用三件套，消除重复（待办）。
 
