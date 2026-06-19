@@ -1924,7 +1924,8 @@ VALUES (1, 1, 1, 1, 'USER', 'Default administrator role principal binding', 1, '
 INSERT INTO dc3_menu (id, parent_menu_id, menu_type_flag, menu_name, menu_code, menu_level, menu_index, menu_ext,
                       enable_flag, remark, creator_id, creator_name, create_time, operator_id, operator_name,
                       operate_time, deleted)
-VALUES (10001, 0, 1, 'Home', 'home', 1, 1,
+VALUES 
+       (10001, 0, 1, 'Home', 'home', 1, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"首页\",\"en\":\"Home\"},\"icon\":\"HomeFilled\",\"url\":\"/home\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10002, 0, 1, 'Driver', 'driver', 1, 2,
@@ -1942,47 +1943,71 @@ VALUES (10001, 0, 1, 'Home', 'home', 1, 1,
        (10006, 0, 0, 'Settings', 'settings', 1, 6,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"设置\",\"en\":\"Settings\"},\"icon\":\"Setting\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10007, 10006, 1, 'User', 'settingsUser', 2, 1,
+       (10050, 10006, 0, 'Identity', 'settingsIdentity', 2, 1,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"身份\",\"en\":\"Identity\"},\"icon\":\"User\",\"url\":\"\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10007, 10050, 1, 'User', 'settingsUser', 2, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"用户管理\",\"en\":\"User\"},\"icon\":\"User\",\"url\":\"/settings/user\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10008, 10006, 1, 'Role', 'settingsRole', 2, 2,
+       (10040, 10050, 1, 'Principals', 'settingsPrincipal', 2, 2,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"主体\",\"en\":\"Principals\"},\"icon\":\"Avatar\",\"url\":\"/settings/principal\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10041, 10050, 1, 'Tenant Membership', 'settingsTenantMembership', 2, 3,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"租户成员\",\"en\":\"Tenant Membership\"},\"icon\":\"OfficeBuilding\",\"url\":\"/settings/tenant_membership\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10042, 10050, 1, 'Local Credentials', 'settingsLocalCredential', 2, 4,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"本地凭证\",\"en\":\"Local Credentials\"},\"icon\":\"Lock\",\"url\":\"/settings/local_credential\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10038, 10050, 1, 'Service Accounts', 'settingsServiceAccount', 2, 5,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"服务账号\",\"en\":\"Service Accounts\"},\"icon\":\"Key\",\"url\":\"/settings/service_account\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10051, 10006, 0, 'Access Control', 'settingsAccess', 2, 2,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"权限\",\"en\":\"Access Control\"},\"icon\":\"Stamp\",\"url\":\"\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10008, 10051, 1, 'Role', 'settingsRole', 2, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"角色管理\",\"en\":\"Role\"},\"icon\":\"Lock\",\"url\":\"/settings/role\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10009, 10006, 1, 'Resource', 'settingsResource', 2, 8,
+       (10039, 10051, 1, 'Role Principal Bind', 'settingsRolePrincipalBind', 2, 2,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"角色主体绑定\",\"en\":\"Role Principal Bind\"},\"icon\":\"Link\",\"url\":\"/settings/role_principal_bind\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10009, 10051, 1, 'Resource', 'settingsResource', 2, 3,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"资源管理\",\"en\":\"Resource\"},\"icon\":\"Tickets\",\"url\":\"/settings/resource\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10010, 10006, 1, 'Api', 'settingsApi', 2, 7,
+       (10010, 10051, 1, 'Api', 'settingsApi', 2, 4,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"API 接口\",\"en\":\"Api\"},\"icon\":\"Connection\",\"url\":\"/settings/api\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10011, 10006, 1, 'Menu', 'settingsMenu', 2, 9,
+       (10011, 10051, 1, 'Menu', 'settingsMenu', 2, 5,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"菜单管理\",\"en\":\"Menu\"},\"icon\":\"Discount\",\"url\":\"/settings/menu\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10018, 10006, 1, 'Group', 'settingsGroup', 2, 10,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"分组管理\",\"en\":\"Groups\"},\"icon\":\"Grid\",\"url\":\"/settings/group\"}"}',
+       (10013, 10006, 0, 'Model', 'settingsModel', 2, 3,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"模型管理\",\"en\":\"Model Management\"},\"icon\":\"Cpu\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10019, 10006, 1, 'Label', 'settingsLabel', 2, 11,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"标签管理\",\"en\":\"Labels\"},\"icon\":\"CollectionTag\",\"url\":\"/settings/label\"}"}',
+       (10020, 10013, 1, 'Model Config', 'settingsModelConfig', 3, 1,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"模型配置\",\"en\":\"Model Config\"},\"icon\":\"ChatDotRound\",\"url\":\"/settings/model/config\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10022, 10006, 0, 'Alarm', 'settingsAlarm', 2, 6,
+       (10021, 10013, 1, 'Model Providers', 'settingsModelProvider', 3, 2,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"模型供应商\",\"en\":\"Model Providers\"},\"icon\":\"ChatLineSquare\",\"url\":\"/settings/model/provider\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10022, 10006, 0, 'Alarm', 'settingsAlarm', 2, 4,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"告警\",\"en\":\"Alarm\"},\"icon\":\"AlarmClock\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10015, 10022, 1, 'Overview', 'settingsAlarmOverview', 3, 1,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"概览\",\"en\":\"Overview\"},\"icon\":\"DataAnalysis\",\"url\":\"/settings/alarm/overview\"}"}',
-        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10023, 10022, 1, 'Alarm Rules', 'settingsAlarmRule', 3, 2,
+       (10023, 10022, 1, 'Alarm Rules', 'settingsAlarmRule', 3, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"告警规则\",\"en\":\"Alarm Rules\"},\"icon\":\"SetUp\",\"url\":\"/settings/alarm/rule\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10024, 10022, 1, 'Alarm Notify', 'settingsAlarmNotify', 3, 3,
+       (10024, 10022, 1, 'Alarm Notify', 'settingsAlarmNotify', 3, 2,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"告警通知策略\",\"en\":\"Alarm Notify\"},\"icon\":\"Bell\",\"url\":\"/settings/alarm/notify\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10025, 10022, 1, 'Alarm Message', 'settingsAlarmMessage', 3, 4,
+       (10025, 10022, 1, 'Alarm Message', 'settingsAlarmMessage', 3, 3,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"告警消息模板\",\"en\":\"Alarm Message\"},\"icon\":\"Message\",\"url\":\"/settings/alarm/message\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10026, 10022, 1, 'Alarm Channels', 'settingsAlarmChannel', 3, 5,
+       (10026, 10022, 1, 'Alarm Channels', 'settingsAlarmChannel', 3, 4,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"告警通知渠道\",\"en\":\"Alarm Channels\"},\"icon\":\"Connection\",\"url\":\"/settings/alarm/channel\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10027, 10022, 1, 'Alarm Bindings', 'settingsAlarmBind', 3, 6,
+       (10027, 10022, 1, 'Alarm Bindings', 'settingsAlarmBind', 3, 5,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"告警渠道绑定\",\"en\":\"Alarm Bindings\"},\"icon\":\"Link\",\"url\":\"/settings/alarm/bind\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10015, 10022, 1, 'Overview', 'settingsAlarmOverview', 3, 6,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"概览\",\"en\":\"Overview\"},\"icon\":\"DataAnalysis\",\"url\":\"/settings/alarm/overview\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10028, 10022, 1, 'Alarm States', 'settingsAlarmState', 3, 7,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"告警运行状态\",\"en\":\"Alarm States\"},\"icon\":\"Monitor\",\"url\":\"/settings/alarm/state\"}"}',
@@ -1999,34 +2024,40 @@ VALUES (10001, 0, 1, 'Home', 'home', 1, 1,
        (10036, 10022, 1, 'Point Alarm', 'settingsPointAlarm', 3, 11,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"点位告警\",\"en\":\"Point Alarm\"},\"icon\":\"TrendCharts\",\"url\":\"/settings/alarm/point\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10012, 10006, 0, 'Event', 'settingsEvent', 2, 5,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"事件\",\"en\":\"Event\"},\"icon\":\"Bell\",\"url\":\"\"}"}', 0,
-        '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10035, 10012, 1, 'Event History', 'settingsEventHistory', 3, 1,
+       (10052, 10006, 0, 'Event & Command', 'settingsEventCommand', 2, 5,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"事件与指令\",\"en\":\"Event & Command\"},\"icon\":\"Operation\",\"url\":\"\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10035, 10052, 1, 'Event History', 'settingsEventHistory', 3, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"事件历史\",\"en\":\"Event History\"},\"icon\":\"Document\",\"url\":\"/settings/event/history\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10030, 10006, 0, 'Command', 'settingsCommand', 2, 4,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"指令\",\"en\":\"Command\"},\"icon\":\"Operation\",\"url\":\"\"}"}',
-        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10032, 10030, 1, 'Command History', 'settingsCommandHistory', 3, 1,
+       (10032, 10052, 1, 'Command History', 'settingsCommandHistory', 3, 2,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"指令历史\",\"en\":\"Command History\"},\"icon\":\"Document\",\"url\":\"/settings/command/history\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10013, 10006, 0, 'Model', 'settingsModel', 2, 3,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"模型管理\",\"en\":\"Model Management\"},\"icon\":\"Cpu\",\"url\":\"\"}"}',
+       (10053, 10006, 0, 'Audit', 'settingsAudit', 2, 6,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"审计\",\"en\":\"Audit\"},\"icon\":\"Files\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10020, 10013, 1, 'Model Config', 'settingsModelConfig', 3, 1,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"模型配置\",\"en\":\"Model Config\"},\"icon\":\"ChatDotRound\",\"url\":\"/settings/model/config\"}"}',
+       (10044, 10053, 1, 'Identity Audit', 'settingsIdentityAudit', 2, 1,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"身份审计\",\"en\":\"Identity Audit\"},\"icon\":\"DocumentChecked\",\"url\":\"/settings/identity_audit\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10021, 10013, 1, 'Model Providers', 'settingsModelProvider', 3, 2,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"模型供应商\",\"en\":\"Model Providers\"},\"icon\":\"ChatLineSquare\",\"url\":\"/settings/model/provider\"}"}',
+       (10043, 10053, 1, 'MCP Audit', 'settingsMcpAudit', 2, 2,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"MCP 审计\",\"en\":\"MCP Audit\"},\"icon\":\"Document\",\"url\":\"/settings/mcp_audit\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10037, 10006, 1, 'MCP Service', 'settingsMcpServer', 2, 13,
+       (10054, 10006, 0, 'Integration', 'settingsIntegration', 2, 7,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"集成\",\"en\":\"Integration\"},\"icon\":\"Share\",\"url\":\"\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10037, 10054, 1, 'MCP Service', 'settingsMcpServer', 2, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"MCP 服务\",\"en\":\"MCP Service\"},\"icon\":\"Connection\",\"url\":\"/settings/mcp\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10038, 10006, 1, 'Service Accounts', 'settingsServiceAccount', 2, 12,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"服务账号\",\"en\":\"Service Accounts\"},\"icon\":\"Key\",\"url\":\"/settings/service_account\"}"}',
+       (10055, 10006, 0, 'System', 'settingsSystem', 2, 8,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"系统\",\"en\":\"System\"},\"icon\":\"Tools\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (10014, 10006, 1, 'About', 'settingsAbout', 2, 14,
+       (10018, 10055, 1, 'Group', 'settingsGroup', 2, 1,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"分组管理\",\"en\":\"Groups\"},\"icon\":\"Grid\",\"url\":\"/settings/group\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10019, 10055, 1, 'Label', 'settingsLabel', 2, 2,
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"标签管理\",\"en\":\"Labels\"},\"icon\":\"CollectionTag\",\"url\":\"/settings/label\"}"}',
+        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10014, 10055, 1, 'About', 'settingsAbout', 2, 3,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"关于\",\"en\":\"About\"},\"icon\":\"InfoFilled\",\"url\":\"/settings/about\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0);
 
@@ -2040,79 +2071,54 @@ VALUES (10001, 0, 1, 'Home', 'home', 1, 1,
 INSERT INTO dc3_resource (id, parent_resource_id, resource_name, resource_code, service_name, resource_type_flag,
                           resource_scope_flag, entity_id, resource_ext, enable_flag, remark, creator_id, creator_name,
                           create_time, operator_id, operator_name, operate_time, deleted)
-VALUES (20000, 0, 'Administrator Wildcard', '*', '', 6, 3, 0, '{}', 0,
-        'Grants all permissions to the default administrator role.', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 0),
-       (20001, 0, 'Home', 'menu:home', '', 5, 3, 10001, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 0),
-       (20002, 0, 'Driver', 'menu:driver', '', 5, 3, 10002, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1,
-        'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20003, 0, 'Profile', 'menu:profile', '', 5, 3, 10003, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1,
-        'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20004, 0, 'Device', 'menu:device', '', 5, 3, 10004, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1,
-        'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20005, 0, 'PointValue', 'menu:pointValue', '', 5, 3, 10005, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00',
-        1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20006, 0, 'Settings', 'menu:settings', '', 5, 3, 10006, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1,
-        'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20007, 20006, 'User', 'menu:settingsUser', '', 5, 3, 10007, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00',
-        1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20008, 20006, 'Role', 'menu:settingsRole', '', 5, 3, 10008, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00',
-        1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20009, 20006, 'Resource', 'menu:settingsResource', '', 5, 3, 10009, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20010, 20006, 'Api', 'menu:settingsApi', '', 5, 3, 10010, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00',
-        1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20011, 20006, 'Menu', 'menu:settingsMenu', '', 5, 3, 10011, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00',
-        1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20018, 20006, 'Group', 'menu:settingsGroup', '', 5, 3, 10018, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20019, 20006, 'Label', 'menu:settingsLabel', '', 5, 3, 10019, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20022, 20006, 'Alarm', 'menu:settingsAlarm', '', 5, 3, 10022, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20023, 20022, 'Alarm Rules', 'menu:settingsAlarmRule', '', 5, 3, 10023, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20024, 20022, 'Alarm Notify', 'menu:settingsAlarmNotify', '', 5, 3, 10024, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20025, 20022, 'Alarm Message', 'menu:settingsAlarmMessage', '', 5, 3, 10025, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20026, 20022, 'Alarm Channels', 'menu:settingsAlarmChannel', '', 5, 3, 10026, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20027, 20022, 'Alarm Bindings', 'menu:settingsAlarmBind', '', 5, 3, 10027, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20028, 20022, 'Alarm States', 'menu:settingsAlarmState', '', 5, 3, 10028, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20029, 20022, 'Alarm History', 'menu:settingsAlarmHistory', '', 5, 3, 10029, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20015, 20022, 'Overview', 'menu:settingsAlarmOverview', '', 5, 3, 10015, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20016, 20022, 'Device Alarm', 'menu:settingsDeviceAlarm', '', 5, 3, 10016, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20017, 20022, 'Driver Alarm', 'menu:settingsDriverAlarm', '', 5, 3, 10017, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20036, 20022, 'Point Alarm', 'menu:settingsPointAlarm', '', 5, 3, 10036, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20012, 20006, 'Event', 'menu:settingsEvent', '', 5, 3, 10012, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20035, 20012, 'Event History', 'menu:settingsEventHistory', '', 5, 3, 10035, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20030, 20006, 'Command', 'menu:settingsCommand', '', 5, 3, 10030, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20032, 20030, 'Command History', 'menu:settingsCommandHistory', '', 5, 3, 10032, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20013, 20006, 'Model', 'menu:settingsModel', '', 5, 3, 10013, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20020, 20013, 'Model Config', 'menu:settingsModelConfig', '', 5, 3, 10020, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20021, 20013, 'Model Providers', 'menu:settingsModelProvider', '', 5, 3, 10021, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20037, 20006, 'MCP Service', 'menu:settingsMcpServer', '', 5, 3, 10037, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20038, 20006, 'Service Accounts', 'menu:settingsServiceAccount', '', 5, 3, 10038, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
-       (20014, 20006, 'About', 'menu:settingsAbout', '', 5, 3, 10014, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0);
+VALUES 
+       (20000, 0, 'Administrator Wildcard', '*', '', 6, 3, 0, '{}', 0,
+        'Grants all permissions to the default administrator role.', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20001, 0, 'Home', 'menu:home', '', 5, 3, 10001, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20002, 0, 'Driver', 'menu:driver', '', 5, 3, 10002, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20003, 0, 'Profile', 'menu:profile', '', 5, 3, 10003, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20004, 0, 'Device', 'menu:device', '', 5, 3, 10004, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20005, 0, 'PointValue', 'menu:pointValue', '', 5, 3, 10005, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20006, 0, 'Settings', 'menu:settings', '', 5, 3, 10006, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20050, 20006, 'Identity', 'menu:settingsIdentity', '', 5, 3, 10050, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20007, 20050, 'User', 'menu:settingsUser', '', 5, 3, 10007, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20040, 20050, 'Principals', 'menu:settingsPrincipal', '', 5, 3, 10040, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20041, 20050, 'Tenant Membership', 'menu:settingsTenantMembership', '', 5, 3, 10041, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20042, 20050, 'Local Credentials', 'menu:settingsLocalCredential', '', 5, 3, 10042, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20038, 20050, 'Service Accounts', 'menu:settingsServiceAccount', '', 5, 3, 10038, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20051, 20006, 'Access Control', 'menu:settingsAccess', '', 5, 3, 10051, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20008, 20051, 'Role', 'menu:settingsRole', '', 5, 3, 10008, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20039, 20051, 'Role Principal Bind', 'menu:settingsRolePrincipalBind', '', 5, 3, 10039, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20009, 20051, 'Resource', 'menu:settingsResource', '', 5, 3, 10009, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20010, 20051, 'Api', 'menu:settingsApi', '', 5, 3, 10010, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20011, 20051, 'Menu', 'menu:settingsMenu', '', 5, 3, 10011, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20013, 20006, 'Model', 'menu:settingsModel', '', 5, 3, 10013, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20020, 20013, 'Model Config', 'menu:settingsModelConfig', '', 5, 3, 10020, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20021, 20013, 'Model Providers', 'menu:settingsModelProvider', '', 5, 3, 10021, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20022, 20006, 'Alarm', 'menu:settingsAlarm', '', 5, 3, 10022, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20023, 20022, 'Alarm Rules', 'menu:settingsAlarmRule', '', 5, 3, 10023, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20024, 20022, 'Alarm Notify', 'menu:settingsAlarmNotify', '', 5, 3, 10024, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20025, 20022, 'Alarm Message', 'menu:settingsAlarmMessage', '', 5, 3, 10025, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20026, 20022, 'Alarm Channels', 'menu:settingsAlarmChannel', '', 5, 3, 10026, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20027, 20022, 'Alarm Bindings', 'menu:settingsAlarmBind', '', 5, 3, 10027, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20015, 20022, 'Overview', 'menu:settingsAlarmOverview', '', 5, 3, 10015, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20028, 20022, 'Alarm States', 'menu:settingsAlarmState', '', 5, 3, 10028, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20029, 20022, 'Alarm History', 'menu:settingsAlarmHistory', '', 5, 3, 10029, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20017, 20022, 'Driver Alarm', 'menu:settingsDriverAlarm', '', 5, 3, 10017, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20016, 20022, 'Device Alarm', 'menu:settingsDeviceAlarm', '', 5, 3, 10016, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20036, 20022, 'Point Alarm', 'menu:settingsPointAlarm', '', 5, 3, 10036, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20052, 20006, 'Event & Command', 'menu:settingsEventCommand', '', 5, 3, 10052, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20035, 20052, 'Event History', 'menu:settingsEventHistory', '', 5, 3, 10035, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20032, 20052, 'Command History', 'menu:settingsCommandHistory', '', 5, 3, 10032, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20053, 20006, 'Audit', 'menu:settingsAudit', '', 5, 3, 10053, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20044, 20053, 'Identity Audit', 'menu:settingsIdentityAudit', '', 5, 3, 10044, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20043, 20053, 'MCP Audit', 'menu:settingsMcpAudit', '', 5, 3, 10043, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20054, 20006, 'Integration', 'menu:settingsIntegration', '', 5, 3, 10054, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20037, 20054, 'MCP Service', 'menu:settingsMcpServer', '', 5, 3, 10037, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20055, 20006, 'System', 'menu:settingsSystem', '', 5, 3, 10055, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20018, 20055, 'Group', 'menu:settingsGroup', '', 5, 3, 10018, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20019, 20055, 'Label', 'menu:settingsLabel', '', 5, 3, 10019, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (20014, 20055, 'About', 'menu:settingsAbout', '', 5, 3, 10014, '{}', 0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0);
 
 -- ----------------------------
 -- Records of dc3_role_resource_bind
@@ -2122,116 +2128,6 @@ INSERT INTO dc3_role_resource_bind (id, role_id, resource_id, remark, creator_id
 VALUES (1, 1, 20000, 'Default administrator wildcard permission binding', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1,
         'dc3',
         '2026-05-01 00:00:00 +00:00', 0);
-
--- ----------------------------
--- Additional menu/resource: Role Principal Bind settings page
--- ----------------------------
-INSERT INTO dc3_menu (id, parent_menu_id, menu_type_flag, menu_name, menu_code, menu_level, menu_index, menu_ext,
-                      enable_flag, remark, creator_id, creator_name, create_time, operator_id, operator_name,
-                      operate_time, deleted)
-VALUES (10039, 10006, 1, 'Role Principal Bind', 'settingsRolePrincipalBind', 2, 15,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"角色主体绑定\",\"en\":\"Role Principal Bind\"},\"icon\":\"Link\",\"url\":\"/settings/role_principal_bind\"}"}',
-        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
-
-INSERT INTO dc3_resource (id, parent_resource_id, resource_name, resource_code, service_name, resource_type_flag,
-                          resource_scope_flag, entity_id, resource_ext, enable_flag, remark, creator_id, creator_name,
-                          create_time, operator_id, operator_name, operate_time, deleted)
-VALUES (20039, 20006, 'Role Principal Bind', 'menu:settingsRolePrincipalBind', '', 5, 3, 10039, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
-
--- ----------------------------
--- Additional menu/resource: Principal settings page
--- ----------------------------
-INSERT INTO dc3_menu (id, parent_menu_id, menu_type_flag, menu_name, menu_code, menu_level, menu_index, menu_ext,
-                      enable_flag, remark, creator_id, creator_name, create_time, operator_id, operator_name,
-                      operate_time, deleted)
-VALUES (10040, 10006, 1, 'Principals', 'settingsPrincipal', 2, 16,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"主体\",\"en\":\"Principals\"},\"icon\":\"Avatar\",\"url\":\"/settings/principal\"}"}',
-        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
-
-INSERT INTO dc3_resource (id, parent_resource_id, resource_name, resource_code, service_name, resource_type_flag,
-                          resource_scope_flag, entity_id, resource_ext, enable_flag, remark, creator_id, creator_name,
-                          create_time, operator_id, operator_name, operate_time, deleted)
-VALUES (20040, 20006, 'Principals', 'menu:settingsPrincipal', '', 5, 3, 10040, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
-
--- ----------------------------
--- Additional menu/resource: Tenant Membership settings page
--- ----------------------------
-INSERT INTO dc3_menu (id, parent_menu_id, menu_type_flag, menu_name, menu_code, menu_level, menu_index, menu_ext,
-                      enable_flag, remark, creator_id, creator_name, create_time, operator_id, operator_name,
-                      operate_time, deleted)
-VALUES (10041, 10006, 1, 'Tenant Membership', 'settingsTenantMembership', 2, 17,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"租户成员\",\"en\":\"Tenant Membership\"},\"icon\":\"OfficeBuilding\",\"url\":\"/settings/tenant_membership\"}"}',
-        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
-
-INSERT INTO dc3_resource (id, parent_resource_id, resource_name, resource_code, service_name, resource_type_flag,
-                          resource_scope_flag, entity_id, resource_ext, enable_flag, remark, creator_id, creator_name,
-                          create_time, operator_id, operator_name, operate_time, deleted)
-VALUES (20041, 20006, 'Tenant Membership', 'menu:settingsTenantMembership', '', 5, 3, 10041, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
-
--- ----------------------------
--- Additional menu/resource: Local Credential settings page
--- ----------------------------
-INSERT INTO dc3_menu (id, parent_menu_id, menu_type_flag, menu_name, menu_code, menu_level, menu_index, menu_ext,
-                      enable_flag, remark, creator_id, creator_name, create_time, operator_id, operator_name,
-                      operate_time, deleted)
-VALUES (10042, 10006, 1, 'Local Credentials', 'settingsLocalCredential', 2, 18,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"本地凭证\",\"en\":\"Local Credentials\"},\"icon\":\"Lock\",\"url\":\"/settings/local_credential\"}"}',
-        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
-
-INSERT INTO dc3_resource (id, parent_resource_id, resource_name, resource_code, service_name, resource_type_flag,
-                          resource_scope_flag, entity_id, resource_ext, enable_flag, remark, creator_id, creator_name,
-                          create_time, operator_id, operator_name, operate_time, deleted)
-VALUES (20042, 20006, 'Local Credentials', 'menu:settingsLocalCredential', '', 5, 3, 10042, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
-
--- ----------------------------
--- Additional menu/resource: MCP Audit settings page
--- ----------------------------
-INSERT INTO dc3_menu (id, parent_menu_id, menu_type_flag, menu_name, menu_code, menu_level, menu_index, menu_ext,
-                      enable_flag, remark, creator_id, creator_name, create_time, operator_id, operator_name,
-                      operate_time, deleted)
-VALUES (10043, 10006, 1, 'MCP Audit', 'settingsMcpAudit', 2, 19,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"MCP 审计\",\"en\":\"MCP Audit\"},\"icon\":\"Document\",\"url\":\"/settings/mcp_audit\"}"}',
-        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
-
-INSERT INTO dc3_resource (id, parent_resource_id, resource_name, resource_code, service_name, resource_type_flag,
-                          resource_scope_flag, entity_id, resource_ext, enable_flag, remark, creator_id, creator_name,
-                          create_time, operator_id, operator_name, operate_time, deleted)
-VALUES (20043, 20006, 'MCP Audit', 'menu:settingsMcpAudit', '', 5, 3, 10043, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
 
 -- ----------------------------
 -- Table structure for dc3_identity_audit_log
@@ -2261,24 +2157,3 @@ CREATE INDEX IF NOT EXISTS idx_identity_audit_principal
 CREATE INDEX IF NOT EXISTS idx_identity_audit_resource
     ON dc3_identity_audit_log (resource_type, resource_id, create_time) WHERE deleted = 0;
 
--- ----------------------------
--- Additional menu/resource: Identity Audit settings page
--- ----------------------------
-INSERT INTO dc3_menu (id, parent_menu_id, menu_type_flag, menu_name, menu_code, menu_level, menu_index, menu_ext,
-                      enable_flag, remark, creator_id, creator_name, create_time, operator_id, operator_name,
-                      operate_time, deleted)
-VALUES (10044, 10006, 1, 'Identity Audit', 'settingsIdentityAudit', 2, 20,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"身份审计\",\"en\":\"Identity Audit\"},\"icon\":\"DocumentChecked\",\"url\":\"/settings/identity_audit\"}"}',
-        0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
-
-INSERT INTO dc3_resource (id, parent_resource_id, resource_name, resource_code, service_name, resource_type_flag,
-                          resource_scope_flag, entity_id, resource_ext, enable_flag, remark, creator_id, creator_name,
-                          create_time, operator_id, operator_name, operate_time, deleted)
-VALUES (20044, 20006, 'Identity Audit', 'menu:settingsIdentityAudit', '', 5, 3, 10044, '{}', 0, '', 1, 'dc3',
-        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0)
-ON CONFLICT
-    (id)
-DO NOTHING;
