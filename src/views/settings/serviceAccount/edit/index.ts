@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref } from 'vue';
+import { defineComponent, reactive, ref, watch } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
+import { listPrincipalByIds } from '@/api/principal';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import { NAME_PATTERN } from '@/utils/formRuleUtil';
 
@@ -61,6 +62,27 @@ export default defineComponent({
       form: createEmptyForm(),
       originalForm: createEmptyForm(),
     });
+
+    // Owner is fixed (the acting user); show its display name instead of the raw id.
+    const ownerName = ref('');
+    watch(
+      () => reactiveData.form.ownerPrincipalId,
+      async (id) => {
+        const key = String(id ?? '');
+        if (!key || key === '0') {
+          ownerName.value = '';
+          return;
+        }
+        try {
+          const res: any = await listPrincipalByIds([key]);
+          const p = (res?.data || [])[0];
+          ownerName.value = p ? p.displayName || p.principalName || key : key;
+        } catch {
+          ownerName.value = key;
+        }
+      },
+      { immediate: true }
+    );
 
     const rules: FormRules = {
       serviceAccountName: [
@@ -128,6 +150,7 @@ export default defineComponent({
       show,
       showEdit,
       submit,
+      ownerName,
     };
   },
 });

@@ -15,78 +15,17 @@
   -->
 
 <template>
-  <div>
-    <tool-card
-      :form-model="filterForm"
-      :page="reactiveData.page"
-      @refresh="refresh"
-      @reset="onReset"
-      @search="onSearch"
-      @sort="sort"
-      @size-change="sizeChange"
-      @current-change="currentChange"
-    >
-      <template #filters>
-        <el-form-item :label="t('settings.rolePrincipalBind.roleId')" prop="roleId">
-          <el-input v-model="filterForm.roleId" class="edit-form-default" clearable />
-        </el-form-item>
-        <el-form-item :label="t('settings.rolePrincipalBind.principalId')" prop="principalId">
-          <el-input v-model="filterForm.principalId" class="edit-form-default" clearable />
-        </el-form-item>
-      </template>
-      <template #actions>
-        <el-button :icon="Plus" type="success" @click="openAdd">{{ t('common.add') }}</el-button>
-      </template>
-    </tool-card>
-
-    <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column :label="t('settings.rolePrincipalBind.roleId')" min-width="140" prop="roleId" />
-        <el-table-column :label="t('settings.rolePrincipalBind.principalId')" min-width="140" prop="principalId" />
-        <el-table-column :label="t('settings.rolePrincipalBind.principalType')" min-width="150" prop="principalType" />
-        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
-        <el-table-column :label="t('common.operation')" fixed="right" width="120">
-          <template #default="{ row }">
-            <el-popconfirm
-              :cancel-button-text="t('common.cancel')"
-              :confirm-button-text="t('common.confirm')"
-              :title="t('settings.rolePrincipalBind.confirmDelete')"
-              @confirm="remove(row.id)"
-            >
-              <template #reference>
-                <el-button link type="danger">{{ t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <el-empty :description="t('settings.rolePrincipalBind.empty')" />
-        </template>
-      </el-table>
-    </blank-card>
-
-    <el-dialog v-model="dialog.visible" :title="t('settings.rolePrincipalBind.addTitle')" width="520px">
-      <el-form :model="dialog.form" label-position="top">
-        <el-form-item :label="t('settings.rolePrincipalBind.roleId')">
-          <el-select v-model="dialog.form.roleId" filterable style="width: 100%">
-            <el-option v-for="r in roles" :key="r.id" :label="r.roleName" :value="r.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="t('settings.rolePrincipalBind.principalId')">
-          <el-input v-model="dialog.form.principalId" />
-        </el-form-item>
-        <el-form-item :label="t('settings.rolePrincipalBind.principalType')">
-          <el-segmented v-model="dialog.form.principalType" :options="principalTypeOptions" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialog.visible = false">{{ t('common.cancel') }}</el-button>
-        <el-button :loading="dialog.submitting" type="primary" @click="submit">
-          {{ t('common.confirm') }}
-        </el-button>
-      </template>
-    </el-dialog>
-  </div>
+  <entity-list-page :config="config" />
 </template>
 
-<script lang="ts" src="./index.ts"></script>
+<script lang="ts" setup>
+  import { useI18n } from 'vue-i18n';
+
+  import EntityListPage from '@/components/entity/EntityListPage.vue';
+
+  import { createRolePrincipalBindConfig } from './rolePrincipalBindConfig';
+
+  const { t } = useI18n();
+
+  const config = createRolePrincipalBindConfig(t);
+</script>

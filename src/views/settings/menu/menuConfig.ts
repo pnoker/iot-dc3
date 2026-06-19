@@ -24,6 +24,7 @@ import { authNameRules, remarkRules } from '@/utils/formRuleUtil';
 
 export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
   name: 'menu',
+  title: t('nav.settingsMenu'),
   mode: 'tree',
   rowKey: 'id',
   defaultExpandAll: true,

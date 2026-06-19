@@ -26,6 +26,7 @@ interface UserHandlers {
 
 export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers): EntityListConfig => ({
   name: 'user',
+  title: t('nav.settingsUser'),
   editable: true,
   searchFields: [
     {

@@ -64,9 +64,10 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     },
   });
 
-  const dialogTitle = computed(() =>
-    editing.value ? `${t('common.edit')} ${config.value.name}` : `${t('common.add')} ${config.value.name}`
-  );
+  const dialogTitle = computed(() => {
+    const entity = config.value.title || config.value.name;
+    return editing.value ? `${t('common.edit')} ${entity}` : `${t('common.add')} ${entity}`;
+  });
 
   const formRules = computed<FormRules>(() => {
     const rules: FormRules = {};
@@ -315,9 +316,27 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
 
   const tagType = (value: unknown) => {
     const text = String(value ?? '');
-    if (text === 'ENABLE' || text === 'SUCCESS' || text === 'NORMAL' || text === 'AUTO') return 'success';
-    if (text === 'DISABLE' || text === 'FAILED' || text === 'FIRING') return 'danger';
-    if (text === 'PENDING' || text === 'RETRYING' || text === 'RECOVERED') return 'warning';
+    if (
+      text === 'ENABLE' ||
+      text === 'SUCCESS' ||
+      text === 'NORMAL' ||
+      text === 'AUTO' ||
+      text === 'LOW' ||
+      text === 'ACTIVE'
+    )
+      return 'success';
+    if (
+      text === 'DISABLE' ||
+      text === 'FAILED' ||
+      text === 'FAILURE' ||
+      text === 'ERROR' ||
+      text === 'DENIED' ||
+      text === 'FIRING' ||
+      text === 'HIGH'
+    )
+      return 'danger';
+    if (text === 'PENDING' || text === 'RETRYING' || text === 'RECOVERED' || text === 'MEDIUM' || text === 'SUSPENDED')
+      return 'warning';
     return 'info';
   };
 

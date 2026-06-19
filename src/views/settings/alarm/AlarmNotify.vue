@@ -121,6 +121,21 @@
               >
                 <el-option v-for="option in field.options || []" :key="option.value" v-bind="option" />
               </el-select>
+              <el-select
+                v-else-if="field.kind === 'remoteSelect'"
+                v-model="formModel[field.prop]"
+                :placeholder="field.placeholder"
+                clearable
+                filterable
+                @visible-change="(visible: boolean) => visible && loadRemote(field)"
+              >
+                <el-option
+                  v-for="option in remoteOptions[field.prop] || []"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
+                />
+              </el-select>
               <el-input-number
                 v-else-if="field.kind === 'number'"
                 v-model="formModel[field.prop]"
@@ -155,12 +170,14 @@
 </template>
 
 <script lang="ts" setup>
+  import { reactive, watch } from 'vue';
   import { Plus } from '@element-plus/icons-vue';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 
+  import type { AlarmFieldConfig, AlarmOption } from './alarmEntityConfig';
   import { type AlarmEntityPageProps, useAlarmEntityPage } from './useAlarmEntityPage';
 
   const props = defineProps<AlarmEntityPageProps>();
@@ -190,6 +207,26 @@
     tagType,
     formatCell,
   } = useAlarmEntityPage(props);
+
+  // remoteSelect option cache keyed by field.prop. Loaded when the dialog opens
+  // (so edit-mode values render as names) and on each dropdown expand (so entityId
+  // reflects the currently selected alarmTargetTypeFlag).
+  const remoteOptions = reactive<Record<string, AlarmOption[]>>({});
+  const loadRemote = async (field: AlarmFieldConfig) => {
+    if (!field.loadOptions) return;
+    remoteOptions[field.prop] = await field.loadOptions(formModel);
+  };
+  watch(formVisible, (visible) => {
+    if (!visible) return;
+    activeConfig.value.fields
+      .filter((field) => field.kind === 'remoteSelect')
+      .forEach((field) => {
+        if (formModel[field.prop] != null && formModel[field.prop] !== '') {
+          formModel[field.prop] = String(formModel[field.prop]);
+        }
+        loadRemote(field);
+      });
+  });
 </script>
 
 <style lang="scss" scoped>

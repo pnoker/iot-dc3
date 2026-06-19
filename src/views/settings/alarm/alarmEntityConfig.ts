@@ -38,10 +38,13 @@ import {
   updateNotifyChannelBind,
   updateRule,
 } from '@/api/alarm';
+import { listDevice } from '@/api/device';
+import { listDriver } from '@/api/driver';
+import { listPoint } from '@/api/point';
 import type { PageQuery } from '@/config/types';
 
 export type AlarmTabKey = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'history';
-export type AlarmFieldKind = 'input' | 'number' | 'select' | 'enableFlag' | 'textarea' | 'json';
+export type AlarmFieldKind = 'input' | 'number' | 'select' | 'remoteSelect' | 'enableFlag' | 'textarea' | 'json';
 export type AlarmColumnKind = 'text' | 'tag' | 'code' | 'time' | 'json';
 
 export interface AlarmOption {
@@ -54,6 +57,9 @@ export interface AlarmFieldConfig {
   label: string;
   kind?: AlarmFieldKind;
   options?: AlarmOption[];
+  // remoteSelect: async option loader. Receives the live form so dependent fields
+  // (e.g. entityId reading alarmTargetTypeFlag) can branch on other selections.
+  loadOptions?: (form: Record<string, any>) => Promise<AlarmOption[]>;
   placeholder?: string;
   required?: boolean;
   span?: number;
@@ -159,6 +165,48 @@ const defaultBindExt = () =>
     rateLimitOverrideMs: 300000,
   });
 
+// remoteSelect loaders: resolve foreign-key fields to selectable {name → id}
+// options instead of typing raw ids. value is String(id) so edit-mode echo matches.
+const FK_PAGE: PageQuery = { page: { current: 1, size: 1000 } };
+
+const loadNotifyOptions = async (): Promise<AlarmOption[]> => {
+  const res: any = await listNotify(FK_PAGE);
+  return (res?.data?.records || []).map((r: any) => ({
+    label: r.notifyName || r.notifyCode || String(r.id),
+    value: String(r.id),
+  }));
+};
+const loadMessageOptions = async (): Promise<AlarmOption[]> => {
+  const res: any = await listMessage(FK_PAGE);
+  return (res?.data?.records || []).map((r: any) => ({
+    label: r.messageName || r.messageCode || String(r.id),
+    value: String(r.id),
+  }));
+};
+const loadChannelOptions = async (): Promise<AlarmOption[]> => {
+  const res: any = await listNotifyChannel(FK_PAGE);
+  return (res?.data?.records || []).map((r: any) => ({
+    label: r.channelName || r.channelCode || String(r.id),
+    value: String(r.id),
+  }));
+};
+const loadEntityOptions = async (form: Record<string, any>): Promise<AlarmOption[]> => {
+  const type = form.alarmTargetTypeFlag;
+  let res: any;
+  let nameKey: string;
+  if (type === 'DEVICE') {
+    res = await listDevice(FK_PAGE);
+    nameKey = 'deviceName';
+  } else if (type === 'DRIVER') {
+    res = await listDriver(FK_PAGE);
+    nameKey = 'driverName';
+  } else {
+    res = await listPoint(FK_PAGE);
+    nameKey = 'pointName';
+  }
+  return (res?.data?.records || []).map((r: any) => ({ label: r[nameKey] || String(r.id), value: String(r.id) }));
+};
+
 export const createAlarmEntityConfigs = (t: Translate) => {
   const enableOptions: AlarmOption[] = [
     { label: t('common.enable'), value: 'ENABLE' },
@@ -239,9 +287,27 @@ export const createAlarmEntityConfigs = (t: Translate) => {
           options: targetOptions,
           required: true,
         },
-        { prop: 'entityId', label: t('settings.alarm.entityId'), required: true },
-        { prop: 'notifyId', label: t('settings.alarm.notifyId'), required: true },
-        { prop: 'messageId', label: t('settings.alarm.messageId'), required: true },
+        {
+          prop: 'entityId',
+          label: t('settings.alarm.entityId'),
+          kind: 'remoteSelect',
+          loadOptions: loadEntityOptions,
+          required: true,
+        },
+        {
+          prop: 'notifyId',
+          label: t('settings.alarm.notifyId'),
+          kind: 'remoteSelect',
+          loadOptions: loadNotifyOptions,
+          required: true,
+        },
+        {
+          prop: 'messageId',
+          label: t('settings.alarm.messageId'),
+          kind: 'remoteSelect',
+          loadOptions: loadMessageOptions,
+          required: true,
+        },
         { prop: 'ruleExt', label: t('settings.alarm.ruleExt'), kind: 'json', span: 24, rows: 10, required: true },
         ...commonFields(),
       ],
@@ -417,8 +483,20 @@ export const createAlarmEntityConfigs = (t: Translate) => {
         ...commonColumns(),
       ],
       fields: [
-        { prop: 'notifyId', label: t('settings.alarm.notifyId'), required: true },
-        { prop: 'channelId', label: t('settings.alarm.channelId'), required: true },
+        {
+          prop: 'notifyId',
+          label: t('settings.alarm.notifyId'),
+          kind: 'remoteSelect',
+          loadOptions: loadNotifyOptions,
+          required: true,
+        },
+        {
+          prop: 'channelId',
+          label: t('settings.alarm.channelId'),
+          kind: 'remoteSelect',
+          loadOptions: loadChannelOptions,
+          required: true,
+        },
         { prop: 'bindExt', label: t('settings.alarm.bindExt'), kind: 'json', span: 24, rows: 8, required: true },
         ...commonFields(),
       ],

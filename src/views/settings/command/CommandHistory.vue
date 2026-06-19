@@ -60,8 +60,9 @@
 
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column :label="$t('commandHistory.recordId')" min-width="180" prop="recordId" show-overflow-tooltip />
-        <el-table-column :label="$t('commandHistory.deviceId')" min-width="160" prop="deviceId" show-overflow-tooltip />
+        <el-table-column :label="$t('commandHistory.device')" min-width="160" show-overflow-tooltip>
+          <template #default="{ row }">{{ deviceNameFor(row) }}</template>
+        </el-table-column>
         <el-table-column :label="$t('commandHistory.commandCode')" min-width="140" prop="commandCode" />
         <el-table-column :label="$t('commandHistory.status')" prop="status" width="100" />
         <el-table-column
@@ -148,8 +149,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+  import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
   import { getCommandHistoryByRecordId, listCommandHistory } from '@/api/command';
+  import { listDeviceByIds } from '@/api/device';
   import { usePagedList } from '@/composables/usePagedList';
   import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
   import { prettyJson } from '@/utils/jsonUtil';
@@ -182,6 +184,34 @@
   });
 
   const formatJson = (value: unknown) => prettyJson(value);
+
+  // Resolve deviceId → deviceName for the list column, reusing the same
+  // listDeviceByIds source EventTable uses. Filled as rows arrive.
+  const deviceNameMap = reactive<Record<string, string>>({});
+  const resolveDeviceNames = async (rows: CommandHistoryRecord[]) => {
+    const ids = Array.from(
+      new Set(rows.map((r) => String(r.deviceId ?? '')).filter((id) => id && id !== '0' && !deviceNameMap[id]))
+    );
+    if (!ids.length) return;
+    try {
+      const res: any = await listDeviceByIds(ids);
+      const data = res?.data || {};
+      ids.forEach((id) => {
+        if (data[id]) deviceNameMap[id] = data[id].deviceName || id;
+      });
+    } catch {
+      // handled globally
+    }
+  };
+  watch(
+    () => reactiveData.listData,
+    (rows) => resolveDeviceNames((rows as CommandHistoryRecord[]) || []),
+    {
+      immediate: true,
+    }
+  );
+  const deviceNameFor = (row: CommandHistoryRecord) =>
+    deviceNameMap[String(row.deviceId)] || String(row.deviceId ?? '-');
 
   const onSearch = (data: Record<string, string>) => {
     search(cleanSearchParams(data));

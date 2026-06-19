@@ -78,6 +78,7 @@ const normalizeGroupPayload = (payload: Record<string, unknown>) => {
 
 export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => ({
   name: 'group',
+  title: t('nav.settingsGroup'),
   editable: true,
   searchFields: [
     {

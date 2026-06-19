@@ -71,7 +71,9 @@
               prop="clientId"
               show-overflow-tooltip
             />
-            <el-table-column :label="t('settings.mcp.principalId')" min-width="150" prop="principalId" />
+            <el-table-column :label="t('settings.mcp.principalId')" min-width="150">
+              <template #default="{ row }">{{ principalNameFor(row) }}</template>
+            </el-table-column>
             <el-table-column :label="t('settings.mcp.principalType')" min-width="150" prop="principalType" />
             <el-table-column :label="t('settings.mcp.grantType')" min-width="180" prop="grantType" />
             <el-table-column :label="t('common.enable')" width="90">
@@ -176,7 +178,7 @@
               prop="permissionCode"
               show-overflow-tooltip
             />
-            <el-table-column :label="t('settings.mcp.httpMethod')" width="95" prop="httpMethod" />
+            <el-table-column :label="t('settings.mcp.httpMethod')" prop="httpMethod" width="95" />
             <el-table-column :label="t('settings.mcp.apiPath')" min-width="220" prop="apiPath" show-overflow-tooltip />
             <template #empty>
               <el-empty :description="t('settings.mcp.empty')" />
@@ -213,8 +215,8 @@
         <el-form-item :label="t('settings.mcp.serviceAccountPrincipalId')">
           <el-select
             v-model="reactiveData.clientForm.service_account_principal_id"
-            filterable
             :placeholder="t('settings.mcp.serviceAccountPrincipalId')"
+            filterable
           >
             <el-option
               v-for="sa in reactiveData.serviceAccounts"
@@ -265,7 +267,14 @@
           <el-segmented v-model="reactiveData.connectionForm.principalType" :options="MCP_PRINCIPAL_TYPE_OPTIONS" />
         </el-form-item>
         <el-form-item :label="t('settings.mcp.principalId')">
-          <el-input v-model="reactiveData.connectionForm.principalId" />
+          <el-select v-model="reactiveData.connectionForm.principalId" filterable style="width: 100%">
+            <el-option
+              v-for="opt in reactiveData.principalOptions"
+              :key="opt.value"
+              :label="opt.label"
+              :value="opt.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item :label="t('settings.mcp.tenantId')">
           <el-input v-model="reactiveData.connectionForm.tenantId" />
@@ -358,6 +367,7 @@
     replaceMcpConnectionTools,
     revokeMcpConnection,
   } from '@/api/mcp';
+  import { listPrincipal, listPrincipalByIds } from '@/api/principal';
   import { listServiceAccount } from '@/api/serviceAccount';
   import { useAuthStore } from '@/store/modules/auth';
   import type {
@@ -401,6 +411,7 @@
     clients: [] as OAuthClientRecord[],
     serviceAccounts: [] as ServiceAccountRecord[],
     connections: [] as McpConnectionRecord[],
+    principalOptions: [] as Array<{ label: string; value: string }>,
     tools: [] as McpToolRecord[],
     toolKeyword: '',
     toolRisk: '',
@@ -484,18 +495,44 @@
     }
   };
 
+  // Resolve principalId → principal name for the connections table, reusing the
+  // shared listPrincipalByIds endpoint (same source as the family relations).
+  const principalNameMap = reactive<Record<string, string>>({});
+  const resolvePrincipalNames = async (rows: McpConnectionRecord[]) => {
+    const ids = Array.from(
+      new Set(rows.map((r) => String(r.principalId ?? '')).filter((id) => id && id !== '0' && !principalNameMap[id]))
+    );
+    if (!ids.length) return;
+    try {
+      const res: any = await listPrincipalByIds(ids);
+      (res?.data || []).forEach((p: any) => {
+        principalNameMap[String(p.id)] = p.displayName || p.principalName || String(p.id);
+      });
+    } catch {
+      // handled globally
+    }
+  };
+  const principalNameFor = (row: McpConnectionRecord) =>
+    principalNameMap[String(row.principalId)] || String(row.principalId ?? '-');
+
   const loadAll = async () => {
     reactiveData.loading = true;
     try {
-      const [metadataRes, clientRes, connectionRes, serviceAccountRes] = await Promise.all([
+      const [metadataRes, clientRes, connectionRes, serviceAccountRes, principalRes] = await Promise.all([
         getMcpMetadata(),
         listMcpClient(),
         listMcpConnection(),
         listServiceAccount({ page: { current: 1, size: 1000 } }),
+        listPrincipal({ page: { current: 1, size: 1000 } }),
       ]);
       reactiveData.metadata = metadataRes.data || {};
       reactiveData.clients = clientRes.data || [];
       reactiveData.connections = connectionRes.data || [];
+      void resolvePrincipalNames(reactiveData.connections);
+      reactiveData.principalOptions = ((principalRes as any)?.data?.records || []).map((p: any) => ({
+        label: p.displayName || p.principalName || String(p.id),
+        value: String(p.id),
+      }));
       reactiveData.serviceAccounts = (serviceAccountRes.data?.records || []).filter((sa) =>
         isEnabledFlag(sa.enableFlag)
       );

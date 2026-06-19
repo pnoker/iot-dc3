@@ -23,6 +23,7 @@ import { nameRules, remarkRules } from '@/utils/formRuleUtil';
 
 export const createLabelConfig = (t: ComposerTranslation): EntityListConfig => ({
   name: 'label',
+  title: t('nav.settingsLabel'),
   editable: true,
   searchFields: [
     {

@@ -104,6 +104,7 @@ export interface EntityRelation {
 
 export interface EntityListConfig {
   name: string; // 调试/组件名
+  title?: string; // 对话框标题用的本地化实体名；缺省回退 name
   mode?: EntityMode; // 默认 'page'
   editable: boolean;
   rowKey?: string; // tree 模式必填，默认 'id'

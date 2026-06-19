@@ -39,23 +39,23 @@
         />
       </el-form-item>
       <el-form-item :label="t('settings.serviceAccount.ownerPrincipalId')">
-        <el-input v-model="reactiveData.form.ownerPrincipalId" disabled />
+        <el-input :model-value="ownerName" disabled />
       </el-form-item>
       <el-form-item :label="t('settings.serviceAccount.purpose')">
         <el-input
           v-model="reactiveData.form.purpose"
           :placeholder="t('settings.serviceAccount.purposePlaceholder')"
-          type="textarea"
           maxlength="255"
           show-word-limit
+          type="textarea"
         />
       </el-form-item>
       <el-form-item :label="t('settings.serviceAccount.expireTime')">
         <el-date-picker
           v-model="reactiveData.form.expireTime"
+          style="width: 100%"
           type="datetime"
           value-format="YYYY-MM-DDTHH:mm:ss"
-          style="width: 100%"
         />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">

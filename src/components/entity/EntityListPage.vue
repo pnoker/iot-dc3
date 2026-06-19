@@ -18,8 +18,8 @@
   <div class="entity-list-page">
     <tool-card
       :form-model="searchForm"
-      :hide-sort="config.mode === 'tree'"
       :hide-pagination="config.mode === 'tree'"
+      :hide-sort="config.mode === 'tree'"
       :page="config.mode === 'tree' ? { total: 0, size: 0, current: 1 } : state.page"
       @refresh="load"
       @reset="reset"
@@ -35,13 +35,18 @@
             v-model="searchForm[field.prop]"
             :include-all="field.includeAll"
           />
+          <search-segmented
+            v-else-if="field.kind === 'select' && !field.multiple && (field.options?.length ?? 0) <= 3"
+            v-model="searchForm[field.prop]"
+            :options="field.options || []"
+          />
           <el-select
             v-else-if="field.kind === 'select'"
             v-model="searchForm[field.prop]"
             :multiple="field.multiple"
             :placeholder="field.placeholder"
-            collapse-tags
             clearable
+            collapse-tags
             filterable
           >
             <el-option
@@ -71,8 +76,8 @@
       <el-table
         v-loading="state.loading"
         :data="state.rows"
-        :row-key="config.mode === 'tree' ? config.rowKey || 'id' : undefined"
         :default-expand-all="config.mode === 'tree' && config.defaultExpandAll"
+        :row-key="config.mode === 'tree' ? config.rowKey || 'id' : undefined"
         class="entity-list-page__table"
         stripe
       >
@@ -82,15 +87,15 @@
           :fixed="column.fixed"
           :label="column.label"
           :min-width="column.minWidth"
-          :width="column.width"
           :show-overflow-tooltip="column.overflow !== false"
+          :width="column.width"
         >
           <template #default="{ row }">
             <enable-tag v-if="column.kind === 'enable'" :value="getCellValue(row, column.prop)" />
             <span v-else-if="column.kind === 'color'" class="entity-list-page__color-cell">
               <span
-                class="entity-list-page__swatch"
                 :style="{ background: getCellValue(row, column.prop) || '#F4F4F5' }"
+                class="entity-list-page__swatch"
               />
               {{ formatCell(row, column) }}
             </span>
@@ -120,7 +125,12 @@
             <span v-else>{{ formatCell(row, column) }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.operation')" :width="operationWidth" fixed="right">
+        <el-table-column
+          v-if="config.detail || config.editable || (config.extraActions && config.extraActions.length)"
+          :label="t('common.operation')"
+          :width="operationWidth"
+          fixed="right"
+        >
           <template #default="{ row }">
             <el-button v-if="config.detail" link type="primary" @click="openDetail(row)">
               {{ t('common.detail') }}
@@ -129,8 +139,8 @@
               <el-button
                 v-for="action in config.extraActions"
                 :key="action.key"
-                link
                 :type="action.type || 'primary'"
+                link
                 @click="action.onClick(row)"
               >
                 {{ action.label }}
@@ -183,8 +193,8 @@
               <el-select
                 v-if="field.kind === 'select'"
                 v-model="formModel[field.prop]"
-                :placeholder="field.placeholder"
                 :disabled="editing && field.disabledOnEdit"
+                :placeholder="field.placeholder"
                 clearable
                 filterable
               >
@@ -198,9 +208,9 @@
               <el-input-number
                 v-else-if="field.kind === 'number'"
                 v-model="formModel[field.prop]"
+                :disabled="editing && field.disabledOnEdit"
                 :min="0"
                 :precision="field.precision || 0"
-                :disabled="editing && field.disabledOnEdit"
                 controls-position="right"
                 style="width: 100%"
               />
@@ -213,8 +223,8 @@
                 v-else-if="field.kind === 'json' || field.kind === 'textarea'"
                 v-model="formModel[field.prop]"
                 :autosize="{ minRows: field.rows || 4, maxRows: 18 }"
-                :placeholder="field.placeholder"
                 :disabled="editing && field.disabledOnEdit"
+                :placeholder="field.placeholder"
                 resize="vertical"
                 type="textarea"
               />
@@ -227,21 +237,21 @@
               <el-tree-select
                 v-else-if="field.kind === 'treeSelect'"
                 v-model="formModel[field.prop]"
+                :check-strictly="field.tree?.checkStrictly"
                 :data="treeOptionsFor(field)"
+                :disabled="editing && field.disabledOnEdit"
                 :node-key="field.tree?.nodeKey || 'id'"
                 :props="field.tree?.props"
-                :check-strictly="field.tree?.checkStrictly"
-                :disabled="editing && field.disabledOnEdit"
                 clearable
                 filterable
               />
               <el-input
                 v-else
                 v-model="formModel[field.prop]"
-                :placeholder="field.placeholder"
-                :maxlength="field.maxlength"
-                :show-word-limit="!!field.maxlength"
                 :disabled="editing && field.disabledOnEdit"
+                :maxlength="field.maxlength"
+                :placeholder="field.placeholder"
+                :show-word-limit="!!field.maxlength"
                 clearable
               />
             </el-form-item>
@@ -266,6 +276,7 @@
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
+  import SearchSegmented from '@/components/segmented/SearchSegmented.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
   import { resolveIcon } from '@/config/constant/icons';
   import type { EntityListConfig } from '@/config/types/entityList';

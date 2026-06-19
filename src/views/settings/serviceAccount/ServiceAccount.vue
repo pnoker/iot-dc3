@@ -40,11 +40,9 @@
           prop="purpose"
           show-overflow-tooltip
         />
-        <el-table-column
-          :label="t('settings.serviceAccount.ownerPrincipalId')"
-          min-width="140"
-          prop="ownerPrincipalId"
-        />
+        <el-table-column :label="t('settings.serviceAccount.ownerPrincipalId')" min-width="140">
+          <template #default="{ row }">{{ ownerNameFor(row) }}</template>
+        </el-table-column>
         <el-table-column
           :formatter="timestampColumn"
           :label="t('settings.serviceAccount.expireTime')"

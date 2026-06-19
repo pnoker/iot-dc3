@@ -32,6 +32,7 @@ const normalizeRolePayload = (p: Record<string, unknown>) => {
 
 export const createRoleConfig = (t: ComposerTranslation, handlers: RoleHandlers): EntityListConfig => ({
   name: 'role',
+  title: t('nav.settingsRole'),
   editable: true,
   searchFields: [
     {

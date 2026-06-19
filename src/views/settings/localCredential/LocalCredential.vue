@@ -39,7 +39,9 @@
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
         <el-table-column :label="t('settings.localCredential.loginName')" min-width="160" prop="loginName" />
-        <el-table-column :label="t('settings.localCredential.principalId')" min-width="140" prop="principalId" />
+        <el-table-column :label="t('settings.localCredential.principalId')" min-width="140">
+          <template #default="{ row }">{{ principalNameFor(row) }}</template>
+        </el-table-column>
         <el-table-column :label="t('settings.localCredential.credentialType')" min-width="130" prop="credentialType" />
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
@@ -82,10 +84,12 @@
           <el-input v-model="addDialog.form.loginName" />
         </el-form-item>
         <el-form-item :label="t('settings.localCredential.principalId')">
-          <el-input v-model="addDialog.form.principalId" />
+          <el-select v-model="addDialog.form.principalId" filterable style="width: 100%">
+            <el-option v-for="opt in principalOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+          </el-select>
         </el-form-item>
         <el-form-item :label="t('settings.localCredential.password')">
-          <el-input v-model="addDialog.form.password" type="password" show-password />
+          <el-input v-model="addDialog.form.password" show-password type="password" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -102,7 +106,7 @@
           <el-input :model-value="resetDialog.loginName" disabled />
         </el-form-item>
         <el-form-item :label="t('settings.localCredential.newPassword')">
-          <el-input v-model="resetDialog.password" type="password" show-password />
+          <el-input v-model="resetDialog.password" show-password type="password" />
         </el-form-item>
       </el-form>
       <template #footer>

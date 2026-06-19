@@ -15,79 +15,17 @@
   -->
 
 <template>
-  <div>
-    <blank-card>
-      <div class="mcp-audit-filter">
-        <el-input
-          v-model="reactiveData.filter.principalId"
-          :placeholder="t('settings.mcpAudit.principalId')"
-          clearable
-        />
-        <el-input v-model="reactiveData.filter.toolId" :placeholder="t('settings.mcpAudit.toolId')" clearable />
-        <el-select v-model="reactiveData.filter.status" :placeholder="t('settings.mcpAudit.status')" clearable>
-          <el-option v-for="opt in statusOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
-        </el-select>
-        <el-select v-model="reactiveData.filter.riskLevel" :placeholder="t('settings.mcpAudit.riskLevel')" clearable>
-          <el-option v-for="opt in riskOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
-        </el-select>
-        <el-button :icon="Search" type="primary" @click="load">{{ t('common.search') }}</el-button>
-        <el-button :icon="Refresh" @click="reset">{{ t('common.reset') }}</el-button>
-      </div>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.list" stripe>
-        <el-table-column :label="t('settings.mcpAudit.createTime')" min-width="165">
-          <template #default="{ row }">{{ timestampLabel(row.createTime) }}</template>
-        </el-table-column>
-        <el-table-column :label="t('settings.mcpAudit.principalId')" min-width="120" prop="principalId" />
-        <el-table-column :label="t('settings.mcpAudit.principalType')" min-width="130" prop="principalType" />
-        <el-table-column
-          :label="t('settings.mcpAudit.toolName')"
-          min-width="180"
-          prop="toolName"
-          show-overflow-tooltip
-        />
-        <el-table-column :label="t('settings.mcpAudit.status')" min-width="100">
-          <template #default="{ row }">
-            <el-tag :type="statusTag(row.status)">{{ row.status }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column :label="t('settings.mcpAudit.riskLevel')" min-width="100">
-          <template #default="{ row }">
-            <el-tag :type="riskTag(row.riskLevel)">{{ row.riskLevel }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column :label="t('settings.mcpAudit.durationMs')" min-width="110" prop="durationMs" />
-        <el-table-column
-          :label="t('settings.mcpAudit.clientId')"
-          min-width="160"
-          prop="clientId"
-          show-overflow-tooltip
-        />
-        <el-table-column :label="t('settings.mcpAudit.errorCode')" min-width="120" prop="errorCode" />
-        <el-table-column :label="t('settings.mcpAudit.traceId')" min-width="200" prop="traceId" show-overflow-tooltip />
-        <template #empty>
-          <el-empty :description="t('settings.mcpAudit.empty')" />
-        </template>
-      </el-table>
-    </blank-card>
-  </div>
+  <entity-list-page :config="config" />
 </template>
 
-<script lang="ts" src="./index.ts"></script>
+<script lang="ts" setup>
+  import { useI18n } from 'vue-i18n';
 
-<style lang="scss" scoped>
-  .mcp-audit-filter {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
+  import EntityListPage from '@/components/entity/EntityListPage.vue';
 
-  .mcp-audit-filter .el-input {
-    max-width: 200px;
-  }
+  import { createMcpAuditConfig } from './mcpAuditConfig';
 
-  .mcp-audit-filter .el-select {
-    width: 150px;
-  }
-</style>
+  const { t } = useI18n();
+
+  const config = createMcpAuditConfig(t);
+</script>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from 'vue';
+import { defineComponent, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import {
@@ -25,6 +25,7 @@ import {
   listServiceAccount,
   updateServiceAccount,
 } from '@/api/serviceAccount';
+import { listPrincipalByIds } from '@/api/principal';
 import { getUserByName } from '@/api/user';
 import { useAuthStore } from '@/store/modules/auth';
 import { usePagedList } from '@/composables/usePagedList';
@@ -67,6 +68,33 @@ export default defineComponent({
     });
 
     const refresh = () => load();
+
+    // Resolve ownerPrincipalId → principal name for the table column, reusing the
+    // shared listPrincipalByIds endpoint (same source as the family relations).
+    const ownerNameMap = reactive<Record<string, string>>({});
+    const resolveOwnerNames = async (rows: ServiceAccountRecord[]) => {
+      const ids = Array.from(
+        new Set(rows.map((r) => String(r.ownerPrincipalId ?? '')).filter((id) => id && id !== '0' && !ownerNameMap[id]))
+      );
+      if (!ids.length) return;
+      try {
+        const res: any = await listPrincipalByIds(ids);
+        (res?.data || []).forEach((p: any) => {
+          ownerNameMap[String(p.id)] = p.displayName || p.principalName || String(p.id);
+        });
+      } catch {
+        // handled globally
+      }
+    };
+    watch(
+      () => reactiveData.listData,
+      (rows) => resolveOwnerNames((rows as ServiceAccountRecord[]) || []),
+      {
+        immediate: true,
+      }
+    );
+    const ownerNameFor = (row: ServiceAccountRecord) =>
+      ownerNameMap[String(row.ownerPrincipalId)] || String(row.ownerPrincipalId ?? '-');
 
     // Resolve the current user's principalId to use as the default owner of a new service account.
     getUserByName(String(authStore.getName || ''))
@@ -147,6 +175,7 @@ export default defineComponent({
       currentChange,
       timestampColumn,
       isEnabledFlag,
+      ownerNameFor,
     };
   },
 });

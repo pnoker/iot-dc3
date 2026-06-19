@@ -21,6 +21,7 @@ import type { EntityListConfig } from '@/config/types/entityList';
 
 export const createApiConfig = (t: ComposerTranslation): EntityListConfig => ({
   name: 'api',
+  title: t('nav.settingsApi'),
   editable: false,
   searchFields: [
     {

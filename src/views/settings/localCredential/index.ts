@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive } from 'vue';
+import { defineComponent, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Plus } from '@element-plus/icons-vue';
 
@@ -24,6 +24,7 @@ import {
   listLocalCredential,
   resetLocalCredentialPassword,
 } from '@/api/localCredential';
+import { listPrincipal, listPrincipalByIds } from '@/api/principal';
 import { usePagedList } from '@/composables/usePagedList';
 import { timestampColumn } from '@/utils/dateUtil';
 import { successMessage } from '@/utils/notificationUtil';
@@ -58,6 +59,48 @@ export default defineComponent({
 
     const refresh = () => load();
 
+    // Resolve principalId → principal name for the table column, reusing the
+    // shared listPrincipalByIds endpoint (same source as the family relations).
+    const principalNameMap = reactive<Record<string, string>>({});
+    const resolvePrincipalNames = async (rows: LocalCredentialRecord[]) => {
+      const ids = Array.from(
+        new Set(rows.map((r) => String(r.principalId ?? '')).filter((id) => id && id !== '0' && !principalNameMap[id]))
+      );
+      if (!ids.length) return;
+      try {
+        const res: any = await listPrincipalByIds(ids);
+        (res?.data || []).forEach((p: any) => {
+          principalNameMap[String(p.id)] = p.displayName || p.principalName || String(p.id);
+        });
+      } catch {
+        // handled globally
+      }
+    };
+    watch(
+      () => reactiveData.listData,
+      (rows) => resolvePrincipalNames((rows as LocalCredentialRecord[]) || []),
+      {
+        immediate: true,
+      }
+    );
+    const principalNameFor = (row: LocalCredentialRecord) =>
+      principalNameMap[String(row.principalId)] || String(row.principalId ?? '-');
+
+    // Principal options for the add-dialog dropdown (choose by name, not raw id).
+    const principalOptions = ref<Array<{ label: string; value: string }>>([]);
+    const loadPrincipalOptions = async () => {
+      if (principalOptions.value.length) return;
+      try {
+        const res: any = await listPrincipal({ page: { current: 1, size: 1000 } });
+        principalOptions.value = (res?.data?.records || []).map((p: any) => ({
+          label: p.displayName || p.principalName || String(p.id),
+          value: String(p.id),
+        }));
+      } catch {
+        // handled globally
+      }
+    };
+
     const addDialog = reactive({
       visible: false,
       submitting: false,
@@ -69,6 +112,7 @@ export default defineComponent({
     const filterForm = reactive<Record<string, any>>({ loginName: '' });
 
     const openAdd = () => {
+      loadPrincipalOptions();
       addDialog.form = { loginName: '', principalId: '', password: '' };
       addDialog.visible = true;
     };
@@ -148,6 +192,8 @@ export default defineComponent({
       onSearch,
       onReset,
       timestampColumn,
+      principalNameFor,
+      principalOptions,
       Plus,
     };
   },

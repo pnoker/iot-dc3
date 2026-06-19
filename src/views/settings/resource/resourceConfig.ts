@@ -237,6 +237,7 @@ interface ResourceHandlers {
 
 export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceHandlers): EntityListConfig => ({
   name: 'resource',
+  title: t('nav.settingsResource'),
   mode: 'tree',
   rowKey: 'id',
   defaultExpandAll: true,
