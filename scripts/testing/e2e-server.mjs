@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { existsSync, readFileSync, statSync, createReadStream } from 'node:fs';
+import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { createServer, request as httpRequest } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 import { extname, join, normalize, resolve, sep } from 'node:path';

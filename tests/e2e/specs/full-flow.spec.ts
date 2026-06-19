@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { expect, test, type BrowserContext, type Page } from '@playwright/test';
+import { type BrowserContext, expect, type Page, test } from '@playwright/test';
 
 import {
   clickTab,
+  type E2eDataContext,
   ensureE2eData,
   expectHealthy,
   fillFirstEditableInput,
   login,
   markHealth,
-  type E2eDataContext,
   waitForAppSettled,
   watchPageHealth,
 } from '../fixtures/app';

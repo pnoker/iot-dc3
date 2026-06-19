@@ -15,6 +15,8 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useEntityListPage } from '@/composables/useEntityListPage';
+import { ENTITY_LIST_ROWS, makeEntityListConfig } from '../fixtures/entity-list-config';
 
 // --- hoisted mocks -----------------------------------------------------------
 
@@ -37,9 +39,6 @@ vi.mock('@/utils/notificationUtil', () => ({
 }));
 
 // -----------------------------------------------------------------------------
-
-import { useEntityListPage } from '@/composables/useEntityListPage';
-import { ENTITY_LIST_ROWS, makeEntityListConfig } from '../fixtures/entity-list-config';
 
 describe('useEntityListPage', () => {
   beforeEach(() => {

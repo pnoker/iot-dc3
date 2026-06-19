@@ -21,6 +21,7 @@
   import { useI18n } from 'vue-i18n';
   import EntityListPage from '@/components/entity/EntityListPage.vue';
   import { createMenuConfig } from './menuConfig';
+
   const { t } = useI18n();
   const config = createMenuConfig(t);
 </script>

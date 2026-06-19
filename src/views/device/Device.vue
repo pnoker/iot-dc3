@@ -46,9 +46,9 @@
               :driver="reactiveData.driverTable[data.driverId ?? '']"
               :embedded="embedded != ''"
               :status="reactiveData.statusTable[data.id]"
+              @delete="onDelete"
               @disable="onDisable"
               @enable="onEnable"
-              @delete="onDelete"
             />
           </el-col>
         </template>
@@ -56,7 +56,7 @@
     </blank-card>
 
     <device-add-form ref="deviceAddFormRef" @add="onAdd" />
-    <device-import-form ref="deviceImportFormRef" @import-template="importTemplate" @import="onImport" />
+    <device-import-form ref="deviceImportFormRef" @import="onImport" @import-template="importTemplate" />
   </div>
 </template>
 

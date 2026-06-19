@@ -57,7 +57,7 @@
 
 <script lang="ts" setup>
   import { computed, onMounted, reactive, ref } from 'vue';
-  import { listPointUnit, getPointValueLatest, listPointByIds, listPointValue, writePointValue } from '@/api/point';
+  import { getPointValueLatest, listPointByIds, listPointUnit, listPointValue, writePointValue } from '@/api/point';
   import { listDeviceByIds } from '@/api/device';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';

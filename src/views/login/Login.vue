@@ -71,22 +71,22 @@
     </div>
 
     <el-dialog v-model="changePasswordVisible" :title="t('login.changePasswordTitle')" width="420px">
-      <el-alert :title="changePasswordHint" :closable="false" type="warning" show-icon class="mb-4" />
+      <el-alert :closable="false" :title="changePasswordHint" class="mb-4" show-icon type="warning" />
       <el-form ref="changePasswordRef" :model="changePasswordData" :rules="changePasswordRule" label-width="0">
         <el-form-item prop="newPassword">
           <el-input
             v-model="changePasswordData.newPassword"
             :placeholder="t('login.newPasswordPlaceholder')"
-            type="password"
             show-password
+            type="password"
           />
         </el-form-item>
         <el-form-item prop="confirmPassword">
           <el-input
             v-model="changePasswordData.confirmPassword"
             :placeholder="t('login.confirmPasswordPlaceholder')"
-            type="password"
             show-password
+            type="password"
           />
         </el-form-item>
       </el-form>
@@ -107,7 +107,7 @@
 
   import { useAuthStore } from '@/store';
   import { PASSWORD_CHANGE_CODES } from '@/config/constant/axios';
-  import { successMessage, failMessage } from '@/utils/notificationUtil';
+  import { failMessage, successMessage } from '@/utils/notificationUtil';
 
   import Particles from '@/components/particles/Particles.vue';
 
