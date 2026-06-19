@@ -35,6 +35,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +83,14 @@ public class ServiceAccountController implements BaseController {
      */
     @PreAuthorize("@perm.can('service_account', 'add')")
     @Operation(summary = "Add Service Account", description = "Create a non-human service account principal under the current tenant for API/MCP access. "
-            + "The named owner principal must already be a tenant member; returns the create result.")
+            + "The named owner principal must already be a tenant member; returns the create result.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ServiceAccountVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -102,7 +111,14 @@ public class ServiceAccountController implements BaseController {
      */
     @PreAuthorize("@perm.can('service_account', 'delete')")
     @Operation(summary = "Delete Service Account", description = "Delete a service account by ID, scoped to the current tenant. "
-            + "Removes the machine principal so its credentials can no longer authenticate; returns the delete result.")
+            + "Removes the machine principal so its credentials can no longer authenticate; returns the delete result.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -120,7 +136,13 @@ public class ServiceAccountController implements BaseController {
      */
     @PreAuthorize("@perm.can('service_account', 'update')")
     @Operation(summary = "Update Service Account", description = "Update a tenant-scoped service account's name, purpose, expiry, owner or credential policy. "
-            + "Tenant and ID are taken from the existing record; any new owner principal must be a tenant member.")
+            + "Tenant and ID are taken from the existing record; any new owner principal must be a tenant member.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ServiceAccountVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -146,7 +168,13 @@ public class ServiceAccountController implements BaseController {
      */
     @PreAuthorize("@perm.can('service_account', 'update')")
     @Operation(summary = "Enable Service Account", description = "Set a service account's enable flag to ENABLE so its credentials can authenticate again. "
-            + "Tenant-scoped and audit-logged as an ENABLE action.")
+            + "Tenant-scoped and audit-logged as an ENABLE action.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/enable")
     public Mono<R<String>> enable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return toggleEnableFlag(id, EnableFlagEnum.ENABLE);
@@ -160,7 +188,13 @@ public class ServiceAccountController implements BaseController {
      */
     @PreAuthorize("@perm.can('service_account', 'update')")
     @Operation(summary = "Disable Service Account", description = "Set a service account's enable flag to DISABLE to block its credentials from authenticating. "
-            + "Tenant-scoped and audit-logged as a DISABLE action.")
+            + "Tenant-scoped and audit-logged as a DISABLE action.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/disable")
     public Mono<R<String>> disable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return toggleEnableFlag(id, EnableFlagEnum.DISABLE);
@@ -189,7 +223,13 @@ public class ServiceAccountController implements BaseController {
      */
     @PreAuthorize("@perm.can('service_account', 'get')")
     @Operation(summary = "Get Service Account by ID", description = "Fetch one service account by ID, scoped to the current tenant. "
-            + "Returns the principal, owner, purpose, expiry and enable flag; use to inspect an account before rotating its credentials.")
+            + "Returns the principal, owner, purpose, expiry and enable flag; use to inspect an account before rotating its credentials.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<ServiceAccountVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -206,7 +246,13 @@ public class ServiceAccountController implements BaseController {
      */
     @PreAuthorize("@perm.can('service_account', 'list')")
     @Operation(summary = "List Service Accounts", description = "Page through service accounts for the current tenant with the supplied query filters. "
-            + "Returns a page of service accounts; use to browse machine principals or select a target account.")
+            + "Returns a page of service accounts; use to browse machine principals or select a target account.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<ServiceAccountVO>>> list(@RequestBody(required = false) ServiceAccountQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

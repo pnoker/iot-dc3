@@ -32,6 +32,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +77,13 @@ public class ApiController implements BaseController {
      * @return add-success status; restricted to system admins
      */
     @PreAuthorize("@perm.can('api', 'add')")
-    @Operation(summary = "Add API Endpoint", description = "Register a new HTTP API endpoint entry that feeds the permission tree and the MCP tool catalog. Restricted to system admins; returns an add-success result.")
+    @Operation(summary = "Add API Endpoint", description = "Register a new HTTP API endpoint entry that feeds the permission tree and the MCP tool catalog. Restricted to system admins; returns an add-success result.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ApiVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -93,7 +101,13 @@ public class ApiController implements BaseController {
      * @return delete-success status; restricted to system admins
      */
     @PreAuthorize("@perm.can('api', 'delete')")
-    @Operation(summary = "Delete API Endpoint", description = "Remove a registered API endpoint by its ID so it no longer appears in the permission tree or tool catalog. Restricted to system admins.")
+    @Operation(summary = "Delete API Endpoint", description = "Remove a registered API endpoint by its ID so it no longer appears in the permission tree or tool catalog. Restricted to system admins.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -110,7 +124,13 @@ public class ApiController implements BaseController {
      * @return update-success status; restricted to system admins
      */
     @PreAuthorize("@perm.can('api', 'update')")
-    @Operation(summary = "Update API Endpoint", description = "Modify an existing registered API endpoint's metadata. Restricted to system admins; returns an update-success result.")
+    @Operation(summary = "Update API Endpoint", description = "Modify an existing registered API endpoint's metadata. Restricted to system admins; returns an update-success result.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ApiVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -128,7 +148,13 @@ public class ApiController implements BaseController {
      * @return the matched ApiVO; read access is open to all authenticated users
      */
     @PreAuthorize("@perm.can('api', 'get')")
-    @Operation(summary = "Get API Endpoint by ID", description = "Fetch one registered API endpoint by its ID. Read access is open to all authenticated users; returns the full API endpoint detail.")
+    @Operation(summary = "Get API Endpoint by ID", description = "Fetch one registered API endpoint by its ID. Read access is open to all authenticated users; returns the full API endpoint detail.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<ApiVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         // Read access to global API data is open to all authenticated users.
@@ -146,7 +172,13 @@ public class ApiController implements BaseController {
      * @return a page of ApiVO matching the query; read access is open to all authenticated users
      */
     @PreAuthorize("@perm.can('api', 'list')")
-    @Operation(summary = "List API Endpoints", description = "Page through registered API endpoints with filters from the query body. Read access is open to all authenticated users; returns a page of API endpoints.")
+    @Operation(summary = "List API Endpoints", description = "Page through registered API endpoints with filters from the query body. Read access is open to all authenticated users; returns a page of API endpoints.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<ApiVO>>> list(@RequestBody(required = false) ApiQuery entityQuery) {
         // Read access to global API data is open to all authenticated users.

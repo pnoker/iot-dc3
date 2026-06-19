@@ -36,6 +36,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -84,7 +86,13 @@ public class MenuController implements BaseController {
      * @return add-success status; requires the system admin role
      */
     @PreAuthorize("@perm.can('menu', 'add')")
-    @Operation(summary = "Add Menu", description = "Create a new menu node in the settings-sidebar tree. A menu carries i18n titles, an icon and a frontend URL; requires the system admin role. Returns the new menu ID.")
+    @Operation(summary = "Add Menu", description = "Create a new menu node in the settings-sidebar tree. A menu carries i18n titles, an icon and a frontend URL; requires the system admin role. Returns the new menu ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MenuVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -106,7 +114,13 @@ public class MenuController implements BaseController {
      * @return delete-success status; requires the system admin role for the owning tenant
      */
     @PreAuthorize("@perm.can('menu', 'delete')")
-    @Operation(summary = "Delete Menu", description = "Delete a menu node by its ID. Removes the settings-sidebar entry; requires the system admin role for the owning tenant.")
+    @Operation(summary = "Delete Menu", description = "Delete a menu node by its ID. Removes the settings-sidebar entry; requires the system admin role for the owning tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -123,7 +137,13 @@ public class MenuController implements BaseController {
      * @return update-success status; requires the system admin role
      */
     @PreAuthorize("@perm.can('menu', 'update')")
-    @Operation(summary = "Update Menu", description = "Update an existing menu node's label, icon, URL, parent or display order. Requires the system admin role; returns the updated menu.")
+    @Operation(summary = "Update Menu", description = "Update an existing menu node's label, icon, URL, parent or display order. Requires the system admin role; returns the updated menu.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MenuVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -143,7 +163,13 @@ public class MenuController implements BaseController {
      * @return the matched MenuVO; menu data is global and readable by any authenticated user
      */
     @PreAuthorize("@perm.can('menu', 'get')")
-    @Operation(summary = "Get Menu by ID", description = "Fetch one menu node by ID, including its i18n titles, icon, URL and parent. Menu data is global and readable by any authenticated user.")
+    @Operation(summary = "Get Menu by ID", description = "Fetch one menu node by ID, including its i18n titles, icon, URL and parent. Menu data is global and readable by any authenticated user.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<MenuVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         // Read access to global menu data is open to all authenticated users.
@@ -161,7 +187,13 @@ public class MenuController implements BaseController {
      * @return a flat page of MenuVO matching the query
      */
     @PreAuthorize("@perm.can('menu', 'list')")
-    @Operation(summary = "List Menus", description = "Page through menu nodes with filters such as code, parent and enable flag. Returns a flat page of menus; use for browsing or selecting a target menu.")
+    @Operation(summary = "List Menus", description = "Page through menu nodes with filters such as code, parent and enable flag. Returns a flat page of menus; use for browsing or selecting a target menu.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<MenuVO>>> list(@RequestBody(required = false) MenuQuery entityQuery) {
         // Read access to global menu data is open to all authenticated users.
@@ -181,7 +213,13 @@ public class MenuController implements BaseController {
      */
     @PreAuthorize("@perm.can('menu', 'list')")
     @Operation(summary = "List Menu Tree", description = "Return menus as a nested tree and prune it to the nodes the current principal can access. " +
-            "A node is retained only when the principal's granted resources include 'menu:<code>' (or the '*' wildcard); use to render the user's settings sidebar.")
+            "A node is retained only when the principal's granted resources include 'menu:<code>' (or the '*' wildcard); use to render the user's settings sidebar.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list_tree")
     public Mono<R<List<MenuTreeVO>>> listTree(@RequestBody(required = false) MenuQuery entityQuery) {
         return getPrincipalHeader().flatMap(header -> async(() -> {

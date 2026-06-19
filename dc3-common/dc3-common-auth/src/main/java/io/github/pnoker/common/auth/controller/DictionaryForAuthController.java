@@ -25,6 +25,8 @@ import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.dal.entity.vo.DictionaryVO;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +63,13 @@ public class DictionaryForAuthController implements BaseController {
      */
     @PreAuthorize("@perm.can('dictionary_for_auth', 'get')")
     @Operation(summary = "List Tenant Dictionary", description = "List tenants as dictionary options (id and display label) for Auth Center selection. " +
-            "Use to populate tenant pickers such as the membership switcher; returns the full option set without paging.")
+            "Use to populate tenant pickers such as the membership switcher; returns the full option set without paging.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/tenant")
     public Mono<R<List<DictionaryVO>>> tenantDictionary() {
         return async(() -> {

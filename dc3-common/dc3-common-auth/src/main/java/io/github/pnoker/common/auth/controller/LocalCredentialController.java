@@ -33,6 +33,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -77,7 +79,14 @@ public class LocalCredentialController implements BaseController {
      */
     @PreAuthorize("@perm.can('local_credential', 'add')")
     @Operation(summary = "Add Local Credential", description = "Store a secret credential (e.g. password or API key) for a principal under the current tenant. " +
-            "The caller must be a tenant member of the target principal; returns the new credential record id.")
+            "The caller must be a tenant member of the target principal; returns the new credential record id.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LocalCredentialVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -96,7 +105,14 @@ public class LocalCredentialController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('local_credential', 'delete')")
-    @Operation(summary = "Delete Local Credential", description = "Remove a stored credential by id. The credential's principal must belong to the current tenant; revokes that secret for the principal.")
+    @Operation(summary = "Delete Local Credential", description = "Remove a stored credential by id. The credential's principal must belong to the current tenant; revokes that secret for the principal.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -114,7 +130,14 @@ public class LocalCredentialController implements BaseController {
      * @return update-success status
      */
     @PreAuthorize("@perm.can('local_credential', 'update')")
-    @Operation(summary = "Update Local Credential", description = "Modify an existing credential's metadata. The principal id is preserved from the stored record; use to rotate attributes without changing ownership.")
+    @Operation(summary = "Update Local Credential", description = "Modify an existing credential; when the write-only password field is supplied it is re-hashed and overwrites the stored secret. The principal id is preserved from the stored record.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody LocalCredentialVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -137,7 +160,14 @@ public class LocalCredentialController implements BaseController {
      * @return true on successful reset
      */
     @PreAuthorize("@perm.can('local_credential', 'update')")
-    @Operation(summary = "Reset Local Credential Password", description = "Replace the raw password of a credential by id with a new value. Use to rotate or recover a principal's stored secret; returns true on success.")
+    @Operation(summary = "Reset Local Credential Password", description = "Replace the raw password of a credential by id with a new value. Use to rotate or recover a principal's stored secret; returns true on success.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/reset_password")
     public Mono<R<Boolean>> resetPassword(@Parameter(description = "Primary key of the local credential to reset. The credential's principal must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id,
                                           @Parameter(description = "New raw password to replace the current one. Must meet the system's password policy.", example = "P@ssw0rd!") @NotNull @RequestParam(value = "password") String password) {
@@ -156,7 +186,13 @@ public class LocalCredentialController implements BaseController {
      * @return the matched LocalCredentialVO (raw secret omitted)
      */
     @PreAuthorize("@perm.can('local_credential', 'get')")
-    @Operation(summary = "Get Local Credential by ID", description = "Fetch one credential by id. The credential's principal must belong to the current tenant; returns the credential view without exposing the raw secret.")
+    @Operation(summary = "Get Local Credential by ID", description = "Fetch one credential by id. The credential's principal must belong to the current tenant; returns the credential view without exposing the raw secret.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<LocalCredentialVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -173,7 +209,13 @@ public class LocalCredentialController implements BaseController {
      * @return true when no existing credential currently uses the name
      */
     @PreAuthorize("@perm.can('local_credential', 'get')")
-    @Operation(summary = "Check Login Name Availability", description = "Test whether a login name is free to register. Returns true when no credential currently uses the name; use before creating a new credential to avoid collisions.")
+    @Operation(summary = "Check Login Name Availability", description = "Test whether a login name is free to register. Returns true when no credential currently uses the name; use before creating a new credential to avoid collisions.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/check")
     public Mono<R<Boolean>> checkLoginNameAvailable(@Parameter(description = "Login name to check for availability. Returns true when no existing credential uses this name.", example = "alice") @NotNull @RequestParam(value = "name") String name) {
         return async(() -> R.ok(localCredentialService.isLoginNameAvailable(name)));
@@ -186,7 +228,13 @@ public class LocalCredentialController implements BaseController {
      * @return a page of LocalCredentialVO matching the query
      */
     @PreAuthorize("@perm.can('local_credential', 'list')")
-    @Operation(summary = "List Local Credentials", description = "Page through credentials for the current tenant with query filters such as principal and login name. Returns a page of credential views; use to browse or select a target credential.")
+    @Operation(summary = "List Local Credentials", description = "Page through credentials for the current tenant with query filters such as principal and login name. Returns a page of credential views; use to browse or select a target credential.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<LocalCredentialVO>>> list(@RequestBody(required = false) LocalCredentialQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

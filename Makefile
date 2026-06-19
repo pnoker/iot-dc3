@@ -173,7 +173,8 @@ validate-annotations:
 	$(MVN) -q -pl dc3-common/dc3-common-manager -am test -Dtest=ManagerAnnotationGateTest -Dsurefire.failIfNoSpecifiedTests=false
 	$(MVN) -q -pl dc3-common/dc3-common-data -am test -Dtest=DataAnnotationGateTest -Dsurefire.failIfNoSpecifiedTests=false
 	$(MVN) -q -pl dc3-common/dc3-common-agentic -am test -Dtest=AgenticAnnotationGateTest -Dsurefire.failIfNoSpecifiedTests=false
-	@echo "Allowlisted: manager, data, agentic. Add auth's gate (-pl/-Dtest) here once its batch completes."
+	$(MVN) -q -pl dc3-common/dc3-common-auth -am test -Dtest=AuthAnnotationGateTest -Dsurefire.failIfNoSpecifiedTests=false
+	@echo "Allowlisted: manager, data, agentic, auth (all center services)."
 
 test-it:
 	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify

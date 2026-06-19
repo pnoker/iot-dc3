@@ -47,15 +47,21 @@ import java.time.LocalDateTime;
 @Schema(description = "Tenant membership view object", example = "1024")
 public class TenantMembershipVO extends BaseVO {
 
+    @Schema(description = "Identifier of the tenant this membership belongs to.", example = "1024")
     private Long tenantId;
 
+    @Schema(description = "Identifier of the principal (user or service account) attached to the tenant.", example = "2048")
     private Long principalId;
 
+    @Schema(description = "Classification of the principal: USER, SERVICE_ACCOUNT, or SYSTEM.", example = "USER")
     private PrincipalTypeEnum principalType;
 
+    @Schema(description = "Lifecycle status of the membership: ACTIVE, SUSPENDED, or INVITED.", example = "ACTIVE")
     private MembershipStatusEnum membershipStatus;
 
+    @Schema(description = "Timestamp when the principal joined (was attached to) the tenant.")
     private LocalDateTime joinedTime;
 
+    @Schema(description = "Extended JSON metadata for this membership (e.g. custom roles, invitation context); structure is tenant-defined.")
     private JsonExt membershipExt;
 }

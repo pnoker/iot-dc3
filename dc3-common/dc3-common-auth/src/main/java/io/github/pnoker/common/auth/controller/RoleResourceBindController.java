@@ -38,6 +38,8 @@ import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -89,7 +91,13 @@ public class RoleResourceBindController implements BaseController {
      */
     @PreAuthorize("@perm.can('role_resource_bind', 'add')")
     @Operation(summary = "Add Role-Resource Binding", description = "Bind a single resource (permission) to a role under the current tenant. " +
-            "The role must belong to the tenant; use to attach an individual permission to a role.")
+            "The role must belong to the tenant; use to attach an individual permission to a role.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleResourceBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -108,7 +116,13 @@ public class RoleResourceBindController implements BaseController {
      */
     @PreAuthorize("@perm.can('role_resource_bind', 'delete')")
     @Operation(summary = "Delete Role-Resource Binding", description = "Remove a single role-resource binding by its record ID. " +
-            "The binding's role must belong to the current tenant; returns the deletion result.")
+            "The binding's role must belong to the current tenant; returns the deletion result.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -127,7 +141,13 @@ public class RoleResourceBindController implements BaseController {
      */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(summary = "List Role-Resource Bindings", description = "Page through role-resource binding records for the current tenant. " +
-            "Accepts filter criteria; returns a page of bindings showing which resources each role grants.")
+            "Accepts filter criteria; returns a page of bindings showing which resources each role grants.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<RoleResourceBindVO>>> list(@RequestBody(required = false) RoleResourceBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -146,7 +166,13 @@ public class RoleResourceBindController implements BaseController {
      */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(summary = "List Resources by Role", description = "Return the full set of resources (permissions) granted to a role. " +
-            "The role must belong to the current tenant; use to inspect what a role can do.")
+            "The role must belong to the current tenant; use to inspect what a role can do.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_resource_by_role")
     public Mono<R<List<ResourceVO>>> listResourceByRole(@Parameter(description = "Identifier of the role whose granted resources are to be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -166,7 +192,13 @@ public class RoleResourceBindController implements BaseController {
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(summary = "List Resources by Principal", description = "Resolve the effective permissions of a principal (user or service account) " +
             "by aggregating resources from every role assigned to it within the current tenant. " +
-            "The principal must be a member of the tenant; returns the deduplicated resource list.")
+            "The principal must be a member of the tenant; returns the deduplicated resource list.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_resource_by_principal")
     public Mono<R<List<ResourceVO>>> listResourceByPrincipal(@Parameter(description = "Identifier of the principal (user or service account) whose effective permissions are to be resolved; must be a member of the current tenant.", example = "1024") @NotNull @RequestParam(value = "principal_id") Long principalId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -185,7 +217,13 @@ public class RoleResourceBindController implements BaseController {
      */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(summary = "List Roles by Resource", description = "Return the roles within the current tenant that grant a given resource (permission). " +
-            "Use to find which roles can perform a specific action.")
+            "Use to find which roles can perform a specific action.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_role_by_resource")
     public Mono<R<List<RoleVO>>> listRoleByResource(@Parameter(description = "Identifier of the resource (permission) for which to list the roles that grant it; scoped to the current tenant.", example = "1024") @NotNull @RequestParam(value = "resource_id") Long resourceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

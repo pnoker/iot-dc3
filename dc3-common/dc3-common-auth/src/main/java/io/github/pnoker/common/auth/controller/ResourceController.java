@@ -34,6 +34,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -78,7 +80,13 @@ public class ResourceController implements BaseController {
      * @return add-success status; restricted to system admins
      */
     @PreAuthorize("@perm.can('resource', 'add')")
-    @Operation(summary = "Add Resource", description = "Create a new resource, the permission-grantable unit an endpoint declares (e.g. \"device:add\"). Restricted to system admins; returns the new resource ID.")
+    @Operation(summary = "Add Resource", description = "Create a new resource, the permission-grantable unit an endpoint declares (e.g. \"device:add\"). Restricted to system admins; returns the new resource ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ResourceVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -100,7 +108,13 @@ public class ResourceController implements BaseController {
      * @return delete-success status; restricted to system admins
      */
     @PreAuthorize("@perm.can('resource', 'delete')")
-    @Operation(summary = "Delete Resource by ID", description = "Remove a resource permission unit by ID. Restricted to system admins; deleting severs any role bindings that granted it.")
+    @Operation(summary = "Delete Resource by ID", description = "Remove a resource permission unit by ID. Restricted to system admins; deleting severs any role bindings that granted it.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the resource record to delete; deleting it also severs any role bindings that granted this permission.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -117,7 +131,13 @@ public class ResourceController implements BaseController {
      * @return update-success status; restricted to system admins, the change applies to every bound role
      */
     @PreAuthorize("@perm.can('resource', 'update')")
-    @Operation(summary = "Update Resource", description = "Modify an existing resource's definition (e.g. its code or metadata). Restricted to system admins; the change takes effect for every role bound to this resource.")
+    @Operation(summary = "Update Resource", description = "Modify an existing resource's definition (e.g. its code or metadata). Restricted to system admins; the change takes effect for every role bound to this resource.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ResourceVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -137,7 +157,13 @@ public class ResourceController implements BaseController {
      * @return the matched ResourceVO; read access is open to all authenticated users
      */
     @PreAuthorize("@perm.can('resource', 'get')")
-    @Operation(summary = "Get Resource by ID", description = "Fetch one resource (the permission-grantable unit) by ID. Read access is open to all authenticated users; use to resolve a permission code before binding it to a role.")
+    @Operation(summary = "Get Resource by ID", description = "Fetch one resource (the permission-grantable unit) by ID. Read access is open to all authenticated users; use to resolve a permission code before binding it to a role.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<ResourceVO>> getById(@Parameter(description = "Primary key of the resource record to fetch; use to resolve a permission code before binding it to a role.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         // Read access to global resource data is open to all authenticated users.
@@ -155,7 +181,13 @@ public class ResourceController implements BaseController {
      * @return a page of ResourceVO matching the query; read access is open to all authenticated users
      */
     @PreAuthorize("@perm.can('resource', 'list')")
-    @Operation(summary = "List Resources", description = "Page through resources (the permission-grantable units) with query filters. Read access is open to all authenticated users; returns a page of resources for browsing or selecting a target.")
+    @Operation(summary = "List Resources", description = "Page through resources (the permission-grantable units) with query filters. Read access is open to all authenticated users; returns a page of resources for browsing or selecting a target.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<ResourceVO>>> list(@RequestBody(required = false) ResourceQuery entityQuery) {
         // Read access to global resource data is open to all authenticated users.
@@ -174,7 +206,13 @@ public class ResourceController implements BaseController {
      * @return a tree of ResourceTreeVO mirroring the permission hierarchy; read access is open to all authenticated users
      */
     @PreAuthorize("@perm.can('resource', 'list')")
-    @Operation(summary = "List Resource Tree", description = "Return resources as a nested tree reflecting the permission hierarchy (e.g. resource group -> permission code). Read access is open to all authenticated users; use to render permission pickers or inspect parent/child relationships.")
+    @Operation(summary = "List Resource Tree", description = "Return resources as a nested tree reflecting the permission hierarchy (e.g. resource group -> permission code). Read access is open to all authenticated users; use to render permission pickers or inspect parent/child relationships.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list_tree")
     public Mono<R<List<ResourceTreeVO>>> listTree(@RequestBody(required = false) ResourceQuery entityQuery) {
         // Read access to global resource data is open to all authenticated users.

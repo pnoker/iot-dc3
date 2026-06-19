@@ -50,6 +50,7 @@ public class LocalCredentialQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination parameters including page number, page size, time range, and sort order")
     private Pages page;
 
     @Schema(description = "Tenant identifier used to scope credential queries; all results are restricted to this tenant.", example = "1024")

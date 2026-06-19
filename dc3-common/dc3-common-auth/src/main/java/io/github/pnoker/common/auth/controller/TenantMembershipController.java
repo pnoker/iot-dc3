@@ -32,6 +32,8 @@ import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +77,13 @@ public class TenantMembershipController implements BaseController {
      */
     @PreAuthorize("@perm.can('tenant_membership', 'list')")
     @Operation(summary = "List Tenant Memberships", description = "Page through the memberships of the caller's tenant, optionally filtered by query. " +
-            "Each row links a principal (user or service account) to the tenant; use to see who belongs to it.")
+            "Each row links a principal (user or service account) to the tenant; use to see who belongs to it.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<TenantMembershipVO>>> list(@RequestBody(required = false) TenantMembershipQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -93,7 +101,13 @@ public class TenantMembershipController implements BaseController {
      */
     @PreAuthorize("@perm.can('tenant_membership', 'add')")
     @Operation(summary = "Add Tenant Membership", description = "Attach a principal (user or service account) to the caller's tenant. " +
-            "The body tenant id is ignored and the membership is pinned to the caller; defaults to ACTIVE status and records an audit entry.")
+            "The body tenant id is ignored and the membership is pinned to the caller; defaults to ACTIVE status and records an audit entry.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@RequestBody TenantMembershipVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -122,7 +136,13 @@ public class TenantMembershipController implements BaseController {
      */
     @PreAuthorize("@perm.can('tenant_membership', 'delete')")
     @Operation(summary = "Delete Tenant Membership", description = "Remove a membership record by ID, verifying it belongs to the caller's tenant first. " +
-            "Returns 404 if the membership is owned by another tenant; logs a DELETE audit entry on success.")
+            "Returns 404 if the membership is owned by another tenant; logs a DELETE audit entry on success.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> {

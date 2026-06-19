@@ -41,6 +41,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +88,13 @@ public class UserController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('user', 'add')")
-    @Operation(summary = "Add User", description = "Create a new user under the current tenant and enroll them as an active tenant member. A user authenticates with username and password to access the platform; returns an add-success status.")
+    @Operation(summary = "Add User", description = "Create a new user under the current tenant and enroll them as an active tenant member. A user authenticates with username and password to access the platform; returns an add-success status.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -133,7 +141,13 @@ public class UserController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('user', 'delete')")
-    @Operation(summary = "Delete User", description = "Remove a user and their tenant membership for the current tenant (verified by ID). Use to revoke a tenant member's access; returns a delete-success status.")
+    @Operation(summary = "Delete User", description = "Remove a user and their tenant membership for the current tenant (verified by ID). Use to revoke a tenant member's access; returns a delete-success status.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -156,7 +170,13 @@ public class UserController implements BaseController {
      * @return update-success status
      */
     @PreAuthorize("@perm.can('user', 'update')")
-    @Operation(summary = "Update User", description = "Modify an existing user's profile (tenant-scoped, verified by ID). Use to change attributes like nickname or enable flag; returns an update-success status.")
+    @Operation(summary = "Update User", description = "Modify an existing user's profile (tenant-scoped, verified by ID). Use to change attributes like nickname or enable flag; returns an update-success status.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -178,7 +198,13 @@ public class UserController implements BaseController {
      * @return the matched UserVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('user', 'get')")
-    @Operation(summary = "Get User by ID", description = "Fetch one user by ID within the current tenant (ownership checked via principal). Returns the user profile; use when you already hold the numeric ID.")
+    @Operation(summary = "Get User by ID", description = "Fetch one user by ID within the current tenant (ownership checked via principal). Returns the user profile; use when you already hold the numeric ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<UserVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -196,7 +222,13 @@ public class UserController implements BaseController {
      * @return the matched UserVO; not-found and wrong-tenant both 404 to avoid leaking name existence
      */
     @PreAuthorize("@perm.can('user', 'get')")
-    @Operation(summary = "Get User by Name", description = "Look up one user by username within the current tenant. Returns a 404 for both not-found and wrong-tenant so name existence is not leaked; use when resolving a login name to a profile.")
+    @Operation(summary = "Get User by Name", description = "Look up one user by username within the current tenant. Returns a 404 for both not-found and wrong-tenant so name existence is not leaked; use when resolving a login name to a profile.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_name")
     public Mono<R<UserVO>> getByName(@Parameter(description = "Username (login name) of the user to look up within the current tenant. Both not-found and wrong-tenant cases return 404 to avoid leaking name existence.", example = "john_doe") @NotNull @RequestParam(value = "name") String name) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -219,7 +251,13 @@ public class UserController implements BaseController {
      * @return a page of UserVO matching the query
      */
     @PreAuthorize("@perm.can('user', 'list')")
-    @Operation(summary = "List Users", description = "Page through users for the current tenant with filters from the query body (tenant scope is enforced server-side, not client-supplied). Returns a page of user profiles for browsing or selecting a target user.")
+    @Operation(summary = "List Users", description = "Page through users for the current tenant with filters from the query body (tenant scope is enforced server-side, not client-supplied). Returns a page of user profiles for browsing or selecting a target user.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<UserVO>>> list(@RequestBody(required = false) UserQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

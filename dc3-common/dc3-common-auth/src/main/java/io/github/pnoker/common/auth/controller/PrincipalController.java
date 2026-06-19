@@ -30,6 +30,8 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +77,13 @@ public class PrincipalController implements BaseController {
      */
     @PreAuthorize("@perm.can('principal', 'get')")
     @Operation(summary = "Get Principal by ID", description = "Fetch one principal (user or service account) by ID. " +
-            "A principal is the abstract identity that roles and permissions bind to; use to resolve an identity before binding roles or auditing access.")
+            "A principal is the abstract identity that roles and permissions bind to; use to resolve an identity before binding roles or auditing access.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<PrincipalVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return async(() -> R.ok(principalBuilder.buildVOByBO(principalService.getById(id))));
@@ -89,7 +97,13 @@ public class PrincipalController implements BaseController {
      */
     @PreAuthorize("@perm.can('principal', 'list')")
     @Operation(summary = "List Principals", description = "Page through principals (users and service accounts) for the current tenant. " +
-            "Accepts a PrincipalQuery body for filtering; returns a page of PrincipalVO entries for browsing or selecting a target identity.")
+            "Accepts a PrincipalQuery body for filtering; returns a page of PrincipalVO entries for browsing or selecting a target identity.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<PrincipalVO>>> list(@RequestBody(required = false) PrincipalQuery entityQuery) {
         PrincipalQuery query = Objects.isNull(entityQuery) ? new PrincipalQuery() : entityQuery;
@@ -104,7 +118,13 @@ public class PrincipalController implements BaseController {
      */
     @PreAuthorize("@perm.can('principal', 'update')")
     @Operation(summary = "Enable Principal", description = "Set a principal's enable flag to ENABLE by ID so the identity can authenticate. " +
-            "Tenant-scoped; records an ENABLE audit-log entry under the acting caller.")
+            "Tenant-scoped; records an ENABLE audit-log entry under the acting caller.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/enable")
     public Mono<R<String>> enable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return toggleEnableFlag(id, EnableFlagEnum.ENABLE);
@@ -118,7 +138,13 @@ public class PrincipalController implements BaseController {
      */
     @PreAuthorize("@perm.can('principal', 'update')")
     @Operation(summary = "Disable Principal", description = "Set a principal's enable flag to DISABLE by ID to revoke active access for that identity. " +
-            "Tenant-scoped; records a DISABLE audit-log entry under the acting caller.")
+            "Tenant-scoped; records a DISABLE audit-log entry under the acting caller.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/disable")
     public Mono<R<String>> disable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return toggleEnableFlag(id, EnableFlagEnum.DISABLE);

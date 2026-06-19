@@ -34,6 +34,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +77,13 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'get')")
     @Operation(summary = "Get MCP OAuth Metadata", description = "Fetch the OAuth authorization server metadata for the MCP runtime, "
-            + "including issuer, token and registration endpoints. Use to discover how MCP clients should authenticate.")
+            + "including issuer, token and registration endpoints. Use to discover how MCP clients should authenticate.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/metadata")
     public Mono<R<Map<String, Object>>> metadata() {
         return async(() -> R.ok(oauthMcpRuntimeService.authorizationServerMetadata()));
@@ -89,7 +97,14 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'add')")
     @Operation(summary = "Register OAuth Client", description = "Register an OAuth client owned by the current principal for MCP access. "
-            + "Returns the client id and secret; the secret is shown only once at registration time.")
+            + "Returns the client id and secret; the secret is shown only once at registration time.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/client/register")
     public Mono<R<OAuthClientRegistrationResponseDTO>> registerClient(
             @RequestBody OAuthClientRegistrationRequestDTO request) {
@@ -104,7 +119,13 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List OAuth Clients", description = "List the OAuth clients the current principal owns. "
-            + "Returns client records without secrets; use to pick a client before creating or inspecting a connection.")
+            + "Returns client records without secrets; use to pick a client before creating or inspecting a connection.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/client/list")
     public Mono<R<List<OAuthClientVO>>> listClients() {
         return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listClients(header))));
@@ -117,7 +138,13 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List MCP Connections", description = "List the MCP connections owned by the current principal. "
-            + "Each connection binds an OAuth client to a tool whitelist; use to review which clients are wired up.")
+            + "Each connection binds an OAuth client to a tool whitelist; use to review which clients are wired up.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/connection/list")
     public Mono<R<List<McpConnectionVO>>> listConnections() {
         return getPrincipalHeader()
@@ -132,7 +159,13 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'add')")
     @Operation(summary = "Create MCP Connection", description = "Create an MCP connection linking an OAuth client to an allowed tool set for the current principal. "
-            + "Returns the persisted connection record; the client must already be registered.")
+            + "Returns the persisted connection record; the client must already be registered.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/connection/add")
     public Mono<R<McpConnectionVO>> createConnection(
             @Validated(Add.class) @RequestBody McpConnectionAddVO connection) {
@@ -148,7 +181,14 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'delete')")
     @Operation(summary = "Revoke MCP Connection", description = "Revoke an MCP connection by id, severing its OAuth client from the tool whitelist. "
-            + "Only the principal that owns the connection may revoke it; returns true on success.")
+            + "Only the principal that owns the connection may revoke it; returns true on success.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/connection/revoke")
     public Mono<R<Boolean>> revokeConnection(@Parameter(description = "Primary key of the MCP connection to revoke.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -165,7 +205,13 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'update')")
     @Operation(summary = "Replace MCP Connection Tools", description = "Replace a connection's tool whitelist with the supplied tool ids, scoped to the owning principal. "
-            + "The previous whitelist is fully overwritten; returns true on success.")
+            + "The previous whitelist is fully overwritten; returns true on success.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/connection/tools/replace")
     public Mono<R<Boolean>> replaceConnectionTools(
             @Validated(Update.class) @RequestBody McpConnectionToolsReplaceVO request) {
@@ -186,7 +232,13 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List MCP Connection Tools", description = "List the tool ids a connection is currently allowed to invoke. "
-            + "Use to inspect a connection's effective whitelist before editing or revoking it.")
+            + "Use to inspect a connection's effective whitelist before editing or revoking it.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/connection/tools/list")
     public Mono<R<List<String>>> listConnectionTools(@Parameter(description = "Primary key of the MCP connection to list tools for.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listConnectionToolIds(id,
@@ -200,7 +252,13 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'update')")
     @Operation(summary = "Refresh MCP Tool Catalog", description = "Rebuild the MCP tool catalog from the registered APIs (dc3_api entries). "
-            + "Returns the number of tools refreshed; call after API registrations change so the catalog stays current.")
+            + "Returns the number of tools refreshed; call after API registrations change so the catalog stays current.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/tool/catalog/refresh")
     public Mono<R<Integer>> refreshToolCatalog() {
         return async(() -> R.ok(oauthMcpRuntimeService.refreshToolCatalog()));
@@ -214,7 +272,13 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List MCP Tool Catalog", description = "Page the MCP tool catalog with optional keyword, risk level and limit filters. "
-            + "Returns tool records exposing each tool's schema; use to browse tools before whitelisting them on a connection.")
+            + "Returns tool records exposing each tool's schema; use to browse tools before whitelisting them on a connection.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/tool/list")
     public Mono<R<List<McpToolVO>>> listToolCatalog(
             @RequestBody(required = false) McpToolCatalogQueryVO request) {
@@ -238,7 +302,13 @@ public class McpManagementController implements BaseController {
      */
     @PreAuthorize("@perm.can('mcp', 'list')")
     @Operation(summary = "List MCP Audit Log", description = "List MCP tool-call audit entries scoped to the caller's tenant, "
-            + "filterable by principal, tool, status and risk level. Returns append-only records kept for compliance review.")
+            + "filterable by principal, tool, status and risk level. Returns append-only records kept for compliance review.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/audit/list")
     public Mono<R<List<McpAuditVO>>> listAuditLog(
             @Parameter(description = "Filter by owning principal ID.", example = "2048") @RequestParam(value = "principalId", required = false) Long principalId,

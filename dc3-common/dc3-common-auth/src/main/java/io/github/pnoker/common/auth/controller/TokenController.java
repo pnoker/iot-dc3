@@ -26,6 +26,8 @@ import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.TimeUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +69,14 @@ public class TokenController implements BaseController {
     @PublicEndpoint
     @SecurityRequirements
     @Operation(summary = "Generate Token Salt", description = "Generate a random salt for a user under the given tenant, " +
-            "used to salt the password on the subsequent token-generation call. The salt expires in 5 minutes; returns it as a string.")
+            "used to salt the password on the subsequent token-generation call. The salt expires in 5 minutes; returns it as a string.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/salt")
     public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -87,7 +96,14 @@ public class TokenController implements BaseController {
     @PublicEndpoint
     @SecurityRequirements
     @Operation(summary = "Generate Token", description = "Issue an access token for a user by validating name, salt, password and tenant. " +
-            "Call after generating a salt; the returned token authenticates the user for 12 hours.")
+            "Call after generating a salt; the returned token authenticates the user for 12 hours.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -109,7 +125,14 @@ public class TokenController implements BaseController {
     @PublicEndpoint
     @SecurityRequirements
     @Operation(summary = "Change Password", description = "Change a user's password using the current password and a new one, scoped to the given tenant. " +
-            "Use during login when a token cannot be issued because the credential is expired or flagged for a mandatory change.")
+            "Use during login when a token cannot be issued because the credential is expired or flagged for a mandatory change.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/change_password")
     public Mono<R<Boolean>> changePassword(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -127,7 +150,14 @@ public class TokenController implements BaseController {
      */
     @PreAuthorize("@perm.can('token', 'delete')")
     @Operation(summary = "Cancel Token", description = "Acknowledge a client-initiated logout for the current token of the named user under the given tenant. " +
-            "Requires token:delete permission; returns true when the session is cancelled.")
+            "Requires token:delete permission; returns true when the session is cancelled.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false"),
+                    @ExtensionProperty(name = "hidden", value = "true")
+            }))
     @PostMapping("/cancel")
     public Mono<R<Boolean>> cancelToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
@@ -144,7 +174,13 @@ public class TokenController implements BaseController {
      */
     @PreAuthorize("@perm.can('token', 'get')")
     @Operation(summary = "Validate Token", description = "Check whether the supplied token for the named user and tenant is still valid. " +
-            "Requires token:get permission; returns validity plus the token's expiry time.")
+            "Requires token:get permission; returns validity plus the token's expiry time.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/check")
     public Mono<R<Boolean>> checkValid(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {

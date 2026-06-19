@@ -40,6 +40,8 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -91,7 +93,13 @@ public class RolePrincipalBindController implements BaseController {
      */
     @PreAuthorize("@perm.can('role_principal_bind', 'add')")
     @Operation(summary = "Bind Principal to Role", description = "Assign a role to a principal (user or service account) within the current tenant. " +
-            "Both the role and the principal must already belong to the tenant; returns an add-success response.")
+            "Both the role and the principal must already belong to the tenant; returns an add-success response.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RolePrincipalBindVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -113,7 +121,13 @@ public class RolePrincipalBindController implements BaseController {
      */
     @PreAuthorize("@perm.can('role_principal_bind', 'delete')")
     @Operation(summary = "Delete Role-principal Binding", description = "Remove a role-principal binding by its record ID. " +
-            "Verifies the binding belongs to the current tenant before deleting; use to revoke a role assignment.")
+            "Verifies the binding belongs to the current tenant before deleting; use to revoke a role assignment.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -134,7 +148,13 @@ public class RolePrincipalBindController implements BaseController {
      */
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
     @Operation(summary = "List Role-principal Bindings", description = "Page through role-principal bindings for the current tenant with optional query filters. " +
-            "Returns a page of bindings; use to browse which principals hold which roles.")
+            "Returns a page of bindings; use to browse which principals hold which roles.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<RolePrincipalBindVO>>> list(@RequestBody(required = false) RolePrincipalBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -152,7 +172,13 @@ public class RolePrincipalBindController implements BaseController {
      */
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
     @Operation(summary = "List Roles by Principal", description = "Return the roles assigned to one principal within the current tenant. " +
-            "Accepts a principal ID (must be a tenant member); use to see what permissions a user or service account has.")
+            "Accepts a principal ID (must be a tenant member); use to see what permissions a user or service account has.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_role_by_principal")
     public Mono<R<List<RoleVO>>> listRoleByPrincipal(@Parameter(description = "ID of the principal (user or service account) whose roles are to be listed; must be a member of the current tenant.", example = "1024") @NotNull @RequestParam(value = "principal_id") Long principalId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -170,7 +196,13 @@ public class RolePrincipalBindController implements BaseController {
      */
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
     @Operation(summary = "List Users by Role", description = "Return the human users currently bound to a role (the role must belong to the current tenant). " +
-            "Results are filtered to tenant members; use to see who holds a given role.")
+            "Results are filtered to tenant members; use to see who holds a given role.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_user_by_role")
     public Mono<R<List<UserVO>>> listUserByRole(@Parameter(description = "ID of the role whose bound users are to be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "role_id") Long roleId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

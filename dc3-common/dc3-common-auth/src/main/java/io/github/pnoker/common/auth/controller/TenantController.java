@@ -34,6 +34,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +77,13 @@ public class TenantController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('tenant', 'add')")
-    @Operation(summary = "Add Tenant", description = "Create a new tenant as the multi-tenant isolation boundary that owns its users, devices and data. Restricted to system administrators; returns the new tenant code.")
+    @Operation(summary = "Add Tenant", description = "Create a new tenant as the multi-tenant isolation boundary that owns its users, devices and data. Restricted to system administrators; returns the new tenant code.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody TenantVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -100,7 +108,13 @@ public class TenantController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('tenant', 'delete')")
-    @Operation(summary = "Delete Tenant", description = "Remove a tenant by ID, deleting the isolation boundary and its owned data. Non-administrators may delete only their own tenant.")
+    @Operation(summary = "Delete Tenant", description = "Remove a tenant by ID, deleting the isolation boundary and its owned data. Non-administrators may delete only their own tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the tenant to delete. System administrators may delete any tenant; non-administrators may only delete their own tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -121,7 +135,13 @@ public class TenantController implements BaseController {
      * @return update-success status
      */
     @PreAuthorize("@perm.can('tenant', 'update')")
-    @Operation(summary = "Update Tenant", description = "Modify a tenant's editable attributes such as name and enable flag. Non-administrators may update only their own tenant.")
+    @Operation(summary = "Update Tenant", description = "Modify a tenant's editable attributes such as name and enable flag. Non-administrators may update only their own tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody TenantVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -143,7 +163,13 @@ public class TenantController implements BaseController {
      * @return the matched TenantVO; non-administrators get not-found for any other tenant
      */
     @PreAuthorize("@perm.can('tenant', 'get')")
-    @Operation(summary = "Get Tenant by ID", description = "Fetch one tenant by its primary key. Non-administrators are scoped to their own tenant and get a not-found result for any other ID.")
+    @Operation(summary = "Get Tenant by ID", description = "Fetch one tenant by its primary key. Non-administrators are scoped to their own tenant and get a not-found result for any other ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<TenantVO>> getById(@Parameter(description = "Primary key of the tenant to retrieve. System administrators may query any tenant; non-administrators may only query their own tenant ID.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -165,7 +191,13 @@ public class TenantController implements BaseController {
      * @return the matched TenantVO, or a no-resource failure when not found or out of scope
      */
     @PreAuthorize("@perm.can('tenant', 'get')")
-    @Operation(summary = "Get Tenant by Code", description = "Look up a tenant by its unique tenant code. Non-administrators are scoped to their own tenant and receive a not-found result for any other code.")
+    @Operation(summary = "Get Tenant by Code", description = "Look up a tenant by its unique tenant code. Non-administrators are scoped to their own tenant and receive a not-found result for any other code.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_code")
     public Mono<R<TenantVO>> getByCode(@Parameter(description = "Unique business code assigned to the tenant at creation time. System administrators may query any code; non-administrators receive not-found for codes outside their own tenant.", example = "tenant-001") @NotNull @RequestParam(value = "code") String code) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -189,7 +221,13 @@ public class TenantController implements BaseController {
      * @return a page of TenantVO visible to the caller
      */
     @PreAuthorize("@perm.can('tenant', 'list')")
-    @Operation(summary = "List Tenants", description = "Page through tenants matching the query filters (tenant code, name, enable flag). System administrators see all tenants; others see only their own.")
+    @Operation(summary = "List Tenants", description = "Page through tenants matching the query filters (tenant code, name, enable flag). System administrators see all tenants; others see only their own.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<TenantVO>>> list(@RequestBody(required = false) TenantQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

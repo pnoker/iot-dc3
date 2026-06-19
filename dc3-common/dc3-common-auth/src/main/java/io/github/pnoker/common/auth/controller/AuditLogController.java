@@ -25,6 +25,8 @@ import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +72,13 @@ public class AuditLogController implements BaseController {
     @Operation(summary = "List Identity Audit Log",
             description = "List identity and authorization audit entries for the current tenant, with optional filters " +
                     "by principal, action, resource type/id and status, plus a result limit. Admin-only; returns an " +
-                    "append-only trail of who changed which identity or permission.")
+                    "append-only trail of who changed which identity or permission.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<List<IdentityAuditLogVO>>> list(
             @Parameter(description = "Filter by the identity of the principal (user or service account) who performed the action; must belong to the current tenant.", example = "1024") @RequestParam(value = "principal_id", required = false) Long principalId,
