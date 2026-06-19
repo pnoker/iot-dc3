@@ -163,4 +163,8 @@ export const layoutStubs: Record<string, ComponentOptions> = {
   ElUpload: passthrough('div', 'el-upload-stub'),
   ElPopover: passthrough('div', 'el-popover-stub'),
   ElImage: { template: '<img class="el-image-stub" />' },
+  ElProgress: passthrough('div', 'el-progress-stub'),
+  ElSlider: { template: '<input type="range" class="el-slider-stub" />' },
+  ElTimeline: passthrough('ul', 'el-timeline-stub'),
+  ElTimelineItem: { template: '<li class="el-timeline-item-stub"><slot /></li>' },
 };
