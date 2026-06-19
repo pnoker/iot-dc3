@@ -35,6 +35,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -163,10 +164,11 @@ public class OAuthController {
             }))
     @PostMapping(value = McpConstant.OAUTH2_TOKEN, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> token(
-            @RequestBody Mono<MultiValueMap<String, String>> body,
+            ServerWebExchange exchange,
             @org.springframework.web.bind.annotation.RequestHeader(
                     value = HttpHeaders.AUTHORIZATION, required = false) String authorizationHeader) {
-        return body.map(this::firstValues)
+        return exchange.getFormData()
+                .map(this::firstValues)
                 .map(form -> ResponseEntity.ok(oauthMcpRuntimeService.token(form, authorizationHeader)))
                 .onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
@@ -188,10 +190,11 @@ public class OAuthController {
             }))
     @PostMapping(value = McpConstant.OAUTH2_REVOKE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> revoke(
-            @RequestBody Mono<MultiValueMap<String, String>> body,
+            ServerWebExchange exchange,
             @org.springframework.web.bind.annotation.RequestHeader(
                     value = HttpHeaders.AUTHORIZATION, required = false) String authorizationHeader) {
-        return body.map(this::firstValues)
+        return exchange.getFormData()
+                .map(this::firstValues)
                 .map(form -> ResponseEntity.ok(oauthMcpRuntimeService.revoke(form, authorizationHeader)))
                 .onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
