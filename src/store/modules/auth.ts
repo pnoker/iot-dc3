@@ -20,9 +20,10 @@ import router from '@/config/router';
 import i18n from '@/config/i18n';
 import { ElLoading } from 'element-plus';
 
-import { cancelToken, generateSalt, generateToken } from '@/api/token';
+import { cancelToken, changePassword, generateSalt, generateToken } from '@/api/token';
 
 import { AUTH_HEADERS } from '@/config/constant/common';
+import { PASSWORD_CHANGE_CODES } from '@/config/constant/axios';
 import type { Login } from '@/config/types';
 import { getStorage, removeStorage, setStorage } from '@/utils/storageUtil';
 import { failMessage } from '@/utils/notificationUtil';
@@ -91,11 +92,26 @@ export const useAuthStore = defineStore('auth', () => {
         token: tokenRes.data,
       });
       await router.push({ name: 'home' });
-    } catch {
+    } catch (error) {
+      const code = (error as { code?: string })?.code;
+      if (code && PASSWORD_CHANGE_CODES.includes(code as never)) {
+        // Password change required / expired: surface the code so the view can
+        // open the change-password dialog instead of reporting a failed login.
+        throw error;
+      }
       failMessage(i18n.global.t('login.failed'));
     } finally {
       loading.close();
     }
+  };
+
+  const changeLoginPassword = async (form: LoginForm & { newPassword: string }) => {
+    await changePassword({
+      tenant: form.tenant,
+      name: form.name,
+      password: form.password,
+      newPassword: form.newPassword,
+    });
   };
 
   const logout = async () => {
@@ -120,6 +136,7 @@ export const useAuthStore = defineStore('auth', () => {
     getName,
     // Actions
     login,
+    changeLoginPassword,
     logout,
   };
 });

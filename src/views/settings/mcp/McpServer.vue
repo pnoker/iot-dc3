@@ -475,7 +475,7 @@
     try {
       const res = await listMcpTool({
         keyword: reactiveData.toolKeyword,
-        risk_level: reactiveData.toolRisk,
+        riskLevel: reactiveData.toolRisk,
         limit: 500,
       });
       reactiveData.tools = res.data || [];

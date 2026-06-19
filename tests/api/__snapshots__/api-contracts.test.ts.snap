@@ -3847,6 +3847,16 @@ exports[`API wrapper contracts > token > cancelToken maps to its transport contr
 }
 `;
 
+exports[`API wrapper contracts > token > changePassword maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/token/change_password",
+    undefined,
+  ],
+  "transport": "httpPost",
+}
+`;
+
 exports[`API wrapper contracts > token > checkTokenValid maps to its transport contract 1`] = `
 {
   "args": [
@@ -3880,6 +3890,7 @@ exports[`API wrapper contracts > token > generateToken maps to its transport con
 exports[`API wrapper contracts > token > has every export covered by the contract matrix 1`] = `
 [
   "cancelToken",
+  "changePassword",
   "checkTokenValid",
   "generateSalt",
   "generateToken",

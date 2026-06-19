@@ -69,16 +69,45 @@
         </div>
       </div>
     </div>
+
+    <el-dialog v-model="changePasswordVisible" :title="t('login.changePasswordTitle')" width="420px">
+      <el-alert :title="changePasswordHint" :closable="false" type="warning" show-icon class="mb-4" />
+      <el-form ref="changePasswordRef" :model="changePasswordData" :rules="changePasswordRule" label-width="0">
+        <el-form-item prop="newPassword">
+          <el-input
+            v-model="changePasswordData.newPassword"
+            :placeholder="t('login.newPasswordPlaceholder')"
+            type="password"
+            show-password
+          />
+        </el-form-item>
+        <el-form-item prop="confirmPassword">
+          <el-input
+            v-model="changePasswordData.confirmPassword"
+            :placeholder="t('login.confirmPasswordPlaceholder')"
+            type="password"
+            show-password
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button :loading="changePasswordLoading" type="primary" @click="handleChangePassword">
+          {{ t('login.changePasswordSubmit') }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, unref } from 'vue';
+  import { computed, reactive, ref, unref } from 'vue';
   import type { FormInstance, FormRules } from 'element-plus';
   import { Box, Lock, User } from '@element-plus/icons-vue';
   import { useI18n } from 'vue-i18n';
 
   import { useAuthStore } from '@/store';
+  import { PASSWORD_CHANGE_CODES } from '@/config/constant/axios';
+  import { successMessage, failMessage } from '@/utils/notificationUtil';
 
   import Particles from '@/components/particles/Particles.vue';
 
@@ -146,10 +175,77 @@
     loading.value = true;
     try {
       await authStore.login(reactiveData.formData);
-    } catch {
-      // authStore.login already shows failMessage
+    } catch (error) {
+      const code = (error as { code?: string })?.code;
+      if (code && PASSWORD_CHANGE_CODES.includes(code as never)) {
+        openChangePassword(code);
+      }
+      // other failures already surface failMessage inside authStore.login
     } finally {
       loading.value = false;
+    }
+  };
+
+  // Password change flow (mandatory change / expired password)
+  const changePasswordVisible = ref(false);
+  const changePasswordLoading = ref(false);
+  const changePasswordCode = ref('');
+  const changePasswordRef = ref<FormInstance>();
+  const changePasswordData = reactive({ newPassword: '', confirmPassword: '' });
+
+  const changePasswordHint = computed(() =>
+    changePasswordCode.value === 'R4032' ? t('login.passwordExpired') : t('login.changePasswordRequired')
+  );
+
+  const changePasswordRule = reactive<FormRules>({
+    newPassword: [
+      { required: true, message: t('login.passwordRequired'), trigger: 'blur' },
+      { min: 6, message: t('login.passwordMin'), trigger: 'blur' },
+    ],
+    confirmPassword: [
+      {
+        validator: (_rule, value, callback) =>
+          value === changePasswordData.newPassword
+            ? callback()
+            : callback(new Error(t('login.confirmPasswordMismatch'))),
+        trigger: 'blur',
+      },
+    ],
+  });
+
+  const openChangePassword = (code: string) => {
+    changePasswordCode.value = code;
+    changePasswordData.newPassword = '';
+    changePasswordData.confirmPassword = '';
+    changePasswordVisible.value = true;
+  };
+
+  const handleChangePassword = async () => {
+    const form = unref(changePasswordRef);
+    if (!form) {
+      return;
+    }
+    try {
+      await form.validate();
+    } catch {
+      return;
+    }
+    changePasswordLoading.value = true;
+    try {
+      await authStore.changeLoginPassword({
+        tenant: reactiveData.formData.tenant,
+        name: reactiveData.formData.name,
+        password: reactiveData.formData.password,
+        newPassword: changePasswordData.newPassword,
+      });
+      changePasswordVisible.value = false;
+      successMessage(t('login.changePasswordSuccess'));
+      reactiveData.formData.password = changePasswordData.newPassword;
+      await handleLogin();
+    } catch {
+      failMessage(t('login.changePasswordFailed'));
+    } finally {
+      changePasswordLoading.value = false;
     }
   };
 </script>

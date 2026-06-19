@@ -22,6 +22,8 @@ export const generateSalt = (login: Login) => httpPost(`${API_AUTH_BASE}/token/s
 
 export const generateToken = (login: Login) => httpPost(`${API_AUTH_BASE}/token/generate`, login);
 
+export const changePassword = (login: Login) => httpPost(`${API_AUTH_BASE}/token/change_password`, login);
+
 export const cancelToken = (login: Login) => httpPost(`${API_AUTH_BASE}/token/cancel`, login);
 
 export const checkTokenValid = (login: Login) => httpPost(`${API_AUTH_BASE}/token/check`, login);

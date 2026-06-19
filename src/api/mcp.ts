@@ -42,8 +42,8 @@ export const revokeMcpConnection = (id: string) =>
 
 export const replaceMcpConnectionTools = (connectionId: string, toolIds: string[]) =>
   httpPost<R<boolean>>(`${API_MCP_BASE}/connection/tools/replace`, {
-    connection_id: connectionId,
-    tool_ids: toolIds,
+    connectionId,
+    toolIds,
   });
 
 export const listMcpConnectionTool = (id: string) =>
@@ -51,7 +51,7 @@ export const listMcpConnectionTool = (id: string) =>
 
 export const refreshMcpToolCatalog = () => httpPost<R<number>>(`${API_MCP_BASE}/tool/catalog/refresh`);
 
-export const listMcpTool = (query: { keyword?: string; risk_level?: string; limit?: number } = {}) =>
+export const listMcpTool = (query: { keyword?: string; riskLevel?: string; limit?: number } = {}) =>
   httpPost<R<McpToolRecord[]>>(`${API_MCP_BASE}/tool/list`, query);
 
 export const listMcpAudit = (
@@ -62,13 +62,4 @@ export const listMcpAudit = (
     riskLevel?: string;
     limit?: number;
   } = {}
-) =>
-  httpPost<R<McpAuditRecord[]>>(`${API_MCP_BASE}/audit/list`, undefined, {
-    params: {
-      principal_id: params.principalId,
-      tool_id: params.toolId,
-      status: params.status,
-      risk_level: params.riskLevel,
-      limit: params.limit,
-    },
-  });
+) => httpPost<R<McpAuditRecord[]>>(`${API_MCP_BASE}/audit/list`, undefined, { params });

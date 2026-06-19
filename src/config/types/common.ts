@@ -21,6 +21,7 @@ export interface Login {
   salt?: string;
   password?: string;
   token?: string;
+  newPassword?: string;
 }
 
 /** Attribute information */

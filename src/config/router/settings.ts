@@ -124,6 +124,42 @@ const settingsRouter: RouteRecordRaw = {
           meta: { title: 'Command' },
         },
         {
+          name: 'settingsIdentity',
+          path: 'identity',
+          redirect: '/settings/user',
+          meta: { title: 'Identity' },
+        },
+        {
+          name: 'settingsAccess',
+          path: 'access',
+          redirect: '/settings/role',
+          meta: { title: 'Access Control' },
+        },
+        {
+          name: 'settingsEventCommand',
+          path: 'event-command',
+          redirect: '/settings/event/history',
+          meta: { title: 'Event & Command' },
+        },
+        {
+          name: 'settingsAudit',
+          path: 'audit',
+          redirect: '/settings/identity_audit',
+          meta: { title: 'Audit' },
+        },
+        {
+          name: 'settingsIntegration',
+          path: 'integration',
+          redirect: '/settings/mcp',
+          meta: { title: 'Integration' },
+        },
+        {
+          name: 'settingsSystem',
+          path: 'system',
+          redirect: '/settings/group',
+          meta: { title: 'System' },
+        },
+        {
           name: 'settingsAlarmRule',
           path: 'alarm/rule',
           meta: { title: 'Alarm Rules' },
@@ -176,26 +212,26 @@ const settingsRouter: RouteRecordRaw = {
           name: 'settingsAlarmOverview',
           path: 'alarm/overview',
           meta: { title: 'Event Overview' },
-          component: () => import('@/views/settings/event/Overview.vue'),
+          component: () => import('@/views/settings/alarm/Overview.vue'),
         },
         {
           name: 'settingsDeviceAlarm',
           path: 'alarm/device',
           meta: { title: 'Device Alarm' },
-          component: () => import('@/views/settings/event/DeviceEvent.vue'),
+          component: () => import('@/views/settings/alarm/DeviceEvent.vue'),
         },
         {
           name: 'settingsDriverAlarm',
           path: 'alarm/driver',
           meta: { title: 'Driver Alarm' },
-          component: () => import('@/views/settings/event/DriverEvent.vue'),
+          component: () => import('@/views/settings/alarm/DriverEvent.vue'),
         },
         {
           name: 'settingsPointAlarm',
           path: 'alarm/point',
           meta: { title: 'Point Events' },
 
-          component: () => import('@/views/settings/event/PointEvent.vue'),
+          component: () => import('@/views/settings/alarm/PointEvent.vue'),
         },
         {
           name: 'settingsEventHistory',

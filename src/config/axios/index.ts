@@ -18,7 +18,7 @@ import type { AxiosInstance } from 'axios';
 import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { ElNotification } from 'element-plus';
 
-import { AXIOS_CONFIG, AXIOS_ERROR_MESSAGES } from '@/config/constant/axios';
+import { AXIOS_CONFIG, AXIOS_ERROR_MESSAGES, PASSWORD_CHANGE_CODES } from '@/config/constant/axios';
 import { AUTH_HEADERS } from '@/config/constant/common';
 import { failMessage, warnMessage } from '@/utils/notificationUtil';
 import { getStorage, removeStorage } from '@/utils/storageUtil';
@@ -109,6 +109,12 @@ request.interceptors.response.use(
     // Return data if request was successful
     if (ok) {
       return response.data;
+    }
+
+    // Password change / expiry: a business outcome, not an error. Pass the payload
+    // through silently so the login flow can open the password change dialog.
+    if (PASSWORD_CHANGE_CODES.includes(response.data?.code)) {
+      return Promise.reject(response.data);
     }
 
     // Handle unauthorized access

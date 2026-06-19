@@ -32,3 +32,10 @@ export const AXIOS_ERROR_MESSAGES = {
   UNAUTHORIZED_TITLE: 'Login credentials expired',
   REQUEST_ERROR: 'API request error. Please contact the system administrator.',
 } as const;
+
+/**
+ * Business response codes the interceptor must pass through silently so the calling
+ * flow can react (e.g. drive the user to the password change dialog) instead of the
+ * generic error toast. Mirrors backend ErrorCode (R4031 change required, R4032 expired).
+ */
+export const PASSWORD_CHANGE_CODES = ['R4031', 'R4032'] as const;
