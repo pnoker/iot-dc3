@@ -28,6 +28,7 @@ import type { PrincipalRecord } from '@/config/types';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
+import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 
 const PRINCIPAL_TYPE_OPTIONS = [
   { label: 'USER', value: 'USER' },
@@ -40,6 +41,7 @@ export default defineComponent({
   components: {
     BlankCard,
     ToolCard,
+    EnableFlagSegmented,
   },
   setup() {
     const { t } = useI18n();
