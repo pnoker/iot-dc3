@@ -29,6 +29,8 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +72,13 @@ public class SessionController implements BaseController {
      */
     @PreAuthorize("@perm.can('session', 'list')")
     @Operation(summary = "List Sessions", description = "Page through the current user's AI chat sessions for this tenant. " +
-            "Returns a page of session summaries; use to resume or browse past conversations.")
+            "Returns a page of session summaries; use to resume or browse past conversations.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<SessionVO>>> list(@RequestBody(required = false) SessionQuery query) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -92,7 +100,13 @@ public class SessionController implements BaseController {
      */
     @PreAuthorize("@perm.can('session', 'get')")
     @Operation(summary = "Get Session", description = "Fetch a single AI chat session by its conversation id, scoped to the current user and tenant. " +
-            "Returns the session details, or a failure when no matching session exists.")
+            "Returns the session details, or a failure when no matching session exists.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_conversation_id")
     public Mono<R<SessionVO>> get(@Parameter(description = "Unique conversation identifier scoped to the current user and tenant; use the value returned when the session was created.", example = "conv-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -115,7 +129,13 @@ public class SessionController implements BaseController {
      */
     @PreAuthorize("@perm.can('session', 'delete')")
     @Operation(summary = "Delete Session", description = "Permanently delete an AI chat session and its message history by conversation id, scoped to the current user and tenant. " +
-            "Use to discard a conversation; this cannot be undone.")
+            "Use to discard a conversation; this cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<Boolean>> delete(@Parameter(description = "Unique conversation identifier scoped to the current user and tenant; identifies the session to permanently delete along with its message history.", example = "conv-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -134,7 +154,13 @@ public class SessionController implements BaseController {
      */
     @PreAuthorize("@perm.can('session', 'update')")
     @Operation(summary = "Update Session", description = "Update editable fields of an AI chat session identified by conversation id, scoped to the current user and tenant. " +
-            "Use to rename or adjust a session; returns the updated session, or a failure when it does not exist.")
+            "Use to rename or adjust a session; returns the updated session, or a failure when it does not exist.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<SessionVO>> update(@Parameter(description = "Unique conversation identifier scoped to the current user and tenant; identifies the session whose editable fields (e.g. name) are to be updated.", example = "conv-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                      @RequestBody(required = false) SessionVO request) {

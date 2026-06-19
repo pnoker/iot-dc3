@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.entity.dto;
 
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,11 +42,13 @@ public class ChatMessageDTO {
      * {@link AgenticConstant.Chat#ROLE_ASSISTANT}, or
      * {@link AgenticConstant.Chat#ROLE_TOOL}.
      */
+    @Schema(description = "Role of the message sender: system, user, assistant, or tool.", example = "user")
     private String role;
 
     /**
      * Message content text.
      */
+    @Schema(description = "Text content of the message for this conversation turn.", example = "What is the current temperature of sensor 1024?")
     private String content;
 
 }

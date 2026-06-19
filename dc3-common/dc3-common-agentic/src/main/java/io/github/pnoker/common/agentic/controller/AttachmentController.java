@@ -26,6 +26,8 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +69,13 @@ public class AttachmentController implements BaseController {
      */
     @PreAuthorize("@perm.can('attachment', 'list')")
     @Operation(summary = "Upload Attachment", description = "Upload a file as an attachment to the given AI conversation for the current tenant and user. " +
-            "Returns the stored attachment metadata; the file then becomes available as context the assistant can reference in that conversation.")
+            "Returns the stored attachment metadata; the file then becomes available as context the assistant can reference in that conversation.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/upload")
     public Mono<R<AttachmentVO>> upload(@Parameter(description = "Unique identifier of the AI conversation to attach the file to; must belong to the current tenant and user.", example = "conv-20240101-abcde") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                         @RequestPart("file") Mono<FilePart> filePart) {
@@ -90,7 +98,13 @@ public class AttachmentController implements BaseController {
      */
     @PreAuthorize("@perm.can('attachment', 'list')")
     @Operation(summary = "List Attachments", description = "List the attachments uploaded to the given AI conversation, scoped to the current tenant and user. " +
-            "Returns attachment metadata entries; use to discover files the assistant can reference in that conversation.")
+            "Returns attachment metadata entries; use to discover files the assistant can reference in that conversation.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list")
     public Mono<R<List<AttachmentVO>>> list(@Parameter(description = "Unique identifier of the AI conversation whose attachments should be listed; must belong to the current tenant and user.", example = "conv-20240101-abcde") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {

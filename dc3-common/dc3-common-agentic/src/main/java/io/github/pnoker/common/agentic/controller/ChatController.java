@@ -22,6 +22,8 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -64,7 +66,13 @@ public class ChatController implements BaseController {
      */
     @PreAuthorize("@perm.can('chat', 'list')")
     @Operation(summary = "Create Chat Completion", description = "Submit a chat prompt with conversation context and receive the assistant reply using the OpenAI-compatible completion format. "
-            + "When the request sets stream=true the reply is streamed token by token over SSE; otherwise it returns the full reply as a single JSON response.")
+            + "When the request sets stream=true the reply is streamed token by token over SSE; otherwise it returns the full reply as a single JSON response.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "true")
+            }))
     @PostMapping("/completions")
     public Mono<ResponseEntity<?>> chatCompletion(@RequestBody ChatCompletionRequestVO request) {
         return getPrincipalHeader().flatMap(header -> {

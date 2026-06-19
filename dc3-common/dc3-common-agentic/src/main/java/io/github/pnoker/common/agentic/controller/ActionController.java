@@ -27,6 +27,8 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +67,13 @@ public class ActionController implements BaseController {
      */
     @PreAuthorize("@perm.can('action', 'get')")
     @Operation(summary = "List Pending Agent Actions", description = "List agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. " +
-            "Returns each pending action with its tool name and parameters so the user can confirm or reject before execution.")
+            "Returns each pending action with its tool name and parameters so the user can confirm or reject before execution.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/pending")
     public Mono<R<List<ActionVO>>> pending(@Parameter(description = "Unique identifier of the agentic conversation whose pending tool calls are to be listed; scoped to the current tenant and user.", example = "conv-20240618-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -86,7 +94,13 @@ public class ActionController implements BaseController {
      */
     @PreAuthorize("@perm.can('action', 'list')")
     @Operation(summary = "Confirm Agent Action", description = "Approve a pending agent tool call by id so the assistant may execute it. " +
-            "Returns the action with its updated confirmed status; call after the user accepts a proposed tool invocation.")
+            "Returns the action with its updated confirmed status; call after the user accepts a proposed tool invocation.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/confirm")
     public Mono<R<ActionVO>> confirm(@Parameter(description = "Unique identifier of the pending agent tool call to approve; the action must belong to the current tenant and be in pending state.", example = "action-20240618-xyz789") @NotBlank @RequestParam(value = "action_id") String actionId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -105,7 +119,13 @@ public class ActionController implements BaseController {
      */
     @PreAuthorize("@perm.can('action', 'list')")
     @Operation(summary = "Reject Agent Action", description = "Decline a pending agent tool call by id so the assistant does not execute it. " +
-            "Returns the action with its updated rejected status; call when the user denies a proposed tool invocation.")
+            "Returns the action with its updated rejected status; call when the user denies a proposed tool invocation.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/reject")
     public Mono<R<ActionVO>> reject(@Parameter(description = "Unique identifier of the pending agent tool call to decline; the action must belong to the current tenant and be in pending state.", example = "action-20240618-xyz789") @NotBlank @RequestParam(value = "action_id") String actionId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {

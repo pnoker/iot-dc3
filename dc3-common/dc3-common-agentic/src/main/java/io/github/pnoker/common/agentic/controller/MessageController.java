@@ -26,6 +26,8 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +65,13 @@ public class MessageController implements BaseController {
      */
     @PreAuthorize("@perm.can('message', 'list')")
     @Operation(summary = "List Session Messages", description = "List the ordered message history of one AI chat session for the current user and tenant. " +
-            "Returns each turn (user prompts and assistant replies) in chronological order; use to read or resume a past conversation.")
+            "Returns each turn (user prompts and assistant replies) in chronological order; use to read or resume a past conversation.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list")
     public Mono<R<List<MessageVO>>> list(@Parameter(description = "Client-visible conversation identifier scoped to the current user and tenant; used to retrieve the full message history of one chat session.", example = "conv-20240101-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
         return getPrincipalHeader().flatMap(header -> async(() -> {

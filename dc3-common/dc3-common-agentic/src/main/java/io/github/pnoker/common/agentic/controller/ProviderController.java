@@ -27,6 +27,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +67,13 @@ public class ProviderController implements BaseController {
      * @return a list of ModelProviderVO entries with id, name, base URL and capability spec
      */
     @PreAuthorize("@perm.can('provider', 'list')")
-    @Operation(summary = "List Model Providers", description = "List the upstream LLM providers configured for the current tenant. Returns each provider's id, name, base URL and capability spec; use to choose a provider when creating a model configuration.")
+    @Operation(summary = "List Model Providers", description = "List the upstream LLM providers configured for the current tenant. Returns each provider's id, name, base URL and capability spec; use to choose a provider when creating a model configuration.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list")
     public Mono<R<List<ModelProviderVO>>> list() {
         return async(() -> R.ok(modelProviderBuilder.buildVOListByBOList(modelProviderService.list())));
@@ -79,7 +87,13 @@ public class ProviderController implements BaseController {
      */
     @PreAuthorize("@perm.can('provider', 'add')")
     @Operation(summary = "Add Model Provider", description = "Register a new upstream LLM provider for the current tenant with its base URL, credentials and capability spec. "
-            + "Returns the created provider; reference it afterwards when defining model configurations.")
+            + "Returns the created provider; reference it afterwards when defining model configurations.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/config/add")
     public Mono<R<ModelProviderVO>> add(@Validated(Add.class) @RequestBody ModelProviderVO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -96,7 +110,13 @@ public class ProviderController implements BaseController {
      */
     @PreAuthorize("@perm.can('provider', 'update')")
     @Operation(summary = "Update Model Provider", description = "Update an existing LLM provider for the current tenant, changing its base URL, credentials or capability spec. "
-            + "Returns the updated provider; the target must belong to the current tenant.")
+            + "Returns the updated provider; the target must belong to the current tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/config/update")
     public Mono<R<ModelProviderVO>> update(@Validated(Update.class) @RequestBody ModelProviderVO request) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
@@ -113,7 +133,13 @@ public class ProviderController implements BaseController {
      */
     @PreAuthorize("@perm.can('provider', 'delete')")
     @Operation(summary = "Delete Model Provider", description = "Permanently remove an LLM provider from the current tenant by id. "
-            + "Returns true on success; model configurations bound to this provider will no longer resolve, so call only when the provider is unused.")
+            + "Returns true on success; model configurations bound to this provider will no longer resolve, so call only when the provider is unused.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/config/delete")
     public Mono<R<Boolean>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return async(() -> {
