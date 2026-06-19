@@ -78,7 +78,7 @@ public class ProfileQuery implements Serializable {
     /**
      * Type
      */
-    @Schema(description = "Profile share flag enum")
+    @Schema(description = "Filter by profile share scope: TENANT (shared within tenant), DRIVER (shared under driver), or USER (shared under user).", example = "TENANT")
     private ProfileShareTypeEnum profileShareFlag;
 
     /**

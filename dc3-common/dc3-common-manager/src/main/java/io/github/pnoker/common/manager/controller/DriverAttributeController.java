@@ -33,6 +33,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +81,13 @@ public class DriverAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver_attribute', 'add')")
     @Operation(summary = "Add Driver Attribute", description = "Define a new driver attribute for the current tenant. A driver attribute is a configurable field " +
-            "declared on a driver (name, code, type, default value) that driver instances supply a concrete value for; returns the new attribute ID.")
+            "declared on a driver (name, code, type, default value) that driver instances supply a concrete value for; returns the new attribute ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -98,7 +106,13 @@ public class DriverAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver_attribute', 'delete')")
     @Operation(summary = "Delete Driver Attribute", description = "Permanently delete a driver attribute by ID (tenant-scoped). Removes the attribute definition for its " +
-            "driver; the action cannot be undone.")
+            "driver; the action cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -116,7 +130,13 @@ public class DriverAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver_attribute', 'update')")
     @Operation(summary = "Update Driver Attribute", description = "Update an existing driver attribute (tenant-scoped). Modifies the field definition's name, code, type, " +
-            "default value or enable flag on its driver.")
+            "default value or enable flag on its driver.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -136,7 +156,13 @@ public class DriverAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver_attribute', 'get')")
     @Operation(summary = "Get Driver Attribute by ID", description = "Fetch one driver attribute by ID (tenant-scoped). Use to inspect a driver's configurable field " +
-            "definition such as its type and default value before configuring driver attribute values.")
+            "definition such as its type and default value before configuring driver attribute values.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<DriverAttributeVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -154,7 +180,13 @@ public class DriverAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver_attribute', 'list')")
     @Operation(summary = "List Driver Attributes by Driver ID", description = "Return every driver attribute declared on a given driver (tenant-scoped). Use to discover which " +
-            "configurable fields a driver exposes; returns an empty list when the driver does not exist.")
+            "configurable fields a driver exposes; returns an empty list when the driver does not exist.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_driver_id")
     public Mono<R<List<DriverAttributeVO>>> listByDriverId(@Parameter(description = "Identifier of the driver whose declared attributes are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -177,7 +209,13 @@ public class DriverAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver_attribute', 'list')")
     @Operation(summary = "List Driver Attributes", description = "Page through driver attributes for the current tenant with filters such as name, code and driver. Returns a " +
-            "page of driver attributes; use for browsing or selecting a target attribute.")
+            "page of driver attributes; use for browsing or selecting a target attribute.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<DriverAttributeVO>>> list(@RequestBody(required = false) DriverAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

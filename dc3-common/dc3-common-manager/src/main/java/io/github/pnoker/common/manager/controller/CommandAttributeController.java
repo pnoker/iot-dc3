@@ -33,6 +33,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +81,13 @@ public class CommandAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('command_attribute', 'add')")
     @Operation(summary = "Add Command Attribute", description = "Declare a new command attribute field on a profile template. " +
-            "A command attribute is a configurable field definition of a downward control instruction; returns the new attribute ID.")
+            "A command attribute is a configurable field definition of a downward control instruction; returns the new attribute ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -98,7 +106,13 @@ public class CommandAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('command_attribute', 'delete')")
     @Operation(summary = "Delete Command Attribute", description = "Permanently delete a command attribute field definition by ID (tenant-scoped). " +
-            "Removes the field from its parent command; the action cannot be undone.")
+            "Removes the field from its parent command; the action cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -116,7 +130,13 @@ public class CommandAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('command_attribute', 'update')")
     @Operation(summary = "Update Command Attribute", description = "Modify an existing command attribute field definition (tenant-scoped). " +
-            "Use to rename or change the type/default of a field declared on a command in the profile template.")
+            "Use to rename or change the type/default of a field declared on a command in the profile template.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -136,7 +156,13 @@ public class CommandAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('command_attribute', 'get')")
     @Operation(summary = "Get Command Attribute by ID", description = "Fetch one command attribute field definition by ID (tenant-scoped). " +
-            "Returns the attribute's name, type and default value as declared on its parent command.")
+            "Returns the attribute's name, type and default value as declared on its parent command.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<CommandAttributeVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -154,7 +180,13 @@ public class CommandAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('command_attribute', 'list')")
     @Operation(summary = "List Command Attributes by Driver ID", description = "Return every command attribute exposed by the commands of devices driven by a given driver (tenant-scoped). " +
-            "Use to enumerate which configurable command fields a driver-type adapter can send; returns an empty list when the driver is not found.")
+            "Use to enumerate which configurable command fields a driver-type adapter can send; returns an empty list when the driver is not found.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_driver_id")
     public Mono<R<List<CommandAttributeVO>>> listByDriverId(@Parameter(description = "Identifier of the driver whose command attributes are enumerated; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -177,7 +209,13 @@ public class CommandAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('command_attribute', 'list')")
     @Operation(summary = "List Command Attributes", description = "Page through command attribute field definitions for the current tenant with query filters. " +
-            "Returns a page of attributes; use for browsing command fields or selecting a target attribute to inspect or edit.")
+            "Returns a page of attributes; use for browsing command fields or selecting a target attribute to inspect or edit.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<CommandAttributeVO>>> list(@RequestBody(required = false) CommandAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

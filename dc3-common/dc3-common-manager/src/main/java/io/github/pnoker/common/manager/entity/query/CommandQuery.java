@@ -67,11 +67,11 @@ public class CommandQuery implements Serializable {
 
     private String commandCode;
 
-    @Schema(description = "command type")
+    @Schema(description = "Filter by command type: READ (fetch data from device) or WRITE (send data to device).", example = "READ")
 
     private CommandTypeEnum commandType;
 
-    @Schema(description = "call type")
+    @Schema(description = "Filter by call type: SYNC (wait for response) or ASYNC (fire and forget).", example = "SYNC")
 
     private CallTypeEnum callType;
 

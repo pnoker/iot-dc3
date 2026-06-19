@@ -170,7 +170,8 @@ test:
 validate-annotations:
 	@echo "Running x-dc3-ai annotation gate (allowlisted service modules)..."
 	$(MVN) -q -pl dc3-common/dc3-common-resource-registrar test -Dtest=ControllerAnnotationGateTest
-	@echo "Allowlist is empty until a service batch adds its own *AnnotationGateTest; add its -pl/-Dtest here."
+	$(MVN) -q -pl dc3-common/dc3-common-manager -am test -Dtest=ManagerAnnotationGateTest -Dsurefire.failIfNoSpecifiedTests=false
+	@echo "Allowlisted: manager. Add the next service's gate (-pl/-Dtest) here as its batch completes."
 
 test-it:
 	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify

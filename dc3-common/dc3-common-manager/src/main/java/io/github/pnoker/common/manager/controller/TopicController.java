@@ -25,6 +25,8 @@ import io.github.pnoker.common.manager.entity.query.TopicQuery;
 import io.github.pnoker.common.manager.entity.vo.TopicVO;
 import io.github.pnoker.common.manager.service.TopicService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +64,13 @@ public class TopicController implements BaseController {
      */
     @PreAuthorize("@perm.can('topic', 'list')")
     @Operation(summary = "List Topics", description = "Page through broker topics mapped to their device and point for the current tenant. " +
-            "Filter by topic name or device name to resolve which device and point a message topic is bound to; returns a page of topic bindings.")
+            "Filter by topic name or device name to resolve which device and point a message topic is bound to; returns a page of topic bindings.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<TopicVO>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

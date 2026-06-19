@@ -36,6 +36,8 @@ import io.github.pnoker.common.valid.Update;
 import io.github.pnoker.common.valid.Upload;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -94,7 +96,13 @@ public class DeviceController implements BaseController {
      */
     @PreAuthorize("@perm.can('device', 'add')")
     @Operation(summary = "Add Device", description = "Register a new IoT device for the current tenant. " +
-            "A device is a physical or virtual data source that collects point values through a driver; returns the device ID.")
+            "A device is a physical or virtual data source that collects point values through a driver; returns the device ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -113,7 +121,13 @@ public class DeviceController implements BaseController {
      */
     @PreAuthorize("@perm.can('device', 'delete')")
     @Operation(summary = "Delete Device", description = "Permanently delete a device by ID (tenant-scoped). " +
-            "Removes the device and its point-value configuration while preserving collected history; the action cannot be undone.")
+            "Removes the device and its point-value configuration while preserving collected history; the action cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -131,7 +145,13 @@ public class DeviceController implements BaseController {
      */
     @PreAuthorize("@perm.can('device', 'update')")
     @Operation(summary = "Update Device", description = "Modify an existing device's attributes such as name, profile, " +
-            "driver and connection settings. Tenant ownership is verified before applying the update.")
+            "driver and connection settings. Tenant ownership is verified before applying the update.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -151,7 +171,13 @@ public class DeviceController implements BaseController {
      */
     @PreAuthorize("@perm.can('device', 'get')")
     @Operation(summary = "Get Device by ID", description = "Fetch one device with its bound profile, driver " +
-            "and connection attributes. Use to inspect a device before sending commands or reading its point values.")
+            "and connection attributes. Use to inspect a device before sending commands or reading its point values.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<DeviceVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -169,7 +195,13 @@ public class DeviceController implements BaseController {
      */
     @PreAuthorize("@perm.can('device', 'list')")
     @Operation(summary = "List Devices by IDs", description = "Resolve a batch of device IDs to their details for the current tenant. " +
-            "Returns a map of device ID to device VO; IDs the tenant does not own are filtered out, so treat missing keys as not-found.")
+            "Returns a map of device ID to device VO; IDs the tenant does not own are filtered out, so treat missing keys as not-found.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, DeviceVO>>> listByIds(@RequestBody List<Long> deviceIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -188,7 +220,13 @@ public class DeviceController implements BaseController {
      */
     @PreAuthorize("@perm.can('device', 'list')")
     @Operation(summary = "List Devices by Profile ID", description = "Return every device that instantiates a given profile template (tenant-scoped). " +
-            "Use to find which devices share the same point, command and event definitions.")
+            "Use to find which devices share the same point, command and event definitions.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<DeviceVO>>> listByProfileId(@Parameter(description = "Identifier of the profile template whose instantiated devices are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -206,7 +244,13 @@ public class DeviceController implements BaseController {
      */
     @PreAuthorize("@perm.can('device', 'list')")
     @Operation(summary = "List Devices", description = "Page through devices for the current tenant with filters such as name, " +
-            "profile, driver and enable flag. Returns a page of devices; use for browsing or selecting a target device.")
+            "profile, driver and enable flag. Returns a page of devices; use for browsing or selecting a target device.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<DeviceVO>>> list(@RequestBody(required = false) DeviceQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -227,7 +271,13 @@ public class DeviceController implements BaseController {
      */
     @PreAuthorize("@perm.can('device', 'add')")
     @Operation(summary = "Import Devices", description = "Bulk-create devices for the current tenant by uploading an XLSX file " +
-            "(max 20 MB) shaped by the import template; each row becomes a device under the supplied profile and driver.")
+            "(max 20 MB) shaped by the import template; each row becomes a device under the supplied profile and driver.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/import")
     public Mono<R<String>> importDevice(@Validated(Upload.class) DeviceVO entityVO,
                                         @RequestPart("file") Mono<FilePart> filePart) {
@@ -261,7 +311,13 @@ public class DeviceController implements BaseController {
      */
     @PreAuthorize("@perm.can('device', 'list')")
     @Operation(summary = "Download Device Import Template", description = "Generate and download the XLSX template used for bulk device import, " +
-            "pre-shaped for the supplied profile and driver. Fill it in and upload it to the import endpoint.")
+            "pre-shaped for the supplied profile and driver. Fill it in and upload it to the import endpoint.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/export/import_template")
     public Mono<ResponseEntity<Resource>> importTemplate(@Validated(Upload.class) @RequestBody DeviceVO entityVO) {
         return getTenantId().flatMap(tenantId -> Mono.fromCallable(() -> {
@@ -280,7 +336,13 @@ public class DeviceController implements BaseController {
      */
     @PreAuthorize("@perm.can('device', 'list')")
     @Operation(summary = "Count Devices by Driver", description = "Return how many devices for the current tenant are driven by a given driver. " +
-            "Use for quick cardinality checks before reconfiguring a driver; the driver must belong to the tenant.")
+            "Use for quick cardinality checks before reconfiguring a driver; the driver must belong to the tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_count_by_driver_id")
     public Mono<R<Integer>> getCountByDriverId(@Parameter(description = "Identifier of the driver whose device count is returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {

@@ -38,6 +38,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -87,7 +89,13 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'add')")
     @Operation(summary = "Add Point Attribute Configuration", description = "Set the configured value of a point attribute on a specific device-point pair for the current tenant. " +
-            "A point attribute config is the concrete value of a field declared on the profile template; returns the new config ID.")
+            "A point attribute config is the concrete value of a field declared on the profile template; returns the new config ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -106,7 +114,13 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'delete')")
     @Operation(summary = "Delete Point Attribute Configuration", description = "Permanently delete a point attribute config by ID (tenant-scoped). " +
-            "Removes the configured value bound to a device-point pair; the action cannot be undone.")
+            "Removes the configured value bound to a device-point pair; the action cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -124,7 +138,13 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'update')")
     @Operation(summary = "Update Point Attribute Configuration", description = "Change the configured value of an existing point attribute config (tenant-scoped). " +
-            "Use to revise how a specific device-point pair reads or writes a point attribute through its driver.")
+            "Use to revise how a specific device-point pair reads or writes a point attribute through its driver.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -144,7 +164,13 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
     @Operation(summary = "Get Point Attribute Configuration by ID", description = "Fetch one point attribute config by its record ID (tenant-scoped). " +
-            "Use to inspect the configured value bound to a device-point pair before updating or deleting it.")
+            "Use to inspect the configured value bound to a device-point pair before updating or deleting it.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<PointAttributeConfigVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -164,7 +190,13 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
     @Operation(summary = "Get Point Attribute Configuration by Attribute, Device, and Point IDs", description = "Fetch the single config that applies one point attribute to a specific device-point pair. " +
-            "Look up by the (attribute, device, point) tuple; returns the configured value for that exact binding.")
+            "Look up by the (attribute, device, point) tuple; returns the configured value for that exact binding.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_attribute_id_and_device_id_and_point_id")
     public Mono<R<PointAttributeConfigVO>> getByAttributeIdAndDeviceIdAndPointId(
             @Parameter(description = "Identifier of the point attribute definition whose configured value is being looked up; must belong to the current tenant's driver.", example = "1024") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
@@ -189,7 +221,13 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
     @Operation(summary = "List Point Attribute Configurations by Device and Point IDs", description = "Return every point attribute config bound to one device-point pair (tenant-scoped). " +
-            "Use to see all configured attribute values that govern how that point is read or written on the device.")
+            "Use to see all configured attribute values that govern how that point is read or written on the device.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_device_id_and_point_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceIdAndPointId(
             @Parameter(description = "Identifier of the device whose point configs are listed; must belong to the current tenant.", example = "2048") @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -211,7 +249,13 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
     @Operation(summary = "List Point Attribute Configurations by Device ID", description = "Return every point attribute config for one device across all its points (tenant-scoped). " +
-            "Returns a flat list; use to review the full configuration surface of a device at once.")
+            "Returns a flat list; use to review the full configuration surface of a device at once.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_device_id")
     public Mono<R<List<PointAttributeConfigVO>>> listByDeviceId(
             @Parameter(description = "Identifier of the device whose point attribute configs are listed; must belong to the current tenant.", example = "2048") @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -232,7 +276,13 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
     @Operation(summary = "List Point Attribute Configurations", description = "Page through point attribute configs for the current tenant with query filters. " +
-            "Returns a page of configs; use for browsing or locating a config when the device or point binding is unknown.")
+            "Returns a page of configs; use for browsing or locating a config when the device or point binding is unknown.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<PointAttributeConfigVO>>> list(
             @RequestBody(required = false) PointAttributeConfigQuery entityQuery) {

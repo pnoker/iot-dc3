@@ -36,6 +36,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +83,13 @@ public class GroupBindController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('group_bind', 'add')")
-    @Operation(summary = "Add Group Binding", description = "Attach a tenant entity (device, driver, point, etc.) to a group. The entity's type must match the group's type and ownership is tenant-scoped; returns the new binding ID.")
+    @Operation(summary = "Add Group Binding", description = "Attach a tenant entity (device, driver, point, etc.) to a group. The entity's type must match the group's type and ownership is tenant-scoped; returns the new binding ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -100,7 +108,13 @@ public class GroupBindController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('group_bind', 'delete')")
-    @Operation(summary = "Delete Group Binding", description = "Remove a group-to-entity binding by ID (tenant-scoped). Detaches the entity from the group without deleting the group or the entity.")
+    @Operation(summary = "Delete Group Binding", description = "Remove a group-to-entity binding by ID (tenant-scoped). Detaches the entity from the group without deleting the group or the entity.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -117,7 +131,13 @@ public class GroupBindController implements BaseController {
      * @return update-success status
      */
     @PreAuthorize("@perm.can('group_bind', 'update')")
-    @Operation(summary = "Update Group Binding", description = "Change the group or entity referenced by an existing binding (tenant-scoped). The new entity's type must still match the target group's type.")
+    @Operation(summary = "Update Group Binding", description = "Change the group or entity referenced by an existing binding (tenant-scoped). The new entity's type must still match the target group's type.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -137,7 +157,13 @@ public class GroupBindController implements BaseController {
      * @return the matched GroupBindVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('group_bind', 'get')")
-    @Operation(summary = "Get Group Binding by ID", description = "Fetch one group binding by ID (tenant-scoped). Returns the group ID, entity type and entity ID of the association; use to inspect a specific link before editing or removing it.")
+    @Operation(summary = "Get Group Binding by ID", description = "Fetch one group binding by ID (tenant-scoped). Returns the group ID, entity type and entity ID of the association; use to inspect a specific link before editing or removing it.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<GroupBindVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -154,7 +180,13 @@ public class GroupBindController implements BaseController {
      * @return a page of GroupBindVO matching the query
      */
     @PreAuthorize("@perm.can('group_bind', 'list')")
-    @Operation(summary = "List Group Bindings", description = "Page through group bindings for the current tenant, optionally filtered by group ID, entity type or entity ID. Returns a page of bindings; use to enumerate the members of a group or the groups an entity belongs to.")
+    @Operation(summary = "List Group Bindings", description = "Page through group bindings for the current tenant, optionally filtered by group ID, entity type or entity ID. Returns a page of bindings; use to enumerate the members of a group or the groups an entity belongs to.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<GroupBindVO>>> list(@RequestBody(required = false) GroupBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

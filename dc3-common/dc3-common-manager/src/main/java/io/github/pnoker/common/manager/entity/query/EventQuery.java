@@ -67,11 +67,11 @@ public class EventQuery implements Serializable {
 
     private String eventCode;
 
-    @Schema(description = "event type")
+    @Schema(description = "Filter by event type: INFO (informational), ALERT (requires attention), FAULT (malfunction), or LIFECYCLE (state transition).", example = "ALERT")
 
     private EventTypeFlagEnum eventType;
 
-    @Schema(description = "event level")
+    @Schema(description = "Filter by event severity level: LOW, MEDIUM, HIGH, or CRITICAL.", example = "HIGH")
 
     private EventLevelEnum eventLevel;
 

@@ -38,6 +38,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +88,13 @@ public class EventAttributeConfigController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'add')")
-    @Operation(summary = "Add Event Attribute Configuration", description = "Set the configured value of one event attribute field for a specific device and event under the current tenant. Use to override the attribute definition declared on the profile template for that device instance; returns the new config ID.")
+    @Operation(summary = "Add Event Attribute Configuration", description = "Set the configured value of one event attribute field for a specific device and event under the current tenant. Use to override the attribute definition declared on the profile template for that device instance; returns the new config ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -104,7 +112,13 @@ public class EventAttributeConfigController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'delete')")
-    @Operation(summary = "Delete Event Attribute Configuration", description = "Permanently delete one event attribute configuration by ID (tenant-scoped). Removes the device's configured value for that attribute while leaving the attribute definition on the profile template intact; the action cannot be undone.")
+    @Operation(summary = "Delete Event Attribute Configuration", description = "Permanently delete one event attribute configuration by ID (tenant-scoped). Removes the device's configured value for that attribute while leaving the attribute definition on the profile template intact; the action cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -121,7 +135,13 @@ public class EventAttributeConfigController implements BaseController {
      * @return update-success status
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'update')")
-    @Operation(summary = "Update Event Attribute Configuration", description = "Change the configured value of an existing event attribute field for a specific device and event under the current tenant. Tenant ownership of the record is verified before applying the update.")
+    @Operation(summary = "Update Event Attribute Configuration", description = "Change the configured value of an existing event attribute field for a specific device and event under the current tenant. Tenant ownership of the record is verified before applying the update.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventAttributeConfigVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -140,7 +160,13 @@ public class EventAttributeConfigController implements BaseController {
      * @return the matched EventAttributeConfigVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
-    @Operation(summary = "Get Event Attribute Configuration by ID", description = "Fetch one event attribute configuration by its record ID (tenant-scoped). Use to inspect the configured value a device uses for a single event attribute field.")
+    @Operation(summary = "Get Event Attribute Configuration by ID", description = "Fetch one event attribute configuration by its record ID (tenant-scoped). Use to inspect the configured value a device uses for a single event attribute field.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<EventAttributeConfigVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -162,7 +188,13 @@ public class EventAttributeConfigController implements BaseController {
     @Operation(summary = "Get Event Attribute Configuration by Attribute, Device, and Event IDs",
             description = "Fetch the configured value of one event attribute field for a specific device, event, " +
                     "and attribute. Validates that the device's profile matches the event and its driver matches " +
-                    "the attribute before returning; use when you need a single attribute's device-specific override.")
+                    "the attribute before returning; use when you need a single attribute's device-specific override.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_attribute_id_and_device_id_and_event_id")
     public Mono<R<EventAttributeConfigVO>> getByAttributeIdAndDeviceIdAndEventId(
             @Parameter(description = "Identifier of the event attribute whose configured value is being fetched; its driver must match the device's driver.", example = "1024") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
@@ -186,7 +218,13 @@ public class EventAttributeConfigController implements BaseController {
      * @return a list of EventAttributeConfigVO for the device-event pair
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "List Event Attribute Configurations by Device and Event IDs", description = "Return every event attribute configuration for one device and one event (tenant-scoped). Use to read all configured values the device supplies for that event's attributes; the device's profile must match the event.")
+    @Operation(summary = "List Event Attribute Configurations by Device and Event IDs", description = "Return every event attribute configuration for one device and one event (tenant-scoped). Use to read all configured values the device supplies for that event's attributes; the device's profile must match the event.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_device_id_and_event_id")
     public Mono<R<List<EventAttributeConfigVO>>> listByDeviceIdAndEventId(
             @Parameter(description = "Identifier of the device whose configurations are listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId,
@@ -207,7 +245,13 @@ public class EventAttributeConfigController implements BaseController {
      * @return a list of EventAttributeConfigVO set on the device
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "List Event Attribute Configurations by Device ID", description = "Return every event attribute configuration for one device across all of its events (tenant-scoped). Use to read the full set of configured event-attribute values a device uses.")
+    @Operation(summary = "List Event Attribute Configurations by Device ID", description = "Return every event attribute configuration for one device across all of its events (tenant-scoped). Use to read the full set of configured event-attribute values a device uses.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_device_id")
     public Mono<R<List<EventAttributeConfigVO>>> listByDeviceId(
             @Parameter(description = "Identifier of the device whose configurations are listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
@@ -227,7 +271,13 @@ public class EventAttributeConfigController implements BaseController {
      * @return a page of EventAttributeConfigVO matching the query
      */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "List Event Attribute Configurations", description = "Page through event attribute configurations for the current tenant with filters from the query body. Returns a page of configurations; use for browsing or selecting a target configuration.")
+    @Operation(summary = "List Event Attribute Configurations", description = "Page through event attribute configurations for the current tenant with filters from the query body. Returns a page of configurations; use for browsing or selecting a target configuration.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<EventAttributeConfigVO>>> list(
             @RequestBody(required = false) EventAttributeConfigQuery entityQuery) {

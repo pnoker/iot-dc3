@@ -79,7 +79,13 @@ public class DriverController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver', 'add')")
     @Operation(summary = "Add Driver", description = "Register a new driver protocol adapter for the current tenant. " +
-            "A driver connects devices to the platform and reads or writes their point values; returns the new driver ID.")
+            "A driver connects devices to the platform and reads or writes their point values; returns the new driver ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -98,7 +104,13 @@ public class DriverController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver', 'delete')")
     @Operation(summary = "Delete Driver", description = "Permanently delete a driver by ID (tenant-scoped). " +
-            "Removes the driver adapter; devices bound to it can no longer collect or write point values until reassigned; the action cannot be undone.")
+            "Removes the driver adapter; devices bound to it can no longer collect or write point values until reassigned; the action cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -116,7 +128,13 @@ public class DriverController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver', 'update')")
     @Operation(summary = "Update Driver", description = "Update an existing driver's attributes (tenant-scoped). " +
-            "Modifies the protocol adapter configuration such as service name, mode and enable flag; returns the update result.")
+            "Modifies the protocol adapter configuration such as service name, mode and enable flag; returns the update result.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -136,7 +154,13 @@ public class DriverController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver', 'get')")
     @Operation(summary = "Get Driver by ID", description = "Fetch one driver by ID (tenant-scoped). " +
-            "Use to inspect a protocol adapter before assigning devices, sending commands or reading point values through it.")
+            "Use to inspect a protocol adapter before assigning devices, sending commands or reading point values through it.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<DriverVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -154,7 +178,13 @@ public class DriverController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver', 'list')")
     @Operation(summary = "List Drivers by IDs", description = "Return the drivers matching a set of IDs, filtered to the current tenant. " +
-            "Returns a map of driver ID to driver; missing or out-of-tenant IDs are silently omitted.")
+            "Returns a map of driver ID to driver; missing or out-of-tenant IDs are silently omitted.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, DriverVO>>> listByIds(@RequestBody Set<Long> driverIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -173,7 +203,13 @@ public class DriverController implements BaseController {
      */
     @PreAuthorize("@perm.can('driver', 'get')")
     @Operation(summary = "Get Driver by Service Name", description = "Fetch one driver by its protocol service name (tenant-scoped). " +
-            "Use to resolve a driver instance from the service identifier under which it registered with the platform.")
+            "Use to resolve a driver instance from the service identifier under which it registered with the platform.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_service_name")
     public Mono<R<DriverVO>> getByServiceName(@Parameter(description = "Unique protocol service name under which the driver registered; must belong to the current tenant.", example = "Modbus-TCP-Driver") @NotNull @RequestParam(value = "service_name") String serviceName) {
         return getTenantId().flatMap(tenantId -> async(() -> {

@@ -67,7 +67,7 @@ public class CommandParamQuery implements Serializable {
 
     private String paramCode;
 
-    @Schema(description = "param direction")
+    @Schema(description = "Filter by parameter direction: INPUT (sent to device) or OUTPUT (received from device).", example = "INPUT")
 
     private ParamDirectionTypeEnum paramDirection;
 

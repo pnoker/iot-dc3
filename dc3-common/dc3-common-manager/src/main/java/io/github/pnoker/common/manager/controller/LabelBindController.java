@@ -36,6 +36,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +83,13 @@ public class LabelBindController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('label_bind', 'add')")
-    @Operation(summary = "Add Label Binding", description = "Attach a label to an entity (device, driver, etc.) for the current tenant. The label and target entity must share the same entity type and belong to the tenant; returns the add result.")
+    @Operation(summary = "Add Label Binding", description = "Attach a label to an entity (device, driver, etc.) for the current tenant. The label and target entity must share the same entity type and belong to the tenant; returns the add result.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -100,7 +108,13 @@ public class LabelBindController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('label_bind', 'delete')")
-    @Operation(summary = "Delete Label Binding", description = "Remove a label binding by ID (tenant-scoped). Deletes only the association, leaving the label and the bound entity intact.")
+    @Operation(summary = "Delete Label Binding", description = "Remove a label binding by ID (tenant-scoped). Deletes only the association, leaving the label and the bound entity intact.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -117,7 +131,13 @@ public class LabelBindController implements BaseController {
      * @return update-success status
      */
     @PreAuthorize("@perm.can('label_bind', 'update')")
-    @Operation(summary = "Update Label Binding", description = "Modify an existing label binding for the current tenant, such as re-pointing it to another label or entity. The new label and entity must match the binding's entity type and tenant scope.")
+    @Operation(summary = "Update Label Binding", description = "Modify an existing label binding for the current tenant, such as re-pointing it to another label or entity. The new label and entity must match the binding's entity type and tenant scope.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelBindVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -137,7 +157,13 @@ public class LabelBindController implements BaseController {
      * @return the matched LabelBindVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('label_bind', 'get')")
-    @Operation(summary = "Get Label Binding by ID", description = "Fetch one label binding by ID (tenant-scoped). Use to inspect which label is attached to which entity and its entity type.")
+    @Operation(summary = "Get Label Binding by ID", description = "Fetch one label binding by ID (tenant-scoped). Use to inspect which label is attached to which entity and its entity type.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<LabelBindVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -154,7 +180,13 @@ public class LabelBindController implements BaseController {
      * @return a page of LabelBindVO matching the query
      */
     @PreAuthorize("@perm.can('label_bind', 'list')")
-    @Operation(summary = "List Label Bindings", description = "Page through label bindings for the current tenant with filters from the query body. Returns a page of bindings; use to discover which entities carry a given label.")
+    @Operation(summary = "List Label Bindings", description = "Page through label bindings for the current tenant with filters from the query body. Returns a page of bindings; use to discover which entities carry a given label.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<LabelBindVO>>> list(@RequestBody(required = false) LabelBindQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

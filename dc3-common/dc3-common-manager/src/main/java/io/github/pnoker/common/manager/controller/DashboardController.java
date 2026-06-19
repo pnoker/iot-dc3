@@ -27,6 +27,8 @@ import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
 import io.github.pnoker.common.manager.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +68,13 @@ public class DashboardController implements BaseController {
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
     @Operation(summary = "Get Driver Statistics", description = "Aggregate driver statistics for the current tenant for the dashboard home view. " +
-            "Returns driver counts grouped by enable status and protocol type; use to surface driver distribution across the tenant.")
+            "Returns driver counts grouped by enable status and protocol type; use to surface driver distribution across the tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/driver/stats")
     public Mono<R<DriverStatsVO>> driverStats() {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.driverStats(tenantId))));
@@ -81,7 +89,13 @@ public class DashboardController implements BaseController {
     @PreAuthorize("@perm.can('dashboard', 'get')")
     @Operation(summary = "Get Device Statistics", description = "Aggregate device statistics for the current tenant for the dashboard home view. " +
             "Returns device counts plus the top-N devices by point-value volume, where N is set by the top_n parameter (default 10); " +
-            "use to surface device distribution and the most active devices.")
+            "use to surface device distribution and the most active devices.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/device/stats")
     public Mono<R<DeviceStatsVO>> deviceStats(@Parameter(description = "Number of top devices to return, ranked by point-value volume; clamped server-side.", example = "10") @RequestParam(value = "top_n", defaultValue = "10") int topN) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.deviceStats(tenantId, topN))));
@@ -97,7 +111,13 @@ public class DashboardController implements BaseController {
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
     @Operation(summary = "Get Resource Growth Trend", description = "Return daily new-row counts for driver, device, point and profile tables over the trailing days window (default 7). " +
-            "Tenant-scoped and zero-padded to a fixed length per resource so missing days appear as zero; backs the stat-card sparklines.")
+            "Tenant-scoped and zero-padded to a fixed length per resource so missing days appear as zero; backs the stat-card sparklines.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/growth")
     public Mono<R<GrowthVO>> dailyGrowth(@Parameter(description = "Trailing day window for the growth trend; output is zero-padded to this length.", example = "7") @RequestParam(value = "days", defaultValue = "7") int days) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.dailyGrowth(tenantId, days))));
@@ -122,7 +142,13 @@ public class DashboardController implements BaseController {
     @PreAuthorize("@perm.can('dashboard', 'get')")
     @Operation(summary = "Get Topology", description = "Build the Driver → Device → Profile → Point topology for the current tenant. " +
             "Cardinality mode (default) counts relationships along each edge; the range_key parameter selects a preset time window. " +
-            "Returns a Sankey graph with server-side top-N cropping and others pseudo-nodes carrying hidden children for drill-in.")
+            "Returns a Sankey graph with server-side top-N cropping and others pseudo-nodes carrying hidden children for drill-in.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/topology")
     public Mono<R<TopologyVO>> topology(@Parameter(description = "Topology aggregation mode: cardinality counts relationships per edge (default), volume weights edges by point-value sample counts over the range window.", example = "cardinality") @RequestParam(value = "mode", defaultValue = "cardinality") String mode,
                                         @Parameter(description = "Preset time window for volume mode: today, 24h, 7d, or 30d. Ignored in cardinality mode.", example = "7d")

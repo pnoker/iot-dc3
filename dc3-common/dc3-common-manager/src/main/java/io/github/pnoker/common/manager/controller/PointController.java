@@ -38,6 +38,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -90,7 +92,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'add')")
     @Operation(summary = "Add Point", description = "Define a new point (a single measurable channel such as a temperature reading) on a profile template for the current tenant. " +
-            "Points are later attached to devices and read or written through the driver; returns the new point ID.")
+            "Points are later attached to devices and read or written through the driver; returns the new point ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -109,7 +117,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'delete')")
     @Operation(summary = "Delete Point", description = "Permanently remove a point from its profile template by ID (tenant-scoped). " +
-            "The point definition is removed from every device that instantiates the profile; the action cannot be undone.")
+            "The point definition is removed from every device that instantiates the profile; the action cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -127,7 +141,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'update')")
     @Operation(summary = "Update Point", description = "Modify the definition of an existing point (name, data type, unit, access mode and similar fields) on its profile template. " +
-            "Changes apply to every device that instantiates the profile; tenant ownership is verified before mutating.")
+            "Changes apply to every device that instantiates the profile; tenant ownership is verified before mutating.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -147,7 +167,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'get')")
     @Operation(summary = "Get Point by ID", description = "Fetch a single point's definition (data type, unit, access mode and metadata) by ID. " +
-            "Tenant-scoped; use to inspect a point before reading its values or binding it to a device.")
+            "Tenant-scoped; use to inspect a point before reading its values or binding it to a device.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<PointVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -165,7 +191,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "List Points by IDs", description = "Resolve a batch of point IDs to their definitions for the current tenant. " +
-            "Returns a map of point ID to point VO; IDs the tenant does not own are filtered out, so callers should treat missing keys as not-found.")
+            "Returns a map of point ID to point VO; IDs the tenant does not own are filtered out, so callers should treat missing keys as not-found.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, PointVO>>> listByIds(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -184,7 +216,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "List Points by Profile ID", description = "Return every point defined on a given profile template (tenant-scoped). " +
-            "Use to enumerate the measurable channels a device will expose once it instantiates the profile; the profile must belong to the tenant.")
+            "Use to enumerate the measurable channels a device will expose once it instantiates the profile; the profile must belong to the tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<PointVO>>> listByProfileId(@Parameter(description = "Identifier of the profile template whose points should be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -203,7 +241,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "List Points by Device ID", description = "Return every point available on a specific device (tenant-scoped). " +
-            "These are the channels the bound driver can read or write for that device; the device must belong to the tenant.")
+            "These are the channels the bound driver can read or write for that device; the device must belong to the tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_device_id")
     public Mono<R<List<PointVO>>> listByDeviceId(@Parameter(description = "Identifier of the device whose available points should be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -222,7 +266,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "List Points", description = "Page through points for the current tenant with filters such as name and profile. " +
-            "Returns a page of point definitions; use for browsing points or selecting targets for value reads, writes or device binding.")
+            "Returns a page of point definitions; use for browsing points or selecting targets for value reads, writes or device binding.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<PointVO>>> list(@RequestBody(required = false) PointQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -242,7 +292,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "List Point Units", description = "Resolve the engineering unit (for example Celsius or percent) of each point in a batch of IDs (tenant-scoped). " +
-            "Returns a map of point ID to unit string; only tenant-owned points are included.")
+            "Returns a map of point ID to unit string; only tenant-owned points are included.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/unit")
     public Mono<R<Map<Long, String>>> unit(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -268,7 +324,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "Get Point Device Statistics", description = "Return device-level statistics for a single point, such as how many devices expose it (tenant-scoped). " +
-            "Use to gauge the blast radius of editing a point before changing its definition; the point must belong to the tenant.")
+            "Use to gauge the blast radius of editing a point before changing its definition; the point must belong to the tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_device_statistics_by_point_id")
     public Mono<R<DeviceByPointVO>> getPointStatisticsWithDevice(
             @Parameter(description = "Identifier of the point whose device statistics should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "point_id") Long pointId) {
@@ -288,7 +350,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'list')")
     @Operation(summary = "Count Points by Device", description = "Return the number of points available on a specific device (tenant-scoped). " +
-            "Use for quick cardinality checks without fetching full definitions; the device must belong to the tenant.")
+            "Use for quick cardinality checks without fetching full definitions; the device must belong to the tenant.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_count_by_device_id")
     public Mono<R<Long>> getPointByDeviceId(@Parameter(description = "Identifier of the device whose point count should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -306,7 +374,13 @@ public class PointController implements BaseController {
      */
     @PreAuthorize("@perm.can('point', 'get')")
     @Operation(summary = "Get Device Point Configuration", description = "Fetch the resolved point configuration for a device, merging the profile template definitions with the device's per-instance attribute values (tenant-scoped). " +
-            "Use to see exactly how each point is configured before issuing reads, writes or commands through the driver.")
+            "Use to see exactly how each point is configured before issuing reads, writes or commands through the driver.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_point_config_by_device_id")
     public Mono<R<PointConfigByDeviceVO>> getPointConfigByDeviceId(
             @Parameter(description = "Identifier of the device whose resolved point configuration should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {

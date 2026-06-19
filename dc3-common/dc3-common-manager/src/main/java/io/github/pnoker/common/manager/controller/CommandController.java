@@ -33,6 +33,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -80,7 +82,13 @@ public class CommandController implements BaseController {
      */
     @PreAuthorize("@perm.can('command', 'add')")
     @Operation(summary = "Add Command", description = "Create a downward control instruction defined on a profile template for the current tenant. " +
-            "A command carries parameters and attributes that the driver sends to a device; returns the new command ID.")
+            "A command carries parameters and attributes that the driver sends to a device; returns the new command ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<Long>> add(@Validated(Add.class) @RequestBody CommandVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -99,7 +107,13 @@ public class CommandController implements BaseController {
      */
     @PreAuthorize("@perm.can('command', 'delete')")
     @Operation(summary = "Delete Command", description = "Permanently delete a command by ID (tenant-scoped). " +
-            "Removes the command definition from its profile template; the action cannot be undone.")
+            "Removes the command definition from its profile template; the action cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -117,7 +131,13 @@ public class CommandController implements BaseController {
      */
     @PreAuthorize("@perm.can('command', 'update')")
     @Operation(summary = "Update Command", description = "Modify an existing command's parameters and attributes (tenant-scoped). " +
-            "Ownership is verified before applying changes; returns an update-success response.")
+            "Ownership is verified before applying changes; returns an update-success response.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -137,7 +157,13 @@ public class CommandController implements BaseController {
      */
     @PreAuthorize("@perm.can('command', 'get')")
     @Operation(summary = "Get Command by ID", description = "Fetch one command with its parameters and attributes (tenant-scoped). " +
-            "Use to inspect a command before sending it to a device through the driver.")
+            "Use to inspect a command before sending it to a device through the driver.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<CommandVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -155,7 +181,13 @@ public class CommandController implements BaseController {
      */
     @PreAuthorize("@perm.can('command', 'list')")
     @Operation(summary = "List Commands by Profile ID", description = "Return every control command declared on a given profile template (tenant-scoped). " +
-            "Use to enumerate the downward instructions available to all devices that instantiate the profile.")
+            "Use to enumerate the downward instructions available to all devices that instantiate the profile.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_profile_id")
     public Mono<R<List<CommandVO>>> listByProfileId(@Parameter(description = "Identifier of the profile template whose commands are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -174,7 +206,13 @@ public class CommandController implements BaseController {
      */
     @PreAuthorize("@perm.can('command', 'list')")
     @Operation(summary = "List Commands by Device ID", description = "Return the control commands a given device can receive, resolved from its bound profile template (tenant-scoped). " +
-            "Use to discover which downward instructions can be sent to a specific device through its driver.")
+            "Use to discover which downward instructions can be sent to a specific device through its driver.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_device_id")
     public Mono<R<List<CommandVO>>> listByDeviceId(@Parameter(description = "Identifier of the device whose receivable commands are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -193,7 +231,13 @@ public class CommandController implements BaseController {
      */
     @PreAuthorize("@perm.can('command', 'list')")
     @Operation(summary = "List Commands", description = "Page through control commands for the current tenant with query filters. " +
-            "Returns a page of commands; use for browsing commands or selecting one to send to a device.")
+            "Returns a page of commands; use for browsing commands or selecting one to send to a device.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<CommandVO>>> list(@RequestBody(required = false) CommandQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

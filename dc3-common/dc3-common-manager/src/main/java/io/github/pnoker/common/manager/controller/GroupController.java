@@ -31,6 +31,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +74,13 @@ public class GroupController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('group', 'add')")
-    @Operation(summary = "Add Group", description = "Create a group for the current tenant. A group is a logical grouping of devices, drivers, points or other entities used for batch operations; returns the new group ID.")
+    @Operation(summary = "Add Group", description = "Create a group for the current tenant. A group is a logical grouping of devices, drivers, points or other entities used for batch operations; returns the new group ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -90,7 +98,13 @@ public class GroupController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('group', 'delete')")
-    @Operation(summary = "Delete Group", description = "Permanently delete a group by ID (tenant-scoped). Removes the grouping definition without deleting its member entities; the action cannot be undone.")
+    @Operation(summary = "Delete Group", description = "Permanently delete a group by ID (tenant-scoped). Removes the grouping definition without deleting its member entities; the action cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -107,7 +121,13 @@ public class GroupController implements BaseController {
      * @return update-success status
      */
     @PreAuthorize("@perm.can('group', 'update')")
-    @Operation(summary = "Update Group", description = "Update an existing group's attributes for the current tenant. Validates tenant ownership before applying the change; returns the updated group ID.")
+    @Operation(summary = "Update Group", description = "Update an existing group's attributes for the current tenant. Validates tenant ownership before applying the change; returns the updated group ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -126,7 +146,13 @@ public class GroupController implements BaseController {
      * @return the matched GroupVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('group', 'get')")
-    @Operation(summary = "Get Group by ID", description = "Fetch one group by ID for the current tenant. Use to inspect a grouping definition before assigning entities to it or performing batch operations.")
+    @Operation(summary = "Get Group by ID", description = "Fetch one group by ID for the current tenant. Use to inspect a grouping definition before assigning entities to it or performing batch operations.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<GroupVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -143,7 +169,13 @@ public class GroupController implements BaseController {
      * @return a page of GroupVO matching the query
      */
     @PreAuthorize("@perm.can('group', 'list')")
-    @Operation(summary = "List Groups", description = "Page through groups for the current tenant with optional query filters. Returns a page of groups; use for browsing available groupings or selecting a target group.")
+    @Operation(summary = "List Groups", description = "Page through groups for the current tenant with optional query filters. Returns a page of groups; use for browsing available groupings or selecting a target group.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<GroupVO>>> list(@RequestBody(required = false) GroupQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

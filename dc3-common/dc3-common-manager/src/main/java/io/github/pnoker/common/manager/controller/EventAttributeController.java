@@ -33,6 +33,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +81,13 @@ public class EventAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('event_attribute', 'add')")
     @Operation(summary = "Add Event Attribute", description = "Define a new event attribute field on a profile template for the current tenant. " +
-            "An event attribute declares one configurable field of a device-reported event; returns the new attribute ID.")
+            "An event attribute declares one configurable field of a device-reported event; returns the new attribute ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -98,7 +106,13 @@ public class EventAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('event_attribute', 'delete')")
     @Operation(summary = "Delete Event Attribute", description = "Permanently delete an event attribute field definition by ID (tenant-scoped). " +
-            "Removes the attribute from its profile template; the action cannot be undone.")
+            "Removes the attribute from its profile template; the action cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -116,7 +130,13 @@ public class EventAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('event_attribute', 'update')")
     @Operation(summary = "Update Event Attribute", description = "Modify an existing event attribute field definition on its profile template. " +
-            "Tenant-scoped: ownership of the existing attribute is verified before applying the change.")
+            "Tenant-scoped: ownership of the existing attribute is verified before applying the change.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventAttributeVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -136,7 +156,13 @@ public class EventAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('event_attribute', 'get')")
     @Operation(summary = "Get Event Attribute by ID", description = "Fetch one event attribute field definition by ID (tenant-scoped). " +
-            "Use to inspect a single configurable field of a device-reported event before editing it.")
+            "Use to inspect a single configurable field of a device-reported event before editing it.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<EventAttributeVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -154,7 +180,13 @@ public class EventAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('event_attribute', 'list')")
     @Operation(summary = "List Event Attributes by Driver ID", description = "Return every event attribute field definition reachable through a given driver (tenant-scoped). " +
-            "Use to discover which device-reported event fields a driver exposes; returns an empty list when the driver is not found.")
+            "Use to discover which device-reported event fields a driver exposes; returns an empty list when the driver is not found.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_driver_id")
     public Mono<R<List<EventAttributeVO>>> listByDriverId(@Parameter(description = "Identifier of the driver whose reachable event attribute fields should be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -177,7 +209,13 @@ public class EventAttributeController implements BaseController {
      */
     @PreAuthorize("@perm.can('event_attribute', 'list')")
     @Operation(summary = "List Event Attributes", description = "Page through event attribute field definitions for the current tenant with filters from the query body. " +
-            "Returns a page of attributes; use for browsing or selecting a target event attribute.")
+            "Returns a page of attributes; use for browsing or selecting a target event attribute.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<EventAttributeVO>>> list(@RequestBody(required = false) EventAttributeQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {

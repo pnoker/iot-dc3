@@ -77,7 +77,7 @@ public class CommandAttributeQuery implements Serializable {
     /**
      * Type
      */
-    @Schema(description = "Attribute type enum")
+    @Schema(description = "Filter by attribute data type: STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, or BOOLEAN.", example = "BYTE")
     private AttributeTypeEnum attributeTypeFlag;
 
     /**

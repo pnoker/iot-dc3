@@ -28,6 +28,8 @@ import io.github.pnoker.common.manager.entity.builder.DictionaryForManagerBuilde
 import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
 import io.github.pnoker.common.valid.Parent;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +69,13 @@ public class DictionaryForManagerController implements BaseController {
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Driver Dictionary", description = "Page through driver dictionary entries for the current tenant. " +
-            "Use to pick a driver (protocol adapter) when registering or reassigning a device; returns a page of driver dictionaries.")
+            "Use to pick a driver (protocol adapter) when registering or reassigning a device; returns a page of driver dictionaries.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/driver")
     public Mono<R<Page<DictionaryVO>>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -87,7 +95,13 @@ public class DictionaryForManagerController implements BaseController {
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Profile Dictionary", description = "Page through profile template dictionaries for the current tenant. " +
-            "Use to select which profile template a device instantiates; returns a page of profile dictionaries.")
+            "Use to select which profile template a device instantiates; returns a page of profile dictionaries.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/profile")
     public Mono<R<Page<DictionaryVO>>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -107,7 +121,13 @@ public class DictionaryForManagerController implements BaseController {
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Profile Point Dictionary", description = "Page through the point dictionaries declared on a given profile template. " +
-            "Use to discover which measurable channels a profile exposes; the query must carry a valid profile parent id.")
+            "Use to discover which measurable channels a profile exposes; the query must carry a valid profile parent id.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/profile_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForProfile(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
@@ -128,7 +148,13 @@ public class DictionaryForManagerController implements BaseController {
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Device Point Dictionary", description = "Page through the point dictionaries available on a given device. " +
-            "Use to pick a target point before reading values or sending commands; the query must carry a valid device parent id.")
+            "Use to pick a target point before reading values or sending commands; the query must carry a valid device parent id.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/device_point")
     public Mono<R<Page<DictionaryVO>>> pointDictionaryForDevice(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
@@ -149,7 +175,13 @@ public class DictionaryForManagerController implements BaseController {
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Device Dictionary", description = "Page through device dictionaries for the current tenant. " +
-            "Use to select a target device for value reads, commands or configuration; returns a page of device dictionaries.")
+            "Use to select a target device for value reads, commands or configuration; returns a page of device dictionaries.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -169,7 +201,13 @@ public class DictionaryForManagerController implements BaseController {
      */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(summary = "List Driver Device Dictionary", description = "Page through the device dictionaries managed by a given driver. " +
-            "Use to find which devices a protocol adapter is responsible for; the query must carry a valid driver parent id.")
+            "Use to find which devices a protocol adapter is responsible for; the query must carry a valid driver parent id.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/driver_device")
     public Mono<R<Page<DictionaryVO>>> deviceDictionaryForDriver(
             @Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {

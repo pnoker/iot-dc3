@@ -136,6 +136,12 @@
             <artifactId>grpc-inprocess</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- x-dc3-ai annotation gate (SP2 ratchet): scans this module's controllers in a unit test -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-resource-registrar</artifactId>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

@@ -32,6 +32,8 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +81,13 @@ public class ProfileController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('profile', 'add')")
-    @Operation(summary = "Add Profile", description = "Register a new profile template for the current tenant. A profile is a reusable template bundling points, commands, events and attributes that devices instantiate; returns the new profile ID.")
+    @Operation(summary = "Add Profile", description = "Register a new profile template for the current tenant. A profile is a reusable template bundling points, commands, events and attributes that devices instantiate; returns the new profile ID.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "false"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -97,7 +105,13 @@ public class ProfileController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('profile', 'delete')")
-    @Operation(summary = "Delete Profile", description = "Permanently delete a profile template by ID (tenant-scoped). The profile must belong to the current tenant; deletion cannot be undone.")
+    @Operation(summary = "Delete Profile", description = "Permanently delete a profile template by ID (tenant-scoped). The profile must belong to the current tenant; deletion cannot be undone.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/delete")
     public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -114,7 +128,13 @@ public class ProfileController implements BaseController {
      * @return update-success status
      */
     @PreAuthorize("@perm.can('profile', 'update')")
-    @Operation(summary = "Update Profile", description = "Modify an existing profile template's metadata (tenant-scoped). Only profile fields in the body change; points, commands, events and attributes are managed on their own endpoints.")
+    @Operation(summary = "Update Profile", description = "Modify an existing profile template's metadata (tenant-scoped). Only profile fields in the body change; points, commands, events and attributes are managed on their own endpoints.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ProfileVO entityVO) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -133,7 +153,13 @@ public class ProfileController implements BaseController {
      * @return the matched ProfileVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('profile', 'get')")
-    @Operation(summary = "Get Profile by ID", description = "Fetch one profile template by ID (tenant-scoped). Use to inspect a profile's metadata before binding devices or editing its point, command and event definitions.")
+    @Operation(summary = "Get Profile by ID", description = "Fetch one profile template by ID (tenant-scoped). Use to inspect a profile's metadata before binding devices or editing its point, command and event definitions.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/get_by_id")
     public Mono<R<ProfileVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -150,7 +176,13 @@ public class ProfileController implements BaseController {
      * @return a map of id to ProfileVO for the tenant-owned matched ids
      */
     @PreAuthorize("@perm.can('profile', 'list')")
-    @Operation(summary = "List Profiles by IDs", description = "Resolve a set of profile IDs to their profile templates for the current tenant. Returns a map of ID to profile; missing or foreign-tenant IDs are omitted.")
+    @Operation(summary = "List Profiles by IDs", description = "Resolve a set of profile IDs to their profile templates for the current tenant. Returns a map of ID to profile; missing or foreign-tenant IDs are omitted.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list_by_ids")
     public Mono<R<Map<Long, ProfileVO>>> listByIds(@RequestBody Set<Long> profileIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -168,7 +200,13 @@ public class ProfileController implements BaseController {
      * @return a list of ProfileVO instantiated by the device
      */
     @PreAuthorize("@perm.can('profile', 'list')")
-    @Operation(summary = "List Profiles by Device ID", description = "Return every profile template instantiated by a given device (tenant-scoped). Use to discover which point, command and event definitions a device exposes through its driver.")
+    @Operation(summary = "List Profiles by Device ID", description = "Return every profile template instantiated by a given device (tenant-scoped). Use to discover which point, command and event definitions a device exposes through its driver.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @GetMapping("/list_by_device_id")
     public Mono<R<List<ProfileVO>>> listByDeviceId(@Parameter(description = "Identifier of the device whose instantiated profiles are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
@@ -186,7 +224,13 @@ public class ProfileController implements BaseController {
      * @return a page of ProfileVO matching the query
      */
     @PreAuthorize("@perm.can('profile', 'list')")
-    @Operation(summary = "List Profiles", description = "Page through profile templates for the current tenant with the filters in the query body. Returns a page of profiles; use for browsing or selecting a template for a device.")
+    @Operation(summary = "List Profiles", description = "Page through profile templates for the current tenant with the filters in the query body. Returns a page of profiles; use for browsing or selecting a template for a device.",
+            extensions = @Extension(name = "x-dc3-ai", properties = {
+                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "idempotent", value = "true"),
+                    @ExtensionProperty(name = "openWorld", value = "false")
+            }))
     @PostMapping("/list")
     public Mono<R<Page<ProfileVO>>> list(@RequestBody(required = false) ProfileQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
