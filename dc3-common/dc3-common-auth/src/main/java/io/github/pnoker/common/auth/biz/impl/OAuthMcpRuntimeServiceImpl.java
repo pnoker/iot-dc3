@@ -160,9 +160,13 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     /**
-     * True when any persisted catalog column differs between the existing row and the freshly-built
-     * candidate — including the quality fields (title/remark/hints) that a JSON-only edit can change
-     * without altering the schema hash. Keeps the catalog in sync with x-dc3-ai/description edits.
+     * True when any column a quality-only JSON edit can change differs between the existing row and
+     * the freshly-built candidate — the quality fields (title/remark/hints) that such an edit can flip
+     * without altering the schema hash, plus schemaHash/permissionCode/apiPath/riskLevel/enableFlag/toolExt.
+     * Identity columns (toolName/toolCategory/serviceName/apiCode/httpMethod) are not compared directly:
+     * existing and candidate are matched by tool_id (= api_code), and any change to their feeders flips
+     * schemaHash ({@code md5(api_code || ':' || api_name)}) or the tool_id match key itself. Keeps the
+     * catalog in sync with x-dc3-ai/description edits.
      */
     static boolean toolChanged(McpToolRecord existing, McpToolRecord candidate) {
         return !Objects.equals(existing.getSchemaHash(), candidate.getSchemaHash())
