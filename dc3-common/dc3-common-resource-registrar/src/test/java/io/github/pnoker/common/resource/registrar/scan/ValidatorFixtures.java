@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -59,12 +58,16 @@ class ValidatorFixtures {
         return getOperation("valid");
     }
 
-    /** A handler method whose @RequestBody VO field and @RequestParam both LACK descriptions. */
+    /**
+     * A handler method whose @RequestBody VO field and @RequestParam both LACK descriptions.
+     */
     static Method methodWithUndescribedParams() {
         return getMethod("undescribedParams", BodyMissingSchema.class, Long.class);
     }
 
-    /** A handler method whose body fields all carry @Schema and whose @RequestParam carries @Parameter. */
+    /**
+     * A handler method whose body fields all carry @Schema and whose @RequestParam carries @Parameter.
+     */
     static Method methodWithFullyDescribedParams() {
         return getMethod("describedParams", BodyWithSchema.class, Long.class);
     }
@@ -137,7 +140,7 @@ class ValidatorFixtures {
                     @ExtensionProperty(name = "hidden", value = "false")}))
     @SuppressWarnings("unused")
     private void undescribedParams(@RequestBody BodyMissingSchema body,
-                                  @RequestParam("id") Long id) {
+                                   @RequestParam("id") Long id) {
     }
 
     @Operation(description = "Valid operation description exceeding twenty characters",
@@ -149,16 +152,20 @@ class ValidatorFixtures {
                     @ExtensionProperty(name = "hidden", value = "false")}))
     @SuppressWarnings("unused")
     private void describedParams(@RequestBody BodyWithSchema body,
-                                @Parameter(description = "Primary key of the target record") @RequestParam("id") Long id) {
+                                 @Parameter(description = "Primary key of the target record") @RequestParam("id") Long id) {
     }
 
-    /** Request body whose field is missing @Schema(description). */
+    /**
+     * Request body whose field is missing @Schema(description).
+     */
     static class BodyMissingSchema {
         @SuppressWarnings("unused")
         private String deviceName;
     }
 
-    /** Request body whose field carries @Schema(description). */
+    /**
+     * Request body whose field carries @Schema(description).
+     */
     static class BodyWithSchema {
         @Schema(description = "Human-readable device name, unique within the tenant")
         @SuppressWarnings("unused")

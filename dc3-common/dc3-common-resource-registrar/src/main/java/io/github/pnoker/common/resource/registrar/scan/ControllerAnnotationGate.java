@@ -47,6 +47,15 @@ public class ControllerAnnotationGate {
 
     private final ApiAnnotationValidator validator = new ApiAnnotationValidator();
 
+    private static boolean hasMapping(Method method) {
+        for (Class<? extends Annotation> annotation : MAPPING_ANNOTATIONS) {
+            if (method.isAnnotationPresent(annotation)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<String> validatePackage(String basePackage) {
         List<String> defects = new ArrayList<>();
         ClassPathScanningCandidateComponentProvider scanner =
@@ -69,14 +78,5 @@ public class ControllerAnnotationGate {
             }
         });
         return defects;
-    }
-
-    private static boolean hasMapping(Method method) {
-        for (Class<? extends Annotation> annotation : MAPPING_ANNOTATIONS) {
-            if (method.isAnnotationPresent(annotation)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

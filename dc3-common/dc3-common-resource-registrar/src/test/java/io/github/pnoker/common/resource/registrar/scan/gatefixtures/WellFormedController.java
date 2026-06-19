@@ -26,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Fixture: a fully-annotated controller the gate must pass with zero defects. */
+/**
+ * Fixture: a fully-annotated controller the gate must pass with zero defects.
+ */
 @RestController
 @RequestMapping("/gate/ok")
 public class WellFormedController {

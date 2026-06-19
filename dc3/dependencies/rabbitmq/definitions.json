@@ -1,0 +1,47 @@
+{
+  "users": [
+    {
+      "name": "@RABBITMQ_DEFAULT_USER@",
+      "password_hash": "@RABBITMQ_DEFAULT_PASS_HASH@",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [
+        "administrator"
+      ],
+      "limits": {}
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "@RABBITMQ_DEFAULT_VHOST@",
+      "description": "DC3 default virtual host",
+      "tags": [],
+      "default_queue_type": "classic"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "@RABBITMQ_DEFAULT_USER@",
+      "vhost": "@RABBITMQ_DEFAULT_VHOST@",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [],
+  "global_parameters": [],
+  "policies": [],
+  "queues": [],
+  "exchanges": [
+    {
+      "name": "@RABBITMQ_MQTT_EXCHANGE@",
+      "vhost": "@RABBITMQ_DEFAULT_VHOST@",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": []
+}

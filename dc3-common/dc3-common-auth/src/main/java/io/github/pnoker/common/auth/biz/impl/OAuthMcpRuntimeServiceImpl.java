@@ -42,6 +42,8 @@ import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
 import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
 import io.github.pnoker.common.auth.entity.vo.McpConnectionVO;
 import io.github.pnoker.common.auth.entity.vo.McpToolVO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
@@ -55,8 +57,6 @@ import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
 import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
-import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
-import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.DecodeUtil;
@@ -249,7 +249,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OAuthClientRegistrationResponseVO registerClient(OAuthClientRegistrationRequestVO request,
-                                                             RequestHeader.PrincipalHeader principalHeader) {
+                                                            RequestHeader.PrincipalHeader principalHeader) {
         request = Objects.requireNonNullElseGet(request, OAuthClientRegistrationRequestVO::new);
         String clientName = stringValue(request.getClientName());
         if (StringUtils.isBlank(clientName)) {

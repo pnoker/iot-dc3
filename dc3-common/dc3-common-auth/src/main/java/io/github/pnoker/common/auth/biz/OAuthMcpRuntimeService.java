@@ -21,6 +21,8 @@ import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
 import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
 import io.github.pnoker.common.auth.entity.vo.McpConnectionVO;
 import io.github.pnoker.common.auth.entity.vo.McpToolVO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
@@ -29,8 +31,6 @@ import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
 import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
-import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
-import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 
 import java.net.URI;
 import java.util.List;
@@ -51,7 +51,7 @@ public interface OAuthMcpRuntimeService {
     Map<String, Object> jwks();
 
     OAuthClientRegistrationResponseVO registerClient(OAuthClientRegistrationRequestVO request,
-                                                      RequestHeader.PrincipalHeader principalHeader);
+                                                     RequestHeader.PrincipalHeader principalHeader);
 
     List<OAuthClientVO> listClients(RequestHeader.PrincipalHeader principalHeader);
 

@@ -51,7 +51,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-gateway
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       auth:
@@ -87,7 +87,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-auth
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_PORT:-8300}:8300"
@@ -115,7 +115,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-manager
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       auth:
@@ -146,7 +146,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-data
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       auth:
@@ -179,7 +179,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-agentic
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       auth:
@@ -223,7 +223,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-listening-virtual
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -248,7 +248,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-modbus-tcp
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -270,7 +270,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-modbus-rtu
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -292,7 +292,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-mqtt
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -314,7 +314,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-opc-da
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -336,7 +336,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-opc-ua
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -358,7 +358,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-plcs7
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -380,7 +380,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-virtual
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:

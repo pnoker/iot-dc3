@@ -62,6 +62,15 @@ public class ApiAnnotationValidator {
         return props;
     }
 
+    private static boolean hasAnnotation(java.lang.annotation.Annotation[] annotations, Class<?> type) {
+        for (java.lang.annotation.Annotation a : annotations) {
+            if (type.isInstance(a)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<String> validate(String apiCode, Operation operation) {
         List<String> defects = new ArrayList<>();
         if (operation == null) {
@@ -118,16 +127,9 @@ public class ApiAnnotationValidator {
         return defects;
     }
 
-    private static boolean hasAnnotation(java.lang.annotation.Annotation[] annotations, Class<?> type) {
-        for (java.lang.annotation.Annotation a : annotations) {
-            if (type.isInstance(a)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** Walk a request-body type's instance fields, requiring @Schema(description) on each; recurse into nested project types. */
+    /**
+     * Walk a request-body type's instance fields, requiring @Schema(description) on each; recurse into nested project types.
+     */
     private void collectBodyDefects(String apiCode, Class<?> type, Set<Class<?>> visited, int depth, List<String> defects) {
         if (type == null || depth > MAX_BODY_DEPTH || !visited.add(type)) {
             return;

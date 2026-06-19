@@ -33,7 +33,7 @@ podman compose -f dc3/docker-compose-dev.yml config
 根目录 `.env` 常用于 Compose 插值，例如：
 
 ```yaml
-image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.5}
+image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.6}
 ports:
   - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
 ```

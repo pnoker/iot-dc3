@@ -78,7 +78,7 @@ services:
           - dc3-web
 
   gateway:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       auth:
@@ -108,7 +108,7 @@ services:
           - dc3-gateway
 
   auth:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     environment:
       <<: *app-runtime-env
@@ -129,7 +129,7 @@ services:
           - dc3-center-auth
 
   manager:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       auth:
@@ -153,7 +153,7 @@ services:
           - dc3-center-manager
 
   data:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       auth:
@@ -179,7 +179,7 @@ services:
           - dc3-center-data
 
   agentic:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       auth:
@@ -217,7 +217,7 @@ services:
           - dc3-center-agentic
 
   listening-virtual:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -241,7 +241,7 @@ services:
           - dc3-driver-listening-virtual
 
   modbus-tcp:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -259,7 +259,7 @@ services:
           - dc3-driver-modbus-tcp
 
   modbus-rtu:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -277,7 +277,7 @@ services:
           - dc3-driver-modbus-rtu
 
   mqtt:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -295,7 +295,7 @@ services:
           - dc3-driver-mqtt
 
   opc-da:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -313,7 +313,7 @@ services:
           - dc3-driver-opc-da
 
   opc-ua:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -331,7 +331,7 @@ services:
           - dc3-driver-opc-ua
 
   plcs7:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:
@@ -349,7 +349,7 @@ services:
           - dc3-driver-plcs7
 
   virtual:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.5}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
       manager:

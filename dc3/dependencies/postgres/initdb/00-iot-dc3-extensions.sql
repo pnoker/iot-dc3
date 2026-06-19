@@ -15,22 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.resource.registrar.scan.gatefixtures;
+-- ----------------------------
+-- Database extensions
+-- ----------------------------
+CREATE
+EXTENSION IF NOT EXISTS timescaledb;
+CREATE
+EXTENSION IF NOT EXISTS vector;
+CREATE
+EXTENSION IF NOT EXISTS age;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-/**
- * Fixture: a controller missing @Operation/x-dc3-ai and an undescribed @RequestParam.
- */
-@RestController
-@RequestMapping("/gate/bad")
-public class DefectiveController {
-
-    @GetMapping("/get")
-    public String get(@RequestParam("id") Long id) {
-        return "bad";
-    }
-}
+-- Validate that the AGE shared library can be loaded during bootstrap.
+-- Application sessions that use Cypher should still LOAD age and include
+-- ag_catalog in their search_path before issuing AGE queries.
+LOAD
+'age';
