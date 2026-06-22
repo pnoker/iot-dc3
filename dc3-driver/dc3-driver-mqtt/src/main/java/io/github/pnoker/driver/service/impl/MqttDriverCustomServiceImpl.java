@@ -78,16 +78,6 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
-        AttributeBO attr = config.get(code);
-        if (attr == null || attr.getValue() == null) {
-            issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
-        }
-    }
-
     /**
      * Initializes the MQTT driver.
      * <p>
@@ -303,9 +293,9 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
+        // No required driver-level attributes: commandTopic/commandQos are per-point
+        // attributes consumed by write(), not driver config.
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
-        checkRequired(driverConfig, "commandTopic", issues);
-        checkRequired(driverConfig, "commandQos", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
                 .issues(issues).build();
