@@ -1114,6 +1114,10 @@
                     <version>${surefire.version}</version>
                     <configuration>
                         <skip>${skip.integration.tests}</skip>
+                        <!-- Run integration tests against the plain compiled classes; Spring Boot
+                             repackages the module artifact into a fat jar that is not directly
+                             loadable on the Failsafe classpath. -->
+                        <classesDirectory>${project.build.outputDirectory}</classesDirectory>
                         <argLine>@{failsafe.argLine} ${mockito.javaagent.argLine} -Xshare:off -Duser.language=en
                             -Duser.country=US
                         </argLine>
