@@ -19,10 +19,6 @@ package io.github.pnoker.center.data;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
  * Data Center Service Application
@@ -36,7 +32,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  * @since 2016.10.1
  */
 @SpringBootApplication
-@EnableScheduling
 public class DataApplication {
 
     /**
@@ -46,16 +41,6 @@ public class DataApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(DataApplication.class, args);
-    }
-
-    @Bean
-    public TaskScheduler taskScheduler() {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(4);
-        scheduler.setThreadNamePrefix("dc3-schedule-");
-        scheduler.setAwaitTerminationSeconds(60);
-        scheduler.setWaitForTasksToCompleteOnShutdown(true);
-        return scheduler;
     }
 
 }
