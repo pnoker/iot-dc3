@@ -20,7 +20,7 @@ dc3:
     tenant: default
     name: CoAP Driver
     code: CoapDriver
-    type: DRIVER_SERVER
+    type: DRIVER_CLIENT
     remark: @project.description@
     schedule:
       read:
