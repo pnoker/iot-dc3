@@ -19,8 +19,12 @@ package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.vo.McpToolVO;
+import io.github.pnoker.common.enums.McpRiskLevelEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -40,7 +44,13 @@ public interface McpToolBuilder {
      * @param entityRecord EntityRecord
      * @return EntityVO
      */
+    @Mapping(target = "riskLevel", ignore = true)
     McpToolVO buildVOByRecord(McpToolRecord entityRecord);
+
+    @AfterMapping
+    default void afterProcess(McpToolRecord entityRecord, @MappingTarget McpToolVO entityVO) {
+        entityVO.setRiskLevel(McpRiskLevelEnum.ofValue(entityRecord.getRiskLevel()));
+    }
 
     /**
      * RecordList to VOList

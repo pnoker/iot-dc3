@@ -19,6 +19,9 @@ package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.enums.McpAuditStatusEnum;
+import io.github.pnoker.common.enums.McpRiskLevelEnum;
+import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,7 +55,7 @@ public class McpAuditVO extends BaseVO {
     private Long principalId;
 
     @Schema(description = "Principal type: USER or SERVICE_ACCOUNT.", example = "USER")
-    private String principalType;
+    private PrincipalTypeEnum principalType;
 
     @Schema(description = "OAuth client identifier.", example = "mcp-abcd1234")
     private String clientId;
@@ -70,7 +73,7 @@ public class McpAuditVO extends BaseVO {
     private String permissionCode;
 
     @Schema(description = "Tool risk level: LOW, MEDIUM or HIGH.", example = "LOW")
-    private String riskLevel;
+    private McpRiskLevelEnum riskLevel;
 
     @Schema(description = "Confirmation id for high-risk calls.", example = "cfm-abcd1234")
     private String confirmId;
@@ -82,7 +85,7 @@ public class McpAuditVO extends BaseVO {
     private String argumentDigest;
 
     @Schema(description = "Invocation outcome: SUCCESS, DENIED, POLICY_DENIED, ERROR or UNKNOWN.", example = "SUCCESS")
-    private String status;
+    private McpAuditStatusEnum status;
 
     @Schema(description = "Error code when the call failed.", example = "policy_denied")
     private String errorCode;

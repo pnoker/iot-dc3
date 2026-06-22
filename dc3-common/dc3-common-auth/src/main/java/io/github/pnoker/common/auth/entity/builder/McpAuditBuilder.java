@@ -19,8 +19,14 @@ package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
 import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
+import io.github.pnoker.common.enums.McpAuditStatusEnum;
+import io.github.pnoker.common.enums.McpRiskLevelEnum;
+import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -40,7 +46,17 @@ public interface McpAuditBuilder {
      * @param entityRecord EntityRecord
      * @return EntityVO
      */
+    @Mapping(target = "principalType", ignore = true)
+    @Mapping(target = "riskLevel", ignore = true)
+    @Mapping(target = "status", ignore = true)
     McpAuditVO buildVOByRecord(McpAuditCommand entityRecord);
+
+    @AfterMapping
+    default void afterProcess(McpAuditCommand entityRecord, @MappingTarget McpAuditVO entityVO) {
+        entityVO.setPrincipalType(PrincipalTypeEnum.ofValue(entityRecord.getPrincipalType()));
+        entityVO.setRiskLevel(McpRiskLevelEnum.ofValue(entityRecord.getRiskLevel()));
+        entityVO.setStatus(McpAuditStatusEnum.ofValue(entityRecord.getStatus()));
+    }
 
     /**
      * RecordList to VOList

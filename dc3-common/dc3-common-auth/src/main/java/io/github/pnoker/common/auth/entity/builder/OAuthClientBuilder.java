@@ -19,8 +19,12 @@ package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
+import io.github.pnoker.common.enums.OAuthClientTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -40,7 +44,13 @@ public interface OAuthClientBuilder {
      * @param entityRecord EntityRecord
      * @return EntityVO
      */
+    @Mapping(target = "clientType", ignore = true)
     OAuthClientVO buildVOByRecord(OAuthRegisteredClientRecord entityRecord);
+
+    @AfterMapping
+    default void afterProcess(OAuthRegisteredClientRecord entityRecord, @MappingTarget OAuthClientVO entityVO) {
+        entityVO.setClientType(OAuthClientTypeEnum.ofValue(entityRecord.getClientType()));
+    }
 
     /**
      * RecordList to VOList

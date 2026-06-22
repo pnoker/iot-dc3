@@ -19,6 +19,8 @@ package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.enums.OAuthGrantTypeEnum;
+import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,13 +56,13 @@ public class McpConnectionVO extends BaseVO {
     private Long principalId;
 
     @Schema(description = "Principal type: USER or SERVICE_ACCOUNT.", example = "USER")
-    private String principalType;
+    private PrincipalTypeEnum principalType;
 
     @Schema(description = "Tenant the connection belongs to.", example = "1")
     private Long tenantId;
 
     @Schema(description = "Authorization grant type.", example = "authorization_code")
-    private String grantType;
+    private OAuthGrantTypeEnum grantType;
 
     @Schema(description = "Enable flag: 0 enabled, 1 disabled.", example = "0")
     private Byte enableFlag;

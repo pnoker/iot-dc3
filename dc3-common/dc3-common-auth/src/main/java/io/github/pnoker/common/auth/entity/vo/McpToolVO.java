@@ -19,6 +19,7 @@ package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.enums.McpRiskLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -73,7 +74,7 @@ public class McpToolVO extends BaseVO {
     private String schemaHash;
 
     @Schema(description = "Tool risk level: LOW, MEDIUM or HIGH.", example = "LOW")
-    private String riskLevel;
+    private McpRiskLevelEnum riskLevel;
 
     @Schema(description = "Read-only hint: 1 yes, 0 no.", example = "1")
     private Byte readOnlyHint;

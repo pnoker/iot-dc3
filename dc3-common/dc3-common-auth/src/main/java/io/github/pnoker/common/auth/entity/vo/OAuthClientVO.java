@@ -19,6 +19,7 @@ package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.enums.OAuthClientTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,7 +52,7 @@ public class OAuthClientVO extends BaseVO {
     private String clientName;
 
     @Schema(description = "Client type: PUBLIC or CONFIDENTIAL.", example = "CONFIDENTIAL")
-    private String clientType;
+    private OAuthClientTypeEnum clientType;
 
     @Schema(description = "Principal that owns the client.", example = "1024")
     private Long ownerPrincipalId;
