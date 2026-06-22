@@ -22,6 +22,7 @@ Defines driver registration RPC calls and data structures.
 **Service**: `DriverApi`
 
 - `DriverRegister` - Register a driver instance with the platform (used by drivers on startup)
+- `GetById` - Query driver registration information by driver ID
 
 **Key Messages**:
 
@@ -34,8 +35,8 @@ Defines device-related RPC calls for driver services.
 
 **Service**: `DeviceApi`
 
-- `SelectByPage` - Query devices with pagination support
-- `SelectById` - Query device by device ID
+- `ListByPage` - Query devices with pagination support
+- `GetById` - Query device by device ID
 
 **Key Messages**:
 
@@ -51,8 +52,8 @@ Defines point-related RPC calls for driver services.
 
 **Service**: `PointApi`
 
-- `SelectByPage` - Query points with pagination support
-- `SelectById` - Query point by point ID
+- `ListByPage` - Query points with pagination support
+- `GetById` - Query point by point ID
 
 **Key Messages**:
 
@@ -141,7 +142,7 @@ GrpcDeviceQuery query = GrpcDeviceQuery.newBuilder()
     .setDriverId(driver.getId())
     .setDeviceId(deviceId)
     .build();
-    GrpcRDeviceDTO deviceResponse = deviceApi.selectById(query);
+    GrpcRDeviceDTO deviceResponse = deviceApi.getById(query);
 // Process device configuration
     }
 ```
@@ -150,7 +151,7 @@ GrpcDeviceQuery query = GrpcDeviceQuery.newBuilder()
 
 ```java
 // Query device with full configuration
-GrpcRDeviceAttachDTO deviceAttach = deviceApi.selectById(deviceQuery);
+GrpcRDeviceAttachDTO deviceAttach = deviceApi.getById(deviceQuery);
 
 // Extract device information
 GrpcDeviceDTO device = deviceAttach.getDevice();
@@ -171,7 +172,7 @@ GrpcPointQuery pointQuery = GrpcPointQuery.newBuilder()
                 .setPointId(pointId)
                 .build();
 
-GrpcRPointDTO pointResponse = pointApi.selectById(pointQuery);
+GrpcRPointDTO pointResponse = pointApi.getById(pointQuery);
 GrpcPointDTO point = pointResponse.getData();
 
 // Configure point reading

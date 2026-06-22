@@ -21,7 +21,7 @@ Defines tenant-related RPC calls and data structures.
 
 **Service**: `TenantApi`
 
-- `SelectByCode` - Query tenant information by tenant code
+- `GetByCode` - Query tenant information by tenant code
 
 **Key Messages**:
 
@@ -48,8 +48,8 @@ Defines user-related RPC calls and data structures.
 
 **Service**: `UserApi`
 
-- `SelectById` - Query user information by user ID
-- `SelectByPrincipalId` - Query user information by principal ID
+- `GetById` - Query user information by user ID
+- `GetByPrincipalId` - Query user information by principal ID
 
 **Key Messages**:
 
@@ -70,6 +70,34 @@ Defines local credential lookup RPC calls and data structures.
 - `GrpcLoginNameQuery` - Request wrapper for login-name queries
 - `GrpcRLocalCredentialDTO` - Response wrapper containing local credential information
 - `GrpcLocalCredentialDTO` - Local credential data structure (login name, principal ID)
+
+### permission.proto
+
+Defines permission lookup RPC calls for RBAC.
+
+**Service**: `PermissionApi`
+
+- `ListPermissionCodes` - List the permission codes granted to a principal
+
+### resource_registry.proto
+
+Defines resource registry synchronization RPC calls.
+
+**Service**: `ResourceRegistryApi`
+
+- `Sync` - Synchronize API/menu resource definitions into the registry
+
+### mcp_runtime.proto
+
+Defines MCP (Model Context Protocol) runtime RPC calls for AI tool integration.
+
+**Service**: `McpRuntimeApi`
+
+- `Introspect` - Introspect an MCP connection
+- `ListTools` - List the tools exposed by an MCP connection
+- `ResolveTool` - Resolve a tool definition by name
+- `AuthorizeToolCall` - Authorize an MCP tool invocation
+- `Audit` - Record an MCP tool-call audit entry
 
 ## Dependencies
 
@@ -94,10 +122,10 @@ This module depends on common proto definitions:
 ### 2. Import Proto Files
 
 ```protobuf
-import "api/common/auth/tenant.proto";
-import "api/common/auth/token.proto";
-import "api/common/auth/user.proto";
-import "api/common/auth/local_credential.proto";
+import "api/center/auth/tenant.proto";
+import "api/center/auth/token.proto";
+import "api/center/auth/user.proto";
+import "api/center/auth/local_credential.proto";
 ```
 
 ### 3. Implement Service
@@ -105,8 +133,8 @@ import "api/common/auth/local_credential.proto";
 ```java
 public class TenantServiceImpl extends TenantApiGrpc.TenantApiImplBase {
     @Override
-    public void selectByCode(GrpcCodeQuery request,
-                             StreamObserver<GrpcRTenantDTO> responseObserver) {
+    public void getByCode(GrpcCodeQuery request,
+                          StreamObserver<GrpcRTenantDTO> responseObserver) {
         // Implementation
     }
 }

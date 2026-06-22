@@ -4,7 +4,7 @@
 
 `dc3-api-manager` provides gRPC service definitions for the Manager Center in the IoT DC3 platform. It defines the
 interfaces used by the Data service and other consumers to query
-driver, device, and point metadata from the Manager Center.
+driver, device, point, profile, command, and event metadata from the Manager Center.
 
 ## Module Information
 
@@ -21,14 +21,18 @@ Defines driver-related RPC calls from the manager perspective.
 
 **Service**: `DriverApi`
 
-- `SelectByDeviceId` - Query driver information by device ID
-- `SelectByServiceName` - Query driver information by service name
+- `ListByPage` - Query drivers with pagination support
+- `GetByDriverId` - Query driver information by driver ID
+- `ListByDriverIds` - Query drivers by a list of driver IDs
+- `GetByDeviceId` - Query driver information by device ID
 
 **Key Messages**:
 
-- `GrpcDriverQuery` - Driver query by device ID
-- `GrpcServiceNameQuery` - Driver query by service name
+- `GrpcPageDriverQuery` - Paginated driver query request
+- `GrpcDriverQuery` - Driver query by driver ID / device ID
+- `GrpcDriverIdsQuery` - Driver query by a list of driver IDs
 - `GrpcRDriverDTO` - Response wrapper containing driver information
+- `GrpcRPageDriverDTO` / `GrpcRDriverListDTO` - Paginated / list responses
 - `GrpcDriverDTO` - Driver data structure (service name, driver type, host, etc.)
 
 ### manager_device.proto
@@ -37,12 +41,18 @@ Defines device-related RPC calls from the manager perspective.
 
 **Service**: `DeviceApi`
 
-- `SelectById` - Query device information by device ID
+- `ListByPage` - Query devices with pagination support
+- `ListByProfileId` - Query devices by profile ID
+- `ListByDriverId` - Query devices by driver ID
+- `GetByDeviceId` - Query device information by device ID
+- `ListByDeviceIds` - Query devices by a list of device IDs
 
 **Key Messages**:
 
-- `GrpcDeviceQuery` - Device query by device ID
-- `GrpcRDeviceDTO` - Response wrapper containing device information
+- `GrpcPageDeviceQuery` - Paginated device query request
+- `GrpcDeviceQuery` - Single device query
+- `GrpcDeviceIdsQuery` - Device query by a list of device IDs
+- `GrpcRDeviceDTO` / `GrpcRPageDeviceDTO` / `GrpcRDeviceListDTO` - Single / paginated / list responses
 
 ### manager_point.proto
 
@@ -50,12 +60,47 @@ Defines point-related RPC calls from the manager perspective.
 
 **Service**: `PointApi`
 
-- `SelectById` - Query point information by point ID
+- `ListByPage` - Query points with pagination support
+- `GetById` - Query point information by point ID
+- `ListByIds` - Query points by a list of point IDs
 
 **Key Messages**:
 
-- `GrpcPointQuery` - Point query by point ID
-- `GrpcRPointDTO` - Response wrapper containing point information
+- `GrpcPagePointQuery` - Paginated point query request
+- `GrpcPointQuery` - Single point query
+- `GrpcPointIdsQuery` - Point query by a list of point IDs
+- `GrpcRPointDTO` / `GrpcRPagePointDTO` / `GrpcRPointListDTO` - Single / paginated / list responses
+
+### manager_command.proto
+
+Defines command-related RPC calls from the manager perspective.
+
+**Service**: `CommandApi`
+
+- `ListByPage` - Query commands with pagination support
+- `GetById` - Query command information by command ID
+- `ListByIds` - Query commands by a list of command IDs
+
+### manager_event.proto
+
+Defines event-related RPC calls from the manager perspective.
+
+**Service**: `EventApi`
+
+- `ListByPage` - Query events with pagination support
+- `GetById` - Query event information by event ID
+- `ListByIds` - Query events by a list of event IDs
+
+### manager_profile.proto
+
+Defines profile-related RPC calls from the manager perspective.
+
+**Service**: `ProfileApi`
+
+- `ListByPage` - Query profiles with pagination support
+- `GetByProfileId` - Query profile information by profile ID
+- `ListByProfileIds` - Query profiles by a list of profile IDs
+- `ListByDeviceId` - Query profiles bound to a device
 
 ### manager_query.proto / manager_query_page.proto
 
@@ -99,7 +144,7 @@ private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 GrpcDeviceQuery query = GrpcDeviceQuery.newBuilder()
         .setDeviceId(deviceId)
         .build();
-GrpcRDriverDTO response = driverApiBlockingStub.selectByDeviceId(query);
+GrpcRDriverDTO response = driverApiBlockingStub.getByDeviceId(query);
 if(response.
 
 getResult().

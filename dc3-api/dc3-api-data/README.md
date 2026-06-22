@@ -21,13 +21,48 @@ Defines point value query RPC calls and data structures for device data collecti
 
 **Service**: `PointValueApi`
 
-- `LastValue` - Query the latest collected value of a device point
+- `GetLastValue` - Query the latest collected value of a device point
+- `ListHistoryValues` - Query historical values of a device point
+- `ReadCommand` - Trigger a read command for a device point
+- `WriteCommand` - Trigger a write command for a device point
 
 **Key Messages**:
 
 - `GrpcPointValueQuery` - Request wrapper for point value queries (device_id, point_id, tenant_id)
 - `GrpcRPointValueDTO` - Response wrapper containing point value information
 - `GrpcPointValueDTO` - Point value data structure
+
+### event_history.proto
+
+Defines device event history RPC calls.
+
+**Service**: `EventHistoryApi`
+
+- `ReportEvent` - Report a device event
+- `GetByRecordId` - Query an event history record by record ID
+- `ListByPage` - Query event history with pagination support
+
+### command_history.proto
+
+Defines device command history RPC calls.
+
+**Service**: `CommandHistoryApi`
+
+- `CallCommand` - Issue a command to a device
+- `GetByRecordId` - Query a command history record by record ID
+- `ListByPage` - Query command history with pagination support
+
+### status_health.proto
+
+Defines device/driver status and system health RPC calls.
+
+**Service**: `StatusHealthApi`
+
+- `DeviceStatusesByIds` - Query device statuses by device IDs
+- `DeviceStatusesByProfileId` - Query device statuses by profile ID
+- `DriverStatusesByIds` - Query driver statuses by driver IDs
+- `DriverDeviceStatusSummary` - Summarize device statuses under a driver
+- `SystemHealth` - Query overall system health
 
 ## Data Models
 
@@ -79,7 +114,7 @@ This module depends on common proto definitions:
 ### 2. Import Proto Files
 
 ```protobuf
-import "api/common/data/point_value.proto";
+import "api/center/data/point_value.proto";
 ```
 
 ### 3. Implement Service
@@ -87,8 +122,8 @@ import "api/common/data/point_value.proto";
 ```java
 public class PointValueServiceImpl extends PointValueApiGrpc.PointValueApiImplBase {
     @Override
-    public void lastValue(GrpcPointValueQuery request,
-                          StreamObserver<GrpcRPointValueDTO> responseObserver) {
+    public void getLastValue(GrpcPointValueQuery request,
+                             StreamObserver<GrpcRPointValueDTO> responseObserver) {
         // Query latest point value from database
         // Return GrpcRPointValueDTO with point value data
     }
@@ -106,7 +141,7 @@ GrpcPointValueQuery query = GrpcPointValueQuery.newBuilder()
                 .build();
 
 // Call service
-GrpcRPointValueDTO response = pointValueApi.lastValue(query);
+GrpcRPointValueDTO response = pointValueApi.getLastValue(query);
 
 // Extract data
 if(response.
@@ -177,7 +212,7 @@ Date collectionTime = new Date(timestamp);
 
 - **Query Optimization**: Always include tenant_id for proper data isolation
 - **Caching**: Consider caching recent point values for high-frequency queries
-- **Time Series Database**: This API typically queries time-series databases (e.g., InfluxDB, TDengine)
+- **Time Series Store**: This API queries the time-series store through `dc3-common-repository` (PostgreSQL with the TimescaleDB extension)
 - **Data Volume**: Point value queries can generate high traffic in large-scale deployments
 
 ## Integration Points
