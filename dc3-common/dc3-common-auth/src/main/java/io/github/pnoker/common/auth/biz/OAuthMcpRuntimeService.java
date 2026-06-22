@@ -17,11 +17,11 @@
 
 package io.github.pnoker.common.auth.biz;
 
+import io.github.pnoker.common.auth.entity.bo.McpConnectionAddBO;
+import io.github.pnoker.common.auth.entity.bo.OAuthClientRegistrationBO;
 import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
-import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
 import io.github.pnoker.common.auth.entity.vo.McpConnectionVO;
 import io.github.pnoker.common.auth.entity.vo.McpToolVO;
-import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -50,7 +50,7 @@ public interface OAuthMcpRuntimeService {
 
     Map<String, Object> jwks();
 
-    OAuthClientRegistrationResponseVO registerClient(OAuthClientRegistrationRequestVO request,
+    OAuthClientRegistrationResponseVO registerClient(OAuthClientRegistrationBO request,
                                                      RequestHeader.PrincipalHeader principalHeader);
 
     List<OAuthClientVO> listClients(RequestHeader.PrincipalHeader principalHeader);
@@ -69,7 +69,7 @@ public interface OAuthMcpRuntimeService {
 
     List<McpConnectionVO> listConnections(RequestHeader.PrincipalHeader principalHeader);
 
-    McpConnectionVO createConnection(McpConnectionAddVO connection,
+    McpConnectionVO createConnection(McpConnectionAddBO connection,
                                      RequestHeader.PrincipalHeader principalHeader);
 
     void revokeConnection(Long connectionId, RequestHeader.PrincipalHeader principalHeader);

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
+import io.github.pnoker.common.auth.entity.bo.McpConnectionAddBO;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
 import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
 import io.github.pnoker.common.auth.entity.vo.McpConnectionVO;
@@ -65,11 +66,19 @@ public interface McpConnectionBuilder {
     List<McpConnectionVO> buildVOListByRecordList(List<McpConnectionRecord> entityRecordList);
 
     /**
-     * AddVO to Record
+     * AddVO to BO (write-path input; string fields parsed into domain enums)
      *
      * @param entityVO Create request VO
-     * @return EntityRecord
+     * @return EntityBO
      */
-    McpConnectionRecord buildRecordByAddVO(McpConnectionAddVO entityVO);
+    @Mapping(target = "principalType", ignore = true)
+    @Mapping(target = "grantType", ignore = true)
+    McpConnectionAddBO buildBOByAddVO(McpConnectionAddVO entityVO);
+
+    @AfterMapping
+    default void afterProcess(McpConnectionAddVO entityVO, @MappingTarget McpConnectionAddBO entityBO) {
+        entityBO.setPrincipalType(PrincipalTypeEnum.ofValue(entityVO.getPrincipalType()));
+        entityBO.setGrantType(OAuthGrantTypeEnum.ofValue(entityVO.getGrantType()));
+    }
 
 }

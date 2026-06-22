@@ -19,6 +19,7 @@ package io.github.pnoker.common.auth.controller;
 
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
+import io.github.pnoker.common.auth.entity.builder.OAuthClientBuilder;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.McpConstant;
@@ -59,6 +60,7 @@ import java.util.Map;
 public class OAuthController {
 
     private final OAuthMcpRuntimeService oauthMcpRuntimeService;
+    private final OAuthClientBuilder oauthClientBuilder;
 
     /**
      * Publish the OAuth 2.1 authorization server metadata for MCP client discovery.
@@ -116,8 +118,15 @@ public class OAuthController {
             @RequestBody OAuthClientRegistrationRequestVO request,
             @org.springframework.web.bind.annotation.RequestHeader(
                     value = RequestConstant.Header.X_AUTH_PRINCIPAL, required = false) String principalJson) {
-        return Mono.<ResponseEntity<?>>fromSupplier(() -> ResponseEntity.status(HttpStatus.CREATED)
-                        .body(oauthMcpRuntimeService.registerClient(request, parsePrincipal(principalJson))))
+        return Mono.<ResponseEntity<?>>fromSupplier(() -> {
+                    if (oauthClientBuilder.isUnknownClientType(request)) {
+                        throw new OAuthProtocolException(HttpStatus.BAD_REQUEST.value(), "invalid_client_metadata",
+                                "unsupported client_type");
+                    }
+                    return ResponseEntity.status(HttpStatus.CREATED)
+                            .body(oauthMcpRuntimeService.registerClient(oauthClientBuilder.buildBOByRequestVO(request),
+                                    parsePrincipal(principalJson)));
+                })
                 .onErrorResume(OAuthProtocolException.class, this::oauthAnyError);
     }
 

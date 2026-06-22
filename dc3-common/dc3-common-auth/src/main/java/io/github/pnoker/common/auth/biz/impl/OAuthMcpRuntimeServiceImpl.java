@@ -33,16 +33,16 @@ import io.github.pnoker.common.auth.entity.builder.OAuthClientBuilder;
 import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
 import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
+import io.github.pnoker.common.auth.entity.bo.McpConnectionAddBO;
+import io.github.pnoker.common.auth.entity.bo.OAuthClientRegistrationBO;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
-import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
 import io.github.pnoker.common.auth.entity.vo.McpConnectionVO;
 import io.github.pnoker.common.auth.entity.vo.McpToolVO;
-import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
@@ -253,21 +253,21 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public OAuthClientRegistrationResponseVO registerClient(OAuthClientRegistrationRequestVO request,
+    public OAuthClientRegistrationResponseVO registerClient(OAuthClientRegistrationBO request,
                                                             RequestHeader.PrincipalHeader principalHeader) {
-        request = Objects.requireNonNullElseGet(request, OAuthClientRegistrationRequestVO::new);
+        request = Objects.requireNonNullElseGet(request, OAuthClientRegistrationBO::new);
         String clientName = stringValue(request.getClientName());
         if (StringUtils.isBlank(clientName)) {
             throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata", "client_name is required");
         }
-        String clientType = StringUtils.defaultIfBlank(stringValue(request.getClientType()),
-                OAuthClientTypeEnum.PUBLIC.getValue()).toUpperCase();
-        if (!Set.of(OAuthClientTypeEnum.PUBLIC.getValue(), OAuthClientTypeEnum.CONFIDENTIAL.getValue())
-                .contains(clientType)) {
-            throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata", "unsupported client_type");
-        }
+        // The BO already carries a validated OAuthClientTypeEnum (null when unspecified), so the wire
+        // value can no longer be an unknown string; default to PUBLIC when absent.
+        String clientType = Objects.requireNonNullElse(request.getClientType(), OAuthClientTypeEnum.PUBLIC).getValue();
 
-        Set<String> grants = normalizeSet(request.getGrantTypes());
+        List<String> grantValues = Objects.isNull(request.getGrantTypes()) ? null
+                : request.getGrantTypes().stream().filter(Objects::nonNull)
+                        .map(OAuthGrantTypeEnum::getValue).toList();
+        Set<String> grants = normalizeSet(grantValues);
         if (grants.isEmpty()) {
             grants = OAuthClientTypeEnum.PUBLIC.getValue().equals(clientType)
                     ? Set.of(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue())
@@ -542,10 +542,21 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public McpConnectionVO createConnection(McpConnectionAddVO entityVO,
+    public McpConnectionVO createConnection(McpConnectionAddBO entityBO,
                                             RequestHeader.PrincipalHeader principalHeader) {
         requireAuthenticatedPrincipal(principalHeader);
-        McpConnectionRecord connection = mcpConnectionBuilder.buildRecordByAddVO(entityVO);
+        // Build the projection from the BO; the *Record stays String-typed (OAuthMcpMapper resultType),
+        // so domain enums are flattened to their wire value here.
+        McpConnectionRecord connection = new McpConnectionRecord();
+        connection.setConnectionName(entityBO.getConnectionName());
+        connection.setClientId(entityBO.getClientId());
+        connection.setPrincipalId(entityBO.getPrincipalId());
+        connection.setPrincipalType(Objects.isNull(entityBO.getPrincipalType()) ? null
+                : entityBO.getPrincipalType().getValue());
+        connection.setTenantId(entityBO.getTenantId());
+        connection.setGrantType(Objects.isNull(entityBO.getGrantType()) ? null
+                : entityBO.getGrantType().getValue());
+        connection.setExpireTime(entityBO.getExpireTime());
         OAuthRegisteredClientRecord client = requireClient(connection.getClientId());
         String grantType = StringUtils.defaultIfBlank(connection.getGrantType(),
                 OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue());

@@ -18,6 +18,9 @@
 package io.github.pnoker.common.auth.controller;
 
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
+import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
+import io.github.pnoker.common.auth.entity.builder.McpConnectionBuilder;
+import io.github.pnoker.common.auth.entity.builder.OAuthClientBuilder;
 import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
 import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
 import io.github.pnoker.common.auth.entity.vo.McpConnectionToolsReplaceVO;
@@ -41,6 +44,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,6 +73,8 @@ import java.util.Map;
 public class McpManagementController implements BaseController {
 
     private final OAuthMcpRuntimeService oauthMcpRuntimeService;
+    private final McpConnectionBuilder mcpConnectionBuilder;
+    private final OAuthClientBuilder oauthClientBuilder;
 
     /**
      * Fetch the OAuth authorization server metadata for the MCP runtime.
@@ -108,8 +114,13 @@ public class McpManagementController implements BaseController {
     @PostMapping("/client/register")
     public Mono<R<OAuthClientRegistrationResponseVO>> registerClient(
             @RequestBody OAuthClientRegistrationRequestVO request) {
-        return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.registerClient(request,
-                header))));
+        return getPrincipalHeader().flatMap(header -> async(() -> {
+            if (oauthClientBuilder.isUnknownClientType(request)) {
+                throw new OAuthProtocolException(HttpStatus.BAD_REQUEST.value(), "invalid_client_metadata",
+                        "unsupported client_type");
+            }
+            return R.ok(oauthMcpRuntimeService.registerClient(oauthClientBuilder.buildBOByRequestVO(request), header));
+        }));
     }
 
     /**
@@ -169,8 +180,8 @@ public class McpManagementController implements BaseController {
     @PostMapping("/connection/add")
     public Mono<R<McpConnectionVO>> createConnection(
             @Validated(Add.class) @RequestBody McpConnectionAddVO connection) {
-        return getPrincipalHeader()
-                .flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.createConnection(connection, header))));
+        return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.createConnection(
+                mcpConnectionBuilder.buildBOByAddVO(connection), header))));
     }
 
     /**
@@ -311,10 +322,10 @@ public class McpManagementController implements BaseController {
             }))
     @PostMapping("/audit/list")
     public Mono<R<List<McpAuditVO>>> listAuditLog(
-            @Parameter(description = "Filter by owning principal ID.", example = "2048") @RequestParam(value = "principalId", required = false) Long principalId,
-            @Parameter(description = "Filter by MCP tool ID.", example = "tool_read_device") @RequestParam(value = "toolId", required = false) String toolId,
+            @Parameter(description = "Filter by owning principal ID.", example = "2048") @RequestParam(value = "principal_id", required = false) Long principalId,
+            @Parameter(description = "Filter by MCP tool ID.", example = "tool_read_device") @RequestParam(value = "tool_id", required = false) String toolId,
             @Parameter(description = "Filter by audit invocation outcome: SUCCESS, DENIED, POLICY_DENIED, ERROR, or UNKNOWN.", example = "SUCCESS") @RequestParam(value = "status", required = false) String status,
-            @Parameter(description = "Filter by tool risk level: LOW, MEDIUM, or HIGH.", example = "LOW") @RequestParam(value = "riskLevel", required = false) String riskLevel,
+            @Parameter(description = "Filter by tool risk level: LOW, MEDIUM, or HIGH.", example = "LOW") @RequestParam(value = "risk_level", required = false) String riskLevel,
             @Parameter(description = "Maximum number of records to return.", example = "20") @RequestParam(value = "limit", required = false) Integer limit) {
         return getTenantId().flatMap(tenantId -> async(() -> R.ok(oauthMcpRuntimeService.listAudit(
                 tenantId, principalId, StringUtils.defaultString(toolId), StringUtils.defaultString(status),

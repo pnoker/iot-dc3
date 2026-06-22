@@ -20,6 +20,8 @@ package io.github.pnoker.common.auth.biz.impl;
 import io.github.pnoker.common.auth.config.OAuthProperties;
 import io.github.pnoker.common.auth.dal.PrincipalManager;
 import io.github.pnoker.common.auth.dal.ServiceAccountManager;
+import io.github.pnoker.common.auth.entity.bo.McpConnectionAddBO;
+import io.github.pnoker.common.auth.entity.bo.OAuthClientRegistrationBO;
 import io.github.pnoker.common.auth.entity.builder.McpConnectionBuilder;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
@@ -27,13 +29,14 @@ import io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
-import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
-import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
 import io.github.pnoker.common.auth.service.TenantMembershipService;
 import io.github.pnoker.common.auth.tool.McpOpenApiAggregator;
 import io.github.pnoker.common.constant.service.McpConstant;
+import io.github.pnoker.common.enums.OAuthClientTypeEnum;
+import io.github.pnoker.common.enums.OAuthGrantTypeEnum;
+import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
 import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
@@ -277,11 +280,10 @@ class OAuthMcpRuntimeServiceImplTest {
 
     @Test
     void publicClientRegistrationPersistsPkceClientWithoutSecret() {
-        OAuthClientRegistrationRequestVO request = OAuthClientRegistrationRequestVO.builder()
-                .clientName("Claude Desktop")
-                .redirectUris(List.of("http://127.0.0.1/callback"))
-                .scope("mcp:tools:list mcp:tools:call")
-                .build();
+        OAuthClientRegistrationBO request = new OAuthClientRegistrationBO();
+        request.setClientName("Claude Desktop");
+        request.setRedirectUris(List.of("http://127.0.0.1/callback"));
+        request.setScope("mcp:tools:list mcp:tools:call");
 
         RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
         principal.setPrincipalId(100L);
@@ -305,12 +307,11 @@ class OAuthMcpRuntimeServiceImplTest {
 
     @Test
     void confidentialClientCredentialsRegistrationRequiresActiveServiceAccount() {
-        OAuthClientRegistrationRequestVO request = OAuthClientRegistrationRequestVO.builder()
-                .clientName("Robot")
-                .clientType("CONFIDENTIAL")
-                .grantTypes(List.of("client_credentials"))
-                .serviceAccountPrincipalId(200L)
-                .build();
+        OAuthClientRegistrationBO request = new OAuthClientRegistrationBO();
+        request.setClientName("Robot");
+        request.setClientType(OAuthClientTypeEnum.CONFIDENTIAL);
+        request.setGrantTypes(List.of(OAuthGrantTypeEnum.CLIENT_CREDENTIALS));
+        request.setServiceAccountPrincipalId(200L);
 
         RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
         principal.setPrincipalId(100L);
@@ -335,12 +336,11 @@ class OAuthMcpRuntimeServiceImplTest {
 
     @Test
     void confidentialRegistrationRejectsNullPrincipal() {
-        OAuthClientRegistrationRequestVO request = OAuthClientRegistrationRequestVO.builder()
-                .clientName("Robot")
-                .clientType("CONFIDENTIAL")
-                .grantTypes(List.of("client_credentials"))
-                .serviceAccountPrincipalId(200L)
-                .build();
+        OAuthClientRegistrationBO request = new OAuthClientRegistrationBO();
+        request.setClientName("Robot");
+        request.setClientType(OAuthClientTypeEnum.CONFIDENTIAL);
+        request.setGrantTypes(List.of(OAuthGrantTypeEnum.CLIENT_CREDENTIALS));
+        request.setServiceAccountPrincipalId(200L);
 
         assertThatThrownBy(() -> service.registerClient(request, null))
                 .isInstanceOf(OAuthMcpRuntimeServiceImpl.OAuthProtocolException.class)
@@ -352,13 +352,12 @@ class OAuthMcpRuntimeServiceImplTest {
         // Body claims tenantId 99 plus a foreign service account, but the caller is in tenant 1.
         // The service-account lookup must run against the caller's tenant (1), where none exists,
         // so the body-supplied tenantId is effectively ignored.
-        OAuthClientRegistrationRequestVO request = OAuthClientRegistrationRequestVO.builder()
-                .clientName("Robot")
-                .clientType("CONFIDENTIAL")
-                .grantTypes(List.of("client_credentials"))
-                .tenantId(99L)
-                .serviceAccountPrincipalId(200L)
-                .build();
+        OAuthClientRegistrationBO request = new OAuthClientRegistrationBO();
+        request.setClientName("Robot");
+        request.setClientType(OAuthClientTypeEnum.CONFIDENTIAL);
+        request.setGrantTypes(List.of(OAuthGrantTypeEnum.CLIENT_CREDENTIALS));
+        request.setTenantId(99L);
+        request.setServiceAccountPrincipalId(200L);
 
         RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
         principal.setPrincipalId(100L);
@@ -502,14 +501,12 @@ class OAuthMcpRuntimeServiceImplTest {
 
     @Test
     void createConnectionStampsCreatorFromCaller() {
-        McpConnectionAddVO entityVO = new McpConnectionAddVO();
-        McpConnectionRecord built = new McpConnectionRecord();
-        built.setClientId("dc3_abc");
-        built.setGrantType("client_credentials");
-        built.setPrincipalId(200L);
-        built.setPrincipalType("SERVICE_ACCOUNT");
-        built.setTenantId(1L);
-        when(mcpConnectionBuilder.buildRecordByAddVO(entityVO)).thenReturn(built);
+        McpConnectionAddBO entityBO = new McpConnectionAddBO();
+        entityBO.setClientId("dc3_abc");
+        entityBO.setGrantType(OAuthGrantTypeEnum.CLIENT_CREDENTIALS);
+        entityBO.setPrincipalId(200L);
+        entityBO.setPrincipalType(PrincipalTypeEnum.SERVICE_ACCOUNT);
+        entityBO.setTenantId(1L);
         OAuthRegisteredClientRecord client = new OAuthRegisteredClientRecord();
         client.setClientId("dc3_abc");
         client.setAuthorizationGrantTypes("client_credentials");
@@ -521,7 +518,7 @@ class OAuthMcpRuntimeServiceImplTest {
 
         RequestHeader.PrincipalHeader header = header(100L, 1L);
         header.setDisplayName("alice");
-        service.createConnection(entityVO, header);
+        service.createConnection(entityBO, header);
 
         ArgumentCaptor<McpConnectionRecord> captor = ArgumentCaptor.forClass(McpConnectionRecord.class);
         verify(oauthMcpMapper).insertConnection(captor.capture());

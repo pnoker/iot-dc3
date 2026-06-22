@@ -17,16 +17,21 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
+import io.github.pnoker.common.auth.entity.bo.OAuthClientRegistrationBO;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
+import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.enums.OAuthClientTypeEnum;
+import io.github.pnoker.common.enums.OAuthGrantTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * MapStruct builder converting an OAuth registered client projection to its view object.
@@ -59,5 +64,42 @@ public interface OAuthClientBuilder {
      * @return EntityVO Array
      */
     List<OAuthClientVO> buildVOListByRecordList(List<OAuthRegisteredClientRecord> entityRecordList);
+
+    /**
+     * RequestVO to BO (write-path input; string client type / grant types parsed into domain enums)
+     *
+     * @param entityVO Registration request VO
+     * @return EntityBO
+     */
+    @Mapping(target = "clientType", ignore = true)
+    @Mapping(target = "grantTypes", ignore = true)
+    OAuthClientRegistrationBO buildBOByRequestVO(OAuthClientRegistrationRequestVO entityVO);
+
+    @AfterMapping
+    default void afterProcess(OAuthClientRegistrationRequestVO entityVO,
+                              @MappingTarget OAuthClientRegistrationBO entityBO) {
+        entityBO.setClientType(
+                OAuthClientTypeEnum.ofValue(StringUtils.upperCase(StringUtils.trimToNull(entityVO.getClientType()))));
+        if (Objects.nonNull(entityVO.getGrantTypes())) {
+            entityBO.setGrantTypes(entityVO.getGrantTypes().stream()
+                    .map(StringUtils::trimToNull)
+                    .filter(Objects::nonNull)
+                    .map(OAuthGrantTypeEnum::ofValue)
+                    .filter(Objects::nonNull)
+                    .toList());
+        }
+    }
+
+    /**
+     * Whether the request carries a non-blank but unrecognized client_type. Lets the caller reject it
+     * (preserving the original "unsupported client_type" check) instead of silently defaulting to PUBLIC.
+     *
+     * @param entityVO Registration request VO
+     * @return true when client_type is present yet not a known {@link OAuthClientTypeEnum}
+     */
+    default boolean isUnknownClientType(OAuthClientRegistrationRequestVO entityVO) {
+        String raw = StringUtils.upperCase(StringUtils.trimToNull(entityVO.getClientType()));
+        return Objects.nonNull(raw) && Objects.isNull(OAuthClientTypeEnum.ofValue(raw));
+    }
 
 }
