@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-common-thread` is the shared thread pool configuration module of the IoT DC3 platform. It configures the
-platform-wide async task executor used for `@Async` annotated methods
-across all services.
+`dc3-common-thread` is the shared thread pool module of the IoT DC3 platform. It exposes a set of JDK executor
+beans (configured from the `dc3.thread` properties) that other modules inject explicitly for background work such
+as concurrent point reads and batch message handling.
 
 ## Module Information
 
@@ -14,28 +14,30 @@ across all services.
 
 ## Key Components
 
-| Component          | Purpose                                                                                            |
-|--------------------|----------------------------------------------------------------------------------------------------|
-| `ThreadPoolConfig` | Creates and configures the `TaskExecutor` bean used by Spring's `@Async`                           |
-| `ThreadProperties` | Binds thread pool properties from YAML (`core-pool-size`, `max-pool-size`, `queue-capacity`, etc.) |
-| `ThreadInitRunner` | Startup log for confirming thread pool initialization                                              |
+| Component          | Purpose                                                                                              |
+|--------------------|------------------------------------------------------------------------------------------------------|
+| `ThreadPoolConfig` | Provides three executor beans — `threadPoolExecutor` (`ThreadPoolExecutor`), `virtualThreadExecutor` (virtual-thread `ExecutorService`), `scheduledThreadPoolExecutor` (`ScheduledThreadPoolExecutor`) — sharing a caller-runs rejection handler |
+| `ThreadProperties` | Binds thread pool properties from YAML (prefix `dc3.thread`: `prefix`, `corePoolSize`, `maximumPoolSize`, `keepAliveTime`) |
+| `ThreadInitRunner` | Startup log for confirming thread pool initialization                                                |
 
 ## Configuration Properties
 
 ```yaml
-thread:
-  pool:
-    core-pool-size: ${THREAD_POOL_CORE_SIZE:10}
-    max-pool-size: ${THREAD_POOL_MAX_SIZE:200}
-    queue-capacity: ${THREAD_POOL_QUEUE_CAPACITY:1000}
-    keep-alive-seconds: ${THREAD_POOL_KEEP_ALIVE:30}
-    thread-name-prefix: dc3-async-
+dc3:
+  thread:
+    prefix: dc3-thread-
+    core-pool-size: 4
+    maximum-pool-size: 32
+    keep-alive-time: 15
 ```
 
 ## Usage
 
-Any `@Async` annotated method (e.g., `MetadataEventListener.onApplicationEvent`) executes on this thread pool
-automatically when `dc3-common-thread` is on the classpath.
+Inject the executor you need, e.g. `private final ExecutorService virtualThreadExecutor;` in `PointValueJob` /
+`MqttScheduleJob`, or `private final ThreadPoolExecutor threadPoolExecutor;` in `DriverReadScheduleJob`.
+
+> Note: Spring's `@Async` does **not** use these beans — it runs on Spring Boot's default `applicationTaskExecutor`.
+> These executors are obtained by explicit constructor injection, not via `@Async`.
 
 ## Build Instructions
 
@@ -45,8 +47,9 @@ mvn -s ../../.mvn/settings.xml clean package
 
 ## Related Modules
 
-- `dc3-common-manager` — Uses async thread pool for `MetadataEventListener`
-- All `dc3-center-*` — Pull in this module for async support
+- `dc3-common-data` / `dc3-common-mqtt` — inject `virtualThreadExecutor` for batch persistence / message handling
+- `dc3-common-driver` — injects `threadPoolExecutor` for concurrent device reads
+- `dc3-driver-opc-da` — injects `scheduledThreadPoolExecutor`
 
 ## License
 
