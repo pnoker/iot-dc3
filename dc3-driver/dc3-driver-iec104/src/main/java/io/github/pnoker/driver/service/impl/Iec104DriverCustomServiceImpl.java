@@ -27,35 +27,32 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
+import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.openmuc.j60870.ClientConnectionBuilder;
-import org.openmuc.j60870.Connection;
-import org.openmuc.j60870.ConnectionEventListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Custom driver service implementation for the IEC 60870-5-104 Driver.
  * <p>
- * This service implements the IEC 104 protocol for communication with substation
- * automation and telecontrol equipment. It uses the j60870 library for IEC 104
- * client connections and supports ASDU event handling and data polling.
+ * Validates device/point configuration and builds outbound control command payloads for
+ * substation automation and telecontrol equipment.
  * </p>
  *
- *
  * <p>
- * <b>WARNING:</b> This driver is a work-in-progress skeleton. Protocol-level
- * I/O is not yet fully implemented — see TODO markers in method bodies.
+ * <b>WORK IN PROGRESS:</b> protocol-level I/O over the j60870 client (IOA read and control
+ * command write) is not implemented yet. {@link #read} and {@link #write} therefore fail fast by
+ * throwing instead of echoing a locally cached value or reporting a fabricated success, so the SDK
+ * records the failure and applies connection backoff.
  * </p>
  *
  * @author pnoker
@@ -68,14 +65,6 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
-    /**
-     * Device connection cache keyed by device ID.
-     */
-    private final ConcurrentHashMap<Long, Connection> connectMap = new ConcurrentHashMap<>();
-    /**
-     * IOA value cache keyed by point ID for quick read access.
-     */
-    private final ConcurrentHashMap<Long, String> valueCache = new ConcurrentHashMap<>();
     @Value("${dc3.driver.code}")
     private String driverCode;
 
@@ -124,60 +113,19 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                                PointBO point) {
-        int ioa = getConfigIntValue(pointConfig, "ioa", 0);
-
-        // TODO: Verify the correct j60870 API for reading an IOA value.
-        // The actual API call depends on the library version:
-        //   Connection.read(int ioa) or Connection.getInformationObject(int ioa)
-        // Use the connection from connectMap and retrieve the cached value.
-        String cachedValue = valueCache.get(point.getId());
-        if (StringUtils.isNotBlank(cachedValue)) {
-            return new ReadPointValue(device, point, cachedValue);
-        }
-
-        Connection connection = connectMap.get(device.getId());
-        if (Objects.isNull(connection)) {
-            connection = connectToIec104Server(driverConfig, device);
-            if (Objects.isNull(connection)) {
-                log.error("IEC 104 connection failed, deviceId={}", device.getId());
-                throw new RuntimeException("IEC 104 connection failed for device " + device.getId());
-            }
-            connectMap.put(device.getId(), connection);
-        }
-
-        // TODO: Perform actual read from the IEC 104 server using the connection.
-        // For now, return the cached value or empty string.
-        return new ReadPointValue(device, point, StringUtils.defaultString(cachedValue));
+        // Protocol read is not implemented yet (see class WORK IN PROGRESS note). Fail fast so the
+        // SDK records a read failure and applies backoff instead of echoing a fabricated/cached value.
+        throw new ReadPointException("IEC 104 read not implemented: protocol I/O is pending, protocol={}, deviceId={}",
+                driverCode, device.getId());
     }
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
                          PointBO point, WritePointValue writePointValue) {
-        int ioa = getConfigIntValue(pointConfig, "ioa", 0);
-        String value = writePointValue.getValue();
-
-        Connection connection = connectMap.get(device.getId());
-        if (Objects.isNull(connection)) {
-            connection = connectToIec104Server(driverConfig, device);
-            if (Objects.isNull(connection)) {
-                log.error("IEC 104 connection failed for write, deviceId={}", device.getId());
-                return false;
-            }
-            connectMap.put(device.getId(), connection);
-        }
-
-        try {
-            // TODO: Verify the correct j60870 API for writing a control command.
-            // Use the ASDU type from pointConfig to determine the control type.
-            // Example: connection.sendControlCommand(ioa, value) or similar.
-            //
-            // Update the value cache after successful write.
-            valueCache.put(point.getId(), value);
-            return true;
-        } catch (Exception e) {
-            log.error("IEC 104 write failed, deviceId={}, pointId={}, ioa={}", device.getId(), point.getId(), ioa, e);
-            return false;
-        }
+        // Protocol write is not implemented yet (see class WORK IN PROGRESS note). Fail fast instead
+        // of caching the value locally and reporting a fabricated write success.
+        throw new WritePointException("IEC 104 write not implemented: protocol I/O is pending, protocol={}, deviceId={}",
+                driverCode, device.getId());
     }
 
     @Override
@@ -195,59 +143,6 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Connect to an IEC 104 server and register listeners for ASDU events.
-     *
-     * @param driverConfig driver configuration containing host, port, etc.
-     * @param device       device descriptor
-     * @return the established Connection, or null on failure
-     */
-    private Connection connectToIec104Server(Map<String, AttributeBO> driverConfig, DeviceBO device) {
-        String host = getConfigValue(driverConfig, "host", "localhost");
-        int port = getConfigIntValue(driverConfig, "port", 2404);
-        int connectTimeout = getConfigIntValue(driverConfig, "connectTimeout", 10000);
-
-        try {
-            // TODO: Verify the ClientConnectionBuilder API for j60870.
-            // The builder may require address lengths (asduAddress, cotLength, caLength, ioaLength).
-            // Example:
-            //   Connection connection = new ClientConnectionBuilder(host)
-            //       .setPort(port)
-            //       .build();
-            // Register listeners for ASDU events to cache IOA values.
-            Connection connection = new ClientConnectionBuilder(host)
-                    .setPort(port)
-                    .setConnectionEventListener(new ConnectionEventListener() {
-                        @Override
-                        public void newASdu(Connection conn, org.openmuc.j60870.ASdu aSdu) {
-                            log.debug("IEC 104 ASDU received, typeId={}, ioaCount={}",
-                                    aSdu.getTypeIdentification(),
-                                    aSdu.getInformationObjects() != null ? aSdu.getInformationObjects().length : 0);
-                        }
-
-                        @Override
-                        public void connectionClosed(Connection conn, IOException e) {
-                            log.warn("IEC 104 connection closed, deviceId={}", device.getId());
-                            connectMap.remove(device.getId());
-                        }
-
-                        @Override
-                        public void dataTransferStateChanged(Connection conn, boolean active) {
-                            log.info("IEC 104 data transfer state changed: active={}, deviceId={}", active, device.getId());
-                        }
-                    })
-                    .build();
-
-            connection.startDataTransfer();
-
-            log.info("IEC 104 connected to {}:{}, deviceId={}", host, port, device.getId());
-            return connection;
-        } catch (Exception e) {
-            log.error("IEC 104 connection failed, host={}, port={}, deviceId={}", host, port, device.getId(), e);
-            return null;
-        }
-    }
-
-    /**
      * Get string config value with default.
      */
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
@@ -256,19 +151,6 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
         }
         String value = config.get(code).getValue();
         return StringUtils.defaultIfBlank(value, defaultValue);
-    }
-
-    /**
-     * Get int config value with default.
-     */
-    private int getConfigIntValue(Map<String, AttributeBO> config, String code, int defaultValue) {
-        String value = getConfigValue(config, code, String.valueOf(defaultValue));
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            log.warn("Failed to parse int config value for code={}, using default={}", code, defaultValue);
-            return defaultValue;
-        }
     }
 
     @Override

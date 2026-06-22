@@ -18,10 +18,6 @@
 package io.github.pnoker.driver.service.impl;
 
 import gurux.dlms.GXDLMSClient;
-import gurux.dlms.enums.Authentication;
-import gurux.dlms.enums.InterfaceType;
-import gurux.dlms.enums.ObjectType;
-import gurux.dlms.objects.GXDLMSObject;
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
@@ -50,15 +46,15 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * DLMS/COSEM driver service implementation.
  * <p>
- * Provides DLMS/COSEM protocol communication for smart metering devices.
- * Supports TCP and serial transport, with configurable authentication and
- * standard DLMS object types (Register, Clock, Data, etc.).
+ * Provides DLMS/COSEM protocol metadata for smart metering devices: configuration validation,
+ * connection bookkeeping, and metadata-event handling.
  * </p>
  *
- *
  * <p>
- * <b>WARNING:</b> This driver is a work-in-progress skeleton. Protocol-level
- * I/O is not yet fully implemented — see TODO markers in method bodies.
+ * <b>WORK IN PROGRESS:</b> protocol-level transport I/O (TCP/serial send-receive and HDLC
+ * handshake) is not implemented yet. {@link #read} and {@link #write} therefore fail fast by
+ * throwing instead of returning fabricated success, so the SDK records the failure and applies
+ * connection backoff rather than emitting placeholder values.
  * </p>
  *
  * @author pnoker
@@ -136,131 +132,20 @@ public class DlmsDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                                DeviceBO device, PointBO point) {
-        GXDLMSClient client = getConnector(device.getId(), driverConfig);
-        try {
-            String objectTypeStr = getConfigValue(pointConfig, "objectType", "REGISTER");
-            String logicalName = getConfigValue(pointConfig, "logicalName", "");
-            int attributeId = getConfigIntValue(pointConfig, "attributeId", 2);
-
-            ObjectType objectType = ObjectType.valueOf(objectTypeStr.toUpperCase());
-            GXDLMSObject dlmsObject = client.getObjects().findByLN(objectType, logicalName);
-            if (Objects.isNull(dlmsObject)) {
-                dlmsObject = GXDLMSClient.createObject(objectType);
-                dlmsObject.setLogicalName(logicalName);
-                client.getObjects().add(dlmsObject);
-            }
-
-            // TODO: client.read() generates raw DLMS frames (byte[][]) that must be sent
-            //       over the transport. The full flow requires:
-            //       1. byte[][] frames = client.read(dlmsObject, attributeId)
-            //       2. Send frames over TCP/serial transport
-            //       3. Receive response bytes from transport
-            //       4. Object value = client.updateValue(dlmsObject, attributeId, responseBytes)
-            byte[][] frames = client.read(dlmsObject, attributeId);
-            log.debug("DLMS read frames generated, protocol={}, deviceId={}, objectType={}, logicalName={}, frameCount={}",
-                    driverCode, device.getId(), objectTypeStr, logicalName, frames.length);
-
-            // TODO: Replace with actual transport send/receive and value decoding
-            // For now, return a placeholder indicating the DLMS frame was generated
-            return new ReadPointValue(device, point, null);
-        } catch (ReadPointException e) {
-            throw e;
-        } catch (Exception e) {
-            clientMap.remove(device.getId());
-            throw new ReadPointException("DLMS read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
-        }
+        // Transport send/receive is not implemented yet (see class WORK IN PROGRESS note). Fail
+        // fast so the SDK records a read failure and applies backoff instead of emitting a
+        // fabricated value.
+        throw new ReadPointException("DLMS read not implemented: transport I/O is pending, protocol={}, deviceId={}",
+                driverCode, device.getId());
     }
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                          DeviceBO device, PointBO point, WritePointValue writePointValue) {
-        GXDLMSClient client = getConnector(device.getId(), driverConfig);
-        try {
-            String objectTypeStr = getConfigValue(pointConfig, "objectType", "REGISTER");
-            String logicalName = getConfigValue(pointConfig, "logicalName", "");
-            int attributeId = getConfigIntValue(pointConfig, "attributeId", 2);
-
-            ObjectType objectType = ObjectType.valueOf(objectTypeStr.toUpperCase());
-            GXDLMSObject dlmsObject = client.getObjects().findByLN(objectType, logicalName);
-            if (Objects.isNull(dlmsObject)) {
-                dlmsObject = GXDLMSClient.createObject(objectType);
-                dlmsObject.setLogicalName(logicalName);
-                client.getObjects().add(dlmsObject);
-            }
-
-            // TODO: client.write() generates raw DLMS frames that must be sent over transport.
-            //       The full write flow:
-            //       1. Set the value on the DLMS object attribute
-            //       2. byte[][] frames = client.write(dlmsObject, attributeId)
-            //       3. Send frames over TCP/serial transport
-            //       4. Receive and process acknowledgment
-            byte[][] frames = client.write(dlmsObject, attributeId);
-            log.debug("DLMS write frames generated, protocol={}, deviceId={}, objectType={}, logicalName={}, frameCount={}",
-                    driverCode, device.getId(), objectTypeStr, logicalName, frames.length);
-
-            return true;
-        } catch (Exception e) {
-            clientMap.remove(device.getId());
-            throw new WritePointException("DLMS write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Get or create a GXDLMSClient for the given device.
-     *
-     * @param deviceId     unique device identifier
-     * @param driverConfig driver configuration containing DLMS connection parameters
-     * @return cached or newly created GXDLMSClient
-     */
-    private GXDLMSClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
-        return clientMap.computeIfAbsent(deviceId, id -> {
-            String transportType = getConfigValue(driverConfig, "transportType", "TCP");
-            int clientAddress = getConfigIntValue(driverConfig, "clientAddress", 16);
-            int serverAddress = getConfigIntValue(driverConfig, "serverAddress", 1);
-            String authenticationStr = getConfigValue(driverConfig, "authentication", "NONE");
-            String password = getConfigValue(driverConfig, "password", "");
-
-            log.debug("Driver connection creating, protocol={}, deviceId={}, transportType={}",
-                    driverCode, deviceId, transportType);
-
-            Authentication authentication = Authentication.valueOf(authenticationStr.toUpperCase());
-            InterfaceType interfaceType = "SERIAL".equalsIgnoreCase(transportType)
-                    ? InterfaceType.HDLC
-                    : InterfaceType.WRAPPER;
-
-            GXDLMSClient client = new GXDLMSClient(true);
-            client.setInterfaceType(interfaceType);
-            client.setClientAddress(clientAddress);
-            client.setServerAddress(serverAddress);
-            client.setAuthentication(authentication);
-            if (!password.isEmpty()) {
-                client.setPassword(password.getBytes());
-            }
-
-            // TODO: Implement actual TCP/serial transport connection and HDLC handshake
-            // TODO: For production use, establish the physical connection here and store
-            //       the transport alongside the client for proper read/write operations
-
-            log.info("Driver connection established, protocol={}, deviceId={}, transportType={}, clientAddress={}, serverAddress={}",
-                    driverCode, deviceId, transportType, clientAddress, serverAddress);
-            return client;
-        });
-    }
-
-    private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
-        AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
-            return defaultValue;
-        }
-        return attr.getValue(String.class);
-    }
-
-    private int getConfigIntValue(Map<String, AttributeBO> config, String code, int defaultValue) {
-        AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue())) {
-            return defaultValue;
-        }
-        return attr.getValue(Integer.class);
+        // Transport send/receive is not implemented yet (see class WORK IN PROGRESS note). Fail
+        // fast instead of reporting a fabricated write success.
+        throw new WritePointException("DLMS write not implemented: transport I/O is pending, protocol={}, deviceId={}",
+                driverCode, device.getId());
     }
 
     @Override
