@@ -24,6 +24,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Manager Initialization Runner for DC3 IoT Platform. This class is responsible for
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @since 2016.10.1
  */
 @AutoConfiguration
+@EnableAsync
 @ComponentScan(basePackages = {"io.github.pnoker.common.manager"})
 @MapperScan(basePackages = {"io.github.pnoker.common.manager.mapper"})
 @RequiredArgsConstructor

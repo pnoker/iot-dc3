@@ -22,7 +22,6 @@ import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,7 +33,6 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@EnableAsync
 @RequiredArgsConstructor
 public class MetadataEventPublisher {
 
