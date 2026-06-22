@@ -57,12 +57,12 @@ fail-gate** 防回退。
 
 - **P1 扩展校验器**：`ApiAnnotationValidator` 新增「请求参数描述覆盖」检查，对齐聚合器 `buildOperationSchema` 实际并入
   inputSchema 的两类来源：
-  - **请求体字段**：反射解析 `@RequestBody` 参数类型 → 遍历其非静态、非 transient 声明字段 → 要求每个字段带 `@Schema` 且
-    `description` 非空；缺失报 `apiCode: body field <name> missing @Schema(description)`
-    。嵌套类型有界递归（深度上限，防循环），跳过原生/包装/JDK/框架类型。
-  - **query/path 参数**：对 `@RequestParam`/`@PathVariable` 方法参数，要求带 `@Parameter` 且 `description` 非空；缺失报
-    `apiCode: param <name> missing @Parameter(description)`。
-  - 无任何请求参数的端点（如无参 GET）此项跳过。保留 SP1 的 operation 级检查。
+    - **请求体字段**：反射解析 `@RequestBody` 参数类型 → 遍历其非静态、非 transient 声明字段 → 要求每个字段带 `@Schema` 且
+      `description` 非空；缺失报 `apiCode: body field <name> missing @Schema(description)`
+      。嵌套类型有界递归（深度上限，防循环），跳过原生/包装/JDK/框架类型。
+    - **query/path 参数**：对 `@RequestParam`/`@PathVariable` 方法参数，要求带 `@Parameter` 且 `description` 非空；缺失报
+      `apiCode: param <name> missing @Parameter(description)`。
+    - 无任何请求参数的端点（如无参 GET）此项跳过。保留 SP1 的 operation 级检查。
 - **P2 接入 make/CI 做棘轮 fail-gate**：把校验器做成可在 `make`/CI
   调用的检查，带「已完成服务白名单」（配置项，初始为空）。白名单内服务有任一缺陷 → **fail build**；名单外服务 → 仅输出缺失清单不
   fail。每完成一个服务批次，把该服务加入白名单。
