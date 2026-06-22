@@ -2,8 +2,8 @@
 
 - `git`
 - `Visual Studio Code`
-- `nodejs` >= 18, recommended to use 22
-- `pnpm`, install using `corepack enable && corepack prepare pnpm@latest --activate` (or `npm install -g pnpm`)
+- `nodejs` >= 22 (enforced by `engines` in `package.json`)
+- `pnpm` 11.3.0 (pinned via `packageManager`), install using `corepack enable && corepack prepare pnpm@11.3.0 --activate`
 
 ## 2. Source code
 
@@ -22,3 +22,12 @@ pnpm install
 # run
 pnpm dev
 ```
+
+The dev server runs on `http://localhost:8080` and proxies API calls to the backend
+gateway (`http://localhost:8000`), so start the backend stack first.
+
+## 4. More
+
+For the full command surface (build, type-check, lint, unit/component/E2E tests), the
+tech stack, environment configuration (`src/config/env/`), and project conventions, see
+[`AGENTS.md`](./AGENTS.md).

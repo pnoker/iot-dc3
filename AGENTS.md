@@ -218,9 +218,9 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 
 ## Cross-Repo References
 
-The canonical project instructions are in `../AGENTS.md` (shared across AI tools). The backend lives in `../iot-dc3/`,
-container infrastructure in `../dc3-docker/`, parent POM in `../dc3-parent/`. See the root `CLAUDE.md` for the full
-monorepo map.
+The canonical project instructions are in `../AGENTS.md` (shared across AI tools). The backend lives in `../iot-dc3/`;
+container/compose infrastructure and the parent POM also live under `../iot-dc3/` (see `iot-dc3/dc3/` and
+`iot-dc3/pom.xml`). See the root `CLAUDE.md` for the full monorepo map.
 
 ### Menu system (frontend ↔ backend)
 
@@ -242,6 +242,8 @@ All settings route names use the pattern `settings<Group><Item>`, e.g. `settings
 
 ## Dockerfile Build
 
-Uses `pnpm@10.33.2`, matching `package.json`'s `packageManager` field. **When bumping pnpm, update
-the `corepack prepare pnpm@X --activate` line in `Dockerfile` in lockstep** — otherwise CI will resolve a different
-version than local.
+The `Dockerfile` pins pnpm via `corepack prepare pnpm@<version> --activate`, which **must** stay in lockstep with
+`package.json`'s `packageManager` field — otherwise CI resolves a different version than local.
+
+> ⚠️ Currently out of sync: `Dockerfile` uses `pnpm@10.33.2` while `packageManager` is `pnpm@11.3.0`. Align the
+> Dockerfile to the pinned version.
