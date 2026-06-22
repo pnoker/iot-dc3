@@ -161,10 +161,10 @@ public abstract class AbstractJdbcDriverCustomService implements DriverCustomSer
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                          DeviceBO device, PointBO point, WritePointValue writePointValue) {
         String writeQuery = getRequiredConfig(pointConfig, "writeQuery");
-        String resolvedQuery = writeQuery.replace("${value}", writePointValue.getValue(String.class));
+        String value = writePointValue.getValue(String.class);
         HikariDataSource ds = getConnector(device.getId(), driverConfig);
         try {
-            return executeWriteQuery(ds, resolvedQuery);
+            return executeWriteQuery(ds, writeQuery, value);
         } catch (WritePointException e) {
             invalidateConnector(device.getId(), ds);
             throw e;
@@ -240,16 +240,23 @@ public abstract class AbstractJdbcDriverCustomService implements DriverCustomSer
     }
 
     /**
-     * Execute a write SQL query (UPDATE/INSERT/DELETE).
+     * Execute a write SQL query (UPDATE/INSERT/DELETE), binding the point value as a parameter.
+     * <p>
+     * The {@code writeQuery} must use a single {@code ?} placeholder for the written value; the
+     * value is bound via {@link PreparedStatement#setString} rather than concatenated into the SQL,
+     * so a malicious point value cannot alter the statement (no SQL injection).
+     * </p>
      *
      * @param ds         active HikariDataSource
-     * @param writeQuery SQL write query
+     * @param writeQuery SQL write query containing a single {@code ?} value placeholder
+     * @param value      point value to bind to the placeholder
      * @return true if at least one row was affected
      * @throws WritePointException if query execution fails
      */
-    protected boolean executeWriteQuery(HikariDataSource ds, String writeQuery) {
+    protected boolean executeWriteQuery(HikariDataSource ds, String writeQuery, String value) {
         try (Connection conn = ds.getConnection();
              PreparedStatement ps = conn.prepareStatement(writeQuery)) {
+            ps.setString(1, value);
             int rows = ps.executeUpdate();
             log.debug("Driver SQL write executed, protocol={}, rows={}", driverCode, rows);
             return rows > 0;

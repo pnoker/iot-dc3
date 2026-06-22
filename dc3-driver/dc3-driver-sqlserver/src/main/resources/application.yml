@@ -87,7 +87,7 @@ dc3:
         attribute-code: writeQuery
         attribute-type-flag: STRING
         default-value:
-        remark: SQL UPDATE/INSERT query for writing point value
+        remark: SQL UPDATE/INSERT using a single ? placeholder for the written value (bound as a parameter)
     command-attribute:
       - attribute-name: Execute Query
         attribute-code: executeQuery
