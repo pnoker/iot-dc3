@@ -15,10 +15,11 @@ and write data block registers.
 
 ## Driver Attributes (Device-level)
 
-| Attribute | Description                 |
-|-----------|-----------------------------|
-| Host      | PLC IP address              |
-| Port      | S7 TCP port (typically 102) |
+| Attribute | Description                                          |
+|-----------|------------------------------------------------------|
+| Host      | PLC IP address                                       |
+| Port      | S7 TCP port (typically 102)                          |
+| PLC Type  | Siemens PLC model (selects the S7 addressing scheme) |
 
 ## Point Attributes
 
@@ -27,7 +28,6 @@ and write data block registers.
 | DB Number   | Siemens data block number                       |
 | Byte Offset | Byte offset within the data block               |
 | Bit Offset  | Bit offset within the byte (for boolean points) |
-| Data Length | Length of data to read in bytes                 |
 
 ## Prerequisites
 

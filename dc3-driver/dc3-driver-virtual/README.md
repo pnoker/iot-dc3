@@ -19,7 +19,26 @@ values on a configurable schedule without connecting to real hardware.
 |-----------|---------------------------|
 | Host      | Simulated target hostname |
 | Port      | Simulated target port     |
-| Tag       | Point tag identifier      |
+
+## Point Attributes
+
+| Attribute | Description          |
+|-----------|----------------------|
+| Tag       | Point tag identifier |
+
+## Command Attributes (write)
+
+| Attribute         | Description                       |
+|-------------------|-----------------------------------|
+| Payload Template  | Template for the command payload  |
+| Response Template | Template for parsing the response |
+
+## Event Attributes
+
+| Attribute       | Description                        |
+|-----------------|------------------------------------|
+| Event Code Path | Path to the event code in payload  |
+| Payload Path    | Path to the event payload          |
 
 ## Data Collection Schedule
 

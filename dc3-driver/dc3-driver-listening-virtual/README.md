@@ -20,7 +20,7 @@ devices that push data. It demonstrates listening-type driver patterns supportin
 | TCP      | `6270` (default, overridable via `TCP_PORT`) |
 | UDP      | `6271` (default, overridable via `UDP_PORT`) |
 
-## Driver Attributes
+## Point Attributes
 
 | Attribute  | Description                   |
 |------------|-------------------------------|
@@ -28,6 +28,8 @@ devices that push data. It demonstrates listening-type driver patterns supportin
 | Start Byte | Data start byte offset        |
 | End Byte   | Data end byte offset          |
 | Type       | Data type interpretation      |
+
+This driver declares no device-level driver attributes; all configuration is per-point.
 
 ## Running Locally
 

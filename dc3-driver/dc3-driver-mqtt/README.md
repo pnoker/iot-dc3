@@ -2,9 +2,12 @@
 
 ## Overview
 
-`dc3-driver-mqtt` is the MQTT protocol driver of the IoT DC3 platform. It subscribes to configured MQTT topics, parses
-incoming payloads as device point values, and forwards
-commands to devices via MQTT publish.
+`dc3-driver-mqtt` is the MQTT protocol driver of the IoT DC3 platform. It is intended to subscribe to configured MQTT
+topics, parse incoming payloads as device point values, and forward commands to devices via MQTT publish.
+
+> ⚠️ **Work in progress.** This driver is currently a skeleton — protocol-level I/O is not yet fully implemented
+> (`health()` always reports online and `read()` is a reference stub; see the TODO markers in
+> `MqttDriverCustomServiceImpl`). Treat it as a starting template, not a production-ready driver.
 
 ## Module Information
 
@@ -20,14 +23,33 @@ commands to devices via MQTT publish.
 | Command Topic | MQTT topic for sending write commands       |
 | Command QoS   | MQTT QoS level for command messages (0/1/2) |
 
+## Command Attributes (write)
+
+| Attribute        | Description                                 |
+|------------------|---------------------------------------------|
+| Command Topic    | MQTT topic for sending write commands       |
+| Command QoS      | MQTT QoS level for command messages (0/1/2) |
+| Payload Template | Template for the command payload            |
+
+## Event Attributes
+
+| Attribute       | Description                       |
+|-----------------|-----------------------------------|
+| Source Topic    | MQTT topic to receive events from |
+| Event Code Path | Path to the event code in payload |
+| Payload Path    | Path to the event payload         |
+
 ## Prerequisites
 
-An MQTT broker (EMQX recommended) must be running:
+An MQTT broker must be running. The dev profile connects to the RabbitMQ MQTT plugin (`dc3-rabbitmq:2883`),
+which ships with the base stack:
 
 ```bash
-podman compose -f dc3/docker-compose-optional.yml up -d
-# EMQX MQTT broker on port 31883
+podman compose -f dc3/docker-compose-db.yml up -d
 ```
+
+EMQX is available as an alternative via the optional stack (`docker-compose-optional.yml`, port `31883`); point
+`MQTT_BROKER_HOST` / `MQTT_BROKER_PORT` at whichever broker you use.
 
 ## Running Locally
 
@@ -35,7 +57,6 @@ podman compose -f dc3/docker-compose-optional.yml up -d
 
 ```bash
 podman compose -f dc3/docker-compose-db.yml up -d
-podman compose -f dc3/docker-compose-optional.yml up -d
 java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
 ```
 

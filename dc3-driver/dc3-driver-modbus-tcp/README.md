@@ -19,14 +19,23 @@ write commands for register control.
 |-----------|---------------------------------|
 | Host      | Modbus slave IP address         |
 | Port      | Modbus TCP port (typically 502) |
-| Slave ID  | Modbus slave unit ID            |
 
 ## Point Attributes
 
 | Attribute     | Description                        |
 |---------------|------------------------------------|
+| Slave ID      | Modbus slave unit ID               |
 | Function Code | Modbus function code (01/02/03/04) |
 | Offset        | Register/coil address offset       |
+
+## Command Attributes (write)
+
+| Attribute      | Description                     |
+|----------------|---------------------------------|
+| Slave ID       | Modbus slave unit ID            |
+| Function Code  | Modbus function code            |
+| Offset         | Register/coil address offset    |
+| Value Template | Template for the value to write |
 
 ## Prerequisites
 
