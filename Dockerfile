@@ -25,7 +25,7 @@ WORKDIR /build
 
 COPY ./ ./
 
-RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
+RUN corepack enable && corepack prepare pnpm@11.3.0 --activate
 RUN pnpm install --frozen-lockfile
 RUN pnpm build
 

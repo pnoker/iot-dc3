@@ -242,8 +242,5 @@ All settings route names use the pattern `settings<Group><Item>`, e.g. `settings
 
 ## Dockerfile Build
 
-The `Dockerfile` pins pnpm via `corepack prepare pnpm@<version> --activate`, which **must** stay in lockstep with
-`package.json`'s `packageManager` field — otherwise CI resolves a different version than local.
-
-> ⚠️ Currently out of sync: `Dockerfile` uses `pnpm@10.33.2` while `packageManager` is `pnpm@11.3.0`. Align the
-> Dockerfile to the pinned version.
+The `Dockerfile` pins pnpm via `corepack prepare pnpm@11.3.0 --activate`, matching `package.json`'s `packageManager`
+field. **When bumping pnpm, update both in lockstep** — otherwise CI resolves a different version than local.
