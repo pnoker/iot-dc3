@@ -99,7 +99,7 @@ public class EventAttributeConfigServiceImpl implements EventAttributeConfigServ
             throw new AddException("Failed to create event attribute config");
         }
 
-        //
+        // Notify subscribed drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
@@ -130,7 +130,7 @@ public class EventAttributeConfigServiceImpl implements EventAttributeConfigServ
             throw new DeleteException("Failed to remove event attribute config");
         }
 
-        //
+        // Notify subscribed drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
@@ -155,7 +155,7 @@ public class EventAttributeConfigServiceImpl implements EventAttributeConfigServ
             throw new UpdateException("Failed to update event attribute config");
         }
 
-        //
+        // Notify subscribed drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);

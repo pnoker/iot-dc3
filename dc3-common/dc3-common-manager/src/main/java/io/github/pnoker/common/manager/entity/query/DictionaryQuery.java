@@ -59,8 +59,6 @@ public class DictionaryQuery implements Serializable {
 
     @Schema(description = "Dictionary label")
 
-    //
-
     private String label;
 
     @Schema(description = "parent ID")

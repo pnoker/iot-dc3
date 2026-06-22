@@ -82,7 +82,7 @@ public class RoleServiceImpl implements RoleService {
     public void delete(Long id) {
         getDOById(id, true);
 
-        //
+        // Refuse deletion while sub roles exist, otherwise they would be orphaned
         LambdaQueryChainWrapper<RoleDO> wrapper = roleManager.lambdaQuery().eq(RoleDO::getParentRoleId, id);
         long count = wrapper.count();
         if (count > 0) {

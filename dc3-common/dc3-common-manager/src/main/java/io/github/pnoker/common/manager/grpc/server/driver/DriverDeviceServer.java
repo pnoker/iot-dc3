@@ -178,7 +178,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcDeviceDTO entityGrpcDTO = grpcDeviceBuilder.buildGrpcDTOByBO(entityBO);
         builder.setDevice(entityGrpcDTO);
 
-        //
+        // Attach the device's point ids
         List<PointBO> pointBOList = pointService.listByDeviceId(entityBO.getId(), entityBO.getTenantId());
         CollectionOptional.ofNullable(pointBOList)
                 .ifPresent(value -> builder.addAllPointIds(value.stream().map(PointBO::getId).toList()));

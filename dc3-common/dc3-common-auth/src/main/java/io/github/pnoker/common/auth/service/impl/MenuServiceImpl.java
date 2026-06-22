@@ -89,7 +89,7 @@ public class MenuServiceImpl implements MenuService {
     public void delete(Long id) {
         getDOById(id, true);
 
-        //
+        // Refuse deletion while sub menus exist, otherwise they would be orphaned
         LambdaQueryChainWrapper<MenuDO> wrapper = menuManager.lambdaQuery().eq(MenuDO::getParentMenuId, id);
         long count = wrapper.count();
         if (count > 0) {

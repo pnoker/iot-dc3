@@ -23,6 +23,15 @@ import io.github.pnoker.common.auth.entity.model.ExternalIdentityDO;
 import io.github.pnoker.common.auth.mapper.ExternalIdentityMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * <p>
+ * Persistence manager implementation for external identity CRUD operations.
+ * </p>
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @Service
 public class ExternalIdentityManagerImpl extends ServiceImpl<ExternalIdentityMapper, ExternalIdentityDO>
         implements ExternalIdentityManager {

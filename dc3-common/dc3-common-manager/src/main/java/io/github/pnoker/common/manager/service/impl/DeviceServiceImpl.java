@@ -132,7 +132,7 @@ public class DeviceServiceImpl implements DeviceService {
             throw new AddException("Failed to create device");
         }
 
-        //
+        // Notify drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.ADD, driverServiceNames(entityDO.getDriverId()));
         metadataEventPublisher.publishEvent(metadataEvent);
@@ -144,12 +144,11 @@ public class DeviceServiceImpl implements DeviceService {
         DeviceDO entityDO = getDOById(id, true);
         Set<String> targetServices = driverServiceNames(entityDO.getDriverId());
 
-        //
         if (!deviceManager.removeById(id)) {
             throw new DeleteException("Failed to remove device");
         }
 
-        //
+        // Notify drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.DELETE, targetServices);
         metadataEventPublisher.publishEvent(metadataEvent);
@@ -180,7 +179,7 @@ public class DeviceServiceImpl implements DeviceService {
         DeviceBO deviceBO = getById(entityBO.getId());
         entityBO.setDeviceName(deviceBO.getDeviceName());
 
-        //
+        // On driver change, retarget metadata events from old to new driver; otherwise just refresh in place
         if (Objects.equals(oldDriverId, entityBO.getDriverId())) {
             MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE,
                     MetadataOperateTypeEnum.UPDATE, driverServiceNames(entityBO.getDriverId()));
@@ -309,13 +308,12 @@ public class DeviceServiceImpl implements DeviceService {
                 continue;
             }
 
-            //
+            // Notify drivers so they refresh the device metadata cache
             MetadataEvent metadataEvent = new MetadataEvent(this, importDeviceBO.getId(), MetadataTypeEnum.DEVICE,
                     MetadataOperateTypeEnum.ADD);
             metadataEventPublisher.publishEvent(metadataEvent);
         }
 
-        //
         try {
             FileUtils.delete(file);
         } catch (IOException e) {
@@ -342,20 +340,16 @@ public class DeviceServiceImpl implements DeviceService {
         Workbook workbook = new XSSFWorkbook();
         CellStyle cellStyle = PoiUtil.getCenterCellStyle(workbook);
 
-        //
         Sheet mainSheet = workbook.createSheet("");
         mainSheet.setDefaultColumnWidth(25);
 
-        //
         configConfigSheet(driverAttributeBOList, pointAttributeBOList, pointBOList, workbook);
 
-        //
         Row remarkRow = mainSheet.createRow(0);
         PoiUtil.createCell(remarkRow, 0, ": 5");
         PoiUtil.mergedRegion(mainSheet, 0, 0, 0,
                 2 + driverAttributeBOList.size() + pointAttributeBOList.size() * pointBOList.size() - 1);
 
-        //
         Row titleRow = mainSheet.createRow(1);
         PoiUtil.createCellWithStyle(titleRow, 0, "Device Name", cellStyle);
         PoiUtil.createCellWithStyle(titleRow, 1, "Description", cellStyle);
@@ -363,13 +357,10 @@ public class DeviceServiceImpl implements DeviceService {
         PoiUtil.mergedRegion(mainSheet, 1, 3, 1, 1);
 
         Row attributeRow = mainSheet.createRow(3);
-        //
         configAttributeCell(driverAttributeBOList, mainSheet, titleRow, attributeRow, cellStyle);
-        //
         configPointCell(driverAttributeBOList, pointAttributeBOList, pointBOList, mainSheet, titleRow, attributeRow,
                 cellStyle);
 
-        //
         return generateTemplate(workbook);
     }
 

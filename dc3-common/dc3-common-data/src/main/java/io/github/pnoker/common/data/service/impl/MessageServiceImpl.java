@@ -76,7 +76,7 @@ public class MessageServiceImpl implements MessageService {
     public void delete(Long id) {
         getDOById(id, true);
 
-        //
+        // Block deletion while child records still reference this group, to preserve referential integrity
         LambdaQueryChainWrapper<MessageDO> wrapper = messageManager.lambdaQuery().eq(MessageDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {

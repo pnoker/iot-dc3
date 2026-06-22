@@ -23,6 +23,15 @@ import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
 import io.github.pnoker.common.auth.mapper.ServiceAccountMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * <p>
+ * Persistence manager implementation for service account CRUD operations.
+ * </p>
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @Service
 public class ServiceAccountManagerImpl extends ServiceImpl<ServiceAccountMapper, ServiceAccountDO>
         implements ServiceAccountManager {

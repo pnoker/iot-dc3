@@ -58,8 +58,6 @@ public class RoleQuery implements Serializable {
     @Schema(description = "Tenant identifier used to scope this query; only roles belonging to this tenant are returned.", example = "1024")
     private Long tenantId;
 
-    //
-
     /**
      * Name
      */

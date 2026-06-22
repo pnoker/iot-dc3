@@ -20,5 +20,14 @@ package io.github.pnoker.common.auth.dal;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
 
+/**
+ * <p>
+ * Persistence manager for service account CRUD operations.
+ * </p>
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 public interface ServiceAccountManager extends IService<ServiceAccountDO> {
 }

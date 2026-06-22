@@ -87,7 +87,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
             throw new AddException("Failed to create driver attribute config");
         }
 
-        //
+        // Notify subscribed drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
@@ -118,7 +118,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
             throw new DeleteException("Failed to remove driver attribute config");
         }
 
-        //
+        // Notify subscribed drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
@@ -143,7 +143,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
             throw new UpdateException("Failed to update driver attribute config");
         }
 
-        //
+        // Notify subscribed drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);

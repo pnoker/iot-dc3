@@ -416,7 +416,6 @@ public class DashboardServiceImpl implements DashboardService {
         // whose sensor hasn't reported in the selected window — just add
         // visual noise (half-rendered columns with no bands). Drop them
         // here BEFORE Top-N sort so the crop reflects real activity.
-        //
         // Cardinality mode keeps everything so operators can still see
         // "unconfigured" entities on the structural view.
         List<TopologyDriverRow> activeDrivers = volumeMode ? driverRows.stream()

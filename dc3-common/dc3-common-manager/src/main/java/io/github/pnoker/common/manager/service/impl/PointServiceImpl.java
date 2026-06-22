@@ -109,7 +109,7 @@ public class PointServiceImpl implements PointService {
             throw new AddException("Failed to create point");
         }
 
-        //
+        // Notify drivers bound to the profile so they refresh point metadata
         List<Long> deviceIds = listDeviceIdsByProfileId(entityDO.getProfileId());
         metadataEventPublisher.publishEvent(
                 new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT, MetadataOperateTypeEnum.ADD,
@@ -128,7 +128,7 @@ public class PointServiceImpl implements PointService {
             throw new DeleteException("Failed to remove ");
         }
 
-        //
+        // Notify drivers bound to the profile so they refresh point metadata
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT,
                 MetadataOperateTypeEnum.DELETE, targetServices);
         metadataEventPublisher.publishEvent(metadataEvent);
@@ -154,7 +154,7 @@ public class PointServiceImpl implements PointService {
             throw new UpdateException("Failed to update point");
         }
 
-        //
+        // On profile change, retarget metadata events from old to new drivers; otherwise just refresh in place
         if (Objects.equals(current.getProfileId(), entityDO.getProfileId())) {
             MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT,
                     MetadataOperateTypeEnum.UPDATE, driverServiceNamesByDeviceIds(oldDeviceIds));

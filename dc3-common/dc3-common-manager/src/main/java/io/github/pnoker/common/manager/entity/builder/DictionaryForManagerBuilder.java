@@ -38,8 +38,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DictionaryForManagerBuilder extends DictionaryBuilder {
 
-    //
-
     /**
      * BO to VO
      *
@@ -59,8 +57,6 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
     default Page<DictionaryBO> buildVOPageByDriverBOPage(Page<DriverBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByDriverBO);
     }
-
-    //
 
     /**
      * BO to VO
@@ -82,8 +78,6 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
         return PageUtil.copyPage(entityPageBO, this::buildVOByProfileBO);
     }
 
-    //
-
     /**
      * BO to VO
      *
@@ -103,8 +97,6 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
     default Page<DictionaryBO> buildVOPageByPointBOPage(Page<PointBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByPointBO);
     }
-
-    //
 
     /**
      * BO to VO

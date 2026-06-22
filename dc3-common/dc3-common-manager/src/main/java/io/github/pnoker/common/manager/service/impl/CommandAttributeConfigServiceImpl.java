@@ -99,7 +99,7 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
             throw new AddException("Failed to create command attribute config");
         }
 
-        //
+        // Notify subscribed drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
@@ -130,7 +130,7 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
             throw new DeleteException("Failed to remove command attribute config");
         }
 
-        //
+        // Notify subscribed drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
@@ -155,7 +155,7 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
             throw new UpdateException("Failed to update command attribute config");
         }
 
-        //
+        // Notify subscribed drivers so they refresh the device metadata cache
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);

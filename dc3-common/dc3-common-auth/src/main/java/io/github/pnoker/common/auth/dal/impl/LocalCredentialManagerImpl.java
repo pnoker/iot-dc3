@@ -23,6 +23,15 @@ import io.github.pnoker.common.auth.entity.model.LocalCredentialDO;
 import io.github.pnoker.common.auth.mapper.LocalCredentialMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * <p>
+ * Persistence manager implementation for local credential CRUD operations.
+ * </p>
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2016.10.1
+ */
 @Service
 public class LocalCredentialManagerImpl extends ServiceImpl<LocalCredentialMapper, LocalCredentialDO>
         implements LocalCredentialManager {

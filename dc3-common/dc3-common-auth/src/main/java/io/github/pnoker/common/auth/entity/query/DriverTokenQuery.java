@@ -59,8 +59,6 @@ public class DriverTokenQuery implements Serializable {
     @Schema(description = "Tenant identifier used to scope all query results; only driver tokens belonging to this tenant are returned.", example = "1024")
     private Long tenantId;
 
-    //
-
     /**
      * Driver ID
      */

@@ -59,8 +59,6 @@ public class CommandAttributeQuery implements Serializable {
     @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
-    //
-
     /**
      * Name
      */

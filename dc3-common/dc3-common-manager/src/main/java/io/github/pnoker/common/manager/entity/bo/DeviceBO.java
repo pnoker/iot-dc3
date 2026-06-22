@@ -81,8 +81,6 @@ public class DeviceBO extends BaseBO implements TenantOwned {
      */
     private Integer version;
 
-    //
-
     /**
      * Profile ID
      */

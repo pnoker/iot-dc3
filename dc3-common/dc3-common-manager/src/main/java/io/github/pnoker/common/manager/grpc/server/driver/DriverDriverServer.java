@@ -97,12 +97,12 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
         GrpcR result;
 
         try {
-            //
+            // Register the driver and attach it to the response
             DriverBO entityBO = driverRegisterService.registerDriver(request);
             GrpcDriverDTO entityGrpcDTO = grpcDriverBuilder.buildGrpcDTOByBO(entityBO);
             builder.setDriver(entityGrpcDTO);
 
-            //
+            // Register driver-level attributes
             List<DriverAttributeBO> driverAttributeBOList = driverRegisterService.registerDriverAttribute(request,
                     entityBO);
             List<GrpcDriverAttributeDTO> grpcDriverAttributeDTOList = driverAttributeBOList.stream()
@@ -110,7 +110,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
                     .toList();
             builder.addAllDriverAttributes(grpcDriverAttributeDTOList);
 
-            //
+            // Register point-level attributes
             List<PointAttributeBO> pointAttributeBOList = driverRegisterService.registerPointAttribute(request,
                     entityBO);
             List<GrpcPointAttributeDTO> grpcPointAttributeDTOList = pointAttributeBOList.stream()
@@ -118,7 +118,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
                     .toList();
             builder.addAllPointAttributes(grpcPointAttributeDTOList);
 
-            //
+            // Register command-level attributes
             List<CommandAttributeBO> commandAttributeBOList = driverRegisterService.registerCommandAttribute(request,
                     entityBO);
             List<GrpcCommandAttributeDTO> grpcCommandAttributeDTOList = commandAttributeBOList.stream()
@@ -126,7 +126,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
                     .toList();
             builder.addAllCommandAttributes(grpcCommandAttributeDTOList);
 
-            //
+            // Register event-level attributes
             List<EventAttributeBO> eventAttributeBOList = driverRegisterService.registerEventAttribute(request,
                     entityBO);
             List<GrpcEventAttributeDTO> grpcEventAttributeDTOList = eventAttributeBOList.stream()
@@ -134,7 +134,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
                     .toList();
             builder.addAllEventAttributes(grpcEventAttributeDTOList);
 
-            //
+            // Attach the device ids bound to this driver
             List<Long> idList = deviceService.listIdsByDriverId(entityBO.getId(), entityBO.getTenantId());
             builder.addAllDeviceIds(idList);
 

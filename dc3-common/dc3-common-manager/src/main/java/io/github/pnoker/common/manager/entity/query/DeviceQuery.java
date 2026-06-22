@@ -58,8 +58,6 @@ public class DeviceQuery implements Serializable {
     @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
-    //
-
     /**
      * Device Name
      */
@@ -101,8 +99,6 @@ public class DeviceQuery implements Serializable {
      */
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
-    //
 
     /**
      * ID
