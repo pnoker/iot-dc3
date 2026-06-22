@@ -20,8 +20,19 @@ package io.github.pnoker.common.utils;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.ConnectorException;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.io.pem.PemReader;
+import org.bouncycastle.openssl.PEMDecryptorProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
+import org.bouncycastle.operator.InputDecryptorProvider;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
+import org.bouncycastle.pkcs.PKCSException;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -31,21 +42,23 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 /**
  * X.509 certificate loading and SSL socket factory creation.
  * <p>
- * <b>WARNING:</b> This utility is currently <b>unavailable</b>. The generic
- * return type with {@code (T)} cast from {@code PemReader.readPemObject()} is
- * type-unsafe and must be reworked to explicitly convert PemObject to
- * X509Certificate / KeyPair before casting. Until resolved,
- * {@code getSSLSocketFactory} is unusable in production.
+ * Loads PEM-encoded CA and client certificates via {@link CertificateFactory} and PEM-encoded
+ * client private keys (PKCS#1 / PKCS#8, encrypted or plain) via BouncyCastle's PEM parser, then
+ * assembles a mutual-TLS {@link SSLSocketFactory}.
  * </p>
  *
  * @author pnoker
@@ -58,10 +71,6 @@ public class X509Util {
     private X509Util() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
-
-    // TODO: 2023.10.16 — PemObject-to-typed-certificate conversion is broken.
-// The (T) cast from PemReader.readPemObject() is type-unsafe.
-// PemObject must be explicitly converted to X509Certificate / KeyPair first.
 
     /**
      * Create SSL socket factory with custom certificates
@@ -90,13 +99,13 @@ public class X509Util {
             // load client certificate
             X509Certificate cert = loadCertificate(crtFile);
             // load client private key
-            KeyPair key = loadCertificateWithPassword(keyFile, password);
+            PrivateKey key = loadPrivateKey(keyFile, password);
             // client key and certificates are sent to server, so it can authenticate us
             KeyStore certKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             certKeyStore.load(null, null);
             certKeyStore.setCertificateEntry("certfile", cert);
-            certKeyStore.setKeyEntry("keyfile", key.getPrivate(), password.toCharArray(),
-                    new java.security.cert.Certificate[]{cert});
+            certKeyStore.setKeyEntry("keyfile", key, password.toCharArray(),
+                    new Certificate[]{cert});
             KeyManagerFactory keyManagerFactory = KeyManagerFactory
                     .getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(certKeyStore, password.toCharArray());
@@ -111,30 +120,60 @@ public class X509Util {
         }
     }
 
-    // TODO: 2023.10.16 — PemObject-to-typed-certificate conversion is broken.
-// The (T) cast from PemReader.readPemObject() is type-unsafe.
-// PemObject must be explicitly converted to X509Certificate / KeyPair first.
-    private static <T> T loadCertificate(String caCrtFile) throws IOException {
-        return loadCertificateWithPassword(caCrtFile, null);
+    /**
+     * Load a PEM- or DER-encoded X.509 certificate from a classpath ({@code classpath:}) or filesystem path.
+     */
+    private static X509Certificate loadCertificate(String certFile) throws IOException, CertificateException {
+        try (InputStream inputStream = open(certFile)) {
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            return (X509Certificate) certificateFactory.generateCertificate(inputStream);
+        }
     }
 
-    // TODO: 2023.10.16 — PemObject-to-typed-certificate conversion is broken.
-// The (T) cast from PemReader.readPemObject() is type-unsafe.
-// PemObject must be explicitly converted to X509Certificate / KeyPair first.
-    @SuppressWarnings("unchecked")
-    private static <T> T loadCertificateWithPassword(String caCrtFile, String password) throws IOException {
+    /**
+     * Load a PEM-encoded private key, transparently handling PKCS#1 / PKCS#8 and encrypted variants.
+     */
+    private static PrivateKey loadPrivateKey(String keyFile, String password) throws IOException {
+        char[] passwordChars = password == null ? new char[0] : password.toCharArray();
+        try (Reader reader = new InputStreamReader(open(keyFile));
+             PEMParser pemParser = new PEMParser(reader)) {
+            Object pemObject = pemParser.readObject();
+            JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME);
+            return switch (pemObject) {
+                // Encrypted traditional (PKCS#1) key, e.g. "Proc-Type: 4,ENCRYPTED"
+                case PEMEncryptedKeyPair encryptedKeyPair -> {
+                    PEMDecryptorProvider decryptor = new JcePEMDecryptorProviderBuilder().build(passwordChars);
+                    yield converter.getKeyPair(encryptedKeyPair.decryptKeyPair(decryptor)).getPrivate();
+                }
+                // Encrypted PKCS#8 key ("ENCRYPTED PRIVATE KEY")
+                case PKCS8EncryptedPrivateKeyInfo encryptedInfo -> {
+                    try {
+                        InputDecryptorProvider decryptor = new JceOpenSSLPKCS8DecryptorProviderBuilder()
+                                .setProvider(BouncyCastleProvider.PROVIDER_NAME).build(passwordChars);
+                        yield converter.getPrivateKey(encryptedInfo.decryptPrivateKeyInfo(decryptor));
+                    } catch (OperatorCreationException | PKCSException e) {
+                        throw new IOException("Failed to decrypt PKCS#8 private key", e);
+                    }
+                }
+                // Plain traditional (PKCS#1) key
+                case PEMKeyPair keyPair -> converter.getKeyPair(keyPair).getPrivate();
+                // Plain PKCS#8 key ("PRIVATE KEY")
+                case PrivateKeyInfo privateKeyInfo -> converter.getPrivateKey(privateKeyInfo);
+                case null -> throw new IOException("No PEM private key found in: " + keyFile);
+                default -> throw new IOException("Unsupported private key PEM content: " + pemObject.getClass().getName());
+            };
+        }
+    }
+
+    /**
+     * Open a {@code classpath:}-prefixed resource or a filesystem path as an input stream.
+     */
+    private static InputStream open(String path) throws IOException {
         String classPath = "classpath:";
-        InputStream inputStream;
-        if (caCrtFile.startsWith(classPath)) {
-            inputStream = X509Util.class.getResourceAsStream(caCrtFile.replace(classPath, ""));
-        } else {
-            inputStream = new ByteArrayInputStream(Files.readAllBytes(Paths.get(caCrtFile)));
+        if (path.startsWith(classPath)) {
+            return X509Util.class.getResourceAsStream(path.replace(classPath, ""));
         }
-        try (InputStream is = inputStream;
-             InputStreamReader isr = new InputStreamReader(is);
-             PemReader reader = new PemReader(isr)) {
-            return (T) reader.readPemObject();
-        }
+        return new ByteArrayInputStream(Files.readAllBytes(Paths.get(path)));
     }
 
 }
