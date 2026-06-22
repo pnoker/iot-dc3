@@ -582,6 +582,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         connection.setGrantType(grantType);
         connection.setEnableFlag((byte) 0);
         connection.setRemark(StringUtils.defaultString(connection.getRemark()));
+        connection.setCreatorId(principalHeader.getPrincipalId());
+        connection.setCreatorName(principalName(principalHeader));
         oauthMcpMapper.insertConnection(connection);
         return mcpConnectionBuilder.buildVOByRecord(connection);
     }
@@ -604,7 +606,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         requireAuthenticatedPrincipal(principalHeader);
         McpConnectionRecord connection = oauthMcpMapper.selectConnectionById(connectionId);
         if (connection == null || !Objects.equals(connection.getTenantId(), principalHeader.getTenantId())
-                || !Objects.equals(connection.getPrincipalId(), principalHeader.getPrincipalId())) {
+                || !Objects.equals(connection.getCreatorId(), principalHeader.getPrincipalId())) {
             throw oauthError(BAD_REQUEST.value(), "invalid_request", "MCP connection does not exist");
         }
         oauthMcpMapper.deleteConnectionTools(connectionId);

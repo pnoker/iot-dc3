@@ -59,4 +59,8 @@ public class McpConnectionRecord {
 
     private String remark;
 
+    private Long creatorId;
+
+    private String creatorName;
+
 }

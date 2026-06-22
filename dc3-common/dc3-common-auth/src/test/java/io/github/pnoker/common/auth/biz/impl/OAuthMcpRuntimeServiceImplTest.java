@@ -20,11 +20,14 @@ package io.github.pnoker.common.auth.biz.impl;
 import io.github.pnoker.common.auth.config.OAuthProperties;
 import io.github.pnoker.common.auth.dal.PrincipalManager;
 import io.github.pnoker.common.auth.dal.ServiceAccountManager;
+import io.github.pnoker.common.auth.entity.builder.McpConnectionBuilder;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
+import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
+import io.github.pnoker.common.auth.entity.vo.McpConnectionAddVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
@@ -75,6 +78,9 @@ class OAuthMcpRuntimeServiceImplTest {
 
     @Mock
     private McpOpenApiAggregator openApiAggregator;
+
+    @Mock
+    private McpConnectionBuilder mcpConnectionBuilder;
 
     @InjectMocks
     private OAuthMcpRuntimeServiceImpl service;
@@ -454,6 +460,83 @@ class OAuthMcpRuntimeServiceImplTest {
                 .isInstanceOf(OAuthMcpRuntimeServiceImpl.OAuthProtocolException.class)
                 .hasMessageContaining("refresh token is invalid or expired");
         verify(oauthMcpMapper, never()).revokeAuthorizationByAccessTokenJti(any(), any(), any());
+    }
+
+    @Test
+    void replaceConnectionToolsAllowsCreatorOfClientCredentialsConnection() {
+        // client_credentials connection: principal is the service account (200),
+        // but the building/managing user is 100. The creator must be able to manage it.
+        McpConnectionRecord connection = new McpConnectionRecord();
+        connection.setId(300L);
+        connection.setTenantId(1L);
+        connection.setPrincipalId(200L);
+        connection.setCreatorId(100L);
+        connection.setGrantType("client_credentials");
+        when(oauthMcpMapper.selectConnectionById(300L)).thenReturn(connection);
+        McpToolRecord tool = new McpToolRecord();
+        tool.setToolId("auth:user:get");
+        tool.setEnableFlag((byte) 0);
+        when(oauthMcpMapper.selectToolByToolId("auth:user:get")).thenReturn(tool);
+
+        service.replaceConnectionTools(300L, List.of("auth:user:get"), header(100L, 1L));
+
+        verify(oauthMcpMapper).deleteConnectionTools(300L);
+        verify(oauthMcpMapper).insertConnectionTool(any(), eq(300L), eq("auth:user:get"), eq(100L), any());
+    }
+
+    @Test
+    void replaceConnectionToolsRejectsNonCreator() {
+        McpConnectionRecord connection = new McpConnectionRecord();
+        connection.setId(300L);
+        connection.setTenantId(1L);
+        connection.setPrincipalId(200L);
+        connection.setCreatorId(100L);
+        connection.setGrantType("client_credentials");
+        when(oauthMcpMapper.selectConnectionById(300L)).thenReturn(connection);
+
+        assertThatThrownBy(() -> service.replaceConnectionTools(300L, List.of("auth:user:get"), header(999L, 1L)))
+                .isInstanceOf(OAuthMcpRuntimeServiceImpl.OAuthProtocolException.class)
+                .hasMessageContaining("MCP connection does not exist");
+        verify(oauthMcpMapper, never()).deleteConnectionTools(any());
+    }
+
+    @Test
+    void createConnectionStampsCreatorFromCaller() {
+        McpConnectionAddVO entityVO = new McpConnectionAddVO();
+        McpConnectionRecord built = new McpConnectionRecord();
+        built.setClientId("dc3_abc");
+        built.setGrantType("client_credentials");
+        built.setPrincipalId(200L);
+        built.setPrincipalType("SERVICE_ACCOUNT");
+        built.setTenantId(1L);
+        when(mcpConnectionBuilder.buildRecordByAddVO(entityVO)).thenReturn(built);
+        OAuthRegisteredClientRecord client = new OAuthRegisteredClientRecord();
+        client.setClientId("dc3_abc");
+        client.setAuthorizationGrantTypes("client_credentials");
+        client.setServiceAccountPrincipalId(200L);
+        client.setTenantId(1L);
+        client.setEnableFlag((byte) 0);
+        when(oauthMcpMapper.selectClientByClientId("dc3_abc")).thenReturn(client);
+        when(serviceAccountManager.getOne(any())).thenReturn(new ServiceAccountDO());
+
+        RequestHeader.PrincipalHeader header = header(100L, 1L);
+        header.setDisplayName("alice");
+        service.createConnection(entityVO, header);
+
+        ArgumentCaptor<McpConnectionRecord> captor = ArgumentCaptor.forClass(McpConnectionRecord.class);
+        verify(oauthMcpMapper).insertConnection(captor.capture());
+        McpConnectionRecord stored = captor.getValue();
+        assertThat(stored.getCreatorId()).isEqualTo(100L);
+        assertThat(stored.getCreatorName()).isEqualTo("alice");
+        // principal stays the service account — we only add creator, never repurpose principal.
+        assertThat(stored.getPrincipalId()).isEqualTo(200L);
+    }
+
+    private RequestHeader.PrincipalHeader header(Long principalId, Long tenantId) {
+        RequestHeader.PrincipalHeader principalHeader = new RequestHeader.PrincipalHeader();
+        principalHeader.setPrincipalId(principalId);
+        principalHeader.setTenantId(tenantId);
+        return principalHeader;
     }
 
     @SuppressWarnings("unchecked")
