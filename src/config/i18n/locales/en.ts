@@ -157,6 +157,9 @@ export default {
     settingsIdentityAudit: 'Identity Audit',
     settingsRolePrincipalBind: 'Role Principal Bind',
     settingsMcpServer: 'MCP Service',
+    settingsMcpConnection: 'MCP Connection',
+    settingsMcpClient: 'MCP Client',
+    settingsMcpTool: 'MCP Tool',
     settingsMcpAudit: 'MCP Audit',
     settingsAbout: 'About',
     settingsUserDetail: 'User Detail',
@@ -865,6 +868,7 @@ export default {
     },
     mcp: {
       title: 'MCP Service',
+      agentConfig: 'Agent Config',
       connections: 'Connections',
       clients: 'OAuth Clients',
       tools: 'Tool Catalog',

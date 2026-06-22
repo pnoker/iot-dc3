@@ -66,6 +66,16 @@
         </el-form-item>
       </template>
       <template #actions>
+        <el-button
+          v-for="action in config.toolbarActions"
+          :key="action.key"
+          :icon="resolveIcon(action.icon)"
+          :loading="action.loading?.()"
+          :type="action.type || 'primary'"
+          @click="action.onClick"
+        >
+          {{ action.label }}
+        </el-button>
         <el-button v-if="config.editable" :icon="Plus" type="success" @click="openAdd">
           {{ t('common.add') }}
         </el-button>
@@ -348,6 +358,7 @@
 
   // Operation column width based on number of visible action buttons
   const operationWidth = computed(() => {
+    if (config.value.operationWidth) return config.value.operationWidth;
     let count = 0;
     if (config.value.detail) count++;
     if (config.value.extraActions) count += config.value.extraActions.length;
@@ -357,6 +368,9 @@
     if (count === 4) return 260;
     return 320;
   });
+
+  // 供父页在配套弹窗保存 / 工具栏动作完成后刷新表格
+  defineExpose({ reload: load });
 </script>
 
 <style lang="scss" scoped>

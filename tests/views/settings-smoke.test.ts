@@ -115,6 +115,9 @@ const PAGES: SmokePage[] = [
   { name: 'McpAudit', loader: () => import('@/views/settings/mcpAudit/McpAudit.vue') },
   // integration
   { name: 'McpServer', loader: () => import('@/views/settings/mcp/McpServer.vue') },
+  { name: 'McpConnection', loader: () => import('@/views/settings/mcp/McpConnection.vue') },
+  { name: 'McpClient', loader: () => import('@/views/settings/mcp/McpClient.vue') },
+  { name: 'McpTool', loader: () => import('@/views/settings/mcp/McpTool.vue') },
   // system
   { name: 'Group', loader: () => import('@/views/settings/group/Group.vue') },
   { name: 'Label', loader: () => import('@/views/settings/label/Label.vue') },

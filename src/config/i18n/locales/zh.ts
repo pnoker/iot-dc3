@@ -155,6 +155,9 @@ export default {
     settingsIdentityAudit: '身份审计',
     settingsRolePrincipalBind: '角色主体绑定',
     settingsMcpServer: 'MCP 服务',
+    settingsMcpConnection: 'MCP 连接',
+    settingsMcpClient: 'MCP Client',
+    settingsMcpTool: 'MCP 工具',
     settingsMcpAudit: 'MCP 审计',
     settingsAbout: '关于',
     settingsUserDetail: '用户详情',
@@ -853,6 +856,7 @@ export default {
     },
     mcp: {
       title: 'MCP 服务',
+      agentConfig: 'Agent 配置',
       connections: '连接',
       clients: 'OAuth Client',
       tools: '工具目录',

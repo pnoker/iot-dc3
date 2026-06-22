@@ -2554,8 +2554,8 @@ exports[`API wrapper contracts > mcp > replaceMcpConnectionTools maps to its tra
   "args": [
     "api/v3/auth/mcp/connection/tools/replace",
     {
-      "connection_id": "connection-1",
-      "tool_ids": [
+      "connectionId": "connection-1",
+      "toolIds": [
         "tool-1",
         "tool-2",
       ],
@@ -2949,6 +2949,7 @@ exports[`API wrapper contracts > principal > has every export covered by the con
   "enablePrincipal",
   "getPrincipalById",
   "listPrincipal",
+  "listPrincipalByIds",
 ]
 `;
 
@@ -2963,6 +2964,19 @@ exports[`API wrapper contracts > principal > listPrincipal maps to its transport
         "size": 20,
       },
     },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > principal > listPrincipalByIds maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/principal/list_by_ids",
+    [
+      "id-1",
+      "id-2",
+    ],
   ],
   "transport": "httpPost",
 }

@@ -72,6 +72,9 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
   settingsMcpAudit: 'nav.settingsMcpAudit',
   // integration
   settingsMcpServer: 'nav.settingsMcpServer',
+  settingsMcpConnection: 'nav.settingsMcpConnection',
+  settingsMcpClient: 'nav.settingsMcpClient',
+  settingsMcpTool: 'nav.settingsMcpTool',
   // system
   settingsGroup: 'nav.settingsGroup',
   settingsLabel: 'nav.settingsLabel',
@@ -141,6 +144,9 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsMcpAudit: 'Document',
   // integration
   settingsMcpServer: 'Connection',
+  settingsMcpConnection: 'Link',
+  settingsMcpClient: 'Ticket',
+  settingsMcpTool: 'Tools',
   // system
   settingsGroup: 'Grid',
   settingsLabel: 'CollectionTag',
@@ -213,6 +219,9 @@ export const SETTINGS_AUDIT_CHILDREN: SettingsNavNode[] = [
 
 export const SETTINGS_INTEGRATION_CHILDREN: SettingsNavNode[] = [
   { name: 'settingsMcpServer', titleKey: 'nav.settingsMcpServer', icon: 'Connection' },
+  { name: 'settingsMcpConnection', titleKey: 'nav.settingsMcpConnection', icon: 'Link' },
+  { name: 'settingsMcpClient', titleKey: 'nav.settingsMcpClient', icon: 'Ticket' },
+  { name: 'settingsMcpTool', titleKey: 'nav.settingsMcpTool', icon: 'Tools' },
 ];
 
 export const SETTINGS_SYSTEM_CHILDREN: SettingsNavNode[] = [
@@ -323,6 +332,9 @@ export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
   settingsMcpAudit: 'settingsAudit',
   // integration
   settingsMcpServer: 'settingsIntegration',
+  settingsMcpConnection: 'settingsIntegration',
+  settingsMcpClient: 'settingsIntegration',
+  settingsMcpTool: 'settingsIntegration',
   // system
   settingsGroup: 'settingsSystem',
   settingsLabel: 'settingsSystem',
@@ -426,6 +438,9 @@ export const SETTINGS_BREADCRUMB_PARENTS: Record<string, SettingsBreadcrumbParen
   settingsMcpAudit: [auditParent],
   // integration leaves
   settingsMcpServer: [integrationParent],
+  settingsMcpConnection: [integrationParent],
+  settingsMcpClient: [integrationParent],
+  settingsMcpTool: [integrationParent],
   // system leaves
   settingsGroup: [systemParent],
   settingsLabel: [systemParent],

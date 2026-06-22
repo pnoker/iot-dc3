@@ -62,4 +62,15 @@ export const listMcpAudit = (
     riskLevel?: string;
     limit?: number;
   } = {}
-) => httpPost<R<McpAuditRecord[]>>(`${API_MCP_BASE}/audit/list`, undefined, { params });
+) =>
+  httpPost<R<McpAuditRecord[]>>(`${API_MCP_BASE}/audit/list`, undefined, {
+    // Wire params follow the platform snake_case query convention; the camelCase
+    // signature is kept for callers. Undefined keys are dropped by the transport.
+    params: {
+      principal_id: params.principalId,
+      tool_id: params.toolId,
+      status: params.status,
+      risk_level: params.riskLevel,
+      limit: params.limit,
+    },
+  });

@@ -97,6 +97,16 @@ export interface EntityRowAction {
   onClick: (row: Record<string, any>) => void;
 }
 
+/** 工具栏级自定义按钮（与内置 Add 并列），用于无法走通用增删改的动作，如刷新目录、注册、新增连接。 */
+export interface EntityToolbarAction {
+  key: string;
+  label: string;
+  icon?: string; // 图标名，经 resolveIcon 解析
+  type?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
+  loading?: () => boolean; // 响应式 loading（闭包读取页面 ref）
+  onClick: () => void;
+}
+
 export interface EntityRelation {
   key: string; // ctx.relations[key]
   load: (rows: any[]) => Promise<Record<string, string>>;
@@ -130,6 +140,8 @@ export interface EntityListConfig {
 
   detail?: { routeName: string }; // 跳转详情；缺省则无 detail 按钮
   extraActions?: EntityRowAction[];
+  toolbarActions?: EntityToolbarAction[]; // 工具栏自定义按钮
+  operationWidth?: number; // 覆盖操作列宽（自动估算不适配长标签时）
   rowEditable?: (row: Record<string, any>) => boolean; // 行级编辑可用（resource 分组节点禁）
   rowDeletable?: (row: Record<string, any>) => boolean;
 

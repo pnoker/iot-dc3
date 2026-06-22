@@ -214,6 +214,9 @@
     settingsEventHistory: 'nav.settingsEventHistory',
     settingsServiceAccount: 'nav.settingsServiceAccount',
     settingsMcpServer: 'nav.settingsMcpServer',
+    settingsMcpConnection: 'nav.settingsMcpConnection',
+    settingsMcpClient: 'nav.settingsMcpClient',
+    settingsMcpTool: 'nav.settingsMcpTool',
     settingsMcpAudit: 'nav.settingsMcpAudit',
   };
 
@@ -289,6 +292,9 @@
     settingsEventHistory: 'Document',
     settingsServiceAccount: 'Key',
     settingsMcpServer: 'Connection',
+    settingsMcpConnection: 'Link',
+    settingsMcpClient: 'Ticket',
+    settingsMcpTool: 'Tools',
     settingsMcpAudit: 'Document',
   };
 
