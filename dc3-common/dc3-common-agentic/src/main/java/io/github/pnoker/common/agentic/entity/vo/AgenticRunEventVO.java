@@ -38,39 +38,30 @@ import org.apache.commons.lang3.StringUtils;
 public class AgenticRunEventVO {
 
     @Schema(description = "Fixed object type discriminator for agentic run events; always \"agentic.event\".", example = "agentic.event")
-
     private String object;
 
     @Schema(description = "Category of the event; one of: event, tool, reasoning, error.", example = "tool")
-
     private String type;
 
     @Schema(description = "Human-readable headline summarising what happened in this event.", example = "Query device history")
-
     private String title;
 
     @Schema(description = "Additional detail or domain context for the event, such as the tool domain or error message.", example = "Querying point history data")
-
     private String detail;
 
     @Schema(description = "Name of the tool or agent component that produced this event.", example = "queryPointHistory")
-
     private String name;
 
     @Schema(description = "Lifecycle phase of the event within its operation; one of: start, result, error.", example = "start")
-
     private String phase;
 
     @Schema(description = "Execution status of the event; one of: running, success, empty, failed.", example = "running")
-
     private String status;
 
     @Schema(description = "Machine-readable result code returned by the tool; one of: OK, EMPTY, INVALID_ARGUMENT, NOT_FOUND, UNAVAILABLE, ERROR.", example = "OK")
-
     private String code;
 
     @Schema(description = "Unix epoch seconds when the event was emitted; derived from the internal millisecond timestamp divided by 1000.", example = "1718700000")
-
     private Long created;
 
     public static AgenticRunEventVO of(AgenticRunEvent runEvent) {

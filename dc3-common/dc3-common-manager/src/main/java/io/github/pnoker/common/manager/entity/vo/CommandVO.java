@@ -58,7 +58,6 @@ public class CommandVO extends BaseVO {
     private String commandName;
 
     @Schema(description = "Command code. Stable business identifier; must not change once deployed.", example = "READ_HOLDING_REG")
-
     private String commandCode;
 
     @Schema(description = "Command type: READ (fetch data) or WRITE (send data).", example = "READ", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -77,7 +76,6 @@ public class CommandVO extends BaseVO {
     private Integer timeout;
 
     @Schema(description = "Command extension information, serialized as JSON for custom parameters and metadata.")
-
     private CommandExt commandExt;
 
     @Schema(description = "ID of the profile (device template) this command is defined in.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -86,15 +84,12 @@ public class CommandVO extends BaseVO {
     private Long profileId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
-
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Signature used for configuration integrity verification.")
-
     private String signature;
 
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
-
     private Integer version;
 
 }

@@ -29,9 +29,6 @@ package io.github.pnoker.common.constant.common;
  */
 public class QueryWrapperConstant {
 
-    /**
-     * SQL LIMIT clause for single record: "LIMIT 1"
-     */
     public static final String LIMIT_ONE = "LIMIT 1";
 
     private QueryWrapperConstant() {

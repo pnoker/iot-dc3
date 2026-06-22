@@ -123,21 +123,41 @@ public class ExchangeConfig {
         return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_CHECK, true, false);
     }
 
+    /**
+     * Custom command exchange for driver-side load balancing.
+     *
+     * @return TopicExchange bean for custom command messages
+     */
     @Bean
     TopicExchange commandExchange() {
         return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND, true, false);
     }
 
+    /**
+     * Custom command result exchange for platform-side load balancing.
+     *
+     * @return TopicExchange bean for custom command result messages
+     */
     @Bean
     TopicExchange commandResultExchange() {
         return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT, true, false);
     }
 
+    /**
+     * Custom command dead-letter exchange for platform-side load balancing.
+     *
+     * @return TopicExchange bean for custom command dead-letter messages
+     */
     @Bean
     TopicExchange commandDeadExchange() {
         return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND_DEAD, true, false);
     }
 
+    /**
+     * Event exchange for platform-side load balancing.
+     *
+     * @return TopicExchange bean for event report messages
+     */
     @Bean
     TopicExchange eventExchange() {
         return new TopicExchange(RabbitConstant.TOPIC_EXCHANGE_EVENT, true, false);

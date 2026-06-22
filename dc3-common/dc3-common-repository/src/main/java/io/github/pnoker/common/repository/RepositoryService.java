@@ -44,57 +44,57 @@ public interface RepositoryService {
     String getRepositoryName();
 
     /**
-     * Save PointValue
+     * Persist a single point value to the time-series store.
      *
-     * @param entityBO PointValue
-     * @throws IOException IOException
+     * @param entityBO point value to persist
+     * @throws IOException on write failure
      */
     void savePointValue(PointValueBO entityBO) throws IOException;
 
     /**
-     * Save PointValue list
+     * Persist a batch of point values to the time-series store.
      *
-     * @param entityBOList PointValue Array
-     * @throws IOException IOException
+     * @param entityBOList point values to persist
+     * @throws IOException on write failure
      */
     void savePointValues(List<PointValueBO> entityBOList) throws IOException;
 
     /**
-     * Get historical PointValue within the tenant scope.
+     * Get historical point values within the tenant scope.
      *
-     * @param tenantId Tenant ID (required for tenant isolation)
-     * @param deviceId Device ID
-     * @param pointId  Point ID
-     * @param count    Count
-     * @return History Value Array
+     * @param tenantId tenant ID (required for tenant isolation)
+     * @param deviceId device ID
+     * @param pointId  point ID
+     * @param count    maximum number of records to retrieve
+     * @return list of serialized point value strings, newest first
      */
     List<String> listHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count);
 
     /**
-     * Query latest PointValue within the tenant scope.
+     * Query the latest point value within the tenant scope.
      *
-     * @param tenantId Tenant ID (required for tenant isolation)
-     * @param deviceId Device ID
-     * @param pointId  Point ID
-     * @return PointValueBO
+     * @param tenantId tenant ID (required for tenant isolation)
+     * @param deviceId device ID
+     * @param pointId  point ID
+     * @return the most recent point value, or {@code null} if none found
      */
     PointValueBO selectLatestPointValue(Long tenantId, Long deviceId, Long pointId);
 
     /**
-     * Query latest PointValue list within the tenant scope.
+     * Query the latest point values for multiple points within the tenant scope.
      *
-     * @param tenantId Tenant ID (required for tenant isolation)
-     * @param deviceId Device ID
-     * @param pointIds Point ID list
-     * @return PointValueBO Array
+     * @param tenantId tenant ID (required for tenant isolation)
+     * @param deviceId device ID
+     * @param pointIds point ID list
+     * @return list of most recent point values per point, may contain fewer entries than requested
      */
     List<PointValueBO> listLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds);
 
     /**
-     * Page query PointValue
+     * Paginated query of point values.
      *
-     * @param entityQuery Entry of Query
-     * @return Entity of BO Page
+     * @param entityQuery query criteria including tenant, device, point, and time range
+     * @return paginated results of matching point values
      */
     Page<PointValueBO> listPagePointValue(PointValueQuery entityQuery);
 

@@ -53,6 +53,12 @@ import java.util.Objects;
  * through the MQTT receive handler.
  * </p>
  *
+ *
+ * <p>
+ * <b>WARNING:</b> This driver is a work-in-progress skeleton. Protocol-level
+ * I/O is not yet fully implemented — see TODO markers in method bodies.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2016.10.1

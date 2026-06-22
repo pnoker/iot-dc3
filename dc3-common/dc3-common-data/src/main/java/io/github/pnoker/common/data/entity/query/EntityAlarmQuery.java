@@ -49,7 +49,6 @@ public class EntityAlarmQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-
     private Pages page;
 
     /**

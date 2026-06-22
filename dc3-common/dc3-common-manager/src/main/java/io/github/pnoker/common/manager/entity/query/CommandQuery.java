@@ -52,43 +52,33 @@ public class CommandQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-
     private Pages page;
 
     @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
-
     private Long tenantId;
 
     @Schema(description = "Filter by command name. Supports partial matching.", example = "Read Holding Register")
-
     private String commandName;
 
     @Schema(description = "Filter by command code. Exact match on the stable business identifier.", example = "READ_HOLDING_REG")
-
     private String commandCode;
 
     @Schema(description = "Filter by command type: READ (fetch data from device) or WRITE (send data to device).", example = "READ")
-
     private CommandTypeEnum commandType;
 
     @Schema(description = "Filter by call type: SYNC (wait for response) or ASYNC (fire and forget).", example = "SYNC")
-
     private CallTypeEnum callType;
 
     @Schema(description = "Filter by profile (device template) ID.", example = "2048")
-
     private Long profileId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
-
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
-
     private Integer version;
 
     @Schema(description = "Filter by device ID. Returns results scoped to a specific device.", example = "1024")
-
     private Long deviceId;
 
 }

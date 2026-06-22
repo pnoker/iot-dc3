@@ -40,9 +40,9 @@ import java.io.Serializable;
 public class DeviceExt extends BaseExt {
 
     /**
-     *
+     * Extended content.
      * <p>
-     * Type Version
+     * The content can be distinguished by Type and Version.
      */
     @Schema(description = "Device extension content payload carrying type-specific configuration")
     private Content content;

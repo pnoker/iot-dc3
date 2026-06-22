@@ -43,14 +43,8 @@ public class DefaultConstant {
      */
     public static final long DEFAULT_ID = 0L;
 
-    /**
-     * Zero constant: {@code 0}.
-     */
     public static final Integer ZERO = 0;
 
-    /**
-     * One constant: {@code 1}.
-     */
     public static final Integer ONE = 1;
 
     /**

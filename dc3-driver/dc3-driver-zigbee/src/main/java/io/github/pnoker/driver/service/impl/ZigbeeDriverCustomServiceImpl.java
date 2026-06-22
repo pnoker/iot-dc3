@@ -58,6 +58,12 @@ import java.util.Objects;
  * values from Zigbee devices via ZCL attributes, and writes values to ZCL attributes.
  * </p>
  *
+ *
+ * <p>
+ * <b>WARNING:</b> This driver is a work-in-progress skeleton. Protocol-level
+ * I/O is not yet fully implemented — see TODO markers in method bodies.
+ * </p>
+ *
  * @author pnoker
  * @version 2026.5.22
  * @since 2026.6.2

@@ -58,7 +58,6 @@ public class EventVO extends BaseVO {
     private String eventName;
 
     @Schema(description = "Event code. Stable business identifier; must not change once deployed.", example = "HIGH_TEMP_ALARM")
-
     private String eventCode;
 
     @Schema(description = "Event classification: INFO (informational), ALERT (requires attention), FAULT (malfunction), or LIFECYCLE (state transition).", example = "ALERT", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -72,7 +71,6 @@ public class EventVO extends BaseVO {
     private EventLevelEnum eventLevelFlag;
 
     @Schema(description = "Event extension information, serialized as JSON for custom metadata and trigger conditions.")
-
     private EventExt eventExt;
 
     @Schema(description = "ID of the profile (device template) this event is defined in.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -81,15 +79,12 @@ public class EventVO extends BaseVO {
     private Long profileId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
-
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Signature used for configuration integrity verification.")
-
     private String signature;
 
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
-
     private Integer version;
 
 }

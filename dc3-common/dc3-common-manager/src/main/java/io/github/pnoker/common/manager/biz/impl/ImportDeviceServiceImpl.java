@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Driver synchronization interface implementation
+ * Excel-based device import service implementation.
  *
  * @author pnoker
  * @version 2025.9.0

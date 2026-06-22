@@ -38,9 +38,9 @@ import lombok.Setter;
 public class DriverAttributeExt extends BaseExt {
 
     /**
-     *
+     * Extended content.
      * <p>
-     * Type Version
+     * The content can be distinguished by Type and Version.
      */
     @Schema(description = "Driver attribute extension payload carrying the reserved keep field")
     private Content content;

@@ -46,22 +46,18 @@ public class EventHistoryQueryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Identifier of the device to filter by; must belong to the current tenant.", example = "1024")
-
     private Long deviceId;
 
     @Schema(description = "Identifier of the event definition to filter by; must belong to the current tenant.", example = "4096")
-
     private Long eventId;
 
     @Schema(description = "Code of the event to filter by.", example = "HIGH_TEMP_ALARM")
-
     private String eventCode;
 
     @Schema(description = "Type of the event to filter by.", example = "ALERT")
     private EventTypeFlagEnum eventTypeFlag;
 
     @Schema(description = "Pagination parameters: page number and page size.")
-
     private Pages page;
 
     public <T> Page<T> toPage() {

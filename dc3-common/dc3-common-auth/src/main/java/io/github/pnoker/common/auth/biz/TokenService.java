@@ -29,18 +29,37 @@ import io.github.pnoker.common.auth.entity.bean.TokenValid;
 public interface TokenService {
 
     /**
-     * @param loginName  Name
-     * @param tenantCode TenantCode
-     * @return R of String
+     * Generate a random salt for the login handshake. Validates tenant existence
+     * before returning.
+     *
+     * @param loginName  login name
+     * @param tenantCode tenant code
+     * @return a random UUID salt, never null
+     * @throws UnAuthorizedException if the tenant does not exist
      */
     String generateSalt(String loginName, String tenantCode);
 
     /**
-     * @param loginName  Name
-     * @param salt       User Salt
-     * @param password   User Password
-     * @param tenantCode TenantCode
-     * @return R of String
+     * Authenticate a principal and generate a signed JWT token.
+     * <p>
+     * Validation chain (order matters):
+     * <ol>
+     *   <li>Resolve and validate the tenant</li>
+     *   <li>Resolve the local credential by login name</li>
+     *   <li>Verify the principal is a member of the tenant</li>
+     *   <li>Verify the provided password against the stored credential</li>
+     *   <li>Record a failed login attempt on mismatch</li>
+     *   <li>Check for password expiration</li>
+     *   <li>Check for mandatory password-change flag</li>
+     * </ol>
+     *
+     * @param loginName  login name
+     * @param salt       server-issued random salt from {@link #generateSalt}
+     * @param password   raw password
+     * @param tenantCode tenant code
+     * @return signed JWT token string
+     * @throws UnAuthorizedException          on bad tenant, credential, membership, salt, or password
+     * @throws PasswordChangeRequiredException when password is expired or flagged for change
      */
     String generateToken(String loginName, String salt, String password, String tenantCode);
 
@@ -57,11 +76,15 @@ public interface TokenService {
     void changePassword(String loginName, String currentPassword, String newPassword, String tenantCode);
 
     /**
-     * @param loginName  Name
-     * @param salt
-     * @param token      Token
-     * @param tenantCode TenantCode
-     * @return TokenValid
+     * Validate a token by replaying the salt and tenant lookups, then verifying
+     * the JWT signature and checking the denylist for revoked tokens.
+     *
+     * @param loginName  login name
+     * @param salt       server-issued salt bound to the login session
+     * @param token      JWT token string
+     * @param tenantCode tenant code
+     * @return the resolved token validity with principal and tenant info
+     * @throws UnAuthorizedException on invalid token, revoked token, or mismatched tenant
      */
     TokenValid checkValid(String loginName, String salt, String token, String tenantCode);
 

@@ -50,7 +50,6 @@ public class AlertPageQuery implements Serializable {
     private String source;
 
     @Schema(description = "Alarm type enum", example = "1")
-
     private Integer alarmTypeFlag;
 
     /**
@@ -78,7 +77,6 @@ public class AlertPageQuery implements Serializable {
     private Long current;
 
     @Schema(description = "Page size", example = "20")
-
     private Long size;
 
 }

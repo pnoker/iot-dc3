@@ -73,15 +73,12 @@ public class CommandParamVO extends BaseVO {
     private PointTypeEnum paramTypeFlag;
 
     @Schema(description = "Whether this parameter is REQUIRED or OPTIONAL for command execution.", example = "REQUIRED")
-
     private Boolean requiredFlag;
 
     @Schema(description = "Default value pre-populated when the command is invoked without an explicit value.", example = "0")
-
     private String defaultValue;
 
     @Schema(description = "Command parameter extension information, serialized as JSON for custom metadata.")
-
     private CommandParamExt paramExt;
 
     @Schema(description = "ID of the parent command this parameter belongs to.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -90,15 +87,12 @@ public class CommandParamVO extends BaseVO {
     private Long commandId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
-
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Signature used for configuration integrity verification.")
-
     private String signature;
 
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
-
     private Integer version;
 
 }

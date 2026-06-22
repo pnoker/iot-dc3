@@ -45,19 +45,15 @@ import lombok.ToString;
 public class NotifyChannelBindVO extends BaseVO {
 
     @Schema(description = "ID of the notification rule to bind.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-
     private Long notifyId;
 
     @Schema(description = "ID of the notification channel to bind.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-
     private Long channelId;
 
     @Schema(description = "Bind extension information, serialized as JSON for custom routing metadata.")
-
     private NotifyChannelBindExt bindExt;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
-
     private EnableFlagEnum enableFlag;
 
 }

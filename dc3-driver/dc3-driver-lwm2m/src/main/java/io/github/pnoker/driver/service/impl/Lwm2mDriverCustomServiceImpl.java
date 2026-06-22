@@ -50,6 +50,12 @@ import java.util.Objects;
  * Supports active read/write operations via the embedded Leshan server.
  * </p>
  *
+ *
+ * <p>
+ * <b>WARNING:</b> This driver is a work-in-progress skeleton. Protocol-level
+ * I/O is not yet fully implemented — see TODO markers in method bodies.
+ * </p>
+ *
  * @author pnoker
  * @version 2026.5.22
  * @since 2026.6.2

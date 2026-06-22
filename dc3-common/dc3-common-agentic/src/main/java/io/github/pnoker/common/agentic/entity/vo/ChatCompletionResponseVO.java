@@ -47,27 +47,21 @@ import java.util.List;
 public class ChatCompletionResponseVO {
 
     @Schema(description = "Unique identifier of this completion response, prefixed with 'chatcmpl-'.", example = "chatcmpl-abc123xyz")
-
     private String id;
 
     @Schema(description = "Object type discriminator; always 'chat.completion' for non-streaming responses.", example = "chat.completion")
-
     private String object;
 
     @Schema(description = "Unix timestamp (seconds since epoch) when the completion was created.", example = "1718700000")
-
     private long created;
 
     @Schema(description = "Identifier of the model that generated the response.", example = "gpt-4o")
-
     private String model;
 
     @Schema(description = "List of generated completion choices; contains one entry per requested choice (n parameter).")
-
     private List<Choice> choices;
 
     @Schema(description = "Token usage statistics for the request and response.")
-
     private Usage usage;
 
     @Getter

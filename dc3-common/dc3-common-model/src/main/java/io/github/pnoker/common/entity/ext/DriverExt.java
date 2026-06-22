@@ -38,9 +38,9 @@ import lombok.Setter;
 public class DriverExt extends BaseExt {
 
     /**
-     *
+     * Extended content.
      * <p>
-     * Type Version
+     * The content can be distinguished by Type and Version.
      */
     @Schema(description = "Driver configuration content payload; a structured object carrying driver-specific settings, not a scalar value")
     private Content content;

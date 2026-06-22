@@ -51,35 +51,27 @@ public class EventParamQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-
     private Pages page;
 
     @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
-
     private Long tenantId;
 
     @Schema(description = "Filter by parameter name. Supports partial matching.", example = "Register Address")
-
     private String paramName;
 
     @Schema(description = "Filter by parameter code. Exact match on the stable business identifier.", example = "REG_ADDR")
-
     private String paramCode;
 
     @Schema(description = "Filter by parameter data type: STRING, INT, LONG, FLOAT, DOUBLE, or BOOL.", example = "INT")
-
     private PointTypeEnum paramTypeFlag;
 
     @Schema(description = "Filter by event definition ID.", example = "4096")
-
     private Long eventId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
-
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
-
     private Integer version;
 
 }

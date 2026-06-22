@@ -52,23 +52,18 @@ public class NotifyChannelBindQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-
     private Pages page;
 
     @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
-
     private Long tenantId;
 
     @Schema(description = "Filter by notification rule ID. Exact match.", example = "2048")
-
     private Long notifyId;
 
     @Schema(description = "Filter by notification channel ID. Exact match.", example = "512")
-
     private Long channelId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
-
     private EnableFlagEnum enableFlag;
 
 }

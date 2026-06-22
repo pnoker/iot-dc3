@@ -47,51 +47,39 @@ import lombok.ToString;
 public class NotifyHistoryVO extends BaseVO {
 
     @Schema(description = "ID of the rule that triggered this notification.", example = "1024")
-
     private Long ruleId;
 
     @Schema(description = "ID of the notification definition used.", example = "2048")
-
     private Long notifyId;
 
     @Schema(description = "ID of the message template used for this notification.", example = "4096")
-
     private Long messageId;
 
     @Schema(description = "ID of the notification channel through which this notification was delivered.", example = "512")
-
     private Long channelId;
 
     @Schema(description = "ID of the alarm associated with this notification.", example = "512")
-
     private Long alarmId;
 
     @Schema(description = "Channel type used to deliver this notification (e.g. EMAIL, SMS, WEBHOOK).", example = "EMAIL")
-
     private NotifyChannelTypeEnum channelTypeFlag;
 
     @Schema(description = "Notification target address or identifier (e.g. email address, phone number, webhook URL).", example = "admin@example.com")
-
     private String target;
 
     @Schema(description = "Delivery status of this notification record (e.g. SUCCESS, FAILED, PENDING).", example = "SUCCESS")
-
     private NotifyHistoryStatusEnum statusFlag;
 
     @Schema(description = "Request payload sent to the notification channel, serialized as JSON.")
-
     private NotifyHistoryRequestExt requestExt;
 
     @Schema(description = "Response received from the notification channel, serialized as JSON.")
-
     private NotifyHistoryResponseExt responseExt;
 
     @Schema(description = "Error message if the notification delivery failed. Null on success.", example = "SMTP connection refused")
-
     private String errorMessage;
 
     @Schema(description = "Number of delivery retries attempted for this notification.", example = "0")
-
     private Integer retryCount;
 
 }

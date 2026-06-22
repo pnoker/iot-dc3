@@ -22,17 +22,17 @@
     <select id="listIdentityAudit"
             resultType="io.github.pnoker.common.auth.entity.model.IdentityAuditLogDO">
         SELECT id,
-               tenant_id,
-               principal_id,
-               principal_type,
-               action,
-               resource_type,
-               resource_id,
-               resource_name,
-               status,
-               error_code,
-               detail_ext,
-               create_time
+        tenant_id,
+        principal_id,
+        principal_type,
+        action,
+        resource_type,
+        resource_id,
+        resource_name,
+        status,
+        error_code,
+        detail_ext,
+        create_time
         FROM dc3_identity_audit_log
         <where>
             deleted = 0

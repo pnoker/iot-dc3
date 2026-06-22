@@ -41,9 +41,9 @@ import java.util.Map;
 public class CommandAttributeExt extends BaseExt {
 
     /**
-     *
+     * Extended content.
      * <p>
-     * Type Version
+     * The content can be distinguished by Type and Version.
      */
     @Schema(description = "Command attribute content, holding the detailed configuration of the attribute.")
     private Content content;

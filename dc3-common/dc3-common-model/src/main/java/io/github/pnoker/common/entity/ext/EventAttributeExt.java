@@ -41,9 +41,9 @@ import java.util.Map;
 public class EventAttributeExt extends BaseExt {
 
     /**
-     *
+     * Extended content.
      * <p>
-     * Type Version
+     * The content can be distinguished by Type and Version.
      */
     @Schema(description = "Event attribute configuration content")
     private Content content;

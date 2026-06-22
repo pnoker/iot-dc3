@@ -40,6 +40,13 @@ import java.security.cert.X509Certificate;
 
 /**
  * X.509 certificate loading and SSL socket factory creation.
+ * <p>
+ * <b>WARNING:</b> This utility is currently <b>unavailable</b>. The generic
+ * return type with {@code (T)} cast from {@code PemReader.readPemObject()} is
+ * type-unsafe and must be reworked to explicitly convert PemObject to
+ * X509Certificate / KeyPair before casting. Until resolved,
+ * {@code getSSLSocketFactory} is unusable in production.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -52,7 +59,9 @@ public class X509Util {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
-    // TODO: 2023.10.16 There are issues here, currently in an unavailable state
+    // TODO: 2023.10.16 — PemObject-to-typed-certificate conversion is broken.
+// The (T) cast from PemReader.readPemObject() is type-unsafe.
+// PemObject must be explicitly converted to X509Certificate / KeyPair first.
 
     /**
      * Create SSL socket factory with custom certificates
@@ -102,12 +111,16 @@ public class X509Util {
         }
     }
 
-    // TODO: 2023.10.16 There are issues here, currently in an unavailable state
+    // TODO: 2023.10.16 — PemObject-to-typed-certificate conversion is broken.
+// The (T) cast from PemReader.readPemObject() is type-unsafe.
+// PemObject must be explicitly converted to X509Certificate / KeyPair first.
     private static <T> T loadCertificate(String caCrtFile) throws IOException {
         return loadCertificateWithPassword(caCrtFile, null);
     }
 
-    // TODO: 2023.10.16 There are issues here, currently in an unavailable state
+    // TODO: 2023.10.16 — PemObject-to-typed-certificate conversion is broken.
+// The (T) cast from PemReader.readPemObject() is type-unsafe.
+// PemObject must be explicitly converted to X509Certificate / KeyPair first.
     @SuppressWarnings("unchecked")
     private static <T> T loadCertificateWithPassword(String caCrtFile, String password) throws IOException {
         String classPath = "classpath:";

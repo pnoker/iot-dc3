@@ -37,15 +37,12 @@ import lombok.Setter;
 public class AgenticVisualizationVO {
 
     @Schema(description = "Fixed discriminator identifying this SSE payload as a visualization object; always \"agentic.visualization\".", example = "agentic.visualization")
-
     private String object;
 
     @Schema(description = "Structured visualization specification carrying chart type, data, and rendering options.")
-
     private AgenticVisualizationSpec visualization;
 
     @Schema(description = "Unix timestamp (milliseconds since epoch) when the visualization response was generated.", example = "1718678400000")
-
     private Long created;
 
     public static AgenticVisualizationVO of(AgenticVisualizationSpec visualization, long created) {

@@ -53,27 +53,21 @@ public class NotifyChannelQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-
     private Pages page;
 
     @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
-
     private Long tenantId;
 
     @Schema(description = "Filter by notification channel name. Supports partial matching.", example = "SMS Alert Channel")
-
     private String channelName;
 
     @Schema(description = "Filter by notification channel code. Exact match on the stable business identifier.", example = "SMS_CHANNEL")
-
     private String channelCode;
 
     @Schema(description = "Filter by notification channel type (e.g. EMAIL, SMS, WEBHOOK, MESSAGE_BUS). Exact match.")
-
     private NotifyChannelTypeEnum channelTypeFlag;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
-
     private EnableFlagEnum enableFlag;
 
 }

@@ -48,18 +48,15 @@ public class EventReportVO implements Serializable {
     private Long deviceId;
 
     @Schema(description = "Identifier of the event definition being reported; must belong to the current tenant.", example = "4096")
-
     private Long eventId;
 
     @Schema(description = "Stable business code of the event; must match a defined event code.", example = "HIGH_TEMP_ALARM")
-
     private String eventCode;
 
     @Schema(description = "Parameter values submitted with this event report, keyed by parameter code.")
     private Map<String, String> paramValues;
 
     @Schema(description = "Free-text detail or payload accompanying the event report.", example = "Temperature exceeded the configured threshold")
-
     private String message;
 
 }

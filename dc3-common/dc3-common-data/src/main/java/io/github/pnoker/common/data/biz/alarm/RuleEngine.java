@@ -31,8 +31,8 @@ public interface RuleEngine {
     /**
      * Evaluate a normalized fact.
      *
-     * @param fact fact
-     * @return matched rules
+     * @param fact normalized fact to evaluate against registered rules
+     * @return subset of rules whose conditions match the fact
      */
     List<RuleMatch> evaluate(RuleFact fact);
 

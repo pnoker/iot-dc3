@@ -52,43 +52,33 @@ public class EventQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-
     private Pages page;
 
     @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
-
     private Long tenantId;
 
     @Schema(description = "Filter by event name. Supports partial matching.", example = "High Temperature Alarm")
-
     private String eventName;
 
     @Schema(description = "Filter by event code. Exact match on the stable business identifier.", example = "HIGH_TEMP_ALARM")
-
     private String eventCode;
 
     @Schema(description = "Filter by event type: INFO (informational), ALERT (requires attention), FAULT (malfunction), or LIFECYCLE (state transition).", example = "ALERT")
-
     private EventTypeFlagEnum eventType;
 
     @Schema(description = "Filter by event severity level: LOW, MEDIUM, HIGH, or CRITICAL.", example = "HIGH")
-
     private EventLevelEnum eventLevel;
 
     @Schema(description = "Filter by profile (device template) ID.", example = "2048")
-
     private Long profileId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
-
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
-
     private Integer version;
 
     @Schema(description = "Filter by device ID. Returns results scoped to a specific device.", example = "1024")
-
     private Long deviceId;
 
 }

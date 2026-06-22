@@ -52,27 +52,21 @@ public class EventHistoryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Primary key")
-
     private Long id;
 
     @Schema(description = "Unique record ID for this event history entry.", example = "123456")
-
     private String recordId;
 
     @Schema(description = "Tenant ID")
-
     private Long tenantId;
 
     @Schema(description = "ID of the device that triggered this event.", example = "1024")
-
     private Long deviceId;
 
     @Schema(description = "ID of the event definition.", example = "4096")
-
     private Long eventId;
 
     @Schema(description = "Event code. Stable business identifier for this event.", example = "HIGH_TEMP_ALARM")
-
     private String eventCode;
 
     @Schema(description = "Event type enum", example = "ALERT")
@@ -82,46 +76,36 @@ public class EventHistoryVO implements Serializable {
     private EventLevelEnum eventLevelFlag;
 
     @Schema(description = "Event parameter values", example = "{\"temperature\": \"85\"}")
-
     private String paramValues;
 
     @Schema(description = "Event configuration snapshot", example = "{\"threshold\": 80}")
-
     private String configSnapshot;
 
     @Schema(description = "Message content", example = "High temperature alarm triggered: 85°C exceeds 80°C threshold")
-
     private String message;
 
     @Schema(description = "Timestamp when the event occurred on the device.")
-
     private LocalDateTime occurTime;
 
     @Schema(description = "Timestamp when the platform received the event report.")
-
     private LocalDateTime receiveTime;
 
     @Schema(description = "Acknowledge flag enum", example = "NO")
     private EventHistoryAcknowledgeFlagEnum acknowledgeFlag;
 
     @Schema(description = "Timestamp when a user acknowledged this event. Null if not yet acknowledged.")
-
     private LocalDateTime acknowledgeTime;
 
     @Schema(description = "ID of the user who acknowledged this event. Null if not yet acknowledged.", example = "1000")
-
     private Long acknowledgeUserId;
 
     @Schema(description = "Schema version")
-
     private Short schemaVersion;
 
     @Schema(description = "Creation time")
-
     private LocalDateTime createTime;
 
     @Schema(description = "Last operation time")
-
     private LocalDateTime operateTime;
 
 }

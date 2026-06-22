@@ -52,82 +52,63 @@ public class PointCommandHistoryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Primary key", example = "1")
-
     private Long id;
 
     @Schema(description = "ID of the command definition invoked.", example = "4096")
-
     private String commandId;
 
     @Schema(description = "Tenant ID", example = "100001")
-
     private Long tenantId;
 
     @Schema(description = "Point command type", example = "READ")
-
     private PointCommandTypeEnum type;
 
     @Schema(description = "ID of the device the point command was sent to.", example = "1024")
-
     private Long deviceId;
 
     @Schema(description = "ID of the target data point.", example = "2048")
-
     private Long pointId;
 
     @Schema(description = "Command value sent to the data point.", example = "42")
-
     private String requestValue;
 
     @Schema(description = "Response value received from the data point after command execution.", example = "42")
-
     private String responseValue;
 
     @Schema(description = "Command status", example = "SUCCESS")
     private PointCommandStatusEnum status;
 
     @Schema(description = "Error code if the point command execution failed. Null on success.", example = "ERR_TIMEOUT")
-
     private String errorCode;
 
     @Schema(description = "Human-readable error message if the point command execution failed. Null on success.", example = "Connection timeout after 3000ms")
-
     private String errorMessage;
 
     @Schema(description = "Source identifier", example = "HTTP")
-
     private PointCommandSourceEnum source;
 
     @Schema(description = "ID of the user who issued this point command.", example = "1000")
-
     private Long sourceUserId;
 
     @Schema(description = "Timestamp when the point command was issued.")
-
     private LocalDateTime occurTime;
 
     @Schema(description = "Timestamp when the point command was dispatched.")
-
     private LocalDateTime sendTime;
 
     @Schema(description = "Timestamp when the point command execution completed.")
-
     private LocalDateTime finishTime;
 
     @Schema(description = "Timestamp when the point command expires without a response.")
-
     private LocalDateTime expireTime;
 
     @Schema(description = "Schema version")
-
     private Short schemaVersion;
 
     @Schema(description = "Creation time")
-
     private LocalDateTime createTime;
 
     @Schema(description = "Last operation time")
-
     private LocalDateTime operateTime;
 
 }
