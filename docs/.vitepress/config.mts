@@ -16,219 +16,274 @@
  */
 
 import {defineConfig} from 'vitepress'
+import {withMermaid} from 'vitepress-plugin-mermaid'
 
-export default defineConfig({
-    lang: 'zh-CN',
-    title: 'IoT DC3',
-    description: '面向工业物联网的分布式设备接入、数据采集与 AI 运营平台',
+// 各栏目页面结构：[code, 中文标题, English]
+// code 为空串 → 栏目首页；含 "/" → 跨栏目绝对路径（如 'architecture/modules'）
+// 扁平结构（不设 group 文本）：侧栏直接列页面，避免与顶部 nav 标题重复
+const SECTIONS: ReadonlyArray<{
+    key: string
+    items: ReadonlyArray<readonly [string, string, string]>
+}> = [
+    {key: 'introduction', items: [
+        ['', '总览', 'Overview'],
+        ['concepts', '核心概念', 'Core Concepts'],
+        ['paths', '按角色选择路径', 'Choose Your Path']
+    ]},
+    {key: 'quickstart', items: [
+        ['', '本地开发', 'Local Development'],
+        ['environment', '环境变量', 'Environment Variables'],
+        ['first-device', '第一个设备', 'First Device']
+    ]},
+    {key: 'architecture', items: [
+        ['', '总览', 'Overview'],
+        ['services', '服务与拓扑', 'Services & Topology'],
+        ['facade-modes', 'Facade 模式', 'Facade Modes'],
+        ['data-plane', '数据平面', 'Data Plane'],
+        ['command-plane', '命令平面', 'Command Plane'],
+        ['auth-rbac', '鉴权 · 租户 · RBAC', 'Auth, Tenant & RBAC'],
+        ['domain-model', '领域模型', 'Domain Model'],
+        ['modules', '模块地图', 'Module Map']
+    ]},
+    {key: 'operation', items: [
+        ['', '概览', 'Overview'],
+        ['device-onboarding', '设备接入', 'Device Onboarding'],
+        ['data-commands', '数据与命令', 'Data & Commands'],
+        ['alarms', '告警与通知', 'Alarms & Notifications']
+    ]},
+    {key: 'development', items: [
+        ['', '概览', 'Overview'],
+        ['driver-authoring', '驱动开发', 'Driver Authoring'],
+        ['api-documentation', 'API 文档', 'API Documentation'],
+        ['testing', '测试', 'Testing'],
+        ['changelog', '变更日志', 'Changelog']
+    ]},
+    {key: 'ai', items: [
+        ['', '概览', 'Overview'],
+        ['agentic', 'Agentic 中心', 'Agentic Center'],
+        ['mcp', 'AI Agent / MCP', 'AI Agent / MCP']
+    ]},
+    {key: 'automation', items: [
+        ['', '概览', 'Overview'],
+        ['cli', 'CLI 使用指南', 'CLI Guide']
+    ]},
+    {key: 'guide', items: [
+        ['', '概览', 'Overview'],
+        ['usage', '部署模式与镜像源', 'Deployment & Images'],
+        ['observability', '可观测性', 'Observability'],
+        ['logging', '日志规范', 'Logging'],
+        ['troubleshooting', '故障排查', 'Troubleshooting']
+    ]},
+    {key: 'modules', items: [
+        ['', '模块清单', 'Catalog'],
+        ['architecture/modules', '模块地图', 'Module Map']
+    ]},
+    {key: 'community', items: [
+        ['contributing', '贡献指南', 'Contributing'],
+        ['code-of-conduct', '行为准则', 'Code of Conduct'],
+        ['security', '安全策略', 'Security']
+    ]}
+]
+
+type Lang = 'zh' | 'en'
+
+function buildSidebar(lang: Lang) {
+    const p = lang === 'en' ? '/en' : '/zh'
+    const sidebar: Record<string, Array<{ text: string; link: string }>> = {}
+    for (const s of SECTIONS) {
+        sidebar[`${p}/${s.key}/`] = s.items.map(([code, zh, en]) => {
+            const link = code.includes('/')
+                ? `${p}/${code}`
+                : `${p}/${s.key}${code ? '/' + code : ''}`
+            return {text: lang === 'en' ? en : zh, link}
+        })
+    }
+    return sidebar
+}
+
+function buildNav(lang: Lang) {
+    const p = lang === 'en' ? '/en' : '/zh'
+    const t = lang === 'en'
+    return [
+        {text: t ? 'Home' : '首页', link: `${p}/`},
+        {text: t ? 'Introduction' : '介绍', link: `${p}/introduction/`},
+        {text: t ? 'Quick Start' : '快速开始', link: `${p}/quickstart/`},
+        {text: t ? 'Architecture' : '架构', link: `${p}/architecture/`},
+        {text: t ? 'AI' : 'AI', link: `${p}/ai/`},
+        {text: t ? 'Automation' : '自动化', link: `${p}/automation/`},
+        {text: t ? 'Operation' : '操作指南', link: `${p}/operation/`},
+        {text: t ? 'Development' : '开发', link: `${p}/development/`},
+        {text: t ? 'Deployment' : '部署运维', link: `${p}/guide/`},
+        {
+            text: t ? 'Community' : '社区',
+            items: [
+                {text: t ? 'Contributing' : '贡献指南', link: `${p}/community/contributing`},
+                {text: t ? 'Code of Conduct' : '行为准则', link: `${p}/community/code-of-conduct`},
+                {text: t ? 'Security' : '安全策略', link: `${p}/community/security`}
+            ]
+        }
+    ]
+}
+
+function uiLabels(lang: Lang) {
+    if (lang === 'en') {
+        return {
+            editLinkText: 'Edit this page on GitHub',
+            outlineLabel: 'On this page',
+            lastUpdatedText: 'Last updated',
+            returnToTop: 'Back to top',
+            sidebarMenu: 'Menu',
+            darkModeSwitch: 'Appearance',
+            lightModeSwitchTitle: 'Switch to light theme',
+            darkModeSwitchTitle: 'Switch to dark theme',
+            docFooterPrev: 'Previous',
+            docFooterNext: 'Next',
+            searchButtonText: 'Search',
+            searchButtonAria: 'Search',
+            searchNoResults: 'No results found',
+            searchReset: 'Reset query',
+            searchSelect: 'Select',
+            searchNavigate: 'Switch',
+            searchClose: 'Close'
+        }
+    }
+    return {
+        editLinkText: '在 GitHub 上编辑此页',
+        outlineLabel: '页面导航',
+        lastUpdatedText: '最后更新于',
+        returnToTop: '回到顶部',
+        sidebarMenu: '菜单',
+        darkModeSwitch: '主题',
+        lightModeSwitchTitle: '切换到浅色模式',
+        darkModeSwitchTitle: '切换到深色模式',
+        docFooterPrev: '上一页',
+        docFooterNext: '下一页',
+        searchButtonText: '搜索文档',
+        searchButtonAria: '搜索文档',
+        searchNoResults: '无法找到相关结果',
+        searchReset: '清除查询条件',
+        searchSelect: '选择',
+        searchNavigate: '切换',
+        searchClose: '关闭'
+    }
+}
+
+function localeThemeConfig(lang: Lang) {
+    const t = uiLabels(lang)
+    return {
+        nav: buildNav(lang),
+        sidebar: buildSidebar(lang),
+        editLink: {text: t.editLinkText},
+        outline: {level: [2, 3], label: t.outlineLabel},
+        lastUpdated: {
+            text: t.lastUpdatedText,
+            formatOptions: {dateStyle: 'short', timeStyle: 'medium'}
+        },
+        docFooter: {prev: t.docFooterPrev, next: t.docFooterNext},
+        returnToTopLabel: t.returnToTop,
+        sidebarMenuLabel: t.sidebarMenu,
+        darkModeSwitchLabel: t.darkModeSwitch,
+        lightModeSwitchTitle: t.lightModeSwitchTitle,
+        darkModeSwitchTitle: t.darkModeSwitchTitle,
+        search: {
+            provider: 'local',
+            options: {
+                translations: {
+                    button: {
+                        buttonText: t.searchButtonText,
+                        buttonAriaLabel: t.searchButtonAria
+                    },
+                    modal: {
+                        noResultsText: t.searchNoResults,
+                        resetButtonTitle: t.searchReset,
+                        footer: {
+                            selectText: t.searchSelect,
+                            navigateText: t.searchNavigate,
+                            closeText: t.searchClose
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Mermaid 渲染：浅色模式品牌绿主题；深色模式由插件强制。统一中文技术字体栈避免文字遮挡。
+const MERMAID = {
+    theme: 'base',
+    themeVariables: {
+        fontFamily: '"Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif',
+        fontSize: '15px',
+        primaryColor: '#e7f1ed',
+        primaryBorderColor: '#2f7d68',
+        primaryTextColor: '#15231f',
+        lineColor: '#4f9a85',
+        secondaryColor: '#eef3f1',
+        tertiaryColor: '#f6faf8',
+        noteBkgColor: '#fff7e6',
+        noteBorderColor: '#d8a544'
+    },
+    flowchart: {curve: 'basis', useMaxWidth: true, nodeSpacing: 60, rankSpacing: 66, padding: 24, htmlLabels: false},
+    sequence: {useMaxWidth: true, mirrorActors: false, actorMargin: 64, boxMargin: 12, noteMargin: 12, messageMargin: 44},
+    state: {useMaxWidth: true, padding: 18},
+    er: {useMaxWidth: true},
+    class: {useMaxWidth: true}
+}
+
+// 根路径（语言门）总是按偏好重定向到 /zh/ 或 /en/：localStorage 优先，否则按浏览器语言；语言选择页仅作 JS 禁用的 fallback
+const LANG_DETECT = `(function(){var K='dc3-lang',B='/iot-dc3/';var p;try{p=localStorage.getItem(K);}catch(e){}var r=location.pathname;if(r.length&&r[r.length-1]!=='/')r=r+'/';var rel=r.indexOf(B)===0?r.slice(B.length):r;var onEn=rel.indexOf('en/')===0;var onZh=rel.indexOf('zh/')===0;if(!onEn&&!onZh){if(!p){p=/^en/i.test(navigator.language)?'en':'zh';try{localStorage.setItem(K,p);}catch(e){}}location.replace(B+p+'/');}})();`
+
+export default withMermaid(defineConfig({
     base: '/iot-dc3/',
     cleanUrls: true,
     lastUpdated: true,
 
+    // 维护者内部资料不进入公开站点构建
+    srcExclude: ['superpowers/**'],
+
     head: [
-        ['link', {rel: 'icon', href: '/iot-dc3/images/logo-blue.zh.png'}],
-        ['meta', {name: 'theme-color', content: '#3c8772'}]
+        ['link', {rel: 'icon', href: '/iot-dc3/images/logo.svg', type: 'image/svg+xml'}],
+        ['meta', {name: 'theme-color', content: '#3c8772'}],
+        ['script', {}, LANG_DETECT]
     ],
 
-    themeConfig: {
-        logo: '/images/logo-blue.zh.png',
-        siteTitle: 'IoT DC3',
-
-        nav: [
-            {text: '首页', link: '/'},
-            {text: '快速开始', link: '/quickstart/'},
-            {text: '操作手册', link: '/operation/'},
-            {text: '使用指南', link: '/guide/'},
-            {text: '架构', link: '/architecture/'},
-            {text: '开发', link: '/development/'},
-            {text: '模块', link: '/modules/'},
-            {text: 'Superpowers', link: '/superpowers/'},
-            {
-                text: '社区',
-                items: [
-                    {text: '贡献指南', link: '/community/contributing'},
-                    {text: '行为准则', link: '/community/code-of-conduct'},
-                    {text: '安全策略', link: '/community/security'}
-                ]
+    locales: {
+        root: {
+            label: 'Languages',
+            lang: 'zh-CN',
+            themeConfig: {
+                nav: [],
+                sidebar: []
             }
-        ],
-
-        sidebar: {
-            '/quickstart/': [
-                {
-                    text: '快速开始',
-                    items: [
-                        {text: '本地开发', link: '/quickstart/'},
-                        {text: '环境变量', link: '/quickstart/environment'}
-                    ]
-                }
-            ],
-            '/guide/': [
-                {
-                    text: '使用指南',
-                    items: [
-                        {text: '概览', link: '/guide/'},
-                        {text: '镜像与部署', link: '/guide/usage'},
-                        {text: '日志规范', link: '/guide/logging'},
-                        {text: '故障排查', link: '/guide/troubleshooting'}
-                    ]
-                }
-            ],
-            '/operation/': [
-                {
-                    text: '操作手册',
-                    items: [
-                        {text: '概览', link: '/operation/'},
-                        {text: '核心概念', link: '/operation/concepts'},
-                        {text: '设备接入流程', link: '/operation/device-onboarding'},
-                        {text: '数据与命令', link: '/operation/data-commands'},
-                        {text: 'AI 辅助运营', link: '/operation/agentic'}
-                    ]
-                }
-            ],
-            '/architecture/': [
-                {
-                    text: '架构',
-                    items: [
-                        {text: '概览', link: '/architecture/'},
-                        {text: '模块与依赖', link: '/architecture/modules'}
-                    ]
-                }
-            ],
-            '/development/': [
-                {
-                    text: '开发',
-                    items: [
-                        {text: '概览', link: '/development/'},
-                        {text: '驱动开发', link: '/development/driver-authoring'},
-                        {text: 'API 文档', link: '/development/api-documentation'},
-                        {text: '测试', link: '/development/testing'},
-                        {text: '变更日志', link: '/development/changelog'}
-                    ]
-                }
-            ],
-            '/modules/': [
-                {
-                    text: '模块',
-                    items: [
-                        {text: '模块清单', link: '/modules/'}
-                    ]
-                }
-            ],
-            '/superpowers/': [
-                {
-                    text: 'Superpowers',
-                    items: [
-                        {text: '概览', link: '/superpowers/'},
-                        {text: '文档机制', link: '/superpowers/documentation/'}
-                    ]
-                },
-                {
-                    text: '设计方案',
-                    items: [
-                        {text: '方案索引', link: '/superpowers/design/'},
-                        {text: '物模型', link: '/superpowers/design/thing-model'},
-                        {text: '指令与事件属性', link: '/superpowers/design/command-event-attribute-config'},
-                        {text: '位号命令链路', link: '/superpowers/design/point-command'},
-                        {text: '设备与驱动超时', link: '/superpowers/design/device-driver-timeout'},
-                        {text: '自定义指令调用', link: '/superpowers/design/command-call'},
-                        {text: '事件上报', link: '/superpowers/design/event-report'},
-                        {text: '实体告警统一表', link: '/superpowers/design/entity-alarm'},
-                        {text: '规则告警链路优化', link: '/superpowers/design/rule-alarm-optimization'},
-                        {text: 'Gateway MCP 服务', link: '/superpowers/design/mcp-server'}
-                    ]
-                },
-                {
-                    text: '分析与策略',
-                    items: [
-                        {text: '分析索引', link: '/superpowers/analysis/'},
-                        {text: '协议库对比分析', link: '/superpowers/analysis/iot-dc3-vs-iot-communication'},
-                        {text: '策略索引', link: '/superpowers/strategy/'},
-                        {text: 'AI 定位草案', link: '/superpowers/strategy/ai-positioning'}
-                    ]
-                },
-                {
-                    text: '计划与归档',
-                    items: [
-                        {text: '待办池', link: '/superpowers/backlog/'},
-                        {text: '旧版操作手册', link: '/superpowers/legacy-operation/'},
-                        {text: '旧版驱动截图', link: '/superpowers/legacy-operation/driver'},
-                        {text: '旧版模板截图', link: '/superpowers/legacy-operation/template'},
-                        {text: '旧版设备截图', link: '/superpowers/legacy-operation/device'},
-                        {text: '旧版数据截图', link: '/superpowers/legacy-operation/data'}
-                    ]
-                }
-            ],
-            '/community/': [
-                {
-                    text: '社区',
-                    items: [
-                        {text: '贡献指南', link: '/community/contributing'},
-                        {text: '行为准则', link: '/community/code-of-conduct'},
-                        {text: '安全策略', link: '/community/security'}
-                    ]
-                }
-            ]
         },
+        zh: {
+            label: '简体中文',
+            lang: 'zh-CN',
+            themeConfig: localeThemeConfig('zh')
+        },
+        en: {
+            label: 'English',
+            lang: 'en-US',
+            themeConfig: localeThemeConfig('en')
+        }
+    },
+
+    themeConfig: {
+        logo: '/images/logo.svg',
+        siteTitle: 'IoT DC3',
 
         socialLinks: [
             {icon: 'github', link: 'https://github.com/pnoker/iot-dc3'}
         ],
 
         editLink: {
-            pattern: 'https://github.com/pnoker/iot-dc3/edit/release/docs/:path',
-            text: '在 GitHub 上编辑此页'
+            pattern: 'https://github.com/pnoker/iot-dc3/edit/release/docs/:path'
         },
 
         footer: {
-            message: '基于 AGPL-3.0 协议发布',
+            message: 'Released under the AGPL-3.0 License · 基于 AGPL-3.0 协议发布',
             copyright: 'Copyright © 2017-2026 pnoker'
-        },
-
-        search: {
-            provider: 'local',
-            options: {
-                translations: {
-                    button: {
-                        buttonText: '搜索文档',
-                        buttonAriaLabel: '搜索文档'
-                    },
-                    modal: {
-                        noResultsText: '无法找到相关结果',
-                        resetButtonTitle: '清除查询条件',
-                        footer: {
-                            selectText: '选择',
-                            navigateText: '切换',
-                            closeText: '关闭'
-                        }
-                    }
-                }
-            }
-        },
-
-        docFooter: {
-            prev: '上一页',
-            next: '下一页'
-        },
-
-        outline: {
-            level: [2, 3],
-            label: '页面导航'
-        },
-
-        lastUpdated: {
-            text: '最后更新于',
-            formatOptions: {
-                dateStyle: 'short',
-                timeStyle: 'medium'
-            }
-        },
-
-        returnToTopLabel: '回到顶部',
-        sidebarMenuLabel: '菜单',
-        darkModeSwitchLabel: '主题',
-        lightModeSwitchTitle: '切换到浅色模式',
-        darkModeSwitchTitle: '切换到深色模式'
+        }
     },
 
     markdown: {
@@ -236,5 +291,10 @@ export default defineConfig({
         image: {
             lazyLoading: true
         }
+    },
+
+    mermaid: MERMAID,
+    mermaidPlugin: {
+        class: 'dc3-mermaid'
     }
-})
+}))

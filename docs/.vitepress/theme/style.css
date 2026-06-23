@@ -29,7 +29,7 @@
     --vp-c-text-3: #6a7b74;
     --vp-c-divider: rgba(39, 68, 58, 0.13);
     --vp-c-gutter: rgba(39, 68, 58, 0.12);
-    --vp-code-block-bg: #10201b;
+    --vp-code-block-bg: #eef3f1;
     --vp-code-line-highlight-color: rgba(90, 163, 143, 0.16);
     --vp-home-hero-name-color: #1f6f5b;
     --vp-button-brand-bg: #2f7d68;
@@ -303,6 +303,46 @@ body {
     background: color-mix(in srgb, var(--vp-c-brand-soft) 65%, transparent);
     color: var(--vp-c-brand-1);
     font-weight: 620;
+}
+
+/* Mermaid 技术插图：与全站卡片/表格一致的容器，居中、可横向滚动、随主题切换 */
+.dc3-mermaid,
+.vp-doc .mermaid {
+    display: flex;
+    justify-content: center;
+    margin: 24px 0;
+    padding: 20px 18px;
+    border: 1px solid var(--vp-c-divider);
+    border-radius: 8px;
+    background: var(--vp-c-bg-elv);
+    box-shadow: 0 10px 28px rgba(30, 54, 46, 0.06);
+    overflow-x: auto;
+}
+
+.dc3-mermaid svg,
+.vp-doc .mermaid svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* 首页架构图为深底设计：亮色主题反色适配（invert+hue-rotate 抵消色相反转，呈现浅底深字），
+   暗色主题原样（深底本就配套）。 */
+.dc3-arch-diagram {
+    filter: invert(1) hue-rotate(180deg);
+    border-radius: 8px;
+}
+
+.dark .dc3-arch-diagram {
+    filter: none;
+}
+
+/* 强制 mermaid SVG 文字用跨平台可靠字体栈（与 config themeVariables.fontFamily 一致）。
+   canvas measureText 取第一个可用字体，SVG text 按优先级回退——同一字体确保测宽/渲染一致。 */
+.dc3-mermaid text,
+.dc3-mermaid tspan,
+.mermaid text,
+.mermaid tspan {
+    font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
 }
 
 .custom-block {
