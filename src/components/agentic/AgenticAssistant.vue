@@ -208,7 +208,7 @@
           <Welcome
             :description="t('agentic.welcomeDescription')"
             :title="t('agentic.title')"
-            icon="/images/logo/logo.png"
+            icon="/images/logo/logo.svg"
             variant="borderless"
           />
           <Prompts :items="promptItems" :wrap="true" @item-click="handlePromptClick" />
