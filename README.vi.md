@@ -18,6 +18,9 @@
   <a href="https://gitee.com/pnoker/iot-dc3/members">
     <img src="https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp" alt="Gitee Fork">
   </a>
+  <a href="https://github.com/pnoker/iot-dc3/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/pnoker/iot-dc3?label=contributors&color=orange" alt="Contributors">
+  </a>
   <img src="https://img.shields.io/badge/License-AGPL%203.0-blue" alt="License">
   <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk" alt="Java 21">
   <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot" alt="Spring Boot 4">
@@ -25,14 +28,14 @@
 
 <p align="center">
   <strong>
-    IoT DC3 là một nền tảng IoT phân tán mã nguồn mở, đang phát triển cho các kịch bản AI.<br>
-    Nền tảng bao phủ kết nối thiết bị, thu thập dữ liệu, quản lý vận hành và phân tích thông minh cho giải pháp IoT công nghiệp.
+    IoT DC3 — nền tảng IoT công nghiệp mã nguồn mở cho phép mô hình ngôn ngữ lớn điều khiển thiết bị trực tiếp.<br>
+    Tích hợp Spring AI native · Vận hành bằng ngôn ngữ tự nhiên · 28 driver sẵn dùng
   </strong>
 </p>
 
 <p align="center">
-  🔌 <strong>28 module driver kết nối</strong> &nbsp;·&nbsp;
-  🤖 <strong>Tích hợp năng lực AI</strong> &nbsp;·&nbsp;
+  🔌 <strong>Kết nối đa giao thức</strong> &nbsp;·&nbsp;
+  🤖 <strong>AI Agentic Center</strong> &nbsp;·&nbsp;
   ☁️ <strong>Microservice cloud-native</strong>
 </p>
 
@@ -225,6 +228,8 @@ Xem [tài liệu biến môi trường](https://pnoker.github.io/iot-dc3/quickst
 | **Tầng Dữ liệu**  | Thu thập, lưu trữ và truy vấn dữ liệu thiết bị, phục vụ dữ liệu thời gian thực và lịch sử                                |
 | **Tầng Quản lý**  | Lõi cộng tác microservice: đăng ký dịch vụ, quản lý thiết bị/driver, điều phối lệnh, quản trị cấu hình                   |
 | **Tầng Ứng dụng** | Mở dữ liệu, lập lịch tác vụ, cảnh báo, quản lý log, tích hợp bên thứ ba và tự động hóa AI                                |
+
+🧱 **Nguyên tắc thiết kế** — các lời gọi xuyên dịch vụ luôn đi qua interface Facade; mô hình ba tầng DO/BO/VO tách biệt rõ ràng giữa persistence, business và API; cách ly tenant xuyên suốt từ database, cache đến API. Ranh giới rõ ràng, dễ mở rộng theo dịch vụ và đội nhóm.
 
 > 📖 Để xem đầy đủ phụ thuộc module và luồng runtime,
 > xem [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html).

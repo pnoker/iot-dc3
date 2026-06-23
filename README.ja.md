@@ -18,6 +18,9 @@
   <a href="https://gitee.com/pnoker/iot-dc3/members">
     <img src="https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp" alt="Gitee Fork">
   </a>
+  <a href="https://github.com/pnoker/iot-dc3/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/pnoker/iot-dc3?label=contributors&color=orange" alt="Contributors">
+  </a>
   <img src="https://img.shields.io/badge/License-AGPL%203.0-blue" alt="License">
   <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk" alt="Java 21">
   <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot" alt="Spring Boot 4">
@@ -25,14 +28,14 @@
 
 <p align="center">
   <strong>
-    IoT DC3 は、AI シナリオに向けて進化するオープンソースの分散型 IoT プラットフォームです。<br>
-    デバイス接続、データ収集、運用管理、インテリジェント分析をカバーし、産業 IoT ソリューションの構築を支援します。
+    IoT DC3 — 大規模言語モデルがデバイスを直接操作できるオープンソース産業 IoT プラットフォーム<br>
+    Spring AI ネイティブ統合 · 自然言語による運用 · 28 個のすぐ使えるドライバー
   </strong>
 </p>
 
 <p align="center">
-  🔌 <strong>28 個の接続ドライバーモジュール</strong> &nbsp;·&nbsp;
-  🤖 <strong>AI 機能統合</strong> &nbsp;·&nbsp;
+  🔌 <strong>マルチプロトコル接続</strong> &nbsp;·&nbsp;
+  🤖 <strong>AI Agentic Center</strong> &nbsp;·&nbsp;
   ☁️ <strong>クラウドネイティブマイクロサービス</strong>
 </p>
 
@@ -223,10 +226,9 @@ cp .env.example .env    # テンプレートをコピー
 | **管理層**       | マイクロサービス連携の中核。サービス登録、デバイス / ドライバー管理、コマンド編成、設定管理    |
 | **アプリケーション層** | データ公開、タスクスケジューリング、アラーム、ログ管理、サードパーティ統合、AI 自動化       |
 
-> 📖
->
-詳細なモジュール依存関係とランタイムフローについては、[モジュールと依存関係](https://pnoker.github.io/iot-dc3/architecture/modules.html)
-> を参照してください。
+🧱 **設計原則** — サービス間呼び出しは常に Facade インターフェース経由；DO/BO/VO の三層モデルで永続化・ビジネス・API の形を厳密に分離；テナント分離をデータベース・キャッシュ・API パスまで一貫して適用。境界が明確で、サービスとチームの規模拡大に強い設計です。
+
+> 📖 詳細なモジュール依存関係とランタイムフローについては、[モジュールと依存関係](https://pnoker.github.io/iot-dc3/architecture/modules.html)を参照してください。
 
 ## 🛠️ 技術スタック
 

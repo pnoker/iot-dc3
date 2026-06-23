@@ -18,6 +18,9 @@
   <a href="https://gitee.com/pnoker/iot-dc3/members">
     <img src="https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp" alt="Gitee Fork">
   </a>
+  <a href="https://github.com/pnoker/iot-dc3/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/pnoker/iot-dc3?label=contributors&color=orange" alt="Contributors">
+  </a>
   <img src="https://img.shields.io/badge/License-AGPL%203.0-blue" alt="License">
   <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk" alt="Java 21">
   <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot" alt="Spring Boot 4">
@@ -25,14 +28,14 @@
 
 <p align="center">
   <strong>
-    IoT DC3 is an open-source distributed IoT platform evolving for AI scenarios.<br>
-    It covers device connectivity, data collection, operations management, and intelligent analytics for industrial IoT solutions.
+    IoT DC3 — the open-source industrial IoT platform that lets large language models operate your devices directly.<br>
+    Native Spring AI integration · Natural-language operations · 28 ready-to-use drivers
   </strong>
 </p>
 
 <p align="center">
-  🔌 <strong>28 access driver modules</strong> &nbsp;·&nbsp;
-  🤖 <strong>AI capability integration</strong> &nbsp;·&nbsp;
+  🔌 <strong>Multi-protocol connectivity</strong> &nbsp;·&nbsp;
+  🤖 <strong>AI Agentic Center</strong> &nbsp;·&nbsp;
   ☁️ <strong>Cloud-native microservices</strong>
 </p>
 
@@ -225,6 +228,8 @@ the [environment documentation](https://pnoker.github.io/iot-dc3/quickstart/envi
 | **Data Layer**        | Device data collection, storage, and query services for real-time and historical data                                            |
 | **Management Layer**  | Microservice collaboration core: service registration, device/driver management, command orchestration, configuration governance |
 | **Application Layer** | Data openness, scheduling, alarms, logging, third-party integration, and AI automation                                           |
+
+🧱 **Design principles** — cross-service calls always go through Facade interfaces; the DO/BO/VO three-tier model keeps persistence, business, and API shapes strictly separated; and tenant isolation runs end to end across database, cache, and API paths. Clear boundaries that scale across services and teams.
 
 > 📖 For full module dependencies and runtime flow,
 > see [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html).

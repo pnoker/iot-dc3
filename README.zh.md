@@ -18,6 +18,9 @@
   <a href="https://gitee.com/pnoker/iot-dc3/members">
     <img src="https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp" alt="Gitee Fork">
   </a>
+  <a href="https://github.com/pnoker/iot-dc3/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/pnoker/iot-dc3?label=contributors&color=orange" alt="Contributors">
+  </a>
   <img src="https://img.shields.io/badge/License-AGPL%203.0-blue" alt="License">
   <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk" alt="Java 21">
   <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot" alt="Spring Boot 4">
@@ -25,14 +28,14 @@
 
 <p align="center">
   <strong>
-    IoT DC3 是一个开源、面向 AI 场景演进的分布式物联网平台。<br>
-    覆盖设备接入、数据采集、运营管理与智能分析，帮助构建工业 IoT 解决方案。
+    IoT DC3 — 让大模型直接操控设备的开源工业物联网平台<br>
+    Spring AI 原生集成 · 自然语言运维 · 28 个开箱即用驱动
   </strong>
 </p>
 
 <p align="center">
-  🔌 <strong>28 个接入驱动模块</strong> &nbsp;·&nbsp;
-  🤖 <strong>AI 能力集成</strong> &nbsp;·&nbsp;
+  🔌 <strong>多协议接入</strong> &nbsp;·&nbsp;
+  🤖 <strong>AI Agentic 中心</strong> &nbsp;·&nbsp;
   ☁️ <strong>云原生微服务</strong>
 </p>
 
@@ -219,6 +222,8 @@ cp .env.example .env    # 复制模板文件
 | **数据层** | 设备数据采集、存储与查询，支撑实时与历史数据服务         |
 | **管理层** | 微服务协作核心：服务注册、设备/驱动管理、命令编排、配置治理   |
 | **应用层** | 数据开放、任务调度、告警消息、日志管理、第三方集成、AI 自动化 |
+
+🧱 **设计原则** — 跨服务调用统一经 Facade 接口；DO/BO/VO 三层模型严格分离持久化、业务与接口形态；租户隔离贯穿数据库、缓存到 API 全链路。边界清晰，易于规模化扩展与多团队协作。
 
 > 📖 完整模块依赖关系和运行时流程请参阅 [模块与依赖](https://pnoker.github.io/iot-dc3/architecture/modules.html)。
 
