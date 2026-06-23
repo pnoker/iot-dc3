@@ -69,7 +69,7 @@
         <!-- Framework BOMs -->
         <spring.boot.version>4.0.6</spring.boot.version>
         <spring.cloud.version>2025.1.1</spring.cloud.version>
-        <spring-ai.version>2.0.0-M8</spring-ai.version>
+        <spring-ai.version>2.0.0</spring-ai.version>
         <!-- springdoc 3.x targets Spring Boot 4.0 / Spring Framework 7; the 2.8.x
              line is for Spring Boot 3.x and crashes the Swagger UI on SF7
              (UriComponentsBuilder.fromHttpRequest NoSuchMethodError). -->
@@ -166,16 +166,6 @@
 
     </properties>
 
-    <repositories>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <dependencies>
         <!-- Common compile/test dependencies -->
