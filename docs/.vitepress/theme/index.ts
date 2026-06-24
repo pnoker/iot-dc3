@@ -23,7 +23,7 @@ import Dc3Architecture from './components/Dc3Architecture.vue'
 // 语言偏好在内部导航（含顶部语言切换器）后写回 localStorage，刷新时由 head 内联脚本据此保持。
 function persistLang(path: string) {
     try {
-        localStorage.setItem('dc3-lang', path.indexOf('/iot-dc3/en') >= 0 ? 'en' : 'zh')
+        localStorage.setItem('dc3-lang', path.indexOf('/en') === 0 ? 'en' : 'zh')
     } catch (e) {
         // localStorage 不可用时静默跳过
     }

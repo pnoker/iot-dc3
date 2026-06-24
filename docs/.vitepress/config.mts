@@ -248,10 +248,10 @@ const MERMAID = {
 }
 
 // 根路径（语言门）总是按偏好重定向到 /zh/ 或 /en/：localStorage 优先，否则按浏览器语言；语言选择页仅作 JS 禁用的 fallback
-const LANG_DETECT = `(function(){var K='dc3-lang',B='/iot-dc3/';var p;try{p=localStorage.getItem(K);}catch(e){}var r=location.pathname;if(r.length&&r[r.length-1]!=='/')r=r+'/';var rel=r.indexOf(B)===0?r.slice(B.length):r;var onEn=rel.indexOf('en/')===0;var onZh=rel.indexOf('zh/')===0;if(!onEn&&!onZh){if(!p){p=/^en/i.test(navigator.language)?'en':'zh';try{localStorage.setItem(K,p);}catch(e){}}location.replace(B+p+'/');}})();`
+const LANG_DETECT = `(function(){var K='dc3-lang',B='/';var p;try{p=localStorage.getItem(K);}catch(e){}var r=location.pathname;if(r.length&&r[r.length-1]!=='/')r=r+'/';var rel=r.indexOf(B)===0?r.slice(B.length):r;var onEn=rel.indexOf('en/')===0;var onZh=rel.indexOf('zh/')===0;if(!onEn&&!onZh){if(!p){p=/^en/i.test(navigator.language)?'en':'zh';try{localStorage.setItem(K,p);}catch(e){}}location.replace(B+p+'/');}})();`
 
 export default withMermaid(defineConfig({
-    base: '/iot-dc3/',
+    base: '/',
     cleanUrls: true,
     lastUpdated: true,
 
@@ -259,7 +259,7 @@ export default withMermaid(defineConfig({
     srcExclude: ['superpowers/**'],
 
     head: [
-        ['link', {rel: 'icon', href: '/iot-dc3/images/logo.svg', type: 'image/svg+xml'}],
+        ['link', {rel: 'icon', href: '/images/logo.svg', type: 'image/svg+xml'}],
         ['meta', {name: 'theme-color', content: '#1296db'}],
         ['script', {}, LANG_DETECT]
     ],
