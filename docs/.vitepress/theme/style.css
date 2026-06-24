@@ -169,11 +169,7 @@ body {
 }
 
 .VPHero .image-src {
-    max-width: min(440px, 38vw);
-    border: 1px solid var(--vp-c-divider);
-    border-radius: 8px;
-    background: var(--vp-c-bg-elv);
-    box-shadow: 0 22px 60px rgba(16, 42, 72, 0.16);
+    max-width: min(460px, 40vw);
 }
 
 .VPHome {
