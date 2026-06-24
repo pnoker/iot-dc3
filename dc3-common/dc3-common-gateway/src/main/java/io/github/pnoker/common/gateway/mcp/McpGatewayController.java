@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.gateway.mcp;
 
+import io.github.pnoker.common.annotation.PublicEndpoint;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -90,6 +91,7 @@ public class McpGatewayController {
      * @return a metadata map describing the resource, authorization servers, supported bearer methods and scopes
      */
     @Operation(summary = "Get Protected Resource Metadata", description = "Return the OAuth 2.0 protected-resource metadata (RFC 9728) advertised at the well-known path, so MCP clients can discover the authorization server, supported bearer transport methods and accepted scopes.")
+    @PublicEndpoint
     @GetMapping(McpConstant.WELL_KNOWN_PROTECTED_RESOURCE)
     public Mono<Map<String, Object>> protectedResourceMetadata() {
         return Mono.just(orderedMap(
@@ -111,6 +113,7 @@ public class McpGatewayController {
      * @return a JSON-RPC result or error entity; 401 with a WWW-Authenticate challenge when the token is missing or inactive
      */
     @Operation(summary = "Handle MCP JSON-RPC Request", description = "Process one MCP JSON-RPC request (initialize, ping, tools/list, tools/call) behind the gateway. Validates the bearer token by introspecting it against the auth center, re-checks tool visibility before every tools/call, and returns a JSON-RPC result or error entity, or a 401 challenge when the token is missing or inactive.")
+    @PublicEndpoint
     @PostMapping(value = McpConstant.URL_PREFIX, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> mcp(@RequestBody Map<String, Object> request,
                                                          ServerWebExchange exchange) {

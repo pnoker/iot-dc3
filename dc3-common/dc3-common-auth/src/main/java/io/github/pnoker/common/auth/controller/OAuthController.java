@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import io.github.pnoker.common.annotation.PublicEndpoint;
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
 import io.github.pnoker.common.auth.entity.builder.OAuthClientBuilder;
@@ -75,6 +76,7 @@ public class OAuthController {
                     @ExtensionProperty(name = "openWorld", value = "false"),
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
+    @PublicEndpoint
     @GetMapping(McpConstant.WELL_KNOWN_AUTHORIZATION_SERVER)
     public Mono<Map<String, Object>> authorizationServerMetadata() {
         return Mono.fromSupplier(oauthMcpRuntimeService::authorizationServerMetadata);
@@ -93,6 +95,7 @@ public class OAuthController {
                     @ExtensionProperty(name = "openWorld", value = "false"),
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
+    @PublicEndpoint
     @GetMapping(McpConstant.OAUTH2_JWKS)
     public Mono<Map<String, Object>> jwks() {
         return Mono.fromSupplier(oauthMcpRuntimeService::jwks);
@@ -113,6 +116,7 @@ public class OAuthController {
                     @ExtensionProperty(name = "openWorld", value = "false"),
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
+    @PublicEndpoint
     @PostMapping(value = McpConstant.OAUTH2_REGISTER, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<?>> register(
             @RequestBody OAuthClientRegistrationRequestVO request,
@@ -145,6 +149,7 @@ public class OAuthController {
                     @ExtensionProperty(name = "openWorld", value = "false"),
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
+    @PublicEndpoint
     @GetMapping(McpConstant.OAUTH2_AUTHORIZE)
     public Mono<ResponseEntity<Map<String, Object>>> authorize(
             @Parameter(description = "OAuth 2.1 authorization request parameters. Required fields: client_id, redirect_uri, response_type (must be 'code'), scope, and code_challenge / code_challenge_method (PKCE). Optional: state (recommended for CSRF protection).", example = "client_id=my-client&response_type=code&redirect_uri=https%3A%2F%2Fapp.example.com%2Fcallback&scope=openid&state=xyz&code_challenge=abc123&code_challenge_method=S256") @RequestParam MultiValueMap<String, String> params,
@@ -171,6 +176,7 @@ public class OAuthController {
                     @ExtensionProperty(name = "openWorld", value = "false"),
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
+    @PublicEndpoint
     @PostMapping(value = McpConstant.OAUTH2_TOKEN, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> token(
             ServerWebExchange exchange,
@@ -197,6 +203,7 @@ public class OAuthController {
                     @ExtensionProperty(name = "openWorld", value = "false"),
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
+    @PublicEndpoint
     @PostMapping(value = McpConstant.OAUTH2_REVOKE, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public Mono<ResponseEntity<Map<String, Object>>> revoke(
             ServerWebExchange exchange,
