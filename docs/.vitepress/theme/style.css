@@ -16,45 +16,46 @@
  */
 
 :root {
-    --vp-c-brand-1: #2f7d68;
-    --vp-c-brand-2: #3c8772;
-    --vp-c-brand-3: #5aa38f;
-    --vp-c-brand-soft: rgba(47, 125, 104, 0.13);
-    --vp-c-bg: #f8faf9;
-    --vp-c-bg-alt: #f1f5f3;
+    --vp-c-brand-1: #0a6cb2;
+    --vp-c-brand-2: #1183c9;
+    --vp-c-brand-3: #1296db;
+    --vp-c-brand-soft: rgba(18, 150, 219, 0.12);
+    --vp-c-bg: #ffffff;
+    --vp-c-bg-alt: #f5f7fa;
     --vp-c-bg-elv: #ffffff;
-    --vp-c-bg-soft: #f3f7f5;
-    --vp-c-text-1: #15231f;
-    --vp-c-text-2: #40534c;
-    --vp-c-text-3: #6a7b74;
-    --vp-c-divider: rgba(39, 68, 58, 0.13);
-    --vp-c-gutter: rgba(39, 68, 58, 0.12);
-    --vp-code-block-bg: #eef3f1;
-    --vp-code-line-highlight-color: rgba(90, 163, 143, 0.16);
-    --vp-home-hero-name-color: #1f6f5b;
-    --vp-button-brand-bg: #2f7d68;
-    --vp-button-brand-hover-bg: #256f5b;
-    --vp-button-brand-active-bg: #1f604f;
+    --vp-c-bg-soft: #f2f5f8;
+    --vp-c-text-1: #1b2733;
+    --vp-c-text-2: #475563;
+    --vp-c-text-3: #6b7a89;
+    --vp-c-divider: #e2e7ec;
+    --vp-c-gutter: #e6eaef;
+    --vp-code-block-bg: #f2f5f8;
+    --vp-code-line-highlight-color: rgba(18, 150, 219, 0.12);
+    --vp-home-hero-name-color: transparent;
+    --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #0a6cb2 30%, #16a6dd);
+    --vp-button-brand-bg: #0a6cb2;
+    --vp-button-brand-hover-bg: #0c5f9e;
+    --vp-button-brand-active-bg: #0a5288;
     --vp-button-brand-text: #ffffff;
     --vp-layout-max-width: 1504px;
     font-synthesis-weight: none;
 }
 
 .dark {
-    --vp-c-brand-1: #78c8af;
-    --vp-c-brand-2: #5fb69d;
-    --vp-c-brand-3: #3f8c76;
-    --vp-c-brand-soft: rgba(120, 200, 175, 0.16);
-    --vp-c-bg: #101715;
-    --vp-c-bg-alt: #0c1210;
-    --vp-c-bg-elv: #17211e;
-    --vp-c-bg-soft: #15201c;
-    --vp-c-text-1: #eef7f3;
-    --vp-c-text-2: #cad9d2;
-    --vp-c-text-3: #99ada5;
-    --vp-c-divider: rgba(209, 232, 223, 0.14);
-    --vp-c-gutter: rgba(209, 232, 223, 0.12);
-    --vp-code-block-bg: #07100d;
+    --vp-c-brand-1: #4fb0f2;
+    --vp-c-brand-2: #38a0e8;
+    --vp-c-brand-3: #1f8ad4;
+    --vp-c-brand-soft: rgba(30, 150, 230, 0.16);
+    --vp-c-bg: #0f1620;
+    --vp-c-bg-alt: #0b1018;
+    --vp-c-bg-elv: #161f2b;
+    --vp-c-bg-soft: #141c27;
+    --vp-c-text-1: #e8eef6;
+    --vp-c-text-2: #c0ccda;
+    --vp-c-text-3: #8a98a8;
+    --vp-c-divider: rgba(200, 216, 234, 0.14);
+    --vp-c-gutter: rgba(200, 216, 234, 0.12);
+    --vp-code-block-bg: #0a1018;
 }
 
 html {
@@ -68,16 +69,22 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* 全站 header 无分隔线、毛玻璃背景，与正文融为一体（仿参考站） */
 .VPNav {
-    border-bottom: 1px solid var(--vp-c-divider);
+    border-bottom: none;
 }
 
 .VPNavBar {
-    background: color-mix(in srgb, var(--vp-c-bg) 88%, transparent);
+    background: color-mix(in srgb, var(--vp-c-bg) 85%, transparent);
+    backdrop-filter: saturate(1.4) blur(12px);
 }
 
 .VPNavBar.has-sidebar .content {
-    background: color-mix(in srgb, var(--vp-c-bg) 92%, transparent);
+    background: transparent;
+}
+
+.VPNavBar.has-sidebar .divider-line {
+    background-color: transparent !important;
 }
 
 .VPNavBarTitle .title {
@@ -106,7 +113,7 @@ body {
 }
 
 .VPButton.brand {
-    box-shadow: 0 8px 18px rgba(47, 125, 104, 0.22);
+    box-shadow: 0 8px 18px rgba(10, 108, 178, 0.24);
 }
 
 .VPButton.alt {
@@ -164,7 +171,7 @@ body {
     border: 1px solid var(--vp-c-divider);
     border-radius: 8px;
     background: var(--vp-c-bg-elv);
-    box-shadow: 0 22px 60px rgba(30, 54, 46, 0.16);
+    box-shadow: 0 22px 60px rgba(16, 42, 72, 0.16);
 }
 
 .VPHome {
@@ -176,17 +183,16 @@ body {
 }
 
 .VPFeature {
-    border: 1px solid var(--vp-c-divider) !important;
-    border-radius: 8px !important;
-    background: var(--vp-c-bg-elv) !important;
-    box-shadow: 0 10px 28px rgba(30, 54, 46, 0.07);
-    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    border: 1px solid transparent !important;
+    border-radius: 12px !important;
+    background: var(--vp-c-bg-soft) !important;
+    box-shadow: none;
+    transition: background-color 0.18s ease, border-color 0.18s ease;
 }
 
 .VPFeature:hover {
-    border-color: color-mix(in srgb, var(--vp-c-brand-1) 42%, var(--vp-c-divider)) !important;
-    box-shadow: 0 16px 36px rgba(30, 54, 46, 0.11);
-    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--vp-c-brand-1) 30%, transparent) !important;
+    background: color-mix(in srgb, var(--vp-c-brand-soft) 40%, var(--vp-c-bg-soft)) !important;
 }
 
 .VPFeature .icon {
@@ -266,7 +272,7 @@ body {
     border: 1px solid var(--vp-c-divider);
     border-radius: 8px;
     background: var(--vp-c-bg-elv);
-    box-shadow: 0 8px 24px rgba(30, 54, 46, 0.05);
+    box-shadow: 0 8px 24px rgba(16, 42, 72, 0.06);
 }
 
 .VPDoc th {
@@ -294,7 +300,7 @@ body {
 .vp-doc div[class*='language-'] {
     border: 1px solid color-mix(in srgb, var(--vp-c-divider) 70%, transparent);
     border-radius: 8px;
-    box-shadow: 0 12px 28px rgba(10, 20, 16, 0.12);
+    box-shadow: 0 12px 28px rgba(12, 24, 40, 0.14);
 }
 
 .vp-doc :not(pre) > code {
@@ -315,7 +321,7 @@ body {
     border: 1px solid var(--vp-c-divider);
     border-radius: 8px;
     background: var(--vp-c-bg-elv);
-    box-shadow: 0 10px 28px rgba(30, 54, 46, 0.06);
+    box-shadow: 0 10px 28px rgba(16, 42, 72, 0.07);
     overflow-x: auto;
 }
 
@@ -370,12 +376,25 @@ body {
 }
 
 .VPSidebarItem.level-0 > .item > .text {
-    font-weight: 740;
+    font-weight: 650;
+}
+
+/* 激活项：淡蓝胶囊 + 蓝字加粗，替代默认左侧竖条指示器，更醒目 */
+.VPSidebarItem.is-active > .item {
+    margin: 0 -12px;
+    padding: 5px 12px;
+    border-radius: 7px;
+    background: var(--vp-c-brand-soft);
+}
+
+.VPSidebarItem.is-active > .item .indicator {
+    display: none;
 }
 
 .VPSidebarItem.is-active > .item .link > .text,
 .VPSidebarItem.is-active > .item > .link > .text {
     color: var(--vp-c-brand-1);
+    font-weight: 600;
 }
 
 .VPDocAsideOutline .content {
@@ -384,6 +403,7 @@ body {
 
 .VPDocAsideOutline .outline-link.active {
     color: var(--vp-c-brand-1);
+    font-weight: 600;
 }
 
 .VPDocFooter {

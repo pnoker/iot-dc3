@@ -18,6 +18,7 @@
 import type {Theme} from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import './style.css'
+import Dc3Architecture from './components/Dc3Architecture.vue'
 
 // 语言偏好在内部导航（含顶部语言切换器）后写回 localStorage，刷新时由 head 内联脚本据此保持。
 function persistLang(path: string) {
@@ -31,7 +32,8 @@ function persistLang(path: string) {
 const theme: Theme = {
     extends: DefaultTheme,
 
-    enhanceApp({router}) {
+    enhanceApp({app, router}) {
+        app.component('Dc3Architecture', Dc3Architecture)
         if (typeof window === 'undefined' || !router) {
             return
         }

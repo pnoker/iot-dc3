@@ -87,16 +87,33 @@ const SECTIONS: ReadonlyArray<{
 
 type Lang = 'zh' | 'en'
 
+// 各栏目侧栏分组标题（与顶部 nav 对应），[中文, English]
+const SECTION_TITLES: Record<string, readonly [string, string]> = {
+    introduction: ['介绍', 'Introduction'],
+    quickstart: ['快速开始', 'Quick Start'],
+    architecture: ['架构', 'Architecture'],
+    operation: ['操作指南', 'Operation'],
+    development: ['开发', 'Development'],
+    ai: ['AI', 'AI'],
+    automation: ['自动化', 'Automation'],
+    guide: ['部署运维', 'Deployment'],
+    modules: ['模块', 'Modules'],
+    community: ['社区', 'Community']
+}
+
 function buildSidebar(lang: Lang) {
     const p = lang === 'en' ? '/en' : '/zh'
-    const sidebar: Record<string, Array<{ text: string; link: string }>> = {}
+    // 每个栏目侧栏包一层分组标题（栏目名），其下列出页面
+    const sidebar: Record<string, Array<{ text: string; items: Array<{ text: string; link: string }> }>> = {}
     for (const s of SECTIONS) {
-        sidebar[`${p}/${s.key}/`] = s.items.map(([code, zh, en]) => {
+        const items = s.items.map(([code, zh, en]) => {
             const link = code.includes('/')
                 ? `${p}/${code}`
                 : `${p}/${s.key}${code ? '/' + code : ''}`
             return {text: lang === 'en' ? en : zh, link}
         })
+        const title = SECTION_TITLES[s.key]
+        sidebar[`${p}/${s.key}/`] = [{text: lang === 'en' ? title[1] : title[0], items}]
     }
     return sidebar
 }
@@ -208,18 +225,18 @@ function localeThemeConfig(lang: Lang) {
     }
 }
 
-// Mermaid 渲染：浅色模式品牌绿主题；深色模式由插件强制。统一中文技术字体栈避免文字遮挡。
+// Mermaid 渲染：浅色模式品牌蓝主题；深色模式由插件强制。统一中文技术字体栈避免文字遮挡。
 const MERMAID = {
     theme: 'base',
     themeVariables: {
         fontFamily: '"Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif',
         fontSize: '15px',
-        primaryColor: '#e7f1ed',
-        primaryBorderColor: '#2f7d68',
-        primaryTextColor: '#15231f',
-        lineColor: '#4f9a85',
-        secondaryColor: '#eef3f1',
-        tertiaryColor: '#f6faf8',
+        primaryColor: '#e3f1fb',
+        primaryBorderColor: '#0a6cb2',
+        primaryTextColor: '#13212e',
+        lineColor: '#4aa3da',
+        secondaryColor: '#eef4fb',
+        tertiaryColor: '#f5f9fd',
         noteBkgColor: '#fff7e6',
         noteBorderColor: '#d8a544'
     },
@@ -243,7 +260,7 @@ export default withMermaid(defineConfig({
 
     head: [
         ['link', {rel: 'icon', href: '/iot-dc3/images/logo.svg', type: 'image/svg+xml'}],
-        ['meta', {name: 'theme-color', content: '#3c8772'}],
+        ['meta', {name: 'theme-color', content: '#1296db'}],
         ['script', {}, LANG_DETECT]
     ],
 

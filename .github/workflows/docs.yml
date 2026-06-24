@@ -5,8 +5,6 @@ on:
     branches: [ release ]
     paths:
       - docs/**
-      - package.json
-      - pnpm-lock.yaml
       - .github/workflows/docs.yml
       - CONTRIBUTING.md
       - CODE_OF_CONDUCT.md
@@ -27,6 +25,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,6 +45,7 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
+          cache-dependency-path: docs/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

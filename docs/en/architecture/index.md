@@ -8,6 +8,12 @@ IoT DC3 runs the "collect → normalize → analyze → act → feedback" loop a
 
 > You are here: you have read [Platform Positioning](../introduction/) and [Core Concepts](../introduction/concepts), and now you're breaking the loop down into a concrete layered structure. From here you can jump into any plane (data / command / auth / domain model).
 
+## Architecture at a Glance
+
+This panorama lays out all six layers, the four center services with their ports, the message-bus exchanges, and the optional observability stack in one view — get the whole picture first, then read the logical drill-down below. The diagram adapts to the site's light/dark theme.
+
+<Dc3Architecture lang="en" />
+
 ## Three-Layer Structure: Access, Platform, Storage & Messaging
 
 The platform isn't one monolith. It's a set of services split by responsibility. From the caller's perspective, there's a single entry point — the gateway `dc3-gateway` (HTTP `8000`), the only externally exposed HTTP port. The HTTP and gRPC ports of the other center services are reachable only on the internal network. The gateway routes requests to the four center services, which don't call each other over HTTP but cooperate cross-process through gRPC facades.
