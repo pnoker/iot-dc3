@@ -37,6 +37,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
+          package_json_file: docs/package.json
           run_install: false
 
       - name: Setup Node.js
