@@ -69,7 +69,8 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* 全站 header 无分隔线、毛玻璃背景，与正文融为一体（仿参考站） */
+/* 去掉旧的全站底边线；首页顶部 header 透明融入（hero 不被毛玻璃遮挡），
+   滚动后转毛玻璃；文档页保留 VitePress 默认底部分隔线，与左侧栏竖线呼应（不“秃顶”）。 */
 .VPNav {
     border-bottom: none;
 }
@@ -79,12 +80,13 @@ body {
     backdrop-filter: saturate(1.4) blur(12px);
 }
 
-.VPNavBar.has-sidebar .content {
-    background: transparent;
+.VPNavBar.home.top {
+    background-color: transparent;
+    backdrop-filter: none;
 }
 
-.VPNavBar.has-sidebar .divider-line {
-    background-color: transparent !important;
+.VPNavBar.has-sidebar .content {
+    background: transparent;
 }
 
 .VPNavBarTitle .title {
