@@ -93,7 +93,21 @@ For the full implementation of both pipelines (exchanges, queues, lifecycle, ack
 
 ## Tenant Boundary
 
-Business data is isolated by **tenant (`tenantId`)**. When you call APIs, create devices, query data, or dispatch commands, keep the tenant context consistent. The platform appends `WHERE tenant_id = ?` at the query layer, and cross-tenant access is rejected with a 404 rather than the data itself. In development the default tenant is usually `default`; in production it follows your organization and permission model. For how isolation is enforced layer by layer, see [Auth · Tenant · RBAC](../architecture/auth-rbac).
+Business data is isolated by **tenant (`tenantId`)**. When you call APIs, create devices, query data, or dispatch commands, keep the tenant context consistent. The platform checks the tenant context at the controller layer (`requireTenant` / `filterTenant`) — accessing another tenant's records by id or in bulk is treated as not-found (a 404 rather than the data itself). In development the default tenant is usually `default`; in production it follows your organization and permission model. For how isolation is enforced layer by layer, see [Auth · Tenant · RBAC](../architecture/auth-rbac).
+
+## Concept Reference
+
+Each core concept has its own entry covering its definition, key fields, relationships, lifecycle, and common pitfalls:
+
+- [Profile (Thing Model)](./concepts/profile) — capability template for a class of devices, aggregating points / commands / events
+- [Device](./concepts/device) — a platform mirror of one field device
+- [Driver](./concepts/driver) — a protocol adapter service that talks to devices
+- [Point](./concepts/point) — a single data item (a value to read or write)
+- [Point Value](./concepts/point-value) — a snapshot of a point's value at a moment
+- [Command](./concepts/command) — trigger a device action (vs. writing a point)
+- [Event](./concepts/event) — a business occurrence a device reports
+- [Attribute & Config](./concepts/attribute-config) — the Param / Attribute / Config layers
+- [Tenant](./concepts/tenant) — the business-data isolation boundary
 
 ## Further Reading
 

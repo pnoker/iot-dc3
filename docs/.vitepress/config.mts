@@ -28,6 +28,15 @@ const SECTIONS: ReadonlyArray<{
     {key: 'introduction', items: [
         ['', '总览', 'Overview'],
         ['concepts', '核心概念', 'Core Concepts'],
+        ['concepts/profile', '物模型', 'Profile'],
+        ['concepts/device', '设备', 'Device'],
+        ['concepts/driver', '驱动', 'Driver'],
+        ['concepts/point', '位号', 'Point'],
+        ['concepts/point-value', '位号值', 'Point Value'],
+        ['concepts/command', '指令', 'Command'],
+        ['concepts/event', '事件', 'Event'],
+        ['concepts/attribute-config', '属性与配置', 'Attribute & Config'],
+        ['concepts/tenant', '租户', 'Tenant'],
         ['paths', '按角色选择路径', 'Choose Your Path']
     ]},
     {key: 'quickstart', items: [

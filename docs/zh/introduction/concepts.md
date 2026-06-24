@@ -93,7 +93,21 @@ flowchart LR
 
 ## 租户边界
 
-业务数据以**租户（`tenantId`）**为边界隔离。调用 API、创建设备、查询数据、下发命令时都应保持租户上下文一致——平台会在数据库查询层自动追加 `WHERE tenant_id = ?`，跨租户访问会被拒绝（返回 404 而非数据）。开发环境默认租户通常是 `default`，生产环境按实际组织与权限模型配置。隔离是怎么一层层落实的，见 [鉴权 · 租户 · RBAC](../architecture/auth-rbac)。
+业务数据以**租户（`tenantId`）**为边界隔离。调用 API、创建设备、查询数据、下发命令时都应保持租户上下文一致——平台在控制器层校验租户上下文（`requireTenant` / `filterTenant`）——按 ID 或批量访问别的租户的记录会被判为不存在（返回 404 而非数据）。开发环境默认租户通常是 `default`，生产环境按实际组织与权限模型配置。隔离是怎么一层层落实的，见 [鉴权 · 租户 · RBAC](../architecture/auth-rbac)。
+
+## 概念详解
+
+每个核心概念都有独立词条，讲清定义、关键字段、与其它概念的关系、生命周期与易错点：
+
+- [物模型 Profile](./concepts/profile) — 同类设备的能力模板，聚合位号 / 指令 / 事件
+- [设备 Device](./concepts/device) — 现场一台设备的平台镜像
+- [驱动 Driver](./concepts/driver) — 协议适配服务，负责和设备通信
+- [位号 Point](./concepts/point) — 一个数据项（要采集或写入的量）
+- [位号值 PointValue](./concepts/point-value) — 某位号某时刻的取值快照
+- [指令 Command](./concepts/command) — 触发设备动作（区别于写位号）
+- [事件 Event](./concepts/event) — 设备主动上报的一次业务发生
+- [属性与配置 Attribute & Config](./concepts/attribute-config) — Param / Attribute / Config 三层
+- [租户 Tenant](./concepts/tenant) — 业务数据隔离边界
 
 ## 延伸阅读
 
