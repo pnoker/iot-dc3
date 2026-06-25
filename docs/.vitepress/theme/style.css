@@ -125,11 +125,15 @@ body {
 }
 
 .VPHero {
+    position: relative;
     padding-top: 48px !important;
     padding-bottom: 44px !important;
 }
 
+/* hero 内容浮在两层背景 canvas（HeroWaves z-index 0、HeroParticles z-index 1）之上 */
 .VPHero .container {
+    position: relative;
+    z-index: 2;
     align-items: center;
 }
 

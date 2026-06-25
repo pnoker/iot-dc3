@@ -343,6 +343,7 @@ const LANG_DETECT = `(function(){var K='dc3-lang',B='/';var p;try{p=localStorage
 
 export default withMermaid(defineConfig({
     base: '/',
+    title: 'IoT DC3',
     cleanUrls: true,
     lastUpdated: true,
 

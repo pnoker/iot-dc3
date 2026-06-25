@@ -21,6 +21,8 @@ import DefaultTheme from 'vitepress/theme'
 import './style.css'
 import Architecture from './components/Architecture.vue'
 import HeroLogo from './components/HeroLogo.vue'
+import HeroParticles from './components/HeroParticles.vue'
+import HeroWaves from './components/HeroWaves.vue'
 
 // 语言偏好在内部导航（含顶部语言切换器）后写回 localStorage，刷新时由 head 内联脚本据此保持。
 function persistLang(path: string) {
@@ -34,9 +36,10 @@ function persistLang(path: string) {
 const theme: Theme = {
     extends: DefaultTheme,
 
-    // 用自定义组件替换首页 hero 图区：由 logo 自身的粒子圆点组成、做漩涡汇聚动效
+    // 首页 hero：背景两层（最底波浪点阵 HeroWaves + 其上全幅汇聚粒子 HeroParticles，home-hero-before），图区是 logo 粒子动效（home-hero-image）
     Layout() {
         return h(DefaultTheme.Layout, null, {
+            'home-hero-before': () => [h(HeroWaves), h(HeroParticles)],
             'home-hero-image': () => h(HeroLogo)
         })
     },
