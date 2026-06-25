@@ -10,61 +10,38 @@ hero:
     alt: IoT DC3
   actions:
     - theme: brand
-      text: 快速开始
-      link: ./quickstart/
-    - theme: alt
       text: 跑通第一个设备
       link: ./quickstart/first-device
     - theme: alt
-      text: 在 GitHub 查看
-      link: https://github.com/pnoker/iot-dc3
+      text: 从源码运行
+      link: ./quickstart/
 
 features:
   - icon: 🧭
-    title: 平台介绍
-    details: 它是什么、给谁用、解决什么问题，以及与同类平台的真正差异。
+    title: 总览
+    details: 平台定位、核心概念与按角色的学习路径——先懂它是什么、给谁用、怎么入门。
     link: ./introduction/
     linkText: 了解定位
-  - icon: 🚀
-    title: 快速开始
-    details: 本地起依赖、装环境、从虚拟驱动到看见第一条实时数据，全程可复制命令。
-    link: ./quickstart/
-    linkText: 立即上手
   - icon: 🏗️
-    title: 系统架构
-    details: 服务拓扑、数据平面与命令平面、鉴权租户、领域模型——配时序图与状态机。
+    title: 架构
+    details: 服务拓扑、数据平面与命令平面、鉴权租户、领域模型与模块地图——配时序图与状态机。
     link: ./architecture/
     linkText: 读懂架构
-  - icon: 🤖
-    title: AI
-    details: Agentic 中心做自然语言运营，MCP 把工具安全接给外部 AI Agent。
-    link: ./ai/
-    linkText: 接入 AI
-  - icon: ⚡
-    title: 自动化
-    details: dc3 CLI 命令行脚本化操作——本地调试、CI 流水线、运维脚本。
-    link: ./automation/
-    linkText: 脚本化操作
+  - icon: 🔌
+    title: 接入
+    details: 28 个多协议驱动接入异构设备，含设备接入流程与驱动能力矩阵。
+    link: ./drivers/
+    linkText: 接入设备
   - icon: 🧰
-    title: 操作指南
-    details: 接入设备、采集与读写命令、告警与通知——日常运营的操作流程。
+    title: 运维
+    details: 采集与读写命令、告警通知、部署模式与镜像源、可观测性、日志与排障。
     link: ./operation/
-    linkText: 查看流程
+    linkText: 运营运维
   - icon: 🛠️
-    title: 二次开发
-    details: 基于 Driver SDK 从模板派生新协议驱动，含 API 文档、测试与编码规范。
+    title: 开发
+    details: 基于 Driver SDK 派生新驱动，API 文档与测试，dc3 CLI 与 AI Agent / MCP 集成。
     link: ./development/
     linkText: 开始开发
-  - icon: 📦
-    title: 部署运维
-    details: 部署模式与镜像源、可选可观测性栈（EMQX/ELK/Prometheus/Grafana）、日志与排障。
-    link: ./guide/
-    linkText: 部署上线
-  - icon: 🤝
-    title: 参与社区
-    details: 贡献指南、行为准则与安全披露策略，欢迎提交驱动、修复与文档改进。
-    link: ./community/contributing
-    linkText: 参与贡献
 ---
 
 ## IoT DC3 是什么

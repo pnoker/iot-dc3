@@ -10,61 +10,38 @@ hero:
     alt: IoT DC3
   actions:
     - theme: brand
-      text: Quick Start
-      link: /en/quickstart/
-    - theme: alt
       text: Run your first device
       link: /en/quickstart/first-device
     - theme: alt
-      text: View on GitHub
-      link: https://github.com/pnoker/iot-dc3
+      text: Run from source
+      link: /en/quickstart/
 
 features:
   - icon: 🧭
-    title: Introduction
-    details: What it is, who it's for, the problem it solves, and how it differs from comparable platforms.
+    title: Overview
+    details: Positioning, core concepts, and role-based learning paths — what it is, who it's for, and how to start.
     link: /en/introduction/
     linkText: Read the pitch
-  - icon: 🚀
-    title: Quick Start
-    details: Bring up the dependencies, load the environment, and go from the virtual driver to your first live data point — every command ready to copy.
-    link: /en/quickstart/
-    linkText: Get started
   - icon: 🏗️
     title: Architecture
-    details: Service topology, the data and command planes, auth and tenancy, the domain model — with sequence and state diagrams.
+    details: Service topology, data and command planes, auth and tenancy, the domain model and module map — with sequence and state diagrams.
     link: /en/architecture/
     linkText: Understand the design
-  - icon: 🤖
-    title: AI
-    details: Drive operations in natural language with the Agentic Center, and expose tools safely to external AI agents over MCP.
-    link: /en/ai/
-    linkText: Wire up AI
-  - icon: ⚡
-    title: Automation
-    details: Drive the platform from the `dc3` CLI — local debugging, CI pipelines, ops scripts.
-    link: /en/automation/
-    linkText: Script it
+  - icon: 🔌
+    title: Connectivity
+    details: 28 multi-protocol drivers for heterogeneous devices, with the onboarding flow and a driver capability matrix.
+    link: /en/drivers/
+    linkText: Connect devices
   - icon: 🧰
-    title: Operation Guide
-    details: Onboard devices, collect data and run read/write commands, and configure alarms and notifications — the everyday operations flow.
+    title: Operations
+    details: Data collection and read/write commands, alarms and notifications, deployment modes and registries, observability, logging and troubleshooting.
     link: /en/operation/
-    linkText: See the flows
+    linkText: Operate & maintain
   - icon: 🛠️
-    title: Development
-    details: Derive a new protocol driver from the Driver SDK template, plus API docs, testing, and coding conventions.
+    title: Develop
+    details: Derive new drivers from the Driver SDK, API docs and testing, the dc3 CLI and AI Agent / MCP integration.
     link: /en/development/
     linkText: Start building
-  - icon: 📦
-    title: Deploy & Ops
-    details: Deployment modes and image registries, the optional observability stack (EMQX/ELK/Prometheus/Grafana), logging, and troubleshooting.
-    link: /en/guide/
-    linkText: Ship it
-  - icon: 🤝
-    title: Community
-    details: Contributing guide, code of conduct, and security disclosure policy — drivers, fixes, and docs all welcome.
-    link: /en/community/contributing
-    linkText: Get involved
 ---
 
 ## What is IoT DC3
