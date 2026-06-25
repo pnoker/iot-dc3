@@ -92,6 +92,7 @@ body {
 .VPNavBarTitle .title {
     font-weight: 720;
     letter-spacing: 0;
+    color: var(--vp-c-brand-1);
 }
 
 .VPNavBarMenuLink,
@@ -168,9 +169,7 @@ body {
     display: none;
 }
 
-.VPHero .image-src {
-    max-width: min(460px, 40vw);
-}
+/* hero 图区由 HeroLogo 组件渲染（slot home-hero-image），尺寸在组件内自带 */
 
 .VPHome {
     padding-bottom: 48px;
@@ -329,17 +328,6 @@ body {
     height: auto;
 }
 
-/* 首页架构图为深底设计：亮色主题反色适配（invert+hue-rotate 抵消色相反转，呈现浅底深字），
-   暗色主题原样（深底本就配套）。 */
-.dc3-arch-diagram {
-    filter: invert(1) hue-rotate(180deg);
-    border-radius: 8px;
-}
-
-.dark .dc3-arch-diagram {
-    filter: none;
-}
-
 /* 强制 mermaid SVG 文字用跨平台可靠字体栈（与 config themeVariables.fontFamily 一致）。
    canvas measureText 取第一个可用字体，SVG text 按优先级回退——同一字体确保测宽/渲染一致。 */
 .dc3-mermaid text,
@@ -421,10 +409,6 @@ body {
 
     .VPHero .image {
         margin-top: 24px;
-    }
-
-    .VPHero .image-src {
-        max-width: min(360px, 78vw);
     }
 
     .VPDoc .container {

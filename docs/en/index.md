@@ -77,7 +77,7 @@ It's a good fit for teams that need to connect many industrial protocols, manage
 
 The platform is one gateway, four center services, and a set of protocol drivers. Only the gateway's HTTP port faces outward; the centers talk to each other over gRPC, and drivers and the data center are decoupled through RabbitMQ.
 
-![IoT DC3 Architecture](/images/iot-dc3-architecture-en.svg){.dc3-arch-diagram}
+<Architecture lang="en" />
 
 For how each hop works and why it's designed that way, see [Architecture](/en/architecture/).
 

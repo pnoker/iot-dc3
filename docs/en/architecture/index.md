@@ -12,7 +12,7 @@ IoT DC3 runs the "collect → normalize → analyze → act → feedback" loop a
 
 This panorama lays out all six layers, the four center services with their ports, the message-bus exchanges, and the optional observability stack in one view — get the whole picture first, then read the logical drill-down below. The diagram adapts to the site's light/dark theme.
 
-<Dc3Architecture lang="en" />
+<Architecture lang="en" />
 
 ## Three-Layer Structure: Access, Platform, Storage & Messaging
 

@@ -20,70 +20,101 @@ import {withMermaid} from 'vitepress-plugin-mermaid'
 
 // 各栏目页面结构：[code, 中文标题, English]
 // code 为空串 → 栏目首页；含 "/" → 跨栏目绝对路径（如 'architecture/modules'）
-// 扁平结构（不设 group 文本）：侧栏直接列页面，避免与顶部 nav 标题重复
+// 一个栏目可二选一：
+//   items  → 扁平结构，侧栏直接列页面（短栏目用）
+//   groups → 可折叠子分组，每组 {zh, en, items}；组标题为空串 → 不带标题的置顶单列（页面多的栏目用）
+type Entry = readonly [string, string, string]
+type Group = {zh: string; en: string; items: ReadonlyArray<Entry>}
 const SECTIONS: ReadonlyArray<{
     key: string
-    items: ReadonlyArray<readonly [string, string, string]>
+    items?: ReadonlyArray<Entry>
+    groups?: ReadonlyArray<Group>
 }> = [
-    {key: 'introduction', items: [
-        ['', '总览', 'Overview'],
-        ['concepts', '核心概念', 'Core Concepts'],
-        ['concepts/profile', '物模型', 'Profile'],
-        ['concepts/device', '设备', 'Device'],
-        ['concepts/driver', '驱动', 'Driver'],
-        ['concepts/point', '位号', 'Point'],
-        ['concepts/point-value', '位号值', 'Point Value'],
-        ['concepts/command', '指令', 'Command'],
-        ['concepts/event', '事件', 'Event'],
-        ['concepts/attribute-config', '属性与配置', 'Attribute & Config'],
-        ['concepts/tenant', '租户', 'Tenant'],
-        ['paths', '按角色选择路径', 'Choose Your Path']
+    {key: 'introduction', groups: [
+        {zh: '', en: '', items: [
+            ['', '总览', 'Overview'],
+            ['concepts', '核心概念', 'Core Concepts'],
+            ['paths', '按角色选择路径', 'Choose Your Path']
+        ]},
+        {zh: '对象与数据', en: 'Objects & Data', items: [
+            ['concepts/profile', '物模型', 'Profile'],
+            ['concepts/device', '设备', 'Device'],
+            ['concepts/driver', '驱动', 'Driver'],
+            ['concepts/point', '位号', 'Point'],
+            ['concepts/point-value', '位号值', 'Point Value']
+        ]},
+        {zh: '能力与边界', en: 'Capabilities & Boundaries', items: [
+            ['concepts/command', '指令', 'Command'],
+            ['concepts/event', '事件', 'Event'],
+            ['concepts/attribute-config', '属性与配置', 'Attribute & Config'],
+            ['concepts/tenant', '租户', 'Tenant']
+        ]}
     ]},
     {key: 'quickstart', items: [
         ['', '本地开发', 'Local Development'],
         ['environment', '环境变量', 'Environment Variables'],
         ['first-device', '第一个设备', 'First Device']
     ]},
-    {key: 'architecture', items: [
-        ['', '总览', 'Overview'],
-        ['services', '服务与拓扑', 'Services & Topology'],
-        ['facade-modes', 'Facade 模式', 'Facade Modes'],
-        ['data-plane', '数据平面', 'Data Plane'],
-        ['command-plane', '命令平面', 'Command Plane'],
-        ['auth-rbac', '鉴权 · 租户 · RBAC', 'Auth, Tenant & RBAC'],
-        ['domain-model', '领域模型', 'Domain Model'],
-        ['modules', '模块地图', 'Module Map']
+    {key: 'architecture', groups: [
+        {zh: '', en: '', items: [
+            ['', '总览', 'Overview']
+        ]},
+        {zh: '服务与协作', en: 'Services & Collaboration', items: [
+            ['services', '服务与拓扑', 'Services & Topology'],
+            ['facade-modes', 'Facade 模式', 'Facade Modes']
+        ]},
+        {zh: '链路与模型', en: 'Pipelines & Model', items: [
+            ['data-plane', '数据平面', 'Data Plane'],
+            ['command-plane', '命令平面', 'Command Plane'],
+            ['auth-rbac', '鉴权 · 租户 · RBAC', 'Auth, Tenant & RBAC'],
+            ['domain-model', '领域模型', 'Domain Model'],
+            ['modules', '模块地图', 'Module Map']
+        ]}
     ]},
-    {key: 'drivers', items: [
-        ['', '驱动总览', 'Drivers'],
-        ['modbus-tcp', 'Modbus TCP', 'Modbus TCP'],
-        ['modbus-rtu', 'Modbus RTU', 'Modbus RTU'],
-        ['opc-ua', 'OPC UA', 'OPC UA'],
-        ['opc-da', 'OPC DA', 'OPC DA'],
-        ['plcs7', 'S7 (Siemens)', 'S7 (Siemens)'],
-        ['melsec', 'MELSEC', 'MELSEC'],
-        ['fins', 'FINS (Omron)', 'FINS (Omron)'],
-        ['ethernet-ip', 'EtherNet/IP', 'EtherNet/IP'],
-        ['bacnet-ip', 'BACnet/IP', 'BACnet/IP'],
-        ['iec104', 'IEC 104', 'IEC 104'],
-        ['dlms', 'DLMS', 'DLMS'],
-        ['sl651', 'SL651', 'SL651'],
-        ['snmp', 'SNMP', 'SNMP'],
-        ['mqtt', 'MQTT', 'MQTT'],
-        ['coap', 'CoAP', 'CoAP'],
-        ['lwm2m', 'LwM2M', 'LwM2M'],
-        ['http', 'HTTP', 'HTTP'],
-        ['ble', 'BLE', 'BLE'],
-        ['zigbee', 'Zigbee', 'Zigbee'],
-        ['can', 'CAN', 'CAN'],
-        ['serial', '串口 Serial', 'Serial'],
-        ['tcp-udp', 'TCP/UDP', 'TCP/UDP'],
-        ['mysql', 'MySQL', 'MySQL'],
-        ['postgresql', 'PostgreSQL', 'PostgreSQL'],
-        ['oracle', 'Oracle', 'Oracle'],
-        ['sqlserver', 'SQL Server', 'SQL Server'],
-        ['virtual', '虚拟 Virtual', 'Virtual'],
-        ['listening-virtual', '监听虚拟', 'Listening Virtual']
+    {key: 'drivers', groups: [
+        {zh: '', en: '', items: [
+            ['', '驱动总览', 'Drivers']
+        ]},
+        {zh: '工业总线 / PLC', en: 'Industrial Bus / PLC', items: [
+            ['modbus-tcp', 'Modbus TCP', 'Modbus TCP'],
+            ['modbus-rtu', 'Modbus RTU', 'Modbus RTU'],
+            ['opc-ua', 'OPC UA', 'OPC UA'],
+            ['opc-da', 'OPC DA', 'OPC DA'],
+            ['plcs7', 'S7 (Siemens)', 'S7 (Siemens)'],
+            ['melsec', 'MELSEC', 'MELSEC'],
+            ['fins', 'FINS (Omron)', 'FINS (Omron)'],
+            ['ethernet-ip', 'EtherNet/IP', 'EtherNet/IP']
+        ]},
+        {zh: 'SCADA / 电力 / 计量', en: 'SCADA / Power / Metering', items: [
+            ['bacnet-ip', 'BACnet/IP', 'BACnet/IP'],
+            ['iec104', 'IEC 104', 'IEC 104'],
+            ['dlms', 'DLMS', 'DLMS'],
+            ['sl651', 'SL651', 'SL651'],
+            ['snmp', 'SNMP', 'SNMP']
+        ]},
+        {zh: '物联网 / 无线', en: 'IoT / Wireless', items: [
+            ['mqtt', 'MQTT', 'MQTT'],
+            ['coap', 'CoAP', 'CoAP'],
+            ['lwm2m', 'LwM2M', 'LwM2M'],
+            ['http', 'HTTP', 'HTTP'],
+            ['ble', 'BLE', 'BLE'],
+            ['zigbee', 'Zigbee', 'Zigbee'],
+            ['can', 'CAN', 'CAN']
+        ]},
+        {zh: '串口 / 通用网络', en: 'Serial / Generic Network', items: [
+            ['serial', '串口 Serial', 'Serial'],
+            ['tcp-udp', 'TCP/UDP', 'TCP/UDP']
+        ]},
+        {zh: '数据库', en: 'Database', items: [
+            ['mysql', 'MySQL', 'MySQL'],
+            ['postgresql', 'PostgreSQL', 'PostgreSQL'],
+            ['oracle', 'Oracle', 'Oracle'],
+            ['sqlserver', 'SQL Server', 'SQL Server']
+        ]},
+        {zh: '虚拟 / 测试', en: 'Virtual / Testing', items: [
+            ['virtual', '虚拟 Virtual', 'Virtual'],
+            ['listening-virtual', '监听虚拟', 'Listening Virtual']
+        ]}
     ]},
     {key: 'operation', items: [
         ['', '概览', 'Overview'],
@@ -142,19 +173,37 @@ const SECTION_TITLES: Record<string, readonly [string, string]> = {
     community: ['社区', 'Community']
 }
 
+type SidebarItem = {text: string; link: string}
+type SidebarGroup = {text: string; collapsed?: boolean; items: SidebarItem[]}
+
+const SECTION_KEYS = new Set(SECTIONS.map(s => s.key))
+
 function buildSidebar(lang: Lang) {
     const p = lang === 'en' ? '/en' : '/zh'
-    // 每个栏目侧栏包一层分组标题（栏目名），其下列出页面
-    const sidebar: Record<string, Array<{ text: string; items: Array<{ text: string; link: string }> }>> = {}
+    const en = lang === 'en'
+    // code 含 "/" 且首段是另一栏目 key → 跨栏目绝对路径（如 'architecture/modules'）；
+    // 否则视为本栏目内子路径（如 'concepts/profile' → /<lang>/introduction/concepts/profile）
+    const linkOf = (key: string, code: string) => {
+        if (code.includes('/') && SECTION_KEYS.has(code.split('/')[0])) return `${p}/${code}`
+        return `${p}/${key}${code ? '/' + code : ''}`
+    }
+    const toItems = (key: string, entries: ReadonlyArray<Entry>): SidebarItem[] =>
+        entries.map(([code, zh, enText]) => ({text: en ? enText : zh, link: linkOf(key, code)}))
+
+    const sidebar: Record<string, SidebarGroup[]> = {}
     for (const s of SECTIONS) {
-        const items = s.items.map(([code, zh, en]) => {
-            const link = code.includes('/')
-                ? `${p}/${code}`
-                : `${p}/${s.key}${code ? '/' + code : ''}`
-            return {text: lang === 'en' ? en : zh, link}
-        })
-        const title = SECTION_TITLES[s.key]
-        sidebar[`${p}/${s.key}/`] = [{text: lang === 'en' ? title[1] : title[0], items}]
+        if (s.groups) {
+            // 多个可折叠子分组：组标题为空 → 置顶不带标题；其余 collapsed:false（默认展开可折叠）
+            sidebar[`${p}/${s.key}/`] = s.groups.map(g => {
+                const text = en ? g.en : g.zh
+                const items = toItems(s.key, g.items)
+                return text ? {text, collapsed: false, items} : {text: '', items}
+            })
+        } else {
+            // 扁平栏目：单分组，标题用栏目名
+            const title = SECTION_TITLES[s.key]
+            sidebar[`${p}/${s.key}/`] = [{text: en ? title[1] : title[0], items: toItems(s.key, s.items!)}]
+        }
     }
     return sidebar
 }
