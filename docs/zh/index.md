@@ -22,6 +22,11 @@ features:
     details: 平台定位、核心概念与按角色的学习路径——先懂它是什么、给谁用、怎么入门。
     link: ./introduction/
     linkText: 了解定位
+  - icon: 📚
+    title: 基础
+    details: 物联网四层技术体系——感知、网络、平台、应用与安全，每一层都接回 DC3 怎么实现。
+    link: ./foundations/
+    linkText: 读懂体系
   - icon: 🏗️
     title: 架构
     details: 服务拓扑、数据平面与命令平面、鉴权租户、领域模型与模块地图——配时序图与状态机。

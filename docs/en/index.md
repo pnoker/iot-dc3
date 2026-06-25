@@ -22,6 +22,11 @@ features:
     details: Positioning, core concepts, and role-based learning paths — what it is, who it's for, and how to start.
     link: /en/introduction/
     linkText: Read the pitch
+  - icon: 📚
+    title: Foundations
+    details: The four-layer IoT technology stack — perception, network, platform, application and security — each tied back to how DC3 implements it.
+    link: /en/foundations/
+    linkText: Learn the stack
   - icon: 🏗️
     title: Architecture
     details: Service topology, data and command planes, auth and tenancy, the domain model and module map — with sequence and state diagrams.

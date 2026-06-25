@@ -23,6 +23,7 @@ import Architecture from './components/Architecture.vue'
 import DataPlane from './components/DataPlane.vue'
 import CommandPlane from './components/CommandPlane.vue'
 import AuthFlow from './components/AuthFlow.vue'
+import FourLayers from './components/FourLayers.vue'
 import HeroLogo from './components/HeroLogo.vue'
 import HeroParticles from './components/HeroParticles.vue'
 import HeroWaves from './components/HeroWaves.vue'
@@ -52,6 +53,7 @@ const theme: Theme = {
         app.component('DataPlane', DataPlane)
         app.component('CommandPlane', CommandPlane)
         app.component('AuthFlow', AuthFlow)
+        app.component('FourLayers', FourLayers)
         if (typeof window === 'undefined' || !router) {
             return
         }

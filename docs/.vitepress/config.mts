@@ -64,6 +64,32 @@ const PILLARS: ReadonlyArray<Pillar> = [
         ]}
      ]},
 
+    {navZh: '基础', navEn: 'Foundations', landing: 'foundations',
+     paths: ['foundations'], activeMatch: '^/(zh|en)/foundations/',
+     groups: [
+        {zh: '', en: '', items: [
+            ['foundations', '物联网技术总览', 'IoT Technology Overview']
+        ]},
+        {zh: '感知层', en: 'Perception', items: [
+            ['foundations/sensing', '传感与测量', 'Sensing & Measurement'],
+            ['foundations/identification', '自动识别与定位', 'Auto-ID & Positioning']
+        ]},
+        {zh: '网络层', en: 'Network', items: [
+            ['foundations/fieldbus', '工业总线与协议', 'Industrial Buses & Protocols'],
+            ['foundations/iot-protocols', 'IoT 协议与无线网络', 'IoT Protocols & Wireless']
+        ]},
+        {zh: '平台层', en: 'Platform', items: [
+            ['foundations/edge-cloud', '边缘与云架构', 'Edge & Cloud Architecture'],
+            ['foundations/data-pipeline', '时序数据与流处理', 'Time-Series & Streaming']
+        ]},
+        {zh: '应用层', en: 'Application', items: [
+            ['foundations/aiot', '数据智能与 AIoT', 'Data Intelligence & AIoT']
+        ]},
+        {zh: '安全', en: 'Security', items: [
+            ['foundations/security', '物联网安全', 'IoT Security']
+        ]}
+     ]},
+
     {navZh: '架构', navEn: 'Architecture', landing: 'architecture',
      paths: ['architecture', 'modules'], activeMatch: '^/(zh|en)/(architecture|modules)/',
      groups: [
