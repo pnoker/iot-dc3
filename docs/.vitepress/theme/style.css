@@ -332,6 +332,51 @@ body {
     height: auto;
 }
 
+/* 节点圆角 + 柔和描边，贴近全站卡片观感（Architecture 组件那种圆角矩形） */
+.dc3-mermaid .node rect,
+.dc3-mermaid .node polygon,
+.dc3-mermaid .node circle,
+.dc3-mermaid .node path,
+.vp-doc .mermaid .node rect {
+    rx: 9px;
+    ry: 9px;
+    stroke-width: 1.5px;
+}
+
+/* 子图/分组：圆角 + 极淡底，呼应 Architecture 的 region 框 */
+.dc3-mermaid .cluster rect,
+.vp-doc .mermaid .cluster rect {
+    rx: 12px;
+    ry: 12px;
+}
+
+/* 连线更利落、箭头更清晰 */
+.dc3-mermaid .edgePath .path,
+.dc3-mermaid .flowchart-link,
+.dc3-mermaid .relation {
+    stroke-width: 1.6px;
+}
+
+/* 边标签贴合卡片底色，去掉默认刺眼白块 */
+.dc3-mermaid .edgeLabel,
+.dc3-mermaid .edgeLabel rect,
+.dc3-mermaid .edgeLabel foreignObject div {
+    background-color: var(--vp-c-bg-elv) !important;
+    fill: var(--vp-c-bg-elv) !important;
+}
+
+/* 节点与时序角色文字稍加粗，提升可读 */
+.dc3-mermaid .nodeLabel,
+.dc3-mermaid .actor tspan,
+.dc3-mermaid .messageText {
+    font-weight: 560;
+}
+
+/* 时序图生命线/激活块更柔和 */
+.dc3-mermaid .actor-line {
+    stroke: var(--vp-c-divider);
+}
+
 /* 强制 mermaid SVG 文字用跨平台可靠字体栈（与 config themeVariables.fontFamily 一致）。
    canvas measureText 取第一个可用字体，SVG text 按优先级回退——同一字体确保测宽/渲染一致。 */
 .dc3-mermaid text,
@@ -340,6 +385,51 @@ body {
 .mermaid tspan {
     font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
 }
+
+/* 通用图表组件（DataPlane / CommandPlane 等）：沿用 Architecture 的语义调色板 + 卡片框，随主题切换 */
+.dc3-diagram {
+    --dc3-grid: #e2e8f0;
+    --dc3-text2: #475569;
+    --dc3-box-name: #0f172a;
+    --dc3-fe-fill: #ecfeff;   --dc3-fe-stroke: #0891b2;
+    --dc3-be-fill: #ecfdf5;   --dc3-be-stroke: #059669;  --dc3-be-text: #047857;
+    --dc3-db-fill: #f5f3ff;   --dc3-db-stroke: #7c3aed;  --dc3-db-text: #6d28d9;
+    --dc3-amber-fill: #fffbeb; --dc3-amber-stroke: #d97706;
+    --dc3-rose-stroke: #e11d48;
+    --dc3-bus-fill: #fff7ed;  --dc3-bus-stroke: #ea580c;  --dc3-bus-text: #c2410c;
+    --dc3-ext-fill: #f1f5f9;  --dc3-ext-stroke: #64748b;
+    --dc3-arrow: #94a3b8;     --dc3-arrow-label: #64748b;
+
+    border: 1px solid var(--vp-c-divider);
+    border-radius: 12px;
+    background: var(--vp-c-bg-soft);
+    padding: 16px;
+    margin: 24px 0;
+    overflow-x: auto;
+}
+
+.dark .dc3-diagram {
+    --dc3-grid: #1e293b;
+    --dc3-text2: #94a3b8;
+    --dc3-box-name: #ffffff;
+    --dc3-fe-fill: rgba(8, 51, 68, 0.5);    --dc3-fe-stroke: #22d3ee;
+    --dc3-be-fill: rgba(6, 78, 59, 0.5);    --dc3-be-stroke: #34d399;  --dc3-be-text: #34d399;
+    --dc3-db-fill: rgba(76, 29, 149, 0.45); --dc3-db-stroke: #a78bfa;  --dc3-db-text: #cbb6f7;
+    --dc3-amber-fill: rgba(120, 53, 15, 0.35); --dc3-amber-stroke: #fbbf24;
+    --dc3-rose-stroke: #fb7185;
+    --dc3-bus-fill: rgba(251, 146, 60, 0.3); --dc3-bus-stroke: #fb923c;  --dc3-bus-text: #fcd9b6;
+    --dc3-ext-fill: rgba(30, 41, 59, 0.5);  --dc3-ext-stroke: #94a3b8;
+    --dc3-arrow: #64748b;     --dc3-arrow-label: #94a3b8;
+}
+
+.dc3-diagram svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+}
+
+.dc3-diagram .d-name { font-weight: 600; }
 
 .custom-block {
     border-radius: 8px;

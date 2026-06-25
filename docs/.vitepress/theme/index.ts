@@ -20,6 +20,9 @@ import {h} from 'vue'
 import DefaultTheme from 'vitepress/theme'
 import './style.css'
 import Architecture from './components/Architecture.vue'
+import DataPlane from './components/DataPlane.vue'
+import CommandPlane from './components/CommandPlane.vue'
+import AuthFlow from './components/AuthFlow.vue'
 import HeroLogo from './components/HeroLogo.vue'
 import HeroParticles from './components/HeroParticles.vue'
 import HeroWaves from './components/HeroWaves.vue'
@@ -46,6 +49,9 @@ const theme: Theme = {
 
     enhanceApp({app, router}) {
         app.component('Architecture', Architecture)
+        app.component('DataPlane', DataPlane)
+        app.component('CommandPlane', CommandPlane)
+        app.component('AuthFlow', AuthFlow)
         if (typeof window === 'undefined' || !router) {
             return
         }

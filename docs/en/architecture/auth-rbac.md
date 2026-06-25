@@ -23,20 +23,7 @@ So the backend never repeats the login check, and it can't be fooled by a bare f
 
 Login is a two-step handshake: fetch a one-time salt, then hash the password with that salt to trade for a token. The salt stops a plaintext password or a fixed hash from being replayed over the wire.
 
-```mermaid
-sequenceDiagram
-    participant Client as Caller
-    participant GW as Gateway dc3-gateway
-    participant Auth as Auth Center dc3-center-auth
-    Client->>GW: "POST /api/v3/auth/token/salt (tenant, name)"
-    GW->>Auth: Verify tenant exists
-    Auth-->>Client: "Return salt (valid for 5 minutes)"
-    Client->>Client: "hash(password, salt)"
-    Client->>GW: "POST /api/v3/auth/token/generate (tenant, name, salt, hashed password)"
-    GW->>Auth: "Verification chain tenant -> credential -> membership -> password -> expiry/change"
-    Auth-->>Client: "Return access token (valid for 12 hours)"
-    Note over Auth: "token is a JWT, bound to principal_id + tenant_id"
-```
+<AuthFlow lang="en" />
 
 Both endpoints are public and need no authentication:
 

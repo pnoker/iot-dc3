@@ -12,15 +12,7 @@ A raw register read on a device has a long way to go before it becomes a queryab
 
 The data flow is a one-way **south-to-north** link. Drivers poll their devices periodically, wrap each read of a point into a `PointValue`, and publish it to RabbitMQ's value exchange via `DriverSenderService.pointValueSender()`. The data center `dc3-center-data` consumes the queue, writes each value to TimescaleDB, and at the same time pushes it into a local Caffeine cache for hot reads. The whole link is **asynchronous** — once the driver publishes, it does not wait for the data center to confirm the write. Durable delivery on the bus plus manual ack make sure nothing is lost.
 
-```mermaid
-flowchart LR
-    Dev["Field Device / Data Source"] --> Drv["Driver SDK<br/>dc3-driver-*"]
-    Drv -->|"exchange dc3.e.value<br/>routing dc3.r.value.point.{service}"| Q["queue dc3.q.value.point<br/>TTL 7 days + DLX"]
-    Q --> Recv["PointValueReceiver<br/>@RabbitListener (manual ack)"]
-    Recv --> TS[("TimescaleDB<br/>dc3_point_value")]
-    Recv --> Cache[("Caffeine latest-value cache<br/>key=prefix.tenant.device.point")]
-    Q -.->|"reject on consume error"| DLX["Dead-letter exchange<br/>dc3.e.point_value_dead"]
-```
+<DataPlane lang="en" />
 
 The driver's routing key is `dc3.r.value.point.` plus its own service name (`driverProperties.getService()`, e.g. the service name you configured for a `dc3-driver-virtual` instance). The data center's queue binds with the wildcard `dc3.r.value.point.*`, so a single queue receives values from every driver. When publishing, `pointValueSender()` fills in `driverId` and `tenantId` from `DriverMetadata` if the message doesn't already carry them. It uses `PointValueCorrelation` (a random UUID plus deviceId and pointId) as correlation data, paired with publisher confirms to track delivery.
 

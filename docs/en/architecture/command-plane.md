@@ -20,33 +20,7 @@ The chain starts at `PointCommandController` (`dc3-common-data`). Both endpoints
 
 The sequence diagram below shows the happy path: the caller submits, the driver writes the value into the device and acknowledges success, and the caller polls and gets the result.
 
-```mermaid
-sequenceDiagram
-    participant Client as Caller
-    participant GW as Gateway dc3-gateway
-    participant Data as Data Center dc3-center-data
-    participant MQ as RabbitMQ
-    participant Driver as Driver dc3-driver-*
-    participant Dev as Field Device
-
-    Client->>GW: "POST /api/v3/data/point_command/write (deviceId,pointId,value)"
-    GW->>Data: "Forward (inject tenant/principal)"
-    Data->>Data: "Validate: tenant/enableFlag/rwFlag/driver online"
-    Data->>Data: "Persist dc3_point_command_history (PENDING)"
-    Data->>MQ: "Publish (CorrelationData=commandId)"
-    Data->>Data: "Mark SENT"
-    Data-->>Client: "Return commandId (immediately)"
-    MQ->>Driver: "Deliver dc3.e.point_command"
-    Driver->>Driver: "expireAt precheck -> dedup -> per-device lock"
-    Driver->>Dev: "write() the value"
-    Dev-->>Driver: "TRUE / FALSE"
-    Driver->>MQ: "Receipt dc3.e.point_command_result (SUCCESS/FAILED)"
-    MQ->>Data: "Deliver to result queue"
-    Data->>Data: "PointCommandResultReceiver updates terminal state"
-    Client->>GW: "GET /api/v3/data/point_command_history/get_by_command_id?commandId=..."
-    GW->>Data: "Forward"
-    Data-->>Client: "PointCommandHistoryVO (status + responseValue)"
-```
+<CommandPlane lang="en" />
 
 ### Submission Side: Validate, Persist, Publish
 

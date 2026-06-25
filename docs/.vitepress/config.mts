@@ -321,15 +321,35 @@ const MERMAID = {
     theme: 'base',
     themeVariables: {
         fontFamily: '"Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif',
-        fontSize: '15px',
-        primaryColor: '#e3f1fb',
-        primaryBorderColor: '#0a6cb2',
-        primaryTextColor: '#13212e',
-        lineColor: '#4aa3da',
+        fontSize: '14px',
+        // 主节点：浅青底 + 品牌青描边 + 深墨字（贴近 Architecture 卡片观感）
+        primaryColor: '#ecfdf6',
+        primaryBorderColor: '#0e9f6e',
+        primaryTextColor: '#0f2231',
+        // 连线与次级元素：克制的中性蓝灰，避免花哨
+        lineColor: '#7c93ab',
         secondaryColor: '#eef4fb',
-        tertiaryColor: '#f5f9fd',
+        secondaryBorderColor: '#3f7fb8',
+        secondaryTextColor: '#0f2231',
+        tertiaryColor: '#f6f9fc',
+        tertiaryBorderColor: '#9bb2c7',
+        tertiaryTextColor: '#0f2231',
+        // 分组/子图：极淡底 + 虚线感描边（与 Architecture region 一致）
+        clusterBkg: 'rgba(14, 159, 110, 0.05)',
+        clusterBorder: '#9cc7b4',
+        // 边标签：贴合卡片底色，文字中性
+        edgeLabelBackground: '#f6f9fc',
+        labelBoxBorderColor: '#9bb2c7',
+        // 备注：暖黄
         noteBkgColor: '#fff7e6',
-        noteBorderColor: '#d8a544'
+        noteBorderColor: '#d8a544',
+        noteTextColor: '#5b4a1f',
+        // 时序图角色框
+        actorBkg: '#ecfdf6',
+        actorBorder: '#0e9f6e',
+        actorTextColor: '#0f2231',
+        signalColor: '#5f7a90',
+        signalTextColor: '#33485c'
     },
     flowchart: {curve: 'basis', useMaxWidth: true, nodeSpacing: 60, rankSpacing: 66, padding: 24, htmlLabels: false},
     sequence: {useMaxWidth: true, mirrorActors: false, actorMargin: 64, boxMargin: 12, noteMargin: 12, messageMargin: 44},
@@ -343,6 +363,7 @@ const LANG_DETECT = `(function(){var K='dc3-lang',B='/';var p;try{p=localStorage
 
 export default withMermaid(defineConfig({
     base: '/',
+    lang: 'zh-CN',
     title: 'IoT DC3',
     cleanUrls: true,
     lastUpdated: true,
@@ -357,14 +378,6 @@ export default withMermaid(defineConfig({
     ],
 
     locales: {
-        root: {
-            label: 'Languages',
-            lang: 'zh-CN',
-            themeConfig: {
-                nav: [],
-                sidebar: []
-            }
-        },
         zh: {
             label: '简体中文',
             lang: 'zh-CN',
