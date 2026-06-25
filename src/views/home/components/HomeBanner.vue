@@ -162,7 +162,7 @@
 
 <style lang="scss" scoped>
   .home-banner {
-    background: linear-gradient(135deg, #409eff 0%, #6a86ff 55%, #9059f6 100%);
+    background: linear-gradient(135deg, #1296db 0%, #6a86ff 55%, #9059f6 100%);
     color: #ffffff;
 
     :deep(.el-card__body) {

@@ -45,6 +45,6 @@
   }
 
   #nprogress .bar {
-    background: #409eff !important;
+    background: var(--el-color-primary) !important;
   }
 </style>

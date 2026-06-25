@@ -22,6 +22,18 @@
 // 会被预置到每个 scoped <style> 块,所有选择器都会被附加 scope hash,
 // 对 body、teleport(dropdown/popover/dialog 外层)等 scope-less 元素全部失效。
 
+// 品牌主色：把 Element Plus 默认蓝（#409eff）统一为品牌蓝 #1296db。
+// 完整引入预编译 CSS，故用 CSS 变量覆盖；light-N / dark-2 取自 Element Plus 官方混色算法结果。
+:root {
+  --el-color-primary: #1296db;
+  --el-color-primary-light-3: #59b6e6;
+  --el-color-primary-light-5: #89cbed;
+  --el-color-primary-light-7: #b8e0f4;
+  --el-color-primary-light-8: #d0eaf8;
+  --el-color-primary-light-9: #e7f5fb;
+  --el-color-primary-dark-2: #0e78af;
+}
+
 body {
   margin: 0;
   min-width: 1280px;
