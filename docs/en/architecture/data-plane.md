@@ -120,12 +120,27 @@ Layer by layer:
 
 ## Storage: dc3_point_value Is a TimescaleDB Hypertable
 
-Values land in a single TimescaleDB **hypertable**, `dc3_point_value`. It is partitioned along two dimensions: the time dimension `create_time` with one chunk per **1 day**, and the device dimension `device_id` with **16** hash buckets.
+Values land in a TimescaleDB **hypertable**, `dc3_history.dc3_point_value` (it lives in the `dc3_history` schema; `search_path` includes `dc3_history, public`, so this page and queries often shorten it to `dc3_point_value`). It is partitioned along two dimensions: the time dimension `create_time` with one chunk per **1 day**, and the device dimension `device_id` with **16** hash buckets.
 
 ```sql
 SELECT create_hypertable('dc3_point_value', by_range('create_time', INTERVAL '1 day'));
 SELECT add_dimension('dc3_point_value', by_hash('device_id', 16));
 ```
+
+To control storage and query cost, this hypertable also has two data-lifecycle policies:
+
+```sql
+-- chunks older than 7 days are compressed automatically (segmented by tenant/device/point, ordered by create_time)
+ALTER TABLE dc3_point_value SET (timescaledb.compress,
+    compress_segmentby='tenant_id,device_id,point_id', compress_orderby='create_time DESC');
+SELECT add_compression_policy('dc3_point_value', INTERVAL '7 days');
+-- data older than 180 days is dropped automatically
+SELECT add_retention_policy('dc3_point_value', INTERVAL '180 days');
+```
+
+::: tip Compression and retention are on by default
+Compressing after 7 days cuts disk usage significantly (compressed chunks stay queryable, just write-restricted); the 180-day retention policy drops expired chunks automatically. If your workload needs a longer horizon, tune both intervals at deployment.
+:::
 
 Key columns and indexes:
 
@@ -238,7 +253,7 @@ The values above are examples. `PointValueVO`'s exposed fields (`rawValue`/`calV
 - **Aggregations must carry `num_value IS NOT NULL`**: see the danger callout above. It's a hard prerequisite for correct numeric statistics.
 - **`PointValue` ≠ `PointValueBO`**: don't swap the driver sending bean for the business object across layers — their field sets and serialization contexts differ.
 - **Consumer concurrency is the default tier**: the point queue runs on the default listener factory (prefetch=10, concurrency 2–8). The high-throughput factory exists but isn't enabled; opt in explicitly when you need it.
-- **Tenant isolation is enforced at the query layer**: read endpoints carry tenant context via `PointValueQuery`, and the storage layer appends `WHERE tenant_id = ?` automatically. Cross-tenant access returns no data.
+- **Tenant isolation is enforced at the controller layer**: read endpoints carry tenant context via `PointValueQuery`, and after fetching, the controller layer's `requireTenant` / `filterTenant` checks the tenant; cross-tenant access returns no data.
 - **Dead letters aren't loss**: values that time out or get rejected land in `dc3.e.point_value_dead`. When troubleshooting, look in the dead-letter queue.
 
 ## Further Reading

@@ -97,5 +97,5 @@ flowchart LR
 
 - [设备 Device](./device) — 最典型的"被租户隔离"的业务实体
 - [核心概念与心智模型](../concepts) — 租户边界在整个对象模型中的位置
-- [鉴权 · 租户 · RBAC](../../architecture/auth-rbac) — 主体、成员关系、RBAC 与隔离两道闸的完整链路
+- [鉴权 · 租户 · RBAC](../../architecture/auth-rbac) — 主体、成员关系、RBAC 与接口层租户隔离的完整链路
 - [快速开始](../../quickstart/) — 用默认 `default` 租户在本地起栈

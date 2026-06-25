@@ -90,12 +90,12 @@ A write command counts as successful only when the driver's `write()` returns `B
 
 ## Multi-Tenant Isolation: How tenantId Runs Through Every Layer
 
-The platform is multi-tenant by design. Isolation isn't a filter bolted on afterward — it's a foundation that runs through the entire request chain. Once a request comes in, `tenantId` is carried all the way along "gateway → center service → gRPC call → database query → cache key." No layer is allowed to fetch data across tenants.
+The platform is multi-tenant by design. Isolation is enforced at the interface layer; `tenantId` is carried along "gateway → center service → gRPC call → cache key," and both single-ID and batch queries are checked at the controller layer so cross-tenant access is blocked.
 
 The enforcement points in practice:
 
-- **Query layer**: MyBatis-Plus's tenant row handler automatically appends `WHERE tenant_id = ?` to all `TenantOwned` entities, covering full-database queries across the four centers.
-- **Interface layer**: `BaseController.requireTenant()` returns 404 (rather than leaking data) for cross-tenant single-ID lookups, and `filterTenant()` strips records that don't belong to the current tenant from batch results.
+- **Interface layer (single by ID)**: `BaseController.requireTenant()` compares the entity's `tenantId` after fetching it, returning 404 (rather than leaking data) for cross-tenant access.
+- **Interface layer (batch)**: `BaseController.filterTenant()` strips records that don't belong to the current tenant from batch results. The database query layer does no automatic tenant pruning today (`MybatisPlusConfig` registers only the pagination plugin); isolation is applied at the controller layer.
 - **Cross-service**: gRPC facade calls carry the tenant ID where the contract supports it, and cache keys also include tenant context.
 
 So when you write a new query, a new gRPC call, or a new cache key, you have to preserve the tenant scope. That's a hard requirement, not an optional optimization. For how isolation is enforced layer by layer and how it works with RBAC, see [Auth · Tenant · RBAC](./auth-rbac).

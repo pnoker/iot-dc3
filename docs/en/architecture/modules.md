@@ -98,7 +98,7 @@ Controllers and services only ever `@Autowired` the interfaces in `dc3-common-fa
 **The shared layer `dc3-common-*`** is the cross-service reusable infrastructure and domain libraries, grouped into four by responsibility:
 
 - Foundation: `dc3-common-constant` (enums and constants, like `PointCommandTypeEnum`), `dc3-common-model` (BO / VO / DTO, like `PointCommandDTO`), `dc3-common-exception`, `dc3-common-public` (the `R<T>` response wrapper), `dc3-common-web`, `dc3-common-log`, `dc3-common-thread`.
-- Data access: `dc3-common-dal` (MyBatis-Plus base capabilities, including the tenant row handler), `dc3-common-postgres` (multi-schema data source), `dc3-common-repository` (repository abstractions and point-value domain objects, like `PointValueBO`), `dc3-common-sql`.
+- Data access: `dc3-common-dal` (MyBatis-Plus base capabilities, data-access and query wrappers), `dc3-common-postgres` (multi-schema data source), `dc3-common-repository` (repository abstractions and point-value domain objects, like `PointValueBO`), `dc3-common-sql`.
 - Communication: `dc3-common-rabbitmq` (exchange / queue configuration, like `dc3.e.value`), `dc3-common-mqtt`.
 - Domain: `dc3-common-{auth,manager,data,driver,gateway,agentic}`, each holding the business logic of one deployment unit. The `dc3-center-manager` process, for example, is little more than the runtime shell around `dc3-common-manager`.
 

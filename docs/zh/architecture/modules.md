@@ -98,7 +98,7 @@ flowchart TB
 **公共层 `dc3-common-*`** 是跨服务复用的基础设施与领域库，按职责分四组：
 
 - 基础：`dc3-common-constant`（枚举、常量，如 `PointCommandTypeEnum`）、`dc3-common-model`（BO / VO / DTO，如 `PointCommandDTO`）、`dc3-common-exception`、`dc3-common-public`（`R<T>` 响应封装）、`dc3-common-web`、`dc3-common-log`、`dc3-common-thread`。
-- 数据访问：`dc3-common-dal`（MyBatis-Plus 基础能力，含租户行处理器）、`dc3-common-postgres`（多 schema 数据源）、`dc3-common-repository`（仓储抽象与位号值领域对象，如 `PointValueBO`）、`dc3-common-sql`。
+- 数据访问：`dc3-common-dal`（MyBatis-Plus 基础能力，数据访问与查询封装）、`dc3-common-postgres`（多 schema 数据源）、`dc3-common-repository`（仓储抽象与位号值领域对象，如 `PointValueBO`）、`dc3-common-sql`。
 - 通信：`dc3-common-rabbitmq`（交换机 / 队列配置，如 `dc3.e.value`）、`dc3-common-mqtt`。
 - 领域：`dc3-common-{auth,manager,data,driver,gateway,agentic}`，每个对应一个部署单元的业务逻辑。例如 `dc3-center-manager` 这个进程几乎只是 `dc3-common-manager` 的运行外壳。
 

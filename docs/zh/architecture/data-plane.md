@@ -120,12 +120,27 @@ classDiagram
 
 ## 存储：dc3_point_value 是 TimescaleDB 超表
 
-值落在单张 TimescaleDB **hypertable** `dc3_point_value`。它按两维分区——时间维 `create_time` 每 **1 天**一个 chunk，设备维 `device_id` **16** 个哈希桶：
+值落在 TimescaleDB **hypertable** `dc3_history.dc3_point_value`（位于 `dc3_history` schema；`search_path` 含 `dc3_history, public`，故正文与查询里常简写为 `dc3_point_value`）。它按两维分区——时间维 `create_time` 每 **1 天**一个 chunk，设备维 `device_id` **16** 个哈希桶：
 
 ```sql
 SELECT create_hypertable('dc3_point_value', by_range('create_time', INTERVAL '1 day'));
 SELECT add_dimension('dc3_point_value', by_hash('device_id', 16));
 ```
+
+为控制存储与查询成本，这张超表还配了两条数据生命周期策略：
+
+```sql
+-- 7 天前的 chunk 自动压缩（按 tenant/device/point 分段、create_time 排序）
+ALTER TABLE dc3_point_value SET (timescaledb.compress,
+    compress_segmentby='tenant_id,device_id,point_id', compress_orderby='create_time DESC');
+SELECT add_compression_policy('dc3_point_value', INTERVAL '7 days');
+-- 超过 180 天的数据自动清理
+SELECT add_retention_policy('dc3_point_value', INTERVAL '180 days');
+```
+
+::: tip 压缩与保留默认开启
+7 天后压缩能显著降低磁盘占用（压缩后的 chunk 仍可查询，只是写入受限）；180 天保留策略会自动 drop 超期 chunk。业务需要更长留存时，在部署侧调整这两条策略的间隔。
+:::
 
 关键列与索引：
 
@@ -238,7 +253,7 @@ curl -X POST http://localhost:8000/api/v3/data/point_value/list \
 - **聚合必带 `num_value IS NOT NULL`**：见上文 danger，这是数值统计正确性的硬前提。
 - **`PointValue` ≠ `PointValueBO`**：跨层时别把驱动发送 bean 当成业务对象互用，二者字段集与序列化场景不同。
 - **消费者并发是默认档**：位号队列当前跑在默认监听工厂（prefetch=10、并发 2–8）；高吞吐工厂存在但未启用，需要时显式 opt-in。
-- **租户隔离在查询层强制**：读接口经 `PointValueQuery` 带租户上下文，库层自动追加 `WHERE tenant_id = ?`，跨租户访问取不到数据。
+- **租户隔离在接口层强制**：读接口经 `PointValueQuery` 带租户上下文，数据中心取数后由控制器层 `requireTenant` / `filterTenant` 校验，跨租户访问取不到数据。
 - **死信不等于丢失**：超时或被 reject 的值进 `dc3.e.point_value_dead`，排障时去死信队列找。
 
 ## 延伸阅读

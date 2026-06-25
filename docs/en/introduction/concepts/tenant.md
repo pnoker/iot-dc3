@@ -97,5 +97,5 @@ Tenant management endpoints live in the auth center under the prefix `/tenant` (
 
 - [Device](./device) — the most typical business entity that gets tenant-isolated
 - [Core Concepts and Mental Model](../concepts) — where the tenant boundary sits in the overall object model
-- [Auth · Tenant · RBAC](../../architecture/auth-rbac) — the full chain of principal, membership, RBAC and the two gates of isolation
+- [Auth · Tenant · RBAC](../../architecture/auth-rbac) — the full chain of principal, membership, RBAC and controller-layer tenant isolation
 - [Quick Start](../../quickstart/) — bring up the stack locally with the default `default` tenant

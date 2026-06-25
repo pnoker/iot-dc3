@@ -184,13 +184,15 @@ The most important part is the failure behavior — **fail-closed**:
 When permission loading hits a transient failure, `GatewayJwtConverter` still builds an "authenticated but permission-less" token (an empty authorities set). That's intentional fail-closed behavior: the caller counts as logged in but with no permissions at all, and every `@PreAuthorize` guard returns **403** rather than dressing up a backend hiccup as a 401 or letting the call slip through. When permissions can't be loaded, the default is no permission — never the other way around.
 :::
 
-## Tenant isolation: two gates
+## Tenant isolation: controller-layer enforcement
 
-RBAC decides "can you perform this kind of operation." Tenant isolation decides "can you touch this piece of data." The two are orthogonal and both required — having `device:get` doesn't mean you can fetch another tenant's device. Isolation lands at two layers:
+RBAC decides "can you perform this kind of operation." Tenant isolation decides "can you touch this piece of data." The two are orthogonal and both required — having `device:get` doesn't mean you can fetch another tenant's device. Isolation lands at the controller layer (the database query layer does no automatic tenant pruning today; `MybatisPlusConfig` registers only the pagination plugin):
 
 **Controller layer `BaseController.requireTenant()`**: after looking up an entity by ID, it compares the entity's `tenantId` against the caller's. On a mismatch (or if the entity doesn't exist) it throws `NotFoundException` and returns **404** to the outside — deliberately "does not exist" rather than "no permission," so a cross-tenant probe can't tell whether the resource is there. Batch queries go through `filterTenant()`, which drops any item that doesn't belong to the current tenant.
 
-**Persistence layer MyBatis-Plus tenant row handler**: for entities implementing `TenantOwned`, it appends `WHERE tenant_id = ?` to the SQL automatically. This layer runs at the library level and gives a uniform safety net across all four centers (Auth/Manager/Data/Agentic) — it doesn't rely on every query remembering to add the tenant condition. Even if a developer forgets, the handler fills it in.
+::: warning There is no database-layer tenant safety net
+Don't assume the SQL layer will fill in a missing tenant condition — the current implementation has **no** MyBatis-Plus tenant-line interceptor; isolation relies entirely on the controller layer's `requireTenant` / `filterTenant`. When you add a single or batch query, you must call these methods yourself to enforce the tenant scope, otherwise the query is not pruned by tenant.
+:::
 
 ```java
 // Controller layer: if the entity looked up by ID does not belong to the current tenant, return 404 instead of 403

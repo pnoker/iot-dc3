@@ -62,7 +62,7 @@ flowchart LR
 | Gateway API | `http://localhost:8000/api/v3/...` | 唯一对外 HTTP 入口；下文示例的 curl 都打到这里 |
 | Swagger UI | `http://localhost:8000/swagger-ui.html` | 开发环境查看网关聚合后的 API（生产环境一般关闭） |
 | 各中心直连调试 | Auth `8300` / Manager `8400` / Data `8500` / Agentic `8600` | 单独调试某个中心时直连其 HTTP 端口，绕过网关 |
-| MCP / OAuth 入口 | `POST /api/v3/agentic/mcp`、`/.well-known/oauth-protected-resource` | 供 AI Agent 经 OAuth 2.1 访问 MCP 工具，见 [Agentic 中心](../ai/agentic) |
+| MCP / OAuth 入口 | `POST /mcp`、`GET /.well-known/oauth-protected-resource` | 供 AI Agent 经 OAuth 2.1 访问 MCP 工具（均在网关根路径，不经 `/api/v3`），见 [Agentic 中心](../ai/agentic) |
 | Web UI | 前端源码在独立的 `iot-dc3-web` 仓库 | 图形化操作界面，后端接口同样通过 Gateway 访问 |
 
 ::: info Web UI 不在本仓库
