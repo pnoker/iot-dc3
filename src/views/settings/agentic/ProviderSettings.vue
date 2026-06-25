@@ -53,6 +53,7 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
+        <!-- @vue-generic {AgenticProvider} -->
         <el-table-column :label="$t('common.operation')" fixed="right" width="210">
           <template #default="{ row }">
             <el-button :disabled="!row.id" link type="primary" @click="openDetail(row)">{{

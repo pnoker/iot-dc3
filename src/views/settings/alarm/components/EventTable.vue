@@ -90,6 +90,7 @@
         @selection-change="onSelectionChange"
       >
         <el-table-column type="selection" width="44" />
+        <!-- @vue-generic {Row} -->
         <el-table-column :label="entityLabel" min-width="180" show-overflow-tooltip>
           <template #default="{ row }">
             <span>{{ nameFor(row) }}</span>
@@ -130,6 +131,7 @@
           prop="createTime"
           width="180"
         />
+        <!-- @vue-generic {Row} -->
         <el-table-column :label="$t('common.operation')" fixed="right" width="140">
           <template #default="{ row }">
             <el-popconfirm

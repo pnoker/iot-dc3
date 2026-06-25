@@ -33,6 +33,7 @@
         </template>
       </el-table-column>
       <el-table-column :label="t('settings.event.overview.colDrivers')" align="right" prop="driverCount" width="100" />
+      <!-- @vue-generic {ProtocolHealth} -->
       <el-table-column :label="t('settings.event.overview.colEnabled')" align="right" width="120">
         <template #default="{ row }">
           <span :class="enabledClass(row)" class="protocol-health__enabled">
@@ -41,6 +42,7 @@
         </template>
       </el-table-column>
       <el-table-column :label="t('settings.event.overview.colDevices')" align="right" prop="deviceCount" width="100" />
+      <!-- @vue-generic {ProtocolHealth} -->
       <el-table-column :label="t('settings.event.overview.colHealthRatio')" min-width="130">
         <template #default="{ row }">
           <el-progress

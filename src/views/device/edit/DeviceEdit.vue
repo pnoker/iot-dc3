@@ -119,6 +119,7 @@
                 <el-tag effect="plain" size="small">{{ row.attributeTypeFlag }}</el-tag>
               </template>
             </el-table-column>
+            <!-- @vue-generic {import('@/config/types').Attribute} -->
             <el-table-column :label="$t('device.edit.configValue')" min-width="240">
               <template #default="{ row: attribute }">
                 <div class="matrix-cell">
@@ -210,6 +211,7 @@
                 </el-tooltip>
               </template>
             </el-table-column>
+            <!-- @vue-generic {import('./index').PointInfoMatrixRow} -->
             <el-table-column :label="$t('device.edit.configStatus')" fixed width="100">
               <template #default="{ row }">
                 <el-tag :type="pointRowStatusTag(row)" effect="plain" size="small">
@@ -217,6 +219,7 @@
                 </el-tag>
               </template>
             </el-table-column>
+            <!-- @vue-generic {import('./index').PointInfoMatrixRow} -->
             <el-table-column v-for="attribute in reactiveData.pointAttributes" :key="attribute.id" min-width="180">
               <template #header>
                 <div class="point-matrix-attribute-header">
@@ -234,7 +237,7 @@
                 >
                   <el-switch
                     v-if="isBooleanAttribute(attribute)"
-                    v-model="row.attributes[attribute.attributeCode].configValue"
+                    v-model="pointCell(row, attribute).configValue"
                     :active-value="true"
                     :inactive-value="false"
                     size="small"
@@ -242,7 +245,7 @@
                   />
                   <el-input
                     v-else-if="isNumberAttribute(attribute)"
-                    v-model="row.attributes[attribute.attributeCode].configValue"
+                    v-model="pointCell(row, attribute).configValue"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     inputmode="decimal"
@@ -254,7 +257,7 @@
                   />
                   <el-input
                     v-else
-                    v-model="row.attributes[attribute.attributeCode].configValue"
+                    v-model="pointCell(row, attribute).configValue"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     maxlength="512"
@@ -325,6 +328,7 @@
                 </el-tooltip>
               </template>
             </el-table-column>
+            <!-- @vue-generic {import('./index').CommandInfoMatrixRow} -->
             <el-table-column :label="$t('device.edit.configStatus')" fixed width="100">
               <template #default="{ row }">
                 <el-tag :type="commandRowStatusTag(row)" effect="plain" size="small">
@@ -332,6 +336,7 @@
                 </el-tag>
               </template>
             </el-table-column>
+            <!-- @vue-generic {import('./index').CommandInfoMatrixRow} -->
             <el-table-column v-for="attribute in reactiveData.commandAttributes" :key="attribute.id" min-width="180">
               <template #header>
                 <div class="point-matrix-attribute-header">
@@ -349,7 +354,7 @@
                 >
                   <el-switch
                     v-if="isBooleanAttribute(attribute)"
-                    v-model="row.attributes[attribute.attributeCode].configValue"
+                    v-model="commandCell(row, attribute).configValue"
                     :active-value="true"
                     :inactive-value="false"
                     size="small"
@@ -357,7 +362,7 @@
                   />
                   <el-input
                     v-else-if="isNumberAttribute(attribute)"
-                    v-model="row.attributes[attribute.attributeCode].configValue"
+                    v-model="commandCell(row, attribute).configValue"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     inputmode="decimal"
@@ -369,7 +374,7 @@
                   />
                   <el-input
                     v-else
-                    v-model="row.attributes[attribute.attributeCode].configValue"
+                    v-model="commandCell(row, attribute).configValue"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     maxlength="512"
@@ -440,6 +445,7 @@
                 </el-tooltip>
               </template>
             </el-table-column>
+            <!-- @vue-generic {import('./index').EventInfoMatrixRow} -->
             <el-table-column :label="$t('device.edit.configStatus')" fixed width="100">
               <template #default="{ row }">
                 <el-tag :type="eventRowStatusTag(row)" effect="plain" size="small">
@@ -447,6 +453,7 @@
                 </el-tag>
               </template>
             </el-table-column>
+            <!-- @vue-generic {import('./index').EventInfoMatrixRow} -->
             <el-table-column v-for="attribute in reactiveData.eventAttributes" :key="attribute.id" min-width="180">
               <template #header>
                 <div class="point-matrix-attribute-header">
@@ -464,7 +471,7 @@
                 >
                   <el-switch
                     v-if="isBooleanAttribute(attribute)"
-                    v-model="row.attributes[attribute.attributeCode].configValue"
+                    v-model="eventCell(row, attribute).configValue"
                     :active-value="true"
                     :inactive-value="false"
                     size="small"
@@ -472,7 +479,7 @@
                   />
                   <el-input
                     v-else-if="isNumberAttribute(attribute)"
-                    v-model="row.attributes[attribute.attributeCode].configValue"
+                    v-model="eventCell(row, attribute).configValue"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     inputmode="decimal"
@@ -484,7 +491,7 @@
                   />
                   <el-input
                     v-else
-                    v-model="row.attributes[attribute.attributeCode].configValue"
+                    v-model="eventCell(row, attribute).configValue"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     maxlength="512"

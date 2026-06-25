@@ -148,7 +148,7 @@
   import { computed, reactive, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { ArrowLeft, ArrowRight, Search } from '@element-plus/icons-vue';
-  import type { ElTable } from 'element-plus';
+  import type { TableInstance } from 'element-plus';
 
   import { listRole } from '@/api/role';
   import { listRoleByPrincipalId, listRolePrincipalBind } from '@/api/rolePrincipalBind';
@@ -165,8 +165,8 @@
     (e: 'save', principalId: string, addIds: string[], removeBindIds: string[], done: () => void): void;
   }>();
 
-  const leftTableRef = ref<InstanceType<typeof ElTable>>();
-  const rightTableRef = ref<InstanceType<typeof ElTable>>();
+  const leftTableRef = ref<TableInstance>();
+  const rightTableRef = ref<TableInstance>();
 
   const reactiveData = reactive({
     visible: false,

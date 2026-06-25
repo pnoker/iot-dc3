@@ -49,7 +49,7 @@
 <script lang="ts" setup>
   import { nextTick, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import type { ElTable } from 'element-plus';
+  import type { TableInstance } from 'element-plus';
 
   import { listMcpConnectionTool, listMcpTool, replaceMcpConnectionTools } from '@/api/mcp';
   import { MCP_RISK_LEVELS } from '@/config/constant/enums';
@@ -64,7 +64,7 @@
   const tools = ref<McpToolRecord[]>([]);
   const selectedToolIds = ref<string[]>([]);
   const connection = ref<McpConnectionRecord | null>(null);
-  const toolTableRef = ref<InstanceType<typeof ElTable>>();
+  const toolTableRef = ref<TableInstance>();
 
   const riskTag = (riskLevel?: string) => {
     if (riskLevel === MCP_RISK_LEVELS.HIGH) return 'danger';

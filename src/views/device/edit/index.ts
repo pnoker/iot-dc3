@@ -89,7 +89,7 @@ interface PointAttributeCell extends AttributeFormItem {
   error: string;
 }
 
-interface PointInfoMatrixRow {
+export interface PointInfoMatrixRow {
   id: string;
   pointName: string;
   pointCode?: string;
@@ -102,7 +102,7 @@ interface PointInfoMatrixRow {
 type CommandAttributeCell = PointAttributeCell;
 type EventAttributeCell = PointAttributeCell;
 
-interface CommandInfoMatrixRow {
+export interface CommandInfoMatrixRow {
   id: string;
   commandName: string;
   commandCode?: string;
@@ -111,7 +111,7 @@ interface CommandInfoMatrixRow {
   attributes: Record<string, CommandAttributeCell>;
 }
 
-interface EventInfoMatrixRow {
+export interface EventInfoMatrixRow {
   id: string;
   eventName: string;
   eventCode?: string;
@@ -1523,6 +1523,9 @@ export default defineComponent({
       savePointMatrix,
       saveCommandMatrix,
       saveEventMatrix,
+      pointCell,
+      commandCell,
+      eventCell,
       markPointCellDirty,
       markCommandCellDirty,
       markEventCellDirty,

@@ -39,6 +39,7 @@
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
         <el-table-column :label="t('settings.localCredential.loginName')" min-width="160" prop="loginName" />
+        <!-- @vue-generic {import('@/config/types').LocalCredentialRecord} -->
         <el-table-column :label="t('settings.localCredential.principalId')" min-width="140">
           <template #default="{ row }">{{ principalNameFor(row) }}</template>
         </el-table-column>
@@ -55,6 +56,7 @@
           width="165"
         />
         <el-table-column :label="t('settings.localCredential.failedAttempts')" min-width="120" prop="failedAttempts" />
+        <!-- @vue-generic {import('@/config/types').LocalCredentialRecord} -->
         <el-table-column :label="t('common.operation')" fixed="right" width="180">
           <template #default="{ row }">
             <el-button link type="primary" @click="openReset(row)">

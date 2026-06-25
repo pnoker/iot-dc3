@@ -40,6 +40,7 @@
           prop="purpose"
           show-overflow-tooltip
         />
+        <!-- @vue-generic {import('@/config/types/auth').ServiceAccountRecord} -->
         <el-table-column :label="t('settings.serviceAccount.ownerPrincipalId')" min-width="140">
           <template #default="{ row }">{{ ownerNameFor(row) }}</template>
         </el-table-column>
@@ -55,12 +56,14 @@
           prop="lastUsedTime"
           width="165"
         />
+        <!-- @vue-generic {import('@/config/types/auth').ServiceAccountRecord} -->
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
             <el-switch :model-value="isEnabledFlag(row.enableFlag)" @change="() => toggleEnable(row)" />
           </template>
         </el-table-column>
         <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165" />
+        <!-- @vue-generic {import('@/config/types/auth').ServiceAccountRecord} -->
         <el-table-column :label="t('common.operation')" fixed="right" width="170">
           <template #default="{ row }">
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>

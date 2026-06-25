@@ -60,6 +60,7 @@
 
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
+        <!-- @vue-generic {CommandHistoryRecord} -->
         <el-table-column :label="$t('commandHistory.device')" min-width="160" show-overflow-tooltip>
           <template #default="{ row }">{{ deviceNameFor(row) }}</template>
         </el-table-column>
@@ -78,6 +79,7 @@
           width="165"
         />
         <el-table-column :formatter="timestampColumn" :label="$t('common.createTime')" prop="createTime" width="165" />
+        <!-- @vue-generic {CommandHistoryRecord} -->
         <el-table-column :label="$t('common.operation')" fixed="right" width="100">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ $t('common.detail') }}</el-button>

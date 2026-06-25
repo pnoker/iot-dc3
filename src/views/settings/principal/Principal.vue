@@ -47,6 +47,7 @@
         <el-table-column :label="t('settings.principal.displayName')" min-width="160" prop="displayName" />
         <el-table-column :label="t('settings.principal.principalType')" min-width="150" prop="principalType" />
         <el-table-column :label="t('settings.principal.sourceType')" min-width="130" prop="sourceType" />
+        <!-- @vue-generic {import('@/config/types').PrincipalRecord} -->
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
             <el-switch :model-value="isEnabledFlag(row.enableFlag)" @change="() => toggleEnable(row)" />

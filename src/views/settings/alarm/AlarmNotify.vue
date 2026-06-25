@@ -51,6 +51,7 @@
 
     <blank-card>
       <el-table v-loading="state.loading" :data="state.rows" class="alarm-notify__table" stripe>
+        <!-- @vue-generic {import('@/config/types').AlarmEntity} -->
         <el-table-column
           v-for="column in activeConfig.columns"
           :key="column.prop"
@@ -71,6 +72,7 @@
             <span v-else>{{ formatCell(row, column) }}</span>
           </template>
         </el-table-column>
+        <!-- @vue-generic {import('@/config/types').AlarmEntity} -->
         <el-table-column :label="t('common.operation')" :width="activeConfig.editable ? 180 : 100" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>

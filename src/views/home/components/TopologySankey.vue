@@ -60,12 +60,14 @@
        scoped flex sizing and overlays cleanly. -->
   <el-dialog v-model="othersDialog.visible" :title="othersDialog.title" append-to-body width="560px">
     <el-table :data="othersDialog.children" height="420" size="small">
+      <!-- @vue-generic {TopologyHiddenChild} -->
       <el-table-column :label="$t('home.topology.colType')" prop="type" width="110">
         <template #default="{ row }">
           <el-tag :type="tagTypeFor(row.type)" size="small">{{ layerLabel(row.type) }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column :label="$t('home.topology.colName')" prop="name" show-overflow-tooltip />
+      <!-- @vue-generic {TopologyHiddenChild} -->
       <el-table-column :label="$t('common.operation')" width="110">
         <template #default="{ row }">
           <el-button link size="small" type="primary" @click="onChildJump(row)">
