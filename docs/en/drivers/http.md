@@ -4,90 +4,126 @@ title: HTTP Driver
 
 # HTTP Driver
 
-> **`dc3-driver-http` onboards an HTTP/REST endpoint into IoT DC3 as a data source**—it periodically calls REST endpoints, extracts a value from the JSON response, and supports write commands that push values via a request-body template.
+`dc3-driver-http` onboards any HTTP/REST endpoint into IoT DC3 as a data source—it periodically calls REST endpoints, extracts one field from the JSON response as the [PointValue](../introduction/concepts/point-value), and supports write commands that push values via a request-body template. After reading this you can decide which devices/platforms fit it, what each attribute should hold, and where to look when a connection fails.
 
-Many devices, gateways, or upstream systems don't speak an industrial protocol directly—they expose an HTTP/REST endpoint that returns some JSON. This driver acts as an HTTP client ([Driver](../introduction/concepts/driver) type `DRIVER_CLIENT`), using Spring WebFlux `WebClient` to call endpoints by the path and method configured on each [Point](../introduction/concepts/point), then extracting one value from the JSON response as the [PointValue](../introduction/concepts/point-value). It fits: third-party platform open APIs, RESTful endpoints built into devices, and HTTP-style data gateways.
+## Protocol background
 
-Two driver-specific concepts that the configuration tables below rely on:
+HTTP (HyperText Transfer Protocol) and the REST-style endpoints built on it are the internet's most universal request/response protocol: a client issues a **method** (`GET`/`POST`/`PUT`/`DELETE`) against a **resource path**, and the server returns a status code and a payload (usually JSON in IoT scenarios). It has simple connectionless semantics, native support in virtually every language and tool, and easy debugging—which makes it the "greatest common divisor" of system integration.
 
-- **JSON path (Response Path)**: a simple dot-notation path to locate a field in the response JSON, e.g. `$.data.temperature` picks `temperature` under the `data` object. Leave it empty to use the whole raw response as the value.
-- **Request body template (Body Template)**: the body template used when writing; the `${value}` placeholder is replaced with the actual value from the command parameter.
+In the four-layer IoT reference architecture, HTTP belongs to the **network layer**, in the **application-layer messaging protocol** family (alongside MQTT, CoAP, LwM2M)—it defines "what a message looks like and how it is delivered," not which radio the bytes travel over. But to be honest: HTTP has bulky headers, costly keep-alives, and was not designed for constrained devices, so it is **not** a good fit for high-frequency reporting from battery-powered endpoints. Its real place in IoT is **integrating with existing endpoints**—open REST APIs from third-party platforms, RESTful interfaces built into devices, and data gateways that aggregate field data into an HTTP endpoint. These "the upstream already speaks REST, I just need to poll it" cases are exactly what this driver is for. For HTTP versus MQTT/CoAP/LwM2M trade-offs, see the [IoT network layer chapter](../foundations/iot-protocols).
 
-## Driver name / code / type
+This driver acts as an HTTP client ([Driver](../introduction/concepts/driver) type `DRIVER_CLIENT`), using Spring WebFlux `WebClient` to call endpoints by the path and method configured on each [Point](../introduction/concepts/point), then extracting one value from the JSON response. Two driver-specific concepts recur below:
 
-- **Driver name / code**: `HTTP REST Client Driver` / `HttpDriver`
-- **Type**: `DRIVER_CLIENT` (the driver actively issues HTTP requests)
+- **Response Path**: a simple dot-notation path locating a field in the response JSON, e.g. `$.data.temperature` picks `temperature` under the `data` object. Leave it empty to use the whole raw response as the value.
+- **Body Template**: the request body template used when writing; the `${value}` placeholder is replaced with the actual value from the command parameter.
 
-## Driver configuration (device-level `driver-attribute`)
+## Attribute configuration
 
-When onboarding an HTTP data source, fill in these [attributes](../introduction/concepts/attribute-config) on the [Device](../introduction/concepts/device). They decide which service to connect to, the default method, the headers to send, and the timeout:
+Attributes are filled in three layers: **driver attributes** (`driver-attribute`, device-level, deciding which service to connect to), **point attributes** (`point-attribute`, deciding which path each point calls and which field to extract), and **command attributes** (`command-attribute`, deciding the path and method a write command uses). For where these layers come from and how they override, see [Attributes & Config](../introduction/concepts/attribute-config). All defaults are taken from the driver's `application.yml`.
 
-| Attribute | code | Type | Default | Remark |
-|---|---|---|---|---|
-| Base URL | `baseUrl` | STRING | (empty) | Base URL for API requests (e.g. https://api.example.com) |
-| Method | `method` | STRING | `GET` | Default HTTP method (GET, POST, PUT, DELETE) |
-| Headers | `headers` | STRING | (empty) | Custom headers as JSON (e.g. {"Authorization":"Bearer xxx"}) |
-| Timeout | `timeout` | INT | `5000` | Request timeout in milliseconds |
+### Driver attributes (device-level `driver-attribute`)
 
-`baseUrl` is required—it is the prefix for every point path, and without it the driver cannot establish a connection.
-
-## Point configuration (`point-attribute`)
-
-On each polled [Point](../introduction/concepts/point), fill in: which path to call, which method to use, (for writes) what request body to send, and which field to extract from the response:
+When onboarding an HTTP data source, fill in these attributes on the [Device](../introduction/concepts/device). They decide which service to connect to, the default method, the headers, and the timeout—every point under the same device shares this connection:
 
 | Attribute | code | Type | Default | Remark |
 |---|---|---|---|---|
-| Path | `path` | STRING | (empty) | API path (e.g. /api/v1/sensor/{id}) |
-| Method | `method` | STRING | `GET` | HTTP method override for this point |
-| Body Template | `bodyTemplate` | STRING | (empty) | Request body template with ${value} placeholder |
-| Response Path | `responsePath` | STRING | (empty) | JSON path to extract value (e.g. $.data.temperature) |
+| Base URL | `baseUrl` | STRING | (empty) | Base URL for API requests (e.g. `https://api.example.com`) |
+| Method | `method` | STRING | `GET` | Default HTTP method (GET/POST/PUT/DELETE) |
+| Headers | `headers` | STRING | (empty) | Custom headers as JSON (e.g. `{"Authorization":"Bearer xxx"}`) |
+| Timeout | `timeout` | INT | `5000` | Request timeout in milliseconds, applied as `responseTimeout` |
 
-::: tip path is appended after baseUrl
-The actual request URL is `baseUrl + path`. For example, with `baseUrl=https://api.example.com` and `path=/api/v1/sensor/1`, the driver requests `https://api.example.com/api/v1/sensor/1`. The point's `method` overrides the driver-level default method.
+`baseUrl` is required—the driver uses it as the `WebClient` base URL and prefixes every point path with it; without it the driver's `validate()` fails. `timeout` defaults to `5000` ms and lands on the Reactor Netty `HttpClient` `responseTimeout`.
+
+::: warning The Headers attribute currently has no effect
+`headers` is declared in `application.yml`, but the current `getConnector()` only sets a fixed `Content-Type: application/json` on the `WebClient`—it does **not** read or apply the `headers` attribute. Endpoints that need `Authorization` or other custom headers cannot be onboarded by this attribute alone for now.
 :::
 
-## Write command configuration (`command-attribute`)
+### Point attributes (`point-attribute`)
 
-A writable point also needs these on its write command:
+On each polled [Point](../introduction/concepts/point), fill in: which path to call, which method to use, (for writes) what body to send, and which field to extract. The point's `method` overrides the driver-level default:
 
 | Attribute | code | Type | Default | Remark |
 |---|---|---|---|---|
-| Path | `path` | STRING | (empty) | API path for command |
-| Method | `method` | STRING | `POST` | HTTP method for command |
+| Path | `path` | STRING | (empty) | API path (e.g. `/api/v1/sensor/{id}`) |
+| Method | `method` | STRING | `GET` | HTTP method for this point (overrides driver default) |
+| Body Template | `bodyTemplate` | STRING | (empty) | Request body template with `${value}` placeholder |
+| Response Path | `responsePath` | STRING | (empty) | Path to extract a value from the JSON response (e.g. `$.data.temperature`) |
 
-When writing, the driver replaces `${value}` in the point's `bodyTemplate` with the command parameter, then sends the request to `path` using the method configured here.
+::: tip path is appended after baseUrl
+The actual request URL is `baseUrl + path`. For example, with `baseUrl=https://api.example.com` and `path=/api/v1/sensor/1`, the driver requests `https://api.example.com/api/v1/sensor/1`.
+:::
 
-## Polling & health
+::: warning Response Path is simple dot-notation, not full JSONPath
+The driver strips the `$.` prefix and drills down field-by-field on `.` from the root object; it only supports paths like `$.a.b.c`. It does **not** support array indices (`[0]`), filters, wildcards, or other full JSONPath syntax. Reaching an array element, or a path that doesn't resolve to a field, makes the driver fall back to returning the whole raw response—usually the root cause of a PointValue that "looks wrong". When the response is itself a bare value (a plain number or string), leave `responsePath` empty and the driver uses the entire response as the value.
+:::
 
-- **Polling interval**: default cron `0/30 * * * * ?` (read once every 30 seconds).
-- **Health/online**: device health check defaults to cron `0/15 * * * * ?` with a lease timeout of `45 seconds`—see [Device](../introduction/concepts/device) for the online-state mechanism.
-- This driver decides online status by "whether a `WebClient` connection has been established for the device": it is considered online after the first successful read/write.
+::: warning Writing relies on the Body Template
+A write command does not automatically place the value into the request body. You must author a template with `${value}` in the point's `bodyTemplate` (e.g. `{"value":${value}}`) for the driver to substitute the command parameter and send it; an empty template sends an empty request body.
+:::
 
-## Minimal onboarding example
+### Command attributes (`command-attribute`)
 
-Onboard a weather API that returns `{"data":{"temperature":25.6}}`:
+A writable point also needs the path and method on its write command:
+
+| Attribute | code | Type | Default | Remark |
+|---|---|---|---|---|
+| Path | `path` | STRING | (empty) | API path for the command |
+| Method | `method` | STRING | `POST` | HTTP method for the command |
+
+### Polling & health
+
+These are defined under `dc3.driver.schedule` and `health` in `application.yml`; you don't fill them on the device:
+
+- **Polling interval**: read cron `0/30 * * * * ?` (read once every 30 seconds).
+- **Health check**: device health-check cron `0/15 * * * * ?` with a lease timeout of `45 seconds`—see [Device](../introduction/concepts/device) for the online-state mechanism.
+- **Online decision**: `health()` decides online by "whether a `WebClient` exists for the device in `clientMap`"—a connection is built on the first successful read/write, after which the device is online; on a read/write exception the driver does `clientMap.remove(deviceId)`, dropping the connection so it is rebuilt next round.
+
+## Troubleshooting
+
+::: warning Cannot connect / always offline
+First confirm `baseUrl` is reachable: run `curl <baseUrl><path>` on the driver host to verify connectivity and the port. The driver decides online by "whether a `WebClient` was built"; a first failed read/write immediately drops the connection, so a wrong `baseUrl`, an unresolvable DNS, or a firewalled target port all show up as the device staying offline.
+:::
+
+::: warning Request timeouts
+The default `timeout=5000` ms applies to the response timeout. A slow endpoint or network jitter triggers the timeout, fails this read/write round, and drops the connection. Measure the real round-trip with `curl -w '%{time_total}'` to tell whether the endpoint or the link is slow, then raise `timeout` accordingly.
+:::
+
+::: warning PointValue looks wrong / always the whole JSON
+Most likely `responsePath` didn't match. The driver only understands `$.a.b.c` dot paths; a wrong path, mismatched field-name case, or trying to reach an array element (`$.list[0].v`) all fail to resolve and make the driver **fall back to the whole raw response**. Check field names level by level against the real response; reaching an element inside an array is not possible in the current implementation.
+:::
+
+::: warning 401/403 from authenticated endpoints
+The current implementation does not apply the `headers` attribute (see the warning in the driver-attributes table). Endpoints requiring `Authorization`, `X-Api-Key`, etc. cannot be onboarded by device attributes alone and will be rejected with 401/403.
+:::
+
+::: warning Write command errors or has no effect
+Writes are rendered through the point's `bodyTemplate`: an empty template sends an **empty body**, which an endpoint expecting a JSON body will reject. Make sure `bodyTemplate` contains the `${value}` placeholder and renders to valid JSON the endpoint accepts; on failure the driver throws `WritePointException` and drops the connection.
+:::
+
+## Landing in IoT DC3
+
+- **dc3.driver.code**: `HttpDriver` (driver name `HTTP REST Client Driver`, type `DRIVER_CLIENT`). This code is a stable routing identifier and must not be changed casually.
+- **Read**: ✓ implemented. Periodically calls the endpoint by the point's `path`/`method`, extracting a value via `responsePath`.
+- **Write**: ✓ implemented. Substitutes `${value}` in the point's `bodyTemplate` with the command parameter, then sends the request.
+- **Subscribe/report**: — not supported. HTTP is request/response, the driver always initiates, there is no passive push channel.
+
+These read/write capabilities match the `HTTP (HttpDriver)` row in the [driver capability matrix](./matrix).
+
+::: info Implementation status: available
+`HttpDriverCustomServiceImpl` fully implements `initial()`/`read()`/`write()`/`health()`/`validate()`; it is a mature driver ready for collection. Two implementation boundaries to know: (1) `responsePath` supports only simple dot paths, not arrays/filters (above); (2) the `headers` attribute is declared but not yet applied to the connection, so custom request headers don't currently take effect.
+:::
+
+### Minimal onboarding example
+
+Onboard an endpoint that returns `{"data":{"temperature":25.6}}`:
 
 1. Create a [Device](../introduction/concepts/device) with `HTTP REST Client Driver`, and set the driver attributes `baseUrl=https://api.example.com`, `method=GET`, `timeout=5000`.
 2. Add a temperature [Point](../introduction/concepts/point) (`pointTypeFlag=FLOAT`, `READ_ONLY`) to the [Profile](../introduction/concepts/profile) bound to the device, and set the point attributes `path=/api/v1/sensor/1`, `method=GET`, `responsePath=$.data.temperature`.
 3. Start the driver, and within 30 seconds the extracted `25.6` shows up in the [PointValue](../introduction/concepts/point-value).
 
-## Pitfalls
-
-::: warning Response Path is simple dot-notation, not full JSONPath
-The driver only supports field-by-field paths like `$.a.b.c`, splitting on `.` and drilling down from the root object. It does **not** support array indices (`[0]`), filters, wildcards, or other full JSONPath syntax. When you try to reach an array element, or the path doesn't resolve to a field, the driver falls back to returning the whole raw response—which is usually why a PointValue "looks wrong".
-:::
-
-::: tip Empty Response Path = whole response as the value
-When the endpoint itself returns a bare value (a plain number or string), just leave `responsePath` empty and the driver uses the entire raw response as the PointValue. You only need a path when the response is JSON and you want one field out of it.
-:::
-
-::: warning Writing relies on the Body Template
-A write command does not automatically place the value into the request body. You must author a template with `${value}` in the point's `bodyTemplate` (e.g. `{"value":${value}}`) for the driver to substitute the command parameter and send it. An empty template sends an empty request body.
-:::
-
 ## Further reading
 
-- [Driver](../introduction/concepts/driver) — the general driver model and registration mechanism
-- [Attributes & Config](../introduction/concepts/attribute-config) — where attributes like `baseUrl` / `responsePath` come from across the three layers
+- [Driver overview](./index) — all driver groups and the selection entry point
+- [Driver capability matrix](./matrix) — read/write/subscribe capabilities at a glance
 - [Device Onboarding](../operation/device-onboarding) — a complete onboarding walkthrough
-- [Modbus TCP Driver](./modbus-tcp) — onboarding the most common industrial Modbus protocol
+- [IoT network layer chapter](../foundations/iot-protocols) — where HTTP sits among MQTT/CoAP/LwM2M and the trade-offs
