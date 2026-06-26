@@ -67,3 +67,4 @@ For the general onboarding flow see [Device Onboarding](../operation/device-onbo
 - [Attribute & Config](../introduction/concepts/attribute-config) — the three layers of driver / point / command attributes
 - [Device Onboarding](../operation/device-onboarding) — a full onboarding walkthrough
 - [Module Map](../architecture/modules) — where drivers sit in the overall architecture
+- [Industrial Buses & Protocols](../foundations/fieldbus) · [IoT Protocols & Wireless](../foundations/iot-protocols) — the systematic knowledge behind the protocols

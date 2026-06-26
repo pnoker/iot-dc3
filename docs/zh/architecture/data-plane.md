@@ -12,15 +12,7 @@ title: 数据平面：位号值如何落库
 
 数据流是**南向到北向**的单向链路。驱动周期性采集，把每个位号的一次采集封装成一个 `PointValue` 对象，经 `DriverSenderService.pointValueSender()` 发往 RabbitMQ 的值交换机；数据中心 `dc3-center-data` 监听队列、消费消息、写入 TimescaleDB，同时把最新值塞进本地 Caffeine 缓存供热点读取。整条链路是**异步**的——驱动发出后不等数据中心确认落库，靠消息总线的持久投递与手动 ack 保证不丢。
 
-```mermaid
-flowchart LR
-    Dev["现场设备 / 数据源"] --> Drv["驱动 SDK<br/>dc3-driver-*"]
-    Drv -->|"exchange dc3.e.value<br/>routing dc3.r.value.point.{service}"| Q["队列 dc3.q.value.point<br/>TTL 7 天 + DLX"]
-    Q --> Recv["PointValueReceiver<br/>@RabbitListener (手动 ack)"]
-    Recv --> TS[("TimescaleDB<br/>dc3_point_value")]
-    Recv --> Cache[("Caffeine 最新值缓存<br/>key=前缀.tenant.device.point")]
-    Q -.->|消费异常 reject| DLX["死信交换机<br/>dc3.e.point_value_dead"]
-```
+<DataPlane lang="zh" />
 
 驱动用的路由键是 `dc3.r.value.point.` 加上自己的服务名（`driverProperties.getService()`，例如 `dc3-driver-virtual` 实例配的服务名），数据中心的队列用通配绑定 `dc3.r.value.point.*` 收下所有驱动的值。发送时 `pointValueSender()` 会从 `DriverMetadata` 注入 `driverId` 与 `tenantId`（若消息里没带），并用 `PointValueCorrelation`（携带随机 UUID + deviceId + pointId）作为关联数据，配合 publisher confirms 跟踪投递结果。
 
@@ -261,3 +253,4 @@ curl -X POST http://localhost:8000/api/v3/data/point_value/list \
 - [命令平面](./command-plane) — 反向的读写命令如何下发、回执与查询状态
 - [领域模型](./domain-model) — Point / PointValue 的 DO/BO/VO 分层与字段细节
 - [告警与通知](../operation/alarms) — 落库后告警规则如何评估、通知如何投递
+- [时序数据与流处理](../foundations/data-pipeline) — 时序数据库与流处理的通用原理
