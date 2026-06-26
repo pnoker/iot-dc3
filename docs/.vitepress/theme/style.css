@@ -69,8 +69,8 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* 去掉旧的全站底边线；首页顶部 header 透明融入（hero 不被毛玻璃遮挡），
-   滚动后转毛玻璃；文档页保留 VitePress 默认底部分隔线，与左侧栏竖线呼应（不“秃顶”）。 */
+/* Remove the old site-wide bottom border; on the home page the top header blends in transparently (the hero is not covered by frosted glass),
+   turning frosted on scroll; doc pages keep VitePress's default bottom divider, echoing the sidebar's vertical line (so it doesn't look "bald"). */
 .VPNav {
     border-bottom: none;
 }
@@ -130,7 +130,7 @@ body {
     padding-bottom: 44px !important;
 }
 
-/* hero 内容浮在两层背景 canvas（HeroWaves z-index 0、HeroParticles z-index 1）之上 */
+/* hero content floats above the two background canvases (HeroWaves z-index 0, HeroParticles z-index 1) */
 .VPHero .container {
     position: relative;
     z-index: 2;
@@ -173,7 +173,7 @@ body {
     display: none;
 }
 
-/* hero 图区由 HeroLogo 组件渲染（slot home-hero-image），尺寸在组件内自带 */
+/* the hero image area is rendered by the HeroLogo component (slot home-hero-image); its sizing is defined inside the component */
 
 .VPHome {
     padding-bottom: 48px;
@@ -312,7 +312,7 @@ body {
     font-weight: 620;
 }
 
-/* Mermaid 技术插图：与全站卡片/表格一致的容器，居中、可横向滚动、随主题切换 */
+/* Mermaid technical illustrations: a container consistent with the site's cards/tables — centered, horizontally scrollable, theme-aware */
 .dc3-mermaid,
 .vp-doc .mermaid {
     display: flex;
@@ -332,14 +332,104 @@ body {
     height: auto;
 }
 
-/* 强制 mermaid SVG 文字用跨平台可靠字体栈（与 config themeVariables.fontFamily 一致）。
-   canvas measureText 取第一个可用字体，SVG text 按优先级回退——同一字体确保测宽/渲染一致。 */
+/* rounded nodes + soft strokes, close to the site's card look (the rounded rectangles in the Architecture component) */
+.dc3-mermaid .node rect,
+.dc3-mermaid .node polygon,
+.dc3-mermaid .node circle,
+.dc3-mermaid .node path,
+.vp-doc .mermaid .node rect {
+    rx: 9px;
+    ry: 9px;
+    stroke-width: 1.5px;
+}
+
+/* subgraphs/groups: rounded corners + very light fill, echoing the Architecture region box */
+.dc3-mermaid .cluster rect,
+.vp-doc .mermaid .cluster rect {
+    rx: 12px;
+    ry: 12px;
+}
+
+/* crisper edges, clearer arrows */
+.dc3-mermaid .edgePath .path,
+.dc3-mermaid .flowchart-link,
+.dc3-mermaid .relation {
+    stroke-width: 1.6px;
+}
+
+/* edge labels blend with the card fill, removing the default glaring white block */
+.dc3-mermaid .edgeLabel,
+.dc3-mermaid .edgeLabel rect,
+.dc3-mermaid .edgeLabel foreignObject div {
+    background-color: var(--vp-c-bg-elv) !important;
+    fill: var(--vp-c-bg-elv) !important;
+}
+
+/* slightly bolder node and sequence-actor text for readability */
+.dc3-mermaid .nodeLabel,
+.dc3-mermaid .actor tspan,
+.dc3-mermaid .messageText {
+    font-weight: 560;
+}
+
+/* softer lifelines/activation blocks in sequence diagrams */
+.dc3-mermaid .actor-line {
+    stroke: var(--vp-c-divider);
+}
+
+/* Force mermaid SVG text to use a cross-platform reliable font stack (matching config themeVariables.fontFamily).
+   canvas measureText picks the first available font and SVG text falls back by priority — the same font keeps measurement/rendering consistent. */
 .dc3-mermaid text,
 .dc3-mermaid tspan,
 .mermaid text,
 .mermaid tspan {
     font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
 }
+
+/* generic diagram components (DataPlane / CommandPlane, etc.): reuse the Architecture semantic palette + card frame, theme-aware */
+.dc3-diagram {
+    --dc3-grid: #e2e8f0;
+    --dc3-text2: #475569;
+    --dc3-box-name: #0f172a;
+    --dc3-fe-fill: #ecfeff;   --dc3-fe-stroke: #0891b2;
+    --dc3-be-fill: #ecfdf5;   --dc3-be-stroke: #059669;  --dc3-be-text: #047857;
+    --dc3-db-fill: #f5f3ff;   --dc3-db-stroke: #7c3aed;  --dc3-db-text: #6d28d9;
+    --dc3-amber-fill: #fffbeb; --dc3-amber-stroke: #d97706;
+    --dc3-rose-stroke: #e11d48;
+    --dc3-bus-fill: #fff7ed;  --dc3-bus-stroke: #ea580c;  --dc3-bus-text: #c2410c;
+    --dc3-ext-fill: #f1f5f9;  --dc3-ext-stroke: #64748b;
+    --dc3-arrow: #94a3b8;     --dc3-arrow-label: #64748b;
+
+    border: 1px solid var(--vp-c-divider);
+    border-radius: 12px;
+    background: var(--vp-c-bg-soft);
+    padding: 16px;
+    margin: 24px 0;
+    overflow-x: auto;
+}
+
+.dark .dc3-diagram {
+    --dc3-grid: #1e293b;
+    --dc3-text2: #94a3b8;
+    --dc3-box-name: #ffffff;
+    --dc3-fe-fill: rgba(8, 51, 68, 0.5);    --dc3-fe-stroke: #22d3ee;
+    --dc3-be-fill: rgba(6, 78, 59, 0.5);    --dc3-be-stroke: #34d399;  --dc3-be-text: #34d399;
+    --dc3-db-fill: rgba(76, 29, 149, 0.45); --dc3-db-stroke: #a78bfa;  --dc3-db-text: #cbb6f7;
+    --dc3-amber-fill: rgba(120, 53, 15, 0.35); --dc3-amber-stroke: #fbbf24;
+    --dc3-rose-stroke: #fb7185;
+    --dc3-bus-fill: rgba(251, 146, 60, 0.3); --dc3-bus-stroke: #fb923c;  --dc3-bus-text: #fcd9b6;
+    --dc3-ext-fill: rgba(30, 41, 59, 0.5);  --dc3-ext-stroke: #94a3b8;
+    --dc3-arrow: #64748b;     --dc3-arrow-label: #94a3b8;
+}
+
+.dc3-diagram svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+}
+
+.dc3-diagram .d-name { font-weight: 600; }
 
 .custom-block {
     border-radius: 8px;
@@ -369,7 +459,7 @@ body {
     font-weight: 650;
 }
 
-/* 激活项：淡蓝胶囊 + 蓝字加粗，替代默认左侧竖条指示器，更醒目 */
+/* active item: light-blue pill + bold blue text, replacing the default left vertical-bar indicator for greater prominence */
 .VPSidebarItem.is-active > .item {
     margin: 0 -12px;
     padding: 5px 12px;

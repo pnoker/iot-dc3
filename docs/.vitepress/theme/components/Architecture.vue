@@ -2,8 +2,8 @@
   Copyright 2016-present the IoT DC3 original author or authors.
   Licensed under the GNU Affero General Public License v3.0.
 
-  IoT DC3 产品架构全景图 / Product architecture diagram.
-  纯内联 SVG，颜色走 CSS 变量随明暗主题切换，文案由 lang prop 切中英。
+  IoT DC3 product architecture overview / Product architecture diagram.
+  Pure inline SVG; colors use CSS variables to switch with the light/dark theme, and the text switches between Chinese and English via the lang prop.
 -->
 <script setup lang="ts">
 import {computed} from 'vue'
@@ -237,7 +237,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 </template>
 
 <style>
-/* 浅色主题（默认） */
+/* light theme (default) */
 .dc3-arch {
   --dc3-grid: #e2e8f0;
   --dc3-text2: #475569;
@@ -261,7 +261,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
   overflow-x: auto;
 }
 
-/* 深色主题 */
+/* dark theme */
 .dark .dc3-arch {
   --dc3-grid: #1e293b;
   --dc3-text2: #94a3b8;

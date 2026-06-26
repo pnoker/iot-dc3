@@ -38,3 +38,4 @@ flowchart LR
 - [Agentic 中心](./agentic) — 对话式 AI 运营、10 个内置工具、会话持久化与高风险确认
 - [AI Agent / MCP 集成](./mcp) — OAuth 2.1 + MCP，把工具安全接给外部 Agent
 - [自动化（dc3 CLI）](../automation/cli) — 不用 AI，用命令行脚本驱动平台
+- [数据智能与 AIoT](../foundations/aiot) — 物联网数据分析与大模型结合的全景

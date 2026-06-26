@@ -2,10 +2,12 @@
   Copyright 2016-present the IoT DC3 original author or authors.
   Licensed under the GNU Affero General Public License v3.0.
 
-  首页 hero 最底层背景：2D Canvas 伪透视「波浪点阵地平面」——一片向远端延伸、缓慢起伏的
-  蓝色点阵，近大远小、远淡近显，呼应前端登录页那种科技感波浪背景，但用纯 2D canvas 实现，
-  与 hero 现有的汇聚粒子层 / logo 层同一技术栈。垫在最底层（z-index 0），文字/logo/汇聚都在其上。
-  纯色 #1296db、低透明度，不抢主体。SSR 安全（canvas 仅客户端创建注入）。
+  Bottom-most hero background: a 2D-canvas faux-perspective "wave dot-matrix ground plane" —
+  a field of blue dots receding into the distance and undulating slowly, near-large/far-small,
+  far-faint/near-bright. It echoes the tech-feel wave background of the front-end login page,
+  but rendered in plain 2D canvas, sharing the stack with the hero's existing converging-particle
+  layer and logo layer. It sits at the very bottom (z-index 0); text/logo/particles all float above.
+  Solid #1296db at low opacity, never stealing focus. SSR-safe (the canvas is created and injected on the client only).
 -->
 <script setup lang="ts">
 import {onBeforeUnmount, onMounted} from 'vue'
@@ -18,30 +20,33 @@ let dpr = 1, w = 0, h = 0
 let t0 = 0
 let running = false, reduced = false
 
-const COLS = 46     // 横向点数
-const ROWS = 24     // 纵深行数
-const SPD = 0.5     // 波速
+const COLS = 46     // dots across
+const ROWS = 24     // depth rows
+const SPD = 0.3     // wave speed
 
 function paint(t: number) {
   if (!ctx) return
   ctx.clearRect(0, 0, w, h)
   const cx = w / 2
-  const horizon = h * 0.32     // 地平线（远端）所在高度
-  const amp = h * 0.045        // 波高
+  // portrait (phone): the hero is vertical with text in the lower half — keep the wave plane up in the logo area, off the text
+  const portrait = h > w
+  const horizon = (portrait ? 0.06 : 0.32) * h   // height of the horizon (far end)
+  const bottom = (portrait ? 0.46 : 1) * h        // bottom edge of the waves (near end)
+  const amp = (portrait ? 0.03 : 0.04) * h        // wave height
   for (let j = 0; j < ROWS; j++) {
-    const jn = j / (ROWS - 1)          // 0 远 → 1 近
-    const persp = Math.pow(jn, 1.7)    // 近处快速展开到底部、远处挤向地平线（透视）
-    const rowY = horizon + (h - horizon) * persp
-    const scaleX = 0.12 + 0.95 * persp // 远处横向收窄
-    const size = 0.5 + 2.4 * persp     // 远小近大
+    const jn = j / (ROWS - 1)          // 0 far → 1 near
+    const persp = Math.pow(jn, 1.7)    // unfold quickly up close, crowd toward the horizon far away (perspective)
+    const rowY = horizon + (bottom - horizon) * persp
+    const scaleX = 0.12 + 0.95 * persp // narrow horizontally in the distance
+    const size = 0.5 + 2.4 * persp     // far-small, near-large
     const rowAlpha = 0.10 + 0.42 * persp
     for (let i = 0; i < COLS; i++) {
       const xn = i / (COLS - 1) - 0.5
-      // 行波 + 列波叠加的缓慢起伏
+      // slow undulation from a row wave plus a column wave
       const waveH = amp * (Math.sin(i * 0.18 + t * SPD + j * 0.5) + Math.cos(j * 0.42 + t * SPD))
       const sx = cx + xn * w * scaleX
       const sy = rowY - waveH * persp
-      const edge = 1 - Math.min(1, Math.abs(xn) / 0.5)   // 横向边缘淡出，避免硬边
+      const edge = 1 - Math.min(1, Math.abs(xn) / 0.5)   // fade out at the horizontal edges to avoid a hard border
       const a = rowAlpha * edge
       if (a <= 0.01) continue
       ctx.globalAlpha = a
@@ -102,7 +107,7 @@ function init() {
   hero.insertBefore(cv, hero.firstChild)
   resize()
   if (reduced) {
-    paint(0)   // 尊重 reduced-motion：画一帧静态
+    paint(0)   // respect reduced-motion: paint one static frame
     return
   }
   ro = new ResizeObserver(resize)

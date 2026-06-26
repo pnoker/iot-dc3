@@ -67,3 +67,4 @@ title: 驱动总览
 - [属性与配置](../introduction/concepts/attribute-config) — driver / point / command 属性的三层
 - [设备接入](../operation/device-onboarding) — 一次完整接入流程
 - [模块地图](../architecture/modules) — 驱动在整体架构里的位置
+- [工业总线与协议](../foundations/fieldbus) · [IoT 协议与无线网络](../foundations/iot-protocols) — 协议背后的体系化知识
