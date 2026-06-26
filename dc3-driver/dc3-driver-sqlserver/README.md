@@ -18,22 +18,22 @@ using the `com.microsoft.sqlserver.jdbc.SQLServerDriver`.
 
 ## Driver Attributes (Device-level)
 
-| Attribute                | Code                   | Type   | Default   | Description                       |
-|--------------------------|------------------------|--------|-----------|-----------------------------------|
-| Host                     | host                   | STRING | localhost | SQL Server host                   |
-| Port                     | port                   | INT    | 1433      | SQL Server port                   |
-| Database                 | database               | STRING |           | SQL Server database name          |
-| Username                 | username               | STRING | root      | SQL Server username               |
-| Password                 | password               | STRING |           | SQL Server password               |
-| Query Timeout            | queryTimeout           | INT    | 30        | SQL query timeout in seconds      |
-| Encrypt                  | encrypt                | STRING | false     | SQL Server encrypt connection     |
+| Attribute                | Code                   | Type   | Default   | Description                         |
+|--------------------------|------------------------|--------|-----------|-------------------------------------|
+| Host                     | host                   | STRING | localhost | SQL Server host                     |
+| Port                     | port                   | INT    | 1433      | SQL Server port                     |
+| Database                 | database               | STRING |           | SQL Server database name            |
+| Username                 | username               | STRING | root      | SQL Server username                 |
+| Password                 | password               | STRING |           | SQL Server password                 |
+| Query Timeout            | queryTimeout           | INT    | 30        | SQL query timeout in seconds        |
+| Encrypt                  | encrypt                | STRING | false     | SQL Server encrypt connection       |
 | Trust Server Certificate | trustServerCertificate | STRING | true      | SQL Server trust server certificate |
 
 ## Point Attributes
 
-| Attribute   | Code       | Type   | Description                                   |
-|-------------|------------|--------|-----------------------------------------------|
-| Read Query  | readQuery  | STRING | SQL SELECT query for reading point value      |
+| Attribute   | Code       | Type   | Description                                                                           |
+|-------------|------------|--------|---------------------------------------------------------------------------------------|
+| Read Query  | readQuery  | STRING | SQL SELECT query for reading point value                                              |
 | Write Query | writeQuery | STRING | SQL UPDATE/INSERT using a single `?` placeholder for the value (bound as a parameter) |
 
 ## Command Attributes (write)

@@ -15,31 +15,31 @@ instance number, object type, object instance, and property identifier.
 
 ## Driver Attributes (Device-level)
 
-| Attribute         | Description                                       |
-|-------------------|---------------------------------------------------|
-| Local Device ID   | Local BACnet device instance number               |
-| Bind Address      | Local bind address                                |
-| Port              | BACnet UDP port (default 47808 = 0xBAC0)          |
-| Broadcast Address | Broadcast address for device discovery            |
-| Timeout           | Request timeout in milliseconds                   |
+| Attribute         | Description                              |
+|-------------------|------------------------------------------|
+| Local Device ID   | Local BACnet device instance number      |
+| Bind Address      | Local bind address                       |
+| Port              | BACnet UDP port (default 47808 = 0xBAC0) |
+| Broadcast Address | Broadcast address for device discovery   |
+| Timeout           | Request timeout in milliseconds          |
 
 ## Point Attributes
 
-| Attribute       | Description                                                          |
-|-----------------|----------------------------------------------------------------------|
-| Remote Device ID | Remote BACnet device instance number                                |
-| Object Type     | BACnet object type (ANALOG_INPUT, ANALOG_OUTPUT, BINARY_INPUT, etc.) |
-| Object Instance | Object instance number                                               |
-| Property ID     | Property identifier (PRESENT_VALUE, DESCRIPTION, STATUS_FLAGS, etc.) |
+| Attribute        | Description                                                          |
+|------------------|----------------------------------------------------------------------|
+| Remote Device ID | Remote BACnet device instance number                                 |
+| Object Type      | BACnet object type (ANALOG_INPUT, ANALOG_OUTPUT, BINARY_INPUT, etc.) |
+| Object Instance  | Object instance number                                               |
+| Property ID      | Property identifier (PRESENT_VALUE, DESCRIPTION, STATUS_FLAGS, etc.) |
 
 ## Command Attributes (write)
 
-| Attribute        | Description                            |
-|------------------|----------------------------------------|
-| Remote Device ID | Remote BACnet device instance number   |
-| Object Type      | BACnet object type for writing         |
-| Object Instance  | Object instance number                 |
-| Property ID      | Property identifier                    |
+| Attribute        | Description                          |
+|------------------|--------------------------------------|
+| Remote Device ID | Remote BACnet device instance number |
+| Object Type      | BACnet object type for writing       |
+| Object Instance  | Object instance number               |
+| Property ID      | Property identifier                  |
 
 ## Prerequisites
 

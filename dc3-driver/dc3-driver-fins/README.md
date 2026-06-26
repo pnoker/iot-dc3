@@ -28,12 +28,12 @@ commands. It supports the D, W, H, and C memory areas. No external protocol libr
 
 ## Point Attributes
 
-| Attribute    | Description                                          |
-|--------------|------------------------------------------------------|
-| Memory Area  | Memory area (D / W / H / C)                          |
-| Address      | Word address within the memory area                  |
+| Attribute    | Description                                            |
+|--------------|--------------------------------------------------------|
+| Memory Area  | Memory area (D / W / H / C)                            |
+| Address      | Word address within the memory area                    |
 | Data Type    | INT16 / UINT16 / INT32 / UINT32 / FLOAT / STRING / BCD |
-| Bit Position | Bit position within the word                         |
+| Bit Position | Bit position within the word                           |
 
 ## Command Attributes (write)
 

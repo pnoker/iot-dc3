@@ -27,9 +27,9 @@ which constructs the JDBC URL `jdbc:postgresql://<host>:<port>/<database>` using
 
 ## Point Attributes
 
-| Attribute   | Code       | Type   | Description                                   |
-|-------------|------------|--------|-----------------------------------------------|
-| Read Query  | readQuery  | STRING | SQL SELECT query for reading point value      |
+| Attribute   | Code       | Type   | Description                                                                           |
+|-------------|------------|--------|---------------------------------------------------------------------------------------|
+| Read Query  | readQuery  | STRING | SQL SELECT query for reading point value                                              |
 | Write Query | writeQuery | STRING | SQL UPDATE/INSERT using a single `?` placeholder for the value (bound as a parameter) |
 
 ## Command Attributes (write)

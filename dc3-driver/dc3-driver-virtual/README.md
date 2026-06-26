@@ -35,10 +35,10 @@ values on a configurable schedule without connecting to real hardware.
 
 ## Event Attributes
 
-| Attribute       | Description                        |
-|-----------------|------------------------------------|
-| Event Code Path | Path to the event code in payload  |
-| Payload Path    | Path to the event payload          |
+| Attribute       | Description                       |
+|-----------------|-----------------------------------|
+| Event Code Path | Path to the event code in payload |
+| Payload Path    | Path to the event payload         |
 
 ## Data Collection Schedule
 

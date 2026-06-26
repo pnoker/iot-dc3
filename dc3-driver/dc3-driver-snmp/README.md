@@ -29,9 +29,9 @@ write commands issue an SNMP SET, with one SNMP session cached per device.
 
 ## Point Attributes
 
-| Attribute | Code     | Type   | Default      | Description                                                           |
-|-----------|----------|--------|--------------|-----------------------------------------------------------------------|
-| OID       | oid      | STRING |              | SNMP object identifier (e.g. 1.3.6.1.2.1.1.1.0)                       |
+| Attribute | Code     | Type   | Default      | Description                                                                     |
+|-----------|----------|--------|--------------|---------------------------------------------------------------------------------|
+| OID       | oid      | STRING |              | SNMP object identifier (e.g. 1.3.6.1.2.1.1.1.0)                                 |
 | SNMP Type | snmpType | STRING | OCTET_STRING | SNMP data type (INTEGER/GAUGE32/COUNTER32/OCTET_STRING/TIMETICKS/IPADDRESS/OID) |
 
 ## Command Attributes (write)

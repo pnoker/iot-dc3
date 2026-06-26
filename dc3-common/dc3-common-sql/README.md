@@ -14,9 +14,9 @@ and query execution, so each database driver only supplies its dialect/connectio
 
 ## Key Components
 
-| Component                        | Purpose                                                              |
-|----------------------------------|----------------------------------------------------------------------|
-| `AbstractJdbcDriverCustomService`| Base driver service for JDBC sources — pooled connections + queries  |
+| Component                         | Purpose                                                             |
+|-----------------------------------|---------------------------------------------------------------------|
+| `AbstractJdbcDriverCustomService` | Base driver service for JDBC sources — pooled connections + queries |
 
 ## Dependencies
 
@@ -31,7 +31,8 @@ mvn -s ../../.mvn/settings.xml clean package
 
 ## Related Modules
 
-- `dc3-driver-mysql`, `dc3-driver-oracle`, `dc3-driver-postgresql`, `dc3-driver-sqlserver` — JDBC drivers that extend `AbstractJdbcDriverCustomService`
+- `dc3-driver-mysql`, `dc3-driver-oracle`, `dc3-driver-postgresql`, `dc3-driver-sqlserver` — JDBC drivers that extend
+  `AbstractJdbcDriverCustomService`
 
 ## License
 

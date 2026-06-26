@@ -15,17 +15,17 @@ requests against a resource path and the write path performs CoAP PUT requests.
 
 ## Driver Attributes (Device-level)
 
-| Attribute   | Description              |
-|-------------|--------------------------|
-| Device Host | CoAP device host address |
+| Attribute   | Description                     |
+|-------------|---------------------------------|
+| Device Host | CoAP device host address        |
 | Device Port | CoAP device port (default 5683) |
 
 ## Point Attributes
 
-| Attribute      | Description                                 |
-|----------------|---------------------------------------------|
-| Read Path      | CoAP resource path for reading point data   |
-| Write Path     | CoAP resource path for writing point data   |
+| Attribute      | Description                                    |
+|----------------|------------------------------------------------|
+| Read Path      | CoAP resource path for reading point data      |
+| Write Path     | CoAP resource path for writing point data      |
 | Content Format | Content format: json, text, cbor, octet-stream |
 
 ## Prerequisites

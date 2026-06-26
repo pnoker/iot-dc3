@@ -15,27 +15,27 @@
 
 ## Driver Attributes (Device-level)
 
-| Attribute     | Description                     |
-|---------------|---------------------------------|
-| Host          | MySQL host                      |
-| Port          | MySQL port                      |
-| Database      | MySQL database name             |
-| Username      | MySQL username                  |
-| Password      | MySQL password                  |
-| Query Timeout | SQL query timeout in seconds    |
+| Attribute     | Description                  |
+|---------------|------------------------------|
+| Host          | MySQL host                   |
+| Port          | MySQL port                   |
+| Database      | MySQL database name          |
+| Username      | MySQL username               |
+| Password      | MySQL password               |
+| Query Timeout | SQL query timeout in seconds |
 
 ## Point Attributes
 
-| Attribute   | Description                                       |
-|-------------|---------------------------------------------------|
-| Read Query  | SQL SELECT query for reading point value          |
-| Write Query | SQL UPDATE/INSERT query for writing point value   |
+| Attribute   | Description                                     |
+|-------------|-------------------------------------------------|
+| Read Query  | SQL SELECT query for reading point value        |
+| Write Query | SQL UPDATE/INSERT query for writing point value |
 
 ## Command Attributes (write)
 
-| Attribute     | Description                       |
-|---------------|-----------------------------------|
-| Execute Query | SQL query to execute for command  |
+| Attribute     | Description                      |
+|---------------|----------------------------------|
+| Execute Query | SQL query to execute for command |
 
 ## Prerequisites
 

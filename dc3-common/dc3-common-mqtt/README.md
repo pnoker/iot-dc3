@@ -14,8 +14,8 @@ used by the MQTT driver and any service requiring MQTT connectivity.
 
 ## Key Components
 
-| Component               | Purpose                                                                                |
-|-------------------------|----------------------------------------------------------------------------------------|
+| Component               | Purpose                                                                                 |
+|-------------------------|-----------------------------------------------------------------------------------------|
 | `MqttConfig`            | `@AutoConfiguration` wiring Spring Integration MQTT channels and a Paho inbound adapter |
 | `MqttProperties`        | Binds MQTT properties from YAML (prefix `dc3.driver.mqtt`)                              |
 | `MqttEnvironmentConfig` | `EnvironmentPostProcessor` that loads MQTT environment defaults                         |
@@ -56,7 +56,8 @@ mvn -s ../../.mvn/settings.xml clean package
 ## Related Modules
 
 - `dc3-driver-mqtt` — Primary consumer of this module
-- MQTT broker: the dev profile points at the RabbitMQ MQTT plugin (`dc3-rabbitmq:2883`); EMQX is also available via the optional stack (`podman compose -f dc3/docker-compose-optional.yml up -d`, port `31883`)
+- MQTT broker: the dev profile points at the RabbitMQ MQTT plugin (`dc3-rabbitmq:2883`); EMQX is also available via the
+  optional stack (`podman compose -f dc3/docker-compose-optional.yml up -d`, port `31883`)
 
 ## License
 

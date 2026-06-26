@@ -15,13 +15,13 @@ values to coils and holding registers.
 
 ## Driver Attributes (Device-level)
 
-| Attribute | Description                                       |
-|-----------|---------------------------------------------------|
-| Port      | Serial port name (e.g. /dev/ttyUSB0, COM3)        |
-| Baud Rate | Serial baud rate (e.g. 9600, 19200, 115200)       |
-| Data Bits | Data bits (7 or 8)                                |
-| Stop Bits | Stop bits (1 or 2)                                |
-| Parity    | Parity (0=None, 1=Odd, 2=Even, 3=Mark, 4=Space)   |
+| Attribute | Description                                     |
+|-----------|-------------------------------------------------|
+| Port      | Serial port name (e.g. /dev/ttyUSB0, COM3)      |
+| Baud Rate | Serial baud rate (e.g. 9600, 19200, 115200)     |
+| Data Bits | Data bits (7 or 8)                              |
+| Stop Bits | Stop bits (1 or 2)                              |
+| Parity    | Parity (0=None, 1=Odd, 2=Even, 3=Mark, 4=Space) |
 
 ## Point Attributes
 
@@ -33,12 +33,12 @@ values to coils and holding registers.
 
 ## Command Attributes (write)
 
-| Attribute      | Description                                  |
-|----------------|----------------------------------------------|
-| Slave ID       | Modbus slave unit ID                         |
-| Function Code  | Modbus write function code [5, 6, 15, 16]    |
-| Offset         | Register or coil address offset              |
-| Value Template | Value template rendered with command params  |
+| Attribute      | Description                                 |
+|----------------|---------------------------------------------|
+| Slave ID       | Modbus slave unit ID                        |
+| Function Code  | Modbus write function code [5, 6, 15, 16]   |
+| Offset         | Register or coil address offset             |
+| Value Template | Value template rendered with command params |
 
 ## Prerequisites
 

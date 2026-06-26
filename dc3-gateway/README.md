@@ -24,7 +24,8 @@ rate limiting, authentication verification, service routing, and reverse proxyin
 - **Request Routing**: Routes `/api/v3/{service}/**` requests to the corresponding center service via `StripPrefix=2`
 - **Authentication Filter**: `Authentic` filter validates Bearer tokens with the Auth Center before forwarding protected
   routes
-- **Service Addressing**: Routes to backend centers via static addresses, overridable through `GATEWAY_ROUTE_*` / `CENTER_*_HOST` environment variables (no service registry)
+- **Service Addressing**: Routes to backend centers via static addresses, overridable through `GATEWAY_ROUTE_*` /
+  `CENTER_*_HOST` environment variables (no service registry)
 - **gRPC Client**: Connects to `dc3-center-auth` (port `9300`) for token validation
 - **OAuth2 / MCP Ingress**: Exposes the Auth Center's OAuth2 authorization-server and MCP discovery endpoints
 
@@ -33,15 +34,15 @@ rate limiting, authentication verification, service routing, and reverse proxyin
 Routes are matched in definition order (first match wins); the public token and OAuth
 metadata routes are deliberately defined before the `/api/v3/auth/**` wildcard.
 
-| Path Pattern                                                                                                    | Backend Service      | Auth Required |
-|-----------------------------------------------------------------------------------------------------------------|----------------------|---------------|
+| Path Pattern                                                                                                     | Backend Service      | Auth Required |
+|------------------------------------------------------------------------------------------------------------------|----------------------|---------------|
 | `/.well-known/oauth-authorization-server`, `/oauth2/jwks`, `/oauth2/token`, `/oauth2/revoke`, `/oauth2/register` | `dc3-center-auth`    | No            |
-| `/oauth2/authorize`                                                                                             | `dc3-center-auth`    | Yes           |
-| `/api/v3/auth/token/**`                                                                                         | `dc3-center-auth`    | No            |
-| `/api/v3/auth/**`                                                                                               | `dc3-center-auth`    | Yes           |
-| `/api/v3/manager/**`                                                                                            | `dc3-center-manager` | Yes           |
-| `/api/v3/data/**`                                                                                               | `dc3-center-data`    | Yes           |
-| `/api/v3/agentic/**`                                                                                            | `dc3-center-agentic` | Yes           |
+| `/oauth2/authorize`                                                                                              | `dc3-center-auth`    | Yes           |
+| `/api/v3/auth/token/**`                                                                                          | `dc3-center-auth`    | No            |
+| `/api/v3/auth/**`                                                                                                | `dc3-center-auth`    | Yes           |
+| `/api/v3/manager/**`                                                                                             | `dc3-center-manager` | Yes           |
+| `/api/v3/data/**`                                                                                                | `dc3-center-data`    | Yes           |
+| `/api/v3/agentic/**`                                                                                             | `dc3-center-agentic` | Yes           |
 
 The `/oauth2/**` and `/.well-known/**` routes expose the Auth Center's OAuth2
 authorization-server and MCP discovery endpoints for MCP clients.
