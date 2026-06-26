@@ -216,3 +216,4 @@ The hard constraints scattered through the page, gathered in one place for a pre
 - [Services & Topology](./services) — how the gateway, the four centers, and drivers are distributed, plus ports and startup order
 - [Domain Model](./domain-model) — the DO/BO/VO layering and how `TenantOwned` and the tenant field thread through entities
 - [API Documentation](../development/api-documentation) — OpenAPI, authentication headers, and the CRUD verb convention
+- [IoT Security](../foundations/security) — a systematic view of device, comms, platform and data security

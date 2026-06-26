@@ -216,3 +216,4 @@ default <T extends TenantOwned> T requireTenant(Long tenantId, T entity) {
 - [服务与拓扑](./services) — 网关、四个中心与驱动如何分布，端口与启动顺序
 - [领域模型](./domain-model) — DO/BO/VO 分层、`TenantOwned` 与租户字段如何贯穿实体
 - [API 文档](../development/api-documentation) — OpenAPI、鉴权头与 CRUD 动词约定
+- [物联网安全](../foundations/security) — 设备/通信/平台/数据安全的体系化视角

@@ -253,3 +253,4 @@ The values above are examples. `PointValueVO`'s exposed fields (`rawValue`/`calV
 - [Command Plane](./command-plane) — how the reverse read/write commands are dispatched, acknowledged, and queried for status
 - [Domain Model](./domain-model) — the DO/BO/VO layering and field details of Point / PointValue
 - [Alarms and Notifications](../operation/alarms) — how alarm rules are evaluated after persistence and how notifications are delivered
+- [Time-Series & Streaming](../foundations/data-pipeline) — the general principles of time-series databases and stream processing

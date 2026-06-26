@@ -253,3 +253,4 @@ curl -X POST http://localhost:8000/api/v3/data/point_value/list \
 - [命令平面](./command-plane) — 反向的读写命令如何下发、回执与查询状态
 - [领域模型](./domain-model) — Point / PointValue 的 DO/BO/VO 分层与字段细节
 - [告警与通知](../operation/alarms) — 落库后告警规则如何评估、通知如何投递
+- [时序数据与流处理](../foundations/data-pipeline) — 时序数据库与流处理的通用原理
