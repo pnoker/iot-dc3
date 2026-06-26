@@ -75,16 +75,15 @@ On each collected [Point](../introduction/concepts/point), fill in `oid` to spec
 On read, the driver sends a GET to the configured `oid` and reports the returned `VariableBinding` value as-is via `variable.toString()` as the [PointValue](../introduction/concepts/point-value) — `snmpType` is not used in reads. Its real role is on write: `createVariable()` uses it to convert the string into the correct SNMP variable type. `validatePoint()` marks `oid` as required, so a read Point missing `oid` fails validation.
 :::
 
-### Write command attributes (`command-attribute`)
+### Writes reuse the point attributes — no separate write command needed
 
-Writable Points additionally need `oid` and `snmpType` on the write command, telling the driver which OID to write and how to build the value.
-
-| Attribute | code | Type | Default | Description |
-|---|---|---|---|---|
-| OID | `oid` | STRING | (empty) | The OID to write |
-| SNMP Type | `snmpType` | STRING | `OCTET_STRING` | SNMP data type of the value to write |
+Writes and reads share the same `oid` / `snmpType` on the Point: `write()` (SET) reads `oid` and `snmpType` from `pointConfig` (point-attribute), sends a SET to that OID, and builds the value per `snmpType`. A writable Point only needs `oid` and `snmpType` configured on the point — no need to repeat them on a write command.
 
 `snmpType` values supported by `createVariable()`: `INTEGER`/`INTEGER32`, `GAUGE32`/`COUNTER32`/`UNSIGNED_INTEGER32`, `COUNTER64`, `TIMETICKS`, `OID`, `IPADDRESS`, `NULL`; anything else is treated as `OCTET_STRING`.
+
+::: info `command-attribute` is not read by the write path today
+`application.yml` declares a `command-attribute` (`oid` / `snmpType`), but `write()`'s signature only takes `driverConfig` and `pointConfig` — command attributes are not passed in, and this driver does not override `execute()`. So that `command-attribute` is a placeholder declaration today and is never read on write. Configure a writable Point's `oid` / `snmpType` on the Point itself, not on a write command — otherwise the write falls back to the point defaults (`oid` empty, `snmpType=OCTET_STRING`).
+:::
 
 ### Collection and health
 
@@ -132,7 +131,7 @@ The driver's `buildTarget()` only recognizes `v1` (case-insensitive); any other 
 - **Read / write / subscribe capability**: read ✓, write ✓, subscribe —, consistent with the [driver capability matrix](./matrix). The driver polls actively as an SNMP manager and does not listen for device pushes, so there is no subscribe direction.
 
 ::: info Implementation status: available
-In `SnmpDriverCustomServiceImpl`, `read()` (GET), `write()` (SET), `getConnector()` (session management), `health()`, and `event()` (destroying a session on device add/update/delete) are all implemented; the SNMP4J v1/v2c send/receive path is complete and usable. Known boundaries: SNMPv3/USM is not wired up (see the three USM fields above), `write()` does not check the response `errorStatus`, and the health check is a local session-liveness check rather than an end-to-end probe. These are deliberate trade-offs in the current implementation and do not affect normal v1/v2c collection and writes.
+In `SnmpDriverCustomServiceImpl`, `read()` (GET), `write()` (SET), `getConnector()` (session management), `health()`, and `event()` (destroying a session on device update/delete) are all implemented; the SNMP4J v1/v2c send/receive path is complete and usable. Known boundaries: SNMPv3/USM is not wired up (see the three USM fields above), `write()` does not check the response `errorStatus`, and the health check is a local session-liveness check rather than an end-to-end probe. These are deliberate trade-offs in the current implementation and do not affect normal v1/v2c collection and writes.
 :::
 
 Minimal onboarding example — onboard a switch at IP `192.168.1.20:161` with community `public`, collecting its system description (`sysDescr`, OID `1.3.6.1.2.1.1.1.0`):

@@ -111,8 +111,8 @@ flowchart LR
 
 DC3 把上述"轻协议"各自实现为一个独立的**协议[驱动](../drivers/)**（`dc3-driver-*`），启动时把自己和可接受的[属性配置](../introduction/concepts/attribute-config)注册到管理中心，再按[位号](../introduction/concepts/point)采数、按[指令](../introduction/concepts/command)写值。本章涉及的应用层协议对应四个驱动：
 
-- **[MQTT 驱动](../drivers/mqtt)**（`dc3-driver-mqtt`）：类型为 `DRIVER_SERVER`——它**作为服务端订阅 MQTT 主题、被动接收**设备上报，而不是主动轮询。下行写命令时按位号/命令上的 `commandTopic`、`commandQos` 把渲染后的 `payloadTemplate` 报文发布出去。连哪个 broker 由部署环境变量 `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT` 决定，因此该驱动**没有设备级 driver 属性**；MQTT 侧可配合 **EMQX** 这类 broker，开发栈默认用 RabbitMQ 的 MQTT 插件（`dc3-rabbitmq:2883`）。
-- **[CoAP 驱动](../drivers/coap)**（`dc3-driver-coap`）：类型 `DRIVER_CLIENT`，基于 Eclipse Californium 主动连设备——读对位号 `readPath` 发 GET、写对 `writePath` 发 PUT，默认 30 秒采一轮，走 UDP `5683`。
+- **[MQTT 驱动](../drivers/mqtt)**（`dc3-driver-mqtt`）：类型为 `DRIVER_SERVER`——它**作为服务端订阅 MQTT 主题、被动接收**设备上报，而不是主动轮询。下行有两条路径：位号 `write()` 按 `commandTopic`/`commandQos` 直接 publish 原始值；命令 `execute()` 才用命令属性 `payloadTemplate` 渲染报文后再发出。连哪个 broker 由部署环境变量 `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT` 决定，因此该驱动**没有设备级 driver 属性**；MQTT 侧可配合 **EMQX** 这类 broker，docker-compose 栈默认注入 RabbitMQ 的 MQTT 插件（`dc3-rabbitmq:1883`；dev profile 的 YAML 端口回退为 `2883`）。
+- **[CoAP 驱动](../drivers/coap)**（`dc3-driver-coap`）：类型 `DRIVER_CLIENT`，基于 Eclipse Californium 主动连设备——读对位号 `readPath` 发 GET、写对 `writePath` 发 PUT，走 UDP `5683`；采集周期 base 配置默认 30 秒，dev profile（默认激活）覆盖为 5 秒。
 - **[LwM2M 驱动](../drivers/lwm2m)**（`dc3-driver-lwm2m`）：内嵌一个基于 Eclipse Leshan 的 LwM2M 服务端，设备用 `endpoint` 名注册上来，按位号的 `objectId/objectInstanceId/resourceId` 三段路径读写资源。
 - **[HTTP 驱动](../drivers/http)**（`dc3-driver-http`）：类型 `DRIVER_CLIENT`，用 `WebClient` 周期调 REST 端点、按 `responsePath` 从 JSON 响应取值。
 

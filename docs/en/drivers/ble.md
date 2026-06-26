@@ -24,13 +24,17 @@ Onboarding a BLE device means filling [attributes](../introduction/concepts/attr
 
 ### Driver attributes (`driver-attribute`)
 
-Driver attributes answer "which adapter connects to which peripheral". `adapterName` names the Bluetooth adapter on the host (usually `hci0`, `hci1` on Linux); `deviceAddress` is the peripheral's MAC address, serving as its unique identifier; `connectionTimeout` bounds how long the link setup waits. Fill one set per BLE device on the [Device](../introduction/concepts/device):
+Driver attributes answer "which adapter connects to which peripheral". `adapterName` names the Bluetooth adapter on the host (usually `hci0`, `hci1` on Linux); `deviceAddress` is the peripheral's MAC address, serving as its unique identifier. `connectionTimeout` is declared in `application.yml` but is not read by the current driver code (see the note below). Fill one set per BLE device on the [Device](../introduction/concepts/device):
 
 | Attribute | code | Type | Default | Description |
 |---|---|---|---|---|
 | Adapter Name | `adapterName` | STRING | `hci0` | Host Bluetooth adapter name |
 | Device Address | `deviceAddress` | STRING | (empty) | BLE device MAC address (e.g. `AA:BB:CC:DD:EE:FF`) |
-| Connection Timeout | `connectionTimeout` | INT | `10000` | Connection timeout in milliseconds |
+| Connection Timeout | `connectionTimeout` | INT | `10000` | Connection timeout in milliseconds; **not read by the current implementation**, see the note below |
+
+::: info `connectionTimeout` currently has no effect
+`connectionTimeout` is declared in `application.yml` and can be set on the device, but the `dc3-driver-ble` code never reads it—link setup is done by `bluetoothManager.getCharacteristicGovernor(charUrl, true)` waiting for the governor to become ready, without passing any timeout. Changing this value does not affect connection behavior; it is a reserved attribute.
+:::
 
 ::: tip One peripheral = one device
 `deviceAddress` uniquely identifies a peripheral, so one BLE peripheral maps to one [Device](../introduction/concepts/device) on the platform. A single adapter (`hci0`) can connect to several peripherals at once, distinguished by each device's `deviceAddress`; the driver caches a connection controller (governor) per `deviceId`, establishing the link on the first read or write.
@@ -55,12 +59,16 @@ Which `readFormat` and `byteOrder` to use depends on what the peripheral's firmw
 
 ### Write command attributes (`command-attribute`)
 
-Writable points additionally need the UUID of the target characteristic on the write [command](../introduction/concepts/command):
+`application.yml` declares `serviceUuid`/`characteristicUuid` under `command-attribute`, but **the write path does not read them**:
 
 | Attribute | code | Type | Default | Description |
 |---|---|---|---|---|
-| Service UUID | `serviceUuid` | STRING | (empty) | GATT Service UUID |
-| Characteristic UUID | `characteristicUuid` | STRING | (empty) | UUID of the characteristic to write |
+| Service UUID | `serviceUuid` | STRING | (empty) | GATT Service UUID (not consumed currently) |
+| Characteristic UUID | `characteristicUuid` | STRING | (empty) | UUID of the characteristic to write (not consumed currently) |
+
+::: warning Writes reuse the point's UUIDs; command attributes have no effect today
+Like `read()`, BLE's `write()` reads `serviceUuid`/`characteristicUuid` from the point attributes (`point-attribute`)—the point decides which characteristic is written. The driver does not override `execute()`, and `command-attribute` is only consumed on the `execute()` path, so the write command attributes above are placeholder config that the current write path never reads. **A writable point does not need to repeat the UUIDs on the write command**—configure them on the point.
+:::
 
 ::: warning Writes are sent as UTF-8 bytes, with no format conversion
 The read path has `readFormat`/`byteOrder` to parse bytes into a value, but the write path has no symmetric inverse—the driver encodes the command value to UTF-8 bytes and writes them straight into the characteristic. To write a number or hex value, you must express it at the layer above as a string the target characteristic accepts (the driver will not turn `25.5` into little-endian float bytes for you).
@@ -79,9 +87,9 @@ Although the yml configures a `custom` cron (`0/5 * * * * ?`), the driver's `sch
 
 1. **Device stays offline (most common)**. The host has no usable Bluetooth adapter, or `adapterName` is wrong (default `hci0`), so `governor.isOnline()` is never true and the device shows offline forever. Confirm the adapter exists and is up on the host with `hciconfig`/`bluetoothctl`, then re-check `adapterName`.
 2. **Can't reach Bluetooth from a container**. This driver relies on the host's **physical** Bluetooth adapter and the TinyB native library. In containerized deployments, if you don't pass the host's Bluetooth capabilities through (e.g. no D-Bus/adapter mounted, no privileges granted), driver init won't error (`withIgnoreTransportInitErrors(true)` swallows transport-init failures) but the device never connects.
-3. **Characteristic not found, read/write fails**. `serviceUuid`/`characteristicUuid` must match the GATT the peripheral actually exposes, character for character (including short/long form and case). A wrong UUID means the characteristic can't be located: reads return empty, writes throw `WritePointException`. Confirm the peripheral's service/characteristic UUIDs with a BLE scanning tool (`bluetoothctl`, nRF Connect, etc.) before filling them in.
+3. **Characteristic not found, read/write fails**. `serviceUuid`/`characteristicUuid` must match the GATT the peripheral actually exposes, character for character (including short/long form and case). A wrong UUID means the characteristic can't be located: reads throw `ReadPointException` (caught by the driver as a read failure), writes throw `WritePointException`. Confirm the peripheral's service/characteristic UUIDs with a BLE scanning tool (`bluetoothctl`, nRF Connect, etc.) before filling them in.
 4. **Read value looks like garbage or absurd numbers**. Usually `readFormat`/`byteOrder` don't match the peripheral's actual encoding—e.g. the peripheral uses a little-endian float but you set `UTF8`, or the byte order is reversed. Adjust these two against the peripheral's GATT spec; when a read returns empty bytes (`data.length == 0`) the driver returns `null` and nothing is persisted.
-5. **Connection timeout**. `connectionTimeout` (default `10000` ms) is too small, or the peripheral has weak signal, is too far, or its connection is held by another host. BLE typically allows only one central connected to a peripheral at a time—make sure no phone app or other gateway is holding the connection.
+5. **Connection timeout / can't connect**. The current driver does not use `connectionTimeout` (see the note above), so raising it has no effect; connection failures stem only from a weak signal, too much distance, or the peripheral's connection being held by another host. BLE typically allows only one central connected to a peripheral at a time—make sure no phone app or other gateway is holding the connection.
 6. **Write command "has no effect"**. The command value isn't a string the target characteristic accepts (see the write semantics above), or the characteristic isn't writable. Confirm the characteristic's GATT properties include Write, then confirm the string sent from the layer above matches what the device expects.
 
 ## How it lands in IoT DC3
@@ -98,10 +106,10 @@ The code is ready, but whether it runs depends on the deployment environment: th
 
 Bring in a BLE thermometer at MAC `AA:BB:CC:DD:EE:FF`:
 
-1. Create a [Device](../introduction/concepts/device) with `Bluetooth LE Driver`, setting driver attributes `adapterName=hci0`, `deviceAddress=AA:BB:CC:DD:EE:FF`, and leaving `connectionTimeout` at the default `10000`.
+1. Create a [Device](../introduction/concepts/device) with `Bluetooth LE Driver`, setting driver attributes `adapterName=hci0` and `deviceAddress=AA:BB:CC:DD:EE:FF` (`connectionTimeout` is not read by the current implementation, so leave it at the default).
 2. Add a temperature [Point](../introduction/concepts/point) (`READ_ONLY`) to the [Profile](../introduction/concepts/profile) bound to the device. Set the point attributes `serviceUuid` and `characteristicUuid` to that temperature characteristic's UUIDs, with `readFormat=FLOAT` and `byteOrder=LITTLE` (per the peripheral's datasheet).
 3. Start the driver; within 30 seconds the polled reading appears in [PointValue](../introduction/concepts/point-value).
-4. If the point must be writable, configure a write [command](../introduction/concepts/command) for it, fill in the target characteristic's `serviceUuid`/`characteristicUuid`, and express the command value at the layer above as a string the characteristic accepts.
+4. If the point must be writable, configure a write [command](../introduction/concepts/command) for it—the write reuses the `serviceUuid`/`characteristicUuid` already set on the point, with no need to repeat them on the command; just express the command value at the layer above as a string the characteristic accepts.
 
 ## Further reading
 

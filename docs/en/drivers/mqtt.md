@@ -32,14 +32,14 @@ The driver connects to the broker via a `dc3.driver.mqtt.*` block whose values c
 
 | Setting | Env var | Default | Purpose |
 |---|---|---|---|
-| Broker address | `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT` | `localhost` / `31883` | Broker host and port, assembled into the connection URL (`ssl://host:port` form) |
-| Username / password | `MQTT_USERNAME` / `MQTT_PASSWORD` | `dc3` / `dc3dc3dc3` | Auth credentials (auth types: `NONE` / `USERNAME` / `CLIENT_ID` / `X509`) |
-| Keep-alive | `keepAlive` | `15` (s) | Client heartbeat interval |
-| Completion timeout | `completionTimeout` | `3000` (ms) | Wait timeout for a publish operation |
+| Broker address | `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT` | `dc3-rabbitmq` / `1883` (dev profile `2883`) | Broker host and port, assembled into the connection URL (plaintext `tcp://host:port` by default; TLS uses `ssl://host:8883` as a production option) |
+| Username / password | `MQTT_USERNAME` / `MQTT_PASSWORD` | `dc3` / empty (the docker-compose stack injects `dc3dc3dc3`) | Auth credentials (auth types: `NONE` / `USERNAME` / `CLIENT_ID` / `X509`); the password falls back to empty in app config and is injected by the deployment |
+| Keep-alive | no env binding (`dc3.driver.mqtt.keep-alive`) | `15` (s) | Client heartbeat interval, hard-coded default |
+| Completion timeout | no env binding (`dc3.driver.mqtt.completion-timeout`) | `3000` (ms) | Wait timeout for a publish operation, hard-coded default |
 | Batch thresholds | `MQTT_BATCH_SPEED` / `MQTT_BATCH_INTERVAL` | `100` / `5` | Ingest batching: flush at 100 messages or 5 ms, whichever comes first |
 
-::: info The broker defaults to EMQX, not RabbitMQ
-The dev stack's default MQTT broker is **EMQX**, host-published port `31883` (around `1883` inside the container), addressed via `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT`. This is distinct from the platform's internal **RabbitMQ** (AMQP, with a separate `dc3.e.mqtt` bridge exchange) used for inter-service messaging—when onboarding MQTT devices, point those two env vars at your actual MQTT broker. Across the public internet, enable TLS (`8883` / X509 certificates).
+::: info The broker defaults to the RabbitMQ MQTT plugin
+The default MQTT broker is the **RabbitMQ MQTT plugin** (`dc3-rabbitmq`), addressed via `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT`; the docker-compose stack injects `dc3-rabbitmq:1883` (the dev profile YAML falls back to port `2883`). **EMQX** is the optional broker in `docker-compose-optional.yml` (host-mapped port `31883`), not the default. The RabbitMQ MQTT plugin and the platform's internal **RabbitMQ AMQP** (with a separate `dc3.e.mqtt` bridge exchange) used for inter-service messaging are two protocols on the same broker—when onboarding MQTT devices, point those two env vars at your actual MQTT broker. Across the public internet, enable TLS (`8883` / X509 certificates).
 :::
 
 ### Point configuration (`point-attribute`)
@@ -83,7 +83,7 @@ In MQTT, a "read" is not an outbound request but a callback fired when a subscri
 
 ```mermaid
 flowchart LR
-  Dev["Field device"] -->|"publish device/1001/up"| Broker["MQTT Broker<br/>(EMQX)"]
+  Dev["Field device"] -->|"publish device/1001/up"| Broker["MQTT Broker<br/>(RabbitMQ MQTT plugin)"]
   Broker -->|"subscribe (per point/event topic)"| Recv["MqttReceiveServiceImpl<br/>receiveValue()"]
   Recv -->|"parse to PointValue<br/>(needs deviceId + pointId)"| Sender["DriverSenderService<br/>pointValueSender()"]
   Recv -.->|"when topic matches sourceTopic"| Event["event report<br/>eventReportSender()"]
@@ -98,7 +98,7 @@ For a payload to become a [PointValue](../introduction/concepts/point-value), it
 `DRIVER_SERVER` means the driver waits for devices to push data, rather than actively polling. If [PointValues](../introduction/concepts/point-value) never arrive, **first confirm the device is actually publishing to the subscribed topic** and that the topic strings match exactly on both sides (including case and the level separators `/`)—rather than checking the driver's "acquisition interval", since scheduled reads are off by default here (`schedule.read.enable=false`).
 :::
 
-- **Broker unreachable**: check that `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT` point at a real MQTT broker (default EMQX `localhost:31883`) and that `MQTT_USERNAME` / `MQTT_PASSWORD` match the broker account; for public/TLS setups confirm the port is `8883` and the certificate matches.
+- **Broker unreachable**: check that `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT` point at a real MQTT broker (default `dc3-rabbitmq:1883`) and that `MQTT_USERNAME` / `MQTT_PASSWORD` match the broker account; for public/TLS setups confirm the port is `8883` and the certificate matches.
 - **Messages arrive but no point values**: a payload must resolve a `deviceId` and a `pointId`, or it is silently skipped. Look for the `MQTT point value parse failed` warn in the driver log—usually the reported JSON lacks those two fields or is not valid JSON.
 - **QoS mismatch causes missed/duplicated messages**: align QoS on the publishing side and the device's subscribing side. When `commandQos` is missing or errors, the driver **falls back to the default QoS** so the command is still sent, but mismatched levels can still downgrade—use `1` or `2` on both sides for reliable dispatch.
 - **Empty payload or unsubstituted placeholders**: a command does not auto-insert the value; author a template with placeholders such as `${value}` in `payloadTemplate` (e.g. `{"value":${value}}`). An empty template sends the empty object `{}`. Placeholder names must match the command parameter keys to be substituted.
@@ -117,7 +117,7 @@ Per the `MqttDriverCustomServiceImpl` and `MqttReceiveServiceImpl` source: **dat
 
 Minimal onboarding example—onboard a device that reports to `device/1001/up` and receives commands on `device/1001/down`:
 
-1. At deployment, point `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT` at your broker (the dev stack defaults to EMQX `localhost:31883`), and create a [Device](../introduction/concepts/device) with `MQTT Driver` (this driver has no driver attributes to fill).
+1. At deployment, point `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT` at your broker (default `dc3-rabbitmq:1883`, the RabbitMQ MQTT plugin), and create a [Device](../introduction/concepts/device) with `MQTT Driver` (this driver has no driver attributes to fill).
 2. Add a writable [Point](../introduction/concepts/point) to the [Profile](../introduction/concepts/profile) bound to the device, and set the point attributes `commandTopic=device/1001/down`, `commandQos=1`.
 3. Once the device publishes data to the subscribed topic, the [PointValue](../introduction/concepts/point-value) is received passively; when a write command is dispatched, the driver renders the payload per `payloadTemplate` and publishes it to `device/1001/down`.
 

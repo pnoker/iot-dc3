@@ -89,7 +89,7 @@ The Point's `pointTypeFlag` must match the actual type of the ZCL attribute. A t
 :::
 
 ::: warning Driver / device shows offline
-The driver-level health check depends on whether `networkManager` is initialized: the driver is offline while the coordinator is not connected. Device-level online state uses the lease mechanism described in [Device](../introduction/concepts/device) (health check cron `0/15 * * * * ?`, lease timeout `45 seconds`). Note that in the current implementation the device-level health check always returns online, so it cannot be used to tell whether an individual node is actually reachable — see the implementation status below.
+The driver-level health check depends on whether `networkManager` is initialized: the driver is offline while the coordinator is not connected. Device-level online state uses the lease mechanism described in [Device](../introduction/concepts/device) (health check cron `0/15 * * * * ?`, lease timeout `45 seconds`). Note that in the current implementation the device-level health check returns online whenever the device record is valid (no reachability check by IEEE address), so it cannot be used to tell whether an individual node is actually reachable — see the implementation status below.
 :::
 
 ## How it lands in IoT DC3
@@ -97,14 +97,15 @@ The driver-level health check depends on whether `networkManager` is initialized
 - **`dc3.driver.code`**: `ZigbeeDriver` (driver name `Zigbee Driver`, type `DRIVER_CLIENT` — connects to the coordinator and polls nodes). This is a stable routing identifier; do not change it casually.
 - **Collection cycle**: default cron `0/30 * * * * ?`, reading ZCL attributes every 30 seconds.
 - **Health / online**: the device health check defaults to cron `0/15 * * * * ?` with a `45-second` lease timeout; see [Device](../introduction/concepts/device) for the online-state mechanism.
-- **Read / write / subscribe capability**: in the [driver capability matrix](./matrix), Zigbee is marked as supporting read, write, and subscribe (listens for joining and attribute reports). Here "read/subscribe" means: nodes report ZCL attributes, the coordinator caches them, and the read path takes that most recent cached value — rather than synchronously polling the device over the air on every read. This differs from request-response drivers such as `ble` and `coap`.
+- **Read / write capability**: the read path takes the most recent cached value of the ZCL attribute on the coordinator side (`attribute.getLastValue()`) rather than synchronously polling the device over the air on every read; this differs from request-response drivers such as `ble` and `coap`.
+- **Subscribe capability (not implemented yet)**: `initial()` currently **only registers a coordinator network-state listener** (`addNetworkStateListener`, which merely logs network UP/DOWN), and **does not listen for node joining (node-join/announce) or ZCL attribute reports**, nor does it configure attribute binding/reporting. The cached value the read path returns therefore depends on the node reporting on its own or on reporting being configured by external tooling — the driver itself does not capture join or report events, so the "subscribe" column for Zigbee in the [driver capability matrix](./matrix) is marked as not implemented.
 
 ::: warning Work in progress (skeleton)
 This driver is currently a **skeleton** — protocol-level I/O is not yet fully implemented. Treat it as an onboarding template, not a production-ready driver. There are several `TODO` markers in the method bodies; the key limitations are:
 
 - **Serial port and baud rate are hardcoded**: `initial()` hardcodes `/dev/ttyUSB0` and `115200` and **does not read** the `serialPort` / `baudRate` driver attributes. If the coordinator is not on `/dev/ttyUSB0`, you must first wire up the configuration-reading logic, otherwise the attributes have no effect.
 - **Only the Telegesis adapter is bundled**: the code only imports and uses `ZigBeeDongleTelegesis`, so a `dongleType` of `EMBER` / `CONBEE` will not switch the adapter yet.
-- **Device-level health check always online**: `health(driverConfig, device)` currently always returns online and does not actually verify node reachability by IEEE address.
+- **Device-level health check always online**: `health(driverConfig, device)` returns online whenever the device record is valid (it only returns offline when the device or its id is null) and does not actually verify node reachability by IEEE address.
 :::
 
 ::: warning The write command does not actually dispatch yet

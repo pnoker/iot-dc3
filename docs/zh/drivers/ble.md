@@ -24,13 +24,17 @@ Modbus 用"功能码 + 寄存器地址"寻址，BLE 用"服务 UUID + 特征 UUI
 
 ### 驱动属性（`driver-attribute`）
 
-驱动属性回答"用哪个适配器连到哪台外设"。`adapterName` 指定运行主机上的蓝牙适配器名（Linux 下通常是 `hci0`、`hci1`）；`deviceAddress` 是外设的 MAC 地址，作为外设的唯一标识；`connectionTimeout` 控制建链等待时长。在[设备](../introduction/concepts/device)上为每台 BLE 设备填一组：
+驱动属性回答"用哪个适配器连到哪台外设"。`adapterName` 指定运行主机上的蓝牙适配器名（Linux 下通常是 `hci0`、`hci1`）；`deviceAddress` 是外设的 MAC 地址，作为外设的唯一标识。`connectionTimeout` 虽在 `application.yml` 里声明，但当前驱动代码并未读取它（见下方提示）。在[设备](../introduction/concepts/device)上为每台 BLE 设备填一组：
 
 | 属性 | code | 类型 | 默认值 | 说明 |
 |---|---|---|---|---|
 | Adapter Name | `adapterName` | STRING | `hci0` | 主机蓝牙适配器名 |
 | Device Address | `deviceAddress` | STRING | （空）| BLE 设备 MAC 地址（如 `AA:BB:CC:DD:EE:FF`）|
-| Connection Timeout | `connectionTimeout` | INT | `10000` | 连接超时（毫秒）|
+| Connection Timeout | `connectionTimeout` | INT | `10000` | 连接超时（毫秒）；**当前实现未读取**，见下方提示 |
+
+::: info `connectionTimeout` 当前未生效
+`connectionTimeout` 在 `application.yml` 中声明、可在设备上填写，但 `dc3-driver-ble` 代码从未读取该值——建链由 `bluetoothManager.getCharacteristicGovernor(charUrl, true)` 等待 governor ready 完成，不传任何超时参数。改这个值不会影响连接行为，它是预留属性。
+:::
 
 ::: tip 一个外设 = 一个设备
 `deviceAddress` 是外设的唯一标识，一台 BLE 外设对应平台里一个[设备](../introduction/concepts/device)。同一适配器（`hci0`）可同时连多台外设，由各设备的 `deviceAddress` 区分；驱动按 `deviceId` 缓存每台外设的连接控制器（governor），首次读写时建链。
@@ -55,12 +59,16 @@ Modbus 用"功能码 + 寄存器地址"寻址，BLE 用"服务 UUID + 特征 UUI
 
 ### 写命令属性（`command-attribute`）
 
-可写位号还需在写[命令](../introduction/concepts/command)上填写入目标特征的 UUID：
+`application.yml` 在 `command-attribute` 下声明了 `serviceUuid`/`characteristicUuid`，但**写入路径并不读取它们**：
 
 | 属性 | code | 类型 | 默认值 | 说明 |
 |---|---|---|---|---|
-| Service UUID | `serviceUuid` | STRING | （空）| GATT Service UUID |
-| Characteristic UUID | `characteristicUuid` | STRING | （空）| 写入目标特征的 UUID |
+| Service UUID | `serviceUuid` | STRING | （空）| GATT Service UUID（当前未被消费）|
+| Characteristic UUID | `characteristicUuid` | STRING | （空）| 写入目标特征的 UUID（当前未被消费）|
+
+::: warning 写入复用位号上的 UUID，命令属性当前不生效
+BLE 的 `write()` 与 `read()` 一样从位号属性（`point-attribute`）读取 `serviceUuid`/`characteristicUuid`，写哪个特征由位号决定。驱动并未覆写 `execute()`，而 `command-attribute` 只在 `execute()` 路径才会被消费，因此上表声明的写命令属性是占位配置、当前写路径不读取。**可写位号无需在写命令上重复填 UUID**，把它配在位号上即可。
+:::
 
 ::: warning 写入按 UTF-8 字节下发，不做格式转换
 读路径有 `readFormat`/`byteOrder` 把字节解析成值，但写路径没有对称的逆变换——驱动把命令值按 UTF-8 编码成字节直接 write 进特征。要写数值或十六进制，必须在上层把它表达成目标特征接受的字符串形式（驱动不会替你把 `25.5` 转成小端浮点字节）。
@@ -79,9 +87,9 @@ yml 中虽配了一条 `custom` cron（`0/5 * * * * ?`），但驱动的 `schedu
 
 1. **设备一直离线（最常见）**。运行主机没有可用的蓝牙适配器、或 `adapterName` 填错（默认 `hci0`），`governor.isOnline()` 永远为假，设备一直显示离线。先在主机上用 `hciconfig`/`bluetoothctl` 确认适配器存在且 up，再核对 `adapterName`。
 2. **容器里连不上蓝牙**。本驱动依赖运行主机的**物理**蓝牙适配器和 TinyB 本地库。容器化部署时若没把宿主蓝牙能力透传进容器（如未挂载 D-Bus/适配器、未给特权），驱动初始化虽不报错（`withIgnoreTransportInitErrors(true)` 会吞掉传输初始化错误），但设备始终连不上。
-3. **特征找不到、读写失败**。`serviceUuid`/`characteristicUuid` 要和外设实际暴露的 GATT 逐字一致（含短/长格式、大小写）。UUID 写错时定位不到特征，读返回空、写抛 `WritePointException`。先用 BLE 扫描工具（`bluetoothctl`、nRF Connect 等）确认外设的 service/characteristic UUID 再填。
+3. **特征找不到、读写失败**。`serviceUuid`/`characteristicUuid` 要和外设实际暴露的 GATT 逐字一致（含短/长格式、大小写）。UUID 写错时定位不到特征，读会抛 `ReadPointException`（被驱动捕获为读取失败）、写抛 `WritePointException`。先用 BLE 扫描工具（`bluetoothctl`、nRF Connect 等）确认外设的 service/characteristic UUID 再填。
 4. **读到的值像乱码或数值离谱**。多半是 `readFormat`/`byteOrder` 与外设实际编码不符——例如外设用小端浮点而你配了 `UTF8`，或字节序配反。对照外设 GATT 规格调整这两项；读空字节（`data.length == 0`）时驱动返回 `null`，不会落库。
-5. **连接超时**。`connectionTimeout`（默认 `10000` 毫秒）偏小，或外设信号弱、距离远、正被别的主机占用连接。BLE 同一时刻通常只允许一个 central 连一个外设，确认没有手机 App 或其他网关抢占连接。
+5. **连接超时/连不上**。当前驱动不使用 `connectionTimeout`（见上文提示），调大该值无效；连接失败只与外设信号弱、距离远、正被别的主机占用连接有关。BLE 同一时刻通常只允许一个 central 连一个外设，确认没有手机 App 或其他网关抢占连接。
 6. **写命令"没生效"**。命令值不是目标特征接受的字符串形式（见上文写入语义），或该特征不可写。先确认特征的 GATT 属性含 Write，再确认上层下发的字符串与设备约定一致。
 
 ## 在 IoT DC3 中如何落地
@@ -98,10 +106,10 @@ yml 中虽配了一条 `custom` cron（`0/5 * * * * ?`），但驱动的 `schedu
 
 把 MAC `AA:BB:CC:DD:EE:FF` 的一台 BLE 温度计接进来：
 
-1. 选 `Bluetooth LE Driver` 创建[设备](../introduction/concepts/device)，driver 属性填 `adapterName=hci0`、`deviceAddress=AA:BB:CC:DD:EE:FF`，`connectionTimeout` 用默认 `10000`。
+1. 选 `Bluetooth LE Driver` 创建[设备](../introduction/concepts/device)，driver 属性填 `adapterName=hci0`、`deviceAddress=AA:BB:CC:DD:EE:FF`（`connectionTimeout` 当前未被读取，留默认即可）。
 2. 给设备绑定的[物模型](../introduction/concepts/profile)加一个温度[位号](../introduction/concepts/point)（`READ_ONLY`），point 属性填 `serviceUuid`、`characteristicUuid` 为该温度特征的 UUID，`readFormat=FLOAT`、`byteOrder=LITTLE`（按外设手册定）。
 3. 启动驱动，30 秒内就能在[位号值](../introduction/concepts/point-value)里看到采集值。
-4. 若该位号需可写，给它配写[命令](../introduction/concepts/command)，填好目标特征的 `serviceUuid`/`characteristicUuid`，并在上层把命令值表达成特征接受的字符串。
+4. 若该位号需可写，给它配写[命令](../introduction/concepts/command)即可——写入复用该位号上已配的 `serviceUuid`/`characteristicUuid`，无需在命令上重复配置；只需在上层把命令值表达成特征接受的字符串。
 
 ## 延伸阅读
 

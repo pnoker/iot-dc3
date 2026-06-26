@@ -30,7 +30,7 @@ flowchart LR
   subgraph TCP["FINS/TCP frame"]
     Len["TCP length prefix<br/>4 bytes"]
     subgraph FINS["FINS frame"]
-      Hdr["FINS header 10 bytes<br/>ICF 0x80 / RSV / GCT 0x02<br/>DNA DA1 DA2 / SNA SA1 SA2 / SID"]
+      Hdr["FINS header 10 bytes (driver implementation)<br/>ICF 0x80 / RSV / GCT 0x02<br/>destNode destUnit 0x00 / srcNode srcUnit 0x00 / SID"]
       Cmd["command code 2 bytes<br/>MRC 0x01 / SRC 0x01 (memory read)"]
       Par["read params 4 bytes<br/>area code + word address + bit + length"]
     end
@@ -103,7 +103,7 @@ These cadences are fixed in the `schedule`/`health` sections of `application.yml
 - **Non-zero endCode**: bytes 12–13 of the response frame are the FINS end code; non-zero means the PLC rejected the request (e.g. address out of range, memory area absent, insufficient permission). The driver throws `FINS command failed, endCode=0x...`; look the code up in the FINS manual and verify `memoryArea`/`address` fall within the PLC's actual memory range.
 - **Float writes land wrong**: the write command parses `INT32`/`UINT32`/`FLOAT` all via `Integer.parseInt` before writing 4 big-endian bytes, and does **not** encode `12.5` as a float. To write a float, convert the target to its integer bit pattern yourself, or confirm the PLC actually expects an integer.
 - **Frequent timeouts**: `timeout` governs both connect and read (default 5000ms). Increase it for a jittery link or a slow PLC; note that any read/write exception actively closes and evicts that device's cached connection, which is rebuilt on next access.
-- **Node addressing fails**: FINS scenarios crossing gateways/routers need correct `sourceNode`/`destNode` (the header carries only a 1-byte node number; the network addresses DNA/SNA are fixed at 0). A single direct connection works with the defaults `1`/`2`; for multi-level networks fill in per the on-site FINS routing table.
+- **Node addressing fails**: FINS scenarios crossing gateways/routers need correct `sourceNode`/`destNode`. Note the current implementation: after GCT the driver writes `destNode`/`destUnit` and `srcNode`/`srcUnit` directly, and does not emit separate zeroed DNA/SNA network-address bytes——the header does not strictly distinguish network addresses from node numbers (the node number occupies the DNA/SNA slots from the spec). A single direct connection works with the defaults `1`/`2`; across gateways and multi-level routing this simplified header may address incorrectly.
 
 ## How It Lands in IoT DC3
 

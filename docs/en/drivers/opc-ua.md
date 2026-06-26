@@ -108,7 +108,7 @@ The `port` default in the yml is `18600` (the port of the local built-in Milo sa
 This matches the [driver capability matrix](./matrix) (read ✓ / write ✓ / subscribe —).
 
 ::: info Implementation status: available
-`OpcUaDriverCustomServiceImpl`'s `read()` / `write()` / `health()` / `validate()` / `event()` are all complete implementations (built on Eclipse Milo), not a skeleton. Reading nodes, writing the six types, connection caching and reconnect-on-failure, self-signed certificate generation, and clearing connections on device add/update/delete are all in place — it can be pointed at a real OPC UA server directly.
+`OpcUaDriverCustomServiceImpl`'s `read()` / `write()` / `health()` / `validate()` / `event()` are all complete implementations (built on Eclipse Milo), not a skeleton. Reading nodes, writing the six types, connection caching and reconnect-on-failure, self-signed certificate generation, and clearing connections on device update/delete are all in place — it can be pointed at a real OPC UA server directly.
 :::
 
 ### Minimal onboarding example

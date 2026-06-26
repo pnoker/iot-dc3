@@ -108,7 +108,7 @@ yml 里 `port` 默认 `18600`（本地内置 Milo 示例服务端的端口）。
 以上与[驱动能力矩阵](./matrix)的标注一致（读 ✓ / 写 ✓ / 订阅 —）。
 
 ::: info 实现状态：可用
-`OpcUaDriverCustomServiceImpl` 的 `read()` / `write()` / `health()` / `validate()` / `event()` 均为完整实现（基于 Eclipse Milo），非骨架。读节点、写六种类型、连接缓存与失效重连、自签名证书生成、设备增删改时清理连接等行为都已落地，可直接接入真实 OPC UA 服务端。
+`OpcUaDriverCustomServiceImpl` 的 `read()` / `write()` / `health()` / `validate()` / `event()` 均为完整实现（基于 Eclipse Milo），非骨架。读节点、写六种类型、连接缓存与失效重连、自签名证书生成、设备更新或删除时清理连接等行为都已落地，可直接接入真实 OPC UA 服务端。
 :::
 
 ### 最小接入示例

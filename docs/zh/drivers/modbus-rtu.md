@@ -99,7 +99,7 @@ RS-485 总线上可挂多台从站，它们共用同一个 `port`，由位号的
 | 订阅 | — | 主从轮询协议，无设备主动上报，靠采集周期定时读 |
 
 ::: info 实现状态：可用
-`ModbusRtuDriverCustomServiceImpl` 的 `read()`/`write()`/`health()`/连接管理均已完整实现（基于 modbus4j + jSerialComm），非骨架。读路径支持全部四个读功能码；连接、退避、健康判定、元数据事件（设备增删改时销毁旧连接）齐备。
+`ModbusRtuDriverCustomServiceImpl` 的 `read()`/`write()`/`health()`/连接管理均已完整实现（基于 modbus4j + jSerialComm），非骨架。读路径支持全部四个读功能码；连接、退避、健康判定、元数据事件（设备更新或删除时销毁旧连接）齐备。
 :::
 
 ::: warning 写命令只支持线圈和保持寄存器

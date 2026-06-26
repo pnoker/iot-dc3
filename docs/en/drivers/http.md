@@ -19,16 +19,16 @@ This driver acts as an HTTP client ([Driver](../introduction/concepts/driver) ty
 
 ## Attribute configuration
 
-Attributes are filled in three layers: **driver attributes** (`driver-attribute`, device-level, deciding which service to connect to), **point attributes** (`point-attribute`, deciding which path each point calls and which field to extract), and **command attributes** (`command-attribute`, deciding the path and method a write command uses). For where these layers come from and how they override, see [Attributes & Config](../introduction/concepts/attribute-config). All defaults are taken from the driver's `application.yml`.
+Attributes are filled in two layers: **driver attributes** (`driver-attribute`, device-level, deciding which service to connect to) and **point attributes** (`point-attribute`, deciding which path each point calls, which method to use, and which field to extract—used by both read and write). `application.yml` also declares **command attributes** (`command-attribute`), but the current `write()` does not consume them (see the Command attributes section below). For where these layers come from and how they override, see [Attributes & Config](../introduction/concepts/attribute-config). All defaults are taken from the driver's `application.yml`.
 
 ### Driver attributes (device-level `driver-attribute`)
 
-When onboarding an HTTP data source, fill in these attributes on the [Device](../introduction/concepts/device). They decide which service to connect to, the default method, the headers, and the timeout—every point under the same device shares this connection:
+When onboarding an HTTP data source, fill in these attributes on the [Device](../introduction/concepts/device). They decide which service to connect to, the headers, and the timeout—every point under the same device shares this connection:
 
 | Attribute | code | Type | Default | Remark |
 |---|---|---|---|---|
 | Base URL | `baseUrl` | STRING | (empty) | Base URL for API requests (e.g. `https://api.example.com`) |
-| Method | `method` | STRING | `GET` | Default HTTP method (GET/POST/PUT/DELETE) |
+| Method | `method` | STRING | `GET` | Declared default HTTP method, but the current implementation does not read this attribute (see the warning below); the actual method is decided by the point attribute only |
 | Headers | `headers` | STRING | (empty) | Custom headers as JSON (e.g. `{"Authorization":"Bearer xxx"}`) |
 | Timeout | `timeout` | INT | `5000` | Request timeout in milliseconds, applied as `responseTimeout` |
 
@@ -38,14 +38,18 @@ When onboarding an HTTP data source, fill in these attributes on the [Device](..
 `headers` is declared in `application.yml`, but the current `getConnector()` only sets a fixed `Content-Type: application/json` on the `WebClient`—it does **not** read or apply the `headers` attribute. Endpoints that need `Authorization` or other custom headers cannot be onboarded by this attribute alone for now.
 :::
 
+::: warning The driver-level Method attribute currently has no effect
+`method` is declared as a driver-level attribute in `application.yml`, but `getConnector()` reads only `baseUrl` and `timeout`—it never reads the driver-level `method`. The method in `read()`/`write()` comes solely from the point attribute `method`, falling back to the hard-coded `GET`. So setting `method=POST` on the device has no effect—like `headers`, it is a "declared but not applied" attribute. The HTTP method is decided only by the point attribute `method`.
+:::
+
 ### Point attributes (`point-attribute`)
 
-On each polled [Point](../introduction/concepts/point), fill in: which path to call, which method to use, (for writes) what body to send, and which field to extract. The point's `method` overrides the driver-level default:
+On each polled [Point](../introduction/concepts/point), fill in: which path to call, which method to use, (for writes) what body to send, and which field to extract. The HTTP method actually used by read/write comes solely from the point's `method`, falling back to the hard-coded `GET` when absent; it is independent of the driver-level `method` attribute (which the implementation does not read, see above):
 
 | Attribute | code | Type | Default | Remark |
 |---|---|---|---|---|
 | Path | `path` | STRING | (empty) | API path (e.g. `/api/v1/sensor/{id}`) |
-| Method | `method` | STRING | `GET` | HTTP method for this point (overrides driver default) |
+| Method | `method` | STRING | `GET` | HTTP method for this point, falling back to the hard-coded `GET` |
 | Body Template | `bodyTemplate` | STRING | (empty) | Request body template with `${value}` placeholder |
 | Response Path | `responsePath` | STRING | (empty) | Path to extract a value from the JSON response (e.g. `$.data.temperature`) |
 
@@ -63,18 +67,22 @@ A write command does not automatically place the value into the request body. Yo
 
 ### Command attributes (`command-attribute`)
 
-A writable point also needs the path and method on its write command:
+::: warning Command attributes are not consumed by the write path
+`application.yml` declares `path` and `method` (`default-value: POST`) under `command-attribute`, but the SPI `write()` signature only receives `driverConfig` and `pointConfig`—it is never passed a command-attribute map. `write()` actually reads `path`/`method`/`bodyTemplate` from the point attribute (`pointConfig`), and `method` falls back to the hard-coded `GET` (not `POST`). So the `command-attribute` entries below are declared-but-inert dead config today; put the write path and method on the point attribute instead.
+:::
+
+The table below shows the values declared in `application.yml` (not read by the current `write()`):
 
 | Attribute | code | Type | Default | Remark |
 |---|---|---|---|---|
-| Path | `path` | STRING | (empty) | API path for the command |
-| Method | `method` | STRING | `POST` | HTTP method for the command |
+| Path | `path` | STRING | (empty) | API path for the command (not read by `write()` today) |
+| Method | `method` | STRING | `POST` | HTTP method for the command (not read by `write()` today) |
 
 ### Polling & health
 
 These are defined under `dc3.driver.schedule` and `health` in `application.yml`; you don't fill them on the device:
 
-- **Polling interval**: read cron `0/30 * * * * ?` (read once every 30 seconds).
+- **Polling interval**: the `application.yml` baseline read cron is `0/30 * * * * ?` (read once every 30 seconds); the default-active `dev` profile overrides it in `application-dev.yml` to `0/5 * * * * ?` (every 5 seconds), so the out-of-the-box polling interval is 5 seconds.
 - **Health check**: device health-check cron `0/15 * * * * ?` with a lease timeout of `45 seconds`—see [Device](../introduction/concepts/device) for the online-state mechanism.
 - **Online decision**: `health()` decides online by "whether a `WebClient` exists for the device in `clientMap`"—a connection is built on the first successful read/write, after which the device is online; on a read/write exception the driver does `clientMap.remove(deviceId)`, dropping the connection so it is rebuilt next round.
 
@@ -119,7 +127,7 @@ Onboard an endpoint that returns `{"data":{"temperature":25.6}}`:
 
 1. Create a [Device](../introduction/concepts/device) with `HTTP REST Client Driver`, and set the driver attributes `baseUrl=https://api.example.com`, `method=GET`, `timeout=5000`.
 2. Add a temperature [Point](../introduction/concepts/point) (`pointTypeFlag=FLOAT`, `READ_ONLY`) to the [Profile](../introduction/concepts/profile) bound to the device, and set the point attributes `path=/api/v1/sensor/1`, `method=GET`, `responsePath=$.data.temperature`.
-3. Start the driver, and within 30 seconds the extracted `25.6` shows up in the [PointValue](../introduction/concepts/point-value).
+3. Start the driver, and within a few seconds the extracted `25.6` shows up in the [PointValue](../introduction/concepts/point-value) (the default `dev` profile polls every 5 seconds).
 
 ## Further reading
 

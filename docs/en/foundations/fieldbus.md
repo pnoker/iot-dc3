@@ -107,7 +107,13 @@ Every protocol parameter in this chapter lands in DC3 as an **attribute** declar
 In other words, the protocol knowledge in this chapter is not abstract theory — it maps directly to every field you fill in when onboarding a device in DC3. Understand the protocol and you understand the driver's attribute table.
 
 ::: warning Some drivers are currently protocol skeletons (WIP)
-Not every driver has finished its protocol-layer I/O. Among them, [EtherNet/IP](../drivers/ethernet-ip), [IEC 104](../drivers/iec104), [DLMS](../drivers/dlms), and [CAN](../drivers/can) are currently **skeleton implementations**: the attribute tables, collection cycles, and addressing semantics are in place and can be filled in, but the actual protocol send/receive is not yet complete — `read()`/`write()` explicitly throw a "not implemented" exception to fail fast (the SDK records the failure and backs off, rather than faking success). Treat them as **starting-point templates** for the corresponding protocol, not production-ready products. The implementation status on each driver page is authoritative.
+Not every driver has finished its protocol-layer I/O. [EtherNet/IP](../drivers/ethernet-ip), [IEC 104](../drivers/iec104), [DLMS](../drivers/dlms), and [CAN](../drivers/can) are currently **skeleton implementations**: the attribute tables, collection cycles, and addressing semantics are in place and can be filled in, but how far the actual protocol send/receive has progressed varies —
+
+- [IEC 104](../drivers/iec104), [DLMS](../drivers/dlms): `read()`/`write()` explicitly throw a "not implemented" exception to fail fast (the SDK records the failure and backs off, rather than faking success); the protocol I/O is not yet written.
+- [EtherNet/IP](../drivers/ethernet-ip): the upper-layer flow (fetch by tag, encode/decode, socket connect) is in place, but the CIP protocol framing (`RegisterSession`/`ForwardOpen`/encapsulation frame) is not yet complete.
+- [CAN](../drivers/can): `read()`/`write()` shell out to the Linux `can-utils` tools (`candump`/`cansend`) via `ProcessBuilder` and can actually send/receive, but byte slicing/type conversion (`dataOffset`/`dataLength`, etc.) and native SocketCAN I/O are not yet in place, and the `data` template on the write path is not actually wired up yet.
+
+Treat them as **starting-point templates** for the corresponding protocol, not production-ready products. The implementation status on each driver page is authoritative.
 :::
 
 ::: info Modbus / OPC UA / S7 / BACnet and others are working drivers

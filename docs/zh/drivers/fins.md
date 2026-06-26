@@ -30,7 +30,7 @@ flowchart LR
   subgraph TCP["FINS/TCP 帧"]
     Len["TCP 长度前缀<br/>4 字节"]
     subgraph FINS["FINS 帧"]
-      Hdr["FINS 头 10 字节<br/>ICF 0x80 / RSV / GCT 0x02<br/>DNA DA1 DA2 / SNA SA1 SA2 / SID"]
+      Hdr["FINS 头 10 字节（驱动实现）<br/>ICF 0x80 / RSV / GCT 0x02<br/>destNode destUnit 0x00 / srcNode srcUnit 0x00 / SID"]
       Cmd["命令码 2 字节<br/>MRC 0x01 / SRC 0x01 (内存读)"]
       Par["读参数 4 字节<br/>区代码 + 字地址 + 位 + 长度"]
     end
@@ -103,7 +103,7 @@ FINS 的接入参数分两类：连到哪台 PLC 由设备级的 **driver 属性
 - **endCode 非 0**：响应帧第 12–13 字节是 FINS 结束码，非 0 表示 PLC 拒绝（如地址越界、内存区不存在、权限不足）。驱动会抛 `FINS command failed, endCode=0x...`，按 FINS 手册查该码含义并核对 `memoryArea`/`address` 是否落在 PLC 实际内存范围内。
 - **写浮点写进去是错的**：写命令对 `INT32`/`UINT32`/`FLOAT` 都按 `Integer.parseInt` 解析后写 4 字节大端整数，**不会**把 `12.5` 当浮点编码。写浮点前需自行把目标值转成整数位模式下发，或确认 PLC 侧期望的就是整数。
 - **超时频繁**：`timeout` 同时管连接与读（默认 5000ms）。链路抖动或 PLC 响应慢时适当调大；注意每次读写异常都会主动关闭并移除该设备的缓存连接，下次访问重建。
-- **节点号寻址失败**：跨网关/路由的 FINS 场景需要正确的 `sourceNode`/`destNode`（帧头里只写了 1 字节节点号，网络地址 DNA/SNA 固定 0）。单台直连保持默认 `1`/`2` 即可；多级网络请按现场 FINS 路由表填。
+- **节点号寻址失败**：跨网关/路由的 FINS 场景需要正确的 `sourceNode`/`destNode`。注意当前实现：驱动在 GCT 之后直接写出 `destNode`/`destUnit` 与 `srcNode`/`srcUnit`，并未单独写出置 0 的 DNA/SNA 网络地址字节——帧头未严格区分网络地址与节点号（节点号占据了规范里 DNA/SNA 的槽位）。单台直连保持默认 `1`/`2` 即可；跨网关多级路由场景下该简化帧头可能寻址不正确。
 
 ## 在 IoT DC3 中如何落地
 
