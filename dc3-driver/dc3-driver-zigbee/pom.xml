@@ -36,17 +36,17 @@
         <dependency>
             <groupId>com.zsmartsystems.zigbee</groupId>
             <artifactId>com.zsmartsystems.zigbee</artifactId>
-            <version>1.4.16</version>
+            <version>1.4.16.1</version>
         </dependency>
         <dependency>
             <groupId>com.zsmartsystems.zigbee</groupId>
             <artifactId>com.zsmartsystems.zigbee.serial</artifactId>
-            <version>1.4.16</version>
+            <version>1.4.16.1</version>
         </dependency>
         <dependency>
             <groupId>com.zsmartsystems.zigbee</groupId>
             <artifactId>com.zsmartsystems.zigbee.dongle.telegesis</artifactId>
-            <version>1.4.16</version>
+            <version>1.4.16.1</version>
         </dependency>
 
     </dependencies>
