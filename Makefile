@@ -258,7 +258,9 @@ deploy: package
 	&& $(MVN_SUB) clean deploy -P deploy
 
 tag:
-	dc3/bin/tag.sh
+	@dc3/bin/tag.sh $(filter-out $@,$(MAKECMDGOALS))
+%:
+	@:
 
 changelog:
 	@FROM="$(FROM)" TO="$(TO)" VERSION="$(VERSION)" CHANGE_FILE="$(CHANGE_FILE)" dc3/bin/changelog.py
