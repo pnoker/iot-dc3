@@ -3,7 +3,7 @@ name: Docker Image
 on:
   push:
     tags:
-      - 'dc3.release.*'
+      - 'v*'
 
 permissions:
   contents: read
