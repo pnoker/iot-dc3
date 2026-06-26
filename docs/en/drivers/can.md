@@ -61,12 +61,16 @@ Per the source, `read()` actually uses only `interfaceName`, `canId`, `requestCa
 
 ### Write command attributes (`command-attribute`)
 
-Writable points also need these on the write command. `data` is the frame-data template; on dispatch the `${value}` placeholder is replaced with the actual command argument and assembled into the `cansend` frame payload.
+`application.yml` declares `canId` and `data` under `command-attribute` (`data` defaults to `${value}`), intending the write command to carry a frame-data template.
+
+::: warning The `data` template does not take effect yet (skeleton TODO)
+Per the source, `write()` reads `canId` and `data` only from the **point attributes** (`pointConfig`): `canId = getConfigValue(pointConfig, "canId", "")`, `data = getConfigValue(pointConfig, "data", "")`. But `point-attribute` has **no** `data` (it is declared only under `command-attribute`), and `command-attribute` is passed only through `DriverCommand.execute(commandConfig, …)` — which the CAN driver does not override (it uses the default empty implementation). So the write path never reads `command-attribute`. As a result `data` is always the empty default, `frameData` is always empty, the `${value}` template is never rendered, and `cansend` emits an empty payload (of the form `cansend can0 <canId>#`). Like `dataOffset`/`dataLength`, this is a skeleton TODO; dispatched write values do not actually land in the frame payload today.
+:::
 
 | Attribute | code | Type | Default | Description |
 |---|---|---|---|---|
 | CAN ID | `canId` | STRING | (empty) | CAN identifier to write to (hex) |
-| Data | `data` | STRING | `${value}` | Frame-data template, rendered from the command argument (supports `${value}`) |
+| Data | `data` | STRING | `${value}` | Frame-data template (by design rendered from the command argument via `${value}`; not wired up today — see the warning above) |
 
 ### Collection and health
 
@@ -83,22 +87,26 @@ Onboard a node on `can0` that periodically broadcasts temperature with CAN ID `1
 
 ## Troubleshooting
 
-- **The driver must run on Linux with `can-utils` installed**. Low-level read/write relies on `candump`/`cansend`, the health check relies on `ip link show`, and an available SocketCAN interface is required. On macOS/Windows or without `can-utils`, `read()`/`write()` throw `ReadPointException`/`WritePointException` because the commands are not found, and the device stays offline.
+- **The driver must run on Linux with `can-utils` installed**. Low-level read/write relies on `candump`/`cansend`, the health check relies on `ip link show`, and an available SocketCAN interface is required. Commands run through `sh -c`: on macOS/Windows or without `can-utils`, `candump` produces no output, so `read()` throws a `No CAN frame received` read exception (`ReadPointException`) via the `output.isEmpty()` check; on the write side a missing `cansend` surfaces as a `WritePointException` through `executeCommand`'s exit code/timeout, and the device stays offline.
 - **Device stays offline**. The health check is effectively the exit code of `ip link show <interfaceName>`: a wrong interface name, an interface that is not `up`, or a process lacking permission to access it all produce a non-zero exit code and an offline verdict. First run `ip link show can0` manually on the host to confirm the interface exists and is UP.
 - **Getting `No CAN frame received`**. `candump` captures a single frame with `timeout 3`; if no frame matching `canId` arrives within 3 seconds it throws a read exception. Check: wrong `canId` (case/radix), `frameFormat` not matching the device's actual frame format (11/29-bit), or the device requiring a request frame first — for the last, configure `requestCanId`/`requestData`.
 - **CAN ID notation must be correct**. Fill `canId`/`requestCanId` in hex the way `can-utils` expects, **without a `0x` prefix** (e.g. `123` for standard frames; the 29-bit hex literal for extended frames). A prefix or decimal value will fail to match any frame.
 - **Bitrate / frame format mismatch**. `bitrate` and `frameFormat` must match the bus and the device; a wrong bus bitrate means the whole bus receives no frames, showing up as persistent `No CAN frame received`.
-- **Write has no effect**. `write()` replaces `${value}` in the `data` template with the command argument and sends it via `cansend`. If the device does not respond, check whether the `data` template assembles the payload hex the device expects, whether the target `canId` is correct, and whether the point is writable (`rwFlag`).
+- **Write has no effect**. The write path is not wired up today: `write()` reads `data` from the point attributes, but `data` is declared only under `command-attribute` and `execute()` is not implemented, so `data` is always empty, `${value}` is never rendered, and `cansend` emits an empty-payload frame (`cansend can0 <canId>#`) — the device receives no payload. This is a skeleton TODO, not a configuration issue. You can still confirm the target `canId` is correct and the point is writable (`rwFlag`).
 
 ## How it lands in IoT DC3
 
 - **`dc3.driver.code`**: `CanDriver` (driver name `CAN Bus Driver`, type `DRIVER_CLIENT`, actively sends/receives frames on the bus). This is a stable routing identifier and must not be changed casually.
 - **Read**: ✓ supported. `read()` captures a single frame matching `canId` via `candump` and returns its payload field, optionally sending a request frame first via `cansend`.
-- **Write**: ✓ supported. `write()` renders the `data` template and sends the command frame onto the bus via `cansend`.
-- **Subscribe**: — not supported. In this driver CAN is a request-response, scheduled active read, not a subscription push wired into DC3. The above matches the CAN row (✓ read / ✓ write / — subscribe) in the [driver capability matrix](./matrix).
+- **Write**: stub / partial. `write()` already shells out to `cansend` to put a frame on the bus, but the `data` frame-data template is not wired up today (`data` is read from `pointConfig` yet declared only under `command-attribute`, and `execute()` is not implemented), so `${value}` is never rendered and the frame currently emitted has an empty payload (see the "Write command attributes" warning above).
+- **Subscribe**: — not supported. In this driver CAN is a request-response, scheduled active read, not a subscription push wired into DC3. The above matches the CAN row (✓ read / — write / — subscribe) in the [driver capability matrix](./matrix).
 
 ::: warning Implementation status: skeleton (WIP), backed by can-utils
-This driver is a starting template. `read()`/`write()` use `ProcessBuilder` to shell out to the Linux `can-utils` tools (`candump`/`cansend`), and `health()` checks the interface via `ip link show` — these paths **actually work** (they capture/write values on a Linux host with can-utils and a real SocketCAN interface) rather than throwing "not implemented." But the source itself marks it a WIP skeleton: the `dataOffset`/`dataLength`/`dataFormat`/`byteOrder` point attributes are not yet applied to byte slicing and type conversion, and a `TODO` plans to replace the per-call `ProcessBuilder` approach with native SocketCAN JNI to cut latency. Byte parsing and native I/O integration must be completed before production use.
+This driver is a starting template. `read()`/`write()` use `ProcessBuilder` to shell out to the Linux `can-utils` tools (`candump`/`cansend`), and `health()` checks the interface via `ip link show` — these call paths actually execute on a Linux host with can-utils and a real SocketCAN interface, rather than throwing "not implemented." But the source itself marks it a WIP skeleton, with parts still not wired up:
+
+- **Read path**: the `dataOffset`/`dataLength`/`dataFormat`/`byteOrder` point attributes are not yet applied to byte slicing and type conversion; `read()` returns the captured payload field as-is.
+- **Write path**: the `data` frame-data template rendering is not actually wired up — `data` is read from `pointConfig` but declared only under `command-attribute`, and `execute()` is not implemented, so `${value}` is never rendered and the frame currently emitted has an empty payload. Like `dataOffset`, this is a skeleton TODO; **do not treat write as able to deliver values yet.**
+- A `TODO` plans to replace the per-call `ProcessBuilder` approach with native SocketCAN JNI to cut latency. Byte parsing, write-template rendering, and native I/O integration must be completed before production use.
 :::
 
 ## Further reading

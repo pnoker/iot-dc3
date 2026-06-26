@@ -90,7 +90,7 @@ IoT DC3 的应用层智能集中在两条路径上，都建立在前几层已经
 :::
 
 ::: warning 工具调用默认开启，但可关
-工具调用由环境变量 `AGENTIC_TOOL_CALLING_ENABLED` 控制，默认 `true`。设为 `false` 后模型退化为纯对话，不再触碰任何设备/数据接口——需要在受限环境里只放开问答时这样配。此外持久化会话记忆由 `AGENTIC_MEMORY_ENABLED` 控制，默认 `false`（关闭）。
+工具调用由环境变量 `AGENTIC_TOOL_CALLING_ENABLED` 控制，默认 `true`。设为 `false` 后模型退化为纯对话，不再触碰任何设备/数据接口——需要在受限环境里只放开问答时这样配。此外持久化会话记忆由 `AGENTIC_MEMORY_ENABLED` 控制：`.env.example` 部署模板将其置为 `false`（默认关闭）；若不提供该变量，框架内置默认为开启——以实际部署环境为准。
 :::
 
 ::: danger 高风险写动作不直接执行
@@ -104,7 +104,7 @@ IoT DC3 的应用层智能集中在两条路径上，都建立在前几层已经
 - **HIGH 风险两阶段确认**：高风险工具调用先返回 `CONFIRM_REQUIRED` + `confirmId`，客户端须携 `confirmId` + 幂等键二次调用，服务端校验未过期、参数摘要一致、单次消费，并全程写入审计日志。
 
 ::: info MCP 的 resources / prompts 尚未实现
-MCP 协议里的 `resources`（资源暴露）与 `prompts`（提示词模板）在 IoT DC3 中**尚未实现**，属规划项；当前只提供 `tools`（工具）能力。此外 `tools/list_changed` 变更通知**未做事件推送**——工具目录的刷新依赖定时调度（默认 `PT5M`）与提交后事件触发，不是实时推送给已连接的 Agent。
+MCP 协议里的 `resources`（资源暴露）与 `prompts`（提示词模板）在 IoT DC3 中**尚未实现**，属规划项；当前只提供 `tools`（工具）能力。此外 `tools/list_changed` 变更通知**未做事件推送**——工具目录不是实时同步给已连接的 Agent，刷新需经管理端接口 `POST /mcp/tool/catalog/refresh` 手动（或 API 注册变更后）触发重建（`PT5M` 是 HIGH 风险二阶段确认的 `confirm-ttl`，与目录刷新无关）。
 :::
 
 **告警与通知** 则承接了上文"异常检测与智能告警"的工程要点。DC3 的[告警与通知](../operation/alarms)用规则引擎做确定性判断、用 `dc3_rule_state` 做状态机（触发/恢复/关闭）去抖动、用告警分级（P0–P3）与多渠道通知（邮件/SMS/Webhook）做降噪与分发——这是"规则托底"的那一半，与上面"模型补强"的 AI 路径互补：规则覆盖写得出来的硬约束，AI 负责帮人理解与处置。

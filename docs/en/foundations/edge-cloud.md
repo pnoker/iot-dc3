@@ -112,14 +112,15 @@ IoT DC3's platform layer is not one monolith but [one gateway plus four center s
 
 **Protocol drivers = the layer you can push to the edge.** DC3's protocol drivers (`dc3-driver-*`) handle protocol adaptation and near-field collection — exactly the edge gateway's core role. Drivers do **not** talk to the Data Center directly; they exchange asynchronously over RabbitMQ — point values flow north, commands flow south. That async decoupling is the very precondition for splitting edge and cloud deployment: drivers can run close to the field, with the MQ buffer absorbing WAN jitter so collection never back-pressures into dropped connections when the cloud slows down.
 
-**The four center services = the centralizable cloud-side capabilities.** [Auth Center dc3-center-auth, Manager Center dc3-center-manager, Data Center dc3-center-data, Agentic Center dc3-center-agentic](../architecture/services) carry, respectively, auth/tenancy, metadata/device management, point-value and command dispatch, and LLM/tool calling — covering exactly the "device management / connection management / rule engine / data service" set above. Point values ultimately land in a TimescaleDB time-series store and become queryable — the concrete form of the cloud-side "data service."
+**The four center services = the centralizable cloud-side capabilities.** [Auth Center dc3-center-auth, Manager Center dc3-center-manager, Data Center dc3-center-data, Agentic Center dc3-center-agentic](../architecture/services) cover the "device management / connection management / rule engine / data service" set above — of which connection management (device/driver online-offline state, lease expiry) and the rule (alarm) engine fall mainly on Data Center `dc3-center-data`, while device/profile/point metadata is handled by Manager Center; the centers also provide auth/tenancy and LLM/tool-calling capabilities. Point values ultimately land in a TimescaleDB time-series store and become queryable — the concrete form of the cloud-side "data service."
 
 **Facade mode = the edge/cloud division switch.** Calls between center services are written against the contract interfaces in `dc3-common-facade-api`; at runtime `DC3_FACADE_MODE` picks the implementation: [`grpc` (the distributed default)](../architecture/facade-modes) makes each center its own process collaborating across processes — fitting a "centers centralized in the cloud, drivers scattered at the edge" topology; `local` (single process) collapses all centers into one process on one machine, fitting local and small single-host setups. In other words, "how edge and cloud divide the work, distributed or not" is collapsed in DC3 into one deployment flag, not two codebases — the same business logic switches between the two shapes by changing `DC3_FACADE_MODE`.
 
 ::: tip Mapping this chapter's concepts onto DC3
 - Edge gateway's "protocol adapt / filter / collect" → protocol drivers `dc3-driver-*`
 - Async decoupling buffer between edge and cloud → RabbitMQ (point values up / commands down)
-- Cloud-side "device/connection management" → Manager Center `dc3-center-manager`
+- Cloud-side "device metadata management" → Manager Center `dc3-center-manager`
+- Cloud-side "connection/state management" (online-offline, lease expiry) → Data Center `dc3-center-data`
 - Cloud-side "data service" → Data Center `dc3-center-data` + TimescaleDB
 - Edge/cloud division deployment switch → Facade mode `DC3_FACADE_MODE`
 :::

@@ -37,7 +37,7 @@ Building, power, and metering protocols. `bacnet-ip` and `snmp` read and write a
 
 ## IoT / Wireless
 
-IoT and wireless drivers. `mqtt` is publish/subscribe — values arrive passively via subscription (no active read), commands can be sent; `lwm2m` (embedded server) and `zigbee` (listens for device join and attribute reports) cover read, write, and subscribe; `coap`, `http`, `ble`, and `can` are request-response active read/write.
+IoT and wireless drivers. `mqtt` is publish/subscribe — values arrive passively via subscription (no active read), commands can be sent; `lwm2m` (embedded server, receives device registration and notifications) covers read, write, and subscribe; `coap`, `http`, `ble`, and `can` are request-response active read/write; `zigbee` is currently a skeleton that only listens for coordinator network state — it does not yet listen for node join or attribute reports, so its subscribe capability is not implemented.
 
 | Driver (dc3.driver.code) | Category | Read | Write | Subscribe/Report | Notes |
 |---|---|---|---|---|---|
@@ -46,8 +46,8 @@ IoT and wireless drivers. `mqtt` is publish/subscribe — values arrive passivel
 | [LwM2M](./lwm2m) (`Lwm2mDriver`) | IoT/Wireless | ✓ | ✓ | ✓ | Embedded server, device registration & notifications |
 | [HTTP](./http) (`HttpDriver`) | IoT/Wireless | ✓ | ✓ | — | Generic HTTP polling |
 | [BLE](./ble) (`BleDriver`) | IoT/Wireless | ✓ | ✓ | — | Bluetooth Low Energy GATT |
-| [Zigbee](./zigbee) (`ZigbeeDriver`) | IoT/Wireless | ✓ | ✓ | ✓ | Listens for join & attribute reports |
-| [CAN](./can) (`CanDriver`) | IoT/Wireless | ✓ | ✓ | — | Controller Area Network |
+| [Zigbee](./zigbee) (`ZigbeeDriver`) | IoT/Wireless | ✓ | ✓ | — | Skeleton; subscribe (join/reports) not implemented |
+| [CAN](./can) (`CanDriver`) | IoT/Wireless | ✓ | — | — | Controller Area Network |
 
 ## Serial / Generic Network
 

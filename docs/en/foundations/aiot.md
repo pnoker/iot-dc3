@@ -90,7 +90,7 @@ The Agentic Center ships **10** `@Tool` tool classes: `TenantTool`, `UserTool`, 
 :::
 
 ::: warning Tool calling is on by default, but can be turned off
-Tool calling is controlled by the environment variable `AGENTIC_TOOL_CALLING_ENABLED`, default `true`. Set it to `false` and the model degrades to pure chat, never touching any device/data interface — configure it this way to allow Q&A only in a restricted environment. Persistent conversation memory is controlled by `AGENTIC_MEMORY_ENABLED`, default `false` (off).
+Tool calling is controlled by the environment variable `AGENTIC_TOOL_CALLING_ENABLED`, default `true`. Set it to `false` and the model degrades to pure chat, never touching any device/data interface — configure it this way to allow Q&A only in a restricted environment. Persistent conversation memory is controlled by `AGENTIC_MEMORY_ENABLED`: the `.env.example` deployment template sets it to `false` (off by default); if the variable is not provided, the framework's built-in default is on — go by your actual deployment.
 :::
 
 ::: danger High-risk writes are never executed directly
@@ -104,7 +104,7 @@ The Agentic Center's write tool **never issues a command directly**. It first cr
 - **HIGH-risk two-phase confirmation**: a high-risk tool call first returns `CONFIRM_REQUIRED` + a `confirmId`; the client must re-call with `confirmId` + an idempotency key, and the server verifies it is not expired, the parameter digest matches, and it is consumed once — auditing the whole thing.
 
 ::: info MCP resources / prompts are not yet implemented
-The MCP protocol's `resources` (resource exposure) and `prompts` (prompt templates) are **not yet implemented** in IoT DC3 — they are planned; only `tools` is offered today. The `tools/list_changed` change notification is **not event-pushed** either — catalog refresh relies on scheduled polling (default `PT5M`) and after-commit event triggers, not real-time push to connected agents.
+The MCP protocol's `resources` (resource exposure) and `prompts` (prompt templates) are **not yet implemented** in IoT DC3 — they are planned; only `tools` is offered today. The `tools/list_changed` change notification is **not event-pushed** either — the tool catalog is not synced to connected agents in real time; refreshing it requires a manual call to the admin endpoint `POST /mcp/tool/catalog/refresh` (or a rebuild after API registrations change) (`PT5M` is the `confirm-ttl` for high-risk two-step confirmation, unrelated to catalog refresh).
 :::
 
 **Alarms and notifications** pick up the "anomaly detection and smart alarming" engineering notes above. DC3's [alarms and notifications](../operation/alarms) use a rule engine for deterministic judgments, `dc3_rule_state` as a state machine (fire/recover/close) for debouncing, alarm grading (P0–P3) and multi-channel delivery (email/SMS/webhook) for noise reduction and dispatch — this is the "rules as the floor" half, complementing the "models for reinforcement" AI paths above: rules cover the hard constraints you can write down, AI helps people understand and act.

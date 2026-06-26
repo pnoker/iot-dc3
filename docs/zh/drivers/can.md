@@ -61,12 +61,16 @@ CAN 设备的接入配置分三层填写：设备级 `driver-attribute`（接口
 
 ### 写命令属性（`command-attribute`）
 
-可写位号还需在写命令上填以下属性。`data` 是帧数据模板，下发时把 `${value}` 占位符替换为命令参数的实际值，再拼成 `cansend` 帧载荷。
+`application.yml` 在 `command-attribute` 下声明了 `canId` 与 `data`（`data` 默认 `${value}`），原意是让写命令携带帧数据模板。
+
+::: warning `data` 模板当前不会生效（骨架待补）
+按源码，`write()` 只从**位号属性**（`pointConfig`）读取 `canId` 与 `data`：`canId = getConfigValue(pointConfig, "canId", "")`、`data = getConfigValue(pointConfig, "data", "")`。但 `point-attribute` 里**没有** `data`（`data` 只声明在 `command-attribute` 下），而 `command-attribute` 仅经 `DriverCommand.execute(commandConfig, …)` 这条路传入——CAN 驱动并未覆写 `execute()`（用默认空实现），所以写路径根本读不到 `command-attribute`。结果是 `data` 恒取默认空串、`frameData` 恒为空，`${value}` 模板不会被渲染，`cansend` 发出的载荷为空（形如 `cansend can0 <canId>#`）。这与 `dataOffset`/`dataLength` 同属"骨架待补"部分，下发的写值当前不会真正落到帧载荷里。
+:::
 
 | 属性 | code | 类型 | 默认值 | 说明 |
 |---|---|---|---|---|
 | CAN ID | `canId` | STRING | （空）| 写入目标的 CAN 标识符（十六进制）|
-| Data | `data` | STRING | `${value}` | 帧数据模板，用命令参数渲染（支持 `${value}`）|
+| Data | `data` | STRING | `${value}` | 帧数据模板（设计上用命令参数渲染 `${value}`，当前未接通，见上方告警）|
 
 ### 采集与健康
 
@@ -83,22 +87,26 @@ CAN 设备的接入配置分三层填写：设备级 `driver-attribute`（接口
 
 ## 故障排查
 
-- **驱动必须跑在装了 `can-utils` 的 Linux 上**。底层读写依赖 `candump`/`cansend`，健康检查依赖 `ip link show`，且要求一个可用的 SocketCAN 接口。在 macOS/Windows 或缺少 `can-utils` 时，`read()`/`write()` 会因命令找不到而抛 `ReadPointException`/`WritePointException`，设备一直离线。
+- **驱动必须跑在装了 `can-utils` 的 Linux 上**。底层读写依赖 `candump`/`cansend`，健康检查依赖 `ip link show`，且要求一个可用的 SocketCAN 接口。命令通过 `sh -c` 执行：在 macOS/Windows 或缺少 `can-utils` 时，`candump` 无输出，`read()` 会因 `output.isEmpty()` 抛 `No CAN frame received` 读异常（`ReadPointException`）；写侧 `cansend` 缺失则因 `executeCommand` 的退出码/超时进入 `WritePointException`，设备一直离线。
 - **设备一直离线**。健康检查实质是 `ip link show <interfaceName>` 的退出码：接口名写错、接口未 `up`、或进程无权限访问该接口，都会让退出码非 0 而判离线。先在主机上手动跑 `ip link show can0` 确认接口存在且 UP。
 - **采到 `No CAN frame received`**。`candump` 用 `timeout 3` 抓单帧，3 秒内没等到匹配 `canId` 的帧就抛读异常。排查方向：`canId` 写错（大小写/进制）、`frameFormat` 与设备实际帧格式（11/29 位）不一致、设备本就需要先收到请求帧——后者要配上 `requestCanId`/`requestData`。
 - **canId 写法要对**。`canId`/`requestCanId` 按 `can-utils` 的写法填十六进制、**不带 `0x` 前缀**（标准帧如 `123`，扩展帧按其 29 位十六进制原文填）。带前缀或写成十进制会匹配不到帧。
 - **波特率/帧格式不匹配**。`bitrate` 与 `frameFormat` 必须与总线和设备一致；总线波特率配错会导致整条总线收不到任何帧，表现为持续 `No CAN frame received`。
-- **写值没生效**。`write()` 把 `data` 模板里的 `${value}` 替换为命令参数后用 `cansend` 发出。若设备无反应，检查 `data` 模板是否拼出设备期望的载荷十六进制、目标 `canId` 是否正确、以及该位号是否为可写（`rwFlag`）。
+- **写值没生效**。当前写路径未真正接通：`write()` 从位号属性读取 `data`，而 `data` 仅声明在 `command-attribute`、且 `execute()` 未实现，因此 `data` 恒为空、`${value}` 不被渲染，`cansend` 发出的是空载荷帧（`cansend can0 <canId>#`），设备收不到预期数据——这属于"骨架待补"，不是配置问题。即便如此仍可先确认目标 `canId` 是否正确、该位号是否为可写（`rwFlag`）。
 
 ## 在 IoT DC3 中如何落地
 
 - **`dc3.driver.code`**：`CanDriver`（驱动名 `CAN Bus Driver`，类型 `DRIVER_CLIENT`，主动在总线上收发帧）。这是稳定的路由标识，不可随意更改。
 - **读能力**：✓ 支持。`read()` 通过 `candump` 抓取匹配 `canId` 的单帧并返回载荷字段，可选先用 `cansend` 发请求帧。
-- **写能力**：✓ 支持。`write()` 渲染 `data` 模板并用 `cansend` 把命令帧发上总线。
-- **订阅能力**：— 不支持。CAN 在本驱动里是请求-响应式的定时主动读，并非把订阅推送接进 DC3。以上与[驱动能力矩阵](./matrix)中 CAN 行（✓ 读 / ✓ 写 / — 订阅）一致。
+- **写能力**：桩/部分实现。`write()` 已能调 `cansend` 把帧发上总线，但 `data` 帧数据模板当前未接通（`data` 取自 `pointConfig` 却只声明于 `command-attribute`、`execute()` 未实现），故 `${value}` 不被渲染、当前发出的是空载荷帧（详见上方"写命令属性"告警）。
+- **订阅能力**：— 不支持。CAN 在本驱动里是请求-响应式的定时主动读，并非把订阅推送接进 DC3。以上与[驱动能力矩阵](./matrix)中 CAN 行（✓ 读 / — 写 / — 订阅）一致。
 
 ::: warning 实现状态：骨架（WIP），底层走 can-utils
-该驱动是一个起步模板。`read()`/`write()` 通过 `ProcessBuilder` 调用 Linux `can-utils`（`candump`/`cansend`）完成收发，`health()` 用 `ip link show` 检查接口——这些路径是**实际可工作的**（在装了 can-utils 的 Linux + 真实 SocketCAN 接口上能采集/写值），而非抛"未实现"。但源码自身标注为 WIP 骨架：位号属性里的 `dataOffset`/`dataLength`/`dataFormat`/`byteOrder` 尚未参与字节切分与类型转换，且 `TODO` 标注计划用原生 SocketCAN JNI 替换每次起进程的 `ProcessBuilder` 方案以降延迟。生产前需补齐字节解析与原生 I/O 集成。
+该驱动是一个起步模板。`read()`/`write()` 通过 `ProcessBuilder` 调用 Linux `can-utils`（`candump`/`cansend`）完成收发，`health()` 用 `ip link show` 检查接口——这些调用路径在装了 can-utils 的 Linux + 真实 SocketCAN 接口上能真正执行，而非抛"未实现"。但源码自身标注为 WIP 骨架，仍有未接通处：
+
+- **读路径**：位号属性里的 `dataOffset`/`dataLength`/`dataFormat`/`byteOrder` 尚未参与字节切分与类型转换，`read()` 把抓到的载荷字段原样返回。
+- **写路径**：`write()` 的 `data` 帧数据模板渲染当前未真正接通——`data` 取自 `pointConfig` 但仅声明于 `command-attribute`，且 `execute()` 未实现，故 `${value}` 不被渲染、当前发出的是空载荷帧。与 `dataOffset` 等同属待补骨架，**不要把 write 当作已可写值**。
+- `TODO` 标注计划用原生 SocketCAN JNI 替换每次起进程的 `ProcessBuilder` 方案以降延迟。生产前需补齐字节解析、写值模板渲染与原生 I/O 集成。
 :::
 
 ## 延伸阅读

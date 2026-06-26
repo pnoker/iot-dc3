@@ -91,7 +91,7 @@ DC3's security backbone centers on [Authentication · Tenancy · RBAC](../archit
 
 DC3 faces the outside world through one entry only, the gateway `dc3-gateway`. Login is a **two-step handshake**, mirroring the anti-replay idea from communication security:
 
-1. `POST /api/v3/auth/token/salt`: send `tenant` and `name`, confirm the tenant exists, and get a random salt, **valid for 5 minutes**.
+1. `POST /api/v3/auth/token/salt`: send `tenant` and `name`, confirm the tenant exists, and get a random salt. The salt is **stateless** — the server neither stores it nor enforces an expiry; it is only checked together with the next login request. The "5 minutes" is merely a usage hint in the response text, honored client-side, not a server-enforced timeout today.
 2. `POST /api/v3/auth/token/generate`: send `tenant`, `name`, `salt`, and the `password` hashed with the salt; on success, get an access token, **valid for 12 hours**.
 
 The salt prevents a cleartext password or a fixed hash from being replayed on the wire. The minted JWT is **bound to `principal_id` + `tenant_id`** (not the username); on logout the identity goes onto a Caffeine denylist, so an old token, even with a valid signature, is rejected because it was issued before the logout point.
@@ -105,7 +105,7 @@ Center services each have their own HTTP port, unmapped externally by default. T
 - When HMAC is disabled, the gateway **actively strips any inbound `X-Auth-Sign`**, so a downstream service can't be tricked by a fake signature the client brought along.
 
 ::: danger Production HMAC/key fail-fast (hard constraint)
-In `pre` / `pro` environments, if `AUTH_HMAC_SECRET` is empty or still equals the default `io.github.pnoker.dc3`, the service **fails to start** (throws `IllegalStateException`; the check is `HmacAuthConfig.isProtectedEnvironment()`). This is intentional: better not to start than to run a production instance on development keys. In production, inject a strong random value (e.g. `openssl rand -base64 48`) via an environment variable, never hardcode it or write it to logs. `DC3_SECURITY_KEY` (the Auth Center's token signing key, default `dc3.security.key.2026.io.github.pnoker`) has no startup check but must be replaced just as carefully — once it leaks, an attacker can forge login tokens.
+In `pre` / `pro` environments, if `AUTH_HMAC_SECRET` is empty or still equals the default `io.github.pnoker.dc3`, the service **fails to start** (throws `IllegalStateException`; the check is `HmacAuthConfig.isProtectedEnvironment()`). This is intentional: better not to start than to run a production instance on development keys. In production, inject a strong random value (e.g. `openssl rand -base64 48`) via an environment variable, never hardcode it or write it to logs. `DC3_SECURITY_KEY` (the Auth Center's token signing key, default `dc3.security.key.2026.io.github.pnoker`) is subject to a **"must exist" startup check only** — missing it fails startup, but there is no "must not equal the default weak value" rejection; so it still must be actively replaced with a strong random value, since once it leaks an attacker can forge login tokens.
 :::
 
 ### Platform Authorization: RBAC, Fail-Closed

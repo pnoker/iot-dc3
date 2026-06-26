@@ -91,7 +91,7 @@ DC3 的安全主线集中在[鉴权 · 租户 · RBAC](../architecture/auth-rbac
 
 DC3 对外只有网关 `dc3-gateway` 一个入口。登录是**两步握手**，对应通信安全里的"防重放"思路：
 
-1. `POST /api/v3/auth/token/salt`：传 `tenant`、`name`，先确认租户存在，返回一个随机盐，**5 分钟内有效**。
+1. `POST /api/v3/auth/token/salt`：传 `tenant`、`name`，先确认租户存在，返回一个随机盐。盐是**无状态**的——服务端不存储、不做过期校验，仅随下一次登录请求一并核对；"5 分钟"只是接口文案里的建议使用时限，由客户端自律，当前服务端未强制过期。
 2. `POST /api/v3/auth/token/generate`：传 `tenant`、`name`、`salt` 和用盐哈希后的 `password`，校验通过返回 access token，**有效期 12 小时**。
 
 盐的作用是避免口令明文或固定哈希在链路上被重放。签发的 JWT **绑定 `principal_id` + `tenant_id`**（而非用户名），注销时把身份写入 Caffeine 注销名单（denylist），旧令牌即便签名合法也会因签发时间早于注销点而失效。
@@ -105,7 +105,7 @@ DC3 对外只有网关 `dc3-gateway` 一个入口。登录是**两步握手**，
 - HMAC 未启用时，网关会**主动删除入站的 `X-Auth-Sign`**，防止下游被客户端自带的假签名诱骗。
 
 ::: danger 生产 HMAC/密钥 fail-fast（硬约束）
-在 `pre` / `pro` 环境下，若 `AUTH_HMAC_SECRET` 为空、或仍等于默认值 `io.github.pnoker.dc3`，服务**启动即失败**（抛 `IllegalStateException`，判定见 `HmacAuthConfig.isProtectedEnvironment()`）。这是有意为之：宁可不启动，也不让生产实例跑在开发密钥上。生产请用强随机值（如 `openssl rand -base64 48`）通过环境变量注入，绝不硬编码或写进日志。鉴权中心签发令牌用的 `DC3_SECURITY_KEY`（默认 `dc3.security.key.2026.io.github.pnoker`）虽无启动检查，也必须同样替换——一旦泄露，攻击者可伪造登录令牌。
+在 `pre` / `pro` 环境下，若 `AUTH_HMAC_SECRET` 为空、或仍等于默认值 `io.github.pnoker.dc3`，服务**启动即失败**（抛 `IllegalStateException`，判定见 `HmacAuthConfig.isProtectedEnvironment()`）。这是有意为之：宁可不启动，也不让生产实例跑在开发密钥上。生产请用强随机值（如 `openssl rand -base64 48`）通过环境变量注入，绝不硬编码或写进日志。鉴权中心签发令牌用的 `DC3_SECURITY_KEY`（默认 `dc3.security.key.2026.io.github.pnoker`）则**只做"必须存在"的启动检查**——缺失即启动失败，但不做"不得等于默认弱值"的拒绝；因此仍必须主动替换为强随机值，一旦泄露，攻击者可伪造登录令牌。
 :::
 
 ### 平台授权：RBAC 的 fail-closed
