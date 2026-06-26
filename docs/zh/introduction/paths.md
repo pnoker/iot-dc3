@@ -28,7 +28,8 @@ flowchart LR
 1. [平台定位](./) — 解决什么问题、与同类的差异
 2. [核心概念](./concepts) — 对象模型与心智模型
 3. [系统架构总览](../architecture/) — 一张图看清整体
-4. 跑个 demo：按 [快速开始](../quickstart/) 起栈，导入示例数据 `iot-dc3/dc3/dependencies/postgres/demo/iot-dc3-demo.sql` 看真实数据
+4. 跑个 demo：按 [快速开始](../quickstart/) 起栈，导入示例数据 `iot-dc3/dc3/dependencies/postgres/demo/iot-dc3-demo.sql`
+   看真实数据
 
 ## 我要接入设备、做日常运营
 

@@ -1,15 +1,20 @@
 <!--
-  Copyright 2016-present the IoT DC3 original author or authors.
-  Licensed under the GNU Affero General Public License v3.0.
-
-  Bottom-most hero background: a 2D-canvas faux-perspective "wave dot-matrix ground plane" —
-  a field of blue dots receding into the distance and undulating slowly, near-large/far-small,
-  far-faint/near-bright. It echoes the tech-feel wave background of the front-end login page,
-  but rendered in plain 2D canvas, sharing the stack with the hero's existing converging-particle
-  layer and logo layer. It sits at the very bottom (z-index 0); text/logo/particles all float above.
-  Solid #1296db at low opacity, never stealing focus. SSR-safe (the canvas is created and injected on the client only).
--->
-<script setup lang="ts">
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<script lang="ts" setup>
 import {onBeforeUnmount, onMounted} from 'vue'
 
 let raf = 0
@@ -141,5 +146,5 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <span class="hero-waves-mount" aria-hidden="true" style="display:none"/>
+  <span aria-hidden="true" class="hero-waves-mount" style="display:none"/>
 </template>

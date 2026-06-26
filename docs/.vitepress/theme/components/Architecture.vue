@@ -1,11 +1,20 @@
 <!--
-  Copyright 2016-present the IoT DC3 original author or authors.
-  Licensed under the GNU Affero General Public License v3.0.
-
-  IoT DC3 product architecture overview / Product architecture diagram.
-  Pure inline SVG; colors use CSS variables to switch with the light/dark theme, and the text switches between Chinese and English via the lang prop.
--->
-<script setup lang="ts">
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<script lang="ts" setup>
 import {computed} from 'vue'
 
 const props = withDefaults(defineProps<{ lang?: 'zh' | 'en' }>(), {lang: 'zh'})
@@ -84,154 +93,252 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 
 <template>
   <div class="dc3-arch">
-    <svg viewBox="0 0 1200 768" role="img" :aria-label="s.busName">
+    <svg :aria-label="s.busName" role="img" viewBox="0 0 1200 768">
       <defs>
-        <marker id="dc3-ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="var(--dc3-arrow)"/>
+        <marker id="dc3-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
+          <polygon fill="var(--dc3-arrow)" points="0 0, 10 3.5, 0 7"/>
         </marker>
-        <marker id="dc3-ah-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="var(--dc3-amber-stroke)"/>
+        <marker id="dc3-ah-amber" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
+          <polygon fill="var(--dc3-amber-stroke)" points="0 0, 10 3.5, 0 7"/>
         </marker>
-        <marker id="dc3-ah-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="var(--dc3-rose-stroke)"/>
+        <marker id="dc3-ah-rose" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
+          <polygon fill="var(--dc3-rose-stroke)" points="0 0, 10 3.5, 0 7"/>
         </marker>
-        <pattern id="dc3-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <pattern id="dc3-grid" height="40" patternUnits="userSpaceOnUse" width="40">
           <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--dc3-grid)" stroke-width="0.5"/>
         </pattern>
       </defs>
 
-      <rect width="100%" height="100%" fill="url(#dc3-grid)"/>
+      <rect fill="url(#dc3-grid)" height="100%" width="100%"/>
 
       <!-- regions -->
-      <rect x="52" y="262" width="756" height="108" rx="12" fill="var(--dc3-region-be)" stroke="var(--dc3-be-stroke)" stroke-width="1" stroke-dasharray="8,4"/>
-      <text x="64" y="280" fill="var(--dc3-be-stroke)" font-size="10" font-weight="600">{{ s.centerRegion }}</text>
-      <rect x="52" y="496" width="756" height="108" rx="12" fill="var(--dc3-region-be)" stroke="var(--dc3-be-stroke)" stroke-width="1" stroke-dasharray="8,4"/>
-      <text x="64" y="514" fill="var(--dc3-be-stroke)" font-size="10" font-weight="600">{{ s.driverRegion }}</text>
-      <rect x="840" y="502" width="300" height="200" rx="12" fill="var(--dc3-region-amber)" stroke="var(--dc3-amber-stroke)" stroke-width="1" stroke-dasharray="8,4"/>
-      <text x="852" y="520" fill="var(--dc3-amber-stroke)" font-size="10" font-weight="600">{{ s.obsRegion }}</text>
+      <rect fill="var(--dc3-region-be)" height="108" rx="12" stroke="var(--dc3-be-stroke)" stroke-dasharray="8,4"
+            stroke-width="1" width="756"
+            x="52" y="262"/>
+      <text fill="var(--dc3-be-stroke)" font-size="10" font-weight="600" x="64" y="280">{{ s.centerRegion }}</text>
+      <rect fill="var(--dc3-region-be)" height="108" rx="12" stroke="var(--dc3-be-stroke)" stroke-dasharray="8,4"
+            stroke-width="1" width="756"
+            x="52" y="496"/>
+      <text fill="var(--dc3-be-stroke)" font-size="10" font-weight="600" x="64" y="514">{{ s.driverRegion }}</text>
+      <rect fill="var(--dc3-region-amber)" height="200" rx="12" stroke="var(--dc3-amber-stroke)" stroke-dasharray="8,4"
+            stroke-width="1"
+            width="300" x="840" y="502"/>
+      <text fill="var(--dc3-amber-stroke)" font-size="10" font-weight="600" x="852" y="520">{{ s.obsRegion }}</text>
 
       <!-- arrows -->
-      <line x1="175" y1="134" x2="175" y2="171" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dc3-ah)"/>
-      <line x1="412" y1="134" x2="412" y2="171" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dc3-ah)"/>
-      <line x1="667" y1="134" x2="667" y2="171" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dc3-ah)"/>
-      <line x1="415" y1="232" x2="415" y2="289" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dc3-ah)"/>
-      <text x="423" y="252" fill="var(--dc3-arrow-label)" font-size="9">{{ s.httpApi }}</text>
-      <line x1="120" y1="232" x2="120" y2="289" stroke="var(--dc3-rose-stroke)" stroke-width="1.3" stroke-dasharray="5,4" marker-end="url(#dc3-ah-rose)"/>
-      <text x="58" y="258" fill="var(--dc3-rose-stroke)" font-size="8">{{ s.jwtVerify }}</text>
-      <line x1="398" y1="372" x2="398" y2="406" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dc3-ah)"/>
-      <text x="352" y="392" fill="var(--dc3-arrow-label)" font-size="8">{{ s.cmdDown }}</text>
-      <line x1="462" y1="406" x2="462" y2="374" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dc3-ah)"/>
-      <text x="470" y="392" fill="var(--dc3-arrow-label)" font-size="8">{{ s.dataUp }}</text>
-      <line x1="398" y1="466" x2="398" y2="494" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dc3-ah)"/>
-      <line x1="462" y1="494" x2="462" y2="468" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dc3-ah)"/>
-      <line x1="398" y1="604" x2="398" y2="642" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dc3-ah)"/>
-      <text x="352" y="626" fill="var(--dc3-arrow-label)" font-size="8">{{ s.writeDown }}</text>
-      <line x1="462" y1="642" x2="462" y2="606" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dc3-ah)"/>
-      <text x="470" y="626" fill="var(--dc3-arrow-label)" font-size="8">{{ s.readUp }}</text>
-      <line x1="808" y1="330" x2="838" y2="330" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-start="url(#dc3-ah)" marker-end="url(#dc3-ah)"/>
-      <text x="812" y="322" fill="var(--dc3-arrow-label)" font-size="8">JDBC</text>
-      <line x1="980" y1="466" x2="980" y2="501" stroke="var(--dc3-amber-stroke)" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#dc3-ah-amber)"/>
-      <text x="986" y="487" fill="var(--dc3-amber-stroke)" font-size="8">{{ s.metricsLogs }}</text>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="175" x2="175" y1="134" y2="171"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="412" x2="412" y1="134" y2="171"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="667" x2="667" y1="134" y2="171"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="415" x2="415" y1="232" y2="289"/>
+      <text fill="var(--dc3-arrow-label)" font-size="9" x="423" y="252">{{ s.httpApi }}</text>
+      <line marker-end="url(#dc3-ah-rose)" stroke="var(--dc3-rose-stroke)" stroke-dasharray="5,4" stroke-width="1.3"
+            x1="120" x2="120"
+            y1="232" y2="289"/>
+      <text fill="var(--dc3-rose-stroke)" font-size="8" x="58" y="258">{{ s.jwtVerify }}</text>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="398" x2="398" y1="372" y2="406"/>
+      <text fill="var(--dc3-arrow-label)" font-size="8" x="352" y="392">{{ s.cmdDown }}</text>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="462" x2="462" y1="406" y2="374"/>
+      <text fill="var(--dc3-arrow-label)" font-size="8" x="470" y="392">{{ s.dataUp }}</text>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="398" x2="398" y1="466" y2="494"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="462" x2="462" y1="494" y2="468"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="398" x2="398" y1="604" y2="642"/>
+      <text fill="var(--dc3-arrow-label)" font-size="8" x="352" y="626">{{ s.writeDown }}</text>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="462" x2="462" y1="642" y2="606"/>
+      <text fill="var(--dc3-arrow-label)" font-size="8" x="470" y="626">{{ s.readUp }}</text>
+      <line marker-end="url(#dc3-ah)" marker-start="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="808"
+            x2="838" y1="330"
+            y2="330"/>
+      <text fill="var(--dc3-arrow-label)" font-size="8" x="812" y="322">JDBC</text>
+      <line marker-end="url(#dc3-ah-amber)" stroke="var(--dc3-amber-stroke)" stroke-dasharray="5,4" stroke-width="1.2"
+            x1="980" x2="980"
+            y1="466" y2="501"/>
+      <text fill="var(--dc3-amber-stroke)" font-size="8" x="986" y="487">{{ s.metricsLogs }}</text>
 
       <!-- Band 1: clients -->
-      <rect x="60" y="70" width="230" height="64" rx="6" fill="var(--dc3-fe-fill)" stroke="var(--dc3-fe-stroke)" stroke-width="1.5"/>
-      <text x="175" y="98" fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle">{{ s.webName }}</text>
-      <text x="175" y="116" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.webSub }}</text>
-      <rect x="305" y="70" width="215" height="64" rx="6" fill="var(--dc3-fe-fill)" stroke="var(--dc3-fe-stroke)" stroke-width="1.5"/>
-      <text x="412" y="98" fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle">{{ s.cliName }}</text>
-      <text x="412" y="116" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.cliSub }}</text>
-      <rect x="535" y="70" width="265" height="64" rx="6" fill="var(--dc3-fe-fill)" stroke="var(--dc3-fe-stroke)" stroke-width="1.5"/>
-      <text x="667" y="98" fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle">{{ s.agentName }}</text>
-      <text x="667" y="116" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.agentSub }}</text>
+      <rect fill="var(--dc3-fe-fill)" height="64" rx="6" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="230"
+            x="60"
+            y="70"/>
+      <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="175" y="98">{{
+          s.webName
+        }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="175" y="116">{{ s.webSub }}</text>
+      <rect fill="var(--dc3-fe-fill)" height="64" rx="6" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="215"
+            x="305"
+            y="70"/>
+      <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="412" y="98">{{
+          s.cliName
+        }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="412" y="116">{{ s.cliSub }}</text>
+      <rect fill="var(--dc3-fe-fill)" height="64" rx="6" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="265"
+            x="535"
+            y="70"/>
+      <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="667" y="98">
+        {{ s.agentName }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="667" y="116">{{ s.agentSub }}</text>
 
       <!-- Band 2: gateway -->
-      <rect x="60" y="174" width="740" height="58" rx="6" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="430" y="200" fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle">{{ s.gwName }}</text>
-      <text x="430" y="218" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.gwSub }}</text>
+      <rect fill="var(--dc3-be-fill)" height="58" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="740"
+            x="60"
+            y="174"/>
+      <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="430" y="200">{{
+          s.gwName
+        }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="430" y="218">{{ s.gwSub }}</text>
 
       <!-- Band 3: center services -->
-      <rect x="60" y="292" width="176" height="62" rx="6" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="148" y="316" fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle">auth</text>
-      <text x="148" y="332" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.authSub }}</text>
-      <text x="148" y="346" fill="var(--dc3-be-text)" font-size="8" text-anchor="middle">:8300 / gRPC 9300</text>
-      <rect x="246" y="292" width="176" height="62" rx="6" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="334" y="316" fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle">manager</text>
-      <text x="334" y="332" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.mgrSub }}</text>
-      <text x="334" y="346" fill="var(--dc3-be-text)" font-size="8" text-anchor="middle">:8400 / gRPC 9400</text>
-      <rect x="432" y="292" width="176" height="62" rx="6" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="520" y="316" fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle">data</text>
-      <text x="520" y="332" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.dataSub }}</text>
-      <text x="520" y="346" fill="var(--dc3-be-text)" font-size="8" text-anchor="middle">:8500 / gRPC 9500</text>
-      <rect x="618" y="292" width="182" height="62" rx="6" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="709" y="316" fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle">agentic</text>
-      <text x="709" y="332" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.agSub }}</text>
-      <text x="709" y="346" fill="var(--dc3-be-text)" font-size="8" text-anchor="middle">:8600 · Spring AI</text>
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="176"
+            x="60"
+            y="292"/>
+      <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="148" y="316">auth</text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="148" y="332">{{ s.authSub }}</text>
+      <text fill="var(--dc3-be-text)" font-size="8" text-anchor="middle" x="148" y="346">:8300 / gRPC 9300</text>
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="176"
+            x="246"
+            y="292"/>
+      <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="334" y="316">manager
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="334" y="332">{{ s.mgrSub }}</text>
+      <text fill="var(--dc3-be-text)" font-size="8" text-anchor="middle" x="334" y="346">:8400 / gRPC 9400</text>
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="176"
+            x="432"
+            y="292"/>
+      <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="520" y="316">data</text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="520" y="332">{{ s.dataSub }}</text>
+      <text fill="var(--dc3-be-text)" font-size="8" text-anchor="middle" x="520" y="346">:8500 / gRPC 9500</text>
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="182"
+            x="618"
+            y="292"/>
+      <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="709" y="316">agentic
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="709" y="332">{{ s.agSub }}</text>
+      <text fill="var(--dc3-be-text)" font-size="8" text-anchor="middle" x="709" y="346">:8600 · Spring AI</text>
 
       <!-- Band 4: message bus -->
-      <rect x="60" y="410" width="740" height="56" rx="6" fill="var(--dc3-bus-fill)" stroke="var(--dc3-bus-stroke)" stroke-width="1.5"/>
-      <text x="430" y="435" fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle">{{ s.busName }}</text>
-      <text x="430" y="453" fill="var(--dc3-bus-text)" font-size="9" text-anchor="middle">{{ s.busSub }}</text>
+      <rect fill="var(--dc3-bus-fill)" height="56" rx="6" stroke="var(--dc3-bus-stroke)" stroke-width="1.5" width="740"
+            x="60"
+            y="410"/>
+      <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="430" y="435">
+        {{ s.busName }}
+      </text>
+      <text fill="var(--dc3-bus-text)" font-size="9" text-anchor="middle" x="430" y="453">{{ s.busSub }}</text>
 
       <!-- Band 5: drivers -->
-      <rect x="60" y="526" width="150" height="62" rx="6" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="135" y="552" fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle">Modbus</text>
-      <text x="135" y="570" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.modbusSub }}</text>
-      <rect x="220" y="526" width="140" height="62" rx="6" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="290" y="552" fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle">{{ s.opcName }}</text>
-      <text x="290" y="570" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.opcSub }}</text>
-      <rect x="370" y="526" width="120" height="62" rx="6" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="430" y="552" fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle">{{ s.s7Name }}</text>
-      <text x="430" y="570" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.s7Sub }}</text>
-      <rect x="500" y="526" width="120" height="62" rx="6" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="560" y="552" fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle">{{ s.mqttName }}</text>
-      <text x="560" y="570" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.mqttSub }}</text>
-      <rect x="630" y="526" width="170" height="62" rx="6" fill="var(--dc3-ext-fill)" stroke="var(--dc3-ext-stroke)" stroke-width="1.5"/>
-      <text x="715" y="552" fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle">{{ s.moreName }}</text>
-      <text x="715" y="570" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.moreSub }}</text>
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="150"
+            x="60"
+            y="526"/>
+      <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="135" y="552">Modbus
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="135" y="570">{{ s.modbusSub }}</text>
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="140"
+            x="220"
+            y="526"/>
+      <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="290" y="552">
+        {{ s.opcName }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="290" y="570">{{ s.opcSub }}</text>
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="120"
+            x="370"
+            y="526"/>
+      <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="430" y="552">{{
+          s.s7Name
+        }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="430" y="570">{{ s.s7Sub }}</text>
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="120"
+            x="500"
+            y="526"/>
+      <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="560" y="552">
+        {{ s.mqttName }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="560" y="570">{{ s.mqttSub }}</text>
+      <rect fill="var(--dc3-ext-fill)" height="62" rx="6" stroke="var(--dc3-ext-stroke)" stroke-width="1.5" width="170"
+            x="630"
+            y="526"/>
+      <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="715" y="552">
+        {{ s.moreName }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="715" y="570">{{ s.moreSub }}</text>
 
       <!-- Band 6: devices -->
-      <rect x="60" y="644" width="740" height="58" rx="6" fill="var(--dc3-ext-fill)" stroke="var(--dc3-ext-stroke)" stroke-width="1.5"/>
-      <text x="430" y="670" fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle">{{ s.devName }}</text>
-      <text x="430" y="688" fill="var(--dc3-text2)" font-size="9" text-anchor="middle">{{ s.devSub }}</text>
+      <rect fill="var(--dc3-ext-fill)" height="58" rx="6" stroke="var(--dc3-ext-stroke)" stroke-width="1.5" width="740"
+            x="60"
+            y="644"/>
+      <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="430" y="670">
+        {{ s.devName }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="430" y="688">{{ s.devSub }}</text>
 
       <!-- PostgreSQL -->
-      <rect x="840" y="262" width="300" height="204" rx="6" fill="var(--dc3-db-fill)" stroke="var(--dc3-db-stroke)" stroke-width="1.5"/>
-      <text x="990" y="290" fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle">{{ s.pgTitle }}</text>
-      <text x="858" y="318" fill="var(--dc3-db-text)" font-size="9">{{ s.pgL1 }}</text>
-      <text x="858" y="338" fill="var(--dc3-db-text)" font-size="9">{{ s.pgL2 }}</text>
-      <text x="858" y="358" fill="var(--dc3-db-text)" font-size="9">{{ s.pgL3 }}</text>
-      <text x="858" y="384" fill="var(--dc3-text2)" font-size="9">{{ s.pgSchemaLabel }}</text>
-      <text x="858" y="402" fill="var(--dc3-text2)" font-size="8">dc3_auth · dc3_manager · dc3_data</text>
-      <text x="858" y="416" fill="var(--dc3-text2)" font-size="8">dc3_agentic · dc3_common</text>
-      <text x="990" y="446" fill="var(--dc3-db-stroke)" font-size="9" text-anchor="middle">{{ s.pgPort }}</text>
+      <rect fill="var(--dc3-db-fill)" height="204" rx="6" stroke="var(--dc3-db-stroke)" stroke-width="1.5" width="300"
+            x="840"
+            y="262"/>
+      <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="990" y="290">
+        {{ s.pgTitle }}
+      </text>
+      <text fill="var(--dc3-db-text)" font-size="9" x="858" y="318">{{ s.pgL1 }}</text>
+      <text fill="var(--dc3-db-text)" font-size="9" x="858" y="338">{{ s.pgL2 }}</text>
+      <text fill="var(--dc3-db-text)" font-size="9" x="858" y="358">{{ s.pgL3 }}</text>
+      <text fill="var(--dc3-text2)" font-size="9" x="858" y="384">{{ s.pgSchemaLabel }}</text>
+      <text fill="var(--dc3-text2)" font-size="8" x="858" y="402">dc3_auth · dc3_manager · dc3_data</text>
+      <text fill="var(--dc3-text2)" font-size="8" x="858" y="416">dc3_agentic · dc3_common</text>
+      <text fill="var(--dc3-db-stroke)" font-size="9" text-anchor="middle" x="990" y="446">{{ s.pgPort }}</text>
 
       <!-- Observability -->
-      <rect x="852" y="528" width="276" height="44" rx="6" fill="var(--dc3-amber-fill)" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"/>
-      <text x="990" y="548" fill="var(--dc3-box-name)" font-size="10" font-weight="600" text-anchor="middle">EMQX · MQTT Broker</text>
-      <text x="990" y="562" fill="var(--dc3-text2)" font-size="8" text-anchor="middle">:31883 · Dashboard :18083</text>
-      <rect x="852" y="584" width="276" height="44" rx="6" fill="var(--dc3-amber-fill)" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"/>
-      <text x="990" y="604" fill="var(--dc3-box-name)" font-size="10" font-weight="600" text-anchor="middle">{{ s.elkName }}</text>
-      <text x="990" y="618" fill="var(--dc3-text2)" font-size="8" text-anchor="middle">{{ s.elkSub }}</text>
-      <rect x="852" y="640" width="276" height="44" rx="6" fill="var(--dc3-amber-fill)" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"/>
-      <text x="990" y="660" fill="var(--dc3-box-name)" font-size="10" font-weight="600" text-anchor="middle">{{ s.promName }}</text>
-      <text x="990" y="674" fill="var(--dc3-text2)" font-size="8" text-anchor="middle">{{ s.promSub }}</text>
+      <rect fill="var(--dc3-amber-fill)" height="44" rx="6" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"
+            width="276" x="852"
+            y="528"/>
+      <text fill="var(--dc3-box-name)" font-size="10" font-weight="600" text-anchor="middle" x="990" y="548">EMQX · MQTT
+        Broker
+      </text>
+      <text fill="var(--dc3-text2)" font-size="8" text-anchor="middle" x="990" y="562">:31883 · Dashboard :18083</text>
+      <rect fill="var(--dc3-amber-fill)" height="44" rx="6" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"
+            width="276" x="852"
+            y="584"/>
+      <text fill="var(--dc3-box-name)" font-size="10" font-weight="600" text-anchor="middle" x="990" y="604">
+        {{ s.elkName }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="8" text-anchor="middle" x="990" y="618">{{ s.elkSub }}</text>
+      <rect fill="var(--dc3-amber-fill)" height="44" rx="6" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"
+            width="276" x="852"
+            y="640"/>
+      <text fill="var(--dc3-box-name)" font-size="10" font-weight="600" text-anchor="middle" x="990" y="660">
+        {{ s.promName }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="8" text-anchor="middle" x="990" y="674">{{ s.promSub }}</text>
 
       <!-- legend -->
-      <rect x="60" y="724" width="16" height="11" rx="2" fill="var(--dc3-fe-fill)" stroke="var(--dc3-fe-stroke)" stroke-width="1"/>
-      <text x="82" y="733" fill="var(--dc3-text2)" font-size="9">{{ s.legAccess }}</text>
-      <rect x="160" y="724" width="16" height="11" rx="2" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1"/>
-      <text x="182" y="733" fill="var(--dc3-text2)" font-size="9">{{ s.legService }}</text>
-      <rect x="300" y="724" width="16" height="11" rx="2" fill="var(--dc3-bus-fill)" stroke="var(--dc3-bus-stroke)" stroke-width="1"/>
-      <text x="322" y="733" fill="var(--dc3-text2)" font-size="9">{{ s.legBus }}</text>
-      <rect x="430" y="724" width="16" height="11" rx="2" fill="var(--dc3-db-fill)" stroke="var(--dc3-db-stroke)" stroke-width="1"/>
-      <text x="452" y="733" fill="var(--dc3-text2)" font-size="9">{{ s.legData }}</text>
-      <rect x="560" y="724" width="16" height="11" rx="2" fill="var(--dc3-amber-fill)" stroke="var(--dc3-amber-stroke)" stroke-width="1"/>
-      <text x="582" y="733" fill="var(--dc3-text2)" font-size="9">{{ s.legOps }}</text>
-      <rect x="700" y="724" width="16" height="11" rx="2" fill="var(--dc3-ext-fill)" stroke="var(--dc3-ext-stroke)" stroke-width="1"/>
-      <text x="722" y="733" fill="var(--dc3-text2)" font-size="9">{{ s.legDevice }}</text>
-      <line x1="870" y1="730" x2="886" y2="730" stroke="var(--dc3-rose-stroke)" stroke-width="1.3" stroke-dasharray="4,3"/>
-      <text x="892" y="733" fill="var(--dc3-text2)" font-size="9">{{ s.legAuth }}</text>
-      <text x="960" y="733" fill="var(--dc3-arrow-label)" font-size="9">{{ s.legPlane }}</text>
+      <rect fill="var(--dc3-fe-fill)" height="11" rx="2" stroke="var(--dc3-fe-stroke)" stroke-width="1" width="16"
+            x="60"
+            y="724"/>
+      <text fill="var(--dc3-text2)" font-size="9" x="82" y="733">{{ s.legAccess }}</text>
+      <rect fill="var(--dc3-be-fill)" height="11" rx="2" stroke="var(--dc3-be-stroke)" stroke-width="1" width="16"
+            x="160"
+            y="724"/>
+      <text fill="var(--dc3-text2)" font-size="9" x="182" y="733">{{ s.legService }}</text>
+      <rect fill="var(--dc3-bus-fill)" height="11" rx="2" stroke="var(--dc3-bus-stroke)" stroke-width="1" width="16"
+            x="300"
+            y="724"/>
+      <text fill="var(--dc3-text2)" font-size="9" x="322" y="733">{{ s.legBus }}</text>
+      <rect fill="var(--dc3-db-fill)" height="11" rx="2" stroke="var(--dc3-db-stroke)" stroke-width="1" width="16"
+            x="430"
+            y="724"/>
+      <text fill="var(--dc3-text2)" font-size="9" x="452" y="733">{{ s.legData }}</text>
+      <rect fill="var(--dc3-amber-fill)" height="11" rx="2" stroke="var(--dc3-amber-stroke)" stroke-width="1" width="16"
+            x="560"
+            y="724"/>
+      <text fill="var(--dc3-text2)" font-size="9" x="582" y="733">{{ s.legOps }}</text>
+      <rect fill="var(--dc3-ext-fill)" height="11" rx="2" stroke="var(--dc3-ext-stroke)" stroke-width="1" width="16"
+            x="700"
+            y="724"/>
+      <text fill="var(--dc3-text2)" font-size="9" x="722" y="733">{{ s.legDevice }}</text>
+      <line stroke="var(--dc3-rose-stroke)" stroke-dasharray="4,3" stroke-width="1.3" x1="870" x2="886" y1="730"
+            y2="730"/>
+      <text fill="var(--dc3-text2)" font-size="9" x="892" y="733">{{ s.legAuth }}</text>
+      <text fill="var(--dc3-arrow-label)" font-size="9" x="960" y="733">{{ s.legPlane }}</text>
     </svg>
   </div>
 </template>
@@ -242,14 +349,24 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
   --dc3-grid: #e2e8f0;
   --dc3-text2: #475569;
   --dc3-box-name: #0f172a;
-  --dc3-fe-fill: #ecfeff;   --dc3-fe-stroke: #0891b2;
-  --dc3-be-fill: #ecfdf5;   --dc3-be-stroke: #059669;  --dc3-be-text: #047857;
-  --dc3-db-fill: #f5f3ff;   --dc3-db-stroke: #7c3aed;  --dc3-db-text: #6d28d9;
-  --dc3-amber-fill: #fffbeb; --dc3-amber-stroke: #d97706;
+  --dc3-fe-fill: #ecfeff;
+  --dc3-fe-stroke: #0891b2;
+  --dc3-be-fill: #ecfdf5;
+  --dc3-be-stroke: #059669;
+  --dc3-be-text: #047857;
+  --dc3-db-fill: #f5f3ff;
+  --dc3-db-stroke: #7c3aed;
+  --dc3-db-text: #6d28d9;
+  --dc3-amber-fill: #fffbeb;
+  --dc3-amber-stroke: #d97706;
   --dc3-rose-stroke: #e11d48;
-  --dc3-bus-fill: #fff7ed;  --dc3-bus-stroke: #ea580c;  --dc3-bus-text: #c2410c;
-  --dc3-ext-fill: #f1f5f9;  --dc3-ext-stroke: #64748b;
-  --dc3-arrow: #94a3b8;     --dc3-arrow-label: #64748b;
+  --dc3-bus-fill: #fff7ed;
+  --dc3-bus-stroke: #ea580c;
+  --dc3-bus-text: #c2410c;
+  --dc3-ext-fill: #f1f5f9;
+  --dc3-ext-stroke: #64748b;
+  --dc3-arrow: #94a3b8;
+  --dc3-arrow-label: #64748b;
   --dc3-region-be: rgba(5, 150, 105, 0.05);
   --dc3-region-amber: rgba(217, 119, 6, 0.06);
 
@@ -266,14 +383,24 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
   --dc3-grid: #1e293b;
   --dc3-text2: #94a3b8;
   --dc3-box-name: #ffffff;
-  --dc3-fe-fill: rgba(8, 51, 68, 0.5);    --dc3-fe-stroke: #22d3ee;
-  --dc3-be-fill: rgba(6, 78, 59, 0.5);    --dc3-be-stroke: #34d399;  --dc3-be-text: #34d399;
-  --dc3-db-fill: rgba(76, 29, 149, 0.45); --dc3-db-stroke: #a78bfa;  --dc3-db-text: #cbb6f7;
-  --dc3-amber-fill: rgba(120, 53, 15, 0.35); --dc3-amber-stroke: #fbbf24;
+  --dc3-fe-fill: rgba(8, 51, 68, 0.5);
+  --dc3-fe-stroke: #22d3ee;
+  --dc3-be-fill: rgba(6, 78, 59, 0.5);
+  --dc3-be-stroke: #34d399;
+  --dc3-be-text: #34d399;
+  --dc3-db-fill: rgba(76, 29, 149, 0.45);
+  --dc3-db-stroke: #a78bfa;
+  --dc3-db-text: #cbb6f7;
+  --dc3-amber-fill: rgba(120, 53, 15, 0.35);
+  --dc3-amber-stroke: #fbbf24;
   --dc3-rose-stroke: #fb7185;
-  --dc3-bus-fill: rgba(251, 146, 60, 0.3); --dc3-bus-stroke: #fb923c;  --dc3-bus-text: #fcd9b6;
-  --dc3-ext-fill: rgba(30, 41, 59, 0.5);  --dc3-ext-stroke: #94a3b8;
-  --dc3-arrow: #64748b;     --dc3-arrow-label: #94a3b8;
+  --dc3-bus-fill: rgba(251, 146, 60, 0.3);
+  --dc3-bus-stroke: #fb923c;
+  --dc3-bus-text: #fcd9b6;
+  --dc3-ext-fill: rgba(30, 41, 59, 0.5);
+  --dc3-ext-stroke: #94a3b8;
+  --dc3-arrow: #64748b;
+  --dc3-arrow-label: #94a3b8;
   --dc3-region-be: rgba(52, 211, 153, 0.04);
   --dc3-region-amber: rgba(251, 191, 36, 0.05);
 }

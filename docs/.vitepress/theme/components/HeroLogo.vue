@@ -1,17 +1,20 @@
 <!--
-  Copyright 2016-present the IoT DC3 original author or authors.
-  Licensed under the GNU Affero General Public License v3.0.
-
-  Hero logo for the home page: a faithful rebuild of logo.svg — its 54 dots, the solid
-  #1296db color, and their exact positions and radii, drawn on a canvas so it matches the
-  original logo pixel for pixel. Only the dots themselves come "alive": a clockwise,
-  inward-converging coherent wave flows along the three spiral arms, giving each dot a
-  gentle tangential sway plus a very faint shimmer — echoing the logo's "swirl converging,
-  everything connected" form. The whole image never rotates, never breathes by scaling, and
-  carries no stray particles or glow haze. Any still frame equals logo.svg. SSR-safe (the
-  canvas only starts on the client).
--->
-<script setup lang="ts">
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<script lang="ts" setup>
 import {onBeforeUnmount, onMounted, ref} from 'vue'
 import {LOGO_POINTS} from './logo-points'
 
@@ -152,7 +155,7 @@ onBeforeUnmount(() => {
 <template>
   <div ref="root" class="hero-logo">
     <div class="hero-logo-glow"/>
-    <canvas ref="canvas" class="hero-logo-canvas" aria-label="IoT DC3" role="img"/>
+    <canvas ref="canvas" aria-label="IoT DC3" class="hero-logo-canvas" role="img"/>
   </div>
 </template>
 

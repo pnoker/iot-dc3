@@ -6,17 +6,21 @@
 
 ## 1. 背景与问题
 
-当前 `iot-dc3/docs/` 是一个 VitePress（zh-CN，`vitepress ^1.6.4`）站点，内容覆盖较全但质量不达标，逐页审计（见 dossier §C）确认了三类硬伤：
+当前 `iot-dc3/docs/` 是一个 VitePress（zh-CN，`vitepress ^1.6.4`）站点，内容覆盖较全但质量不达标，逐页审计（见 dossier
+§C）确认了三类硬伤：
 
 - **零真实图表**：所有"数据流/命令流"是 ` ```text ` 里的 `->` ASCII 箭头，公开页面没有一张流程图/时序图。
-- **AI 化严重**：`concepts.md`、`data-commands.md` 等是纯平行表格 + 零叙事；架构页只罗列 4 个设计点不解释；模块页用 Maven 清单冒充架构。
-- **不专业 / 不友好**：两个空白页（`guide/usage.md`、`development/changelog.md` 只含 `<!--@include-->`，渲染为全空白）；无角色化学习路径；维护者内部草稿 `superpowers/` 混入公开导航。
+- **AI 化严重**：`concepts.md`、`data-commands.md` 等是纯平行表格 + 零叙事；架构页只罗列 4 个设计点不解释；模块页用 Maven
+  清单冒充架构。
+- **不专业 / 不友好**：两个空白页（`guide/usage.md`、`development/changelog.md` 只含 `<!--@include-->`
+  ，渲染为全空白）；无角色化学习路径；维护者内部草稿 `superpowers/` 混入公开导航。
 
 ## 2. 目标与非目标
 
 **目标**
 
-1. 把全站重写/润色为**产品经理 + 架构师双视角**：既讲清"是什么、解决什么问题、给谁用"，也讲透"如何构成、关键链路如何流转、为何这样设计"。
+1. 把全站重写/润色为**产品经理 + 架构师双视角**：既讲清"是什么、解决什么问题、给谁用"，也讲透"
+   如何构成、关键链路如何流转、为何这样设计"。
 2. 用 **Mermaid** 为每条关键链路补齐流程图/时序图/状态图/ER 图（共 42 张，见 dossier §E）。
 3. 消除 AI 味：遵循 dossier §F 的 12 条写作风格指南（叙事先行、先讲为什么、术语就地定义、具体示例替代占位符、诚实标注实现状态）。
 4. 落地完整扩展版信息架构（dossier §D），新增 ~12 个高价值页面。
@@ -45,7 +49,8 @@
 
 - **图表技术**：Mermaid，嵌入 markdown 的 ` ```mermaid ` 代码块。
 - **标签语言**：图内节点/说明用**中文**，技术标识符保留原文（`Gateway`、`RabbitMQ`、`dc3.e.value`、`PointValueBO`、类名/表名/路由键）。
-- **类型选择**：链路时序 → `sequenceDiagram`；状态机 → `stateDiagram-v2`；拓扑/分支/数据流 → `flowchart`；实体关系 → `erDiagram`；分层/类结构 → `classDiagram`。
+- **类型选择**：链路时序 → `sequenceDiagram`；状态机 → `stateDiagram-v2`；拓扑/分支/数据流 → `flowchart`；实体关系 →
+  `erDiagram`；分层/类结构 → `classDiagram`。
 - **主题**：暗色模式由插件强制深色；浅色模式用 `mermaid` 配置默认主题。不在单图里手写 `themeVariables` 颜色，保持全站一致、随站点主题切换。
 - **可维护性**：图与正文同源同页；架构变更时图随文改。每张图就近放在它解释的段落下方，并在正文引用其要点（图示结构、文述细节，二者不重复堆砌）。
 
@@ -67,7 +72,10 @@
 **落地实测结果（P0 已完成）**：
 
 - 安装版本：`mermaid@11.15.0` + `vitepress-plugin-mermaid@2.0.17`，与 `vitepress@1.6.4` 兼容，`docs:build` 通过。
-- **pnpm 关键坑**：mermaid 的 CJS 传递依赖（`dayjs`、`cytoscape`、`cytoscape-cose-bilkent`、`@braintree/sanitize-url`、`debug`）在 pnpm 非扁平 `node_modules` 下，Vite `optimizeDeps` 预构建解析失败，回退直接加载 `dayjs.min.js` 时报 `does not provide an export named 'default'`，导致**整页不挂载**。修复：把这 5 个依赖显式加为 devDependencies 提升到顶层 `node_modules`，再 `rm -rf docs/.vitepress/cache` 重建预构建缓存。已用 Playwright 实测：浅色模式品牌绿主题、SVG 正常渲染。
+- **pnpm 关键坑**：mermaid 的 CJS 传递依赖（`dayjs`、`cytoscape`、`cytoscape-cose-bilkent`、`@braintree/sanitize-url`、`debug`
+  ）在 pnpm 非扁平 `node_modules` 下，Vite `optimizeDeps` 预构建解析失败，回退直接加载 `dayjs.min.js` 时报
+  `does not provide an export named 'default'`，导致**整页不挂载**。修复：把这 5 个依赖显式加为 devDependencies 提升到顶层
+  `node_modules`，再 `rm -rf docs/.vitepress/cache` 重建预构建缓存。已用 Playwright 实测：浅色模式品牌绿主题、SVG 正常渲染。
 
 ### 5.2 superpowers/ 移出公开导航
 
@@ -135,28 +143,30 @@
 ```
 
 新增页面（13）：what-is-dc3、paths、first-device、services、facade-modes、data-plane、command-plane、auth-rbac、domain-model、alarms、cli、mcp、observability。
-合并/去重：`concepts.md` 并入 introduction（重写）；架构叙事归 `architecture/module-map`，`/modules/index` 收敛为纯模块清单参考（仅表格 + 一句指引到 module-map），二者按"叙事 vs 清单"分工去重，保留 `/modules/` 路径以防外链失效。
+合并/去重：`concepts.md` 并入 introduction（重写）；架构叙事归 `architecture/module-map`，`/modules/index`
+收敛为纯模块清单参考（仅表格 + 一句指引到 module-map），二者按"叙事 vs 清单"分工去重，保留 `/modules/` 路径以防外链失效。
 
 > 落地时同步更新 `config.mts` 的 `nav` 与 `sidebar` 以匹配新结构，并校验所有内链有效。
 
 ## 7. 图表清单
 
-完整 42 张见 dossier §E（D1–D42，已映射到上述页面）。落地时每页按其归属图逐张实现；图必须反映源码事实，落地前据 dossier 对应 §B 小节核对。
+完整 42 张见 dossier §E（D1–D42，已映射到上述页面）。落地时每页按其归属图逐张实现；图必须反映源码事实，落地前据 dossier 对应
+§B 小节核对。
 
 ## 8. 交付计划（按章节全量推进，逐节设检查点）
 
 分 8 批，每批一节，按"基建优先 + 价值优先"排序。每批完成即交付 review。
 
-| 批次 | 范围 | 关键产出 | 图（dossier ID） |
-|---|---|---|---|
-| P0 基建 | mermaid 集成 + superpowers 移除 + nav/sidebar 骨架 | 站点可渲染 mermaid、空白页修复、导航重构 | — |
-| P1 介绍 + 首页 | introduction 全栏目 + 首页 index.md 润色 | 定位/核心概念重写/角色路径 + 首页门面 | D1, D11 |
-| P2 架构 | architecture 全栏目（8 页） | 服务拓扑/facade/数据面/命令面/鉴权租户/领域模型/模块地图 | D2–D13, D15–D21, D25, D39 |
-| P3 快速开始 | quickstart 全栏目 | 本地开发/环境变量/第一个设备 E2E | D3, D34, D35 |
-| P4 操作手册 | operation 全栏目 | 设备接入/数据与命令/告警/Agentic | D28–D31, D37, D38 |
-| P5 开发 | development 全栏目 | 驱动开发/API/测试/Changelog/规范 | D14, D22–D24, D26, D27, D32 |
-| P6 自动化 | automation 新栏目 | CLI / MCP 集成 | D40, D41, D42, D29 |
-| P7 部署运维 + 社区 | guide 全栏目 + 社区 | 部署/可观测性/日志/排障 + 社区修订 | D33, D36 |
+| 批次           | 范围                                           | 关键产出                               | 图（dossier ID）               |
+|--------------|----------------------------------------------|------------------------------------|-----------------------------|
+| P0 基建        | mermaid 集成 + superpowers 移除 + nav/sidebar 骨架 | 站点可渲染 mermaid、空白页修复、导航重构           | —                           |
+| P1 介绍 + 首页   | introduction 全栏目 + 首页 index.md 润色            | 定位/核心概念重写/角色路径 + 首页门面              | D1, D11                     |
+| P2 架构        | architecture 全栏目（8 页）                        | 服务拓扑/facade/数据面/命令面/鉴权租户/领域模型/模块地图 | D2–D13, D15–D21, D25, D39   |
+| P3 快速开始      | quickstart 全栏目                               | 本地开发/环境变量/第一个设备 E2E                | D3, D34, D35                |
+| P4 操作手册      | operation 全栏目                                | 设备接入/数据与命令/告警/Agentic              | D28–D31, D37, D38           |
+| P5 开发        | development 全栏目                              | 驱动开发/API/测试/Changelog/规范           | D14, D22–D24, D26, D27, D32 |
+| P6 自动化       | automation 新栏目                               | CLI / MCP 集成                       | D40, D41, D42, D29          |
+| P7 部署运维 + 社区 | guide 全栏目 + 社区                               | 部署/可观测性/日志/排障 + 社区修订               | D33, D36                    |
 
 **每批的验证方式（完成标准）**
 
@@ -183,4 +193,5 @@
 - **mermaid 版本兼容**：见 §5.1 风险点，安装时锁版本验证。
 - **工作量大**：分 8 批交付，每批独立可评审、可回退，避免一次性大改方向跑偏。
 - **`/modules/` 与架构模块地图去重**：可能影响既有外链；落地时保留重定向或在 `/modules/` 留指引。
+
 ```

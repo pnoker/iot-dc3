@@ -22,7 +22,7 @@ import {withMermaid} from 'vitepress-plugin-mermaid'
 // A pillar may own multiple legacy directory prefixes (paths) and share a single sidebar; Entry: [code, zh, English].
 // code = language-relative path: a single segment is treated as a directory index (→ '/<lang>/<code>/'), multiple segments as a specific page (→ '/<lang>/<code>').
 type Entry = readonly [string, string, string]
-type Group = {zh: string; en: string; items: ReadonlyArray<Entry>}
+type Group = { zh: string; en: string; items: ReadonlyArray<Entry> }
 type Pillar = {
     navZh: string
     navEn: string
@@ -33,173 +33,241 @@ type Pillar = {
 }
 
 const PILLARS: ReadonlyArray<Pillar> = [
-    {navZh: '总览', navEn: 'Overview', landing: 'introduction',
-     paths: ['introduction', 'quickstart'], activeMatch: '^/(zh|en)/(introduction|quickstart)/',
-     groups: [
-        {zh: '', en: '', items: [
-            ['introduction', '总览', 'Overview'],
-            ['introduction/concepts', '核心概念', 'Core Concepts'],
-            ['introduction/paths', '按角色选择路径', 'Choose Your Path']
-        ]},
-        {zh: '对象与数据', en: 'Objects & Data', items: [
-            ['introduction/concepts/profile', '物模型', 'Profile'],
-            ['introduction/concepts/device', '设备', 'Device'],
-            ['introduction/concepts/driver', '驱动', 'Driver'],
-            ['introduction/concepts/point', '位号', 'Point'],
-            ['introduction/concepts/point-value', '位号值', 'Point Value']
-        ]},
-        {zh: '能力与边界', en: 'Capabilities & Boundaries', items: [
-            ['introduction/concepts/command', '指令', 'Command'],
-            ['introduction/concepts/event', '事件', 'Event'],
-            ['introduction/concepts/attribute-config', '属性与配置', 'Attribute & Config'],
-            ['introduction/concepts/tenant', '租户', 'Tenant']
-        ]},
-        {zh: '快速开始', en: 'Quick Start', items: [
-            ['quickstart', '本地开发', 'Local Development'],
-            ['quickstart/environment', '环境变量', 'Environment Variables'],
-            ['quickstart/first-device', '第一个设备', 'First Device']
-        ]},
-        {zh: '附录', en: 'Appendix', items: [
-            ['introduction/glossary', '术语表', 'Glossary']
-        ]}
-     ]},
+    {
+        navZh: '总览', navEn: 'Overview', landing: 'introduction',
+        paths: ['introduction', 'quickstart'], activeMatch: '^/(zh|en)/(introduction|quickstart)/',
+        groups: [
+            {
+                zh: '', en: '', items: [
+                    ['introduction', '总览', 'Overview'],
+                    ['introduction/concepts', '核心概念', 'Core Concepts'],
+                    ['introduction/paths', '按角色选择路径', 'Choose Your Path']
+                ]
+            },
+            {
+                zh: '对象与数据', en: 'Objects & Data', items: [
+                    ['introduction/concepts/profile', '物模型', 'Profile'],
+                    ['introduction/concepts/device', '设备', 'Device'],
+                    ['introduction/concepts/driver', '驱动', 'Driver'],
+                    ['introduction/concepts/point', '位号', 'Point'],
+                    ['introduction/concepts/point-value', '位号值', 'Point Value']
+                ]
+            },
+            {
+                zh: '能力与边界', en: 'Capabilities & Boundaries', items: [
+                    ['introduction/concepts/command', '指令', 'Command'],
+                    ['introduction/concepts/event', '事件', 'Event'],
+                    ['introduction/concepts/attribute-config', '属性与配置', 'Attribute & Config'],
+                    ['introduction/concepts/tenant', '租户', 'Tenant']
+                ]
+            },
+            {
+                zh: '快速开始', en: 'Quick Start', items: [
+                    ['quickstart', '本地开发', 'Local Development'],
+                    ['quickstart/environment', '环境变量', 'Environment Variables'],
+                    ['quickstart/first-device', '第一个设备', 'First Device']
+                ]
+            },
+            {
+                zh: '附录', en: 'Appendix', items: [
+                    ['introduction/glossary', '术语表', 'Glossary']
+                ]
+            }
+        ]
+    },
 
-    {navZh: '基础', navEn: 'Foundations', landing: 'foundations',
-     paths: ['foundations'], activeMatch: '^/(zh|en)/foundations/',
-     groups: [
-        {zh: '', en: '', items: [
-            ['foundations', '物联网技术总览', 'IoT Technology Overview']
-        ]},
-        {zh: '感知层', en: 'Perception', items: [
-            ['foundations/sensing', '传感与测量', 'Sensing & Measurement'],
-            ['foundations/identification', '自动识别与定位', 'Auto-ID & Positioning']
-        ]},
-        {zh: '网络层', en: 'Network', items: [
-            ['foundations/fieldbus', '工业总线与协议', 'Industrial Buses & Protocols'],
-            ['foundations/iot-protocols', 'IoT 协议与无线网络', 'IoT Protocols & Wireless']
-        ]},
-        {zh: '平台层', en: 'Platform', items: [
-            ['foundations/edge-cloud', '边缘与云架构', 'Edge & Cloud Architecture'],
-            ['foundations/data-pipeline', '时序数据与流处理', 'Time-Series & Streaming']
-        ]},
-        {zh: '应用层', en: 'Application', items: [
-            ['foundations/aiot', '数据智能与 AIoT', 'Data Intelligence & AIoT']
-        ]},
-        {zh: '安全', en: 'Security', items: [
-            ['foundations/security', '物联网安全', 'IoT Security']
-        ]}
-     ]},
+    {
+        navZh: '基础', navEn: 'Foundations', landing: 'foundations',
+        paths: ['foundations'], activeMatch: '^/(zh|en)/foundations/',
+        groups: [
+            {
+                zh: '', en: '', items: [
+                    ['foundations', '物联网技术总览', 'IoT Technology Overview']
+                ]
+            },
+            {
+                zh: '感知层', en: 'Perception', items: [
+                    ['foundations/sensing', '传感与测量', 'Sensing & Measurement'],
+                    ['foundations/identification', '自动识别与定位', 'Auto-ID & Positioning']
+                ]
+            },
+            {
+                zh: '网络层', en: 'Network', items: [
+                    ['foundations/fieldbus', '工业总线与协议', 'Industrial Buses & Protocols'],
+                    ['foundations/iot-protocols', 'IoT 协议与无线网络', 'IoT Protocols & Wireless']
+                ]
+            },
+            {
+                zh: '平台层', en: 'Platform', items: [
+                    ['foundations/edge-cloud', '边缘与云架构', 'Edge & Cloud Architecture'],
+                    ['foundations/data-pipeline', '时序数据与流处理', 'Time-Series & Streaming']
+                ]
+            },
+            {
+                zh: '应用层', en: 'Application', items: [
+                    ['foundations/aiot', '数据智能与 AIoT', 'Data Intelligence & AIoT']
+                ]
+            },
+            {
+                zh: '安全', en: 'Security', items: [
+                    ['foundations/security', '物联网安全', 'IoT Security']
+                ]
+            }
+        ]
+    },
 
-    {navZh: '架构', navEn: 'Architecture', landing: 'architecture',
-     paths: ['architecture', 'modules'], activeMatch: '^/(zh|en)/(architecture|modules)/',
-     groups: [
-        {zh: '', en: '', items: [
-            ['architecture', '总览', 'Overview']
-        ]},
-        {zh: '服务与协作', en: 'Services & Collaboration', items: [
-            ['architecture/services', '服务与拓扑', 'Services & Topology'],
-            ['architecture/facade-modes', 'Facade 模式', 'Facade Modes']
-        ]},
-        {zh: '链路与模型', en: 'Pipelines & Model', items: [
-            ['architecture/data-plane', '数据平面', 'Data Plane'],
-            ['architecture/command-plane', '命令平面', 'Command Plane'],
-            ['architecture/auth-rbac', '鉴权 · 租户 · RBAC', 'Auth, Tenant & RBAC'],
-            ['architecture/domain-model', '领域模型', 'Domain Model']
-        ]},
-        {zh: '模块', en: 'Modules', items: [
-            ['architecture/modules', '模块地图', 'Module Map'],
-            ['modules', '模块清单', 'Catalog']
-        ]}
-     ]},
+    {
+        navZh: '架构', navEn: 'Architecture', landing: 'architecture',
+        paths: ['architecture', 'modules'], activeMatch: '^/(zh|en)/(architecture|modules)/',
+        groups: [
+            {
+                zh: '', en: '', items: [
+                    ['architecture', '总览', 'Overview']
+                ]
+            },
+            {
+                zh: '服务与协作', en: 'Services & Collaboration', items: [
+                    ['architecture/services', '服务与拓扑', 'Services & Topology'],
+                    ['architecture/facade-modes', 'Facade 模式', 'Facade Modes']
+                ]
+            },
+            {
+                zh: '链路与模型', en: 'Pipelines & Model', items: [
+                    ['architecture/data-plane', '数据平面', 'Data Plane'],
+                    ['architecture/command-plane', '命令平面', 'Command Plane'],
+                    ['architecture/auth-rbac', '鉴权 · 租户 · RBAC', 'Auth, Tenant & RBAC'],
+                    ['architecture/domain-model', '领域模型', 'Domain Model']
+                ]
+            },
+            {
+                zh: '模块', en: 'Modules', items: [
+                    ['architecture/modules', '模块地图', 'Module Map'],
+                    ['modules', '模块清单', 'Catalog']
+                ]
+            }
+        ]
+    },
 
-    {navZh: '接入', navEn: 'Connectivity', landing: 'drivers',
-     paths: ['drivers', 'operation/device-onboarding'],
-     activeMatch: '^/(zh|en)/(drivers/|operation/device-onboarding)',
-     groups: [
-        {zh: '接入指南', en: 'Onboarding', items: [
-            ['drivers', '驱动总览', 'Drivers'],
-            ['operation/device-onboarding', '设备接入流程', 'Device Onboarding']
-        ]},
-        {zh: '工业总线 / PLC', en: 'Industrial Bus / PLC', items: [
-            ['drivers/modbus-tcp', 'Modbus TCP', 'Modbus TCP'],
-            ['drivers/modbus-rtu', 'Modbus RTU', 'Modbus RTU'],
-            ['drivers/opc-ua', 'OPC UA', 'OPC UA'],
-            ['drivers/opc-da', 'OPC DA', 'OPC DA'],
-            ['drivers/plcs7', 'S7 (Siemens)', 'S7 (Siemens)'],
-            ['drivers/melsec', 'MELSEC', 'MELSEC'],
-            ['drivers/fins', 'FINS (Omron)', 'FINS (Omron)'],
-            ['drivers/ethernet-ip', 'EtherNet/IP', 'EtherNet/IP']
-        ]},
-        {zh: 'SCADA / 电力 / 计量', en: 'SCADA / Power / Metering', items: [
-            ['drivers/bacnet-ip', 'BACnet/IP', 'BACnet/IP'],
-            ['drivers/iec104', 'IEC 104', 'IEC 104'],
-            ['drivers/dlms', 'DLMS', 'DLMS'],
-            ['drivers/sl651', 'SL651', 'SL651'],
-            ['drivers/snmp', 'SNMP', 'SNMP']
-        ]},
-        {zh: '物联网 / 无线', en: 'IoT / Wireless', items: [
-            ['drivers/mqtt', 'MQTT', 'MQTT'],
-            ['drivers/coap', 'CoAP', 'CoAP'],
-            ['drivers/lwm2m', 'LwM2M', 'LwM2M'],
-            ['drivers/http', 'HTTP', 'HTTP'],
-            ['drivers/ble', 'BLE', 'BLE'],
-            ['drivers/zigbee', 'Zigbee', 'Zigbee'],
-            ['drivers/can', 'CAN', 'CAN']
-        ]},
-        {zh: '串口 / 通用网络', en: 'Serial / Generic Network', items: [
-            ['drivers/serial', '串口 Serial', 'Serial'],
-            ['drivers/tcp-udp', 'TCP/UDP', 'TCP/UDP']
-        ]},
-        {zh: '数据库', en: 'Database', items: [
-            ['drivers/mysql', 'MySQL', 'MySQL'],
-            ['drivers/postgresql', 'PostgreSQL', 'PostgreSQL'],
-            ['drivers/oracle', 'Oracle', 'Oracle'],
-            ['drivers/sqlserver', 'SQL Server', 'SQL Server']
-        ]},
-        {zh: '虚拟 / 测试', en: 'Virtual / Testing', items: [
-            ['drivers/virtual', '虚拟 Virtual', 'Virtual'],
-            ['drivers/listening-virtual', '监听虚拟', 'Listening Virtual']
-        ]},
-        {zh: '附录', en: 'Appendix', items: [
-            ['drivers/matrix', '驱动能力矩阵', 'Driver Capability Matrix']
-        ]}
-     ]},
+    {
+        navZh: '接入', navEn: 'Connectivity', landing: 'drivers',
+        paths: ['drivers', 'operation/device-onboarding'],
+        activeMatch: '^/(zh|en)/(drivers/|operation/device-onboarding)',
+        groups: [
+            {
+                zh: '接入指南', en: 'Onboarding', items: [
+                    ['drivers', '驱动总览', 'Drivers'],
+                    ['operation/device-onboarding', '设备接入流程', 'Device Onboarding']
+                ]
+            },
+            {
+                zh: '工业总线 / PLC', en: 'Industrial Bus / PLC', items: [
+                    ['drivers/modbus-tcp', 'Modbus TCP', 'Modbus TCP'],
+                    ['drivers/modbus-rtu', 'Modbus RTU', 'Modbus RTU'],
+                    ['drivers/opc-ua', 'OPC UA', 'OPC UA'],
+                    ['drivers/opc-da', 'OPC DA', 'OPC DA'],
+                    ['drivers/plcs7', 'S7 (Siemens)', 'S7 (Siemens)'],
+                    ['drivers/melsec', 'MELSEC', 'MELSEC'],
+                    ['drivers/fins', 'FINS (Omron)', 'FINS (Omron)'],
+                    ['drivers/ethernet-ip', 'EtherNet/IP', 'EtherNet/IP']
+                ]
+            },
+            {
+                zh: 'SCADA / 电力 / 计量', en: 'SCADA / Power / Metering', items: [
+                    ['drivers/bacnet-ip', 'BACnet/IP', 'BACnet/IP'],
+                    ['drivers/iec104', 'IEC 104', 'IEC 104'],
+                    ['drivers/dlms', 'DLMS', 'DLMS'],
+                    ['drivers/sl651', 'SL651', 'SL651'],
+                    ['drivers/snmp', 'SNMP', 'SNMP']
+                ]
+            },
+            {
+                zh: '物联网 / 无线', en: 'IoT / Wireless', items: [
+                    ['drivers/mqtt', 'MQTT', 'MQTT'],
+                    ['drivers/coap', 'CoAP', 'CoAP'],
+                    ['drivers/lwm2m', 'LwM2M', 'LwM2M'],
+                    ['drivers/http', 'HTTP', 'HTTP'],
+                    ['drivers/ble', 'BLE', 'BLE'],
+                    ['drivers/zigbee', 'Zigbee', 'Zigbee'],
+                    ['drivers/can', 'CAN', 'CAN']
+                ]
+            },
+            {
+                zh: '串口 / 通用网络', en: 'Serial / Generic Network', items: [
+                    ['drivers/serial', '串口 Serial', 'Serial'],
+                    ['drivers/tcp-udp', 'TCP/UDP', 'TCP/UDP']
+                ]
+            },
+            {
+                zh: '数据库', en: 'Database', items: [
+                    ['drivers/mysql', 'MySQL', 'MySQL'],
+                    ['drivers/postgresql', 'PostgreSQL', 'PostgreSQL'],
+                    ['drivers/oracle', 'Oracle', 'Oracle'],
+                    ['drivers/sqlserver', 'SQL Server', 'SQL Server']
+                ]
+            },
+            {
+                zh: '虚拟 / 测试', en: 'Virtual / Testing', items: [
+                    ['drivers/virtual', '虚拟 Virtual', 'Virtual'],
+                    ['drivers/listening-virtual', '监听虚拟', 'Listening Virtual']
+                ]
+            },
+            {
+                zh: '附录', en: 'Appendix', items: [
+                    ['drivers/matrix', '驱动能力矩阵', 'Driver Capability Matrix']
+                ]
+            }
+        ]
+    },
 
-    {navZh: '运维', navEn: 'Operations', landing: 'operation',
-     paths: ['operation', 'guide'], activeMatch: '^/(zh|en)/(operation|guide)/',
-     groups: [
-        {zh: '运营', en: 'Operations', items: [
-            ['operation', '概览', 'Overview'],
-            ['operation/data-commands', '数据与命令', 'Data & Commands'],
-            ['operation/alarms', '告警与通知', 'Alarms & Notifications']
-        ]},
-        {zh: '部署与运维', en: 'Deployment & Ops', items: [
-            ['guide/usage', '部署模式与镜像源', 'Deployment & Images'],
-            ['guide/observability', '可观测性', 'Observability'],
-            ['guide/logging', '日志规范', 'Logging'],
-            ['guide/troubleshooting', '故障排查', 'Troubleshooting']
-        ]}
-     ]},
+    {
+        navZh: '运维', navEn: 'Operations', landing: 'operation',
+        paths: ['operation', 'guide'], activeMatch: '^/(zh|en)/(operation|guide)/',
+        groups: [
+            {
+                zh: '运营', en: 'Operations', items: [
+                    ['operation', '概览', 'Overview'],
+                    ['operation/data-commands', '数据与命令', 'Data & Commands'],
+                    ['operation/alarms', '告警与通知', 'Alarms & Notifications']
+                ]
+            },
+            {
+                zh: '部署与运维', en: 'Deployment & Ops', items: [
+                    ['guide/usage', '部署模式与镜像源', 'Deployment & Images'],
+                    ['guide/observability', '可观测性', 'Observability'],
+                    ['guide/logging', '日志规范', 'Logging'],
+                    ['guide/troubleshooting', '故障排查', 'Troubleshooting']
+                ]
+            }
+        ]
+    },
 
-    {navZh: '开发', navEn: 'Develop', landing: 'development',
-     paths: ['development', 'ai', 'automation'], activeMatch: '^/(zh|en)/(development|ai|automation)/',
-     groups: [
-        {zh: '开发', en: 'Development', items: [
-            ['development', '概览', 'Overview'],
-            ['development/driver-authoring', '驱动开发', 'Driver Authoring'],
-            ['development/api-documentation', 'API 文档', 'API Documentation'],
-            ['development/testing', '测试', 'Testing'],
-            ['development/changelog', '变更日志', 'Changelog']
-        ]},
-        {zh: 'AI 集成', en: 'AI Integration', items: [
-            ['ai', 'AI 概览', 'AI Overview'],
-            ['ai/agentic', 'Agentic 中心', 'Agentic Center'],
-            ['ai/mcp', 'AI Agent / MCP', 'AI Agent / MCP']
-        ]},
-        {zh: '自动化', en: 'Automation', items: [
-            ['automation/cli', 'CLI 使用指南', 'CLI Guide']
-        ]}
-     ]}
+    {
+        navZh: '开发', navEn: 'Develop', landing: 'development',
+        paths: ['development', 'ai', 'automation'], activeMatch: '^/(zh|en)/(development|ai|automation)/',
+        groups: [
+            {
+                zh: '开发', en: 'Development', items: [
+                    ['development', '概览', 'Overview'],
+                    ['development/driver-authoring', '驱动开发', 'Driver Authoring'],
+                    ['development/api-documentation', 'API 文档', 'API Documentation'],
+                    ['development/testing', '测试', 'Testing'],
+                    ['development/changelog', '变更日志', 'Changelog']
+                ]
+            },
+            {
+                zh: 'AI 集成', en: 'AI Integration', items: [
+                    ['ai', 'AI 概览', 'AI Overview'],
+                    ['ai/agentic', 'Agentic 中心', 'Agentic Center'],
+                    ['ai/mcp', 'AI Agent / MCP', 'AI Agent / MCP']
+                ]
+            },
+            {
+                zh: '自动化', en: 'Automation', items: [
+                    ['automation/cli', 'CLI 使用指南', 'CLI Guide']
+                ]
+            }
+        ]
+    }
 ]
 
 // Community: only a nav dropdown + its own sidebar, not counted as a pillar
@@ -210,8 +278,8 @@ const COMMUNITY: ReadonlyArray<Entry> = [
 ]
 
 type Lang = 'zh' | 'en'
-type SidebarItem = {text: string; link: string}
-type SidebarGroup = {text: string; collapsed?: boolean; items: SidebarItem[]}
+type SidebarItem = { text: string; link: string }
+type SidebarGroup = { text: string; collapsed?: boolean; items: SidebarItem[] }
 
 // single-segment code → directory index (trailing slash hits index.md); multi-segment code → specific page
 const linkOf = (lang: Lang, code: string) => {
@@ -378,7 +446,14 @@ const MERMAID = {
         signalTextColor: '#33485c'
     },
     flowchart: {curve: 'basis', useMaxWidth: true, nodeSpacing: 60, rankSpacing: 66, padding: 24, htmlLabels: false},
-    sequence: {useMaxWidth: true, mirrorActors: false, actorMargin: 64, boxMargin: 12, noteMargin: 12, messageMargin: 44},
+    sequence: {
+        useMaxWidth: true,
+        mirrorActors: false,
+        actorMargin: 64,
+        boxMargin: 12,
+        noteMargin: 12,
+        messageMargin: 44
+    },
     state: {useMaxWidth: true, padding: 18},
     er: {useMaxWidth: true},
     class: {useMaxWidth: true}

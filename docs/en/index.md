@@ -51,13 +51,20 @@ features:
 
 ## What is IoT DC3
 
-IoT DC3 is an open-source, distributed IoT platform built for AI scenarios (AGPL-3.0). It covers **device connectivity, data collection, operations management, and intelligent analytics** for industrial IoT. **28 driver modules** pull data up from heterogeneous devices and normalize it into semantically labeled point values; **Spring AI** then plugs large language models into operations — a model can query devices, read and write points, run commands, analyze alarms, and surface insights, closing the sense–decide–act–feedback loop.
+IoT DC3 is an open-source, distributed IoT platform built for AI scenarios (AGPL-3.0). It covers **device connectivity,
+data collection, operations management, and intelligent analytics** for industrial IoT. **28 driver modules** pull data
+up from heterogeneous devices and normalize it into semantically labeled point values; **Spring AI** then plugs large
+language models into operations — a model can query devices, read and write points, run commands, analyze alarms, and
+surface insights, closing the sense–decide–act–feedback loop.
 
-It's a good fit for teams that need to connect many industrial protocols, manage devices and points, query real-time and historical data, and build on the platform within the Spring ecosystem — including bringing AI into operations. To understand the problem it solves and how it compares to alternatives, start with [the pitch](/en/introduction/).
+It's a good fit for teams that need to connect many industrial protocols, manage devices and points, query real-time and
+historical data, and build on the platform within the Spring ecosystem — including bringing AI into operations. To
+understand the problem it solves and how it compares to alternatives, start with [the pitch](/en/introduction/).
 
 ## Architecture at a glance
 
-The platform is one gateway, four center services, and a set of protocol drivers. Only the gateway's HTTP port faces outward; the centers talk to each other over gRPC, and drivers and the data center are decoupled through RabbitMQ.
+The platform is one gateway, four center services, and a set of protocol drivers. Only the gateway's HTTP port faces
+outward; the centers talk to each other over gRPC, and drivers and the data center are decoupled through RabbitMQ.
 
 <Architecture lang="en" />
 
@@ -65,12 +72,16 @@ For how each hop works and why it's designed that way, see [Architecture](/en/ar
 
 ## Tech stack
 
-- **Language & frameworks**: [Java 21](https://www.java.com) · [Spring Boot 4](https://spring.io/projects/spring-boot) · [Spring Cloud 2025](https://spring.io/projects/spring-cloud) · [Spring AI 2.0.0](https://spring.io/projects/spring-ai)
+- **Language & frameworks
+  **: [Java 21](https://www.java.com) · [Spring Boot 4](https://spring.io/projects/spring-boot) · [Spring Cloud 2025](https://spring.io/projects/spring-cloud) · [Spring AI 2.0.0](https://spring.io/projects/spring-ai)
 - **Data, cache & scheduling**: PostgreSQL (+ TimescaleDB / AGE / pgvector) · Caffeine · MyBatis-Plus · Quartz
 - **Messaging**: RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf
 - **Security**: Spring Security · JWT · BouncyCastle
-- **Frontend**: Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6 (in the separate [`iot-dc3-web`](https://github.com/pnoker/iot-dc3-web) repo)
+- **Frontend**: Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6 (in the separate [
+  `iot-dc3-web`](https://github.com/pnoker/iot-dc3-web) repo)
 
 ## License
 
-IoT DC3 is open source under the [AGPL-3.0 License](https://github.com/pnoker/iot-dc3/blob/release/LICENSE-AGPL.txt). For licensing details and commercial licensing, see [LICENSE.txt](https://github.com/pnoker/iot-dc3/blob/release/LICENSE.txt).
+IoT DC3 is open source under the [AGPL-3.0 License](https://github.com/pnoker/iot-dc3/blob/release/LICENSE-AGPL.txt).
+For licensing details and commercial licensing,
+see [LICENSE.txt](https://github.com/pnoker/iot-dc3/blob/release/LICENSE.txt).
