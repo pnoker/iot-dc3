@@ -2,9 +2,9 @@ name: Security
 
 on:
   pull_request:
-    branches: [ develop, release, main ]
+    branches: [ develop, main ]
   push:
-    branches: [ develop, release, main ]
+    branches: [ develop, main ]
   schedule:
     - cron: '24 19 * * 1'
   workflow_dispatch:
