@@ -34,7 +34,7 @@ from pathlib import Path
 HEADER = "# \u2728 What's Changed"
 DETAILS_OPEN = "<details>"
 DETAILS_SUMMARY = "<summary>\U0001f4dd Historical Version Description, Click to Expand</summary>"
-DEFAULT_TAG_PATTERN = "dc3.release.*"
+DEFAULT_TAG_PATTERN = "v*"
 GENERATED_CHANGELOG_RE = re.compile(r"^(docs|chore)\(release\): update generated changelog$")
 
 CATEGORY_ORDER = [

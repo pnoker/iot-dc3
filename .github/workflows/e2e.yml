@@ -1,8 +1,8 @@
 name: E2E
 
 on:
-  push:
-    branches: [ develop, release, main ]
+  pull_request:
+    branches: [ develop ]
   workflow_dispatch:
 
 permissions:
