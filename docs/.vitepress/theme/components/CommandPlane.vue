@@ -2,8 +2,8 @@
   Copyright 2016-present the IoT DC3 original author or authors.
   Licensed under the GNU Affero General Public License v3.0.
 
-  命令平面：一条读写命令从客户端下发到现场设备、再把结果回执到数据中心的链路。
-  纯内联 SVG，颜色走 .dc3-diagram CSS 变量随明暗主题切换，文案由 lang prop 切中英。
+  Command plane: the path of a read/write command dispatched from the client to a field device and the result returned to the data center.
+  Pure inline SVG; colors use the .dc3-diagram CSS variables to switch with the light/dark theme, and the text switches between Chinese and English via the lang prop.
 -->
 <script setup lang="ts">
 import {computed} from 'vue'
@@ -107,7 +107,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text x="1092" y="133" class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle">{{ s.dev }}</text>
       <text x="1092" y="152" fill="var(--dc3-text2)" font-size="10" text-anchor="middle">{{ s.devSub }}</text>
 
-      <!-- key facts (据 command-plane.md 核对) -->
+      <!-- key facts (verified against command-plane.md) -->
       <text x="590" y="240" fill="var(--dc3-text2)" font-size="10" text-anchor="middle">{{ s.note1 }}</text>
       <text x="590" y="262" fill="var(--dc3-text2)" font-size="10" text-anchor="middle">{{ s.note2 }}</text>
       <text x="590" y="290" fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle">{{ s.note3 }}</text>

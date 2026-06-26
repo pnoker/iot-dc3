@@ -2,21 +2,23 @@
   Copyright 2016-present the IoT DC3 original author or authors.
   Licensed under the GNU Affero General Public License v3.0.
 
-  首页 hero 背景粒子场：铺满整个 .VPHero（含左侧标题文字背景），粒子从四面八方外缘
-  沿顺时针螺旋向心汇聚到 logo，呼应「万物互联、节点从四方汇聚成网」。
-  canvas 垫在 hero 内容之下（z-index 0、pointer-events:none），文字/logo 浮在其上；
-  粒子在文字区做淡、在 logo 周围渐明显——既铺得开又不挡阅读。纯色 #1296db、无辉光雾。
-  SSR 安全（canvas 仅客户端创建并注入）。
+  Home hero background particle field: it fills the whole .VPHero (including behind the
+  left-hand title text). Particles converge from every outer edge along a clockwise spiral
+  toward the logo, echoing "everything connected, nodes converging from all sides into a network."
+  The canvas sits beneath the hero content (z-index 0, pointer-events:none), so the text/logo
+  float above it; particles stay faint over the text area and grow more visible around the logo —
+  spread out yet never obscuring reading. Solid #1296db, no glow haze.
+  SSR-safe (the canvas is created and injected on the client only).
 -->
 <script setup lang="ts">
 import {onBeforeUnmount, onMounted} from 'vue'
 
 interface P {
-  ang: number   // 相对锚点的极角
-  dist: number  // 到锚点距离（px）
-  seed: number  // 生成时距离，用于淡入
-  spin: number  // 角速度（顺时针，rad/s）
-  vin: number   // 向心速度（px/s）
+  ang: number   // polar angle relative to the anchor
+  dist: number  // distance to the anchor (px)
+  seed: number  // spawn distance, used for fade-in
+  spin: number  // angular velocity (clockwise, rad/s)
+  vin: number   // inward velocity (px/s)
   r: number
   alpha: number
 }
@@ -26,7 +28,7 @@ let ctx: CanvasRenderingContext2D | null = null
 let cv: HTMLCanvasElement | null = null
 let hero: HTMLElement | null = null
 let dpr = 1, w = 0, h = 0
-let ax = 0, ay = 0, ar = 60   // 汇聚锚点（logo 中心）与汇入终点半径
+let ax = 0, ay = 0, ar = 60   // convergence anchor (logo center) and the final merge radius
 let last = 0, frames = 0
 let running = false, reduced = false
 let ps: P[] = []
@@ -35,7 +37,7 @@ function rand(a: number, b: number) {
   return a + Math.random() * (b - a)
 }
 
-// 锚点 = logo 中心相对 hero 的位置；logo 未就绪时回退到 hero 右侧
+// anchor = the logo center relative to the hero; falls back to the right side of the hero before the logo is ready
 function measureAnchor() {
   if (!hero) return
   const hr = hero.getBoundingClientRect()
@@ -53,7 +55,12 @@ function measureAnchor() {
 }
 
 function spawn(): P {
-  // 从 hero 四边外缘生成（四面八方）；左侧来的粒子会穿过文字背景汇向右侧 logo
+  // portrait (phone): the hero is vertical with the logo in the upper half — merge in from a ring around the logo, focused on the upper half, without a long trip across the text
+  if (h > w) {
+    const d = rand(1.5, 2.4) * ar
+    return {ang: rand(0, Math.PI * 2), dist: d, seed: d, spin: rand(0.2, 0.4), vin: rand(32, 60), r: rand(1.4, 3.2), alpha: 0}
+  }
+  // landscape (desktop): spawn from the hero's four outer edges (all directions); particles from the left cross the text background on their way to the logo on the right
   let x = 0, y = 0
   const m = 24
   const e = Math.random() * 4 | 0
@@ -67,17 +74,17 @@ function spawn(): P {
     ang: Math.atan2(dy, dx),
     dist: d,
     seed: d,
-    spin: rand(0.2, 0.45),   // 顺时针
-    vin: rand(120, 200),
+    spin: rand(0.14, 0.3),   // clockwise
+    vin: rand(70, 120),
     r: rand(1.4, 3.6),
     alpha: 0
   }
 }
 
 function build() {
-  const n = Math.max(40, Math.min(90, Math.round(w * h / 10000)))
+  const n = h > w ? 14 : Math.max(32, Math.min(70, Math.round(w * h / 12000)))
   ps = Array.from({length: n}, spawn)
-  // 打散初始进度，让粒子一开始就铺在途中各处，而非齐刷刷从边缘出发
+  // scatter the initial progress so particles start spread along the route rather than all marching from the edge at once
   for (const p of ps) p.dist *= rand(0.4, 1)
 }
 
@@ -97,21 +104,21 @@ function frame(now: number) {
   if (!last) last = now
   let dt = (now - last) / 1000
   last = now
-  if (dt > 0.05) dt = 0.05   // 切后台回来/掉帧钳制
-  if ((frames++ % 12) === 0) measureAnchor()   // 周期性跟随 logo 位置（便宜）
+  if (dt > 0.05) dt = 0.05   // clamp after returning from background / dropped frames
+  if ((frames++ % 12) === 0) measureAnchor()   // periodically follow the logo position (cheap)
   ctx.clearRect(0, 0, w, h)
   const maxD = Math.hypot(w, h)
   for (const p of ps) {
-    p.dist -= p.vin * dt   // 向心汇入
-    p.ang += p.spin * dt   // 顺时针旋转
-    if (p.dist <= ar) {    // 抵达 logo 外缘 → 融入消失，从边缘重生
+    p.dist -= p.vin * dt   // converge inward
+    p.ang += p.spin * dt   // rotate clockwise
+    if (p.dist <= ar) {    // reached the logo's outer edge → merge and vanish, respawn from the edge
       Object.assign(p, spawn())
       continue
     }
-    const prox = Math.max(0, Math.min(1, 1 - p.dist / (0.6 * maxD)))  // 近 logo→1
-    const inF = Math.max(0, Math.min(1, (p.seed - p.dist) / 100))     // 生成后淡入
-    const outF = Math.max(0, Math.min(1, (p.dist - ar) / 70))         // 临近 logo 淡出
-    // 文字区（远）淡至 ~0.16，logo 周围（近）升至 ~0.6：铺得开又不挡字
+    const prox = Math.max(0, Math.min(1, 1 - p.dist / (0.6 * maxD)))  // near the logo → 1
+    const inF = Math.max(0, Math.min(1, (p.seed - p.dist) / 100))     // fade in after spawn
+    const outF = Math.max(0, Math.min(1, (p.dist - ar) / 70))         // fade out as it nears the logo
+    // text area (far) fades to ~0.16, around the logo (near) rises to ~0.6: spread out yet not blocking text
     p.alpha = (0.16 + 0.44 * prox) * inF * outF
     const x = ax + Math.cos(p.ang) * p.dist
     const y = ay + Math.sin(p.ang) * p.dist
@@ -151,7 +158,7 @@ function init() {
   hero = document.querySelector('.VPHero') as HTMLElement | null
   if (!hero) return
   hero.style.position = 'relative'
-  // 防重复（HMR / 重挂载）
+  // guard against duplicates (HMR / remount)
   hero.querySelectorAll('.hero-particles-canvas').forEach(n => n.remove())
   cv = document.createElement('canvas')
   cv.className = 'hero-particles-canvas'
@@ -159,7 +166,7 @@ function init() {
   hero.insertBefore(cv, hero.firstChild)
   resize()
   measureAnchor()
-  if (reduced) return   // 尊重 prefers-reduced-motion：注入但不动
+  if (reduced) return   // respect prefers-reduced-motion: inject but do not animate
   build()
   ro = new ResizeObserver(() => {
     resize()
@@ -172,7 +179,7 @@ function init() {
 
 onMounted(() => {
   reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
-  // VPHero 可能比本组件晚一拍进入 DOM，重试若干帧直到出现
+  // the VPHero may enter the DOM a beat later than this component; retry for a few frames until it appears
   let tries = 0
   const tick = () => {
     if (document.querySelector('.VPHero')) {

@@ -2,8 +2,8 @@
   Copyright 2016-present the IoT DC3 original author or authors.
   Licensed under the GNU Affero General Public License v3.0.
 
-  鉴权流：登录取令牌 + 带令牌鉴权请求的完整链路。
-  纯内联 SVG，颜色走 .dc3-diagram CSS 变量随明暗主题切换，文案由 lang prop 切中英。
+  Auth flow: the full path of logging in to obtain a token + making token-bearing authenticated requests.
+  Pure inline SVG; colors use the .dc3-diagram CSS variables to switch with the light/dark theme, and the text switches between Chinese and English via the lang prop.
 -->
 <script setup lang="ts">
 import {computed} from 'vue'

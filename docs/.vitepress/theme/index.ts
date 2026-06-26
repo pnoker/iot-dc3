@@ -28,19 +28,19 @@ import HeroLogo from './components/HeroLogo.vue'
 import HeroParticles from './components/HeroParticles.vue'
 import HeroWaves from './components/HeroWaves.vue'
 
-// 语言偏好在内部导航（含顶部语言切换器）后写回 localStorage，刷新时由 head 内联脚本据此保持。
+// The language preference is written back to localStorage after internal navigation (including the top language switcher), so the head inline script can keep it on refresh.
 function persistLang(path: string) {
     try {
         localStorage.setItem('dc3-lang', path.indexOf('/en') === 0 ? 'en' : 'zh')
     } catch (e) {
-        // localStorage 不可用时静默跳过
+        // silently skip when localStorage is unavailable
     }
 }
 
 const theme: Theme = {
     extends: DefaultTheme,
 
-    // 首页 hero：背景两层（最底波浪点阵 HeroWaves + 其上全幅汇聚粒子 HeroParticles，home-hero-before），图区是 logo 粒子动效（home-hero-image）
+    // Home hero: two background layers (HeroWaves wave dot-matrix at the bottom + full-width converging particles HeroParticles above it, home-hero-before), and the image area is the logo particle animation (home-hero-image)
     Layout() {
         return h(DefaultTheme.Layout, null, {
             'home-hero-before': () => [h(HeroWaves), h(HeroParticles)],

@@ -18,18 +18,18 @@
 import {defineConfig} from 'vitepress'
 import {withMermaid} from 'vitepress-plugin-mermaid'
 
-// ── 站点信息架构：支柱(pillar)模型（5 支柱 + 社区；「基础」支柱待 P1 插入第②位）──
-// 一个支柱可拥有多个旧目录前缀(paths)并共享同一侧栏；Entry: [code, 中文, English]。
-// code = 语言相对路径：单段视为目录首页(→ '/<lang>/<code>/')，多段视为具体页面(→ '/<lang>/<code>')。
+// ── Site information architecture: pillar model (5 pillars + community; the "Foundations" pillar will be inserted at slot ② in P1) ──
+// A pillar may own multiple legacy directory prefixes (paths) and share a single sidebar; Entry: [code, zh, English].
+// code = language-relative path: a single segment is treated as a directory index (→ '/<lang>/<code>/'), multiple segments as a specific page (→ '/<lang>/<code>').
 type Entry = readonly [string, string, string]
 type Group = {zh: string; en: string; items: ReadonlyArray<Entry>}
 type Pillar = {
     navZh: string
     navEn: string
-    landing: string                       // 顶栏链接落地页 code
-    paths: ReadonlyArray<string>          // 该支柱拥有的侧栏路径前缀（多 path 共享同一侧栏）
-    activeMatch?: string                  // 跨目录支柱的 nav 高亮正则（匹配含 locale 的路径）
-    groups: ReadonlyArray<Group>          // 侧栏分组；组标题空串 → 置顶不带标题单列
+    landing: string                       // landing page code for the nav-bar link
+    paths: ReadonlyArray<string>          // sidebar path prefixes owned by this pillar (multiple paths share one sidebar)
+    activeMatch?: string                  // nav highlight regex for cross-directory pillars (matches the locale-prefixed path)
+    groups: ReadonlyArray<Group>          // sidebar groups; an empty group title → pinned, title-less single column
 }
 
 const PILLARS: ReadonlyArray<Pillar> = [
@@ -202,7 +202,7 @@ const PILLARS: ReadonlyArray<Pillar> = [
      ]}
 ]
 
-// 社区：仅作 nav 下拉 + 自身侧栏，不计入支柱
+// Community: only a nav dropdown + its own sidebar, not counted as a pillar
 const COMMUNITY: ReadonlyArray<Entry> = [
     ['community/contributing', '贡献指南', 'Contributing'],
     ['community/code-of-conduct', '行为准则', 'Code of Conduct'],
@@ -213,7 +213,7 @@ type Lang = 'zh' | 'en'
 type SidebarItem = {text: string; link: string}
 type SidebarGroup = {text: string; collapsed?: boolean; items: SidebarItem[]}
 
-// 单段 code → 目录首页（带尾斜杠命中 index.md）；多段 code → 具体页面
+// single-segment code → directory index (trailing slash hits index.md); multi-segment code → specific page
 const linkOf = (lang: Lang, code: string) => {
     const p = lang === 'en' ? '/en' : '/zh'
     return code.includes('/') ? `${p}/${code}` : `${p}/${code}/`
@@ -231,7 +231,7 @@ function buildSidebar(lang: Lang) {
             const items = itemsOf(lang, g.items)
             return text ? {text, collapsed: false, items} : {text: '', items}
         })
-        // 多 path 共享同一侧栏；具体页面 path（多段）注册为更长 key，最长前缀优先生效
+        // multiple paths share one sidebar; specific-page paths (multi-segment) register as longer keys, longest prefix wins
         for (const path of pillar.paths) {
             const key = path.includes('/') ? `${p}/${path}` : `${p}/${path}/`
             sidebar[key] = groups
@@ -342,17 +342,17 @@ function localeThemeConfig(lang: Lang) {
     }
 }
 
-// Mermaid 渲染：浅色模式品牌蓝主题；深色模式由插件强制。统一中文技术字体栈避免文字遮挡。
+// Mermaid rendering: brand-blue theme in light mode; dark mode is forced by the plugin. A unified CJK-capable technical font stack avoids text clipping.
 const MERMAID = {
     theme: 'base',
     themeVariables: {
         fontFamily: '"Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif',
         fontSize: '14px',
-        // 主节点：浅青底 + 品牌青描边 + 深墨字（贴近 Architecture 卡片观感）
+        // primary node: light teal fill + brand teal border + deep ink text (close to the Architecture card look)
         primaryColor: '#ecfdf6',
         primaryBorderColor: '#0e9f6e',
         primaryTextColor: '#0f2231',
-        // 连线与次级元素：克制的中性蓝灰，避免花哨
+        // edges and secondary elements: restrained neutral blue-gray, no flashiness
         lineColor: '#7c93ab',
         secondaryColor: '#eef4fb',
         secondaryBorderColor: '#3f7fb8',
@@ -360,17 +360,17 @@ const MERMAID = {
         tertiaryColor: '#f6f9fc',
         tertiaryBorderColor: '#9bb2c7',
         tertiaryTextColor: '#0f2231',
-        // 分组/子图：极淡底 + 虚线感描边（与 Architecture region 一致）
+        // groups/subgraphs: very light fill + dashed-feel border (consistent with the Architecture region)
         clusterBkg: 'rgba(14, 159, 110, 0.05)',
         clusterBorder: '#9cc7b4',
-        // 边标签：贴合卡片底色，文字中性
+        // edge labels: blend with the card fill, neutral text
         edgeLabelBackground: '#f6f9fc',
         labelBoxBorderColor: '#9bb2c7',
-        // 备注：暖黄
+        // notes: warm yellow
         noteBkgColor: '#fff7e6',
         noteBorderColor: '#d8a544',
         noteTextColor: '#5b4a1f',
-        // 时序图角色框
+        // sequence-diagram actor boxes
         actorBkg: '#ecfdf6',
         actorBorder: '#0e9f6e',
         actorTextColor: '#0f2231',
@@ -384,7 +384,7 @@ const MERMAID = {
     class: {useMaxWidth: true}
 }
 
-// 根路径（语言门）总是按偏好重定向到 /zh/ 或 /en/：localStorage 优先，否则按浏览器语言；语言选择页仅作 JS 禁用的 fallback
+// The root path (language gate) always redirects to /zh/ or /en/ by preference: localStorage first, otherwise browser language; the language-selection page is only a fallback for when JS is disabled
 const LANG_DETECT = `(function(){var K='dc3-lang',B='/';var p;try{p=localStorage.getItem(K);}catch(e){}var r=location.pathname;if(r.length&&r[r.length-1]!=='/')r=r+'/';var rel=r.indexOf(B)===0?r.slice(B.length):r;var onEn=rel.indexOf('en/')===0;var onZh=rel.indexOf('zh/')===0;if(!onEn&&!onZh){if(!p){p=/^en/i.test(navigator.language)?'en':'zh';try{localStorage.setItem(K,p);}catch(e){}}location.replace(B+p+'/');}})();`
 
 export default withMermaid(defineConfig({
@@ -394,7 +394,7 @@ export default withMermaid(defineConfig({
     cleanUrls: true,
     lastUpdated: true,
 
-    // 维护者内部资料不进入公开站点构建
+    // maintainer-internal material is excluded from the public site build
     srcExclude: ['superpowers/**'],
 
     head: [

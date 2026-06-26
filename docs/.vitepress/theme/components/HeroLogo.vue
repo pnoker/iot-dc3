@@ -2,11 +2,14 @@
   Copyright 2016-present the IoT DC3 original author or authors.
   Licensed under the GNU Affero General Public License v3.0.
 
-  首页 hero logo：忠实重建 logo.svg —— 它的 54 个圆点、纯色 #1296db、精确位置与半径，
-  在 canvas 上画出来和原版 logo 一模一样。然后只让这些点本身「活」起来：
-  一道顺时针、向心汇聚的相干波沿三条旋臂流动，带动每个点做小幅切向摆动 + 极轻的流光，
-  呼应 logo「漩涡汇聚、万物互联」的形态。不旋转整张图、不整体缩放呼吸、不掺任何游离粒子或辉光雾。
-  静止任一帧都等同 logo.svg。SSR 安全（canvas 仅客户端启动）。
+  Hero logo for the home page: a faithful rebuild of logo.svg — its 54 dots, the solid
+  #1296db color, and their exact positions and radii, drawn on a canvas so it matches the
+  original logo pixel for pixel. Only the dots themselves come "alive": a clockwise,
+  inward-converging coherent wave flows along the three spiral arms, giving each dot a
+  gentle tangential sway plus a very faint shimmer — echoing the logo's "swirl converging,
+  everything connected" form. The whole image never rotates, never breathes by scaling, and
+  carries no stray particles or glow haze. Any still frame equals logo.svg. SSR-safe (the
+  canvas only starts on the client).
 -->
 <script setup lang="ts">
 import {onBeforeUnmount, onMounted, ref} from 'vue'
@@ -15,19 +18,20 @@ import {LOGO_POINTS} from './logo-points'
 const canvas = ref<HTMLCanvasElement | null>(null)
 const root = ref<HTMLDivElement | null>(null)
 
-// logo.svg 原色：纯色 #1296db。波峰处向这个略亮的蓝做微弱流光，谷底回到原色——原色即下限，忠实不脏。
+// logo.svg base color: solid #1296db. At wave crests the dots shimmer faintly toward a
+// slightly brighter blue; at troughs they return to the base color — the base is the floor, kept clean.
 const BASE = [18, 150, 219]    // #1296db
 const CREST = [56, 169, 230]   // #38a9e6
 
-// 点到中心的最大半径，用于布局缩放
+// Maximum radius of any dot from the center, used to scale the layout.
 const LOGO_R = Math.max(...LOGO_POINTS.map(p => Math.hypot(p.x, p.y) + p.r))
 
 interface Node {
-  x: number    // 稳态位置（相对中心，viewBox 尺度）
+  x: number    // steady-state position (relative to center, in viewBox units)
   y: number
   r: number
-  ang: number  // 极角
-  spiral: number  // 沿旋臂的相位：邻近点相位相近，使波相干流动而非散点噪动
+  ang: number  // polar angle
+  spiral: number  // phase along the spiral arm: neighbors share a similar phase, so the wave flows coherently rather than as scattered noise
 }
 
 let raf = 0
@@ -46,7 +50,7 @@ function buildNodes() {
       y: p.y,
       r: p.r,
       ang: Math.atan2(p.y, p.x),
-      // 角度 + 径向项构成螺旋相位；2.2 圈让旋臂上呈现约两道流光带
+      // angle + radial term form the spiral phase; 2.2 turns yield roughly two shimmer bands along the arms
       spiral: Math.atan2(p.y, p.x) + (dist / LOGO_R) * Math.PI * 2.2
     }
   })
@@ -65,25 +69,25 @@ function resize() {
   if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   cx = w / 2
   cy = h / 2
-  // logo 占容器约 92%，留薄边
+  // the logo fills about 92% of the container, leaving a thin margin
   scale = (Math.min(w, h) * 0.46) / LOGO_R
 }
 
 function paint(t: number) {
   if (!ctx) return
   ctx.clearRect(0, 0, cx * 2, cy * 2)
-  const omega = 1.0   // 波速（rad/s），缓慢
-  const amp = 6       // 切向摆幅（viewBox 尺度），小幅以保持 logo 清晰
+  const omega = 0.6   // wave speed (rad/s); slow and calm
+  const amp = 4.5     // tangential sway (viewBox units); gentle, to keep the logo crisp
   for (const nd of nodes) {
-    // 相干波相位：+t 使波峰向心收拢（汇聚），顺三旋臂流动
+    // coherent wave phase: +t pulls crests inward (converging), flowing along the three spiral arms
     const wave = Math.sin(nd.spiral + t * omega)
-    // 切向单位向量（顺时针），点沿切向小幅摆动 → 漩涡流动感，非整图旋转
+    // tangential unit vector (clockwise); each dot sways slightly along it → swirling flow, not whole-image rotation
     const tx = -Math.sin(nd.ang), ty = Math.cos(nd.ang)
     const x = cx + (nd.x + tx * wave * amp) * scale
     const y = cy + (nd.y + ty * wave * amp) * scale
-    const rr = nd.r * scale * (1 + 0.03 * wave)
-    // 微弱流光：仅波峰侧从原色向亮蓝偏移，谷底保持 #1296db
-    const k = 0.16 * Math.max(0, wave)
+    const rr = nd.r * scale * (1 + 0.022 * wave)
+    // faint shimmer: only the crest side shifts from base toward bright blue; troughs stay at #1296db
+    const k = 0.13 * Math.max(0, wave)
     const r = BASE[0] + (CREST[0] - BASE[0]) * k
     const g = BASE[1] + (CREST[1] - BASE[1]) * k
     const b = BASE[2] + (CREST[2] - BASE[2]) * k
@@ -124,7 +128,7 @@ onMounted(() => {
   reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
   buildNodes()
   resize()
-  // reduced：画一帧静态 logo（等同 logo.svg）就停
+  // reduced: paint one static frame (equal to logo.svg) and stop
   if (reduced) {
     paint(0)
     return
@@ -162,7 +166,7 @@ onBeforeUnmount(() => {
   place-items: center;
 }
 
-/* 极轻的背景辉光，避免大图贴在白底上显得突兀；与点本身无关，不污染 logo */
+/* A very faint background glow so the large logo doesn't sit harshly on white; unrelated to the dots, it never pollutes the logo. */
 .hero-logo-glow {
   position: absolute;
   inset: 0;

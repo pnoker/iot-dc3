@@ -2,8 +2,8 @@
   Copyright 2016-present the IoT DC3 original author or authors.
   Licensed under the GNU Affero General Public License v3.0.
 
-  数据平面：位号值从现场设备到落库与缓存的链路。
-  纯内联 SVG，颜色走 .dc3-diagram CSS 变量随明暗主题切换，文案由 lang prop 切中英。
+  Data plane: the path of point values from field devices to storage and cache.
+  Pure inline SVG; colors use the .dc3-diagram CSS variables to switch with the light/dark theme, and the text switches between Chinese and English via the lang prop.
 -->
 <script setup lang="ts">
 import {computed} from 'vue'

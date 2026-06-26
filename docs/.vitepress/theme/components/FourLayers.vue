@@ -2,8 +2,8 @@
   Copyright 2016-present the IoT DC3 original author or authors.
   Licensed under the GNU Affero General Public License v3.0.
 
-  物联网四层参考架构 ↔ IoT DC3 落地映射（感知 / 网络 / 平台 / 应用 + 贯穿性安全）。
-  纯内联 SVG，颜色走 .dc3-diagram CSS 变量随明暗主题切换，文案由 lang prop 切中英。
+  IoT four-layer reference architecture ↔ IoT DC3 implementation mapping (Perception / Network / Platform / Application + cross-cutting Security).
+  Pure inline SVG; colors use the .dc3-diagram CSS variables to switch with the light/dark theme, and the text switches between Chinese and English via the lang prop.
 -->
 <script setup lang="ts">
 import {computed} from 'vue'
@@ -45,13 +45,13 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
         </marker>
       </defs>
 
-      <!-- 左侧方向轴：数据上行 / 命令下行 -->
+      <!-- left direction axis: data up / command down -->
       <line x1="30" y1="404" x2="30" y2="60" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#fl-ah)"/>
       <text x="22" y="240" fill="var(--dc3-arrow-label)" font-size="11" transform="rotate(-90 22 240)" text-anchor="middle">{{ s.up }}</text>
       <line x1="52" y1="60" x2="52" y2="404" stroke="var(--dc3-arrow)" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#fl-ah)"/>
       <text x="62" y="240" fill="var(--dc3-arrow-label)" font-size="11" transform="rotate(-90 62 240)" text-anchor="middle">{{ s.down }}</text>
 
-      <!-- 应用层 -->
+      <!-- application layer -->
       <rect x="84" y="48" width="852" height="84" rx="10" fill="var(--dc3-db-fill)" stroke="var(--dc3-db-stroke)" stroke-width="1.5"/>
       <text x="108" y="82" class="d-name" fill="var(--dc3-box-name)" font-size="15">{{ s.appName }}</text>
       <text x="108" y="106" fill="var(--dc3-text2)" font-size="11">{{ s.appSub }}</text>
@@ -59,7 +59,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text x="576" y="80" fill="var(--dc3-text2)" font-size="10">{{ s.dcLabel }}</text>
       <text x="576" y="104" fill="var(--dc3-db-text)" font-size="12.5">{{ s.appDc }}</text>
 
-      <!-- 平台层 -->
+      <!-- platform layer -->
       <rect x="84" y="144" width="852" height="84" rx="10" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
       <text x="108" y="178" class="d-name" fill="var(--dc3-box-name)" font-size="15">{{ s.platName }}</text>
       <text x="108" y="202" fill="var(--dc3-text2)" font-size="11">{{ s.platSub }}</text>
@@ -67,7 +67,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text x="576" y="176" fill="var(--dc3-text2)" font-size="10">{{ s.dcLabel }}</text>
       <text x="576" y="200" fill="var(--dc3-be-text)" font-size="12.5">{{ s.platDc }}</text>
 
-      <!-- 网络层 -->
+      <!-- network layer -->
       <rect x="84" y="240" width="852" height="84" rx="10" fill="var(--dc3-bus-fill)" stroke="var(--dc3-bus-stroke)" stroke-width="1.5"/>
       <text x="108" y="274" class="d-name" fill="var(--dc3-box-name)" font-size="15">{{ s.netName }}</text>
       <text x="108" y="298" fill="var(--dc3-text2)" font-size="11">{{ s.netSub }}</text>
@@ -75,7 +75,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text x="576" y="272" fill="var(--dc3-text2)" font-size="10">{{ s.dcLabel }}</text>
       <text x="576" y="296" fill="var(--dc3-bus-text)" font-size="12.5">{{ s.netDc }}</text>
 
-      <!-- 感知层 -->
+      <!-- perception layer -->
       <rect x="84" y="336" width="852" height="84" rx="10" fill="var(--dc3-fe-fill)" stroke="var(--dc3-fe-stroke)" stroke-width="1.5"/>
       <text x="108" y="370" class="d-name" fill="var(--dc3-box-name)" font-size="15">{{ s.percName }}</text>
       <text x="108" y="394" fill="var(--dc3-text2)" font-size="11">{{ s.percSub }}</text>
@@ -83,7 +83,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text x="576" y="368" fill="var(--dc3-text2)" font-size="10">{{ s.dcLabel }}</text>
       <text x="576" y="392" fill="var(--dc3-fe-text, var(--dc3-fe-stroke))" font-size="12.5">{{ s.percDc }}</text>
 
-      <!-- 安全：贯穿四层 -->
+      <!-- security: cross-cutting across all four layers -->
       <rect x="952" y="48" width="200" height="372" rx="10" fill="var(--dc3-amber-fill)" stroke="var(--dc3-amber-stroke)" stroke-width="1.5" stroke-dasharray="8,4"/>
       <text x="1052" y="210" class="d-name" fill="var(--dc3-box-name)" font-size="14" text-anchor="middle">{{ s.secName }}</text>
       <text x="1052" y="234" fill="var(--dc3-text2)" font-size="10.5" text-anchor="middle">{{ s.secSub }}</text>
