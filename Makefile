@@ -87,7 +87,8 @@ endef
 	docker-ps \
 	docker-logs \
 	docker-config \
-	docker-restart
+	docker-restart \
+	tag
 
 help:
 	@printf '%s\n' \
@@ -120,7 +121,8 @@ help:
 		'make docker-up    - start dc3 docker services' \
 		'make docker-down  - stop dc3 docker services' \
 		'make docker-logs  - follow dc3 web logs' \
-		'make env          - print effective Make/Compose defaults'
+		'make env          - print effective Make/Compose defaults' \
+		'make tag [patch|minor|major] - create semver release tag on main'
 
 env:
 	@printf 'ENV_FILE=%s\n' "$(ENV_FILE)"
@@ -233,3 +235,8 @@ docker-config:
 
 docker-restart:
 	$(call dc3_compose) restart
+
+tag:
+	@bin/tag.sh $(filter-out $@,$(MAKECMDGOALS))
+%:
+	@:
