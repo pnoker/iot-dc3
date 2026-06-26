@@ -58,7 +58,7 @@ public interface TokenService {
      * @param password   raw password
      * @param tenantCode tenant code
      * @return signed JWT token string
-     * @throws UnAuthorizedException          on bad tenant, credential, membership, salt, or password
+     * @throws UnAuthorizedException           on bad tenant, credential, membership, salt, or password
      * @throws PasswordChangeRequiredException when password is expired or flagged for change
      */
     String generateToken(String loginName, String salt, String password, String tenantCode);

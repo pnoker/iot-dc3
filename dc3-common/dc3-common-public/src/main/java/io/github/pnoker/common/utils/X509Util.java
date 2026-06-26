@@ -160,7 +160,8 @@ public class X509Util {
                 // Plain PKCS#8 key ("PRIVATE KEY")
                 case PrivateKeyInfo privateKeyInfo -> converter.getPrivateKey(privateKeyInfo);
                 case null -> throw new IOException("No PEM private key found in: " + keyFile);
-                default -> throw new IOException("Unsupported private key PEM content: " + pemObject.getClass().getName());
+                default ->
+                        throw new IOException("Unsupported private key PEM content: " + pemObject.getClass().getName());
             };
         }
     }

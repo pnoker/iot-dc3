@@ -26,6 +26,8 @@ import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.config.OAuthProperties;
 import io.github.pnoker.common.auth.dal.PrincipalManager;
 import io.github.pnoker.common.auth.dal.ServiceAccountManager;
+import io.github.pnoker.common.auth.entity.bo.McpConnectionAddBO;
+import io.github.pnoker.common.auth.entity.bo.OAuthClientRegistrationBO;
 import io.github.pnoker.common.auth.entity.builder.McpAuditBuilder;
 import io.github.pnoker.common.auth.entity.builder.McpConnectionBuilder;
 import io.github.pnoker.common.auth.entity.builder.McpToolBuilder;
@@ -33,8 +35,6 @@ import io.github.pnoker.common.auth.entity.builder.OAuthClientBuilder;
 import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
 import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
-import io.github.pnoker.common.auth.entity.bo.McpConnectionAddBO;
-import io.github.pnoker.common.auth.entity.bo.OAuthClientRegistrationBO;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
@@ -266,7 +266,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
         List<String> grantValues = Objects.isNull(request.getGrantTypes()) ? null
                 : request.getGrantTypes().stream().filter(Objects::nonNull)
-                        .map(OAuthGrantTypeEnum::getValue).toList();
+                .map(OAuthGrantTypeEnum::getValue).toList();
         Set<String> grants = normalizeSet(grantValues);
         if (grants.isEmpty()) {
             grants = OAuthClientTypeEnum.PUBLIC.getValue().equals(clientType)
