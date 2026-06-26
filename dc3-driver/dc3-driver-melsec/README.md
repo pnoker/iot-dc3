@@ -15,18 +15,18 @@ the MC protocol using the `iot-communication` library, reading and writing devic
 
 ## Driver Attributes (Device-level)
 
-| Attribute  | Description                       |
-|------------|-----------------------------------|
-| Host       | Ip                                |
-| Port       | Port                              |
-| PLC Series | PLC series (A/QnA/Q_L/IQ_R)       |
+| Attribute  | Description                 |
+|------------|-----------------------------|
+| Host       | Ip                          |
+| Port       | Port                        |
+| PLC Series | PLC series (A/QnA/Q_L/IQ_R) |
 
 ## Point Attributes
 
-| Attribute      | Description                                         |
-|----------------|-----------------------------------------------------|
-| Device Address | Device memory address (D100, M0, X10, W200 etc.)    |
-| String Length  | String read length (0 for non-string types)         |
+| Attribute      | Description                                      |
+|----------------|--------------------------------------------------|
+| Device Address | Device memory address (D100, M0, X10, W200 etc.) |
+| String Length  | String read length (0 for non-string types)      |
 
 ## Prerequisites
 

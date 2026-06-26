@@ -229,7 +229,9 @@ the [environment documentation](https://pnoker.github.io/iot-dc3/quickstart/envi
 | **Management Layer**  | Microservice collaboration core: service registration, device/driver management, command orchestration, configuration governance |
 | **Application Layer** | Data openness, scheduling, alarms, logging, third-party integration, and AI automation                                           |
 
-🧱 **Design principles** — cross-service calls always go through Facade interfaces; the DO/BO/VO three-tier model keeps persistence, business, and API shapes strictly separated; and tenant isolation runs end to end across database, cache, and API paths. Clear boundaries that scale across services and teams.
+🧱 **Design principles** — cross-service calls always go through Facade interfaces; the DO/BO/VO three-tier model keeps
+persistence, business, and API shapes strictly separated; and tenant isolation runs end to end across database, cache,
+and API paths. Clear boundaries that scale across services and teams.
 
 > 📖 For full module dependencies and runtime flow,
 > see [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html).

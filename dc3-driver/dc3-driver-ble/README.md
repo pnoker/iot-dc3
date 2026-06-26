@@ -15,27 +15,27 @@ values to characteristics.
 
 ## Driver Attributes (Device-level)
 
-| Attribute          | Description                                  |
-|--------------------|----------------------------------------------|
-| Adapter Name       | Bluetooth adapter name (e.g. hci0)           |
+| Attribute          | Description                                     |
+|--------------------|-------------------------------------------------|
+| Adapter Name       | Bluetooth adapter name (e.g. hci0)              |
 | Device Address     | BLE device MAC address (e.g. AA:BB:CC:DD:EE:FF) |
-| Connection Timeout | Connection timeout in milliseconds           |
+| Connection Timeout | Connection timeout in milliseconds              |
 
 ## Point Attributes
 
 | Attribute           | Description                                   |
 |---------------------|-----------------------------------------------|
 | Service UUID        | GATT Service UUID                             |
-| Characteristic UUID | GATT Characteristic UUID                       |
+| Characteristic UUID | GATT Characteristic UUID                      |
 | Read Format         | Data format (UTF8, HEX, INT16, UINT16, FLOAT) |
-| Byte Order          | Byte order (BIG, LITTLE)                       |
+| Byte Order          | Byte order (BIG, LITTLE)                      |
 
 ## Command Attributes (write)
 
-| Attribute           | Description                            |
-|---------------------|----------------------------------------|
-| Service UUID        | GATT Service UUID                      |
-| Characteristic UUID | GATT Characteristic UUID for writing   |
+| Attribute           | Description                          |
+|---------------------|--------------------------------------|
+| Service UUID        | GATT Service UUID                    |
+| Characteristic UUID | GATT Characteristic UUID for writing |
 
 ## Prerequisites
 

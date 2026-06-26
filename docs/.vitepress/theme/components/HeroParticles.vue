@@ -1,16 +1,20 @@
 <!--
-  Copyright 2016-present the IoT DC3 original author or authors.
-  Licensed under the GNU Affero General Public License v3.0.
-
-  Home hero background particle field: it fills the whole .VPHero (including behind the
-  left-hand title text). Particles converge from every outer edge along a clockwise spiral
-  toward the logo, echoing "everything connected, nodes converging from all sides into a network."
-  The canvas sits beneath the hero content (z-index 0, pointer-events:none), so the text/logo
-  float above it; particles stay faint over the text area and grow more visible around the logo —
-  spread out yet never obscuring reading. Solid #1296db, no glow haze.
-  SSR-safe (the canvas is created and injected on the client only).
--->
-<script setup lang="ts">
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<script lang="ts" setup>
 import {onBeforeUnmount, onMounted} from 'vue'
 
 interface P {
@@ -58,16 +62,33 @@ function spawn(): P {
   // portrait (phone): the hero is vertical with the logo in the upper half — merge in from a ring around the logo, focused on the upper half, without a long trip across the text
   if (h > w) {
     const d = rand(1.5, 2.4) * ar
-    return {ang: rand(0, Math.PI * 2), dist: d, seed: d, spin: rand(0.2, 0.4), vin: rand(32, 60), r: rand(1.4, 3.2), alpha: 0}
+    return {
+      ang: rand(0, Math.PI * 2),
+      dist: d,
+      seed: d,
+      spin: rand(0.2, 0.4),
+      vin: rand(32, 60),
+      r: rand(1.4, 3.2),
+      alpha: 0
+    }
   }
   // landscape (desktop): spawn from the hero's four outer edges (all directions); particles from the left cross the text background on their way to the logo on the right
   let x = 0, y = 0
   const m = 24
   const e = Math.random() * 4 | 0
-  if (e === 0) { x = rand(0, w); y = -m }
-  else if (e === 1) { x = w + m; y = rand(0, h) }
-  else if (e === 2) { x = rand(0, w); y = h + m }
-  else { x = -m; y = rand(0, h) }
+  if (e === 0) {
+    x = rand(0, w);
+    y = -m
+  } else if (e === 1) {
+    x = w + m;
+    y = rand(0, h)
+  } else if (e === 2) {
+    x = rand(0, w);
+    y = h + m
+  } else {
+    x = -m;
+    y = rand(0, h)
+  }
   const dx = x - ax, dy = y - ay
   const d = Math.hypot(dx, dy)
   return {
@@ -203,5 +224,5 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <span class="hero-particles-mount" aria-hidden="true" style="display:none"/>
+  <span aria-hidden="true" class="hero-particles-mount" style="display:none"/>
 </template>

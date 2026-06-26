@@ -42,12 +42,14 @@ See `dc3/doc/ENVIRONMENT.md` for the difference between `.env.example`, `.env`, 
 
 ## Branches and Pull Requests
 
-- Create feature and fix branches from the latest `main` branch unless a maintainer asks otherwise.
-- Use descriptive branch names such as `feature/<name>/<topic>` or `fix/<name>/<topic>`.
-- Open pull requests against `develop`.
-- Keep pull requests focused. Avoid mixing refactors, formatting churn, and behavior changes unless they are necessary
-  for the same fix.
-- Reference related issues in the pull request description.
+IoT DC3 follows a simplified Git Flow:
+
+- `develop` — integration branch. Cut `feature/<scope>` branches from `develop` and open pull requests back against `develop`. Full CI (lint / test / build / e2e) runs here.
+- `main` — production trunk. Verified work is promoted from `develop` to `main` via pull request. Each merge to `main` is a release (a tag is cut and artifacts are published).
+- `hotfix/<scope>` — cut from `main` for production fixes; open the PR back against `main` (then tag), and back-merge to `develop`.
+- `release` — archived (read-only). It is kept for history only; do not open pull requests against it.
+
+Use descriptive branch names such as `feature/<name>/<topic>` or `fix/<name>/<topic>`. Keep pull requests focused — avoid mixing refactors, formatting churn, and behavior changes unless they are necessary for the same fix. Reference related issues in the pull request description.
 
 ## Commit Messages
 
@@ -92,12 +94,22 @@ Before tagging a release, generate the categorized changelog from git:
 make changelog
 ```
 
-By default this reads the current version from `pom.xml`, compares `HEAD` with the latest reachable `dc3.release.*`
-tag, and updates `dc3/doc/CHANGE.md`. You can override the range or version when needed:
+By default this reads the current version from `pom.xml`, compares `HEAD` with the latest reachable `v*`
+(semver) tag, and updates `dc3/doc/CHANGE.md`. You can override the range or version when needed:
 
 ```bash
-make changelog FROM=dc3.release.20251005.00 TO=HEAD VERSION=2026.5.22
+make changelog FROM=v2025.9.3 TO=HEAD VERSION=2026.5.22
 ```
+
+To cut a release, switch to `main` and create the next semver tag (this also opens a GitHub Release):
+
+```bash
+make tag            # patch: v2025.9.3 -> v2025.9.4
+make tag minor      # minor: v2025.9.4 -> v2025.10.0
+make tag major      # major: v2025.10.0 -> v2026.0.0
+```
+
+`bash dc3/bin/tag.sh --dry-run` previews the next tag without pushing. Tagging only runs on `main`.
 
 Generated changelog-only release commits are skipped by default so rerunning the command after committing
 `CHANGE.md` remains stable. Set `INCLUDE_CHANGELOG_COMMITS=true` only when those commits should appear in

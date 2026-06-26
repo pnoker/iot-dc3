@@ -20,30 +20,30 @@ SocketCAN interface, parsing frame payloads into device point values and sending
 
 ## Driver Attributes (Device-level)
 
-| Attribute    | Description                          |
-|--------------|--------------------------------------|
-| Interface    | CAN interface name (e.g. can0)       |
-| Bitrate      | CAN bus bitrate                      |
+| Attribute    | Description                            |
+|--------------|----------------------------------------|
+| Interface    | CAN interface name (e.g. can0)         |
+| Bitrate      | CAN bus bitrate                        |
 | Frame Format | STANDARD (11-bit) or EXTENDED (29-bit) |
 
 ## Point Attributes
 
-| Attribute      | Description                          |
-|----------------|--------------------------------------|
-| CAN ID         | CAN identifier to match              |
-| Data Offset    | Byte offset within the frame payload |
-| Data Length    | Number of bytes to read              |
-| Data Format    | INT / UINT / HEX                     |
-| Byte Order     | Byte order (e.g. LITTLE)             |
-| Request CAN ID | CAN ID for an optional request frame |
+| Attribute      | Description                           |
+|----------------|---------------------------------------|
+| CAN ID         | CAN identifier to match               |
+| Data Offset    | Byte offset within the frame payload  |
+| Data Length    | Number of bytes to read               |
+| Data Format    | INT / UINT / HEX                      |
+| Byte Order     | Byte order (e.g. LITTLE)              |
+| Request CAN ID | CAN ID for an optional request frame  |
 | Request Data   | Payload of the optional request frame |
 
 ## Command Attributes (write)
 
-| Attribute | Description                         |
-|-----------|-------------------------------------|
-| CAN ID    | CAN identifier to write to          |
-| Data      | Frame data (supports `${value}`)    |
+| Attribute | Description                      |
+|-----------|----------------------------------|
+| CAN ID    | CAN identifier to write to       |
+| Data      | Frame data (supports `${value}`) |
 
 ## Prerequisites
 

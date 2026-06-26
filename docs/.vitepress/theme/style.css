@@ -391,14 +391,24 @@ body {
     --dc3-grid: #e2e8f0;
     --dc3-text2: #475569;
     --dc3-box-name: #0f172a;
-    --dc3-fe-fill: #ecfeff;   --dc3-fe-stroke: #0891b2;
-    --dc3-be-fill: #ecfdf5;   --dc3-be-stroke: #059669;  --dc3-be-text: #047857;
-    --dc3-db-fill: #f5f3ff;   --dc3-db-stroke: #7c3aed;  --dc3-db-text: #6d28d9;
-    --dc3-amber-fill: #fffbeb; --dc3-amber-stroke: #d97706;
+    --dc3-fe-fill: #ecfeff;
+    --dc3-fe-stroke: #0891b2;
+    --dc3-be-fill: #ecfdf5;
+    --dc3-be-stroke: #059669;
+    --dc3-be-text: #047857;
+    --dc3-db-fill: #f5f3ff;
+    --dc3-db-stroke: #7c3aed;
+    --dc3-db-text: #6d28d9;
+    --dc3-amber-fill: #fffbeb;
+    --dc3-amber-stroke: #d97706;
     --dc3-rose-stroke: #e11d48;
-    --dc3-bus-fill: #fff7ed;  --dc3-bus-stroke: #ea580c;  --dc3-bus-text: #c2410c;
-    --dc3-ext-fill: #f1f5f9;  --dc3-ext-stroke: #64748b;
-    --dc3-arrow: #94a3b8;     --dc3-arrow-label: #64748b;
+    --dc3-bus-fill: #fff7ed;
+    --dc3-bus-stroke: #ea580c;
+    --dc3-bus-text: #c2410c;
+    --dc3-ext-fill: #f1f5f9;
+    --dc3-ext-stroke: #64748b;
+    --dc3-arrow: #94a3b8;
+    --dc3-arrow-label: #64748b;
 
     border: 1px solid var(--vp-c-divider);
     border-radius: 12px;
@@ -412,14 +422,24 @@ body {
     --dc3-grid: #1e293b;
     --dc3-text2: #94a3b8;
     --dc3-box-name: #ffffff;
-    --dc3-fe-fill: rgba(8, 51, 68, 0.5);    --dc3-fe-stroke: #22d3ee;
-    --dc3-be-fill: rgba(6, 78, 59, 0.5);    --dc3-be-stroke: #34d399;  --dc3-be-text: #34d399;
-    --dc3-db-fill: rgba(76, 29, 149, 0.45); --dc3-db-stroke: #a78bfa;  --dc3-db-text: #cbb6f7;
-    --dc3-amber-fill: rgba(120, 53, 15, 0.35); --dc3-amber-stroke: #fbbf24;
+    --dc3-fe-fill: rgba(8, 51, 68, 0.5);
+    --dc3-fe-stroke: #22d3ee;
+    --dc3-be-fill: rgba(6, 78, 59, 0.5);
+    --dc3-be-stroke: #34d399;
+    --dc3-be-text: #34d399;
+    --dc3-db-fill: rgba(76, 29, 149, 0.45);
+    --dc3-db-stroke: #a78bfa;
+    --dc3-db-text: #cbb6f7;
+    --dc3-amber-fill: rgba(120, 53, 15, 0.35);
+    --dc3-amber-stroke: #fbbf24;
     --dc3-rose-stroke: #fb7185;
-    --dc3-bus-fill: rgba(251, 146, 60, 0.3); --dc3-bus-stroke: #fb923c;  --dc3-bus-text: #fcd9b6;
-    --dc3-ext-fill: rgba(30, 41, 59, 0.5);  --dc3-ext-stroke: #94a3b8;
-    --dc3-arrow: #64748b;     --dc3-arrow-label: #94a3b8;
+    --dc3-bus-fill: rgba(251, 146, 60, 0.3);
+    --dc3-bus-stroke: #fb923c;
+    --dc3-bus-text: #fcd9b6;
+    --dc3-ext-fill: rgba(30, 41, 59, 0.5);
+    --dc3-ext-stroke: #94a3b8;
+    --dc3-arrow: #64748b;
+    --dc3-arrow-label: #94a3b8;
 }
 
 .dc3-diagram svg {
@@ -429,7 +449,9 @@ body {
     font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
 }
 
-.dc3-diagram .d-name { font-weight: 600; }
+.dc3-diagram .d-name {
+    font-weight: 600;
+}
 
 .custom-block {
     border-radius: 8px;

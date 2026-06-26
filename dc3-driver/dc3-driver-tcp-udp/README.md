@@ -30,16 +30,16 @@ it uses the JDK socket APIs directly.
 
 ## Point Attributes
 
-| Attribute      | Code          | Type   | Default | Description                              |
-|----------------|---------------|--------|---------|------------------------------------------|
-| Send Command   | sendCommand   | STRING |         |                                          |
-| Receive Length | receiveLength | INT    | 0       | 0 means use delimiter                    |
-| Frame Header   | frameHeader   | STRING |         |                                          |
-| Frame Footer   | frameFooter   | STRING |         |                                          |
-| Data Offset    | dataOffset    | INT    | 0       |                                          |
-| Data Length    | dataLength    | INT    | 0       |                                          |
-| Data Format    | dataFormat    | STRING | HEX     | HEX/ASCII/INT16/UINT16/INT32/FLOAT       |
-| Byte Order     | byteOrder     | STRING | BIG     |                                          |
+| Attribute      | Code          | Type   | Default | Description                        |
+|----------------|---------------|--------|---------|------------------------------------|
+| Send Command   | sendCommand   | STRING |         |                                    |
+| Receive Length | receiveLength | INT    | 0       | 0 means use delimiter              |
+| Frame Header   | frameHeader   | STRING |         |                                    |
+| Frame Footer   | frameFooter   | STRING |         |                                    |
+| Data Offset    | dataOffset    | INT    | 0       |                                    |
+| Data Length    | dataLength    | INT    | 0       |                                    |
+| Data Format    | dataFormat    | STRING | HEX     | HEX/ASCII/INT16/UINT16/INT32/FLOAT |
+| Byte Order     | byteOrder     | STRING | BIG     |                                    |
 
 ## Command Attributes (write)
 

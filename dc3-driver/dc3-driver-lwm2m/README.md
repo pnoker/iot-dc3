@@ -31,12 +31,12 @@ Object Instance / Resource ID.
 
 ## Point Attributes
 
-| Attribute          | Description                                  |
-|--------------------|----------------------------------------------|
-| Object ID          | LwM2M Object ID (e.g. 3303=Temperature)      |
-| Object Instance ID | LwM2M Object Instance ID                     |
-| Resource ID        | LwM2M Resource ID (e.g. 5700=Sensor Value)   |
-| Observe            | Enable LwM2M Observe: true, false            |
+| Attribute          | Description                                |
+|--------------------|--------------------------------------------|
+| Object ID          | LwM2M Object ID (e.g. 3303=Temperature)    |
+| Object Instance ID | LwM2M Object Instance ID                   |
+| Resource ID        | LwM2M Resource ID (e.g. 5700=Sensor Value) |
+| Observe            | Enable LwM2M Observe: true, false          |
 
 ## Prerequisites
 

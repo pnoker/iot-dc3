@@ -22,23 +22,23 @@ false`); only the custom schedule and device health check are enabled.
 
 ## Service Ports
 
-| Port | Code | Default | Description                          |
-|------|------|---------|--------------------------------------|
+| Port | Code | Default | Description                                |
+|------|------|---------|--------------------------------------------|
 | 5001 | port | 5001    | TCP port for the SL651 server to listen on |
 
 The listen port is exposed as a driver attribute (see below) and read at startup.
 
 ## Driver Attributes (Device-level)
 
-| Attribute     | Code | Type   | Default | Description                              |
-|---------------|------|--------|---------|------------------------------------------|
-| Listen Port   | port | INT    | 5001    | TCP port for SL651 server to listen on   |
-| Auth Password | pwd  | STRING | 0000    | Remote station authentication password   |
+| Attribute     | Code | Type   | Default | Description                            |
+|---------------|------|--------|---------|----------------------------------------|
+| Listen Port   | port | INT    | 5001    | TCP port for SL651 server to listen on |
+| Auth Password | pwd  | STRING | 0000    | Remote station authentication password |
 
 ## Point Attributes
 
-| Attribute     | Code  | Type | Default | Description                                          |
-|---------------|-------|------|---------|------------------------------------------------------|
+| Attribute     | Code  | Type | Default | Description                                           |
+|---------------|-------|------|---------|-------------------------------------------------------|
 | Element Index | index | INT  | 0       | Zero-based index into the telemetry body element list |
 
 ## Prerequisites

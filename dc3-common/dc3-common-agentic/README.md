@@ -14,19 +14,20 @@ model uses to read and operate platform resources.
 
 ## Key Components
 
-| Area            | Components                                                                                          |
-|-----------------|-----------------------------------------------------------------------------------------------------|
-| Chat client     | `ChatClientConfig`, `ChatClientFactory` — build Spring AI `ChatClient`s per model configuration     |
-| Memory          | `MessageChatMemoryRepository` — JDBC-backed conversation memory                                     |
-| Configuration   | `AgenticProperties` (prefix `dc3.agentic`), `AgenticApiGroupConfig`, `AgenticAutoConfiguration`     |
-| Tools           | `DriverTool`, `DeviceTool`, `PointTool`, `PointValueTool`, `ProfileTool`, `CommandTool`, `EventTool`, `UserTool`, `TenantTool`, `SystemTool` |
-| Model mgmt      | `ModelController` + MapStruct mappers (`Session`, `Message`, `Attachment`, `ModelProvider`, `ModelConfig`, `Action`) |
-| Tool support    | `AgenticToolMetadata` annotation, `AgenticToolUtil`, `AgenticToolContextUtil`, `AgenticConversationIdUtil`, `AgenticVisualizationUtil`, `AgenticTokenEstimatorUtil` |
+| Area          | Components                                                                                                                                                          |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Chat client   | `ChatClientConfig`, `ChatClientFactory` — build Spring AI `ChatClient`s per model configuration                                                                     |
+| Memory        | `MessageChatMemoryRepository` — JDBC-backed conversation memory                                                                                                     |
+| Configuration | `AgenticProperties` (prefix `dc3.agentic`), `AgenticApiGroupConfig`, `AgenticAutoConfiguration`                                                                     |
+| Tools         | `DriverTool`, `DeviceTool`, `PointTool`, `PointValueTool`, `ProfileTool`, `CommandTool`, `EventTool`, `UserTool`, `TenantTool`, `SystemTool`                        |
+| Model mgmt    | `ModelController` + MapStruct mappers (`Session`, `Message`, `Attachment`, `ModelProvider`, `ModelConfig`, `Action`)                                                |
+| Tool support  | `AgenticToolMetadata` annotation, `AgenticToolUtil`, `AgenticToolContextUtil`, `AgenticConversationIdUtil`, `AgenticVisualizationUtil`, `AgenticTokenEstimatorUtil` |
 
 ## Configuration
 
 - Bound from the `dc3.agentic` prefix (`AgenticProperties`).
-- An OpenAI-compatible fallback model is configured via the `AGENTIC_FALLBACK_OPENAI_*` environment variables (see `.env.example`).
+- An OpenAI-compatible fallback model is configured via the `AGENTIC_FALLBACK_OPENAI_*` environment variables (see
+  `.env.example`).
 - Conversation memory uses the Spring AI JDBC chat-memory repository.
 
 ## Dependencies

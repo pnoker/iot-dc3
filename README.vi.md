@@ -229,7 +229,9 @@ Xem [tài liệu biến môi trường](https://pnoker.github.io/iot-dc3/quickst
 | **Tầng Quản lý**  | Lõi cộng tác microservice: đăng ký dịch vụ, quản lý thiết bị/driver, điều phối lệnh, quản trị cấu hình                   |
 | **Tầng Ứng dụng** | Mở dữ liệu, lập lịch tác vụ, cảnh báo, quản lý log, tích hợp bên thứ ba và tự động hóa AI                                |
 
-🧱 **Nguyên tắc thiết kế** — các lời gọi xuyên dịch vụ luôn đi qua interface Facade; mô hình ba tầng DO/BO/VO tách biệt rõ ràng giữa persistence, business và API; cách ly tenant xuyên suốt từ database, cache đến API. Ranh giới rõ ràng, dễ mở rộng theo dịch vụ và đội nhóm.
+🧱 **Nguyên tắc thiết kế** — các lời gọi xuyên dịch vụ luôn đi qua interface Facade; mô hình ba tầng DO/BO/VO tách biệt
+rõ ràng giữa persistence, business và API; cách ly tenant xuyên suốt từ database, cache đến API. Ranh giới rõ ràng, dễ
+mở rộng theo dịch vụ và đội nhóm.
 
 > 📖 Để xem đầy đủ phụ thuộc module và luồng runtime,
 > xem [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html).

@@ -212,7 +212,8 @@ Date collectionTime = new Date(timestamp);
 
 - **Query Optimization**: Always include tenant_id for proper data isolation
 - **Caching**: Consider caching recent point values for high-frequency queries
-- **Time Series Store**: This API queries the time-series store through `dc3-common-repository` (PostgreSQL with the TimescaleDB extension)
+- **Time Series Store**: This API queries the time-series store through `dc3-common-repository` (PostgreSQL with the
+  TimescaleDB extension)
 - **Data Volume**: Point value queries can generate high traffic in large-scale deployments
 
 ## Integration Points

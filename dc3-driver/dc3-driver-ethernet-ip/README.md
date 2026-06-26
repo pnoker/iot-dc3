@@ -31,16 +31,16 @@ via CIP Data Table Read/Write services.
 
 ## Point Attributes
 
-| Attribute     | Description                          |
-|---------------|--------------------------------------|
-| Tag Name      | CIP tag name                         |
-| Tag Type      | Tag data type (e.g. DINT)            |
-| Element Count | Number of elements to read           |
+| Attribute     | Description                |
+|---------------|----------------------------|
+| Tag Name      | CIP tag name               |
+| Tag Type      | Tag data type (e.g. DINT)  |
+| Element Count | Number of elements to read |
 
 ## Command Attributes (write)
 
-| Attribute    | Description                       |
-|--------------|-----------------------------------|
+| Attribute    | Description                          |
+|--------------|--------------------------------------|
 | Send Command | Value to write (supports `${value}`) |
 
 ## Prerequisites

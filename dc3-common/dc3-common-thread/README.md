@@ -14,11 +14,11 @@ as concurrent point reads and batch message handling.
 
 ## Key Components
 
-| Component          | Purpose                                                                                              |
-|--------------------|------------------------------------------------------------------------------------------------------|
+| Component          | Purpose                                                                                                                                                                                                                                          |
+|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `ThreadPoolConfig` | Provides three executor beans — `threadPoolExecutor` (`ThreadPoolExecutor`), `virtualThreadExecutor` (virtual-thread `ExecutorService`), `scheduledThreadPoolExecutor` (`ScheduledThreadPoolExecutor`) — sharing a caller-runs rejection handler |
-| `ThreadProperties` | Binds thread pool properties from YAML (prefix `dc3.thread`: `prefix`, `corePoolSize`, `maximumPoolSize`, `keepAliveTime`) |
-| `ThreadInitRunner` | Startup log for confirming thread pool initialization                                                |
+| `ThreadProperties` | Binds thread pool properties from YAML (prefix `dc3.thread`: `prefix`, `corePoolSize`, `maximumPoolSize`, `keepAliveTime`)                                                                                                                       |
+| `ThreadInitRunner` | Startup log for confirming thread pool initialization                                                                                                                                                                                            |
 
 ## Configuration Properties
 

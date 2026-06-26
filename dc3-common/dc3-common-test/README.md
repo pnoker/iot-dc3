@@ -14,11 +14,11 @@ the same fixtures.
 
 ## Key Components
 
-| Area              | Components                                                                         |
-|-------------------|------------------------------------------------------------------------------------|
-| Contract tests    | `SecretFieldContractTest`, `EnumContractTest`                                      |
-| Test support      | `RabbitTestHarness`, `JsonAssertions`, `FixedClockConfig`, `GrpcInProcessExtension`|
-| Testcontainers    | `PgTimescaleContainer`, `RabbitContainer`, `MqttContainer`                         |
+| Area           | Components                                                                          |
+|----------------|-------------------------------------------------------------------------------------|
+| Contract tests | `SecretFieldContractTest`, `EnumContractTest`                                       |
+| Test support   | `RabbitTestHarness`, `JsonAssertions`, `FixedClockConfig`, `GrpcInProcessExtension` |
+| Testcontainers | `PgTimescaleContainer`, `RabbitContainer`, `MqttContainer`                          |
 
 ## Dependencies
 

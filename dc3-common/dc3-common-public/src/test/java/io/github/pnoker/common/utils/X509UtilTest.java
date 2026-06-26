@@ -56,33 +56,6 @@ class X509UtilTest {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    @Test
-    void getSSLSocketFactoryLoadsCertificatesAndEncryptedKey(@TempDir Path dir) throws Exception {
-        KeyPair keyPair = generateRsaKeyPair();
-        X509Certificate cert = selfSignedCertificate(keyPair);
-        Path caFile = writeCertificate(dir.resolve("ca.crt"), cert);
-        Path certFile = writeCertificate(dir.resolve("client.crt"), cert);
-        Path keyFile = writeEncryptedKey(dir.resolve("client.key"), keyPair, KEY_PASSWORD);
-
-        SSLSocketFactory factory = X509Util.getSSLSocketFactory(
-                caFile.toString(), certFile.toString(), keyFile.toString(), KEY_PASSWORD);
-
-        assertThat(factory).isNotNull();
-    }
-
-    @Test
-    void getSSLSocketFactoryWithWrongKeyPasswordFails(@TempDir Path dir) throws Exception {
-        KeyPair keyPair = generateRsaKeyPair();
-        X509Certificate cert = selfSignedCertificate(keyPair);
-        Path caFile = writeCertificate(dir.resolve("ca.crt"), cert);
-        Path certFile = writeCertificate(dir.resolve("client.crt"), cert);
-        Path keyFile = writeEncryptedKey(dir.resolve("client.key"), keyPair, KEY_PASSWORD);
-
-        assertThatThrownBy(() -> X509Util.getSSLSocketFactory(
-                caFile.toString(), certFile.toString(), keyFile.toString(), "wrong-password"))
-                .isInstanceOf(ConnectorException.class);
-    }
-
     private static KeyPair generateRsaKeyPair() throws Exception {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(2048);
@@ -120,6 +93,33 @@ class X509UtilTest {
             pemWriter.writeObject(keyPair.getPrivate(), encryptor);
         }
         return file;
+    }
+
+    @Test
+    void getSSLSocketFactoryLoadsCertificatesAndEncryptedKey(@TempDir Path dir) throws Exception {
+        KeyPair keyPair = generateRsaKeyPair();
+        X509Certificate cert = selfSignedCertificate(keyPair);
+        Path caFile = writeCertificate(dir.resolve("ca.crt"), cert);
+        Path certFile = writeCertificate(dir.resolve("client.crt"), cert);
+        Path keyFile = writeEncryptedKey(dir.resolve("client.key"), keyPair, KEY_PASSWORD);
+
+        SSLSocketFactory factory = X509Util.getSSLSocketFactory(
+                caFile.toString(), certFile.toString(), keyFile.toString(), KEY_PASSWORD);
+
+        assertThat(factory).isNotNull();
+    }
+
+    @Test
+    void getSSLSocketFactoryWithWrongKeyPasswordFails(@TempDir Path dir) throws Exception {
+        KeyPair keyPair = generateRsaKeyPair();
+        X509Certificate cert = selfSignedCertificate(keyPair);
+        Path caFile = writeCertificate(dir.resolve("ca.crt"), cert);
+        Path certFile = writeCertificate(dir.resolve("client.crt"), cert);
+        Path keyFile = writeEncryptedKey(dir.resolve("client.key"), keyPair, KEY_PASSWORD);
+
+        assertThatThrownBy(() -> X509Util.getSSLSocketFactory(
+                caFile.toString(), certFile.toString(), keyFile.toString(), "wrong-password"))
+                .isInstanceOf(ConnectorException.class);
     }
 
 }

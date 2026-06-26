@@ -17,35 +17,35 @@ with the `${value}` placeholder substituted.
 
 ## Driver Attributes (Device-level)
 
-| Attribute   | Code     | Type   | Default      | Description                                                  |
-|-------------|----------|--------|--------------|--------------------------------------------------------------|
-| Serial Port | port     | STRING | /dev/ttyUSB0 | Serial port device path                                      |
+| Attribute   | Code     | Type   | Default      | Description                                                     |
+|-------------|----------|--------|--------------|-----------------------------------------------------------------|
+| Serial Port | port     | STRING | /dev/ttyUSB0 | Serial port device path                                         |
 | Baud Rate   | baudRate | INT    | 9600         | Baud rate (1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200) |
-| Data Bits   | dataBits | INT    | 8            | Data bits (5, 6, 7, 8)                                       |
-| Stop Bits   | stopBits | INT    | 1            | Stop bits (1, 2)                                             |
-| Parity      | parity   | INT    | 0            | Parity (0=None, 1=Odd, 2=Even)                               |
-| Timeout     | timeout  | INT    | 1000         | Read timeout in milliseconds                                 |
+| Data Bits   | dataBits | INT    | 8            | Data bits (5, 6, 7, 8)                                          |
+| Stop Bits   | stopBits | INT    | 1            | Stop bits (1, 2)                                                |
+| Parity      | parity   | INT    | 0            | Parity (0=None, 1=Odd, 2=Even)                                  |
+| Timeout     | timeout  | INT    | 1000         | Read timeout in milliseconds                                    |
 
 ## Point Attributes
 
-| Attribute      | Code          | Type   | Default | Description                                          |
-|----------------|---------------|--------|---------|------------------------------------------------------|
-| Send Command   | sendCommand   | STRING |         | HEX command to send (e.g. 01 03 00 00 00 0A C5 CD)   |
-| Receive Length | receiveLength | INT    | 0       | Expected response length in bytes (0=auto detect)    |
-| Frame Header   | frameHeader   | STRING |         | Frame header in HEX (e.g. 01 03)                     |
-| Frame Footer   | frameFooter   | STRING |         | Frame footer in HEX (e.g. 0D 0A)                     |
-| Data Offset    | dataOffset    | INT    | 0       | Data region offset from frame start                  |
-| Data Length    | dataLength    | INT    | 0       | Data region length in bytes (0=until frame footer)   |
-| Checksum Type  | checksumType  | STRING | NONE    | Checksum type: NONE, CRC16, XOR                      |
-| Data Format    | dataFormat    | STRING | HEX     | Data format: HEX, ASCII, BINARY, FLOAT               |
-| Byte Order     | byteOrder     | STRING | BIG     | Byte order: BIG, LITTLE                              |
+| Attribute      | Code          | Type   | Default | Description                                        |
+|----------------|---------------|--------|---------|----------------------------------------------------|
+| Send Command   | sendCommand   | STRING |         | HEX command to send (e.g. 01 03 00 00 00 0A C5 CD) |
+| Receive Length | receiveLength | INT    | 0       | Expected response length in bytes (0=auto detect)  |
+| Frame Header   | frameHeader   | STRING |         | Frame header in HEX (e.g. 01 03)                   |
+| Frame Footer   | frameFooter   | STRING |         | Frame footer in HEX (e.g. 0D 0A)                   |
+| Data Offset    | dataOffset    | INT    | 0       | Data region offset from frame start                |
+| Data Length    | dataLength    | INT    | 0       | Data region length in bytes (0=until frame footer) |
+| Checksum Type  | checksumType  | STRING | NONE    | Checksum type: NONE, CRC16, XOR                    |
+| Data Format    | dataFormat    | STRING | HEX     | Data format: HEX, ASCII, BINARY, FLOAT             |
+| Byte Order     | byteOrder     | STRING | BIG     | Byte order: BIG, LITTLE                            |
 
 ## Command Attributes (write)
 
-| Attribute    | Code        | Type   | Default  | Description                                  |
-|--------------|-------------|--------|----------|----------------------------------------------|
+| Attribute    | Code        | Type   | Default  | Description                                    |
+|--------------|-------------|--------|----------|------------------------------------------------|
 | Send Command | sendCommand | STRING | ${value} | HEX command template with ${value} placeholder |
-| Byte Order   | byteOrder   | STRING | BIG      | Byte order for encoding value: BIG, LITTLE   |
+| Byte Order   | byteOrder   | STRING | BIG      | Byte order for encoding value: BIG, LITTLE     |
 
 ## Prerequisites
 

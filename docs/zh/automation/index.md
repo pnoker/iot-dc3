@@ -4,11 +4,14 @@ title: 自动化
 
 # 自动化
 
-确定性的、可重复的程序化操作，用 `dc3` CLI 完成——不涉及大模型，结果可预测、可脚本化。AI 栏目（Agentic 中心、MCP）解决"让模型决策"，自动化栏目解决"让人或脚本执行"。
+确定性的、可重复的程序化操作，用 `dc3` CLI 完成——不涉及大模型，结果可预测、可脚本化。AI 栏目（Agentic 中心、MCP）解决"
+让模型决策"，自动化栏目解决"让人或脚本执行"。
 
 ## dc3 CLI
 
-`dc3` CLI 是一个独立的 TypeScript 命令行客户端（Node ≥ 20），通过 HTTP 网关与运行中的后端通信，自身不耦合 Java 构建。它封装了三段式登录、Token 自动续期与凭据存储，让你直接面对按结果基数命名的子命令：`dc3 device list`、`dc3 point history`、`dc3 driver add`。
+`dc3` CLI 是一个独立的 TypeScript 命令行客户端（Node ≥ 20），通过 HTTP 网关与运行中的后端通信，自身不耦合 Java
+构建。它封装了三段式登录、Token 自动续期与凭据存储，让你直接面对按结果基数命名的子命令：`dc3 device list`、
+`dc3 point history`、`dc3 driver add`。
 
 适合三类场景：
 
@@ -26,7 +29,8 @@ flowchart LR
     RBAC --> Svc["管理 / 数据中心"]
 ```
 
-CLI 的鉴权用登录令牌：先取盐、再换 12 小时有效的 access token，每个请求带 `X-Auth-Tenant` / `X-Auth-Login` / `X-Auth-Token` 三个鉴权头。和 AI 栏目一样，CLI 拿不到比登录账号更多的权限，跨租户数据看不到（返回 404 而非数据）。
+CLI 的鉴权用登录令牌：先取盐、再换 12 小时有效的 access token，每个请求带 `X-Auth-Tenant` / `X-Auth-Login` / `X-Auth-Token`
+三个鉴权头。和 AI 栏目一样，CLI 拿不到比登录账号更多的权限，跨租户数据看不到（返回 404 而非数据）。
 
 > 想让大模型而非脚本来驱动操作？见 [AI 栏目](../ai/)（Agentic 中心对话式运营 + MCP 接外部 Agent）。
 

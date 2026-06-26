@@ -7,7 +7,8 @@ uses for cross-service calls instead of binding directly to a transport. Two int
 these contracts at runtime:
 
 - **gRPC** (`dc3-common-facade-grpc`) — cross-process calls between the standalone center services.
-- **In-process** (`dc3-common-facade-local-auth` / `-data` / `-manager`) — direct local calls inside the `dc3-center-single` monolith.
+- **In-process** (`dc3-common-facade-local-auth` / `-data` / `-manager`) — direct local calls inside the
+  `dc3-center-single` monolith.
 
 The implementation is selected by the `dc3.facade.mode` property (`DC3_FACADE_MODE`, default `grpc`), so controllers
 and services never depend on transport details.
@@ -20,11 +21,11 @@ and services never depend on transport details.
 
 ## Facade Contracts
 
-| Domain  | Facade interfaces                                                                                                |
-|---------|-----------------------------------------------------------------------------------------------------------------|
+| Domain  | Facade interfaces                                                                                                                      |
+|---------|----------------------------------------------------------------------------------------------------------------------------------------|
 | Auth    | `TokenFacade`, `UserFacade`, `TenantFacade`, `PermissionFacade`, `ResourceRegistryFacade`, `McpRuntimeFacade`, `LocalCredentialFacade` |
-| Manager | `DriverFacade`, `DeviceFacade`, `PointFacade`, `ProfileFacade`, `CommandFacade`, `EventFacade`                   |
-| Data    | `PointValueFacade`, `PointCommandFacade`, `StatusHealthFacade`                                                   |
+| Manager | `DriverFacade`, `DeviceFacade`, `PointFacade`, `ProfileFacade`, `CommandFacade`, `EventFacade`                                         |
+| Data    | `PointValueFacade`, `PointCommandFacade`, `StatusHealthFacade`                                                                         |
 
 Facades exchange business objects (BO); request/response shaping is the caller's responsibility.
 

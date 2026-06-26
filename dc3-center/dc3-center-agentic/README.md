@@ -24,16 +24,20 @@ The WebFlux base path is `/agentic`; through the gateway the service is reached 
 
 ## Key Responsibilities
 
-- **Conversational AI**: chat sessions backed by a Spring AI `ChatClient`, with configurable model providers and per-conversation memory.
-- **Tool calling**: a suite of platform tools (`DriverTool`, `DeviceTool`, `PointTool`, `PointValueTool`, `ProfileTool`, `CommandTool`, `EventTool`, `UserTool`, `TenantTool`, `SystemTool`) lets the model read and act on platform data.
-- **Model management**: model providers and model configs are managed via REST controllers (e.g. `ModelController`) and persisted through MyBatis mappers.
+- **Conversational AI**: chat sessions backed by a Spring AI `ChatClient`, with configurable model providers and
+  per-conversation memory.
+- **Tool calling**: a suite of platform tools (`DriverTool`, `DeviceTool`, `PointTool`, `PointValueTool`, `ProfileTool`,
+  `CommandTool`, `EventTool`, `UserTool`, `TenantTool`, `SystemTool`) lets the model read and act on platform data.
+- **Model management**: model providers and model configs are managed via REST controllers (e.g. `ModelController`) and
+  persisted through MyBatis mappers.
 - **Facade access**: cross-service reads/writes go through the gRPC facade (`dc3-common-facade-grpc`).
 
 ## Configuration
 
 - `DC3_AGENTIC_PORT` — HTTP port (default `8600`)
 - `DC3_FACADE_MODE` — facade transport (default `grpc`)
-- Model/provider settings are bound via `AgenticProperties`, with an OpenAI-compatible fallback configured through the `AGENTIC_FALLBACK_OPENAI_*` environment variables (see `dc3/.env.example` / repo-root `.env.example`).
+- Model/provider settings are bound via `AgenticProperties`, with an OpenAI-compatible fallback configured through the
+  `AGENTIC_FALLBACK_OPENAI_*` environment variables (see `dc3/.env.example` / repo-root `.env.example`).
 
 ## Running Locally
 

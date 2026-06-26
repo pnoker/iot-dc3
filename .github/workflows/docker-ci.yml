@@ -3,7 +3,7 @@ name: Docker Image
 on:
   push:
     tags:
-      - dc3.release.*
+      - v*
   workflow_dispatch:
 
 permissions:
@@ -114,7 +114,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: build-push
-    if: startsWith(github.ref, 'refs/tags/dc3.release.')
+    if: startsWith(github.ref, 'refs/tags/v')
     timeout-minutes: 20
     permissions:
       contents: write

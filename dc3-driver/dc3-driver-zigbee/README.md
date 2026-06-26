@@ -22,31 +22,31 @@ attributes addressed by node IEEE address / endpoint / cluster / attribute, and 
 
 ## Driver Attributes (Device-level)
 
-| Attribute   | Code       | Type   | Default      | Description                                |
-|-------------|------------|--------|--------------|--------------------------------------------|
-| Serial Port | serialPort | STRING | /dev/ttyUSB0 | Zigbee coordinator serial port             |
-| Baud Rate   | baudRate   | INT    | 115200       | Serial port baud rate                      |
+| Attribute   | Code       | Type   | Default      | Description                                        |
+|-------------|------------|--------|--------------|----------------------------------------------------|
+| Serial Port | serialPort | STRING | /dev/ttyUSB0 | Zigbee coordinator serial port                     |
+| Baud Rate   | baudRate   | INT    | 115200       | Serial port baud rate                              |
 | Dongle Type | dongleType | STRING | TELEGESIS    | Coordinator dongle type (TELEGESIS, EMBER, CONBEE) |
-| PAN ID      | panId      | INT    | 0            | PAN ID (0=auto)                            |
-| Channel     | channel    | INT    | 0            | Channel (0=auto, 11-26)                    |
+| PAN ID      | panId      | INT    | 0            | PAN ID (0=auto)                                    |
+| Channel     | channel    | INT    | 0            | Channel (0=auto, 11-26)                            |
 
 ## Point Attributes
 
-| Attribute         | Code            | Type   | Default | Description                                          |
-|-------------------|-----------------|--------|---------|------------------------------------------------------|
-| Node IEEE Address | nodeIeeeAddress | STRING |         | Zigbee node IEEE address (e.g. 00158D0001234567)     |
-| Endpoint ID       | endpointId      | INT    | 1       | Endpoint ID                                          |
-| Cluster ID        | clusterId       | INT    | 0       | Cluster ID (e.g. 1026=Temperature Measurement)       |
-| Attribute ID      | attributeId     | INT    | 0       | Attribute ID (e.g. 0=Measured Value)                 |
+| Attribute         | Code            | Type   | Default | Description                                      |
+|-------------------|-----------------|--------|---------|--------------------------------------------------|
+| Node IEEE Address | nodeIeeeAddress | STRING |         | Zigbee node IEEE address (e.g. 00158D0001234567) |
+| Endpoint ID       | endpointId      | INT    | 1       | Endpoint ID                                      |
+| Cluster ID        | clusterId       | INT    | 0       | Cluster ID (e.g. 1026=Temperature Measurement)   |
+| Attribute ID      | attributeId     | INT    | 0       | Attribute ID (e.g. 0=Measured Value)             |
 
 ## Command Attributes (write)
 
-| Attribute         | Code            | Type   | Default | Description               |
-|-------------------|-----------------|--------|---------|---------------------------|
-| Node IEEE Address | nodeIeeeAddress | STRING |         | Zigbee node IEEE address  |
-| Endpoint ID       | endpointId      | INT    | 1       | Endpoint ID               |
-| Cluster ID        | clusterId       | INT    | 0       | Cluster ID for writing    |
-| Attribute ID      | attributeId     | INT    | 0       | Attribute ID for writing  |
+| Attribute         | Code            | Type   | Default | Description              |
+|-------------------|-----------------|--------|---------|--------------------------|
+| Node IEEE Address | nodeIeeeAddress | STRING |         | Zigbee node IEEE address |
+| Endpoint ID       | endpointId      | INT    | 1       | Endpoint ID              |
+| Cluster ID        | clusterId       | INT    | 0       | Cluster ID for writing   |
+| Attribute ID      | attributeId     | INT    | 0       | Attribute ID for writing |
 
 ## Prerequisites
 

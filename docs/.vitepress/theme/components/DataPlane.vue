@@ -1,11 +1,20 @@
 <!--
-  Copyright 2016-present the IoT DC3 original author or authors.
-  Licensed under the GNU Affero General Public License v3.0.
-
-  Data plane: the path of point values from field devices to storage and cache.
-  Pure inline SVG; colors use the .dc3-diagram CSS variables to switch with the light/dark theme, and the text switches between Chinese and English via the lang prop.
--->
-<script setup lang="ts">
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<script lang="ts" setup>
 import {computed} from 'vue'
 
 const props = withDefaults(defineProps<{ lang?: 'zh' | 'en' }>(), {lang: 'zh'})
@@ -44,56 +53,86 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 
 <template>
   <div class="dc3-diagram">
-    <svg viewBox="0 0 1180 300" role="img" :aria-label="s.aria">
+    <svg :aria-label="s.aria" role="img" viewBox="0 0 1180 300">
       <defs>
-        <marker id="dp-ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="var(--dc3-arrow)"/>
+        <marker id="dp-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
+          <polygon fill="var(--dc3-arrow)" points="0 0, 10 3.5, 0 7"/>
         </marker>
       </defs>
 
       <!-- arrows -->
-      <line x1="172" y1="150" x2="210" y2="150" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dp-ah)"/>
-      <text x="178" y="142" fill="var(--dc3-arrow-label)" font-size="10">{{ s.e1 }}</text>
-      <line x1="374" y1="150" x2="412" y2="150" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dp-ah)"/>
-      <text x="372" y="142" fill="var(--dc3-arrow-label)" font-size="10">{{ s.e2 }}</text>
-      <line x1="640" y1="150" x2="678" y2="150" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dp-ah)"/>
-      <text x="640" y="142" fill="var(--dc3-arrow-label)" font-size="10">{{ s.e3 }}</text>
-      <line x1="872" y1="138" x2="910" y2="92" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dp-ah)"/>
-      <text x="876" y="116" fill="var(--dc3-arrow-label)" font-size="10">{{ s.e4 }}</text>
-      <line x1="872" y1="164" x2="910" y2="212" stroke="var(--dc3-arrow)" stroke-width="1.5" marker-end="url(#dp-ah)"/>
-      <text x="876" y="200" fill="var(--dc3-arrow-label)" font-size="10">{{ s.e5 }}</text>
+      <line marker-end="url(#dp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="172" x2="210" y1="150" y2="150"/>
+      <text fill="var(--dc3-arrow-label)" font-size="10" x="178" y="142">{{ s.e1 }}</text>
+      <line marker-end="url(#dp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="374" x2="412" y1="150" y2="150"/>
+      <text fill="var(--dc3-arrow-label)" font-size="10" x="372" y="142">{{ s.e2 }}</text>
+      <line marker-end="url(#dp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="640" x2="678" y1="150" y2="150"/>
+      <text fill="var(--dc3-arrow-label)" font-size="10" x="640" y="142">{{ s.e3 }}</text>
+      <line marker-end="url(#dp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="872" x2="910" y1="138" y2="92"/>
+      <text fill="var(--dc3-arrow-label)" font-size="10" x="876" y="116">{{ s.e4 }}</text>
+      <line marker-end="url(#dp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="872" x2="910" y1="164" y2="212"/>
+      <text fill="var(--dc3-arrow-label)" font-size="10" x="876" y="200">{{ s.e5 }}</text>
 
       <!-- field devices -->
-      <rect x="22" y="116" width="150" height="68" rx="9" fill="var(--dc3-ext-fill)" stroke="var(--dc3-ext-stroke)" stroke-width="1.5"/>
-      <text x="97" y="146" class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle">{{ s.dev }}</text>
-      <text x="97" y="165" fill="var(--dc3-text2)" font-size="10" text-anchor="middle">{{ s.devSub }}</text>
+      <rect fill="var(--dc3-ext-fill)" height="68" rx="9" stroke="var(--dc3-ext-stroke)" stroke-width="1.5" width="150"
+            x="22"
+            y="116"/>
+      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="97" y="146">{{
+          s.dev
+        }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="97" y="165">{{ s.devSub }}</text>
 
       <!-- driver sdk -->
-      <rect x="212" y="116" width="162" height="68" rx="9" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="293" y="146" class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle">{{ s.drv }}</text>
-      <text x="293" y="165" fill="var(--dc3-text2)" font-size="10" text-anchor="middle">{{ s.drvSub }}</text>
+      <rect fill="var(--dc3-be-fill)" height="68" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="162"
+            x="212"
+            y="116"/>
+      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="293" y="146">{{
+          s.drv
+        }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="293" y="165">{{ s.drvSub }}</text>
 
       <!-- rabbitmq -->
-      <rect x="414" y="98" width="226" height="104" rx="10" fill="var(--dc3-bus-fill)" stroke="var(--dc3-bus-stroke)" stroke-width="1.5"/>
-      <text x="527" y="124" class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle">{{ s.bus }}</text>
-      <text x="527" y="146" fill="var(--dc3-bus-text)" font-size="10" text-anchor="middle">{{ s.busL1 }}</text>
-      <text x="527" y="163" fill="var(--dc3-bus-text)" font-size="10" text-anchor="middle">{{ s.busL2 }}</text>
-      <text x="527" y="182" fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle">{{ s.busL3 }}</text>
+      <rect fill="var(--dc3-bus-fill)" height="104" rx="10" stroke="var(--dc3-bus-stroke)" stroke-width="1.5"
+            width="226" x="414"
+            y="98"/>
+      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="527" y="124">{{
+          s.bus
+        }}
+      </text>
+      <text fill="var(--dc3-bus-text)" font-size="10" text-anchor="middle" x="527" y="146">{{ s.busL1 }}</text>
+      <text fill="var(--dc3-bus-text)" font-size="10" text-anchor="middle" x="527" y="163">{{ s.busL2 }}</text>
+      <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="527" y="182">{{ s.busL3 }}</text>
 
       <!-- receiver -->
-      <rect x="680" y="116" width="192" height="68" rx="9" fill="var(--dc3-be-fill)" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
-      <text x="776" y="146" class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle">{{ s.rcv }}</text>
-      <text x="776" y="165" fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle">{{ s.rcvSub }}</text>
+      <rect fill="var(--dc3-be-fill)" height="68" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="192"
+            x="680"
+            y="116"/>
+      <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="776" y="146">{{
+          s.rcv
+        }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="776" y="165">{{ s.rcvSub }}</text>
 
       <!-- timescaledb -->
-      <rect x="912" y="40" width="246" height="70" rx="9" fill="var(--dc3-db-fill)" stroke="var(--dc3-db-stroke)" stroke-width="1.5"/>
-      <text x="1035" y="71" class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle">{{ s.ts }}</text>
-      <text x="1035" y="90" fill="var(--dc3-db-text)" font-size="10" text-anchor="middle">{{ s.tsSub }}</text>
+      <rect fill="var(--dc3-db-fill)" height="70" rx="9" stroke="var(--dc3-db-stroke)" stroke-width="1.5" width="246"
+            x="912"
+            y="40"/>
+      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="1035" y="71">{{
+          s.ts
+        }}
+      </text>
+      <text fill="var(--dc3-db-text)" font-size="10" text-anchor="middle" x="1035" y="90">{{ s.tsSub }}</text>
 
       <!-- caffeine cache -->
-      <rect x="912" y="190" width="246" height="70" rx="9" fill="var(--dc3-amber-fill)" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"/>
-      <text x="1035" y="221" class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle">{{ s.cache }}</text>
-      <text x="1035" y="240" fill="var(--dc3-text2)" font-size="10" text-anchor="middle">{{ s.cacheSub }}</text>
+      <rect fill="var(--dc3-amber-fill)" height="70" rx="9" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"
+            width="246" x="912"
+            y="190"/>
+      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="1035" y="221">{{
+          s.cache
+        }}
+      </text>
+      <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="1035" y="240">{{ s.cacheSub }}</text>
     </svg>
   </div>
 </template>

@@ -19,7 +19,6 @@ package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
-import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;

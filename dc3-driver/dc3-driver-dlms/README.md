@@ -36,11 +36,11 @@ build and decode DLMS frames.
 
 ## Point Attributes
 
-| Attribute    | Description                                       |
-|--------------|---------------------------------------------------|
-| Object Type  | DLMS object type (REGISTER, CLOCK, DATA, etc.)    |
+| Attribute    | Description                                          |
+|--------------|------------------------------------------------------|
+| Object Type  | DLMS object type (REGISTER, CLOCK, DATA, etc.)       |
 | Logical Name | Object logical name / OBIS code (e.g. 1.0.1.8.0.255) |
-| Attribute ID | Attribute ID (2 = Present Value)                  |
+| Attribute ID | Attribute ID (2 = Present Value)                     |
 
 ## Prerequisites
 

@@ -15,27 +15,27 @@ via request body templates containing a `${value}` placeholder.
 
 ## Driver Attributes (Device-level)
 
-| Attribute | Description                                                |
-|-----------|------------------------------------------------------------|
-| Base URL  | Base URL for API requests (e.g. https://api.example.com)   |
-| Method    | Default HTTP method (GET, POST, PUT, DELETE)               |
+| Attribute | Description                                                  |
+|-----------|--------------------------------------------------------------|
+| Base URL  | Base URL for API requests (e.g. https://api.example.com)     |
+| Method    | Default HTTP method (GET, POST, PUT, DELETE)                 |
 | Headers   | Custom headers as JSON (e.g. {"Authorization":"Bearer xxx"}) |
-| Timeout   | Request timeout in milliseconds                            |
+| Timeout   | Request timeout in milliseconds                              |
 
 ## Point Attributes
 
-| Attribute     | Description                                       |
-|---------------|---------------------------------------------------|
-| Path          | API path (e.g. /api/v1/sensor/{id})               |
-| Method        | HTTP method override for this point               |
-| Body Template | Request body template with ${value} placeholder   |
+| Attribute     | Description                                          |
+|---------------|------------------------------------------------------|
+| Path          | API path (e.g. /api/v1/sensor/{id})                  |
+| Method        | HTTP method override for this point                  |
+| Body Template | Request body template with ${value} placeholder      |
 | Response Path | JSON path to extract value (e.g. $.data.temperature) |
 
 ## Command Attributes (write)
 
-| Attribute | Description           |
-|-----------|-----------------------|
-| Path      | API path for command  |
+| Attribute | Description             |
+|-----------|-------------------------|
+| Path      | API path for command    |
 | Method    | HTTP method for command |
 
 ## Prerequisites

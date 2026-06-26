@@ -4,9 +4,11 @@ title: 贡献指南
 
 # 贡献指南
 
-这页写给准备给 IoT DC3 提交代码、文档或反馈的贡献者：读完你会知道怎么搭好本地环境、一条改动从分支到 PR 该怎么走、提交信息为什么必须可读，以及合并前要跑哪些验证。
+这页写给准备给 IoT DC3 提交代码、文档或反馈的贡献者：读完你会知道怎么搭好本地环境、一条改动从分支到 PR
+该怎么走、提交信息为什么必须可读，以及合并前要跑哪些验证。
 
-> 你在这里：想动手参与。写后端代码前先通读[开发概览与规范](../development/)（权威工程约定以仓库根的 `AGENTS.md` 为准）；想跑通验证看[测试](../development/testing)。
+> 你在这里：想动手参与。写后端代码前先通读[开发概览与规范](../development/)（权威工程约定以仓库根的 `AGENTS.md`
+> 为准）；想跑通验证看[测试](../development/testing)。
 
 ## 怎么参与
 
@@ -23,7 +25,8 @@ title: 贡献指南
 
 ## 搭好本地开发环境
 
-平台是 Java 21 / Spring Boot 4 的分布式服务，本地至少要起依赖栈（PostgreSQL + RabbitMQ）才能跑通。先准备工具链，再起依赖，最后让 Java 进程读到正确的运行时变量。
+平台是 Java 21 / Spring Boot 4 的分布式服务，本地至少要起依赖栈（PostgreSQL + RabbitMQ）才能跑通。先准备工具链，再起依赖，最后让
+Java 进程读到正确的运行时变量。
 
 支持的工具链：
 
@@ -62,7 +65,9 @@ cp .env.example .env
 :::
 
 ::: warning `.env` 和 `dev.env` 不是一回事
-根目录 `.env`（由 `.env.example` 复制）只用于 Docker Compose 的变量插值；本地 IDE/CLI 跑 Java 必须用 `dc3/env/dev.env`（IDE EnvFile 插件读）或 `dc3/env/dev.env.sh`（`source` 进 shell）。四个文件的区别、以及 JetBrains IDEA 的用法见[环境变量详解](../quickstart/environment)。
+根目录 `.env`（由 `.env.example` 复制）只用于 Docker Compose 的变量插值；本地 IDE/CLI 跑 Java 必须用 `dc3/env/dev.env`（IDE
+EnvFile 插件读）或 `dc3/env/dev.env.sh`（`source` 进 shell）。四个文件的区别、以及 JetBrains IDEA
+的用法见[环境变量详解](../quickstart/environment)。
 :::
 
 ## 分支与 Pull Request
@@ -132,12 +137,14 @@ make config STACK=db    # 或 app/dev/optional，按触及的栈
 - 不要提交密钥、本地生成文件、IDE 元数据或机器相关配置。
 
 ::: tip CRUD 动词随结果基数走
-平台没有自由命名空间——方法名/HTTP 路径/gRPC RPC 的动词必须反映结果基数（查单条 `get`，查集合 `list`）。详见[开发概览与规范](../development/)。
+平台没有自由命名空间——方法名/HTTP 路径/gRPC RPC 的动词必须反映结果基数（查单条 `get`，查集合 `list`
+）。详见[开发概览与规范](../development/)。
 :::
 
 ## 文档与翻译
 
-改动根 README 内容时，保持 `README.md`、`README.zh.md`、`README.ja.md`、`README.vi.md` 结构对齐。若同一个 PR 内无法完成翻译同步，在 PR 描述里明确标注。
+改动根 README 内容时，保持 `README.md`、`README.zh.md`、`README.ja.md`、`README.vi.md` 结构对齐。若同一个 PR 内无法完成翻译同步，在
+PR 描述里明确标注。
 
 ## 发布说明
 
@@ -154,12 +161,14 @@ make changelog FROM=dc3.release.20251005.00 TO=HEAD VERSION=2026.5.22
 ```
 
 ::: info 变更日志专用提交
-默认跳过"生成 changelog"这类发布提交，便于在提交 `CHANGE.md` 后重复运行保持稳定。只有当这些提交需要出现在发布说明里时，才设 `INCLUDE_CHANGELOG_COMMITS=true`。
+默认跳过"生成 changelog"这类发布提交，便于在提交 `CHANGE.md` 后重复运行保持稳定。只有当这些提交需要出现在发布说明里时，才设
+`INCLUDE_CHANGELOG_COMMITS=true`。
 :::
 
 ## 许可
 
-IoT DC3 社区版基于 GNU Affero General Public License v3.0 or later 授权。授权声明见仓库根的 `LICENSE-AGPL.txt` 与 `LICENSE.txt`。
+IoT DC3 社区版基于 GNU Affero General Public License v3.0 or later 授权。授权声明见仓库根的 `LICENSE-AGPL.txt` 与
+`LICENSE.txt`。
 
 ## 延伸阅读
 
