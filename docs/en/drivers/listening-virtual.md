@@ -4,43 +4,62 @@ title: Listening Virtual Driver
 
 # Listening Virtual Driver
 
-> **`dc3-driver-listening-virtual` onboards TCP/UDP devices that push data into IoT DC3 on their own**——the driver opens a listening port and waits for devices to connect, then slices and parses values out of the pushed byte stream according to each point's configuration.
+> `dc3-driver-listening-virtual` onboards TCP/UDP devices that push data into IoT DC3 on their own. The driver opens a listening port, waits for devices to connect, then slices and parses values out of the pushed byte stream according to each [point](../introduction/concepts/point)'s configuration. After this page you can configure your first listening point and have a GPS/BeiDou-class terminal push binary frames into the platform.
 
-Some field devices don't wait to be polled; they periodically push data out by themselves: GPS trackers, environmental monitoring boxes, and assorted sensors speaking proprietary binary frames. The common pattern is to connect to a fixed IP:port and send a byte stream. This driver is built for exactly that case—it is a **listening (passive) [driver](../introduction/concepts/driver)** that starts both a TCP and a UDP listening port; the [device](../introduction/concepts/device) connects in and pushes data, and the driver parses the byte stream into [point values](../introduction/concepts/point-value). It never actively "reads" a device, so it fits: GPS/BeiDou terminals with their own reporting logic, sensor gateways that push binary frames, and any proprietary TCP/UDP protocol where the client connects to a passive server.
+Some field devices don't wait to be polled; they periodically push data out by themselves: GPS trackers, environmental monitoring boxes, and assorted sensors speaking proprietary binary frames. The common pattern is to connect to a fixed IP:port and send a byte stream. This driver is built for exactly that case—it is a **listening (passive) driver** that starts both a TCP and a UDP listening port; the device connects in and pushes data, and the driver parses the byte stream into [point values](../introduction/concepts/point-value). It never actively "reads" a device.
 
-Two driver-specific concepts come first, since the config tables use them repeatedly:
+## Protocol Background
 
-- **Keyword**: the single byte right after the device name in the pushed packet, written in hexadecimal (e.g. `62`). One device can use different keywords to distinguish packet types; the driver uses it to decide which [point](../introduction/concepts/point) a given frame should be parsed into.
+This is a **virtual / testing driver** with no real standard protocol layer—the packet format is a minimal binary convention defined by the driver itself, meant to demonstrate and exercise the "device-initiated push" path end to end. In the four-layer IoT architecture it sits at the **network layer**: TCP/UDP carries the device-to-platform byte stream, which the platform receives passively. In a real project you can use it as a template and drop in your own parsing logic for a proprietary reporting protocol.
+
+It fits:
+
+- GPS/BeiDou terminals with their own reporting logic, and sensor gateways that push binary frames;
+- any proprietary TCP/UDP protocol where the client connects to a passive server;
+- validating the full "push → parse → store" path when no real hardware is available.
+
+Before you start, two driver-specific concepts come first, since the config tables use them repeatedly:
+
+- **Keyword**: the single byte right after the device name in the pushed packet, written in hexadecimal (e.g. `62`). One device can use different keywords to distinguish packet types; the driver uses it to decide which point a given frame should be parsed into.
 - **Byte range (Start / End)**: the byte offsets at which data is sliced out of the packet. `start` is the start offset (inclusive), `end` is the end offset (exclusive); fixed-length numeric points only read a fixed number of bytes from `start`, while the `coordinate` string point uses the whole `start..end` range.
 
-## Packet Format
+Every packet has a fixed structure: a 22-byte device name + a 1-byte keyword + a variable-length payload.
 
-Every packet a device pushes has this fixed structure:
-
+```mermaid
+flowchart LR
+  Dev["Device (GPS/sensor)"] -->|"TCP 6270 / UDP 6271"| Srv["Listening port<br/>Netty Server"]
+  Srv --> Parse["NettyServerHandler<br/>parse per frame"]
+  Parse -->|"first 22 bytes"| DevId["match device ID"]
+  Parse -->|"23rd byte"| Key["compare keyword key"]
+  Parse -->|"payload start..end"| Val["parse value by point name"]
+  DevId --> Send["pointValueSender"]
+  Key --> Send
+  Val --> Send
+  Send --> PV["PointValue"]
 ```
-[ Device Name 22 bytes ][ Keyword 1 byte ][ Payload variable ]
-```
 
-- The first 22 bytes are the device name (the driver parses the [device](../introduction/concepts/device) ID from it; it must map one-to-one to a device on the platform).
-- The 23rd byte (offset 22) is the keyword, compared against the point's `key`.
-- The rest is the payload; each point slices a segment from it per its own `start`/`end`, and the **parse type is decided by the point name**.
+- The first 22 bytes are the device name; the driver parses it into a [device](../introduction/concepts/device) ID via `Long.parseLong` (it must map one-to-one to a device on the platform).
+- The 23rd byte (offset 22) is the keyword, compared byte-for-byte against the point's `key`.
+- The rest is the payload; each point slices a segment from the packet per its own `start`/`end`, and the **parse type is decided by the point name (pointName)**, not by the `type` attribute.
 
-## Driver Name / Code / Type
+## Attribute Configuration
 
-- **Driver name / code**: `Listening Virtual TCP/UDP Driver` / `ListeningVirtualDriver`
-- **Type**: `DRIVER_SERVER` (the driver acts as the listening server, passively receiving pushed data)
+This driver **declares no device-level `driver-attribute`**—the listening ports are process-level configuration, and all onboarding detail lives on the [point](../introduction/concepts/point).
 
-## Driver Configuration (device-level `driver-attribute`)
+**Driver name / code / type** (from `application.yml`):
 
-This driver **declares no device-level `driver-attribute`**—the listening ports are process-level configuration (TCP defaults to `6270`, overridable via the `TCP_PORT` environment variable; UDP defaults to `6271`, overridable via `UDP_PORT`), and all onboarding configuration lives on the [point](../introduction/concepts/point).
+- Driver name / code: `Listening Virtual TCP/UDP Driver` / `ListeningVirtualDriver`
+- Type: `DRIVER_SERVER` (the driver acts as the listening server, passively receiving pushed data)
 
-## Point Configuration (`point-attribute`)
+**Listening ports** are process-level configuration, not set on the point: TCP defaults to `6270`, overridable via the `TCP_PORT` environment variable; UDP defaults to `6271`, overridable via `UDP_PORT`. At startup `initial()` launches one thread per port to listen; packets received on either port go through the same parsing logic.
 
-Each [point](../introduction/concepts/point) carries these [attributes](../introduction/concepts/attribute-config), telling the driver: which keyword to match and which segment of the packet to slice (the parse type is decided by the point name, see the note below):
+### Point Attributes (`point-attribute`)
+
+Each collected [point](../introduction/concepts/point) carries these four [attributes](../introduction/concepts/attribute-config), telling the driver which keyword to match and which segment of the packet to slice (the parse type is decided by the point name, see the note below):
 
 | Attribute | code | Type | Default | Remark |
 |---|---|---|---|---|
-| Keyword | `key` | STRING | `62` | Packet identification keyword |
+| Keyword | `key` | STRING | `62` | Packet identification keyword, hexadecimal |
 | Start Byte | `start` | INT | `0` | Inclusive start byte offset |
 | End Byte | `end` | INT | `8` | Exclusive end byte offset |
 | Type | `type` | STRING | `string` | Required attribute; presence-checked only, not used to choose the parse type |
@@ -50,41 +69,48 @@ Each [point](../introduction/concepts/point) carries these [attributes](../intro
 :::
 
 ::: warning The parse type is decided by the point name, not the `type` attribute
-The driver chooses how to parse based on the **point name (pointName)**, and only these 6 names are supported: `altitude`→float, `speed`→double, `level`→long, `direction`→int, `locked`→boolean, `coordinate`→string. The point name must be one of these, otherwise the point parses to an empty value for that frame and collects no data. The `type` attribute is only presence-checked during validation (it is required); it is never read during parsing.
+The driver chooses how to parse based on the **point name (pointName)** (see `NettyServerHandler.readConfiguredValue`), and only these 6 names are supported: `altitude`→float (4 bytes), `speed`→double (8 bytes), `level`→long (8 bytes), `direction`→int (4 bytes), `locked`→boolean (1 byte), `coordinate`→string (by `start..end`). The point name must be one of these, otherwise the point parses to an empty string for that frame and collects no data. The `type` attribute is only presence-checked in `validatePoint` (one of the four required); it is never read during parsing.
 :::
 
-This driver listens passively and has no command to write back to the device, so there is **no `command-attribute`**. The underlying layer retains the ability to write bytes back over the device's TCP connection, but it is not exposed as a configurable write command.
+## Troubleshooting
 
-## Collection & Health
+When onboarding this driver, almost every "no value collected" case maps to one of the items below. When a frame is dropped the driver only `warn`s in its log—it does not return an error to the device—so check the driver log first.
 
-- **Collection cycle**: this driver does **no active polling**—`schedule.read.enable=false`, and data is entirely push-triggered by the device. The driver does have an internal `0/5 * * * * ?` job (`schedule.custom`, every 5 seconds) for the driver's own periodic upkeep; it issues no reads to devices.
-- **Health / online**: the device health check defaults to cron `0/15 * * * * ?` with a lease timeout of `45 seconds`—each push refreshes the lease; if nothing is pushed before the timeout, the device is marked offline. See [device](../introduction/concepts/device) for the online-state mechanism.
-
-## Minimal Onboarding Example
-
-Onboard a GPS terminal that pushes data over TCP:
-
-1. Create a [device](../introduction/concepts/device) with `Listening Virtual TCP/UDP Driver` (this driver has no driver attributes, so the device needs no connection parameters).
-2. Add a string [point](../introduction/concepts/point) to the [profile](../introduction/concepts/profile) bound to the device; the **point name must be one of the supported names** (here `coordinate`, which parses as a string; `pointTypeFlag=STRING`), with point attributes `key=62`, `start=23`, `end=31`, `type=string`—i.e. match packets with keyword `62` and take 8 bytes from the start of the payload as a string. If the point name is not one of `altitude/speed/level/direction/locked/coordinate`, the driver collects no value.
-3. Start the driver; have the device push "22-byte device name + 1-byte `0x62` + payload" to the driver's TCP port `6270`, and within seconds the parsed result appears in [point values](../introduction/concepts/point-value).
-
-## Pitfalls
-
-::: warning The first 22 bytes of the packet must be the platform device ID
-The driver parses the device ID from the first 22 bytes to match a [device](../introduction/concepts/device) on the platform. When the device pushes data, it **must left-align the numeric device ID into these 22 bytes**—if no number can be parsed, or no device matches, the frame is silently dropped without error. Create the device on the platform first to get its ID, then configure it into the device firmware.
+::: warning The first 22 bytes of the packet must be the platform's numeric device ID
+The driver parses the device ID from the first 22 bytes via `Long.parseLong` to match a [device](../introduction/concepts/device) on the platform. When the device pushes data, it **must place the corresponding numeric device ID into these 22 bytes**—if no number can be parsed (`deviceIdInvalid`) or no device matches (`deviceMissing`), the frame is silently dropped without an error to the device. Create the device on the platform first to get its ID, then configure it into the device firmware.
 :::
 
 ::: warning start/end offsets are relative to the whole frame, not the payload
-A point's `start`/`end` are byte offsets into the **whole frame**. The first 23 bytes are taken by the device name and keyword, so the first payload byte is at offset `23`, not `0`. To read from the start of the payload, `start` must count from `23`; the default `start=0` lands inside the device name and reads the wrong value.
+A point's `start`/`end` are byte offsets into the **whole frame**. The first 23 bytes are taken by the device name (22) and keyword (1), so the first payload byte is at offset `23`, not `0`. To read from the start of the payload, `start` must count from `23`; the default `start=0` lands inside the device name and reads the wrong value.
 :::
 
-::: tip Fixed-length numeric points only use start; only coordinate uses end
-Fixed-length numeric points (`altitude`/`speed`/`level`/`direction`/`locked`) read their fixed byte width from `start` (e.g. `altitude` reads 4 bytes, `speed` reads 8 bytes), and `end` is ignored. Only `coordinate` slices the `start..end` range as a string. If the packet is too short or the offset is out of bounds, that point produces no value for the frame.
+- **Keyword mismatch**: a point's `key` must exactly equal the hexadecimal of the packet's 23rd byte (e.g. `62`). Points whose `key` does not match are silently skipped for that frame; first confirm which byte the device actually sends.
+- **Byte order**: fixed-length numbers are read with Netty `ByteBuf`'s `getFloat/getDouble/getLong/getInt`, all **big-endian**. If the device packs little-endian, the parsed numbers come out garbled—pack big-endian on the device side or adjust the parsing logic yourself.
+- **Packet too short / offset out of bounds**: a frame shorter than 23 bytes (`payloadTooShort`), or a point whose `start+length` exceeds the actual packet length (`payloadOutOfBounds`), yields no value for that point on that frame. Note UDP datagrams are not fragmented while TCP may coalesce/split—this driver parses the received `ByteBuf` as-is and does no framing.
+- **The device stays online regardless of whether data is pushed**: this driver **implements no protocol-level health decision** (it does not override `health()`), so the SDK's default reports the device as online unconditionally every `0/15 * * * * ?` and renews a `45`-second lease TTL. That means the device is **not** marked offline for "nothing pushed before the timeout"—online state is independent of data push. If you need "offline when nothing is pushed", override `health()` in the driver and return OFFLINE based on the last push time. See [device](../introduction/concepts/device) for the online-state mechanism.
+
+## Landing It in IoT DC3
+
+- **dc3.driver.code**: `ListeningVirtualDriver` (routing identifier, stable—do not change casually).
+- **Read / write / subscribe capability** (aligned with the [driver capability matrix](./matrix)):
+  - **Read**: `—`, no active polling. `schedule.read.enable=false`, and `read()` returns `null` directly; data is entirely push-triggered by the device. The config enables a `0/5 * * * * ?` `schedule.custom` callback, but the driver's `schedule()` is an empty implementation that does nothing (no periodic self-upkeep logic).
+  - **Write**: `✓`, `write()` is implemented. Any successfully parsed frame (TCP or UDP) registers that device's most recent `Channel` into `DEVICE_CHANNEL_MAP` (registration happens in `NettyServerHandler.read()`, shared by both TCP and UDP); on a write command it looks up the active channel by `deviceId` and writes the value bytes back to the device (5-second flush timeout). If the channel is missing or inactive the write fails and returns `false`. Note: if the device's most recently registered channel is a connectionless UDP channel, the write-back usually fails—write-back relies on the connection-oriented TCP channel.
+  - **Subscribe / report**: `✓`, this is the driver's primary capability—the device connects in and the driver receives pushes passively.
+
+::: info This is a virtual / testing driver with a self-defined packet format
+The driver as a whole works (listen, parse, write-back are all implemented), but it has no standard protocol layer: the packet format (22+1+payload), the 6 fixed point names, and the big-endian numeric parsing are demonstration conventions defined by the driver itself. To onboard a proprietary protocol in a real project, replace the parsing logic in `NettyServerHandler` with your protocol's rules and treat this as an implementation template for a passive listening driver.
 :::
+
+### Minimal Onboarding Example
+
+Onboard a GPS terminal that pushes data over TCP:
+
+1. Create a [device](../introduction/concepts/device) with `Listening Virtual TCP/UDP Driver` (this driver has no driver attributes, so the device needs no connection parameters), and note the numeric device ID the platform assigns.
+2. Add a string [point](../introduction/concepts/point) to the [profile](../introduction/concepts/profile) bound to the device; the **point name must be one of the supported names** (here `coordinate`, which parses as a string), with point attributes `key=62`, `start=23`, `end=31`, `type=string`—i.e. match packets with keyword `62` and take 8 bytes from the start of the payload as a string. If the point name is not one of `altitude/speed/level/direction/locked/coordinate`, the driver collects no value.
+3. Start the driver; have the device push "22-byte numeric device ID + 1-byte `0x62` + payload" to the driver's TCP port `6270`, and within seconds the parsed result appears in [point values](../introduction/concepts/point-value).
 
 ## Further Reading
 
-- [Driver](../introduction/concepts/driver) — the general driver model and registration mechanism
-- [Attributes & Config](../introduction/concepts/attribute-config) — the three-tier origin of attributes like `key` / `start`
-- [Device Onboarding](../operation/device-onboarding) — a full onboarding walkthrough
-- [HTTP Driver](./http) — another way to onboard an external data source
+- [Drivers Overview](./index) — what a driver is, registration and lifecycle, the three-tier origin of config
+- [Driver Capability Matrix](./matrix) — read/write/subscribe across 28 drivers, to confirm this driver's positioning
+- [Device Onboarding](../operation/device-onboarding) — a full device onboarding walkthrough

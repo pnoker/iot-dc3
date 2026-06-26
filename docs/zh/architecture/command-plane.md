@@ -20,33 +20,7 @@ title: 命令平面：读写命令的下发与回执
 
 下面这张时序图是写命令的 happy path：从调用方提交，到驱动把值真正写进设备并回执成功，再到调用方轮询拿到结果。
 
-```mermaid
-sequenceDiagram
-    participant Client as 调用方
-    participant GW as 网关 dc3-gateway
-    participant Data as 数据中心 dc3-center-data
-    participant MQ as RabbitMQ
-    participant Driver as 驱动 dc3-driver-*
-    participant Dev as 现场设备
-
-    Client->>GW: "POST /api/v3/data/point_command/write (deviceId,pointId,value)"
-    GW->>Data: 转发 (注入租户/principal)
-    Data->>Data: "校验：租户/enableFlag/rwFlag/驱动在线"
-    Data->>Data: "落库 dc3_point_command_history (PENDING)"
-    Data->>MQ: "发布 (CorrelationData=commandId)"
-    Data->>Data: "标记 SENT"
-    Data-->>Client: "返回 commandId (立即)"
-    MQ->>Driver: "投递 dc3.e.point_command"
-    Driver->>Driver: "expireAt 预检 → 去重 → 每设备加锁"
-    Driver->>Dev: "write() 写值"
-    Dev-->>Driver: "TRUE / FALSE"
-    Driver->>MQ: "回执 dc3.e.point_command_result (SUCCESS/FAILED)"
-    MQ->>Data: "投递结果队列"
-    Data->>Data: "PointCommandResultReceiver 更新终态"
-    Client->>GW: "GET /api/v3/data/point_command_history/get_by_command_id?commandId=..."
-    GW->>Data: 转发
-    Data-->>Client: "PointCommandHistoryVO (status + responseValue)"
-```
+<CommandPlane lang="zh" />
 
 ### 提交侧：校验、落库、发布
 

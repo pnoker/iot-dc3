@@ -115,3 +115,4 @@ Each core concept has its own entry covering its definition, key fields, relatio
 - [Device Onboarding](../operation/device-onboarding) — turn the concepts into a real onboarding
 - [Domain Model](../architecture/domain-model) — DO/BO/VO layering and field details
 - [Quick Start](../quickstart/) — bring up the stack locally
+- [IoT Technology Overview](../foundations/) — place these concepts in the four-layer IoT architecture

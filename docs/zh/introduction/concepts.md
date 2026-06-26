@@ -115,3 +115,4 @@ flowchart LR
 - [设备接入](../operation/device-onboarding) — 把概念落成一次真实接入
 - [领域模型](../architecture/domain-model) — DO/BO/VO 分层与字段细节
 - [快速开始](../quickstart/) — 本地起栈
+- [物联网技术总览](../foundations/) — 把这些概念放进物联网四层架构通盘理解

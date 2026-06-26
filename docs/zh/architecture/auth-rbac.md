@@ -23,20 +23,7 @@ IoT DC3 的解法是把"认证身份"和"信任身份"分开：
 
 登录是两步握手：先取一次性盐，再用盐把密码哈希后换令牌。盐的作用是避免密码明文或固定哈希在链路上重放。
 
-```mermaid
-sequenceDiagram
-    participant Client as 调用方
-    participant GW as 网关 dc3-gateway
-    participant Auth as 鉴权中心 dc3-center-auth
-    Client->>GW: "POST /api/v3/auth/token/salt (tenant, name)"
-    GW->>Auth: 校验租户存在
-    Auth-->>Client: "返回盐 salt（5 分钟内有效）"
-    Client->>Client: "hash(password, salt)"
-    Client->>GW: "POST /api/v3/auth/token/generate (tenant, name, salt, hashed password)"
-    GW->>Auth: "校验链 租户→凭据→成员→密码→过期/改密"
-    Auth-->>Client: "返回 access token（12 小时有效）"
-    Note over Auth: "token 即 JWT，绑定 principal_id + tenant_id"
-```
+<AuthFlow lang="zh" />
 
 两个端点都公开、无需鉴权：
 
@@ -229,3 +216,4 @@ default <T extends TenantOwned> T requireTenant(Long tenantId, T entity) {
 - [服务与拓扑](./services) — 网关、四个中心与驱动如何分布，端口与启动顺序
 - [领域模型](./domain-model) — DO/BO/VO 分层、`TenantOwned` 与租户字段如何贯穿实体
 - [API 文档](../development/api-documentation) — OpenAPI、鉴权头与 CRUD 动词约定
+- [物联网安全](../foundations/security) — 设备/通信/平台/数据安全的体系化视角
