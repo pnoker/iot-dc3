@@ -5,7 +5,7 @@
   - Licensed under the GNU Affero General Public License v3.0.
   -->
 
-<svg :aria-label="s.busName" role="img" viewBox="0 0 1200 768">
+<svg aria-label="IoT DC3 Architecture Panorama" role="img" viewBox="0 0 1200 768">
       <defs>
         <marker id="dc3-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
           <polygon fill="#94a3b8" points="0 0, 10 3.5, 0 7"/>
