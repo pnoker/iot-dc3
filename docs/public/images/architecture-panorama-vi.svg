@@ -27,15 +27,15 @@
       <rect fill="rgba(5, 150, 105, 0.05)" height="108" rx="12" stroke="#059669" stroke-dasharray="8,4"
             stroke-width="1" width="756"
             x="52" y="262"/>
-      <text fill="#059669" font-size="10" font-weight="600" x="64" y="280">Center Services · gRPC interconnect (Facade: api / grpc / local)</text>
+      <text fill="#059669" font-size="10" font-weight="600" x="64" y="280">Dịch vụ Trung tâm · Kết nối gRPC (Facade: api / grpc / local)</text>
       <rect fill="rgba(5, 150, 105, 0.05)" height="108" rx="12" stroke="#059669" stroke-dasharray="8,4"
             stroke-width="1" width="756"
             x="52" y="496"/>
-      <text fill="#059669" font-size="10" font-weight="600" x="64" y="514">Driver Layer · 28+ protocol drivers (gRPC ↔ manager, via RabbitMQ)</text>
+      <text fill="#059669" font-size="10" font-weight="600" x="64" y="514">Tầng Driver · 28+ trình điều khiển giao thức (gRPC ↔ manager, qua RabbitMQ)</text>
       <rect fill="rgba(217, 119, 6, 0.06)" height="200" rx="12" stroke="#d97706" stroke-dasharray="8,4"
             stroke-width="1"
             width="300" x="840" y="502"/>
-      <text fill="#d97706" font-size="10" font-weight="600" x="852" y="520">Observability (optional)</text>
+      <text fill="#d97706" font-size="10" font-weight="600" x="852" y="520">Quan sát (tùy chọn)</text>
 
       <!-- arrows -->
       <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="1.5" x1="175" x2="175" y1="134" y2="171"/>
@@ -46,7 +46,7 @@
       <line marker-end="url(#dc3-ah-rose)" stroke="#e11d48" stroke-dasharray="5,4" stroke-width="1.3"
             x1="120" x2="120"
             y1="232" y2="289"/>
-      <text fill="#e11d48" font-size="8" x="58" y="258">JWT verify gRPC</text>
+      <text fill="#e11d48" font-size="8" x="58" y="258">Xác minh JWT gRPC</text>
       <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="1.5" x1="398" x2="398" y1="372" y2="406"/>
       <text fill="#64748b" font-size="8" x="352" y="392">Cmd▼</text>
       <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="1.5" x1="462" x2="462" y1="406" y2="374"/>
@@ -54,9 +54,9 @@
       <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="1.5" x1="398" x2="398" y1="466" y2="494"/>
       <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="1.5" x1="462" x2="462" y1="494" y2="468"/>
       <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="1.5" x1="398" x2="398" y1="604" y2="642"/>
-      <text fill="#64748b" font-size="8" x="352" y="626">Write▼</text>
+      <text fill="#64748b" font-size="8" x="352" y="626">Ghi▼</text>
       <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="1.5" x1="462" x2="462" y1="642" y2="606"/>
-      <text fill="#64748b" font-size="8" x="470" y="626">▲Read</text>
+      <text fill="#64748b" font-size="8" x="470" y="626">▲Đọc</text>
       <line marker-end="url(#dc3-ah)" marker-start="url(#dc3-ah)" stroke="#94a3b8" stroke-width="1.5" x1="808"
             x2="838" y1="330"
             y2="330"/>
@@ -89,7 +89,7 @@
       <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="667" y="98">
         AI Agent / MCP Client
       </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="667" y="116">Chat · Tool calls · OAuth2</text>
+      <text fill="#334155" font-size="9" text-anchor="middle" x="667" y="116">Trò chuyện · Gọi công cụ · OAuth2</text>
 
       <!-- Band 2: gateway -->
       <rect fill="rgba(5, 150, 105, 0.07)" height="58" rx="6" stroke="#059669" stroke-width="1.5" width="740"
@@ -99,34 +99,34 @@
           s.gwName
         }}
       </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="218">Spring Cloud Gateway (WebFlux) · routing + auth filter + rate limit</text>
+      <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="218">Spring Cloud Gateway (WebFlux) · định tuyến + bộ lọc xác thực + giới hạn tốc độ</text>
 
       <!-- Band 3: center services -->
       <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="1.5" width="176"
             x="60"
             y="292"/>
       <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="148" y="316">auth</text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="148" y="332">Auth · Tenant · RBAC</text>
+      <text fill="#334155" font-size="9" text-anchor="middle" x="148" y="332">Xác thực · Tenant · RBAC</text>
       <text fill="#059669" font-size="8" text-anchor="middle" x="148" y="346">:8300 / gRPC 9300</text>
       <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="1.5" width="176"
             x="246"
             y="292"/>
       <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="334" y="316">manager
       </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="334" y="332">Driver/Device/Point/Profile</text>
+      <text fill="#334155" font-size="9" text-anchor="middle" x="334" y="332">Driver/Thiết bị/Điểm/Hồ sơ</text>
       <text fill="#059669" font-size="8" text-anchor="middle" x="334" y="346">:8400 / gRPC 9400</text>
       <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="1.5" width="176"
             x="432"
             y="292"/>
       <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="520" y="316">data</text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="520" y="332">Point value · Command · History</text>
+      <text fill="#334155" font-size="9" text-anchor="middle" x="520" y="332">Giá trị điểm · Lệnh · Lịch sử</text>
       <text fill="#059669" font-size="8" text-anchor="middle" x="520" y="346">:8500 / gRPC 9500</text>
       <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="1.5" width="182"
             x="618"
             y="292"/>
       <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="709" y="316">agentic
       </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="709" y="332">AI tool calls · Session</text>
+      <text fill="#334155" font-size="9" text-anchor="middle" x="709" y="332">Gọi công cụ AI · Phiên</text>
       <text fill="#059669" font-size="8" text-anchor="middle" x="709" y="346">:8600 · Spring AI</text>
 
       <!-- Band 4: message bus -->
@@ -182,7 +182,7 @@
       <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="430" y="670">
         Field Devices
       </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="688">PLC · Sensor · Meter · Gateway  (Modbus / OPC / S7 / MQTT)</text>
+      <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="688">PLC · Cảm biến · Đồng hồ · Gateway  (Modbus / OPC / S7 / MQTT)</text>
 
       <!-- PostgreSQL -->
       <rect fill="rgba(99, 102, 241, 0.05)" height="204" rx="6" stroke="#6366f1" stroke-width="1.5" width="300"
@@ -191,9 +191,9 @@
       <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="990" y="290">
         PostgreSQL Storage
       </text>
-      <text fill="#6366f1" font-size="9" x="858" y="318">• TimescaleDB — point values / history (time-series)</text>
-      <text fill="#6366f1" font-size="9" x="858" y="338">• pgvector — AI vector search / memory</text>
-      <text fill="#6366f1" font-size="9" x="858" y="358">• AGE — graph (device relations)</text>
+      <text fill="#6366f1" font-size="9" x="858" y="318">• TimescaleDB — giá trị điểm / lịch sử (chuỗi thời gian)</text>
+      <text fill="#6366f1" font-size="9" x="858" y="338">• pgvector — tìm kiếm vector AI / bộ nhớ</text>
+      <text fill="#6366f1" font-size="9" x="858" y="358">• AGE — đồ thị (quan hệ thiết bị)</text>
       <text fill="#334155" font-size="9" x="858" y="384">schema:</text>
       <text fill="#334155" font-size="8" x="858" y="402">dc3_auth · dc3_manager · dc3_data</text>
       <text fill="#334155" font-size="8" x="858" y="416">dc3_agentic · dc3_common</text>
@@ -206,7 +206,7 @@
       <text fill="#334155" font-size="10" font-weight="600" text-anchor="middle" x="990" y="548">EMQX · MQTT
         Broker
       </text>
-      <text fill="#334155" font-size="8" text-anchor="middle" x="990" y="562">:31883 · Dashboard :18083</text>
+      <text fill="#334155" font-size="8" text-anchor="middle" x="990" y="562">:31883 · Bảng điều khiển :18083</text>
       <rect fill="rgba(2, 132, 199, 0.05)" height="44" rx="6" stroke="#d97706" stroke-width="1.5"
             width="276" x="852"
             y="584"/>
@@ -220,35 +220,35 @@
       <text fill="#334155" font-size="10" font-weight="600" text-anchor="middle" x="990" y="660">
         Prometheus + Grafana
       </text>
-      <text fill="#334155" font-size="8" text-anchor="middle" x="990" y="674">Metrics · Dashboards :3000</text>
+      <text fill="#334155" font-size="8" text-anchor="middle" x="990" y="674">Chỉ số · Bảng điều khiển :3000</text>
 
       <!-- legend -->
       <rect fill="rgba(8, 145, 178, 0.07)" height="11" rx="2" stroke="#0891b2" stroke-width="1" width="16"
             x="60"
             y="724"/>
-      <text fill="#334155" font-size="9" x="82" y="733">Access</text>
+      <text fill="#334155" font-size="9" x="82" y="733">Truy cập</text>
       <rect fill="rgba(5, 150, 105, 0.07)" height="11" rx="2" stroke="#059669" stroke-width="1" width="16"
             x="160"
             y="724"/>
-      <text fill="#334155" font-size="9" x="182" y="733">Services / Drivers</text>
+      <text fill="#334155" font-size="9" x="182" y="733">Dịch vụ / Trình điều khiển</text>
       <rect fill="rgba(217, 119, 6, 0.06)" height="11" rx="2" stroke="#d97706" stroke-width="1" width="16"
             x="300"
             y="724"/>
-      <text fill="#334155" font-size="9" x="322" y="733">Message Bus</text>
+      <text fill="#334155" font-size="9" x="322" y="733">Bus Tin nhắn</text>
       <rect fill="rgba(99, 102, 241, 0.05)" height="11" rx="2" stroke="#6366f1" stroke-width="1" width="16"
             x="430"
             y="724"/>
-      <text fill="#334155" font-size="9" x="452" y="733">Data Store</text>
+      <text fill="#334155" font-size="9" x="452" y="733">Kho Dữ liệu</text>
       <rect fill="rgba(2, 132, 199, 0.05)" height="11" rx="2" stroke="#d97706" stroke-width="1" width="16"
             x="560"
             y="724"/>
-      <text fill="#334155" font-size="9" x="582" y="733">Ops (optional)</text>
+      <text fill="#334155" font-size="9" x="582" y="733">Vận hành (tùy chọn)</text>
       <rect fill="rgba(100, 116, 139, 0.03)" height="11" rx="2" stroke="#64748b" stroke-width="1" width="16"
             x="700"
             y="724"/>
-      <text fill="#334155" font-size="9" x="722" y="733">Devices / External</text>
+      <text fill="#334155" font-size="9" x="722" y="733">Thiết bị / Bên ngoài</text>
       <line stroke="#e11d48" stroke-dasharray="4,3" stroke-width="1.3" x1="870" x2="886" y1="730"
             y2="730"/>
-      <text fill="#334155" font-size="9" x="892" y="733">Auth flow</text>
-      <text fill="#64748b" font-size="9" x="960" y="733">▼ Command down   ▲ Data up</text>
+      <text fill="#334155" font-size="9" x="892" y="733">Luồng xác thực</text>
+      <text fill="#64748b" font-size="9" x="960" y="733">▼ Lệnh xuống   ▲ Dữ liệu lên</text>
     </svg>
