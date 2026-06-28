@@ -24,15 +24,15 @@
       <rect fill="url(#dc3-grid)" height="100%" width="100%"/>
 
       <!-- regions -->
-      <rect fill="rgba(5, 150, 105, 0.05)" height="108" rx="12" stroke="#059669" stroke-dasharray="8,4"
+      <rect fill="rgba(5, 150, 105, 0.05)" height="108" rx="12" stroke="#059669" stroke-dasharray="6,3"
             stroke-width="1" width="756"
             x="52" y="262"/>
       <text fill="#059669" font-size="10" font-weight="600" x="64" y="280">中心服务 Center Services · gRPC 互联 (Facade: api / grpc / local)</text>
-      <rect fill="rgba(5, 150, 105, 0.05)" height="108" rx="12" stroke="#059669" stroke-dasharray="8,4"
+      <rect fill="rgba(5, 150, 105, 0.05)" height="108" rx="12" stroke="#059669" stroke-dasharray="6,3"
             stroke-width="1" width="756"
             x="52" y="496"/>
       <text fill="#059669" font-size="10" font-weight="600" x="64" y="514">驱动层 Driver Layer · 28+ 协议驱动 (gRPC ↔ manager, RabbitMQ 收发)</text>
-      <rect fill="rgba(217, 119, 6, 0.06)" height="200" rx="12" stroke="#d97706" stroke-dasharray="8,4"
+      <rect fill="rgba(217, 119, 6, 0.06)" height="200" rx="12" stroke="#d97706" stroke-dasharray="6,3"
             stroke-width="1"
             width="300" x="840" y="502"/>
       <text fill="#d97706" font-size="10" font-weight="600" x="852" y="520">可选运维 Observability</text>
@@ -43,7 +43,7 @@
       <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="1.5" x1="667" x2="667" y1="134" y2="171"/>
       <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="1.5" x1="415" x2="415" y1="232" y2="289"/>
       <text fill="#64748b" font-size="9" x="423" y="252">HTTP /api</text>
-      <line marker-end="url(#dc3-ah-rose)" stroke="#e11d48" stroke-dasharray="5,4" stroke-width="1"
+      <line marker-end="url(#dc3-ah-rose)" stroke="#e11d48" stroke-dasharray="4,4" stroke-width="1"
             x1="120" x2="120"
             y1="232" y2="289"/>
       <text fill="#e11d48" font-size="8" x="58" y="258">JWT校验 gRPC</text>
@@ -61,7 +61,7 @@
             x2="838" y1="330"
             y2="330"/>
       <text fill="#64748b" font-size="8" x="812" y="322">JDBC</text>
-      <line marker-end="url(#dc3-ah-amber)" stroke="#d97706" stroke-dasharray="5,4" stroke-width="1"
+      <line marker-end="url(#dc3-ah-amber)" stroke="#d97706" stroke-dasharray="4,4" stroke-width="1"
             x1="980" x2="980"
             y1="466" y2="501"/>
       <text fill="#d97706" font-size="8" x="986" y="487">metrics/logs</text>
