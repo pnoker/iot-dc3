@@ -27,7 +27,7 @@ jobs:
       actions: write   # for GitHub Actions cache (--cache-to type=gha)
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Extract variables
         id: variables
@@ -140,7 +140,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 

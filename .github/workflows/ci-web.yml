@@ -32,7 +32,7 @@ jobs:
         working-directory: dc3-web
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set pnpm
         uses: pnpm/action-setup@v4
@@ -72,7 +72,7 @@ jobs:
         working-directory: dc3-web
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set pnpm
         uses: pnpm/action-setup@v4
