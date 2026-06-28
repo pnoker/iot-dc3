@@ -31,6 +31,7 @@ export interface CommandForm {
   signature?: string;
   version?: number;
   remark?: string;
+
   [key: string]: unknown;
 }
 
@@ -54,6 +55,7 @@ export interface CommandParamForm {
   enableFlag?: string | number;
   signature?: string;
   version?: number;
+
   [key: string]: unknown;
 }
 
@@ -98,5 +100,6 @@ export interface CommandHistoryRecord {
   schemaVersion?: number;
   createTime?: string;
   operateTime?: string;
+
   [key: string]: unknown;
 }

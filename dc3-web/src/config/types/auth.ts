@@ -28,6 +28,7 @@ export interface UserForm {
   phone?: string;
   email?: string;
   enableFlag?: string;
+
   [key: string]: unknown;
 }
 
@@ -46,6 +47,7 @@ export interface RoleForm {
   roleCode?: string;
   enableFlag?: string;
   remark?: string;
+
   [key: string]: unknown;
 }
 
@@ -75,6 +77,7 @@ export interface MenuForm {
       url?: string;
     };
   };
+
   [key: string]: unknown;
 }
 
@@ -99,6 +102,7 @@ export interface ResourceForm {
   resourceExt?: Record<string, unknown>;
   enableFlag?: string;
   remark?: string;
+
   [key: string]: unknown;
 }
 
@@ -127,6 +131,7 @@ export interface ApiForm {
       remark?: string;
     };
   };
+
   [key: string]: unknown;
 }
 
@@ -146,6 +151,7 @@ export interface LocalCredentialForm {
   loginName?: string;
   password?: string;
   enableFlag?: string;
+
   [key: string]: unknown;
 }
 
@@ -167,6 +173,7 @@ export interface TenantMembershipForm {
   principalId?: string;
   principalType?: 'USER' | 'SERVICE_ACCOUNT' | 'SYSTEM' | string;
   membershipStatus?: 'ACTIVE' | 'SUSPENDED' | 'INVITED' | string;
+
   [key: string]: unknown;
 }
 
@@ -187,6 +194,7 @@ export interface PrincipalForm {
   sourceType?: string;
   enableFlag?: string;
   lockedFlag?: string;
+
   [key: string]: unknown;
 }
 
@@ -201,6 +209,7 @@ export interface RolePrincipalBindForm {
   roleId?: string;
   principalId?: string;
   principalType?: 'USER' | 'SERVICE_ACCOUNT' | 'SYSTEM' | string;
+
   [key: string]: unknown;
 }
 
@@ -213,6 +222,7 @@ export interface RolePrincipalBindRecord extends RolePrincipalBindForm {
 export interface RoleResourceBindForm {
   roleId?: string;
   resourceId?: string;
+
   [key: string]: unknown;
 }
 
@@ -226,6 +236,7 @@ export interface ServiceAccountForm {
   purpose?: string;
   expireTime?: string;
   enableFlag?: string;
+
   [key: string]: unknown;
 }
 
@@ -247,6 +258,7 @@ export interface McpClientRegistrationForm {
   scope?: string[];
   tenant_id?: string;
   service_account_principal_id?: string;
+
   [key: string]: unknown;
 }
 
@@ -262,6 +274,7 @@ export interface OAuthClientRecord {
   redirectUris?: string;
   scopes?: string;
   enableFlag?: string | number;
+
   [key: string]: unknown;
 }
 
@@ -274,6 +287,7 @@ export interface McpConnectionForm {
   grantType?: 'authorization_code' | 'client_credentials' | string;
   expireTime?: string;
   remark?: string;
+
   [key: string]: unknown;
 }
 
@@ -303,6 +317,7 @@ export interface McpToolRecord {
   openWorldHint?: number;
   enableFlag?: string | number;
   remark?: string;
+
   [key: string]: unknown;
 }
 
@@ -328,6 +343,7 @@ export interface McpAuditRecord {
   clientVersion?: string;
   remoteIp?: string;
   createTime?: string;
+
   [key: string]: unknown;
 }
 
@@ -343,5 +359,6 @@ export interface IdentityAuditRecord {
   status?: string;
   errorCode?: string;
   createTime?: string;
+
   [key: string]: unknown;
 }

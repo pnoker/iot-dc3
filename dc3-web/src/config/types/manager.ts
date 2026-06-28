@@ -37,6 +37,7 @@ export interface DeviceForm {
   signature?: string;
   version?: number;
   remark?: string;
+
   [key: string]: unknown;
 }
 
@@ -58,6 +59,7 @@ export interface DriverRecord {
   enableFlag?: string;
   createTime?: string;
   operateTime?: string;
+
   [key: string]: unknown;
 }
 
@@ -80,6 +82,7 @@ export interface ProfileForm {
   signature?: string;
   version?: number;
   remark?: string;
+
   [key: string]: unknown;
 }
 
@@ -113,6 +116,7 @@ export interface PointForm {
   signature?: string;
   version?: number;
   remark?: string;
+
   [key: string]: unknown;
 }
 
@@ -129,6 +133,7 @@ export interface DriverInfoForm {
   deviceId?: string;
   attributeId?: string;
   configValue?: string;
+
   [key: string]: unknown;
 }
 
@@ -138,6 +143,7 @@ export interface PointInfoForm {
   pointId?: string;
   attributeId?: string;
   configValue?: string;
+
   [key: string]: unknown;
 }
 
@@ -147,6 +153,7 @@ export interface CommandInfoForm {
   commandId?: string;
   attributeId?: string;
   configValue?: string;
+
   [key: string]: unknown;
 }
 
@@ -156,6 +163,7 @@ export interface EventInfoForm {
   eventId?: string;
   attributeId?: string;
   configValue?: string;
+
   [key: string]: unknown;
 }
 
@@ -171,6 +179,7 @@ export interface GroupForm {
   groupIndex?: number;
   enableFlag?: string;
   remark?: string;
+
   [key: string]: unknown;
 }
 
@@ -189,6 +198,7 @@ export interface LabelForm {
   entityTypeFlag?: string;
   enableFlag?: string;
   remark?: string;
+
   [key: string]: unknown;
 }
 

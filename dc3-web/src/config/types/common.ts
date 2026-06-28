@@ -61,6 +61,7 @@ export interface PageQuery {
     current?: number;
     orders?: Order[];
   };
+
   [key: string]: unknown;
 }
 

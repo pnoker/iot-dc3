@@ -39,6 +39,7 @@ export interface AlarmBase {
   operateTime?: string;
   creatorName?: string;
   operatorName?: string;
+
   [key: string]: unknown;
 }
 
@@ -117,9 +118,4 @@ export interface NotifyHistoryRecord extends AlarmBase {
 }
 
 export type AlarmEntity =
-  | RuleRecord
-  | NotifyRecord
-  | MessageRecord
-  | NotifyChannelBindRecord
-  | RuleStateRecord
-  | NotifyHistoryRecord;
+  RuleRecord | NotifyRecord | MessageRecord | NotifyChannelBindRecord | RuleStateRecord | NotifyHistoryRecord;

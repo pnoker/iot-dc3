@@ -30,6 +30,7 @@ export interface EventForm {
   signature?: string;
   version?: number;
   remark?: string;
+
   [key: string]: unknown;
 }
 
@@ -50,6 +51,7 @@ export interface EventParamForm {
   enableFlag?: string | number;
   signature?: string;
   version?: number;
+
   [key: string]: unknown;
 }
 
@@ -82,5 +84,6 @@ export interface EventHistoryRecord {
   schemaVersion?: number;
   createTime?: string;
   operateTime?: string;
+
   [key: string]: unknown;
 }
