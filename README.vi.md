@@ -2,10 +2,10 @@
   <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
 </p>
 
-> **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
+> **Trợ lý AI:** Đọc [README.ai.md](./README.ai.md) trước để có tổng quan ngắn gọn về IoT DC3 dành cho AI.
 
 <p align="center">
-  <img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3">
+  <img src="docs/public/images/logo.svg" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -249,7 +249,7 @@ mở rộng theo dịch vụ và đội nhóm.
 | **Desktop**                    | Tauri 2                                                     |
 | **Triển khai**                 | Podman · Docker Compose                                     |
 
-> 💡 Mã nguồn frontend nằm trong repository [iot-dc3-web](https://github.com/pnoker/iot-dc3-web).
+> 💡 Mã nguồn frontend nằm trong thư mục `dc3-web/` của repository này (repo độc lập `iot-dc3-web` cũ đã được lưu trữ).
 
 ## 📖 Tài liệu và cộng đồng
 

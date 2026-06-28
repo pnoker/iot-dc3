@@ -2,10 +2,10 @@
   <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
 </p>
 
-> **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
+> **AI 助手：** 请先阅读 [README.ai.md](./README.ai.md) 获取 IoT DC3 的 AI 友好概述。
 
 <p align="center">
-  <img src="dc3/images/logo-blue.zh.png" width="400" alt="IoT DC3">
+  <img src="docs/public/images/logo.svg" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -241,7 +241,7 @@ API 全链路。边界清晰，易于规模化扩展与多团队协作。
 | **桌面端**      | Tauri 2                                                     |
 | **部署**       | Podman · Docker Compose                                     |
 
-> 💡 前端源码位于 [iot-dc3-web](https://github.com/pnoker/iot-dc3-web) 仓库。
+> 💡 前端源码在本仓库 `dc3-web/` 目录（原独立仓库 `iot-dc3-web` 已归档）。
 
 ## 📖 文档与社区
 

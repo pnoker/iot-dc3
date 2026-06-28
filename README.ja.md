@@ -2,10 +2,10 @@
   <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
 </p>
 
-> **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
+> **AI アシスタント：** IoT DC3 の簡潔な AI 向け概要については、最初に [README.ai.md](./README.ai.md) をお読みください。
 
 <p align="center">
-  <img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3">
+  <img src="docs/public/images/logo.svg" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -247,7 +247,7 @@ cp .env.example .env    # テンプレートをコピー
 | **デスクトップ**             | Tauri 2                                                     |
 | **デプロイ**               | Podman · Docker Compose                                     |
 
-> 💡 フロントエンドのソースコードは [iot-dc3-web](https://github.com/pnoker/iot-dc3-web) リポジトリにあります。
+> 💡 フロントエンドのソースコードは本リポジトリの `dc3-web/` ディレクトリにあります（旧スタンドアロンリポジトリ `iot-dc3-web` はアーカイブ済み）。
 
 ## 📖 ドキュメントとコミュニティ
 

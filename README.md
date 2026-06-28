@@ -5,7 +5,7 @@
 > **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
 
 <p align="center">
-  <img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3">
+  <img src="docs/public/images/logo.svg" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -249,7 +249,7 @@ and API paths. Clear boundaries that scale across services and teams.
 | **Desktop**                     | Tauri 2                                                     |
 | **Deployment**                  | Podman · Docker Compose                                     |
 
-> 💡 Frontend source code is in the [iot-dc3-web](https://github.com/pnoker/iot-dc3-web) repository.
+> 💡 Frontend source code is in the `dc3-web/` directory of this repository (the standalone `iot-dc3-web` repo is archived).
 
 ## 📖 Documentation and Community
 
