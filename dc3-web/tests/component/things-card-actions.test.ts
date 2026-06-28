@@ -31,8 +31,8 @@ const ElPopconfirmStub = {
   props: ['title', 'icon', 'iconColor', 'placement'],
   template: `
     <span class="el-popconfirm-stub" :data-title="title">
-      <slot name="reference" />
-      <button type="button" class="popconfirm-confirm" @click="$emit('confirm')" />
+      <slot name="reference"/>
+      <button type="button" class="popconfirm-confirm" @click="$emit('confirm')"/>
     </span>
   `,
 };

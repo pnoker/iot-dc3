@@ -55,6 +55,7 @@ vi.mock('@antv/g2', () => {
       chartInstanceMocks.ChartCtor();
     }
   }
+
   return { Chart };
 });
 
