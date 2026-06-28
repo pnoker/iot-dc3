@@ -6,11 +6,9 @@ minimumReleaseAgeExclude:
   - '@intlify/message-compiler@11.4.4'
   - '@intlify/shared@11.4.4'
   - '@types/node@25.9.0'
-  - '@vue/language-core@3.3.0'
+  - '@vue/language-core@3.3.0 || 3.3.2'
   - vue-i18n@11.4.4
-  - vue-tsc@3.3.0
-  - '@vue/language-core@3.3.2'
-  - vue-tsc@3.3.2
+  - vue-tsc@3.3.0 || 3.3.2
   - '@typescript-eslint/eslint-plugin@8.62.0'
   - '@typescript-eslint/parser@8.62.0'
   - '@typescript-eslint/project-service@8.62.0'
@@ -23,3 +21,4 @@ minimumReleaseAgeExclude:
   - '@typescript-eslint/visitor-keys@8.62.0'
   - axios@1.18.1
   - globals@17.7.0
+  - prettier@3.9.1

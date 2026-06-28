@@ -65,13 +65,20 @@ Use the Bug Fix template for your pull request, and prefix your pull request tit
 
 IoT DC3 follows a simplified Git Flow:
 
-- `develop` — integration branch. Cut `feature/<scope>` branches from `develop` and open pull requests back against `develop`. Full CI (lint / type-check / test / build) runs here.
-- `main` — production trunk. Verified work is promoted from `develop` to `main` via pull request. Each merge to `main` is a release (a tag is cut and the web image is published).
-- `hotfix/<scope>` — cut from `main` for production fixes; open the PR back against `main` (then tag), and back-merge to `develop`.
+- `develop` — integration branch. Cut `feature/<scope>` branches from `develop` and open pull requests back against
+  `develop`. Full CI (lint / type-check / test / build) runs here.
+- `main` — production trunk. Verified work is promoted from `develop` to `main` via pull request. Each merge to `main`
+  is a release (a tag is cut and the web image is published).
+- `hotfix/<scope>` — cut from `main` for production fixes; open the PR back against `main` (then tag), and back-merge to
+  `develop`.
 - `release` — archived (read-only). It is kept for history only; do not open pull requests against it.
 
-**Commits** follow Conventional Commits (`feat`, `fix`, `docs`, `refactor`, `test`, `chore`, …), English, specific subjects.
+**Commits** follow Conventional Commits (`feat`, `fix`, `docs`, `refactor`, `test`, `chore`, …), English, specific
+subjects.
 
-**Releasing (tagging)**: switch to `main` and run `make tag [patch|minor|major]` (default `patch`). It creates a semver tag `vYYYY.M.P`, pushes it, and opens a GitHub Release; pushing a `v*` tag triggers the Docker image build. `make tag --dry-run` previews the next tag without pushing. Tagging only runs on `main`.
+**Releasing (tagging)**: switch to `main` and run `make tag [patch|minor|major]` (default `patch`). It creates a semver
+tag `vYYYY.M.P`, pushes it, and opens a GitHub Release; pushing a `v*` tag triggers the Docker image build.
+`make tag --dry-run` previews the next tag without pushing. Tagging only runs on `main`.
 
-**External contributors**: cut feature branches from `develop` and open pull requests against `develop` (not `main` or `release`).
+**External contributors**: cut feature branches from `develop` and open pull requests against `develop` (not `main` or
+`release`).

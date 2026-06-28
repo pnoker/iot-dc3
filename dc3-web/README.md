@@ -3,7 +3,8 @@
 - `git`
 - `Visual Studio Code`
 - `nodejs` >= 22 (enforced by `engines` in `package.json`)
-- `pnpm` 11.3.0 (pinned via `packageManager`), install using `corepack enable && corepack prepare pnpm@11.3.0 --activate`
+- `pnpm` 11.3.0 (pinned via `packageManager`), install using
+  `corepack enable && corepack prepare pnpm@11.3.0 --activate`
 
 ## 2. Source code
 
