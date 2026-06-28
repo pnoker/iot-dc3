@@ -123,7 +123,7 @@ The project includes three layers of testing:
 
 CI gate: `pnpm lint && pnpm type-check && pnpm test && pnpm build`
 
-See the [Test Debugging Guide](./test-debugging) and [Testing Guardrails](./frontend-testing-guardrails).
+See the [Test Debugging Guide](./test-debugging).
 
 ## Environment Variables
 
