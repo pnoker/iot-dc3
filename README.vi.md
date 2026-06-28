@@ -220,21 +220,32 @@ Xem [tài liệu biến môi trường](https://pnoker.github.io/iot-dc3/quickst
 
 ## 🏗️ Tổng quan kiến trúc
 
-![IoT DC3 Architecture](docs/public/images/architecture-vi.svg)
+### Toàn cảnh kiến trúc sản phẩm
 
-| Tầng              | Trách nhiệm                                                                                                              |
-|-------------------|--------------------------------------------------------------------------------------------------------------------------|
-| **Tầng Driver**   | Phát triển driver bằng SDK, kết nối thiết bị qua giao thức tiêu chuẩn/riêng, thu thập dữ liệu hướng nam và thực thi lệnh |
-| **Tầng Dữ liệu**  | Thu thập, lưu trữ và truy vấn dữ liệu thiết bị, phục vụ dữ liệu thời gian thực và lịch sử                                |
-| **Tầng Quản lý**  | Lõi cộng tác microservice: đăng ký dịch vụ, quản lý thiết bị/driver, điều phối lệnh, quản trị cấu hình                   |
-| **Tầng Ứng dụng** | Mở dữ liệu, lập lịch tác vụ, cảnh báo, quản lý log, tích hợp bên thứ ba và tự động hóa AI                                |
+![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-en.svg)
+
+Kiến trúc microservice 6 tầng: clients → gateway → 4 center services → message bus → 28 protocol drivers → field
+devices. PostgreSQL (TimescaleDB + pgvector + AGE) và stack observability tùy chọn (ELK + Prometheus + Grafana).
+
+### Ánh xạ kiến trúc tham chiếu 4 tầng
+
+![IoT DC3 Kiến trúc tham chiếu 4 tầng](docs/public/images/architecture-vi.svg)
+
+Kiến trúc tham chiếu IoT 4 tầng tiêu chuẩn — Ứng dụng, Nền tảng, Mạng, Cảm biến — cộng với bảo mật xuyên suốt.
+
+| Tầng              | Trách nhiệm tham chiếu IoT                  | Triển khai DC3                       |
+|-------------------|---------------------------------------------|--------------------------------------|
+| **Tầng Ứng dụng** | Vận hành · Cảnh báo · Phân tích · AIoT       | Vận hành · Agentic Center · MCP      |
+| **Tầng Nền tảng** | Quản lý thiết bị · Lưu trữ · Luật & tính toán | Center services · Data plane · TimescaleDB |
+| **Tầng Mạng**     | Fieldbus · Giao thức IoT · Không dây / WAN   | 28 protocol drivers · Gateway · RabbitMQ |
+| **Tầng Cảm biến** | Cảm biến · Nhận dạng · Cơ cấu chấp hành       | Profile · Device · Point             |
 
 🧱 **Nguyên tắc thiết kế** — các lời gọi xuyên dịch vụ luôn đi qua interface Facade; mô hình ba tầng DO/BO/VO tách biệt
 rõ ràng giữa persistence, business và API; cách ly tenant xuyên suốt từ database, cache đến API. Ranh giới rõ ràng, dễ
 mở rộng theo dịch vụ và đội nhóm.
 
-> 📖 Để xem đầy đủ phụ thuộc module và luồng runtime,
-> xem [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html).
+> 📖 Để xem tài liệu kiến trúc đầy đủ,
+> xem [Tổng quan Kiến trúc Hệ thống](https://pnoker.github.io/iot-dc3/architecture/).
 
 ## 🛠️ Công nghệ sử dụng
 

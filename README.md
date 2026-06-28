@@ -220,21 +220,34 @@ the [environment documentation](https://pnoker.github.io/iot-dc3/quickstart/envi
 
 ## 🏗️ Architecture Overview
 
-![IoT DC3 Architecture](docs/public/images/architecture-en.svg)
+### Architecture at a Glance
 
-| Layer                 | Responsibilities                                                                                                                 |
-|-----------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| **Driver Layer**      | SDK-based driver development, standard/proprietary device access, southbound data collection, and command execution              |
-| **Data Layer**        | Device data collection, storage, and query services for real-time and historical data                                            |
-| **Management Layer**  | Microservice collaboration core: service registration, device/driver management, command orchestration, configuration governance |
-| **Application Layer** | Data openness, scheduling, alarms, logging, third-party integration, and AI automation                                           |
+![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-en.svg)
+
+Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 28 protocol
+drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack
+(ELK + Prometheus + Grafana) laid out in one view.
+
+### Four-Layer Reference Architecture Mapping
+
+![IoT DC3 Four-Layer Reference Architecture](docs/public/images/architecture-en.svg)
+
+Industry-standard IoT four-layer reference — Application, Platform, Network, Perception — plus security as a
+cross-cutting concern.
+
+| Layer             | IoT Reference Responsibilities                      | DC3 Implementation                  |
+|-------------------|-----------------------------------------------------|-------------------------------------|
+| **Application**   | Operations · Alarms · Analytics · AIoT              | Operations · Agentic Center · MCP   |
+| **Platform**      | Device mgmt · Storage · Rules & compute             | Center services · Data plane · TimescaleDB |
+| **Network**       | Fieldbus · IoT protocols · Wireless / WAN           | 28 protocol drivers · Gateway · RabbitMQ |
+| **Perception**    | Sensing · Auto-ID · Actuators                       | Profile · Device · Point            |
 
 🧱 **Design principles** — cross-service calls always go through Facade interfaces; the DO/BO/VO three-tier model keeps
 persistence, business, and API shapes strictly separated; and tenant isolation runs end to end across database, cache,
 and API paths. Clear boundaries that scale across services and teams.
 
-> 📖 For full module dependencies and runtime flow,
-> see [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html).
+> 📖 For the full architecture documentation,
+> see [System Architecture Overview](https://pnoker.github.io/iot-dc3/architecture/).
 
 ## 🛠️ Technology Stack
 

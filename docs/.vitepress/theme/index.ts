@@ -22,6 +22,7 @@ import mediumZoom from 'medium-zoom'
 import 'medium-zoom/dist/style.css'
 import './style.css'
 import Architecture from './components/Architecture.vue'
+import ArchitectureDiagram from './components/ArchitectureDiagram.vue'
 import DataPlane from './components/DataPlane.vue'
 import CommandPlane from './components/CommandPlane.vue'
 import AuthFlow from './components/AuthFlow.vue'
@@ -61,6 +62,7 @@ const theme: Theme = {
 
     enhanceApp({app, router}) {
         app.component('Architecture', Architecture)
+        app.component('ArchitectureDiagram', ArchitectureDiagram)
         app.component('DataPlane', DataPlane)
         app.component('CommandPlane', CommandPlane)
         app.component('AuthFlow', AuthFlow)
