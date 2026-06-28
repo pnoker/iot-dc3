@@ -32,8 +32,9 @@ type Pillar = {
     groups: ReadonlyArray<Group>          // sidebar groups; an empty group title → pinned, title-less single column
 }
 
+// Pillar order: 总览 → 架构 → 驱动 → 基础 → 开发 → 运维 (after nav 首页)
 const PILLARS: ReadonlyArray<Pillar> = [
-    {
+    {   // ① 总览
         navZh: '总览', navEn: 'Overview', landing: 'introduction',
         paths: ['introduction', 'quickstart'], activeMatch: '^/(zh|en)/(introduction|quickstart)/',
         groups: [
@@ -70,53 +71,14 @@ const PILLARS: ReadonlyArray<Pillar> = [
             },
             {
                 zh: '附录', en: 'Appendix', items: [
-                    ['introduction/glossary', '术语表', 'Glossary']
+                    ['introduction/glossary', '术语表', 'Glossary'],
+                    ['introduction/license', '开源与许可', 'License']
                 ]
             }
         ]
     },
 
-    {
-        navZh: '基础', navEn: 'Foundations', landing: 'foundations',
-        paths: ['foundations'], activeMatch: '^/(zh|en)/foundations/',
-        groups: [
-            {
-                zh: '', en: '', items: [
-                    ['foundations', '物联网技术总览', 'IoT Technology Overview']
-                ]
-            },
-            {
-                zh: '感知层', en: 'Perception', items: [
-                    ['foundations/sensing', '传感与测量', 'Sensing & Measurement'],
-                    ['foundations/identification', '自动识别与定位', 'Auto-ID & Positioning']
-                ]
-            },
-            {
-                zh: '网络层', en: 'Network', items: [
-                    ['foundations/fieldbus', '工业总线与协议', 'Industrial Buses & Protocols'],
-                    ['foundations/iot-protocols', 'IoT 协议与无线网络', 'IoT Protocols & Wireless']
-                ]
-            },
-            {
-                zh: '平台层', en: 'Platform', items: [
-                    ['foundations/edge-cloud', '边缘与云架构', 'Edge & Cloud Architecture'],
-                    ['foundations/data-pipeline', '时序数据与流处理', 'Time-Series & Streaming']
-                ]
-            },
-            {
-                zh: '应用层', en: 'Application', items: [
-                    ['foundations/aiot', '数据智能与 AIoT', 'Data Intelligence & AIoT']
-                ]
-            },
-            {
-                zh: '安全', en: 'Security', items: [
-                    ['foundations/security', '物联网安全', 'IoT Security']
-                ]
-            }
-        ]
-    },
-
-    {
+    {   // ② 架构
         navZh: '架构', navEn: 'Architecture', landing: 'architecture',
         paths: ['architecture', 'modules'], activeMatch: '^/(zh|en)/(architecture|modules)/',
         groups: [
@@ -148,8 +110,8 @@ const PILLARS: ReadonlyArray<Pillar> = [
         ]
     },
 
-    {
-        navZh: '接入', navEn: 'Connectivity', landing: 'drivers',
+    {   // ③ 驱动
+        navZh: '驱动', navEn: 'Drivers', landing: 'drivers',
         paths: ['drivers', 'operation/device-onboarding'],
         activeMatch: '^/(zh|en)/(drivers/|operation/device-onboarding)',
         groups: [
@@ -219,7 +181,81 @@ const PILLARS: ReadonlyArray<Pillar> = [
         ]
     },
 
-    {
+    {   // ④ 基础
+        navZh: '基础', navEn: 'Foundations', landing: 'foundations',
+        paths: ['foundations'], activeMatch: '^/(zh|en)/foundations/',
+        groups: [
+            {
+                zh: '', en: '', items: [
+                    ['foundations', '物联网技术总览', 'IoT Technology Overview']
+                ]
+            },
+            {
+                zh: '感知层', en: 'Perception', items: [
+                    ['foundations/sensing', '传感与测量', 'Sensing & Measurement'],
+                    ['foundations/identification', '自动识别与定位', 'Auto-ID & Positioning']
+                ]
+            },
+            {
+                zh: '网络层', en: 'Network', items: [
+                    ['foundations/fieldbus', '工业总线与协议', 'Industrial Buses & Protocols'],
+                    ['foundations/iot-protocols', 'IoT 协议与无线网络', 'IoT Protocols & Wireless']
+                ]
+            },
+            {
+                zh: '平台层', en: 'Platform', items: [
+                    ['foundations/edge-cloud', '边缘与云架构', 'Edge & Cloud Architecture'],
+                    ['foundations/data-pipeline', '时序数据与流处理', 'Time-Series & Streaming']
+                ]
+            },
+            {
+                zh: '应用层', en: 'Application', items: [
+                    ['foundations/aiot', '数据智能与 AIoT', 'Data Intelligence & AIoT']
+                ]
+            },
+            {
+                zh: '安全', en: 'Security', items: [
+                    ['foundations/security', '物联网安全', 'IoT Security']
+                ]
+            }
+        ]
+    },
+
+    {   // ⑤ 开发
+        navZh: '开发', navEn: 'Develop', landing: 'development',
+        paths: ['development', 'frontend', 'ai', 'automation'], activeMatch: '^/(zh|en)/(development|frontend|ai|automation)/',
+        groups: [
+            {
+                zh: '开发', en: 'Development', items: [
+                    ['development', '概览', 'Overview'],
+                    ['development/driver-authoring', '驱动开发', 'Driver Authoring'],
+                    ['development/api-documentation', 'API 文档', 'API Documentation'],
+                    ['development/testing', '测试', 'Testing'],
+                    ['development/changelog', '变更日志', 'Changelog']
+                ]
+            },
+            {
+                zh: 'AI 集成', en: 'AI Integration', items: [
+                    ['ai', 'AI 概览', 'AI Overview'],
+                    ['ai/agentic', 'Agentic 中心', 'Agentic Center'],
+                    ['ai/mcp', 'AI Agent / MCP', 'AI Agent / MCP']
+                ]
+            },
+            {
+                zh: '前端', en: 'Frontend', items: [
+                    ['frontend', '前端开发指南', 'Frontend Guide'],
+                    ['frontend/test-debugging', '测试调试 FAQ', 'Test Debugging FAQ']
+                ]
+            },
+            {
+                zh: '自动化', en: 'Automation', items: [
+                    ['automation/cli', 'CLI 使用指南', 'CLI Guide']
+                ]
+            }
+        ]
+    },
+
+    {   // ⑥ 运维
         navZh: '运维', navEn: 'Operations', landing: 'operation',
         paths: ['operation', 'guide'], activeMatch: '^/(zh|en)/(operation|guide)/',
         groups: [
@@ -239,34 +275,6 @@ const PILLARS: ReadonlyArray<Pillar> = [
                 ]
             }
         ]
-    },
-
-    {
-        navZh: '开发', navEn: 'Develop', landing: 'development',
-        paths: ['development', 'ai', 'automation'], activeMatch: '^/(zh|en)/(development|ai|automation)/',
-        groups: [
-            {
-                zh: '开发', en: 'Development', items: [
-                    ['development', '概览', 'Overview'],
-                    ['development/driver-authoring', '驱动开发', 'Driver Authoring'],
-                    ['development/api-documentation', 'API 文档', 'API Documentation'],
-                    ['development/testing', '测试', 'Testing'],
-                    ['development/changelog', '变更日志', 'Changelog']
-                ]
-            },
-            {
-                zh: 'AI 集成', en: 'AI Integration', items: [
-                    ['ai', 'AI 概览', 'AI Overview'],
-                    ['ai/agentic', 'Agentic 中心', 'Agentic Center'],
-                    ['ai/mcp', 'AI Agent / MCP', 'AI Agent / MCP']
-                ]
-            },
-            {
-                zh: '自动化', en: 'Automation', items: [
-                    ['automation/cli', 'CLI 使用指南', 'CLI Guide']
-                ]
-            }
-        ]
     }
 ]
 
@@ -274,7 +282,8 @@ const PILLARS: ReadonlyArray<Pillar> = [
 const COMMUNITY: ReadonlyArray<Entry> = [
     ['community/contributing', '贡献指南', 'Contributing'],
     ['community/code-of-conduct', '行为准则', 'Code of Conduct'],
-    ['community/security', '安全策略', 'Security']
+    ['community/security', '安全策略', 'Security'],
+    ['community/faq', '常见问题', 'FAQ']
 ]
 
 type Lang = 'zh' | 'en'
@@ -496,7 +505,9 @@ export default withMermaid(defineConfig({
         siteTitle: 'IoT DC3',
 
         socialLinks: [
-            {icon: 'github', link: 'https://github.com/pnoker/iot-dc3'}
+            {icon: 'github', link: 'https://github.com/pnoker/iot-dc3'},
+            {icon: 'gitee', link: 'https://gitee.com/pnoker/iot-dc3'},
+            {icon: 'x', link: 'https://x.com/pnoker'}
         ],
 
         editLink: {

@@ -1,7 +1,7 @@
 # Test Debugging FAQ
 
 Quick answers to the failures that recur most often when writing or running
-the frontend tests. Pair this with [tests/README.md](../tests/README.md) for
+the frontend tests. Pair this with `tests/README.md` (in the `dc3-web/` project) for
 the conventions, and `tests/guardrails/ai-guardrails.test.ts` for the
 mechanically-enforced rules.
 
