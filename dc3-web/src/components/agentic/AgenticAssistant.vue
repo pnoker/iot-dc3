@@ -121,18 +121,18 @@
                   />
                 </div>
                 <div class="agentic-capabilities">
-                  <el-tag :type="activeModel.stream ? 'success' : 'info'" size="small">{{
-                    t('agentic.capStream')
-                  }}</el-tag>
-                  <el-tag :type="activeModel.toolCall ? 'success' : 'info'" size="small">{{
-                    t('agentic.capTools')
-                  }}</el-tag>
-                  <el-tag :type="activeModel.vision ? 'success' : 'info'" size="small">{{
-                    t('agentic.capVision')
-                  }}</el-tag>
-                  <el-tag :type="activeModel.reasoning ? 'success' : 'info'" size="small">{{
-                    t('agentic.capReasoning')
-                  }}</el-tag>
+                  <el-tag :type="activeModel.stream ? 'success' : 'info'" size="small"
+                    >{{ t('agentic.capStream') }}
+                  </el-tag>
+                  <el-tag :type="activeModel.toolCall ? 'success' : 'info'" size="small"
+                    >{{ t('agentic.capTools') }}
+                  </el-tag>
+                  <el-tag :type="activeModel.vision ? 'success' : 'info'" size="small"
+                    >{{ t('agentic.capVision') }}
+                  </el-tag>
+                  <el-tag :type="activeModel.reasoning ? 'success' : 'info'" size="small"
+                    >{{ t('agentic.capReasoning') }}
+                  </el-tag>
                 </div>
               </div>
             </el-popover>
@@ -152,9 +152,9 @@
                   >
                     <span class="agentic-history-item">{{ session.title }}</span>
                   </el-dropdown-item>
-                  <el-dropdown-item v-if="conversationItems.length === 0" disabled>{{
-                    t('agentic.headerNoHistory')
-                  }}</el-dropdown-item>
+                  <el-dropdown-item v-if="conversationItems.length === 0" disabled
+                    >{{ t('agentic.headerNoHistory') }}
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>

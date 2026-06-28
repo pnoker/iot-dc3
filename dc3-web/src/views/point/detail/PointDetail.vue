@@ -21,19 +21,19 @@
         <el-tab-pane :label="$t('point.detail.pointInfo')" name="detail">
           <detail-card>
             <el-descriptions :column="2" border>
-              <el-descriptions-item :label="$t('point.detail.pointName')">{{
-                reactiveData.data.pointName
-              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('point.detail.pointName')"
+                >{{ reactiveData.data.pointName }}
+              </el-descriptions-item>
               <el-descriptions-item :label="$t('point.detail.relatedDeviceCount')">
                 {{ reactiveData.listDeviceData.length || 0 }} {{ $t('common.count', { count: '' }) }}:
                 {{ deviceName() }}
               </el-descriptions-item>
-              <el-descriptions-item :label="$t('common.operationTime')">{{
-                timestamp(reactiveData.data.createTime)
-              }}</el-descriptions-item>
-              <el-descriptions-item :label="$t('common.createTime')">{{
-                timestamp(reactiveData.data.createTime)
-              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('common.operationTime')"
+                >{{ timestamp(reactiveData.data.createTime) }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('common.createTime')"
+                >{{ timestamp(reactiveData.data.createTime) }}
+              </el-descriptions-item>
             </el-descriptions>
           </detail-card>
         </el-tab-pane>

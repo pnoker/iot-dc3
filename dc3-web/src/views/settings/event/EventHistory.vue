@@ -102,12 +102,12 @@
         <el-descriptions-item :label="$t('eventHistory.deviceId')">{{ detailRow.deviceId }}</el-descriptions-item>
         <el-descriptions-item :label="$t('eventHistory.eventId')">{{ detailRow.eventId }}</el-descriptions-item>
         <el-descriptions-item :label="$t('eventHistory.eventCode')">{{ detailRow.eventCode }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('eventHistory.type')">{{
-          eventTypeLabel(detailRow.eventTypeFlag)
-        }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('eventHistory.level')">{{
-          eventLevelLabel(detailRow.eventLevelFlag)
-        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.type')"
+          >{{ eventTypeLabel(detailRow.eventTypeFlag) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('eventHistory.level')"
+          >{{ eventLevelLabel(detailRow.eventLevelFlag) }}
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('eventHistory.message')" :span="2">
           {{ detailRow.message || '-' }}
         </el-descriptions-item>

@@ -152,18 +152,22 @@
       --stat-card-accent: var(--el-color-primary);
       --stat-card-bg: var(--el-color-primary-light-9);
     }
+
     &--green {
       --stat-card-accent: var(--el-color-success);
       --stat-card-bg: var(--el-color-success-light-9);
     }
+
     &--orange {
       --stat-card-accent: var(--el-color-warning);
       --stat-card-bg: var(--el-color-warning-light-9);
     }
+
     &--purple {
       --stat-card-accent: #9059f6;
       --stat-card-bg: rgba(144, 89, 246, 0.1);
     }
+
     &--red {
       --stat-card-accent: var(--el-color-danger);
       --stat-card-bg: var(--el-color-danger-light-9);
@@ -238,9 +242,11 @@
     .stat-card__trend--up {
       color: var(--el-color-success);
     }
+
     .stat-card__trend--down {
       color: var(--el-color-danger);
     }
+
     .stat-card__trend--flat {
       color: var(--el-text-color-secondary);
     }

@@ -35,15 +35,21 @@
           <div class="things-card-body-content">
             <ul>
               <li class="nowrap-item">
-                <el-icon><Promotion /></el-icon>
+                <el-icon>
+                  <Promotion />
+                </el-icon>
                 {{ $t('device.card.driver') }}: {{ driver.driverName }}
               </li>
               <li class="nowrap-item">
-                <el-icon><Edit /></el-icon>
+                <el-icon>
+                  <Edit />
+                </el-icon>
                 {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime) }}
               </li>
               <li class="nowrap-item">
-                <el-icon><Sunset /></el-icon>
+                <el-icon>
+                  <Sunset />
+                </el-icon>
                 {{ $t('common.createTime') }}: {{ timestamp(data.createTime) }}
               </li>
             </ul>

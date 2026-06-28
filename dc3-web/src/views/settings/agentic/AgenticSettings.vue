@@ -62,12 +62,12 @@
         <!-- @vue-generic {AgenticModelConfig} -->
         <el-table-column :label="$t('common.operation')" fixed="right" width="210">
           <template #default="{ row }">
-            <el-button :disabled="!row.id" link type="primary" @click="openDetail(row)">{{
-              $t('common.detail')
-            }}</el-button>
-            <el-button :disabled="!row.id" link type="primary" @click="openEdit(row)">{{
-              $t('common.edit')
-            }}</el-button>
+            <el-button :disabled="!row.id" link type="primary" @click="openDetail(row)"
+              >{{ $t('common.detail') }}
+            </el-button>
+            <el-button :disabled="!row.id" link type="primary" @click="openEdit(row)"
+              >{{ $t('common.edit') }}
+            </el-button>
             <el-popconfirm
               :cancel-button-text="$t('common.cancel')"
               :confirm-button-text="$t('common.confirm')"

@@ -28,7 +28,9 @@
           <div class="things-card-body-content">
             <ul>
               <li v-for="attribute in attributes" :key="attribute.id" class="nowrap-item">
-                <el-icon><Goblet /></el-icon>
+                <el-icon>
+                  <Goblet />
+                </el-icon>
                 {{ attribute.attributeName }}: {{ displayConfigValue(attribute.attributeCode) }}
               </li>
             </ul>

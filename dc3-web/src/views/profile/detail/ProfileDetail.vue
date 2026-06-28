@@ -21,27 +21,27 @@
         <el-tab-pane :label="$t('profile.detail.profileInfo')" name="detail">
           <detail-card>
             <el-descriptions :column="2" border>
-              <el-descriptions-item :label="$t('profile.detail.profileName')">{{
-                reactiveData.data.profileName
-              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('profile.detail.profileName')"
+                >{{ reactiveData.data.profileName }}
+              </el-descriptions-item>
               <el-descriptions-item :label="$t('profile.detail.pointCount')"
-                >{{ pointLength }} {{ $t('common.count', { count: '' }) }}</el-descriptions-item
-              >
+                >{{ pointLength }} {{ $t('common.count', { count: '' }) }}
+              </el-descriptions-item>
               <el-descriptions-item :label="$t('profile.detail.commandCount')"
-                >{{ commandLength }} {{ $t('common.count', { count: '' }) }}</el-descriptions-item
-              >
+                >{{ commandLength }} {{ $t('common.count', { count: '' }) }}
+              </el-descriptions-item>
               <el-descriptions-item :label="$t('profile.detail.eventCount')"
-                >{{ eventLength }} {{ $t('common.count', { count: '' }) }}</el-descriptions-item
-              >
+                >{{ eventLength }} {{ $t('common.count', { count: '' }) }}
+              </el-descriptions-item>
               <el-descriptions-item :label="$t('profile.detail.deviceCount')"
-                >{{ deviceLength }} {{ $t('common.count', { count: '' }) }}</el-descriptions-item
-              >
-              <el-descriptions-item :label="$t('common.operationTime')">{{
-                timestamp(reactiveData.data.createTime)
-              }}</el-descriptions-item>
-              <el-descriptions-item :label="$t('common.createTime')">{{
-                timestamp(reactiveData.data.createTime)
-              }}</el-descriptions-item>
+                >{{ deviceLength }} {{ $t('common.count', { count: '' }) }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('common.operationTime')"
+                >{{ timestamp(reactiveData.data.createTime) }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('common.createTime')"
+                >{{ timestamp(reactiveData.data.createTime) }}
+              </el-descriptions-item>
             </el-descriptions>
           </detail-card>
         </el-tab-pane>

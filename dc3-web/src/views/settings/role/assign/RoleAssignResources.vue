@@ -42,7 +42,9 @@
             size="small"
           >
             <template #prefix>
-              <el-icon><Search /></el-icon>
+              <el-icon>
+                <Search />
+              </el-icon>
             </template>
           </el-input>
         </div>
@@ -371,17 +373,21 @@
     flex-wrap: wrap;
     gap: 2px;
   }
+
   .assign-label {
     color: var(--el-text-color-secondary);
     margin-right: 4px;
   }
+
   .assign-value {
     font-weight: 600;
   }
+
   .assign-sep {
     margin: 0 6px;
     color: var(--el-text-color-secondary);
   }
+
   .assign-summary {
     margin-left: auto;
     font-size: 12px;

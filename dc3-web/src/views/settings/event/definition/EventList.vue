@@ -59,36 +59,36 @@
 
     <el-drawer v-model="reactiveData.detailVisible" :title="$t('eventDefinition.detail.title')" size="520px">
       <el-descriptions v-if="reactiveData.detailRecord" :column="1" border>
-        <el-descriptions-item :label="$t('common.name')">{{
-          reactiveData.detailRecord.eventName || '-'
-        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('common.name')"
+          >{{ reactiveData.detailRecord.eventName || '-' }}
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('eventDefinition.detail.code')">
           {{ reactiveData.detailRecord.eventCode || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('eventDefinition.detail.eventType')">{{
-          eventTypeLabel(reactiveData.detailRecord.eventTypeFlag)
-        }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('eventDefinition.detail.eventLevel')">{{
-          eventLevelLabel(reactiveData.detailRecord.eventLevelFlag)
-        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('eventDefinition.detail.eventType')"
+          >{{ eventTypeLabel(reactiveData.detailRecord.eventTypeFlag) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('eventDefinition.detail.eventLevel')"
+          >{{ eventLevelLabel(reactiveData.detailRecord.eventLevelFlag) }}
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('common.enableFlag')">
           <enable-tag :value="reactiveData.detailRecord.enableFlag" />
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('common.remark')">{{
-          reactiveData.detailRecord.remark || '-'
-        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('common.remark')"
+          >{{ reactiveData.detailRecord.remark || '-' }}
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('eventDefinition.detail.profileId')">
           {{ reactiveData.detailRecord.profileId || '-' }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('eventDefinition.detail.tenantId')">
           {{ reactiveData.detailRecord.tenantId || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('common.createTime')">{{
-          timestampLabel(reactiveData.detailRecord.createTime)
-        }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('common.operationTime')">{{
-          timestampLabel(reactiveData.detailRecord.operateTime)
-        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('common.createTime')"
+          >{{ timestampLabel(reactiveData.detailRecord.createTime) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('common.operationTime')"
+          >{{ timestampLabel(reactiveData.detailRecord.operateTime) }}
+        </el-descriptions-item>
       </el-descriptions>
       <el-empty v-else :description="$t('common.description')" />
     </el-drawer>

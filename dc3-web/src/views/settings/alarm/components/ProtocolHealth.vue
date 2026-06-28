@@ -113,14 +113,18 @@
       color: #303133;
       font-size: 13px;
     }
+
     .protocol-health__enabled {
       font-weight: 600;
+
       &--ok {
         color: #67c23a;
       }
+
       &--warn {
         color: #e6a23c;
       }
+
       &--bad {
         color: #f56c6c;
       }

@@ -493,12 +493,14 @@
         background: var(--el-bg-color);
         border-radius: 4px;
       }
+
       :deep(.el-tabs__nav-wrap::after) {
         // Element draws a 1px full-width bottom line under the nav strip;
         // inside a pilled card it reads as a visual double-border with
         // the card edge. Drop it — the active-item underline is enough.
         display: none;
       }
+
       :deep(.el-tab-pane) {
         display: flex;
         flex-direction: column;
@@ -516,6 +518,7 @@
         grid-template-columns: 1fr;
       }
     }
+
     .event-overview__grid-1 {
       display: grid;
       grid-template-columns: 1fr;

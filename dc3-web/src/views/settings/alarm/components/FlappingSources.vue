@@ -113,6 +113,7 @@
       margin: 0;
       padding: 0;
     }
+
     .flapping-sources__item {
       display: flex;
       align-items: center;
@@ -121,13 +122,16 @@
       border-bottom: 1px solid var(--el-border-color-lighter);
       cursor: pointer;
       transition: background-color 0.12s ease;
+
       &:hover {
         background: #fafafa;
       }
+
       &:last-child {
         border-bottom: none;
       }
     }
+
     .flapping-sources__name {
       flex: 1;
       min-width: 0;
@@ -137,6 +141,7 @@
       font-size: 13px;
       color: #303133;
     }
+
     .flapping-sources__count {
       display: inline-flex;
       align-items: center;

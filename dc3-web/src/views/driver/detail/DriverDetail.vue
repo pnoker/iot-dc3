@@ -21,24 +21,24 @@
         <el-tab-pane :label="$t('driver.detail.driverInfo')" name="detail">
           <detail-card>
             <el-descriptions :column="2" border>
-              <el-descriptions-item :label="$t('driver.detail.driverName')">{{
-                reactiveData.data.driverName
-              }}</el-descriptions-item>
-              <el-descriptions-item :label="$t('driver.detail.relatedDeviceCount')">{{
-                deviceLength
-              }}</el-descriptions-item>
-              <el-descriptions-item :label="$t('driver.card.host')">{{
-                reactiveData.data.serviceHost
-              }}</el-descriptions-item>
-              <el-descriptions-item :label="$t('driver.card.driverService')">{{
-                reactiveData.data.serviceName
-              }}</el-descriptions-item>
-              <el-descriptions-item :label="$t('common.operationTime')">{{
-                timestamp(reactiveData.data.createTime)
-              }}</el-descriptions-item>
-              <el-descriptions-item :label="$t('common.createTime')">{{
-                timestamp(reactiveData.data.createTime)
-              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('driver.detail.driverName')"
+                >{{ reactiveData.data.driverName }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('driver.detail.relatedDeviceCount')"
+                >{{ deviceLength }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('driver.card.host')"
+                >{{ reactiveData.data.serviceHost }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('driver.card.driverService')"
+                >{{ reactiveData.data.serviceName }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('common.operationTime')"
+                >{{ timestamp(reactiveData.data.createTime) }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('common.createTime')"
+                >{{ timestamp(reactiveData.data.createTime) }}
+              </el-descriptions-item>
             </el-descriptions>
           </detail-card>
         </el-tab-pane>

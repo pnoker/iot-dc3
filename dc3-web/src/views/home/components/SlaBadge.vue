@@ -25,7 +25,9 @@
 -->
 <template>
   <div v-if="visible" :class="{ 'sla-badge--warn': warn }" class="sla-badge">
-    <el-icon class="sla-badge__icon"><Warning /></el-icon>
+    <el-icon class="sla-badge__icon">
+      <Warning />
+    </el-icon>
     <div v-if="backlog.over24h > 0" class="sla-badge__chip sla-badge__chip--sla" @click="jumpTo('sla')">
       <span class="sla-badge__value">{{ backlog.over24h }}</span>
       <span class="sla-badge__label">{{ $t('home.sla.unackOver24h') }}</span>
@@ -104,13 +106,16 @@
       background: rgba(255, 255, 255, 0.5);
       cursor: pointer;
       transition: background-color 0.12s ease;
+
       &:hover {
         background: #ffffff;
       }
     }
+
     .sla-badge__chip--sla {
       color: #f56c6c;
     }
+
     .sla-badge__chip--avail {
       color: #e6a23c;
     }
@@ -119,6 +124,7 @@
       font-weight: 700;
       font-size: 16px;
     }
+
     .sla-badge__label {
       font-size: 12px;
       opacity: 0.9;

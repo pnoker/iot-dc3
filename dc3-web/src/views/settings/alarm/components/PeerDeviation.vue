@@ -107,6 +107,7 @@
 
 <style lang="scss" scoped>
   @use '@/styles/palette.scss' as *;
+
   .peer-deviation {
     @include clickable-rows;
   }

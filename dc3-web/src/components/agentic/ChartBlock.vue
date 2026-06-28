@@ -58,10 +58,15 @@
 
   interface ChartMark {
     data(value: unknown): ChartMark;
+
     encode(channel: string, field?: string): ChartMark;
+
     style(name: string, value: unknown): ChartMark;
+
     axis(channel: string, value: Record<string, unknown>): ChartMark;
+
     legend(channelOrValue: string | boolean | Record<string, unknown>, value?: Record<string, unknown>): ChartMark;
+
     scale(channel: string, value: Record<string, unknown>): ChartMark;
   }
 

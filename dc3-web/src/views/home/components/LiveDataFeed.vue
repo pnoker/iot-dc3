@@ -229,15 +229,18 @@
         background: rgba(64, 158, 255, 0.1);
         color: #409eff;
       }
+
       &--float,
       &--double {
         background: rgba(103, 194, 58, 0.1);
         color: #67c23a;
       }
+
       &--bool {
         background: rgba(230, 162, 60, 0.1);
         color: #e6a23c;
       }
+
       &--json {
         background: rgba(144, 89, 246, 0.1);
         color: #9059f6;

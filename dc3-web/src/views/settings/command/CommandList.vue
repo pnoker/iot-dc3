@@ -59,39 +59,39 @@
 
     <el-drawer v-model="reactiveData.detailVisible" :title="$t('command.detail.title')" size="520px">
       <el-descriptions v-if="reactiveData.detailRecord" :column="1" border>
-        <el-descriptions-item :label="$t('common.name')">{{
-          reactiveData.detailRecord.commandName || '-'
-        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('common.name')"
+          >{{ reactiveData.detailRecord.commandName || '-' }}
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('command.detail.code')">
           {{ reactiveData.detailRecord.commandCode || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('command.detail.commandType')">{{
-          reactiveData.detailRecord.commandTypeFlag || '-'
-        }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('command.detail.callType')">{{
-          reactiveData.detailRecord.callTypeFlag || '-'
-        }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('command.detail.timeout')">{{
-          commandTimeoutLabel(reactiveData.detailRecord.timeout)
-        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('command.detail.commandType')"
+          >{{ reactiveData.detailRecord.commandTypeFlag || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('command.detail.callType')"
+          >{{ reactiveData.detailRecord.callTypeFlag || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('command.detail.timeout')"
+          >{{ commandTimeoutLabel(reactiveData.detailRecord.timeout) }}
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('common.enableFlag')">
           <enable-tag :value="reactiveData.detailRecord.enableFlag" />
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('common.remark')">{{
-          reactiveData.detailRecord.remark || '-'
-        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('common.remark')"
+          >{{ reactiveData.detailRecord.remark || '-' }}
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('command.detail.profileId')">
           {{ reactiveData.detailRecord.profileId || '-' }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('command.detail.tenantId')">
           {{ reactiveData.detailRecord.tenantId || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('common.createTime')">{{
-          timestampLabel(reactiveData.detailRecord.createTime)
-        }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('common.operationTime')">{{
-          timestampLabel(reactiveData.detailRecord.operateTime)
-        }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('common.createTime')"
+          >{{ timestampLabel(reactiveData.detailRecord.createTime) }}
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('common.operationTime')"
+          >{{ timestampLabel(reactiveData.detailRecord.operateTime) }}
+        </el-descriptions-item>
       </el-descriptions>
       <el-empty v-else :description="$t('common.description')" />
     </el-drawer>

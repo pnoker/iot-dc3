@@ -10,7 +10,7 @@
   },
   "lint-staged": {
     "dc3-web/**/*.{vue,js,mjs,cjs,ts,jsx,tsx}": [
-      "eslint --fix --config dc3-web/eslint.config.mjs"
+      "dc3-web/node_modules/.bin/eslint --fix --config dc3-web/eslint.config.mjs"
     ]
   }
 }

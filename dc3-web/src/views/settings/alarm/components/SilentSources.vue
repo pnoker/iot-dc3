@@ -103,6 +103,7 @@
 
 <style lang="scss" scoped>
   @use '@/styles/palette.scss' as *;
+
   .silent-sources {
     @include clickable-rows;
   }

@@ -43,7 +43,9 @@
               size="small"
             >
               <template #prefix>
-                <el-icon><Search /></el-icon>
+                <el-icon>
+                  <Search />
+                </el-icon>
               </template>
             </el-input>
           </div>
@@ -79,10 +81,14 @@
         <div class="assign-actions">
           <el-button :disabled="reactiveData.leftSelection.length === 0" size="small" type="primary" @click="moveRight">
             {{ t('settings.user.rolesMoveRight') }}
-            <el-icon class="assign-actions__icon"><ArrowRight /></el-icon>
+            <el-icon class="assign-actions__icon">
+              <ArrowRight />
+            </el-icon>
           </el-button>
           <el-button :disabled="reactiveData.rightSelection.length === 0" size="small" @click="moveLeft">
-            <el-icon class="assign-actions__icon"><ArrowLeft /></el-icon>
+            <el-icon class="assign-actions__icon">
+              <ArrowLeft />
+            </el-icon>
             {{ t('settings.user.rolesMoveLeft') }}
           </el-button>
         </div>
@@ -100,7 +106,9 @@
               size="small"
             >
               <template #prefix>
-                <el-icon><Search /></el-icon>
+                <el-icon>
+                  <Search />
+                </el-icon>
               </template>
             </el-input>
           </div>
@@ -308,13 +316,16 @@
     font-size: 14px;
     color: var(--el-text-color-regular);
   }
+
   .assign-label {
     color: var(--el-text-color-secondary);
     margin-right: 4px;
   }
+
   .assign-value {
     font-weight: 600;
   }
+
   .assign-sep {
     margin: 0 6px;
     color: var(--el-text-color-secondary);

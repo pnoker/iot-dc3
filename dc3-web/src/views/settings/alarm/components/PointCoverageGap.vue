@@ -113,6 +113,7 @@
 
 <style lang="scss" scoped>
   @use '@/styles/palette.scss' as *;
+
   .coverage-gap {
     .coverage-gap__summary {
       display: flex;
@@ -121,29 +122,35 @@
       padding: 16px;
       border-bottom: 1px solid var(--el-border-color-lighter);
     }
+
     .coverage-gap__nums {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
+
     .coverage-gap__num {
       display: flex;
       align-items: baseline;
       gap: 10px;
       font-size: 13px;
+
       &--gap .coverage-gap__value {
         color: #f56c6c;
       }
     }
+
     .coverage-gap__label {
       color: #909399;
       min-width: 48px;
     }
+
     .coverage-gap__value {
       color: #303133;
       font-weight: 600;
       font-size: 15px;
     }
+
     @include clickable-rows;
   }
 </style>
