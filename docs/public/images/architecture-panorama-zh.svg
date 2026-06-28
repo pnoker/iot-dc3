@@ -70,17 +70,13 @@
       <rect fill="rgba(8, 145, 178, 0.07)" height="64" rx="6" stroke="#0891b2" stroke-width="0.8" width="230"
             x="60"
             y="70"/>
-      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="175" y="98">{{
-          s.webName
-        }}
+      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="175" y="98">Web 控制台
       </text>
       <text fill="#334155" font-size="9" text-anchor="middle" x="175" y="116">Vue3 · Vite8 · Element Plus · :8080</text>
       <rect fill="rgba(8, 145, 178, 0.07)" height="64" rx="6" stroke="#0891b2" stroke-width="0.8" width="215"
             x="305"
             y="70"/>
-      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="412" y="98">{{
-          s.cliName
-        }}
+      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="412" y="98">dc3-cli
       </text>
       <text fill="#334155" font-size="9" text-anchor="middle" x="412" y="116">TypeScript CLI (HTTP)</text>
       <rect fill="rgba(8, 145, 178, 0.07)" height="64" rx="6" stroke="#0891b2" stroke-width="0.8" width="265"
@@ -95,9 +91,7 @@
       <rect fill="rgba(5, 150, 105, 0.07)" height="58" rx="6" stroke="#059669" stroke-width="0.8" width="740"
             x="60"
             y="174"/>
-      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="430" y="200">{{
-          s.gwName
-        }}
+      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="430" y="200">dc3-gateway · API 网关  :8000
       </text>
       <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="218">Spring Cloud Gateway (WebFlux) · 统一路由 + 鉴权过滤 + 限流</text>
 
@@ -155,9 +149,7 @@
       <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="120"
             x="370"
             y="526"/>
-      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="430" y="552">{{
-          s.s7Name
-        }}
+      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="430" y="552">S7 PLC
       </text>
       <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="570">Siemens</text>
       <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="120"
