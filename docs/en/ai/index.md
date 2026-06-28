@@ -55,5 +55,7 @@ permission point and the tenant boundary:
 - [Agentic Center](./agentic) — conversational AI operations, 10 built-in tools, session persistence, high-risk
   confirmation
 - [AI Agent / MCP](./mcp) — OAuth 2.1 + MCP, exposing tools safely to external agents
+- [Why Spring AI](./spring-ai-deep-dive) — architecture rationale, tool-calling mechanics, and roadmap
 - [Automation (dc3 CLI)](../automation/cli) — drive the platform from the command line, no AI
 - [Data Intelligence & AIoT](../foundations/aiot) — the big picture of IoT analytics meeting large models
+
