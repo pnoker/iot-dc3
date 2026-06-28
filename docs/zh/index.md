@@ -6,7 +6,7 @@ hero:
   text: 面向 AI 场景演进的分布式工业物联网平台
   tagline: 覆盖设备接入、数据采集、运营管理与智能分析。28 个多协议驱动接入异构设备，通过 Spring AI 让大模型读写设备数据、下发命令，形成"感知—决策—执行—反馈"闭环。分布式、多租户、全开源。
   image:
-    src: /images/hero-logo.svg
+    src: /images/logo.svg
     alt: IoT DC3
   actions:
     - theme: brand
@@ -69,11 +69,13 @@ RabbitMQ 异步解耦。
 
 ## 技术栈
 
-- **语言与框架**：[Java 21](https://www.java.com) · [Spring Boot 4](https://spring.io/projects/spring-boot) · [Spring Cloud 2025](https://spring.io/projects/spring-cloud) · [Spring AI 2.0.0](https://spring.io/projects/spring-ai)
+- **语言与框架
+  **：[Java 21](https://www.java.com) · [Spring Boot 4](https://spring.io/projects/spring-boot) · [Spring Cloud 2025](https://spring.io/projects/spring-cloud) · [Spring AI 2.0.0](https://spring.io/projects/spring-ai)
 - **数据、缓存与调度**：PostgreSQL（+ TimescaleDB / AGE / pgvector）· Caffeine · MyBatis-Plus · Quartz
 - **消息与通信**：RabbitMQ · gRPC · MQTT（Paho + EMQX）· Protobuf
 - **安全与认证**：Spring Security · JWT · BouncyCastle
-- **前端**：Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6（源码在本仓库 `dc3-web/` 目录，原独立仓库 `iot-dc3-web` 已归档）
+- **前端**：Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6（源码在本仓库 `dc3-web/` 目录，原独立仓库
+  `iot-dc3-web` 已归档）
 
 ## 开源协议
 

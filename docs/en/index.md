@@ -6,7 +6,7 @@ hero:
   text: An open-source distributed IoT platform built for AI scenarios
   tagline: Device connectivity, data collection, operations management, and intelligent analytics for industrial IoT. 28 multi-protocol drivers bring data up from heterogeneous devices; Spring AI lets large language models read that data and drive commands back to devices, closing the sense–decide–act–feedback loop. Distributed, multi-tenant, fully open source.
   image:
-    src: /images/hero-logo.svg
+    src: /images/logo.svg
     alt: IoT DC3
   actions:
     - theme: brand
@@ -72,11 +72,13 @@ For how each hop works and why it's designed that way, see [Architecture](/en/ar
 
 ## Tech stack
 
-- **Language & frameworks**: [Java 21](https://www.java.com) · [Spring Boot 4](https://spring.io/projects/spring-boot) · [Spring Cloud 2025](https://spring.io/projects/spring-cloud) · [Spring AI 2.0.0](https://spring.io/projects/spring-ai)
+- **Language & frameworks
+  **: [Java 21](https://www.java.com) · [Spring Boot 4](https://spring.io/projects/spring-boot) · [Spring Cloud 2025](https://spring.io/projects/spring-cloud) · [Spring AI 2.0.0](https://spring.io/projects/spring-ai)
 - **Data, cache & scheduling**: PostgreSQL (+ TimescaleDB / AGE / pgvector) · Caffeine · MyBatis-Plus · Quartz
 - **Messaging**: RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf
 - **Security**: Spring Security · JWT · BouncyCastle
-- **Frontend**: Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6 (source in `dc3-web/` directory of this repo; the standalone `iot-dc3-web` repo is archived)
+- **Frontend**: Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6 (source in `dc3-web/` directory of this repo;
+  the standalone `iot-dc3-web` repo is archived)
 
 ## License
 
