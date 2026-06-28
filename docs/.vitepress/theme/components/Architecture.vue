@@ -112,50 +112,50 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <rect fill="url(#dc3-grid)" height="100%" width="100%"/>
 
       <!-- regions -->
-      <rect fill="var(--dc3-region-be)" height="108" rx="12" stroke="var(--dc3-be-stroke)" stroke-dasharray="8,4"
+      <rect fill="var(--dc3-region-be)" height="108" rx="12" stroke="var(--dc3-be-stroke)" stroke-dasharray="6,3"
             stroke-width="1" width="756"
             x="52" y="262"/>
       <text fill="var(--dc3-be-stroke)" font-size="10" font-weight="600" x="64" y="280">{{ s.centerRegion }}</text>
-      <rect fill="var(--dc3-region-be)" height="108" rx="12" stroke="var(--dc3-be-stroke)" stroke-dasharray="8,4"
+      <rect fill="var(--dc3-region-be)" height="108" rx="12" stroke="var(--dc3-be-stroke)" stroke-dasharray="6,3"
             stroke-width="1" width="756"
             x="52" y="496"/>
       <text fill="var(--dc3-be-stroke)" font-size="10" font-weight="600" x="64" y="514">{{ s.driverRegion }}</text>
-      <rect fill="var(--dc3-region-amber)" height="200" rx="12" stroke="var(--dc3-amber-stroke)" stroke-dasharray="8,4"
+      <rect fill="var(--dc3-region-amber)" height="200" rx="12" stroke="var(--dc3-amber-stroke)" stroke-dasharray="6,3"
             stroke-width="1"
             width="300" x="840" y="502"/>
       <text fill="var(--dc3-amber-stroke)" font-size="10" font-weight="600" x="852" y="520">{{ s.obsRegion }}</text>
 
       <!-- arrows -->
-      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="175" x2="175" y1="134" y2="171"/>
-      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="412" x2="412" y1="134" y2="171"/>
-      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="667" x2="667" y1="134" y2="171"/>
-      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="415" x2="415" y1="232" y2="289"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="175" x2="175" y1="134" y2="171"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="412" x2="412" y1="134" y2="171"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="667" x2="667" y1="134" y2="171"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="415" x2="415" y1="232" y2="289"/>
       <text fill="var(--dc3-arrow-label)" font-size="9" x="423" y="252">{{ s.httpApi }}</text>
-      <line marker-end="url(#dc3-ah-rose)" stroke="var(--dc3-rose-stroke)" stroke-dasharray="5,4" stroke-width="1.3"
+      <line marker-end="url(#dc3-ah-rose)" stroke="var(--dc3-rose-stroke)" stroke-dasharray="4,4" stroke-width="0.8"
             x1="120" x2="120"
             y1="232" y2="289"/>
       <text fill="var(--dc3-rose-stroke)" font-size="8" x="58" y="258">{{ s.jwtVerify }}</text>
-      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="398" x2="398" y1="372" y2="406"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="398" x2="398" y1="372" y2="406"/>
       <text fill="var(--dc3-arrow-label)" font-size="8" x="352" y="392">{{ s.cmdDown }}</text>
-      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="462" x2="462" y1="406" y2="374"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="462" x2="462" y1="406" y2="374"/>
       <text fill="var(--dc3-arrow-label)" font-size="8" x="470" y="392">{{ s.dataUp }}</text>
-      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="398" x2="398" y1="466" y2="494"/>
-      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="462" x2="462" y1="494" y2="468"/>
-      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="398" x2="398" y1="604" y2="642"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="398" x2="398" y1="466" y2="494"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="462" x2="462" y1="494" y2="468"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="398" x2="398" y1="604" y2="642"/>
       <text fill="var(--dc3-arrow-label)" font-size="8" x="352" y="626">{{ s.writeDown }}</text>
-      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="462" x2="462" y1="642" y2="606"/>
+      <line marker-end="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="462" x2="462" y1="642" y2="606"/>
       <text fill="var(--dc3-arrow-label)" font-size="8" x="470" y="626">{{ s.readUp }}</text>
-      <line marker-end="url(#dc3-ah)" marker-start="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="808"
+      <line marker-end="url(#dc3-ah)" marker-start="url(#dc3-ah)" stroke="var(--dc3-arrow)" stroke-width="1" x1="808"
             x2="838" y1="330"
             y2="330"/>
       <text fill="var(--dc3-arrow-label)" font-size="8" x="812" y="322">JDBC</text>
-      <line marker-end="url(#dc3-ah-amber)" stroke="var(--dc3-amber-stroke)" stroke-dasharray="5,4" stroke-width="1.2"
+      <line marker-end="url(#dc3-ah-amber)" stroke="var(--dc3-amber-stroke)" stroke-dasharray="4,4" stroke-width="0.8"
             x1="980" x2="980"
             y1="466" y2="501"/>
       <text fill="var(--dc3-amber-stroke)" font-size="8" x="986" y="487">{{ s.metricsLogs }}</text>
 
       <!-- Band 1: clients -->
-      <rect fill="var(--dc3-fe-fill)" height="64" rx="6" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="230"
+      <rect fill="var(--dc3-fe-fill)" height="64" rx="6" stroke="var(--dc3-fe-stroke)" stroke-width="1" width="230"
             x="60"
             y="70"/>
       <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="175" y="98">{{
@@ -163,7 +163,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
         }}
       </text>
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="175" y="116">{{ s.webSub }}</text>
-      <rect fill="var(--dc3-fe-fill)" height="64" rx="6" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="215"
+      <rect fill="var(--dc3-fe-fill)" height="64" rx="6" stroke="var(--dc3-fe-stroke)" stroke-width="1" width="215"
             x="305"
             y="70"/>
       <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="412" y="98">{{
@@ -171,7 +171,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
         }}
       </text>
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="412" y="116">{{ s.cliSub }}</text>
-      <rect fill="var(--dc3-fe-fill)" height="64" rx="6" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="265"
+      <rect fill="var(--dc3-fe-fill)" height="64" rx="6" stroke="var(--dc3-fe-stroke)" stroke-width="1" width="265"
             x="535"
             y="70"/>
       <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="667" y="98">
@@ -180,7 +180,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="667" y="116">{{ s.agentSub }}</text>
 
       <!-- Band 2: gateway -->
-      <rect fill="var(--dc3-be-fill)" height="58" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="740"
+      <rect fill="var(--dc3-be-fill)" height="58" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1" width="740"
             x="60"
             y="174"/>
       <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="430" y="200">{{
@@ -190,26 +190,26 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="430" y="218">{{ s.gwSub }}</text>
 
       <!-- Band 3: center services -->
-      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="176"
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1" width="176"
             x="60"
             y="292"/>
       <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="148" y="316">auth</text>
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="148" y="332">{{ s.authSub }}</text>
       <text fill="var(--dc3-be-text)" font-size="8" text-anchor="middle" x="148" y="346">:8300 / gRPC 9300</text>
-      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="176"
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1" width="176"
             x="246"
             y="292"/>
       <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="334" y="316">manager
       </text>
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="334" y="332">{{ s.mgrSub }}</text>
       <text fill="var(--dc3-be-text)" font-size="8" text-anchor="middle" x="334" y="346">:8400 / gRPC 9400</text>
-      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="176"
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1" width="176"
             x="432"
             y="292"/>
       <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="520" y="316">data</text>
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="520" y="332">{{ s.dataSub }}</text>
       <text fill="var(--dc3-be-text)" font-size="8" text-anchor="middle" x="520" y="346">:8500 / gRPC 9500</text>
-      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="182"
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1" width="182"
             x="618"
             y="292"/>
       <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="709" y="316">agentic
@@ -218,7 +218,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text fill="var(--dc3-be-text)" font-size="8" text-anchor="middle" x="709" y="346">:8600 · Spring AI</text>
 
       <!-- Band 4: message bus -->
-      <rect fill="var(--dc3-bus-fill)" height="56" rx="6" stroke="var(--dc3-bus-stroke)" stroke-width="1.5" width="740"
+      <rect fill="var(--dc3-bus-fill)" height="56" rx="6" stroke="var(--dc3-bus-stroke)" stroke-width="1" width="740"
             x="60"
             y="410"/>
       <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="430" y="435">
@@ -227,20 +227,20 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text fill="var(--dc3-bus-text)" font-size="9" text-anchor="middle" x="430" y="453">{{ s.busSub }}</text>
 
       <!-- Band 5: drivers -->
-      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="150"
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1" width="150"
             x="60"
             y="526"/>
       <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="135" y="552">Modbus
       </text>
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="135" y="570">{{ s.modbusSub }}</text>
-      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="140"
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1" width="140"
             x="220"
             y="526"/>
       <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="290" y="552">
         {{ s.opcName }}
       </text>
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="290" y="570">{{ s.opcSub }}</text>
-      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="120"
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1" width="120"
             x="370"
             y="526"/>
       <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="430" y="552">{{
@@ -248,14 +248,14 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
         }}
       </text>
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="430" y="570">{{ s.s7Sub }}</text>
-      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="120"
+      <rect fill="var(--dc3-be-fill)" height="62" rx="6" stroke="var(--dc3-be-stroke)" stroke-width="1" width="120"
             x="500"
             y="526"/>
       <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="560" y="552">
         {{ s.mqttName }}
       </text>
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="560" y="570">{{ s.mqttSub }}</text>
-      <rect fill="var(--dc3-ext-fill)" height="62" rx="6" stroke="var(--dc3-ext-stroke)" stroke-width="1.5" width="170"
+      <rect fill="var(--dc3-ext-fill)" height="62" rx="6" stroke="var(--dc3-ext-stroke)" stroke-width="1" width="170"
             x="630"
             y="526"/>
       <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="715" y="552">
@@ -264,7 +264,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="715" y="570">{{ s.moreSub }}</text>
 
       <!-- Band 6: devices -->
-      <rect fill="var(--dc3-ext-fill)" height="58" rx="6" stroke="var(--dc3-ext-stroke)" stroke-width="1.5" width="740"
+      <rect fill="var(--dc3-ext-fill)" height="58" rx="6" stroke="var(--dc3-ext-stroke)" stroke-width="1" width="740"
             x="60"
             y="644"/>
       <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="430" y="670">
@@ -273,7 +273,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="430" y="688">{{ s.devSub }}</text>
 
       <!-- PostgreSQL -->
-      <rect fill="var(--dc3-db-fill)" height="204" rx="6" stroke="var(--dc3-db-stroke)" stroke-width="1.5" width="300"
+      <rect fill="var(--dc3-db-fill)" height="204" rx="6" stroke="var(--dc3-db-stroke)" stroke-width="1" width="300"
             x="840"
             y="262"/>
       <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="990" y="290">
@@ -288,21 +288,21 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text fill="var(--dc3-db-stroke)" font-size="9" text-anchor="middle" x="990" y="446">{{ s.pgPort }}</text>
 
       <!-- Observability -->
-      <rect fill="var(--dc3-amber-fill)" height="44" rx="6" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"
+      <rect fill="var(--dc3-amber-fill)" height="44" rx="6" stroke="var(--dc3-amber-stroke)" stroke-width="1"
             width="276" x="852"
             y="528"/>
       <text fill="var(--dc3-box-name)" font-size="10" font-weight="600" text-anchor="middle" x="990" y="548">EMQX · MQTT
         Broker
       </text>
       <text fill="var(--dc3-text2)" font-size="8" text-anchor="middle" x="990" y="562">:31883 · Dashboard :18083</text>
-      <rect fill="var(--dc3-amber-fill)" height="44" rx="6" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"
+      <rect fill="var(--dc3-amber-fill)" height="44" rx="6" stroke="var(--dc3-amber-stroke)" stroke-width="1"
             width="276" x="852"
             y="584"/>
       <text fill="var(--dc3-box-name)" font-size="10" font-weight="600" text-anchor="middle" x="990" y="604">
         {{ s.elkName }}
       </text>
       <text fill="var(--dc3-text2)" font-size="8" text-anchor="middle" x="990" y="618">{{ s.elkSub }}</text>
-      <rect fill="var(--dc3-amber-fill)" height="44" rx="6" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"
+      <rect fill="var(--dc3-amber-fill)" height="44" rx="6" stroke="var(--dc3-amber-stroke)" stroke-width="1"
             width="276" x="852"
             y="640"/>
       <text fill="var(--dc3-box-name)" font-size="10" font-weight="600" text-anchor="middle" x="990" y="660">
@@ -335,7 +335,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
             x="700"
             y="724"/>
       <text fill="var(--dc3-text2)" font-size="9" x="722" y="733">{{ s.legDevice }}</text>
-      <line stroke="var(--dc3-rose-stroke)" stroke-dasharray="4,3" stroke-width="1.3" x1="870" x2="886" y1="730"
+      <line stroke="var(--dc3-rose-stroke)" stroke-dasharray="4,3" stroke-width="0.8" x1="870" x2="886" y1="730"
             y2="730"/>
       <text fill="var(--dc3-text2)" font-size="9" x="892" y="733">{{ s.legAuth }}</text>
       <text fill="var(--dc3-arrow-label)" font-size="9" x="960" y="733">{{ s.legPlane }}</text>
@@ -346,7 +346,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 <style>
 /* light theme (default) */
 .dc3-arch {
-  --dc3-grid: #e2e8f0;
+  --dc3-grid: #cbd5e1;
   --dc3-text2: #475569;
   --dc3-box-name: #0f172a;
   --dc3-fe-fill: #ecfeff;
@@ -383,21 +383,21 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
   --dc3-grid: #1e293b;
   --dc3-text2: #94a3b8;
   --dc3-box-name: #ffffff;
-  --dc3-fe-fill: rgba(8, 51, 68, 0.5);
+  --dc3-fe-fill: rgba(8, 51, 68, 0.25);
   --dc3-fe-stroke: #22d3ee;
-  --dc3-be-fill: rgba(6, 78, 59, 0.5);
+  --dc3-be-fill: rgba(6, 78, 59, 0.25);
   --dc3-be-stroke: #34d399;
   --dc3-be-text: #34d399;
-  --dc3-db-fill: rgba(76, 29, 149, 0.45);
+  --dc3-db-fill: rgba(76, 29, 149, 0.22);
   --dc3-db-stroke: #a78bfa;
   --dc3-db-text: #cbb6f7;
-  --dc3-amber-fill: rgba(120, 53, 15, 0.35);
+  --dc3-amber-fill: rgba(120, 53, 15, 0.18);
   --dc3-amber-stroke: #fbbf24;
   --dc3-rose-stroke: #fb7185;
-  --dc3-bus-fill: rgba(251, 146, 60, 0.3);
+  --dc3-bus-fill: rgba(251, 146, 60, 0.15);
   --dc3-bus-stroke: #fb923c;
   --dc3-bus-text: #fcd9b6;
-  --dc3-ext-fill: rgba(30, 41, 59, 0.5);
+  --dc3-ext-fill: rgba(100, 116, 139, 0.07);
   --dc3-ext-stroke: #94a3b8;
   --dc3-arrow: #64748b;
   --dc3-arrow-label: #94a3b8;
