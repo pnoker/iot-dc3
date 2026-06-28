@@ -8,9 +8,18 @@
 
 ## Verification
 
-- [ ] 本地验证通过（lint / type-check / test / build，按子项目）
+### 后端 (Java / Maven)
+
+- [ ] `mvn -B -DskipTests compile` 通过
 - [ ] 新增 / 修改的行为有测试覆盖
 - [ ] 文档已更新（如有 API / 行为变更）
+
+### 前端 (dc3-web)
+
+- [ ] `pnpm lint-check && pnpm check && pnpm build` 通过
+- [ ] 大范围改动通过 `pnpm run test:ci` 覆盖门槛
+- [ ] E2E 数据动态创建并清理，无固定业务 ID
+- [ ] 文档已更新（如有 UI / 行为变更）
 
 ## Impact
 

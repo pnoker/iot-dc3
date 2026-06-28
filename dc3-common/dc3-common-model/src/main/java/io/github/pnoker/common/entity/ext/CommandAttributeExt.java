@@ -85,7 +85,7 @@ public class CommandAttributeExt extends BaseExt {
         @Schema(description = "Whether the attribute is required in the UI form.", example = "true")
         private Boolean required;
 
-        @Schema(description = "Placeholder text displayed in the input when empty.", example = "请输入")
+        @Schema(description = "Placeholder text displayed in the input when empty.", example = "Enter text")
         private String placeholder;
 
         @Schema(description = "Selectable options for the input, each option represented as a key-value map.")

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.utils;
 
+import io.github.pnoker.common.constant.common.TimeConstant;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -31,9 +32,11 @@ class LocalDateTimeUtilTest {
 
     @Test
     void nowReturnsCurrentInstantInDefaultZone() {
-        LocalDateTime before = LocalDateTime.now().minusSeconds(5);
+        // LocalDateTimeUtil.now() uses TimeConstant.DEFAULT_ZONEID, so the bounds must use the
+        // same zone — otherwise this fails on any machine whose JVM default zone differs (e.g. CI on UTC).
+        LocalDateTime before = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusSeconds(5);
         LocalDateTime now = LocalDateTimeUtil.now();
-        LocalDateTime after = LocalDateTime.now().plusSeconds(5);
+        LocalDateTime after = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).plusSeconds(5);
         assertThat(now).isAfterOrEqualTo(before).isBeforeOrEqualTo(after);
     }
 

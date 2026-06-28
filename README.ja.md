@@ -2,10 +2,10 @@
   <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
 </p>
 
-> **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
+> **AI アシスタント：** IoT DC3 の簡潔な AI 向け概要については、最初に [README.ai.md](./README.ai.md) をお読みください。
 
 <p align="center">
-  <img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3">
+  <img src="docs/public/images/logo.svg" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -51,19 +51,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="dc3/images/screenshot-overview.png" alt="プラットフォームダッシュボード" width="100%">
+      <img src="docs/public/images/screenshot-overview.png" alt="プラットフォームダッシュボード" width="100%">
       <br>
       <strong>ホーム / ダッシュボード</strong><br>
       <em>システム概要 · デバイスオンライン統計 · データトレンドチャート</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-device.png" alt="デバイス管理ページ" width="100%">
+      <img src="docs/public/images/screenshot-device.png" alt="デバイス管理ページ" width="100%">
       <br>
       <strong>デバイス管理</strong><br>
       <em>デバイス一覧 · オンライン状態 · 検索とフィルタ</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-ai.png" alt="AI チャットページ" width="100%">
+      <img src="docs/public/images/screenshot-ai.png" alt="AI チャットページ" width="100%">
       <br>
       <strong>AI チャット</strong><br>
       <em>自然言語によるデバイス操作 · データクエリ · インテリジェント分析</em>
@@ -217,21 +217,31 @@ cp .env.example .env    # テンプレートをコピー
 
 ## 🏗️ アーキテクチャ概要
 
-![IoT DC3 Architecture](dc3/images/iot-dc3-architecture-ja.svg)
+### 製品アーキテクチャ全景
 
-| 層             | 役割                                                 |
-|---------------|----------------------------------------------------|
-| **ドライバー層**    | SDK によるドライバー開発、標準 / 独自プロトコルのデバイス接続、南向きデータ収集とコマンド実行 |
-| **データ層**      | デバイスデータの収集、保存、クエリ。リアルタイムデータと履歴データサービスを支えます         |
-| **管理層**       | マイクロサービス連携の中核。サービス登録、デバイス / ドライバー管理、コマンド編成、設定管理    |
-| **アプリケーション層** | データ公開、タスクスケジューリング、アラーム、ログ管理、サードパーティ統合、AI 自動化       |
+![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-en.svg)
+
+6層マイクロサービスアーキテクチャの全体像：クライアント → ゲートウェイ → 4つのセンターサービス → メッセージバス → 28
+プロトコルドライバー → フィールドデバイス。PostgreSQL（TimescaleDB + pgvector + AGE）永続層とオプションの可観測性スタック（ELK
++ Prometheus + Grafana）を一望。
+
+### 4層リファレンスアーキテクチャマッピング
+
+![IoT DC3 4層リファレンスアーキテクチャ](docs/public/images/architecture-ja.svg)
+
+IoT業界標準の4層リファレンスアーキテクチャ — アプリケーション、プラットフォーム、ネットワーク、知覚 — に加え、4層を横断するセキュリティ。
+
+| 層                | IoT リファレンス責務                   | DC3 実装                          |
+|------------------|---------------------------------|----------------------------------|
+| **アプリケーション層**   | 運用 · アラート · データ分析 · AIoT        | 運用 · Agentic センター · MCP         |
+| **プラットフォーム層**   | デバイス管理 · データ保存 · ルールと計算         | センターサービス · データプレーン · TimescaleDB |
+| **ネットワーク層**      | フィールドバス · IoT プロトコル · 無線 / WAN | 28 プロトコルドライバー · ゲートウェイ · RabbitMQ |
+| **知覚層**          | センシング · 自動識別 · アクチュエータ          | プロファイル · デバイス · ポイント            |
 
 🧱 **設計原則** — サービス間呼び出しは常に Facade インターフェース経由；DO/BO/VO の三層モデルで永続化・ビジネス・API
 の形を厳密に分離；テナント分離をデータベース・キャッシュ・API パスまで一貫して適用。境界が明確で、サービスとチームの規模拡大に強い設計です。
 
-> 📖
->
-詳細なモジュール依存関係とランタイムフローについては、[モジュールと依存関係](https://pnoker.github.io/iot-dc3/architecture/modules.html)
+> 📖 完全なアーキテクチャドキュメントについては、[システムアーキテクチャ概要](https://pnoker.github.io/iot-dc3/architecture/)
 > を参照してください。
 
 ## 🛠️ 技術スタック
@@ -247,7 +257,8 @@ cp .env.example .env    # テンプレートをコピー
 | **デスクトップ**             | Tauri 2                                                     |
 | **デプロイ**               | Podman · Docker Compose                                     |
 
-> 💡 フロントエンドのソースコードは [iot-dc3-web](https://github.com/pnoker/iot-dc3-web) リポジトリにあります。
+> 💡 フロントエンドのソースコードは本リポジトリの `dc3-web/` ディレクトリにあります（旧スタンドアロンリポジトリ
+`iot-dc3-web` はアーカイブ済み）。
 
 ## 📖 ドキュメントとコミュニティ
 

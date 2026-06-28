@@ -21,6 +21,46 @@ JDK/构建工具，外加一个容器运行时。
 - **pnpm** —— 前端 `iot-dc3-web` 与 `dc3-cli` 都用 pnpm（不要用 npm/yarn）。仅做后端开发可跳过。
 - **Podman** —— 本仓库容器操作一律用 `podman`（`make` 默认 `podman compose`）。
 
+## 在 JetBrains IDEA 中开发
+
+如果你用 IntelliJ IDEA（Community 或 Ultimate），以下步骤帮你从零配好项目。
+
+### 1. 打开项目
+
+1. **File → Open**（不是 New → Project from Existing Sources）
+2. 选择仓库根目录的 `pom.xml`
+3. 弹出对话框选 **Open as Project**
+4. 等待 Maven 索引完成（右下角进度条，首次 2-5 分钟）
+
+### 2. 安装 EnvFile 插件
+
+1. **Settings → Plugins → Marketplace**，搜索 **EnvFile**，安装后重启
+2. 打开每个服务的 Run Configuration，在 **EnvFile** 标签页点击 `+`，添加 `dc3/env/dev.env`
+
+### 3. 配置运行入口
+
+打开入口类，点击 `main` 左侧绿色按钮 → **Modify Run Configuration**，在 EnvFile 标签页添加 `dc3/env/dev.env`：
+
+| 服务         | 入口类                  | 模块                              |
+|------------|----------------------|---------------------------------|
+| Gateway    | `GatewayApplication` | `dc3-gateway`                   |
+| Auth 中心    | `AuthApplication`    | `dc3-center/dc3-center-auth`    |
+| Manager 中心 | `ManagerApplication` | `dc3-center/dc3-center-manager` |
+| Data 中心    | `DataApplication`    | `dc3-center/dc3-center-data`    |
+| Agentic 中心 | `AgenticApplication` | `dc3-center/dc3-center-agentic` |
+
+### 4. 启动顺序
+
+1. **Auth 中心**（8300）→ 2. **Manager 中心**（8400）→ 3. **Data 中心**（8500）→ 4. **Agentic 中心**（8600）→ 5. **Gateway**
+   （8000）
+
+### 5. 常见问题
+
+- **Lombok 报红**：Settings → Annotation Processors → 勾选 **Enable annotation processing**
+- **Maven 索引卡住**：File → Invalidate Caches → Invalidate and Restart
+- **EnvFile 未生效**：检查 Run Configuration 的 EnvFile 标签页是否已勾选 `dev.env`
+- **端口占用**：`lsof -i :8000` 查看，在 Run Configuration 的 Environment variables 中覆盖 `SERVER_PORT`
+
 ## 为什么是这五步
 
 本地起栈的最短闭环是五步，每一步都有明确产物，下一步依赖上一步的产物：先有基础设施（容器），才能加载指向它们的环境变量；先构建出

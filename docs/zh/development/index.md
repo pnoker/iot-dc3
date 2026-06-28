@@ -128,6 +128,42 @@ docs(env): explain JetBrains IDEA environment variables
 - 提交前对照上面的格式与真实示例自查 commit message；不合规格式会被 CI 拦在合并前。
   :::
 
+## 常用 Maven 命令速查
+
+| 场景     | 命令                                                                   | 说明          |
+|--------|----------------------------------------------------------------------|-------------|
+| 全量编译   | `mvn -s .mvn/settings.xml compile`                                   | 只编译，不跑测试    |
+| 快速编译检查 | `mvn -s .mvn/settings.xml -q -DskipTests compile`                    | 安静模式，改完快速验证 |
+| 全量打包   | `mvn -s .mvn/settings.xml clean package`                             | 编译+测试+打包    |
+| 跳测试打包  | `mvn -s .mvn/settings.xml -DskipTests clean package`                 | 不跑测试        |
+| 单模块打包  | `mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-virtual package` | -pl 指定模块    |
+| 查看依赖树  | `mvn -s .mvn/settings.xml dependency:tree -pl <模块>`                  | 排查传递冲突      |
+
+::: tip 并行构建
+`.mvn/maven.config` 已配 `-T 1C`，不需要手动加。
+:::
+
+## 调试技巧
+
+### IDEA 远程调试
+
+VM options 添加 `-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005`，然后 Run → Attach to Process。
+
+建议调试端口：Gateway 5005、Auth 5006、Manager 5007、Data 5008、Agentic 5009。
+
+### 模块导航速查
+
+| 我要...         | 去这里                                     |
+|---------------|-----------------------------------------|
+| 改设备/驱动/位号业务逻辑 | `dc3-center/dc3-center-manager`         |
+| 改认证/租户/RBAC   | `dc3-center/dc3-center-auth`            |
+| 改位号值存储/命令分发   | `dc3-center/dc3-center-data`            |
+| 改 AI 对话/工具调用  | `dc3-center/dc3-center-agentic`         |
+| 改网关路由/过滤器     | `dc3-gateway`                           |
+| 新加协议驱动        | `dc3-driver/`，从 `dc3-driver-virtual` 复制 |
+| 改 gRPC proto  | `dc3-api/`，改完重新 `mvn compile`           |
+| 改前端页面         | `dc3-web/`（独立 pnpm 项目）                  |
+
 ## 延伸阅读
 
 - [领域模型](../architecture/domain-model) — DO/BO/VO 各层字段、枚举转换与 MapStruct `*Builder` 细节

@@ -1,0 +1,29 @@
+{
+  "folders": [
+    {
+      "path": "src",
+      "name": "web",
+    },
+    {
+      "path": "dc3",
+      "name": "dc3",
+    },
+    {
+      "path": ".",
+      "name": "root",
+    },
+  ],
+  "launch": {
+    "version": "2026.5.22",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder:web}",
+        "name": "yarn serve",
+        "runtimeExecutable": "yarn",
+        "runtimeArgs": ["serve"],
+      },
+    ],
+  },
+}

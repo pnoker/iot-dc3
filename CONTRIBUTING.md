@@ -44,12 +44,17 @@ See `dc3/doc/ENVIRONMENT.md` for the difference between `.env.example`, `.env`, 
 
 IoT DC3 follows a simplified Git Flow:
 
-- `develop` — integration branch. Cut `feature/<scope>` branches from `develop` and open pull requests back against `develop`. Full CI (lint / test / build / e2e) runs here.
-- `main` — production trunk. Verified work is promoted from `develop` to `main` via pull request. Each merge to `main` is a release (a tag is cut and artifacts are published).
-- `hotfix/<scope>` — cut from `main` for production fixes; open the PR back against `main` (then tag), and back-merge to `develop`.
+- `develop` — integration branch. Cut `feature/<scope>` branches from `develop` and open pull requests back against
+  `develop`. Full CI (lint / test / build / e2e) runs here.
+- `main` — production trunk. Verified work is promoted from `develop` to `main` via pull request. Each merge to `main`
+  is a release (a tag is cut and artifacts are published).
+- `hotfix/<scope>` — cut from `main` for production fixes; open the PR back against `main` (then tag), and back-merge to
+  `develop`.
 - `release` — archived (read-only). It is kept for history only; do not open pull requests against it.
 
-Use descriptive branch names such as `feature/<name>/<topic>` or `fix/<name>/<topic>`. Keep pull requests focused — avoid mixing refactors, formatting churn, and behavior changes unless they are necessary for the same fix. Reference related issues in the pull request description.
+Use descriptive branch names such as `feature/<name>/<topic>` or `fix/<name>/<topic>`. Keep pull requests focused —
+avoid mixing refactors, formatting churn, and behavior changes unless they are necessary for the same fix. Reference
+related issues in the pull request description.
 
 ## Commit Messages
 

@@ -98,7 +98,6 @@ public class ChatClientConfig {
         return ToolCallAdvisor.builder()
                 .toolCallingManager(toolCallingManager)
                 .advisorOrder(Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER + 100)
-                .streamToolCallResponses(false)
                 .build();
     }
 

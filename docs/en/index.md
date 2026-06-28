@@ -6,7 +6,7 @@ hero:
   text: An open-source distributed IoT platform built for AI scenarios
   tagline: Device connectivity, data collection, operations management, and intelligent analytics for industrial IoT. 28 multi-protocol drivers bring data up from heterogeneous devices; Spring AI lets large language models read that data and drive commands back to devices, closing the sense–decide–act–feedback loop. Distributed, multi-tenant, fully open source.
   image:
-    src: /images/hero-logo.svg
+    src: /images/logo.svg
     alt: IoT DC3
   actions:
     - theme: brand
@@ -22,31 +22,31 @@ features:
     details: Positioning, core concepts, and role-based learning paths — what it is, who it's for, and how to start.
     link: /en/introduction/
     linkText: Read the pitch
-  - icon: 📚
-    title: Foundations
-    details: The four-layer IoT technology stack — perception, network, platform, application and security — each tied back to how DC3 implements it.
-    link: /en/foundations/
-    linkText: Learn the stack
   - icon: 🏗️
     title: Architecture
     details: Service topology, data and command planes, auth and tenancy, the domain model and module map — with sequence and state diagrams.
     link: /en/architecture/
     linkText: Understand the design
   - icon: 🔌
-    title: Connectivity
+    title: Drivers
     details: 28 multi-protocol drivers for heterogeneous devices, with the onboarding flow and a driver capability matrix.
     link: /en/drivers/
-    linkText: Connect devices
-  - icon: 🧰
-    title: Operations
-    details: Data collection and read/write commands, alarms and notifications, deployment modes and registries, observability, logging and troubleshooting.
-    link: /en/operation/
-    linkText: Operate & maintain
+    linkText: Browse drivers
+  - icon: 📚
+    title: Foundations
+    details: The four-layer IoT technology stack — perception, network, platform, application and security — each tied back to how DC3 implements it.
+    link: /en/foundations/
+    linkText: Learn the stack
   - icon: 🛠️
     title: Develop
     details: Derive new drivers from the Driver SDK, API docs and testing, the dc3 CLI and AI Agent / MCP integration.
     link: /en/development/
     linkText: Start building
+  - icon: 🧰
+    title: Operations
+    details: Data collection and read/write commands, alarms and notifications, deployment modes and registries, observability, logging and troubleshooting.
+    link: /en/operation/
+    linkText: Operate & maintain
 ---
 
 ## What is IoT DC3
@@ -77,8 +77,8 @@ For how each hop works and why it's designed that way, see [Architecture](/en/ar
 - **Data, cache & scheduling**: PostgreSQL (+ TimescaleDB / AGE / pgvector) · Caffeine · MyBatis-Plus · Quartz
 - **Messaging**: RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf
 - **Security**: Spring Security · JWT · BouncyCastle
-- **Frontend**: Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6 (in the separate [
-  `iot-dc3-web`](https://github.com/pnoker/iot-dc3-web) repo)
+- **Frontend**: Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6 (source in `dc3-web/` directory of this repo;
+  the standalone `iot-dc3-web` repo is archived)
 
 ## License
 

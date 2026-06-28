@@ -1,0 +1,140 @@
+/*!
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@use '@/styles/things-dialog.scss';
+@use '@/styles/things-card.scss';
+
+// 真正的全局样式,在 main.ts 里一次性 import。
+// 不能放到 element-variables.scss 里,因为后者是 Vite additionalData,
+// 会被预置到每个 scoped <style> 块,所有选择器都会被附加 scope hash,
+// 对 body、teleport(dropdown/popover/dialog 外层)等 scope-less 元素全部失效。
+
+// 品牌主色：把 Element Plus 默认蓝（#409eff）统一为品牌蓝 #1296db。
+// 完整引入预编译 CSS，故用 CSS 变量覆盖；light-N / dark-2 取自 Element Plus 官方混色算法结果。
+:root {
+  --el-color-primary: #1296db;
+  --el-color-primary-light-3: #59b6e6;
+  --el-color-primary-light-5: #89cbed;
+  --el-color-primary-light-7: #b8e0f4;
+  --el-color-primary-light-8: #d0eaf8;
+  --el-color-primary-light-9: #e7f5fb;
+  --el-color-primary-dark-2: #0e78af;
+}
+
+body {
+  margin: 0;
+  min-width: 1280px;
+  min-height: 768px;
+}
+
+// Form width helper classes are real CSS, so they live in the one-time global
+// stylesheet. The Sass variables behind them are still injected everywhere for
+// token reuse.
+.el-select.edit-form-small,
+.el-input.edit-form-small {
+  width: $form-width-small;
+}
+
+.el-select.edit-form-medium {
+  width: $form-width-medium;
+}
+
+.el-select.edit-form-default {
+  width: $form-width-default;
+}
+
+.el-select.edit-form-special,
+.el-input.edit-form-special {
+  width: $form-width-special;
+}
+
+.el-select.edit-form-large {
+  width: $form-width-large;
+}
+
+.settings-table {
+  margin-top: 1px;
+  border-radius: 4px;
+}
+
+.json-preview {
+  max-height: 220px;
+  margin: 0;
+  padding: 8px;
+  overflow: auto;
+  border-radius: 4px;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-primary);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+// el-popconfirm 的 popper 也通过 teleport 挂到 body,作用域外样式必须放在全局。
+// Element Plus 默认 popconfirm 只按文字宽度撑开,文字 + 两个按钮常常挤在一行,
+// 视觉上又窄又紧。这里统一:
+//   1. 给 __main 设置最小宽度,保证标题有充足呼吸空间
+//   2. 标题与操作区之间留出垂直间距
+//   3. 操作区按钮之间补 gap,避免贴在一起
+//   4. 主危险按钮加粗,强调不可逆操作
+.el-popover.el-popper.el-popconfirm {
+  --el-popover-padding: 14px 16px;
+
+  .el-popconfirm__main {
+    min-width: 240px;
+    padding: 2px 0 10px;
+    line-height: 1.5;
+    align-items: flex-start;
+
+    .el-popconfirm__icon {
+      margin-top: 2px;
+      font-size: 16px;
+    }
+  }
+
+  .el-popconfirm__action {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
+
+.el-dropdown-menu {
+  // 让 emoji 国旗占一个和 el-icon 同尺寸的方格,与同级走 :icon 属性的
+  // 设置 / 关于 / 退出项在同一条基线上。em 单位跟随 dropdown-item 字号,
+  // 在高 DPI 下也保持稳定。
+  .lang-flag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    margin-right: 8px;
+    font-size: 1em;
+    line-height: 1;
+    vertical-align: -0.15em;
+  }
+
+  .lang-text {
+    margin-right: 16px;
+  }
+
+  .lang-check {
+    margin-left: auto;
+    color: var(--el-color-primary);
+  }
+}

@@ -73,7 +73,7 @@ Backend commands go through the Makefile under `iot-dc3/`. The four most common:
 ```bash
 make test                 # Unit tests (Surefire)
 make test-it              # Integration tests (Failsafe + Testcontainers; needs a container runtime)
-make test-e2e             # E2E: equivalent to DC3_E2E=true mvn -pl dc3-e2e -am -Pe2e verify
+make test-e2e             # E2E: equivalent to DC3_E2E=true mvn -s .mvn/settings.xml -pl dc3-e2e -am -Pe2e verify
 make coverage             # Aggregated JaCoCo report (dc3-coverage -am verify)
 ```
 

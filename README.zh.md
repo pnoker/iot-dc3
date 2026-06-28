@@ -2,10 +2,10 @@
   <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
 </p>
 
-> **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
+> **AI 助手：** 请先阅读 [README.ai.md](./README.ai.md) 获取 IoT DC3 的 AI 友好概述。
 
 <p align="center">
-  <img src="dc3/images/logo-blue.zh.png" width="400" alt="IoT DC3">
+  <img src="docs/public/images/logo.svg" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -51,19 +51,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="dc3/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
+      <img src="docs/public/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
       <br>
       <strong>平台首页 / 仪表盘</strong><br>
       <em>系统概览 · 设备在线统计 · 数据趋势图表</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-device.png" alt="设备管理页面" width="100%">
+      <img src="docs/public/images/screenshot-device.png" alt="设备管理页面" width="100%">
       <br>
       <strong>设备管理页面</strong><br>
       <em>设备列表 · 在线状态指示 · 搜索筛选</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
+      <img src="docs/public/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
       <br>
       <strong>AI 智能对话页面</strong><br>
       <em>自然语言操控设备 · 数据查询 · 智能分析</em>
@@ -214,19 +214,30 @@ cp .env.example .env    # 复制模板文件
 
 ## 🏗️ 架构概览
 
-![IoT DC3 架构](dc3/images/iot-dc3-architecture-zh.svg)
+### 产品架构全景
 
-| 层级      | 职责                               |
-|---------|----------------------------------|
-| **驱动层** | SDK 驱动开发，标准/私有协议设备接入，南向数据采集与命令执行 |
-| **数据层** | 设备数据采集、存储与查询，支撑实时与历史数据服务         |
-| **管理层** | 微服务协作核心：服务注册、设备/驱动管理、命令编排、配置治理   |
-| **应用层** | 数据开放、任务调度、告警消息、日志管理、第三方集成、AI 自动化 |
+![IoT DC3 产品架构全景](docs/public/images/architecture-panorama-zh.svg)
+
+六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 28 协议驱动 → 现场设备。
+PostgreSQL（TimescaleDB + pgvector + AGE）持久层与可选运维栈（ELK + Prometheus + Grafana）一并铺开。
+
+### 四层参考架构映射
+
+![IoT DC3 四层参考架构](docs/public/images/architecture-zh.svg)
+
+IoT 业界标准四层参考架构——应用层、平台层、网络层、感知层——外加贯穿四层的安全。
+
+| 层级      | IoT 参考职责                                        | DC3 落地                       |
+|---------|--------------------------------------------------|-------------------------------|
+| **应用层** | 运营 · 告警 · 数据分析 · AIoT                             | 运营中心 · Agentic 中心 · MCP       |
+| **平台层** | 设备管理 · 数据存储 · 规则与计算                               | 中心服务 · 数据平面 · TimescaleDB     |
+| **网络层** | 现场总线 · IoT 协议 · 无线广域                               | 28 协议驱动 · API 网关 · RabbitMQ  |
+| **感知层** | 传感测量 · 自动识别 · 执行器                                 | 物模型 Profile · 设备 Device · 位号 Point |
 
 🧱 **设计原则** — 跨服务调用统一经 Facade 接口；DO/BO/VO 三层模型严格分离持久化、业务与接口形态；租户隔离贯穿数据库、缓存到
 API 全链路。边界清晰，易于规模化扩展与多团队协作。
 
-> 📖 完整模块依赖关系和运行时流程请参阅 [模块与依赖](https://pnoker.github.io/iot-dc3/architecture/modules.html)。
+> 📖 完整架构文档请参阅 [系统架构总览](https://pnoker.github.io/iot-dc3/architecture/)。
 
 ## 🛠️ 技术栈
 
@@ -241,7 +252,7 @@ API 全链路。边界清晰，易于规模化扩展与多团队协作。
 | **桌面端**      | Tauri 2                                                     |
 | **部署**       | Podman · Docker Compose                                     |
 
-> 💡 前端源码位于 [iot-dc3-web](https://github.com/pnoker/iot-dc3-web) 仓库。
+> 💡 前端源码在本仓库 `dc3-web/` 目录（原独立仓库 `iot-dc3-web` 已归档）。
 
 ## 📖 文档与社区
 

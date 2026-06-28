@@ -31,7 +31,7 @@ The harness (`E2eStack`, `BaseE2eIT`) lives under `src/test/java/io/github/pnoke
 
 ```bash
 make test-e2e
-# = DC3_E2E=true mvn -B -Dmaven.test.skip=false -Dskip.unit.tests=true -pl dc3-e2e -am -Pe2e verify
+# = DC3_E2E=true mvn -s .mvn/settings.xml -B -Dmaven.test.skip=false -Dskip.unit.tests=true -pl dc3-e2e -am -Pe2e verify
 ```
 
 Requires a container runtime (`podman`) for the Testcontainers-backed dependencies provided by `dc3-common-test`.

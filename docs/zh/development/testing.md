@@ -62,7 +62,7 @@ flowchart TB
 ```bash
 make test                 # 单元测试（Surefire）
 make test-it              # 集成测试（Failsafe + Testcontainers，需容器运行时）
-make test-e2e             # E2E：等价于 DC3_E2E=true mvn -pl dc3-e2e -am -Pe2e verify
+make test-e2e             # E2E：等价于 DC3_E2E=true mvn -s .mvn/settings.xml -pl dc3-e2e -am -Pe2e verify
 make coverage             # 聚合 JaCoCo 报告（dc3-coverage -am verify）
 ```
 

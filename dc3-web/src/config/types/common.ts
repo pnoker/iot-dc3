@@ -1,0 +1,72 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/** Login information */
+export interface Login {
+  tenant?: string;
+  name?: string;
+  salt?: string;
+  password?: string;
+  token?: string;
+  newPassword?: string;
+}
+
+/** Attribute information */
+export interface Attribute {
+  id: string;
+  name: string;
+  attributeName: string;
+  attributeCode: string;
+  attributeTypeFlag?: 'STRING' | 'BYTE' | 'SHORT' | 'INT' | 'LONG' | 'FLOAT' | 'DOUBLE' | 'BOOLEAN' | string;
+  defaultValue?: string;
+  remark?: string;
+  attributeExt?: Record<string, unknown>;
+  enableFlag?: string;
+}
+
+/** Dictionary item */
+export interface Dictionary {
+  type: string;
+  label: string;
+  value: string;
+  disabled: boolean;
+  expand: boolean;
+  children: Array<Dictionary>;
+}
+
+/** Sort order for table queries */
+export interface Order {
+  column: string;
+  asc: boolean;
+}
+
+/** Pagination query shape used by all list endpoints */
+export interface PageQuery {
+  page?: {
+    total?: number;
+    size?: number;
+    current?: number;
+    orders?: Order[];
+  };
+
+  [key: string]: unknown;
+}
+
+/** Generic paginated response */
+export interface PageResult<T = unknown> {
+  total: number;
+  records: T[];
+}

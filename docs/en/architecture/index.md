@@ -22,6 +22,17 @@ diagram adapts to the site's light/dark theme.
 
 <Architecture lang="en" />
 
+## Four-Layer Reference Architecture Mapping
+
+The industry-standard IoT four-layer reference architecture — Perception, Network, Platform, Application — plus security
+as a cross-cutting concern — every DC3 component maps onto this framework. This diagram helps you quickly see where DC3
+stands on the "from sensor to AI operations" full map.
+
+<ArchitectureDiagram lang="en" />
+
+Legend colors: purple=Application · green=Platform · orange=Network · cyan=Perception · amber=Security. For a
+systematic walkthrough of the IoT four-layer reference, see IoT Technology Overview.
+
 ## Three-Layer Structure: Access, Platform, Storage & Messaging
 
 The platform isn't one monolith. It's a set of services split by responsibility. From the caller's perspective, there's

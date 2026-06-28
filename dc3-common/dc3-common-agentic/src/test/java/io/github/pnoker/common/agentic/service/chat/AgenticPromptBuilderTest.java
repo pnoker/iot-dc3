@@ -69,17 +69,19 @@ class AgenticPromptBuilderTest {
         when(chatClientFactory.getOrCreate("dc3-test-model")).thenReturn(chatClient);
         when(chatClient.prompt()).thenReturn(promptSpec);
         when(promptSpec.user(anyString())).thenReturn(promptSpec);
-        when(promptSpec.tools(any(Consumer.class))).thenReturn(promptSpec);
+        when(promptSpec.toolContext(any(Map.class))).thenReturn(promptSpec);
         when(promptSpec.advisors(any(Consumer.class))).thenReturn(promptSpec);
         when(promptSpec.system(anyString())).thenReturn(promptSpec);
     }
 
     @Test
     void buildAttachesToolCallbacksAndExplicitToolCallAdvisorWhenToolCallingIsEnabled() {
+        when(promptSpec.toolCallbacks(toolCallbackProvider)).thenReturn(promptSpec);
         when(promptSpec.advisors(toolCallAdvisor)).thenReturn(promptSpec);
 
         promptBuilder.build(prepared(true));
 
+        verify(promptSpec).toolCallbacks(toolCallbackProvider);
         verify(promptSpec).advisors(toolCallAdvisor);
     }
 
@@ -102,6 +104,7 @@ class AgenticPromptBuilderTest {
 
     @Test
     void buildAdvertisesPlatformToolsWhenToolCallingIsEnabled() {
+        when(promptSpec.toolCallbacks(toolCallbackProvider)).thenReturn(promptSpec);
         when(promptSpec.advisors(toolCallAdvisor)).thenReturn(promptSpec);
 
         promptBuilder.build(prepared(true));

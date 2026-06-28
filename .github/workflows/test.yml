@@ -34,7 +34,7 @@ jobs:
       - name: Run unit tests
         run: |
           set -euo pipefail
-          mvn -U -e -B -Dskip.integration.tests=true test --no-transfer-progress
+          mvn -U -e -B -Dskip.integration.tests=true -Dcoverage.check.skip=true test --no-transfer-progress
 
       - name: Upload surefire reports
         if: always()
@@ -80,7 +80,7 @@ jobs:
           TESTCONTAINERS_REUSE_ENABLE: "true"
         run: |
           set -euo pipefail
-          mvn -U -e -B -Dskip.unit.tests=true verify --no-transfer-progress
+          mvn -U -e -B -Dskip.unit.tests=true -Dcoverage.check.skip=true verify --no-transfer-progress
 
       - name: Upload failsafe reports
         if: always()

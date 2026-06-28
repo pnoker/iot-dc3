@@ -50,6 +50,29 @@
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-anthropic</artifactId>
         </dependency>
+        <!-- OkHttp transport for the OpenAI/Anthropic Java SDKs. spring-ai pulls only the
+             *-java-core artifacts; the com.{openai,anthropic}.client.okhttp.* classes used by
+             ChatClientFactory live in these separate client-okhttp artifacts. Keep versions in
+             sync with the *-java-core versions that spring-ai transitively provides. -->
+        <dependency>
+            <groupId>com.openai</groupId>
+            <artifactId>openai-java-client-okhttp</artifactId>
+            <version>4.39.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.anthropic</groupId>
+            <artifactId>anthropic-java-client-okhttp</artifactId>
+            <version>2.40.1</version>
+        </dependency>
+        <!-- Align victools jsonschema-module-jackson with the generator/swagger 5.0.0 that spring-ai
+             provides. openai-java-core transitively drags in module-jackson 4.38.0, which is binary
+             incompatible with generator 5.0.0 and fails at runtime with NoClassDefFoundError on
+             JacksonSchemaModule when Spring AI builds tool JSON schemas. -->
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-module-jackson</artifactId>
+            <version>5.0.0</version>
+        </dependency>
 
         <!-- DC3 Common Related -->
         <dependency>

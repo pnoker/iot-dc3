@@ -1,0 +1,110 @@
+name: Web CI
+
+on:
+  pull_request:
+    paths:
+      - dc3-web/**
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - dc3-web/**
+  workflow_dispatch:
+    inputs:
+      e2e_base_url:
+        description: 'Optional running web environment URL for Playwright e2e'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dc3-web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: dc3-web/package.json
+
+      - name: Set Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: dc3-web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint:check
+
+      - name: Type Check
+        run: pnpm run check
+
+      - name: Guardrails
+        run: pnpm run test:guard
+
+      - name: Test With Coverage
+        run: pnpm run test:ci
+
+      - name: Build
+        run: pnpm build
+
+  e2e:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.e2e_base_url != '' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dc3-web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: dc3-web/package.json
+
+      - name: Set Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: dc3-web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E
+        run: pnpm run test:e2e
+        env:
+          E2E_BASE_URL: ${{ inputs.e2e_base_url }}
+          E2E_START_SERVER: '0'
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            dc3-web/playwright-report
+            dc3-web/test-results/e2e-results.json
+            dc3-web/test-results/e2e-artifacts
+          if-no-files-found: ignore

@@ -6,7 +6,7 @@ hero:
   text: 面向 AI 场景演进的分布式工业物联网平台
   tagline: 覆盖设备接入、数据采集、运营管理与智能分析。28 个多协议驱动接入异构设备，通过 Spring AI 让大模型读写设备数据、下发命令，形成"感知—决策—执行—反馈"闭环。分布式、多租户、全开源。
   image:
-    src: /images/hero-logo.svg
+    src: /images/logo.svg
     alt: IoT DC3
   actions:
     - theme: brand
@@ -22,31 +22,31 @@ features:
     details: 平台定位、核心概念与按角色的学习路径——先懂它是什么、给谁用、怎么入门。
     link: ./introduction/
     linkText: 了解定位
-  - icon: 📚
-    title: 基础
-    details: 物联网四层技术体系——感知、网络、平台、应用与安全，每一层都接回 DC3 怎么实现。
-    link: ./foundations/
-    linkText: 读懂体系
   - icon: 🏗️
     title: 架构
     details: 服务拓扑、数据平面与命令平面、鉴权租户、领域模型与模块地图——配时序图与状态机。
     link: ./architecture/
     linkText: 读懂架构
   - icon: 🔌
-    title: 接入
+    title: 驱动
     details: 28 个多协议驱动接入异构设备，含设备接入流程与驱动能力矩阵。
     link: ./drivers/
-    linkText: 接入设备
-  - icon: 🧰
-    title: 运维
-    details: 采集与读写命令、告警通知、部署模式与镜像源、可观测性、日志与排障。
-    link: ./operation/
-    linkText: 运营运维
+    linkText: 浏览驱动
+  - icon: 📚
+    title: 基础
+    details: 物联网四层技术体系——感知、网络、平台、应用与安全，每一层都接回 DC3 怎么实现。
+    link: ./foundations/
+    linkText: 读懂体系
   - icon: 🛠️
     title: 开发
     details: 基于 Driver SDK 派生新驱动，API 文档与测试，dc3 CLI 与 AI Agent / MCP 集成。
     link: ./development/
     linkText: 开始开发
+  - icon: 🧰
+    title: 运维
+    details: 采集与读写命令、告警通知、部署模式与镜像源、可观测性、日志与排障。
+    link: ./operation/
+    linkText: 运营运维
 ---
 
 ## IoT DC3 是什么
@@ -74,8 +74,8 @@ RabbitMQ 异步解耦。
 - **数据、缓存与调度**：PostgreSQL（+ TimescaleDB / AGE / pgvector）· Caffeine · MyBatis-Plus · Quartz
 - **消息与通信**：RabbitMQ · gRPC · MQTT（Paho + EMQX）· Protobuf
 - **安全与认证**：Spring Security · JWT · BouncyCastle
-- **前端**：Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6（源码在独立 [
-  `iot-dc3-web`](https://github.com/pnoker/iot-dc3-web) 仓库）
+- **前端**：Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6（源码在本仓库 `dc3-web/` 目录，原独立仓库
+  `iot-dc3-web` 已归档）
 
 ## 开源协议
 
