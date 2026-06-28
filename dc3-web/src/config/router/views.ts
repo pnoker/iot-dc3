@@ -1,0 +1,80 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import type { RouteRecordRaw } from 'vue-router';
+
+/**
+ * Lazy-loaded layout component
+ */
+const Layout = () => import('@/components/layout/Layout.vue');
+
+/**
+ * Main view routes configuration
+ * Includes navigation menu items
+ */
+const routes: RouteRecordRaw = {
+  path: '/',
+  redirect: '/home',
+  component: Layout,
+  children: [
+    {
+      name: 'home',
+      path: '/home',
+      meta: {
+        title: 'Home',
+      },
+      component: () => import('@/views/home/Home.vue'),
+    },
+    {
+      name: 'driver',
+      path: '/driver',
+      meta: {
+        icon: 'Promotion',
+        title: 'Driver',
+      },
+      component: () => import('@/views/driver/Driver.vue'),
+    },
+    {
+      name: 'profile',
+      path: '/profile',
+      meta: {
+        icon: 'List',
+        title: 'Profile',
+      },
+      component: () => import('@/views/profile/Profile.vue'),
+    },
+    {
+      name: 'device',
+      path: '/device',
+      meta: {
+        icon: 'Management',
+        title: 'Device',
+      },
+      component: () => import('@/views/device/Device.vue'),
+    },
+    {
+      name: 'pointValue',
+      path: '/point_value',
+      meta: {
+        icon: 'Histogram',
+        title: 'Data',
+      },
+      component: () => import('@/views/point/value/PointValue.vue'),
+    },
+  ],
+};
+
+export default routes;
