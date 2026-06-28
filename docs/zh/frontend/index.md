@@ -123,7 +123,7 @@ dc3_menu 表写入 → 前端路由注册 → i18n 翻译 → 权限点绑定
 
 CI 门禁：`pnpm lint && pnpm type-check && pnpm test && pnpm build`
 
-详见 [测试调试指南](./test-debugging) 和 [测试规范](./frontend-testing-guardrails)。
+详见 [测试调试指南](./test-debugging)。
 
 ## 环境变量
 
