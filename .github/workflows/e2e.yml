@@ -43,7 +43,7 @@ jobs:
 
       - name: Upload failsafe reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-failsafe-reports
           path: dc3-e2e/target/failsafe-reports/

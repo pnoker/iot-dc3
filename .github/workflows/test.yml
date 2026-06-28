@@ -38,7 +38,7 @@ jobs:
 
       - name: Upload surefire reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: surefire-reports
           path: '**/target/surefire-reports/'
@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload jacoco unit data
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-unit-exec
           path: '**/target/jacoco.exec'
@@ -84,7 +84,7 @@ jobs:
 
       - name: Upload failsafe reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: failsafe-reports
           path: '**/target/failsafe-reports/'
@@ -93,7 +93,7 @@ jobs:
 
       - name: Upload jacoco integration data
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-it-exec
           path: '**/target/jacoco-it.exec'
@@ -138,7 +138,7 @@ jobs:
 
       - name: Upload aggregate report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-aggregate
           path: dc3-coverage/target/site/jacoco-aggregate/
