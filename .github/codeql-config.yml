@@ -1,0 +1,10 @@
+name: DC3 CodeQL Configuration
+
+paths-ignore:
+  # Protobuf-generated sources (protoc output); we do not control these files.
+  - "**/target/generated-sources/**"
+  # Third-party / vendored code
+  - "**/node_modules/**"
+
+queries:
+  - uses: security-and-quality
