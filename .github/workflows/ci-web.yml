@@ -2,10 +2,14 @@ name: Web CI
 
 on:
   pull_request:
+    paths:
+      - dc3-web/**
   push:
     branches:
       - main
       - develop
+    paths:
+      - dc3-web/**
   workflow_dispatch:
     inputs:
       e2e_base_url:
@@ -23,18 +27,24 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dc3-web
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set pnpm
         uses: pnpm/action-setup@v4
+        with:
+          package_json_file: dc3-web/package.json
 
       - name: Set Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: dc3-web/pnpm-lock.yaml
 
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -57,18 +67,24 @@ jobs:
   e2e:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.e2e_base_url != '' }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dc3-web
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set pnpm
         uses: pnpm/action-setup@v4
+        with:
+          package_json_file: dc3-web/package.json
 
       - name: Set Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: dc3-web/pnpm-lock.yaml
 
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -88,7 +104,7 @@ jobs:
         with:
           name: playwright-report
           path: |
-            playwright-report
-            test-results/e2e-results.json
-            test-results/e2e-artifacts
+            dc3-web/playwright-report
+            dc3-web/test-results/e2e-results.json
+            dc3-web/test-results/e2e-artifacts
           if-no-files-found: ignore

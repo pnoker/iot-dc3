@@ -8,13 +8,13 @@
 ## 2. Source code
 
 ```bash
-git clone https://github.com/pnoker/iot-dc3-web.git
+git clone https://github.com/pnoker/iot-dc3.git
 ```
 
 ## 3. Develop
 
 ```bash
-cd iot-dc3-web
+cd iot-dc3/dc3-web
 
 # install
 pnpm install

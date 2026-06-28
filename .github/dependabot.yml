@@ -18,6 +18,15 @@ updates:
       timezone: Asia/Shanghai
     open-pull-requests-limit: 5
 
+  - package-ecosystem: npm
+    directory: /dc3-web
+    schedule:
+      interval: weekly
+      day: monday
+      time: "03:15"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
+
   - package-ecosystem: maven
     directory: /
     schedule:

@@ -1,4 +1,4 @@
-name: Docker Image
+name: Docker Web Image
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: docker-image-${{ github.ref }}
+  group: docker-web-image-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -46,14 +46,14 @@ jobs:
             pnoker/dc3-web
             registry.cn-beijing.aliyuncs.com/dc3/dc3-web
           tags: |
-            type=match,pattern=dc3\.release\.(.*),group=1
+            type=match,pattern=v(.*),group=1
             type=raw,value=latest
 
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile
+          file: dc3-web/Dockerfile
           push: true
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.meta.outputs.tags }}

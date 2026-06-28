@@ -48,9 +48,12 @@ x-app-runtime-env: &app-runtime-env
 services:
   web:
     # Frontend follows the same DC3_IMAGE_REGISTRY switch as backend services
-    # (so `make app REGISTRY=cn` retags everything together), but keeps
-    # an independent DC3_WEB_VERSION because the UI ships on its own cadence.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-web:${DC3_WEB_VERSION:-latest}
+    # (so `make app REGISTRY=cn` retags everything together), and shares
+    # the unified DC3_VERSION for the whole monorepo.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-web:${DC3_VERSION:-latest}
+    build:
+      context: ..
+      dockerfile: dc3-web/Dockerfile
     restart: always
     depends_on:
       gateway:

@@ -1,10 +1,14 @@
-name: CI
+name: Backend CI
 
 on:
   push:
     branches: [ develop, main ]
+    paths-ignore:
+      - dc3-web/**
   pull_request:
     branches: [ develop, main ]
+    paths-ignore:
+      - dc3-web/**
 
 permissions:
   contents: read

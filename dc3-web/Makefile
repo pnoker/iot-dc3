@@ -122,7 +122,7 @@ help:
 		'make docker-down  - stop dc3 docker services' \
 		'make docker-logs  - follow dc3 web logs' \
 		'make env          - print effective Make/Compose defaults' \
-		'make tag [patch|minor|major] - create semver release tag on main'
+		'make tag [patch|minor|major] - create semver release tag (delegates to root)'
 
 env:
 	@printf 'ENV_FILE=%s\n' "$(ENV_FILE)"
@@ -237,6 +237,6 @@ docker-restart:
 	$(call dc3_compose) restart
 
 tag:
-	@bin/tag.sh $(filter-out $@,$(MAKECMDGOALS))
+	@$(MAKE) -C .. tag $(filter-out $@,$(MAKECMDGOALS))
 %:
 	@:

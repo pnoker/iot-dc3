@@ -15,6 +15,8 @@
 #
 
 # builder
+# Build context is the repository root so that dc3/dependencies/ (nginx
+# configs, SSL certs) is reachable at runtime.
 FROM pnoker/dc3-node:2025.2 AS builder
 LABEL dc3.author=pnokers
 LABEL dc3.author.email=pnokers.icloud.com
@@ -23,7 +25,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 WORKDIR /build
 
-COPY ./ ./
+COPY dc3-web/ ./
 
 RUN corepack enable && corepack prepare pnpm@11.3.0 --activate
 RUN pnpm install --frozen-lockfile
@@ -36,9 +38,9 @@ LABEL dc3.author.email=pnokers.icloud.com
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-COPY --from=builder /build/dc3/nginx/ /etc/nginx/
+COPY dc3/dependencies/nginx/ /etc/nginx/
 COPY --from=builder /build/dist/ /usr/share/nginx/html/
-COPY --from=builder /build/dc3/dependencies/conf.crt/ /etc/letsencrypt/live/
+COPY dc3/dependencies/conf.crt/ /etc/letsencrypt/live/
 
 EXPOSE 80 443
 VOLUME /var/log/nginx

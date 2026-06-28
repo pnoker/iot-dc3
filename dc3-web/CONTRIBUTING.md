@@ -72,6 +72,6 @@ IoT DC3 follows a simplified Git Flow:
 
 **Commits** follow Conventional Commits (`feat`, `fix`, `docs`, `refactor`, `test`, `chore`, …), English, specific subjects.
 
-**Releasing (tagging)**: switch to `main` and run `make tag [patch|minor|major]` (default `patch`). It creates a semver tag `vYYYY.M.P`, pushes it, and opens a GitHub Release; pushing a `v*` tag triggers the Docker image build. `bash bin/tag.sh --dry-run` previews the next tag without pushing. Tagging only runs on `main`.
+**Releasing (tagging)**: switch to `main` and run `make tag [patch|minor|major]` (default `patch`). It creates a semver tag `vYYYY.M.P`, pushes it, and opens a GitHub Release; pushing a `v*` tag triggers the Docker image build. `make tag --dry-run` previews the next tag without pushing. Tagging only runs on `main`.
 
 **External contributors**: cut feature branches from `develop` and open pull requests against `develop` (not `main` or `release`).
