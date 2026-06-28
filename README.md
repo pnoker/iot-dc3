@@ -51,19 +51,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="dc3/images/screenshot-overview.png" alt="Platform dashboard" width="100%">
+      <img src="docs/public/images/screenshot-overview.png" alt="Platform dashboard" width="100%">
       <br>
       <strong>Home / Dashboard</strong><br>
       <em>System overview · Online device metrics · Data trend charts</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-device.png" alt="Device management page" width="100%">
+      <img src="docs/public/images/screenshot-device.png" alt="Device management page" width="100%">
       <br>
       <strong>Device Management</strong><br>
       <em>Device list · Online status · Search and filtering</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-ai.png" alt="AI chat page" width="100%">
+      <img src="docs/public/images/screenshot-ai.png" alt="AI chat page" width="100%">
       <br>
       <strong>AI Chat</strong><br>
       <em>Natural-language device operations · Data queries · Intelligent analysis</em>
@@ -220,7 +220,7 @@ the [environment documentation](https://pnoker.github.io/iot-dc3/quickstart/envi
 
 ## 🏗️ Architecture Overview
 
-![IoT DC3 Architecture](dc3/images/iot-dc3-architecture-en.svg)
+![IoT DC3 Architecture](docs/public/images/architecture-en.svg)
 
 | Layer                 | Responsibilities                                                                                                                 |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------|

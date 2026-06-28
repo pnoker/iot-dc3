@@ -51,19 +51,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="dc3/images/screenshot-overview.png" alt="プラットフォームダッシュボード" width="100%">
+      <img src="docs/public/images/screenshot-overview.png" alt="プラットフォームダッシュボード" width="100%">
       <br>
       <strong>ホーム / ダッシュボード</strong><br>
       <em>システム概要 · デバイスオンライン統計 · データトレンドチャート</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-device.png" alt="デバイス管理ページ" width="100%">
+      <img src="docs/public/images/screenshot-device.png" alt="デバイス管理ページ" width="100%">
       <br>
       <strong>デバイス管理</strong><br>
       <em>デバイス一覧 · オンライン状態 · 検索とフィルタ</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-ai.png" alt="AI チャットページ" width="100%">
+      <img src="docs/public/images/screenshot-ai.png" alt="AI チャットページ" width="100%">
       <br>
       <strong>AI チャット</strong><br>
       <em>自然言語によるデバイス操作 · データクエリ · インテリジェント分析</em>
@@ -217,7 +217,7 @@ cp .env.example .env    # テンプレートをコピー
 
 ## 🏗️ アーキテクチャ概要
 
-![IoT DC3 Architecture](dc3/images/iot-dc3-architecture-ja.svg)
+![IoT DC3 Architecture](docs/public/images/architecture-ja.svg)
 
 | 層             | 役割                                                 |
 |---------------|----------------------------------------------------|

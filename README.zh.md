@@ -51,19 +51,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="dc3/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
+      <img src="docs/public/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
       <br>
       <strong>平台首页 / 仪表盘</strong><br>
       <em>系统概览 · 设备在线统计 · 数据趋势图表</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-device.png" alt="设备管理页面" width="100%">
+      <img src="docs/public/images/screenshot-device.png" alt="设备管理页面" width="100%">
       <br>
       <strong>设备管理页面</strong><br>
       <em>设备列表 · 在线状态指示 · 搜索筛选</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
+      <img src="docs/public/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
       <br>
       <strong>AI 智能对话页面</strong><br>
       <em>自然语言操控设备 · 数据查询 · 智能分析</em>
@@ -214,7 +214,7 @@ cp .env.example .env    # 复制模板文件
 
 ## 🏗️ 架构概览
 
-![IoT DC3 架构](dc3/images/iot-dc3-architecture-zh.svg)
+![IoT DC3 架构](docs/public/images/architecture-zh.svg)
 
 | 层级      | 职责                               |
 |---------|----------------------------------|

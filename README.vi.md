@@ -51,19 +51,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="dc3/images/screenshot-overview.png" alt="Dashboard nền tảng" width="100%">
+      <img src="docs/public/images/screenshot-overview.png" alt="Dashboard nền tảng" width="100%">
       <br>
       <strong>Trang chủ / Dashboard</strong><br>
       <em>Tổng quan hệ thống · Thống kê thiết bị online · Biểu đồ xu hướng dữ liệu</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-device.png" alt="Trang quản lý thiết bị" width="100%">
+      <img src="docs/public/images/screenshot-device.png" alt="Trang quản lý thiết bị" width="100%">
       <br>
       <strong>Quản lý thiết bị</strong><br>
       <em>Danh sách thiết bị · Trạng thái online · Tìm kiếm và lọc</em>
     </td>
     <td align="center">
-      <img src="dc3/images/screenshot-ai.png" alt="Trang trò chuyện AI" width="100%">
+      <img src="docs/public/images/screenshot-ai.png" alt="Trang trò chuyện AI" width="100%">
       <br>
       <strong>Trò chuyện AI</strong><br>
       <em>Điều khiển thiết bị bằng ngôn ngữ tự nhiên · Truy vấn dữ liệu · Phân tích thông minh</em>
@@ -220,7 +220,7 @@ Xem [tài liệu biến môi trường](https://pnoker.github.io/iot-dc3/quickst
 
 ## 🏗️ Tổng quan kiến trúc
 
-![IoT DC3 Architecture](dc3/images/iot-dc3-architecture-vi.svg)
+![IoT DC3 Architecture](docs/public/images/architecture-vi.svg)
 
 | Tầng              | Trách nhiệm                                                                                                              |
 |-------------------|--------------------------------------------------------------------------------------------------------------------------|
