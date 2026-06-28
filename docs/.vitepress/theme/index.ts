@@ -16,8 +16,10 @@
  */
 
 import type {Theme} from 'vitepress'
-import {h} from 'vue'
+import {h, onMounted} from 'vue'
 import DefaultTheme from 'vitepress/theme'
+import mediumZoom from 'medium-zoom'
+import 'medium-zoom/dist/style.css'
 import './style.css'
 import Architecture from './components/Architecture.vue'
 import DataPlane from './components/DataPlane.vue'
@@ -45,6 +47,15 @@ const theme: Theme = {
         return h(DefaultTheme.Layout, null, {
             'home-hero-before': () => [h(HeroWaves), h(HeroParticles)],
             'home-hero-image': () => h(HeroLogo)
+        })
+    },
+
+    setup() {
+        onMounted(() => {
+            mediumZoom('.vp-doc img:not(.no-zoom):not(.dc3-diagram img):not(.dc3-mermaid img)', {
+                background: 'rgba(0, 0, 0, 0.78)',
+                margin: 24
+            })
         })
     },
 

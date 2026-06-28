@@ -300,16 +300,30 @@ body {
 
 .vp-doc div[class*='language-'] {
     border: 1px solid color-mix(in srgb, var(--vp-c-divider) 70%, transparent);
+    border-left: 4px solid var(--vp-c-brand-2);
     border-radius: 8px;
+    background: var(--vp-code-block-bg);
     box-shadow: 0 12px 28px rgba(12, 24, 40, 0.14);
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Fira Mono', 'Roboto Mono', Menlo, Monaco, 'Courier New', monospace;
+}
+
+.vp-doc div[class*='language-'] pre {
+    font-family: inherit;
+}
+
+.vp-doc div[class*='language-'] code {
+    font-family: inherit;
 }
 
 .vp-doc :not(pre) > code {
-    border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 20%, var(--vp-c-divider));
+    border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 24%, var(--vp-c-divider));
     border-radius: 5px;
-    background: color-mix(in srgb, var(--vp-c-brand-soft) 65%, transparent);
+    padding: 2px 7px;
+    background: color-mix(in srgb, var(--vp-c-brand-soft) 50%, transparent);
     color: var(--vp-c-brand-1);
-    font-weight: 620;
+    font-size: 0.9em;
+    font-weight: 560;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Fira Mono', 'Roboto Mono', Menlo, Monaco, 'Courier New', monospace;
 }
 
 /* Mermaid technical illustrations: a container consistent with the site's cards/tables — centered, horizontally scrollable, theme-aware */
