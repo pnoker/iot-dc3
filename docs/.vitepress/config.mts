@@ -17,400 +17,198 @@
 
 import {defineConfig} from 'vitepress'
 import {withMermaid} from 'vitepress-plugin-mermaid'
+import {t, Lang} from './i18n'
 
-// ── Site information architecture: pillar model (5 pillars + community; the "Foundations" pillar will be inserted at slot ② in P1) ──
-// A pillar may own multiple legacy directory prefixes (paths) and share a single sidebar; Entry: [code, zh, English].
-// code = language-relative path: a single segment is treated as a directory index (→ '/<lang>/<code>/'), multiple segments as a specific page (→ '/<lang>/<code>').
-type Entry = readonly [string, string, string]
-type Group = { zh: string; en: string; items: ReadonlyArray<Entry> }
+// ── i18n via locales/{lang}.json ──
+// All user-facing strings are resolved through t(lang, key).
+// Adding a language: create locales/<lang>.json, add to Lang type and VitePress locales block.
+// Entry: [code] — code doubles as the i18n key. Code = language-relative path; single segment → directory index.
+type Entry = readonly [string]
+type Group = { key?: string; items: ReadonlyArray<Entry> }   // key omitted → pinned title-less group
 type Pillar = {
-    navZh: string
-    navEn: string
-    landing: string                       // landing page code for the nav-bar link
-    paths: ReadonlyArray<string>          // sidebar path prefixes owned by this pillar (multiple paths share one sidebar)
-    activeMatch?: string                  // nav highlight regex for cross-directory pillars (matches the locale-prefixed path)
-    groups: ReadonlyArray<Group>          // sidebar groups; an empty group title → pinned, title-less single column
+    navKey: string
+    landing: string
+    paths: ReadonlyArray<string>
+    activeMatch?: string
+    groups: ReadonlyArray<Group>
 }
 
 // Pillar order: 总览 → 架构 → 驱动 → 基础 → 开发 → 运维 (after nav 首页)
 const PILLARS: ReadonlyArray<Pillar> = [
-    {   // ① 总览
-        navZh: '总览', navEn: 'Overview', landing: 'introduction',
+    {   // ①
+        navKey: 'pillar.overview', landing: 'introduction',
         paths: ['introduction', 'quickstart'], activeMatch: '^/(zh|en)/(introduction|quickstart)/',
         groups: [
-            {
-                zh: '', en: '', items: [
-                    ['introduction', '总览', 'Overview'],
-                    ['introduction/concepts', '核心概念', 'Core Concepts'],
-                    ['introduction/paths', '按角色选择路径', 'Choose Your Path']
-                ]
-            },
-            {
-                zh: '对象与数据', en: 'Objects & Data', items: [
-                    ['introduction/concepts/profile', '物模型', 'Profile'],
-                    ['introduction/concepts/device', '设备', 'Device'],
-                    ['introduction/concepts/driver', '驱动', 'Driver'],
-                    ['introduction/concepts/point', '位号', 'Point'],
-                    ['introduction/concepts/point-value', '位号值', 'Point Value']
-                ]
-            },
-            {
-                zh: '能力与边界', en: 'Capabilities & Boundaries', items: [
-                    ['introduction/concepts/command', '指令', 'Command'],
-                    ['introduction/concepts/event', '事件', 'Event'],
-                    ['introduction/concepts/attribute-config', '属性与配置', 'Attribute & Config'],
-                    ['introduction/concepts/tenant', '租户', 'Tenant']
-                ]
-            },
-            {
-                zh: '快速开始', en: 'Quick Start', items: [
-                    ['quickstart', '本地开发', 'Local Development'],
-                    ['quickstart/environment', '环境变量', 'Environment Variables'],
-                    ['quickstart/first-device', '第一个设备', 'First Device']
-                ]
-            },
-            {
-                zh: '附录', en: 'Appendix', items: [
-                    ['introduction/glossary', '术语表', 'Glossary'],
-                    ['introduction/license', '开源与许可', 'License']
-                ]
-            }
+            {key: '', items: [['introduction'], ['introduction/concepts'], ['introduction/paths']]},
+            {key: 'group.objects-data', items: [['introduction/concepts/profile'], ['introduction/concepts/device'], ['introduction/concepts/driver'], ['introduction/concepts/point'], ['introduction/concepts/point-value']]},
+            {key: 'group.capabilities-boundaries', items: [['introduction/concepts/command'], ['introduction/concepts/event'], ['introduction/concepts/attribute-config'], ['introduction/concepts/tenant']]},
+            {key: 'group.quickstart', items: [['quickstart'], ['quickstart/environment'], ['quickstart/first-device']]},
+            {key: 'group.appendix', items: [['introduction/glossary'], ['introduction/license']]}
         ]
     },
-
-    {   // ② 架构
-        navZh: '架构', navEn: 'Architecture', landing: 'architecture',
+    {   // ②
+        navKey: 'pillar.architecture', landing: 'architecture',
         paths: ['architecture', 'modules'], activeMatch: '^/(zh|en)/(architecture|modules)/',
         groups: [
-            {
-                zh: '', en: '', items: [
-                    ['architecture', '总览', 'Overview']
-                ]
-            },
-            {
-                zh: '服务与协作', en: 'Services & Collaboration', items: [
-                    ['architecture/services', '服务与拓扑', 'Services & Topology'],
-                    ['architecture/facade-modes', 'Facade 模式', 'Facade Modes']
-                ]
-            },
-            {
-                zh: '链路与模型', en: 'Pipelines & Model', items: [
-                    ['architecture/data-plane', '数据平面', 'Data Plane'],
-                    ['architecture/command-plane', '命令平面', 'Command Plane'],
-                    ['architecture/auth-rbac', '鉴权 · 租户 · RBAC', 'Auth, Tenant & RBAC'],
-                    ['architecture/domain-model', '领域模型', 'Domain Model']
-                ]
-            },
-            {
-                zh: '模块', en: 'Modules', items: [
-                    ['architecture/modules', '模块地图', 'Module Map'],
-                    ['modules', '模块清单', 'Catalog']
-                ]
-            }
+            {key: '', items: [['architecture']]},
+            {key: 'group.services-collab', items: [['architecture/services'], ['architecture/facade-modes']]},
+            {key: 'group.pipelines-model', items: [['architecture/data-plane'], ['architecture/command-plane'], ['architecture/auth-rbac'], ['architecture/domain-model']]},
+            {key: 'group.modules', items: [['architecture/modules'], ['modules']]}
         ]
     },
-
-    {   // ③ 驱动
-        navZh: '驱动', navEn: 'Drivers', landing: 'drivers',
+    {   // ③
+        navKey: 'pillar.drivers', landing: 'drivers',
         paths: ['drivers', 'operation/device-onboarding'],
         activeMatch: '^/(zh|en)/(drivers/|operation/device-onboarding)',
         groups: [
-            {
-                zh: '接入指南', en: 'Onboarding', items: [
-                    ['drivers', '驱动总览', 'Drivers'],
-                    ['operation/device-onboarding', '设备接入流程', 'Device Onboarding']
-                ]
-            },
-            {
-                zh: '工业总线 / PLC', en: 'Industrial Bus / PLC', items: [
-                    ['drivers/modbus-tcp', 'Modbus TCP', 'Modbus TCP'],
-                    ['drivers/modbus-rtu', 'Modbus RTU', 'Modbus RTU'],
-                    ['drivers/opc-ua', 'OPC UA', 'OPC UA'],
-                    ['drivers/opc-da', 'OPC DA', 'OPC DA'],
-                    ['drivers/plcs7', 'S7 (Siemens)', 'S7 (Siemens)'],
-                    ['drivers/melsec', 'MELSEC', 'MELSEC'],
-                    ['drivers/fins', 'FINS (Omron)', 'FINS (Omron)'],
-                    ['drivers/ethernet-ip', 'EtherNet/IP', 'EtherNet/IP']
-                ]
-            },
-            {
-                zh: 'SCADA / 电力 / 计量', en: 'SCADA / Power / Metering', items: [
-                    ['drivers/bacnet-ip', 'BACnet/IP', 'BACnet/IP'],
-                    ['drivers/iec104', 'IEC 104', 'IEC 104'],
-                    ['drivers/dlms', 'DLMS', 'DLMS'],
-                    ['drivers/sl651', 'SL651', 'SL651'],
-                    ['drivers/snmp', 'SNMP', 'SNMP']
-                ]
-            },
-            {
-                zh: '物联网 / 无线', en: 'IoT / Wireless', items: [
-                    ['drivers/mqtt', 'MQTT', 'MQTT'],
-                    ['drivers/coap', 'CoAP', 'CoAP'],
-                    ['drivers/lwm2m', 'LwM2M', 'LwM2M'],
-                    ['drivers/http', 'HTTP', 'HTTP'],
-                    ['drivers/ble', 'BLE', 'BLE'],
-                    ['drivers/zigbee', 'Zigbee', 'Zigbee'],
-                    ['drivers/can', 'CAN', 'CAN']
-                ]
-            },
-            {
-                zh: '串口 / 通用网络', en: 'Serial / Generic Network', items: [
-                    ['drivers/serial', '串口 Serial', 'Serial'],
-                    ['drivers/tcp-udp', 'TCP/UDP', 'TCP/UDP']
-                ]
-            },
-            {
-                zh: '数据库', en: 'Database', items: [
-                    ['drivers/mysql', 'MySQL', 'MySQL'],
-                    ['drivers/postgresql', 'PostgreSQL', 'PostgreSQL'],
-                    ['drivers/oracle', 'Oracle', 'Oracle'],
-                    ['drivers/sqlserver', 'SQL Server', 'SQL Server']
-                ]
-            },
-            {
-                zh: '虚拟 / 测试', en: 'Virtual / Testing', items: [
-                    ['drivers/virtual', '虚拟 Virtual', 'Virtual'],
-                    ['drivers/listening-virtual', '监听虚拟', 'Listening Virtual']
-                ]
-            },
-            {
-                zh: '附录', en: 'Appendix', items: [
-                    ['drivers/matrix', '驱动能力矩阵', 'Driver Capability Matrix']
-                ]
-            }
+            {key: 'group.onboarding', items: [['drivers'], ['operation/device-onboarding']]},
+            {key: 'group.industrial-bus', items: [['drivers/modbus-tcp'], ['drivers/modbus-rtu'], ['drivers/opc-ua'], ['drivers/opc-da'], ['drivers/plcs7'], ['drivers/melsec'], ['drivers/fins'], ['drivers/ethernet-ip']]},
+            {key: 'group.scada-power', items: [['drivers/bacnet-ip'], ['drivers/iec104'], ['drivers/dlms'], ['drivers/sl651'], ['drivers/snmp']]},
+            {key: 'group.iot-wireless', items: [['drivers/mqtt'], ['drivers/coap'], ['drivers/lwm2m'], ['drivers/http'], ['drivers/ble'], ['drivers/zigbee'], ['drivers/can']]},
+            {key: 'group.serial-network', items: [['drivers/serial'], ['drivers/tcp-udp']]},
+            {key: 'group.database', items: [['drivers/mysql'], ['drivers/postgresql'], ['drivers/oracle'], ['drivers/sqlserver']]},
+            {key: 'group.virtual-test', items: [['drivers/virtual'], ['drivers/listening-virtual']]},
+            {key: 'group.appendix-drivers', items: [['drivers/matrix']]}
         ]
     },
-
-    {   // ④ 基础
-        navZh: '基础', navEn: 'Foundations', landing: 'foundations',
+    {   // ④
+        navKey: 'pillar.foundations', landing: 'foundations',
         paths: ['foundations'], activeMatch: '^/(zh|en)/foundations/',
         groups: [
-            {
-                zh: '', en: '', items: [
-                    ['foundations', '物联网技术总览', 'IoT Technology Overview']
-                ]
-            },
-            {
-                zh: '感知层', en: 'Perception', items: [
-                    ['foundations/sensing', '传感与测量', 'Sensing & Measurement'],
-                    ['foundations/identification', '自动识别与定位', 'Auto-ID & Positioning']
-                ]
-            },
-            {
-                zh: '网络层', en: 'Network', items: [
-                    ['foundations/fieldbus', '工业总线与协议', 'Industrial Buses & Protocols'],
-                    ['foundations/iot-protocols', 'IoT 协议与无线网络', 'IoT Protocols & Wireless']
-                ]
-            },
-            {
-                zh: '平台层', en: 'Platform', items: [
-                    ['foundations/edge-cloud', '边缘与云架构', 'Edge & Cloud Architecture'],
-                    ['foundations/data-pipeline', '时序数据与流处理', 'Time-Series & Streaming']
-                ]
-            },
-            {
-                zh: '应用层', en: 'Application', items: [
-                    ['foundations/aiot', '数据智能与 AIoT', 'Data Intelligence & AIoT']
-                ]
-            },
-            {
-                zh: '安全', en: 'Security', items: [
-                    ['foundations/security', '物联网安全', 'IoT Security']
-                ]
-            }
+            {key: '', items: [['foundations']]},
+            {key: 'group.perception', items: [['foundations/sensing'], ['foundations/identification']]},
+            {key: 'group.network', items: [['foundations/fieldbus'], ['foundations/iot-protocols']]},
+            {key: 'group.platform', items: [['foundations/edge-cloud'], ['foundations/data-pipeline']]},
+            {key: 'group.application', items: [['foundations/aiot']]},
+            {key: 'group.security', items: [['foundations/security']]}
         ]
     },
-
-    {   // ⑤ 开发
-        navZh: '开发', navEn: 'Develop', landing: 'development',
+    {   // ⑤
+        navKey: 'pillar.develop', landing: 'development',
         paths: ['development', 'frontend', 'ai', 'automation'], activeMatch: '^/(zh|en)/(development|frontend|ai|automation)/',
         groups: [
-            {
-                zh: '开发', en: 'Development', items: [
-                    ['development', '概览', 'Overview'],
-                    ['development/driver-authoring', '驱动开发', 'Driver Authoring'],
-                    ['development/api-documentation', 'API 文档', 'API Documentation'],
-                    ['development/testing', '测试', 'Testing'],
-                    ['development/changelog', '变更日志', 'Changelog']
-                ]
-            },
-            {
-                zh: 'AI 集成', en: 'AI Integration', items: [
-                    ['ai', 'AI 概览', 'AI Overview'],
-                    ['ai/agentic', 'Agentic 中心', 'Agentic Center'],
-                    ['ai/mcp', 'AI Agent / MCP', 'AI Agent / MCP']
-                ]
-            },
-            {
-                zh: '前端', en: 'Frontend', items: [
-                    ['frontend', '前端开发指南', 'Frontend Guide'],
-                    ['frontend/test-debugging', '测试调试 FAQ', 'Test Debugging FAQ']
-                ]
-            },
-            {
-                zh: '自动化', en: 'Automation', items: [
-                    ['automation/cli', 'CLI 使用指南', 'CLI Guide']
-                ]
-            }
+            {key: 'group.development', items: [['development'], ['development/driver-authoring'], ['development/api-documentation'], ['development/testing'], ['development/changelog']]},
+            {key: 'group.ai-integration', items: [['ai'], ['ai/agentic'], ['ai/mcp']]},
+            {key: 'group.frontend', items: [['frontend'], ['frontend/test-debugging']]},
+            {key: 'group.automation', items: [['automation/cli']]}
         ]
     },
-
-    {   // ⑥ 运维
-        navZh: '运维', navEn: 'Operations', landing: 'operation',
+    {   // ⑥
+        navKey: 'pillar.operations', landing: 'operation',
         paths: ['operation', 'guide'], activeMatch: '^/(zh|en)/(operation|guide)/',
         groups: [
-            {
-                zh: '运营', en: 'Operations', items: [
-                    ['operation', '概览', 'Overview'],
-                    ['operation/data-commands', '数据与命令', 'Data & Commands'],
-                    ['operation/alarms', '告警与通知', 'Alarms & Notifications']
-                ]
-            },
-            {
-                zh: '部署与运维', en: 'Deployment & Ops', items: [
-                    ['guide/usage', '部署模式与镜像源', 'Deployment & Images'],
-                    ['guide/observability', '可观测性', 'Observability'],
-                    ['guide/logging', '日志规范', 'Logging'],
-                    ['guide/troubleshooting', '故障排查', 'Troubleshooting']
-                ]
-            }
+            {key: 'group.operations', items: [['operation'], ['operation/data-commands'], ['operation/alarms']]},
+            {key: 'group.deploy-ops', items: [['guide/usage'], ['guide/observability'], ['guide/logging'], ['guide/troubleshooting']]}
         ]
     }
 ]
 
-// Community: only a nav dropdown + its own sidebar, not counted as a pillar
 const COMMUNITY: ReadonlyArray<Entry> = [
-    ['community/contributing', '贡献指南', 'Contributing'],
-    ['community/code-of-conduct', '行为准则', 'Code of Conduct'],
-    ['community/security', '安全策略', 'Security'],
-    ['community/faq', '常见问题', 'FAQ']
+    ['community/contributing'],
+    ['community/code-of-conduct'],
+    ['community/security'],
+    ['community/faq']
 ]
 
-type Lang = 'zh' | 'en'
 type SidebarItem = { text: string; link: string }
 type SidebarGroup = { text: string; collapsed?: boolean; items: SidebarItem[] }
 
-// single-segment code → directory index (trailing slash hits index.md); multi-segment code → specific page
 const linkOf = (lang: Lang, code: string) => {
     const p = lang === 'en' ? '/en' : '/zh'
     return code.includes('/') ? `${p}/${code}` : `${p}/${code}/`
 }
 
 const itemsOf = (lang: Lang, entries: ReadonlyArray<Entry>): SidebarItem[] =>
-    entries.map(([code, zh, en]) => ({text: lang === 'en' ? en : zh, link: linkOf(lang, code)}))
+    entries.map(([code]) => ({text: t(lang, code), link: linkOf(lang, code)}))
 
 function buildSidebar(lang: Lang) {
     const p = lang === 'en' ? '/en' : '/zh'
     const sidebar: Record<string, SidebarGroup[]> = {}
     for (const pillar of PILLARS) {
         const groups: SidebarGroup[] = pillar.groups.map(g => {
-            const text = lang === 'en' ? g.en : g.zh
+            const title = g.key ? t(lang, g.key) : ''
             const items = itemsOf(lang, g.items)
-            return text ? {text, collapsed: false, items} : {text: '', items}
+            return title ? {text: title, collapsed: false, items} : {text: '', items}
         })
-        // multiple paths share one sidebar; specific-page paths (multi-segment) register as longer keys, longest prefix wins
         for (const path of pillar.paths) {
-            const key = path.includes('/') ? `${p}/${path}` : `${p}/${path}/`
-            sidebar[key] = groups
+            const k = path.includes('/') ? `${p}/${path}` : `${p}/${path}/`
+            sidebar[k] = groups
         }
     }
-    sidebar[`${p}/community/`] = [{
-        text: lang === 'en' ? 'Community' : '社区',
-        items: itemsOf(lang, COMMUNITY)
-    }]
+    sidebar[`${p}/community/`] = [{text: t(lang, 'community'), items: itemsOf(lang, COMMUNITY)}]
     return sidebar
 }
 
 function buildNav(lang: Lang) {
     const p = lang === 'en' ? '/en' : '/zh'
-    const t = lang === 'en'
     const pillars = PILLARS.map(pillar => ({
-        text: t ? pillar.navEn : pillar.navZh,
+        text: t(lang, pillar.navKey),
         link: linkOf(lang, pillar.landing),
         ...(pillar.activeMatch ? {activeMatch: pillar.activeMatch} : {})
     }))
     return [
-        {text: t ? 'Home' : '首页', link: `${p}/`},
+        {text: lang === 'en' ? 'Home' : '首页', link: `${p}/`},
         ...pillars,
-        {text: t ? 'Community' : '社区', items: itemsOf(lang, COMMUNITY)}
+        {text: t(lang, 'community'), items: itemsOf(lang, COMMUNITY)}
     ]
 }
 
 function uiLabels(lang: Lang) {
-    if (lang === 'en') {
-        return {
-            editLinkText: 'Edit this page on GitHub',
-            outlineLabel: 'On this page',
-            lastUpdatedText: 'Last updated',
-            returnToTop: 'Back to top',
-            sidebarMenu: 'Menu',
-            darkModeSwitch: 'Appearance',
-            lightModeSwitchTitle: 'Switch to light theme',
-            darkModeSwitchTitle: 'Switch to dark theme',
-            docFooterPrev: 'Previous',
-            docFooterNext: 'Next',
-            searchButtonText: 'Search',
-            searchButtonAria: 'Search',
-            searchNoResults: 'No results found',
-            searchReset: 'Reset query',
-            searchSelect: 'Select',
-            searchNavigate: 'Switch',
-            searchClose: 'Close'
-        }
-    }
     return {
-        editLinkText: '在 GitHub 上编辑此页',
-        outlineLabel: '页面导航',
-        lastUpdatedText: '最后更新于',
-        returnToTop: '回到顶部',
-        sidebarMenu: '菜单',
-        darkModeSwitch: '主题',
-        lightModeSwitchTitle: '切换到浅色模式',
-        darkModeSwitchTitle: '切换到深色模式',
-        docFooterPrev: '上一页',
-        docFooterNext: '下一页',
-        searchButtonText: '搜索文档',
-        searchButtonAria: '搜索文档',
-        searchNoResults: '无法找到相关结果',
-        searchReset: '清除查询条件',
-        searchSelect: '选择',
-        searchNavigate: '切换',
-        searchClose: '关闭'
+        editLinkText: t(lang, 'ui.editLinkText'),
+        outlineLabel: t(lang, 'ui.outlineLabel'),
+        lastUpdatedText: t(lang, 'ui.lastUpdatedText'),
+        returnToTop: t(lang, 'ui.returnToTop'),
+        sidebarMenu: t(lang, 'ui.sidebarMenu'),
+        darkModeSwitch: t(lang, 'ui.darkModeSwitch'),
+        lightModeSwitchTitle: t(lang, 'ui.lightModeSwitchTitle'),
+        darkModeSwitchTitle: t(lang, 'ui.darkModeSwitchTitle'),
+        docFooterPrev: t(lang, 'ui.docFooterPrev'),
+        docFooterNext: t(lang, 'ui.docFooterNext'),
+        searchButtonText: t(lang, 'ui.searchButtonText'),
+        searchButtonAria: t(lang, 'ui.searchButtonAria'),
+        searchNoResults: t(lang, 'ui.searchNoResults'),
+        searchReset: t(lang, 'ui.searchReset'),
+        searchSelect: t(lang, 'ui.searchSelect'),
+        searchNavigate: t(lang, 'ui.searchNavigate'),
+        searchClose: t(lang, 'ui.searchClose'),
+        footerMessage: t(lang, 'ui.footerMessage')
     }
 }
 
 function localeThemeConfig(lang: Lang) {
-    const t = uiLabels(lang)
+    const u = uiLabels(lang)
     return {
         nav: buildNav(lang),
         sidebar: buildSidebar(lang),
-        editLink: {text: t.editLinkText},
-        outline: {level: [2, 3], label: t.outlineLabel},
+        editLink: {text: u.editLinkText},
+        footer: {message: u.footerMessage, copyright: 'Copyright © 2017-2026 pnoker'},
+        outline: {level: [2, 3], label: u.outlineLabel},
         lastUpdated: {
-            text: t.lastUpdatedText,
+            text: u.lastUpdatedText,
             formatOptions: {dateStyle: 'short', timeStyle: 'medium'}
         },
-        docFooter: {prev: t.docFooterPrev, next: t.docFooterNext},
-        returnToTopLabel: t.returnToTop,
-        sidebarMenuLabel: t.sidebarMenu,
-        darkModeSwitchLabel: t.darkModeSwitch,
-        lightModeSwitchTitle: t.lightModeSwitchTitle,
-        darkModeSwitchTitle: t.darkModeSwitchTitle,
+        docFooter: {prev: u.docFooterPrev, next: u.docFooterNext},
+        returnToTopLabel: u.returnToTop,
+        sidebarMenuLabel: u.sidebarMenu,
+        darkModeSwitchLabel: u.darkModeSwitch,
+        lightModeSwitchTitle: u.lightModeSwitchTitle,
+        darkModeSwitchTitle: u.darkModeSwitchTitle,
         search: {
             provider: 'local',
             options: {
                 translations: {
                     button: {
-                        buttonText: t.searchButtonText,
-                        buttonAriaLabel: t.searchButtonAria
+                        buttonText: u.searchButtonText,
+                        buttonAriaLabel: u.searchButtonAria
                     },
                     modal: {
-                        noResultsText: t.searchNoResults,
-                        resetButtonTitle: t.searchReset,
+                        noResultsText: u.searchNoResults,
+                        resetButtonTitle: u.searchReset,
                         footer: {
-                            selectText: t.searchSelect,
-                            navigateText: t.searchNavigate,
-                            closeText: t.searchClose
+                            selectText: u.searchSelect,
+                            navigateText: u.searchNavigate,
+                            closeText: u.searchClose
                         }
                     }
                 }
@@ -507,16 +305,11 @@ export default withMermaid(defineConfig({
         socialLinks: [
             {icon: 'github', link: 'https://github.com/pnoker/iot-dc3'},
             {icon: 'gitee', link: 'https://gitee.com/pnoker/iot-dc3'},
-            {icon: 'x', link: 'https://x.com/pnoker'}
+            {icon: 'x', link: 'https://x.com/IoTDC3'}
         ],
 
         editLink: {
             pattern: 'https://github.com/pnoker/iot-dc3/edit/release/docs/:path'
-        },
-
-        footer: {
-            message: 'Released under the AGPL-3.0 License · 基于 AGPL-3.0 协议发布',
-            copyright: 'Copyright © 2017-2026 pnoker'
         }
     },
 
