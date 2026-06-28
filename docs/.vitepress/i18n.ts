@@ -13,7 +13,7 @@ import en from '../locales/en.json'
 
 export type Lang = 'zh' | 'en'
 
-const bundles: Record<Lang, Record<string, string>> = { zh, en }
+const bundles: Record<Lang, Record<string, string>> = {zh, en}
 
 /** Resolve a translation key for the given language. Falls back to zh if key or lang is missing. */
 export function t(lang: Lang, key: string): string {

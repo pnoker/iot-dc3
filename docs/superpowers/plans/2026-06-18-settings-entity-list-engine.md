@@ -198,9 +198,9 @@ export interface EntityListConfig {
 - `openEdit`：以 `defaultForm()` 为底，按 `fields` 覆盖 `row` 值，写入 `id`/`version`。
 - `openDetail`：`config.detail` 存在则 `router.push({ name: config.detail.routeName, query: { id: String(row.id) } })`。
 - `formatCell(row, column)`：
-  - 取值支持点路径（`column.prop.split('.').reduce(...)`）。
-  - `column.formatter` 优先（传 `{ t, relations }`）。
-  - `kind==='time'`→`timestampLabel`；`kind==='tag'`→`optionLabel(column.options, value)`；空→`'-'`；余→`String`。
+    - 取值支持点路径（`column.prop.split('.').reduce(...)`）。
+    - `column.formatter` 优先（传 `{ t, relations }`）。
+    - `kind==='time'`→`timestampLabel`；`kind==='tag'`→`optionLabel(column.options, value)`；空→`'-'`；余→`String`。
 - `tagType(value)`：`ENABLE/SUCCESS/NORMAL/AUTO→success`、`DISABLE/FAILED/FIRING→danger`、
   `PENDING/RETRYING/RECOVERED→warning`、余 `info`（enable 列实际用 `<enable-tag>`，此函数供普通 tag 列）。
 - `canEdit(row)=config.rowEditable?config.rowEditable(row):true`；`canDelete` 同理。
@@ -232,9 +232,9 @@ const optionLabel = (options: EntityOption[] | undefined, value: unknown) => {
 
 - `defineProps<{ config: EntityListConfig }>()`，调用 `useEntityListPage(props.config)`。
 - 搜索区 `#filters` 改为 `v-for="field in config.searchFields"`：
-  - `kind==='enableFlag'`→`<enable-flag-segmented :include-all="field.includeAll">`；
-  - `kind==='select'`→`<el-select :multiple="field.multiple" collapse-tags>`；
-  - 余→`<el-input>`。
+    - `kind==='enableFlag'`→`<enable-flag-segmented :include-all="field.includeAll">`；
+    - `kind==='select'`→`<el-select :multiple="field.multiple" collapse-tags>`；
+    - 余→`<el-input>`。
 - 表格：`v-if="config.mode==='tree'"` 的
   `<el-table :row-key="config.rowKey||'id'" :default-expand-all="config.defaultExpandAll" :data="state.rows">`；否则分页
   `<el-table :data="state.rows">`。两者列循环相同。
@@ -253,8 +253,8 @@ const optionLabel = (options: EntityOption[] | undefined, value: unknown) => {
 - 颜色色块样式 `.entity-list__swatch` 迁自原 Label/LabelDetail 的 `.label-color__swatch`。
 
 - [ ] **Step 2: 写 composable 单测** `tests/unit/use-entity-list-page.test.ts`：mock 一个最小 config（含 1 个 list 返回固定
-      records、1 个 search 字段、2 列），断言 `query()` 注入搜索参数、`formatCell` 对 time/tag/空值的输出、`payload()` 对 json
-      字段的解析。遵守 guardrails：kebab 文件名、小写动词 `it()` 描述、无 `toBeTruthy`、fixture 放 `tests/fixtures/`。
+  records、1 个 search 字段、2 列），断言 `query()` 注入搜索参数、`formatCell` 对 time/tag/空值的输出、`payload()` 对 json
+  字段的解析。遵守 guardrails：kebab 文件名、小写动词 `it()` 描述、无 `toBeTruthy`、fixture 放 `tests/fixtures/`。
 
 - [ ] **Step 3: 验收** `pnpm check` + `pnpm test:unit tests/unit/use-entity-list-page.test.ts` + `pnpm test:guard`。
 
@@ -385,7 +385,7 @@ export const createLabelConfig = (t: T): EntityListConfig => ({
 - CRUD：`listGroup/addGroup/updateGroup/deleteGroup`；detail `settingsGroupDetail`。
 
 - [ ] Step 1 写 `groupConfig.ts` · Step 2 改写 `Group.vue` · Step 3 删旧文件 · Step 4 验收 `pnpm check`+
-      `pnpm test:guard`+手测 · Step 5 Commit `refactor(settings): migrate group to entity list engine`
+  `pnpm test:guard`+手测 · Step 5 Commit `refactor(settings): migrate group to entity list engine`
 
 ---
 
@@ -404,7 +404,7 @@ export const createLabelConfig = (t: T): EntityListConfig => ({
 - 引擎需正确隐藏 Add 按钮与 edit/delete 操作（`editable:false`），操作列只剩 detail（宽 100）。
 
 - [ ] Step 1 写 config · Step 2 改写 `Api.vue` · Step 3 删旧 · Step 4 验收（重点确认只读：无新增/编辑/删除按钮）· Step 5
-      Commit `refactor(settings): migrate read-only api page to entity list engine`
+  Commit `refactor(settings): migrate read-only api page to entity list engine`
 
 ---
 
@@ -441,7 +441,7 @@ config 工厂签名 `createUserConfig(t, { onAssignRoles })`，其中
 - CRUD `listUser/addUser/updateUser/deleteUser`；detail `settingsUserDetail`。
 
 - [ ] Step 1 写 config · Step 2 改写 `User.vue`（含 assign 接线）· Step 3 删旧 · Step 4 验收 + 手测（含分配角色弹窗打开）·
-      Step 5 Commit `refactor(settings): migrate user page to entity list engine`
+  Step 5 Commit `refactor(settings): migrate user page to entity list engine`
 
 ---
 
@@ -460,7 +460,7 @@ config 工厂签名 `createUserConfig(t, { onAssignRoles })`，其中
 - CRUD `listRole/addRole/updateRole/deleteRole`；detail `settingsRoleDetail`。
 
 - [ ] Step 1 写 config · Step 2 改写 `Role.vue` · Step 3 删旧 · Step 4 验收 + 手测 · Step 5 Commit
-      `refactor(settings): migrate role page to entity list engine`
+  `refactor(settings): migrate role page to entity list engine`
 
 ---
 
@@ -499,7 +499,7 @@ config 工厂签名 `createUserConfig(t, { onAssignRoles })`，其中
 - CRUD `addResource/updateResource/deleteResource`；detail `settingsResourceDetail`。
 
 - [ ] Step 1 写 config（迁入实体名聚合）· Step 2 改写 `Resource.vue` · Step 3 删旧 · Step 4 验收 + 手测（树展开/分组节点禁编辑/实体名显示）·
-      Step 5 Commit `refactor(settings): migrate resource tree page to entity list engine`
+  Step 5 Commit `refactor(settings): migrate resource tree page to entity list engine`
 
 ---
 
@@ -517,14 +517,14 @@ config 工厂签名 `createUserConfig(t, { onAssignRoles })`，其中
 - 字段：parentMenuId(treeSelect tree.load=listMenuTree required)/menuName(authNameRules max32 required)/menuCode(required
   max64)/titleZh(required max64)/titleEn(required max64)/menuTypeFlag(select required)/menuLevel(select
   MENU_LEVEL_OPTIONS required)/menuIndex(number)/icon(select iconNames)/url(input)/enableFlag/remark(textarea)。
-  - 注意 add/update payload 需把 titleZh/titleEn/icon/url 组装回 `menuExt.content`（沿用现 edit/index.ts 的组装逻辑）——在
-    config 的 `add`/`update` 包装函数里做映射，或在 `defaultForm`/`payload` 钩子处理。本任务在 config 提供
-    `add:(p)=>addMenu(toMenuPayload(p))`、`update:(p)=>updateMenu(toMenuPayload(p))`，`toMenuPayload` 迁自现
-    edit/index.ts。
+    - 注意 add/update payload 需把 titleZh/titleEn/icon/url 组装回 `menuExt.content`（沿用现 edit/index.ts 的组装逻辑）——在
+      config 的 `add`/`update` 包装函数里做映射，或在 `defaultForm`/`payload` 钩子处理。本任务在 config 提供
+      `add:(p)=>addMenu(toMenuPayload(p))`、`update:(p)=>updateMenu(toMenuPayload(p))`，`toMenuPayload` 迁自现
+      edit/index.ts。
 - CRUD `addMenu/updateMenu/deleteMenu`；detail `settingsMenuDetail`。
 
 - [ ] Step 1 写 config（迁入 ext 组装 + icon）· Step 2 改写 `Menu.vue` · Step 3 删旧 · Step 4 验收 + 手测（图标列/URL
-      列/树展开/编辑回填）· Step 5 Commit `refactor(settings): migrate menu tree page to entity list engine`
+  列/树展开/编辑回填）· Step 5 Commit `refactor(settings): migrate menu tree page to entity list engine`
 
 ---
 

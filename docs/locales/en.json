@@ -5,9 +5,7 @@
   "pillar.foundations": "Foundations",
   "pillar.develop": "Develop",
   "pillar.operations": "Operations",
-
   "community": "Community",
-
   "introduction": "Overview",
   "introduction/concepts": "Core Concepts",
   "introduction/paths": "Choose Your Path",
@@ -22,11 +20,9 @@
   "introduction/concepts/tenant": "Tenant",
   "introduction/glossary": "Glossary",
   "introduction/license": "License",
-
   "quickstart": "Local Development",
   "quickstart/environment": "Environment Variables",
   "quickstart/first-device": "First Device",
-
   "foundations": "IoT Technology Overview",
   "foundations/sensing": "Sensing & Measurement",
   "foundations/identification": "Auto-ID & Positioning",
@@ -36,7 +32,6 @@
   "foundations/data-pipeline": "Time-Series & Streaming",
   "foundations/aiot": "Data Intelligence & AIoT",
   "foundations/security": "IoT Security",
-
   "architecture": "Overview",
   "architecture/services": "Services & Topology",
   "architecture/facade-modes": "Facade Modes",
@@ -46,10 +41,8 @@
   "architecture/domain-model": "Domain Model",
   "architecture/modules": "Module Map",
   "modules": "Catalog",
-
   "drivers": "Drivers",
   "operation/device-onboarding": "Device Onboarding",
-
   "drivers/modbus-tcp": "Modbus TCP",
   "drivers/modbus-rtu": "Modbus RTU",
   "drivers/opc-ua": "OPC UA",
@@ -79,7 +72,6 @@
   "drivers/virtual": "Virtual",
   "drivers/listening-virtual": "Listening Virtual",
   "drivers/matrix": "Driver Capability Matrix",
-
   "operation": "Overview",
   "operation/data-commands": "Data & Commands",
   "operation/alarms": "Alarms & Notifications",
@@ -87,27 +79,21 @@
   "guide/observability": "Observability",
   "guide/logging": "Logging",
   "guide/troubleshooting": "Troubleshooting",
-
   "development": "Overview",
   "development/driver-authoring": "Driver Authoring",
   "development/api-documentation": "API Documentation",
   "development/testing": "Testing",
   "development/changelog": "Changelog",
-
   "ai": "AI Overview",
   "ai/agentic": "Agentic Center",
   "ai/mcp": "AI Agent / MCP",
-
   "automation/cli": "CLI Guide",
-
   "frontend": "Frontend Guide",
   "frontend/test-debugging": "Test Debugging FAQ",
-
   "community/contributing": "Contributing",
   "community/code-of-conduct": "Code of Conduct",
   "community/security": "Security",
   "community/faq": "FAQ",
-
   "group.objects-data": "Objects & Data",
   "group.capabilities-boundaries": "Capabilities & Boundaries",
   "group.quickstart": "Quick Start",
@@ -134,7 +120,6 @@
   "group.ai-integration": "AI Integration",
   "group.automation": "Automation",
   "group.frontend": "Frontend",
-
   "ui.editLinkText": "Edit this page on GitHub",
   "ui.outlineLabel": "On this page",
   "ui.lastUpdatedText": "Last updated",

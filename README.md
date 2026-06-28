@@ -249,7 +249,8 @@ and API paths. Clear boundaries that scale across services and teams.
 | **Desktop**                     | Tauri 2                                                     |
 | **Deployment**                  | Podman · Docker Compose                                     |
 
-> 💡 Frontend source code is in the `dc3-web/` directory of this repository (the standalone `iot-dc3-web` repo is archived).
+> 💡 Frontend source code is in the `dc3-web/` directory of this repository (the standalone `iot-dc3-web` repo is
+> archived).
 
 ## 📖 Documentation and Community
 

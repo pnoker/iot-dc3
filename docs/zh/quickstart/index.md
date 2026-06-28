@@ -41,17 +41,18 @@ JDK/构建工具，外加一个容器运行时。
 
 打开入口类，点击 `main` 左侧绿色按钮 → **Modify Run Configuration**，在 EnvFile 标签页添加 `dc3/env/dev.env`：
 
-| 服务 | 入口类 | 模块 |
-|------|--------|------|
-| Gateway | `GatewayApplication` | `dc3-gateway` |
-| Auth 中心 | `AuthApplication` | `dc3-center/dc3-center-auth` |
+| 服务         | 入口类                  | 模块                              |
+|------------|----------------------|---------------------------------|
+| Gateway    | `GatewayApplication` | `dc3-gateway`                   |
+| Auth 中心    | `AuthApplication`    | `dc3-center/dc3-center-auth`    |
 | Manager 中心 | `ManagerApplication` | `dc3-center/dc3-center-manager` |
-| Data 中心 | `DataApplication` | `dc3-center/dc3-center-data` |
+| Data 中心    | `DataApplication`    | `dc3-center/dc3-center-data`    |
 | Agentic 中心 | `AgenticApplication` | `dc3-center/dc3-center-agentic` |
 
 ### 4. 启动顺序
 
-1. **Auth 中心**（8300）→ 2. **Manager 中心**（8400）→ 3. **Data 中心**（8500）→ 4. **Agentic 中心**（8600）→ 5. **Gateway**（8000）
+1. **Auth 中心**（8300）→ 2. **Manager 中心**（8400）→ 3. **Data 中心**（8500）→ 4. **Agentic 中心**（8600）→ 5. **Gateway**
+   （8000）
 
 ### 5. 常见问题
 

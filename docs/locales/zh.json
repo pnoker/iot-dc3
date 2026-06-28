@@ -5,9 +5,7 @@
   "pillar.foundations": "基础",
   "pillar.develop": "开发",
   "pillar.operations": "运维",
-
   "community": "社区",
-
   "introduction": "总览",
   "introduction/concepts": "核心概念",
   "introduction/paths": "按角色选择路径",
@@ -22,11 +20,9 @@
   "introduction/concepts/tenant": "租户",
   "introduction/glossary": "术语表",
   "introduction/license": "开源与许可",
-
   "quickstart": "本地开发",
   "quickstart/environment": "环境变量",
   "quickstart/first-device": "第一个设备",
-
   "foundations": "物联网技术总览",
   "foundations/sensing": "传感与测量",
   "foundations/identification": "自动识别与定位",
@@ -36,7 +32,6 @@
   "foundations/data-pipeline": "时序数据与流处理",
   "foundations/aiot": "数据智能与 AIoT",
   "foundations/security": "物联网安全",
-
   "architecture": "总览",
   "architecture/services": "服务与拓扑",
   "architecture/facade-modes": "Facade 模式",
@@ -46,10 +41,8 @@
   "architecture/domain-model": "领域模型",
   "architecture/modules": "模块地图",
   "modules": "模块清单",
-
   "drivers": "驱动总览",
   "operation/device-onboarding": "设备接入流程",
-
   "drivers/modbus-tcp": "Modbus TCP",
   "drivers/modbus-rtu": "Modbus RTU",
   "drivers/opc-ua": "OPC UA",
@@ -79,7 +72,6 @@
   "drivers/virtual": "虚拟 Virtual",
   "drivers/listening-virtual": "监听虚拟",
   "drivers/matrix": "驱动能力矩阵",
-
   "operation": "概览",
   "operation/data-commands": "数据与命令",
   "operation/alarms": "告警与通知",
@@ -87,27 +79,21 @@
   "guide/observability": "可观测性",
   "guide/logging": "日志规范",
   "guide/troubleshooting": "故障排查",
-
   "development": "概览",
   "development/driver-authoring": "驱动开发",
   "development/api-documentation": "API 文档",
   "development/testing": "测试",
   "development/changelog": "变更日志",
-
   "ai": "AI 概览",
   "ai/agentic": "Agentic 中心",
   "ai/mcp": "AI Agent / MCP",
-
   "automation/cli": "CLI 使用指南",
-
   "frontend": "前端开发指南",
   "frontend/test-debugging": "测试调试 FAQ",
-
   "community/contributing": "贡献指南",
   "community/code-of-conduct": "行为准则",
   "community/security": "安全策略",
   "community/faq": "常见问题",
-
   "group.objects-data": "对象与数据",
   "group.capabilities-boundaries": "能力与边界",
   "group.quickstart": "快速开始",
@@ -134,7 +120,6 @@
   "group.ai-integration": "AI 集成",
   "group.automation": "自动化",
   "group.frontend": "前端",
-
   "ui.editLinkText": "在 GitHub 上编辑此页",
   "ui.outlineLabel": "页面导航",
   "ui.lastUpdatedText": "最后更新于",

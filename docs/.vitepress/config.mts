@@ -17,7 +17,7 @@
 
 import {defineConfig} from 'vitepress'
 import {withMermaid} from 'vitepress-plugin-mermaid'
-import {t, Lang} from './i18n'
+import {Lang, t} from './i18n'
 
 // ── i18n via locales/{lang}.json ──
 // All user-facing strings are resolved through t(lang, key).
@@ -40,8 +40,14 @@ const PILLARS: ReadonlyArray<Pillar> = [
         paths: ['introduction', 'quickstart'], activeMatch: '^/(zh|en)/(introduction|quickstart)/',
         groups: [
             {key: '', items: [['introduction'], ['introduction/concepts'], ['introduction/paths']]},
-            {key: 'group.objects-data', items: [['introduction/concepts/profile'], ['introduction/concepts/device'], ['introduction/concepts/driver'], ['introduction/concepts/point'], ['introduction/concepts/point-value']]},
-            {key: 'group.capabilities-boundaries', items: [['introduction/concepts/command'], ['introduction/concepts/event'], ['introduction/concepts/attribute-config'], ['introduction/concepts/tenant']]},
+            {
+                key: 'group.objects-data',
+                items: [['introduction/concepts/profile'], ['introduction/concepts/device'], ['introduction/concepts/driver'], ['introduction/concepts/point'], ['introduction/concepts/point-value']]
+            },
+            {
+                key: 'group.capabilities-boundaries',
+                items: [['introduction/concepts/command'], ['introduction/concepts/event'], ['introduction/concepts/attribute-config'], ['introduction/concepts/tenant']]
+            },
             {key: 'group.quickstart', items: [['quickstart'], ['quickstart/environment'], ['quickstart/first-device']]},
             {key: 'group.appendix', items: [['introduction/glossary'], ['introduction/license']]}
         ]
@@ -52,7 +58,10 @@ const PILLARS: ReadonlyArray<Pillar> = [
         groups: [
             {key: '', items: [['architecture']]},
             {key: 'group.services-collab', items: [['architecture/services'], ['architecture/facade-modes']]},
-            {key: 'group.pipelines-model', items: [['architecture/data-plane'], ['architecture/command-plane'], ['architecture/auth-rbac'], ['architecture/domain-model']]},
+            {
+                key: 'group.pipelines-model',
+                items: [['architecture/data-plane'], ['architecture/command-plane'], ['architecture/auth-rbac'], ['architecture/domain-model']]
+            },
             {key: 'group.modules', items: [['architecture/modules'], ['modules']]}
         ]
     },
@@ -62,11 +71,23 @@ const PILLARS: ReadonlyArray<Pillar> = [
         activeMatch: '^/(zh|en)/(drivers/|operation/device-onboarding)',
         groups: [
             {key: 'group.onboarding', items: [['drivers'], ['operation/device-onboarding']]},
-            {key: 'group.industrial-bus', items: [['drivers/modbus-tcp'], ['drivers/modbus-rtu'], ['drivers/opc-ua'], ['drivers/opc-da'], ['drivers/plcs7'], ['drivers/melsec'], ['drivers/fins'], ['drivers/ethernet-ip']]},
-            {key: 'group.scada-power', items: [['drivers/bacnet-ip'], ['drivers/iec104'], ['drivers/dlms'], ['drivers/sl651'], ['drivers/snmp']]},
-            {key: 'group.iot-wireless', items: [['drivers/mqtt'], ['drivers/coap'], ['drivers/lwm2m'], ['drivers/http'], ['drivers/ble'], ['drivers/zigbee'], ['drivers/can']]},
+            {
+                key: 'group.industrial-bus',
+                items: [['drivers/modbus-tcp'], ['drivers/modbus-rtu'], ['drivers/opc-ua'], ['drivers/opc-da'], ['drivers/plcs7'], ['drivers/melsec'], ['drivers/fins'], ['drivers/ethernet-ip']]
+            },
+            {
+                key: 'group.scada-power',
+                items: [['drivers/bacnet-ip'], ['drivers/iec104'], ['drivers/dlms'], ['drivers/sl651'], ['drivers/snmp']]
+            },
+            {
+                key: 'group.iot-wireless',
+                items: [['drivers/mqtt'], ['drivers/coap'], ['drivers/lwm2m'], ['drivers/http'], ['drivers/ble'], ['drivers/zigbee'], ['drivers/can']]
+            },
             {key: 'group.serial-network', items: [['drivers/serial'], ['drivers/tcp-udp']]},
-            {key: 'group.database', items: [['drivers/mysql'], ['drivers/postgresql'], ['drivers/oracle'], ['drivers/sqlserver']]},
+            {
+                key: 'group.database',
+                items: [['drivers/mysql'], ['drivers/postgresql'], ['drivers/oracle'], ['drivers/sqlserver']]
+            },
             {key: 'group.virtual-test', items: [['drivers/virtual'], ['drivers/listening-virtual']]},
             {key: 'group.appendix-drivers', items: [['drivers/matrix']]}
         ]
@@ -84,10 +105,15 @@ const PILLARS: ReadonlyArray<Pillar> = [
         ]
     },
     {   // ⑤
-        navKey: 'pillar.develop', landing: 'development',
-        paths: ['development', 'frontend', 'ai', 'automation'], activeMatch: '^/(zh|en)/(development|frontend|ai|automation)/',
+        navKey: 'pillar.develop',
+        landing: 'development',
+        paths: ['development', 'frontend', 'ai', 'automation'],
+        activeMatch: '^/(zh|en)/(development|frontend|ai|automation)/',
         groups: [
-            {key: 'group.development', items: [['development'], ['development/driver-authoring'], ['development/api-documentation'], ['development/testing'], ['development/changelog']]},
+            {
+                key: 'group.development',
+                items: [['development'], ['development/driver-authoring'], ['development/api-documentation'], ['development/testing'], ['development/changelog']]
+            },
             {key: 'group.ai-integration', items: [['ai'], ['ai/agentic'], ['ai/mcp']]},
             {key: 'group.frontend', items: [['frontend'], ['frontend/test-debugging']]},
             {key: 'group.automation', items: [['automation/cli']]}
@@ -98,7 +124,10 @@ const PILLARS: ReadonlyArray<Pillar> = [
         paths: ['operation', 'guide'], activeMatch: '^/(zh|en)/(operation|guide)/',
         groups: [
             {key: 'group.operations', items: [['operation'], ['operation/data-commands'], ['operation/alarms']]},
-            {key: 'group.deploy-ops', items: [['guide/usage'], ['guide/observability'], ['guide/logging'], ['guide/troubleshooting']]}
+            {
+                key: 'group.deploy-ops',
+                items: [['guide/usage'], ['guide/observability'], ['guide/logging'], ['guide/troubleshooting']]
+            }
         ]
     }
 ]
