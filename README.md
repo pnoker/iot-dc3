@@ -127,7 +127,7 @@ Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 20
 ### 🧩 Developer Friendly
 
 - **Driver SDK** - A complete driver development toolkit. See
-  the [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring.html)
+  the [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring)
 - **Separated frontend and backend** - Vue 3 + TypeScript frontend, RESTful and gRPC APIs
 - **Containerized deployment** - One-command startup with Podman / Docker Compose, with a path toward Kubernetes and
   other container platforms
@@ -184,7 +184,7 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar  # Virtual
 ```
 
 > 📖 For full local setup, see the [Quickstart](https://pnoker.github.io/iot-dc3/quickstart/) and
-> [Environment Variables](https://pnoker.github.io/iot-dc3/quickstart/environment.html) docs.
+> [Environment Variables](https://pnoker.github.io/iot-dc3/quickstart/environment) docs.
 
 <details>
 <summary>🔧 More startup options (optional dependencies, single-service startup, environment variables)</summary>
@@ -214,7 +214,7 @@ cp .env.example .env    # Copy the template
 
 The root `.env` file is used for Compose variable interpolation, such as image registry, image tag, and published ports.
 Application runtime variables are configured in `dc3/env/dev.env`. See
-the [environment documentation](https://pnoker.github.io/iot-dc3/quickstart/environment.html).
+the [environment documentation](https://pnoker.github.io/iot-dc3/quickstart/environment).
 
 </details>
 
@@ -271,10 +271,10 @@ and API paths. Clear boundaries that scale across services and teams.
 |-----------------------|----------------------------------------------------------------------------------------------|
 | 📚 Online docs        | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                                |
 | 🚀 Quickstart         | [Quickstart Guide](https://pnoker.github.io/iot-dc3/quickstart/)                             |
-| 🏗️ Architecture      | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html)       |
-| 🔧 Driver development | [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring.html) |
-| 🐛 Troubleshooting    | [Troubleshooting](https://pnoker.github.io/iot-dc3/guide/troubleshooting.html)               |
-| 📋 Changelog          | [Release Changelog](https://pnoker.github.io/iot-dc3/development/changelog.html)             |
+| 🏗️ Architecture      | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules)       |
+| 🔧 Driver development | [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring) |
+| 🐛 Troubleshooting    | [Troubleshooting](https://pnoker.github.io/iot-dc3/guide/troubleshooting)               |
+| 📋 Changelog          | [Release Changelog](https://pnoker.github.io/iot-dc3/development/changelog)             |
 | 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                                    |
 | 🇨🇳 Gitee mirror     | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                                        |
 

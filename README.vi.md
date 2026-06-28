@@ -126,7 +126,7 @@ Kiến trúc microservice phân tán dựa trên **Spring Boot 4 + Spring Cloud 
 ### 🧩 Thân thiện với nhà phát triển
 
 - **Driver SDK** - Bộ công cụ phát triển driver hoàn chỉnh.
-  Xem [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring.html)
+  Xem [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring)
 - **Tách frontend và backend** - Frontend Vue 3 + TypeScript, API RESTful + gRPC
 - **Triển khai bằng container** - Khởi động một lệnh với Podman / Docker Compose, thuận tiện để chuyển sang Kubernetes
   và các nền tảng container khác
@@ -184,7 +184,7 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar  # Virtual
 ```
 
 > 📖 Để thiết lập môi trường local đầy đủ, xem [Quickstart](https://pnoker.github.io/iot-dc3/quickstart/) và
-> [Environment Variables](https://pnoker.github.io/iot-dc3/quickstart/environment.html).
+> [Environment Variables](https://pnoker.github.io/iot-dc3/quickstart/environment).
 
 <details>
 <summary>🔧 Tùy chọn khởi động khác (phụ thuộc tùy chọn, khởi động từng dịch vụ, biến môi trường)</summary>
@@ -214,7 +214,7 @@ cp .env.example .env    # Sao chép file mẫu
 
 File `.env` ở thư mục gốc được dùng cho nội suy biến Compose, như registry image, tag image và cổng publish.
 Biến runtime của ứng dụng được cấu hình trong `dc3/env/dev.env`.
-Xem [tài liệu biến môi trường](https://pnoker.github.io/iot-dc3/quickstart/environment.html).
+Xem [tài liệu biến môi trường](https://pnoker.github.io/iot-dc3/quickstart/environment).
 
 </details>
 
@@ -268,10 +268,10 @@ mở rộng theo dịch vụ và đội nhóm.
 |----------------------|----------------------------------------------------------------------------------------------|
 | 📚 Tài liệu online   | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                                |
 | 🚀 Quickstart        | [Quickstart Guide](https://pnoker.github.io/iot-dc3/quickstart/)                             |
-| 🏗️ Kiến trúc        | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules.html)       |
-| 🔧 Phát triển driver | [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring.html) |
-| 🐛 Khắc phục sự cố   | [Troubleshooting](https://pnoker.github.io/iot-dc3/guide/troubleshooting.html)               |
-| 📋 Changelog         | [Release Changelog](https://pnoker.github.io/iot-dc3/development/changelog.html)             |
+| 🏗️ Kiến trúc        | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules)       |
+| 🔧 Phát triển driver | [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring) |
+| 🐛 Khắc phục sự cố   | [Troubleshooting](https://pnoker.github.io/iot-dc3/guide/troubleshooting)               |
+| 📋 Changelog         | [Release Changelog](https://pnoker.github.io/iot-dc3/development/changelog)             |
 | 🐛 Phản hồi issue    | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                                    |
 | 🇨🇳 Gitee mirror    | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                                        |
 
