@@ -16,6 +16,7 @@
   -->
 <script lang="ts" setup>
 import {computed} from 'vue'
+import DiagramFrame from './DiagramFrame.vue'
 
 const props = withDefaults(defineProps<{ lang?: 'zh' | 'en' }>(), {lang: 'zh'})
 
@@ -52,7 +53,8 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 </script>
 
 <template>
-  <div class="dc3-diagram">
+  <DiagramFrame>
+    <div class="dc3-diagram">
     <svg :aria-label="s.aria" role="img" viewBox="0 0 1180 320">
       <defs>
         <marker id="cp-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
@@ -151,5 +153,6 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
       <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="590" y="262">{{ s.note2 }}</text>
       <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="590" y="290">{{ s.note3 }}</text>
     </svg>
-  </div>
+    </div>
+  </DiagramFrame>
 </template>

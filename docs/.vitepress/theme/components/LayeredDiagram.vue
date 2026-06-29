@@ -16,6 +16,7 @@
   -->
 <script lang="ts" setup>
 import {computed} from 'vue'
+import DiagramFrame from './DiagramFrame.vue'
 
 const props = withDefaults(defineProps<{ lang?: 'zh' | 'en' }>(), {lang: 'zh'})
 
@@ -49,21 +50,59 @@ const DICT = {
   },
   en: {
     aria: 'IoT DC3 system architecture layered diagram',
-    gw: 'Gateway', cloud: 'Cloud Server',
+    gw: 'Gateway',
+    cloud: 'Cloud Server',
     secLabel: 'Security & Load',
-    sec1: 'Load Balancing', sec2: 'Security Services Suite', sec3: 'Token', sec4: 'Encryption',
+    sec1: 'Load Balancing',
+    sec2: 'Security Services Suite',
+    sec3: 'Token',
+    sec4: 'Encryption',
     depLabel: 'Deployment & System',
-    dep1: 'Management Platform', dep2: 'Container', dep3: 'Fast Deployment', dep4: 'System Services',
-    dep5a: 'Device', dep5b: 'System', dep5c: 'Monitoring Mgmt',
-    L1: 'Application Layer', L1a: 'Client Registration & Mgmt', L1b: 'Data Open API', L1c: 'Data Distribution', L1d: 'Extension Module',
-    L2: 'Platform Layer', L2a: 'Task Scheduling', L2b: 'Alerting', L2c: 'Notification', L2d: 'Logging', L2e: 'Message',
-    L3: 'Network Layer', L3a: 'Protocol Gateway', L3b: 'MQTT Broker', L3c: 'Message Routing', L3d: 'RabbitMQ', L3e: 'Driver Access',
-    L4: 'Perception Layer', L4a: 'Sensor', L4b: 'Actuator', L4c: 'PLC Controller', L4d: 'Smart Meter', L4e: 'RFID', L4f: 'Field Device…',
-    bot1: 'SDK Fast Development', bot2: 'Deployment & Ops',
+    dep1: 'Management Platform',
+    dep2: 'Container',
+    dep3: 'Fast Deployment',
+    dep4: 'System Services',
+    dep5a: 'Device',
+    dep5b: 'System',
+    dep5c: 'Monitoring Mgmt',
+    L1: 'Application Layer',
+    L1a: 'Client Registration & Mgmt',
+    L1b: 'Data Open API',
+    L1c: 'Data Distribution',
+    L1d: 'Extension Module',
+    L2: 'Platform Layer',
+    L2a: 'Task Scheduling',
+    L2b: 'Alerting',
+    L2c: 'Notification',
+    L2d: 'Logging',
+    L2e: 'Message',
+    L3: 'Network Layer',
+    L3a: 'Protocol Gateway',
+    L3b: 'MQTT Broker',
+    L3c: 'Message Routing',
+    L3d: 'RabbitMQ',
+    L3e: 'Driver Access',
+    L4: 'Perception Layer',
+    L4a: 'Sensor',
+    L4b: 'Actuator',
+    L4c: 'PLC Controller',
+    L4d: 'Smart Meter',
+    L4e: 'RFID',
+    L4f: 'Field Device…',
+    bot1: 'SDK Fast Development',
+    bot2: 'Deployment & Ops',
     legTitle: 'Legend',
-    leg1: 'Entry / Exit', leg2: 'Service / Component', leg3: 'Data / Dependency Flow',
-    leg4: 'External Access', leg5: 'Service Group',
-    legApp: 'App', legPlat: 'Platform', legNet: 'Network', legPerc: 'Perception', legSec: 'Security', legDep: 'Deploy',
+    leg1: 'Entry / Exit',
+    leg2: 'Service / Component',
+    leg3: 'Data / Dependency Flow',
+    leg4: 'External Access',
+    leg5: 'Service Group',
+    legApp: 'App',
+    legPlat: 'Platform',
+    legNet: 'Network',
+    legPerc: 'Perception',
+    legSec: 'Security',
+    legDep: 'Deploy',
   }
 } as const
 
@@ -71,30 +110,31 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 </script>
 
 <template>
-  <div class="dc3-arch-diagram">
+  <DiagramFrame>
+    <div class="dc3-arch-diagram">
     <svg :aria-label="s.aria" role="img" viewBox="0 0 1400 695" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <marker id="ad-arrow-down" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="var(--ad-blue)"/>
+        <marker id="ad-arrow-down" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
+          <polygon fill="var(--ad-blue)" points="0 0, 10 3.5, 0 7"/>
         </marker>
-        <marker id="ad-arrow-up" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="var(--ad-blue)"/>
+        <marker id="ad-arrow-up" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
+          <polygon fill="var(--ad-blue)" points="0 0, 10 3.5, 0 7"/>
         </marker>
-        <marker id="ad-arrow-data" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="var(--ad-blue-light)"/>
+        <marker id="ad-arrow-data" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
+          <polygon fill="var(--ad-blue-light)" points="0 0, 10 3.5, 0 7"/>
         </marker>
-        <pattern id="ad-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <pattern id="ad-grid" height="40" patternUnits="userSpaceOnUse" width="40">
           <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--dc3-grid)" stroke-width="0.5"/>
         </pattern>
-        <linearGradient id="ad-banner-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <linearGradient id="ad-banner-grad" x1="0%" x2="100%" y1="0%" y2="0%">
           <stop offset="0%" stop-color="var(--ad-blue-dark)"/>
           <stop offset="100%" stop-color="var(--ad-blue)"/>
         </linearGradient>
       </defs>
 
       <!-- Background -->
-      <rect width="100%" height="100%" fill="var(--ad-bg)"/>
-      <rect width="100%" height="100%" fill="url(#ad-grid)"/>
+      <rect fill="var(--ad-bg)" height="100%" width="100%"/>
+      <rect fill="url(#ad-grid)" height="100%" width="100%"/>
 
       <g transform="translate(0, -57)">
 
@@ -102,239 +142,410 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
              TOP BANNERS
              ============================================================ -->
         <!-- Gateway -->
-        <rect x="260" y="85" width="420" height="34" rx="8" fill="url(#ad-banner-grad)"/>
-        <g transform="translate(282, 93)" fill="none" stroke="var(--ad-icon-stroke)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect fill="url(#ad-banner-grad)" height="34" rx="8" width="420" x="260" y="85"/>
+        <g fill="none" stroke="var(--ad-icon-stroke)" stroke-linecap="round" stroke-linejoin="round"
+           stroke-width="1.5" transform="translate(282, 93)">
           <circle cx="7" cy="4" r="2.5"/>
           <circle cx="7" cy="14" r="2.5"/>
           <circle cx="16" cy="9" r="2.5"/>
-          <line x1="7" y1="6.5" x2="7" y2="11.5"/>
-          <line x1="9" y1="7.5" x2="14" y2="9"/>
-          <line x1="9" y1="10.5" x2="14" y2="9"/>
+          <line x1="7" x2="7" y1="6.5" y2="11.5"/>
+          <line x1="9" x2="14" y1="7.5" y2="9"/>
+          <line x1="9" x2="14" y1="10.5" y2="9"/>
         </g>
-        <text x="470" y="107" fill="var(--ad-text-bright)" font-size="13" font-weight="700" text-anchor="middle">{{ s.gw }}</text>
-        <line x1="470" y1="119" x2="470" y2="133" stroke="var(--ad-blue)" stroke-width="2" marker-end="url(#ad-arrow-down)"/>
+        <text fill="var(--ad-text-bright)" font-size="13" font-weight="700" text-anchor="middle" x="470" y="107">{{
+            s.gw
+          }}
+        </text>
+        <line marker-end="url(#ad-arrow-down)" stroke="var(--ad-blue)" stroke-width="2" x1="470" x2="470" y1="119"
+              y2="133"/>
 
         <!-- Cloud Server -->
-        <rect x="720" y="85" width="420" height="34" rx="8" fill="url(#ad-banner-grad)"/>
-        <g transform="translate(744, 93)" fill="var(--ad-icon-stroke)" stroke="var(--ad-icon-stroke)" stroke-width="1" stroke-linejoin="round">
-          <path d="M4 12 C2 12 2 9 3.5 8.5 C3.5 6.5 6.5 5.5 8 7 C9 4.5 13 4.5 15 7 C17 6.5 18 8.5 16.5 10.5 C17.5 11 17 12 15 12 Z"/>
+        <rect fill="url(#ad-banner-grad)" height="34" rx="8" width="420" x="720" y="85"/>
+        <g fill="var(--ad-icon-stroke)" stroke="var(--ad-icon-stroke)" stroke-linejoin="round" stroke-width="1"
+           transform="translate(744, 93)">
+          <path
+              d="M4 12 C2 12 2 9 3.5 8.5 C3.5 6.5 6.5 5.5 8 7 C9 4.5 13 4.5 15 7 C17 6.5 18 8.5 16.5 10.5 C17.5 11 17 12 15 12 Z"/>
         </g>
-        <text x="930" y="107" fill="var(--ad-text-bright)" font-size="13" font-weight="700" text-anchor="middle">{{ s.cloud }}</text>
-        <line x1="930" y1="119" x2="930" y2="133" stroke="var(--ad-blue)" stroke-width="2" marker-end="url(#ad-arrow-down)"/>
+        <text fill="var(--ad-text-bright)" font-size="13" font-weight="700" text-anchor="middle" x="930" y="107">
+          {{ s.cloud }}
+        </text>
+        <line marker-end="url(#ad-arrow-down)" stroke="var(--ad-blue)" stroke-width="2" x1="930" x2="930" y1="119"
+              y2="133"/>
 
         <!-- ============================================================
              LEFT SIDEBAR — Security & Load
              ============================================================ -->
-        <rect x="28" y="85" width="195" height="560" rx="10" fill="var(--ad-rose-fill)" stroke="var(--dc3-rose-stroke)" stroke-width="1" stroke-dasharray="6,3"/>
+        <rect fill="var(--ad-rose-fill)" height="560" rx="10" stroke="var(--dc3-rose-stroke)" stroke-dasharray="6,3" stroke-width="1" width="195"
+              x="28" y="85"/>
 
-        <rect x="43" y="110" width="165" height="52" rx="6" fill="var(--ad-rose-box)" stroke="var(--ad-rose-box-stroke)" stroke-width="0.5"/>
-        <text x="125" y="141" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.sec1 }}</text>
+        <rect fill="var(--ad-rose-box)" height="52" rx="6" stroke="var(--ad-rose-box-stroke)" stroke-width="0.5" width="165" x="43"
+              y="110"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="125" y="141">{{
+            s.sec1
+          }}
+        </text>
 
-        <rect x="43" y="212" width="165" height="52" rx="6" fill="var(--ad-rose-box)" stroke="var(--ad-rose-box-stroke)" stroke-width="0.5"/>
-        <text x="125" y="243" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.sec2 }}</text>
+        <rect fill="var(--ad-rose-box)" height="52" rx="6" stroke="var(--ad-rose-box-stroke)" stroke-width="0.5" width="165" x="43"
+              y="212"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="125" y="243">{{
+            s.sec2
+          }}
+        </text>
 
-        <rect x="43" y="314" width="165" height="52" rx="6" fill="var(--ad-rose-box)" stroke="var(--ad-rose-box-stroke)" stroke-width="0.5"/>
-        <text x="125" y="345" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.sec3 }}</text>
+        <rect fill="var(--ad-rose-box)" height="52" rx="6" stroke="var(--ad-rose-box-stroke)" stroke-width="0.5" width="165" x="43"
+              y="314"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="125" y="345">{{
+            s.sec3
+          }}
+        </text>
 
-        <rect x="43" y="416" width="165" height="52" rx="6" fill="var(--ad-rose-box)" stroke="var(--ad-rose-box-stroke)" stroke-width="0.5"/>
-        <text x="125" y="447" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.sec4 }}</text>
+        <rect fill="var(--ad-rose-box)" height="52" rx="6" stroke="var(--ad-rose-box-stroke)" stroke-width="0.5" width="165" x="43"
+              y="416"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="125" y="447">{{
+            s.sec4
+          }}
+        </text>
 
-        <text x="125" y="636" fill="var(--dc3-rose-stroke)" font-size="12" font-weight="700" text-anchor="middle">{{ s.secLabel }}</text>
+        <text fill="var(--dc3-rose-stroke)" font-size="12" font-weight="700" text-anchor="middle" x="125" y="636">
+          {{ s.secLabel }}
+        </text>
 
         <!-- ============================================================
              RIGHT SIDEBAR — Deployment & System
              ============================================================ -->
-        <rect x="1177" y="85" width="195" height="560" rx="10" fill="var(--ad-amber-fill)" stroke="var(--dc3-amber-stroke)" stroke-width="1" stroke-dasharray="6,3"/>
+        <rect fill="var(--ad-amber-fill)" height="560" rx="10" stroke="var(--dc3-amber-stroke)" stroke-dasharray="6,3" stroke-width="1"
+              width="195" x="1177" y="85"/>
 
-        <rect x="1192" y="110" width="165" height="48" rx="6" fill="var(--ad-amber-box)" stroke="var(--ad-amber-box-stroke)" stroke-width="0.5"/>
-        <text x="1274" y="139" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.dep1 }}</text>
+        <rect fill="var(--ad-amber-box)" height="48" rx="6" stroke="var(--ad-amber-box-stroke)" stroke-width="0.5" width="165"
+              x="1192" y="110"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1274" y="139">{{
+            s.dep1
+          }}
+        </text>
 
-        <rect x="1192" y="198" width="165" height="48" rx="6" fill="var(--ad-amber-box)" stroke="var(--ad-amber-box-stroke)" stroke-width="0.5"/>
-        <text x="1274" y="227" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.dep2 }}</text>
+        <rect fill="var(--ad-amber-box)" height="48" rx="6" stroke="var(--ad-amber-box-stroke)" stroke-width="0.5" width="165"
+              x="1192" y="198"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1274" y="227">{{
+            s.dep2
+          }}
+        </text>
 
-        <rect x="1192" y="286" width="165" height="48" rx="6" fill="var(--ad-amber-box)" stroke="var(--ad-amber-box-stroke)" stroke-width="0.5"/>
-        <text x="1274" y="315" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.dep3 }}</text>
+        <rect fill="var(--ad-amber-box)" height="48" rx="6" stroke="var(--ad-amber-box-stroke)" stroke-width="0.5" width="165"
+              x="1192" y="286"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1274" y="315">{{
+            s.dep3
+          }}
+        </text>
 
-        <rect x="1192" y="374" width="165" height="48" rx="6" fill="var(--ad-amber-box)" stroke="var(--ad-amber-box-stroke)" stroke-width="0.5"/>
-        <text x="1274" y="403" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.dep4 }}</text>
+        <rect fill="var(--ad-amber-box)" height="48" rx="6" stroke="var(--ad-amber-box-stroke)" stroke-width="0.5" width="165"
+              x="1192" y="374"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1274" y="403">{{
+            s.dep4
+          }}
+        </text>
 
-        <rect x="1192" y="462" width="165" height="52" rx="6" fill="var(--ad-amber-box)" stroke="var(--ad-amber-box-stroke)" stroke-width="0.5"/>
-        <text x="1274" y="478" fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle">{{ s.dep5a }}</text>
-        <text x="1274" y="492" fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle">{{ s.dep5b }}</text>
-        <text x="1274" y="506" fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle">{{ s.dep5c }}</text>
+        <rect fill="var(--ad-amber-box)" height="52" rx="6" stroke="var(--ad-amber-box-stroke)" stroke-width="0.5" width="165"
+              x="1192" y="462"/>
+        <text fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle" x="1274" y="478">{{
+            s.dep5a
+          }}
+        </text>
+        <text fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle" x="1274" y="492">{{
+            s.dep5b
+          }}
+        </text>
+        <text fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle" x="1274" y="506">{{
+            s.dep5c
+          }}
+        </text>
 
-        <text x="1274" y="636" fill="var(--dc3-amber-stroke)" font-size="12" font-weight="700" text-anchor="middle">{{ s.depLabel }}</text>
+        <text fill="var(--dc3-amber-stroke)" font-size="12" font-weight="700" text-anchor="middle" x="1274" y="636">
+          {{ s.depLabel }}
+        </text>
 
         <!-- ============================================================
              CENTER — Layered Architecture
              ============================================================ -->
 
         <!-- 1. 应用层 -->
-        <rect x="260" y="140" width="880" height="72" rx="6" fill="var(--ad-app-fill)" stroke="var(--dc3-fe-stroke)" stroke-width="0.8" stroke-dasharray="4,4"/>
+        <rect fill="var(--ad-app-fill)" height="72" rx="6" stroke="var(--dc3-fe-stroke)" stroke-dasharray="4,4" stroke-width="0.8" width="880"
+              x="260" y="140"/>
 
-        <rect x="266" y="154" width="205" height="40" rx="5" fill="var(--ad-app-box)" stroke="var(--dc3-fe-stroke)" stroke-width="0.5"/>
-        <text x="368" y="179" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L1a }}</text>
+        <rect fill="var(--ad-app-box)" height="40" rx="5" stroke="var(--dc3-fe-stroke)" stroke-width="0.5" width="205" x="266"
+              y="154"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="368" y="179">{{
+            s.L1a
+          }}
+        </text>
 
-        <rect x="487" y="154" width="205" height="40" rx="5" fill="var(--ad-app-box)" stroke="var(--dc3-fe-stroke)" stroke-width="0.5"/>
-        <text x="589" y="179" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L1b }}</text>
+        <rect fill="var(--ad-app-box)" height="40" rx="5" stroke="var(--dc3-fe-stroke)" stroke-width="0.5" width="205" x="487"
+              y="154"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="589" y="179">{{
+            s.L1b
+          }}
+        </text>
 
-        <rect x="708" y="154" width="205" height="40" rx="5" fill="var(--ad-app-box)" stroke="var(--dc3-fe-stroke)" stroke-width="0.5"/>
-        <text x="810" y="179" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L1c }}</text>
+        <rect fill="var(--ad-app-box)" height="40" rx="5" stroke="var(--dc3-fe-stroke)" stroke-width="0.5" width="205" x="708"
+              y="154"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="810" y="179">{{
+            s.L1c
+          }}
+        </text>
 
-        <rect x="929" y="154" width="205" height="40" rx="5" fill="var(--ad-app-box)" stroke="var(--dc3-fe-stroke)" stroke-width="0.5"/>
-        <text x="1031" y="179" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L1d }}</text>
+        <rect fill="var(--ad-app-box)" height="40" rx="5" stroke="var(--dc3-fe-stroke)" stroke-width="0.5" width="205" x="929"
+              y="154"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1031" y="179">{{
+            s.L1d
+          }}
+        </text>
 
-        <text x="700" y="230" fill="var(--dc3-fe-stroke)" font-size="13" font-weight="700" text-anchor="middle">{{ s.L1 }}</text>
+        <text fill="var(--dc3-fe-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="700" y="230">{{
+            s.L1
+          }}
+        </text>
 
         <!-- 2. 平台层 -->
-        <rect x="260" y="260" width="880" height="72" rx="6" fill="var(--ad-plat-mgmt-fill)" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.8" stroke-dasharray="4,4"/>
+        <rect fill="var(--ad-plat-mgmt-fill)" height="72" rx="6" stroke="var(--ad-plat-mgmt-stroke)" stroke-dasharray="4,4" stroke-width="0.8"
+              width="880" x="260" y="260"/>
 
-        <rect x="268" y="274" width="160" height="40" rx="5" fill="var(--ad-plat-mgmt-box)" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.5"/>
-        <text x="348" y="299" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L2a }}</text>
+        <rect fill="var(--ad-plat-mgmt-box)" height="40" rx="5" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.5" width="160"
+              x="268" y="274"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="348" y="299">{{
+            s.L2a
+          }}
+        </text>
 
-        <rect x="444" y="274" width="160" height="40" rx="5" fill="var(--ad-plat-mgmt-box)" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.5"/>
-        <text x="524" y="299" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L2b }}</text>
+        <rect fill="var(--ad-plat-mgmt-box)" height="40" rx="5" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.5" width="160"
+              x="444" y="274"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="524" y="299">{{
+            s.L2b
+          }}
+        </text>
 
-        <rect x="620" y="274" width="160" height="40" rx="5" fill="var(--ad-plat-mgmt-box)" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.5"/>
-        <text x="700" y="299" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L2c }}</text>
+        <rect fill="var(--ad-plat-mgmt-box)" height="40" rx="5" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.5" width="160"
+              x="620" y="274"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="700" y="299">{{
+            s.L2c
+          }}
+        </text>
 
-        <rect x="796" y="274" width="160" height="40" rx="5" fill="var(--ad-plat-mgmt-box)" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.5"/>
-        <text x="876" y="299" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L2d }}</text>
+        <rect fill="var(--ad-plat-mgmt-box)" height="40" rx="5" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.5" width="160"
+              x="796" y="274"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="876" y="299">{{
+            s.L2d
+          }}
+        </text>
 
-        <rect x="972" y="274" width="162" height="40" rx="5" fill="var(--ad-plat-mgmt-box)" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.5"/>
-        <text x="1053" y="299" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L2e }}</text>
+        <rect fill="var(--ad-plat-mgmt-box)" height="40" rx="5" stroke="var(--ad-plat-mgmt-stroke)" stroke-width="0.5" width="162"
+              x="972" y="274"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1053" y="299">{{
+            s.L2e
+          }}
+        </text>
 
-        <text x="700" y="350" fill="var(--ad-plat-mgmt-stroke)" font-size="13" font-weight="700" text-anchor="middle">{{ s.L2 }}</text>
+        <text fill="var(--ad-plat-mgmt-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="700" y="350">
+          {{ s.L2 }}
+        </text>
 
         <!-- 3. 网络层 -->
-        <rect x="260" y="380" width="880" height="72" rx="6" fill="var(--ad-plat-data-fill)" stroke="var(--ad-plat-data-stroke)" stroke-width="0.8" stroke-dasharray="4,4"/>
+        <rect fill="var(--ad-plat-data-fill)" height="72" rx="6" stroke="var(--ad-plat-data-stroke)" stroke-dasharray="4,4" stroke-width="0.8"
+              width="880" x="260" y="380"/>
 
-        <rect x="268" y="394" width="160" height="40" rx="5" fill="var(--ad-plat-data-box)" stroke="var(--ad-plat-data-stroke)" stroke-width="0.5"/>
-        <text x="348" y="419" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L3a }}</text>
+        <rect fill="var(--ad-plat-data-box)" height="40" rx="5" stroke="var(--ad-plat-data-stroke)" stroke-width="0.5" width="160"
+              x="268" y="394"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="348" y="419">{{
+            s.L3a
+          }}
+        </text>
 
-        <rect x="444" y="394" width="160" height="40" rx="5" fill="var(--ad-plat-data-box)" stroke="var(--ad-plat-data-stroke)" stroke-width="0.5"/>
-        <text x="524" y="419" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L3b }}</text>
+        <rect fill="var(--ad-plat-data-box)" height="40" rx="5" stroke="var(--ad-plat-data-stroke)" stroke-width="0.5" width="160"
+              x="444" y="394"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="524" y="419">{{
+            s.L3b
+          }}
+        </text>
 
-        <rect x="620" y="394" width="160" height="40" rx="5" fill="var(--ad-plat-data-box)" stroke="var(--ad-plat-data-stroke)" stroke-width="0.5"/>
-        <text x="700" y="419" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L3c }}</text>
+        <rect fill="var(--ad-plat-data-box)" height="40" rx="5" stroke="var(--ad-plat-data-stroke)" stroke-width="0.5" width="160"
+              x="620" y="394"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="700" y="419">{{
+            s.L3c
+          }}
+        </text>
 
-        <rect x="796" y="394" width="160" height="40" rx="5" fill="var(--ad-plat-data-box)" stroke="var(--ad-plat-data-stroke)" stroke-width="0.5"/>
-        <text x="876" y="419" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L3d }}</text>
+        <rect fill="var(--ad-plat-data-box)" height="40" rx="5" stroke="var(--ad-plat-data-stroke)" stroke-width="0.5" width="160"
+              x="796" y="394"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="876" y="419">{{
+            s.L3d
+          }}
+        </text>
 
-        <rect x="972" y="394" width="162" height="40" rx="5" fill="var(--ad-plat-data-box)" stroke="var(--ad-plat-data-stroke)" stroke-width="0.5"/>
-        <text x="1053" y="419" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L3e }}</text>
+        <rect fill="var(--ad-plat-data-box)" height="40" rx="5" stroke="var(--ad-plat-data-stroke)" stroke-width="0.5" width="162"
+              x="972" y="394"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1053" y="419">{{
+            s.L3e
+          }}
+        </text>
 
-        <text x="700" y="470" fill="var(--ad-plat-data-stroke)" font-size="13" font-weight="700" text-anchor="middle">{{ s.L3 }}</text>
+        <text fill="var(--ad-plat-data-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="700" y="470">
+          {{ s.L3 }}
+        </text>
 
         <!-- 4. 感知层 -->
-        <rect x="260" y="500" width="880" height="72" rx="6" fill="var(--ad-net-fill)" stroke="var(--dc3-be-stroke)" stroke-width="0.8" stroke-dasharray="4,4"/>
+        <rect fill="var(--ad-net-fill)" height="72" rx="6" stroke="var(--dc3-be-stroke)" stroke-dasharray="4,4" stroke-width="0.8" width="880"
+              x="260" y="500"/>
 
-        <rect x="273" y="514" width="132" height="40" rx="5" fill="var(--ad-net-box)" stroke="var(--dc3-be-stroke)" stroke-width="0.5"/>
-        <text x="339" y="539" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L4a }}</text>
+        <rect fill="var(--ad-net-box)" height="40" rx="5" stroke="var(--dc3-be-stroke)" stroke-width="0.5" width="132" x="273"
+              y="514"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="339" y="539">{{
+            s.L4a
+          }}
+        </text>
 
-        <rect x="419" y="514" width="132" height="40" rx="5" fill="var(--ad-net-box)" stroke="var(--dc3-be-stroke)" stroke-width="0.5"/>
-        <text x="485" y="539" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L4b }}</text>
+        <rect fill="var(--ad-net-box)" height="40" rx="5" stroke="var(--dc3-be-stroke)" stroke-width="0.5" width="132" x="419"
+              y="514"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="485" y="539">{{
+            s.L4b
+          }}
+        </text>
 
-        <rect x="565" y="514" width="132" height="40" rx="5" fill="var(--ad-net-box)" stroke="var(--dc3-be-stroke)" stroke-width="0.5"/>
-        <text x="631" y="539" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L4c }}</text>
+        <rect fill="var(--ad-net-box)" height="40" rx="5" stroke="var(--dc3-be-stroke)" stroke-width="0.5" width="132" x="565"
+              y="514"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="631" y="539">{{
+            s.L4c
+          }}
+        </text>
 
-        <rect x="711" y="514" width="132" height="40" rx="5" fill="var(--ad-net-box)" stroke="var(--dc3-be-stroke)" stroke-width="0.5"/>
-        <text x="777" y="539" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L4d }}</text>
+        <rect fill="var(--ad-net-box)" height="40" rx="5" stroke="var(--dc3-be-stroke)" stroke-width="0.5" width="132" x="711"
+              y="514"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="777" y="539">{{
+            s.L4d
+          }}
+        </text>
 
-        <rect x="857" y="514" width="132" height="40" rx="5" fill="var(--ad-net-box)" stroke="var(--dc3-be-stroke)" stroke-width="0.5"/>
-        <text x="923" y="539" fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle">{{ s.L4e }}</text>
+        <rect fill="var(--ad-net-box)" height="40" rx="5" stroke="var(--dc3-be-stroke)" stroke-width="0.5" width="132" x="857"
+              y="514"/>
+        <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="923" y="539">{{
+            s.L4e
+          }}
+        </text>
 
-        <rect x="1003" y="514" width="132" height="40" rx="5" fill="var(--ad-net-box)" stroke="var(--dc3-be-stroke)" stroke-width="0.5"/>
-        <text x="1069" y="539" fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle">{{ s.L4f }}</text>
+        <rect fill="var(--ad-net-box)" height="40" rx="5" stroke="var(--dc3-be-stroke)" stroke-width="0.5" width="132" x="1003"
+              y="514"/>
+        <text fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle" x="1069" y="539">{{
+            s.L4f
+          }}
+        </text>
 
-        <text x="700" y="590" fill="var(--dc3-be-stroke)" font-size="13" font-weight="700" text-anchor="middle">{{ s.L4 }}</text>
+        <text fill="var(--dc3-be-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="700" y="590">{{
+            s.L4
+          }}
+        </text>
 
         <!-- ============================================================
              LAYER 3 → LAYER 4 CONNECTIONS
              ============================================================ -->
-        <line x1="524" y1="434" x2="524" y2="484" stroke="var(--ad-blue-light)" stroke-width="1.5"/>
-        <line x1="876" y1="434" x2="876" y2="484" stroke="var(--ad-blue-light)" stroke-width="1.5"/>
+        <line stroke="var(--ad-blue-light)" stroke-width="1.5" x1="524" x2="524" y1="434" y2="484"/>
+        <line stroke="var(--ad-blue-light)" stroke-width="1.5" x1="876" x2="876" y1="434" y2="484"/>
 
-        <line x1="339" y1="484" x2="1069" y2="484" stroke="var(--ad-blue-light)" stroke-width="1"/>
+        <line stroke="var(--ad-blue-light)" stroke-width="1" x1="339" x2="1069" y1="484" y2="484"/>
 
-        <line x1="339" y1="484" x2="339" y2="512" stroke="var(--ad-blue-light)" stroke-width="1" marker-end="url(#ad-arrow-data)"/>
-        <line x1="485" y1="484" x2="485" y2="512" stroke="var(--ad-blue-light)" stroke-width="1" marker-end="url(#ad-arrow-data)"/>
-        <line x1="631" y1="484" x2="631" y2="512" stroke="var(--ad-blue-light)" stroke-width="1" marker-end="url(#ad-arrow-data)"/>
-        <line x1="777" y1="484" x2="777" y2="512" stroke="var(--ad-blue-light)" stroke-width="1" marker-end="url(#ad-arrow-data)"/>
-        <line x1="923" y1="484" x2="923" y2="512" stroke="var(--ad-blue-light)" stroke-width="1" marker-end="url(#ad-arrow-data)"/>
-        <line x1="1069" y1="484" x2="1069" y2="512" stroke="var(--ad-blue-light)" stroke-width="1" marker-end="url(#ad-arrow-data)"/>
+        <line marker-end="url(#ad-arrow-data)" stroke="var(--ad-blue-light)" stroke-width="1" x1="339" x2="339" y1="484"
+              y2="512"/>
+        <line marker-end="url(#ad-arrow-data)" stroke="var(--ad-blue-light)" stroke-width="1" x1="485" x2="485" y1="484"
+              y2="512"/>
+        <line marker-end="url(#ad-arrow-data)" stroke="var(--ad-blue-light)" stroke-width="1" x1="631" x2="631" y1="484"
+              y2="512"/>
+        <line marker-end="url(#ad-arrow-data)" stroke="var(--ad-blue-light)" stroke-width="1" x1="777" x2="777" y1="484"
+              y2="512"/>
+        <line marker-end="url(#ad-arrow-data)" stroke="var(--ad-blue-light)" stroke-width="1" x1="923" x2="923" y1="484"
+              y2="512"/>
+        <line marker-end="url(#ad-arrow-data)" stroke="var(--ad-blue-light)" stroke-width="1" x1="1069" x2="1069" y1="484"
+              y2="512"/>
 
         <!-- ============================================================
              BOTTOM BANNERS
              ============================================================ -->
-        <rect x="260" y="611" width="420" height="34" rx="8" fill="url(#ad-banner-grad)"/>
-        <g transform="translate(282, 619)" fill="none" stroke="var(--ad-icon-stroke)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="2" width="15" height="14" rx="2"/>
-          <rect x="6" y="6" width="7" height="6"/>
-          <line x1="2" y1="6" x2="0" y2="6"/>
-          <line x1="2" y1="12" x2="0" y2="12"/>
-          <line x1="17" y1="6" x2="19" y2="6"/>
-          <line x1="17" y1="12" x2="19" y2="12"/>
-          <line x1="6" y1="2" x2="6" y2="0"/>
-          <line x1="13" y1="2" x2="13" y2="0"/>
-          <line x1="6" y1="16" x2="6" y2="18"/>
-          <line x1="13" y1="16" x2="13" y2="18"/>
+        <rect fill="url(#ad-banner-grad)" height="34" rx="8" width="420" x="260" y="611"/>
+        <g fill="none" stroke="var(--ad-icon-stroke)" stroke-linecap="round" stroke-linejoin="round"
+           stroke-width="1.5" transform="translate(282, 619)">
+          <rect height="14" rx="2" width="15" x="2" y="2"/>
+          <rect height="6" width="7" x="6" y="6"/>
+          <line x1="2" x2="0" y1="6" y2="6"/>
+          <line x1="2" x2="0" y1="12" y2="12"/>
+          <line x1="17" x2="19" y1="6" y2="6"/>
+          <line x1="17" x2="19" y1="12" y2="12"/>
+          <line x1="6" x2="6" y1="2" y2="0"/>
+          <line x1="13" x2="13" y1="2" y2="0"/>
+          <line x1="6" x2="6" y1="16" y2="18"/>
+          <line x1="13" x2="13" y1="16" y2="18"/>
         </g>
-        <text x="470" y="633" fill="var(--ad-text-bright)" font-size="12" font-weight="700" text-anchor="middle">{{ s.bot1 }}</text>
-        <line x1="470" y1="611" x2="470" y2="598" stroke="var(--ad-blue)" stroke-width="2" marker-end="url(#ad-arrow-up)"/>
+        <text fill="var(--ad-text-bright)" font-size="12" font-weight="700" text-anchor="middle" x="470" y="633">
+          {{ s.bot1 }}
+        </text>
+        <line marker-end="url(#ad-arrow-up)" stroke="var(--ad-blue)" stroke-width="2" x1="470" x2="470" y1="611"
+              y2="598"/>
 
-        <rect x="720" y="611" width="420" height="34" rx="8" fill="url(#ad-banner-grad)"/>
-        <g transform="translate(742, 619)" fill="none" stroke="var(--ad-icon-stroke)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect fill="url(#ad-banner-grad)" height="34" rx="8" width="420" x="720" y="611"/>
+        <g fill="none" stroke="var(--ad-icon-stroke)" stroke-linecap="round" stroke-linejoin="round"
+           stroke-width="1.5" transform="translate(742, 619)">
           <circle cx="10" cy="9" r="5.5"/>
-          <circle cx="10" cy="9" r="1.8" fill="var(--ad-icon-stroke)"/>
-          <line x1="10" y1="1" x2="10" y2="3"/>
-          <line x1="10" y1="15" x2="10" y2="17"/>
-          <line x1="2" y1="9" x2="4" y2="9"/>
-          <line x1="16" y1="9" x2="18" y2="9"/>
-          <line x1="4.5" y1="3.5" x2="6" y2="5"/>
-          <line x1="14" y1="13" x2="15.5" y2="14.5"/>
-          <line x1="15.5" y1="3.5" x2="14" y2="5"/>
-          <line x1="6" y1="13" x2="4.5" y2="14.5"/>
+          <circle cx="10" cy="9" fill="var(--ad-icon-stroke)" r="1.8"/>
+          <line x1="10" x2="10" y1="1" y2="3"/>
+          <line x1="10" x2="10" y1="15" y2="17"/>
+          <line x1="2" x2="4" y1="9" y2="9"/>
+          <line x1="16" x2="18" y1="9" y2="9"/>
+          <line x1="4.5" x2="6" y1="3.5" y2="5"/>
+          <line x1="14" x2="15.5" y1="13" y2="14.5"/>
+          <line x1="15.5" x2="14" y1="3.5" y2="5"/>
+          <line x1="6" x2="4.5" y1="13" y2="14.5"/>
         </g>
-        <text x="930" y="633" fill="var(--ad-text-bright)" font-size="12" font-weight="700" text-anchor="middle">{{ s.bot2 }}</text>
-        <line x1="930" y1="611" x2="930" y2="598" stroke="var(--ad-blue)" stroke-width="2" marker-end="url(#ad-arrow-up)"/>
+        <text fill="var(--ad-text-bright)" font-size="12" font-weight="700" text-anchor="middle" x="930" y="633">
+          {{ s.bot2 }}
+        </text>
+        <line marker-end="url(#ad-arrow-up)" stroke="var(--ad-blue)" stroke-width="2" x1="930" x2="930" y1="611"
+              y2="598"/>
 
         <!-- ============================================================
              LEGEND
              ============================================================ -->
-        <text x="60" y="700" fill="var(--ad-text-bright)" font-size="11" font-weight="700">{{ s.legTitle }}</text>
+        <text fill="var(--ad-text-bright)" font-size="11" font-weight="700" x="60" y="700">{{ s.legTitle }}</text>
 
-        <rect x="60" y="712" width="18" height="10" rx="2" fill="url(#ad-banner-grad)"/>
-        <text x="84" y="721" fill="var(--ad-legend-text)" font-size="9">{{ s.leg1 }}</text>
+        <rect fill="url(#ad-banner-grad)" height="10" rx="2" width="18" x="60" y="712"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="84" y="721">{{ s.leg1 }}</text>
 
-        <rect x="210" y="712" width="18" height="10" rx="2" fill="var(--ad-app-box)" stroke="var(--dc3-fe-stroke)" stroke-width="0.5"/>
-        <text x="234" y="721" fill="var(--ad-legend-text)" font-size="9">{{ s.leg2 }}</text>
+        <rect fill="var(--ad-app-box)" height="10" rx="2" stroke="var(--dc3-fe-stroke)" stroke-width="0.5" width="18" x="210"
+              y="712"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="234" y="721">{{ s.leg2 }}</text>
 
-        <line x1="390" y1="717" x2="408" y2="717" stroke="var(--ad-blue-light)" stroke-width="1.5" marker-end="url(#ad-arrow-data)"/>
-        <text x="414" y="721" fill="var(--ad-legend-text)" font-size="9">{{ s.leg3 }}</text>
+        <line marker-end="url(#ad-arrow-data)" stroke="var(--ad-blue-light)" stroke-width="1.5" x1="390" x2="408" y1="717"
+              y2="717"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="414" y="721">{{ s.leg3 }}</text>
 
-        <line x1="570" y1="717" x2="588" y2="717" stroke="var(--ad-blue)" stroke-width="2" marker-end="url(#ad-arrow-down)"/>
-        <text x="594" y="721" fill="var(--ad-legend-text)" font-size="9">{{ s.leg4 }}</text>
+        <line marker-end="url(#ad-arrow-down)" stroke="var(--ad-blue)" stroke-width="2" x1="570" x2="588" y1="717"
+              y2="717"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="594" y="721">{{ s.leg4 }}</text>
 
-        <rect x="750" y="712" width="18" height="10" rx="2" fill="var(--ad-rose-box)" stroke="var(--dc3-rose-stroke)" stroke-width="1" stroke-dasharray="4,3"/>
-        <text x="774" y="721" fill="var(--ad-legend-text)" font-size="9">{{ s.leg5 }}</text>
+        <rect fill="var(--ad-rose-box)" height="10" rx="2" stroke="var(--dc3-rose-stroke)" stroke-dasharray="4,3" stroke-width="1" width="18"
+              x="750" y="712"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="774" y="721">{{ s.leg5 }}</text>
 
-        <rect x="910" y="714" width="8" height="8" rx="2" fill="var(--dc3-fe-stroke)"/>
-        <text x="924" y="722" fill="var(--ad-legend-text)" font-size="9">{{ s.legApp }}</text>
-        <rect x="956" y="714" width="8" height="8" rx="2" fill="var(--ad-plat-mgmt-stroke)"/>
-        <text x="970" y="722" fill="var(--ad-legend-text)" font-size="9">{{ s.legPlat }}</text>
-        <rect x="1012" y="714" width="8" height="8" rx="2" fill="var(--ad-plat-data-stroke)"/>
-        <text x="1026" y="722" fill="var(--ad-legend-text)" font-size="9">{{ s.legNet }}</text>
-        <rect x="1068" y="714" width="8" height="8" rx="2" fill="var(--dc3-be-stroke)"/>
-        <text x="1082" y="722" fill="var(--ad-legend-text)" font-size="9">{{ s.legPerc }}</text>
-        <rect x="1132" y="714" width="8" height="8" rx="2" fill="var(--dc3-rose-stroke)"/>
-        <text x="1146" y="722" fill="var(--ad-legend-text)" font-size="9">{{ s.legSec }}</text>
-        <rect x="1208" y="714" width="8" height="8" rx="2" fill="var(--dc3-amber-stroke)"/>
-        <text x="1222" y="722" fill="var(--ad-legend-text)" font-size="9">{{ s.legDep }}</text>
+        <rect fill="var(--dc3-fe-stroke)" height="8" rx="2" width="8" x="910" y="714"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="924" y="722">{{ s.legApp }}</text>
+        <rect fill="var(--ad-plat-mgmt-stroke)" height="8" rx="2" width="8" x="956" y="714"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="970" y="722">{{ s.legPlat }}</text>
+        <rect fill="var(--ad-plat-data-stroke)" height="8" rx="2" width="8" x="1012" y="714"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="1026" y="722">{{ s.legNet }}</text>
+        <rect fill="var(--dc3-be-stroke)" height="8" rx="2" width="8" x="1068" y="714"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="1082" y="722">{{ s.legPerc }}</text>
+        <rect fill="var(--dc3-rose-stroke)" height="8" rx="2" width="8" x="1132" y="714"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="1146" y="722">{{ s.legSec }}</text>
+        <rect fill="var(--dc3-amber-stroke)" height="8" rx="2" width="8" x="1208" y="714"/>
+        <text fill="var(--ad-legend-text)" font-size="9" x="1222" y="722">{{ s.legDep }}</text>
 
       </g>
     </svg>
-  </div>
+    </div>
+  </DiagramFrame>
 </template>
 
 <style>
