@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { expect, type Page, test } from '@playwright/test';
+import {expect, type Page, test} from '@playwright/test';
 
-import { waitForAppSettled } from '../fixtures/app';
+import {waitForAppSettled} from '../fixtures/app';
 
 /**
  * Login form must reject obviously bad input client-side and bad
@@ -34,12 +34,12 @@ const passwordInput = (page: Page) => page.locator('.login-form input[type="pass
 const submitButton = (page: Page) => page.locator('.login-submit');
 
 test.describe('login form validation', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#/login', { waitUntil: 'domcontentloaded' });
+  test.beforeEach(async ({page}) => {
+    await page.goto('/#/login', {waitUntil: 'domcontentloaded'});
     await waitForAppSettled(page);
   });
 
-  test('blocks submission and surfaces an error when the password is empty', async ({ page }) => {
+  test('blocks submission and surfaces an error when the password is empty', async ({page}) => {
     // The form pre-fills tenant/name/password defaults — clear password
     // to drive the "required" rule. We don't rely on i18n text; instead
     // we look at the structural `is-error` state Element Plus toggles
@@ -55,7 +55,7 @@ test.describe('login form validation', () => {
     await expect(page.locator('.login-form .el-form-item.is-error')).toHaveCount(1);
   });
 
-  test('rejects passwords shorter than the 6-character minimum rule', async ({ page }) => {
+  test('rejects passwords shorter than the 6-character minimum rule', async ({page}) => {
     await passwordInput(page).fill('12345');
     await submitButton(page).click();
 
@@ -63,7 +63,7 @@ test.describe('login form validation', () => {
     await expect(page.locator('.login-form .el-form-item.is-error')).toHaveCount(1);
   });
 
-  test('keeps the user on /login when the backend rejects the credentials', async ({ page }) => {
+  test('keeps the user on /login when the backend rejects the credentials', async ({page}) => {
     // Stub the auth API at the network layer so this test stays
     // deterministic regardless of backend health. We intercept *before*
     // navigating to /login below so the route handlers are armed by the
@@ -72,18 +72,18 @@ test.describe('login form validation', () => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ ok: true, code: 200, data: 'forced-salt' }),
+        body: JSON.stringify({ok: true, code: 200, data: 'forced-salt'}),
       })
     );
     await page.route('**/api/v3/auth/token/generate', (route) =>
       route.fulfill({
         status: 401,
         contentType: 'application/json',
-        body: JSON.stringify({ ok: false, code: 401, message: 'Invalid credentials', data: null }),
+        body: JSON.stringify({ok: false, code: 401, message: 'Invalid credentials', data: null}),
       })
     );
 
-    await page.goto('/#/login', { waitUntil: 'domcontentloaded' });
+    await page.goto('/#/login', {waitUntil: 'domcontentloaded'});
     await waitForAppSettled(page);
 
     await passwordInput(page).fill('dc3dc3dc3');

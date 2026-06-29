@@ -88,12 +88,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { useI18n } from 'vue-i18n';
+  import {useI18n} from 'vue-i18n';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import pkg from '../../../../package.json';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const version = pkg.version;
 
   const objectiveKeys = [

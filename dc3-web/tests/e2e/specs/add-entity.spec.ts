@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { expect, test } from '@playwright/test';
+import {expect, test} from '@playwright/test';
 
 import {
   ensureE2eData,
@@ -52,11 +52,11 @@ async function openAddDialogAndFill(
   route: string,
   fields: Record<string, string>
 ) {
-  await page.goto(`/#${route}`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`/#${route}`, {waitUntil: 'domcontentloaded'});
   await waitForAppSettled(page);
 
   // Click the Add button on the list page
-  const addBtn = page.getByRole('button', { name: /Add|新增/ }).first();
+  const addBtn = page.getByRole('button', {name: /Add|新增/}).first();
   await addBtn.click();
   await waitForAppSettled(page);
 
@@ -79,7 +79,7 @@ async function submitAndCleanup(
   health: ReturnType<typeof watchPageHealth>
 ) {
   const mark = markHealth(health);
-  await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
+  await dialog.getByRole('button', {name: /Confirm|确定/}).click();
   await waitForAppSettled(page);
 
   // Check for errors
@@ -89,16 +89,16 @@ async function submitAndCleanup(
   // We look for the success notification to confirm creation
   // The dialog should close on success
   await expect(dialog)
-    .not.toBeVisible({ timeout: 5_000 })
+    .not.toBeVisible({timeout: 5_000})
     .catch(() => {});
 }
 
 test.describe('add entity via UI forms', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({page}) => {
     await login(page);
   });
 
-  test('add profile via profile list page', async ({ page }) => {
+  test('add profile via profile list page', async ({page}) => {
     const health = watchPageHealth(page);
     const e2eData = await ensureE2eData(page);
 
@@ -116,7 +116,7 @@ test.describe('add entity via UI forms', () => {
     }
   });
 
-  test('add device via device list page', async ({ page }) => {
+  test('add device via device list page', async ({page}) => {
     const health = watchPageHealth(page);
     const e2eData = await ensureE2eData(page);
     const driverId = e2eData.routeIds.driverId;
@@ -148,25 +148,25 @@ test.describe('add entity via UI forms', () => {
     }
   });
 
-  test('add point via profile detail page', async ({ page }) => {
+  test('add point via profile detail page', async ({page}) => {
     const health = watchPageHealth(page);
     const e2eData = await ensureE2eData(page);
     const profileId = e2eData.routeIds.profileId;
     expect(profileId, 'need a seeded profile').toBeDefined();
 
     try {
-      await page.goto(`/#/profile/detail?id=${profileId}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`/#/profile/detail?id=${profileId}`, {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
 
       // Click on "Point" tab if it exists
-      const pointTab = page.getByRole('tab', { name: /Point|位号/ });
+      const pointTab = page.getByRole('tab', {name: /Point|位号/});
       if (await pointTab.isVisible().catch(() => false)) {
         await pointTab.click();
         await waitForAppSettled(page);
       }
 
       // Click Add button for points
-      const addBtn = page.getByRole('button', { name: /Add|新增/ }).first();
+      const addBtn = page.getByRole('button', {name: /Add|新增/}).first();
       if (await addBtn.isVisible().catch(() => false)) {
         await addBtn.click();
         await waitForAppSettled(page);
@@ -179,7 +179,7 @@ test.describe('add entity via UI forms', () => {
         }
 
         const mark = markHealth(health);
-        await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
+        await dialog.getByRole('button', {name: /Confirm|确定/}).click();
         await waitForAppSettled(page);
         expectHealthy(health, mark);
       }
@@ -188,15 +188,15 @@ test.describe('add entity via UI forms', () => {
     }
   });
 
-  test('add settings user via user list page', async ({ page }) => {
+  test('add settings user via user list page', async ({page}) => {
     const health = watchPageHealth(page);
     const e2eData = await ensureE2eData(page);
 
     try {
-      await page.goto('/#/settings/user', { waitUntil: 'domcontentloaded' });
+      await page.goto('/#/settings/user', {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
 
-      const addBtn = page.getByRole('button', { name: /Add|新增/ }).first();
+      const addBtn = page.getByRole('button', {name: /Add|新增/}).first();
       if (!(await addBtn.isVisible().catch(() => false))) return;
 
       await addBtn.click();
@@ -209,7 +209,7 @@ test.describe('add entity via UI forms', () => {
       await dialog.getByPlaceholder(/nick name|nickname|昵称/i).fill(name);
 
       const mark = markHealth(health);
-      await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
+      await dialog.getByRole('button', {name: /Confirm|确定/}).click();
       await waitForAppSettled(page);
 
       // May fail due to password requirements etc — just verify no page errors
@@ -219,15 +219,15 @@ test.describe('add entity via UI forms', () => {
     }
   });
 
-  test('add settings role via role list page', async ({ page }) => {
+  test('add settings role via role list page', async ({page}) => {
     const health = watchPageHealth(page);
     const e2eData = await ensureE2eData(page);
 
     try {
-      await page.goto('/#/settings/role', { waitUntil: 'domcontentloaded' });
+      await page.goto('/#/settings/role', {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
 
-      const addBtn = page.getByRole('button', { name: /Add|新增/ }).first();
+      const addBtn = page.getByRole('button', {name: /Add|新增/}).first();
       if (!(await addBtn.isVisible().catch(() => false))) return;
 
       await addBtn.click();
@@ -242,7 +242,7 @@ test.describe('add entity via UI forms', () => {
       }
 
       const mark = markHealth(health);
-      await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
+      await dialog.getByRole('button', {name: /Confirm|确定/}).click();
       await waitForAppSettled(page);
       expectHealthy(health, mark);
     } finally {
@@ -250,15 +250,15 @@ test.describe('add entity via UI forms', () => {
     }
   });
 
-  test('add settings group via group list page', async ({ page }) => {
+  test('add settings group via group list page', async ({page}) => {
     const health = watchPageHealth(page);
     const e2eData = await ensureE2eData(page);
 
     try {
-      await page.goto('/#/settings/group', { waitUntil: 'domcontentloaded' });
+      await page.goto('/#/settings/group', {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
 
-      const addBtn = page.getByRole('button', { name: /Add|新增/ }).first();
+      const addBtn = page.getByRole('button', {name: /Add|新增/}).first();
       if (!(await addBtn.isVisible().catch(() => false))) return;
 
       await addBtn.click();
@@ -273,7 +273,7 @@ test.describe('add entity via UI forms', () => {
       }
 
       const mark = markHealth(health);
-      await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
+      await dialog.getByRole('button', {name: /Confirm|确定/}).click();
       await waitForAppSettled(page);
       expectHealthy(health, mark);
     } finally {
@@ -281,15 +281,15 @@ test.describe('add entity via UI forms', () => {
     }
   });
 
-  test('add settings label via label list page', async ({ page }) => {
+  test('add settings label via label list page', async ({page}) => {
     const health = watchPageHealth(page);
     const e2eData = await ensureE2eData(page);
 
     try {
-      await page.goto('/#/settings/label', { waitUntil: 'domcontentloaded' });
+      await page.goto('/#/settings/label', {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
 
-      const addBtn = page.getByRole('button', { name: /Add|新增/ }).first();
+      const addBtn = page.getByRole('button', {name: /Add|新增/}).first();
       if (!(await addBtn.isVisible().catch(() => false))) return;
 
       await addBtn.click();
@@ -304,7 +304,7 @@ test.describe('add entity via UI forms', () => {
       }
 
       const mark = markHealth(health);
-      await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
+      await dialog.getByRole('button', {name: /Confirm|确定/}).click();
       await waitForAppSettled(page);
       expectHealthy(health, mark);
     } finally {
@@ -312,15 +312,15 @@ test.describe('add entity via UI forms', () => {
     }
   });
 
-  test('add agentic provider via settings page', async ({ page }) => {
+  test('add agentic provider via settings page', async ({page}) => {
     const health = watchPageHealth(page);
     const e2eData = await ensureE2eData(page);
 
     try {
-      await page.goto('/#/settings/model/provider', { waitUntil: 'domcontentloaded' });
+      await page.goto('/#/settings/model/provider', {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
 
-      const addBtn = page.getByRole('button', { name: /Add|新增/ }).first();
+      const addBtn = page.getByRole('button', {name: /Add|新增/}).first();
       if (!(await addBtn.isVisible().catch(() => false))) return;
 
       await addBtn.click();
@@ -337,7 +337,7 @@ test.describe('add entity via UI forms', () => {
       }
 
       const mark = markHealth(health);
-      await dialog.getByRole('button', { name: /Confirm|确定/ }).click();
+      await dialog.getByRole('button', {name: /Confirm|确定/}).click();
       await waitForAppSettled(page);
       expectHealthy(health, mark);
     } finally {

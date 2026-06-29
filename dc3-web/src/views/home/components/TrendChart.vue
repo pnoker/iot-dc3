@@ -24,12 +24,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-  import { Chart } from '@antv/g2';
+  import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+  import {Chart} from '@antv/g2';
 
-  import { statsTimeseries } from '@/api/dashboard';
+  import {statsTimeseries} from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
   const rangeKey = ref<RangeKey>('24h');
@@ -40,10 +40,10 @@
   const ensureChart = () => {
     if (!chartRef.value) return;
     chart?.destroy();
-    chart = new Chart({ container: chartRef.value, autoFit: true });
+    chart = new Chart({container: chartRef.value, autoFit: true});
   };
 
-  const render = (points: { bucket: string; count: number }[]) => {
+  const render = (points: {bucket: string; count: number}[]) => {
     ensureChart();
     if (!chart) return;
     chart
@@ -52,10 +52,10 @@
       .encode('x', 'bucket')
       .encode('y', 'count')
       .encode('shape', 'smooth')
-      .scale('y', { zero: true, nice: true })
+      .scale('y', {zero: true, nice: true})
       .style('fill', 'linear-gradient(-90deg, rgba(64,158,255,0.02) 0%, rgba(64,158,255,0.45) 100%)')
-      .axis({ x: { title: false, labelAutoHide: true }, y: { title: false } })
-      .animate('enter', { type: 'fadeIn', duration: 400 });
+      .axis({x: {title: false, labelAutoHide: true}, y: {title: false}})
+      .animate('enter', {type: 'fadeIn', duration: 400});
     chart
       .line()
       .data(points)
@@ -85,7 +85,7 @@
         granularity: granularityFor(rangeKey.value),
         rangeKey: rangeKey.value,
       });
-      const points = (res?.data ?? []).map((p: any) => ({ bucket: p.bucket, count: Number(p.count) || 0 }));
+      const points = (res?.data ?? []).map((p: any) => ({bucket: p.bucket, count: Number(p.count) || 0}));
       await nextTick();
       render(points);
     } catch {

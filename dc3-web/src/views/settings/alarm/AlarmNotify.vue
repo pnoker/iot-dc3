@@ -62,7 +62,7 @@
           :show-overflow-tooltip="column.overflow !== false"
           :width="column.width"
         >
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-tag v-if="column.kind === 'tag'" :type="tagType(row[column.prop], column.prop)">
               {{ formatCell(row, column) }}
             </el-tag>
@@ -74,7 +74,7 @@
         </el-table-column>
         <!-- @vue-generic {import('@/config/types').AlarmEntity} -->
         <el-table-column :label="t('common.operation')" :width="activeConfig.editable ? 180 : 100" fixed="right">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button v-if="activeConfig.editable" link type="primary" @click="openEdit(row)">
               {{ t('common.edit') }}
@@ -150,7 +150,7 @@
               <el-input
                 v-else-if="field.kind === 'json' || field.kind === 'textarea'"
                 v-model="formModel[field.prop]"
-                :autosize="{ minRows: field.rows || 4, maxRows: 18 }"
+                :autosize="{minRows: field.rows || 4, maxRows: 18}"
                 :placeholder="field.placeholder"
                 resize="vertical"
                 type="textarea"
@@ -172,15 +172,15 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, watch } from 'vue';
-  import { Plus } from '@element-plus/icons-vue';
+  import {reactive, watch} from 'vue';
+  import {Plus} from '@element-plus/icons-vue';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 
-  import type { AlarmFieldConfig, AlarmOption } from './alarmEntityConfig';
-  import { type AlarmEntityPageProps, useAlarmEntityPage } from './useAlarmEntityPage';
+  import type {AlarmFieldConfig, AlarmOption} from './alarmEntityConfig';
+  import {type AlarmEntityPageProps, useAlarmEntityPage} from './useAlarmEntityPage';
 
   const props = defineProps<AlarmEntityPageProps>();
 

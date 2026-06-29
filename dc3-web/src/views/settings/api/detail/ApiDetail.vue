@@ -57,11 +57,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive } from 'vue';
-  import { useRoute } from 'vue-router';
+  import {onMounted, reactive} from 'vue';
+  import {useRoute} from 'vue-router';
 
-  import { getApiById } from '@/api/api';
-  import { timestampLabel } from '@/utils/dateUtil';
+  import {getApiById} from '@/api/api';
+  import {timestampLabel} from '@/utils/dateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';

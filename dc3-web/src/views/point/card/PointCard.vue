@@ -116,21 +116,21 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, type PropType } from 'vue';
-  import { Edit, List, Location, Sunset } from '@element-plus/icons-vue';
-  import { copy } from '@/utils/commonUtil';
-  import { timestamp } from '@/utils/dateUtil';
-  import { successMessage } from '@/utils/notificationUtil';
-  import { pointTypeKey, rwFlagKey } from '@/utils/pointFormatUtil';
-  import { isEnabledFlag } from '@/utils/thingModelFormatUtil';
+  import {computed, type PropType} from 'vue';
+  import {Edit, List, Location, Sunset} from '@element-plus/icons-vue';
+  import {copy} from '@/utils/commonUtil';
+  import {timestamp} from '@/utils/dateUtil';
+  import {successMessage} from '@/utils/notificationUtil';
+  import {pointTypeKey, rwFlagKey} from '@/utils/pointFormatUtil';
+  import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
   import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
   import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
 
   const props = defineProps({
-    embedded: { type: Boolean, default: false },
-    data: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
-    profile: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
-    icon: { type: String, default: 'images/common/point.png' },
+    embedded: {type: Boolean, default: false},
+    data: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+    profile: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+    icon: {type: String, default: 'images/common/point.png'},
   });
 
   const emit = defineEmits(['disable', 'enable', 'delete', 'edit', 'detail']);

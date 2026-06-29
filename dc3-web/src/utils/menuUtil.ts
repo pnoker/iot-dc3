@@ -15,7 +15,7 @@
  */
 
 import i18n from '@/config/i18n';
-import type { MenuNode } from '@/store/modules/menu';
+import type {MenuNode} from '@/store/modules/menu';
 
 /**
  * Resolve the display name of a menu node given the currently active locale.

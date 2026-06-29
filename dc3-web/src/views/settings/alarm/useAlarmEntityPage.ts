@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import type { FormInstance, FormItemRule, FormRules } from 'element-plus';
-import { computed, reactive, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import type {FormInstance, FormItemRule, FormRules} from 'element-plus';
+import {computed, reactive, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
+import {useRouter} from 'vue-router';
 
-import type { AlarmEntity, Order, PageQuery } from '@/config/types';
-import { timestampLabel } from '@/utils/dateUtil';
-import { prettyJson } from '@/utils/jsonUtil';
-import { successMessage } from '@/utils/notificationUtil';
-import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
+import type {AlarmEntity, Order, PageQuery} from '@/config/types';
+import {timestampLabel} from '@/utils/dateUtil';
+import {prettyJson} from '@/utils/jsonUtil';
+import {successMessage} from '@/utils/notificationUtil';
+import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
 import {
   ALARM_DETAIL_ROUTE_MAP,
@@ -38,9 +38,9 @@ export interface AlarmEntityPageProps {
 }
 
 export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
-  const { configs } = createAlarmEntityConfigs((key) => t(key));
+  const {configs} = createAlarmEntityConfigs((key) => t(key));
 
   const formVisible = ref(false);
   const editing = ref(false);
@@ -62,7 +62,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
       total: 0,
       size: 12,
       current: 1,
-      orders: [{ column: 'create_time', asc: false }] as Order[],
+      orders: [{column: 'create_time', asc: false}] as Order[],
     },
   });
 
@@ -151,7 +151,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   };
 
   const reset = () => {
-    resetSearchForm(searchForm, { keyword: '', filterValue: '' });
+    resetSearchForm(searchForm, {keyword: '', filterValue: ''});
     state.page.current = 1;
     load();
   };
@@ -159,7 +159,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   const sort = () => {
     const currentOrder = state.page.orders[0];
     const asc = currentOrder ? !currentOrder.asc : true;
-    state.page.orders = [{ column: 'create_time', asc }];
+    state.page.orders = [{column: 'create_time', asc}];
     load();
   };
 
@@ -210,7 +210,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   };
 
   const openDetail = (row: AlarmEntity) => {
-    router.push({ name: ALARM_DETAIL_ROUTE_MAP[activeConfig.value.key], query: { id: String(row.id) } }).catch(() => {
+    router.push({name: ALARM_DETAIL_ROUTE_MAP[activeConfig.value.key], query: {id: String(row.id)}}).catch(() => {
       // handled globally
     });
   };
@@ -324,7 +324,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   watch(
     () => props.entity,
     () => {
-      resetSearchForm(searchForm, { keyword: '', filterValue: '' });
+      resetSearchForm(searchForm, {keyword: '', filterValue: ''});
       state.page.current = 1;
       formVisible.value = false;
       load();

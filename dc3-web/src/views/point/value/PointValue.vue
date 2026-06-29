@@ -56,9 +56,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref } from 'vue';
-  import { getPointValueLatest, listPointByIds, listPointUnit, listPointValue, writePointValue } from '@/api/point';
-  import { listDeviceByIds } from '@/api/device';
+  import {computed, onMounted, reactive, ref} from 'vue';
+  import {getPointValueLatest, listPointByIds, listPointUnit, listPointValue, writePointValue} from '@/api/point';
+  import {listDeviceByIds} from '@/api/device';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
@@ -67,7 +67,7 @@
   import pointValueEditForm from './edit/PointValueEditForm.vue';
   import pointValueDetail from './detail/PointValueDetail.vue';
 
-  import { isNull } from '@/utils/validationUtil';
+  import {isNull} from '@/utils/validationUtil';
 
   const props = defineProps({
     embedded: {

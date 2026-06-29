@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
 import DefaultTag from '@/components/tag/DefaultTag.vue';
@@ -31,28 +31,28 @@ function mountTag(props: Record<string, unknown>) {
     props,
     global: {
       plugins: [i18n],
-      stubs: { ElTag: ElTagStub },
+      stubs: {ElTag: ElTagStub},
     },
   });
 }
 
 describe('DefaultTag', () => {
   it('renders the success type with the yes label when value matches activeValue', () => {
-    const wrapper = mountTag({ value: 'DEFAULT' });
+    const wrapper = mountTag({value: 'DEFAULT'});
     const tag = wrapper.find('.el-tag-stub');
     expect(tag.attributes('data-type')).toBe('success');
     expect(tag.text()).toBe('Yes');
   });
 
   it('renders the info type with the no label when value does not match', () => {
-    const wrapper = mountTag({ value: 'NORMAL' });
+    const wrapper = mountTag({value: 'NORMAL'});
     const tag = wrapper.find('.el-tag-stub');
     expect(tag.attributes('data-type')).toBe('info');
     expect(tag.text()).toBe('No');
   });
 
   it('honors a custom activeValue prop for non-default semantics', () => {
-    const wrapper = mountTag({ value: 1, activeValue: 1 });
+    const wrapper = mountTag({value: 1, activeValue: 1});
     expect(wrapper.find('.el-tag-stub').attributes('data-type')).toBe('success');
   });
 });

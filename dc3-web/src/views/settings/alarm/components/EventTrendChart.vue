@@ -26,23 +26,23 @@
 </template>
 
 <script lang="ts" setup>
-  import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-  import { Chart } from '@antv/g2';
+  import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+  import {Chart} from '@antv/g2';
 
-  import { alertTrend } from '@/api/dashboard';
+  import {alertTrend} from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
-  const props = defineProps<{ days?: number }>();
+  const props = defineProps<{days?: number}>();
 
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
   let chart: Chart | undefined;
 
-  const render = (data: { date: string; source: string; count: number }[]) => {
+  const render = (data: {date: string; source: string; count: number}[]) => {
     const el = chartRef.value;
     if (!el) return;
     chart?.destroy();
-    chart = new Chart({ container: el, autoFit: true });
+    chart = new Chart({container: el, autoFit: true});
     chart
       .line()
       .data(data)
@@ -51,9 +51,9 @@
       .encode('color', 'source')
       .encode('shape', 'smooth')
       .style('lineWidth', 2)
-      .axis({ x: { title: false, labelAutoHide: true }, y: { title: false } })
+      .axis({x: {title: false, labelAutoHide: true}, y: {title: false}})
       .legend('color')
-      .tooltip({ channel: 'y', valueFormatter: (d: number) => d.toLocaleString() });
+      .tooltip({channel: 'y', valueFormatter: (d: number) => d.toLocaleString()});
     chart.render();
   };
 
@@ -62,11 +62,11 @@
     try {
       const res: any = await alertTrend(props.days ?? 30);
       const rows: any[] = res?.data ?? [];
-      const flat: { date: string; source: string; count: number }[] = [];
+      const flat: {date: string; source: string; count: number}[] = [];
       for (const r of rows) {
-        flat.push({ date: r.date, source: 'Device', count: r.deviceCount ?? 0 });
-        flat.push({ date: r.date, source: 'Driver', count: r.driverCount ?? 0 });
-        flat.push({ date: r.date, source: 'Point', count: r.pointCount ?? 0 });
+        flat.push({date: r.date, source: 'Device', count: r.deviceCount ?? 0});
+        flat.push({date: r.date, source: 'Driver', count: r.driverCount ?? 0});
+        flat.push({date: r.date, source: 'Point', count: r.pointCount ?? 0});
       }
       await nextTick();
       render(flat);
@@ -81,7 +81,7 @@
   watch(() => props.days, load);
   onUnmounted(() => chart?.destroy());
 
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const apiMocks = vi.hoisted(() => ({
   listApi: vi.fn(() =>
     Promise.resolve({
-      data: { records: [{ id: 'api-1', apiName: '/api/v3/manager/device/list', enableFlag: 'ENABLE' }], total: 1 },
+      data: {records: [{id: 'api-1', apiName: '/api/v3/manager/device/list', enableFlag: 'ENABLE'}], total: 1},
     })
   ),
 }));
@@ -44,15 +44,15 @@ describe('SettingsApi view', () => {
     await mountListPage({
       component: SettingsApi,
       stubs: {
-        apiTool: { template: '<section class="api-tool-stub" />' },
+        apiTool: {template: '<section class="api-tool-stub" />'},
       },
-      extraRoutes: [{ name: 'settingsApiDetail', path: '/settings/api/detail', component: { template: '<div />' } }],
+      extraRoutes: [{name: 'settingsApiDetail', path: '/settings/api/detail', component: {template: '<div />'}}],
     });
     await flushPromises();
 
     expect(apiMocks.listApi).toHaveBeenCalledTimes(1);
     expect(apiMocks.listApi).toHaveBeenCalledWith(
-      expect.objectContaining({ page: expect.objectContaining({ current: 1, size: 12 }) })
+      expect.objectContaining({page: expect.objectContaining({current: 1, size: 12})})
     );
   });
 });

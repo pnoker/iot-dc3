@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineConfig, devices } from '@playwright/test';
+import {defineConfig, devices} from '@playwright/test';
 
 const baseURL = process.env.E2E_BASE_URL || 'http://localhost:8080';
 const startServer = process.env.E2E_START_SERVER !== '0';
@@ -32,8 +32,8 @@ export default defineConfig({
   workers,
   reporter: [
     ['list'],
-    ['html', { open: 'never', outputFolder: 'playwright-report' }],
-    ['json', { outputFile: 'test-results/e2e-results.json' }],
+    ['html', {open: 'never', outputFolder: 'playwright-report'}],
+    ['json', {outputFile: 'test-results/e2e-results.json'}],
   ],
   use: {
     baseURL,
@@ -55,7 +55,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {...devices['Desktop Chrome']},
     },
   ],
   outputDir: 'test-results/e2e-artifacts',

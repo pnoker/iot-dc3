@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { vi } from 'vitest';
+import {vi} from 'vitest';
 
-import type { EntityListConfig } from '@/config/types/entityList';
+import type {EntityListConfig} from '@/config/types/entityList';
 
 /**
  * Fixed rows returned by the stub list function. Two records with deterministic
@@ -28,14 +28,14 @@ export const ENTITY_LIST_ROWS = [
     name: 'Alpha',
     status: 'SUCCESS',
     createTime: '2026-01-15T10:30:00.000Z',
-    extra: { metadata: '{"key":"value"}' },
+    extra: {metadata: '{"key":"value"}'},
   },
   {
     id: 'row-2',
     name: null,
     status: 'FAILED',
     createTime: null,
-    extra: { metadata: null },
+    extra: {metadata: null},
   },
 ];
 
@@ -72,8 +72,8 @@ export function makeEntityListConfig(): EntityListConfig {
         label: 'Status',
         kind: 'tag',
         options: [
-          { label: 'Success', value: 'SUCCESS' },
-          { label: 'Failed', value: 'FAILED' },
+          {label: 'Success', value: 'SUCCESS'},
+          {label: 'Failed', value: 'FAILED'},
         ],
       },
     ],
@@ -102,13 +102,13 @@ export function makeEntityListConfig(): EntityListConfig {
         ok: true,
         code: 'ok',
         message: 'ok',
-        data: { records: ENTITY_LIST_ROWS, total: ENTITY_LIST_ROWS.length },
+        data: {records: ENTITY_LIST_ROWS, total: ENTITY_LIST_ROWS.length},
       })
     ),
 
-    add: vi.fn(() => Promise.resolve({ ok: true, code: 'ok', message: 'ok', data: null })),
-    update: vi.fn(() => Promise.resolve({ ok: true, code: 'ok', message: 'ok', data: null })),
-    remove: vi.fn(() => Promise.resolve({ ok: true, code: 'ok', message: 'ok', data: null })),
+    add: vi.fn(() => Promise.resolve({ok: true, code: 'ok', message: 'ok', data: null})),
+    update: vi.fn(() => Promise.resolve({ok: true, code: 'ok', message: 'ok', data: null})),
+    remove: vi.fn(() => Promise.resolve({ok: true, code: 'ok', message: 'ok', data: null})),
 
     emptyText: 'No records',
     confirmDeleteText: 'Confirm delete?',

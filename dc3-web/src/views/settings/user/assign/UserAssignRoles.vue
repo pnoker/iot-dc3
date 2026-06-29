@@ -153,13 +153,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { ArrowLeft, ArrowRight, Search } from '@element-plus/icons-vue';
-  import type { TableInstance } from 'element-plus';
+  import {computed, reactive, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {ArrowLeft, ArrowRight, Search} from '@element-plus/icons-vue';
+  import type {TableInstance} from 'element-plus';
 
-  import { listRole } from '@/api/role';
-  import { listRoleByPrincipalId, listRolePrincipalBind } from '@/api/rolePrincipalBind';
+  import {listRole} from '@/api/role';
+  import {listRoleByPrincipalId, listRolePrincipalBind} from '@/api/rolePrincipalBind';
 
   interface RoleRow {
     id: string;
@@ -168,7 +168,7 @@
     remark?: string;
   }
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const emit = defineEmits<{
     (e: 'save', principalId: string, addIds: string[], removeBindIds: string[], done: () => void): void;
   }>();
@@ -217,9 +217,9 @@
     try {
       const principalId = String(reactiveData.user.principalId || '');
       const [allRes, ownRes, bindsRes] = await Promise.all([
-        listRole({ page: { size: 1000, current: 1 } }) as Promise<any>,
+        listRole({page: {size: 1000, current: 1}}) as Promise<any>,
         listRoleByPrincipalId(principalId) as Promise<any>,
-        listRolePrincipalBind({ page: { size: 1000, current: 1 }, principalId }) as Promise<any>,
+        listRolePrincipalBind({page: {size: 1000, current: 1}, principalId}) as Promise<any>,
       ]);
 
       const allRoles: RoleRow[] = ((allRes.data?.records as any[]) || []).map(toRow);
@@ -302,7 +302,7 @@
     });
   };
 
-  defineExpose({ show });
+  defineExpose({show});
 </script>
 
 <style lang="scss" scoped>

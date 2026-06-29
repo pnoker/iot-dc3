@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const deviceMocks = vi.hoisted(() => ({
-  addDevice: vi.fn(() => Promise.resolve({ data: true })),
-  deleteDevice: vi.fn(() => Promise.resolve({ data: true })),
-  listDeviceStatus: vi.fn(() => Promise.resolve({ data: {} })),
-  importDevice: vi.fn(() => Promise.resolve({ data: true })),
-  importDeviceTemplate: vi.fn(() => Promise.resolve({ data: '' })),
+  addDevice: vi.fn(() => Promise.resolve({data: true})),
+  deleteDevice: vi.fn(() => Promise.resolve({data: true})),
+  listDeviceStatus: vi.fn(() => Promise.resolve({data: {}})),
+  importDevice: vi.fn(() => Promise.resolve({data: true})),
+  importDeviceTemplate: vi.fn(() => Promise.resolve({data: ''})),
   listDevice: vi.fn(() =>
-    Promise.resolve({ data: { records: [{ id: 'dev-1', driverId: 'drv-1', deviceName: 'Pump' }], total: 1 } })
+    Promise.resolve({data: {records: [{id: 'dev-1', driverId: 'drv-1', deviceName: 'Pump'}], total: 1}})
   ),
-  updateDevice: vi.fn(() => Promise.resolve({ data: true })),
+  updateDevice: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/device', () => deviceMocks);
 vi.mock('@/api/driver', () => ({
-  listDriverByIds: vi.fn(() => Promise.resolve({ data: { 'drv-1': { driverName: 'Modbus' } } })),
+  listDriverByIds: vi.fn(() => Promise.resolve({data: {'drv-1': {driverName: 'Modbus'}}})),
 }));
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('Device list view', () => {
   it('lists devices on mount', async () => {
@@ -43,10 +43,10 @@ describe('Device list view', () => {
     await mountListPage({
       component: Device,
       stubs: {
-        DeviceTool: { template: '<div />' },
-        DeviceCard: { template: '<div />' },
-        DeviceAddForm: { template: '<div />' },
-        DeviceImportForm: { template: '<div />' },
+        DeviceTool: {template: '<div />'},
+        DeviceCard: {template: '<div />'},
+        DeviceAddForm: {template: '<div />'},
+        DeviceImportForm: {template: '<div />'},
       },
     });
     await flushPromises();

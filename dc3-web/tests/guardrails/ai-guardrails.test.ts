@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import {existsSync, readdirSync, readFileSync, statSync} from 'node:fs';
+import {join, relative} from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 const root = process.cwd();
 
@@ -69,7 +69,7 @@ describe('AI coding guardrails', () => {
   });
 
   it('exposes the required quality scripts for local and CI use', () => {
-    const packageJson = JSON.parse(readProjectFile('package.json')) as { scripts?: Record<string, string> };
+    const packageJson = JSON.parse(readProjectFile('package.json')) as {scripts?: Record<string, string>};
 
     expect(packageJson.scripts).toEqual(
       expect.objectContaining({

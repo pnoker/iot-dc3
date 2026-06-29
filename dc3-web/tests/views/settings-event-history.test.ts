@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const eventMocks = vi.hoisted(() => ({
-  getEventHistoryByRecordId: vi.fn(() => Promise.resolve({ data: {} })),
-  listEventHistory: vi.fn(() => Promise.resolve({ data: { records: [], total: 0 } })),
+  getEventHistoryByRecordId: vi.fn(() => Promise.resolve({data: {}})),
+  listEventHistory: vi.fn(() => Promise.resolve({data: {records: [], total: 0}})),
 }));
 
 vi.mock('@/api/event', () => eventMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('EventHistory view', () => {
   it('lists event history on mount', async () => {
     const EventHistory = (await import('@/views/settings/event/EventHistory.vue')).default;
-    await mountListPage({ component: EventHistory });
+    await mountListPage({component: EventHistory});
     await flushPromises();
     expect(eventMocks.listEventHistory).toHaveBeenCalledTimes(1);
   });

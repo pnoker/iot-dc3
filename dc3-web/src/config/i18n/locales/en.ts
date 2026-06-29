@@ -314,7 +314,7 @@ export default {
     activity: {
       title: 'Hourly Data Activity',
       count: 'Records',
-      dow: { sun: 'Sun', mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat' },
+      dow: {sun: 'Sun', mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat'},
     },
     topology: {
       title: 'Topology & Data Flow',
@@ -347,7 +347,7 @@ export default {
       serviceDatabase: 'DB',
       serviceMq: 'MQ',
       serviceGateway: 'Gateway',
-      group: { center: 'Center', infra: 'Infra', drivers: 'Drivers', devices: 'Devices' },
+      group: {center: 'Center', infra: 'Infra', drivers: 'Drivers', devices: 'Devices'},
     },
   },
   layout: {

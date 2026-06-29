@@ -76,11 +76,11 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
-  import { ref, unref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import type { FormInstance, FormRules } from 'element-plus';
-  import { Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue';
+  import type {PropType} from 'vue';
+  import {ref, unref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import type {FormInstance, FormRules} from 'element-plus';
+  import {Refresh, RefreshRight, Search, Sort} from '@element-plus/icons-vue';
 
   const props = defineProps({
     formModel: {
@@ -118,7 +118,7 @@
     (e: 'current-change', current: number): void;
   }>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const formRef = ref<FormInstance>();
 
   const search = async () => {
@@ -147,7 +147,7 @@
   const onSizeChange = (size: number) => emit('size-change', size);
   const onCurrentChange = (current: number) => emit('current-change', current);
 
-  defineExpose({ search, reset });
+  defineExpose({search, reset});
 </script>
 
 <style lang="scss" scoped>

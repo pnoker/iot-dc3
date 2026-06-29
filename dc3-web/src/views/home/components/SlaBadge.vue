@@ -24,7 +24,7 @@
   corresponding event-overview tab.
 -->
 <template>
-  <div v-if="visible" :class="{ 'sla-badge--warn': warn }" class="sla-badge">
+  <div v-if="visible" :class="{'sla-badge--warn': warn}" class="sla-badge">
     <el-icon class="sla-badge__icon">
       <Warning />
     </el-icon>
@@ -40,18 +40,18 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { Warning } from '@element-plus/icons-vue';
+  import {computed, onMounted, reactive, ref} from 'vue';
+  import {useRouter} from 'vue-router';
+  import {Warning} from '@element-plus/icons-vue';
 
-  import { alertAging, silentSources } from '@/api/dashboard';
-  import type { AgingBacklog, SilentSource } from '@/config/types/dashboard';
-  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
+  import {alertAging, silentSources} from '@/api/dashboard';
+  import type {AgingBacklog, SilentSource} from '@/config/types/dashboard';
+  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
   const router = useRouter();
-  const { run } = useAsyncLoader();
+  const {run} = useAsyncLoader();
 
-  const backlog = reactive<AgingBacklog>({ under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0 });
+  const backlog = reactive<AgingBacklog>({under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
   const silentCount = ref(0);
 
   const visible = computed(() => backlog.over24h > 0 || silentCount.value > 0);
@@ -59,20 +59,20 @@
 
   const load = () =>
     run(async () => {
-      const [a, s]: [{ data?: AgingBacklog }, { data?: SilentSource[] }] = await Promise.all([
+      const [a, s]: [{data?: AgingBacklog}, {data?: SilentSource[]}] = await Promise.all([
         alertAging(),
         silentSources(7, 15, 200),
       ]);
-      Object.assign(backlog, a?.data ?? { under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0 });
+      Object.assign(backlog, a?.data ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
       silentCount.value = (s?.data ?? []).length;
     });
 
   const jumpTo = (tab: 'sla' | 'availability') => {
-    router.push({ name: 'settingsAlarmOverview', query: { tab } }).catch(() => {});
+    router.push({name: 'settingsAlarmOverview', query: {tab}}).catch(() => {});
   };
 
   onMounted(load);
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

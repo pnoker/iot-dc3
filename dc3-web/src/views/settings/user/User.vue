@@ -22,17 +22,17 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { addRolePrincipalBind, deleteRolePrincipalBind } from '@/api/rolePrincipalBind';
+  import {addRolePrincipalBind, deleteRolePrincipalBind} from '@/api/rolePrincipalBind';
   import EntityListPage from '@/components/entity/EntityListPage.vue';
-  import { successMessage } from '@/utils/notificationUtil';
+  import {successMessage} from '@/utils/notificationUtil';
 
   import UserAssignRoles from './assign/UserAssignRoles.vue';
-  import { createUserConfig } from './userConfig';
+  import {createUserConfig} from './userConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const assignRef = ref<InstanceType<typeof UserAssignRoles>>();
 
@@ -41,7 +41,7 @@
   const onAssignRoles = async (principalId: string, addIds: string[], removeBindIds: string[], done: () => void) => {
     try {
       await Promise.all([
-        ...addIds.map((roleId) => addRolePrincipalBind({ principalId, principalType: 'USER', roleId })),
+        ...addIds.map((roleId) => addRolePrincipalBind({principalId, principalType: 'USER', roleId})),
         ...removeBindIds.map((id) => deleteRolePrincipalBind(id)),
       ]);
       successMessage(t('settings.user.assignSaved'));
@@ -51,5 +51,5 @@
     }
   };
 
-  const config = createUserConfig(t, { onAssignRoles: openAssignRoles });
+  const config = createUserConfig(t, {onAssignRoles: openAssignRoles});
 </script>

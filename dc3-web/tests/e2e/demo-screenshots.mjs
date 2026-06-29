@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { chromium } from 'playwright';
+import {chromium} from 'playwright';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { firstRecord, idOf, login, shortText, waitPage } from './browser-sweep/support.mjs';
+import {fileURLToPath} from 'node:url';
+import {firstRecord, idOf, login, shortText, waitPage} from './browser-sweep/support.mjs';
 
 const BASE = process.env.E2E_BASE_URL || 'http://localhost:8080';
 const CHROME = process.env.E2E_CHROME_PATH || '';
@@ -50,7 +50,7 @@ function createScreenshotWatch(page) {
   page.on('response', async (res) => {
     if (!isBusinessApi(res.url()) || res.status() < 400) return;
     const body = await res.text().catch(() => '');
-    state.badResponses.push({ status: res.status(), url: res.url(), body: shortText(body, 500) });
+    state.badResponses.push({status: res.status(), url: res.url(), body: shortText(body, 500)});
   });
 
   return state;
@@ -96,7 +96,7 @@ function fallbackRouteFor(route) {
 }
 
 async function gotoFallback(page, route) {
-  await page.goto(`${BASE}/#${cacheBustRoute(fallbackRouteFor(route))}`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${BASE}/#${cacheBustRoute(fallbackRouteFor(route))}`, {waitUntil: 'domcontentloaded'});
   await settle(page, 250);
 }
 
@@ -108,13 +108,13 @@ function assertPattern(pattern, text, step, target) {
 
 async function expectActiveTab(page, pattern, step) {
   const tab = page.locator('.el-tabs__item.is-active:visible').first();
-  await tab.waitFor({ state: 'visible', timeout: 10000 });
+  await tab.waitFor({state: 'visible', timeout: 10000});
   assertPattern(pattern, (await tab.innerText()).trim(), step, 'active tab');
 }
 
 async function expectEditDivider(page, pattern, step) {
   const tab = page.locator('.el-tabs__item.is-active:visible').first();
-  await tab.waitFor({ state: 'visible', timeout: 10000 });
+  await tab.waitFor({state: 'visible', timeout: 10000});
   assertPattern(pattern, (await tab.innerText()).trim(), step, 'edit tab');
 }
 
@@ -146,7 +146,7 @@ async function discoverIds(page) {
 }
 
 async function clickByRoleName(page, name, root = page) {
-  const locator = root.getByRole('button', { name }).first();
+  const locator = root.getByRole('button', {name}).first();
   if (!(await locator.count())) return false;
   if (!(await locator.isVisible().catch(() => false))) return false;
   await locator.click();
@@ -157,7 +157,7 @@ async function openAddDialog(page) {
   const clicked =
     (await clickByRoleName(page, /^(Add|新增)$/)) ||
     (await page
-      .locator('button.el-button:visible', { hasText: /Add|新增/ })
+      .locator('button.el-button:visible', {hasText: /Add|新增/})
       .first()
       .click()
       .then(() => true)
@@ -165,7 +165,7 @@ async function openAddDialog(page) {
   if (!clicked) throw new Error(`Cannot find Add button on ${page.url()}`);
 
   const dialog = page.locator('.el-dialog:visible').last();
-  await dialog.waitFor({ state: 'visible', timeout: 10000 });
+  await dialog.waitFor({state: 'visible', timeout: 10000});
   await settle(page, 300);
   return dialog;
 }
@@ -200,7 +200,7 @@ async function openFirstSelectOption(root, page, selector = '.el-select:visible'
 }
 
 async function clickEventTab(page, label) {
-  const tab = page.locator('.event-overview__tabs .el-tabs__item:visible', { hasText: label }).first();
+  const tab = page.locator('.event-overview__tabs .el-tabs__item:visible', {hasText: label}).first();
   if (!(await tab.count())) throw new Error(`Cannot find event tab: ${label}`);
   await tab.click();
   await settle(page, 1200);
@@ -249,14 +249,14 @@ async function expandAppScrollForFullCapture(page) {
 
 async function captureScreenshot(page, shot, target) {
   if (!shot.expandAppScroll) {
-    await page.screenshot({ path: target, fullPage: shot.fullPage !== false });
+    await page.screenshot({path: target, fullPage: shot.fullPage !== false});
     return;
   }
 
   const style = await expandAppScrollForFullCapture(page);
   await page.waitForTimeout(500);
   try {
-    await page.screenshot({ path: target, fullPage: true });
+    await page.screenshot({path: target, fullPage: true});
   } finally {
     await style.evaluate((node) => node.remove()).catch(() => {});
   }
@@ -265,7 +265,7 @@ async function captureScreenshot(page, shot, target) {
 async function screenshotPage(page, watch, shot) {
   await gotoFallback(page, shot.route);
   const mark = markWatch(watch);
-  await page.goto(`${BASE}/#${cacheBustRoute(shot.route)}`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${BASE}/#${cacheBustRoute(shot.route)}`, {waitUntil: 'domcontentloaded'});
   await settle(page, shot.wait ?? 900);
   if (shot.prepare) {
     await shot.prepare(page);
@@ -282,12 +282,12 @@ async function screenshotPage(page, watch, shot) {
 
 function buildShots(ids) {
   const shots = [];
-  const full = { expandAppScroll: true };
+  const full = {expandAppScroll: true};
   const add = (slug, name, route, options = {}) => {
-    shots.push({ slug, name, route, ...options });
+    shots.push({slug, name, route, ...options});
   };
 
-  add('home-dashboard', 'Home dashboard', '/home', { wait: 1600, ...full });
+  add('home-dashboard', 'Home dashboard', '/home', {wait: 1600, ...full});
 
   add('driver-list', 'Driver list', '/driver', full);
   add('driver-detail-info', 'Driver detail info tab', `/driver/detail?id=${ids.driverId}&active=detail`, {
@@ -451,7 +451,7 @@ function buildShots(ids) {
     'settings-user-detail-resources',
     'Settings user detail resources tab',
     `/settings/user/detail?id=${ids.userId}&active=resource`,
-    { wait: 1200, expectActiveTab: /Accessible Resources|可访问资源/, ...full }
+    {wait: 1200, expectActiveTab: /Accessible Resources|可访问资源/, ...full}
   );
 
   add('settings-role-list', 'Settings role list', '/settings/role', full);
@@ -486,7 +486,7 @@ function buildShots(ids) {
     'settings-role-detail-resources',
     'Settings role detail resources tab',
     `/settings/role/detail?id=${ids.roleId}&active=resource`,
-    { wait: 1200, expectActiveTab: /Assigned Resources|已分配资源/, ...full }
+    {wait: 1200, expectActiveTab: /Assigned Resources|已分配资源/, ...full}
   );
 
   add('settings-resource-list', 'Settings resource list', '/settings/resource', full);
@@ -503,13 +503,13 @@ function buildShots(ids) {
     'settings-resource-detail-roles',
     'Settings resource detail roles tab',
     `/settings/resource/detail?id=${ids.resourceId}&active=role`,
-    { wait: 1200, expectActiveTab: /Assigned Roles|关联角色/, ...full }
+    {wait: 1200, expectActiveTab: /Assigned Roles|关联角色/, ...full}
   );
   add(
     'settings-resource-detail-children',
     'Settings resource detail children tab',
     `/settings/resource/detail?id=${ids.resourceId}&active=children`,
-    { wait: 1200, expectActiveTab: /Child Resources|子资源/, ...full }
+    {wait: 1200, expectActiveTab: /Child Resources|子资源/, ...full}
   );
 
   add('settings-api-list', 'Settings API list', '/settings/api', full);
@@ -586,7 +586,7 @@ function buildShots(ids) {
       const launcher = page.locator('.agentic-launcher:visible').first();
       if (!(await launcher.count())) throw new Error('Cannot find AI assistant launcher');
       await launcher.click();
-      await page.locator('.agentic-panel:visible').waitFor({ state: 'visible', timeout: 10000 });
+      await page.locator('.agentic-panel:visible').waitFor({state: 'visible', timeout: 10000});
     },
   });
 
@@ -596,15 +596,15 @@ function buildShots(ids) {
   }));
 }
 
-const launchOptions = { headless: HEADLESS };
+const launchOptions = {headless: HEADLESS};
 if (CHROME) launchOptions.executablePath = CHROME;
 
-await fs.rm(OUT_DIR, { force: true, recursive: true });
-await fs.mkdir(OUT_DIR, { recursive: true });
+await fs.rm(OUT_DIR, {force: true, recursive: true});
+await fs.mkdir(OUT_DIR, {recursive: true});
 
 const browser = await chromium.launch(launchOptions);
 const context = await browser.newContext({
-  viewport: { width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT },
+  viewport: {width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT},
   deviceScaleFactor: 1,
 });
 const page = await context.newPage();

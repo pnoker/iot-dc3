@@ -66,12 +66,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive } from 'vue';
-  import { useRoute } from 'vue-router';
+  import {computed, onMounted, reactive} from 'vue';
+  import {useRoute} from 'vue-router';
 
-  import { getMenuById } from '@/api/menu';
-  import { useMenuStore } from '@/store';
-  import { timestampLabel } from '@/utils/dateUtil';
+  import {getMenuById} from '@/api/menu';
+  import {useMenuStore} from '@/store';
+  import {timestampLabel} from '@/utils/dateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';

@@ -54,7 +54,7 @@
             <el-table-column :label="$t('settings.role.roleName')" min-width="180" prop="roleName" />
             <el-table-column :label="$t('settings.role.roleCode')" min-width="180" prop="roleCode" />
             <el-table-column :label="$t('common.enable')" width="90">
-              <template #default="{ row }">
+              <template #default="{row}">
                 <enable-tag :value="row.enableFlag" />
               </template>
             </el-table-column>
@@ -83,14 +83,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive } from 'vue';
-  import type { TabsPaneContext } from 'element-plus';
-  import { useRoute, useRouter } from 'vue-router';
+  import {onMounted, reactive} from 'vue';
+  import type {TabsPaneContext} from 'element-plus';
+  import {useRoute, useRouter} from 'vue-router';
 
-  import { listResourceByPrincipalId } from '@/api/roleResourceBind';
-  import { listRoleByPrincipalId } from '@/api/rolePrincipalBind';
-  import { getUserById } from '@/api/user';
-  import { timestampLabel } from '@/utils/dateUtil';
+  import {listResourceByPrincipalId} from '@/api/roleResourceBind';
+  import {listRoleByPrincipalId} from '@/api/rolePrincipalBind';
+  import {getUserById} from '@/api/user';
+  import {timestampLabel} from '@/utils/dateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';
@@ -158,7 +158,7 @@
 
   const changeActive = (tab: TabsPaneContext) => {
     const name = String(tab.props.name || '');
-    router.push({ query: { ...route.query, active: name } }).catch(() => {});
+    router.push({query: {...route.query, active: name}}).catch(() => {});
     if (name === 'role') loadRoles();
     if (name === 'resource') loadResources();
   };

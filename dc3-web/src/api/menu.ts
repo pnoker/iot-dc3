@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import { httpGet, httpPost } from '@/api/common';
-import { API_AUTH_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/types';
-import type { MenuForm, MenuRecord } from '@/config/types/auth';
+import {httpGet, httpPost} from '@/api/common';
+import {API_AUTH_BASE} from '@/config/constant/api';
+import type {PageQuery, PageResult} from '@/config/types';
+import type {MenuForm, MenuRecord} from '@/config/types/auth';
 
 export const addMenu = (menu: MenuForm) => httpPost(`${API_AUTH_BASE}/menu/add`, menu);
 
-export const deleteMenu = (id: string) => httpPost(`${API_AUTH_BASE}/menu/delete`, undefined, { params: { id } });
+export const deleteMenu = (id: string) => httpPost(`${API_AUTH_BASE}/menu/delete`, undefined, {params: {id}});
 
 export const updateMenu = (menu: MenuForm) => httpPost(`${API_AUTH_BASE}/menu/update`, menu);
 
-export const getMenuById = (id: string) => httpGet(`${API_AUTH_BASE}/menu/get_by_id`, { params: { id } });
+export const getMenuById = (id: string) => httpGet(`${API_AUTH_BASE}/menu/get_by_id`, {params: {id}});
 
 export const listMenu = <T = R<PageResult<MenuRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_AUTH_BASE}/menu/list`, query);

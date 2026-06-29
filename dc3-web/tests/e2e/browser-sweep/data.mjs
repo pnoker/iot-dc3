@@ -100,7 +100,7 @@ export function buildEntityRoutes(routeIds) {
 }
 
 export const interactionPages = [
-  { name: 'Driver', route: '/driver', placeholder: 'Enter driver name', value: 'Virtual', detail: true },
+  {name: 'Driver', route: '/driver', placeholder: 'Enter driver name', value: 'Virtual', detail: true},
   {
     name: 'Profile',
     route: '/profile',
@@ -218,12 +218,12 @@ export const interactionPages = [
     edit: true,
     deleteClick: true,
   },
-  { name: 'Alarm Overview', route: '/settings/alarm/overview', paginate: true },
-  { name: 'Device Alarm', route: '/settings/alarm/device', paginate: true },
-  { name: 'Driver Alarm', route: '/settings/alarm/driver', paginate: true },
-  { name: 'Point Alarm', route: '/settings/alarm/point', paginate: true },
-  { name: 'Event History', route: '/settings/event/history', paginate: true },
-  { name: 'Command History', route: '/settings/command/history', paginate: true },
+  {name: 'Alarm Overview', route: '/settings/alarm/overview', paginate: true},
+  {name: 'Device Alarm', route: '/settings/alarm/device', paginate: true},
+  {name: 'Driver Alarm', route: '/settings/alarm/driver', paginate: true},
+  {name: 'Point Alarm', route: '/settings/alarm/point', paginate: true},
+  {name: 'Event History', route: '/settings/event/history', paginate: true},
+  {name: 'Command History', route: '/settings/command/history', paginate: true},
 ];
 
 export function buildDestructiveDeleteCases(routeIds) {
@@ -306,7 +306,7 @@ export function buildDestructiveDeleteCases(routeIds) {
         menuIndex: 999,
         enableFlag: 'ENABLE',
         remark: 'codex e2e delete',
-        menuExt: { content: { titles: { zh: name, en: name }, icon: 'Menu', url: '/codex' } },
+        menuExt: {content: {titles: {zh: name, en: name}, icon: 'Menu', url: '/codex'}},
       }),
     },
     {

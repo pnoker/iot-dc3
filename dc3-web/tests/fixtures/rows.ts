@@ -27,7 +27,7 @@ export interface PagedRow {
  * paging math without ceremony.
  */
 export function pagedRows(count = 25): PagedRow[] {
-  return Array.from({ length: count }, (_, i) => ({
+  return Array.from({length: count}, (_, i) => ({
     id: `id-${i + 1}`,
     name: `Row ${String(i + 1).padStart(2, '0')}`,
     createTime: `2026-05-${String((i % 28) + 1).padStart(2, '0')}`,

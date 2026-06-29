@@ -54,14 +54,14 @@
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
         <!-- @vue-generic {EventHistoryRecord} -->
         <el-table-column :label="$t('eventHistory.device')" min-width="160" show-overflow-tooltip>
-          <template #default="{ row }">{{ deviceNameFor(row) }}</template>
+          <template #default="{row}">{{ deviceNameFor(row) }}</template>
         </el-table-column>
         <el-table-column :label="$t('eventHistory.eventCode')" min-width="140" prop="eventCode" />
         <el-table-column :label="$t('eventHistory.type')" width="110">
-          <template #default="{ row }">{{ eventTypeLabel(row.eventTypeFlag) }}</template>
+          <template #default="{row}">{{ eventTypeLabel(row.eventTypeFlag) }}</template>
         </el-table-column>
         <el-table-column :label="$t('eventHistory.level')" width="100">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-tag :type="eventLevelTag(row.eventLevelFlag)" size="small">
               {{ eventLevelLabel(row.eventLevelFlag) }}
             </el-tag>
@@ -78,7 +78,7 @@
         <el-table-column :formatter="timestampColumn" :label="$t('common.createTime')" prop="createTime" width="165" />
         <!-- @vue-generic {EventHistoryRecord} -->
         <el-table-column :label="$t('common.operation')" fixed="right" width="100">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-button link type="primary" @click="openDetail(row)">{{ $t('common.detail') }}</el-button>
           </template>
         </el-table-column>
@@ -141,17 +141,17 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
-  import { listDeviceByIds } from '@/api/device';
-  import { getEventHistoryByRecordId, listEventHistory } from '@/api/event';
-  import { usePagedList } from '@/composables/usePagedList';
-  import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
-  import { prettyJson } from '@/utils/jsonUtil';
-  import { eventLevelLabel, eventLevelTag, eventTypeLabel } from '@/utils/thingModelFormatUtil';
-  import type { EventHistoryRecord } from '@/config/types';
+  import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
+  import {listDeviceByIds} from '@/api/device';
+  import {getEventHistoryByRecordId, listEventHistory} from '@/api/event';
+  import {usePagedList} from '@/composables/usePagedList';
+  import {timestampColumn, timestampLabel} from '@/utils/dateUtil';
+  import {prettyJson} from '@/utils/jsonUtil';
+  import {eventLevelLabel, eventLevelTag, eventTypeLabel} from '@/utils/thingModelFormatUtil';
+  import type {EventHistoryRecord} from '@/config/types';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
-  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
+  import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
   const {
     state: reactiveData,

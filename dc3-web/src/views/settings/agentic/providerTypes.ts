@@ -15,6 +15,6 @@
  */
 
 export const AGENTIC_PROVIDER_TYPES = [
-  { label: 'OpenAI Compatible', value: 'OPENAI_COMPATIBLE' },
-  { label: 'Anthropic', value: 'ANTHROPIC' },
+  {label: 'OpenAI Compatible', value: 'OPENAI_COMPATIBLE'},
+  {label: 'Anthropic', value: 'ANTHROPIC'},
 ] as const;

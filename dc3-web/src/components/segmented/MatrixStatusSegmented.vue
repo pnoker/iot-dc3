@@ -19,9 +19,9 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
-  import { computed } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import type {PropType} from 'vue';
+  import {computed} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
   export type MatrixStatus = '' | 'missing' | 'configured' | 'dirty' | 'error';
 
@@ -36,16 +36,16 @@
     },
   });
 
-  const emit = defineEmits<{ (e: 'update:modelValue', value: MatrixStatus): void }>();
+  const emit = defineEmits<{(e: 'update:modelValue', value: MatrixStatus): void}>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
-  const options = computed<Array<{ label: string; value: MatrixStatus }>>(() => [
-    { label: t('common.all'), value: '' },
-    { label: t('common.configStatus.missing'), value: 'missing' },
-    { label: t('common.configStatus.configured'), value: 'configured' },
-    { label: t('common.configStatus.dirty'), value: 'dirty' },
-    { label: t('common.configStatus.error'), value: 'error' },
+  const options = computed<Array<{label: string; value: MatrixStatus}>>(() => [
+    {label: t('common.all'), value: ''},
+    {label: t('common.configStatus.missing'), value: 'missing'},
+    {label: t('common.configStatus.configured'), value: 'configured'},
+    {label: t('common.configStatus.dirty'), value: 'dirty'},
+    {label: t('common.configStatus.error'), value: 'error'},
   ]);
 
   const onChange = (value: string | number | boolean) => {

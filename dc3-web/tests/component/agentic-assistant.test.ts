@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { createPinia, setActivePinia } from 'pinia';
-import { defineComponent, h } from 'vue';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {createPinia, setActivePinia} from 'pinia';
+import {defineComponent, h} from 'vue';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AgenticAssistant from '@/components/agentic/AgenticAssistant.vue';
 import i18n from '@/config/i18n';
-import type { AgenticMessage } from '@/config/types';
-import { useAgenticStore } from '@/store';
+import type {AgenticMessage} from '@/config/types';
+import {useAgenticStore} from '@/store';
 
-import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus';
+import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus';
 
 vi.mock('vue-element-plus-x/styles/index.css', () => ({}));
 vi.mock('vue-element-plus-x', () => ({
-  Prompts: { template: '<div class="prompts-stub" />' },
-  Welcome: { template: '<div class="welcome-stub" />' },
+  Prompts: {template: '<div class="prompts-stub" />'},
+  Welcome: {template: '<div class="welcome-stub" />'},
 }));
 
 const PassthroughStub = defineComponent({
   name: 'PassthroughStub',
-  setup(_, { slots }) {
+  setup(_, {slots}) {
     return () => h('span', slots.default?.());
   },
 });
@@ -52,7 +52,7 @@ function seedAssistant(messages: AgenticMessage[]) {
   store.loading = false;
   store.streaming = messages.some((message) => message.streaming);
   store.activeConversationId = 'conversation-ui-test';
-  store.sessions = [{ conversationId: 'conversation-ui-test', title: 'Reasoning UI' }];
+  store.sessions = [{conversationId: 'conversation-ui-test', title: 'Reasoning UI'}];
   store.models = [
     {
       model: 'reasoning-model',
@@ -65,11 +65,11 @@ function seedAssistant(messages: AgenticMessage[]) {
   ];
   store.selectedModel = 'reasoning-model';
   store.reasoningEnabled = true;
-  store.messagesByConversation = { 'conversation-ui-test': messages };
-  store.attachmentsByConversation = { 'conversation-ui-test': [] };
-  store.pendingAttachmentIdsByConversation = { 'conversation-ui-test': [] };
-  store.pendingActionsByConversation = { 'conversation-ui-test': [] };
-  store.traceEventsByConversation = { 'conversation-ui-test': [] };
+  store.messagesByConversation = {'conversation-ui-test': messages};
+  store.attachmentsByConversation = {'conversation-ui-test': []};
+  store.pendingAttachmentIdsByConversation = {'conversation-ui-test': []};
+  store.pendingActionsByConversation = {'conversation-ui-test': []};
+  store.traceEventsByConversation = {'conversation-ui-test': []};
 }
 
 function mountAssistant() {
@@ -82,12 +82,12 @@ function mountAssistant() {
       stubs: {
         ...layoutStubs,
         ElButton: createElButtonStub(),
-        ElDropdown: { template: '<span><slot /><slot name="dropdown" /></span>' },
-        ElDropdownItem: { template: '<span><slot /></span>' },
-        ElDropdownMenu: { template: '<span><slot /></span>' },
+        ElDropdown: {template: '<span><slot /><slot name="dropdown" /></span>'},
+        ElDropdownItem: {template: '<span><slot /></span>'},
+        ElDropdownMenu: {template: '<span><slot /></span>'},
         ElIcon: PassthroughStub,
-        ElPopover: { template: '<span><slot name="reference" /><slot /></span>' },
-        ElSlider: { template: '<input class="el-slider-stub" />' },
+        ElPopover: {template: '<span><slot name="reference" /><slot /></span>'},
+        ElSlider: {template: '<input class="el-slider-stub" />'},
         // Element Plus icons — stub to a passthrough so the component tree mounts.
         ChatDotRound: PassthroughStub,
         ChatLineSquare: PassthroughStub,
@@ -156,7 +156,7 @@ describe('AgenticAssistant', () => {
         contentExt: {
           reasoning: true,
           tools: ['searchDevices'],
-          tokens: { input: 40, output: 20 },
+          tokens: {input: 40, output: 20},
         },
       },
     ]);

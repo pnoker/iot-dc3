@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
 import RenderedAssistantMessage from '@/components/agentic/RenderedAssistantMessage.vue'; // Stub ChartBlock — its internals (G2, getContext, ResizeObserver) aren't
 
@@ -31,12 +31,12 @@ vi.mock('@/components/agentic/ChartBlock.vue', () => ({
 }));
 
 function mountAssistant(props: Record<string, unknown>) {
-  return mount(RenderedAssistantMessage, { props });
+  return mount(RenderedAssistantMessage, {props});
 }
 
 describe('RenderedAssistantMessage', () => {
   it('renders plain text content as a single sanitized markdown segment', () => {
-    const wrapper = mountAssistant({ content: 'hello **world**' });
+    const wrapper = mountAssistant({content: 'hello **world**'});
 
     const markdown = wrapper.findAll('.agentic-markdown');
     expect(markdown).toHaveLength(1);
@@ -60,8 +60,8 @@ describe('RenderedAssistantMessage', () => {
     const wrapper = mountAssistant({
       content: 'see chart',
       charts: [
-        { id: 'c1', type: 'line', title: 'Trend', dataset: [], encode: { x: 'i', y: 'v' } },
-        { id: 'c2', type: 'column', title: 'Counts', dataset: [], encode: { x: 'i', y: 'v' } },
+        {id: 'c1', type: 'line', title: 'Trend', dataset: [], encode: {x: 'i', y: 'v'}},
+        {id: 'c2', type: 'column', title: 'Counts', dataset: [], encode: {x: 'i', y: 'v'}},
       ],
     });
 

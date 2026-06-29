@@ -21,7 +21,7 @@
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.silentEmpty')"
     :loading="loading"
-    :subtitle="t('settings.event.overview.silentSubtitle', { min: silentKey })"
+    :subtitle="t('settings.event.overview.silentSubtitle', {min: silentKey})"
     :title="t('settings.event.overview.silentTitle')"
     body-mode="scroll"
     class="silent-sources"
@@ -34,16 +34,16 @@
 
     <el-table :data="rows" size="small" @row-click="onRowClick">
       <el-table-column :label="t('settings.event.overview.colDevice')" min-width="110" prop="deviceId">
-        <template #default="{ row }">{{ deviceName(row.deviceId) }}</template>
+        <template #default="{row}">{{ deviceName(row.deviceId) }}</template>
       </el-table-column>
       <el-table-column :label="t('settings.event.overview.colPoint')" min-width="110" prop="pointId">
-        <template #default="{ row }">{{ pointName(row.pointId) }}</template>
+        <template #default="{row}">{{ pointName(row.pointId) }}</template>
       </el-table-column>
       <el-table-column :label="t('settings.event.overview.colLastSeen')" min-width="160" prop="lastSeen">
-        <template #default="{ row }">{{ formatDateTime(row.lastSeen) }}</template>
+        <template #default="{row}">{{ formatDateTime(row.lastSeen) }}</template>
       </el-table-column>
       <el-table-column :label="t('settings.event.overview.colSilentFor')" min-width="110" prop="silentSeconds">
-        <template #default="{ row }">
+        <template #default="{row}">
           <el-tag size="small" type="warning">{{ humanDuration(row.silentSeconds) }}</el-tag>
         </template>
       </el-table-column>
@@ -52,28 +52,28 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
+  import {onMounted, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRouter} from 'vue-router';
 
-  import { silentSources as apiSilentSources } from '@/api/dashboard';
-  import type { SilentSource } from '@/config/types/dashboard';
+  import {silentSources as apiSilentSources} from '@/api/dashboard';
+  import type {SilentSource} from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
-  import { useEntityNames } from '@/composables/useEntityNames';
-  import { formatDateTime, humanDuration } from '@/utils/timeUtil';
+  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+  import {useEntityNames} from '@/composables/useEntityNames';
+  import {formatDateTime, humanDuration} from '@/utils/timeUtil';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
-  const { loading, run } = useAsyncLoader();
-  const { resolveDevices, resolvePoints, deviceName, pointName } = useEntityNames();
+  const {loading, run} = useAsyncLoader();
+  const {resolveDevices, resolvePoints, deviceName, pointName} = useEntityNames();
 
   // silentKey is the threshold (minutes) — "no sample within the last N min
   // for a baseline-active point" becomes flagged.
   const silentOptions = [
-    { label: '15m', value: '15' },
-    { label: '1h', value: '60' },
-    { label: '6h', value: '360' },
+    {label: '15m', value: '15'},
+    {label: '1h', value: '60'},
+    {label: '6h', value: '360'},
   ];
   const silentKey = ref<string>('15');
 
@@ -81,7 +81,7 @@
 
   const load = () =>
     run(async () => {
-      const res: { data?: SilentSource[] } = await apiSilentSources(7, Number(silentKey.value), 100);
+      const res: {data?: SilentSource[]} = await apiSilentSources(7, Number(silentKey.value), 100);
       rows.value = res?.data ?? [];
       await Promise.all([
         resolveDevices(rows.value.map((r) => r.deviceId)),
@@ -94,11 +94,11 @@
 
   const onRowClick = (row: SilentSource) => {
     router
-      .push({ name: 'pointValue', query: { pointId: String(row.pointId), deviceId: String(row.deviceId) } })
+      .push({name: 'pointValue', query: {pointId: String(row.pointId), deviceId: String(row.deviceId)}})
       .catch(() => {});
   };
 
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

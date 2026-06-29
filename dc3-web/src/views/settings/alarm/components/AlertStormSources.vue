@@ -20,7 +20,7 @@
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.stormEmpty')"
     :loading="loading"
-    :subtitle="t('settings.event.overview.stormSubtitle', { hours: window.hours, min: window.minCount })"
+    :subtitle="t('settings.event.overview.stormSubtitle', {hours: window.hours, min: window.minCount})"
     :title="t('settings.event.overview.stormTitle')"
     body-mode="scroll"
     class="alert-storm"
@@ -47,16 +47,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
-  import { Warning } from '@element-plus/icons-vue';
+  import {computed, onMounted, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRouter} from 'vue-router';
+  import {Warning} from '@element-plus/icons-vue';
 
-  import { alertStormSources } from '@/api/dashboard';
+  import {alertStormSources} from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useEntityNames } from '@/composables/useEntityNames';
-  import { jumpToSourceEvents } from '@/utils/jumpUtil';
-  import type { AlertSource } from '@/config/types/dashboard';
+  import {useEntityNames} from '@/composables/useEntityNames';
+  import {jumpToSourceEvents} from '@/utils/jumpUtil';
+  import type {AlertSource} from '@/config/types/dashboard';
 
   interface StormRow {
     source: AlertSource;
@@ -65,27 +65,27 @@
   }
 
   const props = defineProps({
-    limit: { type: Number, default: 10 },
+    limit: {type: Number, default: 10},
   });
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
-  const { resolveBySource, nameBySource } = useEntityNames();
+  const {resolveBySource, nameBySource} = useEntityNames();
 
   // Storm is "high frequency within a short window", so the threshold has
   // to scale with the window: a source hitting 10 alarms in 1h is noisy,
   // but 10 in 24h is noise you'd ignore. Preset pairs below keep the
   // relative severity consistent across the three spans.
   type WindowKey = '1h' | '6h' | '24h';
-  const WINDOW_SPECS: Record<WindowKey, { hours: number; minCount: number }> = {
-    '1h': { hours: 1, minCount: 10 },
-    '6h': { hours: 6, minCount: 30 },
-    '24h': { hours: 24, minCount: 100 },
+  const WINDOW_SPECS: Record<WindowKey, {hours: number; minCount: number}> = {
+    '1h': {hours: 1, minCount: 10},
+    '6h': {hours: 6, minCount: 30},
+    '24h': {hours: 24, minCount: 100},
   };
   const windowOptions = [
-    { label: '1h', value: '1h' as WindowKey },
-    { label: '6h', value: '6h' as WindowKey },
-    { label: '24h', value: '24h' as WindowKey },
+    {label: '1h', value: '1h' as WindowKey},
+    {label: '6h', value: '6h' as WindowKey},
+    {label: '24h', value: '24h' as WindowKey},
   ];
   // Default to 24h so the page is populated out of the box on fresh
   // tenants — 1h would frequently be empty when the fleet is quiet.
@@ -98,8 +98,8 @@
   const load = async () => {
     loading.value = true;
     try {
-      const { hours, minCount } = window.value;
-      const res: { data?: StormRow[] } = await alertStormSources(hours, minCount, props.limit);
+      const {hours, minCount} = window.value;
+      const res: {data?: StormRow[]} = await alertStormSources(hours, minCount, props.limit);
       rows.value = res?.data ?? [];
       await resolveBySource(rows.value);
     } catch {
@@ -123,7 +123,7 @@
   };
 
   onMounted(load);
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

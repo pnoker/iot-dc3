@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPinia, setActivePinia } from 'pinia';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
 
-import { useIntervalStore } from '@/store'; // Arbitrary non-zero handles. Names express ordering rather than the
+import {useIntervalStore} from '@/store'; // Arbitrary non-zero handles. Names express ordering rather than the
 
 // Arbitrary non-zero handles. Names express ordering rather than the
 // values themselves so the assertions stay readable.

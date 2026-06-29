@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { isEmail, isNull, isNum, isPhone, isUrl } from '@/utils/validationUtil';
+import {isEmail, isNull, isNum, isPhone, isUrl} from '@/utils/validationUtil';
 
 describe('validationUtil', () => {
   describe('isUrl', () => {
@@ -120,14 +120,14 @@ describe('validationUtil', () => {
       [[], true],
       [[1], false],
       [{}, true],
-      [{ a: 1 }, false],
+      [{a: 1}, false],
     ])('isNull(%p) → %p', (input, expected) => {
       expect(isNull(input)).toBe(expected);
     });
 
     it('treats nested empty arrays/objects as non-null', () => {
       expect(isNull([[]])).toBe(false);
-      expect(isNull({ nested: {} })).toBe(false);
+      expect(isNull({nested: {}})).toBe(false);
     });
   });
 });

@@ -19,13 +19,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { useI18n } from 'vue-i18n';
+  import {useI18n} from 'vue-i18n';
 
   import EntityListPage from '@/components/entity/EntityListPage.vue';
 
-  import { createTenantMembershipConfig } from './tenantMembershipConfig';
+  import {createTenantMembershipConfig} from './tenantMembershipConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const config = createTenantMembershipConfig(t);
 </script>

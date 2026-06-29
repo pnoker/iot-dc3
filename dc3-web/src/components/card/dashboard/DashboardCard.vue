@@ -30,7 +30,7 @@
 -->
 <template>
   <el-card
-    :class="[`dashboard-card--${bodyMode}`, { 'dashboard-card--tabs': variant === 'tabs' }]"
+    :class="[`dashboard-card--${bodyMode}`, {'dashboard-card--tabs': variant === 'tabs'}]"
     :style="rootStyle"
     class="dashboard-card"
     shadow="never"
@@ -91,8 +91,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onUnmounted, useSlots, watch } from 'vue';
-  import { Refresh } from '@element-plus/icons-vue';
+  import {computed, onUnmounted, useSlots, watch} from 'vue';
+  import {Refresh} from '@element-plus/icons-vue';
 
   export type DashboardCardHeight = number | 'auto';
   export type DashboardCardBodyMode = 'plain' | 'chart' | 'scroll';
@@ -165,9 +165,9 @@
 
   const rootStyle = computed(() => {
     if (props.height === 'auto') {
-      return { minHeight: '300px', height: '100%' };
+      return {minHeight: '300px', height: '100%'};
     }
-    return { height: `${props.height}px` };
+    return {height: `${props.height}px`};
   });
 
   const loadBody = computed(() => props.loading && props.loadingTarget === 'body');
@@ -199,7 +199,7 @@
   watch(
     () => props.interval,
     (ms) => startPoll(ms || 0),
-    { immediate: true }
+    {immediate: true}
   );
   onUnmounted(clearPoll);
 

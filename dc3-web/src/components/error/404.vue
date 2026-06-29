@@ -18,7 +18,7 @@
   <div class="error">
     <el-result :sub-title="t('error.notFound')" icon="warning" title="404">
       <template #extra>
-        <router-link :to="{ path: '/' }">
+        <router-link :to="{path: '/'}">
           <el-button plain type="primary">{{ t('error.backHome') }}</el-button>
         </router-link>
       </template>
@@ -27,9 +27,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { useI18n } from 'vue-i18n';
+  import {useI18n} from 'vue-i18n';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 </script>
 
 <style lang="scss" scoped>

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, watch } from 'vue';
-import type { FormRules } from 'element-plus';
-import { nameRules, remarkRules } from '@/utils/formRuleUtil';
-import { useI18n } from 'vue-i18n';
+import {defineComponent, reactive, watch} from 'vue';
+import type {FormRules} from 'element-plus';
+import {nameRules, remarkRules} from '@/utils/formRuleUtil';
+import {useI18n} from 'vue-i18n';
 
 import router from '@/config/router';
-import { useRoute } from 'vue-router';
+import {useRoute} from 'vue-router';
 
-import { getProfileById, updateProfile } from '@/api/profile';
+import {getProfileById, updateProfile} from '@/api/profile';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
 import InfoCard from '@/components/card/info/InfoCard.vue';
@@ -40,10 +40,10 @@ function resolveTab(value: unknown): string {
 }
 
 export default defineComponent({
-  components: { baseCard, InfoCard, EnableFlagSegmented, point, CommandList, EventList },
+  components: {baseCard, InfoCard, EnableFlagSegmented, point, CommandList, EventList},
   setup() {
     const route = useRoute();
-    const { t } = useI18n();
+    const {t} = useI18n();
 
     const reactiveData = reactive({
       id: route.query.id,
@@ -66,27 +66,27 @@ export default defineComponent({
     const profile = () => {
       getProfileById(reactiveData.id as string).then((res) => {
         reactiveData.profileFormData = res.data;
-        reactiveData.oldProfileFormData = { ...res.data };
+        reactiveData.oldProfileFormData = {...res.data};
       });
     };
 
     const profileSave = async () => {
       try {
         const res = await updateProfile(reactiveData.profileFormData);
-        reactiveData.oldProfileFormData = { ...res.data };
+        reactiveData.oldProfileFormData = {...res.data};
       } catch {
         // API error
       }
     };
 
     const profileReset = () => {
-      reactiveData.profileFormData = { ...reactiveData.oldProfileFormData };
+      reactiveData.profileFormData = {...reactiveData.oldProfileFormData};
     };
 
     const changeActive = (tab: any) => {
       reactiveData.active = tab.props.name;
       const query = route.query;
-      router.push({ query: { ...query, active: tab.props.name } });
+      router.push({query: {...query, active: tab.props.name}});
     };
 
     watch(

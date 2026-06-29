@@ -57,12 +57,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, unref } from 'vue';
-  import type { FormInstance, FormRules } from 'element-plus';
-  import { useI18n } from 'vue-i18n';
+  import {reactive, ref, unref} from 'vue';
+  import type {FormInstance, FormRules} from 'element-plus';
+  import {useI18n} from 'vue-i18n';
 
-  import { successMessage } from '@/utils/notificationUtil';
-  import { nameRules, remarkRules } from '@/utils/formRuleUtil';
+  import {successMessage} from '@/utils/notificationUtil';
+  import {nameRules, remarkRules} from '@/utils/formRuleUtil';
 
   interface ProfileAddFormData {
     profileName?: string;
@@ -73,7 +73,7 @@
     (e: 'add-thing', formData: ProfileAddFormData, done: () => void): void;
   }>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const formDataRef = ref<FormInstance>();
 
   const formRule = reactive<FormRules>({
@@ -107,7 +107,7 @@
 
     try {
       await form.validate();
-      emit('add-thing', { ...reactiveData.formData }, () => {
+      emit('add-thing', {...reactiveData.formData}, () => {
         cancel();
         reset();
         successMessage();

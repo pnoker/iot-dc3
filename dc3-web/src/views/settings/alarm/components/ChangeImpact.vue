@@ -20,7 +20,7 @@
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.changeImpactEmpty')"
     :loading="loading"
-    :subtitle="t('settings.event.overview.changeImpactSubtitle', { days: Number(daysKey) })"
+    :subtitle="t('settings.event.overview.changeImpactSubtitle', {days: Number(daysKey)})"
     :title="t('settings.event.overview.changeImpactTitle')"
     body-mode="scroll"
     class="change-impact"
@@ -49,28 +49,28 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
+  import {onMounted, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRouter} from 'vue-router';
 
-  import { alertChangeImpact } from '@/api/dashboard';
-  import type { ChangeImpact } from '@/config/types/dashboard';
+  import {alertChangeImpact} from '@/api/dashboard';
+  import type {ChangeImpact} from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
-  import { useEntityNames } from '@/composables/useEntityNames';
-  import { resolveDashboardColour } from '@/config/constant/palette';
-  import { jumpToEntity } from '@/utils/jumpUtil';
-  import { formatDateTime } from '@/utils/timeUtil';
+  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+  import {useEntityNames} from '@/composables/useEntityNames';
+  import {resolveDashboardColour} from '@/config/constant/palette';
+  import {jumpToEntity} from '@/utils/jumpUtil';
+  import {formatDateTime} from '@/utils/timeUtil';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
-  const { loading, run } = useAsyncLoader();
-  const { resolveDevices, resolveDrivers, resolveProfiles, deviceName, driverName, profileName } = useEntityNames();
+  const {loading, run} = useAsyncLoader();
+  const {resolveDevices, resolveDrivers, resolveProfiles, deviceName, driverName, profileName} = useEntityNames();
 
   const daysOptions = [
-    { label: '1d', value: '1' },
-    { label: '7d', value: '7' },
-    { label: '30d', value: '30' },
+    {label: '1d', value: '1'},
+    {label: '7d', value: '7'},
+    {label: '30d', value: '30'},
   ];
   const daysKey = ref<string>('7');
 
@@ -78,7 +78,7 @@
 
   const load = () =>
     run(async () => {
-      const res: { data?: ChangeImpact[] } = await alertChangeImpact(Number(daysKey.value), 30);
+      const res: {data?: ChangeImpact[]} = await alertChangeImpact(Number(daysKey.value), 30);
       rows.value = res?.data ?? [];
       // Each entityId goes through its kind-specific batch endpoint.
       await Promise.all([
@@ -111,7 +111,7 @@
 
   const onJump = (r: ChangeImpact) => jumpToEntity(router, r.kind, r.entityId);
 
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

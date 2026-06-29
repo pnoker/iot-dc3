@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { App, DirectiveBinding } from 'vue';
+import type {App, DirectiveBinding} from 'vue';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { httpGet } from '@/api/common';
-import { API_MANAGER_BASE } from '@/config/constant/api';
-import type { TopologyMode } from '@/config/types/dashboard';
+import {httpGet} from '@/api/common';
+import {API_MANAGER_BASE} from '@/config/constant/api';
+import type {TopologyMode} from '@/config/types/dashboard';
 
-export const topology = (params: { mode?: TopologyMode; rangeKey?: string } = {}) =>
+export const topology = (params: {mode?: TopologyMode; rangeKey?: string} = {}) =>
   httpGet(`${API_MANAGER_BASE}/dashboard/topology`, {
     params: {
-      ...(params.mode ? { mode: params.mode } : {}),
-      ...(params.rangeKey ? { range_key: params.rangeKey } : {}),
+      ...(params.mode ? {mode: params.mode} : {}),
+      ...(params.rangeKey ? {range_key: params.rangeKey} : {}),
     },
   });

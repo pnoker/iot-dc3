@@ -26,20 +26,20 @@
       @size-change="sizeChange"
       @current-change="currentChange"
     >
-      <template #filters="{ formData: fd }">
+      <template #filters="{formData: fd}">
         <el-form-item :label="$t('settings.event.alarmType')" prop="alarmTypeFlag">
           <el-segmented
             v-model="fd.alarmTypeFlag"
-            :options="[{ label: $t('common.all'), value: '' }, ...alarmTypeOptions]"
+            :options="[{label: $t('common.all'), value: ''}, ...alarmTypeOptions]"
           />
         </el-form-item>
         <el-form-item :label="$t('settings.event.confirmFlag')" prop="confirmFlag">
           <el-segmented
             v-model="fd.confirmFlag"
             :options="[
-              { label: $t('common.all'), value: '' },
-              { label: $t('common.unconfirmed'), value: 0 },
-              { label: $t('common.confirmed'), value: 1 },
+              {label: $t('common.all'), value: ''},
+              {label: $t('common.unconfirmed'), value: 0},
+              {label: $t('common.confirmed'), value: 1},
             ]"
           />
         </el-form-item>
@@ -51,19 +51,19 @@
         <el-popconfirm
           :cancel-button-text="$t('common.cancel')"
           :confirm-button-text="$t('common.confirm')"
-          :title="$t('settings.event.bulkConfirmTitle', { n: selection.length })"
+          :title="$t('settings.event.bulkConfirmTitle', {n: selection.length})"
           @confirm="bulkConfirm(true)"
         >
           <template #reference>
             <el-button :loading="bulkRunning" type="primary">
-              {{ $t('settings.event.bulkConfirm', { n: selection.length }) }}
+              {{ $t('settings.event.bulkConfirm', {n: selection.length}) }}
             </el-button>
           </template>
         </el-popconfirm>
         <el-popconfirm
           :cancel-button-text="$t('common.cancel')"
           :confirm-button-text="$t('common.confirm')"
-          :title="$t('settings.event.bulkUnconfirmTitle', { n: selection.length })"
+          :title="$t('settings.event.bulkUnconfirmTitle', {n: selection.length})"
           @confirm="bulkConfirm(false)"
         >
           <template #reference>
@@ -92,7 +92,7 @@
         <el-table-column type="selection" width="44" />
         <!-- @vue-generic {Row} -->
         <el-table-column :label="entityLabel" min-width="180" show-overflow-tooltip>
-          <template #default="{ row }">
+          <template #default="{row}">
             <span>{{ nameFor(row) }}</span>
           </template>
         </el-table-column>
@@ -104,14 +104,14 @@
           width="140"
         />
         <el-table-column :label="$t('settings.event.alarmType')" width="110">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-tag :type="alarmTypeTag(row.eventTypeFlag)" size="small">
               {{ alarmTypeLabel(row.eventTypeFlag) }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column :label="$t('settings.event.alarmLevel')" width="100">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-tag :type="alarmLevelTag(row.alarmLevelFlag)" size="small">
               {{ alarmLevelLabel(row.alarmLevelFlag) }}
             </el-tag>
@@ -119,7 +119,7 @@
         </el-table-column>
         <el-table-column :label="$t('settings.event.message')" min-width="240" prop="message" show-overflow-tooltip />
         <el-table-column :label="$t('settings.event.confirmFlag')" width="110">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-tag :type="row.confirmFlag === 'CONFIRMED' ? 'success' : 'warning'" size="small">
               {{ row.confirmFlag === 'CONFIRMED' ? $t('common.confirmed') : $t('common.unconfirmed') }}
             </el-tag>
@@ -133,7 +133,7 @@
         />
         <!-- @vue-generic {Row} -->
         <el-table-column :label="$t('common.operation')" fixed="right" width="140">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-popconfirm
               v-if="row.confirmFlag !== 'CONFIRMED'"
               :cancel-button-text="$t('common.cancel')"
@@ -167,16 +167,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRoute } from 'vue-router';
+  import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRoute} from 'vue-router';
 
-  import { alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm } from '@/api/dashboard';
-  import { listDeviceByIds } from '@/api/device';
-  import { listDriverByIds } from '@/api/driver';
-  import { listPointByIds } from '@/api/point';
-  import { timestampColumn } from '@/utils/dateUtil';
-  import { successMessage } from '@/utils/notificationUtil';
+  import {alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm} from '@/api/dashboard';
+  import {listDeviceByIds} from '@/api/device';
+  import {listDriverByIds} from '@/api/driver';
+  import {listPointByIds} from '@/api/point';
+  import {timestampColumn} from '@/utils/dateUtil';
+  import {successMessage} from '@/utils/notificationUtil';
   import {
     ALARM_TYPE_OPTIONS,
     alarmLevelLabel,
@@ -186,7 +186,7 @@
   } from '@/utils/thingModelFormatUtil';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
-  import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
   interface Row {
@@ -205,7 +205,7 @@
     source: 'point' | 'device' | 'driver';
   }>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const route = useRoute();
 
   const loading = ref(false);
@@ -242,12 +242,12 @@
   };
 
   const initial = readQuery();
-  const formData = reactive<{ alarmTypeFlag: number | ''; confirmFlag: number | ''; rangeKey: RangeKey }>({
+  const formData = reactive<{alarmTypeFlag: number | ''; confirmFlag: number | ''; rangeKey: RangeKey}>({
     alarmTypeFlag: initial.alarmTypeFlag,
     confirmFlag: initial.confirmFlag,
     rangeKey: initial.rangeKey,
   });
-  const page = reactive({ current: 1, size: 20, total: 0 });
+  const page = reactive({current: 1, size: 20, total: 0});
 
   const entityLabel = computed(() => {
     switch (props.source) {
@@ -369,7 +369,7 @@
     if (selection.value.length === 0) return;
     bulkRunning.value = true;
     try {
-      const items = selection.value.map((r) => ({ source: r.source, id: r.id }));
+      const items = selection.value.map((r) => ({source: r.source, id: r.id}));
       await alertBulkConfirm(items, confirm);
       successMessage();
       selection.value = [];

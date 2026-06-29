@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { httpPost } from '@/api/common';
-import { API_AUTH_BASE } from '@/config/constant/api';
-import type { Login } from '@/config/types';
+import {httpPost} from '@/api/common';
+import {API_AUTH_BASE} from '@/config/constant/api';
+import type {Login} from '@/config/types';
 
 export const generateSalt = (login: Login) => httpPost(`${API_AUTH_BASE}/token/salt`, login);
 

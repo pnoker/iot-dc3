@@ -38,10 +38,10 @@ import type {
   AgenticTraceEvent,
   AgenticVisualizationSpec,
 } from '@/config/types';
-import { failMessage, warnMessage } from '@/utils/notificationUtil';
-import { getStorage, setStorage } from '@/utils/storageUtil';
-import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import {failMessage, warnMessage} from '@/utils/notificationUtil';
+import {getStorage, setStorage} from '@/utils/storageUtil';
+import {defineStore} from 'pinia';
+import {computed, ref} from 'vue';
 
 const MESSAGE_STORAGE_KEY = 'dc3-agentic-messages';
 const DEFAULT_SESSION_TITLE = 'New Conversation';
@@ -170,7 +170,7 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const loadSessions = async () => {
     try {
-      const response = await listAgenticSessions({ page: { current: 1, size: 50 } });
+      const response = await listAgenticSessions({page: {current: 1, size: 50}});
       sessions.value = (response.data?.records || []).map(normalizeSession);
       if (activeConversationId.value) {
         restoreSessionModel(sessions.value.find((session) => session.conversationId === activeConversationId.value));
@@ -250,7 +250,7 @@ export const useAgenticStore = defineStore('agentic', () => {
   const renameSession = async (conversationId: string, title: string) => {
     const normalizedTitle = normalizeTitle(title);
     sessions.value = sessions.value.map((session) =>
-      session.conversationId === conversationId ? { ...session, title: normalizedTitle } : session
+      session.conversationId === conversationId ? {...session, title: normalizedTitle} : session
     );
 
     try {
@@ -258,7 +258,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         title: normalizedTitle,
       });
       sessions.value = sessions.value.map((session) =>
-        session.conversationId === conversationId ? normalizeSession({ ...session, ...(response.data || {}) }) : session
+        session.conversationId === conversationId ? normalizeSession({...session, ...(response.data || {})}) : session
       );
     } catch (error) {
       warnMessage('Failed to update agentic session metadata.', 'Agentic', error);
@@ -279,7 +279,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     const model = resolveModelName(selectedModel.value || sessionModel(currentSession.value));
     selectedModel.value = model;
     applyModelCapabilities();
-    updateSessionLocally(conversationId, { sessionExt: buildCurrentSessionExt(model) });
+    updateSessionLocally(conversationId, {sessionExt: buildCurrentSessionExt(model)});
     const userMessage: AgenticMessage = {
       id: createMessageId('user'),
       role: 'user',
@@ -301,7 +301,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     try {
       const request = {
         model,
-        messages: [{ role: 'user' as const, content: text }],
+        messages: [{role: 'user' as const, content: text}],
         stream: activeModel.value.stream,
         conversationId,
         temperature: temperature.value,
@@ -480,15 +480,15 @@ export const useAgenticStore = defineStore('agentic', () => {
     if (!conversationId) {
       return;
     }
-    updateSessionLocally(conversationId, { sessionExt: { model: nextModel } });
+    updateSessionLocally(conversationId, {sessionExt: {model: nextModel}});
     const session = sessions.value.find((item) => item.conversationId === conversationId);
     if (!session?.createTime && !session?.operateTime) {
       return;
     }
     try {
-      const response = await updateAgenticSession(conversationId, { sessionExt: { model: nextModel } });
+      const response = await updateAgenticSession(conversationId, {sessionExt: {model: nextModel}});
       sessions.value = sessions.value.map((session) =>
-        session.conversationId === conversationId ? normalizeSession({ ...session, ...(response.data || {}) }) : session
+        session.conversationId === conversationId ? normalizeSession({...session, ...(response.data || {})}) : session
       );
     } catch (error) {
       warnMessage('Failed to update agentic session model.', 'Agentic', error);
@@ -511,9 +511,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         ? {
             ...session,
             ...patch,
-            sessionExt: patch.sessionExt
-              ? { ...(sessionExtOf(session) || {}), ...patch.sessionExt }
-              : session.sessionExt,
+            sessionExt: patch.sessionExt ? {...(sessionExtOf(session) || {}), ...patch.sessionExt} : session.sessionExt,
           }
         : session
     );
@@ -522,7 +520,7 @@ export const useAgenticStore = defineStore('agentic', () => {
   const persistSessionPrefs = async (conversationId: string) => {
     if (!conversationId) return;
     const sessionExt = buildCurrentSessionExt();
-    updateSessionLocally(conversationId, { sessionExt });
+    updateSessionLocally(conversationId, {sessionExt});
     const session = sessions.value.find((item) => item.conversationId === conversationId);
     if (!session?.createTime && !session?.operateTime) {
       return;
@@ -575,7 +573,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     const index = messages.findIndex((message) => message.id === messageId);
     if (index < 0) return;
     const target = messages[index]!;
-    messages[index] = { ...target, content: target.content + delta };
+    messages[index] = {...target, content: target.content + delta};
     messagesByConversation.value[conversationId] = [...messages];
   };
 
@@ -585,7 +583,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     const index = messages.findIndex((message) => message.id === messageId);
     if (index < 0) return;
     const target = messages[index]!;
-    messages[index] = { ...target, reasoning: (target.reasoning || '') + reasoning };
+    messages[index] = {...target, reasoning: (target.reasoning || '') + reasoning};
     messagesByConversation.value[conversationId] = [...messages];
   };
 
@@ -614,7 +612,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     const messages = messagesByConversation.value[conversationId] || [];
     setConversationMessages(
       conversationId,
-      messages.map((message) => (message.id === messageId ? { ...message, streaming: false } : message))
+      messages.map((message) => (message.id === messageId ? {...message, streaming: false} : message))
     );
   };
 
@@ -624,7 +622,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     const index = messages.findIndex((message) => message.id === messageId);
     if (index < 0) return;
     const target = messages[index]!;
-    messages[index] = { ...target, finishReason: reason };
+    messages[index] = {...target, finishReason: reason};
     messagesByConversation.value[conversationId] = [...messages];
   };
 
@@ -777,7 +775,7 @@ const mergeEphemeralAssistantState = (previous: AgenticMessage[], loaded: Agenti
       contentExt:
         message.contentExt?.charts?.length || !state.charts?.length
           ? message.contentExt
-          : { ...(message.contentExt || {}), charts: state.charts },
+          : {...(message.contentExt || {}), charts: state.charts},
     };
   });
 };
@@ -792,7 +790,7 @@ type RawAgenticSession = AgenticSession & {
 };
 
 const normalizeSession = (session: RawAgenticSession): AgenticSession => {
-  const { session_ext: _sessionExt, sessionExt, ...rest } = session;
+  const {session_ext: _sessionExt, sessionExt, ...rest} = session;
   const normalizedExt = normalizeSessionExt(sessionExt || _sessionExt);
   return {
     ...rest,

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import {existsSync, readFileSync} from 'node:fs';
+import {join} from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { SETTINGS_FALLBACK_SIDEBAR } from '@/config/settingsNav';
+import {SETTINGS_FALLBACK_SIDEBAR} from '@/config/settingsNav';
 
 // The settings sidebar is authoritatively driven by the backend dc3_menu seed,
 // with settingsNav.ts as the offline fallback. They MUST encode the same group
@@ -40,15 +40,15 @@ function parseSeedMenu(sql: string): MenuRow[] {
   // leading integers distinguish it from resource tuples (id, parent, 'name').
   const re = /\((\d+),\s*(\d+),\s*\d+,\s*'[^']*',\s*'([^']*)',\s*\d+,\s*(\d+),/g;
   const rows: MenuRow[] = [];
-  for (let m; (m = re.exec(sql)); ) {
+  for (let m; (m = re.exec(sql));) {
     const id = Number(m[1]);
     if (id < 10001 || id > 10099) continue; // menu id band
-    rows.push({ id, parent: Number(m[2]), code: m[3], index: Number(m[4]) });
+    rows.push({id, parent: Number(m[2]), code: m[3], index: Number(m[4])});
   }
   return rows;
 }
 
-type Tree = Array<{ code: string; leaves: string[] }>;
+type Tree = Array<{code: string; leaves: string[]}>;
 
 const sortByIndex = (a: MenuRow, b: MenuRow) => a.index - b.index;
 

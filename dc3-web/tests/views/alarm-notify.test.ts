@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import { flushPromises, mount } from '@vue/test-utils';
-import { defineComponent, h } from 'vue';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createMemoryHistory, createRouter } from 'vue-router';
+import {flushPromises, mount} from '@vue/test-utils';
+import {defineComponent, h} from 'vue';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {createMemoryHistory, createRouter} from 'vue-router';
 
 import i18n from '@/config/i18n';
 import AlarmNotify from '@/views/settings/alarm/AlarmNotify.vue';
 
-import { createElButtonStub, createElFormStub, layoutStubs } from '../setup/stubs/element-plus';
+import {createElButtonStub, createElFormStub, layoutStubs} from '../setup/stubs/element-plus';
 
 const alarmMocks = vi.hoisted(() => {
-  const listResponse = { data: { records: [{ id: 'alarm-row-1', ruleName: 'Cooling threshold' }], total: 1 } };
+  const listResponse = {data: {records: [{id: 'alarm-row-1', ruleName: 'Cooling threshold'}], total: 1}};
   const list = () => vi.fn(() => Promise.resolve(listResponse));
-  const mutate = () => vi.fn(() => Promise.resolve({ data: true }));
+  const mutate = () => vi.fn(() => Promise.resolve({data: true}));
 
   return {
     addMessage: mutate(),
@@ -66,17 +66,17 @@ const ToolCardStub = defineComponent({
   name: 'ToolCard',
   props: ['formModel', 'page'],
   emits: ['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change'],
-  setup(_, { emit, slots }) {
+  setup(_, {emit, slots}) {
     return () =>
-      h('section', { 'data-test': 'tool-card' }, [
-        h('div', { 'data-test': 'filters' }, slots.filters?.()),
-        h('div', { 'data-test': 'actions' }, slots.actions?.()),
+      h('section', {'data-test': 'tool-card'}, [
+        h('div', {'data-test': 'filters'}, slots.filters?.()),
+        h('div', {'data-test': 'actions'}, slots.actions?.()),
         h(
           'button',
           {
             'data-test': 'search',
             type: 'button',
-            onClick: () => emit('search', { keyword: 'Cooling threshold', filterValue: 'ENABLE' }),
+            onClick: () => emit('search', {keyword: 'Cooling threshold', filterValue: 'ENABLE'}),
           },
           'Search'
         ),
@@ -85,22 +85,22 @@ const ToolCardStub = defineComponent({
 });
 
 function makeTestRouter() {
-  const noop = defineComponent({ render: () => null });
+  const noop = defineComponent({render: () => null});
   return createRouter({
     history: createMemoryHistory(),
     routes: [
-      { name: 'home', path: '/', component: noop },
-      { name: 'alarm-rule', path: '/alarm/rule', component: noop },
-      { name: 'alarm-notify', path: '/alarm/notify', component: noop },
-      { name: 'alarm-state', path: '/alarm/state', component: noop },
+      {name: 'home', path: '/', component: noop},
+      {name: 'alarm-rule', path: '/alarm/rule', component: noop},
+      {name: 'alarm-notify', path: '/alarm/notify', component: noop},
+      {name: 'alarm-state', path: '/alarm/state', component: noop},
     ],
   });
 }
 
 function mountAlarmNotify(entity: 'rule' | 'notify' | 'state' = 'rule') {
-  const { ElForm } = createElFormStub();
+  const {ElForm} = createElFormStub();
   return mount(AlarmNotify, {
-    props: { entity },
+    props: {entity},
     global: {
       plugins: [i18n, makeTestRouter()],
       directives: {
@@ -108,7 +108,7 @@ function mountAlarmNotify(entity: 'rule' | 'notify' | 'state' = 'rule') {
       },
       stubs: {
         ...layoutStubs,
-        BlankCard: { template: '<section class="blank-card-stub"><slot /></section>' },
+        BlankCard: {template: '<section class="blank-card-stub"><slot /></section>'},
         ElForm,
         ToolCard: ToolCardStub,
         ElButton: createElButtonStub(),
@@ -130,7 +130,7 @@ describe('AlarmNotify view', () => {
     expect(alarmMocks.listNotify).not.toHaveBeenCalled();
     expect(alarmMocks.listRuleState).not.toHaveBeenCalled();
 
-    await wrapper.setProps({ entity: 'notify' });
+    await wrapper.setProps({entity: 'notify'});
     await flushPromises();
 
     expect(alarmMocks.listRule).toHaveBeenCalledTimes(1);
@@ -149,7 +149,7 @@ describe('AlarmNotify view', () => {
       expect.objectContaining({
         ruleName: 'Cooling threshold',
         enableFlag: 'ENABLE',
-        page: expect.objectContaining({ current: 1, size: 12 }),
+        page: expect.objectContaining({current: 1, size: 12}),
       })
     );
   });

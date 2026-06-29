@@ -19,9 +19,9 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
-  import { computed } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import type {PropType} from 'vue';
+  import {computed} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
   /**
    * Presets the frontend sends as {@code rangeKey} — kept in sync with
@@ -50,19 +50,19 @@
     },
   });
 
-  const emit = defineEmits<{ (e: 'update:modelValue', value: RangeKey): void }>();
+  const emit = defineEmits<{(e: 'update:modelValue', value: RangeKey): void}>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const options = computed(() => {
-    const base: Array<{ label: string; value: RangeKey }> = [
-      { label: t('common.ranges.today'), value: 'today' },
-      { label: t('common.ranges.h24'), value: '24h' },
-      { label: t('common.ranges.d7'), value: '7d' },
-      { label: t('common.ranges.d30'), value: '30d' },
+    const base: Array<{label: string; value: RangeKey}> = [
+      {label: t('common.ranges.today'), value: 'today'},
+      {label: t('common.ranges.h24'), value: '24h'},
+      {label: t('common.ranges.d7'), value: '7d'},
+      {label: t('common.ranges.d30'), value: '30d'},
     ];
     if (props.includeAll) {
-      base.unshift({ label: t('common.all'), value: '' });
+      base.unshift({label: t('common.all'), value: ''});
     }
     return base;
   });

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
 import EnableTag from '@/components/tag/EnableTag.vue';
@@ -31,7 +31,7 @@ function mountTag(props: Record<string, unknown>) {
     props,
     global: {
       plugins: [i18n],
-      stubs: { ElTag: ElTagStub },
+      stubs: {ElTag: ElTagStub},
     },
   });
 }
@@ -39,7 +39,7 @@ function mountTag(props: Record<string, unknown>) {
 describe('EnableTag', () => {
   it('renders the success type with the enable label for enabled values', () => {
     for (const value of ['ENABLE', 'enabled', true, '0']) {
-      const wrapper = mountTag({ value });
+      const wrapper = mountTag({value});
       const tag = wrapper.find('.el-tag-stub');
       expect(tag.attributes('data-type')).toBe('success');
       expect(tag.text()).toBe('Enable');
@@ -48,7 +48,7 @@ describe('EnableTag', () => {
 
   it('renders the info type with the disable label for disabled or missing values', () => {
     for (const value of ['DISABLE', false, null, undefined, '']) {
-      const wrapper = mountTag({ value });
+      const wrapper = mountTag({value});
       const tag = wrapper.find('.el-tag-stub');
       expect(tag.attributes('data-type')).toBe('info');
       expect(tag.text()).toBe('Disable');
@@ -56,7 +56,7 @@ describe('EnableTag', () => {
   });
 
   it('forwards the size prop to the underlying tag', () => {
-    const wrapper = mountTag({ value: 'ENABLE', size: 'small' });
+    const wrapper = mountTag({value: 'ENABLE', size: 'small'});
     expect(wrapper.find('.el-tag-stub').attributes('data-size')).toBe('small');
   });
 });

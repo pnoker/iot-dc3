@@ -25,16 +25,16 @@
                 >{{ reactiveData.data.profileName }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('profile.detail.pointCount')"
-                >{{ pointLength }} {{ $t('common.count', { count: '' }) }}
+                >{{ pointLength }} {{ $t('common.count', {count: ''}) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('profile.detail.commandCount')"
-                >{{ commandLength }} {{ $t('common.count', { count: '' }) }}
+                >{{ commandLength }} {{ $t('common.count', {count: ''}) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('profile.detail.eventCount')"
-                >{{ eventLength }} {{ $t('common.count', { count: '' }) }}
+                >{{ eventLength }} {{ $t('common.count', {count: ''}) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('profile.detail.deviceCount')"
-                >{{ deviceLength }} {{ $t('common.count', { count: '' }) }}
+                >{{ deviceLength }} {{ $t('common.count', {count: ''}) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')"
                 >{{ timestamp(reactiveData.data.createTime) }}

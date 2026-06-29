@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const userMocks = vi.hoisted(() => ({
-  addUser: vi.fn(() => Promise.resolve({ data: true })),
-  deleteUser: vi.fn(() => Promise.resolve({ data: true })),
-  listUser: vi.fn(() => Promise.resolve({ data: { records: [{ id: 'u-1', nickName: 'Alice' }], total: 1 } })),
-  updateUser: vi.fn(() => Promise.resolve({ data: true })),
+  addUser: vi.fn(() => Promise.resolve({data: true})),
+  deleteUser: vi.fn(() => Promise.resolve({data: true})),
+  listUser: vi.fn(() => Promise.resolve({data: {records: [{id: 'u-1', nickName: 'Alice'}], total: 1}})),
+  updateUser: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/user', () => userMocks);
 vi.mock('@/api/rolePrincipalBind', () => ({
-  addRolePrincipalBind: vi.fn(() => Promise.resolve({ data: true })),
-  deleteRolePrincipalBind: vi.fn(() => Promise.resolve({ data: true })),
+  addRolePrincipalBind: vi.fn(() => Promise.resolve({data: true})),
+  deleteRolePrincipalBind: vi.fn(() => Promise.resolve({data: true})),
 }));
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('SettingsUser view', () => {
   it('lists users on mount', async () => {
@@ -39,9 +39,9 @@ describe('SettingsUser view', () => {
     await mountListPage({
       component: User,
       stubs: {
-        userTool: { template: '<div />' },
-        userAddForm: { template: '<div />' },
-        userEditForm: { template: '<div />' },
+        userTool: {template: '<div />'},
+        userAddForm: {template: '<div />'},
+        userEditForm: {template: '<div />'},
       },
     });
     await flushPromises();

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
 import Error500 from '@/components/error/500.vue';
 
-import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus';
+import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus';
 
 describe('Error500', () => {
   it('renders a 500 result with the error icon and server-error subtitle', () => {
@@ -30,7 +30,7 @@ describe('Error500', () => {
         stubs: {
           ...layoutStubs,
           ElButton: createElButtonStub(),
-          RouterLink: { props: ['to'], template: '<a class="router-link-stub"><slot /></a>' },
+          RouterLink: {props: ['to'], template: '<a class="router-link-stub"><slot /></a>'},
         },
       },
     });

@@ -35,17 +35,17 @@
                 <el-button round size="small" @click="goto('device', {})">
                   {{ t('settings.event.overview.quickAll') }}
                 </el-button>
-                <el-button plain round size="small" type="warning" @click="goto('device', { confirmFlag: '0' })">
+                <el-button plain round size="small" type="warning" @click="goto('device', {confirmFlag: '0'})">
                   {{ t('settings.event.overview.quickUnconfirmed') }}
                 </el-button>
                 <span class="event-overview__quick-divider" />
-                <el-button plain round size="small" @click="goto('device', { rangeKey: 'today' })">
+                <el-button plain round size="small" @click="goto('device', {rangeKey: 'today'})">
                   {{ t('settings.event.overview.quickToday') }}
                 </el-button>
-                <el-button plain round size="small" @click="goto('device', { rangeKey: '7d' })">
+                <el-button plain round size="small" @click="goto('device', {rangeKey: '7d'})">
                   {{ t('settings.event.overview.quick7d') }}
                 </el-button>
-                <el-button plain round size="small" @click="goto('device', { rangeKey: '30d' })">
+                <el-button plain round size="small" @click="goto('device', {rangeKey: '30d'})">
                   {{ t('settings.event.overview.quick30d') }}
                 </el-button>
               </div>
@@ -61,17 +61,17 @@
                 <el-button round size="small" @click="goto('driver', {})">
                   {{ t('settings.event.overview.quickAll') }}
                 </el-button>
-                <el-button plain round size="small" type="warning" @click="goto('driver', { confirmFlag: '0' })">
+                <el-button plain round size="small" type="warning" @click="goto('driver', {confirmFlag: '0'})">
                   {{ t('settings.event.overview.quickUnconfirmed') }}
                 </el-button>
                 <span class="event-overview__quick-divider" />
-                <el-button plain round size="small" @click="goto('driver', { rangeKey: 'today' })">
+                <el-button plain round size="small" @click="goto('driver', {rangeKey: 'today'})">
                   {{ t('settings.event.overview.quickToday') }}
                 </el-button>
-                <el-button plain round size="small" @click="goto('driver', { rangeKey: '7d' })">
+                <el-button plain round size="small" @click="goto('driver', {rangeKey: '7d'})">
                   {{ t('settings.event.overview.quick7d') }}
                 </el-button>
-                <el-button plain round size="small" @click="goto('driver', { rangeKey: '30d' })">
+                <el-button plain round size="small" @click="goto('driver', {rangeKey: '30d'})">
                   {{ t('settings.event.overview.quick30d') }}
                 </el-button>
               </div>
@@ -87,17 +87,17 @@
                 <el-button round size="small" @click="goto('point', {})">
                   {{ t('settings.event.overview.quickAll') }}
                 </el-button>
-                <el-button plain round size="small" type="warning" @click="goto('point', { confirmFlag: '0' })">
+                <el-button plain round size="small" type="warning" @click="goto('point', {confirmFlag: '0'})">
                   {{ t('settings.event.overview.quickUnconfirmed') }}
                 </el-button>
                 <span class="event-overview__quick-divider" />
-                <el-button plain round size="small" @click="goto('point', { rangeKey: 'today' })">
+                <el-button plain round size="small" @click="goto('point', {rangeKey: 'today'})">
                   {{ t('settings.event.overview.quickToday') }}
                 </el-button>
-                <el-button plain round size="small" @click="goto('point', { rangeKey: '7d' })">
+                <el-button plain round size="small" @click="goto('point', {rangeKey: '7d'})">
                   {{ t('settings.event.overview.quick7d') }}
                 </el-button>
-                <el-button plain round size="small" @click="goto('point', { rangeKey: '30d' })">
+                <el-button plain round size="small" @click="goto('point', {rangeKey: '30d'})">
                   {{ t('settings.event.overview.quick30d') }}
                 </el-button>
               </div>
@@ -173,13 +173,13 @@
 </template>
 
 <script lang="ts" setup>
-  import type { Component } from 'vue';
-  import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRoute, useRouter } from 'vue-router';
-  import { Bell, CircleCheck, Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
+  import type {Component} from 'vue';
+  import {computed, defineAsyncComponent, onBeforeUnmount, onMounted, reactive, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRoute, useRouter} from 'vue-router';
+  import {Bell, CircleCheck, Management, Promotion, Warning, WarningFilled} from '@element-plus/icons-vue';
 
-  import { alertPage, alertStats, alertTrend } from '@/api/dashboard';
+  import {alertPage, alertStats, alertTrend} from '@/api/dashboard';
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import StatCard from '@/components/card/stat/StatCard.vue';
   import EventTrendChart from './components/EventTrendChart.vue';
@@ -219,7 +219,7 @@
     onRefresh: () => Promise<void>;
   }
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
   const route = useRoute();
 
@@ -233,7 +233,7 @@
   const activeTab = ref<TabName>(initialTab);
 
   const onTabChange = (name: string | number) => {
-    router.replace({ query: { ...route.query, tab: String(name) } }).catch(() => {});
+    router.replace({query: {...route.query, tab: String(name)}}).catch(() => {});
   };
 
   const loading = ref(false);
@@ -270,7 +270,7 @@
 
   const fetchCount = async (source: 'point' | 'device' | 'driver', confirmFlag: number | null) => {
     try {
-      const res: { data?: { total?: number } } = await alertPage({ source, confirmFlag, current: 1, size: 1 });
+      const res: {data?: {total?: number}} = await alertPage({source, confirmFlag, current: 1, size: 1});
       return Number(res?.data?.total ?? 0);
     } catch {
       return 0;
@@ -310,7 +310,7 @@
       state.todayDriverUnconfirmed = Number(statsData?.todayDriverUnconfirmed ?? 0);
 
       const trendRows =
-        ((trend as { data?: Array<{ deviceCount?: number; driverCount?: number }> } | null)?.data as Array<{
+        ((trend as {data?: Array<{deviceCount?: number; driverCount?: number}>} | null)?.data as Array<{
           deviceCount?: number;
           driverCount?: number;
         }>) || [];
@@ -331,9 +331,9 @@
     const prev = data[data.length - 2] ?? 0;
     const curr = data[data.length - 1] ?? 0;
     const diff = curr - prev;
-    if (diff > 0) return { direction: 'up', label: `+${diff}` };
-    if (diff < 0) return { direction: 'down', label: `${diff}` };
-    return { direction: 'flat', label: '0' };
+    if (diff > 0) return {direction: 'up', label: `+${diff}`};
+    if (diff < 0) return {direction: 'down', label: `${diff}`};
+    return {direction: 'flat', label: '0'};
   };
 
   // Subtitle builders — every card gets a second data point so the primary
@@ -344,14 +344,14 @@
   const totalSubtitle = (unconfirmed: number, total: number) => {
     if (total === 0) return '';
     const pct = Math.round((unconfirmed / total) * 100);
-    return t('settings.event.overview.subtitleTotalUnconfirmed', { unconfirmed, total, pct });
+    return t('settings.event.overview.subtitleTotalUnconfirmed', {unconfirmed, total, pct});
   };
   const unconfirmedSubtitle = (unconfirmed: number, total: number) => {
     if (total === 0) return '';
     const pct = Math.round((unconfirmed / total) * 100);
-    return t('settings.event.overview.subtitleUnconfirmedOfTotal', { total, pct });
+    return t('settings.event.overview.subtitleUnconfirmedOfTotal', {total, pct});
   };
-  const todaySubtitle = (unconfirmed: number) => t('settings.event.overview.subtitleTodayUnconfirmed', { unconfirmed });
+  const todaySubtitle = (unconfirmed: number) => t('settings.event.overview.subtitleTodayUnconfirmed', {unconfirmed});
 
   // Card order chosen deliberately: driver lane first (the one tenants run
   // diagnostics off most), then device, split into totals → unconfirmed →
@@ -370,7 +370,7 @@
       tone: 'purple',
       sparkline: state.driverDaily,
       trend: sparkTrend(state.driverDaily),
-      onClick: () => router.push({ name: 'settingsDriverAlarm' }),
+      onClick: () => router.push({name: 'settingsDriverAlarm'}),
       onRefresh: load,
     },
     {
@@ -382,7 +382,7 @@
       tone: 'blue',
       sparkline: state.deviceDaily,
       trend: sparkTrend(state.deviceDaily),
-      onClick: () => router.push({ name: 'settingsDeviceAlarm' }),
+      onClick: () => router.push({name: 'settingsDeviceAlarm'}),
       onRefresh: load,
     },
     {
@@ -394,7 +394,7 @@
       tone: 'red',
       sparkline: state.driverDaily,
       trend: sparkTrend(state.driverDaily),
-      onClick: () => router.push({ name: 'settingsDriverAlarm', query: { confirmFlag: '0' } }),
+      onClick: () => router.push({name: 'settingsDriverAlarm', query: {confirmFlag: '0'}}),
       onRefresh: load,
     },
     {
@@ -406,7 +406,7 @@
       tone: 'orange',
       sparkline: state.deviceDaily,
       trend: sparkTrend(state.deviceDaily),
-      onClick: () => router.push({ name: 'settingsDeviceAlarm', query: { confirmFlag: '0' } }),
+      onClick: () => router.push({name: 'settingsDeviceAlarm', query: {confirmFlag: '0'}}),
       onRefresh: load,
     },
     {
@@ -418,7 +418,7 @@
       tone: 'purple',
       sparkline: state.sparkline24h,
       trend: sparkTrend(state.sparkline24h),
-      onClick: () => router.push({ name: 'settingsDriverAlarm', query: { rangeKey: 'today' } }),
+      onClick: () => router.push({name: 'settingsDriverAlarm', query: {rangeKey: 'today'}}),
       onRefresh: load,
     },
     {
@@ -430,7 +430,7 @@
       tone: 'blue',
       sparkline: state.sparkline24h,
       trend: sparkTrend(state.sparkline24h),
-      onClick: () => router.push({ name: 'settingsDeviceAlarm', query: { rangeKey: 'today' } }),
+      onClick: () => router.push({name: 'settingsDeviceAlarm', query: {rangeKey: 'today'}}),
       onRefresh: load,
     },
   ]);
@@ -444,7 +444,7 @@
     if (source === 'point') name = 'settingsPointAlarm';
     else if (source === 'driver') name = 'settingsDriverAlarm';
     else name = 'settingsDeviceAlarm';
-    router.push({ name, query }).catch(() => {});
+    router.push({name, query}).catch(() => {});
   };
 
   onMounted(() => {

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { isNull } from '@/utils/validationUtil';
-import { decode, encode } from 'js-base64';
+import {isNull} from '@/utils/validationUtil';
+import {decode, encode} from 'js-base64';
 import Cookies from 'js-cookie';
 
 /**
@@ -63,7 +63,7 @@ export const getStorage = (key: string, isSession?: boolean): unknown => {
   else obj = window.localStorage.getItem(key);
   if (isNull(obj)) return;
 
-  let parsed: { dataType: string; content: unknown };
+  let parsed: {dataType: string; content: unknown};
   try {
     parsed = JSON.parse(decode(obj!));
   } catch {
@@ -118,7 +118,7 @@ export const removeStorage = (key: string, isSession?: boolean) => {
  * @returns Array of storage items
  */
 export const getAllStorage = (isSession?: boolean) => {
-  const list = [] as Array<{ name: string | null; content: unknown }>;
+  const list = [] as Array<{name: string | null; content: unknown}>;
   if (isSession) {
     for (let i = 0; i < window.sessionStorage.length; i++) {
       list.push({

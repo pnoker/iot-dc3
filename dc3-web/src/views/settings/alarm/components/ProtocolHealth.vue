@@ -28,14 +28,14 @@
   >
     <el-table :data="rows" size="small">
       <el-table-column :label="t('settings.event.overview.colProtocol')" min-width="140">
-        <template #default="{ row }">
+        <template #default="{row}">
           <span class="protocol-health__name">{{ stripPrefix(row.serviceName) }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="t('settings.event.overview.colDrivers')" align="right" prop="driverCount" width="100" />
       <!-- @vue-generic {ProtocolHealth} -->
       <el-table-column :label="t('settings.event.overview.colEnabled')" align="right" width="120">
-        <template #default="{ row }">
+        <template #default="{row}">
           <span :class="enabledClass(row)" class="protocol-health__enabled">
             {{ row.enabledCount }} / {{ row.driverCount }}
           </span>
@@ -44,7 +44,7 @@
       <el-table-column :label="t('settings.event.overview.colDevices')" align="right" prop="deviceCount" width="100" />
       <!-- @vue-generic {ProtocolHealth} -->
       <el-table-column :label="t('settings.event.overview.colHealthRatio')" min-width="130">
-        <template #default="{ row }">
+        <template #default="{row}">
           <el-progress
             :color="healthColor(row)"
             :percentage="healthPercent(row)"
@@ -58,22 +58,22 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {onMounted, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { protocolHealth } from '@/api/dashboard';
-  import type { ProtocolHealth } from '@/config/types/dashboard';
+  import {protocolHealth} from '@/api/dashboard';
+  import type {ProtocolHealth} from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
+  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
-  const { t } = useI18n();
-  const { loading, run } = useAsyncLoader();
+  const {t} = useI18n();
+  const {loading, run} = useAsyncLoader();
 
   const rows = ref<ProtocolHealth[]>([]);
 
   const load = () =>
     run(async () => {
-      const res: { data?: ProtocolHealth[] } = await protocolHealth();
+      const res: {data?: ProtocolHealth[]} = await protocolHealth();
       rows.value = res?.data ?? [];
     });
 
@@ -103,7 +103,7 @@
 
   onMounted(load);
 
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

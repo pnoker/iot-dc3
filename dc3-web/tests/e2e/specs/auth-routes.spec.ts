@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import { expect, test } from '@playwright/test';
+import {expect, test} from '@playwright/test';
 
-import { ensureE2eData, expectHealthy, login, markHealth, waitForAppSettled, watchPageHealth } from '../fixtures/app';
-import { buildEntityRoutes, protectedRouteProbes, protectedRoutes, publicRoutes } from '../fixtures/routes';
+import {ensureE2eData, expectHealthy, login, markHealth, waitForAppSettled, watchPageHealth} from '../fixtures/app';
+import {buildEntityRoutes, protectedRouteProbes, protectedRoutes, publicRoutes} from '../fixtures/routes';
 
 test.describe('auth and route smoke', () => {
-  test('unauthenticated protected routes redirect before calling business APIs', async ({ page }) => {
+  test('unauthenticated protected routes redirect before calling business APIs', async ({page}) => {
     const health = watchPageHealth(page);
 
     for (const route of [...protectedRoutes, ...protectedRouteProbes]) {
       const mark = markHealth(health);
-      await page.goto(`/#${route}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`/#${route}`, {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
 
       await expect(page, route).toHaveURL(/\/login/);
@@ -33,12 +33,12 @@ test.describe('auth and route smoke', () => {
     }
   });
 
-  test('public and authenticated routes open without browser or API errors', async ({ page }) => {
+  test('public and authenticated routes open without browser or API errors', async ({page}) => {
     const health = watchPageHealth(page);
 
     for (const route of publicRoutes) {
       const mark = markHealth(health);
-      await page.goto(`/#${route}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`/#${route}`, {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
       expectHealthy(health, mark);
     }
@@ -49,7 +49,7 @@ test.describe('auth and route smoke', () => {
     try {
       for (const route of [...protectedRoutes, ...buildEntityRoutes(e2eData.routeIds)]) {
         const mark = markHealth(health);
-        await page.goto(`/#${route}`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`/#${route}`, {waitUntil: 'domcontentloaded'});
         await waitForAppSettled(page);
 
         await expect(page, route).not.toHaveURL(/\/login/);

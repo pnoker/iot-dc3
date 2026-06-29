@@ -47,9 +47,9 @@
       }}</span>
       <span class="topology-sankey__footer-right">
         <span v-if="mode === 'volume' && stats.rangeLabel" class="topology-sankey__range">
-          {{ $t('home.topology.volumeWindow', { range: stats.rangeLabel }) }}
+          {{ $t('home.topology.volumeWindow', {range: stats.rangeLabel}) }}
         </span>
-        <span v-if="updatedLabel">{{ $t('home.liveFeed.updatedAt', { time: updatedLabel }) }}</span>
+        <span v-if="updatedLabel">{{ $t('home.liveFeed.updatedAt', {time: updatedLabel}) }}</span>
         <span v-else>-</span>
       </span>
     </template>
@@ -62,14 +62,14 @@
     <el-table :data="othersDialog.children" height="420" size="small">
       <!-- @vue-generic {TopologyHiddenChild} -->
       <el-table-column :label="$t('home.topology.colType')" prop="type" width="110">
-        <template #default="{ row }">
+        <template #default="{row}">
           <el-tag :type="tagTypeFor(row.type)" size="small">{{ layerLabel(row.type) }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column :label="$t('home.topology.colName')" prop="name" show-overflow-tooltip />
       <!-- @vue-generic {TopologyHiddenChild} -->
       <el-table-column :label="$t('common.operation')" width="110">
-        <template #default="{ row }">
+        <template #default="{row}">
           <el-button link size="small" type="primary" @click="onChildJump(row)">
             {{ $t('common.detail') }}
           </el-button>
@@ -80,12 +80,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
-  import { Chart } from '@antv/g2';
+  import {computed, onMounted, onUnmounted, reactive, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRouter} from 'vue-router';
+  import {Chart} from '@antv/g2';
 
-  import { topology } from '@/api/dashboard';
+  import {topology} from '@/api/dashboard';
   import type {
     TopologyHiddenChild,
     TopologyLink,
@@ -95,10 +95,10 @@
     TopologyStats,
   } from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
 
   const loading = ref(false);
@@ -114,10 +114,10 @@
   const rangeKey = ref<RangeKey>('7d');
 
   const modeOptions = computed(() => [
-    { label: t('home.topology.modeCardinality'), value: 'cardinality' as const },
-    { label: t('home.topology.modeVolume'), value: 'volume' as const },
+    {label: t('home.topology.modeCardinality'), value: 'cardinality' as const},
+    {label: t('home.topology.modeVolume'), value: 'volume' as const},
   ]);
-  const othersDialog = reactive<{ visible: boolean; title: string; children: TopologyHiddenChild[] }>({
+  const othersDialog = reactive<{visible: boolean; title: string; children: TopologyHiddenChild[]}>({
     visible: false,
     title: '',
     children: [],
@@ -126,10 +126,10 @@
 
   const hasData = computed(() => (data.value?.nodes.length ?? 0) > 0);
   const stats = computed<TopologyStats>(
-    () => data.value?.stats ?? { driverCount: 0, deviceCount: 0, profileCount: 0, pointCount: 0 }
+    () => data.value?.stats ?? {driverCount: 0, deviceCount: 0, profileCount: 0, pointCount: 0}
   );
   const updatedLabel = computed(() =>
-    lastRefreshed.value ? new Date(lastRefreshed.value).toLocaleTimeString('zh-CN', { hour12: false }) : ''
+    lastRefreshed.value ? new Date(lastRefreshed.value).toLocaleTimeString('zh-CN', {hour12: false}) : ''
   );
 
   // Per-layer colour matching the LiveDataFeed driver/device/point palette
@@ -203,19 +203,19 @@
     // "driver:42 / device:101" which is garbage. Add a `key` alias equal
     // to the display name so the default label renders the human name,
     // while keeping `id` as the unique match token for link source/target.
-    const nodes = payload.nodes.map((n) => ({ ...n, key: n.name }));
+    const nodes = payload.nodes.map((n) => ({...n, key: n.name}));
 
     chart?.destroy();
-    chart = new Chart({ container: el, autoFit: true });
+    chart = new Chart({container: el, autoFit: true});
 
     chart.options({
       type: 'sankey',
       data: {
-        value: { nodes, links: payload.links },
+        value: {nodes, links: payload.links},
         transform: [
           {
             type: 'custom',
-            callback: (d: { nodes: (TopologyNode & { key: string })[]; links: TopologyLink[] }) => ({
+            callback: (d: {nodes: (TopologyNode & {key: string})[]; links: TopologyLink[]}) => ({
               nodes: d.nodes,
               links: d.links,
             }),
@@ -231,7 +231,7 @@
       },
       encode: {
         // Derive colour from the id prefix (defensive — see typeFromKey).
-        color: (d: { id?: string; key?: string; type?: string }) => colourFor(d.type ?? typeFromKey(d.id ?? d.key)),
+        color: (d: {id?: string; key?: string; type?: string}) => colourFor(d.type ?? typeFromKey(d.id ?? d.key)),
       },
       style: {
         labelSpacing: 4,
@@ -247,27 +247,26 @@
         // Sankey reads as "flowing out of" its driver/device/profile. Uses
         // the same palette as the nodes, rendered at low opacity so the
         // stripes layer gracefully without overpowering the node tiles.
-        linkFill: (d: { source?: { id?: string; key?: string } }) =>
-          colourFor(typeFromKey(d.source?.id ?? d.source?.key)),
+        linkFill: (d: {source?: {id?: string; key?: string}}) => colourFor(typeFromKey(d.source?.id ?? d.source?.key)),
         linkFillOpacity: 0.25,
       },
       tooltip: {
         nodeItems: [
-          (d: { id?: string; key?: string; type?: string; name?: string }) => {
+          (d: {id?: string; key?: string; type?: string; name?: string}) => {
             const type = d.type ?? typeFromKey(d.id ?? d.key);
             const label = nameById.get(d.id ?? '') ?? d.name ?? d.key ?? '-';
-            return { name: layerLabel(type), value: label };
+            return {name: layerLabel(type), value: label};
           },
         ],
         linkItems: [
           (d: {
-            source: { id?: string; key?: string; name?: string };
-            target: { id?: string; key?: string; name?: string };
+            source: {id?: string; key?: string; name?: string};
+            target: {id?: string; key?: string; name?: string};
             value: number;
           }) => {
             const from = nameById.get(d.source.id ?? '') ?? d.source.name ?? d.source.key ?? '-';
             const to = nameById.get(d.target.id ?? '') ?? d.target.name ?? d.target.key ?? '-';
-            return { name: `${from} → ${to}`, value: d.value };
+            return {name: `${from} → ${to}`, value: d.value};
           },
         ],
       },
@@ -277,7 +276,7 @@
     // by the presence of an `id` field; links carry `source` / `target`.
     chart.on(
       'element:click',
-      (e: { data?: { data?: { id?: string; type?: string; hiddenChildren?: TopologyHiddenChild[] } } }) => {
+      (e: {data?: {data?: {id?: string; type?: string; hiddenChildren?: TopologyHiddenChild[]}}}) => {
         const raw = e?.data?.data;
         if (!raw || !raw.id) return;
         const type = raw.type ?? typeFromKey(raw.id);
@@ -302,12 +301,12 @@
       // Only send rangeKey when it's actually meaningful (volume mode).
       // Cardinality doesn't look at it, and omitting keeps the server
       // cache key tight (one entry per tenant instead of one per range).
-      const params = mode.value === 'volume' ? { mode: mode.value, rangeKey: rangeKey.value } : { mode: mode.value };
-      const res: { data?: TopologyResponse } = await topology(params);
+      const params = mode.value === 'volume' ? {mode: mode.value, rangeKey: rangeKey.value} : {mode: mode.value};
+      const res: {data?: TopologyResponse} = await topology(params);
       const payload = res?.data ?? {
         nodes: [],
         links: [],
-        stats: { driverCount: 0, deviceCount: 0, profileCount: 0, pointCount: 0 },
+        stats: {driverCount: 0, deviceCount: 0, profileCount: 0, pointCount: 0},
       };
       data.value = payload;
       lastRefreshed.value = new Date().toISOString();
@@ -339,13 +338,13 @@
 
   const routeTo = (type: string, id: string) => {
     if (type === 'driver') {
-      router.push({ name: 'driverDetail', query: { id, active: 'detail' } }).catch(() => {});
+      router.push({name: 'driverDetail', query: {id, active: 'detail'}}).catch(() => {});
     } else if (type === 'device') {
-      router.push({ name: 'deviceDetail', query: { id, active: 'detail' } }).catch(() => {});
+      router.push({name: 'deviceDetail', query: {id, active: 'detail'}}).catch(() => {});
     } else if (type === 'profile') {
-      router.push({ name: 'profileDetail', query: { id, active: 'detail' } }).catch(() => {});
+      router.push({name: 'profileDetail', query: {id, active: 'detail'}}).catch(() => {});
     } else if (type === 'point') {
-      router.push({ name: 'pointValue', query: { pointId: id } }).catch(() => {});
+      router.push({name: 'pointValue', query: {pointId: id}}).catch(() => {});
     }
   };
 
@@ -354,7 +353,7 @@
       // The node id is "others:{layer}:{parentId}" — infer what kind of
       // entities are collapsed so the dialog title reads naturally.
       const inferred = node.hiddenChildren?.[0]?.type ?? 'point';
-      othersDialog.title = t('home.topology.othersDialogTitle', { type: layerLabel(inferred) });
+      othersDialog.title = t('home.topology.othersDialogTitle', {type: layerLabel(inferred)});
       othersDialog.children = node.hiddenChildren ?? [];
       othersDialog.visible = true;
       return;

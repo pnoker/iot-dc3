@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
 import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
 
-import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus'; // Popconfirm stub that surfaces the `confirm` event so we can simulate
+import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus'; // Popconfirm stub that surfaces the `confirm` event so we can simulate
 
 // Popconfirm stub that surfaces the `confirm` event so we can simulate
 // a user accepting the dialog. The real ElPopconfirm renders the
@@ -89,20 +89,20 @@ describe('ThingsCardActions', () => {
   });
 
   it('disables the detail button when detailDisabled is true', () => {
-    const wrapper = mountActions({ detailDisabled: true });
+    const wrapper = mountActions({detailDisabled: true});
     const buttons = wrapper.findAll('button.el-button-stub');
     const detail = buttons[buttons.length - 1];
     expect(detail.attributes('disabled')).toBeDefined();
   });
 
   it('disables disable when already disabled, and enable when already enabled', () => {
-    const enabled = mountActions({ enabled: true });
+    const enabled = mountActions({enabled: true});
     const enabledButtons = enabled.findAll('button.el-button-stub');
     // Buttons in template order: disable(0), enable(1), delete(2), edit(3), detail(4)
     expect(enabledButtons[0].attributes('disabled')).toBeUndefined();
     expect(enabledButtons[1].attributes('disabled')).toBeDefined();
 
-    const disabled = mountActions({ enabled: false });
+    const disabled = mountActions({enabled: false});
     const disabledButtons = disabled.findAll('button.el-button-stub');
     expect(disabledButtons[0].attributes('disabled')).toBeDefined();
     expect(disabledButtons[1].attributes('disabled')).toBeUndefined();

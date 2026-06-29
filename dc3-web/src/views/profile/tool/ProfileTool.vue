@@ -47,11 +47,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive } from 'vue';
-  import { Plus } from '@element-plus/icons-vue';
+  import {reactive} from 'vue';
+  import {Plus} from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
+  import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
   defineProps({
     embedded: {
@@ -66,14 +66,14 @@
 
   const emit = defineEmits(['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change']);
 
-  const formData = reactive<Record<string, any>>({ enableFlag: '' });
+  const formData = reactive<Record<string, any>>({enableFlag: ''});
 
   const onSearch = (data: Record<string, any>) => {
     emit('search', cleanSearchParams(data));
   };
 
   const onReset = () => {
-    resetSearchForm(formData, { enableFlag: '' });
+    resetSearchForm(formData, {enableFlag: ''});
     emit('reset');
   };
 </script>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { expect, test } from '@playwright/test';
+import {expect, test} from '@playwright/test';
 
 import {
   clickTab,
@@ -39,11 +39,11 @@ import {
  */
 
 test.describe('detail pages', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({page}) => {
     await login(page);
   });
 
-  test('device detail loads with all tabs', async ({ page }) => {
+  test('device detail loads with all tabs', async ({page}) => {
     const e2eData = await ensureE2eData(page);
     const health = watchPageHealth(page);
     const deviceId = e2eData.routeIds.deviceId;
@@ -51,15 +51,15 @@ test.describe('detail pages', () => {
 
     try {
       const initialMark = markHealth(health);
-      await page.goto(`/#/device/detail?id=${deviceId}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`/#/device/detail?id=${deviceId}`, {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
       expectHealthy(health, initialMark);
 
-      await expect(page.locator('.el-tabs__item').filter({ hasText: /Device Info|设备信息/ })).toBeVisible();
-      await expect(page.locator('.el-tabs__item').filter({ hasText: /Related Points|关联位号/ })).toBeVisible();
-      await expect(page.locator('.el-tabs__item').filter({ hasText: /Related Commands|关联指令/ })).toBeVisible();
-      await expect(page.locator('.el-tabs__item').filter({ hasText: /Related Events|关联事件/ })).toBeVisible();
-      await expect(page.locator('.el-tabs__item').filter({ hasText: /Device Data|设备数据/ })).toBeVisible();
+      await expect(page.locator('.el-tabs__item').filter({hasText: /Device Info|设备信息/})).toBeVisible();
+      await expect(page.locator('.el-tabs__item').filter({hasText: /Related Points|关联位号/})).toBeVisible();
+      await expect(page.locator('.el-tabs__item').filter({hasText: /Related Commands|关联指令/})).toBeVisible();
+      await expect(page.locator('.el-tabs__item').filter({hasText: /Related Events|关联事件/})).toBeVisible();
+      await expect(page.locator('.el-tabs__item').filter({hasText: /Device Data|设备数据/})).toBeVisible();
 
       for (const tab of [/Related Points|关联位号/, /Related Commands|关联指令/, /Related Events|关联事件/]) {
         const mark = markHealth(health);
@@ -71,14 +71,14 @@ test.describe('detail pages', () => {
     }
   });
 
-  test('profile detail loads with all tabs', async ({ page }) => {
+  test('profile detail loads with all tabs', async ({page}) => {
     const e2eData = await ensureE2eData(page);
     const health = watchPageHealth(page);
     const profileId = e2eData.routeIds.profileId;
     expect(profileId, 'need a seeded profile').toBeDefined();
 
     try {
-      await page.goto(`/#/profile/detail?id=${profileId}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`/#/profile/detail?id=${profileId}`, {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
 
       const tabs = page.locator('.el-tabs__item');
@@ -99,14 +99,14 @@ test.describe('detail pages', () => {
     }
   });
 
-  test('driver detail loads without errors', async ({ page }) => {
+  test('driver detail loads without errors', async ({page}) => {
     const e2eData = await ensureE2eData(page);
     const health = watchPageHealth(page);
     const driverId = e2eData.routeIds.driverId;
     expect(driverId, 'need a seeded driver').toBeDefined();
 
     try {
-      await page.goto(`/#/driver/detail?id=${driverId}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`/#/driver/detail?id=${driverId}`, {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
 
       const mark = markHealth(health);
@@ -128,14 +128,14 @@ test.describe('detail pages', () => {
     }
   });
 
-  test('point detail loads without errors', async ({ page }) => {
+  test('point detail loads without errors', async ({page}) => {
     const e2eData = await ensureE2eData(page);
     const health = watchPageHealth(page);
     const pointId = e2eData.routeIds.pointId;
     expect(pointId, 'need a seeded point').toBeDefined();
 
     try {
-      await page.goto(`/#/point/detail?id=${pointId}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`/#/point/detail?id=${pointId}`, {waitUntil: 'domcontentloaded'});
       await waitForAppSettled(page);
 
       const mark = markHealth(health);

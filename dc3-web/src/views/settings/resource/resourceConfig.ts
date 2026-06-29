@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { listApi } from '@/api/api';
-import { listDeviceByIds } from '@/api/device';
-import { listDriverByIds } from '@/api/driver';
-import { listPointByIds } from '@/api/point';
-import { listProfileByIds } from '@/api/profile';
-import { addResource, deleteResource, listResourceTree, updateResource } from '@/api/resource';
-import { RESOURCE_SCOPE_OPTIONS, RESOURCE_TYPE_OPTIONS } from '@/config/constant/enums';
-import { useMenuStore } from '@/store';
-import type { ApiRecord, DeviceRecord, DriverRecord, PointRecord, ProfileRecord } from '@/config/types';
-import type { EntityColumnContext, EntityListConfig } from '@/config/types/entityList';
-import { authNameRules, positiveIntegerRules, remarkRules, requiredSelectRule } from '@/utils/formRuleUtil';
+import {listApi} from '@/api/api';
+import {listDeviceByIds} from '@/api/device';
+import {listDriverByIds} from '@/api/driver';
+import {listPointByIds} from '@/api/point';
+import {listProfileByIds} from '@/api/profile';
+import {addResource, deleteResource, listResourceTree, updateResource} from '@/api/resource';
+import {RESOURCE_SCOPE_OPTIONS, RESOURCE_TYPE_OPTIONS} from '@/config/constant/enums';
+import {useMenuStore} from '@/store';
+import type {ApiRecord, DeviceRecord, DriverRecord, PointRecord, ProfileRecord} from '@/config/types';
+import type {EntityColumnContext, EntityListConfig} from '@/config/types/entityList';
+import {authNameRules, positiveIntegerRules, remarkRules, requiredSelectRule} from '@/utils/formRuleUtil';
 
 type LinkableResourceType = 'DRIVER' | 'DEVICE' | 'POINT' | 'PROFILE' | 'API' | 'MENU';
 type EntityRecord = DriverRecord | DeviceRecord | PointRecord | ProfileRecord | ApiRecord;
@@ -144,7 +144,7 @@ const resolveEntityNames = async (records: Record<string, any>[]): Promise<Recor
   // that map.
   if (apiIds.length)
     promises.push(
-      listApi({ page: { size: 1000, current: 1 } })
+      listApi({page: {size: 1000, current: 1}})
         .then((r) => {
           const apiRecords = r.data?.records || [];
           const byId = new Map(apiRecords.map((a) => [String(a.id), a.apiName]));
@@ -228,7 +228,7 @@ const buildParentTreeOptions = (t: ComposerTranslation, treeData: any[]) => {
     disabled: true,
     children: treesByType[type],
   }));
-  return [{ id: 0, resourceName: t('settings.resource.rootResource') }, ...groups];
+  return [{id: 0, resourceName: t('settings.resource.rootResource')}, ...groups];
 };
 
 interface ResourceHandlers {
@@ -271,14 +271,14 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
       options: RESOURCE_SCOPE_OPTIONS,
       placeholder: t('common.all'),
     },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true},
   ],
   columns: [
-    { prop: 'resourceName', label: t('settings.resource.resourceName'), minWidth: 220 },
-    { prop: 'resourceCode', label: t('settings.resource.resourceCode'), kind: 'code', minWidth: 180 },
-    { prop: 'serviceName', label: t('settings.resource.serviceName'), minWidth: 160 },
-    { prop: 'resourceTypeFlag', label: t('settings.resource.resourceType'), minWidth: 120 },
-    { prop: 'resourceScopeFlag', label: t('settings.resource.resourceScope'), minWidth: 100 },
+    {prop: 'resourceName', label: t('settings.resource.resourceName'), minWidth: 220},
+    {prop: 'resourceCode', label: t('settings.resource.resourceCode'), kind: 'code', minWidth: 180},
+    {prop: 'serviceName', label: t('settings.resource.serviceName'), minWidth: 160},
+    {prop: 'resourceTypeFlag', label: t('settings.resource.resourceType'), minWidth: 120},
+    {prop: 'resourceScopeFlag', label: t('settings.resource.resourceScope'), minWidth: 100},
     {
       prop: 'entityId',
       label: t('settings.resource.entity'),
@@ -288,9 +288,9 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
       linkable: (row) => isEntityLinkable(row),
       onClick: handlers.onEntityClick,
     },
-    { prop: 'remark', label: t('common.remark'), minWidth: 140 },
-    { prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
+    {prop: 'remark', label: t('common.remark'), minWidth: 140},
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
   ],
   relations: [
     {
@@ -313,7 +313,7 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
       tree: {
         load: () => listResourceTree({}).then((res) => res.data || []),
         transform: (rows) => buildParentTreeOptions(t, rows),
-        props: { label: 'resourceName', children: 'children', disabled: 'disabled' },
+        props: {label: 'resourceName', children: 'children', disabled: 'disabled'},
         nodeKey: 'id',
         checkStrictly: true,
       },
@@ -339,13 +339,13 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
       required: true,
       placeholder: t('settings.resource.resourceTypePlaceholder'),
       options: [
-        { label: 'DRIVER', value: 'DRIVER' },
-        { label: 'PROFILE', value: 'PROFILE' },
-        { label: 'POINT', value: 'POINT' },
-        { label: 'DEVICE', value: 'DEVICE' },
-        { label: 'DATA', value: 'DATA' },
-        { label: 'MENU', value: 'MENU' },
-        { label: 'API', value: 'API' },
+        {label: 'DRIVER', value: 'DRIVER'},
+        {label: 'PROFILE', value: 'PROFILE'},
+        {label: 'POINT', value: 'POINT'},
+        {label: 'DEVICE', value: 'DEVICE'},
+        {label: 'DATA', value: 'DATA'},
+        {label: 'MENU', value: 'MENU'},
+        {label: 'API', value: 'API'},
       ],
       rules: requiredSelectRule(t('settings.resource.resourceTypePlaceholder')),
     },
@@ -357,7 +357,7 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
       maxlength: 19,
       rules: positiveIntegerRules(t, t('settings.resource.entityIdPlaceholder')),
     },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag' },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag'},
     {
       prop: 'remark',
       label: t('common.remark'),
@@ -382,7 +382,7 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
   add: addResource as EntityListConfig['add'],
   update: updateResource as EntityListConfig['update'],
   remove: deleteResource,
-  detail: { routeName: 'settingsResourceDetail' },
+  detail: {routeName: 'settingsResourceDetail'},
   confirmDeleteText: t('settings.resource.confirmDelete'),
   emptyText: t('settings.resource.empty'),
 });

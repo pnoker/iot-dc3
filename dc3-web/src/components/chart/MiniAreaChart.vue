@@ -15,13 +15,13 @@
   -->
 
 <template>
-  <div ref="containerRef" :style="{ height: `${height}px` }" class="mini-area-chart"></div>
+  <div ref="containerRef" :style="{height: `${height}px`}" class="mini-area-chart"></div>
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
-  import { onMounted, onUnmounted, ref, watch } from 'vue';
-  import { Chart } from '@antv/g2';
+  import type {PropType} from 'vue';
+  import {onMounted, onUnmounted, ref, watch} from 'vue';
+  import {Chart} from '@antv/g2';
 
   /**
    * A small area+line chart used by stat cards and the point-value history
@@ -92,7 +92,7 @@
         draw(attempt + 1);
         return;
       }
-      const points = props.data.map((y, i) => ({ x: i, y: Number.isFinite(y) ? y : 0 }));
+      const points = props.data.map((y, i) => ({x: i, y: Number.isFinite(y) ? y : 0}));
 
       chart?.destroy();
       chart = new Chart({
@@ -114,17 +114,17 @@
         .encode('x', 'x')
         .encode('y', 'y')
         .encode('shape', 'smooth')
-        .scale('y', { zero: true })
+        .scale('y', {zero: true})
         .style('fill', fillGradient)
         .style('fillOpacity', 0.3)
         .axis(false)
         .legend(false);
       if (props.animate) {
-        area.animate('enter', { type: 'fadeIn' });
+        area.animate('enter', {type: 'fadeIn'});
       }
       if (props.tooltipUnit) {
         chart.interaction('tooltip', {
-          render: (_e: unknown, { items }: { items: Array<{ value: unknown }> }) => {
+          render: (_e: unknown, {items}: {items: Array<{value: unknown}>}) => {
             const first = items[0];
             return first ? `${first.value} ${props.tooltipUnit}` : '';
           },
@@ -159,7 +159,7 @@
   watch(
     () => [props.data, props.color, props.height, props.tooltipUnit, props.showLine],
     () => draw(),
-    { deep: true, flush: 'post' }
+    {deep: true, flush: 'post'}
   );
 
   onUnmounted(() => chart?.destroy());

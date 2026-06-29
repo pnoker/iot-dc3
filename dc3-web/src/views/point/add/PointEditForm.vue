@@ -112,14 +112,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, unref } from 'vue';
-  import type { FormInstance, FormRules } from 'element-plus';
-  import { useI18n } from 'vue-i18n';
+  import {reactive, ref, unref} from 'vue';
+  import type {FormInstance, FormRules} from 'element-plus';
+  import {useI18n} from 'vue-i18n';
 
-  import { byteRules, decimalRules, nameRules, remarkRules, requiredSelectRule } from '@/utils/formRuleUtil';
+  import {byteRules, decimalRules, nameRules, remarkRules, requiredSelectRule} from '@/utils/formRuleUtil';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 
-  import type { PointRecord } from '@/config/types';
+  import type {PointRecord} from '@/config/types';
 
   interface PointFormData {
     pointName?: string;
@@ -141,7 +141,7 @@
     (e: 'update', form: PointFormData, done: DoneCallback): void;
   }>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const formRef = ref<FormInstance>();
 
   const isEdit = ref(false);
@@ -168,7 +168,7 @@
     pointName: nameRules(t, t('common.entityPoint')),
     pointTypeFlag: requiredSelectRule(t('point.add.dataTypeRequired')),
     rwFlag: requiredSelectRule(t('point.add.rwTypeRequired')),
-    enableFlag: [{ message: t('common.enableFlag'), trigger: 'change' }],
+    enableFlag: [{message: t('common.enableFlag'), trigger: 'change'}],
     baseValue: decimalRules(t('point.add.baseValueFormat')),
     multiple: decimalRules(t('point.add.ratioFormat')),
     valueDecimal: byteRules(t, t('point.add.accuracyFormat')),
@@ -184,7 +184,7 @@
 
   const showEdit = (row: PointRecord) => {
     isEdit.value = true;
-    originalData.value = { ...row };
+    originalData.value = {...row};
     reactiveData.formData = {
       pointName: row.pointName,
       pointTypeFlag: row.pointTypeFlag,
@@ -236,7 +236,7 @@
 
     try {
       await form.validate();
-      const data = { ...reactiveData.formData };
+      const data = {...reactiveData.formData};
       const done: DoneCallback = (close = true) => {
         if (close) {
           reactiveData.visible = false;
@@ -246,7 +246,7 @@
 
       reactiveData.submitting = true;
       if (isEdit.value) {
-        Object.assign(data, { id: originalData.value?.id });
+        Object.assign(data, {id: originalData.value?.id});
         emit('update', data, done);
       } else {
         emit('add', data, done);
@@ -256,5 +256,5 @@
     }
   };
 
-  defineExpose({ show, showEdit, cancel, reset });
+  defineExpose({show, showEdit, cancel, reset});
 </script>

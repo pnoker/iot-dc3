@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-import { httpGet, httpPost } from '@/api/common';
-import { API_SERVICE_ACCOUNT_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/types';
-import type { ServiceAccountForm, ServiceAccountRecord } from '@/config/types/auth';
+import {httpGet, httpPost} from '@/api/common';
+import {API_SERVICE_ACCOUNT_BASE} from '@/config/constant/api';
+import type {PageQuery, PageResult} from '@/config/types';
+import type {ServiceAccountForm, ServiceAccountRecord} from '@/config/types/auth';
 
 export const addServiceAccount = (serviceAccount: ServiceAccountForm) =>
   httpPost<R<ServiceAccountRecord>>(`${API_SERVICE_ACCOUNT_BASE}/add`, serviceAccount);
 
 export const deleteServiceAccount = (id: string) =>
-  httpPost(`${API_SERVICE_ACCOUNT_BASE}/delete`, undefined, { params: { id } });
+  httpPost(`${API_SERVICE_ACCOUNT_BASE}/delete`, undefined, {params: {id}});
 
 export const updateServiceAccount = (serviceAccount: ServiceAccountForm) =>
   httpPost<R<ServiceAccountRecord>>(`${API_SERVICE_ACCOUNT_BASE}/update`, serviceAccount);
 
 export const enableServiceAccount = (id: string) =>
-  httpPost(`${API_SERVICE_ACCOUNT_BASE}/enable`, undefined, { params: { id } });
+  httpPost(`${API_SERVICE_ACCOUNT_BASE}/enable`, undefined, {params: {id}});
 
 export const disableServiceAccount = (id: string) =>
-  httpPost(`${API_SERVICE_ACCOUNT_BASE}/disable`, undefined, { params: { id } });
+  httpPost(`${API_SERVICE_ACCOUNT_BASE}/disable`, undefined, {params: {id}});
 
 export const getServiceAccountById = (id: string) =>
-  httpGet<R<ServiceAccountRecord>>(`${API_SERVICE_ACCOUNT_BASE}/get_by_id`, { params: { id } });
+  httpGet<R<ServiceAccountRecord>>(`${API_SERVICE_ACCOUNT_BASE}/get_by_id`, {params: {id}});
 
 export const listServiceAccount = <T = R<PageResult<ServiceAccountRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_SERVICE_ACCOUNT_BASE}/list`, query);

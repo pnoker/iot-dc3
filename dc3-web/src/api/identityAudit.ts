@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { httpPost } from '@/api/common';
-import { API_IDENTITY_AUDIT_BASE } from '@/config/constant/api';
-import type { IdentityAuditRecord } from '@/config/types/auth';
+import {httpPost} from '@/api/common';
+import {API_IDENTITY_AUDIT_BASE} from '@/config/constant/api';
+import type {IdentityAuditRecord} from '@/config/types/auth';
 
 export const listIdentityAudit = (
   params: {

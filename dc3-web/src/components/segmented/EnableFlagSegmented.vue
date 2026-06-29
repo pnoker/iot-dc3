@@ -25,12 +25,12 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
-  import { computed } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import type {PropType} from 'vue';
+  import {computed} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
   type ValueType = 'flag' | 'number';
-  type SegmentedOption = { label: string; value: string | number };
+  type SegmentedOption = {label: string; value: string | number};
 
   const props = defineProps({
     modelValue: {
@@ -51,23 +51,23 @@
     },
   });
 
-  const emit = defineEmits<{ (e: 'update:modelValue', value: string | number): void }>();
+  const emit = defineEmits<{(e: 'update:modelValue', value: string | number): void}>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const options = computed<SegmentedOption[]>(() => {
     const base =
       props.valueType === 'number'
         ? [
-            { label: t('common.enable'), value: 0 },
-            { label: t('common.disable'), value: 1 },
+            {label: t('common.enable'), value: 0},
+            {label: t('common.disable'), value: 1},
           ]
         : [
-            { label: t('common.enable'), value: 'ENABLE' },
-            { label: t('common.disable'), value: 'DISABLE' },
+            {label: t('common.enable'), value: 'ENABLE'},
+            {label: t('common.disable'), value: 'DISABLE'},
           ];
     if (props.includeAll) {
-      return [{ label: t('common.all'), value: '' }, ...base];
+      return [{label: t('common.all'), value: ''}, ...base];
     }
     return base;
   });

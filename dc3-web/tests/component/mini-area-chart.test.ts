@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { flushPromises, mount } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
 
 const chartInstanceMocks = vi.hoisted(() => ({
@@ -56,7 +56,7 @@ vi.mock('@antv/g2', () => {
     }
   }
 
-  return { Chart };
+  return {Chart};
 });
 
 describe('MiniAreaChart', () => {
@@ -64,7 +64,7 @@ describe('MiniAreaChart', () => {
     chartInstanceMocks.ChartCtor.mockClear();
     chartInstanceMocks.render.mockClear();
 
-    mount(MiniAreaChart, { props: { data: [] } });
+    mount(MiniAreaChart, {props: {data: []}});
     await flushPromises();
     // Wait one rAF tick — the component schedules draw via requestAnimationFrame.
     await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
@@ -73,7 +73,7 @@ describe('MiniAreaChart', () => {
   });
 
   it('exposes the passed height as inline style on the container', () => {
-    const wrapper = mount(MiniAreaChart, { props: { data: [], height: 80 } });
+    const wrapper = mount(MiniAreaChart, {props: {data: [], height: 80}});
     expect(wrapper.find('.mini-area-chart').attributes('style')).toContain('height: 80px');
   });
 });

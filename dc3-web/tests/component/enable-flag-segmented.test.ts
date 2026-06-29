@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
@@ -46,14 +46,14 @@ function mountSegmented(props: Record<string, unknown> = {}) {
     props,
     global: {
       plugins: [i18n],
-      stubs: { ElSegmented: ElSegmentedStub },
+      stubs: {ElSegmented: ElSegmentedStub},
     },
   });
 }
 
 describe('EnableFlagSegmented', () => {
   it('uses string-coded ENABLE/DISABLE options by default', () => {
-    const wrapper = mountSegmented({ modelValue: 'ENABLE' });
+    const wrapper = mountSegmented({modelValue: 'ENABLE'});
     const buttons = wrapper.findAll('button');
     expect(buttons).toHaveLength(2);
     expect(buttons[0].attributes('data-value')).toBe('ENABLE');
@@ -61,14 +61,14 @@ describe('EnableFlagSegmented', () => {
   });
 
   it('switches to numeric 0/1 options when valueType=number', () => {
-    const wrapper = mountSegmented({ modelValue: 0, valueType: 'number' });
+    const wrapper = mountSegmented({modelValue: 0, valueType: 'number'});
     const buttons = wrapper.findAll('button');
     expect(buttons[0].attributes('data-value')).toBe('0');
     expect(buttons[1].attributes('data-value')).toBe('1');
   });
 
   it('prepends an all option when includeAll=true', () => {
-    const wrapper = mountSegmented({ modelValue: '', includeAll: true });
+    const wrapper = mountSegmented({modelValue: '', includeAll: true});
     const buttons = wrapper.findAll('button');
     expect(buttons).toHaveLength(3);
     expect(buttons[0].attributes('data-value')).toBe('');
@@ -77,19 +77,19 @@ describe('EnableFlagSegmented', () => {
   });
 
   it('emits the chosen flag string via update:modelValue', async () => {
-    const wrapper = mountSegmented({ modelValue: 'ENABLE' });
+    const wrapper = mountSegmented({modelValue: 'ENABLE'});
     await wrapper.findAll('button')[1].trigger('click');
     expect(wrapper.emitted('update:modelValue')).toEqual([['DISABLE']]);
   });
 
   it('emits 1 (numeric) when DISABLE is chosen with valueType=number', async () => {
-    const wrapper = mountSegmented({ modelValue: 0, valueType: 'number' });
+    const wrapper = mountSegmented({modelValue: 0, valueType: 'number'});
     await wrapper.findAll('button')[1].trigger('click');
     expect(wrapper.emitted('update:modelValue')).toEqual([[1]]);
   });
 
   it('keeps the empty all value when includeAll is used with numeric mode', async () => {
-    const wrapper = mountSegmented({ modelValue: '', includeAll: true, valueType: 'number' });
+    const wrapper = mountSegmented({modelValue: '', includeAll: true, valueType: 'number'});
     await wrapper.findAll('button')[0].trigger('click');
     expect(wrapper.emitted('update:modelValue')).toEqual([['']]);
   });

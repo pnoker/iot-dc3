@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-import type { AxiosInstance } from 'axios';
-import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
-import { ElNotification } from 'element-plus';
+import type {AxiosInstance} from 'axios';
+import axios, {type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig} from 'axios';
+import {ElNotification} from 'element-plus';
 
-import { AXIOS_CONFIG, AXIOS_ERROR_MESSAGES, PASSWORD_CHANGE_CODES } from '@/config/constant/axios';
-import { AUTH_HEADERS } from '@/config/constant/common';
-import { failMessage, warnMessage } from '@/utils/notificationUtil';
-import { getStorage, removeStorage } from '@/utils/storageUtil';
-import { isNull } from '@/utils/validationUtil';
+import {AXIOS_CONFIG, AXIOS_ERROR_MESSAGES, PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
+import {AUTH_HEADERS} from '@/config/constant/common';
+import {failMessage, warnMessage} from '@/utils/notificationUtil';
+import {getStorage, removeStorage} from '@/utils/storageUtil';
+import {isNull} from '@/utils/validationUtil';
 import router from '@/config/router';
 import JSONBigInt from 'json-bigint';
 
 /**
  * JSONBigInt parser instance with storeAsString option
  */
-const JSONBigIntStr = JSONBigInt({ storeAsString: true });
+const JSONBigIntStr = JSONBigInt({storeAsString: true});
 
 /**
  * Transform response data using JSONBigInt to handle large integers
@@ -55,7 +55,7 @@ function transformResponse(data: any): any {
 const request: AxiosInstance = axios.create({
   timeout: AXIOS_CONFIG.TIMEOUT,
   withCredentials: true,
-  headers: { Accept: AXIOS_CONFIG.HEADERS.ACCEPT, 'Content-Type': AXIOS_CONFIG.HEADERS.CONTENT_TYPE },
+  headers: {Accept: AXIOS_CONFIG.HEADERS.ACCEPT, 'Content-Type': AXIOS_CONFIG.HEADERS.CONTENT_TYPE},
   validateStatus: (status) => status >= AXIOS_CONFIG.MIN_STATUS && status <= AXIOS_CONFIG.MAX_STATUS,
   transformResponse: [transformResponse],
 });
@@ -124,7 +124,7 @@ request.interceptors.response.use(
       removeStorage(AUTH_HEADERS.TENANT);
       removeStorage(AUTH_HEADERS.LOGIN);
       removeStorage(AUTH_HEADERS.TOKEN);
-      router.push({ name: 'login' }).catch(() => {});
+      router.push({name: 'login'}).catch(() => {});
     } else if (status >= 500) {
       ElNotification({
         title: 'Server Error',
@@ -136,7 +136,7 @@ request.interceptors.response.use(
     }
     // Reject with the server payload so callers can inspect code/message if needed.
     // Existing no-op `.catch(() => {})` sites remain valid because they ignore the argument.
-    return Promise.reject(response.data ?? { status, message: 'Request failed' });
+    return Promise.reject(response.data ?? {status, message: 'Request failed'});
   },
   (error: AxiosError) => {
     if (!error.response) {

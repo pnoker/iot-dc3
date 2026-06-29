@@ -70,14 +70,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref, watch } from 'vue';
+  import {computed, onMounted, reactive, ref, watch} from 'vue';
 
-  import { useRoute } from 'vue-router';
+  import {useRoute} from 'vue-router';
   import router from '@/config/router';
 
-  import { getDriverById } from '@/api/driver';
-  import { getProfileById } from '@/api/profile';
-  import { getDeviceById } from '@/api/device';
+  import {getDriverById} from '@/api/driver';
+  import {getProfileById} from '@/api/profile';
+  import {getDeviceById} from '@/api/device';
 
   import baseCard from '@/components/card/base/BaseCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';
@@ -85,7 +85,7 @@
   import pointValue from '@/views/point/value/PointValue.vue';
   import CommandList from '@/views/settings/command/CommandList.vue';
   import EventList from '@/views/settings/event/definition/EventList.vue';
-  import { timestamp } from '@/utils/dateUtil';
+  import {timestamp} from '@/utils/dateUtil';
 
   const route = useRoute();
   const pointViewRef: any = ref<InstanceType<typeof point>>();
@@ -164,7 +164,7 @@
   const changeActive = (tab: any) => {
     reactiveData.active = String(tab.props.name);
     const query = route.query;
-    router.push({ query: { ...query, active: String(tab.props.name) } }).catch(() => {
+    router.push({query: {...query, active: String(tab.props.name)}}).catch(() => {
       // nothing to do
     });
 

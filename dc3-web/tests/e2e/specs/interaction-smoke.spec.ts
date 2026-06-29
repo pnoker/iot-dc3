@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { expect, type Locator, test } from '@playwright/test';
+import {expect, type Locator, test} from '@playwright/test';
 
 import {
   clickButtonIfPresent,
@@ -26,36 +26,36 @@ import {
   waitForAppSettled,
   watchPageHealth,
 } from '../fixtures/app';
-import { interactionPages } from '../fixtures/routes';
+import {interactionPages} from '../fixtures/routes';
 
 async function expectEnableSegmented(container: Locator) {
   await expect(container.locator('.enable-flag-segmented:visible').first()).toBeVisible();
   await expect(
     container
       .locator('.el-form-item')
-      .filter({ hasText: /Enable/ })
+      .filter({hasText: /Enable/})
       .locator('.el-switch')
   ).toHaveCount(0);
   await expect(
     container
       .locator('.el-form-item')
-      .filter({ hasText: /Enable/ })
+      .filter({hasText: /Enable/})
       .locator('.el-select')
   ).toHaveCount(0);
 }
 
 test.describe('authenticated UI interactions', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({page}) => {
     await login(page);
   });
 
   for (const pageDef of interactionPages) {
-    test(`${pageDef.name} toolbar and safe actions`, async ({ page }) => {
+    test(`${pageDef.name} toolbar and safe actions`, async ({page}) => {
       const e2eData = await ensureE2eData(page);
       const health = watchPageHealth(page);
 
       try {
-        await page.goto(`/#${pageDef.route}`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`/#${pageDef.route}`, {waitUntil: 'domcontentloaded'});
         await waitForAppSettled(page);
 
         if (pageDef.placeholder) {
@@ -92,7 +92,7 @@ test.describe('authenticated UI interactions', () => {
         }
 
         if (pageDef.addDisabled) {
-          const add = page.getByRole('button', { name: 'Add' }).first();
+          const add = page.getByRole('button', {name: 'Add'}).first();
           if (await add.count()) {
             await expect(add).toBeDisabled();
           }
@@ -133,7 +133,7 @@ test.describe('authenticated UI interactions', () => {
     });
   }
 
-  test('entity edit forms use the common Enable segmented control', async ({ page }) => {
+  test('entity edit forms use the common Enable segmented control', async ({page}) => {
     const e2eData = await ensureE2eData(page);
     const health = watchPageHealth(page);
     const editRoutes: string[] = [];
@@ -143,7 +143,7 @@ test.describe('authenticated UI interactions', () => {
     try {
       for (const route of editRoutes) {
         const mark = markHealth(health);
-        await page.goto(`/#${route}`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`/#${route}`, {waitUntil: 'domcontentloaded'});
         await waitForAppSettled(page);
         await expectEnableSegmented(page.locator('body'));
         expectHealthy(health, mark);

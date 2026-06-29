@@ -61,7 +61,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, watch } from 'vue';
+  import {computed, ref, watch} from 'vue';
 
   import {
     addDevice,
@@ -72,12 +72,12 @@
     listDeviceStatus,
     updateDevice,
   } from '@/api/device';
-  import { listDriverByIds } from '@/api/driver';
-  import { usePagedList } from '@/composables/usePagedList';
-  import { failMessage, successMessage } from '@/utils/notificationUtil';
-  import { isNull } from '@/utils/validationUtil';
+  import {listDriverByIds} from '@/api/driver';
+  import {usePagedList} from '@/composables/usePagedList';
+  import {failMessage, successMessage} from '@/utils/notificationUtil';
+  import {isNull} from '@/utils/validationUtil';
 
-  import type { DeviceRecord } from '@/config/types/manager';
+  import type {DeviceRecord} from '@/config/types/manager';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
@@ -90,7 +90,7 @@
     data: BlobPart;
   }
 
-  type DialogInstance = { show: () => void };
+  type DialogInstance = {show: () => void};
 
   const props = withDefaults(
     defineProps<{
@@ -136,7 +136,7 @@
   });
 
   const search = (params: Record<string, unknown>) => {
-    _search({ ...baseDeviceQuery.value, ...params });
+    _search({...baseDeviceQuery.value, ...params});
   };
 
   const reset = () => {
@@ -204,7 +204,7 @@
   };
 
   const onDisable = (id: string, driverId: string, done: () => void) => {
-    updateDevice({ id, driverId, enableFlag: 'DISABLE' })
+    updateDevice({id, driverId, enableFlag: 'DISABLE'})
       .then(() => {
         successMessage();
         load();
@@ -218,7 +218,7 @@
   };
 
   const onEnable = (id: string, driverId: string, done: () => void) => {
-    updateDevice({ id, driverId, enableFlag: 'ENABLE' })
+    updateDevice({id, driverId, enableFlag: 'ENABLE'})
       .then(() => {
         successMessage();
         load();
@@ -251,7 +251,7 @@
     () => reactiveData.listData,
     (devices) => {
       // Load status table
-      listDeviceStatus({ page: reactiveData.page, ...(reactiveData.query as Record<string, unknown>) })
+      listDeviceStatus({page: reactiveData.page, ...(reactiveData.query as Record<string, unknown>)})
         .then((res) => {
           reactiveData.statusTable = (res.data || {}) as Record<string, string>;
         })

@@ -78,22 +78,22 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, type PropType } from 'vue';
-  import { Edit, Promotion, Sunset } from '@element-plus/icons-vue';
+  import {computed, type PropType} from 'vue';
+  import {Edit, Promotion, Sunset} from '@element-plus/icons-vue';
   import router from '@/config/router';
-  import { copy } from '@/utils/commonUtil';
-  import { timestamp } from '@/utils/dateUtil';
-  import { successMessage } from '@/utils/notificationUtil';
-  import { isEnabledFlag } from '@/utils/thingModelFormatUtil';
+  import {copy} from '@/utils/commonUtil';
+  import {timestamp} from '@/utils/dateUtil';
+  import {successMessage} from '@/utils/notificationUtil';
+  import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
   import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
   import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
 
   const props = defineProps({
-    embedded: { type: Boolean, default: false },
-    status: { type: String, default: '' },
-    data: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
-    driver: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
-    icon: { type: String, default: 'images/common/device.png' },
+    embedded: {type: Boolean, default: false},
+    status: {type: String, default: ''},
+    data: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+    driver: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+    icon: {type: String, default: 'images/common/device.png'},
   });
 
   const emit = defineEmits(['disable', 'enable', 'delete']);
@@ -108,13 +108,13 @@
   };
 
   const edit = () => {
-    router.push({ name: 'deviceEdit', query: { id: props.data.id, active: 'deviceConfig' } }).catch(() => {
+    router.push({name: 'deviceEdit', query: {id: props.data.id, active: 'deviceConfig'}}).catch(() => {
       // nothing to do
     });
   };
 
   const detail = () => {
-    router.push({ name: 'deviceDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
+    router.push({name: 'deviceDetail', query: {id: props.data.id, active: 'detail'}}).catch(() => {
       // nothing to do
     });
   };

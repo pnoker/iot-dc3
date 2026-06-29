@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const groupMocks = vi.hoisted(() => ({
-  addGroup: vi.fn(() => Promise.resolve({ data: true })),
-  deleteGroup: vi.fn(() => Promise.resolve({ data: true })),
-  listGroup: vi.fn(() => Promise.resolve({ data: { records: [{ id: 'g-1', groupName: 'Default' }], total: 1 } })),
-  updateGroup: vi.fn(() => Promise.resolve({ data: true })),
+  addGroup: vi.fn(() => Promise.resolve({data: true})),
+  deleteGroup: vi.fn(() => Promise.resolve({data: true})),
+  listGroup: vi.fn(() => Promise.resolve({data: {records: [{id: 'g-1', groupName: 'Default'}], total: 1}})),
+  updateGroup: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/group', () => groupMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('SettingsGroup view', () => {
   it('lists groups on mount', async () => {
     const Group = (await import('@/views/settings/group/Group.vue')).default;
     await mountListPage({
       component: Group,
-      stubs: { groupTool: { template: '<div />' }, groupAddForm: { template: '<div />' } },
+      stubs: {groupTool: {template: '<div />'}, groupAddForm: {template: '<div />'}},
     });
     await flushPromises();
     expect(groupMocks.listGroup.mock.calls.length).toBeGreaterThanOrEqual(1);

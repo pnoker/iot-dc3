@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const driverMocks = vi.hoisted(() => ({
-  listDriverStatus: vi.fn(() => Promise.resolve({ data: {} })),
-  listDriver: vi.fn(() => Promise.resolve({ data: { records: [{ id: 'd-1', driverName: 'Modbus' }], total: 1 } })),
+  listDriverStatus: vi.fn(() => Promise.resolve({data: {}})),
+  listDriver: vi.fn(() => Promise.resolve({data: {records: [{id: 'd-1', driverName: 'Modbus'}], total: 1}})),
 }));
 
 vi.mock('@/api/driver', () => driverMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('Driver list view', () => {
   it('lists drivers on mount', async () => {
     const Driver = (await import('@/views/driver/Driver.vue')).default;
     await mountListPage({
       component: Driver,
-      stubs: { DriverTool: { template: '<div />' }, DriverCard: { template: '<div />' } },
+      stubs: {DriverTool: {template: '<div />'}, DriverCard: {template: '<div />'}},
     });
     await flushPromises();
     expect(driverMocks.listDriver).toHaveBeenCalledTimes(1);

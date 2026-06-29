@@ -65,8 +65,8 @@
       </div>
       <el-table :data="reactiveData.params" border max-height="260" size="small">
         <el-table-column :label="$t('common.name')" min-width="150">
-          <template #default="{ row, $index }">
-            <div :class="{ 'is-error': !!paramErrors[$index]?.paramName }" class="param-field">
+          <template #default="{row, $index}">
+            <div :class="{'is-error': !!paramErrors[$index]?.paramName}" class="param-field">
               <el-input
                 v-model="row.paramName"
                 clearable
@@ -82,8 +82,8 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t('command.form.code')" min-width="150">
-          <template #default="{ row, $index }">
-            <div :class="{ 'is-error': !!paramErrors[$index]?.paramCode }" class="param-field">
+          <template #default="{row, $index}">
+            <div :class="{'is-error': !!paramErrors[$index]?.paramCode}" class="param-field">
               <el-input
                 v-model="row.paramCode"
                 clearable
@@ -98,7 +98,7 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t('command.form.direction')" min-width="130">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-select v-model="row.paramDirectionFlag">
               <el-option
                 v-for="opt in PARAM_DIRECTION_OPTIONS"
@@ -110,29 +110,29 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t('command.form.type')" min-width="130">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-select v-model="row.paramTypeFlag">
               <el-option v-for="opt in POINT_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
             </el-select>
           </template>
         </el-table-column>
         <el-table-column :label="$t('command.form.required')" width="96">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-checkbox v-model="row.requiredFlag" />
           </template>
         </el-table-column>
         <el-table-column :label="$t('command.form.defaultValue')" min-width="150">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-input v-model="row.defaultValue" clearable maxlength="256" />
           </template>
         </el-table-column>
         <el-table-column :label="$t('command.form.enabled')" width="104">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-switch v-model="row.enableFlag" active-value="ENABLE" inactive-value="DISABLE" />
           </template>
         </el-table-column>
         <el-table-column align="center" width="64">
-          <template #default="{ $index }">
+          <template #default="{$index}">
             <el-tooltip :content="$t('common.delete')" placement="top">
               <el-button :icon="Delete" link type="danger" @click="removeParamRow($index)" />
             </el-tooltip>
@@ -151,11 +151,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
-  import type { FormInstance, FormRules } from 'element-plus';
-  import { Delete, Plus } from '@element-plus/icons-vue';
-  import { useI18n } from 'vue-i18n';
-  import { listCommandParamByCommandId } from '@/api/command';
+  import {reactive, ref} from 'vue';
+  import type {FormInstance, FormRules} from 'element-plus';
+  import {Delete, Plus} from '@element-plus/icons-vue';
+  import {useI18n} from 'vue-i18n';
+  import {listCommandParamByCommandId} from '@/api/command';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import {
     CALL_TYPE_OPTIONS,
@@ -163,8 +163,8 @@
     PARAM_DIRECTION_OPTIONS,
     POINT_TYPE_OPTIONS,
   } from '@/config/constant/enums';
-  import type { CommandForm, CommandParamForm, CommandParamRecord, CommandRecord } from '@/config/types';
-  import { NAME_PATTERN, nameRules, remarkRules } from '@/utils/formRuleUtil';
+  import type {CommandForm, CommandParamForm, CommandParamRecord, CommandRecord} from '@/config/types';
+  import {NAME_PATTERN, nameRules, remarkRules} from '@/utils/formRuleUtil';
   import {
     callTypeValue,
     commandTypeValue,
@@ -177,9 +177,9 @@
   type FormMode = 'add' | 'edit';
   type DoneCallback = (close?: boolean) => void;
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
-  type CommandParamDraft = CommandParamForm & { _key: string };
+  type CommandParamDraft = CommandParamForm & {_key: string};
 
   const emit = defineEmits<{
     (e: 'add-thing', form: CommandForm, params: CommandParamRecord[], done: DoneCallback): void;
@@ -219,23 +219,23 @@
 
   const rules: FormRules = {
     commandName: nameRules(t, t('common.entityCommand')),
-    commandTypeFlag: [{ required: true, message: t('command.form.commandTypeRequired'), trigger: 'change' }],
-    callTypeFlag: [{ required: true, message: t('command.form.callTypeRequired'), trigger: 'change' }],
-    timeout: [{ required: true, message: t('command.form.timeoutRequired'), trigger: 'blur' }],
+    commandTypeFlag: [{required: true, message: t('command.form.commandTypeRequired'), trigger: 'change'}],
+    callTypeFlag: [{required: true, message: t('command.form.callTypeRequired'), trigger: 'change'}],
+    timeout: [{required: true, message: t('command.form.timeoutRequired'), trigger: 'blur'}],
     remark: remarkRules(t),
   };
 
-  type RowErrors = { paramName?: string; paramCode?: string };
+  type RowErrors = {paramName?: string; paramCode?: string};
   type RowErrorField = keyof RowErrors;
   const paramErrors = reactive<RowErrors[]>([]);
 
   const setParamFieldError = (index: number, field: RowErrorField, message: string) => {
-    paramErrors[index] = { ...(paramErrors[index] || {}), [field]: message };
+    paramErrors[index] = {...(paramErrors[index] || {}), [field]: message};
   };
 
   const clearParamFieldError = (index: number, field: RowErrorField) => {
     if (!paramErrors[index]?.[field]) return;
-    paramErrors[index] = { ...(paramErrors[index] || {}), [field]: undefined };
+    paramErrors[index] = {...(paramErrors[index] || {}), [field]: undefined};
   };
 
   const validateRow = (index: number): boolean => {
@@ -261,7 +261,7 @@
   };
 
   const reset = () => {
-    reactiveData.form = { ...reactiveData.originalForm };
+    reactiveData.form = {...reactiveData.originalForm};
     reactiveData.params = cloneParams(reactiveData.originalParams);
     reactiveData.submitting = false;
     formRef.value?.clearValidate();
@@ -293,8 +293,8 @@
 
   const normalizeParams = (): CommandParamRecord[] =>
     reactiveData.params.map((item) => {
-      const param = { ...item } as CommandParamRecord;
-      delete (param as { _key?: string })._key;
+      const param = {...item} as CommandParamRecord;
+      delete (param as {_key?: string})._key;
       return {
         ...param,
         paramName: String(item.paramName || '').trim(),
@@ -352,8 +352,8 @@
   const show = (profileId = '') => {
     reactiveData.mode = 'add';
     const emptyForm = createEmptyForm(profileId);
-    reactiveData.originalForm = { ...emptyForm };
-    reactiveData.form = { ...emptyForm };
+    reactiveData.originalForm = {...emptyForm};
+    reactiveData.form = {...emptyForm};
     reactiveData.originalParams = [];
     reactiveData.params = [];
     clearParamErrors();
@@ -372,8 +372,8 @@
       timeout: normalizeCommandTimeoutSeconds(row.timeout) ?? emptyForm.timeout,
       enableFlag: enableFlagValue(row.enableFlag, emptyForm.enableFlag),
     };
-    reactiveData.originalForm = { ...initial };
-    reactiveData.form = { ...initial };
+    reactiveData.originalForm = {...initial};
+    reactiveData.form = {...initial};
     reactiveData.originalParams = [];
     reactiveData.params = [];
     clearParamErrors();
@@ -422,7 +422,7 @@
     }
   };
 
-  defineExpose({ show, showEdit });
+  defineExpose({show, showEdit});
 </script>
 
 <style>

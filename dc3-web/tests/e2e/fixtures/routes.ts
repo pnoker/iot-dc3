@@ -132,8 +132,8 @@ export function buildEntityRoutes(routeIds: RouteIds) {
 }
 
 export const interactionPages = [
-  { name: 'Driver', route: '/driver', placeholder: 'Enter driver name', value: 'Virtual', detail: true },
-  { name: 'Profile', route: '/profile', placeholder: 'Enter profile name', value: 'Demo', add: true, detail: true },
+  {name: 'Driver', route: '/driver', placeholder: 'Enter driver name', value: 'Virtual', detail: true},
+  {name: 'Profile', route: '/profile', placeholder: 'Enter profile name', value: 'Demo', add: true, detail: true},
   {
     name: 'Device',
     route: '/device',
@@ -142,7 +142,7 @@ export const interactionPages = [
     add: true,
     importButton: true,
   },
-  { name: 'PointValue', route: '/point_value', addDisabled: true, paginate: true },
+  {name: 'PointValue', route: '/point_value', addDisabled: true, paginate: true},
   {
     name: 'Settings User',
     route: '/settings/user',
@@ -175,7 +175,7 @@ export const interactionPages = [
     add: true,
     enableForm: true,
   },
-  { name: 'Settings API', route: '/settings/api', placeholder: 'Enter api name', value: 'Controller', paginate: true },
+  {name: 'Settings API', route: '/settings/api', placeholder: 'Enter api name', value: 'Controller', paginate: true},
   {
     name: 'Settings Group',
     route: '/settings/group',
@@ -232,8 +232,8 @@ export const interactionPages = [
     add: true,
     enableForm: true,
   },
-  { name: 'Alarm Runtime State', route: '/settings/alarm/state', placeholder: 'Search rule ID', value: '1' },
-  { name: 'Alarm Delivery History', route: '/settings/alarm/history', placeholder: 'Search target', value: 'ops' },
+  {name: 'Alarm Runtime State', route: '/settings/alarm/state', placeholder: 'Search rule ID', value: '1'},
+  {name: 'Alarm Delivery History', route: '/settings/alarm/history', placeholder: 'Search target', value: 'ops'},
   {
     name: 'Agentic Model Config',
     route: '/settings/model/config',
@@ -250,10 +250,10 @@ export const interactionPages = [
     add: true,
     enableForm: true,
   },
-  { name: 'Alarm Overview', route: '/settings/alarm/overview', paginate: true },
-  { name: 'Device Alarm', route: '/settings/alarm/device', paginate: true },
-  { name: 'Driver Alarm', route: '/settings/alarm/driver', paginate: true },
-  { name: 'Point Alarm', route: '/settings/alarm/point', paginate: true },
-  { name: 'Event History', route: '/settings/event/history', paginate: true },
-  { name: 'Command History', route: '/settings/command/history', paginate: true },
+  {name: 'Alarm Overview', route: '/settings/alarm/overview', paginate: true},
+  {name: 'Device Alarm', route: '/settings/alarm/device', paginate: true},
+  {name: 'Driver Alarm', route: '/settings/alarm/driver', paginate: true},
+  {name: 'Point Alarm', route: '/settings/alarm/point', paginate: true},
+  {name: 'Event History', route: '/settings/event/history', paginate: true},
+  {name: 'Command History', route: '/settings/command/history', paginate: true},
 ];

@@ -79,16 +79,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive } from 'vue';
-  import { useRoute } from 'vue-router';
+  import {onMounted, reactive} from 'vue';
+  import {useRoute} from 'vue-router';
 
-  import { listAgenticModelConfigs } from '@/api/agentic';
+  import {listAgenticModelConfigs} from '@/api/agentic';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
   import DefaultTag from '@/components/tag/DefaultTag.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
-  import type { AgenticModelConfig } from '@/config/types';
-  import { timestampLabel } from '@/utils/dateUtil';
+  import type {AgenticModelConfig} from '@/config/types';
+  import {timestampLabel} from '@/utils/dateUtil';
 
   const route = useRoute();
 

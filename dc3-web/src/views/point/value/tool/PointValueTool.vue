@@ -92,14 +92,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
-  import { Plus } from '@element-plus/icons-vue';
+  import {reactive, ref} from 'vue';
+  import {Plus} from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
-  import type { Dictionary } from '@/config/types';
-  import { listDeviceDictionary, listPointDictionary } from '@/api/dictionary';
-  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
+  import type {Dictionary} from '@/config/types';
+  import {listDeviceDictionary, listPointDictionary} from '@/api/dictionary';
+  import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
   defineProps({
     embedded: {
@@ -114,7 +114,7 @@
 
   const emit = defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change']);
 
-  const formData = reactive<Record<string, any>>({ enableFlag: '', rangeKey: '' });
+  const formData = reactive<Record<string, any>>({enableFlag: '', rangeKey: ''});
   const deviceDictionaries = ref<Dictionary[]>([]);
   const deviceLoading = ref(false);
   const pointDictionaries = ref<Dictionary[]>([]);
@@ -125,14 +125,14 @@
   };
 
   const onReset = () => {
-    resetSearchForm(formData, { enableFlag: '', rangeKey: '' });
+    resetSearchForm(formData, {enableFlag: '', rangeKey: ''});
     emit('reset');
   };
 
   const deviceDictionary = (query?: string) => {
     deviceLoading.value = true;
     listDeviceDictionary({
-      page: { size: 50, current: 1 },
+      page: {size: 50, current: 1},
       label: query || '',
     })
       .then((res) => {
@@ -149,7 +149,7 @@
   const pointDictionary = (query?: string) => {
     pointLoading.value = true;
     listPointDictionary({
-      page: { size: 50, current: 1 },
+      page: {size: 50, current: 1},
       label: query || '',
       parentId: formData.deviceId,
     })

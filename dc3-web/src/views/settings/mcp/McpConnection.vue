@@ -24,21 +24,21 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { ElMessageBox } from 'element-plus';
+  import {ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {ElMessageBox} from 'element-plus';
 
-  import { revokeMcpConnection } from '@/api/mcp';
+  import {revokeMcpConnection} from '@/api/mcp';
   import EntityListPage from '@/components/entity/EntityListPage.vue';
-  import type { McpConnectionRecord } from '@/config/types';
-  import { successMessage } from '@/utils/notificationUtil';
+  import type {McpConnectionRecord} from '@/config/types';
+  import {successMessage} from '@/utils/notificationUtil';
 
   import AddConnectionDialog from './components/AddConnectionDialog.vue';
   import ConnectionInfoDialog from './components/ConnectionInfoDialog.vue';
   import ManageToolsDrawer from './components/ManageToolsDrawer.vue';
-  import { createMcpConnectionConfig } from './mcpConnectionConfig';
+  import {createMcpConnectionConfig} from './mcpConnectionConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const listRef = ref<InstanceType<typeof EntityListPage>>();
   const addRef = ref<InstanceType<typeof AddConnectionDialog>>();
   const infoRef = ref<InstanceType<typeof ConnectionInfoDialog>>();

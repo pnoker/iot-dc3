@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { addTenantMembership, deleteTenantMembership, listTenantMembership } from '@/api/tenantMembership';
-import type { EntityListConfig } from '@/config/types/entityList';
+import {addTenantMembership, deleteTenantMembership, listTenantMembership} from '@/api/tenantMembership';
+import type {EntityListConfig} from '@/config/types/entityList';
 
-import { principalIdField, principalNameRelation } from '../relations';
+import {principalIdField, principalNameRelation} from '../relations';
 
 const PRINCIPAL_TYPE_OPTIONS = [
-  { label: 'USER', value: 'USER' },
-  { label: 'SERVICE_ACCOUNT', value: 'SERVICE_ACCOUNT' },
-  { label: 'SYSTEM', value: 'SYSTEM' },
+  {label: 'USER', value: 'USER'},
+  {label: 'SERVICE_ACCOUNT', value: 'SERVICE_ACCOUNT'},
+  {label: 'SYSTEM', value: 'SYSTEM'},
 ];
 const MEMBERSHIP_STATUS_OPTIONS = [
-  { label: 'ACTIVE', value: 'ACTIVE' },
-  { label: 'SUSPENDED', value: 'SUSPENDED' },
-  { label: 'INVITED', value: 'INVITED' },
+  {label: 'ACTIVE', value: 'ACTIVE'},
+  {label: 'SUSPENDED', value: 'SUSPENDED'},
+  {label: 'INVITED', value: 'INVITED'},
 ];
 
 export const createTenantMembershipConfig = (t: ComposerTranslation): EntityListConfig => ({
@@ -37,7 +37,7 @@ export const createTenantMembershipConfig = (t: ComposerTranslation): EntityList
   title: t('nav.settingsTenantMembership'),
   editable: true,
   searchFields: [
-    { prop: 'principalId', label: t('settings.tenantMembership.principalId'), kind: 'input' },
+    {prop: 'principalId', label: t('settings.tenantMembership.principalId'), kind: 'input'},
     {
       prop: 'membershipStatus',
       label: t('settings.tenantMembership.membershipStatus'),
@@ -52,7 +52,7 @@ export const createTenantMembershipConfig = (t: ComposerTranslation): EntityList
       minWidth: 160,
       formatter: (row, ctx) => ctx.relations.principalName?.[String(row.principalId)] || String(row.principalId ?? '-'),
     },
-    { prop: 'principalType', label: t('settings.tenantMembership.principalType'), minWidth: 150 },
+    {prop: 'principalType', label: t('settings.tenantMembership.principalType'), minWidth: 150},
     {
       prop: 'membershipStatus',
       label: t('settings.tenantMembership.membershipStatus'),
@@ -60,8 +60,8 @@ export const createTenantMembershipConfig = (t: ComposerTranslation): EntityList
       options: MEMBERSHIP_STATUS_OPTIONS,
       minWidth: 150,
     },
-    { prop: 'joinedTime', label: t('settings.tenantMembership.joinedTime'), kind: 'time', width: 165 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
+    {prop: 'joinedTime', label: t('settings.tenantMembership.joinedTime'), kind: 'time', width: 165},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
   ],
   fields: [
     principalIdField(t('settings.tenantMembership.principalId')),
@@ -80,7 +80,7 @@ export const createTenantMembershipConfig = (t: ComposerTranslation): EntityList
       required: true,
     },
   ],
-  defaultForm: () => ({ principalId: '', principalType: 'USER', membershipStatus: 'ACTIVE' }),
+  defaultForm: () => ({principalId: '', principalType: 'USER', membershipStatus: 'ACTIVE'}),
   relations: [principalNameRelation()],
   list: listTenantMembership,
   add: addTenantMembership,

@@ -38,10 +38,10 @@ import {
   updateNotifyChannelBind,
   updateRule,
 } from '@/api/alarm';
-import { listDevice } from '@/api/device';
-import { listDriver } from '@/api/driver';
-import { listPoint } from '@/api/point';
-import type { PageQuery } from '@/config/types';
+import {listDevice} from '@/api/device';
+import {listDriver} from '@/api/driver';
+import {listPoint} from '@/api/point';
+import type {PageQuery} from '@/config/types';
 
 export type AlarmTabKey = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'history';
 export type AlarmFieldKind = 'input' | 'number' | 'select' | 'remoteSelect' | 'enableFlag' | 'textarea' | 'json';
@@ -118,9 +118,9 @@ const structuredExt = (type: string, content: Record<string, unknown>, remark = 
 
 const defaultRuleExt = () =>
   structuredExt('alarm-rule', {
-    condition: { field: 'numValue', operator: '>', threshold: 80, unit: '' },
-    window: { mode: 'LAST', minSamples: 1 },
-    recovery: { enabled: true, operator: '<=', threshold: 75, duration: 'PT5M' },
+    condition: {field: 'numValue', operator: '>', threshold: 80, unit: ''},
+    window: {mode: 'LAST', minSamples: 1},
+    recovery: {enabled: true, operator: '<=', threshold: 75, duration: 'PT5M'},
     severity: 'P2',
     eventType: 'ALARM',
     labels: [],
@@ -128,10 +128,10 @@ const defaultRuleExt = () =>
 
 const defaultNotifyExt = () =>
   structuredExt('alarm-notify-policy', {
-    dedup: { enabled: true, key: '${tenantId}:${ruleCode}:${entityId}' },
-    rateLimit: { intervalMs: 300000, maxCount: 1 },
-    repeat: { enabled: false },
-    recovery: { enabled: true, sendRecoveryMessage: true, autoConfirmOnRecovery: false },
+    dedup: {enabled: true, key: '${tenantId}:${ruleCode}:${entityId}'},
+    rateLimit: {intervalMs: 300000, maxCount: 1},
+    repeat: {enabled: false},
+    recovery: {enabled: true, sendRecoveryMessage: true, autoConfirmOnRecovery: false},
   });
 
 const defaultMessageExt = () =>
@@ -155,7 +155,7 @@ const defaultChannelExt = () =>
     cardVersion: 'interactive-card-v1',
     atAllAllowed: false,
     testMessageEnabled: true,
-    options: { locale: 'zh-CN' },
+    options: {locale: 'zh-CN'},
   });
 
 const defaultBindExt = () =>
@@ -167,7 +167,7 @@ const defaultBindExt = () =>
 
 // remoteSelect loaders: resolve foreign-key fields to selectable {name → id}
 // options instead of typing raw ids. value is String(id) so edit-mode echo matches.
-const FK_PAGE: PageQuery = { page: { current: 1, size: 1000 } };
+const FK_PAGE: PageQuery = {page: {current: 1, size: 1000}};
 
 const loadNotifyOptions = async (): Promise<AlarmOption[]> => {
   const res: any = await listNotify(FK_PAGE);
@@ -204,55 +204,55 @@ const loadEntityOptions = async (form: Record<string, any>): Promise<AlarmOption
     res = await listPoint(FK_PAGE);
     nameKey = 'pointName';
   }
-  return (res?.data?.records || []).map((r: any) => ({ label: r[nameKey] || String(r.id), value: String(r.id) }));
+  return (res?.data?.records || []).map((r: any) => ({label: r[nameKey] || String(r.id), value: String(r.id)}));
 };
 
 export const createAlarmEntityConfigs = (t: Translate) => {
   const enableOptions: AlarmOption[] = [
-    { label: t('common.enable'), value: 'ENABLE' },
-    { label: t('common.disable'), value: 'DISABLE' },
+    {label: t('common.enable'), value: 'ENABLE'},
+    {label: t('common.disable'), value: 'DISABLE'},
   ];
   const autoConfirmOptions: AlarmOption[] = [
-    { label: t('settings.alarm.auto'), value: 'AUTO' },
-    { label: t('settings.alarm.manual'), value: 'MANUAL' },
+    {label: t('settings.alarm.auto'), value: 'AUTO'},
+    {label: t('settings.alarm.manual'), value: 'MANUAL'},
   ];
   const targetOptions: AlarmOption[] = [
-    { label: t('settings.alarm.point'), value: 'POINT' },
-    { label: t('settings.alarm.device'), value: 'DEVICE' },
-    { label: t('settings.alarm.driver'), value: 'DRIVER' },
+    {label: t('settings.alarm.point'), value: 'POINT'},
+    {label: t('settings.alarm.device'), value: 'DEVICE'},
+    {label: t('settings.alarm.driver'), value: 'DRIVER'},
   ];
   const channelTypeOptions: AlarmOption[] = [
-    { label: 'Feishu Bot', value: 'FEISHU_BOT' },
-    { label: 'Webhook', value: 'WEBHOOK' },
-    { label: 'Email', value: 'EMAIL' },
+    {label: 'Feishu Bot', value: 'FEISHU_BOT'},
+    {label: 'Webhook', value: 'WEBHOOK'},
+    {label: 'Email', value: 'EMAIL'},
   ];
   const messageLevelOptions: AlarmOption[] = [
-    { label: 'P0', value: 'P0' },
-    { label: 'P1', value: 'P1' },
-    { label: 'P2', value: 'P2' },
-    { label: 'P3', value: 'P3' },
+    {label: 'P0', value: 'P0'},
+    {label: 'P1', value: 'P1'},
+    {label: 'P2', value: 'P2'},
+    {label: 'P3', value: 'P3'},
   ];
   const ruleStateOptions: AlarmOption[] = [
-    { label: t('settings.alarm.normal'), value: 'NORMAL' },
-    { label: t('settings.alarm.firing'), value: 'FIRING' },
-    { label: t('settings.alarm.recovered'), value: 'RECOVERED' },
+    {label: t('settings.alarm.normal'), value: 'NORMAL'},
+    {label: t('settings.alarm.firing'), value: 'FIRING'},
+    {label: t('settings.alarm.recovered'), value: 'RECOVERED'},
   ];
   const historyStatusOptions: AlarmOption[] = [
-    { label: t('settings.alarm.pending'), value: 'PENDING' },
-    { label: t('settings.alarm.success'), value: 'SUCCESS' },
-    { label: t('settings.alarm.failed'), value: 'FAILED' },
-    { label: t('settings.alarm.retrying'), value: 'RETRYING' },
-    { label: t('settings.alarm.skipped'), value: 'SKIPPED' },
+    {label: t('settings.alarm.pending'), value: 'PENDING'},
+    {label: t('settings.alarm.success'), value: 'SUCCESS'},
+    {label: t('settings.alarm.failed'), value: 'FAILED'},
+    {label: t('settings.alarm.retrying'), value: 'RETRYING'},
+    {label: t('settings.alarm.skipped'), value: 'SKIPPED'},
   ];
 
   const commonColumns = (): AlarmColumnConfig[] => [
-    { prop: 'remark', label: t('common.remark'), minWidth: 150 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
+    {prop: 'remark', label: t('common.remark'), minWidth: 150},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
   ];
 
   const commonFields = (): AlarmFieldConfig[] => [
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', span: 12 },
-    { prop: 'remark', label: t('common.remark'), kind: 'textarea', span: 24, rows: 3 },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', span: 12},
+    {prop: 'remark', label: t('common.remark'), kind: 'textarea', span: 24, rows: 3},
   ];
 
   const configs: AlarmEntityConfig[] = [
@@ -268,18 +268,18 @@ export const createAlarmEntityConfigs = (t: Translate) => {
       filterPlaceholder: t('common.enableFlag'),
       filterOptions: enableOptions,
       columns: [
-        { prop: 'ruleName', label: t('settings.alarm.ruleName'), minWidth: 180 },
-        { prop: 'ruleCode', label: t('settings.alarm.ruleCode'), kind: 'code', minWidth: 180 },
-        { prop: 'alarmTargetTypeFlag', label: t('settings.alarm.targetType'), kind: 'tag', width: 110 },
-        { prop: 'entityId', label: t('settings.alarm.entityId'), kind: 'code', minWidth: 130 },
-        { prop: 'notifyId', label: t('settings.alarm.notifyId'), kind: 'code', minWidth: 130 },
-        { prop: 'messageId', label: t('settings.alarm.messageId'), kind: 'code', minWidth: 130 },
-        { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90 },
+        {prop: 'ruleName', label: t('settings.alarm.ruleName'), minWidth: 180},
+        {prop: 'ruleCode', label: t('settings.alarm.ruleCode'), kind: 'code', minWidth: 180},
+        {prop: 'alarmTargetTypeFlag', label: t('settings.alarm.targetType'), kind: 'tag', width: 110},
+        {prop: 'entityId', label: t('settings.alarm.entityId'), kind: 'code', minWidth: 130},
+        {prop: 'notifyId', label: t('settings.alarm.notifyId'), kind: 'code', minWidth: 130},
+        {prop: 'messageId', label: t('settings.alarm.messageId'), kind: 'code', minWidth: 130},
+        {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90},
         ...commonColumns(),
       ],
       fields: [
-        { prop: 'ruleName', label: t('settings.alarm.ruleName'), required: true },
-        { prop: 'ruleCode', label: t('settings.alarm.ruleCode') },
+        {prop: 'ruleName', label: t('settings.alarm.ruleName'), required: true},
+        {prop: 'ruleCode', label: t('settings.alarm.ruleCode')},
         {
           prop: 'alarmTargetTypeFlag',
           label: t('settings.alarm.targetType'),
@@ -308,7 +308,7 @@ export const createAlarmEntityConfigs = (t: Translate) => {
           loadOptions: loadMessageOptions,
           required: true,
         },
-        { prop: 'ruleExt', label: t('settings.alarm.ruleExt'), kind: 'json', span: 24, rows: 10, required: true },
+        {prop: 'ruleExt', label: t('settings.alarm.ruleExt'), kind: 'json', span: 24, rows: 10, required: true},
         ...commonFields(),
       ],
       defaultForm: () => ({
@@ -339,16 +339,16 @@ export const createAlarmEntityConfigs = (t: Translate) => {
       filterPlaceholder: t('common.enableFlag'),
       filterOptions: enableOptions,
       columns: [
-        { prop: 'notifyName', label: t('settings.alarm.notifyName'), minWidth: 180 },
-        { prop: 'notifyCode', label: t('settings.alarm.notifyCode'), kind: 'code', minWidth: 180 },
-        { prop: 'autoConfirmFlag', label: t('settings.alarm.autoConfirm'), kind: 'tag', width: 120 },
-        { prop: 'notifyInterval', label: t('settings.alarm.notifyInterval'), width: 130 },
-        { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90 },
+        {prop: 'notifyName', label: t('settings.alarm.notifyName'), minWidth: 180},
+        {prop: 'notifyCode', label: t('settings.alarm.notifyCode'), kind: 'code', minWidth: 180},
+        {prop: 'autoConfirmFlag', label: t('settings.alarm.autoConfirm'), kind: 'tag', width: 120},
+        {prop: 'notifyInterval', label: t('settings.alarm.notifyInterval'), width: 130},
+        {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90},
         ...commonColumns(),
       ],
       fields: [
-        { prop: 'notifyName', label: t('settings.alarm.notifyName'), required: true },
-        { prop: 'notifyCode', label: t('settings.alarm.notifyCode') },
+        {prop: 'notifyName', label: t('settings.alarm.notifyName'), required: true},
+        {prop: 'notifyCode', label: t('settings.alarm.notifyCode')},
         {
           prop: 'autoConfirmFlag',
           label: t('settings.alarm.autoConfirm'),
@@ -356,8 +356,8 @@ export const createAlarmEntityConfigs = (t: Translate) => {
           options: autoConfirmOptions,
           required: true,
         },
-        { prop: 'notifyInterval', label: t('settings.alarm.notifyInterval'), kind: 'number', required: true },
-        { prop: 'notifyExt', label: t('settings.alarm.notifyExt'), kind: 'json', span: 24, rows: 10, required: true },
+        {prop: 'notifyInterval', label: t('settings.alarm.notifyInterval'), kind: 'number', required: true},
+        {prop: 'notifyExt', label: t('settings.alarm.notifyExt'), kind: 'json', span: 24, rows: 10, required: true},
         ...commonFields(),
       ],
       defaultForm: () => ({
@@ -386,15 +386,15 @@ export const createAlarmEntityConfigs = (t: Translate) => {
       filterPlaceholder: t('common.enableFlag'),
       filterOptions: enableOptions,
       columns: [
-        { prop: 'messageName', label: t('settings.alarm.messageName'), minWidth: 190 },
-        { prop: 'messageCode', label: t('settings.alarm.messageCode'), kind: 'code', minWidth: 190 },
-        { prop: 'messageLevel', label: t('settings.alarm.messageLevel'), kind: 'tag', width: 110 },
-        { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90 },
+        {prop: 'messageName', label: t('settings.alarm.messageName'), minWidth: 190},
+        {prop: 'messageCode', label: t('settings.alarm.messageCode'), kind: 'code', minWidth: 190},
+        {prop: 'messageLevel', label: t('settings.alarm.messageLevel'), kind: 'tag', width: 110},
+        {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90},
         ...commonColumns(),
       ],
       fields: [
-        { prop: 'messageName', label: t('settings.alarm.messageName'), required: true },
-        { prop: 'messageCode', label: t('settings.alarm.messageCode') },
+        {prop: 'messageName', label: t('settings.alarm.messageName'), required: true},
+        {prop: 'messageCode', label: t('settings.alarm.messageCode')},
         {
           prop: 'messageLevel',
           label: t('settings.alarm.messageLevel'),
@@ -402,7 +402,7 @@ export const createAlarmEntityConfigs = (t: Translate) => {
           options: messageLevelOptions,
           required: true,
         },
-        { prop: 'messageExt', label: t('settings.alarm.messageExt'), kind: 'json', span: 24, rows: 10, required: true },
+        {prop: 'messageExt', label: t('settings.alarm.messageExt'), kind: 'json', span: 24, rows: 10, required: true},
         ...commonFields(),
       ],
       defaultForm: () => ({
@@ -430,16 +430,16 @@ export const createAlarmEntityConfigs = (t: Translate) => {
       filterPlaceholder: t('settings.alarm.channelType'),
       filterOptions: channelTypeOptions,
       columns: [
-        { prop: 'channelName', label: t('settings.alarm.channelName'), minWidth: 180 },
-        { prop: 'channelCode', label: t('settings.alarm.channelCode'), kind: 'code', minWidth: 180 },
-        { prop: 'channelTypeFlag', label: t('settings.alarm.channelType'), kind: 'tag', width: 130 },
-        { prop: 'credentialRef', label: t('settings.alarm.credentialRef'), kind: 'code', minWidth: 190 },
-        { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90 },
+        {prop: 'channelName', label: t('settings.alarm.channelName'), minWidth: 180},
+        {prop: 'channelCode', label: t('settings.alarm.channelCode'), kind: 'code', minWidth: 180},
+        {prop: 'channelTypeFlag', label: t('settings.alarm.channelType'), kind: 'tag', width: 130},
+        {prop: 'credentialRef', label: t('settings.alarm.credentialRef'), kind: 'code', minWidth: 190},
+        {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90},
         ...commonColumns(),
       ],
       fields: [
-        { prop: 'channelName', label: t('settings.alarm.channelName'), required: true },
-        { prop: 'channelCode', label: t('settings.alarm.channelCode') },
+        {prop: 'channelName', label: t('settings.alarm.channelName'), required: true},
+        {prop: 'channelCode', label: t('settings.alarm.channelCode')},
         {
           prop: 'channelTypeFlag',
           label: t('settings.alarm.channelType'),
@@ -447,8 +447,8 @@ export const createAlarmEntityConfigs = (t: Translate) => {
           options: channelTypeOptions,
           required: true,
         },
-        { prop: 'credentialRef', label: t('settings.alarm.credentialRef'), required: true },
-        { prop: 'channelExt', label: t('settings.alarm.channelExt'), kind: 'json', span: 24, rows: 8, required: true },
+        {prop: 'credentialRef', label: t('settings.alarm.credentialRef'), required: true},
+        {prop: 'channelExt', label: t('settings.alarm.channelExt'), kind: 'json', span: 24, rows: 8, required: true},
         ...commonFields(),
       ],
       defaultForm: () => ({
@@ -477,9 +477,9 @@ export const createAlarmEntityConfigs = (t: Translate) => {
       filterPlaceholder: t('common.enableFlag'),
       filterOptions: enableOptions,
       columns: [
-        { prop: 'notifyId', label: t('settings.alarm.notifyId'), kind: 'code', minWidth: 140 },
-        { prop: 'channelId', label: t('settings.alarm.channelId'), kind: 'code', minWidth: 140 },
-        { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90 },
+        {prop: 'notifyId', label: t('settings.alarm.notifyId'), kind: 'code', minWidth: 140},
+        {prop: 'channelId', label: t('settings.alarm.channelId'), kind: 'code', minWidth: 140},
+        {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag', width: 90},
         ...commonColumns(),
       ],
       fields: [
@@ -497,7 +497,7 @@ export const createAlarmEntityConfigs = (t: Translate) => {
           loadOptions: loadChannelOptions,
           required: true,
         },
-        { prop: 'bindExt', label: t('settings.alarm.bindExt'), kind: 'json', span: 24, rows: 8, required: true },
+        {prop: 'bindExt', label: t('settings.alarm.bindExt'), kind: 'json', span: 24, rows: 8, required: true},
         ...commonFields(),
       ],
       defaultForm: () => ({
@@ -524,12 +524,12 @@ export const createAlarmEntityConfigs = (t: Translate) => {
       filterPlaceholder: t('settings.alarm.state'),
       filterOptions: ruleStateOptions,
       columns: [
-        { prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code', minWidth: 130 },
-        { prop: 'alarmTargetTypeFlag', label: t('settings.alarm.targetType'), kind: 'tag', width: 110 },
-        { prop: 'entityId', label: t('settings.alarm.entityId'), kind: 'code', minWidth: 130 },
-        { prop: 'entityStateFlag', label: t('settings.alarm.state'), kind: 'tag', width: 110 },
-        { prop: 'triggerCount', label: t('settings.alarm.triggerCount'), width: 110 },
-        { prop: 'lastTriggerTime', label: t('settings.alarm.lastTriggerTime'), kind: 'time', width: 165 },
+        {prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code', minWidth: 130},
+        {prop: 'alarmTargetTypeFlag', label: t('settings.alarm.targetType'), kind: 'tag', width: 110},
+        {prop: 'entityId', label: t('settings.alarm.entityId'), kind: 'code', minWidth: 130},
+        {prop: 'entityStateFlag', label: t('settings.alarm.state'), kind: 'tag', width: 110},
+        {prop: 'triggerCount', label: t('settings.alarm.triggerCount'), width: 110},
+        {prop: 'lastTriggerTime', label: t('settings.alarm.lastTriggerTime'), kind: 'time', width: 165},
         ...commonColumns(),
       ],
       fields: [],
@@ -548,13 +548,13 @@ export const createAlarmEntityConfigs = (t: Translate) => {
       filterPlaceholder: t('settings.alarm.status'),
       filterOptions: historyStatusOptions,
       columns: [
-        { prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code', minWidth: 130 },
-        { prop: 'channelId', label: t('settings.alarm.channelId'), kind: 'code', minWidth: 130 },
-        { prop: 'channelTypeFlag', label: t('settings.alarm.channelType'), kind: 'tag', width: 130 },
-        { prop: 'target', label: t('settings.alarm.target'), minWidth: 160 },
-        { prop: 'statusFlag', label: t('settings.alarm.status'), kind: 'tag', width: 110 },
-        { prop: 'retryCount', label: t('settings.alarm.retryCount'), width: 100 },
-        { prop: 'errorMessage', label: t('settings.alarm.errorMessage'), minWidth: 180 },
+        {prop: 'ruleId', label: t('settings.alarm.ruleId'), kind: 'code', minWidth: 130},
+        {prop: 'channelId', label: t('settings.alarm.channelId'), kind: 'code', minWidth: 130},
+        {prop: 'channelTypeFlag', label: t('settings.alarm.channelType'), kind: 'tag', width: 130},
+        {prop: 'target', label: t('settings.alarm.target'), minWidth: 160},
+        {prop: 'statusFlag', label: t('settings.alarm.status'), kind: 'tag', width: 110},
+        {prop: 'retryCount', label: t('settings.alarm.retryCount'), width: 100},
+        {prop: 'errorMessage', label: t('settings.alarm.errorMessage'), minWidth: 180},
         ...commonColumns(),
       ],
       fields: [],

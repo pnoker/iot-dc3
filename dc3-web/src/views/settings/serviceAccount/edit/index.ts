@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, watch } from 'vue';
-import type { FormInstance, FormRules } from 'element-plus';
-import { useI18n } from 'vue-i18n';
+import {defineComponent, reactive, ref, watch} from 'vue';
+import type {FormInstance, FormRules} from 'element-plus';
+import {useI18n} from 'vue-i18n';
 
-import { listPrincipalByIds } from '@/api/principal';
+import {listPrincipalByIds} from '@/api/principal';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-import { NAME_PATTERN } from '@/utils/formRuleUtil';
+import {NAME_PATTERN} from '@/utils/formRuleUtil';
 
 type FormMode = 'add' | 'edit';
 
@@ -39,7 +39,7 @@ const normalizeEnableFlag = (value: unknown) => {
 };
 
 const submitPayload = (form: ReturnType<typeof createEmptyForm>) => {
-  const payload: Record<string, unknown> = { ...form };
+  const payload: Record<string, unknown> = {...form};
   if (!payload.id) delete payload.id;
   if (!payload.purpose) delete payload.purpose;
   if (!payload.expireTime) delete payload.expireTime;
@@ -48,10 +48,10 @@ const submitPayload = (form: ReturnType<typeof createEmptyForm>) => {
 
 export default defineComponent({
   name: 'ServiceAccountEditForm',
-  components: { EnableFlagSegmented },
+  components: {EnableFlagSegmented},
   emits: ['add-thing', 'update-thing'],
-  setup(_, { emit }) {
-    const { t } = useI18n();
+  setup(_, {emit}) {
+    const {t} = useI18n();
 
     const formRef = ref<FormInstance>();
 
@@ -81,7 +81,7 @@ export default defineComponent({
           ownerName.value = key;
         }
       },
-      { immediate: true }
+      {immediate: true}
     );
 
     const rules: FormRules = {
@@ -92,15 +92,15 @@ export default defineComponent({
           message: t('settings.serviceAccount.serviceAccountNamePlaceholder'),
           trigger: 'blur',
         },
-        { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
-        { pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
+        {min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur'},
+        {pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur'},
       ],
     };
 
     const reset = () => {
       reactiveData.form =
         reactiveData.mode === 'edit'
-          ? { ...reactiveData.originalForm }
+          ? {...reactiveData.originalForm}
           : createEmptyForm(reactiveData.form.ownerPrincipalId);
       reactiveData.submitting = false;
       formRef.value?.clearValidate();
@@ -120,8 +120,8 @@ export default defineComponent({
         ...row,
         enableFlag: normalizeEnableFlag(row.enableFlag),
       };
-      reactiveData.originalForm = { ...initial };
-      reactiveData.form = { ...initial };
+      reactiveData.originalForm = {...initial};
+      reactiveData.form = {...initial};
       reactiveData.visible = true;
     };
 

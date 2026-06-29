@@ -93,13 +93,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import type { FormInstance, FormRules } from 'element-plus';
+  import {computed, reactive, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import type {FormInstance, FormRules} from 'element-plus';
 
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import type { AgenticModelConfig, AgenticProvider } from '@/config/types';
-  import { remarkRules } from '@/utils/formRuleUtil';
+  import type {AgenticModelConfig, AgenticProvider} from '@/config/types';
+  import {remarkRules} from '@/utils/formRuleUtil';
 
   const props = defineProps<{
     providers: AgenticProvider[];
@@ -113,7 +113,7 @@
   const isEdit = ref(false);
   const submitting = ref(false);
   const formRef = ref<FormInstance>();
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const initialForm = (): AgenticModelConfig => ({
     model: '',
@@ -133,9 +133,9 @@
   const form = reactive<AgenticModelConfig>(initialForm());
 
   const rules = computed<FormRules>(() => ({
-    model: [{ required: true, whitespace: true, message: t('settings.agentic.modelRequired'), trigger: 'blur' }],
-    providerId: [{ required: true, message: t('settings.agentic.providerRequired'), trigger: 'change' }],
-    maxTokens: [{ required: true, message: t('settings.agentic.maxTokensRequired'), trigger: 'blur' }],
+    model: [{required: true, whitespace: true, message: t('settings.agentic.modelRequired'), trigger: 'blur'}],
+    providerId: [{required: true, message: t('settings.agentic.providerRequired'), trigger: 'change'}],
+    maxTokens: [{required: true, message: t('settings.agentic.maxTokensRequired'), trigger: 'blur'}],
     temperature: [
       {
         type: 'number',
@@ -182,13 +182,13 @@
       submitting.value = false;
       return;
     }
-    emit('save', { ...form }, () => {
+    emit('save', {...form}, () => {
       submitting.value = false;
       visible.value = false;
     });
   };
 
-  defineExpose({ show, showEdit });
+  defineExpose({show, showEdit});
 </script>
 
 <style lang="scss" scoped>

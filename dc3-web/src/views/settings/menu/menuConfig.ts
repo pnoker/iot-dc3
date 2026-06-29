@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { addMenu, deleteMenu, listMenuTree, updateMenu } from '@/api/menu';
-import { MENU_LEVEL_OPTIONS, MENU_TYPE_OPTIONS } from '@/config/constant/enums';
-import { iconNames } from '@/config/constant/icons';
-import type { EntityListConfig } from '@/config/types/entityList';
-import { authNameRules, remarkRules } from '@/utils/formRuleUtil';
+import {addMenu, deleteMenu, listMenuTree, updateMenu} from '@/api/menu';
+import {MENU_LEVEL_OPTIONS, MENU_TYPE_OPTIONS} from '@/config/constant/enums';
+import {iconNames} from '@/config/constant/icons';
+import type {EntityListConfig} from '@/config/types/entityList';
+import {authNameRules, remarkRules} from '@/utils/formRuleUtil';
 
 export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
   name: 'menu',
@@ -49,29 +49,29 @@ export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
       options: MENU_TYPE_OPTIONS,
       placeholder: t('common.all'),
     },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true},
   ],
   columns: [
-    { prop: 'menuName', label: t('settings.menu.menuName'), minWidth: 220 },
-    { prop: 'menuCode', label: t('settings.menu.menuCode'), kind: 'code', minWidth: 180 },
-    { prop: 'menuTypeFlag', label: t('settings.menu.menuType'), minWidth: 100 },
-    { prop: 'menuLevel', label: t('settings.menu.menuLevel'), minWidth: 90 },
-    { prop: 'menuIndex', label: t('settings.menu.menuIndex'), minWidth: 80 },
-    { prop: 'menuExt.content.url', label: t('settings.menu.menuUrl'), minWidth: 160 },
-    { prop: 'menuExt.content.icon', label: t('settings.menu.menuIcon'), kind: 'icon', width: 90 },
-    { prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
+    {prop: 'menuName', label: t('settings.menu.menuName'), minWidth: 220},
+    {prop: 'menuCode', label: t('settings.menu.menuCode'), kind: 'code', minWidth: 180},
+    {prop: 'menuTypeFlag', label: t('settings.menu.menuType'), minWidth: 100},
+    {prop: 'menuLevel', label: t('settings.menu.menuLevel'), minWidth: 90},
+    {prop: 'menuIndex', label: t('settings.menu.menuIndex'), minWidth: 80},
+    {prop: 'menuExt.content.url', label: t('settings.menu.menuUrl'), minWidth: 160},
+    {prop: 'menuExt.content.icon', label: t('settings.menu.menuIcon'), kind: 'icon', width: 90},
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
   ],
   fields: [
     {
       prop: 'parentMenuId',
       label: t('settings.menu.parentMenuId'),
       kind: 'treeSelect',
-      rules: [{ required: true, message: t('settings.menu.parentMenuIdPlaceholder'), trigger: 'change' }],
+      rules: [{required: true, message: t('settings.menu.parentMenuIdPlaceholder'), trigger: 'change'}],
       tree: {
         load: () => listMenuTree().then((res) => res.data || []),
-        transform: (rows) => [{ id: 0, menuName: 'Root', children: rows }],
-        props: { label: 'menuName', children: 'children' },
+        transform: (rows) => [{id: 0, menuName: 'Root', children: rows}],
+        props: {label: 'menuName', children: 'children'},
         nodeKey: 'id',
       },
     },
@@ -87,43 +87,43 @@ export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
       label: t('settings.menu.menuCode'),
       placeholder: t('settings.menu.menuCodePlaceholder'),
       maxlength: 64,
-      rules: [{ required: true, whitespace: true, message: t('settings.menu.menuCodePlaceholder'), trigger: 'blur' }],
+      rules: [{required: true, whitespace: true, message: t('settings.menu.menuCodePlaceholder'), trigger: 'blur'}],
     },
     {
       prop: 'titleZh',
       label: t('settings.menu.titleZh'),
       placeholder: t('settings.menu.titleZhPlaceholder'),
       maxlength: 64,
-      rules: [{ required: true, whitespace: true, message: t('settings.menu.titleZhPlaceholder'), trigger: 'blur' }],
+      rules: [{required: true, whitespace: true, message: t('settings.menu.titleZhPlaceholder'), trigger: 'blur'}],
     },
     {
       prop: 'titleEn',
       label: t('settings.menu.titleEn'),
       placeholder: t('settings.menu.titleEnPlaceholder'),
       maxlength: 64,
-      rules: [{ required: true, whitespace: true, message: t('settings.menu.titleEnPlaceholder'), trigger: 'blur' }],
+      rules: [{required: true, whitespace: true, message: t('settings.menu.titleEnPlaceholder'), trigger: 'blur'}],
     },
     {
       prop: 'menuTypeFlag',
       label: t('settings.menu.menuType'),
       kind: 'select',
       options: MENU_TYPE_OPTIONS,
-      rules: [{ required: true, message: t('settings.menu.menuTypeRequired'), trigger: 'change' }],
+      rules: [{required: true, message: t('settings.menu.menuTypeRequired'), trigger: 'change'}],
     },
     {
       prop: 'menuLevel',
       label: t('settings.menu.menuLevel'),
       kind: 'select',
       options: MENU_LEVEL_OPTIONS,
-      rules: [{ required: true, message: t('settings.menu.menuLevelRequired'), trigger: 'change' }],
+      rules: [{required: true, message: t('settings.menu.menuLevelRequired'), trigger: 'change'}],
     },
-    { prop: 'menuIndex', label: t('settings.menu.menuIndex'), kind: 'number' },
+    {prop: 'menuIndex', label: t('settings.menu.menuIndex'), kind: 'number'},
     {
       prop: 'icon',
       label: t('settings.menu.menuIcon'),
       kind: 'select',
       placeholder: t('settings.menu.menuIconPlaceholder'),
-      options: iconNames.map((name) => ({ label: name, value: name })),
+      options: iconNames.map((name) => ({label: name, value: name})),
     },
     {
       prop: 'url',
@@ -131,7 +131,7 @@ export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
       placeholder: t('settings.menu.menuUrlPlaceholder'),
       maxlength: 256,
     },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag' },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag'},
     {
       prop: 'remark',
       label: t('common.remark'),
@@ -170,12 +170,12 @@ export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
     };
   },
   toPayload: (form) => {
-    const { icon, url, titleZh, titleEn, ...rest } = form;
+    const {icon, url, titleZh, titleEn, ...rest} = form;
     return {
       ...rest,
       menuExt: {
         content: {
-          titles: { zh: titleZh, en: titleEn },
+          titles: {zh: titleZh, en: titleEn},
           icon: icon || '',
           url: url || '',
           remark: rest.remark || '',
@@ -187,7 +187,7 @@ export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
   add: addMenu as EntityListConfig['add'],
   update: updateMenu as EntityListConfig['update'],
   remove: deleteMenu,
-  detail: { routeName: 'settingsMenuDetail' },
+  detail: {routeName: 'settingsMenuDetail'},
   confirmDeleteText: t('settings.menu.confirmDelete'),
   emptyText: t('settings.menu.empty'),
 });

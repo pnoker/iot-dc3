@@ -26,39 +26,39 @@
 </template>
 
 <script lang="ts" setup>
-  import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-  import { Chart } from '@antv/g2';
+  import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+  import {Chart} from '@antv/g2';
 
-  import { alertTopSources } from '@/api/dashboard';
+  import {alertTopSources} from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useEntityNames } from '@/composables/useEntityNames';
+  import {useEntityNames} from '@/composables/useEntityNames';
 
-  const props = defineProps<{ days?: number; limit?: number }>();
+  const props = defineProps<{days?: number; limit?: number}>();
 
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
   let chart: Chart | undefined;
-  const { resolveBySource, nameBySource } = useEntityNames();
+  const {resolveBySource, nameBySource} = useEntityNames();
 
-  const render = (data: { name: string; count: number }[]) => {
+  const render = (data: {name: string; count: number}[]) => {
     const el = chartRef.value;
     if (!el) return;
     chart?.destroy();
-    chart = new Chart({ container: el, autoFit: true });
+    chart = new Chart({container: el, autoFit: true});
     chart
       .interval()
       .data(data)
       .encode('x', 'name')
       .encode('y', 'count')
       .encode('color', 'name')
-      .scale('x', { padding: 0.5 })
+      .scale('x', {padding: 0.5})
       .axis({
-        x: { title: false, labelAutoRotate: false },
-        y: { title: false },
+        x: {title: false, labelAutoRotate: false},
+        y: {title: false},
       })
       .legend(false)
-      .tooltip({ channel: 'y', valueFormatter: (d: number) => d.toLocaleString() })
-      .coordinate({ transform: [{ type: 'transpose' }] });
+      .tooltip({channel: 'y', valueFormatter: (d: number) => d.toLocaleString()})
+      .coordinate({transform: [{type: 'transpose'}]});
     chart.render();
   };
 
@@ -87,7 +87,7 @@
   watch(() => props.days, load);
   onUnmounted(() => chart?.destroy());
 
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

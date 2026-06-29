@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 
 import Particles from '@/components/particles/Particles.vue';
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { App } from 'vue';
+import type {App} from 'vue';
 import setupElementPlus from '@/config/plugins/element/element';
 import setupHighlight from '@/config/plugins/highlight/highlight';
 

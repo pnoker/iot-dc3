@@ -25,7 +25,7 @@
                 >{{ reactiveData.data.pointName }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('point.detail.relatedDeviceCount')">
-                {{ reactiveData.listDeviceData.length || 0 }} {{ $t('common.count', { count: '' }) }}:
+                {{ reactiveData.listDeviceData.length || 0 }} {{ $t('common.count', {count: ''}) }}:
                 {{ deviceName() }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')"

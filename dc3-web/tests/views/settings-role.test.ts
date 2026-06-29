@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const roleMocks = vi.hoisted(() => ({
-  addRole: vi.fn(() => Promise.resolve({ data: true })),
-  deleteRole: vi.fn(() => Promise.resolve({ data: true })),
-  listRole: vi.fn(() => Promise.resolve({ data: { records: [{ id: 'r-1', roleName: 'Admin' }], total: 1 } })),
-  listRoleTree: vi.fn(() => Promise.resolve({ data: [] })),
-  updateRole: vi.fn(() => Promise.resolve({ data: true })),
+  addRole: vi.fn(() => Promise.resolve({data: true})),
+  deleteRole: vi.fn(() => Promise.resolve({data: true})),
+  listRole: vi.fn(() => Promise.resolve({data: {records: [{id: 'r-1', roleName: 'Admin'}], total: 1}})),
+  listRoleTree: vi.fn(() => Promise.resolve({data: []})),
+  updateRole: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/role', () => roleMocks);
 vi.mock('@/api/roleResourceBind', () => ({
-  addRoleResourceBind: vi.fn(() => Promise.resolve({ data: true })),
-  deleteRoleResourceBind: vi.fn(() => Promise.resolve({ data: true })),
+  addRoleResourceBind: vi.fn(() => Promise.resolve({data: true})),
+  deleteRoleResourceBind: vi.fn(() => Promise.resolve({data: true})),
 }));
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('SettingsRole view', () => {
   it('loads the role list on mount', async () => {
@@ -40,9 +40,9 @@ describe('SettingsRole view', () => {
     await mountListPage({
       component: Role,
       stubs: {
-        roleTool: { template: '<div />' },
-        roleAddForm: { template: '<div />' },
-        roleEditForm: { template: '<div />' },
+        roleTool: {template: '<div />'},
+        roleAddForm: {template: '<div />'},
+        roleEditForm: {template: '<div />'},
       },
     });
     await flushPromises();

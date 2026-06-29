@@ -19,14 +19,14 @@
 // each describe block exercises. Bigger or impure utilities (validation,
 // async loader, clipboard, date) live in their own dedicated test files.
 
-import { afterEach, describe, expect, it } from 'vitest';
+import {afterEach, describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
-import { resolveMenuTitle } from '@/utils/menuUtil';
-import { pointTypeKey, rwFlagKey } from '@/utils/pointFormatUtil';
-import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
-import { getAllStorage, getStorage, removeStorage, setStorage } from '@/utils/storageUtil';
-import { formatMs, humanDuration, parseDateSafe } from '@/utils/timeUtil';
+import {resolveMenuTitle} from '@/utils/menuUtil';
+import {pointTypeKey, rwFlagKey} from '@/utils/pointFormatUtil';
+import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
+import {getAllStorage, getStorage, removeStorage, setStorage} from '@/utils/storageUtil';
+import {formatMs, humanDuration, parseDateSafe} from '@/utils/timeUtil';
 
 describe('utils (misc)', () => {
   describe('searchParamUtil', () => {
@@ -51,11 +51,11 @@ describe('utils (misc)', () => {
     });
 
     it('resets a mutable form model to defaults', () => {
-      const form = { name: 'old', enableFlag: 'ENABLE', page: 2 };
+      const form = {name: 'old', enableFlag: 'ENABLE', page: 2};
 
-      resetSearchForm(form, { enableFlag: '' });
+      resetSearchForm(form, {enableFlag: ''});
 
-      expect(form).toEqual({ enableFlag: '' });
+      expect(form).toEqual({enableFlag: ''});
     });
   });
 
@@ -64,12 +64,12 @@ describe('utils (misc)', () => {
       setStorage('tenant', 'default');
       setStorage('count', 12);
       setStorage('enabled', false);
-      setStorage('token', { salt: 's', token: 't' });
+      setStorage('token', {salt: 's', token: 't'});
 
       expect(getStorage('tenant')).toBe('default');
       expect(getStorage('count')).toBe(12);
       expect(getStorage('enabled')).toBe(false);
-      expect(getStorage('token')).toEqual({ salt: 's', token: 't' });
+      expect(getStorage('token')).toEqual({salt: 's', token: 't'});
       expect(
         getAllStorage()
           .map((item) => item.name)
@@ -121,7 +121,7 @@ describe('utils (misc)', () => {
       expect(
         resolveMenuTitle({
           menuName: 'Fallback',
-          menuExt: { content: { titles: { zh: '设备', en: 'Device' } } },
+          menuExt: {content: {titles: {zh: '设备', en: 'Device'}}},
         })
       ).toBe('设备');
 
@@ -130,11 +130,11 @@ describe('utils (misc)', () => {
       expect(
         resolveMenuTitle({
           menuName: 'Fallback',
-          menuExt: { content: { title: 'nav.home' } },
+          menuExt: {content: {title: 'nav.home'}},
         })
       ).toBe('Home');
 
-      expect(resolveMenuTitle({ menuName: 'Plain' })).toBe('Plain');
+      expect(resolveMenuTitle({menuName: 'Plain'})).toBe('Plain');
       expect(resolveMenuTitle(null)).toBe('');
     });
   });

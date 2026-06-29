@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const labelMocks = vi.hoisted(() => ({
-  addLabel: vi.fn(() => Promise.resolve({ data: true })),
-  deleteLabel: vi.fn(() => Promise.resolve({ data: true })),
-  listLabel: vi.fn(() => Promise.resolve({ data: { records: [{ id: 'l-1', labelName: 'PROD' }], total: 1 } })),
-  updateLabel: vi.fn(() => Promise.resolve({ data: true })),
+  addLabel: vi.fn(() => Promise.resolve({data: true})),
+  deleteLabel: vi.fn(() => Promise.resolve({data: true})),
+  listLabel: vi.fn(() => Promise.resolve({data: {records: [{id: 'l-1', labelName: 'PROD'}], total: 1}})),
+  updateLabel: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/label', () => labelMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('SettingsLabel view', () => {
   it('lists labels on mount', async () => {
     const Label = (await import('@/views/settings/label/Label.vue')).default;
     await mountListPage({
       component: Label,
-      stubs: { labelTool: { template: '<div />' }, labelAddForm: { template: '<div />' } },
+      stubs: {labelTool: {template: '<div />'}, labelAddForm: {template: '<div />'}},
     });
     await flushPromises();
     expect(labelMocks.listLabel).toHaveBeenCalledTimes(1);

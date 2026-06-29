@@ -15,11 +15,11 @@
  */
 
 import vue from '@vitejs/plugin-vue';
-import { resolve } from 'path';
+import {resolve} from 'path';
 import AutoImport from 'unplugin-auto-import/vite';
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+import {ElementPlusResolver} from 'unplugin-vue-components/resolvers';
 import Components from 'unplugin-vue-components/vite';
-import { type ConfigEnv, defineConfig, loadEnv } from 'vite';
+import {type ConfigEnv, defineConfig, loadEnv} from 'vite';
 
 export default (configEnv: ConfigEnv) => {
   const env = loadEnv(configEnv.mode, './src/config/env', '');
@@ -110,7 +110,7 @@ export default (configEnv: ConfigEnv) => {
       sourcemap: configEnv.mode === 'production' ? false : true,
       reportCompressedSize: false,
       cssCodeSplit: true,
-      rollupOptions: { output },
+      rollupOptions: {output},
     },
     plugins: [
       vue(),

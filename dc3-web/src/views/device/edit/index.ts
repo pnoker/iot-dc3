@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, onBeforeUnmount, onMounted, reactive, watch } from 'vue';
-import type { FormItemRule, FormRules } from 'element-plus';
-import { Search } from '@element-plus/icons-vue';
+import {computed, defineComponent, onBeforeUnmount, onMounted, reactive, watch} from 'vue';
+import type {FormItemRule, FormRules} from 'element-plus';
+import {Search} from '@element-plus/icons-vue';
 
-import { onBeforeRouteLeave, useRoute } from 'vue-router';
+import {onBeforeRouteLeave, useRoute} from 'vue-router';
 import router from '@/config/router';
 
-import { listDriverDictionary, listProfileDictionary } from '@/api/dictionary';
-import { getDeviceById, updateDevice } from '@/api/device';
+import {listDriverDictionary, listProfileDictionary} from '@/api/dictionary';
+import {getDeviceById, updateDevice} from '@/api/device';
 import {
   listCommandAttributeByDriverId,
   listDriverAttributeByDriverId,
@@ -61,15 +61,15 @@ import InfoCard from '@/components/card/info/InfoCard.vue';
 import MatrixToolbar from '@/components/card/matrix/MatrixToolbar.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import MatrixStatusSegmented from '@/components/segmented/MatrixStatusSegmented.vue';
-import { isNull } from '@/utils/validationUtil';
-import { failMessage, successMessage } from '@/utils/notificationUtil';
-import { getDriverById } from '@/api/driver';
-import { getProfileById } from '@/api/profile';
-import { listPointByProfileId } from '@/api/point';
-import { listCommandByProfileId } from '@/api/command';
-import { listEventByProfileId } from '@/api/event';
-import { nameRules, remarkRules } from '@/utils/formRuleUtil';
-import { type ComposerTranslation, useI18n } from 'vue-i18n';
+import {isNull} from '@/utils/validationUtil';
+import {failMessage, successMessage} from '@/utils/notificationUtil';
+import {getDriverById} from '@/api/driver';
+import {getProfileById} from '@/api/profile';
+import {listPointByProfileId} from '@/api/point';
+import {listCommandByProfileId} from '@/api/command';
+import {listEventByProfileId} from '@/api/event';
+import {nameRules, remarkRules} from '@/utils/formRuleUtil';
+import {type ComposerTranslation, useI18n} from 'vue-i18n';
 
 type AttributeConfigValue = string | number | boolean | null;
 
@@ -129,10 +129,10 @@ const INTEGER_VALUE_PATTERN = /^[+-]?\d+$/;
 const ATTRIBUTE_CONFIG_MAX_LENGTH = 512;
 const FLOAT_MAX = 3.4028234663852886e38;
 const INTEGER_ATTRIBUTE_RANGES = {
-  BYTE: { min: -128n, max: 127n },
-  SHORT: { min: -32768n, max: 32767n },
-  INT: { min: -2147483648n, max: 2147483647n },
-  LONG: { min: -9223372036854775808n, max: 9223372036854775807n },
+  BYTE: {min: -128n, max: 127n},
+  SHORT: {min: -32768n, max: 32767n},
+  INT: {min: -2147483648n, max: 2147483647n},
+  LONG: {min: -9223372036854775808n, max: 9223372036854775807n},
 };
 
 function attributeType(attribute: Attribute): string {
@@ -154,8 +154,8 @@ function attributePrecision(attribute: Attribute): number | undefined {
 
 function attributePlaceholder(attribute: Attribute, t: ComposerTranslation): string {
   return attribute.defaultValue
-    ? t('device.edit.defaultValue', { value: attribute.defaultValue })
-    : t('device.edit.attributePlaceholder', { name: attribute.attributeName });
+    ? t('device.edit.defaultValue', {value: attribute.defaultValue})
+    : t('device.edit.attributePlaceholder', {name: attribute.attributeName});
 }
 
 function coerceAttributeValue(attribute: Attribute, value?: unknown): AttributeConfigValue {
@@ -224,7 +224,7 @@ function validateAttributeConfigValue(
     return t('device.edit.attributeConfigRequired');
   }
   if (rawValue.length > ATTRIBUTE_CONFIG_MAX_LENGTH) {
-    return t('device.edit.attributeConfigLength', { max: ATTRIBUTE_CONFIG_MAX_LENGTH });
+    return t('device.edit.attributeConfigLength', {max: ATTRIBUTE_CONFIG_MAX_LENGTH});
   }
 
   if (!isNumberAttribute(attribute)) {
@@ -306,7 +306,7 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
-    const { t } = useI18n();
+    const {t} = useI18n();
 
     // 定义响应式数据
     const reactiveData = reactive({
@@ -548,7 +548,7 @@ export default defineComponent({
     const driverDictionary = (query?: string) => {
       reactiveData.driverLoading = true;
       listDriverDictionary({
-        page: { size: 50, current: 1 },
+        page: {size: 50, current: 1},
         label: query || '',
       })
         .then((res) => {
@@ -569,7 +569,7 @@ export default defineComponent({
     const profileDictionary = (query?: string) => {
       reactiveData.profileLoading = true;
       listProfileDictionary({
-        page: { size: 50, current: 1 },
+        page: {size: 50, current: 1},
         label: query || '',
       })
         .then((res) => {
@@ -591,7 +591,7 @@ export default defineComponent({
       getDeviceById(reactiveData.id)
         .then((res) => {
           reactiveData.deviceFormData = res.data;
-          reactiveData.oldDeviceFormData = { ...res.data };
+          reactiveData.oldDeviceFormData = {...res.data};
 
           getDriverById(reactiveData.deviceFormData.driverId).then((res) => {
             const driver = res.data;
@@ -717,7 +717,7 @@ export default defineComponent({
       listDriverInfoByDeviceId(reactiveData.id)
         .then((res) => {
           const formData: AttributeFormData = reactiveData.driverFormData;
-          res.data.forEach((info: { attributeId: string | number; id: any; configValue: any }) => {
+          res.data.forEach((info: {attributeId: string | number; id: any; configValue: any}) => {
             const attributeCode = reactiveData.driverAttributeTable[info.attributeId];
             const attribute = reactiveData.driverAttributes.find((item) => item.attributeCode === attributeCode);
             if (attribute) {
@@ -775,7 +775,7 @@ export default defineComponent({
           return listPointInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
               (infoRes.data || []).forEach(
-                (info: { pointId: string; attributeId: string | number; id: string; configValue: unknown }) => {
+                (info: {pointId: string; attributeId: string | number; id: string; configValue: unknown}) => {
                   const attributeCode = reactiveData.pointAttributeTable[info.attributeId];
                   const attribute = reactiveData.pointAttributes.find((item) => item.attributeCode === attributeCode);
                   const row = rowTable[info.pointId];
@@ -839,7 +839,7 @@ export default defineComponent({
           return listCommandInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
               (infoRes.data || []).forEach(
-                (info: { commandId: string; attributeId: string | number; id: string; configValue: unknown }) => {
+                (info: {commandId: string; attributeId: string | number; id: string; configValue: unknown}) => {
                   const attributeCode = reactiveData.commandAttributeTable[info.attributeId];
                   const attribute = reactiveData.commandAttributes.find((item) => item.attributeCode === attributeCode);
                   const row = rowTable[String(info.commandId)];
@@ -900,7 +900,7 @@ export default defineComponent({
           return listEventInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
               (infoRes.data || []).forEach(
-                (info: { eventId: string; attributeId: string | number; id: string; configValue: unknown }) => {
+                (info: {eventId: string; attributeId: string | number; id: string; configValue: unknown}) => {
                   const attributeCode = reactiveData.eventAttributeTable[info.attributeId];
                   const attribute = reactiveData.eventAttributes.find((item) => item.attributeCode === attributeCode);
                   const row = rowTable[String(info.eventId)];
@@ -926,7 +926,7 @@ export default defineComponent({
     const deviceUpdate = async (): Promise<boolean> => {
       try {
         const res = await updateDevice(reactiveData.deviceFormData);
-        reactiveData.oldDeviceFormData = { ...res.data };
+        reactiveData.oldDeviceFormData = {...res.data};
         return true;
       } catch {
         return false;
@@ -979,7 +979,7 @@ export default defineComponent({
           })
         );
         if (failedCount > 0) {
-          failMessage(t('device.edit.driverSaveFailed', { count: failedCount }));
+          failMessage(t('device.edit.driverSaveFailed', {count: failedCount}));
           return false;
         }
         reactiveData.oldDriverFormData = clone(reactiveData.driverFormData);
@@ -994,9 +994,9 @@ export default defineComponent({
       return isNull(cell.error);
     };
 
-    const validateDirtyCells = (dirtyCells: Array<{ attribute: Attribute; cell: PointAttributeCell }>): boolean => {
+    const validateDirtyCells = (dirtyCells: Array<{attribute: Attribute; cell: PointAttributeCell}>): boolean => {
       let valid = true;
-      dirtyCells.forEach(({ attribute, cell }) => {
+      dirtyCells.forEach(({attribute, cell}) => {
         if (!validateAttributeCell(attribute, cell)) {
           valid = false;
         }
@@ -1061,15 +1061,15 @@ export default defineComponent({
       return 'info';
     };
 
-    const pointMatrixRowClassName = ({ row }: { row: PointInfoMatrixRow }) => {
+    const pointMatrixRowClassName = ({row}: {row: PointInfoMatrixRow}) => {
       return isPointRowDirty(row) ? 'point-matrix-row-dirty' : '';
     };
 
     const savePointMatrix = async (): Promise<boolean> => {
       const dirtyCells = reactiveData.pointInfoData.flatMap((row) =>
         reactiveData.pointAttributes
-          .map((attribute) => ({ row, attribute, cell: pointCell(row, attribute) }))
-          .filter(({ cell }) => cell.dirty)
+          .map((attribute) => ({row, attribute, cell: pointCell(row, attribute)}))
+          .filter(({cell}) => cell.dirty)
       );
       if (dirtyCells.length < 1) {
         return true;
@@ -1081,7 +1081,7 @@ export default defineComponent({
       reactiveData.pointSaving = true;
       let failedCount = 0;
       await Promise.all(
-        dirtyCells.map(async ({ row, cell }) => {
+        dirtyCells.map(async ({row, cell}) => {
           cell.saving = true;
           cell.error = '';
 
@@ -1112,12 +1112,12 @@ export default defineComponent({
       reactiveData.pointSaving = false;
 
       if (failedCount > 0) {
-        failMessage(t('device.edit.pointSaveFailed', { count: failedCount }));
+        failMessage(t('device.edit.pointSaveFailed', {count: failedCount}));
         return false;
       }
 
       reactiveData.oldPointInfoData = clone(reactiveData.pointInfoData);
-      successMessage(t('device.edit.pointSaveSuccess', { count: dirtyCells.length }));
+      successMessage(t('device.edit.pointSaveSuccess', {count: dirtyCells.length}));
       return true;
     };
 
@@ -1180,15 +1180,15 @@ export default defineComponent({
       return 'info';
     };
 
-    const commandMatrixRowClassName = ({ row }: { row: CommandInfoMatrixRow }) => {
+    const commandMatrixRowClassName = ({row}: {row: CommandInfoMatrixRow}) => {
       return isCommandRowDirty(row) ? 'point-matrix-row-dirty' : '';
     };
 
     const saveCommandMatrix = async (): Promise<boolean> => {
       const dirtyCells = reactiveData.commandInfoData.flatMap((row) =>
         reactiveData.commandAttributes
-          .map((attribute) => ({ row, attribute, cell: commandCell(row, attribute) }))
-          .filter(({ cell }) => cell.dirty)
+          .map((attribute) => ({row, attribute, cell: commandCell(row, attribute)}))
+          .filter(({cell}) => cell.dirty)
       );
       if (dirtyCells.length < 1) {
         return true;
@@ -1200,7 +1200,7 @@ export default defineComponent({
       reactiveData.commandSaving = true;
       let failedCount = 0;
       await Promise.all(
-        dirtyCells.map(async ({ row, cell }) => {
+        dirtyCells.map(async ({row, cell}) => {
           cell.saving = true;
           cell.error = '';
 
@@ -1231,12 +1231,12 @@ export default defineComponent({
       reactiveData.commandSaving = false;
 
       if (failedCount > 0) {
-        failMessage(t('device.edit.commandSaveFailed', { count: failedCount }));
+        failMessage(t('device.edit.commandSaveFailed', {count: failedCount}));
         return false;
       }
 
       reactiveData.oldCommandInfoData = clone(reactiveData.commandInfoData);
-      successMessage(t('device.edit.commandSaveSuccess', { count: dirtyCells.length }));
+      successMessage(t('device.edit.commandSaveSuccess', {count: dirtyCells.length}));
       return true;
     };
 
@@ -1297,15 +1297,15 @@ export default defineComponent({
       return 'info';
     };
 
-    const eventMatrixRowClassName = ({ row }: { row: EventInfoMatrixRow }) => {
+    const eventMatrixRowClassName = ({row}: {row: EventInfoMatrixRow}) => {
       return isEventRowDirty(row) ? 'point-matrix-row-dirty' : '';
     };
 
     const saveEventMatrix = async (): Promise<boolean> => {
       const dirtyCells = reactiveData.eventInfoData.flatMap((row) =>
         reactiveData.eventAttributes
-          .map((attribute) => ({ row, attribute, cell: eventCell(row, attribute) }))
-          .filter(({ cell }) => cell.dirty)
+          .map((attribute) => ({row, attribute, cell: eventCell(row, attribute)}))
+          .filter(({cell}) => cell.dirty)
       );
       if (dirtyCells.length < 1) {
         return true;
@@ -1317,7 +1317,7 @@ export default defineComponent({
       reactiveData.eventSaving = true;
       let failedCount = 0;
       await Promise.all(
-        dirtyCells.map(async ({ row, cell }) => {
+        dirtyCells.map(async ({row, cell}) => {
           cell.saving = true;
           cell.error = '';
 
@@ -1348,12 +1348,12 @@ export default defineComponent({
       reactiveData.eventSaving = false;
 
       if (failedCount > 0) {
-        failMessage(t('device.edit.eventSaveFailed', { count: failedCount }));
+        failMessage(t('device.edit.eventSaveFailed', {count: failedCount}));
         return false;
       }
 
       reactiveData.oldEventInfoData = clone(reactiveData.eventInfoData);
-      successMessage(t('device.edit.eventSaveSuccess', { count: dirtyCells.length }));
+      successMessage(t('device.edit.eventSaveSuccess', {count: dirtyCells.length}));
       return true;
     };
 
@@ -1432,7 +1432,7 @@ export default defineComponent({
     const changeActive = (tab: any) => {
       reactiveData.active = tab.props.name;
       const query = route.query;
-      router.push({ query: { ...query, active: tab.props.name } });
+      router.push({query: {...query, active: tab.props.name}});
     };
 
     watch(

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
 import Error404 from '@/components/error/404.vue';
 
-import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus';
+import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus';
 
 describe('Error404', () => {
   it('renders a 404 result with the not-found subtitle', () => {
@@ -30,7 +30,7 @@ describe('Error404', () => {
         stubs: {
           ...layoutStubs,
           ElButton: createElButtonStub(),
-          RouterLink: { props: ['to'], template: '<a class="router-link-stub"><slot /></a>' },
+          RouterLink: {props: ['to'], template: '<a class="router-link-stub"><slot /></a>'},
         },
       },
     });

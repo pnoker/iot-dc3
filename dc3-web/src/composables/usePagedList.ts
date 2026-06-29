@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue';
+import {reactive} from 'vue';
 
-import type { Order, PageQuery, PageResult } from '@/config/types';
+import type {Order, PageQuery, PageResult} from '@/config/types';
 
 export interface PagedListPage {
   total: number;
@@ -79,8 +79,8 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
 
     state.loading = true;
     try {
-      const response = await options.request({ page: state.page, ...state.query } as PageQuery & Partial<Q>);
-      const data = response.data || ({ records: [], total: 0 } as PageResult<T>);
+      const response = await options.request({page: state.page, ...state.query} as PageQuery & Partial<Q>);
+      const data = response.data || ({records: [], total: 0} as PageResult<T>);
       state.listData = data.records || [];
       state.page.total = data.total || 0;
     } catch {
@@ -112,7 +112,7 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
 
   const sort = () => {
     state.order = !state.order;
-    state.page.orders = [{ column: options.sortColumn ?? 'create_time', asc: state.order }];
+    state.page.orders = [{column: options.sortColumn ?? 'create_time', asc: state.order}];
 
     if (options.request) {
       void load();

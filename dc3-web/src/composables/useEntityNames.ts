@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue';
+import {reactive} from 'vue';
 
-import { listDeviceByIds } from '@/api/device';
-import { listDriverByIds } from '@/api/driver';
-import { listPointByIds } from '@/api/point';
-import { listProfileByIds } from '@/api/profile';
+import {listDeviceByIds} from '@/api/device';
+import {listDriverByIds} from '@/api/driver';
+import {listPointByIds} from '@/api/point';
+import {listProfileByIds} from '@/api/profile';
 
 /**
  * Cross-component reactive cache for entity id → display name lookups.
@@ -37,7 +37,7 @@ import { listProfileByIds } from '@/api/profile';
  * id string rather than showing a spinner forever.
  */
 
-type BatchResponse = { data?: Record<string, any> };
+type BatchResponse = {data?: Record<string, any>};
 
 type EntityKind = 'device' | 'driver' | 'profile' | 'point';
 
@@ -160,9 +160,7 @@ export const useEntityNames = () => {
     id == null ? '' : (cache.point[String(id)] ?? String(id));
 
   /** Resolve a mixed batch of (source, id) rows in one call. */
-  const resolveBySource = async (
-    rows: Array<{ source: AlertSourceKind; sourceId: string | number }>
-  ): Promise<void> => {
+  const resolveBySource = async (rows: Array<{source: AlertSourceKind; sourceId: string | number}>): Promise<void> => {
     const ptIds: Array<string | number> = [];
     const devIds: Array<string | number> = [];
     const drvIds: Array<string | number> = [];

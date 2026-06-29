@@ -59,13 +59,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {computed, onMounted, reactive, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { alertLatest, alertStats } from '@/api/dashboard';
+  import {alertLatest, alertStats} from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useEntityNames } from '@/composables/useEntityNames';
-  import type { AlertSource } from '@/config/types/dashboard';
+  import {useEntityNames} from '@/composables/useEntityNames';
+  import type {AlertSource} from '@/config/types/dashboard';
 
   interface AlertRow {
     id: number | string;
@@ -79,15 +79,15 @@
   }
 
   const props = defineProps({
-    size: { type: Number, default: 10 },
+    size: {type: Number, default: 10},
   });
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const loading = ref(false);
   const rows = ref<AlertRow[]>([]);
-  const stats = reactive({ total: 0, unconfirmed: 0 });
-  const { resolveBySource, nameBySource } = useEntityNames();
+  const stats = reactive({total: 0, unconfirmed: 0});
+  const {resolveBySource, nameBySource} = useEntityNames();
 
   const refresh = async () => {
     loading.value = true;
@@ -116,7 +116,7 @@
     }
     // Map preserves insertion order; rows come back newest-first so date
     // groups also land newest-first without extra sorting.
-    return Array.from(byDate.entries()).map(([date, items]) => ({ date, items }));
+    return Array.from(byDate.entries()).map(([date, items]) => ({date, items}));
   });
 
   const sourceLabel = (r: AlertRow) => {
@@ -162,11 +162,11 @@
   const formatClock = (v?: string) => {
     const d = parseTime(v);
     if (!d) return v || '';
-    return d.toLocaleTimeString('zh-CN', { hour12: false });
+    return d.toLocaleTimeString('zh-CN', {hour12: false});
   };
 
   onMounted(refresh);
-  defineExpose({ refresh });
+  defineExpose({refresh});
 </script>
 
 <style lang="scss" scoped>

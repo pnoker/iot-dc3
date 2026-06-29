@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const agenticMocks = vi.hoisted(() => ({
-  addAgenticProvider: vi.fn(() => Promise.resolve({ data: true })),
-  deleteAgenticProvider: vi.fn(() => Promise.resolve({ data: true })),
-  listAgenticProviders: vi.fn(() => Promise.resolve({ data: [] })),
-  updateAgenticProvider: vi.fn(() => Promise.resolve({ data: true })),
+  addAgenticProvider: vi.fn(() => Promise.resolve({data: true})),
+  deleteAgenticProvider: vi.fn(() => Promise.resolve({data: true})),
+  listAgenticProviders: vi.fn(() => Promise.resolve({data: []})),
+  updateAgenticProvider: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/agentic', () => agenticMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('ProviderSettings view', () => {
   it('loads providers on mount via usePagedList', async () => {
@@ -35,9 +35,9 @@ describe('ProviderSettings view', () => {
     await mountListPage({
       component: ProviderSettings,
       stubs: {
-        providerTool: { template: '<div />' },
-        providerEditForm: { template: '<div />' },
-        modelConfigTool: { template: '<div />' },
+        providerTool: {template: '<div />'},
+        providerEditForm: {template: '<div />'},
+        modelConfigTool: {template: '<div />'},
       },
     });
     await flushPromises();

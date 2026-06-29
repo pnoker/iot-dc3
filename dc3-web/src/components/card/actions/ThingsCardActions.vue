@@ -65,20 +65,20 @@
 </template>
 
 <script lang="ts" setup>
-  import { CircleCheck, CircleClose, SwitchButton } from '@element-plus/icons-vue';
-  import { useI18n } from 'vue-i18n';
+  import {CircleCheck, CircleClose, SwitchButton} from '@element-plus/icons-vue';
+  import {useI18n} from 'vue-i18n';
 
   defineProps({
-    enabled: { type: Boolean, required: true },
-    disableTitle: { type: String, required: true },
-    enableTitle: { type: String, required: true },
-    deleteTitle: { type: String, required: true },
-    detailDisabled: { type: Boolean, default: false },
+    enabled: {type: Boolean, required: true},
+    disableTitle: {type: String, required: true},
+    enableTitle: {type: String, required: true},
+    deleteTitle: {type: String, required: true},
+    detailDisabled: {type: Boolean, default: false},
   });
 
   defineEmits(['disable', 'enable', 'delete', 'edit', 'detail']);
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 </script>
 
 <style lang="scss" scoped>

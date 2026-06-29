@@ -19,23 +19,23 @@
 </template>
 
 <script lang="ts" setup>
-  import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
+  import {useI18n} from 'vue-i18n';
+  import {useRouter} from 'vue-router';
 
   import EntityListPage from '@/components/entity/EntityListPage.vue';
 
-  import { createResourceConfig, resolveEntityRoute } from './resourceConfig';
+  import {createResourceConfig, resolveEntityRoute} from './resourceConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
 
   const goEntityDetail = (row: Record<string, any>) => {
     const routeName = resolveEntityRoute(row);
     if (!routeName) return;
-    router.push({ name: routeName, query: { id: String(row.entityId) } }).catch(() => {
+    router.push({name: routeName, query: {id: String(row.entityId)}}).catch(() => {
       // handled globally
     });
   };
 
-  const config = createResourceConfig(t, { onEntityClick: goEntityDetail });
+  const config = createResourceConfig(t, {onEntityClick: goEntityDetail});
 </script>

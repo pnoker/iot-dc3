@@ -47,7 +47,7 @@
             <div class="things-card-body-content-column">
               <div class="things-card-body-content-value">
                 <span
-                  :class="{ 'value-missing': !hasLatestValue }"
+                  :class="{'value-missing': !hasLatestValue}"
                   :title="$t('pointValue.card.processedValue')"
                   class="nowrap-item value"
                   @click="copyValue(data)"
@@ -116,16 +116,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, ref, watch } from 'vue';
-  import { Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue';
-  import { useI18n } from 'vue-i18n';
+  import {computed, onMounted, ref, watch} from 'vue';
+  import {Edit, Management, Sunrise, Sunset, Timer} from '@element-plus/icons-vue';
+  import {useI18n} from 'vue-i18n';
 
   import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
-  import { copy } from '@/utils/commonUtil';
-  import { timestamp } from '@/utils/dateUtil';
-  import { listPointValueHistory } from '@/api/point';
+  import {copy} from '@/utils/commonUtil';
+  import {timestamp} from '@/utils/dateUtil';
+  import {listPointValueHistory} from '@/api/point';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const props = defineProps({
     embedded: {

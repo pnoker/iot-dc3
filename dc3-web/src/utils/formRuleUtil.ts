@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { FormItemRule } from 'element-plus';
-import type { ComposerTranslation } from 'vue-i18n';
+import type {FormItemRule} from 'element-plus';
+import type {ComposerTranslation} from 'vue-i18n';
 
 const NAME_MIN_LENGTH = 2;
 const NAME_MAX_LENGTH = 32;
@@ -43,30 +43,30 @@ function empty(value: unknown): boolean {
 
 export function nameRules(t: ComposerTranslation, entityName: string): FormItemRule[] {
   return [
-    { required: true, whitespace: true, message: t('common.nameRequired', { name: entityName }), trigger: 'blur' },
-    { min: NAME_MIN_LENGTH, max: NAME_MAX_LENGTH, message: t('common.nameLength'), trigger: 'blur' },
-    { pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
+    {required: true, whitespace: true, message: t('common.nameRequired', {name: entityName}), trigger: 'blur'},
+    {min: NAME_MIN_LENGTH, max: NAME_MAX_LENGTH, message: t('common.nameLength'), trigger: 'blur'},
+    {pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur'},
   ];
 }
 
 export function authNameRules(t: ComposerTranslation, entityName: string): FormItemRule[] {
   return [
-    { required: true, whitespace: true, message: t('common.nameRequired', { name: entityName }), trigger: 'blur' },
-    { min: NAME_MIN_LENGTH, max: NAME_MAX_LENGTH, message: t('common.authNameLength'), trigger: 'blur' },
-    { pattern: AUTH_NAME_PATTERN, message: t('common.authNameFormat'), trigger: 'blur' },
+    {required: true, whitespace: true, message: t('common.nameRequired', {name: entityName}), trigger: 'blur'},
+    {min: NAME_MIN_LENGTH, max: NAME_MAX_LENGTH, message: t('common.authNameLength'), trigger: 'blur'},
+    {pattern: AUTH_NAME_PATTERN, message: t('common.authNameFormat'), trigger: 'blur'},
   ];
 }
 
 export function remarkRules(t: ComposerTranslation): FormItemRule[] {
-  return [{ max: REMARK_MAX_LENGTH, message: t('common.remarkLength'), trigger: 'blur' }];
+  return [{max: REMARK_MAX_LENGTH, message: t('common.remarkLength'), trigger: 'blur'}];
 }
 
 export function requiredStringRule(message: string, trigger: 'blur' | 'change' = 'blur'): FormItemRule[] {
-  return [{ required: true, whitespace: true, message, trigger }];
+  return [{required: true, whitespace: true, message, trigger}];
 }
 
 export function requiredSelectRule(message: string): FormItemRule[] {
-  return [{ required: true, message, trigger: 'change' }];
+  return [{required: true, message, trigger: 'change'}];
 }
 
 export function decimalRules(message: string, requiredMessage?: string): FormItemRule[] {
@@ -90,7 +90,7 @@ export function decimalRules(message: string, requiredMessage?: string): FormIte
 
 export function byteRules(t: ComposerTranslation, requiredMessage: string): FormItemRule[] {
   return [
-    { required: true, message: requiredMessage, trigger: 'blur' },
+    {required: true, message: requiredMessage, trigger: 'blur'},
     {
       validator: (_rule, value, callback) => {
         if (empty(value)) {
@@ -100,7 +100,7 @@ export function byteRules(t: ComposerTranslation, requiredMessage: string): Form
 
         const numericValue = Number(value);
         if (!Number.isInteger(numericValue) || numericValue < BYTE_MIN || numericValue > BYTE_MAX) {
-          callback(new Error(t('common.byteRange', { min: BYTE_MIN, max: BYTE_MAX })));
+          callback(new Error(t('common.byteRange', {min: BYTE_MIN, max: BYTE_MAX})));
           return;
         }
 
@@ -113,7 +113,7 @@ export function byteRules(t: ComposerTranslation, requiredMessage: string): Form
 
 export function positiveIntegerRules(t: ComposerTranslation, requiredMessage: string): FormItemRule[] {
   return [
-    { required: true, message: requiredMessage, trigger: 'blur' },
+    {required: true, message: requiredMessage, trigger: 'blur'},
     {
       validator: (_rule, value, callback) => {
         if (empty(value)) {

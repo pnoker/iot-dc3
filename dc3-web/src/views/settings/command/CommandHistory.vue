@@ -62,7 +62,7 @@
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
         <!-- @vue-generic {CommandHistoryRecord} -->
         <el-table-column :label="$t('commandHistory.device')" min-width="160" show-overflow-tooltip>
-          <template #default="{ row }">{{ deviceNameFor(row) }}</template>
+          <template #default="{row}">{{ deviceNameFor(row) }}</template>
         </el-table-column>
         <el-table-column :label="$t('commandHistory.commandCode')" min-width="140" prop="commandCode" />
         <el-table-column :label="$t('commandHistory.status')" prop="status" width="100" />
@@ -81,7 +81,7 @@
         <el-table-column :formatter="timestampColumn" :label="$t('common.createTime')" prop="createTime" width="165" />
         <!-- @vue-generic {CommandHistoryRecord} -->
         <el-table-column :label="$t('common.operation')" fixed="right" width="100">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-button link type="primary" @click="openDetail(row)">{{ $t('common.detail') }}</el-button>
           </template>
         </el-table-column>
@@ -151,16 +151,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
-  import { getCommandHistoryByRecordId, listCommandHistory } from '@/api/command';
-  import { listDeviceByIds } from '@/api/device';
-  import { usePagedList } from '@/composables/usePagedList';
-  import { timestampColumn, timestampLabel } from '@/utils/dateUtil';
-  import { prettyJson } from '@/utils/jsonUtil';
-  import type { CommandHistoryRecord } from '@/config/types';
+  import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
+  import {getCommandHistoryByRecordId, listCommandHistory} from '@/api/command';
+  import {listDeviceByIds} from '@/api/device';
+  import {usePagedList} from '@/composables/usePagedList';
+  import {timestampColumn, timestampLabel} from '@/utils/dateUtil';
+  import {prettyJson} from '@/utils/jsonUtil';
+  import type {CommandHistoryRecord} from '@/config/types';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
-  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
+  import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
   const {
     state: reactiveData,

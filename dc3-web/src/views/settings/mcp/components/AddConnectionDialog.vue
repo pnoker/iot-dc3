@@ -53,33 +53,33 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { addMcpConnection, listMcpClient } from '@/api/mcp';
-  import { listPrincipal } from '@/api/principal';
+  import {addMcpConnection, listMcpClient} from '@/api/mcp';
+  import {listPrincipal} from '@/api/principal';
   import {
     MCP_GRANT_TYPE_OPTIONS,
     MCP_GRANT_TYPES,
     MCP_PRINCIPAL_TYPE_OPTIONS,
     MCP_PRINCIPAL_TYPES,
   } from '@/config/constant/enums';
-  import type { McpConnectionForm, OAuthClientRecord } from '@/config/types';
-  import { successMessage } from '@/utils/notificationUtil';
+  import type {McpConnectionForm, OAuthClientRecord} from '@/config/types';
+  import {successMessage} from '@/utils/notificationUtil';
 
-  const { t } = useI18n();
-  const emit = defineEmits<{ (e: 'saved'): void }>();
+  const {t} = useI18n();
+  const emit = defineEmits<{(e: 'saved'): void}>();
 
   const visible = ref(false);
   const submitting = ref(false);
   const clients = ref<OAuthClientRecord[]>([]);
-  const principalOptions = ref<Array<{ label: string; value: string }>>([]);
+  const principalOptions = ref<Array<{label: string; value: string}>>([]);
   const form = ref<McpConnectionForm>({});
 
   const loadOptions = async () => {
     const [clientRes, principalRes] = await Promise.all([
       listMcpClient(),
-      listPrincipal({ page: { current: 1, size: 1000 } }),
+      listPrincipal({page: {current: 1, size: 1000}}),
     ]);
     clients.value = clientRes.data || [];
     principalOptions.value = (((principalRes as any)?.data?.records || []) as any[]).map((p) => ({
@@ -114,5 +114,5 @@
     }
   };
 
-  defineExpose({ open });
+  defineExpose({open});
 </script>

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import {existsSync, readdirSync, readFileSync, statSync} from 'node:fs';
+import {dirname, join, relative, resolve} from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 // unplugin-vue-components auto-registers Element Plus (el-*) and every SFC under
 // src/components — but only by INJECTING the import into the consuming SFC's

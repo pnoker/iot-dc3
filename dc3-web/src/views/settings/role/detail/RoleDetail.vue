@@ -53,7 +53,7 @@
             <el-table-column :label="$t('settings.user.phone')" min-width="140" prop="phone" />
             <el-table-column :label="$t('settings.user.email')" min-width="180" prop="email" show-overflow-tooltip />
             <el-table-column :label="$t('common.enable')" width="90">
-              <template #default="{ row }">
+              <template #default="{row}">
                 <enable-tag :value="row.enableFlag" />
               </template>
             </el-table-column>
@@ -81,14 +81,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive } from 'vue';
-  import type { TabsPaneContext } from 'element-plus';
-  import { useRoute, useRouter } from 'vue-router';
+  import {onMounted, reactive} from 'vue';
+  import type {TabsPaneContext} from 'element-plus';
+  import {useRoute, useRouter} from 'vue-router';
 
-  import { getRoleById } from '@/api/role';
-  import { listResourceByRoleId } from '@/api/roleResourceBind';
-  import { listUserByRoleId } from '@/api/rolePrincipalBind';
-  import { timestampLabel } from '@/utils/dateUtil';
+  import {getRoleById} from '@/api/role';
+  import {listResourceByRoleId} from '@/api/roleResourceBind';
+  import {listUserByRoleId} from '@/api/rolePrincipalBind';
+  import {timestampLabel} from '@/utils/dateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';
@@ -154,7 +154,7 @@
 
   const changeActive = (tab: TabsPaneContext) => {
     const name = String(tab.props.name || '');
-    router.push({ query: { ...route.query, active: name } }).catch(() => {});
+    router.push({query: {...route.query, active: name}}).catch(() => {});
     if (name === 'user') loadUsers();
     if (name === 'resource') loadResources();
   };

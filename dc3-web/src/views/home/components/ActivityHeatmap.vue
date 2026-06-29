@@ -24,16 +24,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { Chart } from '@antv/g2';
+  import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {Chart} from '@antv/g2';
 
-  import { statsActivity } from '@/api/dashboard';
+  import {statsActivity} from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const rangeKey = ref<RangeKey>('24h');
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
@@ -50,10 +50,10 @@
     t('home.activity.dow.sat'),
   ]);
 
-  const render = (rows: { dow: number; hour: number; count: number }[]) => {
+  const render = (rows: {dow: number; hour: number; count: number}[]) => {
     if (!chartRef.value) return;
     chart?.destroy();
-    chart = new Chart({ container: chartRef.value, autoFit: true });
+    chart = new Chart({container: chartRef.value, autoFit: true});
 
     const labels = dayLabels.value;
     const data = rows.map((r) => ({
@@ -72,14 +72,14 @@
         type: 'sequential',
         palette: 'blues',
       })
-      .style({ stroke: '#ffffff', lineWidth: 1, inset: 0.5 })
+      .style({stroke: '#ffffff', lineWidth: 1, inset: 0.5})
       .axis({
-        x: { title: false, labelAutoHide: false },
-        y: { title: false },
+        x: {title: false, labelAutoHide: false},
+        y: {title: false},
       })
       .tooltip({
         title: (d: any) => `${d.dow} ${d.hour}:00`,
-        items: [{ field: 'count', name: t('home.activity.count') }],
+        items: [{field: 'count', name: t('home.activity.count')}],
       });
     chart.render();
   };
@@ -87,8 +87,8 @@
   const load = async () => {
     loading.value = true;
     try {
-      const res: any = await statsActivity({ rangeKey: rangeKey.value });
-      const rows = (res?.data ?? []) as { dow: number; hour: number; count: number }[];
+      const res: any = await statsActivity({rangeKey: rangeKey.value});
+      const rows = (res?.data ?? []) as {dow: number; hour: number; count: number}[];
       await nextTick();
       render(rows);
     } catch {

@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import TitleCard from '@/components/card/title/TitleCard.vue';
 
-import { layoutStubs } from '../setup/stubs/element-plus';
+import {layoutStubs} from '../setup/stubs/element-plus';
 
 describe('TitleCard', () => {
   it('renders the title prop in the default header span', () => {
     const wrapper = mount(TitleCard, {
-      props: { title: 'Devices' },
-      slots: { default: '<p class="content">content</p>' },
-      global: { stubs: { ...layoutStubs } },
+      props: {title: 'Devices'},
+      slots: {default: '<p class="content">content</p>'},
+      global: {stubs: {...layoutStubs}},
     });
 
     const header = wrapper.find('.title-card__header');
@@ -37,9 +37,9 @@ describe('TitleCard', () => {
 
   it('lets a header slot override the default title rendering', () => {
     const wrapper = mount(TitleCard, {
-      props: { title: 'unused' },
-      slots: { header: '<h2 class="custom">Custom header</h2>' },
-      global: { stubs: { ...layoutStubs } },
+      props: {title: 'unused'},
+      slots: {header: '<h2 class="custom">Custom header</h2>'},
+      global: {stubs: {...layoutStubs}},
     });
 
     expect(wrapper.find('.custom').text()).toBe('Custom header');

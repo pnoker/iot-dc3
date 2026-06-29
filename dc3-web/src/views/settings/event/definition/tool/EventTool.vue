@@ -46,7 +46,7 @@
         <enable-flag-segmented v-model="formData.enableFlag" include-all />
       </el-form-item>
     </template>
-    <template v-if="pre || next" #buttons="{ search, reset }">
+    <template v-if="pre || next" #buttons="{search, reset}">
       <el-button v-if="pre" :icon="Back" plain @click="$emit('pre-handle')">
         {{ $t('common.previous') }}
       </el-button>
@@ -65,17 +65,17 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive } from 'vue';
-  import { Back, Check, Plus, RefreshLeft, Search } from '@element-plus/icons-vue';
+  import {reactive} from 'vue';
+  import {Back, Check, Plus, RefreshLeft, Search} from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
+  import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
   defineProps({
-    page: { type: Object, required: true },
-    editable: { type: Boolean, default: true },
-    pre: { type: Boolean, default: false },
-    next: { type: Boolean, default: false },
+    page: {type: Object, required: true},
+    editable: {type: Boolean, default: true},
+    pre: {type: Boolean, default: false},
+    next: {type: Boolean, default: false},
   });
 
   const emit = defineEmits([
@@ -90,14 +90,14 @@
     'next-handle',
   ]);
 
-  const formData = reactive<Record<string, any>>({ enableFlag: '' });
+  const formData = reactive<Record<string, any>>({enableFlag: ''});
 
   const onSearch = (data: Record<string, any>) => {
     emit('search', cleanSearchParams(data));
   };
 
   const onReset = () => {
-    resetSearchForm(formData, { enableFlag: '' });
+    resetSearchForm(formData, {enableFlag: ''});
     emit('reset');
   };
 </script>

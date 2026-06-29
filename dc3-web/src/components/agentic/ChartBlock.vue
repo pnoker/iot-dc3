@@ -39,10 +39,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { Chart } from '@antv/g2';
-  import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-  import type { ChartSpec } from './assistantContent';
-  import type { AgenticVisualizationSpec, AgenticVisualizationType } from '@/config/types';
+  import {Chart} from '@antv/g2';
+  import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue';
+  import type {ChartSpec} from './assistantContent';
+  import type {AgenticVisualizationSpec, AgenticVisualizationType} from '@/config/types';
 
   const props = defineProps<{
     kind?: 'line' | 'area' | 'column';
@@ -113,7 +113,7 @@
     return Object.entries(row)
       .filter(([, value]) => value !== null && value !== undefined)
       .slice(0, 6)
-      .map(([label, value]) => ({ label: formatLabel(label), value: formatValue(value) }));
+      .map(([label, value]) => ({label: formatLabel(label), value: formatValue(value)}));
   });
 
   const annotationItems = computed(() => {
@@ -139,9 +139,9 @@
       type: kind,
       title: spec.title,
       dataset,
-      encode: { x: 'x', y: 'y', color: 'series' },
-      scale: { x: spec.xType, y: 'linear' },
-      meta: { unit: spec.unit, xLabel: spec.xLabel, yLabel: spec.yLabel },
+      encode: {x: 'x', y: 'y', color: 'series'},
+      scale: {x: spec.xType, y: 'linear'},
+      meta: {unit: spec.unit, xLabel: spec.xLabel, yLabel: spec.yLabel},
     };
   };
 
@@ -186,7 +186,7 @@
   const renderCartesianChart = (target: Chart, current: NormalizedChart) => {
     const mark = createCartesianMark(target, current.type);
     if (current.type === 'bar') {
-      target.coordinate({ transform: [{ type: 'transpose' }] });
+      target.coordinate({transform: [{type: 'transpose'}]});
     }
     mark.data(current.dataset).encode('x', current.encode.x).encode('y', current.encode.y);
     if (current.encode.color) {
@@ -196,30 +196,30 @@
       mark.style('inset', 2);
     }
     mark
-      .axis('x', { title: axisTitle(current, 'x') })
-      .axis('y', { title: axisTitle(current, 'y') })
-      .legend(current.encode.color ? { color: { position: 'top' } } : false);
+      .axis('x', {title: axisTitle(current, 'x')})
+      .axis('y', {title: axisTitle(current, 'y')})
+      .legend(current.encode.color ? {color: {position: 'top'}} : false);
     applyScale(mark, current, 'x');
     applyScale(mark, current, 'y');
   };
 
   const renderPieLikeChart = (target: Chart, current: NormalizedChart) => {
     const colorField = current.encode.color || current.encode.x;
-    target.coordinate({ type: 'theta', outerRadius: 0.82, innerRadius: current.type === 'donut' ? 0.52 : 0 });
+    target.coordinate({type: 'theta', outerRadius: 0.82, innerRadius: current.type === 'donut' ? 0.52 : 0});
     target
       .interval()
       .data(current.dataset)
-      .transform({ type: 'stackY' })
+      .transform({type: 'stackY'})
       .encode('y', current.encode.y)
       .encode('color', colorField)
-      .legend('color', { position: 'bottom' });
+      .legend('color', {position: 'bottom'});
   };
 
   const createCartesianMark = (target: Chart, type: AgenticVisualizationType): ChartMark => {
     if (type === 'line') return target.line() as unknown as ChartMark;
     if (type === 'area') return target.area() as unknown as ChartMark;
     if (type === 'scatter') return target.point() as unknown as ChartMark;
-    if (type === 'heatmap') return (target as unknown as { cell: () => ChartMark }).cell();
+    if (type === 'heatmap') return (target as unknown as {cell: () => ChartMark}).cell();
     return target.interval() as unknown as ChartMark;
   };
 
@@ -235,13 +235,13 @@
   };
 
   const applyScale = (
-    mark: { scale: (channel: string, value: Record<string, unknown>) => void },
+    mark: {scale: (channel: string, value: Record<string, unknown>) => void},
     current: NormalizedChart,
     axis: 'x' | 'y'
   ) => {
     const type = current.scale?.[axis];
     if (type === 'time' || type === 'linear') {
-      mark.scale(axis, { type });
+      mark.scale(axis, {type});
     }
   };
 
@@ -254,7 +254,7 @@
 
   const formatValue = (value: unknown) => {
     if (typeof value === 'number' && Number.isFinite(value)) {
-      return new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 }).format(value);
+      return new Intl.NumberFormat(undefined, {maximumFractionDigits: 3}).format(value);
     }
     return String(value);
   };
@@ -273,7 +273,7 @@
     () => {
       nextTick(renderChart);
     },
-    { deep: true }
+    {deep: true}
   );
 
   onBeforeUnmount(destroyChart);

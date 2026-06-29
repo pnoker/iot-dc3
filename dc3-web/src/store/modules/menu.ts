@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { defineStore } from 'pinia';
+import {defineStore} from 'pinia';
 
-import { listMenuTree } from '@/api/menu';
+import {listMenuTree} from '@/api/menu';
 
 export interface MenuNode {
   id: number | string;

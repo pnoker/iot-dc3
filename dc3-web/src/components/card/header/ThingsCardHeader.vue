@@ -30,10 +30,10 @@
 
 <script lang="ts" setup>
   defineProps({
-    name: { type: String, default: '' },
-    icon: { type: String, required: true },
-    enabled: { type: Boolean, default: false },
-    statusTitle: { type: String, default: '' },
+    name: {type: String, default: ''},
+    icon: {type: String, required: true},
+    enabled: {type: Boolean, default: false},
+    statusTitle: {type: String, default: ''},
   });
 
   defineEmits(['copy-id']);

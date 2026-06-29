@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const profileMocks = vi.hoisted(() => ({
-  addProfile: vi.fn(() => Promise.resolve({ data: true })),
-  deleteProfile: vi.fn(() => Promise.resolve({ data: true })),
-  listProfile: vi.fn(() => Promise.resolve({ data: { records: [{ id: 'p-1', profileName: 'Sensor' }], total: 1 } })),
-  updateProfile: vi.fn(() => Promise.resolve({ data: true })),
+  addProfile: vi.fn(() => Promise.resolve({data: true})),
+  deleteProfile: vi.fn(() => Promise.resolve({data: true})),
+  listProfile: vi.fn(() => Promise.resolve({data: {records: [{id: 'p-1', profileName: 'Sensor'}], total: 1}})),
+  updateProfile: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/profile', () => profileMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('Profile list view', () => {
   it('lists profiles on mount', async () => {
@@ -35,9 +35,9 @@ describe('Profile list view', () => {
     await mountListPage({
       component: Profile,
       stubs: {
-        ProfileTool: { template: '<div />' },
-        ProfileCard: { template: '<div />' },
-        ProfileAddForm: { template: '<div />' },
+        ProfileTool: {template: '<div />'},
+        ProfileCard: {template: '<div />'},
+        ProfileAddForm: {template: '<div />'},
       },
     });
     await flushPromises();

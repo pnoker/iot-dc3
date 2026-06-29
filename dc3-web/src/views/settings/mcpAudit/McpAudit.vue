@@ -19,13 +19,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { useI18n } from 'vue-i18n';
+  import {useI18n} from 'vue-i18n';
 
   import EntityListPage from '@/components/entity/EntityListPage.vue';
 
-  import { createMcpAuditConfig } from './mcpAuditConfig';
+  import {createMcpAuditConfig} from './mcpAuditConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const config = createMcpAuditConfig(t);
 </script>

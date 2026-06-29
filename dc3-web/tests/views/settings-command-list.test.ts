@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const commandMocks = vi.hoisted(() => ({
-  addCommand: vi.fn(() => Promise.resolve({ data: true })),
-  addCommandParam: vi.fn(() => Promise.resolve({ data: true })),
-  deleteCommand: vi.fn(() => Promise.resolve({ data: true })),
-  deleteCommandParam: vi.fn(() => Promise.resolve({ data: true })),
-  listCommand: vi.fn(() => Promise.resolve({ data: { records: [], total: 0 } })),
-  updateCommand: vi.fn(() => Promise.resolve({ data: true })),
-  updateCommandParam: vi.fn(() => Promise.resolve({ data: true })),
+  addCommand: vi.fn(() => Promise.resolve({data: true})),
+  addCommandParam: vi.fn(() => Promise.resolve({data: true})),
+  deleteCommand: vi.fn(() => Promise.resolve({data: true})),
+  deleteCommandParam: vi.fn(() => Promise.resolve({data: true})),
+  listCommand: vi.fn(() => Promise.resolve({data: {records: [], total: 0}})),
+  updateCommand: vi.fn(() => Promise.resolve({data: true})),
+  updateCommandParam: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/command', () => commandMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('CommandList view', () => {
   it('lists command definitions on mount', async () => {
@@ -38,9 +38,9 @@ describe('CommandList view', () => {
     await mountListPage({
       component: CommandList,
       stubs: {
-        CommandCard: { template: '<div />' },
-        CommandTool: { template: '<div />' },
-        CommandEditForm: { template: '<div />' },
+        CommandCard: {template: '<div />'},
+        CommandTool: {template: '<div />'},
+        CommandEditForm: {template: '<div />'},
       },
     });
     await flushPromises();

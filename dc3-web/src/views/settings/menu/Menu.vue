@@ -18,10 +18,10 @@
   <entity-list-page :config="config" />
 </template>
 <script lang="ts" setup>
-  import { useI18n } from 'vue-i18n';
+  import {useI18n} from 'vue-i18n';
   import EntityListPage from '@/components/entity/EntityListPage.vue';
-  import { createMenuConfig } from './menuConfig';
+  import {createMenuConfig} from './menuConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const config = createMenuConfig(t);
 </script>

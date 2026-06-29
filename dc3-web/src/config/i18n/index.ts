@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { watch } from 'vue';
-import { createI18n } from 'vue-i18n';
+import {watch} from 'vue';
+import {createI18n} from 'vue-i18n';
 
 import en from './locales/en';
 import zh from './locales/zh';
@@ -40,7 +40,7 @@ const i18n = createI18n({
   legacy: false,
   locale: readLocale(),
   fallbackLocale: DEFAULT_LOCALE,
-  messages: { en, zh },
+  messages: {en, zh},
 });
 
 // Persist locale to localStorage whenever it changes, regardless of where the change is triggered.
@@ -53,7 +53,7 @@ watch(
       // localStorage may be unavailable; fail silently.
     }
   },
-  { flush: 'post' }
+  {flush: 'post'}
 );
 
 export default i18n;

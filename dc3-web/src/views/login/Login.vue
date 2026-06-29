@@ -100,14 +100,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref, unref } from 'vue';
-  import type { FormInstance, FormRules } from 'element-plus';
-  import { Box, Lock, User } from '@element-plus/icons-vue';
-  import { useI18n } from 'vue-i18n';
+  import {computed, reactive, ref, unref} from 'vue';
+  import type {FormInstance, FormRules} from 'element-plus';
+  import {Box, Lock, User} from '@element-plus/icons-vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { useAuthStore } from '@/store';
-  import { PASSWORD_CHANGE_CODES } from '@/config/constant/axios';
-  import { failMessage, successMessage } from '@/utils/notificationUtil';
+  import {useAuthStore} from '@/store';
+  import {PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
+  import {failMessage, successMessage} from '@/utils/notificationUtil';
 
   import Particles from '@/components/particles/Particles.vue';
 
@@ -123,7 +123,7 @@
     formData: LoginFormModel;
   }
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const authStore = useAuthStore();
   // 定义表单引用
   const formDataRef = ref<FormInstance>();
@@ -144,11 +144,11 @@
 
   // 定义表单校验规则
   const formRule = reactive<FormRules>({
-    tenant: [{ required: true, message: t('login.tenantRequired'), trigger: 'blur' }],
-    name: [{ required: true, message: t('login.usernameRequired'), trigger: 'blur' }],
+    tenant: [{required: true, message: t('login.tenantRequired'), trigger: 'blur'}],
+    name: [{required: true, message: t('login.usernameRequired'), trigger: 'blur'}],
     password: [
-      { required: true, message: t('login.passwordRequired'), trigger: 'blur' },
-      { min: 6, message: t('login.passwordMin'), trigger: 'blur' },
+      {required: true, message: t('login.passwordRequired'), trigger: 'blur'},
+      {min: 6, message: t('login.passwordMin'), trigger: 'blur'},
     ],
   });
 
@@ -176,7 +176,7 @@
     try {
       await authStore.login(reactiveData.formData);
     } catch (error) {
-      const code = (error as { code?: string })?.code;
+      const code = (error as {code?: string})?.code;
       if (code && PASSWORD_CHANGE_CODES.includes(code as never)) {
         openChangePassword(code);
       }
@@ -191,7 +191,7 @@
   const changePasswordLoading = ref(false);
   const changePasswordCode = ref('');
   const changePasswordRef = ref<FormInstance>();
-  const changePasswordData = reactive({ newPassword: '', confirmPassword: '' });
+  const changePasswordData = reactive({newPassword: '', confirmPassword: ''});
 
   const changePasswordHint = computed(() =>
     changePasswordCode.value === 'R4032' ? t('login.passwordExpired') : t('login.changePasswordRequired')
@@ -199,8 +199,8 @@
 
   const changePasswordRule = reactive<FormRules>({
     newPassword: [
-      { required: true, message: t('login.passwordRequired'), trigger: 'blur' },
-      { min: 6, message: t('login.passwordMin'), trigger: 'blur' },
+      {required: true, message: t('login.passwordRequired'), trigger: 'blur'},
+      {min: 6, message: t('login.passwordMin'), trigger: 'blur'},
     ],
     confirmPassword: [
       {

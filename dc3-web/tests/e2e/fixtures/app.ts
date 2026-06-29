@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { expect, type Locator, type Page } from '@playwright/test';
+import {expect, type Locator, type Page} from '@playwright/test';
 import JSONBigInt from 'json-bigint';
-import type { RouteIds } from './routes';
+import type {RouteIds} from './routes';
 
 export interface PageHealth {
   pageErrors: string[];
   consoleErrors: string[];
-  badResponses: Array<{ status: number; url: string; body: string }>;
+  badResponses: Array<{status: number; url: string; body: string}>;
   businessApiRequests: string[];
 }
 
@@ -59,7 +59,7 @@ export interface E2eDataContext {
   cleanup: () => Promise<void>;
 }
 
-const JSONBigIntStr = JSONBigInt({ storeAsString: true });
+const JSONBigIntStr = JSONBigInt({storeAsString: true});
 const E2E_CREDENTIALS = {
   tenant: process.env.E2E_TENANT || 'default',
   name: process.env.E2E_USERNAME || 'dc3',
@@ -86,14 +86,14 @@ export async function waitForAppSettled(page: Page) {
   // Wait until Vue's mount target has rendered something — that's the
   // earliest deterministic signal that Element Plus / vue-router have
   // wired up. Falls back gracefully if the app shell is unusually slow.
-  await expect(page.locator('#app *').first()).toBeVisible({ timeout: 10_000 });
+  await expect(page.locator('#app *').first()).toBeVisible({timeout: 10_000});
 }
 
 export async function clickTab(page: Page, pattern: RegExp | string) {
   for (let attempt = 0; attempt < 3; attempt++) {
-    const tab = page.locator('.el-tabs__item').filter({ hasText: pattern }).first();
+    const tab = page.locator('.el-tabs__item').filter({hasText: pattern}).first();
     try {
-      await tab.waitFor({ state: 'visible', timeout: 5_000 });
+      await tab.waitFor({state: 'visible', timeout: 5_000});
       await tab.click();
       await waitForAppSettled(page);
       return true;
@@ -106,17 +106,17 @@ export async function clickTab(page: Page, pattern: RegExp | string) {
 
 export async function fillFirstEditableInput(root: Locator, value: string) {
   const input = root.locator('input:not([readonly]):not([disabled]):not([type="hidden"])').first();
-  await expect(input).toBeVisible({ timeout: 10_000 });
+  await expect(input).toBeVisible({timeout: 10_000});
   await input.fill(value);
 }
 
 export async function login(page: Page) {
-  await page.goto('/#/login', { waitUntil: 'domcontentloaded' });
+  await page.goto('/#/login', {waitUntil: 'domcontentloaded'});
   await waitForAppSettled(page);
 
-  const loginButton = page.getByRole('button', { name: 'Login' });
+  const loginButton = page.getByRole('button', {name: 'Login'});
   const loginFormVisible = await loginButton
-    .waitFor({ state: 'visible', timeout: 10_000 })
+    .waitFor({state: 'visible', timeout: 10_000})
     .then(() => true)
     .catch(() => false);
   if (loginFormVisible) {
@@ -154,7 +154,7 @@ export async function apiPost<T = unknown>(
   params: Record<string, string | number | boolean | undefined> = {}
 ) {
   const response = await page.evaluate(
-    async ({ requestUrl, requestBody, requestParams }) => {
+    async ({requestUrl, requestBody, requestParams}) => {
       const decodeStorage = (key: string) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
@@ -185,9 +185,9 @@ export async function apiPost<T = unknown>(
         body: JSON.stringify(requestBody),
       });
       const text = await response.text();
-      return { status: response.status, text };
+      return {status: response.status, text};
     },
-    { requestUrl: url, requestBody: body, requestParams: params }
+    {requestUrl: url, requestBody: body, requestParams: params}
   );
 
   let data: unknown;
@@ -197,7 +197,7 @@ export async function apiPost<T = unknown>(
     data = response.text;
   }
 
-  return { status: response.status, data } as ApiResult<T>;
+  return {status: response.status, data} as ApiResult<T>;
 }
 
 export async function apiGet<T = unknown>(
@@ -206,7 +206,7 @@ export async function apiGet<T = unknown>(
   params: Record<string, string | number | boolean | undefined> = {}
 ) {
   const response = await page.evaluate(
-    async ({ requestUrl, requestParams }) => {
+    async ({requestUrl, requestParams}) => {
       const decodeStorage = (key: string) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
@@ -235,9 +235,9 @@ export async function apiGet<T = unknown>(
         headers,
       });
       const text = await response.text();
-      return { status: response.status, text };
+      return {status: response.status, text};
     },
-    { requestUrl: url, requestParams: params }
+    {requestUrl: url, requestParams: params}
   );
 
   let data: unknown;
@@ -247,32 +247,32 @@ export async function apiGet<T = unknown>(
     data = response.text;
   }
 
-  return { status: response.status, data } as ApiResult<T>;
+  return {status: response.status, data} as ApiResult<T>;
 }
 
 function idOf(record: unknown) {
   if (!record || typeof record !== 'object' || !('id' in record)) return undefined;
-  const id = (record as { id?: unknown }).id;
+  const id = (record as {id?: unknown}).id;
   return id == null ? undefined : String(id);
 }
 
 async function firstRecord(page: Page, url: string) {
-  const response = await apiPost(page, url, { page: { current: 1, size: 1 } });
-  const payload = response.data as { ok?: boolean; data?: { records?: unknown[] } };
+  const response = await apiPost(page, url, {page: {current: 1, size: 1}});
+  const payload = response.data as {ok?: boolean; data?: {records?: unknown[]}};
   if (!payload?.ok) return undefined;
   return payload.data?.records?.[0];
 }
 
 async function firstArrayRecord(page: Page, url: string) {
   const response = await apiGet<unknown[]>(page, url);
-  const payload = response.data as { ok?: boolean; data?: unknown[] };
+  const payload = response.data as {ok?: boolean; data?: unknown[]};
   if (!payload?.ok) return undefined;
   return payload.data?.[0];
 }
 
 async function listByName(page: Page, url: string, nameField: string, name: string) {
-  const response = await apiPost<{ records?: unknown[] }>(page, url, {
-    page: { current: 1, size: 1 },
+  const response = await apiPost<{records?: unknown[]}>(page, url, {
+    page: {current: 1, size: 1},
     [nameField]: name,
   });
   if (!response.data?.ok) return undefined;
@@ -281,7 +281,7 @@ async function listByName(page: Page, url: string, nameField: string, name: stri
 
 async function arrayRecordByName(page: Page, url: string, nameField: string, name: string) {
   const response = await apiGet<unknown[]>(page, url);
-  const payload = response.data as { ok?: boolean; data?: unknown[] };
+  const payload = response.data as {ok?: boolean; data?: unknown[]};
   if (!payload?.ok) return undefined;
   return payload.data?.find((record) => {
     if (!record || typeof record !== 'object') return false;
@@ -309,7 +309,7 @@ async function createEntity(page: Page, seed: EntitySeed, cleanupStack: Array<()
   }
 
   cleanupStack.push(async () => {
-    await apiPost(page, seed.deleteUrl, {}, { id: createdId }).catch(() => undefined);
+    await apiPost(page, seed.deleteUrl, {}, {id: createdId}).catch(() => undefined);
   });
 
   return createdId;
@@ -331,14 +331,14 @@ async function createArrayEntity(page: Page, seed: EntitySeed, cleanupStack: Arr
   }
 
   cleanupStack.push(async () => {
-    await apiPost(page, seed.deleteUrl, {}, { id: createdId }).catch(() => undefined);
+    await apiPost(page, seed.deleteUrl, {}, {id: createdId}).catch(() => undefined);
   });
 
   return createdId;
 }
 
 function structuredExt(type: string, content: Record<string, unknown>, remark = '') {
-  return { type, version: 1, remark, content };
+  return {type, version: 1, remark, content};
 }
 
 const E2E_SETTINGS_MENUS: MenuSeed[] = [
@@ -544,13 +544,13 @@ async function ensureMenuSeed(page: Page, seed: MenuSeed, cleanupStack: Array<()
     if (
       existing &&
       typeof existing === 'object' &&
-      (existing as { remark?: unknown }).remark === 'created by e2e route fixture'
+      (existing as {remark?: unknown}).remark === 'created by e2e route fixture'
     ) {
       cleanupStack.push(async () => {
-        await apiPost(page, '/api/v3/auth/menu/delete', {}, { id: existingId }).catch(() => undefined);
+        await apiPost(page, '/api/v3/auth/menu/delete', {}, {id: existingId}).catch(() => undefined);
       });
     }
-    return { id: existingId, created: false };
+    return {id: existingId, created: false};
   }
 
   const parent = await listByName(page, '/api/v3/auth/menu/list', 'menuCode', seed.parentCode);
@@ -570,7 +570,7 @@ async function ensureMenuSeed(page: Page, seed: MenuSeed, cleanupStack: Array<()
     remark: 'created by e2e route fixture',
     menuExt: {
       content: {
-        titles: { zh: seed.name, en: seed.name },
+        titles: {zh: seed.name, en: seed.name},
         icon: seed.icon,
         url: seed.url,
       },
@@ -587,10 +587,10 @@ async function ensureMenuSeed(page: Page, seed: MenuSeed, cleanupStack: Array<()
   }
 
   cleanupStack.push(async () => {
-    await apiPost(page, '/api/v3/auth/menu/delete', {}, { id: createdId }).catch(() => undefined);
+    await apiPost(page, '/api/v3/auth/menu/delete', {}, {id: createdId}).catch(() => undefined);
   });
 
-  return { id: createdId, created: true };
+  return {id: createdId, created: true};
 }
 
 async function ensureSettingsMenus(page: Page, cleanupStack: Array<() => Promise<void>>) {
@@ -600,7 +600,7 @@ async function ensureSettingsMenus(page: Page, cleanupStack: Array<() => Promise
     created ||= result.created;
   }
   if (created) {
-    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.reload({waitUntil: 'domcontentloaded'});
     await waitForAppSettled(page);
   }
 }
@@ -652,7 +652,7 @@ async function discoverRouteIds(page: Page): Promise<RouteIds> {
 
   const pointProfileId =
     point && typeof point === 'object' && 'profileId' in point
-      ? String((point as { profileId?: unknown }).profileId || '')
+      ? String((point as {profileId?: unknown}).profileId || '')
       : undefined;
 
   return {
@@ -712,8 +712,8 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
     driver_id: driverId,
   });
   const driverAttributes =
-    (driverAttributeResponse.data as { ok?: boolean; data?: unknown[] })?.ok === true
-      ? ((driverAttributeResponse.data as { data?: unknown[] }).data ?? [])
+    (driverAttributeResponse.data as {ok?: boolean; data?: unknown[]})?.ok === true
+      ? ((driverAttributeResponse.data as {data?: unknown[]}).data ?? [])
       : [];
   if (driverAttributes.length === 0) {
     const attributeName = `e2e_attr_${Date.now().toString(36).slice(-6)}`;
@@ -823,7 +823,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
           apiGroup: 'e2e',
           enableFlag: 'ENABLE',
           remark: 'created by e2e route fixture',
-          apiExt: { content: { url: '/e2e/fixture', title: suffix, remark: 'created by e2e route fixture' } },
+          apiExt: {content: {url: '/e2e/fixture', title: suffix, remark: 'created by e2e route fixture'}},
         },
       },
       cleanupStack
@@ -870,7 +870,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
           menuIndex: 999,
           enableFlag: 'ENABLE',
           remark: 'created by e2e route fixture',
-          menuExt: { content: { titles: { zh: suffix, en: suffix }, icon: 'Menu', url: '/e2e-fixture' } },
+          menuExt: {content: {titles: {zh: suffix, en: suffix}, icon: 'Menu', url: '/e2e-fixture'}},
         },
       },
       cleanupStack
@@ -934,10 +934,10 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
           autoConfirmFlag: 'MANUAL',
           notifyInterval: 300000,
           notifyExt: structuredExt('alarm-notify-policy', {
-            dedup: { enabled: true, key: '${tenantId}:${ruleCode}:${entityId}' },
-            rateLimit: { intervalMs: 300000, maxCount: 1 },
-            repeat: { enabled: false },
-            recovery: { enabled: true, sendRecoveryMessage: true, autoConfirmOnRecovery: false },
+            dedup: {enabled: true, key: '${tenantId}:${ruleCode}:${entityId}'},
+            rateLimit: {intervalMs: 300000, maxCount: 1},
+            repeat: {enabled: false},
+            recovery: {enabled: true, sendRecoveryMessage: true, autoConfirmOnRecovery: false},
           }),
           enableFlag: 'ENABLE',
           remark: 'created by e2e route fixture',
@@ -998,7 +998,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
             cardVersion: 'interactive-card-v1',
             atAllAllowed: false,
             testMessageEnabled: false,
-            options: { locale: 'zh-CN' },
+            options: {locale: 'zh-CN'},
           }),
           enableFlag: 'ENABLE',
           remark: 'created by e2e route fixture',
@@ -1048,9 +1048,9 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
           notifyId: alarmNotifyId,
           messageId: alarmMessageId,
           ruleExt: structuredExt('alarm-rule', {
-            condition: { field: 'numValue', operator: '>', threshold: 80, unit: '' },
-            window: { mode: 'LAST', minSamples: 1 },
-            recovery: { enabled: true, operator: '<=', threshold: 75, duration: 'PT5M' },
+            condition: {field: 'numValue', operator: '>', threshold: 80, unit: ''},
+            window: {mode: 'LAST', minSamples: 1},
+            recovery: {enabled: true, operator: '<=', threshold: 75, duration: 'PT5M'},
             severity: 'P2',
             eventType: 'ALARM',
             labels: [],
@@ -1209,7 +1209,7 @@ export function watchPageHealth(page: Page): PageHealth {
     } catch {
       body = '';
     }
-    health.badResponses.push({ status: response.status(), url: response.url(), body });
+    health.badResponses.push({status: response.status(), url: response.url(), body});
   });
 
   return health;
@@ -1240,7 +1240,7 @@ export async function closeOverlay(page: Page) {
   const modal = page.locator(overlaySelector).last();
 
   if (await modal.count()) {
-    const cancel = modal.getByRole('button', { name: /Cancel|Close|No|取消|关闭|否/ }).last();
+    const cancel = modal.getByRole('button', {name: /Cancel|Close|No|取消|关闭|否/}).last();
     if (await cancel.count()) {
       await cancel.click().catch(() => undefined);
     } else {
@@ -1252,7 +1252,7 @@ export async function closeOverlay(page: Page) {
 
   // The overlay must actually disappear; bounded by expect.timeout (10s).
   // A stuck modal here is a real bug, not a flake.
-  await expect(page.locator(overlaySelector)).toHaveCount(0, { timeout: 5_000 });
+  await expect(page.locator(overlaySelector)).toHaveCount(0, {timeout: 5_000});
 }
 
 /**
@@ -1264,9 +1264,9 @@ export async function closeOverlay(page: Page) {
  */
 export async function clickButtonIfPresent(page: Page, name: string | RegExp) {
   const button = page
-    .getByRole('button', { name })
-    .filter({ hasNot: page.locator('[aria-disabled="true"]') })
-    .filter({ hasNot: page.locator('[disabled]') })
+    .getByRole('button', {name})
+    .filter({hasNot: page.locator('[aria-disabled="true"]')})
+    .filter({hasNot: page.locator('[disabled]')})
     .first();
 
   if (!(await button.count())) return false;

@@ -16,7 +16,7 @@
 
 import JSONBigInt from 'json-bigint';
 
-const JSONBigIntStr = JSONBigInt({ storeAsString: true });
+const JSONBigIntStr = JSONBigInt({storeAsString: true});
 const E2E_CREDENTIALS = {
   tenant: process.env.E2E_TENANT || 'default',
   name: process.env.E2E_USERNAME || 'dc3',
@@ -42,20 +42,20 @@ export function shortText(text, size = 260) {
 
 export async function waitPage(page) {
   await page.waitForLoadState('domcontentloaded').catch(() => {});
-  await page.waitForLoadState('networkidle', { timeout: 6000 }).catch(() => {});
+  await page.waitForLoadState('networkidle', {timeout: 6000}).catch(() => {});
   await delay(500);
 }
 
 export async function login(page, base) {
-  await page.goto(`${base}/#/login`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${base}/#/login`, {waitUntil: 'domcontentloaded'});
   await waitPage(page);
-  const loginButton = page.getByRole('button', { name: 'Login' });
+  const loginButton = page.getByRole('button', {name: 'Login'});
   if (await loginButton.count()) {
     await page.getByPlaceholder('Please enter tenant name').fill(E2E_CREDENTIALS.tenant);
     await page.getByPlaceholder('Please enter username').fill(E2E_CREDENTIALS.name);
     await page.locator('.login-form input[type="password"]').fill(E2E_CREDENTIALS.password);
     await loginButton.click();
-    await page.waitForURL((url) => !url.hash.includes('/login'), { timeout: 15000 }).catch(() => {});
+    await page.waitForURL((url) => !url.hash.includes('/login'), {timeout: 15000}).catch(() => {});
   }
   await waitPage(page);
   if (page.url().includes('/login')) {
@@ -85,7 +85,7 @@ export function createWatch(page) {
     } catch {
       parsed = body;
     }
-    state.requestBodies.push({ method: req.method(), url: req.url(), body: parsed });
+    state.requestBodies.push({method: req.method(), url: req.url(), body: parsed});
   });
   page.on('response', async (res) => {
     if (!isBusinessApi(res.url()) || res.status() < 400) return;
@@ -95,7 +95,7 @@ export function createWatch(page) {
     } catch {
       body = '';
     }
-    state.badResponses.push({ status: res.status(), url: res.url(), body: shortText(body) });
+    state.badResponses.push({status: res.status(), url: res.url(), body: shortText(body)});
   });
   return state;
 }
@@ -150,7 +150,7 @@ export async function closeModal(page) {
     .locator('.el-dialog:visible, .el-drawer:visible, .el-popover:visible, .el-message-box:visible')
     .last();
   if (await modal.count()) {
-    const cancel = modal.getByRole('button', { name: /Cancel|Close|No|取消|关闭|否/ }).last();
+    const cancel = modal.getByRole('button', {name: /Cancel|Close|No|取消|关闭|否/}).last();
     if (await cancel.count()) {
       await cancel.click().catch(() => {});
       await delay(300);
@@ -162,7 +162,7 @@ export async function closeModal(page) {
 }
 
 export async function clickButtonIfPresent(page, name, options = {}) {
-  const locator = page.getByRole('button', { name }).filter({ hasNot: page.locator('.is-disabled') });
+  const locator = page.getByRole('button', {name}).filter({hasNot: page.locator('.is-disabled')});
   const count = await locator.count();
   if (!count) return false;
   const btn = locator.nth(options.index || 0);
@@ -174,7 +174,7 @@ export async function clickButtonIfPresent(page, name, options = {}) {
 
 export async function apiPost(page, url, body = {}, params = {}) {
   const response = await page.evaluate(
-    async ({ requestUrl, requestBody, requestParams }) => {
+    async ({requestUrl, requestBody, requestParams}) => {
       const decodeStorage = (key) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
@@ -199,9 +199,9 @@ export async function apiPost(page, url, body = {}, params = {}) {
         body: JSON.stringify(requestBody),
       });
       const text = await res.text();
-      return { status: res.status, text };
+      return {status: res.status, text};
     },
-    { requestUrl: url, requestBody: body, requestParams: params }
+    {requestUrl: url, requestBody: body, requestParams: params}
   );
 
   let data;
@@ -211,11 +211,11 @@ export async function apiPost(page, url, body = {}, params = {}) {
     data = response.text;
   }
 
-  return { status: response.status, data, text: response.text };
+  return {status: response.status, data, text: response.text};
 }
 
 export async function listCount(page, url, nameField, name) {
-  const res = await apiPost(page, url, { page: { size: 10, current: 1 }, [nameField]: name });
+  const res = await apiPost(page, url, {page: {size: 10, current: 1}, [nameField]: name});
   if (!res.data?.ok) {
     throw new Error(`Failed to list ${url}: ${JSON.stringify(res.data)}`);
   }
@@ -229,13 +229,13 @@ export function idOf(record) {
 }
 
 export async function firstRecord(page, url) {
-  const res = await apiPost(page, url, { page: { size: 1, current: 1 } });
+  const res = await apiPost(page, url, {page: {size: 1, current: 1}});
   if (!res.data?.ok) return undefined;
   return res.data.data?.records?.[0];
 }
 
 export async function listByName(page, url, nameField, name) {
-  const res = await apiPost(page, url, { page: { size: 1, current: 1 }, [nameField]: name });
+  const res = await apiPost(page, url, {page: {size: 1, current: 1}, [nameField]: name});
   if (!res.data?.ok) return undefined;
   return res.data.data?.records?.[0];
 }
@@ -260,7 +260,7 @@ export async function createEntity(page, cleanupStack, seed) {
   }
 
   cleanupStack.push(async () => {
-    await apiPost(page, seed.deleteUrl, {}, { id }).catch(() => {});
+    await apiPost(page, seed.deleteUrl, {}, {id}).catch(() => {});
   });
   return id;
 }

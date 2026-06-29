@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { prettyJson } from '@/utils/jsonUtil';
+import {prettyJson} from '@/utils/jsonUtil';
 
 describe('jsonUtil', () => {
   it('returns the fallback for null, undefined, and empty string', () => {
@@ -36,7 +36,7 @@ describe('jsonUtil', () => {
   });
 
   it('serializes plain objects and arrays', () => {
-    expect(prettyJson({ name: 'driver', enabled: true })).toBe('{\n  "name": "driver",\n  "enabled": true\n}');
+    expect(prettyJson({name: 'driver', enabled: true})).toBe('{\n  "name": "driver",\n  "enabled": true\n}');
     expect(prettyJson([1, 2])).toBe('[\n  1,\n  2\n]');
   });
 });

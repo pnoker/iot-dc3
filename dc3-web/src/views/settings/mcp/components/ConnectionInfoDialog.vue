@@ -31,14 +31,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {computed, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { getMcpMetadata } from '@/api/mcp';
-  import { MCP_SERVER_PATH } from '@/config/constant/api';
-  import type { McpConnectionRecord } from '@/config/types';
+  import {getMcpMetadata} from '@/api/mcp';
+  import {MCP_SERVER_PATH} from '@/config/constant/api';
+  import type {McpConnectionRecord} from '@/config/types';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const visible = ref(false);
   const clientId = ref('');
@@ -53,5 +53,5 @@
     metadata.value = res.data || {};
   };
 
-  defineExpose({ open });
+  defineExpose({open});
 </script>

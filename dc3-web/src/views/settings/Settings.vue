@@ -55,9 +55,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRoute, useRouter } from 'vue-router';
+  import {computed, onMounted} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRoute, useRouter} from 'vue-router';
 
   import {
     getSettingsActiveName,
@@ -67,10 +67,10 @@
     SETTINGS_TITLE_KEYS,
     type SettingsNavNode,
   } from '@/config/settingsNav';
-  import { useMenuStore } from '@/store';
-  import { resolveMenuTitle } from '@/utils/menuUtil';
+  import {useMenuStore} from '@/store';
+  import {resolveMenuTitle} from '@/utils/menuUtil';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const route = useRoute();
   const router = useRouter();
   const menuStore = useMenuStore();
@@ -141,7 +141,7 @@
   });
 
   const onSelect = (name: string) => {
-    router.push({ name: getSettingsRouteName(name) });
+    router.push({name: getSettingsRouteName(name)});
   };
 </script>
 

@@ -33,7 +33,7 @@
               <el-descriptions-item :label="$t('settings.label.labelColor')">
                 <span class="label-color">
                   <span
-                    :style="{ backgroundColor: reactiveData.data.labelColor || '#F4F4F5' }"
+                    :style="{backgroundColor: reactiveData.data.labelColor || '#F4F4F5'}"
                     class="label-color__swatch"
                   />
                   <span>{{ reactiveData.data.labelColor || '-' }}</span>
@@ -66,14 +66,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive } from 'vue';
-  import { useRoute } from 'vue-router';
+  import {onMounted, reactive} from 'vue';
+  import {useRoute} from 'vue-router';
 
-  import { getLabelById } from '@/api/label';
+  import {getLabelById} from '@/api/label';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
-  import { timestampLabel } from '@/utils/dateUtil';
+  import {timestampLabel} from '@/utils/dateUtil';
 
   const route = useRoute();
 

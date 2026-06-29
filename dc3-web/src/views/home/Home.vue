@@ -101,17 +101,17 @@
 </template>
 
 <script lang="ts" setup>
-  import type { Component } from 'vue';
-  import { computed, onMounted, reactive } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
-  import { Bell, List, Management, Promotion, TrendCharts, Warning } from '@element-plus/icons-vue';
+  import type {Component} from 'vue';
+  import {computed, onMounted, reactive} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRouter} from 'vue-router';
+  import {Bell, List, Management, Promotion, TrendCharts, Warning} from '@element-plus/icons-vue';
 
-  import { listDevice } from '@/api/device';
-  import { listPoint } from '@/api/point';
-  import { listProfile } from '@/api/profile';
-  import { listDriver } from '@/api/driver';
-  import { alertStats, dailyGrowth, statsTimeseries, statsToday } from '@/api/dashboard';
+  import {listDevice} from '@/api/device';
+  import {listPoint} from '@/api/point';
+  import {listProfile} from '@/api/profile';
+  import {listDriver} from '@/api/driver';
+  import {alertStats, dailyGrowth, statsTimeseries, statsToday} from '@/api/dashboard';
   import type {
     AlertStatsSummary,
     DailyGrowthSummary,
@@ -139,7 +139,7 @@
     subtitle: string;
     icon: Component;
     tone: Tone;
-    trend: { direction: 'up' | 'down' | 'flat'; label: string } | null;
+    trend: {direction: 'up' | 'down' | 'flat'; label: string} | null;
     sparkline: number[];
     onClick: () => void;
     onRefresh: () => Promise<void> | void;
@@ -176,7 +176,7 @@
 
   type ListPageResponse = R<ListPageSummary>;
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
 
   const state = reactive<HomeState>({
@@ -204,7 +204,7 @@
     alertSparkline: [],
   });
 
-  const emptyPage = { current: 1, size: 1 };
+  const emptyPage = {current: 1, size: 1};
   const toNumber = (value: number | string | null | undefined) => Number(value) || 0;
   const toNumberArray = (values: Array<number | string | null | undefined>) => values.map((value) => toNumber(value));
   const getSettledTotal = (result: PromiseSettledResult<ListPageResponse>) =>
@@ -212,10 +212,10 @@
 
   const loadTotals = async () => {
     const [driverRes, deviceRes, pointRes, profileRes] = await Promise.allSettled([
-      listDriver<ListPageResponse>({ page: emptyPage }),
-      listDevice<ListPageResponse>({ page: emptyPage }),
-      listPoint<ListPageResponse>({ page: emptyPage }),
-      listProfile<ListPageResponse>({ page: emptyPage }),
+      listDriver<ListPageResponse>({page: emptyPage}),
+      listDevice<ListPageResponse>({page: emptyPage}),
+      listPoint<ListPageResponse>({page: emptyPage}),
+      listProfile<ListPageResponse>({page: emptyPage}),
     ]);
 
     state.driverCount = getSettledTotal(driverRes);
@@ -238,7 +238,7 @@
 
   const loadSparkline = async () => {
     try {
-      const res = await statsTimeseries({ granularity: 'hour', rangeKey: '24h' });
+      const res = await statsTimeseries({granularity: 'hour', rangeKey: '24h'});
       const buckets: StatsTimeBucket[] = res.data;
       state.todaySparkline = buckets.map((bucket) => toNumber(bucket.count));
     } catch {
@@ -289,12 +289,12 @@
   const percentTrend = computed(() => {
     const percent = state.todayPercentChange;
     if (percent > 0) {
-      return { direction: 'up' as const, label: `${percent}% ${t('home.vsYesterday')}` };
+      return {direction: 'up' as const, label: `${percent}% ${t('home.vsYesterday')}`};
     }
     if (percent < 0) {
-      return { direction: 'down' as const, label: `${percent}% ${t('home.vsYesterday')}` };
+      return {direction: 'down' as const, label: `${percent}% ${t('home.vsYesterday')}`};
     }
-    return { direction: 'flat' as const, label: `0% ${t('home.vsYesterday')}` };
+    return {direction: 'flat' as const, label: `0% ${t('home.vsYesterday')}`};
   });
 
   const refreshDriver = async () => {
@@ -307,7 +307,7 @@
   };
   const refreshAlert = loadAlerts;
 
-  const sparkTrend = (spark: number[]): { direction: 'up' | 'down' | 'flat'; label: string } | null => {
+  const sparkTrend = (spark: number[]): {direction: 'up' | 'down' | 'flat'; label: string} | null => {
     if (spark.length < 2) {
       return null;
     }
@@ -316,12 +316,12 @@
     const current = spark[spark.length - 1] ?? 0;
     const diff = current - previous;
     if (diff > 0) {
-      return { direction: 'up', label: `+${diff}` };
+      return {direction: 'up', label: `+${diff}`};
     }
     if (diff < 0) {
-      return { direction: 'down', label: `${diff}` };
+      return {direction: 'down', label: `${diff}`};
     }
-    return { direction: 'flat', label: '0' };
+    return {direction: 'flat', label: '0'};
   };
 
   const cards = computed<CardModel[]>(() => [
@@ -329,72 +329,72 @@
       key: 'driver',
       title: t('home.driverCount'),
       value: state.driverCount,
-      subtitle: t('home.entityAlarms', { n: state.driverAlertCount }),
+      subtitle: t('home.entityAlarms', {n: state.driverAlertCount}),
       icon: Promotion,
       tone: 'blue',
       trend: sparkTrend(state.driverSparkline),
       sparkline: state.driverSparkline,
-      onClick: () => router.push({ name: 'driver' }),
+      onClick: () => router.push({name: 'driver'}),
       onRefresh: refreshDriver,
     },
     {
       key: 'device',
       title: t('home.deviceCount'),
       value: state.deviceCount,
-      subtitle: t('home.entityAlarms', { n: state.deviceAlertCount }),
+      subtitle: t('home.entityAlarms', {n: state.deviceAlertCount}),
       icon: Management,
       tone: 'purple',
       trend: sparkTrend(state.deviceSparkline),
       sparkline: state.deviceSparkline,
-      onClick: () => router.push({ name: 'device' }),
+      onClick: () => router.push({name: 'device'}),
       onRefresh: refreshDevice,
     },
     {
       key: 'point',
       title: t('home.pointCount'),
       value: state.pointCount,
-      subtitle: t('home.pointsAcrossProfiles', { n: state.profileCount }),
+      subtitle: t('home.pointsAcrossProfiles', {n: state.profileCount}),
       icon: List,
       tone: 'orange',
       trend: sparkTrend(state.pointSparkline),
       sparkline: state.pointSparkline,
-      onClick: () => router.push({ name: 'profile' }),
+      onClick: () => router.push({name: 'profile'}),
       onRefresh: refreshPoint,
     },
     {
       key: 'data',
       title: t('home.todayData'),
       value: state.todayCount,
-      subtitle: state.totalCount > 0 ? t('home.todayTotal', { n: state.totalCount }) : '',
+      subtitle: state.totalCount > 0 ? t('home.todayTotal', {n: state.totalCount}) : '',
       icon: TrendCharts,
       tone: 'green',
       trend: percentTrend.value,
       sparkline: state.todaySparkline,
-      onClick: () => router.push({ name: 'pointValue' }),
+      onClick: () => router.push({name: 'pointValue'}),
       onRefresh: refreshData,
     },
     {
       key: 'alert',
       title: t('home.driverAlarms'),
       value: state.todayDriverAlarms,
-      subtitle: t('home.alertUnconfirmed', { n: state.todayDriverUnconfirmed }),
+      subtitle: t('home.alertUnconfirmed', {n: state.todayDriverUnconfirmed}),
       icon: Bell,
       tone: 'red',
       trend: sparkTrend(state.alertSparkline),
       sparkline: state.alertSparkline,
-      onClick: () => router.push({ name: 'settingsDriverAlarm' }),
+      onClick: () => router.push({name: 'settingsDriverAlarm'}),
       onRefresh: refreshAlert,
     },
     {
       key: 'deviceAlert',
       title: t('home.deviceAlarms'),
       value: state.todayDeviceAlarms,
-      subtitle: t('home.alertUnconfirmed', { n: state.todayDeviceUnconfirmed }),
+      subtitle: t('home.alertUnconfirmed', {n: state.todayDeviceUnconfirmed}),
       icon: Warning,
       tone: 'orange',
       trend: sparkTrend(state.alertSparkline),
       sparkline: state.alertSparkline,
-      onClick: () => router.push({ name: 'settingsDeviceAlarm' }),
+      onClick: () => router.push({name: 'settingsDeviceAlarm'}),
       onRefresh: refreshAlert,
     },
   ]);

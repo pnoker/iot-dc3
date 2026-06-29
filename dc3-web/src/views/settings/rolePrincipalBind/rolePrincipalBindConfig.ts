@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { listRole } from '@/api/role';
-import { addRolePrincipalBind, deleteRolePrincipalBind, listRolePrincipalBind } from '@/api/rolePrincipalBind';
-import type { EntityListConfig } from '@/config/types/entityList';
+import {listRole} from '@/api/role';
+import {addRolePrincipalBind, deleteRolePrincipalBind, listRolePrincipalBind} from '@/api/rolePrincipalBind';
+import type {EntityListConfig} from '@/config/types/entityList';
 
-import { principalIdField, principalNameRelation, roleNameRelation } from '../relations';
+import {principalIdField, principalNameRelation, roleNameRelation} from '../relations';
 
 const PRINCIPAL_TYPE_OPTIONS = [
-  { label: 'USER', value: 'USER' },
-  { label: 'SERVICE_ACCOUNT', value: 'SERVICE_ACCOUNT' },
-  { label: 'SYSTEM', value: 'SYSTEM' },
+  {label: 'USER', value: 'USER'},
+  {label: 'SERVICE_ACCOUNT', value: 'SERVICE_ACCOUNT'},
+  {label: 'SYSTEM', value: 'SYSTEM'},
 ];
 
 export const createRolePrincipalBindConfig = (t: ComposerTranslation): EntityListConfig => ({
@@ -33,8 +33,8 @@ export const createRolePrincipalBindConfig = (t: ComposerTranslation): EntityLis
   title: t('nav.settingsRolePrincipalBind'),
   editable: true,
   searchFields: [
-    { prop: 'roleId', label: t('settings.rolePrincipalBind.roleId'), kind: 'input' },
-    { prop: 'principalId', label: t('settings.rolePrincipalBind.principalId'), kind: 'input' },
+    {prop: 'roleId', label: t('settings.rolePrincipalBind.roleId'), kind: 'input'},
+    {prop: 'principalId', label: t('settings.rolePrincipalBind.principalId'), kind: 'input'},
   ],
   columns: [
     {
@@ -49,8 +49,8 @@ export const createRolePrincipalBindConfig = (t: ComposerTranslation): EntityLis
       minWidth: 160,
       formatter: (row, ctx) => ctx.relations.principalName?.[String(row.principalId)] || String(row.principalId ?? '-'),
     },
-    { prop: 'principalType', label: t('settings.rolePrincipalBind.principalType'), minWidth: 150 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
+    {prop: 'principalType', label: t('settings.rolePrincipalBind.principalType'), minWidth: 150},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
   ],
   fields: [
     {
@@ -59,10 +59,10 @@ export const createRolePrincipalBindConfig = (t: ComposerTranslation): EntityLis
       kind: 'treeSelect',
       tree: {
         load: async () => {
-          const res: any = await listRole({ page: { current: 1, size: 1000 } });
+          const res: any = await listRole({page: {current: 1, size: 1000}});
           return res?.data?.records || [];
         },
-        props: { label: 'roleName', value: 'id' },
+        props: {label: 'roleName', value: 'id'},
       },
       required: true,
     },
@@ -75,7 +75,7 @@ export const createRolePrincipalBindConfig = (t: ComposerTranslation): EntityLis
       required: true,
     },
   ],
-  defaultForm: () => ({ roleId: '', principalId: '', principalType: 'USER' }),
+  defaultForm: () => ({roleId: '', principalId: '', principalType: 'USER'}),
   relations: [roleNameRelation(), principalNameRelation()],
   list: listRolePrincipalBind,
   add: addRolePrincipalBind,

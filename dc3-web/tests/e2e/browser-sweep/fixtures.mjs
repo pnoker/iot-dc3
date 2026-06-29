@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { createEntity, firstRecord, idOf, uniqueName } from './support.mjs';
+import {createEntity, firstRecord, idOf, uniqueName} from './support.mjs';
 
 async function discoverRouteIds(page) {
   const [driver, profile, device, point, api, resource, menu, user, role] = await Promise.all([
@@ -137,7 +137,7 @@ export async function ensureE2eData(page, routeIds) {
         apiGroup: 'e2e',
         enableFlag: 'ENABLE',
         remark: 'created by e2e route fixture',
-        apiExt: { content: { url: '/e2e/fixture', title: suffix, remark: 'created by e2e route fixture' } },
+        apiExt: {content: {url: '/e2e/fixture', title: suffix, remark: 'created by e2e route fixture'}},
       },
     }));
 
@@ -176,7 +176,7 @@ export async function ensureE2eData(page, routeIds) {
         menuIndex: 999,
         enableFlag: 'ENABLE',
         remark: 'created by e2e route fixture',
-        menuExt: { content: { titles: { zh: suffix, en: suffix }, icon: 'Menu', url: '/e2e-fixture' } },
+        menuExt: {content: {titles: {zh: suffix, en: suffix}, icon: 'Menu', url: '/e2e-fixture'}},
       },
     }));
 

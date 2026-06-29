@@ -72,11 +72,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {computed, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { registerMcpClient } from '@/api/mcp';
-  import { listServiceAccount } from '@/api/serviceAccount';
+  import {registerMcpClient} from '@/api/mcp';
+  import {listServiceAccount} from '@/api/serviceAccount';
   import {
     MCP_CLIENT_TYPE_OPTIONS,
     MCP_CLIENT_TYPES,
@@ -85,14 +85,14 @@
     MCP_SCOPE_OPTIONS,
     MCP_SCOPES,
   } from '@/config/constant/enums';
-  import type { ServiceAccountRecord } from '@/config/types';
-  import { useAuthStore } from '@/store/modules/auth';
-  import { successMessage } from '@/utils/notificationUtil';
-  import { isEnabledFlag } from '@/utils/thingModelFormatUtil';
+  import type {ServiceAccountRecord} from '@/config/types';
+  import {useAuthStore} from '@/store/modules/auth';
+  import {successMessage} from '@/utils/notificationUtil';
+  import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const authStore = useAuthStore();
-  const emit = defineEmits<{ (e: 'saved'): void }>();
+  const emit = defineEmits<{(e: 'saved'): void}>();
 
   const visible = ref(false);
   const submitting = ref(false);
@@ -116,7 +116,7 @@
       .filter(Boolean);
 
   const loadServiceAccounts = async () => {
-    const res = await listServiceAccount({ page: { current: 1, size: 1000 } });
+    const res = await listServiceAccount({page: {current: 1, size: 1000}});
     serviceAccounts.value = (res.data?.records || []).filter((sa) => isEnabledFlag(sa.enableFlag));
   };
 
@@ -154,5 +154,5 @@
     }
   };
 
-  defineExpose({ open });
+  defineExpose({open});
 </script>

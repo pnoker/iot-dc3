@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { RouteRecordRaw } from 'vue-router';
+import type {RouteRecordRaw} from 'vue-router';
 
 /**
  * Lazy-loaded layout component
@@ -149,7 +149,7 @@ const routes: Array<RouteRecordRaw> = [
           title: 'Alarm Rule Detail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
-        props: { entity: 'rule' },
+        props: {entity: 'rule'},
       },
       {
         name: 'settingsAlarmNotifyDetail',
@@ -159,7 +159,7 @@ const routes: Array<RouteRecordRaw> = [
           title: 'Alarm Notify Policy Detail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
-        props: { entity: 'notify' },
+        props: {entity: 'notify'},
       },
       {
         name: 'settingsAlarmMessageDetail',
@@ -169,7 +169,7 @@ const routes: Array<RouteRecordRaw> = [
           title: 'Alarm Message Template Detail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
-        props: { entity: 'message' },
+        props: {entity: 'message'},
       },
       {
         name: 'settingsAlarmChannelDetail',
@@ -179,7 +179,7 @@ const routes: Array<RouteRecordRaw> = [
           title: 'Alarm Notify Channel Detail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
-        props: { entity: 'channel' },
+        props: {entity: 'channel'},
       },
       {
         name: 'settingsAlarmBindDetail',
@@ -189,7 +189,7 @@ const routes: Array<RouteRecordRaw> = [
           title: 'Alarm Channel Binding Detail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
-        props: { entity: 'bind' },
+        props: {entity: 'bind'},
       },
       {
         name: 'settingsAlarmStateDetail',
@@ -199,7 +199,7 @@ const routes: Array<RouteRecordRaw> = [
           title: 'Alarm Runtime State Detail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
-        props: { entity: 'state' },
+        props: {entity: 'state'},
       },
       {
         name: 'settingsAlarmHistoryDetail',
@@ -209,7 +209,7 @@ const routes: Array<RouteRecordRaw> = [
           title: 'Alarm Delivery History Detail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
-        props: { entity: 'history' },
+        props: {entity: 'history'},
       },
       {
         name: 'settingsModelConfigDetail',

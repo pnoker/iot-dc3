@@ -25,13 +25,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { marked } from 'marked';
-  import { computed } from 'vue';
+  import {marked} from 'marked';
+  import {computed} from 'vue';
   import ChartBlock from './ChartBlock.vue';
-  import { parseAssistantContent } from './assistantContent';
-  import type { AgenticVisualizationSpec } from '@/config/types';
+  import {parseAssistantContent} from './assistantContent';
+  import type {AgenticVisualizationSpec} from '@/config/types';
 
-  const props = defineProps<{ content: string; charts?: AgenticVisualizationSpec[] }>();
+  const props = defineProps<{content: string; charts?: AgenticVisualizationSpec[]}>();
 
   const segments = computed(() => parseAssistantContent(props.content).segments);
   const charts = computed(() => props.charts || []);

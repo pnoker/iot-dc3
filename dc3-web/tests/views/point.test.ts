@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const pointMocks = vi.hoisted(() => ({
-  addPoint: vi.fn(() => Promise.resolve({ data: true })),
-  deletePoint: vi.fn(() => Promise.resolve({ data: true })),
+  addPoint: vi.fn(() => Promise.resolve({data: true})),
+  deletePoint: vi.fn(() => Promise.resolve({data: true})),
   listPoint: vi.fn(() =>
-    Promise.resolve({ data: { records: [{ id: 'pt-1', pointName: 'Temp', profileId: 'pf-1' }], total: 1 } })
+    Promise.resolve({data: {records: [{id: 'pt-1', pointName: 'Temp', profileId: 'pf-1'}], total: 1}})
   ),
-  updatePoint: vi.fn(() => Promise.resolve({ data: true })),
+  updatePoint: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/point', () => pointMocks);
 vi.mock('@/api/profile', () => ({
-  listProfileByIds: vi.fn(() => Promise.resolve({ data: { 'pf-1': { profileName: 'Sensor' } } })),
+  listProfileByIds: vi.fn(() => Promise.resolve({data: {'pf-1': {profileName: 'Sensor'}}})),
 }));
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('Point list view', () => {
   it('lists points on mount', async () => {
@@ -40,9 +40,9 @@ describe('Point list view', () => {
     await mountListPage({
       component: Point,
       stubs: {
-        PointTool: { template: '<div />' },
-        PointCard: { template: '<div />' },
-        PointAddForm: { template: '<div />' },
+        PointTool: {template: '<div />'},
+        PointCard: {template: '<div />'},
+        PointAddForm: {template: '<div />'},
       },
     });
     await flushPromises();

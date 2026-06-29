@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { RouteRecordRaw } from 'vue-router';
+import type {RouteRecordRaw} from 'vue-router';
 
 /**
  * Lazy-loaded layout component

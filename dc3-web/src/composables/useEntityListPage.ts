@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import type { FormInstance, FormItemRule, FormRules } from 'element-plus';
-import { computed, reactive, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import type {FormInstance, FormItemRule, FormRules} from 'element-plus';
+import {computed, reactive, ref} from 'vue';
+import {useI18n} from 'vue-i18n';
+import {useRouter} from 'vue-router';
 
-import type { Order, PageQuery } from '@/config/types';
-import type { EntityColumnConfig, EntityListConfig, EntityOption } from '@/config/types/entityList';
-import { timestampLabel } from '@/utils/dateUtil';
-import { prettyJson } from '@/utils/jsonUtil';
-import { successMessage } from '@/utils/notificationUtil';
-import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
+import type {Order, PageQuery} from '@/config/types';
+import type {EntityColumnConfig, EntityListConfig, EntityOption} from '@/config/types/entityList';
+import {timestampLabel} from '@/utils/dateUtil';
+import {prettyJson} from '@/utils/jsonUtil';
+import {successMessage} from '@/utils/notificationUtil';
+import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
 export const useEntityListPage = (rawConfig: EntityListConfig) => {
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
 
   const config = ref(rawConfig);
@@ -60,7 +60,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
       total: 0,
       size: config.value.pageSize || 12,
       current: 1,
-      orders: [{ column: config.value.defaultOrderColumn || 'create_time', asc: false }] as Order[],
+      orders: [{column: config.value.defaultOrderColumn || 'create_time', asc: false}] as Order[],
     },
   });
 
@@ -189,7 +189,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
   const sort = () => {
     const currentOrder = state.page.orders[0];
     const asc = currentOrder ? !currentOrder.asc : true;
-    state.page.orders = [{ column: config.value.defaultOrderColumn || 'create_time', asc }];
+    state.page.orders = [{column: config.value.defaultOrderColumn || 'create_time', asc}];
     load();
   };
 
@@ -242,7 +242,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
 
   const openDetail = (row: Record<string, any>) => {
     if (!config.value.detail) return;
-    router.push({ name: config.value.detail.routeName, query: { id: String(row.id) } }).catch(() => {
+    router.push({name: config.value.detail.routeName, query: {id: String(row.id)}}).catch(() => {
       // handled globally
     });
   };
@@ -342,7 +342,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
 
   const formatCell = (row: Record<string, any>, column: EntityColumnConfig) => {
     const value = column.prop.split('.').reduce((obj: any, key) => (obj != null ? obj[key] : undefined), row);
-    if (column.formatter) return column.formatter(row, { t, relations });
+    if (column.formatter) return column.formatter(row, {t, relations});
     if (column.kind === 'time') return timestampLabel(value);
     if (column.kind === 'tag') return optionLabel(column.options, value);
     if (value == null || value === '') return '-';

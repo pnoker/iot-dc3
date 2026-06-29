@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { addGroup, deleteGroup, listGroup, updateGroup } from '@/api/group';
-import { ENTITY_TYPE_OPTIONS } from '@/config/constant/enums';
-import type { GroupRecord } from '@/config/types/manager';
-import type { EntityListConfig } from '@/config/types/entityList';
-import { nameRules, remarkRules } from '@/utils/formRuleUtil';
+import {addGroup, deleteGroup, listGroup, updateGroup} from '@/api/group';
+import {ENTITY_TYPE_OPTIONS} from '@/config/constant/enums';
+import type {GroupRecord} from '@/config/types/manager';
+import type {EntityListConfig} from '@/config/types/entityList';
+import {nameRules, remarkRules} from '@/utils/formRuleUtil';
 
-const GROUP_PAGE_QUERY = { page: { current: 1, size: 5000, orders: [{ column: 'group_index', asc: true }] } };
+const GROUP_PAGE_QUERY = {page: {current: 1, size: 5000, orders: [{column: 'group_index', asc: true}]}};
 
 const loadGroupRecords = async (): Promise<GroupRecord[]> => {
   const res = await listGroup(GROUP_PAGE_QUERY);
@@ -31,9 +31,9 @@ const loadGroupRecords = async (): Promise<GroupRecord[]> => {
 
 /** Build a sorted tree from flat GroupRecord rows. */
 const buildTree = (rows: GroupRecord[]): GroupRecord[] => {
-  const byId = new Map<string, GroupRecord & { children: GroupRecord[] }>();
-  rows.forEach((row) => byId.set(String(row.id), { ...row, children: [] }));
-  const roots: (GroupRecord & { children: GroupRecord[] })[] = [];
+  const byId = new Map<string, GroupRecord & {children: GroupRecord[]}>();
+  rows.forEach((row) => byId.set(String(row.id), {...row, children: []}));
+  const roots: (GroupRecord & {children: GroupRecord[]})[] = [];
   byId.forEach((node) => {
     const parentId = node.parentGroupId ? String(node.parentGroupId) : '';
     const parent = parentId ? byId.get(parentId) : undefined;
@@ -71,7 +71,7 @@ const computeExcluded = (rows: GroupRecord[], currentId: string): Set<string> =>
 };
 
 const normalizeGroupPayload = (payload: Record<string, unknown>) => {
-  const next = { ...payload };
+  const next = {...payload};
   if (!next.parentGroupId || String(next.parentGroupId) === '0') next.parentGroupId = null;
   return next;
 };
@@ -87,13 +87,13 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
       kind: 'input',
       placeholder: t('settings.group.groupNamePlaceholder'),
     },
-    { prop: 'groupTypeFlag', label: t('settings.common.entityType'), kind: 'select', options: ENTITY_TYPE_OPTIONS },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true },
+    {prop: 'groupTypeFlag', label: t('settings.common.entityType'), kind: 'select', options: ENTITY_TYPE_OPTIONS},
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true},
   ],
   columns: [
-    { prop: 'groupName', label: t('settings.group.groupName'), minWidth: 160 },
-    { prop: 'groupCode', label: t('settings.group.groupCode'), kind: 'code', minWidth: 150 },
-    { prop: 'groupTypeFlag', label: t('settings.common.entityType'), width: 110 },
+    {prop: 'groupName', label: t('settings.group.groupName'), minWidth: 160},
+    {prop: 'groupCode', label: t('settings.group.groupCode'), kind: 'code', minWidth: 150},
+    {prop: 'groupTypeFlag', label: t('settings.common.entityType'), width: 110},
     {
       prop: 'parentGroupId',
       label: t('settings.group.parentGroupId'),
@@ -103,9 +103,9 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
         return ctx.relations.parentName?.[String(row.parentGroupId)] || '-';
       },
     },
-    { prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90 },
-    { prop: 'remark', label: t('common.remark'), minWidth: 180 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
+    {prop: 'remark', label: t('common.remark'), minWidth: 180},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
   ],
   relations: [
     {
@@ -134,7 +134,7 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
       kind: 'treeSelect',
       tree: {
         load: loadGroupRecords,
-        props: { label: 'groupName', children: 'children' },
+        props: {label: 'groupName', children: 'children'},
         nodeKey: 'id',
         checkStrictly: true,
         transform: (rows: GroupRecord[], form: Record<string, any>) => {
@@ -142,7 +142,7 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
           const filtered = rows.filter(
             (row) => row.groupTypeFlag === form.groupTypeFlag && !excluded.has(String(row.id))
           );
-          return [{ id: 0, groupName: t('settings.group.rootGroup'), children: buildTree(filtered) }];
+          return [{id: 0, groupName: t('settings.group.rootGroup'), children: buildTree(filtered)}];
         },
       },
     },
@@ -159,9 +159,9 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
       placeholder: t('settings.group.groupCodePlaceholder'),
       maxlength: 32,
     },
-    { prop: 'groupIndex', label: t('settings.group.groupIndex'), kind: 'number' },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag' },
-    { prop: 'remark', label: t('common.remark'), kind: 'textarea', span: 24, maxlength: 300, rules: remarkRules(t) },
+    {prop: 'groupIndex', label: t('settings.group.groupIndex'), kind: 'number'},
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag'},
+    {prop: 'remark', label: t('common.remark'), kind: 'textarea', span: 24, maxlength: 300, rules: remarkRules(t)},
   ],
   defaultForm: () => ({
     parentGroupId: null,
@@ -176,7 +176,7 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
   add: (payload) => addGroup(normalizeGroupPayload(payload) as Parameters<typeof addGroup>[0]),
   update: (payload) => updateGroup(normalizeGroupPayload(payload) as Parameters<typeof updateGroup>[0]),
   remove: deleteGroup,
-  detail: { routeName: 'settingsGroupDetail' },
+  detail: {routeName: 'settingsGroupDetail'},
   confirmDeleteText: t('settings.group.confirmDelete'),
   emptyText: t('settings.group.empty'),
 });

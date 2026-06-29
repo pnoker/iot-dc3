@@ -28,7 +28,7 @@
         <span class="assign-sep">/</span>
         <span class="assign-value">{{ reactiveData.role.roleCode }}</span>
         <span class="assign-summary">
-          {{ t('settings.role.resourcesSelectedSummary', { count: reactiveData.selectedIds.length }) }}
+          {{ t('settings.role.resourcesSelectedSummary', {count: reactiveData.selectedIds.length}) }}
         </span>
       </div>
 
@@ -65,7 +65,7 @@
               :ref="(el) => registerTree(type, el)"
               :data="treesByType[type] || []"
               :filter-node-method="filterNode"
-              :props="{ label: 'resourceName', children: 'children' }"
+              :props="{label: 'resourceName', children: 'children'}"
               node-key="id"
               show-checkbox
               @check-change="onCheckChange"
@@ -90,13 +90,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, nextTick, reactive, ref, watch } from 'vue';
-  import type { ElTree } from 'element-plus';
-  import { Search } from '@element-plus/icons-vue';
-  import { useI18n } from 'vue-i18n';
+  import {computed, nextTick, reactive, ref, watch} from 'vue';
+  import type {ElTree} from 'element-plus';
+  import {Search} from '@element-plus/icons-vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { listResourceTree } from '@/api/resource';
-  import { listResourceByRoleId, listRoleResourceBind } from '@/api/roleResourceBind';
+  import {listResourceTree} from '@/api/resource';
+  import {listResourceByRoleId, listRoleResourceBind} from '@/api/roleResourceBind';
 
   interface ResourceNode {
     id: string;
@@ -113,7 +113,7 @@
   // via `availableTypes`.
   const TYPE_ORDER = ['MENU', 'API', 'DATA', 'DEVICE', 'POINT', 'PROFILE', 'DRIVER'];
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const emit = defineEmits<{
     (e: 'save', roleId: string, addIds: string[], removeBindIds: string[], done: () => void): void;
   }>();
@@ -259,7 +259,7 @@
       trees[type] = roots;
     }
 
-    return { flatMap: map, trees };
+    return {flatMap: map, trees};
   };
 
   const applyCheckedToTrees = () => {
@@ -281,11 +281,11 @@
       const [treeRes, ownRes, bindsRes] = await Promise.all([
         listResourceTree({}) as Promise<any>,
         listResourceByRoleId(reactiveData.role.id) as Promise<any>,
-        listRoleResourceBind({ page: { size: 1000, current: 1 }, roleId: reactiveData.role.id }) as Promise<any>,
+        listRoleResourceBind({page: {size: 1000, current: 1}, roleId: reactiveData.role.id}) as Promise<any>,
       ]);
 
       const treeData = (treeRes.data as any[]) || [];
-      const { flatMap, trees } = groupByType(treeData);
+      const {flatMap, trees} = groupByType(treeData);
       reactiveData.nodeMap = flatMap;
       reactiveData.treesByType = trees;
 
@@ -355,7 +355,7 @@
     });
   };
 
-  defineExpose({ show });
+  defineExpose({show});
 </script>
 
 <style lang="scss" scoped>

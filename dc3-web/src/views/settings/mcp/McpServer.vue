@@ -65,15 +65,15 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { DocumentCopy, Refresh } from '@element-plus/icons-vue';
+  import {computed, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {DocumentCopy, Refresh} from '@element-plus/icons-vue';
 
-  import { getMcpMetadata } from '@/api/mcp';
-  import { MCP_SERVER_PATH } from '@/config/constant/api';
-  import { copy } from '@/utils/commonUtil';
+  import {getMcpMetadata} from '@/api/mcp';
+  import {MCP_SERVER_PATH} from '@/config/constant/api';
+  import {copy} from '@/utils/commonUtil';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const loading = ref(false);
   const metadata = ref<Record<string, any>>({});
 
@@ -82,11 +82,11 @@
   // Ready-to-paste MCP client config snippets for common AI agents. The agents discover OAuth
   // via the protected-resource metadata, so the snippet only needs the server URL.
   const agentSnippets = computed(() => {
-    const server = { type: 'http', url: mcpServerUrl.value };
+    const server = {type: 'http', url: mcpServerUrl.value};
     return [
-      { name: 'Claude Desktop', config: JSON.stringify({ mcpServers: { dc3: server } }, null, 2) },
-      { name: 'Cursor', config: JSON.stringify({ mcpServers: { dc3: server } }, null, 2) },
-      { name: 'VS Code', config: JSON.stringify({ servers: { dc3: server } }, null, 2) },
+      {name: 'Claude Desktop', config: JSON.stringify({mcpServers: {dc3: server}}, null, 2)},
+      {name: 'Cursor', config: JSON.stringify({mcpServers: {dc3: server}}, null, 2)},
+      {name: 'VS Code', config: JSON.stringify({servers: {dc3: server}}, null, 2)},
     ];
   });
 

@@ -110,29 +110,29 @@
 <script lang="ts" setup>
   import AgenticAssistant from '@/components/agentic/AgenticAssistant.vue';
   import router from '@/config/router';
-  import { HomeFilled, QuestionFilled, Setting, SwitchButton } from '@element-plus/icons-vue';
-  import { computed, onMounted } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRoute } from 'vue-router';
+  import {HomeFilled, QuestionFilled, Setting, SwitchButton} from '@element-plus/icons-vue';
+  import {computed, onMounted} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRoute} from 'vue-router';
   import {
     getSettingsLeafIconCode,
     getSettingsTitleKey,
     SETTINGS_BREADCRUMB_PARENTS,
     SETTINGS_FALLBACK_ICON,
   } from '@/config/settingsNav';
-  import { useAgenticStore, useAuthStore, useMenuStore } from '@/store';
-  import type { MenuNode } from '@/store/modules/menu';
-  import { resolveMenuTitle } from '@/utils/menuUtil';
+  import {useAgenticStore, useAuthStore, useMenuStore} from '@/store';
+  import type {MenuNode} from '@/store/modules/menu';
+  import {resolveMenuTitle} from '@/utils/menuUtil';
 
-  const { t, locale } = useI18n();
+  const {t, locale} = useI18n();
   const route = useRoute();
   const authStore = useAuthStore();
   const menuStore = useMenuStore();
   const agenticStore = useAgenticStore();
 
   const langOptions = [
-    { label: 'EN', value: 'en' },
-    { label: '中', value: 'zh' },
+    {label: 'EN', value: 'en'},
+    {label: '中', value: 'zh'},
   ];
   const langModel = computed({
     get: () => locale.value,
@@ -309,8 +309,8 @@
   });
 
   const breadcrumbItems = computed(() => {
-    const items: { path: string; title: string; icon?: string }[] = [
-      { path: '/home', title: t('nav.home'), icon: iconForCode('home') },
+    const items: {path: string; title: string; icon?: string}[] = [
+      {path: '/home', title: t('nav.home'), icon: iconForCode('home')},
     ];
     const name = route.name as string;
     if (!name || name === 'home') return items;
@@ -319,23 +319,23 @@
     const title = titleKey ? t(titleKey) : name;
     const leafCode = getSettingsLeafIconCode(name);
     if (name.startsWith('driver')) {
-      items.push({ path: '/driver', title: t('nav.driver'), icon: iconForCode('driver') });
+      items.push({path: '/driver', title: t('nav.driver'), icon: iconForCode('driver')});
     } else if (name.startsWith('device')) {
-      items.push({ path: '/device', title: t('nav.device'), icon: iconForCode('device') });
+      items.push({path: '/device', title: t('nav.device'), icon: iconForCode('device')});
     } else if (name.startsWith('profile')) {
-      items.push({ path: '/profile', title: t('nav.profile'), icon: iconForCode('profile') });
+      items.push({path: '/profile', title: t('nav.profile'), icon: iconForCode('profile')});
     } else if (name.startsWith('point')) {
-      items.push({ path: '/profile', title: t('nav.profile'), icon: iconForCode('profile') });
+      items.push({path: '/profile', title: t('nav.profile'), icon: iconForCode('profile')});
     } else if (name.startsWith('settings')) {
-      items.push({ path: '/settings', title: t('nav.settings'), icon: iconForCode('settings') });
+      items.push({path: '/settings', title: t('nav.settings'), icon: iconForCode('settings')});
       (SETTINGS_BREADCRUMB_PARENTS[name] || []).forEach((mid) => {
-        items.push({ path: mid.path, title: t(mid.titleKey), icon: iconForCode(mid.code) });
+        items.push({path: mid.path, title: t(mid.titleKey), icon: iconForCode(mid.code)});
       });
     }
     if (!['home', 'driver', 'profile', 'device', 'pointValue', 'settings'].includes(name)) {
       const last = items[items.length - 1];
       if (!last || last.path !== route.path || last.title !== title) {
-        items.push({ path: route.path, title, icon: iconForCode(leafCode) });
+        items.push({path: route.path, title, icon: iconForCode(leafCode)});
       }
     }
     return items;
@@ -376,7 +376,7 @@
   const handleCommand = async (command: string) => {
     if (command === 'settings') {
       if (settingsEntryName.value) {
-        await router.push({ name: settingsEntryName.value });
+        await router.push({name: settingsEntryName.value});
       }
     } else if (command === 'logout') {
       try {
@@ -386,7 +386,7 @@
       }
       menuStore.reset();
       agenticStore.reset();
-      await router.push({ name: 'login' });
+      await router.push({name: 'login'});
     } else if (command === 'help') {
       const helpWindow = window.open('https://doc.dc3.site', '_blank', 'noopener,noreferrer');
       if (helpWindow) helpWindow.opener = null;

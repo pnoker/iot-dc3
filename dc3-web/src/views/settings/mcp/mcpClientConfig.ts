@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { listMcpClient } from '@/api/mcp';
-import { MCP_CLIENT_TYPE_OPTIONS } from '@/config/constant/enums';
-import type { EntityListConfig } from '@/config/types/entityList';
+import {listMcpClient} from '@/api/mcp';
+import {MCP_CLIENT_TYPE_OPTIONS} from '@/config/constant/enums';
+import type {EntityListConfig} from '@/config/types/entityList';
 
 interface McpClientHandlers {
   onRegister: () => void;
 }
 
-const CLIENT_TYPE_OPTIONS = MCP_CLIENT_TYPE_OPTIONS.map((o) => ({ label: o.label, value: o.value }));
+const CLIENT_TYPE_OPTIONS = MCP_CLIENT_TYPE_OPTIONS.map((o) => ({label: o.label, value: o.value}));
 
 const includes = (value: unknown, keyword: string) =>
   String(value ?? '')
@@ -44,15 +44,15 @@ export const createMcpClientConfig = (t: ComposerTranslation, handlers: McpClien
       kind: 'input',
       placeholder: t('settings.mcp.clientName'),
     },
-    { prop: 'clientType', label: t('settings.mcp.clientType'), kind: 'select', options: CLIENT_TYPE_OPTIONS },
+    {prop: 'clientType', label: t('settings.mcp.clientType'), kind: 'select', options: CLIENT_TYPE_OPTIONS},
   ],
   columns: [
-    { prop: 'clientName', label: t('settings.mcp.clientName'), minWidth: 180 },
-    { prop: 'clientId', label: t('settings.mcp.clientId'), kind: 'code', minWidth: 240 },
-    { prop: 'clientType', label: t('settings.mcp.clientType'), minWidth: 130 },
-    { prop: 'authorizationGrantTypes', label: t('settings.mcp.grantTypes'), minWidth: 220 },
-    { prop: 'scopes', label: t('settings.mcp.scopes'), minWidth: 240 },
-    { prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90 },
+    {prop: 'clientName', label: t('settings.mcp.clientName'), minWidth: 180},
+    {prop: 'clientId', label: t('settings.mcp.clientId'), kind: 'code', minWidth: 240},
+    {prop: 'clientType', label: t('settings.mcp.clientType'), minWidth: 130},
+    {prop: 'authorizationGrantTypes', label: t('settings.mcp.grantTypes'), minWidth: 220},
+    {prop: 'scopes', label: t('settings.mcp.scopes'), minWidth: 240},
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
   ],
   fields: [],
   defaultForm: () => ({}),
@@ -62,7 +62,7 @@ export const createMcpClientConfig = (t: ComposerTranslation, handlers: McpClien
     let records: Record<string, any>[] = Array.isArray(res?.data) ? res.data : [];
     if (p.clientName) records = records.filter((r) => includes(r.clientName, p.clientName));
     if (p.clientType) records = records.filter((r) => r.clientType === p.clientType);
-    return { data: { records, total: records.length } } as R;
+    return {data: {records, total: records.length}} as R;
   },
   toolbarActions: [
     {

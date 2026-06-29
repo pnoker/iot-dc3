@@ -18,10 +18,10 @@
   <entity-list-page :config="config" />
 </template>
 <script lang="ts" setup>
-  import { useI18n } from 'vue-i18n';
+  import {useI18n} from 'vue-i18n';
   import EntityListPage from '@/components/entity/EntityListPage.vue';
-  import { createGroupConfig } from './groupConfig';
+  import {createGroupConfig} from './groupConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const config = createGroupConfig(t);
 </script>

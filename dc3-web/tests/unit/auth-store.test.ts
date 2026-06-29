@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPinia, setActivePinia } from 'pinia';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
 
-import { useAuthStore } from '@/store';
-import { AUTH_HEADERS } from '@/config/constant/common';
-import { getStorage } from '@/utils/storageUtil';
+import {useAuthStore} from '@/store';
+import {AUTH_HEADERS} from '@/config/constant/common';
+import {getStorage} from '@/utils/storageUtil';
 
-import { seedAuthStorage, TEST_CREDENTIALS } from '../fixtures/auth';
+import {seedAuthStorage, TEST_CREDENTIALS} from '../fixtures/auth';
 
 const tokenMocks = vi.hoisted(() => ({
   generateSalt: vi.fn(),
@@ -34,12 +34,12 @@ vi.mock('@/api/token', () => tokenMocks);
 
 const elementPlusMocks = vi.hoisted(() => {
   const close = vi.fn();
-  const service = vi.fn(() => ({ close }));
-  return { close, service };
+  const service = vi.fn(() => ({close}));
+  return {close, service};
 });
 
 vi.mock('element-plus', () => ({
-  ElLoading: { service: elementPlusMocks.service },
+  ElLoading: {service: elementPlusMocks.service},
 }));
 
 const routerMocks = vi.hoisted(() => ({
@@ -47,7 +47,7 @@ const routerMocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/config/router', () => ({
-  default: { push: routerMocks.push },
+  default: {push: routerMocks.push},
 }));
 
 const notificationMocks = vi.hoisted(() => ({
@@ -65,9 +65,9 @@ describe('auth store', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
 
-    tokenMocks.generateSalt.mockResolvedValue({ data: 'salt-abc' });
-    tokenMocks.generateToken.mockResolvedValue({ data: 'token-xyz' });
-    tokenMocks.cancelToken.mockResolvedValue({ data: true });
+    tokenMocks.generateSalt.mockResolvedValue({data: 'salt-abc'});
+    tokenMocks.generateToken.mockResolvedValue({data: 'token-xyz'});
+    tokenMocks.cancelToken.mockResolvedValue({data: true});
   });
 
   describe('login', () => {
@@ -106,7 +106,7 @@ describe('auth store', () => {
       expect(store.name).toBe(TEST_CREDENTIALS.name);
 
       // Router pushed to home.
-      expect(routerPush).toHaveBeenCalledWith({ name: 'home' });
+      expect(routerPush).toHaveBeenCalledWith({name: 'home'});
 
       // Loading was opened and closed exactly once.
       expect(loadingService).toHaveBeenCalledTimes(1);
@@ -139,7 +139,7 @@ describe('auth store', () => {
       const store = useAuthStore();
       await store.logout();
 
-      expect(tokenMocks.cancelToken).toHaveBeenCalledWith({ tenant: creds.tenant, name: creds.name });
+      expect(tokenMocks.cancelToken).toHaveBeenCalledWith({tenant: creds.tenant, name: creds.name});
       expect(getStorage(AUTH_HEADERS.TENANT)).toBeUndefined();
       expect(getStorage(AUTH_HEADERS.LOGIN)).toBeUndefined();
       expect(getStorage(AUTH_HEADERS.TOKEN)).toBeUndefined();
@@ -157,7 +157,7 @@ describe('auth store', () => {
 
   describe('getters', () => {
     it('exposes getTenant and getName from storage', () => {
-      const creds = seedAuthStorage({ tenant: 'tenant-1', name: 'user-1' });
+      const creds = seedAuthStorage({tenant: 'tenant-1', name: 'user-1'});
 
       const store = useAuthStore();
 

@@ -20,7 +20,7 @@
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.peerEmpty')"
     :loading="loading"
-    :subtitle="t('settings.event.overview.peerSubtitle', { days: Number(daysKey) })"
+    :subtitle="t('settings.event.overview.peerSubtitle', {days: Number(daysKey)})"
     :title="t('settings.event.overview.peerTitle')"
     body-mode="scroll"
     class="peer-deviation"
@@ -33,10 +33,10 @@
 
     <el-table :data="rows" size="small" @row-click="onRowClick">
       <el-table-column :label="t('settings.event.overview.colProfile')" min-width="120">
-        <template #default="{ row }">{{ profileName(row.profileId) }}</template>
+        <template #default="{row}">{{ profileName(row.profileId) }}</template>
       </el-table-column>
       <el-table-column :label="t('settings.event.overview.colDevice')" min-width="120">
-        <template #default="{ row }">{{ deviceName(row.deviceId) }}</template>
+        <template #default="{row}">{{ deviceName(row.deviceId) }}</template>
       </el-table-column>
       <el-table-column
         :label="t('settings.event.overview.colAlarmCount')"
@@ -51,7 +51,7 @@
         width="100"
       />
       <el-table-column :label="t('settings.event.overview.colRatio')" align="right" width="100">
-        <template #default="{ row }">
+        <template #default="{row}">
           <el-tag :type="row.ratio >= 5 ? 'danger' : 'warning'" size="small">
             {{ row.ratio ? `${row.ratio}×` : '—' }}
           </el-tag>
@@ -62,26 +62,26 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
+  import {onMounted, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRouter} from 'vue-router';
 
-  import { alertPeerDeviation } from '@/api/dashboard';
-  import type { PeerDeviation } from '@/config/types/dashboard';
+  import {alertPeerDeviation} from '@/api/dashboard';
+  import type {PeerDeviation} from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
-  import { useEntityNames } from '@/composables/useEntityNames';
-  import { jumpToSourceEvents } from '@/utils/jumpUtil';
+  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+  import {useEntityNames} from '@/composables/useEntityNames';
+  import {jumpToSourceEvents} from '@/utils/jumpUtil';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
-  const { loading, run } = useAsyncLoader();
-  const { resolveDevices, resolveProfiles, deviceName, profileName } = useEntityNames();
+  const {loading, run} = useAsyncLoader();
+  const {resolveDevices, resolveProfiles, deviceName, profileName} = useEntityNames();
 
   const daysOptions = [
-    { label: '1d', value: '1' },
-    { label: '7d', value: '7' },
-    { label: '30d', value: '30' },
+    {label: '1d', value: '1'},
+    {label: '7d', value: '7'},
+    {label: '30d', value: '30'},
   ];
   const daysKey = ref<string>('7');
 
@@ -89,7 +89,7 @@
 
   const load = () =>
     run(async () => {
-      const res: { data?: PeerDeviation[] } = await alertPeerDeviation(Number(daysKey.value));
+      const res: {data?: PeerDeviation[]} = await alertPeerDeviation(Number(daysKey.value));
       rows.value = res?.data ?? [];
       await Promise.all([
         resolveDevices(rows.value.map((r) => r.deviceId)),
@@ -102,7 +102,7 @@
 
   const onRowClick = (row: PeerDeviation) => jumpToSourceEvents(router, 'device', row.deviceId);
 
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

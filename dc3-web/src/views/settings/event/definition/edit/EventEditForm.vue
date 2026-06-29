@@ -62,8 +62,8 @@
       </div>
       <el-table :data="reactiveData.params" border max-height="260" size="small">
         <el-table-column :label="$t('common.name')" min-width="170">
-          <template #default="{ row, $index }">
-            <div :class="{ 'is-error': !!paramErrors[$index]?.paramName }" class="param-field">
+          <template #default="{row, $index}">
+            <div :class="{'is-error': !!paramErrors[$index]?.paramName}" class="param-field">
               <el-input
                 v-model="row.paramName"
                 clearable
@@ -79,8 +79,8 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t('eventDefinition.form.code')" min-width="170">
-          <template #default="{ row, $index }">
-            <div :class="{ 'is-error': !!paramErrors[$index]?.paramCode }" class="param-field">
+          <template #default="{row, $index}">
+            <div :class="{'is-error': !!paramErrors[$index]?.paramCode}" class="param-field">
               <el-input
                 v-model="row.paramCode"
                 clearable
@@ -95,19 +95,19 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t('eventDefinition.form.type')" min-width="140">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-select v-model="row.paramTypeFlag">
               <el-option v-for="opt in POINT_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
             </el-select>
           </template>
         </el-table-column>
         <el-table-column :label="$t('eventDefinition.form.enabled')" width="104">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-switch v-model="row.enableFlag" active-value="ENABLE" inactive-value="DISABLE" />
           </template>
         </el-table-column>
         <el-table-column align="center" width="64">
-          <template #default="{ $index }">
+          <template #default="{$index}">
             <el-tooltip :content="$t('common.delete')" placement="top">
               <el-button :icon="Delete" link type="danger" @click="removeParamRow($index)" />
             </el-tooltip>
@@ -126,23 +126,23 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
-  import type { FormInstance, FormRules } from 'element-plus';
-  import { Delete, Plus } from '@element-plus/icons-vue';
-  import { useI18n } from 'vue-i18n';
-  import { listEventParamByEventId } from '@/api/event';
+  import {reactive, ref} from 'vue';
+  import type {FormInstance, FormRules} from 'element-plus';
+  import {Delete, Plus} from '@element-plus/icons-vue';
+  import {useI18n} from 'vue-i18n';
+  import {listEventParamByEventId} from '@/api/event';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import { EVENT_LEVEL_OPTIONS, EVENT_TYPE_OPTIONS, POINT_TYPE_OPTIONS } from '@/config/constant/enums';
-  import type { EventForm, EventParamForm, EventParamRecord, EventRecord } from '@/config/types';
-  import { NAME_PATTERN, nameRules, remarkRules } from '@/utils/formRuleUtil';
-  import { enableFlagValue, eventLevelValue, eventTypeValue, pointTypeValue } from '@/utils/thingModelFormatUtil';
+  import {EVENT_LEVEL_OPTIONS, EVENT_TYPE_OPTIONS, POINT_TYPE_OPTIONS} from '@/config/constant/enums';
+  import type {EventForm, EventParamForm, EventParamRecord, EventRecord} from '@/config/types';
+  import {NAME_PATTERN, nameRules, remarkRules} from '@/utils/formRuleUtil';
+  import {enableFlagValue, eventLevelValue, eventTypeValue, pointTypeValue} from '@/utils/thingModelFormatUtil';
 
   type FormMode = 'add' | 'edit';
   type DoneCallback = (close?: boolean) => void;
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
-  type EventParamDraft = EventParamForm & { _key: string };
+  type EventParamDraft = EventParamForm & {_key: string};
 
   const emit = defineEmits<{
     (e: 'add-thing', form: EventForm, params: EventParamRecord[], done: DoneCallback): void;
@@ -181,22 +181,22 @@
 
   const rules: FormRules = {
     eventName: nameRules(t, t('common.entityEvent')),
-    eventTypeFlag: [{ required: true, message: t('eventDefinition.form.eventTypeRequired'), trigger: 'change' }],
-    eventLevelFlag: [{ required: true, message: t('eventDefinition.form.eventLevelRequired'), trigger: 'change' }],
+    eventTypeFlag: [{required: true, message: t('eventDefinition.form.eventTypeRequired'), trigger: 'change'}],
+    eventLevelFlag: [{required: true, message: t('eventDefinition.form.eventLevelRequired'), trigger: 'change'}],
     remark: remarkRules(t),
   };
 
-  type RowErrors = { paramName?: string; paramCode?: string };
+  type RowErrors = {paramName?: string; paramCode?: string};
   type RowErrorField = keyof RowErrors;
   const paramErrors = reactive<RowErrors[]>([]);
 
   const setParamFieldError = (index: number, field: RowErrorField, message: string) => {
-    paramErrors[index] = { ...(paramErrors[index] || {}), [field]: message };
+    paramErrors[index] = {...(paramErrors[index] || {}), [field]: message};
   };
 
   const clearParamFieldError = (index: number, field: RowErrorField) => {
     if (!paramErrors[index]?.[field]) return;
-    paramErrors[index] = { ...(paramErrors[index] || {}), [field]: undefined };
+    paramErrors[index] = {...(paramErrors[index] || {}), [field]: undefined};
   };
 
   const validateRow = (index: number): boolean => {
@@ -222,7 +222,7 @@
   };
 
   const reset = () => {
-    reactiveData.form = { ...reactiveData.originalForm };
+    reactiveData.form = {...reactiveData.originalForm};
     reactiveData.params = cloneParams(reactiveData.originalParams);
     reactiveData.submitting = false;
     formRef.value?.clearValidate();
@@ -249,8 +249,8 @@
 
   const normalizeParams = (): EventParamRecord[] =>
     reactiveData.params.map((item) => {
-      const param = { ...item } as EventParamRecord;
-      delete (param as { _key?: string })._key;
+      const param = {...item} as EventParamRecord;
+      delete (param as {_key?: string})._key;
       return {
         ...param,
         paramName: String(item.paramName || '').trim(),
@@ -306,8 +306,8 @@
   const show = (profileId = '') => {
     reactiveData.mode = 'add';
     const emptyForm = createEmptyForm(profileId);
-    reactiveData.originalForm = { ...emptyForm };
-    reactiveData.form = { ...emptyForm };
+    reactiveData.originalForm = {...emptyForm};
+    reactiveData.form = {...emptyForm};
     reactiveData.originalParams = [];
     reactiveData.params = [];
     clearParamErrors();
@@ -325,8 +325,8 @@
       eventLevelFlag: eventLevelValue(row.eventLevelFlag, emptyForm.eventLevelFlag),
       enableFlag: enableFlagValue(row.enableFlag, emptyForm.enableFlag),
     };
-    reactiveData.originalForm = { ...initial };
-    reactiveData.form = { ...initial };
+    reactiveData.originalForm = {...initial};
+    reactiveData.form = {...initial};
     reactiveData.originalParams = [];
     reactiveData.params = [];
     clearParamErrors();
@@ -359,7 +359,7 @@
       reactiveData.submitting = false;
       return;
     }
-    const payload = { ...reactiveData.form };
+    const payload = {...reactiveData.form};
     const params = normalizeParams();
     if (!validateParams(params)) {
       reactiveData.submitting = false;
@@ -372,7 +372,7 @@
     }
   };
 
-  defineExpose({ show, showEdit });
+  defineExpose({show, showEdit});
 </script>
 
 <style>

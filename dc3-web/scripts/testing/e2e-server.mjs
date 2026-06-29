@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
-import { createServer, request as httpRequest } from 'node:http';
-import { request as httpsRequest } from 'node:https';
-import { extname, join, normalize, resolve, sep } from 'node:path';
-import { pipeline } from 'node:stream';
-import { fileURLToPath } from 'node:url';
+import {createReadStream, existsSync, readFileSync, statSync} from 'node:fs';
+import {createServer, request as httpRequest} from 'node:http';
+import {request as httpsRequest} from 'node:https';
+import {extname, join, normalize, resolve, sep} from 'node:path';
+import {pipeline} from 'node:stream';
+import {fileURLToPath} from 'node:url';
 
 const projectRoot = resolve(fileURLToPath(new URL('../../', import.meta.url)));
 const distDir = resolve(projectRoot, 'dist');
@@ -138,7 +138,7 @@ function proxyRequest(req, res) {
       return;
     }
 
-    res.writeHead(502, { 'content-type': 'application/json; charset=utf-8' });
+    res.writeHead(502, {'content-type': 'application/json; charset=utf-8'});
     res.end(
       JSON.stringify({
         ok: false,
@@ -157,7 +157,7 @@ function proxyRequest(req, res) {
 
 function serveStatic(req, res, pathname) {
   if (req.method !== 'GET' && req.method !== 'HEAD') {
-    res.writeHead(405, { allow: 'GET, HEAD' }).end('Method Not Allowed');
+    res.writeHead(405, {allow: 'GET, HEAD'}).end('Method Not Allowed');
     return;
   }
 
@@ -167,7 +167,7 @@ function serveStatic(req, res, pathname) {
     return;
   }
 
-  const { size } = statSync(file);
+  const {size} = statSync(file);
   res.writeHead(200, {
     'content-length': size,
     'content-type': contentType(file),

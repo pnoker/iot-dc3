@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { addUser, deleteUser, listUser, updateUser } from '@/api/user';
-import type { EntityListConfig } from '@/config/types/entityList';
-import { AUTH_NAME_PATTERN, EMAIL_PATTERN, NAME_PATTERN, PHONE_PATTERN } from '@/utils/formRuleUtil';
+import {addUser, deleteUser, listUser, updateUser} from '@/api/user';
+import type {EntityListConfig} from '@/config/types/entityList';
+import {AUTH_NAME_PATTERN, EMAIL_PATTERN, NAME_PATTERN, PHONE_PATTERN} from '@/utils/formRuleUtil';
 
 interface UserHandlers {
   onAssignRoles: (row: Record<string, any>) => void;
@@ -53,15 +53,15 @@ export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers)
       kind: 'input',
       placeholder: t('settings.user.emailPlaceholder'),
     },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true},
   ],
   columns: [
-    { prop: 'nickName', label: t('settings.user.nickName'), minWidth: 120 },
-    { prop: 'userName', label: t('settings.user.userName'), minWidth: 140 },
-    { prop: 'phone', label: t('settings.user.phone'), minWidth: 140 },
-    { prop: 'email', label: t('settings.user.email'), minWidth: 180 },
-    { prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
+    {prop: 'nickName', label: t('settings.user.nickName'), minWidth: 120},
+    {prop: 'userName', label: t('settings.user.userName'), minWidth: 140},
+    {prop: 'phone', label: t('settings.user.phone'), minWidth: 140},
+    {prop: 'email', label: t('settings.user.email'), minWidth: 180},
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
   ],
   fields: [
     {
@@ -71,9 +71,9 @@ export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers)
       maxlength: 32,
       disabledOnEdit: true,
       rules: [
-        { required: true, whitespace: true, message: t('settings.user.userNamePlaceholder'), trigger: 'blur' },
-        { min: 2, max: 32, message: t('common.authNameLength'), trigger: 'blur' },
-        { pattern: AUTH_NAME_PATTERN, message: t('common.authNameFormat'), trigger: 'blur' },
+        {required: true, whitespace: true, message: t('settings.user.userNamePlaceholder'), trigger: 'blur'},
+        {min: 2, max: 32, message: t('common.authNameLength'), trigger: 'blur'},
+        {pattern: AUTH_NAME_PATTERN, message: t('common.authNameFormat'), trigger: 'blur'},
       ],
     },
     {
@@ -82,9 +82,9 @@ export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers)
       placeholder: t('settings.user.nickNamePlaceholder'),
       maxlength: 32,
       rules: [
-        { required: true, whitespace: true, message: t('settings.user.nickNamePlaceholder'), trigger: 'blur' },
-        { min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur' },
-        { pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur' },
+        {required: true, whitespace: true, message: t('settings.user.nickNamePlaceholder'), trigger: 'blur'},
+        {min: 2, max: 32, message: t('common.nameLength'), trigger: 'blur'},
+        {pattern: NAME_PATTERN, message: t('common.nameFormat'), trigger: 'blur'},
       ],
     },
     {
@@ -92,16 +92,16 @@ export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers)
       label: t('settings.user.phone'),
       placeholder: t('settings.user.phonePlaceholder'),
       maxlength: 11,
-      rules: [{ pattern: PHONE_PATTERN, message: t('settings.user.phoneFormat'), trigger: 'blur' }],
+      rules: [{pattern: PHONE_PATTERN, message: t('settings.user.phoneFormat'), trigger: 'blur'}],
     },
     {
       prop: 'email',
       label: t('settings.user.email'),
       placeholder: t('settings.user.emailPlaceholder'),
       maxlength: 128,
-      rules: [{ pattern: EMAIL_PATTERN, message: t('settings.user.emailFormat'), trigger: 'blur' }],
+      rules: [{pattern: EMAIL_PATTERN, message: t('settings.user.emailFormat'), trigger: 'blur'}],
     },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag' },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag'},
   ],
   defaultForm: () => ({
     userName: '',
@@ -111,7 +111,7 @@ export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers)
     enableFlag: 'ENABLE',
   }),
   toPayload: (form) => {
-    const next = { ...form };
+    const next = {...form};
     if (!next.phone) delete next.phone;
     if (!next.email) delete next.email;
     return next;
@@ -120,7 +120,7 @@ export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers)
   add: addUser,
   update: updateUser,
   remove: deleteUser,
-  detail: { routeName: 'settingsUserDetail' },
+  detail: {routeName: 'settingsUserDetail'},
   extraActions: [
     {
       key: 'assignRoles',

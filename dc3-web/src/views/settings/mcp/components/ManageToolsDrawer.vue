@@ -17,7 +17,7 @@
 <template>
   <el-drawer v-model="visible" :title="t('settings.mcp.manageTools')" size="720px">
     <div class="manage-tools__toolbar">
-      <span>{{ t('settings.mcp.selectedTools', { count: selectedToolIds.length }) }}</span>
+      <span>{{ t('settings.mcp.selectedTools', {count: selectedToolIds.length}) }}</span>
       <el-button :loading="submitting" type="primary" @click="submit">{{ t('common.save') }}</el-button>
     </div>
     <el-table
@@ -32,7 +32,7 @@
       <el-table-column type="selection" width="42" />
       <el-table-column :label="t('settings.mcp.toolName')" min-width="220" prop="toolName" show-overflow-tooltip />
       <el-table-column :label="t('settings.mcp.riskLevel')" width="110">
-        <template #default="{ row }">
+        <template #default="{row}">
           <el-tag :type="riskTag(row.riskLevel)">{{ row.riskLevel }}</el-tag>
         </template>
       </el-table-column>
@@ -47,16 +47,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { nextTick, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import type { TableInstance } from 'element-plus';
+  import {nextTick, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import type {TableInstance} from 'element-plus';
 
-  import { listMcpConnectionTool, listMcpTool, replaceMcpConnectionTools } from '@/api/mcp';
-  import { MCP_RISK_LEVELS } from '@/config/constant/enums';
-  import type { McpConnectionRecord, McpToolRecord } from '@/config/types';
-  import { successMessage } from '@/utils/notificationUtil';
+  import {listMcpConnectionTool, listMcpTool, replaceMcpConnectionTools} from '@/api/mcp';
+  import {MCP_RISK_LEVELS} from '@/config/constant/enums';
+  import type {McpConnectionRecord, McpToolRecord} from '@/config/types';
+  import {successMessage} from '@/utils/notificationUtil';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const visible = ref(false);
   const loading = ref(false);
@@ -82,7 +82,7 @@
     visible.value = true;
     loading.value = true;
     try {
-      const [toolRes, selectedRes] = await Promise.all([listMcpTool({ limit: 500 }), listMcpConnectionTool(row.id)]);
+      const [toolRes, selectedRes] = await Promise.all([listMcpTool({limit: 500}), listMcpConnectionTool(row.id)]);
       tools.value = toolRes.data || [];
       selectedToolIds.value = selectedRes.data || [];
     } finally {
@@ -108,7 +108,7 @@
     }
   };
 
-  defineExpose({ open });
+  defineExpose({open});
 </script>
 
 <style lang="scss" scoped>

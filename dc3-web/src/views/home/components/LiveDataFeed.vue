@@ -54,18 +54,18 @@
     </el-timeline>
 
     <template #footer>
-      <span v-if="lastRefreshed">{{ $t('home.liveFeed.updatedAt', { time: formatTime(lastRefreshed) }) }}</span>
+      <span v-if="lastRefreshed">{{ $t('home.liveFeed.updatedAt', {time: formatTime(lastRefreshed)}) }}</span>
       <span v-else>-</span>
-      <span>{{ $t('home.liveFeed.rows', { n: rows.length }) }}</span>
+      <span>{{ $t('home.liveFeed.rows', {n: rows.length}) }}</span>
     </template>
   </dashboard-card>
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {computed, onMounted, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { streamLatest } from '@/api/dashboard';
+  import {streamLatest} from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
   interface Row {
@@ -85,10 +85,10 @@
   }
 
   const props = defineProps({
-    size: { type: Number, default: 20 },
+    size: {type: Number, default: 20},
   });
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const loading = ref(false);
   const rows = ref<Row[]>([]);
@@ -96,10 +96,10 @@
   const intervalMs = ref(0);
 
   const intervalOptions = computed(() => [
-    { label: t('home.liveFeed.intervalOff'), value: 0 },
-    { label: '5s', value: 5000 },
-    { label: '10s', value: 10000 },
-    { label: '30s', value: 30000 },
+    {label: t('home.liveFeed.intervalOff'), value: 0},
+    {label: '5s', value: 5000},
+    {label: '10s', value: 10000},
+    {label: '30s', value: 30000},
   ]);
 
   const refresh = async () => {
@@ -129,7 +129,7 @@
     if (!v) return '';
     const d = typeof v === 'string' ? new Date(v.replace(' ', 'T')) : v;
     if (Number.isNaN(d.getTime())) return String(v);
-    return d.toLocaleTimeString('zh-CN', { hour12: false });
+    return d.toLocaleTimeString('zh-CN', {hour12: false});
   };
 
   const typeColor = (vt?: string) => {

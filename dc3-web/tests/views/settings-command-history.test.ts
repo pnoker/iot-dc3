@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const commandMocks = vi.hoisted(() => ({
-  getCommandHistoryByRecordId: vi.fn(() => Promise.resolve({ data: {} })),
-  listCommandHistory: vi.fn(() => Promise.resolve({ data: { records: [], total: 0 } })),
+  getCommandHistoryByRecordId: vi.fn(() => Promise.resolve({data: {}})),
+  listCommandHistory: vi.fn(() => Promise.resolve({data: {records: [], total: 0}})),
 }));
 
 vi.mock('@/api/command', () => commandMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('CommandHistory view', () => {
   it('lists command history on mount', async () => {
     const CommandHistory = (await import('@/views/settings/command/CommandHistory.vue')).default;
-    await mountListPage({ component: CommandHistory });
+    await mountListPage({component: CommandHistory});
     await flushPromises();
     expect(commandMocks.listCommandHistory).toHaveBeenCalledTimes(1);
   });

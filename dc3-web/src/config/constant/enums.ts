@@ -25,137 +25,137 @@ export interface EnumOption {
 }
 
 export const RESOURCE_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'DRIVER', value: 'DRIVER' },
-  { label: 'PROFILE', value: 'PROFILE' },
-  { label: 'POINT', value: 'POINT' },
-  { label: 'DEVICE', value: 'DEVICE' },
-  { label: 'DATA', value: 'DATA' },
-  { label: 'MENU', value: 'MENU' },
-  { label: 'API', value: 'API' },
+  {label: 'DRIVER', value: 'DRIVER'},
+  {label: 'PROFILE', value: 'PROFILE'},
+  {label: 'POINT', value: 'POINT'},
+  {label: 'DEVICE', value: 'DEVICE'},
+  {label: 'DATA', value: 'DATA'},
+  {label: 'MENU', value: 'MENU'},
+  {label: 'API', value: 'API'},
 ];
 
 export const RESOURCE_SCOPE_OPTIONS: EnumOption[] = [
-  { label: 'ADD', value: 'ADD' },
-  { label: 'DELETE', value: 'DELETE' },
-  { label: 'UPDATE', value: 'UPDATE' },
-  { label: 'LIST', value: 'LIST' },
+  {label: 'ADD', value: 'ADD'},
+  {label: 'DELETE', value: 'DELETE'},
+  {label: 'UPDATE', value: 'UPDATE'},
+  {label: 'LIST', value: 'LIST'},
 ];
 
 export const API_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'GET', value: 'GET' },
-  { label: 'POST', value: 'POST' },
-  { label: 'PUT', value: 'PUT' },
-  { label: 'DELETE', value: 'DELETE' },
+  {label: 'GET', value: 'GET'},
+  {label: 'POST', value: 'POST'},
+  {label: 'PUT', value: 'PUT'},
+  {label: 'DELETE', value: 'DELETE'},
 ];
 
 export const ENABLE_FLAG_OPTIONS: EnumOption[] = [
-  { label: 'ENABLE', value: 'ENABLE' },
-  { label: 'DISABLE', value: 'DISABLE' },
+  {label: 'ENABLE', value: 'ENABLE'},
+  {label: 'DISABLE', value: 'DISABLE'},
 ];
 
 export const ENTITY_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'DRIVER', value: 'DRIVER' },
-  { label: 'PROFILE', value: 'PROFILE' },
-  { label: 'POINT', value: 'POINT' },
-  { label: 'DEVICE', value: 'DEVICE' },
+  {label: 'DRIVER', value: 'DRIVER'},
+  {label: 'PROFILE', value: 'PROFILE'},
+  {label: 'POINT', value: 'POINT'},
+  {label: 'DEVICE', value: 'DEVICE'},
 ];
 
 export const MENU_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'TITLE', value: 'TITLE' },
-  { label: 'COMMON', value: 'COMMON' },
+  {label: 'TITLE', value: 'TITLE'},
+  {label: 'COMMON', value: 'COMMON'},
 ];
 
 export const MENU_LEVEL_OPTIONS: EnumOption[] = [
-  { label: 'ROOT', value: 'ROOT' },
-  { label: 'C1', value: 'C1' },
-  { label: 'C2', value: 'C2' },
-  { label: 'C3', value: 'C3' },
-  { label: 'C4', value: 'C4' },
+  {label: 'ROOT', value: 'ROOT'},
+  {label: 'C1', value: 'C1'},
+  {label: 'C2', value: 'C2'},
+  {label: 'C3', value: 'C3'},
+  {label: 'C4', value: 'C4'},
 ];
 
 // Backend: DriverTypeEnum
 export const DRIVER_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'DRIVER_CLIENT', value: 'DRIVER_CLIENT' },
-  { label: 'DRIVER_SERVER', value: 'DRIVER_SERVER' },
-  { label: 'GATEWAY', value: 'GATEWAY' },
-  { label: 'CONNECT', value: 'CONNECT' },
+  {label: 'DRIVER_CLIENT', value: 'DRIVER_CLIENT'},
+  {label: 'DRIVER_SERVER', value: 'DRIVER_SERVER'},
+  {label: 'GATEWAY', value: 'GATEWAY'},
+  {label: 'CONNECT', value: 'CONNECT'},
 ];
 
 // Backend: ProfileTypeEnum
 export const PROFILE_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'SYSTEM', value: 'SYSTEM' },
-  { label: 'DRIVER', value: 'DRIVER' },
-  { label: 'USER', value: 'USER' },
+  {label: 'SYSTEM', value: 'SYSTEM'},
+  {label: 'DRIVER', value: 'DRIVER'},
+  {label: 'USER', value: 'USER'},
 ];
 
 // Backend: PointTypeEnum
 export const POINT_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'STRING', value: 'STRING' },
-  { label: 'BYTE', value: 'BYTE' },
-  { label: 'SHORT', value: 'SHORT' },
-  { label: 'INT', value: 'INT' },
-  { label: 'LONG', value: 'LONG' },
-  { label: 'FLOAT', value: 'FLOAT' },
-  { label: 'DOUBLE', value: 'DOUBLE' },
-  { label: 'BOOLEAN', value: 'BOOLEAN' },
+  {label: 'STRING', value: 'STRING'},
+  {label: 'BYTE', value: 'BYTE'},
+  {label: 'SHORT', value: 'SHORT'},
+  {label: 'INT', value: 'INT'},
+  {label: 'LONG', value: 'LONG'},
+  {label: 'FLOAT', value: 'FLOAT'},
+  {label: 'DOUBLE', value: 'DOUBLE'},
+  {label: 'BOOLEAN', value: 'BOOLEAN'},
 ];
 
 // Backend: ProfileShareTypeEnum
 export const PROFILE_SHARE_OPTIONS: EnumOption[] = [
-  { label: 'TENANT', value: 'TENANT' },
-  { label: 'DRIVER', value: 'DRIVER' },
-  { label: 'USER', value: 'USER' },
+  {label: 'TENANT', value: 'TENANT'},
+  {label: 'DRIVER', value: 'DRIVER'},
+  {label: 'USER', value: 'USER'},
 ];
 
 // Backend: RwTypeEnum
 export const RW_FLAG_OPTIONS: EnumOption[] = [
-  { label: 'R', value: 'READ_ONLY' },
-  { label: 'W', value: 'WRITE_ONLY' },
-  { label: 'RW', value: 'READ_WRITE' },
+  {label: 'R', value: 'READ_ONLY'},
+  {label: 'W', value: 'WRITE_ONLY'},
+  {label: 'RW', value: 'READ_WRITE'},
 ];
 
 // Backend: AlarmTypeEnum
 export const ALARM_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'RULE', value: 'RULE' },
-  { label: 'OFFLINE', value: 'OFFLINE' },
-  { label: 'FAULT', value: 'FAULT' },
-  { label: 'STATE_FLIP', value: 'STATE_FLIP' },
-  { label: 'REPORT', value: 'REPORT' },
+  {label: 'RULE', value: 'RULE'},
+  {label: 'OFFLINE', value: 'OFFLINE'},
+  {label: 'FAULT', value: 'FAULT'},
+  {label: 'STATE_FLIP', value: 'STATE_FLIP'},
+  {label: 'REPORT', value: 'REPORT'},
 ];
 
 // Backend: CommandTypeEnum
 export const COMMAND_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'CUSTOM', value: 'CUSTOM' },
-  { label: 'CONFIG', value: 'CONFIG' },
-  { label: 'ACTION', value: 'ACTION' },
+  {label: 'CUSTOM', value: 'CUSTOM'},
+  {label: 'CONFIG', value: 'CONFIG'},
+  {label: 'ACTION', value: 'ACTION'},
 ];
 
 // Backend: CallTypeEnum
 export const CALL_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'SYNC', value: 'SYNC' },
-  { label: 'ASYNC', value: 'ASYNC' },
+  {label: 'SYNC', value: 'SYNC'},
+  {label: 'ASYNC', value: 'ASYNC'},
 ];
 
 // Backend: ParamDirectionTypeEnum
 export const PARAM_DIRECTION_OPTIONS: EnumOption[] = [
-  { label: 'INPUT', value: 'INPUT' },
-  { label: 'OUTPUT', value: 'OUTPUT' },
+  {label: 'INPUT', value: 'INPUT'},
+  {label: 'OUTPUT', value: 'OUTPUT'},
 ];
 
 // Backend: EventTypeFlagEnum
 export const EVENT_TYPE_OPTIONS: EnumOption[] = [
-  { label: 'INFO', value: 'INFO' },
-  { label: 'ALERT', value: 'ALERT' },
-  { label: 'FAULT', value: 'FAULT' },
-  { label: 'LIFECYCLE', value: 'LIFECYCLE' },
+  {label: 'INFO', value: 'INFO'},
+  {label: 'ALERT', value: 'ALERT'},
+  {label: 'FAULT', value: 'FAULT'},
+  {label: 'LIFECYCLE', value: 'LIFECYCLE'},
 ];
 
 // Backend: EventLevelEnum
 export const EVENT_LEVEL_OPTIONS: EnumOption[] = [
-  { label: 'LOW', value: 'LOW' },
-  { label: 'MEDIUM', value: 'MEDIUM' },
-  { label: 'HIGH', value: 'HIGH' },
-  { label: 'CRITICAL', value: 'CRITICAL' },
+  {label: 'LOW', value: 'LOW'},
+  {label: 'MEDIUM', value: 'MEDIUM'},
+  {label: 'HIGH', value: 'HIGH'},
+  {label: 'CRITICAL', value: 'CRITICAL'},
 ];
 
 // Backend: OAuth registered client type
@@ -165,8 +165,8 @@ export const MCP_CLIENT_TYPES = {
 } as const;
 
 export const MCP_CLIENT_TYPE_OPTIONS: EnumOption[] = [
-  { label: MCP_CLIENT_TYPES.PUBLIC, value: MCP_CLIENT_TYPES.PUBLIC },
-  { label: MCP_CLIENT_TYPES.CONFIDENTIAL, value: MCP_CLIENT_TYPES.CONFIDENTIAL },
+  {label: MCP_CLIENT_TYPES.PUBLIC, value: MCP_CLIENT_TYPES.PUBLIC},
+  {label: MCP_CLIENT_TYPES.CONFIDENTIAL, value: MCP_CLIENT_TYPES.CONFIDENTIAL},
 ];
 
 // Backend: OAuth grant type
@@ -176,8 +176,8 @@ export const MCP_GRANT_TYPES = {
 } as const;
 
 export const MCP_GRANT_TYPE_OPTIONS: EnumOption[] = [
-  { label: MCP_GRANT_TYPES.AUTHORIZATION_CODE, value: MCP_GRANT_TYPES.AUTHORIZATION_CODE },
-  { label: MCP_GRANT_TYPES.CLIENT_CREDENTIALS, value: MCP_GRANT_TYPES.CLIENT_CREDENTIALS },
+  {label: MCP_GRANT_TYPES.AUTHORIZATION_CODE, value: MCP_GRANT_TYPES.AUTHORIZATION_CODE},
+  {label: MCP_GRANT_TYPES.CLIENT_CREDENTIALS, value: MCP_GRANT_TYPES.CLIENT_CREDENTIALS},
 ];
 
 // Backend: PrincipalTypeEnum
@@ -187,8 +187,8 @@ export const MCP_PRINCIPAL_TYPES = {
 } as const;
 
 export const MCP_PRINCIPAL_TYPE_OPTIONS: EnumOption[] = [
-  { label: MCP_PRINCIPAL_TYPES.USER, value: MCP_PRINCIPAL_TYPES.USER },
-  { label: MCP_PRINCIPAL_TYPES.SERVICE_ACCOUNT, value: MCP_PRINCIPAL_TYPES.SERVICE_ACCOUNT },
+  {label: MCP_PRINCIPAL_TYPES.USER, value: MCP_PRINCIPAL_TYPES.USER},
+  {label: MCP_PRINCIPAL_TYPES.SERVICE_ACCOUNT, value: MCP_PRINCIPAL_TYPES.SERVICE_ACCOUNT},
 ];
 
 // Backend: McpConstant.Scope
@@ -199,9 +199,9 @@ export const MCP_SCOPES = {
 } as const;
 
 export const MCP_SCOPE_OPTIONS: EnumOption[] = [
-  { label: MCP_SCOPES.TOOLS_LIST, value: MCP_SCOPES.TOOLS_LIST },
-  { label: MCP_SCOPES.TOOLS_CALL, value: MCP_SCOPES.TOOLS_CALL },
-  { label: MCP_SCOPES.TOOLS_CALL_HIGH, value: MCP_SCOPES.TOOLS_CALL_HIGH },
+  {label: MCP_SCOPES.TOOLS_LIST, value: MCP_SCOPES.TOOLS_LIST},
+  {label: MCP_SCOPES.TOOLS_CALL, value: MCP_SCOPES.TOOLS_CALL},
+  {label: MCP_SCOPES.TOOLS_CALL_HIGH, value: MCP_SCOPES.TOOLS_CALL_HIGH},
 ];
 
 // Backend: MCP tool risk level
@@ -212,7 +212,7 @@ export const MCP_RISK_LEVELS = {
 } as const;
 
 export const MCP_RISK_LEVEL_OPTIONS: EnumOption[] = [
-  { label: MCP_RISK_LEVELS.LOW, value: MCP_RISK_LEVELS.LOW },
-  { label: MCP_RISK_LEVELS.MEDIUM, value: MCP_RISK_LEVELS.MEDIUM },
-  { label: MCP_RISK_LEVELS.HIGH, value: MCP_RISK_LEVELS.HIGH },
+  {label: MCP_RISK_LEVELS.LOW, value: MCP_RISK_LEVELS.LOW},
+  {label: MCP_RISK_LEVELS.MEDIUM, value: MCP_RISK_LEVELS.MEDIUM},
+  {label: MCP_RISK_LEVELS.HIGH, value: MCP_RISK_LEVELS.HIGH},
 ];

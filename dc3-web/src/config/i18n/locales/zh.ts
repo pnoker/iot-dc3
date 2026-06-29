@@ -311,7 +311,7 @@ export default {
     activity: {
       title: '小时数据活跃度',
       count: '数据条数',
-      dow: { sun: '周日', mon: '周一', tue: '周二', wed: '周三', thu: '周四', fri: '周五', sat: '周六' },
+      dow: {sun: '周日', mon: '周一', tue: '周二', wed: '周三', thu: '周四', fri: '周五', sat: '周六'},
     },
     topology: {
       title: '拓扑与数据流向',
@@ -344,7 +344,7 @@ export default {
       serviceDatabase: '数据库',
       serviceMq: '消息队列',
       serviceGateway: '网关',
-      group: { center: '中心', infra: '基础设施', drivers: '驱动', devices: '设备' },
+      group: {center: '中心', infra: '基础设施', drivers: '驱动', devices: '设备'},
     },
   },
   layout: {

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
 import MatrixStatusSegmented from '@/components/segmented/MatrixStatusSegmented.vue';
@@ -44,14 +44,14 @@ function mountSegmented(props: Record<string, unknown> = {}) {
     props,
     global: {
       plugins: [i18n],
-      stubs: { ElSegmented: ElSegmentedStub },
+      stubs: {ElSegmented: ElSegmentedStub},
     },
   });
 }
 
 describe('MatrixStatusSegmented', () => {
   it('renders all matrix status options', () => {
-    const wrapper = mountSegmented({ modelValue: '', size: 'small' });
+    const wrapper = mountSegmented({modelValue: '', size: 'small'});
     const buttons = wrapper.findAll('button');
 
     expect(wrapper.find('.segmented-stub').attributes('data-size')).toBe('small');
@@ -67,7 +67,7 @@ describe('MatrixStatusSegmented', () => {
   });
 
   it('emits selected matrix status', async () => {
-    const wrapper = mountSegmented({ modelValue: '' });
+    const wrapper = mountSegmented({modelValue: ''});
 
     await wrapper.findAll('button')[3].trigger('click');
 

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { crudAdd, crudDelete, crudGetById, crudList, crudUpdate } from '@/api/common';
-import { API_DATA_BASE } from '@/config/constant/api';
-import type { PageQuery } from '@/config/types';
+import {crudAdd, crudDelete, crudGetById, crudList, crudUpdate} from '@/api/common';
+import {API_DATA_BASE} from '@/config/constant/api';
+import type {PageQuery} from '@/config/types';
 import type {
   MessageRecord,
   NotifyChannelBindRecord,

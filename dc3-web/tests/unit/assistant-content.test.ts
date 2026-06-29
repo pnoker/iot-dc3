@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
-import { parseAssistantContent, toPlainText } from '@/components/agentic/assistantContent';
+import {parseAssistantContent, toPlainText} from '@/components/agentic/assistantContent';
 
 describe('assistant content parser', () => {
   it('keeps model-emitted tool-call JSON as visible markdown', () => {

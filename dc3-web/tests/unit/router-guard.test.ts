@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPinia, setActivePinia } from 'pinia';
-import type { RouteRecordRaw } from 'vue-router';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
+import type {RouteRecordRaw} from 'vue-router';
 
-import { AUTH_HEADERS } from '@/config/constant/common';
-import { setStorage } from '@/utils/storageUtil';
+import {AUTH_HEADERS} from '@/config/constant/common';
+import {setStorage} from '@/utils/storageUtil';
 
-import { seedAuthStorage } from '../fixtures/auth';
+import {seedAuthStorage} from '../fixtures/auth';
 
 const menuStoreMocks = vi.hoisted(() => {
   const fetchTree = vi.fn(() => Promise.resolve());
   const reset = vi.fn();
   const tree = [
-    { id: 1, parentMenuId: 0, menuName: 'Home', menuCode: 'home', children: [] },
-    { id: 2, parentMenuId: 0, menuName: 'Settings', menuCode: 'settings', children: [] },
-    { id: 3, parentMenuId: 0, menuName: 'Point Value', menuCode: 'pointValue', children: [] },
+    {id: 1, parentMenuId: 0, menuName: 'Home', menuCode: 'home', children: []},
+    {id: 2, parentMenuId: 0, menuName: 'Settings', menuCode: 'settings', children: []},
+    {id: 3, parentMenuId: 0, menuName: 'Point Value', menuCode: 'pointValue', children: []},
   ];
   const store = {
     tree,
@@ -39,7 +39,7 @@ const menuStoreMocks = vi.hoisted(() => {
     reset,
     findByCode: vi.fn((code: string) => tree.find((node) => node.menuCode === code)),
   };
-  return { fetchTree, reset, store };
+  return {fetchTree, reset, store};
 });
 
 const elementPlusMocks = vi.hoisted(() => ({
@@ -61,39 +61,39 @@ vi.mock('element-plus', () => elementPlusMocks);
 // can be instantiated in jsdom without dragging in the entire view tree.
 
 const routeStubs = vi.hoisted(() => {
-  const stubComponent = { render: () => null };
+  const stubComponent = {render: () => null};
   const common: RouteRecordRaw[] = [
-    { name: 'login', path: '/login', meta: { title: 'Login' }, component: stubComponent },
-    { name: '404', path: '/404', component: stubComponent },
-    { path: '/:catchAll(.*)', redirect: '/404' },
+    {name: 'login', path: '/login', meta: {title: 'Login'}, component: stubComponent},
+    {name: '404', path: '/404', component: stubComponent},
+    {path: '/:catchAll(.*)', redirect: '/404'},
   ];
   const views: RouteRecordRaw = {
     name: 'home',
     path: '/',
-    meta: { title: 'IoT DC3' },
+    meta: {title: 'IoT DC3'},
     component: stubComponent,
   };
   const settings: RouteRecordRaw = {
     name: 'settings',
     path: '/settings',
-    meta: { title: 'Settings' },
+    meta: {title: 'Settings'},
     component: stubComponent,
   };
   const operate: RouteRecordRaw[] = [
     {
       name: 'reports',
       path: '/reports',
-      meta: { title: 'Reports' },
+      meta: {title: 'Reports'},
       component: stubComponent,
     },
     {
       name: 'pointDetail',
       path: '/point/detail',
-      meta: { title: 'Point Detail' },
+      meta: {title: 'Point Detail'},
       component: stubComponent,
     },
   ];
-  return { common, views, settings, operate };
+  return {common, views, settings, operate};
 });
 
 const nprogressMock = vi.hoisted(() => ({
@@ -103,19 +103,19 @@ const nprogressMock = vi.hoisted(() => ({
   remove: vi.fn(),
 }));
 
-vi.mock('nprogress', () => ({ default: nprogressMock }));
+vi.mock('nprogress', () => ({default: nprogressMock}));
 // Stylesheet import in router/index.ts has no effect in unit tests but happy-dom
 // resolves it through Vite's CSS handling — stub out to keep the import quiet.
 vi.mock('nprogress/nprogress.css', () => ({}));
 
-vi.mock('@/config/router/common', () => ({ default: routeStubs.common }));
-vi.mock('@/config/router/views', () => ({ default: routeStubs.views }));
-vi.mock('@/config/router/settings', () => ({ default: routeStubs.settings }));
-vi.mock('@/config/router/operate', () => ({ default: routeStubs.operate }));
+vi.mock('@/config/router/common', () => ({default: routeStubs.common}));
+vi.mock('@/config/router/views', () => ({default: routeStubs.views}));
+vi.mock('@/config/router/settings', () => ({default: routeStubs.settings}));
+vi.mock('@/config/router/operate', () => ({default: routeStubs.operate}));
 
 async function loadRouter() {
   vi.resetModules();
-  const { default: router } = await import('@/config/router');
+  const {default: router} = await import('@/config/router');
   return router;
 }
 
@@ -136,7 +136,7 @@ describe('router beforeEach guard', () => {
   it('always allows navigation to the login page even when unauthenticated', async () => {
     const router = await loadRouter();
 
-    await router.push({ name: 'login' });
+    await router.push({name: 'login'});
 
     expect(router.currentRoute.value.name).toBe('login');
   });
@@ -144,7 +144,7 @@ describe('router beforeEach guard', () => {
   it('redirects to login when any of tenant/user/token is missing', async () => {
     const router = await loadRouter();
 
-    await router.push({ name: 'home' });
+    await router.push({name: 'home'});
 
     // Without credentials the guard returns { name: 'login' }.
     expect(router.currentRoute.value.name).toBe('login');
@@ -154,7 +154,7 @@ describe('router beforeEach guard', () => {
     seedAuthStorage();
     const router = await loadRouter();
 
-    await router.push({ name: 'settings' });
+    await router.push({name: 'settings'});
 
     expect(router.currentRoute.value.name).toBe('settings');
     expect(document.title).toBe('Settings');
@@ -164,7 +164,7 @@ describe('router beforeEach guard', () => {
     seedAuthStorage();
     const router = await loadRouter();
 
-    await router.push({ name: 'reports' });
+    await router.push({name: 'reports'});
 
     expect(router.currentRoute.value.name).toBe('home');
     expect(elementPlusMocks.ElMessage.warning).toHaveBeenCalledTimes(1);
@@ -174,7 +174,7 @@ describe('router beforeEach guard', () => {
     seedAuthStorage();
     const router = await loadRouter();
 
-    await router.push({ name: 'pointDetail' });
+    await router.push({name: 'pointDetail'});
 
     expect(router.currentRoute.value.name).toBe('pointDetail');
   });
@@ -185,7 +185,7 @@ describe('router beforeEach guard', () => {
     // Token deliberately not set.
     const router = await loadRouter();
 
-    await router.push({ name: 'home' });
+    await router.push({name: 'home'});
 
     expect(router.currentRoute.value.name).toBe('login');
   });
@@ -193,10 +193,10 @@ describe('router beforeEach guard', () => {
   it('redirects to login when the stored token payload is incomplete', async () => {
     setStorage(AUTH_HEADERS.TENANT, 'acme');
     setStorage(AUTH_HEADERS.LOGIN, 'alice');
-    setStorage(AUTH_HEADERS.TOKEN, { salt: 'salt-only' });
+    setStorage(AUTH_HEADERS.TOKEN, {salt: 'salt-only'});
     const router = await loadRouter();
 
-    await router.push({ name: 'home' });
+    await router.push({name: 'home'});
 
     expect(router.currentRoute.value.name).toBe('login');
     expect(localStorage.getItem(AUTH_HEADERS.TENANT)).toBeNull();

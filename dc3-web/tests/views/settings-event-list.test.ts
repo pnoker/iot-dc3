@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const eventMocks = vi.hoisted(() => ({
-  addEvent: vi.fn(() => Promise.resolve({ data: true })),
-  addEventParam: vi.fn(() => Promise.resolve({ data: true })),
-  deleteEvent: vi.fn(() => Promise.resolve({ data: true })),
-  deleteEventParam: vi.fn(() => Promise.resolve({ data: true })),
-  listEvent: vi.fn(() => Promise.resolve({ data: { records: [], total: 0 } })),
-  updateEvent: vi.fn(() => Promise.resolve({ data: true })),
-  updateEventParam: vi.fn(() => Promise.resolve({ data: true })),
+  addEvent: vi.fn(() => Promise.resolve({data: true})),
+  addEventParam: vi.fn(() => Promise.resolve({data: true})),
+  deleteEvent: vi.fn(() => Promise.resolve({data: true})),
+  deleteEventParam: vi.fn(() => Promise.resolve({data: true})),
+  listEvent: vi.fn(() => Promise.resolve({data: {records: [], total: 0}})),
+  updateEvent: vi.fn(() => Promise.resolve({data: true})),
+  updateEventParam: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/event', () => eventMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('EventList view', () => {
   it('lists event definitions on mount', async () => {
@@ -38,9 +38,9 @@ describe('EventList view', () => {
     await mountListPage({
       component: EventList,
       stubs: {
-        EventCard: { template: '<div />' },
-        EventTool: { template: '<div />' },
-        EventEditForm: { template: '<div />' },
+        EventCard: {template: '<div />'},
+        EventTool: {template: '<div />'},
+        EventEditForm: {template: '<div />'},
       },
     });
     await flushPromises();

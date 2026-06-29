@@ -62,10 +62,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, onUnmounted, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useAuthStore } from '@/store/modules/auth';
-  import { systemHealth } from '@/api/dashboard';
+  import {computed, onMounted, onUnmounted, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useAuthStore} from '@/store/modules/auth';
+  import {systemHealth} from '@/api/dashboard';
 
   interface ServiceRow {
     key: string;
@@ -73,7 +73,7 @@
     status: 'up' | 'down';
   }
 
-  const { t, locale } = useI18n();
+  const {t, locale} = useI18n();
   const authStore = useAuthStore();
 
   // Map vue-i18n locale strings to browser BCP-47 tags; fall back to the
@@ -95,12 +95,12 @@
   // Defaults to all-up so the banner doesn't flash "down" during the first
   // request. If /system/health fails we leave everything up (probably the
   // browser's offline — the user can tell from the broken requests below).
-  const center = ref<Record<string, string>>({ auth: 'up', data: 'up', manager: 'up' });
-  const infra = ref<Record<string, string>>({ database: 'up', mq: 'up', gateway: 'up' });
-  const drivers = ref<{ total: number; online: number }>({ total: 0, online: 0 });
-  const devices = ref<{ total: number; online: number }>({ total: 0, online: 0 });
+  const center = ref<Record<string, string>>({auth: 'up', data: 'up', manager: 'up'});
+  const infra = ref<Record<string, string>>({database: 'up', mq: 'up', gateway: 'up'});
+  const drivers = ref<{total: number; online: number}>({total: 0, online: 0});
+  const devices = ref<{total: number; online: number}>({total: 0, online: 0});
 
-  const fleetDotTone = (f: { total: number; online: number }): 'up' | 'partial' | 'down' => {
+  const fleetDotTone = (f: {total: number; online: number}): 'up' | 'partial' | 'down' => {
     if (f.total > 0 && f.online === f.total) return 'up';
     if (f.online > 0) return 'partial';
     return 'down';
@@ -127,8 +127,8 @@
   const tick = () => {
     const d = new Date();
     const tag = bcp47();
-    now.value = d.toLocaleTimeString(tag, { hour12: false });
-    date.value = d.toLocaleDateString(tag, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+    now.value = d.toLocaleTimeString(tag, {hour12: false});
+    date.value = d.toLocaleDateString(tag, {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'});
   };
 
   const refreshHealth = async () => {
@@ -138,8 +138,8 @@
       if (!data) return;
       if (data.center) center.value = data.center;
       if (data.infra) infra.value = data.infra;
-      if (data.drivers) drivers.value = { total: data.drivers.total ?? 0, online: data.drivers.online ?? 0 };
-      if (data.devices) devices.value = { total: data.devices.total ?? 0, online: data.devices.online ?? 0 };
+      if (data.drivers) drivers.value = {total: data.drivers.total ?? 0, online: data.drivers.online ?? 0};
+      if (data.devices) devices.value = {total: data.devices.total ?? 0, online: data.devices.online ?? 0};
     } catch {
       // handled globally
     }

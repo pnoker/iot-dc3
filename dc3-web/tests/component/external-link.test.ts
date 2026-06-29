@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import ExternalLink from '@/components/link/ExternalLink.vue';
 
@@ -28,8 +28,8 @@ const ElLinkStub = {
 describe('ExternalLink', () => {
   it('always opens in a new tab with the noopener relation', () => {
     const wrapper = mount(ExternalLink, {
-      props: { href: 'https://dc3.io/docs' },
-      global: { stubs: { ElLink: ElLinkStub } },
+      props: {href: 'https://dc3.io/docs'},
+      global: {stubs: {ElLink: ElLinkStub}},
     });
 
     const anchor = wrapper.find('a.el-link-stub');
@@ -43,9 +43,9 @@ describe('ExternalLink', () => {
 
   it('honors the custom type prop and renders slot content when provided', () => {
     const wrapper = mount(ExternalLink, {
-      props: { href: 'https://example.com', type: 'success' },
-      slots: { default: 'Visit example' },
-      global: { stubs: { ElLink: ElLinkStub } },
+      props: {href: 'https://example.com', type: 'success'},
+      slots: {default: 'Visit example'},
+      global: {stubs: {ElLink: ElLinkStub}},
     });
 
     const anchor = wrapper.find('a.el-link-stub');

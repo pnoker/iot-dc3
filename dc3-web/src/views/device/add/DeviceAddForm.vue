@@ -97,15 +97,15 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, unref } from 'vue';
-  import type { FormInstance, FormRules } from 'element-plus';
-  import { useI18n } from 'vue-i18n';
+  import {reactive, ref, unref} from 'vue';
+  import type {FormInstance, FormRules} from 'element-plus';
+  import {useI18n} from 'vue-i18n';
 
-  import type { Dictionary } from '@/config/types';
+  import type {Dictionary} from '@/config/types';
 
-  import { successMessage } from '@/utils/notificationUtil';
-  import { nameRules, remarkRules } from '@/utils/formRuleUtil';
-  import { listDriverDictionary, listProfileDictionary } from '@/api/dictionary';
+  import {successMessage} from '@/utils/notificationUtil';
+  import {nameRules, remarkRules} from '@/utils/formRuleUtil';
+  import {listDriverDictionary, listProfileDictionary} from '@/api/dictionary';
 
   interface DeviceAddFormData {
     deviceName: string;
@@ -124,7 +124,7 @@
     (e: 'add', formData: DeviceAddFormData, done: () => void): void;
   }>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const formDataRef = ref<FormInstance>();
 
   const reactiveData = reactive({
@@ -164,7 +164,7 @@
     reactiveData.driverLoading = true;
     try {
       const res = await listDriverDictionary<DictionaryResponse>({
-        page: { size: 50, current: 1 },
+        page: {size: 50, current: 1},
         label: query,
       });
       reactiveData.driverDictionary = res.data.records ?? [];
@@ -185,7 +185,7 @@
     reactiveData.profileLoading = true;
     try {
       const res = await listProfileDictionary<DictionaryResponse>({
-        page: { size: 50, current: 1 },
+        page: {size: 50, current: 1},
         label: query,
       });
       reactiveData.profileDictionary = res.data.records ?? [];
@@ -223,7 +223,7 @@
 
     try {
       await form.validate();
-      emit('add', { ...reactiveData.formData }, () => {
+      emit('add', {...reactiveData.formData}, () => {
         cancel();
         reset();
         successMessage();

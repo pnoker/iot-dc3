@@ -104,7 +104,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { UploadFilled } from '@element-plus/icons-vue';
+  import {UploadFilled} from '@element-plus/icons-vue';
   import type {
     FormInstance,
     FormRules,
@@ -113,14 +113,14 @@
     UploadRawFile,
     UploadRequestOptions,
   } from 'element-plus';
-  import { genFileId } from 'element-plus';
-  import { reactive, ref, unref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {genFileId} from 'element-plus';
+  import {reactive, ref, unref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import type { Dictionary } from '@/config/types';
+  import type {Dictionary} from '@/config/types';
 
-  import { listDriverDictionary, listProfileDictionary } from '@/api/dictionary';
-  import { successMessage } from '@/utils/notificationUtil';
+  import {listDriverDictionary, listProfileDictionary} from '@/api/dictionary';
+  import {successMessage} from '@/utils/notificationUtil';
 
   interface DictionaryPage {
     records: Dictionary[];
@@ -139,7 +139,7 @@
     (e: 'import', formData: DeviceImportFormData, done: () => void): void;
   }>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const formDataRef = ref<FormInstance>();
   const formUploadRef = ref<UploadInstance>();
 
@@ -177,7 +177,7 @@
     reactiveData.driverLoading = true;
     try {
       const res = await listDriverDictionary<DictionaryResponse>({
-        page: { size: 50, current: 1 },
+        page: {size: 50, current: 1},
         label: query,
       });
       reactiveData.driverDictionary = res.data.records ?? [];
@@ -198,7 +198,7 @@
     reactiveData.profileLoading = true;
     try {
       const res = await listProfileDictionary<DictionaryResponse>({
-        page: { size: 50, current: 1 },
+        page: {size: 50, current: 1},
         label: query,
       });
       reactiveData.profileDictionary = res.data.records ?? [];
@@ -239,7 +239,7 @@
 
     try {
       await form.validate();
-      emit('import-template', { ...reactiveData.formData }, () => {
+      emit('import-template', {...reactiveData.formData}, () => {
         successMessage(t('device.import.templateSuccess'));
       });
     } catch {

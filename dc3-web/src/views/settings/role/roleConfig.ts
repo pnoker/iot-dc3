@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { addRole, deleteRole, listRole, listRoleTree, updateRole } from '@/api/role';
-import type { EntityListConfig } from '@/config/types/entityList';
-import { authNameRules, remarkRules } from '@/utils/formRuleUtil';
+import {addRole, deleteRole, listRole, listRoleTree, updateRole} from '@/api/role';
+import type {EntityListConfig} from '@/config/types/entityList';
+import {authNameRules, remarkRules} from '@/utils/formRuleUtil';
 
 interface RoleHandlers {
   onAssignResources: (row: Record<string, any>) => void;
 }
 
 const normalizeRolePayload = (p: Record<string, unknown>) => {
-  const next = { ...p };
+  const next = {...p};
   if (!next.parentRoleId) next.parentRoleId = 0;
   return next;
 };
@@ -47,25 +47,25 @@ export const createRoleConfig = (t: ComposerTranslation, handlers: RoleHandlers)
       kind: 'input',
       placeholder: t('settings.role.roleCodePlaceholder'),
     },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true},
   ],
   columns: [
-    { prop: 'roleName', label: t('settings.role.roleName'), minWidth: 160 },
-    { prop: 'roleCode', label: t('settings.role.roleCode'), minWidth: 160 },
-    { prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90 },
-    { prop: 'remark', label: t('common.remark'), minWidth: 200 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
+    {prop: 'roleName', label: t('settings.role.roleName'), minWidth: 160},
+    {prop: 'roleCode', label: t('settings.role.roleCode'), minWidth: 160},
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
+    {prop: 'remark', label: t('common.remark'), minWidth: 200},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
   ],
   fields: [
     {
       prop: 'parentRoleId',
       label: t('settings.role.parentRoleId'),
       kind: 'treeSelect',
-      rules: [{ required: true, message: t('settings.role.parentRoleIdPlaceholder'), trigger: 'change' }],
+      rules: [{required: true, message: t('settings.role.parentRoleIdPlaceholder'), trigger: 'change'}],
       tree: {
         load: () => listRoleTree().then((res: any) => (res.data as any[]) || []),
-        transform: (rows: any[]) => [{ id: 0, roleName: t('settings.role.rootRole'), children: rows }],
-        props: { label: 'roleName', children: 'children' },
+        transform: (rows: any[]) => [{id: 0, roleName: t('settings.role.rootRole'), children: rows}],
+        props: {label: 'roleName', children: 'children'},
         nodeKey: 'id',
         checkStrictly: true,
       },
@@ -83,8 +83,8 @@ export const createRoleConfig = (t: ComposerTranslation, handlers: RoleHandlers)
       placeholder: t('settings.role.roleCodePlaceholder'),
       maxlength: 32,
     },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag' },
-    { prop: 'remark', label: t('common.remark'), kind: 'textarea', span: 24, maxlength: 300, rules: remarkRules(t) },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag'},
+    {prop: 'remark', label: t('common.remark'), kind: 'textarea', span: 24, maxlength: 300, rules: remarkRules(t)},
   ],
   defaultForm: () => ({
     parentRoleId: 0,
@@ -97,7 +97,7 @@ export const createRoleConfig = (t: ComposerTranslation, handlers: RoleHandlers)
   add: (p) => addRole(normalizeRolePayload(p) as Parameters<typeof addRole>[0]),
   update: (p) => updateRole(normalizeRolePayload(p) as Parameters<typeof updateRole>[0]),
   remove: deleteRole,
-  detail: { routeName: 'settingsRoleDetail' },
+  detail: {routeName: 'settingsRoleDetail'},
   extraActions: [
     {
       key: 'assignResources',

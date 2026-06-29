@@ -115,13 +115,13 @@
           >
             <el-table-column :label="$t('device.edit.attributeName')" min-width="140" prop="attributeName" />
             <el-table-column :label="$t('device.edit.attributeType')" width="90">
-              <template #default="{ row }">
+              <template #default="{row}">
                 <el-tag effect="plain" size="small">{{ row.attributeTypeFlag }}</el-tag>
               </template>
             </el-table-column>
             <!-- @vue-generic {import('@/config/types').Attribute} -->
             <el-table-column :label="$t('device.edit.configValue')" min-width="240">
-              <template #default="{ row: attribute }">
+              <template #default="{row: attribute}">
                 <div class="matrix-cell">
                   <el-switch
                     v-if="isBooleanAttribute(attribute)"
@@ -205,7 +205,7 @@
             stripe
           >
             <el-table-column :label="$t('device.edit.pointName')" fixed min-width="160" show-overflow-tooltip>
-              <template #default="{ row }">
+              <template #default="{row}">
                 <el-tooltip :content="row.pointCode || row.id" :disabled="!row.pointCode" placement="top">
                   <span class="point-matrix-name">{{ row.pointName }}</span>
                 </el-tooltip>
@@ -213,7 +213,7 @@
             </el-table-column>
             <!-- @vue-generic {import('./index').PointInfoMatrixRow} -->
             <el-table-column :label="$t('device.edit.configStatus')" fixed width="100">
-              <template #default="{ row }">
+              <template #default="{row}">
                 <el-tag :type="pointRowStatusTag(row)" effect="plain" size="small">
                   {{ pointRowStatusLabel(row) }}
                 </el-tag>
@@ -227,7 +227,7 @@
                   <el-tag effect="plain" size="small">{{ attribute.attributeTypeFlag || 'STRING' }}</el-tag>
                 </div>
               </template>
-              <template #default="{ row }">
+              <template #default="{row}">
                 <div
                   :class="[
                     'matrix-cell',
@@ -322,7 +322,7 @@
             stripe
           >
             <el-table-column :label="$t('device.edit.commandName')" fixed min-width="160" show-overflow-tooltip>
-              <template #default="{ row }">
+              <template #default="{row}">
                 <el-tooltip :content="row.commandCode || row.id" :disabled="!row.commandCode" placement="top">
                   <span class="point-matrix-name">{{ row.commandName }}</span>
                 </el-tooltip>
@@ -330,7 +330,7 @@
             </el-table-column>
             <!-- @vue-generic {import('./index').CommandInfoMatrixRow} -->
             <el-table-column :label="$t('device.edit.configStatus')" fixed width="100">
-              <template #default="{ row }">
+              <template #default="{row}">
                 <el-tag :type="commandRowStatusTag(row)" effect="plain" size="small">
                   {{ commandRowStatusLabel(row) }}
                 </el-tag>
@@ -344,7 +344,7 @@
                   <el-tag effect="plain" size="small">{{ attribute.attributeTypeFlag || 'STRING' }}</el-tag>
                 </div>
               </template>
-              <template #default="{ row }">
+              <template #default="{row}">
                 <div
                   :class="[
                     'matrix-cell',
@@ -439,7 +439,7 @@
             stripe
           >
             <el-table-column :label="$t('device.edit.eventName')" fixed min-width="160" show-overflow-tooltip>
-              <template #default="{ row }">
+              <template #default="{row}">
                 <el-tooltip :content="row.eventCode || row.id" :disabled="!row.eventCode" placement="top">
                   <span class="point-matrix-name">{{ row.eventName }}</span>
                 </el-tooltip>
@@ -447,7 +447,7 @@
             </el-table-column>
             <!-- @vue-generic {import('./index').EventInfoMatrixRow} -->
             <el-table-column :label="$t('device.edit.configStatus')" fixed width="100">
-              <template #default="{ row }">
+              <template #default="{row}">
                 <el-tag :type="eventRowStatusTag(row)" effect="plain" size="small">
                   {{ eventRowStatusLabel(row) }}
                 </el-tag>
@@ -461,7 +461,7 @@
                   <el-tag effect="plain" size="small">{{ attribute.attributeTypeFlag || 'STRING' }}</el-tag>
                 </div>
               </template>
-              <template #default="{ row }">
+              <template #default="{row}">
                 <div
                   :class="[
                     'matrix-cell',

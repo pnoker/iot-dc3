@@ -15,7 +15,7 @@
  */
 
 import * as ElementIcons from '@element-plus/icons-vue';
-import type { Component } from 'vue';
+import type {Component} from 'vue';
 
 /**
  * Full name → component lookup for every icon shipped by

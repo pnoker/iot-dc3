@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import {defineComponent, reactive, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
 
 import {
   addServiceAccount,
@@ -25,15 +25,15 @@ import {
   listServiceAccount,
   updateServiceAccount,
 } from '@/api/serviceAccount';
-import { listPrincipalByIds } from '@/api/principal';
-import { getUserByName } from '@/api/user';
-import { useAuthStore } from '@/store/modules/auth';
-import { usePagedList } from '@/composables/usePagedList';
-import { timestampColumn } from '@/utils/dateUtil';
-import { successMessage } from '@/utils/notificationUtil';
-import { isEnabledFlag } from '@/utils/thingModelFormatUtil';
+import {listPrincipalByIds} from '@/api/principal';
+import {getUserByName} from '@/api/user';
+import {useAuthStore} from '@/store/modules/auth';
+import {usePagedList} from '@/composables/usePagedList';
+import {timestampColumn} from '@/utils/dateUtil';
+import {successMessage} from '@/utils/notificationUtil';
+import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 
-import type { ServiceAccountForm, ServiceAccountRecord } from '@/config/types/auth';
+import type {ServiceAccountForm, ServiceAccountRecord} from '@/config/types/auth';
 
 import serviceAccountTool from './tool/ServiceAccountTool.vue';
 import serviceAccountEditForm from './edit/ServiceAccountEditForm.vue';
@@ -47,7 +47,7 @@ export default defineComponent({
     serviceAccountEditForm,
   },
   setup() {
-    const { t } = useI18n();
+    const {t} = useI18n();
     const authStore = useAuthStore();
 
     const editRef = ref<InstanceType<typeof serviceAccountEditForm>>();

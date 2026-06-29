@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const menuMocks = vi.hoisted(() => ({
-  addMenu: vi.fn(() => Promise.resolve({ data: true })),
-  deleteMenu: vi.fn(() => Promise.resolve({ data: true })),
-  listMenuTree: vi.fn(() => Promise.resolve({ data: [{ id: 'm-1', menuName: 'Home', children: [] }] })),
-  updateMenu: vi.fn(() => Promise.resolve({ data: true })),
+  addMenu: vi.fn(() => Promise.resolve({data: true})),
+  deleteMenu: vi.fn(() => Promise.resolve({data: true})),
+  listMenuTree: vi.fn(() => Promise.resolve({data: [{id: 'm-1', menuName: 'Home', children: []}]})),
+  updateMenu: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/menu', () => menuMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('SettingsMenu view', () => {
   it('lists the menu tree on mount', async () => {
@@ -35,9 +35,9 @@ describe('SettingsMenu view', () => {
     await mountListPage({
       component: Menu,
       stubs: {
-        menuTool: { template: '<div />' },
-        menuAddForm: { template: '<div />' },
-        menuEditForm: { template: '<div />' },
+        menuTool: {template: '<div />'},
+        menuAddForm: {template: '<div />'},
+        menuEditForm: {template: '<div />'},
       },
     });
     await flushPromises();

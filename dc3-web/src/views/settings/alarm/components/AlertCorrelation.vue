@@ -21,7 +21,7 @@
     :empty-text="t('settings.event.overview.correlationEmpty')"
     :height="520"
     :loading="loading"
-    :subtitle="t('settings.event.overview.correlationSubtitle', { hours, windowSec })"
+    :subtitle="t('settings.event.overview.correlationSubtitle', {hours, windowSec})"
     :title="t('settings.event.overview.correlationTitle')"
     body-mode="chart"
     class="alert-correlation"
@@ -36,28 +36,28 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { Graph } from '@antv/g6';
+  import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {Graph} from '@antv/g6';
 
-  import { alertCorrelation } from '@/api/dashboard';
-  import type { CorrelationPair } from '@/config/types/dashboard';
+  import {alertCorrelation} from '@/api/dashboard';
+  import type {CorrelationPair} from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
-  import { useEntityNames } from '@/composables/useEntityNames';
-  import { DASHBOARD_PALETTE } from '@/config/constant/palette';
+  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+  import {useEntityNames} from '@/composables/useEntityNames';
+  import {DASHBOARD_PALETTE} from '@/config/constant/palette';
 
-  const { t } = useI18n();
-  const { loading, run } = useAsyncLoader();
-  const { resolveBySource, nameBySource } = useEntityNames();
+  const {t} = useI18n();
+  const {loading, run} = useAsyncLoader();
+  const {resolveBySource, nameBySource} = useEntityNames();
 
   // Window tool — longer windows reveal relationships that take minutes
   // to propagate (MQTT broker hiccup → cascading device timeouts), shorter
   // windows isolate immediate co-firings.
   const hoursOptions = [
-    { label: '6h', value: '6' },
-    { label: '24h', value: '24' },
-    { label: '7d', value: '168' },
+    {label: '6h', value: '6'},
+    {label: '24h', value: '24'},
+    {label: '7d', value: '168'},
   ];
   const hoursKey = ref<string>('24');
   const hours = computed(() => Number(hoursKey.value));
@@ -69,12 +69,12 @@
 
   const load = () =>
     run(async () => {
-      const res: { data?: CorrelationPair[] } = await alertCorrelation(hours.value, windowSec, 15);
+      const res: {data?: CorrelationPair[]} = await alertCorrelation(hours.value, windowSec, 15);
       pairs.value = res?.data ?? [];
       // Feed both endpoints per pair into the shared name cache.
       const flat = pairs.value.flatMap((p) => [
-        { source: p.aSource, sourceId: p.aSourceId },
-        { source: p.bSource, sourceId: p.bSourceId },
+        {source: p.aSource, sourceId: p.aSourceId},
+        {source: p.bSource, sourceId: p.bSourceId},
       ]);
       await resolveBySource(flat);
       await nextTick();
@@ -93,39 +93,39 @@
     graph?.destroy();
 
     // Convert pairs → unique nodes + weighted edges.
-    const nodeMap = new Map<string, { id: string; data: { source: string; sid: number | string; name: string } }>();
-    const edges: Array<{ source: string; target: string; data: { weight: number } }> = [];
+    const nodeMap = new Map<string, {id: string; data: {source: string; sid: number | string; name: string}}>();
+    const edges: Array<{source: string; target: string; data: {weight: number}}> = [];
     for (const p of pairs.value) {
       const aId = nodeId(p.aSource, p.aSourceId);
       const bId = nodeId(p.bSource, p.bSourceId);
       if (!nodeMap.has(aId)) {
         nodeMap.set(aId, {
           id: aId,
-          data: { source: p.aSource, sid: p.aSourceId, name: nameBySource(p.aSource, p.aSourceId) },
+          data: {source: p.aSource, sid: p.aSourceId, name: nameBySource(p.aSource, p.aSourceId)},
         });
       }
       if (!nodeMap.has(bId)) {
         nodeMap.set(bId, {
           id: bId,
-          data: { source: p.bSource, sid: p.bSourceId, name: nameBySource(p.bSource, p.bSourceId) },
+          data: {source: p.bSource, sid: p.bSourceId, name: nameBySource(p.bSource, p.bSourceId)},
         });
       }
-      edges.push({ source: aId, target: bId, data: { weight: p.coCount } });
+      edges.push({source: aId, target: bId, data: {weight: p.coCount}});
     }
     const nodes = Array.from(nodeMap.values());
 
     graph = new Graph({
       container,
-      data: { nodes, edges },
+      data: {nodes, edges},
       autoResize: true,
-      layout: { type: 'force', preventOverlap: true, nodeSize: 32, linkDistance: 90 },
+      layout: {type: 'force', preventOverlap: true, nodeSize: 32, linkDistance: 90},
       node: {
         style: {
           size: 28,
-          fill: (d: { data?: { source?: string } }) =>
+          fill: (d: {data?: {source?: string}}) =>
             d.data?.source === 'device' ? DASHBOARD_PALETTE.device : DASHBOARD_PALETTE.driver,
           stroke: 'transparent',
-          labelText: (d: { data?: { name?: string } }) => d.data?.name ?? '',
+          labelText: (d: {data?: {name?: string}}) => d.data?.name ?? '',
           labelPlacement: 'bottom',
           labelFontSize: 11,
           labelFill: '#303133',
@@ -137,10 +137,9 @@
           stroke: '#c0c4cc',
           // Thicker edge = more co-occurrences. Clamp between 1-6 so a
           // single hot pair doesn't wash out everything else.
-          lineWidth: (d: { data?: { weight?: number } }) =>
-            Math.max(1, Math.min(6, Math.log2((d.data?.weight ?? 1) + 1))),
+          lineWidth: (d: {data?: {weight?: number}}) => Math.max(1, Math.min(6, Math.log2((d.data?.weight ?? 1) + 1))),
           endArrow: false,
-          labelText: (d: { data?: { weight?: number } }) => String(d.data?.weight ?? ''),
+          labelText: (d: {data?: {weight?: number}}) => String(d.data?.weight ?? ''),
           labelFontSize: 10,
           labelFill: '#909399',
         },
@@ -150,7 +149,7 @@
     graph.render();
   };
 
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

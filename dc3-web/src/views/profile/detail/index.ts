@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, ref, watch } from 'vue';
+import {computed, defineComponent, reactive, ref, watch} from 'vue';
 
 import router from '@/config/router';
-import { useRoute } from 'vue-router';
+import {useRoute} from 'vue-router';
 
-import { getProfileById } from '@/api/profile';
+import {getProfileById} from '@/api/profile';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
 import detailCard from '@/components/card/detail/DetailCard.vue';
@@ -31,7 +31,7 @@ import point from '@/views/point/Point.vue';
 import CommandList from '@/views/settings/command/CommandList.vue';
 import EventList from '@/views/settings/event/definition/EventList.vue';
 
-import { timestamp } from '@/utils/dateUtil';
+import {timestamp} from '@/utils/dateUtil';
 
 export default defineComponent({
   components: {
@@ -92,7 +92,7 @@ export default defineComponent({
     const changeActive = (tab: any) => {
       reactiveData.active = tab.props.name;
       const query = route.query;
-      router.push({ query: { ...query, active: tab.props.name } });
+      router.push({query: {...query, active: tab.props.name}});
       switch (tab.props.name) {
         case 'device':
           deviceViewRef.value?.refresh();

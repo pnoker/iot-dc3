@@ -17,7 +17,7 @@
 export type SearchFormData = Record<string, any>;
 
 export const cleanSearchParams = <T extends SearchFormData>(data: T): Partial<T> => {
-  const params = { ...data };
+  const params = {...data};
   Object.keys(params).forEach((key) => {
     if (
       params[key] === '' ||

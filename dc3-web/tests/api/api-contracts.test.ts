@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { readdirSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import {readdirSync, statSync} from 'node:fs';
+import {join, relative} from 'node:path';
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import * as agenticApi from '@/api/agentic';
 import * as alarmApi from '@/api/alarm';
@@ -50,24 +50,24 @@ import * as localCredentialApi from '@/api/localCredential';
 import * as principalApi from '@/api/principal';
 import * as serviceAccountApi from '@/api/serviceAccount';
 import * as tenantMembershipApi from '@/api/tenantMembership';
-import { AUTH_HEADERS } from '@/config/constant/common';
-import type { AgenticChatCompletionRequest } from '@/config/types';
-import { setStorage } from '@/utils/storageUtil';
+import {AUTH_HEADERS} from '@/config/constant/common';
+import type {AgenticChatCompletionRequest} from '@/config/types';
+import {setStorage} from '@/utils/storageUtil';
 
 // Builds a minimal-but-valid streaming request. Only `messages`, `stream`,
 // `conversationId` are required by the contract — everything else is optional
 // and irrelevant to the wire-format assertions below.
 const streamRequest = (overrides: Partial<AgenticChatCompletionRequest> = {}): AgenticChatCompletionRequest => ({
-  messages: [{ role: 'user', content: 'hello' }],
+  messages: [{role: 'user', content: 'hello'}],
   conversationId: 'conversation-test',
   stream: true,
   ...overrides,
 });
 
 const apiSpies = vi.hoisted(() => ({
-  httpGet: vi.fn(() => Promise.resolve({ ok: true, data: null })),
-  httpPost: vi.fn(() => Promise.resolve({ ok: true, data: null })),
-  request: vi.fn(() => Promise.resolve({ ok: true, data: null })),
+  httpGet: vi.fn(() => Promise.resolve({ok: true, data: null})),
+  httpPost: vi.fn(() => Promise.resolve({ok: true, data: null})),
+  request: vi.fn(() => Promise.resolve({ok: true, data: null})),
 }));
 
 vi.mock('@/api/common', () => ({
@@ -75,8 +75,8 @@ vi.mock('@/api/common', () => ({
   httpPost: apiSpies.httpPost,
   crudAdd: (base: string, payload: unknown) => apiSpies.httpPost(`${base}/add`, payload),
   crudUpdate: (base: string, payload: unknown) => apiSpies.httpPost(`${base}/update`, payload),
-  crudDelete: (base: string, id: string) => apiSpies.httpPost(`${base}/delete`, undefined, { params: { id } }),
-  crudGetById: (base: string, id: string) => apiSpies.httpGet(`${base}/get_by_id`, { params: { id } }),
+  crudDelete: (base: string, id: string) => apiSpies.httpPost(`${base}/delete`, undefined, {params: {id}}),
+  crudGetById: (base: string, id: string) => apiSpies.httpGet(`${base}/get_by_id`, {params: {id}}),
   crudList: (base: string, query: unknown) => apiSpies.httpPost(`${base}/list`, query),
 }));
 
@@ -86,7 +86,7 @@ vi.mock('@/config/axios', () => ({
 
 type ApiModule = Record<string, unknown>;
 type ApiFunction = (...args: unknown[]) => unknown;
-type TransportCall = { transport: 'httpGet' | 'httpPost' | 'request'; args: unknown[] };
+type TransportCall = {transport: 'httpGet' | 'httpPost' | 'request'; args: unknown[]};
 
 const modules: Record<string, ApiModule> = {
   agentic: agenticApi,
@@ -160,7 +160,7 @@ const apiSourceFileExclusions = new Set(['common', 'dashboard/index']);
 const excludedExports = new Set(['streamAgenticChatCompletion', 'completeAgenticChatCompletion']);
 
 const pageQuery = {
-  page: { current: 2, size: 20 },
+  page: {current: 2, size: 20},
   keyword: 'demo',
 };
 
@@ -183,15 +183,15 @@ function exportedFunctions(moduleApi: ApiModule) {
 // the function expects, in declaration order.
 const sampleArgsRegistry: Record<string, unknown[]> = {
   // Multi-arg or non-pattern shapes that can't be derived from the name.
-  updateAgenticSession: ['conversation-1', { title: 'Renamed session' }],
-  uploadAgenticAttachment: ['conversation-1', new File(['demo'], 'demo.txt', { type: 'text/plain' })],
+  updateAgenticSession: ['conversation-1', {title: 'Renamed session'}],
+  uploadAgenticAttachment: ['conversation-1', new File(['demo'], 'demo.txt', {type: 'text/plain'})],
   alertConfirm: ['driver', 'alert-1'],
   alertUnconfirm: ['driver', 'alert-1'],
-  alertBulkConfirm: [[{ source: 'driver', id: 'alert-1' }], true],
+  alertBulkConfirm: [[{source: 'driver', id: 'alert-1'}], true],
   listPointValueHistory: ['1001', '2002', 30],
   listRoleByPrincipalId: ['principal-1'],
   replaceMcpConnectionTools: ['connection-1', ['tool-1', 'tool-2']],
-  listMcpAudit: [{ principalId: 'principal-1', toolId: 'tool-1', status: 'ACTIVE', riskLevel: 'LOW', limit: 20 }],
+  listMcpAudit: [{principalId: 'principal-1', toolId: 'tool-1', status: 'ACTIVE', riskLevel: 'LOW', limit: 20}],
   listMcpConnectionTool: ['connection-1'],
   registerMcpClient: [payload],
   revokeMcpConnection: ['connection-1'],
@@ -264,9 +264,9 @@ function resetTransportSpies() {
 
 function transportCalls(): TransportCall[] {
   return [
-    ...apiSpies.httpGet.mock.calls.map((args) => ({ transport: 'httpGet' as const, args })),
-    ...apiSpies.httpPost.mock.calls.map((args) => ({ transport: 'httpPost' as const, args })),
-    ...apiSpies.request.mock.calls.map((args) => ({ transport: 'request' as const, args })),
+    ...apiSpies.httpGet.mock.calls.map((args) => ({transport: 'httpGet' as const, args})),
+    ...apiSpies.httpPost.mock.calls.map((args) => ({transport: 'httpPost' as const, args})),
+    ...apiSpies.request.mock.calls.map((args) => ({transport: 'request' as const, args})),
   ];
 }
 
@@ -274,19 +274,19 @@ function callUrl(call: TransportCall) {
   const firstArg = call.args[0];
   if (typeof firstArg === 'string') return firstArg;
   if (firstArg && typeof firstArg === 'object' && 'url' in firstArg) {
-    return String((firstArg as { url?: unknown }).url);
+    return String((firstArg as {url?: unknown}).url);
   }
   return '';
 }
 
 function callConfig(call: TransportCall) {
   if (call.transport === 'request') {
-    return call.args[0] as { params?: Record<string, unknown> };
+    return call.args[0] as {params?: Record<string, unknown>};
   }
   if (call.transport === 'httpGet') {
-    return call.args[1] as { params?: Record<string, unknown> } | undefined;
+    return call.args[1] as {params?: Record<string, unknown>} | undefined;
   }
-  return call.args[2] as { params?: Record<string, unknown> } | undefined;
+  return call.args[2] as {params?: Record<string, unknown>} | undefined;
 }
 
 function expectStandardUrl(call: TransportCall) {
@@ -359,7 +359,7 @@ describe('agentic streaming contract', () => {
   it('posts SSE chat requests with auth headers and emits parsed callbacks', async () => {
     setStorage(AUTH_HEADERS.TENANT, 'default');
     setStorage(AUTH_HEADERS.LOGIN, 'dc3');
-    setStorage(AUTH_HEADERS.TOKEN, { salt: 'salt', token: 'token' });
+    setStorage(AUTH_HEADERS.TOKEN, {salt: 'salt', token: 'token'});
 
     const fetchMock = vi.fn(async () => {
       const body = [
@@ -381,7 +381,7 @@ describe('agentic streaming contract', () => {
 
       return new Response(body, {
         status: 200,
-        headers: { 'Content-Type': 'text/event-stream' },
+        headers: {'Content-Type': 'text/event-stream'},
       });
     });
 
@@ -409,15 +409,15 @@ describe('agentic streaming contract', () => {
           'Content-Type': 'application/json',
           [AUTH_HEADERS.TENANT]: 'default',
           [AUTH_HEADERS.LOGIN]: 'dc3',
-          [AUTH_HEADERS.TOKEN]: JSON.stringify({ salt: 'salt', token: 'token' }),
+          [AUTH_HEADERS.TOKEN]: JSON.stringify({salt: 'salt', token: 'token'}),
         }),
       })
     );
     expect(onEvent).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'tool', title: 'Tool call', phase: 'start', status: 'running' })
+      expect.objectContaining({type: 'tool', title: 'Tool call', phase: 'start', status: 'running'})
     );
     expect(onEvent).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'tool', title: 'Device page loaded', phase: 'result', status: 'success' })
+      expect.objectContaining({type: 'tool', title: 'Device page loaded', phase: 'result', status: 'success'})
     );
     expect(onReasoning.mock.calls.map(([chunk]) => chunk)).toEqual(['let me think ', 'about this']);
     expect(onDelta.mock.calls.map(([chunk]) => chunk)).toEqual(['hello ', 'world']);
@@ -427,12 +427,12 @@ describe('agentic streaming contract', () => {
   it('normalizes failed stream responses and redirects on 401', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => new Response('expired', { status: 401 }))
+      vi.fn(async () => new Response('expired', {status: 401}))
     );
 
     const onError = vi.fn();
 
-    await expect(agenticApi.streamAgenticChatCompletion(streamRequest({ messages: [] }), { onError })).rejects.toThrow(
+    await expect(agenticApi.streamAgenticChatCompletion(streamRequest({messages: []}), {onError})).rejects.toThrow(
       'expired'
     );
 
@@ -455,7 +455,7 @@ describe('agentic streaming contract', () => {
 
         return new Response(body, {
           status: 200,
-          headers: { 'Content-Type': 'text/event-stream' },
+          headers: {'Content-Type': 'text/event-stream'},
         });
       })
     );
@@ -465,9 +465,9 @@ describe('agentic streaming contract', () => {
     const onDone = vi.fn();
     const onError = vi.fn();
 
-    await agenticApi.streamAgenticChatCompletion(streamRequest(), { onEvent, onFinish, onDone, onError });
+    await agenticApi.streamAgenticChatCompletion(streamRequest(), {onEvent, onFinish, onDone, onError});
 
-    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({ type: 'error', title: 'Request failed' }));
+    expect(onEvent).toHaveBeenCalledWith(expect.objectContaining({type: 'error', title: 'Request failed'}));
     expect(onFinish).toHaveBeenCalledWith('error');
     expect(onDone).toHaveBeenCalledTimes(1);
     expect(onError).not.toHaveBeenCalled();

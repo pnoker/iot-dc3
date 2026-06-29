@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
-import type { Component } from 'vue';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
+import type {Component} from 'vue';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 // Intercept the single HTTP chokepoint every settings API funnels through so
 // no real network call fires during the smoke mount. `data` is a hybrid empty
@@ -26,9 +26,9 @@ import { mountListPage } from './_helpers';
 // happy) that also carries the page-result keys (`records`/`total`) list pages
 // read — one stub satisfies both response shapes without per-endpoint mocking.
 vi.mock('@/api/common', () => {
-  const empty = () => Object.assign([] as unknown[], { records: [], total: 0, rows: [], list: [], children: [] });
-  const ok = () => Promise.resolve({ data: empty() });
-  return { httpGet: ok, httpPost: ok, crudAdd: ok, crudUpdate: ok, crudDelete: ok, crudGetById: ok, crudList: ok };
+  const empty = () => Object.assign([] as unknown[], {records: [], total: 0, rows: [], list: [], children: []});
+  const ok = () => Promise.resolve({data: empty()});
+  return {httpGet: ok, httpPost: ok, crudAdd: ok, crudUpdate: ok, crudDelete: ok, crudGetById: ok, crudList: ok};
 });
 
 vi.mock('@/utils/notificationUtil', () => ({
@@ -54,13 +54,13 @@ for (const p of Object.keys(import.meta.glob('@/components/**/*.vue'))) {
     .pop()!
     .replace(/\.vue$/, '');
   if (!HELPER_OWNED.has(name)) {
-    localComponentStubs[name] = { template: '<div class="local-component-stub"><slot /></div>' };
+    localComponentStubs[name] = {template: '<div class="local-component-stub"><slot /></div>'};
   }
 }
 
 interface SmokePage {
   name: string;
-  loader: () => Promise<{ default: Component }>;
+  loader: () => Promise<{default: Component}>;
   props?: Record<string, unknown>;
 }
 
@@ -69,66 +69,66 @@ interface SmokePage {
 // catches "opens with an error" at test time instead of at runtime.
 const PAGES: SmokePage[] = [
   // identity
-  { name: 'User', loader: () => import('@/views/settings/user/User.vue') },
-  { name: 'Principal', loader: () => import('@/views/settings/principal/Principal.vue') },
-  { name: 'TenantMembership', loader: () => import('@/views/settings/tenantMembership/TenantMembership.vue') },
-  { name: 'LocalCredential', loader: () => import('@/views/settings/localCredential/LocalCredential.vue') },
-  { name: 'ServiceAccount', loader: () => import('@/views/settings/serviceAccount/ServiceAccount.vue') },
+  {name: 'User', loader: () => import('@/views/settings/user/User.vue')},
+  {name: 'Principal', loader: () => import('@/views/settings/principal/Principal.vue')},
+  {name: 'TenantMembership', loader: () => import('@/views/settings/tenantMembership/TenantMembership.vue')},
+  {name: 'LocalCredential', loader: () => import('@/views/settings/localCredential/LocalCredential.vue')},
+  {name: 'ServiceAccount', loader: () => import('@/views/settings/serviceAccount/ServiceAccount.vue')},
   // access control
-  { name: 'Role', loader: () => import('@/views/settings/role/Role.vue') },
-  { name: 'RolePrincipalBind', loader: () => import('@/views/settings/rolePrincipalBind/RolePrincipalBind.vue') },
-  { name: 'Resource', loader: () => import('@/views/settings/resource/Resource.vue') },
-  { name: 'Api', loader: () => import('@/views/settings/api/Api.vue') },
-  { name: 'Menu', loader: () => import('@/views/settings/menu/Menu.vue') },
+  {name: 'Role', loader: () => import('@/views/settings/role/Role.vue')},
+  {name: 'RolePrincipalBind', loader: () => import('@/views/settings/rolePrincipalBind/RolePrincipalBind.vue')},
+  {name: 'Resource', loader: () => import('@/views/settings/resource/Resource.vue')},
+  {name: 'Api', loader: () => import('@/views/settings/api/Api.vue')},
+  {name: 'Menu', loader: () => import('@/views/settings/menu/Menu.vue')},
   // model
-  { name: 'ModelConfig', loader: () => import('@/views/settings/agentic/AgenticSettings.vue') },
-  { name: 'ModelProvider', loader: () => import('@/views/settings/agentic/ProviderSettings.vue') },
+  {name: 'ModelConfig', loader: () => import('@/views/settings/agentic/AgenticSettings.vue')},
+  {name: 'ModelProvider', loader: () => import('@/views/settings/agentic/ProviderSettings.vue')},
   // alarm
-  { name: 'AlarmRule', loader: () => import('@/views/settings/alarm/AlarmNotify.vue'), props: { entity: 'rule' } },
-  { name: 'AlarmNotify', loader: () => import('@/views/settings/alarm/AlarmNotify.vue'), props: { entity: 'notify' } },
+  {name: 'AlarmRule', loader: () => import('@/views/settings/alarm/AlarmNotify.vue'), props: {entity: 'rule'}},
+  {name: 'AlarmNotify', loader: () => import('@/views/settings/alarm/AlarmNotify.vue'), props: {entity: 'notify'}},
   {
     name: 'AlarmMessage',
     loader: () => import('@/views/settings/alarm/AlarmNotify.vue'),
-    props: { entity: 'message' },
+    props: {entity: 'message'},
   },
   {
     name: 'AlarmChannel',
     loader: () => import('@/views/settings/alarm/AlarmNotify.vue'),
-    props: { entity: 'channel' },
+    props: {entity: 'channel'},
   },
-  { name: 'AlarmBind', loader: () => import('@/views/settings/alarm/AlarmNotify.vue'), props: { entity: 'bind' } },
-  { name: 'AlarmState', loader: () => import('@/views/settings/alarm/AlarmNotify.vue'), props: { entity: 'state' } },
+  {name: 'AlarmBind', loader: () => import('@/views/settings/alarm/AlarmNotify.vue'), props: {entity: 'bind'}},
+  {name: 'AlarmState', loader: () => import('@/views/settings/alarm/AlarmNotify.vue'), props: {entity: 'state'}},
   {
     name: 'AlarmHistory',
     loader: () => import('@/views/settings/alarm/AlarmNotify.vue'),
-    props: { entity: 'history' },
+    props: {entity: 'history'},
   },
-  { name: 'AlarmOverview', loader: () => import('@/views/settings/alarm/Overview.vue') },
-  { name: 'DriverAlarm', loader: () => import('@/views/settings/alarm/DriverEvent.vue') },
-  { name: 'DeviceAlarm', loader: () => import('@/views/settings/alarm/DeviceEvent.vue') },
-  { name: 'PointAlarm', loader: () => import('@/views/settings/alarm/PointEvent.vue') },
+  {name: 'AlarmOverview', loader: () => import('@/views/settings/alarm/Overview.vue')},
+  {name: 'DriverAlarm', loader: () => import('@/views/settings/alarm/DriverEvent.vue')},
+  {name: 'DeviceAlarm', loader: () => import('@/views/settings/alarm/DeviceEvent.vue')},
+  {name: 'PointAlarm', loader: () => import('@/views/settings/alarm/PointEvent.vue')},
   // event & command
-  { name: 'EventHistory', loader: () => import('@/views/settings/event/EventHistory.vue') },
-  { name: 'CommandHistory', loader: () => import('@/views/settings/command/CommandHistory.vue') },
+  {name: 'EventHistory', loader: () => import('@/views/settings/event/EventHistory.vue')},
+  {name: 'CommandHistory', loader: () => import('@/views/settings/command/CommandHistory.vue')},
   // audit
-  { name: 'IdentityAudit', loader: () => import('@/views/settings/identityAudit/IdentityAudit.vue') },
-  { name: 'McpAudit', loader: () => import('@/views/settings/mcpAudit/McpAudit.vue') },
+  {name: 'IdentityAudit', loader: () => import('@/views/settings/identityAudit/IdentityAudit.vue')},
+  {name: 'McpAudit', loader: () => import('@/views/settings/mcpAudit/McpAudit.vue')},
   // integration
-  { name: 'McpServer', loader: () => import('@/views/settings/mcp/McpServer.vue') },
-  { name: 'McpConnection', loader: () => import('@/views/settings/mcp/McpConnection.vue') },
-  { name: 'McpClient', loader: () => import('@/views/settings/mcp/McpClient.vue') },
-  { name: 'McpTool', loader: () => import('@/views/settings/mcp/McpTool.vue') },
+  {name: 'McpServer', loader: () => import('@/views/settings/mcp/McpServer.vue')},
+  {name: 'McpConnection', loader: () => import('@/views/settings/mcp/McpConnection.vue')},
+  {name: 'McpClient', loader: () => import('@/views/settings/mcp/McpClient.vue')},
+  {name: 'McpTool', loader: () => import('@/views/settings/mcp/McpTool.vue')},
   // system
-  { name: 'Group', loader: () => import('@/views/settings/group/Group.vue') },
-  { name: 'Label', loader: () => import('@/views/settings/label/Label.vue') },
-  { name: 'About', loader: () => import('@/views/settings/about/About.vue') },
+  {name: 'Group', loader: () => import('@/views/settings/group/Group.vue')},
+  {name: 'Label', loader: () => import('@/views/settings/label/Label.vue')},
+  {name: 'About', loader: () => import('@/views/settings/about/About.vue')},
 ];
 
 describe('Settings pages smoke mount', () => {
   for (const page of PAGES) {
     it(`mounts ${page.name} without error`, async () => {
       const component = (await page.loader()).default;
-      const wrapper = await mountListPage({ component, props: page.props, stubs: localComponentStubs });
+      const wrapper = await mountListPage({component, props: page.props, stubs: localComponentStubs});
       await flushPromises();
       expect(wrapper.exists()).toBe(true);
     });

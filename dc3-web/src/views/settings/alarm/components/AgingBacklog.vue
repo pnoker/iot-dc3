@@ -20,7 +20,7 @@
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.agingEmpty')"
     :loading="loading"
-    :subtitle="t('settings.event.overview.agingSubtitle', { n: data.total })"
+    :subtitle="t('settings.event.overview.agingSubtitle', {n: data.total})"
     :title="t('settings.event.overview.agingTitle')"
     body-mode="chart"
     class="aging-backlog"
@@ -31,19 +31,19 @@
 </template>
 
 <script lang="ts" setup>
-  import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { Chart } from '@antv/g2';
+  import {nextTick, onMounted, onUnmounted, reactive, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {Chart} from '@antv/g2';
 
-  import { alertAging } from '@/api/dashboard';
-  import type { AgingBacklog } from '@/config/types/dashboard';
+  import {alertAging} from '@/api/dashboard';
+  import type {AgingBacklog} from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
+  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
-  const { t } = useI18n();
-  const { loading, run } = useAsyncLoader();
+  const {t} = useI18n();
+  const {loading, run} = useAsyncLoader();
 
-  const data = reactive<AgingBacklog>({ under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0 });
+  const data = reactive<AgingBacklog>({under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
   const chartRef = ref<HTMLElement>();
   let chart: Chart | undefined;
 
@@ -55,12 +55,12 @@
     const el = chartRef.value;
     if (!el) return;
     chart?.destroy();
-    chart = new Chart({ container: el, autoFit: true });
+    chart = new Chart({container: el, autoFit: true});
     const rows = [
-      { bucket: t('settings.event.overview.agingBucketUnder1h'), count: data.under1h, idx: 0 },
-      { bucket: t('settings.event.overview.agingBucket1to6'), count: data.h1to6, idx: 1 },
-      { bucket: t('settings.event.overview.agingBucket6to24'), count: data.h6to24, idx: 2 },
-      { bucket: t('settings.event.overview.agingBucketOver24'), count: data.over24h, idx: 3 },
+      {bucket: t('settings.event.overview.agingBucketUnder1h'), count: data.under1h, idx: 0},
+      {bucket: t('settings.event.overview.agingBucket1to6'), count: data.h1to6, idx: 1},
+      {bucket: t('settings.event.overview.agingBucket6to24'), count: data.h6to24, idx: 2},
+      {bucket: t('settings.event.overview.agingBucketOver24'), count: data.over24h, idx: 3},
     ];
     chart
       .interval()
@@ -68,17 +68,17 @@
       .encode('x', 'bucket')
       .encode('y', 'count')
       .encode('color', 'idx')
-      .scale('color', { range: colours })
+      .scale('color', {range: colours})
       .legend(false)
-      .axis({ x: { title: false, labelAutoRotate: false }, y: { title: false } })
-      .label({ text: 'count', position: 'top', style: { fontSize: 11 } });
+      .axis({x: {title: false, labelAutoRotate: false}, y: {title: false}})
+      .label({text: 'count', position: 'top', style: {fontSize: 11}});
     chart.render();
   };
 
   const load = () =>
     run(async () => {
-      const res: { data?: AgingBacklog } = await alertAging();
-      Object.assign(data, res?.data ?? { under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0 });
+      const res: {data?: AgingBacklog} = await alertAging();
+      Object.assign(data, res?.data ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
       await nextTick();
       if (data.total > 0) render();
     });
@@ -86,7 +86,7 @@
   onMounted(load);
   onUnmounted(() => chart?.destroy());
 
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

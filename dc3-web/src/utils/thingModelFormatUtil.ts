@@ -195,12 +195,12 @@ const ALARM_LEVEL_TAG_BY_INDEX: Record<number, 'info' | 'success' | 'warning' | 
   3: 'success',
 };
 
-export const ALARM_TYPE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
-  { value: 0, label: 'RULE' },
-  { value: 1, label: 'OFFLINE' },
-  { value: 2, label: 'FAULT' },
-  { value: 3, label: 'STATE_FLIP' },
-  { value: 4, label: 'REPORT' },
+export const ALARM_TYPE_OPTIONS: ReadonlyArray<{value: number; label: string}> = [
+  {value: 0, label: 'RULE'},
+  {value: 1, label: 'OFFLINE'},
+  {value: 2, label: 'FAULT'},
+  {value: 3, label: 'STATE_FLIP'},
+  {value: 4, label: 'REPORT'},
 ];
 
 export function alarmTypeLabel(flag: number | null | undefined): string {

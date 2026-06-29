@@ -109,15 +109,7 @@ export interface AgenticMessageContent {
 }
 
 export type AgenticVisualizationType =
-  | 'line'
-  | 'area'
-  | 'column'
-  | 'bar'
-  | 'pie'
-  | 'donut'
-  | 'heatmap'
-  | 'scatter'
-  | 'stat';
+  'line' | 'area' | 'column' | 'bar' | 'pie' | 'donut' | 'heatmap' | 'scatter' | 'stat';
 
 export interface AgenticVisualizationSpec {
   id?: string;

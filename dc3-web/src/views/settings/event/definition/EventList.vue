@@ -96,8 +96,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {computed, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
   import {
     addEvent,
     addEventParam,
@@ -107,12 +107,12 @@
     updateEvent,
     updateEventParam,
   } from '@/api/event';
-  import { usePagedList } from '@/composables/usePagedList';
-  import { timestampLabel } from '@/utils/dateUtil';
-  import { failMessage, successMessage } from '@/utils/notificationUtil';
-  import { eventLevelLabel, eventTypeLabel } from '@/utils/thingModelFormatUtil';
-  import { isNull } from '@/utils/validationUtil';
-  import type { EventForm, EventParamRecord, EventRecord } from '@/config/types';
+  import {usePagedList} from '@/composables/usePagedList';
+  import {timestampLabel} from '@/utils/dateUtil';
+  import {failMessage, successMessage} from '@/utils/notificationUtil';
+  import {eventLevelLabel, eventTypeLabel} from '@/utils/thingModelFormatUtil';
+  import {isNull} from '@/utils/validationUtil';
+  import type {EventForm, EventParamRecord, EventRecord} from '@/config/types';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
@@ -127,7 +127,7 @@
       next?: boolean;
       profileId?: string;
     }>(),
-    { embedded: '', pre: false, next: false, profileId: '' }
+    {embedded: '', pre: false, next: false, profileId: ''}
   );
 
   const emit = defineEmits<{
@@ -136,12 +136,12 @@
   }>();
 
   const editRef = ref<InstanceType<typeof EventEditForm>>();
-  const { t } = useI18n();
+  const {t} = useI18n();
   const canManage = computed(() => props.embedded === '' || props.embedded === 'edit');
   const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
 
   const withFixedQuery = (params: Record<string, unknown> = {}) => {
-    const q = { ...params };
+    const q = {...params};
     if (!isNull(props.profileId)) q.profileId = props.profileId;
     return q;
   };
@@ -167,7 +167,7 @@
 
   const withFixedProfile = (form: EventForm) => {
     const profileId = !isNull(props.profileId) ? props.profileId : form.profileId;
-    return isNull(profileId) ? { ...form } : { ...form, profileId };
+    return isNull(profileId) ? {...form} : {...form, profileId};
   };
 
   const search = (params: Record<string, unknown>) => {
@@ -198,7 +198,7 @@
       .map((item) => deleteEventParam(String(item.id)));
 
     const saveTasks = params.map((item) => {
-      const payload = { ...item, eventId };
+      const payload = {...item, eventId};
       return item.id ? updateEventParam(payload) : addEventParam(payload);
     });
 
@@ -249,14 +249,14 @@
   };
 
   const disableThing = (id: string, profileId: string, done: () => void) => {
-    updateEvent({ id, profileId, enableFlag: 'DISABLE' }).then(() => {
+    updateEvent({id, profileId, enableFlag: 'DISABLE'}).then(() => {
       load();
       done();
     });
   };
 
   const enableThing = (id: string, profileId: string, done: () => void) => {
-    updateEvent({ id, profileId, enableFlag: 'ENABLE' }).then(() => {
+    updateEvent({id, profileId, enableFlag: 'ENABLE'}).then(() => {
       load();
       done();
     });

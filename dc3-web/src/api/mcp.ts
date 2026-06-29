@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { httpGet, httpPost } from '@/api/common';
-import { API_MCP_BASE } from '@/config/constant/api';
+import {httpGet, httpPost} from '@/api/common';
+import {API_MCP_BASE} from '@/config/constant/api';
 import type {
   McpAuditRecord,
   McpClientRegistrationForm,
@@ -38,7 +38,7 @@ export const addMcpConnection = (body: McpConnectionForm) =>
   httpPost<R<McpConnectionRecord>>(`${API_MCP_BASE}/connection/add`, body);
 
 export const revokeMcpConnection = (id: string) =>
-  httpPost<R<boolean>>(`${API_MCP_BASE}/connection/revoke`, undefined, { params: { id } });
+  httpPost<R<boolean>>(`${API_MCP_BASE}/connection/revoke`, undefined, {params: {id}});
 
 export const replaceMcpConnectionTools = (connectionId: string, toolIds: string[]) =>
   httpPost<R<boolean>>(`${API_MCP_BASE}/connection/tools/replace`, {
@@ -47,11 +47,11 @@ export const replaceMcpConnectionTools = (connectionId: string, toolIds: string[
   });
 
 export const listMcpConnectionTool = (id: string) =>
-  httpGet<R<string[]>>(`${API_MCP_BASE}/connection/tools/list`, { params: { id } });
+  httpGet<R<string[]>>(`${API_MCP_BASE}/connection/tools/list`, {params: {id}});
 
 export const refreshMcpToolCatalog = () => httpPost<R<number>>(`${API_MCP_BASE}/tool/catalog/refresh`);
 
-export const listMcpTool = (query: { keyword?: string; riskLevel?: string; limit?: number } = {}) =>
+export const listMcpTool = (query: {keyword?: string; riskLevel?: string; limit?: number} = {}) =>
   httpPost<R<McpToolRecord[]>>(`${API_MCP_BASE}/tool/list`, query);
 
 export const listMcpAudit = (

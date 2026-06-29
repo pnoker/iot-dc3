@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ElMessage } from 'element-plus';
+import {ElMessage} from 'element-plus';
 import i18n from '@/config/i18n';
 
 /**
@@ -59,7 +59,7 @@ const fallbackCopy = (content: string, detail?: boolean, message?: string): bool
   if (success) {
     showSuccessMessage(content, detail, message);
   } else {
-    ElMessage.error({ message: i18n.global.t('common.clipboard.failed') });
+    ElMessage.error({message: i18n.global.t('common.clipboard.failed')});
   }
 
   // Safe DOM cleanup - check element exists before removal
@@ -77,7 +77,7 @@ const fallbackCopy = (content: string, detail?: boolean, message?: string): bool
 const showSuccessMessage = (content: string, detail?: boolean, message?: string): void => {
   let tip = i18n.global.t('common.clipboard.copied');
   if (detail) {
-    tip = i18n.global.t('common.clipboard.copiedTarget', { target: message || content });
+    tip = i18n.global.t('common.clipboard.copiedTarget', {target: message || content});
   }
-  ElMessage.success({ message: tip });
+  ElMessage.success({message: tip});
 };

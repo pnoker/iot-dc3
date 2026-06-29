@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export type { Login, Attribute, Dictionary, Order, PageQuery, PageResult } from './common';
+export type {Login, Attribute, Dictionary, Order, PageQuery, PageResult} from './common';
 
 export type {
   AgenticModel,
@@ -56,8 +56,8 @@ export type {
   AlarmEntity,
 } from './alarm';
 
-export type { CommandRecord, CommandForm, CommandParamRecord, CommandParamForm, CommandHistoryRecord } from './command';
-export type { EventRecord, EventForm, EventParamRecord, EventParamForm, EventHistoryRecord } from './event';
+export type {CommandRecord, CommandForm, CommandParamRecord, CommandParamForm, CommandHistoryRecord} from './command';
+export type {EventRecord, EventForm, EventParamRecord, EventParamForm, EventHistoryRecord} from './event';
 
 export type {
   UserForm,

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { httpPost } from '@/api/common';
-import { API_MANAGER_BASE } from '@/config/constant/api';
-import type { Dictionary, PageQuery, PageResult } from '@/config/types';
+import {httpPost} from '@/api/common';
+import {API_MANAGER_BASE} from '@/config/constant/api';
+import type {Dictionary, PageQuery, PageResult} from '@/config/types';
 
 export const listDriverDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/dictionary/driver`, query);

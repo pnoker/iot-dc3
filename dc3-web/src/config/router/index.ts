@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { RouteLocationNormalized, RouteMeta } from 'vue-router';
-import { createRouter, createWebHashHistory } from 'vue-router';
+import type {RouteLocationNormalized, RouteMeta} from 'vue-router';
+import {createRouter, createWebHashHistory} from 'vue-router';
 
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
@@ -23,12 +23,12 @@ import commonRouters from './common';
 import operateRouters from './operate';
 import settingsRouters from './settings';
 import viewsRouters from './views';
-import { getStorage, removeStorage } from '@/utils/storageUtil';
-import { isNull } from '@/utils/validationUtil';
-import { AUTH_HEADERS } from '@/config/constant/common';
+import {getStorage, removeStorage} from '@/utils/storageUtil';
+import {isNull} from '@/utils/validationUtil';
+import {AUTH_HEADERS} from '@/config/constant/common';
 import i18n from '@/config/i18n';
-import { ElMessage } from 'element-plus';
-import { type MenuNode, useMenuStore } from '@/store/modules/menu';
+import {ElMessage} from 'element-plus';
+import {type MenuNode, useMenuStore} from '@/store/modules/menu';
 
 /**
  * NProgress configuration
@@ -106,10 +106,10 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
   // Check if user is authenticated locally
   const tenant = getStorage(AUTH_HEADERS.TENANT) as string | undefined;
   const user = getStorage(AUTH_HEADERS.LOGIN) as string | undefined;
-  const tokenData = getStorage(AUTH_HEADERS.TOKEN) as { salt?: string; token?: string } | undefined;
+  const tokenData = getStorage(AUTH_HEADERS.TOKEN) as {salt?: string; token?: string} | undefined;
 
   if (isNull(tenant) || isNull(user) || isNull(tokenData)) {
-    return { name: 'login' };
+    return {name: 'login'};
   }
 
   // Do not preflight every route with /token/check. A successful login has
@@ -119,7 +119,7 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
     removeStorage(AUTH_HEADERS.TENANT);
     removeStorage(AUTH_HEADERS.LOGIN);
     removeStorage(AUTH_HEADERS.TOKEN);
-    return { name: 'login' };
+    return {name: 'login'};
   }
 
   // Permission check: public routes (login, errors, home) are always allowed.
@@ -138,7 +138,7 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
     const menuRouteName = ROUTE_MENU_ALIASES[routeName] || routeName;
     if (!isRouteInMenuTree(menuRouteName, menuStore.tree)) {
       ElMessage.warning(i18n.global.t('error.forbidden'));
-      return { name: 'home' };
+      return {name: 'home'};
     }
   }
 

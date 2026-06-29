@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { listIdentityAudit } from '@/api/identityAudit';
-import type { EntityListConfig } from '@/config/types/entityList';
+import {listIdentityAudit} from '@/api/identityAudit';
+import type {EntityListConfig} from '@/config/types/entityList';
 
-import { principalNameRelation } from '../relations';
+import {principalNameRelation} from '../relations';
 
 const ACTION_OPTIONS = [
-  { label: 'CREATE', value: 'CREATE' },
-  { label: 'UPDATE', value: 'UPDATE' },
-  { label: 'DELETE', value: 'DELETE' },
-  { label: 'ENABLE', value: 'ENABLE' },
-  { label: 'DISABLE', value: 'DISABLE' },
+  {label: 'CREATE', value: 'CREATE'},
+  {label: 'UPDATE', value: 'UPDATE'},
+  {label: 'DELETE', value: 'DELETE'},
+  {label: 'ENABLE', value: 'ENABLE'},
+  {label: 'DISABLE', value: 'DISABLE'},
 ];
 const STATUS_OPTIONS = [
-  { label: 'SUCCESS', value: 'SUCCESS' },
-  { label: 'FAILURE', value: 'FAILURE' },
+  {label: 'SUCCESS', value: 'SUCCESS'},
+  {label: 'FAILURE', value: 'FAILURE'},
 ];
 
 // Read-only audit log: family list page with no add/edit/delete. The backend
@@ -40,25 +40,25 @@ export const createIdentityAuditConfig = (t: ComposerTranslation): EntityListCon
   name: 'identity-audit',
   editable: false,
   searchFields: [
-    { prop: 'principalId', label: t('settings.identityAudit.principalId'), kind: 'input' },
-    { prop: 'action', label: t('settings.identityAudit.action'), kind: 'select', options: ACTION_OPTIONS },
-    { prop: 'resourceType', label: t('settings.identityAudit.resourceType'), kind: 'input' },
-    { prop: 'status', label: t('settings.identityAudit.status'), kind: 'select', options: STATUS_OPTIONS },
+    {prop: 'principalId', label: t('settings.identityAudit.principalId'), kind: 'input'},
+    {prop: 'action', label: t('settings.identityAudit.action'), kind: 'select', options: ACTION_OPTIONS},
+    {prop: 'resourceType', label: t('settings.identityAudit.resourceType'), kind: 'input'},
+    {prop: 'status', label: t('settings.identityAudit.status'), kind: 'select', options: STATUS_OPTIONS},
   ],
   columns: [
-    { prop: 'createTime', label: t('settings.identityAudit.createTime'), kind: 'time', width: 165 },
+    {prop: 'createTime', label: t('settings.identityAudit.createTime'), kind: 'time', width: 165},
     {
       prop: 'principalId',
       label: t('settings.identityAudit.principalId'),
       minWidth: 140,
       formatter: (row, ctx) => ctx.relations.principalName?.[String(row.principalId)] || String(row.principalId ?? '-'),
     },
-    { prop: 'principalType', label: t('settings.identityAudit.principalType'), minWidth: 130 },
-    { prop: 'action', label: t('settings.identityAudit.action'), minWidth: 110 },
-    { prop: 'resourceType', label: t('settings.identityAudit.resourceType'), minWidth: 150 },
-    { prop: 'resourceName', label: t('settings.identityAudit.resourceName'), minWidth: 150 },
-    { prop: 'status', label: t('settings.identityAudit.status'), kind: 'tag', options: STATUS_OPTIONS, minWidth: 100 },
-    { prop: 'errorCode', label: t('settings.identityAudit.errorCode'), minWidth: 120 },
+    {prop: 'principalType', label: t('settings.identityAudit.principalType'), minWidth: 130},
+    {prop: 'action', label: t('settings.identityAudit.action'), minWidth: 110},
+    {prop: 'resourceType', label: t('settings.identityAudit.resourceType'), minWidth: 150},
+    {prop: 'resourceName', label: t('settings.identityAudit.resourceName'), minWidth: 150},
+    {prop: 'status', label: t('settings.identityAudit.status'), kind: 'tag', options: STATUS_OPTIONS, minWidth: 100},
+    {prop: 'errorCode', label: t('settings.identityAudit.errorCode'), minWidth: 120},
   ],
   fields: [],
   defaultForm: () => ({}),
@@ -73,7 +73,7 @@ export const createIdentityAuditConfig = (t: ComposerTranslation): EntityListCon
       limit: 200,
     });
     const records = Array.isArray(res?.data) ? res.data : [];
-    return { data: { records, total: records.length } } as R;
+    return {data: {records, total: records.length}} as R;
   },
   emptyText: t('settings.identityAudit.empty'),
 });

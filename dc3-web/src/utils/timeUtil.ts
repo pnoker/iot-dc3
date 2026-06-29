@@ -43,14 +43,14 @@ export const parseDateSafe = (v: string | Date | undefined | null): Date | null 
 export const formatDateTime = (v: string | Date | undefined | null): string => {
   const d = parseDateSafe(v);
   if (!d) return typeof v === 'string' ? v : '';
-  return d.toLocaleString(LOCALE, { hour12: false });
+  return d.toLocaleString(LOCALE, {hour12: false});
 };
 
 /** Clock only — "12:34:56". Used by live feeds where the date context is already implicit. */
 export const formatClock = (v: string | Date | undefined | null): string => {
   const d = parseDateSafe(v);
   if (!d) return typeof v === 'string' ? v : '';
-  return d.toLocaleTimeString(LOCALE, { hour12: false });
+  return d.toLocaleTimeString(LOCALE, {hour12: false});
 };
 
 /**

@@ -63,7 +63,7 @@
         <enable-flag-segmented v-model="formData.enableFlag" include-all />
       </el-form-item>
     </template>
-    <template v-if="pre || next" #buttons="{ search, reset }">
+    <template v-if="pre || next" #buttons="{search, reset}">
       <el-button v-if="pre" :icon="Back" plain @click="$emit('pre-handle')">
         {{ $t('common.previous') }}
       </el-button>
@@ -82,13 +82,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
-  import { Back, Check, Plus, RefreshLeft, Search } from '@element-plus/icons-vue';
+  import {reactive, ref} from 'vue';
+  import {Back, Check, Plus, RefreshLeft, Search} from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import type { Dictionary } from '@/config/types';
-  import { listProfileDictionary } from '@/api/dictionary';
-  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
+  import type {Dictionary} from '@/config/types';
+  import {listProfileDictionary} from '@/api/dictionary';
+  import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
   defineProps({
     embedded: {
@@ -121,14 +121,14 @@
     'next-handle',
   ]);
 
-  const formData = reactive<Record<string, any>>({ enableFlag: '' });
+  const formData = reactive<Record<string, any>>({enableFlag: ''});
 
   const onSearch = (data: Record<string, any>) => {
     emit('search', cleanSearchParams(data));
   };
 
   const onReset = () => {
-    resetSearchForm(formData, { enableFlag: '' });
+    resetSearchForm(formData, {enableFlag: ''});
     emit('reset');
   };
 
@@ -138,7 +138,7 @@
   const profileDictionary = (query?: string) => {
     profileLoading.value = true;
     listProfileDictionary({
-      page: { size: 50, current: 1 },
+      page: {size: 50, current: 1},
       label: query || '',
     })
       .then((res) => {

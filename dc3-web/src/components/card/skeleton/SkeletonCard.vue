@@ -15,7 +15,7 @@
   -->
 
 <template>
-  <el-skeleton :loading="props.loading" :throttle="{ leading: 500 }" animated>
+  <el-skeleton :loading="props.loading" :throttle="{leading: 500}" animated>
     <template #template>
       <el-row>
         <el-col v-for="data in 12" :key="data" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">

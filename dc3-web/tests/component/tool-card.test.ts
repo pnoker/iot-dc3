@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
 
-import { createElButtonStub, createElFormStub, createElPaginationStub, layoutStubs } from '../setup/stubs/element-plus';
+import {createElButtonStub, createElFormStub, createElPaginationStub, layoutStubs} from '../setup/stubs/element-plus';
 
 function mountToolCard(props: Record<string, unknown> = {}) {
-  const { ElForm, validate, resetFields } = createElFormStub();
+  const {ElForm, validate, resetFields} = createElFormStub();
 
   const wrapper = mount(ToolCard, {
     props: {
-      formModel: { keyword: 'device' },
-      page: { current: 1, size: 12, total: 36 },
+      formModel: {keyword: 'device'},
+      page: {current: 1, size: 12, total: 36},
       ...props,
     },
     slots: {
@@ -46,13 +46,13 @@ function mountToolCard(props: Record<string, unknown> = {}) {
     },
   });
 
-  return { wrapper, validate, resetFields };
+  return {wrapper, validate, resetFields};
 }
 
 describe('ToolCard', () => {
   it('validates before search and emits the live form model when the search button is clicked', async () => {
-    const formModel = { keyword: 'device' };
-    const { wrapper, validate } = mountToolCard({ formModel });
+    const formModel = {keyword: 'device'};
+    const {wrapper, validate} = mountToolCard({formModel});
 
     // Trigger via the rendered Search button — testing the public contract,
     // not internal vm methods. The Search button is the only `type=primary`
@@ -67,7 +67,7 @@ describe('ToolCard', () => {
   });
 
   it('resets form fields and forwards pagination/tool events from button clicks', async () => {
-    const { wrapper, resetFields } = mountToolCard();
+    const {wrapper, resetFields} = mountToolCard();
 
     // Reset button is the second non-circle, non-primary button in the footer
     // (Search comes first). Find by data-icon on its leading icon prop.
@@ -86,7 +86,7 @@ describe('ToolCard', () => {
   });
 
   it('honors the hideSort contract', () => {
-    const { wrapper } = mountToolCard({ hideSort: true });
+    const {wrapper} = mountToolCard({hideSort: true});
 
     expect(wrapper.find('[data-icon="Sort"]').exists()).toBe(false);
     expect(wrapper.find('[data-icon="Refresh"]').exists()).toBe(true);

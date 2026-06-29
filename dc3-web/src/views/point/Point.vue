@@ -104,16 +104,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, watch } from 'vue';
+  import {computed, ref, watch} from 'vue';
 
-  import { addPoint, deletePoint, listPoint, updatePoint } from '@/api/point';
-  import { listProfileByIds } from '@/api/profile';
-  import { usePagedList } from '@/composables/usePagedList';
-  import { failMessage, successMessage } from '@/utils/notificationUtil';
-  import { isNull } from '@/utils/validationUtil';
-  import { pointTypeKey, rwFlagKey } from '@/utils/pointFormatUtil';
+  import {addPoint, deletePoint, listPoint, updatePoint} from '@/api/point';
+  import {listProfileByIds} from '@/api/profile';
+  import {usePagedList} from '@/composables/usePagedList';
+  import {failMessage, successMessage} from '@/utils/notificationUtil';
+  import {isNull} from '@/utils/validationUtil';
+  import {pointTypeKey, rwFlagKey} from '@/utils/pointFormatUtil';
 
-  import type { PointRecord } from '@/config/types/manager';
+  import type {PointRecord} from '@/config/types/manager';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
@@ -121,7 +121,7 @@
   import PointCard from './card/PointCard.vue';
   import PointTool from './tool/PointTool.vue';
 
-  type EditFormInstance = { show: (profileId: string) => void; showEdit: (row: PointRecord) => void };
+  type EditFormInstance = {show: (profileId: string) => void; showEdit: (row: PointRecord) => void};
 
   const props = withDefaults(
     defineProps<{
@@ -177,7 +177,7 @@
   });
 
   const search = (params: Record<string, unknown>) => {
-    _search({ ...basePointQuery.value, ...params });
+    _search({...basePointQuery.value, ...params});
   };
 
   const reset = () => {
@@ -226,7 +226,7 @@
   };
 
   const onDisable = (id: string, profileId: string, done: () => void) => {
-    updatePoint({ id, profileId, enableFlag: 'DISABLE' })
+    updatePoint({id, profileId, enableFlag: 'DISABLE'})
       .then(() => {
         successMessage();
         load();
@@ -240,7 +240,7 @@
   };
 
   const onEnable = (id: string, profileId: string, done: () => void) => {
-    updatePoint({ id, profileId, enableFlag: 'ENABLE' })
+    updatePoint({id, profileId, enableFlag: 'ENABLE'})
       .then(() => {
         successMessage();
         load();
@@ -290,7 +290,7 @@
     }
   );
 
-  defineExpose({ reactiveData, refresh });
+  defineExpose({reactiveData, refresh});
 
   load();
 </script>

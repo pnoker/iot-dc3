@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 import {
   ALARM_TYPE_OPTIONS,
@@ -82,11 +82,11 @@ describe('thingModelFormatUtil', () => {
 
   it('exposes alarm type options and integer-keyed label/tag helpers', () => {
     expect(ALARM_TYPE_OPTIONS).toEqual([
-      { value: 0, label: 'RULE' },
-      { value: 1, label: 'OFFLINE' },
-      { value: 2, label: 'FAULT' },
-      { value: 3, label: 'STATE_FLIP' },
-      { value: 4, label: 'REPORT' },
+      {value: 0, label: 'RULE'},
+      {value: 1, label: 'OFFLINE'},
+      {value: 2, label: 'FAULT'},
+      {value: 3, label: 'STATE_FLIP'},
+      {value: 4, label: 'REPORT'},
     ]);
 
     expect(alarmTypeLabel(0)).toBe('RULE');

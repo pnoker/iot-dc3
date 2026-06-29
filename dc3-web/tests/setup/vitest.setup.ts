@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { afterEach, beforeEach, vi } from 'vitest';
+import {afterEach, beforeEach, vi} from 'vitest';
 
 class ResizeObserverMock {
   observe = vi.fn();
@@ -119,7 +119,7 @@ const ensureStorage = (name: 'localStorage' | 'sessionStorage') => {
       },
       key: (index: number) => [...store.keys()][index] ?? null,
     };
-    Object.defineProperty(globalThis, name, { value: storage, configurable: true, writable: true });
+    Object.defineProperty(globalThis, name, {value: storage, configurable: true, writable: true});
   }
 };
 ensureStorage('localStorage');

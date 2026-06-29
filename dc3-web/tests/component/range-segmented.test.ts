@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
@@ -46,7 +46,7 @@ function mountRange(props: Record<string, unknown> = {}) {
     },
     global: {
       plugins: [i18n],
-      stubs: { ElSegmented: ElSegmentedStub },
+      stubs: {ElSegmented: ElSegmentedStub},
     },
   });
 }
@@ -63,7 +63,7 @@ describe('RangeSegmented', () => {
   });
 
   it('can include the all option and emits the selected range key', async () => {
-    const wrapper = mountRange({ includeAll: true, size: 'small' });
+    const wrapper = mountRange({includeAll: true, size: 'small'});
     const buttons = wrapper.findAll('button');
 
     expect(wrapper.text()).toContain('All');

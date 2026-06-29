@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { ElNotification } from 'element-plus';
+import {ElNotification} from 'element-plus';
 import i18n from '@/config/i18n';
-import { isNull } from './validationUtil';
+import {isNull} from './validationUtil';
 
 /**
  * Show success notification

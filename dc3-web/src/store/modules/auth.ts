@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import {defineStore} from 'pinia';
+import {computed, ref} from 'vue';
 import router from '@/config/router';
 import i18n from '@/config/i18n';
-import { ElLoading } from 'element-plus';
+import {ElLoading} from 'element-plus';
 
-import { cancelToken, changePassword, generateSalt, generateToken } from '@/api/token';
+import {cancelToken, changePassword, generateSalt, generateToken} from '@/api/token';
 
-import { AUTH_HEADERS } from '@/config/constant/common';
-import { PASSWORD_CHANGE_CODES } from '@/config/constant/axios';
-import type { Login } from '@/config/types';
-import { getStorage, removeStorage, setStorage } from '@/utils/storageUtil';
-import { failMessage } from '@/utils/notificationUtil';
-import { isNull } from '@/utils/validationUtil';
+import {AUTH_HEADERS} from '@/config/constant/common';
+import {PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
+import type {Login} from '@/config/types';
+import {getStorage, removeStorage, setStorage} from '@/utils/storageUtil';
+import {failMessage} from '@/utils/notificationUtil';
+import {isNull} from '@/utils/validationUtil';
 
 interface LoginForm {
   tenant: string;
@@ -53,7 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
   const setToken = (login: Login) => {
     setStorage(AUTH_HEADERS.TENANT, login.tenant);
     setStorage(AUTH_HEADERS.LOGIN, login.name);
-    setStorage(AUTH_HEADERS.TOKEN, { salt: login.salt, token: login.token });
+    setStorage(AUTH_HEADERS.TOKEN, {salt: login.salt, token: login.token});
 
     tenant.value = login.tenant || 'default';
     name.value = login.name || 'dc3';
@@ -71,7 +71,7 @@ export const useAuthStore = defineStore('auth', () => {
       text: i18n.global.t('login.loading'),
     });
     try {
-      const saltRes = await generateSalt({ tenant: form.tenant, name: form.name });
+      const saltRes = await generateSalt({tenant: form.tenant, name: form.name});
       const salt: string = saltRes.data;
       if (!salt) {
         failMessage(i18n.global.t('login.failed'));
@@ -91,9 +91,9 @@ export const useAuthStore = defineStore('auth', () => {
         salt: loginWithPassword.salt,
         token: tokenRes.data,
       });
-      await router.push({ name: 'home' });
+      await router.push({name: 'home'});
     } catch (error) {
-      const code = (error as { code?: string })?.code;
+      const code = (error as {code?: string})?.code;
       if (code && PASSWORD_CHANGE_CODES.includes(code as never)) {
         // Password change required / expired: surface the code so the view can
         // open the change-password dialog instead of reporting a failed login.
@@ -105,7 +105,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
-  const changeLoginPassword = async (form: LoginForm & { newPassword: string }) => {
+  const changeLoginPassword = async (form: LoginForm & {newPassword: string}) => {
     await changePassword({
       tenant: form.tenant,
       name: form.name,
@@ -119,7 +119,7 @@ export const useAuthStore = defineStore('auth', () => {
     const userValue = getStorage(AUTH_HEADERS.LOGIN);
     if (!isNull(tenantValue) && !isNull(userValue)) {
       try {
-        await cancelToken({ tenant: tenantValue, name: userValue } as Login);
+        await cancelToken({tenant: tenantValue, name: userValue} as Login);
       } catch {
         // Server unreachable — proceed with local logout
       }

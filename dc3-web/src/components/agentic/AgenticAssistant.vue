@@ -230,13 +230,13 @@
                 >
                   <summary>
                     <el-icon
-                      :class="{ 'is-active': message.streaming, 'is-done': !message.streaming }"
+                      :class="{'is-active': message.streaming, 'is-done': !message.streaming}"
                       class="agentic-thinking-pulse"
                     >
                       <CircleCheck v-if="!message.streaming" />
                       <Loading v-else />
                     </el-icon>
-                    <span :class="{ 'is-shimmer': message.streaming }" class="agentic-thinking-label"
+                    <span :class="{'is-shimmer': message.streaming}" class="agentic-thinking-label"
                       >{{ t('agentic.detailThinking') }}&ensp;{{ reasoningPanelStatus(message) }}</span
                     >
                   </summary>
@@ -421,7 +421,7 @@
 
           <el-input
             v-model="draft"
-            :autosize="{ minRows: 2, maxRows: 6 }"
+            :autosize="{minRows: 2, maxRows: 6}"
             :disabled="streaming"
             :placeholder="t('agentic.composerPlaceholder')"
             class="agentic-input"
@@ -469,7 +469,7 @@
 <script lang="ts" setup>
   import 'vue-element-plus-x/styles/index.css';
 
-  import { Prompts, Welcome } from 'vue-element-plus-x';
+  import {Prompts, Welcome} from 'vue-element-plus-x';
   import {
     ChatDotRound,
     ChatLineSquare,
@@ -492,14 +492,14 @@
     VideoPause,
     Warning,
   } from '@element-plus/icons-vue';
-  import { ElMessage, ElMessageBox } from 'element-plus';
-  import { storeToRefs } from 'pinia';
-  import { useI18n } from 'vue-i18n';
-  import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
-  import type { AgenticMessage, AgenticMessageContext, AgenticMessageTokens, AgenticTraceEvent } from '@/config/types';
-  import { useAgenticStore } from '@/store';
+  import {ElMessage, ElMessageBox} from 'element-plus';
+  import {storeToRefs} from 'pinia';
+  import {useI18n} from 'vue-i18n';
+  import {computed, nextTick, onBeforeUnmount, ref, watch} from 'vue';
+  import type {AgenticMessage, AgenticMessageContext, AgenticMessageTokens, AgenticTraceEvent} from '@/config/types';
+  import {useAgenticStore} from '@/store';
   import RenderedAssistantMessage from './RenderedAssistantMessage.vue';
-  import { toPlainText } from './assistantContent';
+  import {toPlainText} from './assistantContent';
 
   interface AssistantPromptItem {
     key: string | number;
@@ -533,7 +533,7 @@
 
   const agenticStore = useAgenticStore();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const {
     visible,
     loading,
@@ -575,9 +575,9 @@
   }));
 
   const promptItems = computed<AssistantPromptItem[]>(() => [
-    { key: 'device-status', label: t('agentic.promptDeviceStatus'), description: t('agentic.promptDeviceStatusDesc') },
-    { key: 'point-trend', label: t('agentic.promptPointTrend'), description: t('agentic.promptPointTrendDesc') },
-    { key: 'driver-health', label: t('agentic.promptDriverHealth'), description: t('agentic.promptDriverHealthDesc') },
+    {key: 'device-status', label: t('agentic.promptDeviceStatus'), description: t('agentic.promptDeviceStatusDesc')},
+    {key: 'point-trend', label: t('agentic.promptPointTrend'), description: t('agentic.promptPointTrendDesc')},
+    {key: 'driver-health', label: t('agentic.promptDriverHealth'), description: t('agentic.promptDriverHealthDesc')},
     {
       key: 'operation-plan',
       label: t('agentic.promptOperationPlan'),
@@ -633,7 +633,7 @@
   watch(
     () => messageScrollSignature.value,
     () => scheduleScrollToBottom(),
-    { flush: 'post' }
+    {flush: 'post'}
   );
 
   onBeforeUnmount(() => {
@@ -803,7 +803,7 @@
     if (reason === 'tool_calls') {
       return t('agentic.finishToolCalls');
     }
-    return t('agentic.finishOther', { reason });
+    return t('agentic.finishOther', {reason});
   };
 
   const assistantStatus = (message: AgenticMessage) => {
@@ -841,13 +841,13 @@
       parts.push(t('agentic.thinkingReasoningMode').toLowerCase());
     }
     if (tools.length) {
-      parts.push(t('agentic.detailSummaryTools', { n: tools.length }));
+      parts.push(t('agentic.detailSummaryTools', {n: tools.length}));
     }
     if (contexts.length) {
       parts.push(t('agentic.detailContexts'));
     }
     if (typeof tokenTotal === 'number') {
-      parts.push(t('agentic.detailSummaryTokens', { n: formatCount(tokenTotal) }));
+      parts.push(t('agentic.detailSummaryTokens', {n: formatCount(tokenTotal)}));
     }
     return parts.join(' · ');
   };
@@ -857,13 +857,13 @@
     const tools = assistantToolSteps(message).length;
     const tokenTotal = assistantTokenTotal(message);
     if (assistantReasoning(message)) {
-      stats.push({ label: t('agentic.thinkingReasoningMode'), value: t('agentic.statusEnabled') });
+      stats.push({label: t('agentic.thinkingReasoningMode'), value: t('agentic.statusEnabled')});
     }
     if (tools > 0) {
-      stats.push({ label: t('agentic.detailToolChain'), value: String(tools) });
+      stats.push({label: t('agentic.detailToolChain'), value: String(tools)});
     }
     if (typeof tokenTotal === 'number') {
-      stats.push({ label: t('agentic.detailTokenUsage'), value: formatCount(tokenTotal) });
+      stats.push({label: t('agentic.detailTokenUsage'), value: formatCount(tokenTotal)});
     }
     return stats;
   };
@@ -881,7 +881,7 @@
     if (tools > 0) {
       items.push({
         label: t('agentic.thinkingToolExec'),
-        detail: t('agentic.thinkingToolDetail', { n: tools }),
+        detail: t('agentic.thinkingToolDetail', {n: tools}),
       });
     }
     return uniqueThinkingItems(items);
@@ -1013,7 +1013,7 @@
 
   const assistantTokenTotalLabel = (message: AgenticMessage) => {
     const total = assistantTokenTotal(message);
-    return typeof total === 'number' ? t('agentic.detailTotal', { n: formatCount(total) }) : t('agentic.detailPending');
+    return typeof total === 'number' ? t('agentic.detailTotal', {n: formatCount(total)}) : t('agentic.detailPending');
   };
 
   const assistantTokenItems = (message: AgenticMessage): AssistantTokenItem[] => {
@@ -1031,7 +1031,7 @@
     ];
     return tokenOrder
       .filter(([key]) => typeof tokens[key] === 'number')
-      .map(([key, label]) => ({ label, value: formatCount(tokens[key] || 0) }));
+      .map(([key, label]) => ({label, value: formatCount(tokens[key] || 0)}));
   };
 
   const messageTraceEvents = (message: AgenticMessage) => {

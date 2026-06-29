@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import i18n from '@/config/i18n';
 import Error403 from '@/components/error/403.vue';
 
-import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus';
+import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus';
 
 describe('Error403', () => {
   it('renders a 403 result with a back-home link to /', () => {

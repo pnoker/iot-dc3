@@ -46,17 +46,17 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { Chart } from '@antv/g2';
+  import {computed, nextTick, onMounted, onUnmounted, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {Chart} from '@antv/g2';
 
-  import { deviceStats, driverStats, statsTop } from '@/api/dashboard';
-  import { listDeviceByIds } from '@/api/device';
-  import { listDriverByIds } from '@/api/driver';
-  import { listPointByIds } from '@/api/point';
-  import { listProfileByIds } from '@/api/profile';
+  import {deviceStats, driverStats, statsTop} from '@/api/dashboard';
+  import {listDeviceByIds} from '@/api/device';
+  import {listDriverByIds} from '@/api/driver';
+  import {listPointByIds} from '@/api/point';
+  import {listProfileByIds} from '@/api/profile';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
   type TabKey = 'deviceStatus' | 'protocol' | 'profile' | 'topDevice' | 'topPoint' | 'topDriver';
@@ -67,19 +67,19 @@
       /** Which half of the analytics split this card hosts. */
       group?: Group;
     }>(),
-    { group: 'structural' }
+    {group: 'structural'}
   );
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   // Each group keeps its own driver → point → device → profile precedence
   // so both halves read left-to-right the same way.
   const STRUCTURAL_TABS: TabKey[] = ['protocol', 'deviceStatus', 'profile'];
   const TOP_TABS: TabKey[] = ['topDriver', 'topPoint', 'topDevice'];
 
-  const tabs = computed<{ key: TabKey; label: string }[]>(() => {
+  const tabs = computed<{key: TabKey; label: string}[]>(() => {
     const keys = props.group === 'top' ? TOP_TABS : STRUCTURAL_TABS;
-    return keys.map((k) => ({ key: k, label: t(`home.tabs.${k}`) }));
+    return keys.map((k) => ({key: k, label: t(`home.tabs.${k}`)}));
   });
 
   const activeTab = ref<TabKey>(props.group === 'top' ? 'topDriver' : 'protocol');
@@ -111,7 +111,7 @@
           '7d': t('common.ranges.d7'),
           '30d': t('common.ranges.d30'),
         };
-        return t('home.tabs.captionTopActive', { range: rangeMap[rangeKey.value] });
+        return t('home.tabs.captionTopActive', {range: rangeMap[rangeKey.value]});
       }
     }
   });
@@ -128,7 +128,7 @@
   const ensureChart = () => {
     if (!chartRef.value) return;
     if (chart) return;
-    chart = new Chart({ container: chartRef.value, autoFit: true });
+    chart = new Chart({container: chartRef.value, autoFit: true});
   };
 
   // Entity id → display name caches so top-N charts render labels, not ids.
@@ -163,24 +163,24 @@
   };
 
   // ---- renderers ----------------------------------------------------------
-  const renderPie = (data: { key: string; count: number }[]) => {
+  const renderPie = (data: {key: string; count: number}[]) => {
     ensureChart();
     if (!chart) return;
     chart.clear();
     chart
       .interval()
       .data(data)
-      .transform({ type: 'stackY' })
-      .coordinate({ type: 'theta', innerRadius: 0.6 })
+      .transform({type: 'stackY'})
+      .coordinate({type: 'theta', innerRadius: 0.6})
       .encode('y', 'count')
       .encode('color', 'key')
-      .legend('color', { position: 'right' })
-      .tooltip({ title: (d: any) => d.key, items: [{ field: 'count' }] })
-      .label({ text: 'key', position: 'outside', style: { fontSize: 11 } });
+      .legend('color', {position: 'right'})
+      .tooltip({title: (d: any) => d.key, items: [{field: 'count'}]})
+      .label({text: 'key', position: 'outside', style: {fontSize: 11}});
     chart.render();
   };
 
-  const renderBar = (data: { key: string; count: number }[]) => {
+  const renderBar = (data: {key: string; count: number}[]) => {
     ensureChart();
     if (!chart) return;
     chart.clear();
@@ -191,12 +191,12 @@
       .encode('y', 'count')
       .encode('color', 'key')
       .legend(false)
-      .axis('x', { title: false, labelAutoRotate: false })
-      .axis('y', { title: false });
+      .axis('x', {title: false, labelAutoRotate: false})
+      .axis('y', {title: false});
     chart.render();
   };
 
-  const renderHorizontalBar = (data: { key: string; count: number }[]) => {
+  const renderHorizontalBar = (data: {key: string; count: number}[]) => {
     ensureChart();
     if (!chart) return;
     chart.clear();
@@ -206,10 +206,10 @@
       .encode('x', 'key')
       .encode('y', 'count')
       .encode('color', 'count')
-      .coordinate({ transform: [{ type: 'transpose' }] })
+      .coordinate({transform: [{type: 'transpose'}]})
       .legend(false)
-      .axis('x', { title: false })
-      .axis('y', { title: false });
+      .axis('x', {title: false})
+      .axis('y', {title: false});
     chart.render();
   };
 
@@ -217,11 +217,11 @@
   const loadDriverOrDevice = async () => {
     // deviceStatus / protocol / profile share the same two sources.
     const [drv, dev]: any = await Promise.all([driverStats(), deviceStats(10)]);
-    const driverPayload = drv?.data || { byEnable: [], byType: [], byService: [] };
-    const devicePayload = dev?.data || { byEnable: [], byProfile: [], byDriver: [] };
+    const driverPayload = drv?.data || {byEnable: [], byType: [], byService: []};
+    const devicePayload = dev?.data || {byEnable: [], byProfile: [], byDriver: []};
 
     if (activeTab.value === 'deviceStatus') {
-      const buckets = (devicePayload.byEnable || []) as { key: string; count: number }[];
+      const buckets = (devicePayload.byEnable || []) as {key: string; count: number}[];
       empty.value = buckets.length === 0;
       await nextTick();
       if (!empty.value) renderPie(buckets);
@@ -231,7 +231,7 @@
       // byService keys look like "dc3-driver-modbus-tcp" / "dc3-driver-mqtt";
       // strip the prefix so the chart axis reads "modbus-tcp / mqtt / opc-ua"
       // without the noise.
-      const raw = (driverPayload.byService || []) as { key: string; count: number }[];
+      const raw = (driverPayload.byService || []) as {key: string; count: number}[];
       const buckets = raw.map((b) => ({
         key: (b.key || '-').replace(/^dc3-driver-/, ''),
         count: b.count,
@@ -242,10 +242,10 @@
       return;
     }
     if (activeTab.value === 'profile') {
-      const raw = (devicePayload.byProfile || []) as { key: string; count: number }[];
+      const raw = (devicePayload.byProfile || []) as {key: string; count: number}[];
       const ids = raw.map((b) => b.key).filter(Boolean);
       await resolveNames('profile', ids);
-      const buckets = raw.map((b) => ({ key: nameCache.profile[b.key] || b.key, count: b.count }));
+      const buckets = raw.map((b) => ({key: nameCache.profile[b.key] || b.key, count: b.count}));
       empty.value = buckets.length === 0;
       await nextTick();
       if (!empty.value) renderHorizontalBar(buckets);
@@ -259,8 +259,8 @@
       topDriver: 'driver',
     };
     const dim = dimMap[activeTab.value as keyof typeof dimMap];
-    const res: any = await statsTop({ dimension: dim, rangeKey: rangeKey.value, limit: 10 });
-    const rows: { entityId: number; count: number }[] = res?.data || [];
+    const res: any = await statsTop({dimension: dim, rangeKey: rangeKey.value, limit: 10});
+    const rows: {entityId: number; count: number}[] = res?.data || [];
     const ids = rows.map((r) => String(r.entityId));
     await resolveNames(dim, ids);
     const buckets = rows.map((r) => ({

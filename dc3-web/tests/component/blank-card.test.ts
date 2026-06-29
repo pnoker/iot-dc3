@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 
-import { layoutStubs } from '../setup/stubs/element-plus';
+import {layoutStubs} from '../setup/stubs/element-plus';
 
 describe('BlankCard', () => {
   it('wraps default slot content inside the card body container', () => {
     const wrapper = mount(BlankCard, {
-      slots: { default: '<p class="payload">payload</p>' },
-      global: { stubs: { ...layoutStubs } },
+      slots: {default: '<p class="payload">payload</p>'},
+      global: {stubs: {...layoutStubs}},
     });
 
     expect(wrapper.find('.blank-card').exists()).toBe(true);

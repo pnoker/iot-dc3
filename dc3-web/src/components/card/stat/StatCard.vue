@@ -57,9 +57,9 @@
 </template>
 
 <script lang="ts" setup>
-  import type { Component, PropType } from 'vue';
-  import { computed, ref } from 'vue';
-  import { CaretBottom, CaretTop, Minus, Refresh } from '@element-plus/icons-vue';
+  import type {Component, PropType} from 'vue';
+  import {computed, ref} from 'vue';
+  import {CaretBottom, CaretTop, Minus, Refresh} from '@element-plus/icons-vue';
 
   import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
 
@@ -69,23 +69,23 @@
   }
 
   const props = defineProps({
-    title: { type: String, required: true },
-    value: { type: [Number, String], default: 0 },
-    subtitle: { type: String, default: '' },
-    icon: { type: [String, Object] as PropType<string | Component>, required: true },
-    tone: { type: String as PropType<'blue' | 'green' | 'orange' | 'purple' | 'red'>, default: 'blue' },
-    trend: { type: Object as PropType<Trend | null>, default: null },
-    sparkline: { type: Array as PropType<number[]>, default: () => [] },
+    title: {type: String, required: true},
+    value: {type: [Number, String], default: 0},
+    subtitle: {type: String, default: ''},
+    icon: {type: [String, Object] as PropType<string | Component>, required: true},
+    tone: {type: String as PropType<'blue' | 'green' | 'orange' | 'purple' | 'red'>, default: 'blue'},
+    trend: {type: Object as PropType<Trend | null>, default: null},
+    sparkline: {type: Array as PropType<number[]>, default: () => []},
     /**
      * Optional refresh handler. When provided, a small text button appears
      * in the top-right of the card; clicking it invokes the handler without
      * bubbling the card-level @click (so navigation isn't triggered by a
      * refresh).
      */
-    onRefresh: { type: Function as unknown as PropType<(() => Promise<void> | void) | null>, default: null },
+    onRefresh: {type: Function as unknown as PropType<(() => Promise<void> | void) | null>, default: null},
   });
 
-  const emit = defineEmits<{ (e: 'click'): void }>();
+  const emit = defineEmits<{(e: 'click'): void}>();
 
   const refreshing = ref(false);
   const doRefresh = async () => {

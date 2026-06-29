@@ -29,14 +29,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { nextTick, onMounted, onUnmounted, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { Chart } from '@antv/g2';
+  import {nextTick, onMounted, onUnmounted, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {Chart} from '@antv/g2';
 
-  import { alertTypeDistribution } from '@/api/dashboard';
+  import {alertTypeDistribution} from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   interface TypeRow {
     type: string;
@@ -60,24 +60,24 @@
   const render = (data: TypeRow[]) => {
     if (!chartRef.value) return;
     chart?.destroy();
-    chart = new Chart({ container: chartRef.value, autoFit: true });
-    const mapped = data.map((r) => ({ type: labelFor(r.type), count: Number(r.count) || 0 }));
+    chart = new Chart({container: chartRef.value, autoFit: true});
+    const mapped = data.map((r) => ({type: labelFor(r.type), count: Number(r.count) || 0}));
     chart
       .interval()
       .data(mapped)
-      .transform({ type: 'stackY' })
-      .coordinate({ type: 'theta', innerRadius: 0.6 })
+      .transform({type: 'stackY'})
+      .coordinate({type: 'theta', innerRadius: 0.6})
       .encode('y', 'count')
       .encode('color', 'type')
-      .legend('color', { position: 'right' })
-      .tooltip({ title: (d: { type: string }) => d.type, items: [{ field: 'count' }] });
+      .legend('color', {position: 'right'})
+      .tooltip({title: (d: {type: string}) => d.type, items: [{field: 'count'}]});
     chart.render();
   };
 
   const load = async () => {
     loading.value = true;
     try {
-      const res: { data?: TypeRow[] } = await alertTypeDistribution(30);
+      const res: {data?: TypeRow[]} = await alertTypeDistribution(30);
       rows.value = res?.data ?? [];
       await nextTick();
       if (rows.value.length > 0) render(rows.value);
@@ -90,7 +90,7 @@
 
   onMounted(load);
   onUnmounted(() => chart?.destroy());
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

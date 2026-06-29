@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const agenticMocks = vi.hoisted(() => ({
-  addAgenticModelConfig: vi.fn(() => Promise.resolve({ data: true })),
-  deleteAgenticModelConfig: vi.fn(() => Promise.resolve({ data: true })),
-  listAgenticModelConfigs: vi.fn(() => Promise.resolve({ data: [] })),
-  listAgenticProviders: vi.fn(() => Promise.resolve({ data: [] })),
-  updateAgenticModelConfig: vi.fn(() => Promise.resolve({ data: true })),
+  addAgenticModelConfig: vi.fn(() => Promise.resolve({data: true})),
+  deleteAgenticModelConfig: vi.fn(() => Promise.resolve({data: true})),
+  listAgenticModelConfigs: vi.fn(() => Promise.resolve({data: []})),
+  listAgenticProviders: vi.fn(() => Promise.resolve({data: []})),
+  updateAgenticModelConfig: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/agentic', () => agenticMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('AgenticSettings view', () => {
   it('loads model configs on mount via usePagedList', async () => {
@@ -36,8 +36,8 @@ describe('AgenticSettings view', () => {
     await mountListPage({
       component: AgenticSettings,
       stubs: {
-        modelConfigTool: { template: '<div />' },
-        modelConfigEditForm: { template: '<div />' },
+        modelConfigTool: {template: '<div />'},
+        modelConfigEditForm: {template: '<div />'},
       },
     });
     await flushPromises();

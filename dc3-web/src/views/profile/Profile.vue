@@ -57,14 +57,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref } from 'vue';
+  import {computed, ref} from 'vue';
 
-  import { addProfile, deleteProfile, listProfile, updateProfile } from '@/api/profile';
-  import { usePagedList } from '@/composables/usePagedList';
-  import { failMessage, successMessage } from '@/utils/notificationUtil';
-  import { isNull } from '@/utils/validationUtil';
+  import {addProfile, deleteProfile, listProfile, updateProfile} from '@/api/profile';
+  import {usePagedList} from '@/composables/usePagedList';
+  import {failMessage, successMessage} from '@/utils/notificationUtil';
+  import {isNull} from '@/utils/validationUtil';
 
-  import type { ProfileRecord } from '@/config/types/manager';
+  import type {ProfileRecord} from '@/config/types/manager';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
@@ -72,7 +72,7 @@
   import ProfileCard from '@/views/profile/card/ProfileCard.vue';
   import ProfileTool from '@/views/profile/tool/ProfileTool.vue';
 
-  type DialogInstance = { show: () => void };
+  type DialogInstance = {show: () => void};
 
   const props = withDefaults(
     defineProps<{
@@ -107,7 +107,7 @@
   });
 
   const search = (params: Record<string, unknown>) => {
-    _search({ ...baseProfileQuery.value, ...params });
+    _search({...baseProfileQuery.value, ...params});
   };
 
   const reset = () => {
@@ -133,7 +133,7 @@
   };
 
   const disableThing = (id: number | string, done: () => void) => {
-    updateProfile({ id: String(id), enableFlag: 'DISABLE' })
+    updateProfile({id: String(id), enableFlag: 'DISABLE'})
       .then(() => {
         successMessage();
         load();
@@ -147,7 +147,7 @@
   };
 
   const enableThing = (id: number | string, done: () => void) => {
-    updateProfile({ id: String(id), enableFlag: 'ENABLE' })
+    updateProfile({id: String(id), enableFlag: 'ENABLE'})
       .then(() => {
         successMessage();
         load();

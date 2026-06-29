@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { nextTick } from 'vue';
-import { describe, expect, it, vi } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {nextTick} from 'vue';
+import {describe, expect, it, vi} from 'vitest';
 import ChartBlock from '@/components/agentic/ChartBlock.vue';
-import type { AgenticVisualizationSpec } from '@/config/types';
+import type {AgenticVisualizationSpec} from '@/config/types';
 
 vi.mock('@antv/g2', () => {
   const mark = {
@@ -39,7 +39,7 @@ vi.mock('@antv/g2', () => {
     this.point = vi.fn(() => mark);
     this.render = vi.fn();
   });
-  return { Chart };
+  return {Chart};
 });
 
 describe('ChartBlock', () => {
@@ -47,11 +47,11 @@ describe('ChartBlock', () => {
     const chart: AgenticVisualizationSpec = {
       type: 'stat',
       title: 'Point value summary',
-      dataset: [{ latest: 23.4567, numericCount: 12 }],
+      dataset: [{latest: 23.4567, numericCount: 12}],
       encode: {},
     };
 
-    const wrapper = mount(ChartBlock, { props: { chart } });
+    const wrapper = mount(ChartBlock, {props: {chart}});
 
     expect(wrapper.text()).toContain('Point value summary');
     expect(wrapper.text()).toContain('Latest');
@@ -63,12 +63,12 @@ describe('ChartBlock', () => {
     const chart: AgenticVisualizationSpec = {
       type: 'line',
       title: 'Trend',
-      dataset: [{ index: 0, value: 20 }],
-      encode: { x: 'index', y: 'value' },
-      annotations: [{ type: 'y', label: 'Average', value: 20.1234 }],
+      dataset: [{index: 0, value: 20}],
+      encode: {x: 'index', y: 'value'},
+      annotations: [{type: 'y', label: 'Average', value: 20.1234}],
     };
 
-    const wrapper = mount(ChartBlock, { props: { chart } });
+    const wrapper = mount(ChartBlock, {props: {chart}});
     await nextTick();
 
     expect(wrapper.find('.agentic-chart__annotations').exists()).toBe(true);
@@ -81,11 +81,11 @@ describe('ChartBlock', () => {
     // AgenticVisualizationSpec union to verify the whitelist guard.
     const chart: AgenticVisualizationSpec = {
       type: 'custom',
-      dataset: [{ x: 1, y: 2 }],
-      encode: { x: 'x', y: 'y' },
+      dataset: [{x: 1, y: 2}],
+      encode: {x: 'x', y: 'y'},
     };
 
-    const wrapper = mount(ChartBlock, { props: { chart } });
+    const wrapper = mount(ChartBlock, {props: {chart}});
 
     expect(wrapper.text()).toContain('Chart data is unavailable.');
   });

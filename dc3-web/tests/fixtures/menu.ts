@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { MenuNode } from '@/store';
+import type {MenuNode} from '@/store';
 
 /**
  * Three-level menu tree mirroring the production payload shape

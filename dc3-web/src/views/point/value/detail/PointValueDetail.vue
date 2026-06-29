@@ -28,9 +28,9 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
-  import { ref } from 'vue';
-  import { prettyJson } from '@/utils/jsonUtil';
+  import type {PropType} from 'vue';
+  import {ref} from 'vue';
+  import {prettyJson} from '@/utils/jsonUtil';
 
   defineProps({
     detailData: {
@@ -45,5 +45,5 @@
     detailVisible.value = true;
   };
 
-  defineExpose({ show });
+  defineExpose({show});
 </script>

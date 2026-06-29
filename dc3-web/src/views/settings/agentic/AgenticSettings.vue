@@ -39,7 +39,7 @@
           show-overflow-tooltip
         />
         <el-table-column :label="$t('settings.agentic.capabilities')" min-width="210">
-          <template #default="{ row }">
+          <template #default="{row}">
             <div class="agentic-tags">
               <el-tag :type="row.stream ? 'success' : 'info'" size="small">{{ $t('agentic.capStream') }}</el-tag>
               <el-tag :type="row.toolCall ? 'success' : 'info'" size="small">{{ $t('agentic.capTools') }}</el-tag>
@@ -49,19 +49,19 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t('settings.agentic.default')" width="100">
-          <template #default="{ row }">
+          <template #default="{row}">
             <default-tag :value="row.defaultFlag" size="small" />
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.enable')" width="100">
-          <template #default="{ row }">
+          <template #default="{row}">
             <enable-tag :value="row.enableFlag" size="small" />
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip />
         <!-- @vue-generic {AgenticModelConfig} -->
         <el-table-column :label="$t('common.operation')" fixed="right" width="210">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-button :disabled="!row.id" link type="primary" @click="openDetail(row)"
               >{{ $t('common.detail') }}
             </el-button>
@@ -71,7 +71,7 @@
             <el-popconfirm
               :cancel-button-text="$t('common.cancel')"
               :confirm-button-text="$t('common.confirm')"
-              :title="$t('settings.agentic.confirmDeleteModel', { name: row.model })"
+              :title="$t('settings.agentic.confirmDeleteModel', {name: row.model})"
               @confirm="remove(row)"
             >
               <template #reference>
@@ -91,8 +91,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
+  import {ref} from 'vue';
+  import {useRouter} from 'vue-router';
 
   import {
     addAgenticModelConfig,
@@ -104,9 +104,9 @@
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DefaultTag from '@/components/tag/DefaultTag.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
-  import { usePagedList } from '@/composables/usePagedList';
-  import type { AgenticModelConfig, AgenticProvider } from '@/config/types';
-  import { successMessage } from '@/utils/notificationUtil';
+  import {usePagedList} from '@/composables/usePagedList';
+  import type {AgenticModelConfig, AgenticProvider} from '@/config/types';
+  import {successMessage} from '@/utils/notificationUtil';
 
   import modelConfigTool from './tool/ModelConfigTool.vue';
   import modelConfigEditForm from './edit/ModelConfigEditForm.vue';
@@ -159,7 +159,7 @@
 
   const openAdd = () => editRef.value?.show();
   const openDetail = (row: AgenticModelConfig) => {
-    router.push({ name: 'settingsModelConfigDetail', query: { id: String(row.id) } }).catch(() => {
+    router.push({name: 'settingsModelConfigDetail', query: {id: String(row.id)}}).catch(() => {
       // handled globally
     });
   };

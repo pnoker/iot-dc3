@@ -26,14 +26,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { Chart } from '@antv/g2';
+  import {computed, nextTick, onMounted, onUnmounted, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {Chart} from '@antv/g2';
 
-  import { alertActivity } from '@/api/dashboard';
+  import {alertActivity} from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
@@ -50,10 +50,10 @@
     t('home.activity.dow.sat'),
   ]);
 
-  const render = (rows: { dow: number; hour: number; count: number }[]) => {
+  const render = (rows: {dow: number; hour: number; count: number}[]) => {
     if (!chartRef.value) return;
     chart?.destroy();
-    chart = new Chart({ container: chartRef.value, autoFit: true });
+    chart = new Chart({container: chartRef.value, autoFit: true});
     const labels = dayLabels.value;
     const data = rows.map((r) => ({
       dow: labels[r.dow] || `d-${r.dow}`,
@@ -69,12 +69,12 @@
       // Red-tinted sequential palette — alarm activity reads hotter than the
       // blue-tinted volume heatmap on Home so the two pages stay visually
       // distinct.
-      .scale('color', { type: 'sequential', palette: 'reds' })
-      .style({ stroke: '#ffffff', lineWidth: 1, inset: 0.5 })
-      .axis({ x: { title: false, labelAutoHide: false }, y: { title: false } })
+      .scale('color', {type: 'sequential', palette: 'reds'})
+      .style({stroke: '#ffffff', lineWidth: 1, inset: 0.5})
+      .axis({x: {title: false, labelAutoHide: false}, y: {title: false}})
       .tooltip({
-        title: (d: { dow: string; hour: string }) => `${d.dow} ${d.hour}:00`,
-        items: [{ field: 'count', name: t('settings.event.overview.alarmCount') }],
+        title: (d: {dow: string; hour: string}) => `${d.dow} ${d.hour}:00`,
+        items: [{field: 'count', name: t('settings.event.overview.alarmCount')}],
       });
     chart.render();
   };
@@ -82,7 +82,7 @@
   const load = async () => {
     loading.value = true;
     try {
-      const res: { data?: { dow: number; hour: number; count: number }[] } = await alertActivity(7);
+      const res: {data?: {dow: number; hour: number; count: number}[]} = await alertActivity(7);
       const rows = res?.data ?? [];
       await nextTick();
       render(rows);
@@ -95,7 +95,7 @@
 
   onMounted(load);
   onUnmounted(() => chart?.destroy());
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

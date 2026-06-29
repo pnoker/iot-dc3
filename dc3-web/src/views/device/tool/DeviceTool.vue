@@ -71,13 +71,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
-  import { Plus, Upload } from '@element-plus/icons-vue';
+  import {reactive, ref} from 'vue';
+  import {Plus, Upload} from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import type { Dictionary } from '@/config/types';
-  import { listDriverDictionary } from '@/api/dictionary';
-  import { cleanSearchParams, resetSearchForm } from '@/utils/searchParamUtil';
+  import type {Dictionary} from '@/config/types';
+  import {listDriverDictionary} from '@/api/dictionary';
+  import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
   defineProps({
     embedded: {
@@ -101,7 +101,7 @@
     'current-change',
   ]);
 
-  const formData = reactive<Record<string, any>>({ enableFlag: '' });
+  const formData = reactive<Record<string, any>>({enableFlag: ''});
   const driverDictionaries = ref<Dictionary[]>([]);
   const driverLoading = ref(false);
 
@@ -110,14 +110,14 @@
   };
 
   const onReset = () => {
-    resetSearchForm(formData, { enableFlag: '' });
+    resetSearchForm(formData, {enableFlag: ''});
     emit('reset');
   };
 
   const driverDictionary = (query?: string) => {
     driverLoading.value = true;
     listDriverDictionary({
-      page: { size: 50, current: 1 },
+      page: {size: 50, current: 1},
       label: query || '',
     })
       .then((res) => {

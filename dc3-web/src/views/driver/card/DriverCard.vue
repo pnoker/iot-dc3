@@ -73,20 +73,20 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
-  import { computed } from 'vue';
-  import { Edit, Monitor, Promotion, Sunset } from '@element-plus/icons-vue';
+  import type {PropType} from 'vue';
+  import {computed} from 'vue';
+  import {Edit, Monitor, Promotion, Sunset} from '@element-plus/icons-vue';
   import router from '@/config/router';
-  import { copy } from '@/utils/commonUtil';
-  import { timestamp } from '@/utils/dateUtil';
-  import { isEnabledFlag } from '@/utils/thingModelFormatUtil';
+  import {copy} from '@/utils/commonUtil';
+  import {timestamp} from '@/utils/dateUtil';
+  import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
   import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 
   const props = defineProps({
-    icon: { type: String, default: 'images/common/driver.png' },
-    statusTable: { type: Object as PropType<Record<string, string>>, default: () => ({}) },
-    data: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
-    footer: { type: Boolean, default: false },
+    icon: {type: String, default: 'images/common/driver.png'},
+    statusTable: {type: Object as PropType<Record<string, string>>, default: () => ({})},
+    data: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+    footer: {type: Boolean, default: false},
   });
 
   defineEmits(['select-change']);
@@ -114,7 +114,7 @@
   const detail = () => {
     const id = props.data.id;
     if (id) {
-      router.push({ name: 'driverDetail', query: { id, active: 'detail' } }).catch(() => {
+      router.push({name: 'driverDetail', query: {id, active: 'detail'}}).catch(() => {
         // nothing to do
       });
     }

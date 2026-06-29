@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { expect, type Page, test } from '@playwright/test';
+import {expect, type Page, test} from '@playwright/test';
 
 import {
   apiPost,
@@ -49,7 +49,7 @@ interface DeleteCase {
   nameField: string;
   // Seed payload — needs the dependency ids that ensureE2eData(page) seeds
   // for us (driver / profile / api). We pass that bag in at runtime.
-  seed: (uniqueName: string, deps: { driverId: string; profileId: string; apiId: string }) => Record<string, unknown>;
+  seed: (uniqueName: string, deps: {driverId: string; profileId: string; apiId: string}) => Record<string, unknown>;
 }
 
 const deleteCases: DeleteCase[] = [
@@ -60,7 +60,7 @@ const deleteCases: DeleteCase[] = [
     listUrl: '/api/v3/manager/profile/list',
     addUrl: '/api/v3/manager/profile/add',
     nameField: 'profileName',
-    seed: (n) => ({ profileName: n, profileCode: n, enableFlag: 'ENABLE', remark: 'e2e destructive' }),
+    seed: (n) => ({profileName: n, profileCode: n, enableFlag: 'ENABLE', remark: 'e2e destructive'}),
   },
   {
     name: 'Device',
@@ -151,8 +151,8 @@ function uniqueName() {
 }
 
 async function listCount(page: Page, listUrl: string, nameField: string, name: string) {
-  const response = await apiPost<{ records?: unknown[]; total?: number }>(page, listUrl, {
-    page: { current: 1, size: 1 },
+  const response = await apiPost<{records?: unknown[]; total?: number}>(page, listUrl, {
+    page: {current: 1, size: 1},
     [nameField]: name,
   });
   if (!response.data?.ok) return -1;
@@ -160,12 +160,12 @@ async function listCount(page: Page, listUrl: string, nameField: string, name: s
 }
 
 test.describe('destructive UI delete', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({page}) => {
     await login(page);
   });
 
   for (const testCase of deleteCases) {
-    test(`${testCase.name}: search, delete via UI, and verify removal`, async ({ page }) => {
+    test(`${testCase.name}: search, delete via UI, and verify removal`, async ({page}) => {
       const e2eData = await ensureE2eData(page);
       const health = watchPageHealth(page);
 
@@ -198,11 +198,11 @@ test.describe('destructive UI delete', () => {
           })
           .toBe(1);
 
-        await page.goto(`/#${testCase.route}`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`/#${testCase.route}`, {waitUntil: 'domcontentloaded'});
         await waitForAppSettled(page);
 
         const searchInput = page.getByPlaceholder(testCase.placeholder).first();
-        await expect(searchInput, `${testCase.name} search input should be visible`).toBeVisible({ timeout: 10_000 });
+        await expect(searchInput, `${testCase.name} search input should be visible`).toBeVisible({timeout: 10_000});
         await searchInput.fill(name);
 
         const searchMark = markHealth(health);
@@ -211,14 +211,14 @@ test.describe('destructive UI delete', () => {
 
         // The seeded row must be visible — exact-text match avoids
         // catching unrelated rows that merely contain a substring.
-        await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
+        await expect(page.getByText(name, {exact: true}).first()).toBeVisible();
 
         const deleteMark = markHealth(health);
-        await page.getByRole('button', { name: 'Delete' }).first().click();
+        await page.getByRole('button', {name: 'Delete'}).first().click();
         // Element Plus popconfirm renders Yes/Confirm in the active
         // locale — match both English and Chinese variants.
         await page
-          .getByRole('button', { name: /^(Yes|Confirm|确定|确认)$/ })
+          .getByRole('button', {name: /^(Yes|Confirm|确定|确认)$/})
           .last()
           .click();
         await waitForAppSettled(page);

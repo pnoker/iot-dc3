@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { expect, test } from '@playwright/test';
+import {expect, test} from '@playwright/test';
 
-import { expectHealthy, login, logout, markHealth, waitForAppSettled, watchPageHealth } from '../fixtures/app';
+import {expectHealthy, login, logout, markHealth, waitForAppSettled, watchPageHealth} from '../fixtures/app';
 
 test.describe('logout', () => {
-  test('clearing the auth token forces a redirect to /login on next protected nav', async ({ page }) => {
+  test('clearing the auth token forces a redirect to /login on next protected nav', async ({page}) => {
     const health = watchPageHealth(page);
 
     await login(page);
-    await page.goto('/#/home', { waitUntil: 'domcontentloaded' });
+    await page.goto('/#/home', {waitUntil: 'domcontentloaded'});
     await waitForAppSettled(page);
     await expect(page, 'authenticated /home should not redirect').not.toHaveURL(/\/login/);
 
@@ -42,14 +42,14 @@ test.describe('logout', () => {
 
     // Subsequent protected nav must redirect — proves the guard reads
     // storage on every navigation, not only on app boot.
-    await page.goto('/#/home', { waitUntil: 'domcontentloaded' });
+    await page.goto('/#/home', {waitUntil: 'domcontentloaded'});
     await waitForAppSettled(page);
     await expect(page, 'protected nav after logout must redirect to /login').toHaveURL(/\/login/);
 
     expectHealthy(health, logoutMark);
   });
 
-  test('navigating to a protected route after logout never calls business APIs', async ({ page }) => {
+  test('navigating to a protected route after logout never calls business APIs', async ({page}) => {
     const health = watchPageHealth(page);
 
     await login(page);
@@ -61,7 +61,7 @@ test.describe('logout', () => {
     // contract that keeps a logged-out browser from leaking stale
     // requests against the backend.
     const mark = markHealth(health);
-    await page.goto('/#/device', { waitUntil: 'domcontentloaded' });
+    await page.goto('/#/device', {waitUntil: 'domcontentloaded'});
     await waitForAppSettled(page);
 
     await expect(page).toHaveURL(/\/login/);

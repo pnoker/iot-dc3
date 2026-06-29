@@ -22,17 +22,17 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { addRoleResourceBind, deleteRoleResourceBind } from '@/api/roleResourceBind';
+  import {addRoleResourceBind, deleteRoleResourceBind} from '@/api/roleResourceBind';
   import EntityListPage from '@/components/entity/EntityListPage.vue';
-  import { successMessage } from '@/utils/notificationUtil';
+  import {successMessage} from '@/utils/notificationUtil';
 
   import RoleAssignResources from './assign/RoleAssignResources.vue';
-  import { createRoleConfig } from './roleConfig';
+  import {createRoleConfig} from './roleConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const assignRef = ref<InstanceType<typeof RoleAssignResources>>();
 
@@ -41,7 +41,7 @@
   const onAssignResources = async (roleId: string, addIds: string[], removeBindIds: string[], done: () => void) => {
     try {
       await Promise.all([
-        ...addIds.map((resourceId) => addRoleResourceBind({ roleId, resourceId })),
+        ...addIds.map((resourceId) => addRoleResourceBind({roleId, resourceId})),
         ...removeBindIds.map((id) => deleteRoleResourceBind(id)),
       ]);
       successMessage(t('settings.role.assignSaved'));
@@ -51,5 +51,5 @@
     }
   };
 
-  const config = createRoleConfig(t, { onAssignResources: openAssignResources });
+  const config = createRoleConfig(t, {onAssignResources: openAssignResources});
 </script>

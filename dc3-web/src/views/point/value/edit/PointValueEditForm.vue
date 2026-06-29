@@ -55,14 +55,14 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
-  import { reactive, ref, unref } from 'vue';
-  import type { FormInstance, FormRules } from 'element-plus';
-  import { useI18n } from 'vue-i18n';
+  import type {PropType} from 'vue';
+  import {reactive, ref, unref} from 'vue';
+  import type {FormInstance, FormRules} from 'element-plus';
+  import {useI18n} from 'vue-i18n';
 
-  import { successMessage } from '@/utils/notificationUtil';
+  import {successMessage} from '@/utils/notificationUtil';
 
-  type PointValueFormData = Record<string, unknown> & { value?: string | number; remark?: string };
+  type PointValueFormData = Record<string, unknown> & {value?: string | number; remark?: string};
 
   const props = defineProps({
     formData: {
@@ -75,7 +75,7 @@
     (e: 'update-thing', formData: PointValueFormData, done: () => void): void;
   }>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const formDataRef = ref<FormInstance>();
 
   const reactiveData = reactive({
@@ -102,7 +102,7 @@
   });
 
   const syncFormData = (value = props.formData) => {
-    reactiveData.formData = { ...value };
+    reactiveData.formData = {...value};
   };
 
   const show = (value?: PointValueFormData) => {
@@ -127,7 +127,7 @@
 
     try {
       await form.validate();
-      emit('update-thing', { ...reactiveData.formData }, () => {
+      emit('update-thing', {...reactiveData.formData}, () => {
         cancel();
         reset();
         successMessage();

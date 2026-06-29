@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { httpGet, httpPost } from '@/api/common';
-import { API_PRINCIPAL_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/types';
-import type { PrincipalRecord } from '@/config/types/auth';
+import {httpGet, httpPost} from '@/api/common';
+import {API_PRINCIPAL_BASE} from '@/config/constant/api';
+import type {PageQuery, PageResult} from '@/config/types';
+import type {PrincipalRecord} from '@/config/types/auth';
 
 export const getPrincipalById = (id: string) =>
-  httpGet<R<PrincipalRecord>>(`${API_PRINCIPAL_BASE}/get_by_id`, { params: { id } });
+  httpGet<R<PrincipalRecord>>(`${API_PRINCIPAL_BASE}/get_by_id`, {params: {id}});
 
 export const listPrincipal = <T = R<PageResult<PrincipalRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_PRINCIPAL_BASE}/list`, query);
@@ -30,7 +30,6 @@ export const listPrincipal = <T = R<PageResult<PrincipalRecord>>>(query: PageQue
 export const listPrincipalByIds = (ids: string[]) =>
   httpPost<R<PrincipalRecord[]>>(`${API_PRINCIPAL_BASE}/list_by_ids`, ids);
 
-export const enablePrincipal = (id: string) => httpPost(`${API_PRINCIPAL_BASE}/enable`, undefined, { params: { id } });
+export const enablePrincipal = (id: string) => httpPost(`${API_PRINCIPAL_BASE}/enable`, undefined, {params: {id}});
 
-export const disablePrincipal = (id: string) =>
-  httpPost(`${API_PRINCIPAL_BASE}/disable`, undefined, { params: { id } });
+export const disablePrincipal = (id: string) => httpPost(`${API_PRINCIPAL_BASE}/disable`, undefined, {params: {id}});

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { Router } from 'vue-router';
+import type {Router} from 'vue-router';
 
 /**
  * Central "jump to entity detail" utility. Every list-shaped dashboard
@@ -44,16 +44,16 @@ export const jumpToEntity = (router: Router, kind: JumpKind, id: string | number
   if (!idStr) return;
   switch (kind) {
     case 'driver':
-      router.push({ name: 'driverDetail', query: { id: idStr, active: 'detail' } }).catch(() => {});
+      router.push({name: 'driverDetail', query: {id: idStr, active: 'detail'}}).catch(() => {});
       break;
     case 'device':
-      router.push({ name: 'deviceDetail', query: { id: idStr, active: 'detail' } }).catch(() => {});
+      router.push({name: 'deviceDetail', query: {id: idStr, active: 'detail'}}).catch(() => {});
       break;
     case 'profile':
-      router.push({ name: 'profileDetail', query: { id: idStr, active: 'detail' } }).catch(() => {});
+      router.push({name: 'profileDetail', query: {id: idStr, active: 'detail'}}).catch(() => {});
       break;
     case 'point':
-      router.push({ name: 'pointValue', query: { pointId: idStr } }).catch(() => {});
+      router.push({name: 'pointValue', query: {pointId: idStr}}).catch(() => {});
       break;
   }
 };
@@ -66,5 +66,5 @@ export const jumpToSourceEvents = (router: Router, source: AlertSourceKind, sour
   if (source === 'point') name = 'settingsPointAlarm';
   else if (source === 'driver') name = 'settingsDriverAlarm';
   else name = 'settingsDeviceAlarm';
-  router.push({ name, query: { sourceId: String(sourceId) } }).catch(() => {});
+  router.push({name, query: {sourceId: String(sourceId)}}).catch(() => {});
 };

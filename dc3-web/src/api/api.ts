@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { httpGet, httpPost } from '@/api/common';
-import { API_AUTH_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/types';
-import type { ApiForm, ApiRecord } from '@/config/types/auth';
+import {httpGet, httpPost} from '@/api/common';
+import {API_AUTH_BASE} from '@/config/constant/api';
+import type {PageQuery, PageResult} from '@/config/types';
+import type {ApiForm, ApiRecord} from '@/config/types/auth';
 
 export const addApi = (api: ApiForm) => httpPost<R<ApiRecord>>(`${API_AUTH_BASE}/api/add`, api);
 
-export const deleteApi = (id: string) => httpPost(`${API_AUTH_BASE}/api/delete`, undefined, { params: { id } });
+export const deleteApi = (id: string) => httpPost(`${API_AUTH_BASE}/api/delete`, undefined, {params: {id}});
 
 export const updateApi = (api: ApiForm) => httpPost<R<ApiRecord>>(`${API_AUTH_BASE}/api/update`, api);
 
-export const getApiById = (id: string) => httpGet<R<ApiRecord>>(`${API_AUTH_BASE}/api/get_by_id`, { params: { id } });
+export const getApiById = (id: string) => httpGet<R<ApiRecord>>(`${API_AUTH_BASE}/api/get_by_id`, {params: {id}});
 
 export const listApi = (query: PageQuery) => httpPost<R<PageResult<ApiRecord>>>(`${API_AUTH_BASE}/api/list`, query);

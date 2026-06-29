@@ -48,12 +48,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, watch } from 'vue';
+  import {reactive, watch} from 'vue';
 
-  import { listDriver, listDriverStatus } from '@/api/driver';
-  import { usePagedList } from '@/composables/usePagedList';
+  import {listDriver, listDriverStatus} from '@/api/driver';
+  import {usePagedList} from '@/composables/usePagedList';
 
-  import type { DriverRecord } from '@/config/types/manager';
+  import type {DriverRecord} from '@/config/types/manager';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
@@ -76,17 +76,17 @@
   const statusTable = reactive<Record<string, string>>({});
 
   const search = (params: Record<string, unknown>) => {
-    _search({ type: 'driver', ...params });
+    _search({type: 'driver', ...params});
   };
 
   const reset = () => {
-    _search({ type: 'driver' });
+    _search({type: 'driver'});
   };
 
   const refresh = () => load();
 
   const loadStatus = () => {
-    listDriverStatus({ page: reactiveData.page, ...(reactiveData.query as Record<string, unknown>) })
+    listDriverStatus({page: reactiveData.page, ...(reactiveData.query as Record<string, unknown>)})
       .then((res) => {
         Object.assign(statusTable, res.data as Record<string, string>);
       })

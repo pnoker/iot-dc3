@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { App } from 'vue';
+import type {App} from 'vue';
 import * as ElementIcons from '@element-plus/icons-vue';
 import 'element-plus/dist/index.css';
 

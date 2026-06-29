@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import {readFileSync} from 'node:fs';
+import {join} from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 const root = process.cwd();
 
@@ -66,19 +66,19 @@ describe('thing model profile/device flow', () => {
     //   (2) validation rules get stale because the source of truth moved
     // Asserting on the form-item declaration catches both, and survives
     // refactors that rename the underlying reactive state.
-    const cases: Array<{ file: string; props: string[] }> = [
-      { file: 'src/views/profile/add/ProfileAddForm.vue', props: ['profileCode'] },
-      { file: 'src/views/profile/edit/ProfileEdit.vue', props: ['profileCode'] },
-      { file: 'src/views/device/add/DeviceAddForm.vue', props: ['deviceCode'] },
-      { file: 'src/views/device/edit/DeviceEdit.vue', props: ['deviceCode'] },
-      { file: 'src/views/point/add/PointEditForm.vue', props: ['pointCode'] },
-      { file: 'src/views/point/value/edit/PointValueEditForm.vue', props: ['pointCode'] },
-      { file: 'src/views/settings/command/edit/CommandEditForm.vue', props: ['commandCode'] },
-      { file: 'src/views/settings/event/definition/edit/EventEditForm.vue', props: ['eventCode'] },
+    const cases: Array<{file: string; props: string[]}> = [
+      {file: 'src/views/profile/add/ProfileAddForm.vue', props: ['profileCode']},
+      {file: 'src/views/profile/edit/ProfileEdit.vue', props: ['profileCode']},
+      {file: 'src/views/device/add/DeviceAddForm.vue', props: ['deviceCode']},
+      {file: 'src/views/device/edit/DeviceEdit.vue', props: ['deviceCode']},
+      {file: 'src/views/point/add/PointEditForm.vue', props: ['pointCode']},
+      {file: 'src/views/point/value/edit/PointValueEditForm.vue', props: ['pointCode']},
+      {file: 'src/views/settings/command/edit/CommandEditForm.vue', props: ['commandCode']},
+      {file: 'src/views/settings/event/definition/edit/EventEditForm.vue', props: ['eventCode']},
     ];
 
     const offenders: string[] = [];
-    for (const { file, props } of cases) {
+    for (const {file, props} of cases) {
       const source = readProjectFile(file);
       for (const prop of props) {
         if (declaresFormItemProp(source, prop)) {

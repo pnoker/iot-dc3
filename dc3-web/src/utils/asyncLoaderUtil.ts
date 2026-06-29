@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { Ref } from 'vue';
-import { ref } from 'vue';
+import type {Ref} from 'vue';
+import {ref} from 'vue';
 
 /**
  * The `loading.value = true; try { ... } catch { /* handled globally *\/ }
@@ -36,11 +36,11 @@ import { ref } from 'vue';
  */
 export const useAsyncLoader = (): {
   loading: Ref<boolean>;
-  run: <T>(task: () => Promise<T>, options?: { rethrow?: boolean }) => Promise<T | undefined>;
+  run: <T>(task: () => Promise<T>, options?: {rethrow?: boolean}) => Promise<T | undefined>;
 } => {
   const loading = ref(false);
 
-  const run = async <T>(task: () => Promise<T>, options?: { rethrow?: boolean }): Promise<T | undefined> => {
+  const run = async <T>(task: () => Promise<T>, options?: {rethrow?: boolean}): Promise<T | undefined> => {
     loading.value = true;
     try {
       return await task();
@@ -52,5 +52,5 @@ export const useAsyncLoader = (): {
     }
   };
 
-  return { loading, run };
+  return {loading, run};
 };

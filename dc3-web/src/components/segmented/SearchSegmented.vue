@@ -24,10 +24,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {computed} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import type { EntityOption } from '@/config/types/entityList';
+  import type {EntityOption} from '@/config/types/entityList';
 
   // Single-select search filter rendered as a segmented control. The project
   // convention is: a single-select filter with ≤ 3 options uses Segmented;
@@ -39,11 +39,11 @@
     options: EntityOption[];
   }>();
 
-  const emit = defineEmits<{ (e: 'update:modelValue', value: string | number): void }>();
+  const emit = defineEmits<{(e: 'update:modelValue', value: string | number): void}>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
-  const allOptions = computed<EntityOption[]>(() => [{ label: t('common.all'), value: '' }, ...props.options]);
+  const allOptions = computed<EntityOption[]>(() => [{label: t('common.all'), value: ''}, ...props.options]);
 
   const normalizedValue = computed(() => props.modelValue ?? '');
 

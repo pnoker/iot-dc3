@@ -41,11 +41,11 @@
         <el-table-column :label="t('settings.localCredential.loginName')" min-width="160" prop="loginName" />
         <!-- @vue-generic {import('@/config/types').LocalCredentialRecord} -->
         <el-table-column :label="t('settings.localCredential.principalId')" min-width="140">
-          <template #default="{ row }">{{ principalNameFor(row) }}</template>
+          <template #default="{row}">{{ principalNameFor(row) }}</template>
         </el-table-column>
         <el-table-column :label="t('settings.localCredential.credentialType')" min-width="130" prop="credentialType" />
         <el-table-column :label="t('common.enable')" width="90">
-          <template #default="{ row }">
+          <template #default="{row}">
             <enable-tag :value="row.enableFlag" />
           </template>
         </el-table-column>
@@ -58,7 +58,7 @@
         <el-table-column :label="t('settings.localCredential.failedAttempts')" min-width="120" prop="failedAttempts" />
         <!-- @vue-generic {import('@/config/types').LocalCredentialRecord} -->
         <el-table-column :label="t('common.operation')" fixed="right" width="180">
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-button link type="primary" @click="openReset(row)">
               {{ t('settings.localCredential.resetPassword') }}
             </el-button>

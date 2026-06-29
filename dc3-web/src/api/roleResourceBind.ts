@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import { httpGet, httpPost } from '@/api/common';
-import { API_AUTH_BASE } from '@/config/constant/api';
-import type { PageQuery } from '@/config/types';
-import type { RoleResourceBindForm } from '@/config/types/auth';
+import {httpGet, httpPost} from '@/api/common';
+import {API_AUTH_BASE} from '@/config/constant/api';
+import type {PageQuery} from '@/config/types';
+import type {RoleResourceBindForm} from '@/config/types/auth';
 
 export const addRoleResourceBind = (body: RoleResourceBindForm) => httpPost(`${API_AUTH_BASE}/role_resource/add`, body);
 
 export const deleteRoleResourceBind = (id: string) =>
-  httpPost(`${API_AUTH_BASE}/role_resource/delete`, undefined, { params: { id } });
+  httpPost(`${API_AUTH_BASE}/role_resource/delete`, undefined, {params: {id}});
 
 export const listRoleResourceBind = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_resource/list`, query);
 
 export const listResourceByRoleId = (roleId: string) =>
-  httpGet(`${API_AUTH_BASE}/role_resource/list_resource_by_role`, { params: { role_id: roleId } });
+  httpGet(`${API_AUTH_BASE}/role_resource/list_resource_by_role`, {params: {role_id: roleId}});
 
 export const listResourceByPrincipalId = (principalId: string) =>
-  httpGet(`${API_AUTH_BASE}/role_resource/list_resource_by_principal`, { params: { principal_id: principalId } });
+  httpGet(`${API_AUTH_BASE}/role_resource/list_resource_by_principal`, {params: {principal_id: principalId}});
 
 export const listRoleByResourceId = (resourceId: string) =>
-  httpGet(`${API_AUTH_BASE}/role_resource/list_role_by_resource`, { params: { resource_id: resourceId } });
+  httpGet(`${API_AUTH_BASE}/role_resource/list_role_by_resource`, {params: {resource_id: resourceId}});

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPinia, setActivePinia } from 'pinia';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
 
-import { useAgenticStore } from '@/store';
-import type { AgenticStreamCallbacks } from '@/config/types';
+import {useAgenticStore} from '@/store';
+import type {AgenticStreamCallbacks} from '@/config/types';
 
 const apiMocks = vi.hoisted(() => ({
   completeAgenticChatCompletion: vi.fn(),
@@ -47,13 +47,13 @@ describe('agentic store', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
 
-    apiMocks.listAgenticMessages.mockResolvedValue({ data: undefined });
-    apiMocks.listAgenticAttachments.mockResolvedValue({ data: [] });
-    apiMocks.getPendingAgenticActions.mockResolvedValue({ data: [] });
-    apiMocks.listAgenticModels.mockResolvedValue({ data: [] });
-    apiMocks.listAgenticSessions.mockResolvedValue({ data: { records: [] } });
+    apiMocks.listAgenticMessages.mockResolvedValue({data: undefined});
+    apiMocks.listAgenticAttachments.mockResolvedValue({data: []});
+    apiMocks.getPendingAgenticActions.mockResolvedValue({data: []});
+    apiMocks.listAgenticModels.mockResolvedValue({data: []});
+    apiMocks.listAgenticSessions.mockResolvedValue({data: {records: []}});
     apiMocks.updateAgenticSession.mockImplementation((conversationId: string, data: Record<string, unknown>) =>
-      Promise.resolve({ data: { conversationId, ...data } })
+      Promise.resolve({data: {conversationId, ...data}})
     );
   });
 
@@ -125,11 +125,11 @@ describe('agentic store', () => {
       model: 'deepseek-v4-pro',
       reasoning: true,
       conversationId,
-      messages: [{ role: 'user', content: '查看设备状态' }],
+      messages: [{role: 'user', content: '查看设备状态'}],
     });
 
     const sessionPayloads = apiMocks.updateAgenticSession.mock.calls.map(([, payload]) => payload);
-    expect(sessionPayloads).toEqual([{ title: '查看设备状态' }]);
+    expect(sessionPayloads).toEqual([{title: '查看设备状态'}]);
     for (const payload of sessionPayloads) {
       expect(payload).not.toHaveProperty('model');
       expect(payload).not.toHaveProperty('sessionConfig');
@@ -193,8 +193,8 @@ describe('agentic store', () => {
           id: 'chart-1',
           type: 'line',
           title: 'Point Trend',
-          dataset: [{ index: 0, value: 23.5 }],
-          encode: { x: 'index', y: 'value' },
+          dataset: [{index: 0, value: 23.5}],
+          encode: {x: 'index', y: 'value'},
         });
         callbacks.onDelta?.('趋势分析完成。');
       }

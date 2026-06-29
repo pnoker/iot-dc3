@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { AUTH_HEADERS } from '@/config/constant/common';
-import { setStorage } from '@/utils/storageUtil';
+import {AUTH_HEADERS} from '@/config/constant/common';
+import {setStorage} from '@/utils/storageUtil';
 
 /**
  * Canonical credentials used across auth-related tests. Centralised so
@@ -37,9 +37,9 @@ export const TEST_CREDENTIALS = {
  * credentials so tests can assert against the same values.
  */
 export function seedAuthStorage(overrides: Partial<typeof TEST_CREDENTIALS> = {}) {
-  const creds = { ...TEST_CREDENTIALS, ...overrides };
+  const creds = {...TEST_CREDENTIALS, ...overrides};
   setStorage(AUTH_HEADERS.TENANT, creds.tenant);
   setStorage(AUTH_HEADERS.LOGIN, creds.name);
-  setStorage(AUTH_HEADERS.TOKEN, { salt: creds.salt, token: creds.token });
+  setStorage(AUTH_HEADERS.TOKEN, {salt: creds.salt, token: creds.token});
   return creds;
 }

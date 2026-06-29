@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import {mount} from '@vue/test-utils';
+import {describe, expect, it} from 'vitest';
 
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 
-import { layoutStubs } from '../setup/stubs/element-plus'; // el-skeleton renders the `template` slot (skeleton placeholder) when
+import {layoutStubs} from '../setup/stubs/element-plus'; // el-skeleton renders the `template` slot (skeleton placeholder) when
 
 // el-skeleton renders the `template` slot (skeleton placeholder) when
 // loading=true, and the `default` slot when loading=false. We stub it
@@ -40,7 +40,7 @@ const ElSkeletonItemStub = {
 function mountSkeleton(props: Record<string, unknown> = {}) {
   return mount(SkeletonCard, {
     props,
-    slots: { default: '<p class="loaded">loaded</p>' },
+    slots: {default: '<p class="loaded">loaded</p>'},
     global: {
       stubs: {
         ...layoutStubs,
@@ -53,7 +53,7 @@ function mountSkeleton(props: Record<string, unknown> = {}) {
 
 describe('SkeletonCard', () => {
   it('renders the 12-card placeholder grid with footer buttons by default', () => {
-    const wrapper = mountSkeleton({ loading: true });
+    const wrapper = mountSkeleton({loading: true});
 
     // 12 cards — verified via the icon placeholder count.
     expect(wrapper.findAll('.skeleton-card-icon')).toHaveLength(12);
@@ -62,12 +62,12 @@ describe('SkeletonCard', () => {
   });
 
   it('omits the footer buttons when footer=false', () => {
-    const wrapper = mountSkeleton({ loading: true, footer: false });
+    const wrapper = mountSkeleton({loading: true, footer: false});
     expect(wrapper.findAll('[data-variant="button"]')).toHaveLength(0);
   });
 
   it('exposes the default slot content for the loaded state', () => {
-    const wrapper = mountSkeleton({ loading: false });
+    const wrapper = mountSkeleton({loading: false});
     expect(wrapper.find('.loaded').text()).toBe('loaded');
   });
 });

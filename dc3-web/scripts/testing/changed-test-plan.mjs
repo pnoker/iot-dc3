@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-import { execFileSync } from 'node:child_process';
+import {execFileSync} from 'node:child_process';
 
 function git(args) {
-  return execFileSync('git', args, { encoding: 'utf8' })
+  return execFileSync('git', args, {encoding: 'utf8'})
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);

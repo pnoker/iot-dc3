@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { mount, type VueWrapper } from '@vue/test-utils';
-import { createPinia, setActivePinia } from 'pinia';
-import type { Component, ComponentOptions } from 'vue';
-import { createMemoryHistory, createRouter, type RouteRecordRaw } from 'vue-router';
+import {mount, type VueWrapper} from '@vue/test-utils';
+import {createPinia, setActivePinia} from 'pinia';
+import type {Component, ComponentOptions} from 'vue';
+import {createMemoryHistory, createRouter, type RouteRecordRaw} from 'vue-router';
 
 import i18n from '@/config/i18n';
 
-import { createElButtonStub, createElFormStub, createElPaginationStub, layoutStubs } from '../setup/stubs/element-plus'; // Shared scaffolding for `tests/views/*.test.ts`. Most list pages share the
+import {createElButtonStub, createElFormStub, createElPaginationStub, layoutStubs} from '../setup/stubs/element-plus'; // Shared scaffolding for `tests/views/*.test.ts`. Most list pages share the
 
 // Shared scaffolding for `tests/views/*.test.ts`. Most list pages share the
 // same Element Plus surface (Card / Tool toolbar / Pagination / Tag) and the
@@ -49,13 +49,13 @@ export interface MountListPageOptions {
 }
 
 export async function mountListPage(opts: MountListPageOptions): Promise<VueWrapper> {
-  const noop = { template: '<div />' };
+  const noop = {template: '<div />'};
 
   // Some pages (Resource, agentic) reach for Pinia stores during setup.
   // Establish a fresh active pinia per mount so each test starts clean.
   setActivePinia(createPinia());
 
-  const routes: RouteRecordRaw[] = [{ name: 'test', path: '/test', component: noop }, ...(opts.extraRoutes ?? [])];
+  const routes: RouteRecordRaw[] = [{name: 'test', path: '/test', component: noop}, ...(opts.extraRoutes ?? [])];
 
   const router = createRouter({
     history: createMemoryHistory(),
@@ -63,10 +63,10 @@ export async function mountListPage(opts: MountListPageOptions): Promise<VueWrap
   });
 
   const targetPath = opts.routePath ?? '/test';
-  await router.push({ path: targetPath, query: opts.routeQuery ?? {} });
+  await router.push({path: targetPath, query: opts.routeQuery ?? {}});
   await router.isReady();
 
-  const { ElForm } = createElFormStub();
+  const {ElForm} = createElFormStub();
 
   const wrapper = mount(opts.component, {
     props: opts.props,
@@ -77,16 +77,16 @@ export async function mountListPage(opts: MountListPageOptions): Promise<VueWrap
       // not present under the unplugin auto-import we use in tests; the
       // strict warning handler in vitest.setup would promote a missing
       // directive to a thrown error. Stub it as a no-op here.
-      directives: { loading: () => undefined },
+      directives: {loading: () => undefined},
       stubs: {
         ...layoutStubs,
         ElButton: createElButtonStub(),
         ElPagination: createElPaginationStub(),
-        ...(opts.skipForm ? {} : { ElForm }),
+        ...(opts.skipForm ? {} : {ElForm}),
         // Most list pages compose with these — provide light passthroughs
         // so dialog refs / popconfirms don't blow up the smoke path.
-        BlankCard: { template: '<section class="blank-card-stub"><slot /></section>' },
-        SkeletonCard: { template: '<div class="skeleton-card-stub"><slot /></div>' },
+        BlankCard: {template: '<section class="blank-card-stub"><slot /></section>'},
+        SkeletonCard: {template: '<div class="skeleton-card-stub"><slot /></div>'},
         ToolCard: {
           props: ['formModel', 'page', 'hideSort', 'hidePagination'],
           emits: ['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change'],

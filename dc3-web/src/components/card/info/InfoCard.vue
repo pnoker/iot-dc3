@@ -51,11 +51,11 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
-  import { ref, unref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import type { FormInstance, FormRules } from 'element-plus';
-  import { Check, RefreshLeft } from '@element-plus/icons-vue';
+  import type {PropType} from 'vue';
+  import {ref, unref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import type {FormInstance, FormRules} from 'element-plus';
+  import {Check, RefreshLeft} from '@element-plus/icons-vue';
 
   defineProps({
     formModel: {
@@ -77,7 +77,7 @@
     (e: 'reset'): void;
   }>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const formRef = ref<FormInstance>();
 
   const onSave = async () => {
@@ -100,7 +100,7 @@
     emit('reset');
   };
 
-  defineExpose({ formRef });
+  defineExpose({formRef});
 </script>
 
 <style lang="scss" scoped>

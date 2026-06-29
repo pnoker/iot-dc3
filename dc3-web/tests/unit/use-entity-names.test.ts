@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const apiMocks = vi.hoisted(() => ({
   listDeviceByIds: vi.fn(),
@@ -23,10 +23,10 @@ const apiMocks = vi.hoisted(() => ({
   listPointByIds: vi.fn(),
 }));
 
-vi.mock('@/api/device', () => ({ listDeviceByIds: apiMocks.listDeviceByIds }));
-vi.mock('@/api/driver', () => ({ listDriverByIds: apiMocks.listDriverByIds }));
-vi.mock('@/api/profile', () => ({ listProfileByIds: apiMocks.listProfileByIds }));
-vi.mock('@/api/point', () => ({ listPointByIds: apiMocks.listPointByIds }));
+vi.mock('@/api/device', () => ({listDeviceByIds: apiMocks.listDeviceByIds}));
+vi.mock('@/api/driver', () => ({listDriverByIds: apiMocks.listDriverByIds}));
+vi.mock('@/api/profile', () => ({listProfileByIds: apiMocks.listProfileByIds}));
+vi.mock('@/api/point', () => ({listPointByIds: apiMocks.listPointByIds}));
 
 // Module under test imports the mocked APIs at module scope, so we must
 // import it AFTER vi.mock — but the cache is module-level, so each test
@@ -45,16 +45,16 @@ describe('useEntityNames', () => {
     vi.resetModules();
 
     apiMocks.listDeviceByIds.mockResolvedValue({
-      data: { 'd-1': { deviceName: 'Boiler' }, 'd-2': { deviceName: 'Compressor' } },
+      data: {'d-1': {deviceName: 'Boiler'}, 'd-2': {deviceName: 'Compressor'}},
     });
     apiMocks.listDriverByIds.mockResolvedValue({
-      data: { 'drv-1': { driverName: 'Modbus' } },
+      data: {'drv-1': {driverName: 'Modbus'}},
     });
     apiMocks.listProfileByIds.mockResolvedValue({
-      data: { 'p-1': { profileName: 'TempSensor' } },
+      data: {'p-1': {profileName: 'TempSensor'}},
     });
     apiMocks.listPointByIds.mockResolvedValue({
-      data: { 'pt-1': { pointName: 'Inlet temperature' } },
+      data: {'pt-1': {pointName: 'Inlet temperature'}},
     });
   });
 
@@ -84,7 +84,7 @@ describe('useEntityNames', () => {
   });
 
   it('coerces numeric ids to strings before lookup', async () => {
-    apiMocks.listDeviceByIds.mockResolvedValueOnce({ data: { '42': { deviceName: 'Mixer' } } });
+    apiMocks.listDeviceByIds.mockResolvedValueOnce({data: {'42': {deviceName: 'Mixer'}}});
 
     const hook = await loadHook();
     await hook.resolveDevices([42]);
@@ -105,7 +105,7 @@ describe('useEntityNames', () => {
   });
 
   it('caches the id itself when the backend returns no name (deleted entity)', async () => {
-    apiMocks.listDriverByIds.mockResolvedValueOnce({ data: {} });
+    apiMocks.listDriverByIds.mockResolvedValueOnce({data: {}});
 
     const hook = await loadHook();
     await hook.resolveDrivers(['drv-missing']);
@@ -143,7 +143,7 @@ describe('useEntityNames', () => {
     const first = hook.resolveDevices(['d-1']);
     const second = hook.resolveDevices(['d-1']);
 
-    resolveFetch({ data: { 'd-1': { deviceName: 'Boiler' } } });
+    resolveFetch({data: {'d-1': {deviceName: 'Boiler'}}});
     await Promise.all([first, second]);
 
     expect(apiMocks.listDeviceByIds).toHaveBeenCalledTimes(1);
@@ -154,9 +154,9 @@ describe('useEntityNames', () => {
     const hook = await loadHook();
 
     await hook.resolveBySource([
-      { source: 'device', sourceId: 'd-1' },
-      { source: 'driver', sourceId: 'drv-1' },
-      { source: 'device', sourceId: 'd-2' },
+      {source: 'device', sourceId: 'd-1'},
+      {source: 'driver', sourceId: 'drv-1'},
+      {source: 'device', sourceId: 'd-2'},
     ]);
 
     expect(apiMocks.listDeviceByIds).toHaveBeenCalledTimes(1);
@@ -168,8 +168,8 @@ describe('useEntityNames', () => {
   it('nameBySource routes to deviceName / driverName by source', async () => {
     const hook = await loadHook();
     await hook.resolveBySource([
-      { source: 'device', sourceId: 'd-1' },
-      { source: 'driver', sourceId: 'drv-1' },
+      {source: 'device', sourceId: 'd-1'},
+      {source: 'driver', sourceId: 'drv-1'},
     ]);
 
     expect(hook.nameBySource('device', 'd-1')).toBe('Boiler');

@@ -96,10 +96,10 @@ page.
 
 ```ts
 // ❌ Crashes at runtime
-import { FormInstance, FormRules } from 'element-plus';
+import {FormInstance, FormRules} from 'element-plus';
 
 // ✅
-import type { FormInstance, FormRules } from 'element-plus';
+import type {FormInstance, FormRules} from 'element-plus';
 ```
 
 Common type-only names to watch out for:
@@ -119,14 +119,14 @@ Mirrors the backend convention. The verb reflects the **cardinality** of the res
 ```ts
 // ✅ single record -> get*, /get_*
 export const getDeviceById = (id: string) =>
-  httpGet<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/get_by_id`, { params: { id } });
+  httpGet<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/get_by_id`, {params: {id}});
 
 // ✅ collection -> list*, /list_*
 export const listDevice = <T = R<PageResult<DeviceRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/device/list`, query);
 
 export const listDeviceByDriverId = (driverId: string) =>
-  httpGet(`${API_MANAGER_BASE}/device/list_by_driver_id`, { params: { driver_id: driverId } });
+  httpGet(`${API_MANAGER_BASE}/device/list_by_driver_id`, {params: {driver_id: driverId}});
 
 // ❌ Not allowed in src/api/**
 //   getDeviceList, getDriverByIds, /select_by_id, /tree

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPinia, setActivePinia } from 'pinia';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
 
-import { useMenuStore } from '@/store';
+import {useMenuStore} from '@/store';
 
-import { sampleMenuTree } from '../fixtures/menu';
+import {sampleMenuTree} from '../fixtures/menu';
 
 const menuMocks = vi.hoisted(() => ({
   listMenuTree: vi.fn(),
@@ -31,7 +31,7 @@ describe('menu store', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
-    menuMocks.listMenuTree.mockResolvedValue({ data: sampleMenuTree });
+    menuMocks.listMenuTree.mockResolvedValue({data: sampleMenuTree});
   });
 
   describe('fetchTree', () => {
@@ -70,7 +70,7 @@ describe('menu store', () => {
     });
 
     it('coerces non-array payloads to an empty tree', async () => {
-      menuMocks.listMenuTree.mockResolvedValueOnce({ data: { not: 'an array' } });
+      menuMocks.listMenuTree.mockResolvedValueOnce({data: {not: 'an array'}});
       const store = useMenuStore();
 
       await store.fetchTree();

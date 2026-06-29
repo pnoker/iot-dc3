@@ -19,16 +19,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
-  import { refreshMcpToolCatalog } from '@/api/mcp';
+  import {refreshMcpToolCatalog} from '@/api/mcp';
   import EntityListPage from '@/components/entity/EntityListPage.vue';
-  import { successMessage } from '@/utils/notificationUtil';
+  import {successMessage} from '@/utils/notificationUtil';
 
-  import { createMcpToolConfig } from './mcpToolConfig';
+  import {createMcpToolConfig} from './mcpToolConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const listRef = ref<InstanceType<typeof EntityListPage>>();
   const refreshing = ref(false);
 
@@ -36,12 +36,12 @@
     refreshing.value = true;
     try {
       const res = await refreshMcpToolCatalog();
-      successMessage(t('settings.mcp.refreshed', { count: res.data || 0 }));
+      successMessage(t('settings.mcp.refreshed', {count: res.data || 0}));
       listRef.value?.reload();
     } finally {
       refreshing.value = false;
     }
   };
 
-  const config = createMcpToolConfig(t, { onRefresh, refreshing: () => refreshing.value });
+  const config = createMcpToolConfig(t, {onRefresh, refreshing: () => refreshing.value});
 </script>

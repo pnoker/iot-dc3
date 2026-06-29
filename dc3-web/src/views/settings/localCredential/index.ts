@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { Plus } from '@element-plus/icons-vue';
+import {defineComponent, reactive, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
+import {Plus} from '@element-plus/icons-vue';
 
 import {
   addLocalCredential,
@@ -24,13 +24,13 @@ import {
   listLocalCredential,
   resetLocalCredentialPassword,
 } from '@/api/localCredential';
-import { listPrincipal, listPrincipalByIds } from '@/api/principal';
-import { usePagedList } from '@/composables/usePagedList';
-import { timestampColumn } from '@/utils/dateUtil';
-import { successMessage } from '@/utils/notificationUtil';
-import { cleanSearchParams } from '@/utils/searchParamUtil';
+import {listPrincipal, listPrincipalByIds} from '@/api/principal';
+import {usePagedList} from '@/composables/usePagedList';
+import {timestampColumn} from '@/utils/dateUtil';
+import {successMessage} from '@/utils/notificationUtil';
+import {cleanSearchParams} from '@/utils/searchParamUtil';
 
-import type { LocalCredentialForm, LocalCredentialRecord } from '@/config/types';
+import type {LocalCredentialForm, LocalCredentialRecord} from '@/config/types';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
@@ -44,7 +44,7 @@ export default defineComponent({
     EnableTag,
   },
   setup() {
-    const { t } = useI18n();
+    const {t} = useI18n();
     const {
       state: reactiveData,
       load,
@@ -87,11 +87,11 @@ export default defineComponent({
       principalNameMap[String(row.principalId)] || String(row.principalId ?? '-');
 
     // Principal options for the add-dialog dropdown (choose by name, not raw id).
-    const principalOptions = ref<Array<{ label: string; value: string }>>([]);
+    const principalOptions = ref<Array<{label: string; value: string}>>([]);
     const loadPrincipalOptions = async () => {
       if (principalOptions.value.length) return;
       try {
-        const res: any = await listPrincipal({ page: { current: 1, size: 1000 } });
+        const res: any = await listPrincipal({page: {current: 1, size: 1000}});
         principalOptions.value = (res?.data?.records || []).map((p: any) => ({
           label: p.displayName || p.principalName || String(p.id),
           value: String(p.id),
@@ -104,16 +104,16 @@ export default defineComponent({
     const addDialog = reactive({
       visible: false,
       submitting: false,
-      form: { loginName: '', principalId: '', password: '' } as LocalCredentialForm,
+      form: {loginName: '', principalId: '', password: ''} as LocalCredentialForm,
     });
 
-    const resetDialog = reactive({ visible: false, submitting: false, id: '', loginName: '', password: '' });
+    const resetDialog = reactive({visible: false, submitting: false, id: '', loginName: '', password: ''});
 
-    const filterForm = reactive<Record<string, any>>({ loginName: '' });
+    const filterForm = reactive<Record<string, any>>({loginName: ''});
 
     const openAdd = () => {
       loadPrincipalOptions();
-      addDialog.form = { loginName: '', principalId: '', password: '' };
+      addDialog.form = {loginName: '', principalId: '', password: ''};
       addDialog.visible = true;
     };
 

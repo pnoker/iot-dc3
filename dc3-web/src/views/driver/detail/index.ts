@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, ref } from 'vue';
+import {computed, defineComponent, reactive, ref} from 'vue';
 
-import { useRoute } from 'vue-router';
+import {useRoute} from 'vue-router';
 import router from '@/config/router';
 
-import { getDriverById } from '@/api/driver';
+import {getDriverById} from '@/api/driver';
 
 import blankCard from '@/components/card/blank/BlankCard.vue';
 import baseCard from '@/components/card/base/BaseCard.vue';
@@ -32,7 +32,7 @@ import driverCard from '@/views/driver/card/DriverCard.vue';
 import deviceCard from '@/views/device/card/DeviceCard.vue';
 import pointCard from '@/views/point/card/PointCard.vue';
 
-import { timestamp } from '@/utils/dateUtil';
+import {timestamp} from '@/utils/dateUtil';
 
 export default defineComponent({
   name: 'DriverDetail',
@@ -91,7 +91,7 @@ export default defineComponent({
         default:
           break;
       }
-      router.push({ query: { ...query, active: tab.props.name } });
+      router.push({query: {...query, active: tab.props.name}});
     };
 
     driver();

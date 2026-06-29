@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive } from 'vue';
+import {defineComponent, reactive} from 'vue';
 
-import { useRoute } from 'vue-router';
+import {useRoute} from 'vue-router';
 import router from '@/config/router';
 
-import { listDeviceByPointId, listDeviceStatusByDriverId } from '@/api/device';
-import { listDriverByIds } from '@/api/driver';
-import { getPointById } from '@/api/point';
+import {listDeviceByPointId, listDeviceStatusByDriverId} from '@/api/device';
+import {listDriverByIds} from '@/api/driver';
+import {getPointById} from '@/api/point';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
 import detailCard from '@/components/card/detail/DetailCard.vue';
 import deviceCard from '@/views/device/card/DeviceCard.vue';
 import pointCard from '@/views/point/card/PointCard.vue';
 
-import { timestamp } from '@/utils/dateUtil';
+import {timestamp} from '@/utils/dateUtil';
 
 export default defineComponent({
   components: {
@@ -81,7 +81,7 @@ export default defineComponent({
             Promise.all(driverIds.map((driverId) => listDeviceStatusByDriverId(driverId)))
               .then((resList) => {
                 reactiveData.statusTable = resList.reduce<Record<string, any>>((pre, cur) => {
-                  return { ...pre, ...(cur.data || {}) };
+                  return {...pre, ...(cur.data || {})};
                 }, {});
               })
               .catch(() => {
@@ -103,7 +103,7 @@ export default defineComponent({
 
     const changeActive = (tab: any) => {
       const query = route.query;
-      router.push({ query: { ...query, active: tab.props.name } }).catch(() => {
+      router.push({query: {...query, active: tab.props.name}}).catch(() => {
         // nothing to do
       });
     };

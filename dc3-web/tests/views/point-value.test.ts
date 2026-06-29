@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers';
+import {mountListPage} from './_helpers';
 
 const pointMocks = vi.hoisted(() => ({
-  listPointByIds: vi.fn(() => Promise.resolve({ data: {} })),
-  listPointUnit: vi.fn(() => Promise.resolve({ data: {} })),
-  getPointValueLatest: vi.fn(() => Promise.resolve({ data: {} })),
+  listPointByIds: vi.fn(() => Promise.resolve({data: {}})),
+  listPointUnit: vi.fn(() => Promise.resolve({data: {}})),
+  getPointValueLatest: vi.fn(() => Promise.resolve({data: {}})),
   listPointValue: vi.fn(() =>
-    Promise.resolve({ data: { records: [{ id: 'pv-1', deviceId: 'd-1', pointId: 'pt-1', value: '42' }], total: 1 } })
+    Promise.resolve({data: {records: [{id: 'pv-1', deviceId: 'd-1', pointId: 'pt-1', value: '42'}], total: 1}})
   ),
-  writePointValue: vi.fn(() => Promise.resolve({ data: true })),
+  writePointValue: vi.fn(() => Promise.resolve({data: true})),
 }));
 
 vi.mock('@/api/point', () => pointMocks);
-vi.mock('@/api/device', () => ({ listDeviceByIds: vi.fn(() => Promise.resolve({ data: {} })) }));
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
-vi.mock('@/views/point/value/tool/PointValueTool.vue', () => ({ default: { template: '<div />' } }));
-vi.mock('@/views/point/value/card/PointValueCard.vue', () => ({ default: { template: '<div />' } }));
-vi.mock('@/views/point/value/edit/PointValueEditForm.vue', () => ({ default: { template: '<div />' } }));
-vi.mock('@/views/point/value/detail/PointValueDetail.vue', () => ({ default: { template: '<div />' } }));
+vi.mock('@/api/device', () => ({listDeviceByIds: vi.fn(() => Promise.resolve({data: {}}))}));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
+vi.mock('@/views/point/value/tool/PointValueTool.vue', () => ({default: {template: '<div />'}}));
+vi.mock('@/views/point/value/card/PointValueCard.vue', () => ({default: {template: '<div />'}}));
+vi.mock('@/views/point/value/edit/PointValueEditForm.vue', () => ({default: {template: '<div />'}}));
+vi.mock('@/views/point/value/detail/PointValueDetail.vue', () => ({default: {template: '<div />'}}));
 
 describe('PointValue list view', () => {
   it('lists point values on mount', async () => {
     const PointValue = (await import('@/views/point/value/PointValue.vue')).default;
-    await mountListPage({ component: PointValue });
+    await mountListPage({component: PointValue});
     await flushPromises();
     expect(pointMocks.listPointValue).toHaveBeenCalledTimes(1);
   });

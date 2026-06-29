@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { chromium } from 'playwright';
+import {chromium} from 'playwright';
 import {
   baseProtectedRoutes,
   buildDestructiveDeleteCases,
@@ -22,7 +22,7 @@ import {
   interactionPages,
   protectedRouteProbes,
 } from './data.mjs';
-import { ensureE2eData } from './fixtures.mjs';
+import {ensureE2eData} from './fixtures.mjs';
 import {
   apiPost,
   assertClean,
@@ -100,7 +100,7 @@ async function testPagination(page, watch, pageDef, result) {
     const mark = markWatch(watch);
     await sizeSelect.click();
     await delay(300);
-    const option = page.locator('.el-select-dropdown:visible .el-select-dropdown__item', { hasText: '24/page' }).last();
+    const option = page.locator('.el-select-dropdown:visible .el-select-dropdown__item', {hasText: '24/page'}).last();
     if (await option.count()) {
       await option.click();
       await waitPage(page);
@@ -114,7 +114,7 @@ async function testPagination(page, watch, pageDef, result) {
 
 async function testAddImportForms(page, watch, pageDef, result) {
   if (pageDef.addDisabled) {
-    const add = page.getByRole('button', { name: 'Add' }).first();
+    const add = page.getByRole('button', {name: 'Add'}).first();
     if ((await add.count()) && !(await add.isEnabled().catch(() => true))) {
       result.actions.push('disabled add checked');
     }
@@ -127,13 +127,13 @@ async function testAddImportForms(page, watch, pageDef, result) {
       result.actions.push('open add form');
       const dialog = page.locator('.el-dialog:visible').last();
       if (!(await dialog.count())) throw new Error(`${pageDef.name} add did not open dialog`);
-      const confirm = dialog.getByRole('button', { name: 'Confirm' }).last();
+      const confirm = dialog.getByRole('button', {name: 'Confirm'}).last();
       if (await confirm.count()) {
         await confirm.click();
         await delay(400);
         result.actions.push('add form validation');
       }
-      const reset = dialog.getByRole('button', { name: 'Reset' }).last();
+      const reset = dialog.getByRole('button', {name: 'Reset'}).last();
       if (await reset.count()) {
         await reset.click();
         await delay(200);
@@ -165,7 +165,7 @@ async function testRowActions(page, watch, pageDef, result) {
   ].filter(([name, enabled]) => name && enabled);
 
   for (const [name] of actions) {
-    await page.goto(`${BASE}/#${pageDef.route}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}/#${pageDef.route}`, {waitUntil: 'domcontentloaded'});
     await waitPage(page);
     const mark = markWatch(watch);
     const clicked = await clickButtonIfPresent(page, name);
@@ -177,7 +177,7 @@ async function testRowActions(page, watch, pageDef, result) {
   }
 
   if (pageDef.deleteClick) {
-    await page.goto(`${BASE}/#${pageDef.route}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}/#${pageDef.route}`, {waitUntil: 'domcontentloaded'});
     await waitPage(page);
     const mark = markWatch(watch);
     const deleted = await clickButtonIfPresent(page, 'Delete');
@@ -192,10 +192,10 @@ async function testRowActions(page, watch, pageDef, result) {
 async function testOverviewButtons(page, watch, result) {
   for (const groupIndex of [0, 1]) {
     for (const name of ['All', 'Unconfirmed', 'Today', 'Last 7 days', 'Last 30 days']) {
-      await page.goto(`${BASE}/#/settings/alarm/overview`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/#/settings/alarm/overview`, {waitUntil: 'domcontentloaded'});
       await waitPage(page);
       const group = page.locator('.event-overview__quick-actions').nth(groupIndex);
-      const button = group.getByRole('button', { name }).first();
+      const button = group.getByRole('button', {name}).first();
       if (!(await button.count())) continue;
       const mark = markWatch(watch);
       await button.click();
@@ -207,9 +207,9 @@ async function testOverviewButtons(page, watch, result) {
 }
 
 async function testDashboardTabsAndButtons(page, watch) {
-  const result = { name: 'Dashboard widgets', ok: true, actions: [], error: '' };
+  const result = {name: 'Dashboard widgets', ok: true, actions: [], error: ''};
   try {
-    await page.goto(`${BASE}/#/home`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}/#/home`, {waitUntil: 'domcontentloaded'});
     await waitPage(page);
 
     const statRefreshButtons = page.locator('.home__stats .stat-card__refresh:visible');
@@ -262,7 +262,7 @@ async function testDashboardTabsAndButtons(page, watch) {
     }
 
     for (let i = 0; i < 6; i += 1) {
-      await page.goto(`${BASE}/#/home`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/#/home`, {waitUntil: 'domcontentloaded'});
       await waitPage(page);
       const card = page.locator('.home__stats .stat-card:visible').nth(i);
       if (!(await card.count())) continue;
@@ -273,10 +273,10 @@ async function testDashboardTabsAndButtons(page, watch) {
       await assertClean(`Home stat card ${i + 1}`, watch, mark);
     }
 
-    await page.goto(`${BASE}/#/settings/alarm/overview`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}/#/settings/alarm/overview`, {waitUntil: 'domcontentloaded'});
     await waitPage(page);
     for (const tab of ['Situation', 'Noise', 'Availability', 'SLA']) {
-      const locator = page.locator('.event-overview__tabs .el-tabs__item:visible', { hasText: tab }).first();
+      const locator = page.locator('.event-overview__tabs .el-tabs__item:visible', {hasText: tab}).first();
       if (!(await locator.count())) continue;
       const mark = markWatch(watch);
       await locator.click();
@@ -311,18 +311,18 @@ async function testActualDelete(page, watch, testCase) {
   const before = await listCount(page, testCase.listUrl, testCase.nameField, name);
   if (before < 1) throw new Error(`${testCase.name} seed not found after add`);
 
-  await page.goto(`${BASE}/#${testCase.route}`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${BASE}/#${testCase.route}`, {waitUntil: 'domcontentloaded'});
   await waitPage(page);
   const input = page.getByPlaceholder(testCase.placeholder).first();
   await input.fill(name);
   const searchMark = markWatch(watch);
   await clickButtonIfPresent(page, 'Search');
   await assertClean(`${testCase.name} search before delete`, watch, searchMark);
-  await page.getByText(name).first().waitFor({ state: 'visible', timeout: 10000 });
+  await page.getByText(name).first().waitFor({state: 'visible', timeout: 10000});
 
   const deleteMark = markWatch(watch);
-  await page.getByRole('button', { name: 'Delete' }).first().click();
-  const confirmButton = page.getByRole('button', { name: /^(Yes|Confirm|确定|确认)$/ }).last();
+  await page.getByRole('button', {name: 'Delete'}).first().click();
+  const confirmButton = page.getByRole('button', {name: /^(Yes|Confirm|确定|确认)$/}).last();
   await confirmButton.click();
   await waitPage(page);
   await assertClean(`${testCase.name} confirmed delete`, watch, deleteMark);
@@ -333,7 +333,7 @@ async function testActualDelete(page, watch, testCase) {
 }
 
 async function destructiveDeleteTest(page, watch) {
-  const result = { name: 'Actual delete buttons', ok: true, actions: [], error: '' };
+  const result = {name: 'Actual delete buttons', ok: true, actions: [], error: ''};
   try {
     for (const testCase of buildDestructiveDeleteCases(routeIds)) {
       const action = await testActualDelete(page, watch, testCase);
@@ -356,9 +356,9 @@ async function securityTest(browser) {
   });
 
   for (const route of [...baseProtectedRoutes, ...protectedRouteProbes]) {
-    await page.goto(`${BASE}/#${route}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}/#${route}`, {waitUntil: 'domcontentloaded'});
     await waitPage(page);
-    results.push({ route, ok: page.url().includes('/login'), url: page.url() });
+    results.push({route, ok: page.url().includes('/login'), url: page.url()});
   }
 
   await context.close();
@@ -375,7 +375,7 @@ async function routeOpenTest(page, watch) {
   const openRoutes = ['/login', '/403', '/404', '/500', ...baseProtectedRoutes, ...buildEntityRoutes(routeIds)];
   for (const route of openRoutes) {
     const mark = markWatch(watch);
-    await page.goto(`${BASE}/#${route}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}/#${route}`, {waitUntil: 'domcontentloaded'});
     await waitPage(page);
     const body = shortText(
       await page
@@ -395,7 +395,7 @@ async function routeOpenTest(page, watch) {
       ok = false;
       reason = 'unexpected redirect to login';
     }
-    results.push({ route, ok, url: page.url(), body, reason });
+    results.push({route, ok, url: page.url(), body, reason});
   }
   return {
     total: results.length,
@@ -407,9 +407,9 @@ async function routeOpenTest(page, watch) {
 async function interactionTest(page, watch) {
   const results = [];
   for (const pageDef of interactionPages) {
-    const result = { name: pageDef.name, route: pageDef.route, ok: true, actions: [], error: '' };
+    const result = {name: pageDef.name, route: pageDef.route, ok: true, actions: [], error: ''};
     try {
-      await page.goto(`${BASE}/#${pageDef.route}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/#${pageDef.route}`, {waitUntil: 'domcontentloaded'});
       await waitPage(page);
       await testSearch(page, watch, pageDef, result);
       await testFooterButtons(page, watch, pageDef, result);

@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import { httpGet } from '@/api/common';
-import { API_MANAGER_BASE } from '@/config/constant/api';
-import type { Attribute } from '@/config/types';
+import {httpGet} from '@/api/common';
+import {API_MANAGER_BASE} from '@/config/constant/api';
+import type {Attribute} from '@/config/types';
 
 export const listDriverAttributeByDriverId = (id: string) =>
-  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/driver_attribute/list_by_driver_id`, { params: { driver_id: id } });
+  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/driver_attribute/list_by_driver_id`, {params: {driver_id: id}});
 
 export const listPointAttributeByDriverId = (id: string) =>
-  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/point_attribute/list_by_driver_id`, { params: { driver_id: id } });
+  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/point_attribute/list_by_driver_id`, {params: {driver_id: id}});
 
 export const listCommandAttributeByDriverId = (id: string) =>
-  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/command_attribute/list_by_driver_id`, { params: { driver_id: id } });
+  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/command_attribute/list_by_driver_id`, {params: {driver_id: id}});
 
 export const listEventAttributeByDriverId = (id: string) =>
-  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/event_attribute/list_by_driver_id`, { params: { driver_id: id } });
+  httpGet<R<Attribute[]>>(`${API_MANAGER_BASE}/event_attribute/list_by_driver_id`, {params: {driver_id: id}});

@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import { httpGet, httpPost } from '@/api/common';
-import { API_MANAGER_BASE } from '@/config/constant/api';
-import type { PageQuery, PageResult } from '@/config/types';
-import type { LabelForm, LabelRecord } from '@/config/types/manager';
+import {httpGet, httpPost} from '@/api/common';
+import {API_MANAGER_BASE} from '@/config/constant/api';
+import type {PageQuery, PageResult} from '@/config/types';
+import type {LabelForm, LabelRecord} from '@/config/types/manager';
 
 export const addLabel = (label: LabelForm) => httpPost(`${API_MANAGER_BASE}/label/add`, label);
 
-export const deleteLabel = (id: string) => httpPost(`${API_MANAGER_BASE}/label/delete`, undefined, { params: { id } });
+export const deleteLabel = (id: string) => httpPost(`${API_MANAGER_BASE}/label/delete`, undefined, {params: {id}});
 
 export const updateLabel = (label: LabelForm) => httpPost(`${API_MANAGER_BASE}/label/update`, label);
 
 export const getLabelById = (id: string) =>
-  httpGet<R<LabelRecord>>(`${API_MANAGER_BASE}/label/get_by_id`, { params: { id } });
+  httpGet<R<LabelRecord>>(`${API_MANAGER_BASE}/label/get_by_id`, {params: {id}});
 
 export const listLabel = <T = R<PageResult<LabelRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/label/list`, query);

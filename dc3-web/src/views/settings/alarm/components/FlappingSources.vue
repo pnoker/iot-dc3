@@ -20,7 +20,7 @@
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.flappingEmpty')"
     :loading="loading"
-    :subtitle="t('settings.event.overview.flappingSubtitle', { hours: windowKey, min: minCount })"
+    :subtitle="t('settings.event.overview.flappingSubtitle', {hours: windowKey, min: minCount})"
     :title="t('settings.event.overview.flappingTitle')"
     body-mode="scroll"
     class="flapping-sources"
@@ -50,34 +50,34 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
-  import { Warning } from '@element-plus/icons-vue';
+  import {computed, onMounted, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRouter} from 'vue-router';
+  import {Warning} from '@element-plus/icons-vue';
 
-  import { alertFlapping } from '@/api/dashboard';
-  import type { FlappingSource } from '@/config/types/dashboard';
+  import {alertFlapping} from '@/api/dashboard';
+  import type {FlappingSource} from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
-  import { useEntityNames } from '@/composables/useEntityNames';
-  import { jumpToSourceEvents } from '@/utils/jumpUtil';
+  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+  import {useEntityNames} from '@/composables/useEntityNames';
+  import {jumpToSourceEvents} from '@/utils/jumpUtil';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
-  const { loading, run } = useAsyncLoader();
-  const { resolveBySource, nameBySource } = useEntityNames();
+  const {loading, run} = useAsyncLoader();
+  const {resolveBySource, nameBySource} = useEntityNames();
 
   // Same window semantics + preset thresholds as Storm — operator learns
   // one model of "how the event page works" instead of two.
-  const WINDOW_SPECS: Record<'1' | '6' | '24', { minCount: number }> = {
-    '1': { minCount: 5 },
-    '6': { minCount: 15 },
-    '24': { minCount: 40 },
+  const WINDOW_SPECS: Record<'1' | '6' | '24', {minCount: number}> = {
+    '1': {minCount: 5},
+    '6': {minCount: 15},
+    '24': {minCount: 40},
   };
   const windowOptions = [
-    { label: '1h', value: '1' },
-    { label: '6h', value: '6' },
-    { label: '24h', value: '24' },
+    {label: '1h', value: '1'},
+    {label: '6h', value: '6'},
+    {label: '24h', value: '24'},
   ];
   const windowKey = ref<'1' | '6' | '24'>('6');
   const minCount = computed(() => WINDOW_SPECS[windowKey.value].minCount);
@@ -86,7 +86,7 @@
 
   const load = () =>
     run(async () => {
-      const res: { data?: FlappingSource[] } = await alertFlapping(Number(windowKey.value), minCount.value, 30);
+      const res: {data?: FlappingSource[]} = await alertFlapping(Number(windowKey.value), minCount.value, 30);
       rows.value = res?.data ?? [];
       await resolveBySource(rows.value);
     });
@@ -103,7 +103,7 @@
   const rowKey = (r: FlappingSource) => `${r.source}:${r.sourceId}:${r.eventTypeFlag}`;
   const onJump = (r: FlappingSource) => jumpToSourceEvents(router, r.source, r.sourceId);
 
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

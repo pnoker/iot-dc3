@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { listDeviceByIds } from '@/api/device';
-import { listPrincipal, listPrincipalByIds } from '@/api/principal';
-import { listRole } from '@/api/role';
-import type { EntityFieldConfig, EntityRelation } from '@/config/types/entityList';
+import {listDeviceByIds} from '@/api/device';
+import {listPrincipal, listPrincipalByIds} from '@/api/principal';
+import {listRole} from '@/api/role';
+import type {EntityFieldConfig, EntityRelation} from '@/config/types/entityList';
 
 // Shared `config.relations` loaders for settings lists — turn entity-id foreign
 // keys into display names through the family relations mechanism (same pattern
@@ -69,7 +69,7 @@ export const roleNameRelation = (prop = 'roleId', key = 'roleName'): EntityRelat
   load: async (rows) => {
     const ids = collectIds(rows, prop);
     if (!ids.length) return {};
-    const res: any = await listRole({ page: { current: 1, size: 1000 } });
+    const res: any = await listRole({page: {current: 1, size: 1000}});
     const records = res?.data?.records || [];
     const map: Record<string, string> = {};
     records.forEach((r: any) => {
@@ -89,13 +89,13 @@ export const principalIdField = (label: string, prop = 'principalId'): EntityFie
   kind: 'treeSelect',
   tree: {
     load: async () => {
-      const res: any = await listPrincipal({ page: { current: 1, size: 1000 } });
+      const res: any = await listPrincipal({page: {current: 1, size: 1000}});
       return (res?.data?.records || []).map((p: any) => ({
         ...p,
         displayLabel: p.displayName || p.principalName || String(p.id),
       }));
     },
-    props: { label: 'displayLabel', value: 'id' },
+    props: {label: 'displayLabel', value: 'id'},
   },
   required: true,
 });

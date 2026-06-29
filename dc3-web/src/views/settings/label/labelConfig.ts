@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { addLabel, deleteLabel, listLabel, updateLabel } from '@/api/label';
-import { ENTITY_TYPE_OPTIONS } from '@/config/constant/enums';
-import type { EntityListConfig } from '@/config/types/entityList';
-import { nameRules, remarkRules } from '@/utils/formRuleUtil';
+import {addLabel, deleteLabel, listLabel, updateLabel} from '@/api/label';
+import {ENTITY_TYPE_OPTIONS} from '@/config/constant/enums';
+import type {EntityListConfig} from '@/config/types/entityList';
+import {nameRules, remarkRules} from '@/utils/formRuleUtil';
 
 export const createLabelConfig = (t: ComposerTranslation): EntityListConfig => ({
   name: 'label',
@@ -32,17 +32,17 @@ export const createLabelConfig = (t: ComposerTranslation): EntityListConfig => (
       kind: 'input',
       placeholder: t('settings.label.labelNamePlaceholder'),
     },
-    { prop: 'entityTypeFlag', label: t('settings.common.entityType'), kind: 'select', options: ENTITY_TYPE_OPTIONS },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true },
+    {prop: 'entityTypeFlag', label: t('settings.common.entityType'), kind: 'select', options: ENTITY_TYPE_OPTIONS},
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true},
   ],
   columns: [
-    { prop: 'labelName', label: t('settings.label.labelName'), minWidth: 160 },
-    { prop: 'labelCode', label: t('settings.label.labelCode'), kind: 'code', minWidth: 150 },
-    { prop: 'entityTypeFlag', label: t('settings.common.entityType'), width: 110 },
-    { prop: 'labelColor', label: t('settings.label.labelColor'), kind: 'color', width: 130 },
-    { prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90 },
-    { prop: 'remark', label: t('common.remark'), minWidth: 180 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165 },
+    {prop: 'labelName', label: t('settings.label.labelName'), minWidth: 160},
+    {prop: 'labelCode', label: t('settings.label.labelCode'), kind: 'code', minWidth: 150},
+    {prop: 'entityTypeFlag', label: t('settings.common.entityType'), width: 110},
+    {prop: 'labelColor', label: t('settings.label.labelColor'), kind: 'color', width: 130},
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
+    {prop: 'remark', label: t('common.remark'), minWidth: 180},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
   ],
   fields: [
     {
@@ -52,7 +52,7 @@ export const createLabelConfig = (t: ComposerTranslation): EntityListConfig => (
       options: ENTITY_TYPE_OPTIONS,
       required: true,
     },
-    { prop: 'labelColor', label: t('settings.label.labelColor'), kind: 'color' },
+    {prop: 'labelColor', label: t('settings.label.labelColor'), kind: 'color'},
     {
       prop: 'labelName',
       label: t('settings.label.labelName'),
@@ -66,8 +66,8 @@ export const createLabelConfig = (t: ComposerTranslation): EntityListConfig => (
       placeholder: t('settings.label.labelCodePlaceholder'),
       maxlength: 32,
     },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag' },
-    { prop: 'remark', label: t('common.remark'), kind: 'textarea', span: 24, maxlength: 300, rules: remarkRules(t) },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag'},
+    {prop: 'remark', label: t('common.remark'), kind: 'textarea', span: 24, maxlength: 300, rules: remarkRules(t)},
   ],
   defaultForm: () => ({
     entityTypeFlag: 'DEVICE',
@@ -81,7 +81,7 @@ export const createLabelConfig = (t: ComposerTranslation): EntityListConfig => (
   add: addLabel,
   update: updateLabel,
   remove: deleteLabel,
-  detail: { routeName: 'settingsLabelDetail' },
+  detail: {routeName: 'settingsLabelDetail'},
   confirmDeleteText: t('settings.label.confirmDelete'),
   emptyText: t('settings.label.empty'),
 });

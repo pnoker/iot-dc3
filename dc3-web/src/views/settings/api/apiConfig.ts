@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import type { ComposerTranslation } from 'vue-i18n';
+import type {ComposerTranslation} from 'vue-i18n';
 
-import { listApi } from '@/api/api';
-import type { EntityListConfig } from '@/config/types/entityList';
+import {listApi} from '@/api/api';
+import type {EntityListConfig} from '@/config/types/entityList';
 
 export const createApiConfig = (t: ComposerTranslation): EntityListConfig => ({
   name: 'api',
@@ -53,28 +53,28 @@ export const createApiConfig = (t: ComposerTranslation): EntityListConfig => ({
       label: t('settings.api.apiType'),
       kind: 'select',
       options: [
-        { label: 'GET', value: 'GET' },
-        { label: 'POST', value: 'POST' },
-        { label: 'PUT', value: 'PUT' },
-        { label: 'DELETE', value: 'DELETE' },
+        {label: 'GET', value: 'GET'},
+        {label: 'POST', value: 'POST'},
+        {label: 'PUT', value: 'PUT'},
+        {label: 'DELETE', value: 'DELETE'},
       ],
     },
-    { prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true },
+    {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true},
   ],
   columns: [
-    { prop: 'apiName', label: t('settings.api.apiName'), minWidth: 160 },
-    { prop: 'apiCode', label: t('settings.api.apiCode'), kind: 'code', minWidth: 200 },
-    { prop: 'apiGroup', label: t('settings.api.apiGroup'), minWidth: 160 },
-    { prop: 'serviceName', label: t('settings.api.serviceName'), minWidth: 160 },
-    { prop: 'apiTypeFlag', label: t('settings.api.apiType'), minWidth: 100 },
-    { prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90 },
-    { prop: 'remark', label: t('common.remark'), minWidth: 140 },
-    { prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 180 },
-    { prop: 'operateTime', label: t('common.operationTime'), kind: 'time', width: 180 },
+    {prop: 'apiName', label: t('settings.api.apiName'), minWidth: 160},
+    {prop: 'apiCode', label: t('settings.api.apiCode'), kind: 'code', minWidth: 200},
+    {prop: 'apiGroup', label: t('settings.api.apiGroup'), minWidth: 160},
+    {prop: 'serviceName', label: t('settings.api.serviceName'), minWidth: 160},
+    {prop: 'apiTypeFlag', label: t('settings.api.apiType'), minWidth: 100},
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
+    {prop: 'remark', label: t('common.remark'), minWidth: 140},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 180},
+    {prop: 'operateTime', label: t('common.operationTime'), kind: 'time', width: 180},
   ],
   fields: [],
   defaultForm: () => ({}),
   list: listApi,
-  detail: { routeName: 'settingsApiDetail' },
+  detail: {routeName: 'settingsApiDetail'},
   emptyText: t('settings.api.empty'),
 });

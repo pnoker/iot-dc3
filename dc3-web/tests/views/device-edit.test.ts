@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
-import { mountListPage } from './_helpers'; // DeviceEdit is the wizard that the recent thing-model-matrix work landed.
+import {mountListPage} from './_helpers'; // DeviceEdit is the wizard that the recent thing-model-matrix work landed.
 
 // DeviceEdit is the wizard that the recent thing-model-matrix work landed.
 // We lock in the mount flow + the changeProfile fan-out (point/command/event
@@ -36,54 +36,54 @@ const deviceMocks = vi.hoisted(() => ({
       },
     })
   ),
-  updateDevice: vi.fn(() => Promise.resolve({ data: {} })),
+  updateDevice: vi.fn(() => Promise.resolve({data: {}})),
 }));
 
 const driverMocks = vi.hoisted(() => ({
-  getDriverById: vi.fn(() => Promise.resolve({ data: { id: 'drv-1', driverName: 'Modbus' } })),
+  getDriverById: vi.fn(() => Promise.resolve({data: {id: 'drv-1', driverName: 'Modbus'}})),
 }));
 
 const profileMocks = vi.hoisted(() => ({
-  getProfileById: vi.fn(() => Promise.resolve({ data: { id: 'pf-1', profileName: 'Sensor' } })),
+  getProfileById: vi.fn(() => Promise.resolve({data: {id: 'pf-1', profileName: 'Sensor'}})),
 }));
 
 const dictionaryMocks = vi.hoisted(() => ({
-  getDriverDictionary: vi.fn(() => Promise.resolve({ data: { records: [] } })),
-  getProfileDictionary: vi.fn(() => Promise.resolve({ data: { records: [] } })),
+  getDriverDictionary: vi.fn(() => Promise.resolve({data: {records: []}})),
+  getProfileDictionary: vi.fn(() => Promise.resolve({data: {records: []}})),
 }));
 
 const attributeMocks = vi.hoisted(() => ({
-  listCommandAttributeByDriverId: vi.fn(() => Promise.resolve({ data: [] })),
-  listDriverAttributeByDriverId: vi.fn(() => Promise.resolve({ data: [] })),
-  listEventAttributeByDriverId: vi.fn(() => Promise.resolve({ data: [] })),
-  listPointAttributeByDriverId: vi.fn(() => Promise.resolve({ data: [] })),
+  listCommandAttributeByDriverId: vi.fn(() => Promise.resolve({data: []})),
+  listDriverAttributeByDriverId: vi.fn(() => Promise.resolve({data: []})),
+  listEventAttributeByDriverId: vi.fn(() => Promise.resolve({data: []})),
+  listPointAttributeByDriverId: vi.fn(() => Promise.resolve({data: []})),
 }));
 
 const infoMocks = vi.hoisted(() => ({
-  addCommandInfo: vi.fn(() => Promise.resolve({ data: {} })),
-  addDriverInfo: vi.fn(() => Promise.resolve({ data: {} })),
-  addEventInfo: vi.fn(() => Promise.resolve({ data: {} })),
-  addPointInfo: vi.fn(() => Promise.resolve({ data: {} })),
-  listCommandInfoByDeviceId: vi.fn(() => Promise.resolve({ data: [] })),
-  listDriverInfoByDeviceId: vi.fn(() => Promise.resolve({ data: [] })),
-  listEventInfoByDeviceId: vi.fn(() => Promise.resolve({ data: [] })),
-  listPointInfoByDeviceId: vi.fn(() => Promise.resolve({ data: [] })),
-  updateCommandInfo: vi.fn(() => Promise.resolve({ data: {} })),
-  updateDriverInfo: vi.fn(() => Promise.resolve({ data: {} })),
-  updateEventInfo: vi.fn(() => Promise.resolve({ data: {} })),
-  updatePointInfo: vi.fn(() => Promise.resolve({ data: {} })),
+  addCommandInfo: vi.fn(() => Promise.resolve({data: {}})),
+  addDriverInfo: vi.fn(() => Promise.resolve({data: {}})),
+  addEventInfo: vi.fn(() => Promise.resolve({data: {}})),
+  addPointInfo: vi.fn(() => Promise.resolve({data: {}})),
+  listCommandInfoByDeviceId: vi.fn(() => Promise.resolve({data: []})),
+  listDriverInfoByDeviceId: vi.fn(() => Promise.resolve({data: []})),
+  listEventInfoByDeviceId: vi.fn(() => Promise.resolve({data: []})),
+  listPointInfoByDeviceId: vi.fn(() => Promise.resolve({data: []})),
+  updateCommandInfo: vi.fn(() => Promise.resolve({data: {}})),
+  updateDriverInfo: vi.fn(() => Promise.resolve({data: {}})),
+  updateEventInfo: vi.fn(() => Promise.resolve({data: {}})),
+  updatePointInfo: vi.fn(() => Promise.resolve({data: {}})),
 }));
 
 const pointMocks = vi.hoisted(() => ({
-  listPointByProfileId: vi.fn(() => Promise.resolve({ data: [] })),
+  listPointByProfileId: vi.fn(() => Promise.resolve({data: []})),
 }));
 
 const commandMocks = vi.hoisted(() => ({
-  listCommandByProfileId: vi.fn(() => Promise.resolve({ data: [] })),
+  listCommandByProfileId: vi.fn(() => Promise.resolve({data: []})),
 }));
 
 const eventMocks = vi.hoisted(() => ({
-  listEventByProfileId: vi.fn(() => Promise.resolve({ data: [] })),
+  listEventByProfileId: vi.fn(() => Promise.resolve({data: []})),
 }));
 
 vi.mock('@/api/device', () => deviceMocks);
@@ -95,8 +95,8 @@ vi.mock('@/api/info', () => infoMocks);
 vi.mock('@/api/point', () => pointMocks);
 vi.mock('@/api/command', () => commandMocks);
 vi.mock('@/api/event', () => eventMocks);
-vi.mock('@/utils/notificationUtil', () => ({ failMessage: vi.fn(), successMessage: vi.fn() }));
-vi.mock('@/config/router', () => ({ default: { push: vi.fn(() => Promise.resolve()) } }));
+vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
+vi.mock('@/config/router', () => ({default: {push: vi.fn(() => Promise.resolve())}}));
 
 describe('DeviceEdit view', () => {
   it('loads the device, profile, and driver definitions on mount', async () => {
@@ -104,9 +104,9 @@ describe('DeviceEdit view', () => {
     await mountListPage({
       component: DeviceEdit,
       routePath: '/test',
-      routeQuery: { id: 'dev-1', active: '0' },
+      routeQuery: {id: 'dev-1', active: '0'},
       stubs: {
-        EnableFlagSegmented: { template: '<div />' },
+        EnableFlagSegmented: {template: '<div />'},
       },
     });
     await flushPromises();

@@ -47,7 +47,7 @@
         <div class="matrix-toolbar-footer-trailing">
           <slot name="trailing" />
           <el-tag :type="dirtyCount > 0 ? 'warning' : 'info'" effect="plain">
-            {{ t('device.edit.changedCount', { count: dirtyCount }) }}
+            {{ t('device.edit.changedCount', {count: dirtyCount}) }}
           </el-tag>
         </div>
       </div>
@@ -56,9 +56,9 @@
 </template>
 
 <script lang="ts" setup>
-  import type { PropType } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { Check, RefreshLeft } from '@element-plus/icons-vue';
+  import type {PropType} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {Check, RefreshLeft} from '@element-plus/icons-vue';
 
   defineProps({
     formModel: {
@@ -80,7 +80,7 @@
     (e: 'save'): void;
   }>();
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 </script>
 
 <style lang="scss" scoped>

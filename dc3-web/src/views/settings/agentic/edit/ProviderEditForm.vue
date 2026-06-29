@@ -89,29 +89,29 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import type { FormInstance, FormRules } from 'element-plus';
+  import {computed, reactive, ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import type {FormInstance, FormRules} from 'element-plus';
 
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import type { AgenticProvider } from '@/config/types';
-  import { remarkRules } from '@/utils/formRuleUtil';
+  import type {AgenticProvider} from '@/config/types';
+  import {remarkRules} from '@/utils/formRuleUtil';
 
-  import { AGENTIC_PROVIDER_TYPES } from '../providerTypes';
+  import {AGENTIC_PROVIDER_TYPES} from '../providerTypes';
 
   const providerTypes = AGENTIC_PROVIDER_TYPES;
 
   const emit = defineEmits<{
-    (e: 'save', form: AgenticProvider & { apiKey?: string }, done: () => void): void;
+    (e: 'save', form: AgenticProvider & {apiKey?: string}, done: () => void): void;
   }>();
 
   const visible = ref(false);
   const isEdit = ref(false);
   const submitting = ref(false);
   const formRef = ref<FormInstance>();
-  const { t } = useI18n();
+  const {t} = useI18n();
 
-  const initialForm = (): AgenticProvider & { apiKey?: string } => ({
+  const initialForm = (): AgenticProvider & {apiKey?: string} => ({
     name: '',
     providerType: 'OPENAI_COMPATIBLE',
     baseUrl: '',
@@ -124,8 +124,8 @@
   const form = reactive(initialForm());
 
   const rules = computed<FormRules>(() => ({
-    name: [{ required: true, whitespace: true, message: t('settings.agentic.nameRequired'), trigger: 'blur' }],
-    baseUrl: [{ required: true, whitespace: true, message: t('settings.agentic.baseUrlRequired'), trigger: 'blur' }],
+    name: [{required: true, whitespace: true, message: t('settings.agentic.nameRequired'), trigger: 'blur'}],
+    baseUrl: [{required: true, whitespace: true, message: t('settings.agentic.baseUrlRequired'), trigger: 'blur'}],
     remark: remarkRules(t),
   }));
 
@@ -135,7 +135,7 @@
     visible.value = true;
   };
 
-  const showEdit = (row: AgenticProvider & { apiKey?: string }) => {
+  const showEdit = (row: AgenticProvider & {apiKey?: string}) => {
     isEdit.value = true;
     Object.assign(form, initialForm(), row);
     visible.value = true;
@@ -163,11 +163,11 @@
       submitting.value = false;
       return;
     }
-    emit('save', { ...form }, () => {
+    emit('save', {...form}, () => {
       submitting.value = false;
       visible.value = false;
     });
   };
 
-  defineExpose({ show, showEdit });
+  defineExpose({show, showEdit});
 </script>

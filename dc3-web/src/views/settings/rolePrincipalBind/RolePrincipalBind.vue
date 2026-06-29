@@ -19,13 +19,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { useI18n } from 'vue-i18n';
+  import {useI18n} from 'vue-i18n';
 
   import EntityListPage from '@/components/entity/EntityListPage.vue';
 
-  import { createRolePrincipalBindConfig } from './rolePrincipalBindConfig';
+  import {createRolePrincipalBindConfig} from './rolePrincipalBindConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const config = createRolePrincipalBindConfig(t);
 </script>

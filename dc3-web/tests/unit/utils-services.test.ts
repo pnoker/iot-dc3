@@ -19,8 +19,8 @@
 // Pure helpers without side effects live in `utils-misc.test.ts` and the
 // `*-util.test.ts` files dedicated to a single source module.
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Router } from 'vue-router';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import type {Router} from 'vue-router';
 
 const elementPlusSpies = vi.hoisted(() => ({
   messageError: vi.fn(),
@@ -77,8 +77,8 @@ describe('utils (services)', () => {
 
   describe('asyncLoaderUtil', () => {
     it('tracks async loader success, swallowed errors, and rethrown errors', async () => {
-      const { useAsyncLoader } = await import('@/utils/asyncLoaderUtil');
-      const { loading, run } = useAsyncLoader();
+      const {useAsyncLoader} = await import('@/utils/asyncLoaderUtil');
+      const {loading, run} = useAsyncLoader();
 
       await expect(run(async () => 'ok')).resolves.toBe('ok');
       expect(loading.value).toBe(false);
@@ -86,16 +86,14 @@ describe('utils (services)', () => {
       await expect(run(async () => Promise.reject(new Error('swallowed')))).resolves.toBeUndefined();
       expect(loading.value).toBe(false);
 
-      await expect(run(async () => Promise.reject(new Error('rethrown')), { rethrow: true })).rejects.toThrow(
-        'rethrown'
-      );
+      await expect(run(async () => Promise.reject(new Error('rethrown')), {rethrow: true})).rejects.toThrow('rethrown');
       expect(loading.value).toBe(false);
     });
   });
 
   describe('dateUtil', () => {
     it('formats legacy dates and calculates date differences', async () => {
-      const { calcDate, dateFormat, timestamp, timestampColumn } = await import('@/utils/dateUtil');
+      const {calcDate, dateFormat, timestamp, timestampColumn} = await import('@/utils/dateUtil');
       const date = new Date(2026, 4, 13, 8, 9, 10, 11);
 
       expect(dateFormat(date)).toBe('2026-05-13 08:09:10');
@@ -113,7 +111,7 @@ describe('utils (services)', () => {
 
   describe('formRuleUtil', () => {
     it('exposes stable form validation rule contracts', async () => {
-      const { AUTH_NAME_PATTERN, DECIMAL_PATTERN, NAME_PATTERN, authNameRules, nameRules, remarkRules } =
+      const {AUTH_NAME_PATTERN, DECIMAL_PATTERN, NAME_PATTERN, authNameRules, nameRules, remarkRules} =
         await import('@/utils/formRuleUtil');
       const t = vi.fn((key: string, args?: Record<string, unknown>) => `${key}:${args?.name ?? ''}`);
 
@@ -125,17 +123,17 @@ describe('utils (services)', () => {
       expect(DECIMAL_PATTERN.test('12.3456')).toBe(false);
       expect(nameRules(t, 'Device')).toHaveLength(3);
       expect(authNameRules(t, 'Role')).toHaveLength(3);
-      expect(remarkRules(t)[0]).toMatchObject({ max: 300, trigger: 'blur' });
+      expect(remarkRules(t)[0]).toMatchObject({max: 300, trigger: 'blur'});
     });
   });
 
   describe('commonUtil', () => {
     it('copies content and logs out through the shared helpers', async () => {
-      const { copy, logout } = await import('@/utils/commonUtil');
+      const {copy, logout} = await import('@/utils/commonUtil');
       const writeText = vi.fn(() => Promise.resolve());
       Object.defineProperty(navigator, 'clipboard', {
         configurable: true,
-        value: { writeText },
+        value: {writeText},
       });
 
       copy('driver-1', 'Driver');
@@ -143,13 +141,13 @@ describe('utils (services)', () => {
 
       await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith('driver-1'));
       expect(commonUtilSpies.logout).toHaveBeenCalledTimes(1);
-      expect(commonUtilSpies.push).toHaveBeenCalledWith({ name: 'login' });
+      expect(commonUtilSpies.push).toHaveBeenCalledWith({name: 'login'});
     });
   });
 
   describe('jumpUtil', () => {
     it('routes dashboard jumps to the expected named routes', async () => {
-      const { jumpToEntity, jumpToSourceEvents } = await import('@/utils/jumpUtil');
+      const {jumpToEntity, jumpToSourceEvents} = await import('@/utils/jumpUtil');
       const router = makeRouterStub();
 
       jumpToEntity(router as Router, 'driver', 1);
@@ -161,29 +159,29 @@ describe('utils (services)', () => {
       jumpToSourceEvents(router as Router, 'driver', 6);
       jumpToSourceEvents(router as Router, 'point', 7);
 
-      expect(router.push).toHaveBeenCalledWith({ name: 'driverDetail', query: { id: '1', active: 'detail' } });
-      expect(router.push).toHaveBeenCalledWith({ name: 'deviceDetail', query: { id: '2', active: 'detail' } });
-      expect(router.push).toHaveBeenCalledWith({ name: 'profileDetail', query: { id: '3', active: 'detail' } });
-      expect(router.push).toHaveBeenCalledWith({ name: 'pointValue', query: { pointId: '4' } });
-      expect(router.push).toHaveBeenCalledWith({ name: 'settingsDeviceAlarm', query: { sourceId: '5' } });
-      expect(router.push).toHaveBeenCalledWith({ name: 'settingsDriverAlarm', query: { sourceId: '6' } });
-      expect(router.push).toHaveBeenCalledWith({ name: 'settingsPointAlarm', query: { sourceId: '7' } });
+      expect(router.push).toHaveBeenCalledWith({name: 'driverDetail', query: {id: '1', active: 'detail'}});
+      expect(router.push).toHaveBeenCalledWith({name: 'deviceDetail', query: {id: '2', active: 'detail'}});
+      expect(router.push).toHaveBeenCalledWith({name: 'profileDetail', query: {id: '3', active: 'detail'}});
+      expect(router.push).toHaveBeenCalledWith({name: 'pointValue', query: {pointId: '4'}});
+      expect(router.push).toHaveBeenCalledWith({name: 'settingsDeviceAlarm', query: {sourceId: '5'}});
+      expect(router.push).toHaveBeenCalledWith({name: 'settingsDriverAlarm', query: {sourceId: '6'}});
+      expect(router.push).toHaveBeenCalledWith({name: 'settingsPointAlarm', query: {sourceId: '7'}});
       expect(router.push).toHaveBeenCalledTimes(7);
     });
   });
 
   describe('clipboardUtil', () => {
     it('copies with clipboard API and fallback DOM copy', async () => {
-      const { setCopyContent } = await import('@/utils/clipboardUtil');
+      const {setCopyContent} = await import('@/utils/clipboardUtil');
       const writeText = vi.fn(() => Promise.resolve());
       Object.defineProperty(navigator, 'clipboard', {
         configurable: true,
-        value: { writeText },
+        value: {writeText},
       });
 
       await expect(setCopyContent('abc', true, 'ID')).resolves.toBe(true);
       expect(writeText).toHaveBeenCalledWith('abc');
-      expect(elementPlusSpies.messageSuccess).toHaveBeenCalledWith({ message: 'Copied ID to clipboard!' });
+      expect(elementPlusSpies.messageSuccess).toHaveBeenCalledWith({message: 'Copied ID to clipboard!'});
 
       writeText.mockRejectedValueOnce(new Error('denied'));
       Object.defineProperty(document, 'execCommand', {
@@ -199,20 +197,20 @@ describe('utils (services)', () => {
 
   describe('notificationUtil', () => {
     it('surfaces notification defaults and provided messages', async () => {
-      const { failMessage, successMessage, warnMessage } = await import('@/utils/notificationUtil');
+      const {failMessage, successMessage, warnMessage} = await import('@/utils/notificationUtil');
 
       successMessage();
       warnMessage('Careful', 'Heads up');
       failMessage('', 'Broken');
 
       expect(elementPlusSpies.notification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success', title: 'Success', message: 'Operation successful!' })
+        expect.objectContaining({type: 'success', title: 'Success', message: 'Operation successful!'})
       );
       expect(elementPlusSpies.notification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'warning', title: 'Heads up', message: 'Careful' })
+        expect.objectContaining({type: 'warning', title: 'Heads up', message: 'Careful'})
       );
       expect(elementPlusSpies.notification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'error', title: 'Broken', message: 'Operation failed!' })
+        expect.objectContaining({type: 'error', title: 'Broken', message: 'Operation failed!'})
       );
     });
   });

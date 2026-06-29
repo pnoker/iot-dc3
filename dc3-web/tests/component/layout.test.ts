@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { flushPromises, mount } from '@vue/test-utils';
-import { createMemoryHistory, createRouter } from 'vue-router';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPinia, setActivePinia } from 'pinia';
+import {flushPromises, mount} from '@vue/test-utils';
+import {createMemoryHistory, createRouter} from 'vue-router';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {createPinia, setActivePinia} from 'pinia';
 
 import i18n from '@/config/i18n';
-import { layoutStubs } from '../setup/stubs/element-plus';
-import { sampleMenuTree } from '../fixtures/menu';
+import {layoutStubs} from '../setup/stubs/element-plus';
+import {sampleMenuTree} from '../fixtures/menu';
 
 // Layout reaches through several stores and the router push singleton.
 // Mock at the boundaries — store, router default export, agentic child.
@@ -31,24 +31,24 @@ const layoutMocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/config/router', () => ({
-  default: { push: layoutMocks.routerPush, currentRoute: { value: { path: '/home' } } },
+  default: {push: layoutMocks.routerPush, currentRoute: {value: {path: '/home'}}},
 }));
 
 vi.mock('@/components/agentic/AgenticAssistant.vue', () => ({
-  default: { name: 'AgenticAssistant', template: '<div class="agentic-stub" />' },
+  default: {name: 'AgenticAssistant', template: '<div class="agentic-stub" />'},
 }));
 
 vi.mock('@/store', async () => {
   const actual = await vi.importActual<typeof import('@/store')>('@/store');
   return {
     ...actual,
-    useAuthStore: () => ({ logout: layoutMocks.logout }),
+    useAuthStore: () => ({logout: layoutMocks.logout}),
   };
 });
 
 async function mountLayout() {
   setActivePinia(createPinia());
-  const { useMenuStore } = await import('@/store');
+  const {useMenuStore} = await import('@/store');
   const menuStore = useMenuStore();
   // Seed the store directly — bootstrap() would otherwise hit the menu API.
   menuStore.tree = sampleMenuTree;
@@ -57,9 +57,9 @@ async function mountLayout() {
   const router = createRouter({
     history: createMemoryHistory(),
     routes: [
-      { path: '/', redirect: '/home' },
-      { path: '/home', name: 'home', component: { template: '<div class="home-route" />' } },
-      { path: '/login', name: 'login', component: { template: '<div />' } },
+      {path: '/', redirect: '/home'},
+      {path: '/home', name: 'home', component: {template: '<div class="home-route" />'}},
+      {path: '/login', name: 'login', component: {template: '<div />'}},
     ],
   });
   await router.push('/home');
@@ -72,8 +72,8 @@ async function mountLayout() {
       plugins: [i18n, router],
       stubs: {
         ...layoutStubs,
-        ElBacktop: { template: '<div class="el-backtop-stub" />' },
-        RouterView: { template: '<div class="router-view-stub" />' },
+        ElBacktop: {template: '<div class="el-backtop-stub" />'},
+        RouterView: {template: '<div class="router-view-stub" />'},
       },
     },
   });

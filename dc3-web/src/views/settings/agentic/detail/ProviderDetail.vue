@@ -48,15 +48,15 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive } from 'vue';
-  import { useRoute } from 'vue-router';
+  import {onMounted, reactive} from 'vue';
+  import {useRoute} from 'vue-router';
 
-  import { listAgenticProviders } from '@/api/agentic';
+  import {listAgenticProviders} from '@/api/agentic';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
   import DefaultTag from '@/components/tag/DefaultTag.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
-  import type { AgenticProvider } from '@/config/types';
+  import type {AgenticProvider} from '@/config/types';
 
   const route = useRoute();
 

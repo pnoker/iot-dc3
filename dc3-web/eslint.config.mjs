@@ -18,7 +18,7 @@ import js from '@eslint/js';
 import pluginVue from 'eslint-plugin-vue';
 import tsparser from '@typescript-eslint/parser';
 import configPrettier from 'eslint-config-prettier/flat';
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
+import {defineConfigWithVueTs, vueTsConfigs} from '@vue/eslint-config-typescript';
 import prettier from 'eslint-plugin-prettier';
 import vueParser from 'vue-eslint-parser';
 import globals from 'globals';

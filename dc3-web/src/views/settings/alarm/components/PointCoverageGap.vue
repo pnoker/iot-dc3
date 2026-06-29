@@ -47,33 +47,33 @@
 
     <el-table v-if="report.items.length" :data="report.items" size="small" @row-click="onRowClick">
       <el-table-column :label="t('settings.event.overview.colPoint')" min-width="130">
-        <template #default="{ row }">{{ pointName(row.pointId) }}</template>
+        <template #default="{row}">{{ pointName(row.pointId) }}</template>
       </el-table-column>
       <el-table-column :label="t('settings.event.overview.colProfile')" min-width="130">
-        <template #default="{ row }">{{ profileName(row.profileId) }}</template>
+        <template #default="{row}">{{ profileName(row.profileId) }}</template>
       </el-table-column>
     </el-table>
   </dashboard-card>
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
+  import {computed, onMounted, reactive} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRouter} from 'vue-router';
 
-  import { coverageGap } from '@/api/dashboard';
-  import type { CoverageGap, CoverageGapItem } from '@/config/types/dashboard';
+  import {coverageGap} from '@/api/dashboard';
+  import type {CoverageGap, CoverageGapItem} from '@/config/types/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import { useAsyncLoader } from '@/utils/asyncLoaderUtil';
-  import { useEntityNames } from '@/composables/useEntityNames';
-  import { jumpToEntity } from '@/utils/jumpUtil';
+  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+  import {useEntityNames} from '@/composables/useEntityNames';
+  import {jumpToEntity} from '@/utils/jumpUtil';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const router = useRouter();
-  const { loading, run } = useAsyncLoader();
-  const { resolvePoints, resolveProfiles, pointName, profileName } = useEntityNames();
+  const {loading, run} = useAsyncLoader();
+  const {resolvePoints, resolveProfiles, pointName, profileName} = useEntityNames();
 
-  const report = reactive<CoverageGap>({ totalPoints: 0, missingPoints: 0, items: [] });
+  const report = reactive<CoverageGap>({totalPoints: 0, missingPoints: 0, items: []});
 
   const coveragePercent = computed(() => {
     if (report.totalPoints === 0) return 0;
@@ -96,8 +96,8 @@
 
   const load = () =>
     run(async () => {
-      const res: { data?: CoverageGap } = await coverageGap(100);
-      Object.assign(report, res?.data ?? { totalPoints: 0, missingPoints: 0, items: [] });
+      const res: {data?: CoverageGap} = await coverageGap(100);
+      Object.assign(report, res?.data ?? {totalPoints: 0, missingPoints: 0, items: []});
       await Promise.all([
         resolvePoints(report.items.map((r) => r.pointId)),
         resolveProfiles(report.items.map((r) => r.profileId)),
@@ -108,7 +108,7 @@
 
   const onRowClick = (row: CoverageGapItem) => jumpToEntity(router, 'point', row.pointId);
 
-  defineExpose({ refresh: load });
+  defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>

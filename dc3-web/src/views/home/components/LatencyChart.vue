@@ -24,16 +24,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { Chart } from '@antv/g2';
+  import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {Chart} from '@antv/g2';
 
-  import { statsLatency } from '@/api/dashboard';
+  import {statsLatency} from '@/api/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
+  import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const rangeKey = ref<RangeKey>('24h');
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
@@ -49,12 +49,12 @@
     t('home.latency.bin.over30s'),
   ];
 
-  const render = (rows: { bin: number; count: number }[]) => {
+  const render = (rows: {bin: number; count: number}[]) => {
     if (!chartRef.value) return;
     chart?.destroy();
-    chart = new Chart({ container: chartRef.value, autoFit: true });
+    chart = new Chart({container: chartRef.value, autoFit: true});
     const labels = binLabels();
-    const data = rows.map((r) => ({ label: labels[r.bin] || `bin-${r.bin}`, bin: r.bin, count: Number(r.count) || 0 }));
+    const data = rows.map((r) => ({label: labels[r.bin] || `bin-${r.bin}`, bin: r.bin, count: Number(r.count) || 0}));
     chart
       .interval()
       .data(data)
@@ -65,15 +65,15 @@
         range: ['#67c23a', '#95d475', '#f0c14b', '#e6a23c', '#f56c6c', '#c45656'],
       })
       .legend(false)
-      .axis({ x: { title: false, labelAutoRotate: false }, y: { title: false } });
+      .axis({x: {title: false, labelAutoRotate: false}, y: {title: false}});
     chart.render();
   };
 
   const load = async () => {
     loading.value = true;
     try {
-      const res: any = await statsLatency({ rangeKey: rangeKey.value });
-      const rows = (res?.data ?? []) as { bin: number; count: number }[];
+      const res: any = await statsLatency({rangeKey: rangeKey.value});
+      const rows = (res?.data ?? []) as {bin: number; count: number}[];
       await nextTick();
       render(rows);
     } catch {

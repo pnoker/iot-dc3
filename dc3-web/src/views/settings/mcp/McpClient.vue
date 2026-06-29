@@ -22,19 +22,19 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import {ref} from 'vue';
+  import {useI18n} from 'vue-i18n';
 
   import EntityListPage from '@/components/entity/EntityListPage.vue';
 
   import RegisterClientDialog from './components/RegisterClientDialog.vue';
-  import { createMcpClientConfig } from './mcpClientConfig';
+  import {createMcpClientConfig} from './mcpClientConfig';
 
-  const { t } = useI18n();
+  const {t} = useI18n();
   const listRef = ref<InstanceType<typeof EntityListPage>>();
   const dialogRef = ref<InstanceType<typeof RegisterClientDialog>>();
 
   const reload = () => listRef.value?.reload();
 
-  const config = createMcpClientConfig(t, { onRegister: () => dialogRef.value?.open() });
+  const config = createMcpClientConfig(t, {onRegister: () => dialogRef.value?.open()});
 </script>

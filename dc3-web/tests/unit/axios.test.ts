@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import type { AxiosAdapter, InternalAxiosRequestConfig } from 'axios';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type {AxiosAdapter, InternalAxiosRequestConfig} from 'axios';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import request from '@/config/axios';
-import { AUTH_HEADERS } from '@/config/constant/common';
-import { getStorage, setStorage } from '@/utils/storageUtil';
+import {AUTH_HEADERS} from '@/config/constant/common';
+import {getStorage, setStorage} from '@/utils/storageUtil';
 
 const notificationSpies = vi.hoisted(() => ({
   failMessage: vi.fn(),
@@ -33,7 +33,7 @@ const routerMocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/config/router', () => ({
-  default: { push: routerMocks.push },
+  default: {push: routerMocks.push},
 }));
 
 const responseOf = (config: InternalAxiosRequestConfig, status: number, data: unknown) => ({
@@ -54,12 +54,12 @@ describe('axios request instance', () => {
   it('injects auth headers and parses large integer JSON responses as strings', async () => {
     setStorage(AUTH_HEADERS.TENANT, 'default');
     setStorage(AUTH_HEADERS.LOGIN, 'dc3');
-    setStorage(AUTH_HEADERS.TOKEN, { salt: 'salt', token: 'token' });
+    setStorage(AUTH_HEADERS.TOKEN, {salt: 'salt', token: 'token'});
 
     const adapter: AxiosAdapter = vi.fn(async (config) => {
       expect(config.headers.get(AUTH_HEADERS.TENANT)).toBe('default');
       expect(config.headers.get(AUTH_HEADERS.LOGIN)).toBe('dc3');
-      expect(config.headers.get(AUTH_HEADERS.TOKEN)).toBe(JSON.stringify({ salt: 'salt', token: 'token' }));
+      expect(config.headers.get(AUTH_HEADERS.TOKEN)).toBe(JSON.stringify({salt: 'salt', token: 'token'}));
 
       return responseOf(config, 200, '{"ok":true,"code":0,"message":"success","data":{"id":9007199254740993}}');
     });
@@ -67,7 +67,7 @@ describe('axios request instance', () => {
     const response = await request({
       url: 'api/v3/manager/device/select_by_id',
       method: 'get',
-      params: { id: 1 },
+      params: {id: 1},
       adapter,
     });
 
@@ -75,18 +75,18 @@ describe('axios request instance', () => {
       ok: true,
       code: 0,
       message: 'success',
-      data: { id: '9007199254740993' },
+      data: {id: '9007199254740993'},
     });
   });
 
   it('removes auth keys and routes to login on unauthorized responses', async () => {
     setStorage(AUTH_HEADERS.TENANT, 'default');
     setStorage(AUTH_HEADERS.LOGIN, 'dc3');
-    setStorage(AUTH_HEADERS.TOKEN, { salt: 'salt', token: 'token' });
+    setStorage(AUTH_HEADERS.TOKEN, {salt: 'salt', token: 'token'});
 
-    const adapter: AxiosAdapter = async (config) => responseOf(config, 401, { ok: false, code: 401 });
+    const adapter: AxiosAdapter = async (config) => responseOf(config, 401, {ok: false, code: 401});
 
-    await expect(request({ url: 'api/v3/auth/token/check', method: 'post', adapter })).rejects.toEqual({
+    await expect(request({url: 'api/v3/auth/token/check', method: 'post', adapter})).rejects.toEqual({
       ok: false,
       code: 401,
     });
@@ -97,15 +97,15 @@ describe('axios request instance', () => {
     expect(getStorage(AUTH_HEADERS.LOGIN)).toBeUndefined();
     expect(getStorage(AUTH_HEADERS.TOKEN)).toBeUndefined();
     // Routes via router.push instead of raw hash manipulation
-    expect(routerMocks.push).toHaveBeenCalledWith({ name: 'login' });
+    expect(routerMocks.push).toHaveBeenCalledWith({name: 'login'});
   });
 
   it('rejects non-ok business responses and surfaces the server payload', async () => {
-    const payload = { ok: false, code: 50001, message: 'business failed' };
+    const payload = {ok: false, code: 50001, message: 'business failed'};
     // Use status 400 — non-ok, non-401, non-5xx hits the failMessage branch
     const adapter: AxiosAdapter = async (config) => responseOf(config, 400, payload);
 
-    await expect(request({ url: 'api/v3/data/dashboard/stats/today', method: 'get', adapter })).rejects.toBe(payload);
+    await expect(request({url: 'api/v3/data/dashboard/stats/today', method: 'get', adapter})).rejects.toBe(payload);
 
     expect(notificationSpies.failMessage).toHaveBeenCalledWith(
       'API request error. Please contact the system administrator.',

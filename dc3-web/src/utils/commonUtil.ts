@@ -15,8 +15,8 @@
  */
 
 import router from '@/config/router';
-import { useAuthStore } from '@/store';
-import { setCopyContent } from '@/utils/clipboardUtil';
+import {useAuthStore} from '@/store';
+import {setCopyContent} from '@/utils/clipboardUtil';
 
 /**
  * Copy content to clipboard with success message
@@ -34,5 +34,5 @@ export const copy = (content: string, message: string) => {
 export const logout = async () => {
   const authStore = useAuthStore();
   await authStore.logout();
-  await router.push({ name: 'login' });
+  await router.push({name: 'login'});
 };

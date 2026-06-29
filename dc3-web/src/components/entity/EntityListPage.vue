@@ -20,7 +20,7 @@
       :form-model="searchForm"
       :hide-pagination="config.mode === 'tree'"
       :hide-sort="config.mode === 'tree'"
-      :page="config.mode === 'tree' ? { total: 0, size: 0, current: 1 } : state.page"
+      :page="config.mode === 'tree' ? {total: 0, size: 0, current: 1} : state.page"
       @refresh="load"
       @reset="reset"
       @search="search"
@@ -28,7 +28,7 @@
       @size-change="sizeChange"
       @current-change="currentChange"
     >
-      <template #filters="{ search: doSearch }">
+      <template #filters="{search: doSearch}">
         <el-form-item v-for="field in config.searchFields" :key="field.prop" :label="field.label" :prop="field.prop">
           <enable-flag-segmented
             v-if="field.kind === 'enableFlag'"
@@ -100,11 +100,11 @@
           :show-overflow-tooltip="column.overflow !== false"
           :width="column.width"
         >
-          <template #default="{ row }">
+          <template #default="{row}">
             <enable-tag v-if="column.kind === 'enable'" :value="getCellValue(row, column.prop)" />
             <span v-else-if="column.kind === 'color'" class="entity-list-page__color-cell">
               <span
-                :style="{ background: getCellValue(row, column.prop) || '#F4F4F5' }"
+                :style="{background: getCellValue(row, column.prop) || '#F4F4F5'}"
                 class="entity-list-page__swatch"
               />
               {{ formatCell(row, column) }}
@@ -141,7 +141,7 @@
           :width="operationWidth"
           fixed="right"
         >
-          <template #default="{ row }">
+          <template #default="{row}">
             <el-button v-if="config.detail" link type="primary" @click="openDetail(row)">
               {{ t('common.detail') }}
             </el-button>
@@ -232,7 +232,7 @@
               <el-input
                 v-else-if="field.kind === 'json' || field.kind === 'textarea'"
                 v-model="formModel[field.prop]"
-                :autosize="{ minRows: field.rows || 4, maxRows: 18 }"
+                :autosize="{minRows: field.rows || 4, maxRows: 18}"
                 :disabled="editing && field.disabledOnEdit"
                 :placeholder="field.placeholder"
                 resize="vertical"
@@ -280,19 +280,19 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, watch } from 'vue';
-  import { Plus } from '@element-plus/icons-vue';
+  import {computed, reactive, watch} from 'vue';
+  import {Plus} from '@element-plus/icons-vue';
 
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
   import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
   import SearchSegmented from '@/components/segmented/SearchSegmented.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
-  import { resolveIcon } from '@/config/constant/icons';
-  import type { EntityListConfig } from '@/config/types/entityList';
-  import { useEntityListPage } from '@/composables/useEntityListPage';
+  import {resolveIcon} from '@/config/constant/icons';
+  import type {EntityListConfig} from '@/config/types/entityList';
+  import {useEntityListPage} from '@/composables/useEntityListPage';
 
-  const props = defineProps<{ config: EntityListConfig }>();
+  const props = defineProps<{config: EntityListConfig}>();
 
   const {
     t,
@@ -343,7 +343,7 @@
   /** Returns tree options for a treeSelect field, applying transform with the live form model. */
   const treeOptionsFor = (field: {
     prop: string;
-    tree?: { transform?: (rows: any[], form: Record<string, any>) => unknown[] };
+    tree?: {transform?: (rows: any[], form: Record<string, any>) => unknown[]};
   }) => {
     const raw = rawTreeData[field.prop] || [];
     return field.tree?.transform ? field.tree.transform(raw, formModel) : raw;
@@ -370,7 +370,7 @@
   });
 
   // 供父页在配套弹窗保存 / 工具栏动作完成后刷新表格
-  defineExpose({ reload: load });
+  defineExpose({reload: load});
 </script>
 
 <style lang="scss" scoped>

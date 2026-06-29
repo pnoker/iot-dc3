@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-import type { FormItemRule } from 'element-plus';
-import type { PageQuery } from '@/config/types';
+import type {FormItemRule} from 'element-plus';
+import type {PageQuery} from '@/config/types';
 
 export type EntityMode = 'page' | 'tree';
 export type EntityFieldKind =
-  | 'input'
-  | 'number'
-  | 'select'
-  | 'enableFlag'
-  | 'textarea'
-  | 'json'
-  | 'color'
-  | 'treeSelect';
+  'input' | 'number' | 'select' | 'enableFlag' | 'textarea' | 'json' | 'color' | 'treeSelect';
 export type EntityColumnKind = 'text' | 'tag' | 'code' | 'time' | 'enable' | 'color' | 'icon' | 'link';
 export type EntitySearchKind = 'input' | 'select' | 'enableFlag';
 
@@ -37,7 +30,7 @@ export interface EntityOption {
 
 export interface EntityTreeSource {
   load: () => Promise<unknown[]>;
-  props?: { label?: string; value?: string; children?: string; disabled?: string };
+  props?: {label?: string; value?: string; children?: string; disabled?: string};
   checkStrictly?: boolean;
   /** Synchronous reactive filter/shaping using the live form model. Called on every render. */
   transform?: (rows: any[], form: Record<string, any>) => unknown[];
@@ -138,7 +131,7 @@ export interface EntityListConfig {
   update?: (payload: Record<string, unknown>) => Promise<R>;
   remove?: (id: string) => Promise<R>;
 
-  detail?: { routeName: string }; // 跳转详情；缺省则无 detail 按钮
+  detail?: {routeName: string}; // 跳转详情；缺省则无 detail 按钮
   extraActions?: EntityRowAction[];
   toolbarActions?: EntityToolbarAction[]; // 工具栏自定义按钮
   operationWidth?: number; // 覆盖操作列宽（自动估算不适配长标签时）

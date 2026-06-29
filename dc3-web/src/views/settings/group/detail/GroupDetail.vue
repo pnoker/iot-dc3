@@ -66,18 +66,18 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRoute } from 'vue-router';
+  import {computed, onMounted, reactive} from 'vue';
+  import {useI18n} from 'vue-i18n';
+  import {useRoute} from 'vue-router';
 
-  import { getGroupById, listGroup } from '@/api/group';
+  import {getGroupById, listGroup} from '@/api/group';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import DetailCard from '@/components/card/detail/DetailCard.vue';
   import EnableTag from '@/components/tag/EnableTag.vue';
-  import { timestampLabel } from '@/utils/dateUtil';
+  import {timestampLabel} from '@/utils/dateUtil';
 
   const route = useRoute();
-  const { t } = useI18n();
+  const {t} = useI18n();
 
   const reactiveData = reactive({
     id: route.query.id as string,
@@ -93,7 +93,7 @@
   });
 
   const loadParents = () => {
-    listGroup({ page: { current: 1, size: 5000 } })
+    listGroup({page: {current: 1, size: 5000}})
       .then((res: any) => {
         const records = res.data?.records || [];
         records.forEach((row: Record<string, any>) => {

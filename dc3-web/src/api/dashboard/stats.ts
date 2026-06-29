@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { httpGet } from '@/api/common';
-import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
+import {httpGet} from '@/api/common';
+import {API_DATA_BASE, API_MANAGER_BASE} from '@/config/constant/api';
 import type {
   DailyGrowthSummary,
   Granularity,
@@ -27,33 +27,33 @@ import type {
 
 export const statsToday = () => httpGet<R<StatsTodaySummary>>(`${API_DATA_BASE}/dashboard/stats/today`);
 
-export const statsTimeseries = (params: TimeRangeParams & { granularity?: Granularity } = {}) =>
-  httpGet<R<StatsTimeBucket[]>>(`${API_DATA_BASE}/dashboard/stats/timeseries`, { params: timeRangeParams(params) });
+export const statsTimeseries = (params: TimeRangeParams & {granularity?: Granularity} = {}) =>
+  httpGet<R<StatsTimeBucket[]>>(`${API_DATA_BASE}/dashboard/stats/timeseries`, {params: timeRangeParams(params)});
 
-export const statsTop = (params: TimeRangeParams & { dimension?: TopDimension; limit?: number } = {}) =>
-  httpGet(`${API_DATA_BASE}/dashboard/top`, { params: timeRangeParams(params) });
+export const statsTop = (params: TimeRangeParams & {dimension?: TopDimension; limit?: number} = {}) =>
+  httpGet(`${API_DATA_BASE}/dashboard/top`, {params: timeRangeParams(params)});
 
-export const streamLatest = (size = 20) => httpGet(`${API_DATA_BASE}/dashboard/stream`, { params: { size } });
+export const streamLatest = (size = 20) => httpGet(`${API_DATA_BASE}/dashboard/stream`, {params: {size}});
 
-export const statsLatency = (params: TimeRangeParams = { rangeKey: '24h' }) =>
-  httpGet(`${API_DATA_BASE}/dashboard/stats/latency`, { params: timeRangeParams(params) });
+export const statsLatency = (params: TimeRangeParams = {rangeKey: '24h'}) =>
+  httpGet(`${API_DATA_BASE}/dashboard/stats/latency`, {params: timeRangeParams(params)});
 
-export const statsActivity = (params: TimeRangeParams = { rangeKey: '7d' }) =>
-  httpGet(`${API_DATA_BASE}/dashboard/stats/activity`, { params: timeRangeParams(params) });
+export const statsActivity = (params: TimeRangeParams = {rangeKey: '7d'}) =>
+  httpGet(`${API_DATA_BASE}/dashboard/stats/activity`, {params: timeRangeParams(params)});
 
 export const dailyGrowth = (days = 7) =>
-  httpGet<R<DailyGrowthSummary>>(`${API_MANAGER_BASE}/dashboard/growth`, { params: { days } });
+  httpGet<R<DailyGrowthSummary>>(`${API_MANAGER_BASE}/dashboard/growth`, {params: {days}});
 
 export const driverStats = () => httpGet(`${API_MANAGER_BASE}/dashboard/driver/stats`);
 
 export const deviceStats = (topN = 10) =>
-  httpGet(`${API_MANAGER_BASE}/dashboard/device/stats`, { params: { top_n: topN } });
+  httpGet(`${API_MANAGER_BASE}/dashboard/device/stats`, {params: {top_n: topN}});
 
 const timeRangeParams = <T extends TimeRangeParams>(params: T) => {
-  const { rangeKey, rangeHours, ...rest } = params;
+  const {rangeKey, rangeHours, ...rest} = params;
   return {
     ...rest,
-    ...(rangeKey !== undefined ? { range_key: rangeKey } : {}),
-    ...(rangeHours !== undefined ? { range_hours: rangeHours } : {}),
+    ...(rangeKey !== undefined ? {range_key: rangeKey} : {}),
+    ...(rangeHours !== undefined ? {range_hours: rangeHours} : {}),
   };
 };

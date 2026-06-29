@@ -60,7 +60,7 @@ const CHART_FENCE_RE = /```chart:(line|area|column)\s*\n([\s\S]*?)\n```/g;
  */
 export const parseAssistantContent = (content: string | undefined | null): ParsedAssistantContent => {
   if (!content) {
-    return { segments: [] };
+    return {segments: []};
   }
 
   const segments: AssistantSegment[] = [];
@@ -84,10 +84,10 @@ export const parseAssistantContent = (content: string | undefined | null): Parse
       spec = null;
     }
     if (spec) {
-      segments.push({ type: 'chart', kind, spec });
+      segments.push({type: 'chart', kind, spec});
     } else {
       // Bad JSON — fall back to showing the fence as a normal code block
-      segments.push({ type: 'markdown', text: match[0] });
+      segments.push({type: 'markdown', text: match[0]});
     }
     cursor = match.index + match[0].length;
   }
@@ -95,12 +95,12 @@ export const parseAssistantContent = (content: string | undefined | null): Parse
     pushMarkdown(segments, content.slice(cursor));
   }
 
-  return { segments };
+  return {segments};
 };
 
 const pushMarkdown = (segments: AssistantSegment[], text: string) => {
   if (text.trim().length > 0) {
-    segments.push({ type: 'markdown', text });
+    segments.push({type: 'markdown', text});
   }
 };
 

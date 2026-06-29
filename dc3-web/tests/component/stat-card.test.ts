@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { flushPromises, mount } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
+import {describe, expect, it, vi} from 'vitest';
 
 import StatCard from '@/components/card/stat/StatCard.vue';
 
-import { createElButtonStub, layoutStubs } from '../setup/stubs/element-plus'; // MiniAreaChart drags @antv/g2 in. We stub it because the StatCard
+import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus'; // MiniAreaChart drags @antv/g2 in. We stub it because the StatCard
 
 // MiniAreaChart drags @antv/g2 in. We stub it because the StatCard
 // contract under test is "tone, formatted value, refresh button" — not
@@ -34,7 +34,7 @@ vi.mock('@/components/chart/MiniAreaChart.vue', () => ({
 
 function mountStat(props: Record<string, unknown> = {}) {
   return mount(StatCard, {
-    props: { title: 'Devices', icon: 'IconStub', ...props },
+    props: {title: 'Devices', icon: 'IconStub', ...props},
     global: {
       stubs: {
         ...layoutStubs,
@@ -46,21 +46,21 @@ function mountStat(props: Record<string, unknown> = {}) {
 
 describe('StatCard', () => {
   it('formats large numeric values with k / M shorthand and falls back to non-numeric strings', () => {
-    expect(mountStat({ value: 42 }).find('.stat-card__value-text').text()).toBe('42');
-    expect(mountStat({ value: 1500 }).find('.stat-card__value-text').text()).toBe('1.5k');
-    expect(mountStat({ value: 2_500_000 }).find('.stat-card__value-text').text()).toBe('2.5M');
-    expect(mountStat({ value: 'N/A' }).find('.stat-card__value-text').text()).toBe('N/A');
+    expect(mountStat({value: 42}).find('.stat-card__value-text').text()).toBe('42');
+    expect(mountStat({value: 1500}).find('.stat-card__value-text').text()).toBe('1.5k');
+    expect(mountStat({value: 2_500_000}).find('.stat-card__value-text').text()).toBe('2.5M');
+    expect(mountStat({value: 'N/A'}).find('.stat-card__value-text').text()).toBe('N/A');
   });
 
   it('selects the trend icon and direction class from the trend prop', () => {
-    const up = mountStat({ value: 10, trend: { direction: 'up', label: '+10%' } });
+    const up = mountStat({value: 10, trend: {direction: 'up', label: '+10%'}});
     expect(up.find('.stat-card__trend--up').exists()).toBe(true);
     expect(up.find('.stat-card__trend').text()).toContain('+10%');
 
-    const down = mountStat({ value: 10, trend: { direction: 'down', label: '-2%' } });
+    const down = mountStat({value: 10, trend: {direction: 'down', label: '-2%'}});
     expect(down.find('.stat-card__trend--down').exists()).toBe(true);
 
-    const flat = mountStat({ value: 10, trend: { direction: 'flat', label: '0%' } });
+    const flat = mountStat({value: 10, trend: {direction: 'flat', label: '0%'}});
     expect(flat.find('.stat-card__trend--flat').exists()).toBe(true);
   });
 
@@ -71,7 +71,7 @@ describe('StatCard', () => {
 
   it('runs the refresh handler and emits click on the card body', async () => {
     const onRefresh = vi.fn(() => Promise.resolve());
-    const wrapper = mountStat({ onRefresh });
+    const wrapper = mountStat({onRefresh});
 
     // Card click → emits 'click'.
     await wrapper.find('.stat-card').trigger('click');
@@ -88,7 +88,7 @@ describe('StatCard', () => {
   });
 
   it('applies the tone-derived accent colour to the underlying sparkline', () => {
-    const wrapper = mountStat({ tone: 'green', sparkline: [1, 2, 3] });
+    const wrapper = mountStat({tone: 'green', sparkline: [1, 2, 3]});
     const chart = wrapper.find('.mini-chart-stub');
     expect(chart.attributes('data-color')).toBe('var(--el-color-success)');
     expect(chart.attributes('data-points')).toBe(JSON.stringify([1, 2, 3]));
