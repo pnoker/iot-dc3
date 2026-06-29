@@ -50,7 +50,7 @@
     "test:e2e:sweep": "node tests/e2e/browser-sweep.mjs",
     "test:e2e:sweep:headed": "E2E_HEADLESS=false node tests/e2e/browser-sweep.mjs",
     "test:all": "pnpm run test && pnpm run test:e2e",
-    "prepare": "husky",
+    "prepare": "cd .. && git config core.hooksPath .husky/_",
     "clean": "rimraf dist"
   },
   "dependencies": {
@@ -93,7 +93,6 @@
     "eslint-plugin-vue": "^10.9.2",
     "globals": "^17.7.0",
     "happy-dom": "^20.10.6",
-    "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
     "playwright": "^1.61.1",
     "prettier": "^3.9.1",
