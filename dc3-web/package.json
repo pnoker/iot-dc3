@@ -16,8 +16,7 @@
     "web",
     "vue3",
     "typescript",
-    "element-plus",
-    "tauri"
+    "element-plus"
   ],
   "engines": {
     "node": ">=22.0.0"
@@ -29,7 +28,6 @@
     "dev:prod": "vite --host --mode production",
     "serve:e2e": "vite build --mode dev && node scripts/testing/e2e-server.mjs",
     "build": "vite build",
-    "build:tauri": "tauri build",
     "preview": "vite preview",
     "check": "vue-tsc --noEmit --skipLibCheck",
     "type-check": "pnpm run check",
@@ -52,7 +50,6 @@
     "test:e2e:sweep": "node tests/e2e/browser-sweep.mjs",
     "test:e2e:sweep:headed": "E2E_HEADLESS=false node tests/e2e/browser-sweep.mjs",
     "test:all": "pnpm run test && pnpm run test:e2e",
-    "tauri": "tauri",
     "clean": "rimraf dist"
   },
   "dependencies": {
@@ -79,7 +76,6 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.1",
-    "@tauri-apps/cli": "^2.11.3",
     "@types/js-cookie": "^3.0.6",
     "@types/json-bigint": "^1.0.4",
     "@types/node": "^26.0.1",

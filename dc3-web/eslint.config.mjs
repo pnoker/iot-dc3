@@ -31,7 +31,6 @@ export default [
       'playwright-report/**',
       'public/**',
       'src/assets/**',
-      'src-tauri/**',
       'test-results/**',
       '.github/**',
       '.vscode/**',

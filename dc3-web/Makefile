@@ -61,7 +61,6 @@ endef
 	dev-prod \
 	preview \
 	build \
-	build-tauri \
 	check \
 	type-check \
 	lint \
@@ -97,7 +96,6 @@ help:
 		'make dev-prod     - run Vite dev server (production mode)' \
 		'make preview      - preview built assets' \
 		'make build        - build web assets' \
-		'make build-tauri  - build Tauri app' \
 		'make check        - run vue-tsc type check' \
 		'make type-check   - run vue-tsc type check' \
 		'make lint         - run eslint --fix and prettier --write' \
@@ -155,9 +153,6 @@ preview:
 
 build:
 	$(PNPM) build
-
-build-tauri:
-	$(PNPM) run build:tauri
 
 check:
 	$(PNPM) run check

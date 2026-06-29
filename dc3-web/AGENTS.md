@@ -1,6 +1,6 @@
 # IoT DC3 Web
 
-Frontend for the IoT DC3 IoT platform (Vue 3 + Vite + Element Plus + Tauri).
+Frontend for the IoT DC3 IoT platform (Vue 3 + Vite + Element Plus).
 
 ## Quick Reference
 
@@ -203,7 +203,6 @@ routes to the appropriate center microservice. Base paths are defined in `src/co
   the canvas ref is ready. Wrap init in `onMounted(() => nextTick(...))` if fixing.
 - **Ignored build scripts for `@parcel/watcher` / `core-js`**: disabled by default in pnpm 10 as security hardening.
   Harmless; run `pnpm approve-builds` to silence the warning.
-- **Tauri desktop**: `src-tauri/` exists; `@tauri-apps/api` is not currently imported in `src/`.
 
 ## Commit Rules
 

@@ -94,7 +94,7 @@ export default (configEnv: ConfigEnv) => {
       port: Number(env.APP_CLI_PORT) || 8080,
       proxy,
       watch: {
-        ignored: ['**/dist/**', '**/playwright-report/**', '**/src-tauri/**', '**/test-results/**'],
+        ignored: ['**/dist/**', '**/playwright-report/**', '**/test-results/**'],
       },
       open: false,
     },
