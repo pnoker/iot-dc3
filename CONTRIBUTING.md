@@ -70,14 +70,8 @@ Allowed types are `feat`, `fix`, `perf`, `refactor`, `docs`, `build`, `ci`, `tes
 `revert`. Use English, keep the subject specific, and avoid vague descriptions such as `update`, `fix`, `misc`, `wip`,
 or `.` because release notes are generated from commit history.
 
-Install the local commit-message hook before contributing:
-
-```bash
-make install-hooks
-```
-
-The hook validates the commit subject during `git commit`. It is intentionally strict because `dc3/doc/CHANGE.md` is
-generated from commit messages.
+Husky Git hooks are pre-installed in the repository (`.husky/`). The `pre-commit` hook automatically runs lint-staged
+(eslint + prettier) on staged files before each commit. No manual setup is needed.
 
 ## Build and Verification
 

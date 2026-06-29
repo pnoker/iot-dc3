@@ -95,10 +95,10 @@ iot-dc3/
 │   ├── docker-compose-dev.yml        #   Development overrides
 │   ├── docker-compose-optional.yml   #   Optional monitoring/messaging
 │   ├── env/dev.env                   #   IDE-friendly local env vars
-│   └── bin/                          #   changelog.py, commit_msg_lint.py, tag.sh
+│   └── bin/                          #   changelog.py, tag.sh
 ├── docs/                             # VitePress documentation site
 ├── Makefile                          # Preferred command entrypoint
-├── .githooks/commit-msg              # Conventional commit validation hook
+├── .husky/                           # Git hooks (pre-commit runs lint-staged)
 └── .mvn/settings.xml                 # Local Maven mirror (mainland China)
 ```
 
@@ -159,7 +159,6 @@ make up-optional
 make up-db && make up-optional && make up-dev
 make package
 make changelog
-make install-hooks
 ```
 
 Direct Maven commands should use the checked-in settings file for local development:
@@ -493,14 +492,9 @@ Rules:
 - Use `!` for breaking changes and explain the impact in the body.
 - For release-note-only commits, use exactly `docs(release): update generated changelog`.
 
-Install local commit validation:
-
-```bash
-make install-hooks
-```
-
-The hook checks commit subjects before `git commit` completes. It is a local Git mechanism; CI or branch protection
-should run the same script for server-side enforcement if needed.
+Husky manages Git hooks automatically — no manual install needed. The `pre-commit` hook runs lint-staged (eslint +
+prettier) on staged files before each commit. A `commit-msg` hook stub exists (`.husky/_/commit-msg`) but has no
+validation script attached yet; to enforce conventional-commit format, add a script at `.husky/commit-msg`.
 
 ## Testing
 
