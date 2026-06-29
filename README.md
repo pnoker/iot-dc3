@@ -235,12 +235,12 @@ drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence
 Industry-standard IoT four-layer reference — Application, Platform, Network, Perception — plus security as a
 cross-cutting concern.
 
-| Layer             | IoT Reference Responsibilities                      | DC3 Implementation                  |
-|-------------------|-----------------------------------------------------|-------------------------------------|
-| **Application**   | Operations · Alarms · Analytics · AIoT              | Operations · Agentic Center · MCP   |
-| **Platform**      | Device mgmt · Storage · Rules & compute             | Center services · Data plane · TimescaleDB |
-| **Network**       | Fieldbus · IoT protocols · Wireless / WAN           | 28 protocol drivers · Gateway · RabbitMQ |
-| **Perception**    | Sensing · Auto-ID · Actuators                       | Profile · Device · Point            |
+| Layer           | IoT Reference Responsibilities            | DC3 Implementation                         |
+|-----------------|-------------------------------------------|--------------------------------------------|
+| **Application** | Operations · Alarms · Analytics · AIoT    | Operations · Agentic Center · MCP          |
+| **Platform**    | Device mgmt · Storage · Rules & compute   | Center services · Data plane · TimescaleDB |
+| **Network**     | Fieldbus · IoT protocols · Wireless / WAN | 28 protocol drivers · Gateway · RabbitMQ   |
+| **Perception**  | Sensing · Auto-ID · Actuators             | Profile · Device · Point                   |
 
 🧱 **Design principles** — cross-service calls always go through Facade interfaces; the DO/BO/VO three-tier model keeps
 persistence, business, and API shapes strictly separated; and tenant isolation runs end to end across database, cache,
@@ -267,16 +267,16 @@ and API paths. Clear boundaries that scale across services and teams.
 
 ## 📖 Documentation and Community
 
-| Resource              | Link                                                                                         |
-|-----------------------|----------------------------------------------------------------------------------------------|
-| 📚 Online docs        | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                                |
-| 🚀 Quickstart         | [Quickstart Guide](https://pnoker.github.io/iot-dc3/quickstart/)                             |
+| Resource              | Link                                                                                    |
+|-----------------------|-----------------------------------------------------------------------------------------|
+| 📚 Online docs        | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                           |
+| 🚀 Quickstart         | [Quickstart Guide](https://pnoker.github.io/iot-dc3/quickstart/)                        |
 | 🏗️ Architecture      | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules)       |
 | 🔧 Driver development | [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring) |
 | 🐛 Troubleshooting    | [Troubleshooting](https://pnoker.github.io/iot-dc3/guide/troubleshooting)               |
 | 📋 Changelog          | [Release Changelog](https://pnoker.github.io/iot-dc3/development/changelog)             |
-| 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                                    |
-| 🇨🇳 Gitee mirror     | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                                        |
+| 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                               |
+| 🇨🇳 Gitee mirror     | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                                   |
 
 ## 🌍 Use Cases
 

@@ -233,12 +233,12 @@ devices. PostgreSQL (TimescaleDB + pgvector + AGE) và stack observability tùy 
 
 Kiến trúc tham chiếu IoT 4 tầng tiêu chuẩn — Ứng dụng, Nền tảng, Mạng, Cảm biến — cộng với bảo mật xuyên suốt.
 
-| Tầng              | Trách nhiệm tham chiếu IoT                  | Triển khai DC3                       |
-|-------------------|---------------------------------------------|--------------------------------------|
-| **Tầng Ứng dụng** | Vận hành · Cảnh báo · Phân tích · AIoT       | Vận hành · Agentic Center · MCP      |
+| Tầng              | Trách nhiệm tham chiếu IoT                    | Triển khai DC3                             |
+|-------------------|-----------------------------------------------|--------------------------------------------|
+| **Tầng Ứng dụng** | Vận hành · Cảnh báo · Phân tích · AIoT        | Vận hành · Agentic Center · MCP            |
 | **Tầng Nền tảng** | Quản lý thiết bị · Lưu trữ · Luật & tính toán | Center services · Data plane · TimescaleDB |
-| **Tầng Mạng**     | Fieldbus · Giao thức IoT · Không dây / WAN   | 28 protocol drivers · Gateway · RabbitMQ |
-| **Tầng Cảm biến** | Cảm biến · Nhận dạng · Cơ cấu chấp hành       | Profile · Device · Point             |
+| **Tầng Mạng**     | Fieldbus · Giao thức IoT · Không dây / WAN    | 28 protocol drivers · Gateway · RabbitMQ   |
+| **Tầng Cảm biến** | Cảm biến · Nhận dạng · Cơ cấu chấp hành       | Profile · Device · Point                   |
 
 🧱 **Nguyên tắc thiết kế** — các lời gọi xuyên dịch vụ luôn đi qua interface Facade; mô hình ba tầng DO/BO/VO tách biệt
 rõ ràng giữa persistence, business và API; cách ly tenant xuyên suốt từ database, cache đến API. Ranh giới rõ ràng, dễ
@@ -264,16 +264,16 @@ mở rộng theo dịch vụ và đội nhóm.
 
 ## 📖 Tài liệu và cộng đồng
 
-| Tài nguyên           | Liên kết                                                                                     |
-|----------------------|----------------------------------------------------------------------------------------------|
-| 📚 Tài liệu online   | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                                |
-| 🚀 Quickstart        | [Quickstart Guide](https://pnoker.github.io/iot-dc3/quickstart/)                             |
+| Tài nguyên           | Liên kết                                                                                |
+|----------------------|-----------------------------------------------------------------------------------------|
+| 📚 Tài liệu online   | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                           |
+| 🚀 Quickstart        | [Quickstart Guide](https://pnoker.github.io/iot-dc3/quickstart/)                        |
 | 🏗️ Kiến trúc        | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules)       |
 | 🔧 Phát triển driver | [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring) |
 | 🐛 Khắc phục sự cố   | [Troubleshooting](https://pnoker.github.io/iot-dc3/guide/troubleshooting)               |
 | 📋 Changelog         | [Release Changelog](https://pnoker.github.io/iot-dc3/development/changelog)             |
-| 🐛 Phản hồi issue    | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                                    |
-| 🇨🇳 Gitee mirror    | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                                        |
+| 🐛 Phản hồi issue    | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                               |
+| 🇨🇳 Gitee mirror    | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                                   |
 
 ## 🌍 Trường hợp ứng dụng
 
