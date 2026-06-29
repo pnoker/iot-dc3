@@ -17,7 +17,7 @@ quantities into digital signals, the network layer carries those signals reliabl
 and computes over the data at scale, and the application layer turns data into business value. Security belongs to no
 single layer — it is a cross-cutting concern that runs through all of them.
 
-<FourLayers lang="en" />
+<FourLayersDiagram lang="en" />
 
 This layering is not dogma but a set of **responsibility boundaries**: each layer solves only its own problem and
 collaborates with its neighbors through clear interfaces. Its value is that any IoT platform, any IoT product, can be

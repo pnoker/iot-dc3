@@ -21,7 +21,7 @@ center `dc3-center-data` consumes the queue, writes each value to TimescaleDB, a
 local Caffeine cache for hot reads. The whole link is **asynchronous** — once the driver publishes, it does not wait for
 the data center to confirm the write. Durable delivery on the bus plus manual ack make sure nothing is lost.
 
-<DataPlane lang="en" />
+<DataPlaneDiagram lang="en" />
 
 The driver's routing key is `dc3.r.value.point.` plus its own service name (`driverProperties.getService()`, e.g. the
 service name you configured for a `dc3-driver-virtual` instance). The data center's queue binds with the wildcard

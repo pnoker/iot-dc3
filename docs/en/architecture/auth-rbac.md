@@ -39,7 +39,7 @@ only come from the secret shared between the gateway and the backend.
 Login is a two-step handshake: fetch a one-time salt, then hash the password with that salt to trade for a token. The
 salt stops a plaintext password or a fixed hash from being replayed over the wire.
 
-<AuthFlow lang="en" />
+<AuthFlowDiagram lang="en" />
 
 Both endpoints are public and need no authentication:
 

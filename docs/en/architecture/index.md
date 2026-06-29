@@ -20,7 +20,7 @@ This panorama lays out all six layers, the four center services with their ports
 optional observability stack in one view — get the whole picture first, then read the logical drill-down below. The
 diagram adapts to the site's light/dark theme.
 
-<Architecture lang="en" />
+<TopologyDiagram lang="en" />
 
 ## Four-Layer Reference Architecture Mapping
 
@@ -28,7 +28,7 @@ The industry-standard IoT four-layer reference architecture — Perception, Netw
 as a cross-cutting concern — every DC3 component maps onto this framework. This diagram helps you quickly see where DC3
 stands on the "from sensor to AI operations" full map.
 
-<ArchitectureDiagram lang="en" />
+<LayeredDiagram lang="en" />
 
 Legend colors: purple=Application · green=Platform · orange=Network · cyan=Perception · amber=Security. For a
 systematic walkthrough of the IoT four-layer reference, see IoT Technology Overview.

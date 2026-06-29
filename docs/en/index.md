@@ -66,7 +66,7 @@ understand the problem it solves and how it compares to alternatives, start with
 The platform is one gateway, four center services, and a set of protocol drivers. Only the gateway's HTTP port faces
 outward; the centers talk to each other over gRPC, and drivers and the data center are decoupled through RabbitMQ.
 
-<Architecture lang="en" />
+<TopologyDiagram lang="en" />
 
 For how each hop works and why it's designed that way, see [Architecture](/en/architecture/).
 

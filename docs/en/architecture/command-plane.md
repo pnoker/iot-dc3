@@ -36,7 +36,7 @@ dispatches a duplicate.
 The sequence diagram below shows the happy path: the caller submits, the driver writes the value into the device and
 acknowledges success, and the caller polls and gets the result.
 
-<CommandPlane lang="en" />
+<CommandPlaneDiagram lang="en" />
 
 ### Submission Side: Validate, Persist, Publish
 

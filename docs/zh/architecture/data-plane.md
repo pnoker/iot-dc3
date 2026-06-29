@@ -17,7 +17,7 @@ title: 数据平面：位号值如何落库
 TimescaleDB，同时把最新值塞进本地 Caffeine 缓存供热点读取。整条链路是**异步**的——驱动发出后不等数据中心确认落库，靠消息总线的持久投递与手动
 ack 保证不丢。
 
-<DataPlane lang="zh" />
+<DataPlaneDiagram lang="zh" />
 
 驱动用的路由键是 `dc3.r.value.point.` 加上自己的服务名（`driverProperties.getService()`，例如 `dc3-driver-virtual`
 实例配的服务名），数据中心的队列用通配绑定 `dc3.r.value.point.*` 收下所有驱动的值。发送时 `pointValueSender()` 会从

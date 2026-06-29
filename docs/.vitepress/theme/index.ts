@@ -21,12 +21,12 @@ import DefaultTheme from 'vitepress/theme'
 import mediumZoom from 'medium-zoom'
 import 'medium-zoom/dist/style.css'
 import './style.css'
-import Architecture from './components/Architecture.vue'
-import ArchitectureDiagram from './components/ArchitectureDiagram.vue'
-import DataPlane from './components/DataPlane.vue'
-import CommandPlane from './components/CommandPlane.vue'
-import AuthFlow from './components/AuthFlow.vue'
-import FourLayers from './components/FourLayers.vue'
+import TopologyDiagram from './components/TopologyDiagram.vue'
+import LayeredDiagram from './components/LayeredDiagram.vue'
+import DataPlaneDiagram from './components/DataPlaneDiagram.vue'
+import CommandPlaneDiagram from './components/CommandPlaneDiagram.vue'
+import AuthFlowDiagram from './components/AuthFlowDiagram.vue'
+import FourLayersDiagram from './components/FourLayersDiagram.vue'
 import HeroLogo from './components/HeroLogo.vue'
 import HeroParticles from './components/HeroParticles.vue'
 import HeroWaves from './components/HeroWaves.vue'
@@ -61,12 +61,12 @@ const theme: Theme = {
     },
 
     enhanceApp({app, router}) {
-        app.component('Architecture', Architecture)
-        app.component('ArchitectureDiagram', ArchitectureDiagram)
-        app.component('DataPlane', DataPlane)
-        app.component('CommandPlane', CommandPlane)
-        app.component('AuthFlow', AuthFlow)
-        app.component('FourLayers', FourLayers)
+        app.component('TopologyDiagram', TopologyDiagram)
+        app.component('LayeredDiagram', LayeredDiagram)
+        app.component('DataPlaneDiagram', DataPlaneDiagram)
+        app.component('CommandPlaneDiagram', CommandPlaneDiagram)
+        app.component('AuthFlowDiagram', AuthFlowDiagram)
+        app.component('FourLayersDiagram', FourLayersDiagram)
         if (typeof window === 'undefined' || !router) {
             return
         }
