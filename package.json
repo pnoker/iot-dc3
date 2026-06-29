@@ -5,12 +5,6 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "husky": "^9.1.7",
-    "lint-staged": "^17.0.8"
-  },
-  "lint-staged": {
-    "dc3-web/**/*.{vue,js,mjs,cjs,ts,jsx,tsx}": [
-      "dc3-web/node_modules/.bin/eslint --fix --config dc3-web/eslint.config.mjs"
-    ]
+    "husky": "^9.1.7"
   }
 }

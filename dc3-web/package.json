@@ -50,6 +50,7 @@
     "test:e2e:sweep": "node tests/e2e/browser-sweep.mjs",
     "test:e2e:sweep:headed": "E2E_HEADLESS=false node tests/e2e/browser-sweep.mjs",
     "test:all": "pnpm run test && pnpm run test:e2e",
+    "prepare": "husky",
     "clean": "rimraf dist"
   },
   "dependencies": {
@@ -104,5 +105,10 @@
     "vitest": "^4.1.9",
     "vue-eslint-parser": "^10.4.1",
     "vue-tsc": "^3.3.5"
+  },
+  "lint-staged": {
+    "*.{vue,js,mjs,cjs,ts,jsx,tsx}": [
+      "eslint --fix --config eslint.config.mjs"
+    ]
   }
 }
