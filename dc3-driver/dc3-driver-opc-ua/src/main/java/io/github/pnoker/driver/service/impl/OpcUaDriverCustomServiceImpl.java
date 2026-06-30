@@ -87,11 +87,25 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     private static final long REQUEST_TIMEOUT_MS = 5000;
     private static final long READ_TIMEOUT_SECONDS = 1;
     private static final long WRITE_TIMEOUT_SECONDS = 1;
+    /**
+     * Max consecutive connection failures before entering backoff, mirroring the
+     * Modbus TCP driver. Stops connect storms against unreachable OPC UA servers.
+     */
+    private static final int FAILURE_BACKOFF_THRESHOLD = 3;
+    /**
+     * Backoff duration in milliseconds after exceeding the failure threshold.
+     */
+    private static final long FAILURE_BACKOFF_MS = 60_000;
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     @Value("${dc3.driver.code}")
     private String driverCode;
     private Map<Long, OpcUaClient> connectMap;
+    /**
+     * Failure tracking for connection backoff to prevent repeated TCP+TLS handshake
+     * attempts to unreachable devices on every schedule cycle.
+     */
+    private Map<Long, ConsecutiveFailure> failureMap;
 
     /**
      * KeyLoader for OPC UA client certificate management.
@@ -119,6 +133,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         connectMap = new ConcurrentHashMap<>(16);
+        failureMap = new ConcurrentHashMap<>(16);
         try {
             keyLoader = new KeyLoader().load(
                     java.nio.file.Path.of(System.getProperty("user.dir"), "dc3", "opc-ua"));
@@ -150,7 +165,10 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
                 return DeviceHealthState.online();
             }
         } catch (Exception e) {
-            log.debug("Health check failed for device {}", device.getId(), e);
+            log.warn("Driver health check failed, protocol={}, deviceId={}", driverCode, device.getId(), e);
+            // A failed health probe means the cached client (if any) is stale or broken;
+            // drop it so the next cycle rebuilds from scratch instead of reusing it.
+            invalidateConnector(device.getId());
         }
         return DeviceHealthState.offline();
     }
@@ -202,6 +220,14 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
      * @throws ConnectorException if client creation fails
      */
     private OpcUaClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
+        // Check backoff before attempting connection to avoid TCP+TLS handshake storms
+        ConsecutiveFailure failure = failureMap.get(deviceId);
+        if (failure != null && failure.shouldBackoff()) {
+            throw new ConnectorException(
+                    "Driver connection in backoff after {} consecutive failures, protocol={}, deviceId={}",
+                    failure.count, driverCode, deviceId);
+        }
+
         return connectMap.computeIfAbsent(deviceId, id -> {
             String host = driverConfig.get("host").getValue(String.class);
             int port = driverConfig.get("port").getValue(Integer.class);
@@ -229,11 +255,16 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
                             }
                             return configBuilder.build();
                         });
+                // Successful connection clears failure tracking
+                failureMap.remove(deviceId);
                 log.info("Driver connection created, protocol={}, deviceId={}, host={}, port={}, path={}, identity={}",
                         driverCode, deviceId, host, port, path,
                         identityProvider instanceof X509IdentityProvider ? "x509" : "anonymous");
                 return opcUaClient;
             } catch (UaException e) {
+                // Record failure for backoff
+                failureMap.compute(deviceId, (k, v) ->
+                        v == null ? new ConsecutiveFailure() : v.increment());
                 log.error("Driver connection failed, protocol={}, deviceId={}, host={}, port={}, path={}", driverCode, deviceId,
                         host, port, path, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}, message={}",
@@ -399,6 +430,21 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Invalidate any cached client for the given device. Used by {@link #health} where
+     * only the device id is known (the failing client reference is local to the try block).
+     * Falls back to {@link #invalidateConnector(Long, OpcUaClient) the two-arg form} when a
+     * cached entry exists, so the value-matched remove + disconnect still applies.
+     *
+     * @param deviceId unique device identifier
+     */
+    private void invalidateConnector(Long deviceId) {
+        OpcUaClient cached = connectMap.remove(deviceId);
+        if (cached != null) {
+            invalidateConnector(deviceId, cached);
+        }
+    }
+
     @Override
     public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
@@ -417,6 +463,35 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
                 .issues(issues).build();
+    }
+
+    /**
+     * Tracks consecutive connection failures for backoff. Mirrors the Modbus TCP driver
+     * implementation. Immutable after construction; {@link #increment()} returns a new
+     * instance so {@link ConcurrentHashMap#compute} updates stay race-free.
+     */
+    private static class ConsecutiveFailure {
+        final int count;
+        final long firstFailureTime;
+
+        ConsecutiveFailure() {
+            this.count = 1;
+            this.firstFailureTime = System.currentTimeMillis();
+        }
+
+        ConsecutiveFailure(int count, long firstFailureTime) {
+            this.count = count;
+            this.firstFailureTime = firstFailureTime;
+        }
+
+        ConsecutiveFailure increment() {
+            return new ConsecutiveFailure(count + 1, firstFailureTime);
+        }
+
+        boolean shouldBackoff() {
+            return count >= FAILURE_BACKOFF_THRESHOLD
+                    && (System.currentTimeMillis() - firstFailureTime) < FAILURE_BACKOFF_MS;
+        }
     }
 
 }
