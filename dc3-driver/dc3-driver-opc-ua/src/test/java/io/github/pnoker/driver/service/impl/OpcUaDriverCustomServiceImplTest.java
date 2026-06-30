@@ -31,7 +31,11 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
+import io.github.pnoker.driver.key.KeyLoader;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
+import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
+import org.eclipse.milo.opcua.sdk.client.api.identity.IdentityProvider;
+import org.eclipse.milo.opcua.sdk.client.api.identity.X509IdentityProvider;
 import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
@@ -46,6 +50,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -227,8 +235,40 @@ class OpcUaDriverCustomServiceImplTest {
         assertThat(ok).isTrue();
     }
 
+    @Test
+    void certificateBranchUsesX509IdentityProvider() throws Exception {
+        // A loader carrying both a client certificate and a key pair must produce an
+        // X509IdentityProvider so the certificate is used for application-layer auth,
+        // not just TLS.
+        KeyPair keyPair = Mockito.mock(KeyPair.class);
+        Mockito.when(keyPair.getPrivate()).thenReturn(Mockito.mock(PrivateKey.class));
+        KeyLoader loader = Mockito.mock(KeyLoader.class);
+        Mockito.when(loader.getClientCertificate()).thenReturn(Mockito.mock(X509Certificate.class));
+        Mockito.when(loader.getClientKeyPair()).thenReturn(keyPair);
+
+        IdentityProvider provider = invokeBuildIdentityProvider(loader);
+
+        assertThat(provider).isInstanceOf(X509IdentityProvider.class);
+    }
+
+    @Test
+    void noCertificateBranchUsesAnonymous() throws Exception {
+        // No loader (initial() fell back to anonymous) must yield AnonymousProvider.
+        assertThat(invokeBuildIdentityProvider(null)).isInstanceOf(AnonymousProvider.class);
+
+        // A loader without a certificate or key pair must also yield AnonymousProvider.
+        KeyLoader empty = Mockito.mock(KeyLoader.class);
+        assertThat(invokeBuildIdentityProvider(empty)).isInstanceOf(AnonymousProvider.class);
+    }
+
+    private IdentityProvider invokeBuildIdentityProvider(KeyLoader loader) throws Exception {
+        Method method = OpcUaDriverCustomServiceImpl.class.getDeclaredMethod("buildIdentityProvider", KeyLoader.class);
+        method.setAccessible(true);
+        return (IdentityProvider) method.invoke(service, loader);
+    }
+
     private void invokeGetConnector(Long deviceId, Map<String, AttributeBO> driverConfig) throws Exception {
-        java.lang.reflect.Method method =
+        Method method =
                 OpcUaDriverCustomServiceImpl.class.getDeclaredMethod("getConnector", Long.class, Map.class);
         method.setAccessible(true);
         method.invoke(service, deviceId, driverConfig);

@@ -41,6 +41,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
+import org.eclipse.milo.opcua.sdk.client.api.identity.IdentityProvider;
+import org.eclipse.milo.opcua.sdk.client.api.identity.X509IdentityProvider;
 import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
@@ -210,26 +212,26 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             try {
                 // Prefer certificate-based auth when KeyLoader is available
                 KeyLoader loader = this.keyLoader;
+                IdentityProvider identityProvider = buildIdentityProvider(loader);
                 OpcUaClient opcUaClient = OpcUaClient.create(url, endpoints -> endpoints.stream().findFirst(),
                         configBuilder -> {
                             configBuilder
                                     .setRequestTimeout(Unsigned.uint(REQUEST_TIMEOUT_MS))
                                     .setApplicationName(LocalizedText.english("IoT DC3 OPC UA Driver"))
                                     .setApplicationUri("urn:dc3:opc:ua:client");
-                            if (loader != null && loader.getClientCertificate() != null
-                                    && loader.getClientKeyPair() != null) {
+                            if (identityProvider instanceof X509IdentityProvider) {
                                 configBuilder
                                         .setCertificate(loader.getClientCertificate())
                                         .setKeyPair(loader.getClientKeyPair())
-                                        .setIdentityProvider(new AnonymousProvider());
+                                        .setIdentityProvider(identityProvider);
                             } else {
-                                configBuilder
-                                        .setIdentityProvider(new AnonymousProvider());
+                                configBuilder.setIdentityProvider(identityProvider);
                             }
                             return configBuilder.build();
                         });
-                log.info("Driver connection created, protocol={}, deviceId={}, host={}, port={}, path={}", driverCode, deviceId,
-                        host, port, path);
+                log.info("Driver connection created, protocol={}, deviceId={}, host={}, port={}, path={}, identity={}",
+                        driverCode, deviceId, host, port, path,
+                        identityProvider instanceof X509IdentityProvider ? "x509" : "anonymous");
                 return opcUaClient;
             } catch (UaException e) {
                 log.error("Driver connection failed, protocol={}, deviceId={}, host={}, port={}, path={}", driverCode, deviceId,
@@ -238,6 +240,26 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
                         deviceId, host, port, path, e.getMessage(), e);
             }
         });
+    }
+
+    /**
+     * Choose the OPC UA application-layer identity provider based on whether the
+     * KeyLoader produced a usable client certificate and key pair.
+     * <p>
+     * When the loader carries a certificate and key pair, an {@link X509IdentityProvider}
+     * is returned so the certificate is used for both TLS and user-token authentication.
+     * Otherwise an {@link AnonymousProvider} is returned. Extracted so the branch choice
+     * can be unit-tested without standing up a full OPC UA client configBuilder.
+     *
+     * @param loader the KeyLoader (may be {@code null} when initialization failed)
+     * @return an X509IdentityProvider when a certificate is present, else AnonymousProvider
+     */
+    private IdentityProvider buildIdentityProvider(KeyLoader loader) {
+        if (loader != null && loader.getClientCertificate() != null && loader.getClientKeyPair() != null) {
+            log.info("Configuring OPC UA client with X.509 certificate identity");
+            return new X509IdentityProvider(loader.getClientCertificate(), loader.getClientKeyPair().getPrivate());
+        }
+        return new AnonymousProvider();
     }
 
     /**
