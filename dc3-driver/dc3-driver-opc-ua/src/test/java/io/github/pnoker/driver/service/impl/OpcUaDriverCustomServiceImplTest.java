@@ -17,6 +17,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -25,6 +26,7 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
@@ -230,6 +232,38 @@ class OpcUaDriverCustomServiceImplTest {
                 OpcUaDriverCustomServiceImpl.class.getDeclaredMethod("getConnector", Long.class, Map.class);
         method.setAccessible(true);
         method.invoke(service, deviceId, driverConfig);
+    }
+
+    @Test
+    void healthReportsDegradedModeWhenKeyLoaderFailed() throws Exception {
+        setCertificateDegraded(true);
+        OpcUaClient client = Mockito.mock(OpcUaClient.class);
+        Mockito.when(client.connect()).thenReturn(CompletableFuture.completedFuture(client));
+        connectionMap().put(1L, client);
+
+        DeviceHealthState state = service.health(driverConfig("h", 4840, "/"), device(1L));
+
+        assertThat(state.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
+        assertThat(state.getDescription()).isNotNull().contains("degraded");
+    }
+
+    @Test
+    void healthReportsOnlineWhenNotDegraded() throws Exception {
+        setCertificateDegraded(false);
+        OpcUaClient client = Mockito.mock(OpcUaClient.class);
+        Mockito.when(client.connect()).thenReturn(CompletableFuture.completedFuture(client));
+        connectionMap().put(2L, client);
+
+        DeviceHealthState state = service.health(driverConfig("h", 4840, "/"), device(2L));
+
+        assertThat(state.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
+        assertThat(state.getDescription()).isNull();
+    }
+
+    private void setCertificateDegraded(boolean value) throws Exception {
+        Field field = OpcUaDriverCustomServiceImpl.class.getDeclaredField("certificateDegraded");
+        field.setAccessible(true);
+        field.setBoolean(service, value);
     }
 
     @SuppressWarnings("unchecked")

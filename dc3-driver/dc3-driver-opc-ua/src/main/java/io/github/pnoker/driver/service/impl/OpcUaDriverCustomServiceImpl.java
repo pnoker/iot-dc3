@@ -31,6 +31,7 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
@@ -96,6 +97,13 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
      */
     private volatile KeyLoader keyLoader;
 
+    /**
+     * Set when {@link KeyLoader} initialization failed in {@link #initial()} and the
+     * driver fell back to anonymous auth. Surfaced in {@link #health} description so
+     * operators can see the driver is running in degraded certificate mode.
+     */
+    private volatile boolean certificateDegraded;
+
     private static void checkRequired(Map<String, AttributeBO> config, String code,
                                       List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
@@ -115,6 +123,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             log.warn("OPC UA KeyLoader initialization failed, falling back to anonymous auth", e);
             keyLoader = null;
+            certificateDegraded = true;
         }
     }
 
@@ -130,6 +139,12 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             if (client != null) {
                 // Connect is idempotent — returns immediately when already connected
                 client.connect().get(1, TimeUnit.SECONDS);
+                if (certificateDegraded) {
+                    return DeviceHealthState.builder()
+                            .status(EntityStatusEnum.ONLINE)
+                            .description("OPC UA running in degraded mode: certificate unavailable, using anonymous auth")
+                            .build();
+                }
                 return DeviceHealthState.online();
             }
         } catch (Exception e) {
