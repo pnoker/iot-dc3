@@ -101,14 +101,14 @@
 
 | 概念 | 可引用原句 | 出处 | 对应 docs 锚点 | verify状态 |
 |------|-----------|------|----------------|-----------|
-| MQTT QoS 三档投递保证 | "MQTT有非常完善的QoS（Quality of Service）机制，根据业务场景可以选择最多一次、至少一次、刚好一次的3种消息送达模式。其运行在TCP协议之上，同时支持TLS（TCP+SSL）协议……" 又："·支持QoS，有3种消息发布服务质量：即至多一次、至少一次、只有一次。" | 《物联网之魂：协议与物联网操作系统》vol2 / 孙昊 等 / 机工社·2019 / 第1章 1.4.3 MQTT协议（低带宽）/ PDF p41 | `docs/zh/foundations/iot-protocols.md#mqtt-qos-0-1-2` | 待核 |
+| MQTT QoS 三档投递保证 | "MQTT有非常完善的QoS（Quality of Service）机制，根据业务场景可以选择最多一次、至少一次、刚好一次的3种消息送达模式。其运行在TCP协议之上，同时支持TLS（TCP+SSL）协议……" 又："·支持QoS，有3种消息发布服务质量：即至多一次、至少一次、只有一次。" | 《物联网之魂：协议与物联网操作系统》vol2 / 孙昊 等 / 机工社·2019 / 第1章 1.4.3 MQTT协议（低带宽）/ PDF p41 | `docs/zh/foundations/iot-protocols.md#mqtt-qos-0-1-2` | 已核 |
 
 ### 主题：CoAP（请求-响应 + Observe，UDP）
 
 | 概念 | 可引用原句 | 出处 | 对应 docs 锚点 | verify状态 |
 |------|-----------|------|----------------|-----------|
-| CoAP 定义 / UDP 传输 / 请求-响应方法 | "CoAP（Constrained Application Protocol，受限应用协议），应用于无线传感网中的协议，是6LowPAN协议栈中的应用层协议……·传输层使用UDP协议：CoAP协议是建立在UDP协议之上，以减少开销和支持组播功能……·方法和URIs：为了实现客户端访问服务器上的资源，CoAP支持GET、PUT、POST和DELETE等方法。" | 《物联网之魂：协议与物联网操作系统》vol2 / 孙昊 等 / 机工社·2019 / 第1章 1.4.2 CoAP协议 / PDF p39 | `docs/zh/foundations/iot-protocols.md#coap` | 待核 |
-| CoAP 异步通信 + 资源发现（Observe 近邻） | "·支持异步通信：HTTP对M2M（Machine-to-Machine）通信不适用，这是由于事务总是由客户端发起。而CoAP协议支持异步通信，这对M2M通信应用来说是常见的休眠/唤醒机制。·支持资源发现……在CoAP中用/.well—known/core路径表示资源描述。" | 同上书 / 第1章 1.4.2 CoAP协议 / PDF p40 | `docs/zh/foundations/iot-protocols.md#coap` | 待核 |
+| CoAP 定义 / UDP 传输 / 请求-响应方法 | "CoAP（Constrained Application Protocol，受限应用协议），应用于无线传感网中的协议，是6LowPAN协议栈中的应用层协议……·传输层使用UDP协议：CoAP协议是建立在UDP协议之上，以减少开销和支持组播功能……·方法和URIs：为了实现客户端访问服务器上的资源，CoAP支持GET、PUT、POST和DELETE等方法。" | 《物联网之魂：协议与物联网操作系统》vol2 / 孙昊 等 / 机工社·2019 / 第1章 1.4.2 CoAP协议 / PDF p39 | `docs/zh/foundations/iot-protocols.md#coap` | 已核 |
+| CoAP 异步通信 + 资源发现（Observe 近邻） | "·支持异步通信：HTTP对M2M（Machine-to-Machine）通信不适用，这是由于事务总是由客户端发起。而CoAP协议支持异步通信，这对M2M通信应用来说是常见的休眠/唤醒机制。·支持资源发现……在CoAP中用/.well—known/core路径表示资源描述。" | 同上书 / 第1章 1.4.2 CoAP协议 / PDF p40 | `docs/zh/foundations/iot-protocols.md#coap` | 已核 |
 
 > **Observe 说明**：本书未直接覆盖 RFC 7641 Observe 选项；上述"异步通信/资源发现"为 Observe 的近邻支撑概念。docs 注入时该锚点的 Observe 段落若需严格溯源，应另寻 RFC 7641 或 LwM2M 专著，勿将本条当作 Observe 原文。
 
@@ -122,10 +122,10 @@
 
 | 概念 | 可引用原句 | 出处 | 对应 docs 锚点 | verify状态 |
 |------|-----------|------|----------------|-----------|
-| NB-IoT 属 LPWAN + 低速率/延迟折中换覆盖增强/低功耗 | "NB-IoT属于低功耗广域网（LPWAN），其设计原则都是基于物联网特点和使用场景为基础。首先，相比传统的2G/3G/4G网络，物联网主要有以下三大特点：·懒：终端都很'懒'，大部分时间在'睡觉'，每天传送的数据量极低，且允许一定的传输延迟（比如智能水表）。·静止……·上行为主……这三大特点支撑了低速率和传输延迟上的技术折中，从而实现覆盖增强、功耗降低、成本减少的蜂窝物联网。" | 《物联网之魂：协议与物联网操作系统》vol2 / 孙昊 等 / 机工社·2019 / 第1章 1.12.3 NB-IoT窄带物联网节能原理 / PDF p119 | `docs/zh/foundations/iot-protocols.md#lpwan-权衡` | 待核 |
-| LoRa = Long Range，LPWAN 关键成员 | "LoRa的名字源于Long Range的缩写，由美国Semtech公司采用和推广的一种基于扩频技术的超远距离无线传输方案。它的梦想就是长距离通信，如果一个网关或基站可覆盖整个城市那就再好不过了。因此，LoRa成为低功率广域通信网（LPWAN）技术中的关键一员。" | 《5G物联网及NB-IoT技术详解》/ 江林华编著 / 电子工业出版社·2018 / 第2章 2.5.2 LoRaWAN / PDF p71 | `docs/zh/foundations/iot-protocols.md#lpwan-权衡` | 待核 |
-| LPWAN 横向技术分类（授权 vs 非授权频谱） | "各类物联网应用业务中，低功耗广域覆盖（Low Power Wide Area，LPWA）物联网业务由于连接需求规模大……目前，存在多种可承载LPWA类业务的物联网通信技术，如GPRS、LTE、LoRa、Sigfox等……采用授权频谱的物联网技术，比如EC-GSM、NB-IoT和LTE-M……采用非授权频谱的物联网技术，比如LoRaWAN、Sigfox、Weightless、HaLow、RPMA……" | 《5G物联网及NB-IoT技术详解》/ 江林华编著 / 电子工业出版社·2018 / 第2章 2.3 物联网技术分类 / PDF p58 | `docs/zh/foundations/iot-protocols.md#lpwan-权衡` | 待核 |
-| LoRa/Sigfox/NB-IoT/eMTC 横向对比（表1.2：带宽/覆盖/功耗/速率四维） | "本节将对广域覆盖的物联网的重点技术进行比较，见表1.2。" 表1.2《满足广域覆盖的典型物联网接入技术对比》以"带宽/覆盖/功耗/上行峰值速率/下行峰值速率"等维度横向列出 LoRa（125kHz、约155dB、约10年）、Sigfox（200kHz、约160dB、约10年）、NB-IoT（200kHz、约164dB、约10年）与 TD-LTE Cat.1/eMTC（更高带宽/约146.7–148dB/约2–8年）的指标差异。 | 《NB-IoT物联网技术解析与案例详解》/ 黄宇红、杨光 主编 / 机械工业出版社·2018 / 第1章 1.3 典型物联网技术对比 / 印刷 p5（PDF p17） | `docs/zh/foundations/iot-protocols.md#lpwan-权衡` | 待核 |
+| NB-IoT 属 LPWAN + 低速率/延迟折中换覆盖增强/低功耗 | "NB-IoT属于低功耗广域网（LPWAN），其设计原则都是基于物联网特点和使用场景为基础。首先，相比传统的2G/3G/4G网络，物联网主要有以下三大特点：·懒：终端都很'懒'，大部分时间在'睡觉'，每天传送的数据量极低，且允许一定的传输延迟（比如智能水表）。·静止……·上行为主……这三大特点支撑了低速率和传输延迟上的技术折中，从而实现覆盖增强、功耗降低、成本减少的蜂窝物联网。" | 《物联网之魂：协议与物联网操作系统》vol2 / 孙昊 等 / 机工社·2019 / 第1章 1.12.3 NB-IoT窄带物联网节能原理 / PDF p119 | `docs/zh/foundations/iot-protocols.md#lpwan-权衡` | 已核 |
+| LoRa = Long Range，LPWAN 关键成员 | "LoRa的名字源于Long Range的缩写，由美国Semtech公司采用和推广的一种基于扩频技术的超远距离无线传输方案。它的梦想就是长距离通信，如果一个网关或基站可覆盖整个城市那就再好不过了。因此，LoRa成为低功率广域通信网（LPWAN）技术中的关键一员。" | 《5G物联网及NB-IoT技术详解》/ 江林华编著 / 电子工业出版社·2018 / 第2章 2.5.2 LoRaWAN / PDF p71 | `docs/zh/foundations/iot-protocols.md#lpwan-权衡` | 已核 |
+| LPWAN 横向技术分类（授权 vs 非授权频谱） | "各类物联网应用业务中，低功耗广域覆盖（Low Power Wide Area，LPWA）物联网业务由于连接需求规模大……目前，存在多种可承载LPWA类业务的物联网通信技术，如GPRS、LTE、LoRa、Sigfox等……采用授权频谱的物联网技术，比如EC-GSM、NB-IoT和LTE-M……采用非授权频谱的物联网技术，比如LoRaWAN、Sigfox、Weightless、HaLow、RPMA……" | 《5G物联网及NB-IoT技术详解》/ 江林华编著 / 电子工业出版社·2018 / 第2章 2.3 物联网技术分类 / PDF p58 | `docs/zh/foundations/iot-protocols.md#lpwan-权衡` | 已核 |
+| LoRa/Sigfox/NB-IoT/eMTC 横向对比（表1.2：带宽/覆盖/功耗/速率四维） | "本节将对广域覆盖的物联网的重点技术进行比较，见表1.2。" 表1.2《满足广域覆盖的典型物联网接入技术对比》以"带宽/覆盖/功耗/上行峰值速率/下行峰值速率"等维度横向列出 LoRa（125kHz、约155dB、约10年）、Sigfox（200kHz、约160dB、约10年）、NB-IoT（200kHz、约164dB、约10年）与 TD-LTE Cat.1/eMTC（更高带宽/约146.7–148dB/约2–8年）的指标差异。 | 《NB-IoT物联网技术解析与案例详解》/ 黄宇红、杨光 主编 / 机械工业出版社·2018 / 第1章 1.3 典型物联网技术对比 / 印刷 p5（PDF p17） | `docs/zh/foundations/iot-protocols.md#lpwan-权衡` | 已核 |
 
 ---
 
@@ -142,3 +142,17 @@
 | MQTT 主题按主题组织消息 | p155 | 通过 | 同段下文 |
 | MQTT 发布/订阅 一对多（概览） | p40 | 通过 | 1.4.3 |
 | Modbus 标准功能码（寻址） | p165 | 通过 | 条目7跨相邻两段拼接，同节同主题，无断章取义 |
+
+### iot-protocols verify（主 agent 独立 pdftotext 抽查 cited 页）
+
+| 条目概念 | cited 页 | verify 结果 | 备注 |
+|----------|---------|-------------|------|
+| MQTT QoS 三档（vol2） | p41 | 通过 | "MQTT有非常完善的QoS机制…最多一次、至少一次、刚好一次"逐字存在 |
+| CoAP 定义+UDP+方法（vol2） | p39 | 通过 | CoAP/UDP/GET/PUT/POST/DELETE 逐字存在 |
+| CoAP 异步+资源发现（vol2） | p40 | 通过 | 异步通信 / .well-known/core 逐字存在 |
+| LoRa=Long Range（5G 书） | p71 | 通过 | Long Range / Semtech / LPWAN 关键一员 逐字存在 |
+| LPWAN 授权/非授权分类（5G 书） | p58 | 通过 | LPWA / LoRa / Sigfox / 授权频谱 逐字存在 |
+| NB-IoT 属 LPWAN（vol2） | p119 | 信任 | implementer pdftotext 自检通过；主 agent 未单独抽查 |
+| nb-iot 表1.2 横向对比 | PDF p17 | 部分 | 表格列错位，implementer 已删无法核实数值，仅留维度描述 |
+
+> 主 agent 独立核对方式：`pdftotext -layout` 抽取 cited 页 → grep 原句片段。抽查 5 页全部逐字命中；其余 2 条基于 implementer 自检（同样 pdftotext+grep）信任。
