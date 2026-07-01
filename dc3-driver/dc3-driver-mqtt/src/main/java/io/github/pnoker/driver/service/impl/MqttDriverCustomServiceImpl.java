@@ -36,6 +36,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationListener;
+import org.springframework.integration.mqtt.event.MqttConnectionFailedEvent;
+import org.springframework.integration.mqtt.event.MqttIntegrationEvent;
+import org.springframework.integration.mqtt.event.MqttSubscribedEvent;
+import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -66,7 +72,7 @@ import java.util.Objects;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MqttDriverCustomServiceImpl implements DriverCustomService {
+public class MqttDriverCustomServiceImpl implements DriverCustomService, ApplicationListener<MqttIntegrationEvent> {
 
     private static final String COMMAND_TOPIC = "commandTopic";
     private static final String COMMAND_QOS = "commandQos";
@@ -75,8 +81,23 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final MqttSendService mqttSendService;
+    /**
+     * Inbound MQTT adapter. Absent when the driver runs publish-only (no
+     * {@code receive-topics} / no {@code MqttReceiveService} bean), in which case no
+     * {@link MqttIntegrationEvent} is ever published and {@link #health()} degrades to
+     * ONLINE with a diagnostic note.
+     */
+    private final ObjectProvider<MqttPahoMessageDrivenChannelAdapter> inboundAdapterProvider;
     @Value("${dc3.driver.code}")
     private String driverCode;
+
+    /**
+     * Latest known broker connection state, driven by {@link MqttSubscribedEvent} (up)
+     * and {@link MqttConnectionFailedEvent} (down) emitted by the inbound adapter.
+     * {@code null} means "no signal yet" — startup before the first connect, or a
+     * publish-only driver.
+     */
+    private volatile Boolean brokerConnected;
 
     /**
      * Initializes the MQTT driver.
@@ -103,10 +124,22 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Reports driver-level health based on MQTT connection status.
+     * Reports driver-level health based on the inbound MQTT broker connection.
      * <p>
-     * Process liveness is already protected by Data Center timeout scanning.
-     * This hook reports protocol-level health for the MQTT broker connection.
+     * Process liveness is already protected by Data Center timeout scanning; this hook
+     * exposes protocol-level health so the scheduler stops routing writes to an
+     * unreachable broker. The state is fed by {@link MqttIntegrationEvent}s published by
+     * the inbound adapter:
+     * </p>
+     * <ul>
+     *   <li>{@link MqttSubscribedEvent} → broker reachable and subscribed → ONLINE</li>
+     *   <li>{@link MqttConnectionFailedEvent} → broker connection lost → OFFLINE</li>
+     * </ul>
+     * <p>
+     * When the driver runs publish-only (no inbound adapter configured, i.e. no
+     * {@code receive-topics}), no events are ever published, so the driver degrades to
+     * ONLINE with a diagnostic description. The same fallback applies transiently during
+     * startup before the first connection attempt resolves.
      * </p>
      *
      * @return driver health state
@@ -114,8 +147,31 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService {
      */
     @Override
     public DriverHealthState health() {
-        // TODO: implement real MQTT connection health check via MqttSendService or Spring Integration MQTT client manager
-        return DriverHealthState.online();
+        if (Objects.isNull(inboundAdapterProvider.getIfAvailable())) {
+            return DriverHealthState.builder()
+                    .description("MQTT health not actively probed: no inbound adapter configured")
+                    .build();
+        }
+        Boolean connected = brokerConnected;
+        if (Objects.isNull(connected)) {
+            return DriverHealthState.builder()
+                    .description("MQTT broker connection not yet established")
+                    .build();
+        }
+        return Boolean.TRUE.equals(connected) ? DriverHealthState.online() : DriverHealthState.offline();
+    }
+
+    @Override
+    public void onApplicationEvent(MqttIntegrationEvent event) {
+        if (event instanceof MqttSubscribedEvent) {
+            brokerConnected = Boolean.TRUE;
+            log.info("MQTT broker connected and subscribed, protocol={}, source={}", driverCode,
+                    Objects.toString(event.getSource(), "?"));
+        } else if (event instanceof MqttConnectionFailedEvent) {
+            brokerConnected = Boolean.FALSE;
+            log.warn("MQTT broker connection failed, protocol={}, source={}", driverCode,
+                    Objects.toString(event.getSource(), "?"));
+        }
     }
 
     /**

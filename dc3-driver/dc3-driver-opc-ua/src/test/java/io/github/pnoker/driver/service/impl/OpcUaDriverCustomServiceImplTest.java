@@ -17,6 +17,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -25,11 +26,16 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
+import io.github.pnoker.driver.key.KeyLoader;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
+import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
+import org.eclipse.milo.opcua.sdk.client.api.identity.IdentityProvider;
+import org.eclipse.milo.opcua.sdk.client.api.identity.X509IdentityProvider;
 import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
@@ -44,6 +50,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -225,11 +235,129 @@ class OpcUaDriverCustomServiceImplTest {
         assertThat(ok).isTrue();
     }
 
+    @Test
+    void certificateBranchUsesX509IdentityProvider() throws Exception {
+        // A loader carrying both a client certificate and a key pair must produce an
+        // X509IdentityProvider so the certificate is used for application-layer auth,
+        // not just TLS.
+        KeyPair keyPair = Mockito.mock(KeyPair.class);
+        Mockito.when(keyPair.getPrivate()).thenReturn(Mockito.mock(PrivateKey.class));
+        KeyLoader loader = Mockito.mock(KeyLoader.class);
+        Mockito.when(loader.getClientCertificate()).thenReturn(Mockito.mock(X509Certificate.class));
+        Mockito.when(loader.getClientKeyPair()).thenReturn(keyPair);
+
+        IdentityProvider provider = invokeBuildIdentityProvider(loader);
+
+        assertThat(provider).isInstanceOf(X509IdentityProvider.class);
+    }
+
+    @Test
+    void noCertificateBranchUsesAnonymous() throws Exception {
+        // No loader (initial() fell back to anonymous) must yield AnonymousProvider.
+        assertThat(invokeBuildIdentityProvider(null)).isInstanceOf(AnonymousProvider.class);
+
+        // A loader without a certificate or key pair must also yield AnonymousProvider.
+        KeyLoader empty = Mockito.mock(KeyLoader.class);
+        assertThat(invokeBuildIdentityProvider(empty)).isInstanceOf(AnonymousProvider.class);
+    }
+
+    private IdentityProvider invokeBuildIdentityProvider(KeyLoader loader) throws Exception {
+        Method method = OpcUaDriverCustomServiceImpl.class.getDeclaredMethod("buildIdentityProvider", KeyLoader.class);
+        method.setAccessible(true);
+        return (IdentityProvider) method.invoke(service, loader);
+    }
+
     private void invokeGetConnector(Long deviceId, Map<String, AttributeBO> driverConfig) throws Exception {
-        java.lang.reflect.Method method =
+        Method method =
                 OpcUaDriverCustomServiceImpl.class.getDeclaredMethod("getConnector", Long.class, Map.class);
         method.setAccessible(true);
         method.invoke(service, deviceId, driverConfig);
+    }
+
+    @Test
+    void healthReportsDegradedModeWhenKeyLoaderFailed() throws Exception {
+        setCertificateDegraded(true);
+        OpcUaClient client = Mockito.mock(OpcUaClient.class);
+        Mockito.when(client.connect()).thenReturn(CompletableFuture.completedFuture(client));
+        connectionMap().put(1L, client);
+
+        DeviceHealthState state = service.health(driverConfig("h", 4840, "/"), device(1L));
+
+        assertThat(state.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
+        assertThat(state.getDescription()).isNotNull().contains("degraded");
+    }
+
+    @Test
+    void healthReportsOnlineWhenNotDegraded() throws Exception {
+        setCertificateDegraded(false);
+        OpcUaClient client = Mockito.mock(OpcUaClient.class);
+        Mockito.when(client.connect()).thenReturn(CompletableFuture.completedFuture(client));
+        connectionMap().put(2L, client);
+
+        DeviceHealthState state = service.health(driverConfig("h", 4840, "/"), device(2L));
+
+        assertThat(state.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
+        assertThat(state.getDescription()).isNull();
+    }
+
+    @Test
+    void connectorEntersBackoffAfterConsecutiveFailures() throws Exception {
+        // Mirror of the Modbus TCP behaviour: after FAILURE_BACKOFF_THRESHOLD (3)
+        // consecutive create() failures, the next getConnector must short-circuit
+        // with a backoff ConnectorException instead of attempting another TCP+TLS
+        // handshake. invokeGetConnector calls the private method via reflection, so
+        // the thrown ConnectorException is wrapped by InvocationTargetException —
+        // assert on the root cause.
+        try (MockedStatic<OpcUaClient> staticMock = Mockito.mockStatic(OpcUaClient.class)) {
+            staticMock.when(() -> OpcUaClient.create(anyString(),
+                    any(Function.class),
+                    any(Function.class))).thenThrow(new UaException(0L, "endpoint refused"));
+
+            // Three failures accumulate into failureMap (threshold reached).
+            for (int i = 0; i < 3; i++) {
+                assertThatThrownBy(() -> invokeGetConnector(7L, driverConfig("unreachable", 4840, "/")))
+                        .hasCauseInstanceOf(ConnectorException.class)
+                        .cause()
+                        .isInstanceOf(ConnectorException.class)
+                        .hasMessageContaining("endpoint refused");
+            }
+            assertThat(failureMap()).containsKey(7L);
+
+            // Fourth attempt must short-circuit with a backoff message, not re-invoke create.
+            assertThatThrownBy(() -> invokeGetConnector(7L, driverConfig("unreachable", 4840, "/")))
+                    .hasCauseInstanceOf(ConnectorException.class)
+                    .cause()
+                    .hasMessageContaining("backoff");
+
+            // Backoff path must NOT have touched OpcUaClient.create again (3 invocations, not 4).
+            staticMock.verify(() -> OpcUaClient.create(anyString(),
+                    any(Function.class),
+                    any(Function.class)), times(3));
+        }
+    }
+
+    @Test
+    void healthFailureInvalidatesCachedClient() throws Exception {
+        // A cached client whose connect() probe fails must be removed from connectMap so
+        // the next cycle rebuilds from scratch, and health must report OFFLINE.
+        OpcUaClient badClient = Mockito.mock(OpcUaClient.class);
+        Mockito.when(badClient.connect())
+                .thenReturn(CompletableFuture.failedFuture(new RuntimeException("connection reset")));
+        connectionMap().put(9L, badClient);
+        assertThat(connectionMap()).containsKey(9L);
+
+        DeviceHealthState state = service.health(driverConfig("h", 4840, "/"), device(9L));
+
+        assertThat(state.getStatus()).isEqualTo(EntityStatusEnum.OFFLINE);
+        assertThat(connectionMap()).doesNotContainKey(9L);
+        // Disconnect is best-effort but should have been attempted on the now-stale client.
+        Mockito.verify(badClient).disconnect();
+    }
+
+    private void setCertificateDegraded(boolean value) throws Exception {
+        Field field = OpcUaDriverCustomServiceImpl.class.getDeclaredField("certificateDegraded");
+        field.setAccessible(true);
+        field.setBoolean(service, value);
     }
 
     @SuppressWarnings("unchecked")
@@ -237,6 +365,13 @@ class OpcUaDriverCustomServiceImplTest {
         Field field = OpcUaDriverCustomServiceImpl.class.getDeclaredField("connectMap");
         field.setAccessible(true);
         return (Map<Long, OpcUaClient>) field.get(service);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<Long, Object> failureMap() throws Exception {
+        Field field = OpcUaDriverCustomServiceImpl.class.getDeclaredField("failureMap");
+        field.setAccessible(true);
+        return (Map<Long, Object>) field.get(service);
     }
 
 }

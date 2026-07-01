@@ -31,6 +31,7 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
@@ -40,6 +41,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
+import org.eclipse.milo.opcua.sdk.client.api.identity.IdentityProvider;
+import org.eclipse.milo.opcua.sdk.client.api.identity.X509IdentityProvider;
 import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
@@ -84,17 +87,38 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     private static final long REQUEST_TIMEOUT_MS = 5000;
     private static final long READ_TIMEOUT_SECONDS = 1;
     private static final long WRITE_TIMEOUT_SECONDS = 1;
+    /**
+     * Max consecutive connection failures before entering backoff, mirroring the
+     * Modbus TCP driver. Stops connect storms against unreachable OPC UA servers.
+     */
+    private static final int FAILURE_BACKOFF_THRESHOLD = 3;
+    /**
+     * Backoff duration in milliseconds after exceeding the failure threshold.
+     */
+    private static final long FAILURE_BACKOFF_MS = 60_000;
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     @Value("${dc3.driver.code}")
     private String driverCode;
     private Map<Long, OpcUaClient> connectMap;
+    /**
+     * Failure tracking for connection backoff to prevent repeated TCP+TLS handshake
+     * attempts to unreachable devices on every schedule cycle.
+     */
+    private Map<Long, ConsecutiveFailure> failureMap;
 
     /**
      * KeyLoader for OPC UA client certificate management.
      * Lazy-initialized on first health check to avoid blocking startup.
      */
     private volatile KeyLoader keyLoader;
+
+    /**
+     * Set when {@link KeyLoader} initialization failed in {@link #initial()} and the
+     * driver fell back to anonymous auth. Surfaced in {@link #health} description so
+     * operators can see the driver is running in degraded certificate mode.
+     */
+    private volatile boolean certificateDegraded;
 
     private static void checkRequired(Map<String, AttributeBO> config, String code,
                                       List<ValidationReport.AttributeIssue> issues) {
@@ -109,12 +133,14 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         connectMap = new ConcurrentHashMap<>(16);
+        failureMap = new ConcurrentHashMap<>(16);
         try {
             keyLoader = new KeyLoader().load(
                     java.nio.file.Path.of(System.getProperty("user.dir"), "dc3", "opc-ua"));
         } catch (Exception e) {
             log.warn("OPC UA KeyLoader initialization failed, falling back to anonymous auth", e);
             keyLoader = null;
+            certificateDegraded = true;
         }
     }
 
@@ -130,10 +156,19 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             if (client != null) {
                 // Connect is idempotent — returns immediately when already connected
                 client.connect().get(1, TimeUnit.SECONDS);
+                if (certificateDegraded) {
+                    return DeviceHealthState.builder()
+                            .status(EntityStatusEnum.ONLINE)
+                            .description("OPC UA running in degraded mode: certificate unavailable, using anonymous auth")
+                            .build();
+                }
                 return DeviceHealthState.online();
             }
         } catch (Exception e) {
-            log.debug("Health check failed for device {}", device.getId(), e);
+            log.warn("Driver health check failed, protocol={}, deviceId={}", driverCode, device.getId(), e);
+            // A failed health probe means the cached client (if any) is stale or broken;
+            // drop it so the next cycle rebuilds from scratch instead of reusing it.
+            invalidateConnector(device.getId());
         }
         return DeviceHealthState.offline();
     }
@@ -185,6 +220,14 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
      * @throws ConnectorException if client creation fails
      */
     private OpcUaClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
+        // Check backoff before attempting connection to avoid TCP+TLS handshake storms
+        ConsecutiveFailure failure = failureMap.get(deviceId);
+        if (failure != null && failure.shouldBackoff()) {
+            throw new ConnectorException(
+                    "Driver connection in backoff after {} consecutive failures, protocol={}, deviceId={}",
+                    failure.count, driverCode, deviceId);
+        }
+
         return connectMap.computeIfAbsent(deviceId, id -> {
             String host = driverConfig.get("host").getValue(String.class);
             int port = driverConfig.get("port").getValue(Integer.class);
@@ -195,34 +238,59 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             try {
                 // Prefer certificate-based auth when KeyLoader is available
                 KeyLoader loader = this.keyLoader;
+                IdentityProvider identityProvider = buildIdentityProvider(loader);
                 OpcUaClient opcUaClient = OpcUaClient.create(url, endpoints -> endpoints.stream().findFirst(),
                         configBuilder -> {
                             configBuilder
                                     .setRequestTimeout(Unsigned.uint(REQUEST_TIMEOUT_MS))
                                     .setApplicationName(LocalizedText.english("IoT DC3 OPC UA Driver"))
                                     .setApplicationUri("urn:dc3:opc:ua:client");
-                            if (loader != null && loader.getClientCertificate() != null
-                                    && loader.getClientKeyPair() != null) {
+                            if (identityProvider instanceof X509IdentityProvider) {
                                 configBuilder
                                         .setCertificate(loader.getClientCertificate())
                                         .setKeyPair(loader.getClientKeyPair())
-                                        .setIdentityProvider(new AnonymousProvider());
+                                        .setIdentityProvider(identityProvider);
                             } else {
-                                configBuilder
-                                        .setIdentityProvider(new AnonymousProvider());
+                                configBuilder.setIdentityProvider(identityProvider);
                             }
                             return configBuilder.build();
                         });
-                log.info("Driver connection created, protocol={}, deviceId={}, host={}, port={}, path={}", driverCode, deviceId,
-                        host, port, path);
+                // Successful connection clears failure tracking
+                failureMap.remove(deviceId);
+                log.info("Driver connection created, protocol={}, deviceId={}, host={}, port={}, path={}, identity={}",
+                        driverCode, deviceId, host, port, path,
+                        identityProvider instanceof X509IdentityProvider ? "x509" : "anonymous");
                 return opcUaClient;
             } catch (UaException e) {
+                // Record failure for backoff
+                failureMap.compute(deviceId, (k, v) ->
+                        v == null ? new ConsecutiveFailure() : v.increment());
                 log.error("Driver connection failed, protocol={}, deviceId={}, host={}, port={}, path={}", driverCode, deviceId,
                         host, port, path, e);
                 throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, port={}, path={}, message={}",
                         deviceId, host, port, path, e.getMessage(), e);
             }
         });
+    }
+
+    /**
+     * Choose the OPC UA application-layer identity provider based on whether the
+     * KeyLoader produced a usable client certificate and key pair.
+     * <p>
+     * When the loader carries a certificate and key pair, an {@link X509IdentityProvider}
+     * is returned so the certificate is used for both TLS and user-token authentication.
+     * Otherwise an {@link AnonymousProvider} is returned. Extracted so the branch choice
+     * can be unit-tested without standing up a full OPC UA client configBuilder.
+     *
+     * @param loader the KeyLoader (may be {@code null} when initialization failed)
+     * @return an X509IdentityProvider when a certificate is present, else AnonymousProvider
+     */
+    private IdentityProvider buildIdentityProvider(KeyLoader loader) {
+        if (loader != null && loader.getClientCertificate() != null && loader.getClientKeyPair() != null) {
+            log.info("Configuring OPC UA client with X.509 certificate identity");
+            return new X509IdentityProvider(loader.getClientCertificate(), loader.getClientKeyPair().getPrivate());
+        }
+        return new AnonymousProvider();
     }
 
     /**
@@ -362,6 +430,21 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Invalidate any cached client for the given device. Used by {@link #health} where
+     * only the device id is known (the failing client reference is local to the try block).
+     * Falls back to {@link #invalidateConnector(Long, OpcUaClient) the two-arg form} when a
+     * cached entry exists, so the value-matched remove + disconnect still applies.
+     *
+     * @param deviceId unique device identifier
+     */
+    private void invalidateConnector(Long deviceId) {
+        OpcUaClient cached = connectMap.remove(deviceId);
+        if (cached != null) {
+            invalidateConnector(deviceId, cached);
+        }
+    }
+
     @Override
     public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
@@ -380,6 +463,35 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
                 .issues(issues).build();
+    }
+
+    /**
+     * Tracks consecutive connection failures for backoff. Mirrors the Modbus TCP driver
+     * implementation. Immutable after construction; {@link #increment()} returns a new
+     * instance so {@link ConcurrentHashMap#compute} updates stay race-free.
+     */
+    private static class ConsecutiveFailure {
+        final int count;
+        final long firstFailureTime;
+
+        ConsecutiveFailure() {
+            this.count = 1;
+            this.firstFailureTime = System.currentTimeMillis();
+        }
+
+        ConsecutiveFailure(int count, long firstFailureTime) {
+            this.count = count;
+            this.firstFailureTime = firstFailureTime;
+        }
+
+        ConsecutiveFailure increment() {
+            return new ConsecutiveFailure(count + 1, firstFailureTime);
+        }
+
+        boolean shouldBackoff() {
+            return count >= FAILURE_BACKOFF_THRESHOLD
+                    && (System.currentTimeMillis() - firstFailureTime) < FAILURE_BACKOFF_MS;
+        }
     }
 
 }

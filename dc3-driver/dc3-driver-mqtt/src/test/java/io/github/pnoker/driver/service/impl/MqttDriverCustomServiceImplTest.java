@@ -17,6 +17,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -25,6 +26,7 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
+import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
@@ -34,6 +36,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.integration.mqtt.event.MqttConnectionFailedEvent;
+import org.springframework.integration.mqtt.event.MqttSubscribedEvent;
+import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,9 +47,12 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MqttDriverCustomServiceImplTest {
@@ -79,9 +88,24 @@ class MqttDriverCustomServiceImplTest {
         return event;
     }
 
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<MqttPahoMessageDrivenChannelAdapter> adapterProvider(
+            MqttPahoMessageDrivenChannelAdapter adapter) {
+        ObjectProvider<MqttPahoMessageDrivenChannelAdapter> provider = mock(ObjectProvider.class);
+        lenient().when(provider.getIfAvailable()).thenReturn(adapter);
+        return provider;
+    }
+
     @BeforeEach
     void setUp() {
-        service = new MqttDriverCustomServiceImpl(driverMetadata, driverSenderService, mqttSendService);
+        // Publish-only driver: no inbound adapter configured.
+        service = new MqttDriverCustomServiceImpl(driverMetadata, driverSenderService, mqttSendService,
+                adapterProvider(null));
+    }
+
+    private MqttDriverCustomServiceImpl serviceWithAdapter() {
+        return new MqttDriverCustomServiceImpl(driverMetadata, driverSenderService, mqttSendService,
+                adapterProvider(mock(MqttPahoMessageDrivenChannelAdapter.class)));
     }
 
     @Test
@@ -154,6 +178,40 @@ class MqttDriverCustomServiceImplTest {
 
         assertThat(ok).isTrue();
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", "23.5");
+    }
+
+    @Test
+    void healthReportsOfflineWhenAdapterDisconnected() {
+        MqttDriverCustomServiceImpl svc = serviceWithAdapter();
+        // Inbound adapter emits MqttConnectionFailedEvent when the broker drops.
+        svc.onApplicationEvent(new MqttConnectionFailedEvent(new Object(), new RuntimeException("broker down")));
+
+        DriverHealthState health = svc.health();
+
+        assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.OFFLINE);
+        assertThat(health.getDescription()).isNull();
+    }
+
+    @Test
+    void healthReportsOnlineWhenAdapterConnectedAndRunning() {
+        MqttDriverCustomServiceImpl svc = serviceWithAdapter();
+        // Inbound adapter emits MqttSubscribedEvent once connected and subscribed.
+        svc.onApplicationEvent(new MqttSubscribedEvent(new Object(), "subscribed"));
+
+        DriverHealthState health = svc.health();
+
+        assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
+        assertThat(health.getDescription()).isNull();
+    }
+
+    @Test
+    void healthFallsBackToOnlineWhenNoAdapterConfigured() {
+        // service built in setUp() uses adapterProvider(null) — publish-only driver.
+
+        DriverHealthState health = service.health();
+
+        assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
+        assertThat(health.getDescription()).contains("no inbound adapter");
     }
 
 }
