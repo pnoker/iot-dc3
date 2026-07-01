@@ -4,8 +4,8 @@
 
 > **书源简称**
 > - **Core** = 《物联网：射频识别（RFID）核心技术教程》黄玉兰，人民邮电出版社（`iot-rfid-core-technology-tutorial.pdf`，360 页）
-> - **Multi-domain** = 《RFID 与物联网：多领域解决方案》（`iot-rfid-multi-domain-solutions.pdf`，372 页，应用/数据管理向）
-> - **Beidou** = 《北斗卫星导航系统应用》（`iot-beidou-applications.pdf`，325 页，应用向）
+> - **Multi-domain** = 《物联网 RFID 多领域应用解决方案》（`iot-rfid-multi-domain-solutions.pdf`，372 页，应用/数据管理向）
+> - **Beidou** = 《物联网与北斗应用》（`iot-beidou-applications.pdf`，325 页，应用向）
 >
 > **页码约定**：所标页码均为 PDF 物理页（`pdftotext -f <页> -l <页>` 直接命中的页）。书印刷页码与 PDF 页码有约 +10 页（Core）/约 +12 页（Multi-domain）偏移；核验时以 PDF 页为准。
 >

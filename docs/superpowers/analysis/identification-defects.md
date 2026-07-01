@@ -4,7 +4,7 @@
 >
 > 靶子性质：身份唯一性 + 隔离边界正确性，**不是**传感层的"计算精度"。故不套用 sensing 模板（标定/精度/截断），而按"唯一性破坏 / 跨租户串台 / 隔离边界"归类。
 >
-> 学术依据：`analysis/identification-knowledge-entries.md`。两条关键条目：
+> 学术依据：`docs/superpowers/analysis/identification-knowledge-entries.md`。两条关键条目：
 > - **EPC 全局唯一**（Core PDF p50 §3.1.3）：序列号"能唯一标识每一个物品"——对应 `deviceId` 必须全局唯一。
 > - **身份 + 归属二元边界**（`identification.md` §在 IoT DC3 中如何落地）：`deviceId` 回答"是哪一个"、`tenantId` 回答"归谁、谁能看见"——对应 EPC 的"序列号 + 厂商前缀"二元结构。
 
@@ -23,10 +23,10 @@
 
 | 类 | 文件 | 关键结论 |
 |---|---|---|
-| `TenantOwned` | `dc3-common/dc3-common-public/.../entity/common/TenantOwned.java` | 标记接口，仅 `getTenantId()` 一个契约。**只 BO 实现**（`DeviceBO extends BaseBO implements TenantOwned`，`DriverBO`/`PointBO`/`ProfileBO`/… 16 个 BO），DO 全部不实现——隔离检查只在 controller→BO 边界发生。 |
-| `TenantContextHolder` | `dc3-common/dc3-common-constant/.../tenant/TenantContextHolder.java` | ThreadLocal 存 tenantId + ignore 标志；Javadoc 自称 fail-closed（行 26-31）：tenantId 为 null 且未 ignore 时查询应被拒绝。**但无 MyBatis `TenantLineInnerInterceptor` 消费它**（见 2.1），fail-closed 仅靠 `BaseController#async` 在 finally 里 `clear()`（行 147）维持线程干净，没有 SQL 拦截兜底。 |
-| `EntityTenantServiceImpl` | `dc3-common/dc3-common-manager/.../service/impl/EntityTenantServiceImpl.java` | 多态绑定（group/label bind）的租户守卫；按 `EntityTypeEnum` 分派到 Driver/Profile/Point/Device 的 `getById`，再用泛型 `requireTenant` 校验（行 66-69）。仅 2 处调用（`GroupBindController:207`、`LabelBindController:207`）。 |
-| `BaseController` | `dc3-common/dc3-common-web/.../base/BaseController.java` | 统一入口：`requireTenant`（单实体，行 79-84）、`filterTenant`（批量，行 89-97）、`async`（绑定 ThreadLocal tenant，行 135-150）。**全 22 个 manager controller 均调用其一**（grep 确认无一遗漏），覆盖完整。 |
+| `TenantOwned` | `dc3-common/dc3-common-public/.../entity/common/TenantOwned.java` | 标记接口，仅 `getTenantId()` 一个契约。**只 BO 实现**（`DeviceBO extends BaseBO implements TenantOwned`，`DriverBO`/`PointBO`/`ProfileBO`/… 全仓库 30 处 `implements TenantOwned`，分布于 manager/auth/dal 模块的 BO），DO 全部不实现——隔离检查只在 controller→BO 边界发生。 |
+| `TenantContextHolder` | `dc3-common/dc3-common-constant/.../tenant/TenantContextHolder.java` | ThreadLocal 存 tenantId + ignore 标志；Javadoc 自称 fail-closed（行 26-31）：tenantId 为 null 且未 ignore 时查询应被拒绝。**但无 MyBatis `TenantLineInnerInterceptor` 消费它**（见 2.1）：`BaseController#async`（行 135-150）在 worker 线程先 `setTenantId`、finally 里 `clear()` 维持线程干净，但**没有任何 SQL 拦截器消费 set 的值**，fail-closed 契约不被任何组件执行（详见 D-1）。 |
+| `EntityTenantServiceImpl` | `dc3-common/dc3-common-manager/.../service/impl/EntityTenantServiceImpl.java` | 多态绑定（group/label bind）的租户守卫；按 `EntityTypeEnum` 分派到 Driver/Profile/Point/Device 的 `getById`（switch 行 57-63），再用泛型 `requireTenant` 校验（行 66-70）。仅 2 处调用（`GroupBindController:207`、`LabelBindController:207`）。 |
+| `BaseController` | `dc3-common/dc3-common-web/.../base/BaseController.java` | 统一入口：`requireTenant`（单实体，行 79-84）、`filterTenant`（批量，行 89-97）、`async`（绑定 ThreadLocal tenant，行 135-150）。**全 23 个 manager controller 均调用其一**（grep 确认无一遗漏），覆盖完整。 |
 | `AuthenticGatewayFilter` | `dc3-common/dc3-common-gateway/.../filter/AuthenticGatewayFilter.java` | 网关鉴权过滤器；解析租户/凭证/用户后把 `PrincipalHeader` 写入请求头（行 70-79），下游服务从 header 取 tenantId。租户身份在网关一次解析、下游信任 header（`X_AUTH_PRINCIPAL`）。 |
 | `DriverMetadataListener` | `dc3-common/dc3-common-driver/.../service/DriverMetadataListener.java` | 驱动 SPI 接口，单方法 `event(MetadataEventDTO)`；具体实现（`AbstractJdbcDriverCustomService:124-144` 等）按 `metadataEvent.id` 刷新连接池缓存。**`MetadataEventDTO` 只带 `id`/`metadataType`/`operateType`，不带 tenantId**——但这是驱动内部 trusted 事件路径（见 2.4）。 |
 
@@ -75,7 +75,7 @@
 
 **T-2（技术债）：`DeviceServiceImpl#listByIds` 无租户参数，全靠 controller `filterTenant` 兜**
 
-- 文件:行：`dc3-common/dc3-common-manager/src/main/java/io/github/pnoker/common/manager/service/impl/DeviceServiceImpl.java:253-260`（`listByIds` 直接 `deviceManager.listByIds(ids)`，无 tenant 过滤）
+- 文件:行：`dc3-common/dc3-common-manager/src/main/java/io/github/pnoker/common/manager/service/impl/DeviceServiceImpl.java:254-260`（`listByIds` 直接 `deviceManager.listByIds(ids)`，无 tenant 过滤）
 - 现象：service 层 `listByIds` 不过滤租户，靠 `DeviceController.java:208` 的 `filterTenant(tenantId, deviceService.listByIds(deviceIds))` 在 controller 兜底（先全量查再内存过滤）。这意味着 service 方法**自身不安全**，任何非 controller 调用方（如未来内部 service-to-service）调 `listByIds` 都会拿到全租户数据。
 - 影响：当前 controller 覆盖完整，未爆；但 service API 表面"像普通查询"实则依赖调用方过滤，易误用。与 D-1 同源（无框架兜底）。同类方法 `listByDriverId`/`listByProfileId` 在 tenantId 为 null 时也跳过过滤（行 225-227、246-248），同样依赖调用方传入非 null tenantId。
 
@@ -89,10 +89,10 @@
 
 | 检查项 | 结论 |
 |---|---|
-| 每条 `文件:行` 回读确认 | ✅ 全部回读：D-1 MybatisPlusConfig:51-55、S-1 DeviceServiceImpl:553-566 + DDL:643、S-2 DeviceLockManager:44、S-3 DriverMetadataListener:41、T-1 DeviceDO:48 vs DeviceBO:42、T-2 DeviceServiceImpl:253-260 + DeviceController:208、T-3 BaseController:89-97。 |
+| 每条 `文件:行` 回读确认 | ✅ 全部回读：D-1 MybatisPlusConfig:51-55、S-1 DeviceServiceImpl:553-566 + DDL:643、S-2 DeviceLockManager:44、S-3 DriverMetadataListener:41、T-1 DeviceDO:48 vs DeviceBO:42、T-2 DeviceServiceImpl:254-260 + DeviceController:208、T-3 BaseController:89-97。 |
 | 三分类不混淆 | ✅ D-1 是"契约声明 fail-closed 但无组件执行"=缺陷；S-1/S-2/S-3 是"有明确工程假设的取舍"；T-1/T-2/T-3 是"不影响正确性但待改进"。 |
 | `DeviceDO` 是否 extends/implements TenantOwned | ✅ 读类声明行 48 确认：`implements Serializable`，**不实现 TenantOwned**；DO 全部如此，BO 才实现。 |
-| requireTenant/filterTenant 覆盖面 | ✅ rg 扫全 22 个 manager controller，无一遗漏；`filterTenant` 27 处调用、`requireTenant`/`requireEntityTenant` 各 controller 均覆盖。 |
+| requireTenant/filterTenant 覆盖面 | ✅ rg 扫全 23 个 manager controller，无一遗漏；`filterTenant` 27 处调用、`requireTenant`/`requireEntityTenant` 各 controller 均覆盖。 |
 | DriverMetadataListener tenant 缺失核查 | ✅ 核查到：接口和 DTO 都不带 tenantId，但属 trusted 内部事件路径（事件源头 manager 已校验），归 S-3 有意简化，非缺陷。 |
 | 是否强凑 | ✅ 无强凑。身份/隔离的 controller 层覆盖确实扎实（诚实记录），唯一的真缺陷 D-1 是"框架级兜底缺失"这一架构层问题，非 controller 层 bug。 |
 
@@ -100,6 +100,6 @@
 
 身份唯一性（`deviceId`/`deviceCode`）实现稳健：雪花 ID + UUID 双重全局唯一，DB 对 `(tenant_id, device_code)` 有唯一索引强约束，符合 EPC 全局唯一身份理论。
 
-租户隔离在 controller 层覆盖完整（22/22 controller 全调用 `requireTenant`/`filterTenant`/`getTenantId`），但**缺一道框架级兜底**（D-1：`TenantContextHolder` 声称 fail-closed 却无 `TenantLineInnerInterceptor` 执行），隔离纯靠"每处都记得手过滤"的纪律维持。这是本切片唯一的真缺陷，其余为有意简化与技术债。
+租户隔离在 controller 层覆盖完整（23/23 controller 全调用 `requireTenant`/`filterTenant`/`getTenantId`），但**缺一道框架级兜底**（D-1：`TenantContextHolder` 声称 fail-closed 却无 `TenantLineInnerInterceptor` 执行），隔离纯靠"每处都记得手过滤"的纪律维持。这是本切片唯一的真缺陷，其余为有意简化与技术债。
 
 **计数：真缺陷 1 / 有意简化 3 / 技术债 3**。
