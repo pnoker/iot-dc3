@@ -56,6 +56,17 @@
 
 ### A. 【真缺陷】（4 条）
 
+> ✅ **修复状态（2026-07-01）**：D1-D4 全部已在 `feature/protocol-defect-fixes` 分支修复并通过测试（dc3-driver-mqtt 16/16、dc3-driver-opc-ua 16/16，BUILD SUCCESS）。
+>
+> | 缺陷 | 修复 commit | 修复要点 |
+> |------|------------|---------|
+> | D1 OPC-UA 连接风暴 | `63fdf962d` | 镜像 modbus-tcp `failureMap`+`ConsecutiveFailure`（阈值3/60s）+ health invalidate 坏 client |
+> | D2 OPC-UA 静默降级 | `2d78b55` | `certificateDegraded` 标记 + health description 暴露降级 |
+> | D3 OPC-UA 证书空设 | `94feac5c6` | 提取 `buildIdentityProvider`，证书分支改用 `X509IdentityProvider`（Milo 签名 cert+PrivateKey） |
+> | D4 MQTT health 撒谎 | `f69787eb8` | 事件驱动（`MqttSubscribedEvent`/`MqttConnectionFailedEvent`），health 基于真实连接 |
+>
+> 详见 `.superpowers/sdd/defect-fix-ledger.md`。B（有意简化）与 C（技术债）未在本轮处理。
+
 | 编号 | 文件:行 | 协议/驱动 | 对照 | 三分类 | 描述 | 建议 |
 |------|--------|----------|------|--------|------|------|
 | D1 | `dc3-driver-opc-ua/.../OpcUaDriverCustomServiceImpl.java:135-138` + `187-226` | OPC UA | 同仓库 modbus-tcp 已有 failureMap+ConsecutiveFailure 退避（`ModbusTcpDriverCustomServiceImpl.java:100,275-308`）；OPC UA 规范 Part 4 要求会话生命周期管理 | 真缺陷 | `health()` catch 块仅 `log.debug` 后返回 offline，无失败计数/退避；`getConnector()` 用 `computeIfAbsent` 每周期为不可达主机创建新 `OpcUaClient`。不可达设备被反复 TCP+TLS 握手（连接风暴）。`log.debug` 级别也过低——连接失败是值得 warn 的事件。 | 镜像 modbus-tcp：每设备失败计数器 + 连续 3 次/60s 冷却退避；catch 块日志提级 warn。 |
