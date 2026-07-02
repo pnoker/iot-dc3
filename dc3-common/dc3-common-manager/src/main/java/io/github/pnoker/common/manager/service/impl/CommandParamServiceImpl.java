@@ -175,7 +175,6 @@ public class CommandParamServiceImpl implements CommandParamService {
         wrapper.eq(Objects.nonNull(entityQuery.getCommandId()), "command_id", entityQuery.getCommandId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "enable_flag",
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "tenant_id", entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "version", entityQuery.getVersion());
         return wrapper.lambda();
     }
@@ -188,7 +187,6 @@ public class CommandParamServiceImpl implements CommandParamService {
         }
         LambdaQueryWrapper<CommandParamDO> wrapper = Wrappers.<CommandParamDO>query().lambda();
         wrapper.eq(CommandParamDO::getCommandId, entityBO.getCommandId());
-        wrapper.eq(CommandParamDO::getTenantId, entityBO.getTenantId());
         wrapper.ne(isUpdate && Objects.nonNull(entityBO.getId()), CommandParamDO::getId, entityBO.getId());
         wrapper.and(query -> {
             if (hasName) {

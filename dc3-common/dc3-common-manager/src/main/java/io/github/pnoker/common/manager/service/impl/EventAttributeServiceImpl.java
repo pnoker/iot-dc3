@@ -209,8 +209,6 @@ public class EventAttributeServiceImpl implements EventAttributeService {
                 entityQuery.getDriverId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), EventAttributeDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), EventAttributeDO::getTenantId,
-                entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), EventAttributeDO::getVersion, entityQuery.getVersion());
         return wrapper;
     }
@@ -224,7 +222,6 @@ public class EventAttributeServiceImpl implements EventAttributeService {
         LambdaQueryWrapper<EventAttributeDO> wrapper = Wrappers.<EventAttributeDO>query().lambda();
         wrapper.eq(EventAttributeDO::getAttributeCode, entityBO.getAttributeCode());
         wrapper.eq(EventAttributeDO::getDriverId, entityBO.getDriverId());
-        wrapper.eq(EventAttributeDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         EventAttributeDO one = eventAttributeManager.getOne(wrapper);
         if (Objects.isNull(one)) {

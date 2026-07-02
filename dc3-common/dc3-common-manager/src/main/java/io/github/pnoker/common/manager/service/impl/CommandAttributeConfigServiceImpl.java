@@ -235,8 +235,6 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
                 entityQuery.getCommandId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), CommandAttributeConfigDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), CommandAttributeConfigDO::getTenantId,
-                entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), CommandAttributeConfigDO::getVersion,
                 entityQuery.getVersion());
         return wrapper;
@@ -252,7 +250,6 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
         wrapper.eq(CommandAttributeConfigDO::getAttributeId, entityBO.getAttributeId());
         wrapper.eq(CommandAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
         wrapper.eq(CommandAttributeConfigDO::getCommandId, entityBO.getCommandId());
-        wrapper.eq(CommandAttributeConfigDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         CommandAttributeConfigDO one = commandAttributeConfigManager.getOne(wrapper);
         if (Objects.isNull(one)) {

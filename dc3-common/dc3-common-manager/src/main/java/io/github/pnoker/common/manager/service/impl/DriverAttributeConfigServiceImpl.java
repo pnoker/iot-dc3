@@ -203,8 +203,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
                 entityQuery.getDeviceId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverAttributeConfigDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverAttributeConfigDO::getTenantId,
-                entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), DriverAttributeConfigDO::getVersion,
                 entityQuery.getVersion());
         return wrapper;
@@ -219,7 +217,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
         wrapper.eq(DriverAttributeConfigDO::getAttributeId, entityBO.getAttributeId());
         wrapper.eq(DriverAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
-        wrapper.eq(DriverAttributeConfigDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeConfigDO one = driverAttributeConfigManager.getOne(wrapper);
         if (Objects.isNull(one)) {

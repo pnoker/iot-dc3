@@ -235,8 +235,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
                 entityQuery.getPointId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), PointAttributeConfigDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointAttributeConfigDO::getTenantId,
-                entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), PointAttributeConfigDO::getVersion,
                 entityQuery.getVersion());
         return wrapper;
@@ -252,7 +250,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         wrapper.eq(PointAttributeConfigDO::getAttributeId, entityBO.getAttributeId());
         wrapper.eq(PointAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
         wrapper.eq(PointAttributeConfigDO::getPointId, entityBO.getPointId());
-        wrapper.eq(PointAttributeConfigDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointAttributeConfigDO one = pointAttributeConfigManager.getOne(wrapper);
         if (Objects.isNull(one)) {

@@ -209,8 +209,6 @@ public class CommandAttributeServiceImpl implements CommandAttributeService {
                 entityQuery.getDriverId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), CommandAttributeDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), CommandAttributeDO::getTenantId,
-                entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), CommandAttributeDO::getVersion, entityQuery.getVersion());
         return wrapper;
     }
@@ -224,7 +222,6 @@ public class CommandAttributeServiceImpl implements CommandAttributeService {
         LambdaQueryWrapper<CommandAttributeDO> wrapper = Wrappers.<CommandAttributeDO>query().lambda();
         wrapper.eq(CommandAttributeDO::getAttributeCode, entityBO.getAttributeCode());
         wrapper.eq(CommandAttributeDO::getDriverId, entityBO.getDriverId());
-        wrapper.eq(CommandAttributeDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         CommandAttributeDO one = commandAttributeManager.getOne(wrapper);
         if (Objects.isNull(one)) {

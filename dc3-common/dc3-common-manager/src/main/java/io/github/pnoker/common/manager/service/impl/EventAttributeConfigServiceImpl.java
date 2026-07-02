@@ -235,8 +235,6 @@ public class EventAttributeConfigServiceImpl implements EventAttributeConfigServ
                 entityQuery.getEventId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), EventAttributeConfigDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), EventAttributeConfigDO::getTenantId,
-                entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), EventAttributeConfigDO::getVersion,
                 entityQuery.getVersion());
         return wrapper;
@@ -252,7 +250,6 @@ public class EventAttributeConfigServiceImpl implements EventAttributeConfigServ
         wrapper.eq(EventAttributeConfigDO::getAttributeId, entityBO.getAttributeId());
         wrapper.eq(EventAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
         wrapper.eq(EventAttributeConfigDO::getEventId, entityBO.getEventId());
-        wrapper.eq(EventAttributeConfigDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         EventAttributeConfigDO one = eventAttributeConfigManager.getOne(wrapper);
         if (Objects.isNull(one)) {

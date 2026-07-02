@@ -173,7 +173,6 @@ public class EventParamServiceImpl implements EventParamService {
         wrapper.eq(Objects.nonNull(entityQuery.getEventId()), "event_id", entityQuery.getEventId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "enable_flag",
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "tenant_id", entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "version", entityQuery.getVersion());
         return wrapper.lambda();
     }
@@ -186,7 +185,6 @@ public class EventParamServiceImpl implements EventParamService {
         }
         LambdaQueryWrapper<EventParamDO> wrapper = Wrappers.<EventParamDO>query().lambda();
         wrapper.eq(EventParamDO::getEventId, entityBO.getEventId());
-        wrapper.eq(EventParamDO::getTenantId, entityBO.getTenantId());
         wrapper.ne(isUpdate && Objects.nonNull(entityBO.getId()), EventParamDO::getId, entityBO.getId());
         wrapper.and(query -> {
             if (hasName) {

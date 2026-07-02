@@ -209,8 +209,6 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
                 entityQuery.getDriverId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverAttributeDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverAttributeDO::getTenantId,
-                entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), DriverAttributeDO::getVersion, entityQuery.getVersion());
         return wrapper;
     }
@@ -224,7 +222,6 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
         wrapper.eq(DriverAttributeDO::getAttributeCode, entityBO.getAttributeCode());
         wrapper.eq(DriverAttributeDO::getDriverId, entityBO.getDriverId());
-        wrapper.eq(DriverAttributeDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeDO one = driverAttributeManager.getOne(wrapper);
         if (Objects.isNull(one)) {
