@@ -64,6 +64,7 @@ import io.github.pnoker.common.enums.McpRiskLevelEnum;
 import io.github.pnoker.common.enums.OAuthClientTypeEnum;
 import io.github.pnoker.common.enums.OAuthGrantTypeEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PasswordUtil;
@@ -219,53 +220,63 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
 
     @Override
     public Map<String, Object> authorizationServerMetadata() {
-        String issuer = oauthProperties.getIssuer();
-        return orderedMap(
-                "issuer", issuer,
-                "authorization_endpoint", issuer + McpConstant.OAUTH2_AUTHORIZE,
-                "token_endpoint", issuer + McpConstant.OAUTH2_TOKEN,
-                "jwks_uri", issuer + McpConstant.OAUTH2_JWKS,
-                "revocation_endpoint", issuer + McpConstant.OAUTH2_REVOKE,
-                "registration_endpoint", issuer + McpConstant.OAUTH2_REGISTER,
-                "response_types_supported", List.of(McpConstant.OAuth.RESPONSE_TYPE_CODE),
-                "grant_types_supported", List.of(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue(),
-                        OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue(),
-                        OAuthGrantTypeEnum.REFRESH_TOKEN.getValue()),
-                "code_challenge_methods_supported", List.of(McpConstant.OAuth.CODE_CHALLENGE_METHOD_S256),
-                "scopes_supported", McpConstant.Scope.SUPPORTED,
-                "token_endpoint_auth_methods_supported", List.of(McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC,
-                        McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_POST, McpConstant.OAuth.AUTH_METHOD_NONE)
-        );
+        // PublicEndpoint (OAuthController.authorizationServerMetadata): discovery is unauthenticated.
+        return TenantContextHolder.runIgnore(() -> {
+            String issuer = oauthProperties.getIssuer();
+            return orderedMap(
+                    "issuer", issuer,
+                    "authorization_endpoint", issuer + McpConstant.OAUTH2_AUTHORIZE,
+                    "token_endpoint", issuer + McpConstant.OAUTH2_TOKEN,
+                    "jwks_uri", issuer + McpConstant.OAUTH2_JWKS,
+                    "revocation_endpoint", issuer + McpConstant.OAUTH2_REVOKE,
+                    "registration_endpoint", issuer + McpConstant.OAUTH2_REGISTER,
+                    "response_types_supported", List.of(McpConstant.OAuth.RESPONSE_TYPE_CODE),
+                    "grant_types_supported", List.of(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue(),
+                            OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue(),
+                            OAuthGrantTypeEnum.REFRESH_TOKEN.getValue()),
+                    "code_challenge_methods_supported", List.of(McpConstant.OAuth.CODE_CHALLENGE_METHOD_S256),
+                    "scopes_supported", McpConstant.Scope.SUPPORTED,
+                    "token_endpoint_auth_methods_supported", List.of(McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC,
+                            McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_POST, McpConstant.OAuth.AUTH_METHOD_NONE)
+            );
+        });
     }
 
     @Override
     public Map<String, Object> jwks() {
-        RSAPublicKey publicKey = (RSAPublicKey) keyMaterial().publicKey();
-        return Map.of("keys", List.of(orderedMap(
-                "kty", "RSA",
-                "use", "sig",
-                "kid", KID,
-                "alg", "RS256",
-                "n", DecodeUtil.base64UrlWithoutLeadingZero(publicKey.getModulus().toByteArray()),
-                "e", DecodeUtil.base64UrlWithoutLeadingZero(publicKey.getPublicExponent().toByteArray())
-        )));
+        // PublicEndpoint (OAuthController.jwks): JWKS is unauthenticated.
+        return TenantContextHolder.runIgnore(() -> {
+            RSAPublicKey publicKey = (RSAPublicKey) keyMaterial().publicKey();
+            return Map.of("keys", List.of(orderedMap(
+                    "kty", "RSA",
+                    "use", "sig",
+                    "kid", KID,
+                    "alg", "RS256",
+                    "n", DecodeUtil.base64UrlWithoutLeadingZero(publicKey.getModulus().toByteArray()),
+                    "e", DecodeUtil.base64UrlWithoutLeadingZero(publicKey.getPublicExponent().toByteArray())
+            )));
+        });
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OAuthClientRegistrationResponseVO registerClient(OAuthClientRegistrationBO request,
                                                             RequestHeader.PrincipalHeader principalHeader) {
-        request = Objects.requireNonNullElseGet(request, OAuthClientRegistrationBO::new);
-        String clientName = stringValue(request.getClientName());
+        // PublicEndpoint (OAuthController.register): dynamic client registration runs before tenant
+        // context is established; the caller's tenant is taken from the principal header and bound
+        // explicitly on the record, so the interceptor's implicit scoping must be bypassed here.
+        return TenantContextHolder.runIgnore(() -> {
+        OAuthClientRegistrationBO req = Objects.requireNonNullElseGet(request, OAuthClientRegistrationBO::new);
+        String clientName = stringValue(req.getClientName());
         if (StringUtils.isBlank(clientName)) {
             throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata", "client_name is required");
         }
         // The BO already carries a validated OAuthClientTypeEnum (null when unspecified), so the wire
         // value can no longer be an unknown string; default to PUBLIC when absent.
-        String clientType = Objects.requireNonNullElse(request.getClientType(), OAuthClientTypeEnum.PUBLIC).getValue();
+        String clientType = Objects.requireNonNullElse(req.getClientType(), OAuthClientTypeEnum.PUBLIC).getValue();
 
-        List<String> grantValues = Objects.isNull(request.getGrantTypes()) ? null
-                : request.getGrantTypes().stream().filter(Objects::nonNull)
+        List<String> grantValues = Objects.isNull(req.getGrantTypes()) ? null
+                : req.getGrantTypes().stream().filter(Objects::nonNull)
                 .map(OAuthGrantTypeEnum::getValue).toList();
         Set<String> grants = normalizeSet(grantValues);
         if (grants.isEmpty()) {
@@ -273,11 +284,11 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                     ? Set.of(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue())
                     : Set.of(OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue());
         }
-        Set<String> scopes = normalizeSet(request.getScope());
+        Set<String> scopes = normalizeSet(req.getScope());
         if (scopes.isEmpty()) {
             scopes = Set.of(McpConstant.Scope.TOOLS_LIST, McpConstant.Scope.TOOLS_CALL);
         }
-        Set<String> redirects = normalizeSet(request.getRedirectUris());
+        Set<String> redirects = normalizeSet(req.getRedirectUris());
         if (grants.contains(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue()) && redirects.isEmpty()) {
             throw oauthError(BAD_REQUEST.value(), "invalid_redirect_uri", "redirect_uris is required");
         }
@@ -290,7 +301,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         requireAuthenticatedPrincipal(principalHeader);
         Long ownerPrincipalId = principalHeader.getPrincipalId();
         Long tenantId = principalHeader.getTenantId();
-        Long serviceAccountPrincipalId = request.getServiceAccountPrincipalId();
+        Long serviceAccountPrincipalId = req.getServiceAccountPrincipalId();
         if (grants.contains(OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue())) {
             validateServiceAccountClient(serviceAccountPrincipalId, tenantId);
         }
@@ -336,6 +347,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                         ? McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC : McpConstant.OAuth.AUTH_METHOD_NONE)
                 .clientSecret(clientSecret)
                 .build();
+        });
     }
 
     @Override
@@ -348,6 +360,9 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public URI authorize(Map<String, String> params, RequestHeader.PrincipalHeader principalHeader) {
+        // PublicEndpoint (OAuthController.authorize): authorization endpoint runs before tenant
+        // context; tenant membership is explicitly validated via tenantMembershipService below.
+        return TenantContextHolder.runIgnore(() -> {
         if (principalHeader == null || principalHeader.getPrincipalId() == null) {
             throw oauthError(UNAUTHORIZED.value(), "login_required", "authenticated principal is required");
         }
@@ -414,11 +429,16 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             target.append("&state=").append(urlEncode(params.get("state")));
         }
         return URI.create(target.toString());
+        });
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> token(Map<String, String> form, String authorizationHeader) {
+        // PublicEndpoint (OAuthController.token): token issuance is cross-tenant authentication;
+        // the issued token's tenant_id claim is the authorization basis, validated explicitly via
+        // tenantMembershipService inside issueAndPersistTokens.
+        return TenantContextHolder.runIgnore(() -> {
         String grantType = form.get(McpConstant.Field.GRANT_TYPE);
         if (OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue().equals(grantType)) {
             return authorizationCodeToken(form, authorizationHeader);
@@ -430,10 +450,15 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             return refreshToken(form, authorizationHeader);
         }
         throw oauthError(BAD_REQUEST.value(), "unsupported_grant_type", "unsupported grant_type");
+        });
     }
 
     @Override
     public McpIntrospectResponseDTO introspect(String token) {
+        // PublicEndpoint (McpGatewayController.mcp): token introspection is invoked by the gateway
+        // on every MCP request before tenant context exists; the token's tenant_id claim drives
+        // authorization and is re-checked via tenantMembershipService below.
+        return TenantContextHolder.runIgnore(() -> {
         try {
             Claims claims = parseAccessToken(token);
             String jti = claims.getId();
@@ -475,11 +500,15 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         } catch (RuntimeException e) {
             return McpIntrospectResponseDTO.inactive();
         }
+        });
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> revoke(Map<String, String> form, String authorizationHeader) {
+        // PublicEndpoint (OAuthController.revoke): revocation may be called by a client before any
+        // tenant context; it resolves the authorization by the presented token only.
+        return TenantContextHolder.runIgnore(() -> {
         String token = form.get("token");
         if (StringUtils.isBlank(token)) {
             throw oauthError(BAD_REQUEST.value(), "invalid_request", "token is required");
@@ -492,6 +521,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             oauthMcpMapper.revokeAuthorizationByRefreshTokenHash(sha256(token), "revoke", now);
         }
         return Map.of("revoked", true);
+        });
     }
 
     @Override
