@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -38,7 +39,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class ModelProviderBO extends BaseBO {
+public class ModelProviderBO extends BaseBO implements TenantOwned {
 
     private String name;
 

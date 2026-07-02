@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.entity.bo;
 
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.common.TenantOwned;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class SessionBO extends BaseBO {
+public class SessionBO extends BaseBO implements TenantOwned {
 
     private String conversationId;
 

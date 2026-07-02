@@ -19,7 +19,9 @@ package io.github.pnoker.common.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -42,14 +44,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class MybatisPlusConfig {
 
     /**
-     * Pagination interceptor bean configuration
+     * MybatisPlus interceptor bean: tenant-line interceptor must run before pagination.
      *
-     * @return Configured MybatisPlusInterceptor with PostgreSQL pagination support
+     * @param tenantLineHandler Spring-injected {@code TenantLineHandlerImpl}
+     * @return Configured MybatisPlusInterceptor with tenant-line + PostgreSQL pagination
      */
     @Bean
     @ConditionalOnMissingBean
-    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(TenantLineHandler tenantLineHandler) {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        // Order matters: tenant-line MUST be added before pagination.
+        interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(tenantLineHandler));
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.POSTGRE_SQL));
         return interceptor;
     }

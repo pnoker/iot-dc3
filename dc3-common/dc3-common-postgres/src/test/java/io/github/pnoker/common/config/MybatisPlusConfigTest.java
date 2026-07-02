@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MybatisPlusConfigTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(MybatisPlusConfig.class));
+            .withConfiguration(AutoConfigurations.of(MybatisPlusConfig.class, TenantLineHandlerImpl.class));
 
     @Test
     void mybatisPlusInterceptorIsCreatedByDefault() {

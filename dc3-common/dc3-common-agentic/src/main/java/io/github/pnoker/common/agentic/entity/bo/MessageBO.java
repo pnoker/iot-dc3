@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.entity.bo;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,7 +38,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class MessageBO extends BaseBO {
+public class MessageBO extends BaseBO implements TenantOwned {
 
     private String conversationId;
 

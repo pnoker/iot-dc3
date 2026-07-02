@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.enums.AgenticActionStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,7 +40,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class ActionBO extends BaseBO {
+public class ActionBO extends BaseBO implements TenantOwned {
 
     private String actionId;
 
