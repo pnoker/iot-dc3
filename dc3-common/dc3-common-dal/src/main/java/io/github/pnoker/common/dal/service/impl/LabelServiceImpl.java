@@ -136,7 +136,6 @@ public class LabelServiceImpl implements LabelService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getColor()), LabelDO::getLabelColor, entityQuery.getColor());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), LabelDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), LabelDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -153,7 +152,6 @@ public class LabelServiceImpl implements LabelService {
         wrapper.eq(LabelDO::getLabelName, entityBO.getLabelName());
         wrapper.eq(LabelDO::getEntityTypeFlag,
                 Objects.isNull(entityBO.getEntityTypeFlag()) ? null : entityBO.getEntityTypeFlag().getIndex());
-        wrapper.eq(LabelDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         LabelDO one = labelManager.getOne(wrapper);
         if (Objects.isNull(one)) {

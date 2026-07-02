@@ -119,7 +119,6 @@ public class GroupBindServiceImpl implements GroupBindService {
                 entityQuery.getGroupId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), GroupBindDO::getEntityId,
                 entityQuery.getEntityId());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), GroupBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -136,7 +135,6 @@ public class GroupBindServiceImpl implements GroupBindService {
         wrapper.eq(GroupBindDO::getEntityTypeFlag,
                 Objects.isNull(entityBO.getEntityTypeFlag()) ? null : entityBO.getEntityTypeFlag().getIndex());
         wrapper.eq(GroupBindDO::getEntityId, entityBO.getEntityId());
-        wrapper.eq(GroupBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         GroupBindDO one = groupBindManager.getOne(wrapper);
         if (Objects.isNull(one)) {

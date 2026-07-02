@@ -119,7 +119,6 @@ public class LabelBindServiceImpl implements LabelBindService {
                 entityQuery.getLabelId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), LabelBindDO::getEntityId,
                 entityQuery.getEntityId());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), LabelBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -137,7 +136,6 @@ public class LabelBindServiceImpl implements LabelBindService {
                 Objects.isNull(entityBO.getEntityTypeFlag()) ? null : entityBO.getEntityTypeFlag().getIndex());
         wrapper.eq(LabelBindDO::getLabelId, entityBO.getLabelId());
         wrapper.eq(LabelBindDO::getEntityId, entityBO.getEntityId());
-        wrapper.eq(LabelBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         LabelBindDO one = labelBindManager.getOne(wrapper);
         if (Objects.isNull(one)) {
