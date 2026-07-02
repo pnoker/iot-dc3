@@ -21,6 +21,7 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.BusinessException;
 import io.github.pnoker.common.exception.PasswordChangeRequiredException;
+import io.github.pnoker.common.exception.TenantNotScopedException;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -152,6 +153,23 @@ public class ExceptionConfig {
             map.put(error.getField(), error.getDefaultMessage());
         });
         return Mono.just(R.fail(ErrorCode.VALIDATION, JsonUtil.toJsonString(map)));
+    }
+
+    /**
+     * Handle a {@link TenantNotScopedException}: a tenant-scoped query ran without a
+     * tenant bound to the thread and the ignore flag unset — a programming error that
+     * must surface as HTTP 500 rather than run unscoped.
+     *
+     * @param exception TenantNotScopedException to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response carrying the failure code
+     */
+    @ExceptionHandler(TenantNotScopedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Mono<R<String>> tenantNotScopedException(TenantNotScopedException exception, ServerHttpRequest request) {
+        log.error("Tenant-scoped query executed without tenant context, path={}, message={}",
+                request.getURI().getRawPath(), exception.getMessage(), exception);
+        return Mono.just(R.fail(ErrorCode.FAILURE, "System error: tenant scope missing"));
     }
 
     /**

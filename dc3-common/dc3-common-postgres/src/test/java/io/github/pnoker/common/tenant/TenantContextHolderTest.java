@@ -95,4 +95,22 @@ class TenantContextHolderTest {
         String result = TenantContextHolder.runIgnore(() -> "ok");
         assertThat(result).isEqualTo("ok");
     }
+
+    @Test
+    void runIgnoreActionDisablesFilteringAndRestores() {
+        assertThat(TenantContextHolder.isIgnored()).isFalse();
+        TenantContextHolder.runIgnoreAction(() -> {
+            assertThat(TenantContextHolder.isIgnored()).isTrue();
+        });
+        assertThat(TenantContextHolder.isIgnored()).isFalse();
+    }
+
+    @Test
+    void runIgnoreActionRestoresOnException() {
+        assertThat(TenantContextHolder.isIgnored()).isFalse();
+        assertThatThrownBy(() ->
+            TenantContextHolder.runIgnoreAction(() -> { throw new IllegalStateException("boom"); })
+        ).isInstanceOf(IllegalStateException.class);
+        assertThat(TenantContextHolder.isIgnored()).isFalse();
+    }
 }

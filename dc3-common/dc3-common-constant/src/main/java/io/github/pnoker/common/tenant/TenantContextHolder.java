@@ -82,6 +82,20 @@ public final class TenantContextHolder {
     }
 
     /**
+     * Void variant of {@link #runIgnore(Supplier)} for actions with no result.
+     * Same nesting/exception safety.
+     */
+    public static void runIgnoreAction(Runnable action) {
+        boolean previous = isIgnored();
+        IGNORE.set(Boolean.TRUE);
+        try {
+            action.run();
+        } finally {
+            IGNORE.set(previous);
+        }
+    }
+
+    /**
      * Detach all tenant state from the current thread. Must be called when a pooled
      * worker finishes the unit of work it was bound for.
      */
