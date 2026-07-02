@@ -36,6 +36,8 @@
 
 **D-1（真缺陷）：`TenantContextHolder` 的 fail-closed 设计未接到 MyBatis 拦截层，DB 无 `TenantLineInnerInterceptor`**
 
+> **已修复（2026-07-02，分支 `fix/d1-tenant-line-interceptor`）：落地 `TenantLineInnerInterceptor` + fail-closed handler（`TenantLineHandlerImpl`：非白名单表 tenantId 为 null 即抛 `TenantNotScopedException`→500）+ `runIgnore`/`runIgnoreAction` 包裹 tenant-free 路径（启动 `AuthInitRunner`、OAuth/MCP 公开端点、`EntityStateExpiryScanner`、gateway MCP）+ agentic 6 BO 实现 `TenantOwned` 提供租户归属。设计/计划见 `docs/superpowers/plans/2026-07-02-d1-tenant-line-interceptor.md`。**
+
 - 文件:行：`dc3-common/dc3-common-postgres/src/main/java/io/github/pnoker/common/config/MybatisPlusConfig.java:51-55`
 - 现象：`mybatisPlusInterceptor()` 只 `addInnerInterceptor(new PaginationInnerInterceptor(...))`，全仓库 grep `TenantLineInnerInterceptor`/`TenantLineHandler` 零命中。`TenantContextHolder` 的 fail-closed Javadoc（`TenantContextHolder.java:26-31`）描述的"tenantId 为 null 且未 ignore 时拒绝查询"在代码里**没有任何拦截器执行**——上下文里的 tenantId 只被 `BaseController#async` 用于线程清理，不被任何 SQL 改写器消费。
 - 后果：隔离完全靠 (a) service 层每个 `wrapper.eq(tenant_id)` 手过滤 + (b) controller 层 `requireTenant`/`filterTenant` 手校验。**任何绕过这两道、直接走 `deviceManager.getById(id)`/`listByIds(ids)` 的路径都没有租户过滤**。当前 controller 层覆盖完整（见 1.2），所以现实未爆，但这是一道"靠纪律维持、无框架兜底"的隔离边界——新增 service 方法或忘记包 `filterTenant` 就会串台。
