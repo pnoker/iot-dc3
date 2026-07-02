@@ -41,6 +41,7 @@ import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.EventAttributeService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -96,194 +97,222 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             throw new ServiceException("Tenant[{}] information is invalid", entityGrpc.getTenant());
         }
 
-        DriverBO driverBO = grpcDriverBuilder.buildBOByGrpcDTO(entityGrpc.getDriver());
-        Objects.requireNonNull(driverBO).setTenantId(tenant.getId());
-        DriverBO entityBO = driverService.getByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
-        if (Objects.nonNull(entityBO)) {
-            log.info("The driver has been registered, perform update: {}", JsonUtil.toJsonString(driverBO));
-            driverBO.setId(entityBO.getId());
-            driverService.update(driverBO);
-        } else {
-            log.info("The driver is not registered, perform new addition: {}", JsonUtil.toJsonString(driverBO));
-            driverService.add(driverBO);
-        }
+        // gRPC path has no HTTP security context, so BaseController.async never bound a
+        // tenant. Bind the driver's tenant here so the fail-closed TenantLineInnerInterceptor
+        // (installed in D-1) can scope the dc3_driver queries instead of rejecting them.
+        TenantContextHolder.setTenantId(tenant.getId());
+        try {
+            DriverBO driverBO = grpcDriverBuilder.buildBOByGrpcDTO(entityGrpc.getDriver());
+            Objects.requireNonNull(driverBO).setTenantId(tenant.getId());
+            DriverBO entityBO = driverService.getByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
+            if (Objects.nonNull(entityBO)) {
+                log.info("The driver has been registered, perform update: {}", JsonUtil.toJsonString(driverBO));
+                driverBO.setId(entityBO.getId());
+                driverService.update(driverBO);
+            } else {
+                log.info("The driver is not registered, perform new addition: {}", JsonUtil.toJsonString(driverBO));
+                driverService.add(driverBO);
+            }
 
-        return driverService.getByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
+            return driverService.getByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
     public List<DriverAttributeBO> registerDriverAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO) {
-        Map<String, DriverAttributeBO> newDriverAttributeMap = entityGrpc.getDriverAttributesList()
-                .stream()
-                .collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeCode,
-                        grpcDriverAttributeBuilder::buildBOByGrpcDTO));
+        TenantContextHolder.setTenantId(entityBO.getTenantId());
+        try {
+            Map<String, DriverAttributeBO> newDriverAttributeMap = entityGrpc.getDriverAttributesList()
+                    .stream()
+                    .collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeCode,
+                            grpcDriverAttributeBuilder::buildBOByGrpcDTO));
 
-        Map<String, DriverAttributeBO> oldDriverAttributeMap = driverAttributeService.listByDriverId(entityBO.getId())
-                .stream()
-                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
-                .collect(Collectors.toMap(DriverAttributeBO::getAttributeCode, Function.identity()));
+            Map<String, DriverAttributeBO> oldDriverAttributeMap = driverAttributeService.listByDriverId(entityBO.getId())
+                    .stream()
+                    .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                    .collect(Collectors.toMap(DriverAttributeBO::getAttributeCode, Function.identity()));
 
-        // Diff into three buckets, then issue at most three round-trips (was N round-trips
-        // when a driver came up with many attributes — re-registration storms hit the DB).
-        List<DriverAttributeBO> toInsert = new ArrayList<>();
-        List<DriverAttributeBO> toUpdate = new ArrayList<>();
-        for (Map.Entry<String, DriverAttributeBO> entry : newDriverAttributeMap.entrySet()) {
-            DriverAttributeBO attribute = entry.getValue();
-            attribute.setDriverId(entityBO.getId());
-            attribute.setTenantId(entityBO.getTenantId());
-            DriverAttributeBO existing = oldDriverAttributeMap.get(entry.getKey());
-            if (Objects.nonNull(existing)) {
-                attribute.setId(existing.getId());
-                toUpdate.add(attribute);
-            } else {
-                toInsert.add(attribute);
+            // Diff into three buckets, then issue at most three round-trips (was N round-trips
+            // when a driver came up with many attributes — re-registration storms hit the DB).
+            List<DriverAttributeBO> toInsert = new ArrayList<>();
+            List<DriverAttributeBO> toUpdate = new ArrayList<>();
+            for (Map.Entry<String, DriverAttributeBO> entry : newDriverAttributeMap.entrySet()) {
+                DriverAttributeBO attribute = entry.getValue();
+                attribute.setDriverId(entityBO.getId());
+                attribute.setTenantId(entityBO.getTenantId());
+                DriverAttributeBO existing = oldDriverAttributeMap.get(entry.getKey());
+                if (Objects.nonNull(existing)) {
+                    attribute.setId(existing.getId());
+                    toUpdate.add(attribute);
+                } else {
+                    toInsert.add(attribute);
+                }
             }
-        }
-        Set<Long> toRemoveIds = new HashSet<>();
-        for (Map.Entry<String, DriverAttributeBO> entry : oldDriverAttributeMap.entrySet()) {
-            if (!newDriverAttributeMap.containsKey(entry.getKey())) {
-                toRemoveIds.add(entry.getValue().getId());
+            Set<Long> toRemoveIds = new HashSet<>();
+            for (Map.Entry<String, DriverAttributeBO> entry : oldDriverAttributeMap.entrySet()) {
+                if (!newDriverAttributeMap.containsKey(entry.getKey())) {
+                    toRemoveIds.add(entry.getValue().getId());
+                }
             }
-        }
-        log.debug("Driver attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
-                toInsert.size(), toUpdate.size(), toRemoveIds.size());
-        driverAttributeService.saveBatch(toInsert);
-        driverAttributeService.updateBatch(toUpdate);
-        driverAttributeService.removeByIds(toRemoveIds);
+            log.debug("Driver attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+                    toInsert.size(), toUpdate.size(), toRemoveIds.size());
+            driverAttributeService.saveBatch(toInsert);
+            driverAttributeService.updateBatch(toUpdate);
+            driverAttributeService.removeByIds(toRemoveIds);
 
-        return driverAttributeService.listByDriverId(entityBO.getId()).stream()
-                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
-                .toList();
+            return driverAttributeService.listByDriverId(entityBO.getId()).stream()
+                    .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                    .toList();
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
     public List<PointAttributeBO> registerPointAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO) {
-        Map<String, PointAttributeBO> newPointAttributeMap = entityGrpc.getPointAttributesList()
-                .stream()
-                .collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeCode,
-                        grpcPointAttributeBuilder::buildBOByGrpcDTO));
+        TenantContextHolder.setTenantId(entityBO.getTenantId());
+        try {
+            Map<String, PointAttributeBO> newPointAttributeMap = entityGrpc.getPointAttributesList()
+                    .stream()
+                    .collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeCode,
+                            grpcPointAttributeBuilder::buildBOByGrpcDTO));
 
-        Map<String, PointAttributeBO> oldPointAttributeMap = pointAttributeService.listByDriverId(entityBO.getId())
-                .stream()
-                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
-                .collect(Collectors.toMap(PointAttributeBO::getAttributeCode, Function.identity()));
+            Map<String, PointAttributeBO> oldPointAttributeMap = pointAttributeService.listByDriverId(entityBO.getId())
+                    .stream()
+                    .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                    .collect(Collectors.toMap(PointAttributeBO::getAttributeCode, Function.identity()));
 
-        // See registerDriverAttribute — same three-bucket batch pattern.
-        List<PointAttributeBO> pointToInsert = new ArrayList<>();
-        List<PointAttributeBO> pointToUpdate = new ArrayList<>();
-        for (Map.Entry<String, PointAttributeBO> entry : newPointAttributeMap.entrySet()) {
-            PointAttributeBO attribute = entry.getValue();
-            attribute.setDriverId(entityBO.getId());
-            attribute.setTenantId(entityBO.getTenantId());
-            PointAttributeBO existing = oldPointAttributeMap.get(entry.getKey());
-            if (Objects.nonNull(existing)) {
-                attribute.setId(existing.getId());
-                pointToUpdate.add(attribute);
-            } else {
-                pointToInsert.add(attribute);
+            // See registerDriverAttribute — same three-bucket batch pattern.
+            List<PointAttributeBO> pointToInsert = new ArrayList<>();
+            List<PointAttributeBO> pointToUpdate = new ArrayList<>();
+            for (Map.Entry<String, PointAttributeBO> entry : newPointAttributeMap.entrySet()) {
+                PointAttributeBO attribute = entry.getValue();
+                attribute.setDriverId(entityBO.getId());
+                attribute.setTenantId(entityBO.getTenantId());
+                PointAttributeBO existing = oldPointAttributeMap.get(entry.getKey());
+                if (Objects.nonNull(existing)) {
+                    attribute.setId(existing.getId());
+                    pointToUpdate.add(attribute);
+                } else {
+                    pointToInsert.add(attribute);
+                }
             }
-        }
-        Set<Long> pointToRemoveIds = new HashSet<>();
-        for (Map.Entry<String, PointAttributeBO> entry : oldPointAttributeMap.entrySet()) {
-            if (!newPointAttributeMap.containsKey(entry.getKey())) {
-                pointToRemoveIds.add(entry.getValue().getId());
+            Set<Long> pointToRemoveIds = new HashSet<>();
+            for (Map.Entry<String, PointAttributeBO> entry : oldPointAttributeMap.entrySet()) {
+                if (!newPointAttributeMap.containsKey(entry.getKey())) {
+                    pointToRemoveIds.add(entry.getValue().getId());
+                }
             }
-        }
-        log.debug("Point attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
-                pointToInsert.size(), pointToUpdate.size(), pointToRemoveIds.size());
-        pointAttributeService.saveBatch(pointToInsert);
-        pointAttributeService.updateBatch(pointToUpdate);
-        pointAttributeService.removeByIds(pointToRemoveIds);
+            log.debug("Point attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+                    pointToInsert.size(), pointToUpdate.size(), pointToRemoveIds.size());
+            pointAttributeService.saveBatch(pointToInsert);
+            pointAttributeService.updateBatch(pointToUpdate);
+            pointAttributeService.removeByIds(pointToRemoveIds);
 
-        return pointAttributeService.listByDriverId(entityBO.getId()).stream()
-                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
-                .toList();
+            return pointAttributeService.listByDriverId(entityBO.getId()).stream()
+                    .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                    .toList();
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
     public List<CommandAttributeBO> registerCommandAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO) {
-        Map<String, CommandAttributeBO> newCommandAttributeMap = entityGrpc.getCommandAttributesList()
-                .stream()
-                .collect(Collectors.toMap(GrpcCommandAttributeDTO::getAttributeCode,
-                        grpcCommandAttributeBuilder::buildBOByGrpcDTO));
+        TenantContextHolder.setTenantId(entityBO.getTenantId());
+        try {
+            Map<String, CommandAttributeBO> newCommandAttributeMap = entityGrpc.getCommandAttributesList()
+                    .stream()
+                    .collect(Collectors.toMap(GrpcCommandAttributeDTO::getAttributeCode,
+                            grpcCommandAttributeBuilder::buildBOByGrpcDTO));
 
-        Map<String, CommandAttributeBO> oldCommandAttributeMap = commandAttributeService.listByDriverId(entityBO.getId())
-                .stream()
-                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
-                .collect(Collectors.toMap(CommandAttributeBO::getAttributeCode, Function.identity()));
+            Map<String, CommandAttributeBO> oldCommandAttributeMap = commandAttributeService.listByDriverId(entityBO.getId())
+                    .stream()
+                    .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                    .collect(Collectors.toMap(CommandAttributeBO::getAttributeCode, Function.identity()));
 
-        List<CommandAttributeBO> commandToInsert = new ArrayList<>();
-        List<CommandAttributeBO> commandToUpdate = new ArrayList<>();
-        for (Map.Entry<String, CommandAttributeBO> entry : newCommandAttributeMap.entrySet()) {
-            CommandAttributeBO attribute = entry.getValue();
-            attribute.setDriverId(entityBO.getId());
-            attribute.setTenantId(entityBO.getTenantId());
-            CommandAttributeBO existing = oldCommandAttributeMap.get(entry.getKey());
-            if (Objects.nonNull(existing)) {
-                attribute.setId(existing.getId());
-                commandToUpdate.add(attribute);
-            } else {
-                commandToInsert.add(attribute);
+            List<CommandAttributeBO> commandToInsert = new ArrayList<>();
+            List<CommandAttributeBO> commandToUpdate = new ArrayList<>();
+            for (Map.Entry<String, CommandAttributeBO> entry : newCommandAttributeMap.entrySet()) {
+                CommandAttributeBO attribute = entry.getValue();
+                attribute.setDriverId(entityBO.getId());
+                attribute.setTenantId(entityBO.getTenantId());
+                CommandAttributeBO existing = oldCommandAttributeMap.get(entry.getKey());
+                if (Objects.nonNull(existing)) {
+                    attribute.setId(existing.getId());
+                    commandToUpdate.add(attribute);
+                } else {
+                    commandToInsert.add(attribute);
+                }
             }
-        }
-        Set<Long> commandToRemoveIds = new HashSet<>();
-        for (Map.Entry<String, CommandAttributeBO> entry : oldCommandAttributeMap.entrySet()) {
-            if (!newCommandAttributeMap.containsKey(entry.getKey())) {
-                commandToRemoveIds.add(entry.getValue().getId());
+            Set<Long> commandToRemoveIds = new HashSet<>();
+            for (Map.Entry<String, CommandAttributeBO> entry : oldCommandAttributeMap.entrySet()) {
+                if (!newCommandAttributeMap.containsKey(entry.getKey())) {
+                    commandToRemoveIds.add(entry.getValue().getId());
+                }
             }
-        }
-        log.debug("Command attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
-                commandToInsert.size(), commandToUpdate.size(), commandToRemoveIds.size());
-        commandAttributeService.saveBatch(commandToInsert);
-        commandAttributeService.updateBatch(commandToUpdate);
-        commandAttributeService.removeByIds(commandToRemoveIds);
+            log.debug("Command attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+                    commandToInsert.size(), commandToUpdate.size(), commandToRemoveIds.size());
+            commandAttributeService.saveBatch(commandToInsert);
+            commandAttributeService.updateBatch(commandToUpdate);
+            commandAttributeService.removeByIds(commandToRemoveIds);
 
-        return commandAttributeService.listByDriverId(entityBO.getId()).stream()
-                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
-                .toList();
+            return commandAttributeService.listByDriverId(entityBO.getId()).stream()
+                    .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                    .toList();
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
     public List<EventAttributeBO> registerEventAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO) {
-        Map<String, EventAttributeBO> newEventAttributeMap = entityGrpc.getEventAttributesList()
-                .stream()
-                .collect(Collectors.toMap(GrpcEventAttributeDTO::getAttributeCode,
-                        grpcEventAttributeBuilder::buildBOByGrpcDTO));
+        TenantContextHolder.setTenantId(entityBO.getTenantId());
+        try {
+            Map<String, EventAttributeBO> newEventAttributeMap = entityGrpc.getEventAttributesList()
+                    .stream()
+                    .collect(Collectors.toMap(GrpcEventAttributeDTO::getAttributeCode,
+                            grpcEventAttributeBuilder::buildBOByGrpcDTO));
 
-        Map<String, EventAttributeBO> oldEventAttributeMap = eventAttributeService.listByDriverId(entityBO.getId())
-                .stream()
-                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
-                .collect(Collectors.toMap(EventAttributeBO::getAttributeCode, Function.identity()));
+            Map<String, EventAttributeBO> oldEventAttributeMap = eventAttributeService.listByDriverId(entityBO.getId())
+                    .stream()
+                    .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                    .collect(Collectors.toMap(EventAttributeBO::getAttributeCode, Function.identity()));
 
-        List<EventAttributeBO> eventToInsert = new ArrayList<>();
-        List<EventAttributeBO> eventToUpdate = new ArrayList<>();
-        for (Map.Entry<String, EventAttributeBO> entry : newEventAttributeMap.entrySet()) {
-            EventAttributeBO attribute = entry.getValue();
-            attribute.setDriverId(entityBO.getId());
-            attribute.setTenantId(entityBO.getTenantId());
-            EventAttributeBO existing = oldEventAttributeMap.get(entry.getKey());
-            if (Objects.nonNull(existing)) {
-                attribute.setId(existing.getId());
-                eventToUpdate.add(attribute);
-            } else {
-                eventToInsert.add(attribute);
+            List<EventAttributeBO> eventToInsert = new ArrayList<>();
+            List<EventAttributeBO> eventToUpdate = new ArrayList<>();
+            for (Map.Entry<String, EventAttributeBO> entry : newEventAttributeMap.entrySet()) {
+                EventAttributeBO attribute = entry.getValue();
+                attribute.setDriverId(entityBO.getId());
+                attribute.setTenantId(entityBO.getTenantId());
+                EventAttributeBO existing = oldEventAttributeMap.get(entry.getKey());
+                if (Objects.nonNull(existing)) {
+                    attribute.setId(existing.getId());
+                    eventToUpdate.add(attribute);
+                } else {
+                    eventToInsert.add(attribute);
+                }
             }
-        }
-        Set<Long> eventToRemoveIds = new HashSet<>();
-        for (Map.Entry<String, EventAttributeBO> entry : oldEventAttributeMap.entrySet()) {
-            if (!newEventAttributeMap.containsKey(entry.getKey())) {
-                eventToRemoveIds.add(entry.getValue().getId());
+            Set<Long> eventToRemoveIds = new HashSet<>();
+            for (Map.Entry<String, EventAttributeBO> entry : oldEventAttributeMap.entrySet()) {
+                if (!newEventAttributeMap.containsKey(entry.getKey())) {
+                    eventToRemoveIds.add(entry.getValue().getId());
+                }
             }
-        }
-        log.debug("Event attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
-                eventToInsert.size(), eventToUpdate.size(), eventToRemoveIds.size());
-        eventAttributeService.saveBatch(eventToInsert);
-        eventAttributeService.updateBatch(eventToUpdate);
-        eventAttributeService.removeByIds(eventToRemoveIds);
+            log.debug("Event attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+                    eventToInsert.size(), eventToUpdate.size(), eventToRemoveIds.size());
+            eventAttributeService.saveBatch(eventToInsert);
+            eventAttributeService.updateBatch(eventToUpdate);
+            eventAttributeService.removeByIds(eventToRemoveIds);
 
-        return eventAttributeService.listByDriverId(entityBO.getId()).stream()
-                .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
-                .toList();
+            return eventAttributeService.listByDriverId(entityBO.getId()).stream()
+                    .filter(attribute -> Objects.equals(entityBO.getTenantId(), attribute.getTenantId()))
+                    .toList();
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
 }
