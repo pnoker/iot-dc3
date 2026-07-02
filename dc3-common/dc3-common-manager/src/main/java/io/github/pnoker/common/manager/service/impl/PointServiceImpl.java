@@ -191,18 +191,12 @@ public class PointServiceImpl implements PointService {
         if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return Collections.emptyList();
         }
-        return listByProfileId(deviceDO.getProfileId(), deviceDO.getTenantId())
-                .stream()
-                .filter(point -> Objects.equals(deviceDO.getTenantId(), point.getTenantId()))
-                .toList();
+        return listByProfileId(deviceDO.getProfileId(), deviceDO.getTenantId());
     }
 
     @Override
     public List<PointBO> listByProfileId(Long profileId, Long tenantId) {
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, profileId);
-        if (Objects.nonNull(tenantId)) {
-            wrapper.eq(PointDO::getTenantId, tenantId);
-        }
         List<PointDO> entityDOList = wrapper.list();
         return pointBuilder.buildBOListByDOList(entityDOList);
     }
@@ -326,7 +320,6 @@ public class PointServiceImpl implements PointService {
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), "dp.profile_id", entityQuery.getProfileId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag",
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dp.tenant_id", entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "dp.version", entityQuery.getVersion());
         wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
                 "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
@@ -359,7 +352,6 @@ public class PointServiceImpl implements PointService {
         }
         LambdaQueryWrapper<PointDO> wrapper = Wrappers.<PointDO>query().lambda();
         wrapper.eq(PointDO::getProfileId, entityBO.getProfileId());
-        wrapper.eq(PointDO::getTenantId, entityBO.getTenantId());
         wrapper.ne(isUpdate && Objects.nonNull(entityBO.getId()), PointDO::getId, entityBO.getId());
         wrapper.and(query -> {
             if (hasName) {

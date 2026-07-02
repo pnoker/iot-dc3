@@ -188,18 +188,12 @@ public class CommandServiceImpl implements CommandService {
         if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return Collections.emptyList();
         }
-        return listByProfileId(deviceDO.getProfileId(), deviceDO.getTenantId())
-                .stream()
-                .filter(command -> Objects.equals(deviceDO.getTenantId(), command.getTenantId()))
-                .toList();
+        return listByProfileId(deviceDO.getProfileId(), deviceDO.getTenantId());
     }
 
     @Override
     public List<CommandBO> listByProfileId(Long profileId, Long tenantId) {
         LambdaQueryChainWrapper<CommandDO> wrapper = commandManager.lambdaQuery().eq(CommandDO::getProfileId, profileId);
-        if (Objects.nonNull(tenantId)) {
-            wrapper.eq(CommandDO::getTenantId, tenantId);
-        }
         List<CommandDO> entityDOList = wrapper.list();
         return commandBuilder.buildBOListByDOList(entityDOList);
     }
@@ -236,7 +230,6 @@ public class CommandServiceImpl implements CommandService {
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), "dc.profile_id", entityQuery.getProfileId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dc.enable_flag",
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dc.tenant_id", entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "dc.version", entityQuery.getVersion());
         return wrapper.lambda();
     }
@@ -249,7 +242,6 @@ public class CommandServiceImpl implements CommandService {
         }
         LambdaQueryWrapper<CommandDO> wrapper = Wrappers.<CommandDO>query().lambda();
         wrapper.eq(CommandDO::getProfileId, entityBO.getProfileId());
-        wrapper.eq(CommandDO::getTenantId, entityBO.getTenantId());
         wrapper.ne(isUpdate && Objects.nonNull(entityBO.getId()), CommandDO::getId, entityBO.getId());
         wrapper.and(query -> {
             if (hasName) {

@@ -138,7 +138,6 @@ public class DriverServiceImpl implements DriverService {
     public DriverBO getByServiceName(String serviceName, Long tenantId) {
         LambdaQueryChainWrapper<DriverDO> wrapper = driverManager.lambdaQuery()
                 .eq(DriverDO::getServiceName, serviceName)
-                .eq(DriverDO::getTenantId, tenantId)
                 .last(QueryWrapperConstant.LIMIT_ONE);
         DriverDO entityDO = wrapper.one();
         return driverBuilder.buildBOByDO(entityDO);
@@ -148,9 +147,6 @@ public class DriverServiceImpl implements DriverService {
     public List<DriverBO> listByProfileId(Long profileId, Long tenantId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda()
                 .eq(DeviceDO::getProfileId, profileId);
-        if (Objects.nonNull(tenantId)) {
-            wrapper.eq(DeviceDO::getTenantId, tenantId);
-        }
         List<DeviceDO> deviceDOList = deviceManager.list(wrapper);
         if (CollectionUtils.isEmpty(deviceDOList)) {
             return Collections.emptyList();
@@ -204,7 +200,6 @@ public class DriverServiceImpl implements DriverService {
                 Objects.isNull(entityQuery.getDriverTypeFlag()) ? null : entityQuery.getDriverTypeFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverDO::getTenantId, entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), DriverDO::getVersion, entityQuery.getVersion());
         wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
                 "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
@@ -233,7 +228,6 @@ public class DriverServiceImpl implements DriverService {
         LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
         wrapper.eq(DriverDO::getDriverName, entityBO.getDriverName());
         wrapper.eq(DriverDO::getDriverCode, entityBO.getDriverCode());
-        wrapper.eq(DriverDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DriverDO one = driverManager.getOne(wrapper);
         if (Objects.isNull(one)) {

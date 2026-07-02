@@ -146,7 +146,6 @@ public class ProfileServiceImpl implements ProfileService {
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
         wrapper.eq(ProfileDO::getProfileName, name);
         wrapper.eq(ProfileDO::getProfileTypeFlag, type);
-        wrapper.eq(ProfileDO::getTenantId, tenantId);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileDO entityDO = profileManager.getOne(wrapper);
         return profileBuilder.buildBOByDO(entityDO);
@@ -204,7 +203,6 @@ public class ProfileServiceImpl implements ProfileService {
                 Objects.isNull(entityQuery.getProfileTypeFlag()) ? null : entityQuery.getProfileTypeFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag",
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dp.tenant_id", entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "dp.version", entityQuery.getVersion());
         wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
                 "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
@@ -235,7 +233,6 @@ public class ProfileServiceImpl implements ProfileService {
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
         wrapper.eq(ProfileDO::getProfileName, entityBO.getProfileName());
         wrapper.eq(Objects.nonNull(entityBO.getProfileTypeFlag()), ProfileDO::getProfileTypeFlag, entityBO.getProfileTypeFlag());
-        wrapper.eq(ProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileDO one = profileManager.getOne(wrapper);
         if (Objects.isNull(one)) {

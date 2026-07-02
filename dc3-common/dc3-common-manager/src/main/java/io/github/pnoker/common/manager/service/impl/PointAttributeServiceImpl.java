@@ -205,8 +205,6 @@ public class PointAttributeServiceImpl implements PointAttributeService {
                 entityQuery.getDriverId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), PointAttributeDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointAttributeDO::getTenantId,
-                entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), PointAttributeDO::getVersion, entityQuery.getVersion());
         return wrapper;
     }
@@ -221,7 +219,6 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
         wrapper.eq(PointAttributeDO::getAttributeCode, entityBO.getAttributeCode());
         wrapper.eq(PointAttributeDO::getDriverId, entityBO.getDriverId());
-        wrapper.eq(PointAttributeDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointAttributeDO one = pointAttributeManager.getOne(wrapper);
         if (Objects.isNull(one)) {

@@ -62,7 +62,6 @@ public class TopicServiceImpl implements TopicService {
         String dName = topicQuery.getDeviceName();
         List<DeviceDO> deviceList = Db.lambdaQuery(DeviceDO.class)
                 .eq(Objects.nonNull(deviceIdL), DeviceDO::getId, deviceIdL)
-                .eq(Objects.nonNull(topicQuery.getTenantId()), DeviceDO::getTenantId, topicQuery.getTenantId())
                 .eq(Objects.nonNull(dName) && !dName.isEmpty(), DeviceDO::getDeviceName, dName)
                 .list();
 
@@ -75,7 +74,6 @@ public class TopicServiceImpl implements TopicService {
             }
             List<PointDO> points = Db.lambdaQuery(PointDO.class)
                     .eq(PointDO::getProfileId, profileId)
-                    .eq(Objects.nonNull(topicQuery.getTenantId()), PointDO::getTenantId, topicQuery.getTenantId())
                     .list();
             for (PointDO point : points) {
                 TopicVO topicVO = new TopicVO();

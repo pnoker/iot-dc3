@@ -188,18 +188,12 @@ public class EventServiceImpl implements EventService {
         if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return Collections.emptyList();
         }
-        return listByProfileId(deviceDO.getProfileId(), deviceDO.getTenantId())
-                .stream()
-                .filter(event -> Objects.equals(deviceDO.getTenantId(), event.getTenantId()))
-                .toList();
+        return listByProfileId(deviceDO.getProfileId(), deviceDO.getTenantId());
     }
 
     @Override
     public List<EventBO> listByProfileId(Long profileId, Long tenantId) {
         LambdaQueryChainWrapper<EventDO> wrapper = eventManager.lambdaQuery().eq(EventDO::getProfileId, profileId);
-        if (Objects.nonNull(tenantId)) {
-            wrapper.eq(EventDO::getTenantId, tenantId);
-        }
         List<EventDO> entityDOList = wrapper.list();
         return eventBuilder.buildBOListByDOList(entityDOList);
     }
@@ -236,7 +230,6 @@ public class EventServiceImpl implements EventService {
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), "de.profile_id", entityQuery.getProfileId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "de.enable_flag",
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "de.tenant_id", entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "de.version", entityQuery.getVersion());
         return wrapper.lambda();
     }
@@ -249,7 +242,6 @@ public class EventServiceImpl implements EventService {
         }
         LambdaQueryWrapper<EventDO> wrapper = Wrappers.<EventDO>query().lambda();
         wrapper.eq(EventDO::getProfileId, entityBO.getProfileId());
-        wrapper.eq(EventDO::getTenantId, entityBO.getTenantId());
         wrapper.ne(isUpdate && Objects.nonNull(entityBO.getId()), EventDO::getId, entityBO.getId());
         wrapper.and(query -> {
             if (hasName) {

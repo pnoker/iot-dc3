@@ -202,7 +202,6 @@ public class DeviceServiceImpl implements DeviceService {
     public DeviceBO getByName(String name, Long tenantId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDeviceName, name);
-        wrapper.eq(DeviceDO::getTenantId, tenantId);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO entityDO = deviceManager.getOne(wrapper);
         return deviceBuilder.buildBOByDO(entityDO);
@@ -212,7 +211,6 @@ public class DeviceServiceImpl implements DeviceService {
     public DeviceBO getByCode(String code, Long tenantId) {
         LambdaQueryChainWrapper<DeviceDO> wrapper = deviceManager.lambdaQuery()
                 .eq(DeviceDO::getDeviceCode, code)
-                .eq(DeviceDO::getTenantId, tenantId)
                 .last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO entityDO = wrapper.one();
         return deviceBuilder.buildBOByDO(entityDO);
@@ -222,9 +220,6 @@ public class DeviceServiceImpl implements DeviceService {
     public List<DeviceBO> listByDriverId(Long driverId, Long tenantId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDriverId, driverId);
-        if (Objects.nonNull(tenantId)) {
-            wrapper.eq(DeviceDO::getTenantId, tenantId);
-        }
         List<DeviceDO> entityDOList = deviceManager.list(wrapper);
         return deviceBuilder.buildBOListByDOList(entityDOList);
     }
@@ -233,9 +228,6 @@ public class DeviceServiceImpl implements DeviceService {
     public List<Long> listIdsByDriverId(Long driverId, Long tenantId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDriverId, driverId).select(DeviceDO::getId);
-        if (Objects.nonNull(tenantId)) {
-            wrapper.eq(DeviceDO::getTenantId, tenantId);
-        }
         return deviceManager.list(wrapper).stream().map(DeviceDO::getId).toList();
     }
 
@@ -243,9 +235,6 @@ public class DeviceServiceImpl implements DeviceService {
     public List<DeviceBO> listByProfileId(Long profileId, Long tenantId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getProfileId, profileId);
-        if (Objects.nonNull(tenantId)) {
-            wrapper.eq(DeviceDO::getTenantId, tenantId);
-        }
         List<DeviceDO> entityDOList = deviceManager.list(wrapper);
         return deviceBuilder.buildBOListByDOList(entityDOList);
     }
@@ -273,17 +262,9 @@ public class DeviceServiceImpl implements DeviceService {
     public void importDevice(DeviceBO entityBO, File file) {
         validateTenantRelations(entityBO);
 
-        List<PointBO> pointBOList = pointService.listByProfileId(entityBO.getProfileId(), entityBO.getTenantId()).stream()
-                .filter(pointBO -> Objects.equals(entityBO.getTenantId(), pointBO.getTenantId()))
-                .toList();
-        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.listByDriverId(entityBO.getDriverId())
-                .stream()
-                .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
-                .toList();
-        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.listByDriverId(entityBO.getDriverId())
-                .stream()
-                .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
-                .toList();
+        List<PointBO> pointBOList = pointService.listByProfileId(entityBO.getProfileId(), entityBO.getTenantId());
+        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.listByDriverId(entityBO.getDriverId());
+        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.listByDriverId(entityBO.getDriverId());
 
         Workbook workbook;
         try {
@@ -325,17 +306,9 @@ public class DeviceServiceImpl implements DeviceService {
     public Path generateImportTemplate(DeviceBO entityBO) {
         validateTenantRelations(entityBO);
 
-        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.listByDriverId(entityBO.getDriverId())
-                .stream()
-                .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
-                .toList();
-        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.listByDriverId(entityBO.getDriverId())
-                .stream()
-                .filter(attributeBO -> Objects.equals(entityBO.getTenantId(), attributeBO.getTenantId()))
-                .toList();
-        List<PointBO> pointBOList = pointService.listByProfileId(entityBO.getProfileId(), entityBO.getTenantId()).stream()
-                .filter(pointBO -> Objects.equals(entityBO.getTenantId(), pointBO.getTenantId()))
-                .toList();
+        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.listByDriverId(entityBO.getDriverId());
+        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.listByDriverId(entityBO.getDriverId());
+        List<PointBO> pointBOList = pointService.listByProfileId(entityBO.getProfileId(), entityBO.getTenantId());
 
         Workbook workbook = new XSSFWorkbook();
         CellStyle cellStyle = PoiUtil.getCenterCellStyle(workbook);
@@ -525,7 +498,6 @@ public class DeviceServiceImpl implements DeviceService {
             wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), "dd.profile_id", entityQuery.getProfileId());
             wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dd.enable_flag",
                     Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-            wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dd.tenant_id", entityQuery.getTenantId());
             wrapper.eq(Objects.nonNull(entityQuery.getVersion()), "dd.version", entityQuery.getVersion());
             wrapper.exists(FieldUtil.isValidIdField(entityQuery.getGroupId()),
                     "select 1 from dc3_group_bind dgb where dgb.deleted = 0 "
@@ -556,7 +528,6 @@ public class DeviceServiceImpl implements DeviceService {
         }
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDeviceName, entityBO.getDeviceName());
-        wrapper.eq(DeviceDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO one = deviceManager.getOne(wrapper);
         if (Objects.isNull(one)) {
