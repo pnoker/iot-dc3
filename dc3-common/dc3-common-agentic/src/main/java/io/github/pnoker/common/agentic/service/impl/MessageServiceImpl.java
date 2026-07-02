@@ -73,7 +73,6 @@ public class MessageServiceImpl implements MessageService {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query()
                 .lambda()
                 .eq(MessageDO::getConversationId, conversationId)
-                .eq(MessageDO::getTenantId, header.getTenantId())
                 .eq(MessageDO::getUserId, header.getUserId())
                 .orderByAsc(MessageDO::getCreateTime)
                 .orderByAsc(MessageDO::getId);

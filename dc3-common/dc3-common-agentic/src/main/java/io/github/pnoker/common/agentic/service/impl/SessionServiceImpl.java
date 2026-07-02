@@ -173,7 +173,6 @@ public class SessionServiceImpl implements SessionService {
 
     private LambdaQueryWrapper<SessionDO> fuzzyQuery(SessionQuery query) {
         LambdaQueryWrapper<SessionDO> wrapper = Wrappers.<SessionDO>query().lambda();
-        wrapper.eq(Objects.nonNull(query.getTenantId()), SessionDO::getTenantId, query.getTenantId());
         wrapper.eq(FieldUtil.isValidIdField(query.getUserId()), SessionDO::getUserId, query.getUserId());
         wrapper.like(StringUtils.isNotEmpty(query.getConversationId()), SessionDO::getConversationId,
                 query.getConversationId());

@@ -152,7 +152,6 @@ public class ActionServiceImpl implements ActionService {
                 .set(ActionDO::getStatus, nextStatus.getIndex())
                 .set(ActionDO::getOperateTime, now)
                 .eq(ActionDO::getId, action.getId())
-                .eq(ActionDO::getTenantId, header.getTenantId())
                 .eq(ActionDO::getUserId, header.getUserId())
                 .eq(ActionDO::getStatus, AgenticActionStatusEnum.PENDING.getIndex())
                 .and(wrapper -> wrapper.isNull(ActionDO::getExpireTime)
@@ -178,7 +177,6 @@ public class ActionServiceImpl implements ActionService {
     private LambdaQueryWrapper<ActionDO> scopedWrapper(RequestHeader.PrincipalHeader header) {
         return Wrappers.<ActionDO>query()
                 .lambda()
-                .eq(ActionDO::getTenantId, header.getTenantId())
                 .eq(ActionDO::getUserId, header.getUserId());
     }
 

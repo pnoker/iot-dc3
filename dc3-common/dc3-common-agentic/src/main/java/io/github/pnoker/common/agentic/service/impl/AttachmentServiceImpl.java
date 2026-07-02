@@ -108,7 +108,6 @@ public class AttachmentServiceImpl implements AttachmentService {
         LambdaQueryWrapper<AttachmentDO> wrapper = Wrappers.<AttachmentDO>query()
                 .lambda()
                 .eq(AttachmentDO::getConversationId, conversationId)
-                .eq(AttachmentDO::getTenantId, header.getTenantId())
                 .eq(AttachmentDO::getUserId, header.getUserId())
                 .orderByDesc(AttachmentDO::getCreateTime);
         return attachmentBuilder.buildBOListByDOList(attachmentManager.list(wrapper));
@@ -122,7 +121,6 @@ public class AttachmentServiceImpl implements AttachmentService {
         LambdaQueryWrapper<AttachmentDO> wrapper = Wrappers.<AttachmentDO>query()
                 .lambda()
                 .in(AttachmentDO::getId, attachmentIds)
-                .eq(AttachmentDO::getTenantId, header.getTenantId())
                 .eq(AttachmentDO::getUserId, header.getUserId());
         List<AttachmentDO> attachments = attachmentManager.list(wrapper);
         if (attachments.isEmpty()) {

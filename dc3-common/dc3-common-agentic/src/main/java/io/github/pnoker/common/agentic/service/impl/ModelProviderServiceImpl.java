@@ -151,7 +151,6 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         }
         modelProviderManager.update(Wrappers.<ModelProviderDO>lambdaUpdate()
                 .set(ModelProviderDO::getDefaultFlag, DefaultFlagEnum.NOT_DEFAULT.getIndex())
-                .eq(ModelProviderDO::getTenantId, entityDO.getTenantId())
                 .eq(ModelProviderDO::getDefaultFlag, DefaultFlagEnum.DEFAULT.getIndex())
                 .ne(ModelProviderDO::getId, entityDO.getId()));
     }

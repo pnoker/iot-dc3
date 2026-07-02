@@ -200,7 +200,6 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         }
         modelConfigManager.update(Wrappers.<ModelConfigDO>lambdaUpdate()
                 .set(ModelConfigDO::getDefaultFlag, DefaultFlagEnum.NOT_DEFAULT.getIndex())
-                .eq(ModelConfigDO::getTenantId, entityDO.getTenantId())
                 .eq(ModelConfigDO::getDefaultFlag, DefaultFlagEnum.DEFAULT.getIndex())
                 .ne(ModelConfigDO::getId, entityDO.getId()));
     }
