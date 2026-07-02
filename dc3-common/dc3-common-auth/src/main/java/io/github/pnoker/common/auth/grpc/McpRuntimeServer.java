@@ -30,6 +30,7 @@ import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
 import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,9 +77,13 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
         GrpcRMcpToolListDTO.Builder response = GrpcRMcpToolListDTO.newBuilder();
         try {
             response.setResult(ok());
-            oauthMcpRuntimeService.listVisibleTools(request.getTenantId(), request.getPrincipalId(),
-                            request.getMcpConnectionId(), scopes(request.getScope()))
-                    .forEach(tool -> response.addTools(toGrpc(tool)));
+            // PublicEndpoint (McpGatewayController.mcp via gRPC): no tenant interceptor on the
+            // gateway path; queries carry an explicit tenant_id argument, so bypass tenant-line
+            // filtering here. The management controller calls the service directly and is unaffected.
+            TenantContextHolder.runIgnoreAction(() ->
+                    oauthMcpRuntimeService.listVisibleTools(request.getTenantId(), request.getPrincipalId(),
+                                    request.getMcpConnectionId(), scopes(request.getScope()))
+                            .forEach(tool -> response.addTools(toGrpc(tool))));
         } catch (OAuthProtocolException e) {
             response.setResult(protocolFailure(e));
         } catch (Exception e) {
@@ -94,9 +99,11 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                             StreamObserver<GrpcRMcpToolResolveDTO> responseObserver) {
         GrpcRMcpToolResolveDTO.Builder response = GrpcRMcpToolResolveDTO.newBuilder();
         try {
-            McpToolResolveResponseDTO tool = oauthMcpRuntimeService.resolveVisibleTool(request.getTenantId(),
-                    request.getPrincipalId(), request.getMcpConnectionId(), request.getToolName(),
-                    scopes(request.getScope()));
+            // PublicEndpoint (McpGatewayController.mcp via gRPC): see listTools above.
+            McpToolResolveResponseDTO tool = TenantContextHolder.runIgnore(() ->
+                    oauthMcpRuntimeService.resolveVisibleTool(request.getTenantId(),
+                            request.getPrincipalId(), request.getMcpConnectionId(), request.getToolName(),
+                            scopes(request.getScope())));
             response.setResult(ok());
             response.setData(toGrpc(tool));
         } catch (OAuthProtocolException e) {
@@ -114,17 +121,19 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                                   StreamObserver<GrpcRMcpToolAuthorizeDTO> responseObserver) {
         GrpcRMcpToolAuthorizeDTO.Builder response = GrpcRMcpToolAuthorizeDTO.newBuilder();
         try {
-            McpToolAuthorizeResponseDTO decision = oauthMcpRuntimeService.authorizeToolCall(
-                    McpToolAuthorizeRequestDTO.builder()
-                            .tenantId(request.getTenantId())
-                            .principalId(request.getPrincipalId())
-                            .mcpConnectionId(request.getMcpConnectionId())
-                            .scope(request.getScope())
-                            .toolName(request.getToolName())
-                            .argumentDigest(request.getArgumentDigest())
-                            .confirmId(request.getConfirmId())
-                            .idempotencyKey(request.getIdempotencyKey())
-                            .build());
+            McpToolAuthorizeRequestDTO requestDTO = McpToolAuthorizeRequestDTO.builder()
+                    .tenantId(request.getTenantId())
+                    .principalId(request.getPrincipalId())
+                    .mcpConnectionId(request.getMcpConnectionId())
+                    .scope(request.getScope())
+                    .toolName(request.getToolName())
+                    .argumentDigest(request.getArgumentDigest())
+                    .confirmId(request.getConfirmId())
+                    .idempotencyKey(request.getIdempotencyKey())
+                    .build();
+            // PublicEndpoint (McpGatewayController.mcp via gRPC): see listTools above.
+            McpToolAuthorizeResponseDTO decision = TenantContextHolder.runIgnore(() ->
+                    oauthMcpRuntimeService.authorizeToolCall(requestDTO));
             response.setResult(ok());
             response.setData(toGrpc(decision));
         } catch (OAuthProtocolException e) {
@@ -141,7 +150,9 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
     public void audit(GrpcMcpAuditCommand request, StreamObserver<GrpcRMcpBoolean> responseObserver) {
         GrpcRMcpBoolean.Builder response = GrpcRMcpBoolean.newBuilder();
         try {
-            oauthMcpRuntimeService.audit(toDTO(request));
+            // PublicEndpoint (McpGatewayController.mcp via gRPC): see listTools above.
+            McpAuditCommandDTO command = toDTO(request);
+            TenantContextHolder.runIgnoreAction(() -> oauthMcpRuntimeService.audit(command));
             response.setResult(ok());
             response.setData(true);
         } catch (Exception e) {
