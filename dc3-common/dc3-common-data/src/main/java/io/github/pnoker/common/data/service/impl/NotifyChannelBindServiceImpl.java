@@ -131,8 +131,6 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
                 entityQuery.getChannelId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), NotifyChannelBindDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyChannelBindDO::getTenantId,
-                entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -140,7 +138,6 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
         LambdaQueryWrapper<NotifyChannelBindDO> wrapper = Wrappers.<NotifyChannelBindDO>query().lambda();
         wrapper.eq(NotifyChannelBindDO::getNotifyId, entityBO.getNotifyId());
         wrapper.eq(NotifyChannelBindDO::getChannelId, entityBO.getChannelId());
-        wrapper.eq(NotifyChannelBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         NotifyChannelBindDO one = notifyChannelBindManager.getOne(wrapper);
         if (Objects.isNull(one)) {

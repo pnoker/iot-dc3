@@ -137,7 +137,6 @@ public class NotifyServiceImpl implements NotifyService {
                 entityQuery.getNotifyInterval());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), NotifyDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -151,7 +150,6 @@ public class NotifyServiceImpl implements NotifyService {
         LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
         wrapper.eq(NotifyDO::getNotifyName, entityBO.getNotifyName());
         wrapper.eq(NotifyDO::getNotifyCode, entityBO.getNotifyCode());
-        wrapper.eq(NotifyDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         NotifyDO one = notifyManager.getOne(wrapper);
         if (Objects.isNull(one)) {

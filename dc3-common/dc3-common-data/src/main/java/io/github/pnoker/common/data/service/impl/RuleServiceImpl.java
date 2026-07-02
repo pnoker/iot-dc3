@@ -143,7 +143,6 @@ public class RuleServiceImpl implements RuleService {
                         : entityQuery.getAlarmTargetTypeFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), RuleDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RuleDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -158,7 +157,6 @@ public class RuleServiceImpl implements RuleService {
         wrapper.eq(RuleDO::getRuleName, entityBO.getRuleName());
         wrapper.eq(RuleDO::getRuleCode, entityBO.getRuleCode());
         wrapper.eq(RuleDO::getEntityId, entityBO.getEntityId());
-        wrapper.eq(RuleDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RuleDO one = ruleManager.getOne(wrapper);
         if (Objects.isNull(one)) {

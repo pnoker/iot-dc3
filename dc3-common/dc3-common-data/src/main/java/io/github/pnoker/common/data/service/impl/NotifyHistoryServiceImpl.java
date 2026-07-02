@@ -119,7 +119,6 @@ public class NotifyHistoryServiceImpl implements NotifyHistoryService {
                 entityQuery.getTarget());
         wrapper.eq(Objects.nonNull(entityQuery.getStatusFlag()), NotifyHistoryDO::getStatusFlag,
                 Objects.isNull(entityQuery.getStatusFlag()) ? null : entityQuery.getStatusFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyHistoryDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

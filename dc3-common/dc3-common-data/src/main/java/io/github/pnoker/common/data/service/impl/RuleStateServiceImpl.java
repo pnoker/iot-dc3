@@ -121,13 +121,11 @@ public class RuleStateServiceImpl implements RuleStateService {
                 Objects.isNull(entityQuery.getEntityStateFlag()) ? null : entityQuery.getEntityStateFlag().getIndex());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getAlarmId()), RuleStateDO::getAlarmId,
                 entityQuery.getAlarmId());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RuleStateDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
     private boolean checkDuplicate(RuleStateBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>query().lambda();
-        wrapper.eq(RuleStateDO::getTenantId, entityBO.getTenantId());
         wrapper.eq(RuleStateDO::getRuleId, entityBO.getRuleId());
         wrapper.eq(RuleStateDO::getAlarmTargetTypeFlag,
                 Objects.nonNull(entityBO.getAlarmTargetTypeFlag())

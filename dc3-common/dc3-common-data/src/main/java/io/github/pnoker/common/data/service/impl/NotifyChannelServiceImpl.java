@@ -131,14 +131,12 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
                         : entityQuery.getChannelTypeFlag().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), NotifyChannelDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyChannelDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
     private boolean checkDuplicate(NotifyChannelBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<NotifyChannelDO> wrapper = Wrappers.<NotifyChannelDO>query().lambda();
         wrapper.eq(NotifyChannelDO::getChannelCode, entityBO.getChannelCode());
-        wrapper.eq(NotifyChannelDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         NotifyChannelDO one = notifyChannelManager.getOne(wrapper);
         if (Objects.isNull(one)) {

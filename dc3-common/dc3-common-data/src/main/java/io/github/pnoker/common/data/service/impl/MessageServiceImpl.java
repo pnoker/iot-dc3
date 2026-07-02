@@ -133,7 +133,6 @@ public class MessageServiceImpl implements MessageService {
                 Objects.isNull(entityQuery.getMessageLevel()) ? null : entityQuery.getMessageLevel().getIndex());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), MessageDO::getEnableFlag,
                 Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), MessageDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -147,7 +146,6 @@ public class MessageServiceImpl implements MessageService {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
         wrapper.eq(MessageDO::getMessageName, entityBO.getMessageName());
         wrapper.eq(MessageDO::getMessageCode, entityBO.getMessageCode());
-        wrapper.eq(MessageDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         MessageDO one = messageManager.getOne(wrapper);
         if (Objects.isNull(one)) {
