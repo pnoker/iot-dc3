@@ -34,6 +34,7 @@ import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -104,7 +105,11 @@ public class EntityStateExpiryScanner {
     public void onScanTick(Channel channel, Message message) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            scanExpiredDevices();
+            // This tick fires on a RabbitMQ consumer thread with no HTTP/security
+            // context, so there is no tenant on the thread. The scan must look
+            // across all tenants' device-state rows (and write alarms back keyed
+            // by each row's own tenant_id), so wrap the whole cycle in runIgnoreAction.
+            TenantContextHolder.runIgnoreAction(this::scanExpiredDevices);
 
             // Publish next tick to keep the cycle going
             rabbitTemplate.convertAndSend(
