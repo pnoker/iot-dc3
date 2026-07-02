@@ -266,87 +266,87 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         // context is established; the caller's tenant is taken from the principal header and bound
         // explicitly on the record, so the interceptor's implicit scoping must be bypassed here.
         return TenantContextHolder.runIgnore(() -> {
-        OAuthClientRegistrationBO req = Objects.requireNonNullElseGet(request, OAuthClientRegistrationBO::new);
-        String clientName = stringValue(req.getClientName());
-        if (StringUtils.isBlank(clientName)) {
-            throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata", "client_name is required");
-        }
-        // The BO already carries a validated OAuthClientTypeEnum (null when unspecified), so the wire
-        // value can no longer be an unknown string; default to PUBLIC when absent.
-        String clientType = Objects.requireNonNullElse(req.getClientType(), OAuthClientTypeEnum.PUBLIC).getValue();
+            OAuthClientRegistrationBO req = Objects.requireNonNullElseGet(request, OAuthClientRegistrationBO::new);
+            String clientName = stringValue(req.getClientName());
+            if (StringUtils.isBlank(clientName)) {
+                throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata", "client_name is required");
+            }
+            // The BO already carries a validated OAuthClientTypeEnum (null when unspecified), so the wire
+            // value can no longer be an unknown string; default to PUBLIC when absent.
+            String clientType = Objects.requireNonNullElse(req.getClientType(), OAuthClientTypeEnum.PUBLIC).getValue();
 
-        List<String> grantValues = Objects.isNull(req.getGrantTypes()) ? null
-                : req.getGrantTypes().stream().filter(Objects::nonNull)
-                .map(OAuthGrantTypeEnum::getValue).toList();
-        Set<String> grants = normalizeSet(grantValues);
-        if (grants.isEmpty()) {
-            grants = OAuthClientTypeEnum.PUBLIC.getValue().equals(clientType)
-                    ? Set.of(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue())
-                    : Set.of(OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue());
-        }
-        Set<String> scopes = normalizeSet(req.getScope());
-        if (scopes.isEmpty()) {
-            scopes = Set.of(McpConstant.Scope.TOOLS_LIST, McpConstant.Scope.TOOLS_CALL);
-        }
-        Set<String> redirects = normalizeSet(req.getRedirectUris());
-        if (grants.contains(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue()) && redirects.isEmpty()) {
-            throw oauthError(BAD_REQUEST.value(), "invalid_redirect_uri", "redirect_uris is required");
-        }
+            List<String> grantValues = Objects.isNull(req.getGrantTypes()) ? null
+                    : req.getGrantTypes().stream().filter(Objects::nonNull)
+                    .map(OAuthGrantTypeEnum::getValue).toList();
+            Set<String> grants = normalizeSet(grantValues);
+            if (grants.isEmpty()) {
+                grants = OAuthClientTypeEnum.PUBLIC.getValue().equals(clientType)
+                        ? Set.of(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue())
+                        : Set.of(OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue());
+            }
+            Set<String> scopes = normalizeSet(req.getScope());
+            if (scopes.isEmpty()) {
+                scopes = Set.of(McpConstant.Scope.TOOLS_LIST, McpConstant.Scope.TOOLS_CALL);
+            }
+            Set<String> redirects = normalizeSet(req.getRedirectUris());
+            if (grants.contains(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue()) && redirects.isEmpty()) {
+                throw oauthError(BAD_REQUEST.value(), "invalid_redirect_uri", "redirect_uris is required");
+            }
 
-        // The registered client is bound to the authenticated caller's tenant. The request body's
-        // tenant_id is intentionally ignored, so a caller cannot register an OAuth client for a tenant
-        // they do not belong to (which would otherwise let them bind another tenant's service account
-        // and mint cross-tenant tokens). validateServiceAccountClient below is thereby scoped to the
-        // caller's own tenant as well.
-        requireAuthenticatedPrincipal(principalHeader);
-        Long ownerPrincipalId = principalHeader.getPrincipalId();
-        Long tenantId = principalHeader.getTenantId();
-        Long serviceAccountPrincipalId = req.getServiceAccountPrincipalId();
-        if (grants.contains(OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue())) {
-            validateServiceAccountClient(serviceAccountPrincipalId, tenantId);
-        }
+            // The registered client is bound to the authenticated caller's tenant. The request body's
+            // tenant_id is intentionally ignored, so a caller cannot register an OAuth client for a tenant
+            // they do not belong to (which would otherwise let them bind another tenant's service account
+            // and mint cross-tenant tokens). validateServiceAccountClient below is thereby scoped to the
+            // caller's own tenant as well.
+            requireAuthenticatedPrincipal(principalHeader);
+            Long ownerPrincipalId = principalHeader.getPrincipalId();
+            Long tenantId = principalHeader.getTenantId();
+            Long serviceAccountPrincipalId = req.getServiceAccountPrincipalId();
+            if (grants.contains(OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue())) {
+                validateServiceAccountClient(serviceAccountPrincipalId, tenantId);
+            }
 
-        String clientId = McpConstant.OAuth.CLIENT_ID_PREFIX + UUID.randomUUID().toString().replace("-", "");
-        String clientSecret = null;
-        String secretHash = "";
-        String authMethods = McpConstant.OAuth.AUTH_METHOD_NONE;
-        if (OAuthClientTypeEnum.CONFIDENTIAL.getValue().equals(clientType)) {
-            clientSecret = randomToken();
-            secretHash = PasswordUtil.encode(clientSecret);
-            authMethods = McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC + ' '
-                    + McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_POST;
-        }
+            String clientId = McpConstant.OAuth.CLIENT_ID_PREFIX + UUID.randomUUID().toString().replace("-", "");
+            String clientSecret = null;
+            String secretHash = "";
+            String authMethods = McpConstant.OAuth.AUTH_METHOD_NONE;
+            if (OAuthClientTypeEnum.CONFIDENTIAL.getValue().equals(clientType)) {
+                clientSecret = randomToken();
+                secretHash = PasswordUtil.encode(clientSecret);
+                authMethods = McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC + ' '
+                        + McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_POST;
+            }
 
-        OAuthRegisteredClientRecord client = new OAuthRegisteredClientRecord();
-        client.setId(IdWorker.getId());
-        client.setClientId(clientId);
-        client.setClientName(clientName);
-        client.setClientType(clientType);
-        client.setOwnerPrincipalId(ownerPrincipalId);
-        client.setServiceAccountPrincipalId(Objects.requireNonNullElse(serviceAccountPrincipalId, 0L));
-        client.setTenantId(Objects.requireNonNullElse(tenantId, 0L));
-        client.setClientSecretHash(secretHash);
-        client.setClientSecretExpiresAt(null);
-        client.setClientAuthMethods(authMethods);
-        client.setAuthorizationGrantTypes(String.join(" ", grants));
-        client.setRedirectUris(String.join(" ", redirects));
-        client.setScopes(String.join(" ", scopes));
-        client.setRequirePkce((byte) (grants.contains(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue()) ? 1 : 0));
-        client.setRequireConsent((byte) 1);
-        client.setEnableFlag((byte) 0);
-        oauthMcpMapper.insertClient(client);
+            OAuthRegisteredClientRecord client = new OAuthRegisteredClientRecord();
+            client.setId(IdWorker.getId());
+            client.setClientId(clientId);
+            client.setClientName(clientName);
+            client.setClientType(clientType);
+            client.setOwnerPrincipalId(ownerPrincipalId);
+            client.setServiceAccountPrincipalId(Objects.requireNonNullElse(serviceAccountPrincipalId, 0L));
+            client.setTenantId(Objects.requireNonNullElse(tenantId, 0L));
+            client.setClientSecretHash(secretHash);
+            client.setClientSecretExpiresAt(null);
+            client.setClientAuthMethods(authMethods);
+            client.setAuthorizationGrantTypes(String.join(" ", grants));
+            client.setRedirectUris(String.join(" ", redirects));
+            client.setScopes(String.join(" ", scopes));
+            client.setRequirePkce((byte) (grants.contains(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue()) ? 1 : 0));
+            client.setRequireConsent((byte) 1);
+            client.setEnableFlag((byte) 0);
+            oauthMcpMapper.insertClient(client);
 
-        return OAuthClientRegistrationResponseVO.builder()
-                .clientId(clientId)
-                .clientName(clientName)
-                .clientType(clientType)
-                .grantTypes(grants)
-                .redirectUris(redirects)
-                .scope(String.join(" ", scopes))
-                .tokenEndpointAuthMethod(OAuthClientTypeEnum.CONFIDENTIAL.getValue().equals(clientType)
-                        ? McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC : McpConstant.OAuth.AUTH_METHOD_NONE)
-                .clientSecret(clientSecret)
-                .build();
+            return OAuthClientRegistrationResponseVO.builder()
+                    .clientId(clientId)
+                    .clientName(clientName)
+                    .clientType(clientType)
+                    .grantTypes(grants)
+                    .redirectUris(redirects)
+                    .scope(String.join(" ", scopes))
+                    .tokenEndpointAuthMethod(OAuthClientTypeEnum.CONFIDENTIAL.getValue().equals(clientType)
+                            ? McpConstant.OAuth.AUTH_METHOD_CLIENT_SECRET_BASIC : McpConstant.OAuth.AUTH_METHOD_NONE)
+                    .clientSecret(clientSecret)
+                    .build();
         });
     }
 

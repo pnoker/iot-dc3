@@ -51,9 +51,18 @@ class TenantLineHandlerImplTest {
 
     @Test
     void ignoreTableTrueForWhitelistedTables() {
+        // All 11 tenant_id-less tables whitelisted in IGNORE_TABLES must be skipped.
         assertThat(handler.ignoreTable("dc3_tenant")).isTrue();
+        assertThat(handler.ignoreTable("dc3_principal")).isTrue();
         assertThat(handler.ignoreTable("dc3_user")).isTrue();
+        assertThat(handler.ignoreTable("dc3_local_credential")).isTrue();
+        assertThat(handler.ignoreTable("dc3_external_identity")).isTrue();
         assertThat(handler.ignoreTable("dc3_resource")).isTrue();
+        assertThat(handler.ignoreTable("dc3_role_resource_bind")).isTrue();
+        assertThat(handler.ignoreTable("dc3_api")).isTrue();
+        assertThat(handler.ignoreTable("dc3_mcp_tool_catalog")).isTrue();
+        assertThat(handler.ignoreTable("dc3_mcp_connection_tool")).isTrue();
+        assertThat(handler.ignoreTable("dc3_menu")).isTrue();
     }
 
     @Test

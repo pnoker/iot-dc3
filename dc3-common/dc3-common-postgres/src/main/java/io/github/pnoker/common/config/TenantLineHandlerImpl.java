@@ -30,8 +30,9 @@ import java.util.Set;
  * MyBatis-Plus tenant-line handler backed by {@link TenantContextHolder}.
  * <p>
  * Fail-closed: when no tenant id is bound and the thread is not in a
- * {@link TenantContextHolder#runIgnoreAction} scope, {@link #getTenantId()} throws
- * {@link TenantNotScopedException} rather than letting the query run unscoped.
+ * {@link TenantContextHolder#runIgnore} / {@link TenantContextHolder#runIgnoreAction}
+ * scope, {@link #getTenantId()} throws {@link TenantNotScopedException} rather than
+ * letting the query run unscoped.
  * Tables without a tenant_id column (system/lookup tables) are whitelisted in
  * {@link #ignoreTable} so the interceptor does not inject a non-existent column.
  */
@@ -60,14 +61,14 @@ public class TenantLineHandlerImpl implements TenantLineHandler {
             // isIgnored() paths are routed through ignoreTable (returns true) and never reach here.
             throw new TenantNotScopedException(
                 "Tenant-scoped query executed without tenant id on thread; "
-                + "wrap cross-tenant/tenant-free work in TenantContextHolder.runIgnoreAction");
+                + "wrap cross-tenant/tenant-free work in TenantContextHolder.runIgnore/runIgnoreAction");
         }
         return new LongValue(tenantId);
     }
 
     @Override
     public boolean ignoreTable(String tableName) {
-        // Ignored context (runIgnoreAction) → skip injection for ALL tables.
+        // Ignored context (runIgnore/runIgnoreAction) → skip injection for ALL tables.
         // Otherwise skip whitelisted (tenant_id-less) tables.
         return TenantContextHolder.isIgnored() || IGNORE_TABLES.contains(tableName);
     }
