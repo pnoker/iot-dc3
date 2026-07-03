@@ -26,6 +26,7 @@ import io.github.pnoker.common.facade.local.builder.FacadePointBuilder;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.service.PointService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -53,33 +54,48 @@ public class PointLocalFacade implements PointFacade {
     private final FacadePointBuilder facadePointBuilder;
 
     @Override
-    public FacadePointBO getById(Long id) {
-        PointBO managerBO = pointService.getById(id);
-        return Objects.isNull(managerBO) ? null : facadePointBuilder.toFacadeBO(managerBO);
+    public FacadePointBO getById(Long tenantId, Long id) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            PointBO managerBO = pointService.getById(id);
+            return Objects.isNull(managerBO) ? null : facadePointBuilder.toFacadeBO(managerBO);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
-    public List<FacadePointBO> listByIds(Collection<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
+    public List<FacadePointBO> listByIds(Long tenantId, Collection<Long> ids) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            if (Objects.isNull(ids) || ids.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<PointBO> list = pointService.listByIds(new HashSet<>(ids));
+            if (Objects.isNull(list) || list.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return list.stream().map(facadePointBuilder::toFacadeBO).toList();
+        } finally {
+            TenantContextHolder.clear();
         }
-        List<PointBO> list = pointService.listByIds(new HashSet<>(ids));
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return list.stream().map(facadePointBuilder::toFacadeBO).toList();
     }
 
     @Override
     public FacadePage<FacadePointBO> listByPage(FacadePointQuery query) {
-        PointQuery managerQuery = facadePointBuilder.toManagerQuery(query);
-        Page<PointBO> page = pointService.list(managerQuery);
-        if (Objects.isNull(page)) {
-            return FacadePage.empty();
-        }
+        TenantContextHolder.setTenantId(query.getTenantId());
+        try {
+            PointQuery managerQuery = facadePointBuilder.toManagerQuery(query);
+            Page<PointBO> page = pointService.list(managerQuery);
+            if (Objects.isNull(page)) {
+                return FacadePage.empty();
+            }
 
-        List<FacadePointBO> records = page.getRecords().stream().map(facadePointBuilder::toFacadeBO).toList();
-        return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+            List<FacadePointBO> records = page.getRecords().stream().map(facadePointBuilder::toFacadeBO).toList();
+            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
 }

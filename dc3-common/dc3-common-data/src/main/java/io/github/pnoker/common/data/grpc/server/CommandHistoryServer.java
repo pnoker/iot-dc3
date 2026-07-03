@@ -34,6 +34,7 @@ import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.grpc.stub.StreamObserver;
@@ -63,6 +64,7 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
 
     @Override
     public void callCommand(GrpcCommandCallVO request, StreamObserver<GrpcRString> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
             CommandCallBO entityBO = new CommandCallBO();
             entityBO.setDeviceId(request.getDeviceId());
@@ -81,13 +83,17 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
                     .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
     }
 
     @Override
     public void getByRecordId(GrpcStringQuery request, StreamObserver<GrpcRCommandHistoryDTO> responseObserver) {
         try {
-            CommandHistoryVO record = commandHistoryService.getByRecordId(request.getValue());
+            // record_id is globally unique but dc3_command_history is not tenant-whitelisted;
+            // the GrpcStringQuery carries no tenant_id, so bypass tenant filtering here.
+            CommandHistoryVO record = TenantContextHolder.runIgnore(() -> commandHistoryService.getByRecordId(request.getValue()));
             GrpcRCommandHistoryDTO.Builder response = GrpcRCommandHistoryDTO.newBuilder();
 
             if (Objects.nonNull(record)) {
@@ -109,6 +115,7 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
 
     @Override
     public void listByPage(GrpcCommandHistoryQuery request, StreamObserver<GrpcRPageCommandHistoryDTO> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
             CommandHistoryQueryVO queryVO = new CommandHistoryQueryVO();
             queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
@@ -139,6 +146,8 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
                     .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
     }
 

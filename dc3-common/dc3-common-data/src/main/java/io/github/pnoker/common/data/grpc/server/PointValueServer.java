@@ -31,6 +31,7 @@ import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
 
     @Override
     public void getLastValue(GrpcPointValueQuery request, StreamObserver<GrpcRPointValueDTO> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
             // latest() with a page query — simplified: query by device+point, return
             // first result
@@ -100,12 +102,15 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
     }
 
     @Override
     public void listHistoryValues(GrpcPointValueHistoryQuery request,
                                   StreamObserver<GrpcRPointValueStringList> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
             List<String> history = pointValueService.history(request.getTenantId(), request.getDeviceId(),
                     request.getPointId(), request.getCount());
@@ -125,11 +130,14 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
     }
 
     @Override
     public void readCommand(GrpcPointValueCommandQuery request, StreamObserver<GrpcRBoolean> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
             PointCommandReadBO entityBO = new PointCommandReadBO();
             entityBO.setDeviceId(request.getDeviceId());
@@ -149,11 +157,14 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .setData(false)
                     .build());
             responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
     }
 
     @Override
     public void writeCommand(GrpcPointValueWriteCommand request, StreamObserver<GrpcRBoolean> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
             PointCommandWriteBO entityBO = new PointCommandWriteBO();
             entityBO.setDeviceId(request.getDeviceId());
@@ -174,6 +185,8 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                     .setData(false)
                     .build());
             responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
     }
 

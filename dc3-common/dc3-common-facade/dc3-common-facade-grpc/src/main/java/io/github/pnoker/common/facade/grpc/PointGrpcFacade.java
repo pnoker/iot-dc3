@@ -62,8 +62,8 @@ public class PointGrpcFacade implements PointFacade {
     private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public FacadePointBO getById(Long id) {
-        GrpcPointQuery request = GrpcPointQuery.newBuilder().setPointId(id).build();
+    public FacadePointBO getById(Long tenantId, Long id) {
+        GrpcPointQuery request = GrpcPointQuery.newBuilder().setPointId(id).setTenantId(tenantId).build();
         GrpcRPointDTO response = grpcFacadeSupport.call("PointFacade.getById", pointApiBlockingStub,
                 stub -> stub.getById(request));
         if (!response.getResult().getOk()) {
@@ -74,7 +74,7 @@ public class PointGrpcFacade implements PointFacade {
     }
 
     @Override
-    public List<FacadePointBO> listByIds(Collection<Long> ids) {
+    public List<FacadePointBO> listByIds(Long tenantId, Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -83,7 +83,7 @@ public class PointGrpcFacade implements PointFacade {
             return Collections.emptyList();
         }
 
-        GrpcPointIdsQuery request = GrpcPointIdsQuery.newBuilder().addAllPointIds(pointIds).build();
+        GrpcPointIdsQuery request = GrpcPointIdsQuery.newBuilder().addAllPointIds(pointIds).setTenantId(tenantId).build();
         GrpcRPointListDTO response = grpcFacadeSupport.call("PointFacade.listByIds", pointApiBlockingStub,
                 stub -> stub.listByIds(request));
         if (!response.getResult().getOk()) {

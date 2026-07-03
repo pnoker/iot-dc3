@@ -35,6 +35,7 @@ import io.github.pnoker.common.manager.entity.bo.CommandBO;
 import io.github.pnoker.common.manager.entity.query.CommandQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcCommandBuilder;
 import io.github.pnoker.common.manager.service.CommandService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,84 +63,99 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
 
     @Override
     public void listByPage(GrpcPageCommandQuery request, StreamObserver<GrpcRPageCommandDTO> responseObserver) {
-        GrpcRPageCommandDTO.Builder builder = GrpcRPageCommandDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRPageCommandDTO.Builder builder = GrpcRPageCommandDTO.newBuilder();
+            GrpcR result;
 
-        CommandQuery query = grpcCommandBuilder.buildQueryByGrpcQuery(request);
+            CommandQuery query = grpcCommandBuilder.buildQueryByGrpcQuery(request);
 
-        Page<CommandBO> entityPage = commandService.list(query);
-        if (Objects.isNull(entityPage)) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            Page<CommandBO> entityPage = commandService.list(query);
+            if (Objects.isNull(entityPage)) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            GrpcPageCommandDTO.Builder pageCommandBuilder = GrpcPageCommandDTO.newBuilder();
-            GrpcPage.Builder page = GrpcPage.newBuilder();
-            page.setCurrent(entityPage.getCurrent());
-            page.setSize(entityPage.getSize());
-            page.setPages(entityPage.getPages());
-            page.setTotal(entityPage.getTotal());
-            pageCommandBuilder.setPage(page);
+                GrpcPageCommandDTO.Builder pageCommandBuilder = GrpcPageCommandDTO.newBuilder();
+                GrpcPage.Builder page = GrpcPage.newBuilder();
+                page.setCurrent(entityPage.getCurrent());
+                page.setSize(entityPage.getSize());
+                page.setPages(entityPage.getPages());
+                page.setTotal(entityPage.getTotal());
+                pageCommandBuilder.setPage(page);
 
-            List<GrpcCommandDTO> entityGrpcDTOList = entityPage.getRecords()
-                    .stream()
-                    .map(grpcCommandBuilder::buildGrpcDTOByBO)
-                    .toList();
-            pageCommandBuilder.addAllData(entityGrpcDTOList);
+                List<GrpcCommandDTO> entityGrpcDTOList = entityPage.getRecords()
+                        .stream()
+                        .map(grpcCommandBuilder::buildGrpcDTOByBO)
+                        .toList();
+                pageCommandBuilder.addAllData(entityGrpcDTOList);
 
-            builder.setData(pageCommandBuilder);
+                builder.setData(pageCommandBuilder);
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     @Override
     public void listByIds(GrpcCommandIdsQuery request, StreamObserver<GrpcRCommandListDTO> responseObserver) {
-        GrpcRCommandListDTO.Builder builder = GrpcRCommandListDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRCommandListDTO.Builder builder = GrpcRCommandListDTO.newBuilder();
+            GrpcR result;
 
-        List<CommandBO> entityBOList = commandService.listByIds(new HashSet<>(request.getCommandIdsList()));
-        if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            List<CommandBO> entityBOList = commandService.listByIds(new HashSet<>(request.getCommandIdsList()));
+            if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            List<GrpcCommandDTO> entityGrpcDTOList = entityBOList.stream()
-                    .map(grpcCommandBuilder::buildGrpcDTOByBO)
-                    .toList();
+                List<GrpcCommandDTO> entityGrpcDTOList = entityBOList.stream()
+                        .map(grpcCommandBuilder::buildGrpcDTOByBO)
+                        .toList();
 
-            builder.addAllData(entityGrpcDTOList);
+                builder.addAllData(entityGrpcDTOList);
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     @Override
     public void getById(GrpcCommandQuery request, StreamObserver<GrpcRCommandDTO> responseObserver) {
-        GrpcRCommandDTO.Builder builder = GrpcRCommandDTO.newBuilder();
-        GrpcR result;
-
-        CommandBO entityBO;
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
-            entityBO = commandService.getById(request.getCommandId());
-        } catch (NotFoundException e) {
-            entityBO = null;
-        }
-        if (Objects.isNull(entityBO)) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            GrpcRCommandDTO.Builder builder = GrpcRCommandDTO.newBuilder();
+            GrpcR result;
 
-            builder.setData(grpcCommandBuilder.buildGrpcDTOByBO(entityBO));
-        }
+            CommandBO entityBO;
+            try {
+                entityBO = commandService.getById(request.getCommandId());
+            } catch (NotFoundException e) {
+                entityBO = null;
+            }
+            if (Objects.isNull(entityBO)) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
+                builder.setData(grpcCommandBuilder.buildGrpcDTOByBO(entityBO));
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
 }

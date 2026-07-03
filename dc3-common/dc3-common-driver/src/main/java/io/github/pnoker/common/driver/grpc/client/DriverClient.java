@@ -137,7 +137,9 @@ public class DriverClient {
             throw new ServiceException("Failed to refresh driver metadata: invalid driver id");
         }
 
-        GrpcDriverQuery query = GrpcDriverQuery.newBuilder().setDriverId(driverId).build();
+        GrpcDriverQuery query = GrpcDriverQuery.newBuilder()
+                .setTenantId(driverMetadata.getDriver().getTenantId())
+                .setDriverId(driverId).build();
         GrpcRDriverRegisterDTO rDriverRegisterDTO = driverApiBlockingStub.getById(query);
         if (!rDriverRegisterDTO.getResult().getOk()) {
             throw new ServiceException(rDriverRegisterDTO.getResult().getMessage());

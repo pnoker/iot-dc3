@@ -36,6 +36,7 @@ import io.github.pnoker.common.manager.grpc.builder.GrpcPointBuilder;
 import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,59 +71,69 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
 
     @Override
     public void listByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
-        GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
+            GrpcR result;
 
-        PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
+            PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
 
-        Page<PointBO> entityPage = selectDriverScopedPage(request, query);
-        if (Objects.isNull(entityPage)) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            Page<PointBO> entityPage = selectDriverScopedPage(request, query);
+            if (Objects.isNull(entityPage)) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            GrpcPagePointDTO.Builder pageBuilder = GrpcPagePointDTO.newBuilder();
-            GrpcPage.Builder page = GrpcPage.newBuilder();
-            page.setCurrent(entityPage.getCurrent());
-            page.setSize(entityPage.getSize());
-            page.setPages(entityPage.getPages());
-            page.setTotal(entityPage.getTotal());
-            pageBuilder.setPage(page);
+                GrpcPagePointDTO.Builder pageBuilder = GrpcPagePointDTO.newBuilder();
+                GrpcPage.Builder page = GrpcPage.newBuilder();
+                page.setCurrent(entityPage.getCurrent());
+                page.setSize(entityPage.getSize());
+                page.setPages(entityPage.getPages());
+                page.setTotal(entityPage.getTotal());
+                pageBuilder.setPage(page);
 
-            List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords()
-                    .stream()
-                    .map(grpcPointBuilder::buildGrpcDTOByBO)
-                    .toList();
-            pageBuilder.addAllData(entityGrpcDTOList);
+                List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords()
+                        .stream()
+                        .map(grpcPointBuilder::buildGrpcDTOByBO)
+                        .toList();
+                pageBuilder.addAllData(entityGrpcDTOList);
 
-            builder.setData(pageBuilder);
+                builder.setData(pageBuilder);
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     @Override
     public void getById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
-        GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
+            GrpcR result;
 
-        DriverBO driverBO = selectDriver(request.getDriverId());
-        PointBO entityBO = selectPoint(request.getPointId());
-        if (Objects.isNull(entityBO) || Objects.isNull(driverBO)
-                || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())
-                || !driverHasPoint(driverBO, entityBO)) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            DriverBO driverBO = selectDriver(request.getDriverId());
+            PointBO entityBO = selectPoint(request.getPointId());
+            if (Objects.isNull(entityBO) || Objects.isNull(driverBO)
+                    || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())
+                    || !driverHasPoint(driverBO, entityBO)) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
+                builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     private Page<PointBO> selectDriverScopedPage(GrpcPagePointQuery request, PointQuery query) {

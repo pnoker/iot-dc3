@@ -84,7 +84,8 @@ public class PointClient {
      */
     public PointBO getById(Long id) {
         GrpcPointQuery.Builder query = GrpcPointQuery.newBuilder();
-        query.setDriverId(driverMetadata.getDriver().getId()).setPointId(id);
+        query.setTenantId(driverMetadata.getDriver().getTenantId())
+                .setDriverId(driverMetadata.getDriver().getId()).setPointId(id);
         GrpcRPointDTO rPointDTO = pointApiBlockingStub.getById(query.build());
         if (!rPointDTO.getResult().getOk()) {
             log.error("Point doesn't exist: {}", id);

@@ -109,7 +109,8 @@ public class DeviceClient {
      */
     public DeviceBO getById(Long id) {
         GrpcDeviceQuery.Builder query = GrpcDeviceQuery.newBuilder();
-        query.setDriverId(driverMetadata.getDriver().getId()).setDeviceId(id);
+        query.setTenantId(driverMetadata.getDriver().getTenantId())
+                .setDriverId(driverMetadata.getDriver().getId()).setDeviceId(id);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.getById(query.build());
         if (!rDeviceDTO.getResult().getOk()) {
             log.error("Device doesn't exist: {}", id);

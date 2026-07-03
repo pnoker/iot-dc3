@@ -27,8 +27,6 @@ import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.enums.AlarmSourceTypeEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
-import io.github.pnoker.common.facade.api.DriverFacade;
-import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,8 +52,6 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
 
     private final AlarmRuleTriggerService alarmRuleTriggerService;
 
-    private final DriverFacade driverFacade;
-
     @Override
     public void alarm(DriverAlarmDTO entityDTO) {
         if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
@@ -65,16 +61,9 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
 
         Long tenantId = entityDTO.getTenantId();
         if (Objects.isNull(tenantId) || tenantId <= 0) {
-            FacadeDriverBO driver = driverFacade.getById(entityDTO.getDriverId());
-            if (Objects.isNull(driver)) {
-                log.warn("Drop driver alarm because driver[{}] is not found in metadata; tenant context unavailable",
-                        entityDTO.getDriverId());
-                return;
-            }
-            tenantId = driver.getTenantId();
-        }
-        if (Objects.isNull(tenantId) || tenantId <= 0) {
-            log.warn("Drop driver alarm because tenantId could not be resolved, driverId={}", entityDTO.getDriverId());
+            // See DeviceAlarmServiceImpl: tenant must come from the upstream source; the
+            // fail-closed interceptor forbids reverse-resolving it from the driver.
+            log.warn("Drop driver alarm because tenantId is missing, driverId={}", entityDTO.getDriverId());
             return;
         }
         entityDTO.setTenantId(tenantId);

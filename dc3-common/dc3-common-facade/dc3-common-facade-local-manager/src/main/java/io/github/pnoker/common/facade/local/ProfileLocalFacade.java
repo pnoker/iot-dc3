@@ -26,6 +26,7 @@ import io.github.pnoker.common.facade.local.builder.FacadeProfileBuilder;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.manager.service.ProfileService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -53,42 +54,62 @@ public class ProfileLocalFacade implements ProfileFacade {
     private final FacadeProfileBuilder facadeProfileBuilder;
 
     @Override
-    public FacadeProfileBO getById(Long id) {
-        ProfileBO managerBO = profileService.getById(id);
-        return Objects.isNull(managerBO) ? null : facadeProfileBuilder.toFacadeBO(managerBO);
+    public FacadeProfileBO getById(Long tenantId, Long id) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            ProfileBO managerBO = profileService.getById(id);
+            return Objects.isNull(managerBO) ? null : facadeProfileBuilder.toFacadeBO(managerBO);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
-    public List<FacadeProfileBO> listByIds(Collection<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
+    public List<FacadeProfileBO> listByIds(Long tenantId, Collection<Long> ids) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            if (Objects.isNull(ids) || ids.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<ProfileBO> list = profileService.listByIds(new HashSet<>(ids));
+            if (Objects.isNull(list) || list.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return list.stream().map(facadeProfileBuilder::toFacadeBO).toList();
+        } finally {
+            TenantContextHolder.clear();
         }
-        List<ProfileBO> list = profileService.listByIds(new HashSet<>(ids));
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return list.stream().map(facadeProfileBuilder::toFacadeBO).toList();
     }
 
     @Override
     public FacadePage<FacadeProfileBO> listByPage(FacadeProfileQuery query) {
-        ProfileQuery managerQuery = facadeProfileBuilder.toManagerQuery(query);
-        Page<ProfileBO> page = profileService.list(managerQuery);
-        if (Objects.isNull(page)) {
-            return FacadePage.empty();
-        }
+        TenantContextHolder.setTenantId(query.getTenantId());
+        try {
+            ProfileQuery managerQuery = facadeProfileBuilder.toManagerQuery(query);
+            Page<ProfileBO> page = profileService.list(managerQuery);
+            if (Objects.isNull(page)) {
+                return FacadePage.empty();
+            }
 
-        List<FacadeProfileBO> records = page.getRecords().stream().map(facadeProfileBuilder::toFacadeBO).toList();
-        return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+            List<FacadeProfileBO> records = page.getRecords().stream().map(facadeProfileBuilder::toFacadeBO).toList();
+            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
-    public List<FacadeProfileBO> listByDeviceId(Long deviceId) {
-        List<ProfileBO> list = profileService.listByDeviceId(deviceId);
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
+    public List<FacadeProfileBO> listByDeviceId(Long tenantId, Long deviceId) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            List<ProfileBO> list = profileService.listByDeviceId(deviceId);
+            if (Objects.isNull(list) || list.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return list.stream().map(facadeProfileBuilder::toFacadeBO).toList();
+        } finally {
+            TenantContextHolder.clear();
         }
-        return list.stream().map(facadeProfileBuilder::toFacadeBO).toList();
     }
 
 }

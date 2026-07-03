@@ -36,6 +36,7 @@ import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,103 +64,123 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
     @Override
     public void listByPage(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
-        GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
+            GrpcR result;
 
-        DriverQuery query = grpcDriverBuilder.buildQueryByGrpcQuery(request);
+            DriverQuery query = grpcDriverBuilder.buildQueryByGrpcQuery(request);
 
-        Page<DriverBO> entityPage = driverService.list(query);
-        if (Objects.isNull(entityPage)) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            Page<DriverBO> entityPage = driverService.list(query);
+            if (Objects.isNull(entityPage)) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            GrpcPageDriverDTO.Builder pageBuilder = GrpcPageDriverDTO.newBuilder();
-            GrpcPage.Builder page = GrpcPage.newBuilder();
-            page.setCurrent(entityPage.getCurrent());
-            page.setSize(entityPage.getSize());
-            page.setPages(entityPage.getPages());
-            page.setTotal(entityPage.getTotal());
-            pageBuilder.setPage(page);
+                GrpcPageDriverDTO.Builder pageBuilder = GrpcPageDriverDTO.newBuilder();
+                GrpcPage.Builder page = GrpcPage.newBuilder();
+                page.setCurrent(entityPage.getCurrent());
+                page.setSize(entityPage.getSize());
+                page.setPages(entityPage.getPages());
+                page.setTotal(entityPage.getTotal());
+                pageBuilder.setPage(page);
 
-            List<GrpcDriverDTO> entityGrpcDTOList = entityPage.getRecords()
-                    .stream()
-                    .map(grpcDriverBuilder::buildGrpcDTOByBO)
-                    .toList();
-            pageBuilder.addAllData(entityGrpcDTOList);
+                List<GrpcDriverDTO> entityGrpcDTOList = entityPage.getRecords()
+                        .stream()
+                        .map(grpcDriverBuilder::buildGrpcDTOByBO)
+                        .toList();
+                pageBuilder.addAllData(entityGrpcDTOList);
 
-            builder.setData(pageBuilder);
+                builder.setData(pageBuilder);
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     @Override
     public void getByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
-        GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
+            GrpcR result;
 
-        DriverBO entityDO = driverService.getByDeviceId(request.getDeviceId(), null);
-        if (Objects.isNull(entityDO)) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            DriverBO entityDO = driverService.getByDeviceId(request.getDeviceId(), null);
+            if (Objects.isNull(entityDO)) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(entityDO));
+                builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(entityDO));
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     @Override
     public void listByDriverIds(GrpcDriverIdsQuery request, StreamObserver<GrpcRDriverListDTO> responseObserver) {
-        GrpcRDriverListDTO.Builder builder = GrpcRDriverListDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRDriverListDTO.Builder builder = GrpcRDriverListDTO.newBuilder();
+            GrpcR result;
 
-        List<DriverBO> entityBOList = driverService.listByIds(new HashSet<>(request.getDriverIdsList()));
-        if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            List<DriverBO> entityBOList = driverService.listByIds(new HashSet<>(request.getDriverIdsList()));
+            if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            List<GrpcDriverDTO> entityGrpcDTOList = entityBOList.stream()
-                    .map(grpcDriverBuilder::buildGrpcDTOByBO)
-                    .toList();
+                List<GrpcDriverDTO> entityGrpcDTOList = entityBOList.stream()
+                        .map(grpcDriverBuilder::buildGrpcDTOByBO)
+                        .toList();
 
-            builder.addAllData(entityGrpcDTOList);
+                builder.addAllData(entityGrpcDTOList);
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     @Override
     public void getByDriverId(GrpcDriverQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
-        GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
-        GrpcR result;
-
-        DriverBO driverBO;
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
-            driverBO = driverService.getById(request.getDriverId());
-        } catch (NotFoundException e) {
-            driverBO = null;
-        }
-        if (Objects.isNull(driverBO)) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
+            GrpcR result;
 
-            builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(driverBO));
-        }
+            DriverBO driverBO;
+            try {
+                driverBO = driverService.getById(request.getDriverId());
+            } catch (NotFoundException e) {
+                driverBO = null;
+            }
+            if (Objects.isNull(driverBO)) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
+                builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(driverBO));
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
 }

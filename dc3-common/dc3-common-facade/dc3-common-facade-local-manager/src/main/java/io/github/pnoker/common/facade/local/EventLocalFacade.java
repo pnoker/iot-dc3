@@ -26,6 +26,7 @@ import io.github.pnoker.common.facade.local.builder.FacadeEventBuilder;
 import io.github.pnoker.common.manager.entity.bo.EventBO;
 import io.github.pnoker.common.manager.entity.query.EventQuery;
 import io.github.pnoker.common.manager.service.EventService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -53,33 +54,48 @@ public class EventLocalFacade implements EventFacade {
     private final FacadeEventBuilder facadeEventBuilder;
 
     @Override
-    public FacadeEventBO getById(Long id) {
-        EventBO managerBO = eventService.getById(id);
-        return Objects.isNull(managerBO) ? null : facadeEventBuilder.toFacadeBO(managerBO);
+    public FacadeEventBO getById(Long tenantId, Long id) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            EventBO managerBO = eventService.getById(id);
+            return Objects.isNull(managerBO) ? null : facadeEventBuilder.toFacadeBO(managerBO);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
-    public List<FacadeEventBO> listByIds(Collection<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
+    public List<FacadeEventBO> listByIds(Long tenantId, Collection<Long> ids) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            if (Objects.isNull(ids) || ids.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<EventBO> list = eventService.listByIds(new HashSet<>(ids));
+            if (Objects.isNull(list) || list.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return list.stream().map(facadeEventBuilder::toFacadeBO).toList();
+        } finally {
+            TenantContextHolder.clear();
         }
-        List<EventBO> list = eventService.listByIds(new HashSet<>(ids));
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return list.stream().map(facadeEventBuilder::toFacadeBO).toList();
     }
 
     @Override
     public FacadePage<FacadeEventBO> listByPage(FacadeEventQuery query) {
-        EventQuery managerQuery = facadeEventBuilder.toManagerQuery(query);
-        Page<EventBO> page = eventService.list(managerQuery);
-        if (Objects.isNull(page)) {
-            return FacadePage.empty();
-        }
+        TenantContextHolder.setTenantId(query.getTenantId());
+        try {
+            EventQuery managerQuery = facadeEventBuilder.toManagerQuery(query);
+            Page<EventBO> page = eventService.list(managerQuery);
+            if (Objects.isNull(page)) {
+                return FacadePage.empty();
+            }
 
-        List<FacadeEventBO> records = page.getRecords().stream().map(facadeEventBuilder::toFacadeBO).toList();
-        return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+            List<FacadeEventBO> records = page.getRecords().stream().map(facadeEventBuilder::toFacadeBO).toList();
+            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
 }

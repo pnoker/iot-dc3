@@ -50,6 +50,7 @@ import io.github.pnoker.common.manager.service.EventAttributeConfigService;
 import io.github.pnoker.common.manager.service.PointAttributeConfigService;
 import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.optional.CollectionOptional;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -96,60 +97,70 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
     @Override
     public void listByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
-        GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
+            GrpcR result;
 
-        DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
+            DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
 
-        Page<DeviceBO> entityPage = driverInTenant(query.getTenantId(), query.getDriverId())
-                ? deviceService.list(query) : null;
-        if (Objects.isNull(entityPage)) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            Page<DeviceBO> entityPage = driverInTenant(query.getTenantId(), query.getDriverId())
+                    ? deviceService.list(query) : null;
+            if (Objects.isNull(entityPage)) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            GrpcPageDeviceDTO.Builder pageBuilder = GrpcPageDeviceDTO.newBuilder();
-            GrpcPage.Builder page = GrpcPage.newBuilder();
-            page.setCurrent(entityPage.getCurrent());
-            page.setSize(entityPage.getSize());
-            page.setPages(entityPage.getPages());
-            page.setTotal(entityPage.getTotal());
-            pageBuilder.setPage(page);
+                GrpcPageDeviceDTO.Builder pageBuilder = GrpcPageDeviceDTO.newBuilder();
+                GrpcPage.Builder page = GrpcPage.newBuilder();
+                page.setCurrent(entityPage.getCurrent());
+                page.setSize(entityPage.getSize());
+                page.setPages(entityPage.getPages());
+                page.setTotal(entityPage.getTotal());
+                pageBuilder.setPage(page);
 
-            List<GrpcRDeviceAttachDTO> entityGrpcDTOList = entityPage.getRecords()
-                    .stream()
-                    .map(entityBO -> getDeviceAttachDTO(entityBO).build())
-                    .toList();
-            pageBuilder.addAllData(entityGrpcDTOList);
+                List<GrpcRDeviceAttachDTO> entityGrpcDTOList = entityPage.getRecords()
+                        .stream()
+                        .map(entityBO -> getDeviceAttachDTO(entityBO).build())
+                        .toList();
+                pageBuilder.addAllData(entityGrpcDTOList);
 
-            builder.setData(pageBuilder);
+                builder.setData(pageBuilder);
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     @Override
     public void getById(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
-        GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
+            GrpcR result;
 
-        DriverBO driverBO = selectDriver(request.getDriverId());
-        DeviceBO entityBO = selectDevice(request.getDeviceId());
-        if (Objects.isNull(entityBO) || Objects.isNull(driverBO)
-                || !Objects.equals(entityBO.getDriverId(), driverBO.getId())
-                || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            DriverBO driverBO = selectDriver(request.getDriverId());
+            DeviceBO entityBO = selectDevice(request.getDeviceId());
+            if (Objects.isNull(entityBO) || Objects.isNull(driverBO)
+                    || !Objects.equals(entityBO.getDriverId(), driverBO.getId())
+                    || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            builder.setData(getDeviceAttachDTO(entityBO));
+                builder.setData(getDeviceAttachDTO(entityBO));
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     private boolean driverInTenant(Long tenantId, Long driverId) {

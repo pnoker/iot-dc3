@@ -35,6 +35,7 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
@@ -73,71 +74,96 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
 
     @Override
     public void deviceStatusesByIds(GrpcIdsStatusQuery request, StreamObserver<GrpcRStatusMap> responseObserver) {
-        List<FacadeDeviceBO> devices = deviceFacade.listByIds(request.getTenantId(), request.getIdsList());
-        Map<Long, String> statuses = new LinkedHashMap<>();
-        devices.forEach(device -> statuses.put(device.getId(), deviceStatus(request.getTenantId(), device.getId())));
-        responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
-        responseObserver.onCompleted();
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            List<FacadeDeviceBO> devices = deviceFacade.listByIds(request.getTenantId(), request.getIdsList());
+            Map<Long, String> statuses = new LinkedHashMap<>();
+            devices.forEach(device -> statuses.put(device.getId(), deviceStatus(request.getTenantId(), device.getId())));
+            responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
     public void deviceStatusesByProfileId(GrpcProfileStatusQuery request,
                                           StreamObserver<GrpcRStatusMap> responseObserver) {
-        List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(request.getTenantId(), request.getProfileId());
-        Map<Long, String> statuses = new LinkedHashMap<>();
-        devices.forEach(device -> statuses.put(device.getId(), deviceStatus(request.getTenantId(), device.getId())));
-        responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
-        responseObserver.onCompleted();
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(request.getTenantId(), request.getProfileId());
+            Map<Long, String> statuses = new LinkedHashMap<>();
+            devices.forEach(device -> statuses.put(device.getId(), deviceStatus(request.getTenantId(), device.getId())));
+            responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
     public void driverStatusesByIds(GrpcIdsStatusQuery request, StreamObserver<GrpcRStatusMap> responseObserver) {
-        List<FacadeDriverBO> drivers = driverFacade.listByIds(request.getTenantId(), request.getIdsList());
-        Map<Long, String> statuses = new LinkedHashMap<>();
-        drivers.forEach(driver -> statuses.put(driver.getId(), driverStatus(request.getTenantId(), driver.getId())));
-        responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
-        responseObserver.onCompleted();
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            List<FacadeDriverBO> drivers = driverFacade.listByIds(request.getTenantId(), request.getIdsList());
+            Map<Long, String> statuses = new LinkedHashMap<>();
+            drivers.forEach(driver -> statuses.put(driver.getId(), driverStatus(request.getTenantId(), driver.getId())));
+            responseObserver.onNext(GrpcRStatusMap.newBuilder().setResult(ok()).putAllData(statuses).build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
     public void driverDeviceStatusSummary(GrpcDriverStatusQuery request,
                                           StreamObserver<GrpcRStringMap> responseObserver) {
-        FacadeDriverBO driver = driverFacade.getById(request.getTenantId(), request.getDriverId());
-        if (Objects.isNull(driver)) {
-            responseObserver.onNext(GrpcRStringMap.newBuilder().setResult(noResource()).build());
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            FacadeDriverBO driver = driverFacade.getById(request.getTenantId(), request.getDriverId());
+            if (Objects.isNull(driver)) {
+                responseObserver.onNext(GrpcRStringMap.newBuilder().setResult(noResource()).build());
+                responseObserver.onCompleted();
+                return;
+            }
+            List<FacadeDeviceBO> devices = deviceFacade.listByDriverId(request.getTenantId(), request.getDriverId());
+            long online = devices.stream()
+                    .filter(device -> Objects.equals(EntityStatusEnum.ONLINE.getCode(),
+                            deviceStatus(request.getTenantId(), device.getId())))
+                    .count();
+            FacadeDriverDeviceStatusSummaryBO summary = new FacadeDriverDeviceStatusSummaryBO(
+                    request.getDriverId(),
+                    devices.size(),
+                    (int) online,
+                    (int) Math.max(0, devices.size() - online));
+            responseObserver.onNext(GrpcRStringMap.newBuilder().setResult(ok()).putAllData(summary.toMap()).build());
             responseObserver.onCompleted();
-            return;
+        } finally {
+            TenantContextHolder.clear();
         }
-        List<FacadeDeviceBO> devices = deviceFacade.listByDriverId(request.getTenantId(), request.getDriverId());
-        long online = devices.stream()
-                .filter(device -> Objects.equals(EntityStatusEnum.ONLINE.getCode(),
-                        deviceStatus(request.getTenantId(), device.getId())))
-                .count();
-        FacadeDriverDeviceStatusSummaryBO summary = new FacadeDriverDeviceStatusSummaryBO(
-                request.getDriverId(),
-                devices.size(),
-                (int) online,
-                (int) Math.max(0, devices.size() - online));
-        responseObserver.onNext(GrpcRStringMap.newBuilder().setResult(ok()).putAllData(summary.toMap()).build());
-        responseObserver.onCompleted();
     }
 
     @Override
     public void systemHealth(GrpcTenantHealthQuery request, StreamObserver<GrpcRSystemHealthDTO> responseObserver) {
-        SystemHealthVO health = systemHealthService.snapshot(request.getTenantId());
-        if (Objects.isNull(health)) {
-            responseObserver.onNext(GrpcRSystemHealthDTO.newBuilder().setResult(noResource()).build());
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            SystemHealthVO health = systemHealthService.snapshot(request.getTenantId());
+            if (Objects.isNull(health)) {
+                responseObserver.onNext(GrpcRSystemHealthDTO.newBuilder().setResult(noResource()).build());
+                responseObserver.onCompleted();
+                return;
+            }
+            GrpcSystemHealthDTO dto = GrpcSystemHealthDTO.newBuilder()
+                    .putAllCenter(nullToEmpty(health.getCenter()))
+                    .putAllInfra(nullToEmpty(health.getInfra()))
+                    .setDrivers(toGrpcSummary(health.getDrivers()))
+                    .setDevices(toGrpcSummary(health.getDevices()))
+                    .build();
+            responseObserver.onNext(GrpcRSystemHealthDTO.newBuilder().setResult(ok()).setData(dto).build());
             responseObserver.onCompleted();
-            return;
+        } finally {
+            TenantContextHolder.clear();
         }
-        GrpcSystemHealthDTO dto = GrpcSystemHealthDTO.newBuilder()
-                .putAllCenter(nullToEmpty(health.getCenter()))
-                .putAllInfra(nullToEmpty(health.getInfra()))
-                .setDrivers(toGrpcSummary(health.getDrivers()))
-                .setDevices(toGrpcSummary(health.getDevices()))
-                .build();
-        responseObserver.onNext(GrpcRSystemHealthDTO.newBuilder().setResult(ok()).setData(dto).build());
-        responseObserver.onCompleted();
     }
 
     private Map<String, String> nullToEmpty(Map<String, String> source) {

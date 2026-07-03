@@ -63,8 +63,8 @@ public class DriverGrpcFacade implements DriverFacade {
     private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public FacadeDriverBO getById(Long id) {
-        GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(id).build();
+    public FacadeDriverBO getById(Long tenantId, Long id) {
+        GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(id).setTenantId(tenantId).build();
         GrpcRDriverDTO response = grpcFacadeSupport.call("DriverFacade.getById", driverApiBlockingStub,
                 stub -> stub.getByDriverId(request));
         if (!response.getResult().getOk()) {
@@ -75,7 +75,7 @@ public class DriverGrpcFacade implements DriverFacade {
     }
 
     @Override
-    public List<FacadeDriverBO> listByIds(Collection<Long> ids) {
+    public List<FacadeDriverBO> listByIds(Long tenantId, Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -84,7 +84,7 @@ public class DriverGrpcFacade implements DriverFacade {
             return Collections.emptyList();
         }
 
-        GrpcDriverIdsQuery request = GrpcDriverIdsQuery.newBuilder().addAllDriverIds(driverIds).build();
+        GrpcDriverIdsQuery request = GrpcDriverIdsQuery.newBuilder().addAllDriverIds(driverIds).setTenantId(tenantId).build();
         GrpcRDriverListDTO response = grpcFacadeSupport.call("DriverFacade.listByIds", driverApiBlockingStub,
                 stub -> stub.listByDriverIds(request));
         if (!response.getResult().getOk()) {
@@ -112,8 +112,8 @@ public class DriverGrpcFacade implements DriverFacade {
     }
 
     @Override
-    public FacadeDriverBO getByDeviceId(Long deviceId) {
-        GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).build();
+    public FacadeDriverBO getByDeviceId(Long tenantId, Long deviceId) {
+        GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).setTenantId(tenantId).build();
         GrpcRDriverDTO response = grpcFacadeSupport.call("DriverFacade.getByDeviceId", driverApiBlockingStub,
                 stub -> stub.getByDeviceId(request));
         if (!response.getResult().getOk()) {
