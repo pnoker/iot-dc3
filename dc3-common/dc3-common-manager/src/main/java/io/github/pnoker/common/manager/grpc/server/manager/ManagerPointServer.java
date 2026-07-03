@@ -35,6 +35,7 @@ import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointBuilder;
 import io.github.pnoker.common.manager.service.PointService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,84 +63,99 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
 
     @Override
     public void listByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
-        GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
+            GrpcR result;
 
-        PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
+            PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
 
-        Page<PointBO> entityPage = pointService.list(query);
-        if (Objects.isNull(entityPage)) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            Page<PointBO> entityPage = pointService.list(query);
+            if (Objects.isNull(entityPage)) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
-            GrpcPage.Builder page = GrpcPage.newBuilder();
-            page.setCurrent(entityPage.getCurrent());
-            page.setSize(entityPage.getSize());
-            page.setPages(entityPage.getPages());
-            page.setTotal(entityPage.getTotal());
-            pagePointBuilder.setPage(page);
+                GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
+                GrpcPage.Builder page = GrpcPage.newBuilder();
+                page.setCurrent(entityPage.getCurrent());
+                page.setSize(entityPage.getSize());
+                page.setPages(entityPage.getPages());
+                page.setTotal(entityPage.getTotal());
+                pagePointBuilder.setPage(page);
 
-            List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords()
-                    .stream()
-                    .map(grpcPointBuilder::buildGrpcDTOByBO)
-                    .toList();
-            pagePointBuilder.addAllData(entityGrpcDTOList);
+                List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords()
+                        .stream()
+                        .map(grpcPointBuilder::buildGrpcDTOByBO)
+                        .toList();
+                pagePointBuilder.addAllData(entityGrpcDTOList);
 
-            builder.setData(pagePointBuilder);
+                builder.setData(pagePointBuilder);
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     @Override
     public void listByIds(GrpcPointIdsQuery request, StreamObserver<GrpcRPointListDTO> responseObserver) {
-        GrpcRPointListDTO.Builder builder = GrpcRPointListDTO.newBuilder();
-        GrpcR result;
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRPointListDTO.Builder builder = GrpcRPointListDTO.newBuilder();
+            GrpcR result;
 
-        List<PointBO> entityBOList = pointService.listByIds(new HashSet<>(request.getPointIdsList()));
-        if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            List<PointBO> entityBOList = pointService.listByIds(new HashSet<>(request.getPointIdsList()));
+            if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-            List<GrpcPointDTO> entityGrpcDTOList = entityBOList.stream()
-                    .map(grpcPointBuilder::buildGrpcDTOByBO)
-                    .toList();
+                List<GrpcPointDTO> entityGrpcDTOList = entityBOList.stream()
+                        .map(grpcPointBuilder::buildGrpcDTOByBO)
+                        .toList();
 
-            builder.addAllData(entityGrpcDTOList);
+                builder.addAllData(entityGrpcDTOList);
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     @Override
     public void getById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
-        GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
-        GrpcR result;
-
-        PointBO entityBO;
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
-            entityBO = pointService.getById(request.getPointId());
-        } catch (NotFoundException e) {
-            entityBO = null;
-        }
-        if (Objects.isNull(entityBO)) {
-            result = GrpcRFactory.notFound();
-        } else {
-            result = GrpcRFactory.ok();
+            GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
+            GrpcR result;
 
-            builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
-        }
+            PointBO entityBO;
+            try {
+                entityBO = pointService.getById(request.getPointId());
+            } catch (NotFoundException e) {
+                entityBO = null;
+            }
+            if (Objects.isNull(entityBO)) {
+                result = GrpcRFactory.notFound();
+            } else {
+                result = GrpcRFactory.ok();
 
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
+                builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
+            }
+
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
 }

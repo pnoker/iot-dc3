@@ -61,8 +61,8 @@ public class ProfileGrpcFacade implements ProfileFacade {
     private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public FacadeProfileBO getById(Long id) {
-        GrpcProfileQuery request = GrpcProfileQuery.newBuilder().setProfileId(id).build();
+    public FacadeProfileBO getById(Long tenantId, Long id) {
+        GrpcProfileQuery request = GrpcProfileQuery.newBuilder().setProfileId(id).setTenantId(tenantId).build();
         GrpcRProfileDTO response = grpcFacadeSupport.call("ProfileFacade.getById", profileApiBlockingStub,
                 stub -> stub.getByProfileId(request));
         if (!response.getResult().getOk()) {
@@ -73,7 +73,7 @@ public class ProfileGrpcFacade implements ProfileFacade {
     }
 
     @Override
-    public List<FacadeProfileBO> listByIds(Collection<Long> ids) {
+    public List<FacadeProfileBO> listByIds(Long tenantId, Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -82,7 +82,7 @@ public class ProfileGrpcFacade implements ProfileFacade {
             return Collections.emptyList();
         }
 
-        GrpcProfileIdsQuery request = GrpcProfileIdsQuery.newBuilder().addAllProfileIds(profileIds).build();
+        GrpcProfileIdsQuery request = GrpcProfileIdsQuery.newBuilder().addAllProfileIds(profileIds).setTenantId(tenantId).build();
         GrpcRProfileListDTO response = grpcFacadeSupport.call("ProfileFacade.listByIds", profileApiBlockingStub,
                 stub -> stub.listByProfileIds(request));
         if (!response.getResult().getOk()) {
@@ -109,8 +109,8 @@ public class ProfileGrpcFacade implements ProfileFacade {
     }
 
     @Override
-    public List<FacadeProfileBO> listByDeviceId(Long deviceId) {
-        GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).build();
+    public List<FacadeProfileBO> listByDeviceId(Long tenantId, Long deviceId) {
+        GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).setTenantId(tenantId).build();
         GrpcRProfileListDTO response = grpcFacadeSupport.call("ProfileFacade.listByDeviceId", profileApiBlockingStub,
                 stub -> stub.listByDeviceId(request));
         if (!response.getResult().getOk()) {

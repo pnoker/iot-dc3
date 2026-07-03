@@ -26,6 +26,7 @@ import io.github.pnoker.common.facade.local.builder.FacadeDriverBuilder;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -53,39 +54,59 @@ public class DriverLocalFacade implements DriverFacade {
     private final FacadeDriverBuilder facadeDriverBuilder;
 
     @Override
-    public FacadeDriverBO getById(Long id) {
-        DriverBO managerBO = driverService.getById(id);
-        return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
+    public FacadeDriverBO getById(Long tenantId, Long id) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            DriverBO managerBO = driverService.getById(id);
+            return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
-    public List<FacadeDriverBO> listByIds(Collection<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
+    public List<FacadeDriverBO> listByIds(Long tenantId, Collection<Long> ids) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            if (Objects.isNull(ids) || ids.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<DriverBO> list = driverService.listByIds(new HashSet<>(ids));
+            if (Objects.isNull(list) || list.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return list.stream().map(facadeDriverBuilder::toFacadeBO).toList();
+        } finally {
+            TenantContextHolder.clear();
         }
-        List<DriverBO> list = driverService.listByIds(new HashSet<>(ids));
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return list.stream().map(facadeDriverBuilder::toFacadeBO).toList();
     }
 
     @Override
     public FacadePage<FacadeDriverBO> listByPage(FacadeDriverQuery query) {
-        DriverQuery managerQuery = facadeDriverBuilder.toManagerQuery(query);
-        Page<DriverBO> page = driverService.list(managerQuery);
-        if (Objects.isNull(page)) {
-            return FacadePage.empty();
-        }
+        TenantContextHolder.setTenantId(query.getTenantId());
+        try {
+            DriverQuery managerQuery = facadeDriverBuilder.toManagerQuery(query);
+            Page<DriverBO> page = driverService.list(managerQuery);
+            if (Objects.isNull(page)) {
+                return FacadePage.empty();
+            }
 
-        List<FacadeDriverBO> records = page.getRecords().stream().map(facadeDriverBuilder::toFacadeBO).toList();
-        return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+            List<FacadeDriverBO> records = page.getRecords().stream().map(facadeDriverBuilder::toFacadeBO).toList();
+            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
-    public FacadeDriverBO getByDeviceId(Long deviceId) {
-        DriverBO managerBO = driverService.getByDeviceId(deviceId, null);
-        return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
+    public FacadeDriverBO getByDeviceId(Long tenantId, Long deviceId) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            DriverBO managerBO = driverService.getByDeviceId(deviceId, null);
+            return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
 }

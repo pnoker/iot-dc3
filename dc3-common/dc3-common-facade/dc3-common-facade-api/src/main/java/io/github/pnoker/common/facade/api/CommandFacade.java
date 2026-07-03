@@ -22,12 +22,10 @@ import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
- * Protocol-neutral command facade.
+ * Protocol-neutral command facade. Single-record and bulk lookups are tenant-scoped.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,31 +33,20 @@ import java.util.Objects;
  */
 public interface CommandFacade {
 
-    private static boolean matchesTenant(Long tenantId, FacadeCommandBO command) {
-        return Objects.nonNull(command) && Objects.equals(tenantId, command.getTenantId());
-    }
+    /**
+     * Tenant-scoped single lookup. Returns {@code null} when the command is missing or
+     * belongs to another tenant.
+     */
+    FacadeCommandBO getById(Long tenantId, Long id);
 
-    FacadeCommandBO getById(Long id);
+    /**
+     * Tenant-scoped bulk lookup. Missing or cross-tenant commands are omitted.
+     */
+    List<FacadeCommandBO> listByIds(Long tenantId, Collection<Long> ids);
 
-    default FacadeCommandBO getById(Long tenantId, Long id) {
-        if (Objects.isNull(tenantId)) {
-            return null;
-        }
-        FacadeCommandBO command = getById(id);
-        return matchesTenant(tenantId, command) ? command : null;
-    }
-
-    List<FacadeCommandBO> listByIds(Collection<Long> ids);
-
-    default List<FacadeCommandBO> listByIds(Long tenantId, Collection<Long> ids) {
-        if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return listByIds(ids).stream()
-                .filter(command -> matchesTenant(tenantId, command))
-                .toList();
-    }
-
+    /**
+     * @return a page of commands (never {@code null}; empty page when nothing matches).
+     */
     FacadePage<FacadeCommandBO> listByPage(FacadeCommandQuery query);
 
 }

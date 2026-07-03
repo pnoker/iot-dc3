@@ -22,12 +22,11 @@ import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeProfileQuery;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
- * Protocol-neutral profile/template facade.
+ * Protocol-neutral profile/template facade. Single-record and bulk lookups are
+ * tenant-scoped.
  *
  * @author pnoker
  * @version 2026.5.14
@@ -35,42 +34,25 @@ import java.util.Objects;
  */
 public interface ProfileFacade {
 
-    private static boolean matchesTenant(Long tenantId, FacadeProfileBO profile) {
-        return Objects.nonNull(profile) && Objects.equals(tenantId, profile.getTenantId());
-    }
+    /**
+     * Tenant-scoped single lookup. Returns {@code null} when the profile is missing or
+     * belongs to another tenant.
+     */
+    FacadeProfileBO getById(Long tenantId, Long id);
 
-    FacadeProfileBO getById(Long id);
+    /**
+     * Tenant-scoped bulk lookup. Missing or cross-tenant profiles are omitted.
+     */
+    List<FacadeProfileBO> listByIds(Long tenantId, Collection<Long> ids);
 
-    default FacadeProfileBO getById(Long tenantId, Long id) {
-        if (Objects.isNull(tenantId)) {
-            return null;
-        }
-        FacadeProfileBO profile = getById(id);
-        return matchesTenant(tenantId, profile) ? profile : null;
-    }
-
-    List<FacadeProfileBO> listByIds(Collection<Long> ids);
-
-    default List<FacadeProfileBO> listByIds(Long tenantId, Collection<Long> ids) {
-        if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return listByIds(ids).stream()
-                .filter(profile -> matchesTenant(tenantId, profile))
-                .toList();
-    }
-
+    /**
+     * @return a page of profiles (never {@code null}; empty page when nothing matches).
+     */
     FacadePage<FacadeProfileBO> listByPage(FacadeProfileQuery query);
 
-    List<FacadeProfileBO> listByDeviceId(Long deviceId);
-
-    default List<FacadeProfileBO> listByDeviceId(Long tenantId, Long deviceId) {
-        if (Objects.isNull(tenantId)) {
-            return Collections.emptyList();
-        }
-        return listByDeviceId(deviceId).stream()
-                .filter(profile -> matchesTenant(tenantId, profile))
-                .toList();
-    }
+    /**
+     * Tenant-scoped lookup by device. Cross-tenant profiles are omitted.
+     */
+    List<FacadeProfileBO> listByDeviceId(Long tenantId, Long deviceId);
 
 }

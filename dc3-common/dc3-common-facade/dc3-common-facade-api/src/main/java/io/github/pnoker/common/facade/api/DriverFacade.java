@@ -22,15 +22,15 @@ import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Protocol-neutral driver facade.
  * <p>
- * Mirrors the three RPCs on {@code api.center.manager.DriverApi}. Implementation
- * selection follows the same {@code dc3.facade.mode} switch used by {@link DeviceFacade}.
+ * Mirrors the RPCs on {@code api.center.manager.DriverApi}. Single-record and bulk
+ * lookups are tenant-scoped: the tenant id is carried on the gRPC query so the manager
+ * center's tenant-line interceptor scopes the SQL, and the local implementation binds
+ * it on the thread. Callers must supply the tenant id explicitly.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,46 +38,16 @@ import java.util.Objects;
  */
 public interface DriverFacade {
 
-    private static boolean matchesTenant(Long tenantId, FacadeDriverBO driver) {
-        return Objects.nonNull(driver) && Objects.equals(tenantId, driver.getTenantId());
-    }
-
-    /**
-     * @return the driver, or {@code null} when it does not exist.
-     */
-    FacadeDriverBO getById(Long id);
-
     /**
      * Tenant-scoped single lookup. Returns {@code null} when the driver is missing or
      * belongs to another tenant.
      */
-    default FacadeDriverBO getById(Long tenantId, Long id) {
-        if (Objects.isNull(tenantId)) {
-            return null;
-        }
-        FacadeDriverBO driver = getById(id);
-        return matchesTenant(tenantId, driver) ? driver : null;
-    }
-
-    /**
-     * Bulk lookup. Avoids the N+1 cost of calling {@link #getById(Long)} in a loop.
-     *
-     * @return list of resolved drivers (missing ids are simply omitted; never {@code
-     * null}).
-     */
-    List<FacadeDriverBO> listByIds(Collection<Long> ids);
+    FacadeDriverBO getById(Long tenantId, Long id);
 
     /**
      * Tenant-scoped bulk lookup. Missing or cross-tenant drivers are omitted.
      */
-    default List<FacadeDriverBO> listByIds(Long tenantId, Collection<Long> ids) {
-        if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return listByIds(ids).stream()
-                .filter(driver -> matchesTenant(tenantId, driver))
-                .toList();
-    }
+    List<FacadeDriverBO> listByIds(Long tenantId, Collection<Long> ids);
 
     /**
      * @return a page of drivers (never {@code null}; empty page when nothing matches).
@@ -85,22 +55,9 @@ public interface DriverFacade {
     FacadePage<FacadeDriverBO> listByPage(FacadeDriverQuery query);
 
     /**
-     * Resolve the driver that owns a given device.
-     *
-     * @return the driver, or {@code null} when the device has no bound driver.
-     */
-    FacadeDriverBO getByDeviceId(Long deviceId);
-
-    /**
      * Tenant-scoped owner lookup. Returns {@code null} when the owning driver is missing
      * or belongs to another tenant.
      */
-    default FacadeDriverBO getByDeviceId(Long tenantId, Long deviceId) {
-        if (Objects.isNull(tenantId)) {
-            return null;
-        }
-        FacadeDriverBO driver = getByDeviceId(deviceId);
-        return matchesTenant(tenantId, driver) ? driver : null;
-    }
+    FacadeDriverBO getByDeviceId(Long tenantId, Long deviceId);
 
 }

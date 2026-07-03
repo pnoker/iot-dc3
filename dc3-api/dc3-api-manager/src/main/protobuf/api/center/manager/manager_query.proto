@@ -29,67 +29,102 @@ option java_multiple_files = true;
 message GrpcDriverQuery {
   // Identifies specific driver instance
   int64 driver_id = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Driver ids query structure for batch driver lookup
 message GrpcDriverIdsQuery {
   // Identifies driver instances
   repeated int64 driver_ids = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Profile template query structure for querying template information by profile ID
 message GrpcProfileQuery {
   // Profile template ID that identifies specific configuration template
   int64 profile_id = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Profile ids query structure for batch profile lookup
 message GrpcProfileIdsQuery {
   // Identifies profile template instances
   repeated int64 profile_ids = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Point query structure for querying point information by point ID
 message GrpcPointQuery {
   // Point ID that identifies specific point
   int64 point_id = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Point ids query structure for batch point lookup
 message GrpcPointIdsQuery {
   // Identifies point instances
   repeated int64 point_ids = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Command query structure for querying command information by command ID
 message GrpcCommandQuery {
   int64 command_id = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Command ids query structure for batch command lookup
 message GrpcCommandIdsQuery {
   repeated int64 command_ids = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Event query structure for querying event information by event ID
 message GrpcEventQuery {
   int64 event_id = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Event ids query structure for batch event lookup
 message GrpcEventIdsQuery {
   repeated int64 event_ids = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Device query structure for querying device information by device ID
 message GrpcDeviceQuery {
   // Device ID that identifies specific device
   int64 device_id = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Device ids query structure for batch device lookup
 message GrpcDeviceIdsQuery {
   // Identifies device instances
   repeated int64 device_ids = 1;
-}
 
+  // Identifies the tenant
+  int64 tenant_id = 2;
+}

@@ -34,6 +34,7 @@ import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
 import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.grpc.stub.StreamObserver;
@@ -63,6 +64,7 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
 
     @Override
     public void reportEvent(GrpcEventReportVO request, StreamObserver<GrpcRString> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
             EventReportBO entityBO = new EventReportBO();
             entityBO.setDeviceId(request.getDeviceId());
@@ -82,13 +84,17 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
                     .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
     }
 
     @Override
     public void getByRecordId(GrpcStringQuery request, StreamObserver<GrpcREventHistoryDTO> responseObserver) {
         try {
-            EventHistoryVO record = eventHistoryService.getByRecordId(request.getValue());
+            // record_id is globally unique but dc3_event_history is not tenant-whitelisted;
+            // the GrpcStringQuery carries no tenant_id, so bypass tenant filtering here.
+            EventHistoryVO record = TenantContextHolder.runIgnore(() -> eventHistoryService.getByRecordId(request.getValue()));
             GrpcREventHistoryDTO.Builder response = GrpcREventHistoryDTO.newBuilder();
 
             if (Objects.nonNull(record)) {
@@ -110,6 +116,7 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
 
     @Override
     public void listByPage(GrpcEventHistoryQuery request, StreamObserver<GrpcRPageEventHistoryDTO> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
             EventHistoryQueryVO queryVO = new EventHistoryQueryVO();
             queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
@@ -141,6 +148,8 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
                     .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
                     .build());
             responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
     }
 

@@ -24,6 +24,7 @@ import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.auth.biz.TokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.TimeUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -51,8 +52,12 @@ public class TokenServer extends TokenApiGrpc.TokenApiImplBase {
         GrpcRTokenDTO.Builder builder = GrpcRTokenDTO.newBuilder();
 
         try {
-            TokenValid entity = tokenService.checkValid(request.getName(), request.getSalt(), request.getToken(),
-                    request.getTenant());
+            // Login path: validate the principal before a tenant context is bound to this
+            // thread. checkValid resolves tenant, credential, and tenant-membership; the
+            // membership lookup reads dc3_tenant_membership (tenant_id-bearing, not
+            // whitelisted), so run it with tenant filtering disabled.
+            TokenValid entity = TenantContextHolder.runIgnore(() -> tokenService.checkValid(request.getName(),
+                    request.getSalt(), request.getToken(), request.getTenant()));
             if (Objects.isNull(entity)) {
                 builder.setResult(GrpcRFactory.notFound());
             } else if (!entity.isValid()) {

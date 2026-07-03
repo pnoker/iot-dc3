@@ -46,6 +46,7 @@ import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.EventAttributeService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -153,27 +154,32 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
     @Override
     public void getById(GrpcDriverQuery request, StreamObserver<GrpcRDriverRegisterDTO> responseObserver) {
-        GrpcRDriverRegisterDTO.Builder builder = GrpcRDriverRegisterDTO.newBuilder();
-        GrpcR result;
-
+        TenantContextHolder.setTenantId(request.getTenantId());
         try {
-            DriverBO entityBO = driverService.getById(request.getDriverId());
-            if (Objects.isNull(entityBO)) {
-                result = GrpcRFactory.notFound();
-            } else {
-                buildMetadataResponse(builder, entityBO);
+            GrpcRDriverRegisterDTO.Builder builder = GrpcRDriverRegisterDTO.newBuilder();
+            GrpcR result;
 
-                result = GrpcRFactory.ok();
+            try {
+                DriverBO entityBO = driverService.getById(request.getDriverId());
+                if (Objects.isNull(entityBO)) {
+                    result = GrpcRFactory.notFound();
+                } else {
+                    buildMetadataResponse(builder, entityBO);
+
+                    result = GrpcRFactory.ok();
+                }
+            } catch (Exception e) {
+                result = GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage());
+
+                log.error("Driver metadata gRPC query failed, driverId={}", request.getDriverId(), e);
             }
-        } catch (Exception e) {
-            result = GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage());
 
-            log.error("Driver metadata gRPC query failed, driverId={}", request.getDriverId(), e);
+            builder.setResult(result);
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
         }
-
-        builder.setResult(result);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
     }
 
     private void buildMetadataResponse(GrpcRDriverRegisterDTO.Builder builder, DriverBO entityBO) {

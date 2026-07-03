@@ -92,27 +92,20 @@ class DeviceAlarmServiceImplTest {
     }
 
     @Test
-    void backfillsTenantIdViaFacadeWhenDtoMissesIt() {
+    void dropsAlarmWhenTenantIdIsMissing() {
+        // The fail-closed tenant-line interceptor forbids reverse-resolving the tenant from
+        // the device, so a tenant-less alarm is dropped rather than persisted as tenant_id=0.
         DeviceAlarmDTO dto = DeviceAlarmDTO.builder()
                 .deviceId(10L)
                 .driverId(3L)
                 .message("offline")
                 .build(); // tenantId missing
-        FacadeDeviceBO device = new FacadeDeviceBO();
-        device.setId(10L);
-        device.setTenantId(7L);
-        device.setDriverId(3L);
-        when(deviceFacade.getById(10L)).thenReturn(device);
 
         service.alarm(dto);
 
-        ArgumentCaptor<EntityAlarmDO> captor = ArgumentCaptor.forClass(EntityAlarmDO.class);
-        verify(entityAlarmManager).save(captor.capture());
-        // Tenant id is now backfilled both on the persisted row and on the DTO so the
-        // downstream rule trigger sees a valid tenant context.
-        assertThat(captor.getValue().getTenantId()).isEqualTo(7L);
-        assertThat(dto.getTenantId()).isEqualTo(7L);
-        verify(alarmRuleTriggerService).processDeviceAlarm(dto);
+        verifyNoInteractions(deviceFacade);
+        verify(entityAlarmManager, never()).save(any());
+        verifyNoInteractions(alarmRuleTriggerService);
     }
 
     @Test
@@ -126,7 +119,7 @@ class DeviceAlarmServiceImplTest {
         device.setId(10L);
         device.setTenantId(7L);
         device.setDriverId(99L);
-        when(deviceFacade.getById(10L)).thenReturn(device);
+        when(deviceFacade.getById(7L, 10L)).thenReturn(device);
 
         service.alarm(dto);
 
@@ -140,25 +133,10 @@ class DeviceAlarmServiceImplTest {
     void dropsAlarmWhenDeviceMetadataIsUnavailable() {
         DeviceAlarmDTO dto = DeviceAlarmDTO.builder()
                 .deviceId(10L)
+                .tenantId(7L)
                 .message("offline")
-                .build(); // missing tenantId + driverId
-        when(deviceFacade.getById(10L)).thenReturn(null);
-
-        service.alarm(dto);
-
-        // Without a tenant id we must not write to dc3_entity_alarm with tenant_id=0
-        // because the rule trigger then silently drops the event downstream.
-        verify(entityAlarmManager, never()).save(any());
-        verifyNoInteractions(alarmRuleTriggerService);
-    }
-
-    @Test
-    void dropsAlarmWhenFacadeReturnsDeviceWithoutTenantId() {
-        DeviceAlarmDTO dto = DeviceAlarmDTO.builder().deviceId(10L).message("x").build();
-        FacadeDeviceBO device = new FacadeDeviceBO();
-        device.setId(10L);
-        // tenantId left null
-        when(deviceFacade.getById(10L)).thenReturn(device);
+                .build(); // driverId missing, device not found
+        when(deviceFacade.getById(7L, 10L)).thenReturn(null);
 
         service.alarm(dto);
 

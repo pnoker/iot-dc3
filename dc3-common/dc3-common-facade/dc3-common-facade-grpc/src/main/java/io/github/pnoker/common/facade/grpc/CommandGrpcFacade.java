@@ -62,8 +62,8 @@ public class CommandGrpcFacade implements CommandFacade {
     private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public FacadeCommandBO getById(Long id) {
-        GrpcCommandQuery request = GrpcCommandQuery.newBuilder().setCommandId(id).build();
+    public FacadeCommandBO getById(Long tenantId, Long id) {
+        GrpcCommandQuery request = GrpcCommandQuery.newBuilder().setCommandId(id).setTenantId(tenantId).build();
         GrpcRCommandDTO response = grpcFacadeSupport.call("CommandFacade.getById", commandApiBlockingStub,
                 stub -> stub.getById(request));
         if (!response.getResult().getOk()) {
@@ -74,7 +74,7 @@ public class CommandGrpcFacade implements CommandFacade {
     }
 
     @Override
-    public List<FacadeCommandBO> listByIds(Collection<Long> ids) {
+    public List<FacadeCommandBO> listByIds(Long tenantId, Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -83,7 +83,7 @@ public class CommandGrpcFacade implements CommandFacade {
             return Collections.emptyList();
         }
 
-        GrpcCommandIdsQuery request = GrpcCommandIdsQuery.newBuilder().addAllCommandIds(commandIds).build();
+        GrpcCommandIdsQuery request = GrpcCommandIdsQuery.newBuilder().addAllCommandIds(commandIds).setTenantId(tenantId).build();
         GrpcRCommandListDTO response = grpcFacadeSupport.call("CommandFacade.listByIds", commandApiBlockingStub,
                 stub -> stub.listByIds(request));
         if (!response.getResult().getOk()) {
