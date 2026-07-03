@@ -26,6 +26,7 @@ import io.github.pnoker.common.facade.local.builder.FacadeDeviceBuilder;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.manager.service.DeviceService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -56,51 +57,76 @@ public class DeviceLocalFacade implements DeviceFacade {
     private final FacadeDeviceBuilder facadeDeviceBuilder;
 
     @Override
-    public FacadeDeviceBO getById(Long id) {
-        DeviceBO managerBO = deviceService.getById(id);
-        return Objects.isNull(managerBO) ? null : facadeDeviceBuilder.toFacadeBO(managerBO);
+    public FacadeDeviceBO getById(Long tenantId, Long id) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            DeviceBO managerBO = deviceService.getById(id);
+            return Objects.isNull(managerBO) ? null : facadeDeviceBuilder.toFacadeBO(managerBO);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
-    public List<FacadeDeviceBO> listByIds(Collection<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
+    public List<FacadeDeviceBO> listByIds(Long tenantId, Collection<Long> ids) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            if (Objects.isNull(ids) || ids.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<DeviceBO> list = deviceService.listByIds(new ArrayList<>(ids));
+            if (Objects.isNull(list) || list.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return list.stream().map(facadeDeviceBuilder::toFacadeBO).toList();
+        } finally {
+            TenantContextHolder.clear();
         }
-        List<DeviceBO> list = deviceService.listByIds(new ArrayList<>(ids));
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return list.stream().map(facadeDeviceBuilder::toFacadeBO).toList();
     }
 
     @Override
     public FacadePage<FacadeDeviceBO> listByPage(FacadeDeviceQuery query) {
-        DeviceQuery managerQuery = facadeDeviceBuilder.toManagerQuery(query);
-        Page<DeviceBO> page = deviceService.list(managerQuery);
-        if (Objects.isNull(page)) {
-            return FacadePage.empty();
-        }
+        TenantContextHolder.setTenantId(query.getTenantId());
+        try {
+            DeviceQuery managerQuery = facadeDeviceBuilder.toManagerQuery(query);
+            Page<DeviceBO> page = deviceService.list(managerQuery);
+            if (Objects.isNull(page)) {
+                return FacadePage.empty();
+            }
 
-        List<FacadeDeviceBO> records = page.getRecords().stream().map(facadeDeviceBuilder::toFacadeBO).toList();
-        return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+            List<FacadeDeviceBO> records = page.getRecords().stream().map(facadeDeviceBuilder::toFacadeBO).toList();
+            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
-    public List<FacadeDeviceBO> listByProfileId(Long profileId) {
-        List<DeviceBO> list = deviceService.listByProfileId(profileId, null);
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
+    public List<FacadeDeviceBO> listByProfileId(Long tenantId, Long profileId) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            List<DeviceBO> list = deviceService.listByProfileId(profileId, null);
+            if (Objects.isNull(list) || list.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return list.stream().map(facadeDeviceBuilder::toFacadeBO).toList();
+        } finally {
+            TenantContextHolder.clear();
         }
-        return list.stream().map(facadeDeviceBuilder::toFacadeBO).toList();
     }
 
     @Override
-    public List<FacadeDeviceBO> listByDriverId(Long driverId) {
-        List<DeviceBO> list = deviceService.listByDriverId(driverId, null);
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
+    public List<FacadeDeviceBO> listByDriverId(Long tenantId, Long driverId) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            List<DeviceBO> list = deviceService.listByDriverId(driverId, null);
+            if (Objects.isNull(list) || list.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return list.stream().map(facadeDeviceBuilder::toFacadeBO).toList();
+        } finally {
+            TenantContextHolder.clear();
         }
-        return list.stream().map(facadeDeviceBuilder::toFacadeBO).toList();
     }
 
 }

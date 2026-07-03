@@ -21,8 +21,6 @@ import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
-import io.github.pnoker.common.facade.api.DriverFacade;
-import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -35,7 +33,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DriverAlarmServiceImplTest {
@@ -46,23 +43,20 @@ class DriverAlarmServiceImplTest {
     @Mock
     private AlarmRuleTriggerService alarmRuleTriggerService;
 
-    @Mock
-    private DriverFacade driverFacade;
-
     @InjectMocks
     private DriverAlarmServiceImpl service;
 
     @Test
     void dropsAlarmWhenDtoIsNull() {
         service.alarm(null);
-        verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService, driverFacade);
+        verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService);
     }
 
     @Test
     void dropsAlarmWhenDriverIdMissing() {
         DriverAlarmDTO dto = DriverAlarmDTO.builder().tenantId(7L).message("x").build();
         service.alarm(dto);
-        verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService, driverFacade);
+        verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService);
     }
 
     @Test
@@ -75,7 +69,6 @@ class DriverAlarmServiceImplTest {
 
         service.alarm(dto);
 
-        verifyNoInteractions(driverFacade);
         ArgumentCaptor<EntityAlarmDO> captor = ArgumentCaptor.forClass(EntityAlarmDO.class);
         verify(entityAlarmManager).save(captor.capture());
         assertThat(captor.getValue().getTenantId()).isEqualTo(7L);
@@ -83,42 +76,13 @@ class DriverAlarmServiceImplTest {
     }
 
     @Test
-    void backfillsTenantIdViaFacadeWhenDtoMissesIt() {
+    void dropsAlarmWhenTenantIdIsMissing() {
+        // The fail-closed tenant-line interceptor forbids reverse-resolving the tenant from
+        // the driver, so a tenant-less alarm is dropped rather than persisted as tenant_id=0.
         DriverAlarmDTO dto = DriverAlarmDTO.builder()
                 .driverId(3L)
                 .message("offline")
                 .build(); // tenantId missing
-        FacadeDriverBO driver = new FacadeDriverBO();
-        driver.setId(3L);
-        driver.setTenantId(7L);
-        when(driverFacade.getById(3L)).thenReturn(driver);
-
-        service.alarm(dto);
-
-        ArgumentCaptor<EntityAlarmDO> captor = ArgumentCaptor.forClass(EntityAlarmDO.class);
-        verify(entityAlarmManager).save(captor.capture());
-        assertThat(captor.getValue().getTenantId()).isEqualTo(7L);
-        assertThat(dto.getTenantId()).isEqualTo(7L);
-        verify(alarmRuleTriggerService).processDriverAlarm(dto);
-    }
-
-    @Test
-    void dropsAlarmWhenDriverMetadataIsUnavailable() {
-        DriverAlarmDTO dto = DriverAlarmDTO.builder().driverId(3L).message("offline").build();
-        when(driverFacade.getById(3L)).thenReturn(null);
-
-        service.alarm(dto);
-
-        verify(entityAlarmManager, never()).save(any());
-        verifyNoInteractions(alarmRuleTriggerService);
-    }
-
-    @Test
-    void dropsAlarmWhenFacadeReturnsDriverWithoutTenantId() {
-        DriverAlarmDTO dto = DriverAlarmDTO.builder().driverId(3L).message("x").build();
-        FacadeDriverBO driver = new FacadeDriverBO();
-        driver.setId(3L);
-        when(driverFacade.getById(3L)).thenReturn(driver);
 
         service.alarm(dto);
 

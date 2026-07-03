@@ -22,12 +22,10 @@ import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
- * Protocol-neutral event facade.
+ * Protocol-neutral event facade. Single-record and bulk lookups are tenant-scoped.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,31 +33,20 @@ import java.util.Objects;
  */
 public interface EventFacade {
 
-    private static boolean matchesTenant(Long tenantId, FacadeEventBO event) {
-        return Objects.nonNull(event) && Objects.equals(tenantId, event.getTenantId());
-    }
+    /**
+     * Tenant-scoped single lookup. Returns {@code null} when the event is missing or
+     * belongs to another tenant.
+     */
+    FacadeEventBO getById(Long tenantId, Long id);
 
-    FacadeEventBO getById(Long id);
+    /**
+     * Tenant-scoped bulk lookup. Missing or cross-tenant events are omitted.
+     */
+    List<FacadeEventBO> listByIds(Long tenantId, Collection<Long> ids);
 
-    default FacadeEventBO getById(Long tenantId, Long id) {
-        if (Objects.isNull(tenantId)) {
-            return null;
-        }
-        FacadeEventBO event = getById(id);
-        return matchesTenant(tenantId, event) ? event : null;
-    }
-
-    List<FacadeEventBO> listByIds(Collection<Long> ids);
-
-    default List<FacadeEventBO> listByIds(Long tenantId, Collection<Long> ids) {
-        if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return listByIds(ids).stream()
-                .filter(event -> matchesTenant(tenantId, event))
-                .toList();
-    }
-
+    /**
+     * @return a page of events (never {@code null}; empty page when nothing matches).
+     */
     FacadePage<FacadeEventBO> listByPage(FacadeEventQuery query);
 
 }

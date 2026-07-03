@@ -22,14 +22,12 @@ import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Protocol-neutral device facade.
  * <p>
- * Mirrors the four RPCs on {@code api.center.manager.DeviceApi} but returns plain BO/Page
+ * Mirrors the RPCs on {@code api.center.manager.DeviceApi} but returns plain BO/Page
  * types so callers never have to touch gRPC or protobuf classes. Two implementations back
  * this interface:
  * <ul>
@@ -38,6 +36,9 @@ import java.util.Objects;
  * <li>{@code DeviceGrpcFacade} — gRPC call against Manager Center, selected when
  * {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
  * </ul>
+ * <p>
+ * Single-record and bulk lookups are tenant-scoped: the tenant id rides on the gRPC query
+ * (or the thread-local in local mode) so the manager center enforces tenant isolation.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -45,48 +46,16 @@ import java.util.Objects;
  */
 public interface DeviceFacade {
 
-    private static boolean matchesTenant(Long tenantId, FacadeDeviceBO device) {
-        return Objects.nonNull(device) && Objects.equals(tenantId, device.getTenantId());
-    }
-
-    /**
-     * Query a single device by id.
-     *
-     * @return the device, or {@code null} when the device does not exist.
-     */
-    FacadeDeviceBO getById(Long id);
-
     /**
      * Tenant-scoped single lookup. Returns {@code null} when the device is missing or
      * belongs to another tenant.
      */
-    default FacadeDeviceBO getById(Long tenantId, Long id) {
-        if (Objects.isNull(tenantId)) {
-            return null;
-        }
-        FacadeDeviceBO device = getById(id);
-        return matchesTenant(tenantId, device) ? device : null;
-    }
-
-    /**
-     * Bulk lookup. Avoids the N+1 cost of calling {@link #getById(Long)} in a loop.
-     *
-     * @return list of resolved devices (missing ids are simply omitted; never {@code
-     * null}).
-     */
-    List<FacadeDeviceBO> listByIds(Collection<Long> ids);
+    FacadeDeviceBO getById(Long tenantId, Long id);
 
     /**
      * Tenant-scoped bulk lookup. Missing or cross-tenant devices are omitted.
      */
-    default List<FacadeDeviceBO> listByIds(Long tenantId, Collection<Long> ids) {
-        if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return listByIds(ids).stream()
-                .filter(device -> matchesTenant(tenantId, device))
-                .toList();
-    }
+    List<FacadeDeviceBO> listByIds(Long tenantId, Collection<Long> ids);
 
     /**
      * Paginated query.
@@ -96,41 +65,13 @@ public interface DeviceFacade {
     FacadePage<FacadeDeviceBO> listByPage(FacadeDeviceQuery query);
 
     /**
-     * List devices attached to a given profile.
-     *
-     * @return an immutable list (never {@code null}; empty when nothing matches).
-     */
-    List<FacadeDeviceBO> listByProfileId(Long profileId);
-
-    /**
      * Tenant-scoped lookup by profile. Cross-tenant devices are omitted.
      */
-    default List<FacadeDeviceBO> listByProfileId(Long tenantId, Long profileId) {
-        if (Objects.isNull(tenantId)) {
-            return Collections.emptyList();
-        }
-        return listByProfileId(profileId).stream()
-                .filter(device -> matchesTenant(tenantId, device))
-                .toList();
-    }
-
-    /**
-     * List devices attached to a given driver.
-     *
-     * @return an immutable list (never {@code null}; empty when nothing matches).
-     */
-    List<FacadeDeviceBO> listByDriverId(Long driverId);
+    List<FacadeDeviceBO> listByProfileId(Long tenantId, Long profileId);
 
     /**
      * Tenant-scoped lookup by driver. Cross-tenant devices are omitted.
      */
-    default List<FacadeDeviceBO> listByDriverId(Long tenantId, Long driverId) {
-        if (Objects.isNull(tenantId)) {
-            return Collections.emptyList();
-        }
-        return listByDriverId(driverId).stream()
-                .filter(device -> matchesTenant(tenantId, device))
-                .toList();
-    }
+    List<FacadeDeviceBO> listByDriverId(Long tenantId, Long driverId);
 
 }

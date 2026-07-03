@@ -22,13 +22,11 @@ import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
- * Protocol-neutral point facade. Mirrors the two RPCs on
- * {@code api.center.manager.PointApi}.
+ * Protocol-neutral point facade. Mirrors the RPCs on
+ * {@code api.center.manager.PointApi}. Single-record and bulk lookups are tenant-scoped.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -36,45 +34,16 @@ import java.util.Objects;
  */
 public interface PointFacade {
 
-    private static boolean matchesTenant(Long tenantId, FacadePointBO point) {
-        return Objects.nonNull(point) && Objects.equals(tenantId, point.getTenantId());
-    }
-
-    /**
-     * @return the point, or {@code null} when it does not exist.
-     */
-    FacadePointBO getById(Long id);
-
     /**
      * Tenant-scoped single lookup. Returns {@code null} when the point is missing or
      * belongs to another tenant.
      */
-    default FacadePointBO getById(Long tenantId, Long id) {
-        if (Objects.isNull(tenantId)) {
-            return null;
-        }
-        FacadePointBO point = getById(id);
-        return matchesTenant(tenantId, point) ? point : null;
-    }
-
-    /**
-     * Bulk lookup. Avoids the N+1 cost of calling {@link #getById(Long)} in a loop.
-     *
-     * @return list of resolved points (missing ids are simply omitted; never {@code null}).
-     */
-    List<FacadePointBO> listByIds(Collection<Long> ids);
+    FacadePointBO getById(Long tenantId, Long id);
 
     /**
      * Tenant-scoped bulk lookup. Missing or cross-tenant points are omitted.
      */
-    default List<FacadePointBO> listByIds(Long tenantId, Collection<Long> ids) {
-        if (Objects.isNull(tenantId) || Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return listByIds(ids).stream()
-                .filter(point -> matchesTenant(tenantId, point))
-                .toList();
-    }
+    List<FacadePointBO> listByIds(Long tenantId, Collection<Long> ids);
 
     /**
      * @return a page of points (never {@code null}; empty page when nothing matches).

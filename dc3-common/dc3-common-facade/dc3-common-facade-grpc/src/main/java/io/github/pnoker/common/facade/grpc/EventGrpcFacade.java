@@ -62,8 +62,8 @@ public class EventGrpcFacade implements EventFacade {
     private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public FacadeEventBO getById(Long id) {
-        GrpcEventQuery request = GrpcEventQuery.newBuilder().setEventId(id).build();
+    public FacadeEventBO getById(Long tenantId, Long id) {
+        GrpcEventQuery request = GrpcEventQuery.newBuilder().setEventId(id).setTenantId(tenantId).build();
         GrpcREventDTO response = grpcFacadeSupport.call("EventFacade.getById", eventApiBlockingStub,
                 stub -> stub.getById(request));
         if (!response.getResult().getOk()) {
@@ -74,7 +74,7 @@ public class EventGrpcFacade implements EventFacade {
     }
 
     @Override
-    public List<FacadeEventBO> listByIds(Collection<Long> ids) {
+    public List<FacadeEventBO> listByIds(Long tenantId, Collection<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -83,7 +83,7 @@ public class EventGrpcFacade implements EventFacade {
             return Collections.emptyList();
         }
 
-        GrpcEventIdsQuery request = GrpcEventIdsQuery.newBuilder().addAllEventIds(eventIds).build();
+        GrpcEventIdsQuery request = GrpcEventIdsQuery.newBuilder().addAllEventIds(eventIds).setTenantId(tenantId).build();
         GrpcREventListDTO response = grpcFacadeSupport.call("EventFacade.listByIds", eventApiBlockingStub,
                 stub -> stub.listByIds(request));
         if (!response.getResult().getOk()) {

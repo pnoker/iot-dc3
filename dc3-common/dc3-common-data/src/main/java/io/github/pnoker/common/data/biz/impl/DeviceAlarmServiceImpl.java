@@ -68,26 +68,24 @@ public class DeviceAlarmServiceImpl implements DeviceAlarmService {
             return;
         }
 
-        FacadeDeviceBO device = null;
         Long tenantId = entityDTO.getTenantId();
+        if (Objects.isNull(tenantId) || tenantId <= 0) {
+            // Tenant id must be supplied by the upstream alarm source (driver report, timeout
+            // check, state scan). The fail-closed tenant-line interceptor rejects unscoped
+            // queries, so the tenant can no longer be reverse-resolved from the device — drop
+            // instead of silently persisting with tenant_id=0.
+            log.warn("Drop device alarm because tenantId is missing, deviceId={}", entityDTO.getDeviceId());
+            return;
+        }
         Long driverId = entityDTO.getDriverId();
-        if (Objects.isNull(tenantId) || tenantId <= 0 || Objects.isNull(driverId) || driverId <= 0) {
-            device = deviceFacade.getById(entityDTO.getDeviceId());
+        FacadeDeviceBO device = null;
+        if (Objects.isNull(driverId) || driverId <= 0) {
+            device = deviceFacade.getById(tenantId, entityDTO.getDeviceId());
             if (Objects.isNull(device)) {
-                log.warn("Drop device alarm because device[{}] is not found in metadata; tenant context unavailable",
-                        entityDTO.getDeviceId());
+                log.warn("Drop device alarm because device[{}] is not found in metadata", entityDTO.getDeviceId());
                 return;
             }
-            if (Objects.isNull(tenantId) || tenantId <= 0) {
-                tenantId = device.getTenantId();
-            }
-            if (Objects.isNull(driverId) || driverId <= 0) {
-                driverId = device.getDriverId();
-            }
-        }
-        if (Objects.isNull(tenantId) || tenantId <= 0) {
-            log.warn("Drop device alarm because tenantId could not be resolved, deviceId={}", entityDTO.getDeviceId());
-            return;
+            driverId = device.getDriverId();
         }
         entityDTO.setTenantId(tenantId);
         entityDTO.setDriverId(Objects.requireNonNullElse(driverId, 0L));

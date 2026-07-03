@@ -29,6 +29,9 @@ option java_multiple_files = true;
 message GrpcDriverQuery {
   // Identifier of the specific driver instance
   int64 driver_id = 1;
+
+  // Identifies the tenant
+  int64 tenant_id = 2;
 }
 
 // Device query structure used to query device-related information
@@ -38,6 +41,9 @@ message GrpcDeviceQuery {
 
   // Identifier of the specific device
   int64 device_id = 2;
+
+  // Identifies the tenant
+  int64 tenant_id = 3;
 }
 
 // Point query structure used to query point-related information
@@ -47,4 +53,7 @@ message GrpcPointQuery {
 
   // Identifier of the specific point
   int64 point_id = 2;
+
+  // Identifies the tenant
+  int64 tenant_id = 3;
 }

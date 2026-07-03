@@ -26,6 +26,7 @@ import io.github.pnoker.common.facade.local.builder.FacadeCommandBuilder;
 import io.github.pnoker.common.manager.entity.bo.CommandBO;
 import io.github.pnoker.common.manager.entity.query.CommandQuery;
 import io.github.pnoker.common.manager.service.CommandService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -53,33 +54,48 @@ public class CommandLocalFacade implements CommandFacade {
     private final FacadeCommandBuilder facadeCommandBuilder;
 
     @Override
-    public FacadeCommandBO getById(Long id) {
-        CommandBO managerBO = commandService.getById(id);
-        return Objects.isNull(managerBO) ? null : facadeCommandBuilder.toFacadeBO(managerBO);
+    public FacadeCommandBO getById(Long tenantId, Long id) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            CommandBO managerBO = commandService.getById(id);
+            return Objects.isNull(managerBO) ? null : facadeCommandBuilder.toFacadeBO(managerBO);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
-    public List<FacadeCommandBO> listByIds(Collection<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
+    public List<FacadeCommandBO> listByIds(Long tenantId, Collection<Long> ids) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            if (Objects.isNull(ids) || ids.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<CommandBO> list = commandService.listByIds(new HashSet<>(ids));
+            if (Objects.isNull(list) || list.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return list.stream().map(facadeCommandBuilder::toFacadeBO).toList();
+        } finally {
+            TenantContextHolder.clear();
         }
-        List<CommandBO> list = commandService.listByIds(new HashSet<>(ids));
-        if (Objects.isNull(list) || list.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return list.stream().map(facadeCommandBuilder::toFacadeBO).toList();
     }
 
     @Override
     public FacadePage<FacadeCommandBO> listByPage(FacadeCommandQuery query) {
-        CommandQuery managerQuery = facadeCommandBuilder.toManagerQuery(query);
-        Page<CommandBO> page = commandService.list(managerQuery);
-        if (Objects.isNull(page)) {
-            return FacadePage.empty();
-        }
+        TenantContextHolder.setTenantId(query.getTenantId());
+        try {
+            CommandQuery managerQuery = facadeCommandBuilder.toManagerQuery(query);
+            Page<CommandBO> page = commandService.list(managerQuery);
+            if (Objects.isNull(page)) {
+                return FacadePage.empty();
+            }
 
-        List<FacadeCommandBO> records = page.getRecords().stream().map(facadeCommandBuilder::toFacadeBO).toList();
-        return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+            List<FacadeCommandBO> records = page.getRecords().stream().map(facadeCommandBuilder::toFacadeBO).toList();
+            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
 }
