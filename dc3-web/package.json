@@ -103,7 +103,7 @@
     "vite": "^8.1.0",
     "vitest": "^4.1.9",
     "vue-eslint-parser": "^10.4.1",
-    "vue-tsc": "^3.3.5"
+    "vue-tsc": "^3.3.6"
   },
   "lint-staged": {
     "*.{vue,js,mjs,cjs,ts,jsx,tsx}": [
