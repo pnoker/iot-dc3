@@ -22,11 +22,13 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.filter.RequestIdWebFilter;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
 import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.PrincipalHeaderUtil;
+import org.slf4j.MDC;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -139,14 +141,26 @@ public interface BaseController {
                 .cast(GatewayAuthenticationToken.class)
                 .map(token -> Optional.ofNullable(token.getPrincipalHeader().getTenantId()))
                 .defaultIfEmpty(Optional.empty())
-                .flatMap(tenantId -> Mono.fromCallable(() -> {
+                .flatMap(tenantId -> Mono.deferContextual(ctx -> Mono.fromCallable(() -> {
+                    // The supplier runs on a boundedElastic worker thread (see subscribeOn
+                    // below). Both tenantId and requestId are ThreadLocal-backed, so they must
+                    // be (re)applied on this worker thread — mirroring TenantContextHolder,
+                    // requestId is sourced from the Reactor Context published by
+                    // RequestIdWebFilter, since MDC does not survive the thread hop.
                     tenantId.ifPresent(TenantContextHolder::setTenantId);
+                    String requestId = ctx.getOrDefault(RequestIdWebFilter.CONTEXT_REQUEST_ID, null);
+                    if (requestId != null) {
+                        MDC.put(RequestIdWebFilter.MDC_REQUEST_ID, requestId);
+                    }
                     try {
                         return supplier.get();
                     } finally {
                         TenantContextHolder.clear();
+                        if (requestId != null) {
+                            MDC.remove(RequestIdWebFilter.MDC_REQUEST_ID);
+                        }
                     }
-                }).subscribeOn(Schedulers.boundedElastic()));
+                }).subscribeOn(Schedulers.boundedElastic())));
     }
 
     /**
