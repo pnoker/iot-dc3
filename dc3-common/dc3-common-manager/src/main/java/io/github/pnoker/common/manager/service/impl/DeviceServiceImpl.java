@@ -285,7 +285,7 @@ public class DeviceServiceImpl implements DeviceService {
                         pointAttributeBOList, sheet, i);
                 log.info("Import device succeeded, row index: {}", i + 1);
             } catch (Exception e) {
-                log.info("Skip import device, row index: {}, {}", i + 1, e.getMessage(), e);
+                log.warn("Skip import device, row index: {}", i + 1, e);
                 continue;
             }
 

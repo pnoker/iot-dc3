@@ -225,7 +225,7 @@ public class CommandParamServiceImpl implements CommandParamService {
         CommandBO commandBO;
         try {
             commandBO = commandService.getById(commandId);
-        } catch (NotFoundException e) {
+        } catch (NotFoundException ignored) {
             return;
         }
         if (Objects.isNull(commandBO)) {

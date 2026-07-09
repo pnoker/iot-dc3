@@ -52,7 +52,8 @@ public class DeviceAlarmReceiver {
         try {
             log.debug("Receive device alarm: {}", JsonUtil.toJsonString(entityDTO));
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())) {
-                log.error("Invalid device alarm: {}", entityDTO);
+                log.warn("Invalid device alarm, deviceId is null, deviceId={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

@@ -55,7 +55,9 @@ public class DeviceStateReceiver {
                     || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getTenantId())
                     || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeoutUnit())
                     || entityDTO.getTimeout() <= 0) {
-                log.error("Invalid device state: {}", entityDTO);
+                log.warn("Invalid device state, some required fields are null, deviceId={}, driverId={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

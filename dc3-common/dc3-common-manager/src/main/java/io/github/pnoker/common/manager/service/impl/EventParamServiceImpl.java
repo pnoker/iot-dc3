@@ -223,7 +223,7 @@ public class EventParamServiceImpl implements EventParamService {
         EventBO eventBO;
         try {
             eventBO = eventService.getById(eventId);
-        } catch (NotFoundException e) {
+        } catch (NotFoundException ignored) {
             return;
         }
         if (Objects.isNull(eventBO)) {

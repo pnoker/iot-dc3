@@ -53,7 +53,10 @@ public class EventReportReceiver {
             log.debug("Receive event report: {}", JsonUtil.toJsonString(entityDTO));
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
                     || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.eventId())) {
-                log.error("Invalid event report: {}", entityDTO);
+                log.warn("Invalid event report, some required fields are null, recordId={}, deviceId={}, eventId={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.eventId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

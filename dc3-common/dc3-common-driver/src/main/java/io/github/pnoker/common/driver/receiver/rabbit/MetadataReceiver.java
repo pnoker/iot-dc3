@@ -27,7 +27,6 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +72,8 @@ public class MetadataReceiver {
     public void metadataReceive(Channel channel, Message message, MetadataEventDTO entityDTO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            log.info("Receive driver metadata: {}", JsonUtil.toJsonString(entityDTO));
+            log.debug("Receive driver metadata: id={}, type={}, operate={}",
+                    entityDTO.getId(), entityDTO.getMetadataType(), entityDTO.getOperateType());
 
             // Validate metadata event
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getId())
@@ -88,14 +88,14 @@ public class MetadataReceiver {
             if (MetadataTypeEnum.DEVICE.equals(entityDTO.getMetadataType())) {
                 if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
                         || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.info("Upsert device: {}", entityDTO.getId());
+                    log.debug("Upsert device: {}", entityDTO.getId());
                     // Add the id first so a refresh that races with a Quartz scan does
                     // not bypass the just-loaded entry; loadCache below either fills
                     // the cache or, on a null upstream, removes the orphan id again.
                     driverMetadata.getDeviceIds().add(entityDTO.getId());
                     deviceMetadata.loadCache(entityDTO.getId());
                 } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.info("Delete device: {}", entityDTO.getId());
+                    log.debug("Delete device: {}", entityDTO.getId());
                     // Remove the id before invalidating the cache so a Quartz scan
                     // hitting the cache between the two operations does not re-fetch
                     // the doomed device through the loader.
@@ -111,10 +111,10 @@ public class MetadataReceiver {
             else if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
                 if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
                         || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.info("Upsert point: {}", entityDTO.getId());
+                    log.debug("Upsert point: {}", entityDTO.getId());
                     pointMetadata.loadCache(entityDTO.getId());
                 } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.info("Delete point: {}", entityDTO.getId());
+                    log.debug("Delete point: {}", entityDTO.getId());
                     pointMetadata.removeCache(entityDTO.getId());
                 }
 
@@ -123,13 +123,13 @@ public class MetadataReceiver {
                         new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.POINT, entityDTO.getOperateType()));
             } else if (MetadataTypeEnum.DRIVER.equals(entityDTO.getMetadataType())) {
                 if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.info("Delete driver metadata: {}", entityDTO.getId());
+                    log.debug("Delete driver metadata: {}", entityDTO.getId());
                     driverMetadata.clear();
                     deviceMetadata.clearCache();
                     pointMetadata.clearCache();
                 } else if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
                         || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.info("Refresh driver metadata: {}", entityDTO.getId());
+                    log.debug("Refresh driver metadata: {}", entityDTO.getId());
                     driverClient.refreshMetadata(entityDTO.getId());
                 }
 
@@ -137,7 +137,7 @@ public class MetadataReceiver {
                         new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.DRIVER, entityDTO.getOperateType()));
             } else if (MetadataTypeEnum.COMMAND.equals(entityDTO.getMetadataType())
                     || MetadataTypeEnum.EVENT.equals(entityDTO.getMetadataType())) {
-                log.info("Forward {} metadata event: {}", entityDTO.getMetadataType(), entityDTO.getId());
+                log.debug("Forward {} metadata event: {}", entityDTO.getMetadataType(), entityDTO.getId());
                 metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), entityDTO.getMetadataType(),
                         entityDTO.getOperateType()));
             } else {

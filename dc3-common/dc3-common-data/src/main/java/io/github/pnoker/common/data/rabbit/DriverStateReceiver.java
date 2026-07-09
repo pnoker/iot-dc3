@@ -53,7 +53,8 @@ public class DriverStateReceiver {
             log.debug("Receive driver state: {}", JsonUtil.toJsonString(entityDTO));
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())
                     || Objects.isNull(entityDTO.getTenantId()) || Objects.isNull(entityDTO.getStatus())) {
-                log.error("Invalid driver state: {}", entityDTO);
+                log.warn("Invalid driver state, some required fields are null, driverId={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

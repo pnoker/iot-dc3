@@ -55,7 +55,7 @@ public class MetadataEventListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void onApplicationEvent(MetadataEvent metadataEvent) {
-        log.info("Metadata event listener received: {}", JsonUtil.toJsonString(metadataEvent));
+        log.debug("Metadata event listener received: id={}, type={}", metadataEvent.getId(), metadataEvent.getMetadataType());
         try {
             Long id = metadataEvent.getId();
             MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
@@ -94,7 +94,7 @@ public class MetadataEventListener {
         if (Objects.isNull(service) || service.isBlank()) {
             return;
         }
-        log.info("Notify driver[{}]: {}", service, JsonUtil.toJsonString(entityDTO));
+        log.debug("Notify driver[{}]: id={}, type={}", service, entityDTO.getId(), entityDTO.getMetadataType());
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA,
                 RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + service, entityDTO);
     }

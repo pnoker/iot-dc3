@@ -114,11 +114,11 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         try {
             return future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS) ? DataConstant.Health.STATUS_UP
                     : DataConstant.Health.STATUS_DOWN;
-        } catch (TimeoutException e) {
+        } catch (TimeoutException ignored) {
             future.cancel(true);
             log.debug("Probe timed out after {}ms", PROBE_TIMEOUT_MS);
             return DataConstant.Health.STATUS_DOWN;
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
             return DataConstant.Health.STATUS_DOWN;
         } catch (ExecutionException e) {

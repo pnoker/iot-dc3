@@ -73,7 +73,7 @@ public class CommandReceiver {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         boolean redelivered = Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
         try {
-            log.info("Receive custom command: {}", JsonUtil.toJsonString(entityDTO));
+            log.debug("Receive custom command: recordId={}", entityDTO.recordId());
 
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
                     || Objects.isNull(entityDTO.tenantId())
@@ -164,8 +164,8 @@ public class CommandReceiver {
                         .build();
                 driverSenderService.commandResultSender(result);
             }
-        } catch (Exception ex) {
-            log.error("Failed to send command result, recordId={}", recordId, ex);
+        } catch (Exception e) {
+            log.error("Failed to send command result, recordId={}", recordId, e);
         }
         RabbitAckUtil.ack(channel, deliveryTag);
     }

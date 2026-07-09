@@ -55,7 +55,8 @@ public class PointValueReceiver {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
             if (Objects.isNull(pointValueBO) || Objects.isNull(pointValueBO.getDeviceId())) {
-                log.error("Invalid point value: {}", pointValueBO);
+                log.warn("Invalid point value, deviceId is null or pointValue is blank, deviceId={}",
+                        Objects.isNull(pointValueBO) ? null : pointValueBO.getDeviceId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

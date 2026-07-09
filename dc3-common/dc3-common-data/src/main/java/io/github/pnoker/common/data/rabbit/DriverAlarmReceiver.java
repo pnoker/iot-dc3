@@ -52,7 +52,8 @@ public class DriverAlarmReceiver {
         try {
             log.debug("Receive driver alarm: {}", JsonUtil.toJsonString(entityDTO));
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
-                log.error("Invalid driver alarm: {}", entityDTO);
+                log.warn("Invalid driver alarm, driverId is null, driverId={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
