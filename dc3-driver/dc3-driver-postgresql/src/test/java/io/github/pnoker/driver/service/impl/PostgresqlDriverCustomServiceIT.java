@@ -52,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author pnoker
  * @version 2026.5.22
- * @since 2026.6.2
+ * @since 2026.5.22
  */
 @Testcontainers(disabledWithoutDocker = true)
 class PostgresqlDriverCustomServiceIT {

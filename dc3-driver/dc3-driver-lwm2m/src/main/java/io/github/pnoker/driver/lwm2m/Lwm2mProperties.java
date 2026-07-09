@@ -29,7 +29,7 @@ import org.springframework.validation.annotation.Validated;
  *
  * @author pnoker
  * @version 2026.5.22
- * @since 2026.6.2
+ * @since 2026.5.22
  */
 @Getter
 @Setter
