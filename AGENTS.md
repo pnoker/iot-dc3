@@ -492,8 +492,8 @@ Rules:
 - Use `!` for breaking changes and explain the impact in the body.
 - For release-note-only commits, use exactly `docs(release): update generated changelog`.
 
-Husky manages Git hooks automatically — no manual install needed. The `pre-commit` hook runs lint-staged (eslint +
-prettier) on staged files before each commit. A `commit-msg` hook stub exists (`.husky/_/commit-msg`) but has no
+Husky manages Git hooks automatically — no manual install needed. The `pre-commit` hook runs lint-staged (eslint)
+on staged files before each commit. A `commit-msg` hook stub exists (`.husky/_/commit-msg`) but has no
 validation script attached yet; to enforce conventional-commit format, add a script at `.husky/commit-msg`.
 
 ## Testing
