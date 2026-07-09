@@ -27,7 +27,10 @@ import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import java.util.List;
 
 /**
- * Driver registration interfaces
+ * Driver registration service, invoked over gRPC when a driver process announces itself.
+ * <p>
+ * The gRPC path carries no HTTP security context, so the caller's tenant is taken from
+ * the registration payload and bound explicitly to the tenant context for each method.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -36,41 +39,52 @@ import java.util.List;
 public interface DriverRegisterService {
 
     /**
-     * Register driver
+     * Register or update a driver, keyed by service name within the payload's tenant.
+     * Updates the existing record when the service name is already registered, otherwise
+     * creates it, then returns the latest driver.
      *
-     * @param entityGrpc GrpcDriverRegisterDTO
+     * @param entityGrpc {@link GrpcDriverRegisterDTO} carrying the driver and its tenant code
+     * @return the registered driver
      */
     DriverBO registerDriver(GrpcDriverRegisterDTO entityGrpc);
 
     /**
-     * Register driver attributes
+     * Synchronize a driver's driver attributes via a three-way diff (insert new, update
+     * changed, remove obsolete), keyed by attribute code within the driver's tenant.
      *
-     * @param entityGrpc GrpcDriverRegisterDTO
-     * @param entityBO   DriverBO
+     * @param entityGrpc {@link GrpcDriverRegisterDTO} carrying the declared driver attributes
+     * @param entityBO   the owning driver
+     * @return the driver attributes currently registered for the driver
      */
     List<DriverAttributeBO> registerDriverAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
 
     /**
-     * Register point attributes
+     * Synchronize a driver's point attributes via a three-way diff (insert new, update
+     * changed, remove obsolete), keyed by attribute code within the driver's tenant.
      *
-     * @param entityGrpc GrpcDriverRegisterDTO
-     * @param entityBO   DriverBO
+     * @param entityGrpc {@link GrpcDriverRegisterDTO} carrying the declared point attributes
+     * @param entityBO   the owning driver
+     * @return the point attributes currently registered for the driver
      */
     List<PointAttributeBO> registerPointAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
 
     /**
-     * Register command attributes
+     * Synchronize a driver's command attributes via a three-way diff (insert new, update
+     * changed, remove obsolete), keyed by attribute code within the driver's tenant.
      *
-     * @param entityGrpc GrpcDriverRegisterDTO
-     * @param entityBO   DriverBO
+     * @param entityGrpc {@link GrpcDriverRegisterDTO} carrying the declared command attributes
+     * @param entityBO   the owning driver
+     * @return the command attributes currently registered for the driver
      */
     List<CommandAttributeBO> registerCommandAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
 
     /**
-     * Register event attributes
+     * Synchronize a driver's event attributes via a three-way diff (insert new, update
+     * changed, remove obsolete), keyed by attribute code within the driver's tenant.
      *
-     * @param entityGrpc GrpcDriverRegisterDTO
-     * @param entityBO   DriverBO
+     * @param entityGrpc {@link GrpcDriverRegisterDTO} carrying the declared event attributes
+     * @param entityBO   the owning driver
+     * @return the event attributes currently registered for the driver
      */
     List<EventAttributeBO> registerEventAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
 

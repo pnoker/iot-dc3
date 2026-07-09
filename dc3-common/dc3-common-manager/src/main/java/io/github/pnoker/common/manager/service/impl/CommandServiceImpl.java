@@ -218,6 +218,12 @@ public class CommandServiceImpl implements CommandService {
         return commandBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * Build fuzzy query wrapper for command search.
+     *
+     * @param entityQuery {@link CommandQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link CommandDO}
+     */
     private LambdaQueryWrapper<CommandDO> fuzzyQuery(CommandQuery entityQuery) {
         QueryWrapper<CommandDO> wrapper = Wrappers.query();
         wrapper.eq("dc.deleted", 0);

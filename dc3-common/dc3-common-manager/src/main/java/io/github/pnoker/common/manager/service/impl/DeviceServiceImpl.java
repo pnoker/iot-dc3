@@ -483,8 +483,10 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * @param entityQuery {@link DeviceQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for device search.
+     *
+     * @param entityQuery {@link DeviceQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link DeviceDO}
      */
     private LambdaQueryWrapper<DeviceDO> fuzzyQuery(DeviceQuery entityQuery) {
         QueryWrapper<DeviceDO> wrapper = Wrappers.query();
@@ -518,9 +520,12 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * @param entityBO {@link DeviceBO}
-     * @param isUpdate
-     * @return
+     * Check whether a device is duplicated by device name. Returns {@code false} when
+     * the device name is blank.
+     *
+     * @param entityBO {@link DeviceBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(DeviceBO entityBO, boolean isUpdate) {
         if (StringUtils.isEmpty(entityBO.getDeviceName())) {
@@ -555,11 +560,12 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * Primary key ID
+     * Get device data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link DeviceDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link DeviceDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private DeviceDO getDOById(Long id, boolean throwException) {
         DeviceDO entityDO = deviceManager.getById(id);

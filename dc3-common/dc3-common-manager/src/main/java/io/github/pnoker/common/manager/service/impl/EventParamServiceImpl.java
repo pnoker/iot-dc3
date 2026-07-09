@@ -163,6 +163,12 @@ public class EventParamServiceImpl implements EventParamService {
         return eventParamBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * Build fuzzy query wrapper for event param search.
+     *
+     * @param entityQuery {@link EventParamQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link EventParamDO}
+     */
     private LambdaQueryWrapper<EventParamDO> fuzzyQuery(EventParamQuery entityQuery) {
         QueryWrapper<EventParamDO> wrapper = Wrappers.query();
         wrapper.eq("deleted", 0);

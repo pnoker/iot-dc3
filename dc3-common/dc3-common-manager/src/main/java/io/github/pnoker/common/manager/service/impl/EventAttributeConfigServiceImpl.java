@@ -222,8 +222,10 @@ public class EventAttributeConfigServiceImpl implements EventAttributeConfigServ
     }
 
     /**
-     * @param entityQuery {@link EventAttributeConfigQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for event attribute config search.
+     *
+     * @param entityQuery {@link EventAttributeConfigQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link EventAttributeConfigDO}
      */
     private LambdaQueryWrapper<EventAttributeConfigDO> fuzzyQuery(EventAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<EventAttributeConfigDO> wrapper = Wrappers.<EventAttributeConfigDO>query().lambda();
@@ -241,9 +243,13 @@ public class EventAttributeConfigServiceImpl implements EventAttributeConfigServ
     }
 
     /**
-     * @param entityBO {@link EventAttributeConfigBO}
-     * @param isUpdate
-     * @return
+     * Check whether an event attribute config is duplicated by attribute, device, and
+     * event. Unlike the throwing variant, this only reports the duplicate without
+     * raising an exception.
+     *
+     * @param entityBO {@link EventAttributeConfigBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(EventAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<EventAttributeConfigDO> wrapper = Wrappers.<EventAttributeConfigDO>query().lambda();
@@ -273,11 +279,12 @@ public class EventAttributeConfigServiceImpl implements EventAttributeConfigServ
     }
 
     /**
-     * Primary key ID
+     * Get event attribute config data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link EventAttributeConfigDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link EventAttributeConfigDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private EventAttributeConfigDO getDOById(Long id, boolean throwException) {
         EventAttributeConfigDO entityDO = eventAttributeConfigManager.getById(id);

@@ -35,67 +35,71 @@ import java.util.List;
 public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
 
     /**
-     * Name TenantId
+     * Query a device by its device name, scoped to a tenant.
      *
-     * @param name     Device Name
+     * @param name     Device name
      * @param tenantId Tenant ID
      * @return {@link DeviceBO}
      */
     DeviceBO getByName(String name, Long tenantId);
 
     /**
-     * Name TenantId
+     * Query a device by its device code, scoped to a tenant.
      *
-     * @param code     Device ID
+     * @param code     Device code
      * @param tenantId Tenant ID
      * @return {@link DeviceBO}
      */
     DeviceBO getByCode(String code, Long tenantId);
 
     /**
-     * Driver ID TenantId
+     * Query devices served by a driver, scoped to a tenant.
      *
      * @param driverId Driver ID
      * @param tenantId Tenant ID
-     * @return {@link DeviceBO}
+     * @return {@link DeviceBO} list
      */
     List<DeviceBO> listByDriverId(Long driverId, Long tenantId);
 
     /**
-     * Driver ID TenantId Device ID
+     * Query the device IDs served by a driver, scoped to a tenant.
      *
      * @param driverId Driver ID
      * @param tenantId Tenant ID
-     * @return {@link DeviceBO}
+     * @return device ID list
      */
     List<Long> listIdsByDriverId(Long driverId, Long tenantId);
 
     /**
-     * Profile ID TenantId
+     * Query devices sharing a profile, scoped to a tenant.
      *
      * @param profileId Profile ID
      * @param tenantId  Tenant ID
-     * @return {@link DeviceBO}
+     * @return {@link DeviceBO} list
      */
     List<DeviceBO> listByProfileId(Long profileId, Long tenantId);
 
     /**
-     * Device ID
+     * Query devices by a set of device IDs.
      *
-     * @param ids Device ID
-     * @return {@link DeviceBO}
+     * @param ids Device ID list
+     * @return {@link DeviceBO} list
      */
     List<DeviceBO> listByIds(List<Long> ids);
 
     /**
-     * @param entityBO      {@link DeviceBO}
-     * @param multipartFile {@link File}
+     * Import devices from an uploaded file into the given profile and driver context.
+     *
+     * @param entityBO device context carrying tenant, profile, and driver associations
+     * @param file     the uploaded import file
      */
-    void importDevice(DeviceBO entityBO, File multipartFile);
+    void importDevice(DeviceBO entityBO, File file);
 
     /**
-     * @param entityBO {@link DeviceBO}
-     * @return File Path
+     * Generate a populated import template file for the given device context.
+     *
+     * @param entityBO device context carrying tenant, profile, and driver associations
+     * @return path to the generated template file
      */
     Path generateImportTemplate(DeviceBO entityBO);
 

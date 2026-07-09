@@ -193,8 +193,10 @@ public class EventAttributeServiceImpl implements EventAttributeService {
     }
 
     /**
-     * @param entityQuery {@link EventAttributeQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for event attribute search.
+     *
+     * @param entityQuery {@link EventAttributeQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link EventAttributeDO}
      */
     private LambdaQueryWrapper<EventAttributeDO> fuzzyQuery(EventAttributeQuery entityQuery) {
         LambdaQueryWrapper<EventAttributeDO> wrapper = Wrappers.<EventAttributeDO>query().lambda();
@@ -214,9 +216,13 @@ public class EventAttributeServiceImpl implements EventAttributeService {
     }
 
     /**
-     * @param entityBO {@link EventAttributeBO}
-     * @param isUpdate
-     * @return
+     * Check whether an event attribute is duplicated by attribute code and driver.
+     * Unlike the throwing variant, this only reports the duplicate without raising
+     * an exception.
+     *
+     * @param entityBO {@link EventAttributeBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(EventAttributeBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<EventAttributeDO> wrapper = Wrappers.<EventAttributeDO>query().lambda();
@@ -247,11 +253,12 @@ public class EventAttributeServiceImpl implements EventAttributeService {
     }
 
     /**
-     * Primary key ID
+     * Get event attribute data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link EventAttributeDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link EventAttributeDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private EventAttributeDO getDOById(Long id, boolean throwException) {
         EventAttributeDO entityDO = eventAttributeManager.getById(id);

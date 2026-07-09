@@ -193,8 +193,10 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     /**
-     * @param entityQuery {@link DriverAttributeQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for driver attribute search.
+     *
+     * @param entityQuery {@link DriverAttributeQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link DriverAttributeDO}
      */
     private LambdaQueryWrapper<DriverAttributeDO> fuzzyQuery(DriverAttributeQuery entityQuery) {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
@@ -214,9 +216,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     /**
-     * @param entityBO {@link DriverAttributeBO}
-     * @param isUpdate
-     * @return
+     * Check whether a driver attribute is duplicated by attribute code and driver.
+     * Unlike the throwing variant, this only reports the duplicate without raising
+     * an exception.
+     *
+     * @param entityBO {@link DriverAttributeBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(DriverAttributeBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
@@ -247,11 +253,12 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     /**
-     * Primary key ID
+     * Get driver attribute data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link DriverAttributeDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link DriverAttributeDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private DriverAttributeDO getDOById(Long id, boolean throwException) {
         DriverAttributeDO entityDO = driverAttributeManager.getById(id);

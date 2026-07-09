@@ -40,12 +40,14 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
- * Manager-side dashboard endpoints. Two read-only GETs that power the home page's driver
- * / device distribution tabs:
+ * Manager-side dashboard endpoints. Read-only GETs that power the home page's driver
+ * / device distribution tabs, growth sparklines, and topology view:
  *
  * <ul>
  * <li>{@code GET /manager/dashboard/driver/stats}</li>
- * <li>{@code GET /manager/dashboard/device/stats?topN=10}</li>
+ * <li>{@code GET /manager/dashboard/device/stats?top_n=10}</li>
+ * <li>{@code GET /manager/dashboard/growth?days=7}</li>
+ * <li>{@code GET /manager/dashboard/topology?mode=cardinality}</li>
  * </ul>
  *
  * @author pnoker

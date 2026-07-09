@@ -87,7 +87,7 @@ public class PointAttributeConfigDO implements Serializable {
     private Long pointId;
 
     /**
-     * Enable flag, 0:, 1:Disable
+     * Enable flag, 0:Enable, 1:Disable
      */
     @TableField("enable_flag")
     private Byte enableFlag;

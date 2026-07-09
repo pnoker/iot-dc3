@@ -193,8 +193,10 @@ public class CommandAttributeServiceImpl implements CommandAttributeService {
     }
 
     /**
-     * @param entityQuery {@link CommandAttributeQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for command attribute search.
+     *
+     * @param entityQuery {@link CommandAttributeQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link CommandAttributeDO}
      */
     private LambdaQueryWrapper<CommandAttributeDO> fuzzyQuery(CommandAttributeQuery entityQuery) {
         LambdaQueryWrapper<CommandAttributeDO> wrapper = Wrappers.<CommandAttributeDO>query().lambda();
@@ -214,9 +216,13 @@ public class CommandAttributeServiceImpl implements CommandAttributeService {
     }
 
     /**
-     * @param entityBO {@link CommandAttributeBO}
-     * @param isUpdate
-     * @return
+     * Check whether a command attribute is duplicated by attribute code and driver.
+     * Unlike the throwing variant, this only reports the duplicate without raising
+     * an exception.
+     *
+     * @param entityBO {@link CommandAttributeBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(CommandAttributeBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<CommandAttributeDO> wrapper = Wrappers.<CommandAttributeDO>query().lambda();
@@ -247,11 +253,12 @@ public class CommandAttributeServiceImpl implements CommandAttributeService {
     }
 
     /**
-     * Primary key ID
+     * Get command attribute data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link CommandAttributeDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link CommandAttributeDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private CommandAttributeDO getDOById(Long id, boolean throwException) {
         CommandAttributeDO entityDO = commandAttributeManager.getById(id);

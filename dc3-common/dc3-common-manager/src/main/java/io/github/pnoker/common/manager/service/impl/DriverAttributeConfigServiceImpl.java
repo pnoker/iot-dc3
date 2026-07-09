@@ -192,8 +192,10 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     /**
-     * @param entityQuery {@link DriverAttributeConfigQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for driver attribute config search.
+     *
+     * @param entityQuery {@link DriverAttributeConfigQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link DriverAttributeConfigDO}
      */
     private LambdaQueryWrapper<DriverAttributeConfigDO> fuzzyQuery(DriverAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
@@ -209,9 +211,13 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     /**
-     * @param entityBO {@link DriverAttributeConfigBO}
-     * @param isUpdate
-     * @return
+     * Check whether a driver attribute config is duplicated by attribute and device.
+     * Unlike the throwing variant, this only reports the duplicate without raising
+     * an exception.
+     *
+     * @param entityBO {@link DriverAttributeConfigBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(DriverAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
@@ -237,11 +243,12 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     /**
-     * Primary key ID
+     * Get driver attribute config data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link DriverAttributeConfigDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link DriverAttributeConfigDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private DriverAttributeConfigDO getDOById(Long id, boolean throwException) {
         DriverAttributeConfigDO entityDO = driverAttributeConfigManager.getById(id);

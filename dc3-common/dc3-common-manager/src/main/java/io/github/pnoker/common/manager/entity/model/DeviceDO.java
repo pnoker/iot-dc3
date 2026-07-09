@@ -87,7 +87,7 @@ public class DeviceDO implements Serializable {
     private JsonExt deviceExt;
 
     /**
-     * Enable flag, 0:, 1:Disable
+     * Enable flag, 0:Enable, 1:Disable
      */
     @TableField("enable_flag")
     private Byte enableFlag;
