@@ -72,10 +72,9 @@ public class MetadataReceiver {
     public void metadataReceive(Channel channel, Message message, MetadataEventDTO entityDTO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            log.debug("Receive driver metadata: id={}, type={}, operate={}",
-                    entityDTO.getId(), entityDTO.getMetadataType(), entityDTO.getOperateType());
-
-            // Validate metadata event
+            // Validate metadata event first: the debug log below dereferences entityDTO,
+            // so a null payload must be rejected before logging to avoid an NPE that
+            // would otherwise fall through to the nack(requeue) path and requeue garbage.
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getId())
                     || Objects.isNull(entityDTO.getMetadataType())
                     || Objects.isNull(entityDTO.getOperateType())) {
@@ -83,6 +82,9 @@ public class MetadataReceiver {
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
+
+            log.debug("Receive driver metadata: id={}, type={}, operate={}",
+                    entityDTO.getId(), entityDTO.getMetadataType(), entityDTO.getOperateType());
 
             // Handle device metadata events
             if (MetadataTypeEnum.DEVICE.equals(entityDTO.getMetadataType())) {

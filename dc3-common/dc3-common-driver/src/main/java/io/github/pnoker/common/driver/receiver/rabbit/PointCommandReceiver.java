@@ -65,8 +65,9 @@ public class PointCommandReceiver {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         boolean redelivered = Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
         try {
-            log.debug("Receive point command: commandId={}, type={}", entityDTO.commandId(), entityDTO.type());
-
+            // Validate first: the debug log below dereferences entityDTO, so a null
+            // payload must be rejected before logging to avoid an NPE that would
+            // otherwise fall through to the nack(requeue) path and requeue garbage.
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.commandId())
                     || Objects.isNull(entityDTO.tenantId()) || Objects.isNull(entityDTO.type())
                     || Objects.isNull(entityDTO.payload())) {
@@ -74,6 +75,8 @@ public class PointCommandReceiver {
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
+
+            log.debug("Receive point command: commandId={}, type={}", entityDTO.commandId(), entityDTO.type());
             if (isInvalidPayload(entityDTO.payload())) {
                 log.error("Invalid point command payload: {}", entityDTO);
                 RabbitAckUtil.reject(channel, deliveryTag);

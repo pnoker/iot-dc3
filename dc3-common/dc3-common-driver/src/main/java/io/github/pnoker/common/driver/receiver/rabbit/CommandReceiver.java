@@ -73,8 +73,9 @@ public class CommandReceiver {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         boolean redelivered = Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
         try {
-            log.debug("Receive custom command: recordId={}", entityDTO.recordId());
-
+            // Validate first: the debug log below dereferences entityDTO, so a null
+            // payload must be rejected before logging to avoid an NPE that would
+            // otherwise fall through to the nack(requeue) path and requeue garbage.
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
                     || Objects.isNull(entityDTO.tenantId())
                     || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.commandId())) {
@@ -82,6 +83,8 @@ public class CommandReceiver {
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
+
+            log.debug("Receive custom command: recordId={}", entityDTO.recordId());
 
             String recordId = entityDTO.recordId();
             Long tenantId = entityDTO.tenantId();
