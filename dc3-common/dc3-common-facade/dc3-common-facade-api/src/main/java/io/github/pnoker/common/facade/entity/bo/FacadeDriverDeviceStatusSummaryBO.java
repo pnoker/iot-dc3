@@ -34,7 +34,7 @@ import java.util.Objects;
  *
  * @author pnoker
  * @version 2026.5.18
- * @since 2016.10.1
+ * @since 2026.5.18
  */
 @Getter
 @Setter

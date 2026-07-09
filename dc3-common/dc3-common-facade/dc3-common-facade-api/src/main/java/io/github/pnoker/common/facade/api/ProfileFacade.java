@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author pnoker
  * @version 2026.5.14
- * @since 2016.10.1
+ * @since 2026.5.14
  */
 public interface ProfileFacade {
 
