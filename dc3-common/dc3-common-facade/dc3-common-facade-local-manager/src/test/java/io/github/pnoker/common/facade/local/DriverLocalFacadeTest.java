@@ -25,6 +25,8 @@ import io.github.pnoker.common.facade.local.builder.FacadeDriverBuilder;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.tenant.TenantContextHolder;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,12 +37,15 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DriverLocalFacadeTest {
+
+    private static final Long TENANT_ID = 1L;
 
     @Mock
     private DriverService driverService;
@@ -63,34 +68,54 @@ class DriverLocalFacadeTest {
         facade = new DriverLocalFacade(driverService, facadeDriverBuilder);
     }
 
+    @AfterEach
+    void clearTenant() {
+        // Guard against a leaked tenant context bleeding into the next test on the same
+        // pooled thread — a real bug we want these tests to surface, not mask.
+        TenantContextHolder.clear();
+    }
+
     @Test
     void getByIdReturnsNullWhenServiceReturnsNull() {
         when(driverService.getById(1L)).thenReturn(null);
-        assertThat(facade.getById(1L)).isNull();
+        assertThat(facade.getById(TENANT_ID, 1L)).isNull();
         verify(facadeDriverBuilder, never()).toFacadeBO(any());
+        assertThat(TenantContextHolder.getTenantId()).isNull();
     }
 
     @Test
     void getByIdMapsThroughBuilder() {
         DriverBO bo = new DriverBO();
         FacadeDriverBO mapped = new FacadeDriverBO();
-        when(driverService.getById(1L)).thenReturn(bo);
+        when(driverService.getById(1L)).thenAnswer(inv -> {
+            assertThat(TenantContextHolder.getTenantId()).isEqualTo(TENANT_ID);
+            return bo;
+        });
         when(facadeDriverBuilder.toFacadeBO(bo)).thenReturn(mapped);
-        assertThat(facade.getById(1L)).isSameAs(mapped);
+        assertThat(facade.getById(TENANT_ID, 1L)).isSameAs(mapped);
+        assertThat(TenantContextHolder.getTenantId()).isNull();
+    }
+
+    @Test
+    void getByIdClearsContextEvenWhenServiceThrows() {
+        when(driverService.getById(1L)).thenThrow(new RuntimeException("manager center unreachable"));
+        assertThatThrownBy(() -> facade.getById(TENANT_ID, 1L))
+                .isInstanceOf(RuntimeException.class);
+        assertThat(TenantContextHolder.getTenantId()).isNull();
     }
 
     @Test
     void listByIdsReturnsEmptyForNullOrEmptyInput() {
-        assertThat(facade.listByIds(null)).isEmpty();
-        assertThat(facade.listByIds(Set.of())).isEmpty();
+        assertThat(facade.listByIds(TENANT_ID, null)).isEmpty();
+        assertThat(facade.listByIds(TENANT_ID, Set.of())).isEmpty();
     }
 
     @Test
     void listByIdsReturnsEmptyWhenServiceReturnsNullOrEmpty() {
         when(driverService.listByIds(any())).thenReturn(null);
-        assertThat(facade.listByIds(Set.of(1L))).isEmpty();
+        assertThat(facade.listByIds(TENANT_ID, Set.of(1L))).isEmpty();
         when(driverService.listByIds(any())).thenReturn(List.of());
-        assertThat(facade.listByIds(Set.of(1L))).isEmpty();
+        assertThat(facade.listByIds(TENANT_ID, Set.of(1L))).isEmpty();
     }
 
     @Test
@@ -99,7 +124,7 @@ class DriverLocalFacadeTest {
         FacadeDriverBO mapped = new FacadeDriverBO();
         when(driverService.listByIds(any())).thenReturn(List.of(bo));
         when(facadeDriverBuilder.toFacadeBO(bo)).thenReturn(mapped);
-        assertThat(facade.listByIds(Set.of(1L))).containsExactly(mapped);
+        assertThat(facade.listByIds(TENANT_ID, Set.of(1L))).containsExactly(mapped);
     }
 
     @Test
@@ -125,13 +150,14 @@ class DriverLocalFacadeTest {
         assertThat(result.getCurrent()).isEqualTo(1);
         assertThat(result.getSize()).isEqualTo(10);
         assertThat(result.getTotal()).isEqualTo(50);
+        assertThat(result.getPages()).isEqualTo(5);
         assertThat(result.getRecords()).containsExactly(mapped);
     }
 
     @Test
     void listByDeviceIdReturnsNullWhenServiceReturnsNull() {
         when(driverService.getByDeviceId(7L, null)).thenReturn(null);
-        assertThat(facade.getByDeviceId(7L)).isNull();
+        assertThat(facade.getByDeviceId(TENANT_ID, 7L)).isNull();
     }
 
     @Test
@@ -140,7 +166,7 @@ class DriverLocalFacadeTest {
         FacadeDriverBO mapped = new FacadeDriverBO();
         when(driverService.getByDeviceId(7L, null)).thenReturn(bo);
         when(facadeDriverBuilder.toFacadeBO(bo)).thenReturn(mapped);
-        assertThat(facade.getByDeviceId(7L)).isSameAs(mapped);
+        assertThat(facade.getByDeviceId(TENANT_ID, 7L)).isSameAs(mapped);
     }
 
 }
