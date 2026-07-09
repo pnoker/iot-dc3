@@ -99,6 +99,13 @@ public class OpenAiCompatibleAgenticRuntime {
         this.toolCallbackProvider = toolCallbackProvider;
     }
 
+    /**
+     * Return whether this runtime handles the prepared chat: it requires tool calling to
+     * be enabled and the resolved model's provider to be OpenAI-compatible.
+     *
+     * @param prepared the prepared chat request
+     * @return {@code true} if this runtime should handle the request
+     */
     public boolean supports(AgenticPreparedChatBO prepared) {
         if (Objects.isNull(prepared) || !prepared.toolCallingEnabled()) {
             return false;
@@ -108,6 +115,13 @@ public class OpenAiCompatibleAgenticRuntime {
                 && AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE.equals(provider.getProviderType());
     }
 
+    /**
+     * Run the agent loop as a stream, emitting one frame per delta (reasoning, content,
+     * or tool round boundary) and terminating when the model stops calling tools.
+     *
+     * @param prepared the prepared chat request
+     * @return a flux of stream frames
+     */
     public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatBO prepared) {
         return Flux.create(sink -> {
             try {
@@ -119,6 +133,15 @@ public class OpenAiCompatibleAgenticRuntime {
         });
     }
 
+    /**
+     * Run the agent loop to completion, executing tool calls and re-prompting until the
+     * model produces a final answer or the round limit is exceeded. Preserves the
+     * provider's reasoning content across tool-call continuations.
+     *
+     * @param prepared the prepared chat request
+     * @return the final assistant content and finish reason
+     * @throws IllegalStateException if the agent loop exceeds the max rounds
+     */
     public AgenticRuntimeResult call(AgenticPreparedChatBO prepared) {
         ModelProviderBO provider = requireProvider(prepared);
         OpenAIClient client = createClient(provider);
@@ -154,6 +177,10 @@ public class OpenAiCompatibleAgenticRuntime {
                 + AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS);
     }
 
+    /**
+     * Drive the streaming agent loop into the given sink, executing tool calls and
+     * re-prompting until the model stops or the sink is cancelled.
+     */
     private void doStream(AgenticPreparedChatBO prepared, FluxSink<AgenticRuntimeStreamFrame> sink) {
         ModelProviderBO provider = requireProvider(prepared);
         OpenAIClient client = createClient(provider);
@@ -185,6 +212,11 @@ public class OpenAiCompatibleAgenticRuntime {
         }
     }
 
+    /**
+     * Stream a single model round, accumulating content, reasoning, and the
+     * (incrementally-arriving) tool calls into a single result, emitting deltas to the
+     * sink as they arrive.
+     */
     private StreamRoundResult streamOneRound(OpenAIClient client, AgenticPreparedChatBO prepared,
                                              List<ChatCompletionMessageParam> messages,
                                              FluxSink<AgenticRuntimeStreamFrame> sink) {
