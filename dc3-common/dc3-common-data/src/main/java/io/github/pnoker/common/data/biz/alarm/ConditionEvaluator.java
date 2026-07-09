@@ -102,7 +102,7 @@ public final class ConditionEvaluator {
                 return new BigDecimal(text.toString());
             }
             return null;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             return null;
         }
     }

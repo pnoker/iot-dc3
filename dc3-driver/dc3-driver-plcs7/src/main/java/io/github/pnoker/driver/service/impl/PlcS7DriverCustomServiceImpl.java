@@ -173,7 +173,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             EPlcType ePlcType;
             try {
                 ePlcType = EPlcType.valueOf(plcType);
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ignored) {
                 log.warn("Unknown plcType '{}', fallback to S1200", plcType);
                 ePlcType = EPlcType.S1200;
             }

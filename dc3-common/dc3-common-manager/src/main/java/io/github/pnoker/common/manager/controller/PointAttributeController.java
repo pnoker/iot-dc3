@@ -190,7 +190,7 @@ public class PointAttributeController implements BaseController {
                 List<PointAttributeBO> entityBOList = filterTenant(tenantId, pointAttributeService.listByDriverId(driverId));
                 List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOList);
                 return R.ok(entityVO);
-            } catch (NotFoundException ne) {
+            } catch (NotFoundException ignored) {
                 return R.ok(Collections.emptyList());
             }
         }));

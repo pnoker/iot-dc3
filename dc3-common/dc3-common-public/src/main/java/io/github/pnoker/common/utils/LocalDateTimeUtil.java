@@ -137,7 +137,7 @@ public class LocalDateTimeUtil {
         try {
             DateTimeFormatter formatter = getDefaultDateTimeFormatter();
             return LocalDateTime.parse(dateString, formatter);
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException ignored) {
             return null;
         }
     }
@@ -153,7 +153,7 @@ public class LocalDateTimeUtil {
         try {
             DateTimeFormatter formatter = getCompleteDateTimeFormatter();
             return LocalDateTime.parse(dateString, formatter);
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException ignored) {
             return null;
         }
     }

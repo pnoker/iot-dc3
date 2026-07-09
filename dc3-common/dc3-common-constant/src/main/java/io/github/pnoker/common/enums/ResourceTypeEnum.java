@@ -122,7 +122,7 @@ public enum ResourceTypeEnum {
     public static ResourceTypeEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

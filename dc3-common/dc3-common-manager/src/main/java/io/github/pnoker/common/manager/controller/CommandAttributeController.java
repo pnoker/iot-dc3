@@ -195,7 +195,7 @@ public class CommandAttributeController implements BaseController {
                 List<CommandAttributeBO> entityBOList = filterTenant(tenantId, commandAttributeService.listByDriverId(driverId));
                 List<CommandAttributeVO> entityVO = commandAttributeBuilder.buildVOListByBOList(entityBOList);
                 return R.ok(entityVO);
-            } catch (NotFoundException ne) {
+            } catch (NotFoundException ignored) {
                 return R.ok(Collections.emptyList());
             }
         }));

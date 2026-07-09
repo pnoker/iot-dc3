@@ -176,7 +176,7 @@ public final class TypedValueConverter {
         String raw = requireValue(value, type, label).trim();
         try {
             return new BigDecimal(raw);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             throw new TypeException("{} value type is: {}, invalid numeric value: {}", label, typeCode, value);
         }
     }

@@ -195,7 +195,7 @@ public class DriverAttributeController implements BaseController {
                 List<DriverAttributeBO> entityBOList = filterTenant(tenantId, driverAttributeService.listByDriverId(driverId));
                 List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOList);
                 return R.ok(entityVO);
-            } catch (NotFoundException ne) {
+            } catch (NotFoundException ignored) {
                 return R.ok(Collections.emptyList());
             }
         }));

@@ -218,7 +218,7 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
         if (upperName.startsWith("MULTI_STATE_") || upperName.startsWith("DEVICE")) {
             try {
                 return new UnsignedInteger(Integer.parseInt(value));
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
                 log.warn("BACnet write: multi-state/device value '{}' is not an integer, falling back to Real", value);
                 return new Real(Float.parseFloat(value));
             }
@@ -226,7 +226,7 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
         // Analog types and fallback
         try {
             return new Real(Float.parseFloat(value));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             // For string values on non-analog fallback objects
             return new CharacterString(value);
         }
@@ -262,9 +262,9 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
             } catch (Exception e) {
                 try {
                     localDevice.terminate();
-                } catch (Exception destroyException) {
+                } catch (Exception e1) {
                     log.warn("BACnet connection destroy failed after init error, protocol={}, deviceId={}",
-                            driverCode, deviceId, destroyException);
+                            driverCode, deviceId, e1);
                 }
                 throw new ConnectorException("BACnet connection failed, protocol={}, deviceId={}, message={}",
                         driverCode, deviceId, e.getMessage(), e);

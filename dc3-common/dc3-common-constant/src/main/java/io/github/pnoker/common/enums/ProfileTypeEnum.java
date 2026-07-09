@@ -102,7 +102,7 @@ public enum ProfileTypeEnum {
     public static ProfileTypeEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

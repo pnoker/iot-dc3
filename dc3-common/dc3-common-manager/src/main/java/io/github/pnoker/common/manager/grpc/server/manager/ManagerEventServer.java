@@ -139,7 +139,7 @@ public class ManagerEventServer extends EventApiGrpc.EventApiImplBase {
             EventBO entityBO;
             try {
                 entityBO = eventService.getById(request.getEventId());
-            } catch (NotFoundException e) {
+            } catch (NotFoundException ignored) {
                 entityBO = null;
             }
             if (Objects.isNull(entityBO)) {

@@ -182,7 +182,7 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
         if (value instanceof CharSequence text && StringUtils.isNotBlank(text)) {
             try {
                 return Long.parseLong(text.toString());
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
                 return null;
             }
         }

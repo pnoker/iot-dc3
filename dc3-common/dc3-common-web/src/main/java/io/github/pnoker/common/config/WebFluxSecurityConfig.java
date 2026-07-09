@@ -245,7 +245,7 @@ public class WebFluxSecurityConfig {
             long epochMs = Long.parseLong(timestamp);
             long diffMs = Math.abs(Instant.now().toEpochMilli() - epochMs);
             return diffMs <= RequestConstant.DEFAULT_INTERNAL_SIGNATURE_TTL_MS;
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ignored) {
             return false;
         }
     }

@@ -65,7 +65,7 @@ public class ControllerAnnotationGate {
             Class<?> controller;
             try {
                 controller = Class.forName(bean.getBeanClassName());
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException ignored) {
                 defects.add(bean.getBeanClassName() + ": cannot load controller class");
                 return;
             }

@@ -145,7 +145,7 @@ public class PointValue implements Serializable {
             case BYTE, SHORT, INT, LONG, FLOAT, DOUBLE -> {
                 try {
                     yield Double.parseDouble(value.trim());
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException ignored) {
                     yield null;
                 }
             }

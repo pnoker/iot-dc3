@@ -169,7 +169,7 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
             EMcSeries eMcSeries;
             try {
                 eMcSeries = EMcSeries.valueOf(series);
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ignored) {
                 log.warn("Unknown series '{}', fallback to QnA", series);
                 eMcSeries = EMcSeries.QnA;
             }

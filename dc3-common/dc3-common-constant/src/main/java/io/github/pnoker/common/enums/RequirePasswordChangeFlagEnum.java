@@ -97,7 +97,7 @@ public enum RequirePasswordChangeFlagEnum {
     public static RequirePasswordChangeFlagEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

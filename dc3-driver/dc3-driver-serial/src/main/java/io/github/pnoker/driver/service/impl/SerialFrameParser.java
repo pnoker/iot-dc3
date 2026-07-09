@@ -135,7 +135,7 @@ public class SerialFrameParser {
         }
         try {
             return ChecksumType.valueOf(name.toUpperCase().trim());
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return ChecksumType.NONE;
         }
     }

@@ -371,7 +371,7 @@ public class DeviceController implements BaseController {
             if (Files.size(filePath) > MAX_IMPORT_BYTES) {
                 throw new RequestException("Import file size exceeds 20 MB");
             }
-        } catch (java.io.IOException e) {
+        } catch (java.io.IOException ignored) {
             throw new RequestException("Import file read failed");
         }
     }

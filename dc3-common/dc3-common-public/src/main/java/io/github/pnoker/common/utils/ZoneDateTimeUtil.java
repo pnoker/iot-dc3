@@ -137,7 +137,7 @@ public class ZoneDateTimeUtil {
         try {
             DateTimeFormatter formatter = getDefaultDateTimeFormatter();
             return ZonedDateTime.parse(dateString, formatter);
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException ignored) {
             return null;
         }
     }
@@ -153,7 +153,7 @@ public class ZoneDateTimeUtil {
         try {
             DateTimeFormatter formatter = getCompleteDateTimeFormatter();
             return ZonedDateTime.parse(dateString, formatter);
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException ignored) {
             return null;
         }
     }

@@ -139,7 +139,7 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
             PointBO entityBO;
             try {
                 entityBO = pointService.getById(request.getPointId());
-            } catch (NotFoundException e) {
+            } catch (NotFoundException ignored) {
                 entityBO = null;
             }
             if (Objects.isNull(entityBO)) {

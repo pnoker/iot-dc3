@@ -425,7 +425,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         String value = getConfigValue(config, code, String.valueOf(defaultValue));
         try {
             return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             log.warn("Failed to parse int config value for code={}, using default={}", code, defaultValue);
             return defaultValue;
         }

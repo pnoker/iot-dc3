@@ -74,7 +74,7 @@ public class CoapServerManager implements CommandLineRunner {
     public void shutdown() {
         if (coapServer != null) {
             coapServer.destroy();
-            log.info("CoAP server shut down");
+            log.info("CoAP server shut down on {}:{}", coapProperties.getServerHost(), coapProperties.getServerPort());
         }
     }
 }

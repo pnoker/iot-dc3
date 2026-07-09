@@ -240,7 +240,8 @@ public class Lwm2mServerManager implements DisposableBean {
     public void destroy() {
         if (server != null) {
             server.destroy();
-            log.info("LwM2M server destroyed");
+            log.info("LwM2M server destroyed on coap://{}:{}", lwm2mProperties.getServerHost(),
+                    lwm2mProperties.getServerPort());
         }
     }
 }

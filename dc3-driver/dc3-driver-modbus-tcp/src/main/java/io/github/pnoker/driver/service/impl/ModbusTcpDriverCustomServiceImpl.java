@@ -299,9 +299,9 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
             } catch (ModbusInitException e) {
                 try {
                     modbusMaster.destroy();
-                } catch (Exception destroyException) {
+                } catch (Exception e1) {
                     log.warn("Driver connection destroy failed after init error, protocol={}, deviceId={}, host={}, port={}", driverCode,
-                            deviceId, host, port, destroyException);
+                            deviceId, host, port, e1);
                 }
                 // Record failure for backoff
                 failureMap.compute(deviceId, (k, v) ->

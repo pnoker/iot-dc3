@@ -60,7 +60,7 @@ public final class WindowSpecParser {
         Duration duration;
         try {
             duration = Duration.parse(StringUtils.defaultIfBlank(window.getDuration(), "PT0S"));
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException ignored) {
             return WindowSpec.invalid("Invalid window duration '" + window.getDuration()
                     + "', expected ISO-8601 like PT5M");
         }

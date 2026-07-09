@@ -35,13 +35,13 @@ import io.github.pnoker.driver.service.MqttSendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.integration.mqtt.event.MqttConnectionFailedEvent;
 import org.springframework.integration.mqtt.event.MqttIntegrationEvent;
 import org.springframework.integration.mqtt.event.MqttSubscribedEvent;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -169,7 +169,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
                     Objects.toString(event.getSource(), "?"));
         } else if (event instanceof MqttConnectionFailedEvent) {
             brokerConnected = Boolean.FALSE;
-            log.warn("MQTT broker connection failed, protocol={}, source={}", driverCode,
+            log.error("MQTT broker connection failed, protocol={}, source={}", driverCode,
                     Objects.toString(event.getSource(), "?"));
         }
     }

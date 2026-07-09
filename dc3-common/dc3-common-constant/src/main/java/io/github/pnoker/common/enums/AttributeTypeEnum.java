@@ -127,7 +127,7 @@ public enum AttributeTypeEnum {
     public static AttributeTypeEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

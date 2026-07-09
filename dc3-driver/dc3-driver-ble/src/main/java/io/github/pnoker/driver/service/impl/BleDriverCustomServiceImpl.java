@@ -146,7 +146,7 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
             return governor.isOnline() && governor.isConnected()
                     ? DeviceHealthState.online()
                     : DeviceHealthState.offline();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return DeviceHealthState.offline();
         }
     }

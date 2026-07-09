@@ -107,7 +107,7 @@ public abstract class AbstractMetadataCache<V> {
             Thread.currentThread().interrupt();
             log.error("Interrupted while loading {} cache, id={}", name, id, e);
             return null;
-        } catch (TimeoutException e) {
+        } catch (TimeoutException ignored) {
             log.warn("Timed out loading {} cache after {}s, id={}", name, loadTimeoutSeconds, id);
             return null;
         } catch (ExecutionException e) {

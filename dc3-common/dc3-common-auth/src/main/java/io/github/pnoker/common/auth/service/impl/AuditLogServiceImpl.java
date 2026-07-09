@@ -60,8 +60,8 @@ public class AuditLogServiceImpl implements AuditLogService {
         try {
             identityAuditLogManager.save(entity);
         } catch (Exception e) {
-            log.warn("Failed to record identity audit log (action={}, resourceType={}, resourceId={}): {}",
-                    action, resourceType, resourceId, e.getMessage());
+            log.warn("Failed to record identity audit log (action={}, resourceType={}, resourceId={})",
+                    action, resourceType, resourceId, e);
         }
     }
 

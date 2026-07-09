@@ -24,7 +24,6 @@ import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
@@ -70,7 +69,7 @@ public class DriverHealthScheduleJob extends QuartzJobBean {
         if (Objects.nonNull(healthState.getDescription())) {
             driverState.setStateDescription(healthState.getDescription());
         }
-        log.info("Report driver health: {}", JsonUtil.toJsonString(driverState));
+        log.debug("Report driver health: driverId={}, status={}", driverState.getDriverId(), driverState.getStatus());
         driverSenderService.driverStateSender(driverState);
     }
 

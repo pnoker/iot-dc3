@@ -63,7 +63,7 @@ public class TokenQuery {
     /**
      *
      */
-    @Schema(description = "Credential submitted for authentication; typically the password hashed with the server-issued salt during the login handshake.", example = "5f4dcc3b5aa765d61d8327deb882cf99")
+    @Schema(description = "Credential submitted for authentication; the plaintext password, protected in transit by HTTPS. The salt is NOT mixed into the password — it is concatenated with the server-side key to sign the JWT.", example = "your-plaintext-password")
     private String password;
 
     /**
