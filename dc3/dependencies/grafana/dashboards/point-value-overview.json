@@ -1,0 +1,385 @@
+{
+  "title": "Point Value Overview",
+  "uid": "dc3-point-value-overview",
+  "tags": [
+    "dc3",
+    "iot",
+    "point-value"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "tenant",
+        "type": "query",
+        "label": "Tenant",
+        "datasource": {
+          "type": "postgres",
+          "uid": "dc3-postgres"
+        },
+        "query": "SELECT id AS __value, tenant_name AS __text FROM dc3_manager.dc3_tenant WHERE deleted = 0 ORDER BY id",
+        "refresh": 1,
+        "includeAll": false,
+        "queryParam": "tenant"
+      },
+      {
+        "name": "driver",
+        "type": "query",
+        "label": "Driver",
+        "datasource": {
+          "type": "postgres",
+          "uid": "dc3-postgres"
+        },
+        "query": "SELECT id AS __value, driver_name AS __text FROM dc3_manager.dc3_driver WHERE deleted = 0 AND tenant_id = ${tenant:raw} ORDER BY driver_name",
+        "refresh": 1,
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      },
+      {
+        "name": "device",
+        "type": "query",
+        "label": "Device",
+        "datasource": {
+          "type": "postgres",
+          "uid": "dc3-postgres"
+        },
+        "query": "SELECT id AS __value, device_name AS __text FROM dc3_manager.dc3_device WHERE deleted = 0 AND tenant_id = ${tenant:raw} AND (${driver:raw} = '$__all' OR driver_id IN ($driver)) ORDER BY device_name",
+        "refresh": 1,
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      },
+      {
+        "name": "point",
+        "type": "query",
+        "label": "Point",
+        "datasource": {
+          "type": "postgres",
+          "uid": "dc3-postgres"
+        },
+        "query": "SELECT DISTINCT pv.point_id AS __value, COALESCE(p.point_name, 'point ' || pv.point_id) AS __text FROM dc3_point_value pv LEFT JOIN dc3_manager.dc3_point p ON p.id = pv.point_id AND p.tenant_id = pv.tenant_id WHERE pv.tenant_id = ${tenant:raw} AND (${device:raw} = '$__all' OR pv.device_id IN ($device)) ORDER BY __text",
+        "refresh": 1,
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Overview",
+      "id": 1,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Samples (current range)",
+      "id": 2,
+      "datasource": {
+        "type": "postgres",
+        "uid": "dc3-postgres"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT sum(sample_count) AS value FROM cagg_point_value_1h WHERE bucket >= $__timeFrom() AND bucket < $__timeTo() AND tenant_id = ${tenant:raw} AND (${driver:raw} = '$__all' OR driver_id IN ($driver)) AND (${device:raw} = '$__all' OR device_id IN ($device)) AND (${point:raw} = '$__all' OR point_id IN ($point))"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Active Points (current range)",
+      "id": 3,
+      "datasource": {
+        "type": "postgres",
+        "uid": "dc3-postgres"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(DISTINCT point_id) AS value FROM cagg_point_value_1h WHERE bucket >= $__timeFrom() AND bucket < $__timeTo() AND tenant_id = ${tenant:raw} AND (${driver:raw} = '$__all' OR driver_id IN ($driver)) AND (${device:raw} = '$__all' OR device_id IN ($device))"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Active Devices (current range)",
+      "id": 4,
+      "datasource": {
+        "type": "postgres",
+        "uid": "dc3-postgres"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(DISTINCT device_id) AS value FROM cagg_point_value_1h WHERE bucket >= $__timeFrom() AND bucket < $__timeTo() AND tenant_id = ${tenant:raw} AND (${driver:raw} = '$__all' OR driver_id IN ($driver))"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Silent Points (no sample in range)",
+      "id": 5,
+      "datasource": {
+        "type": "postgres",
+        "uid": "dc3-postgres"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*) AS value FROM dc3_manager.dc3_point p WHERE p.deleted = 0 AND p.tenant_id = ${tenant:raw} AND p.enable_flag = 0 AND (${point:raw} = '$__all' OR p.id IN ($point)) AND NOT EXISTS (SELECT 1 FROM cagg_point_value_1h pv WHERE pv.point_id = p.id AND pv.tenant_id = p.tenant_id AND pv.bucket >= $__timeFrom() AND pv.bucket < $__timeTo())"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            {
+              "color": "green",
+              "value": null
+            },
+            {
+              "color": "red",
+              "value": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Ingest Rate (samples / minute)",
+      "id": 6,
+      "datasource": {
+        "type": "postgres",
+        "uid": "dc3-postgres"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT bucket AS \"time\", sum(sample_count) AS \"samples/min\" FROM cagg_point_value_1m WHERE $__timeFilter(bucket) AND tenant_id = ${tenant:raw} AND (${driver:raw} = '$__all' OR driver_id IN ($driver)) AND (${device:raw} = '$__all' OR device_id IN ($device)) AND (${point:raw} = '$__all' OR point_id IN ($point)) GROUP BY bucket ORDER BY bucket"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20
+          }
+        }
+      }
+    },
+    {
+      "type": "row",
+      "title": "Per-Point Trend",
+      "id": 7,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Selected Point Value",
+      "id": 8,
+      "datasource": {
+        "type": "postgres",
+        "uid": "dc3-postgres"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "description": "Average numeric value of the selected point per minute, with min/max band. Uses time_bucket_gapfill so dropped sample windows show as gaps instead of flat lines. String-typed points (num_value NULL) are excluded.",
+      "targets": [
+        {
+          "refId": "A",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT time_bucket_gapfill('$__interval', bucket, $__timeFrom(), $__timeTo()) AS \"time\", num_avg AS \"avg\", num_min AS \"min\", num_max AS \"max\" FROM cagg_point_value_1m WHERE $__timeFilter(bucket) AND tenant_id = ${tenant:raw} AND (${device:raw} = '$__all' OR device_id IN ($device)) AND (${point:raw} = '$__all' OR point_id IN ($point)) GROUP BY 1 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "min"
+            },
+            "properties": [
+              {
+                "id": "custom.fillBelowTo",
+                "value": "max"
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max"
+            },
+            "properties": [
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "row",
+      "title": "Point List",
+      "id": 9,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "table",
+      "title": "Points — latest value, last seen, sample count",
+      "id": 10,
+      "datasource": {
+        "type": "postgres",
+        "uid": "dc3-postgres"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "description": "One row per point in the current filter. latest_bucket = most recent minute bucket with data; samples = total samples in the selected time range; silent = no sample in range. LEFT JOINs keep value rows even if metadata was soft-deleted.",
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH agg AS (\n  SELECT tenant_id, driver_id, device_id, point_id,\n         max(bucket)              AS latest_bucket,\n         sum(sample_count)        AS range_samples,\n         (array_agg(cal_last ORDER BY bucket DESC))[1] AS latest_cal\n  FROM cagg_point_value_1m\n  WHERE $__timeFilter(bucket)\n    AND tenant_id = ${tenant:raw}\n    AND (${driver:raw} = '$__all' OR driver_id IN ($driver))\n    AND (${device:raw} = '$__all' OR device_id IN ($device))\n    AND (${point:raw} = '$__all'  OR point_id IN ($point))\n  GROUP BY tenant_id, driver_id, device_id, point_id\n)\nSELECT\n  COALESCE(d.device_name,  'device '  || agg.device_id)  AS \"Device\",\n  COALESCE(p.point_name,   'point '   || agg.point_id)   AS \"Point\",\n  COALESCE(p.unit, '')                                   AS \"Unit\",\n  agg.latest_cal                                        AS \"Latest Value\",\n  date_trunc('second', agg.latest_bucket)               AS \"Last Seen\",\n  agg.range_samples                                     AS \"Samples\",\n  CASE WHEN agg.range_samples = 0 THEN 'silent' ELSE 'active' END AS \"Status\",\n  COALESCE(drv.driver_name, '')                         AS \"Driver\"\nFROM agg\nLEFT JOIN dc3_manager.dc3_point  p   ON p.id   = agg.point_id  AND p.tenant_id   = agg.tenant_id AND p.deleted   = 0\nLEFT JOIN dc3_manager.dc3_device d   ON d.id   = agg.device_id AND d.tenant_id   = agg.tenant_id AND d.deleted   = 0\nLEFT JOIN dc3_manager.dc3_driver drv ON drv.id = agg.driver_id AND drv.tenant_id = agg.tenant_id AND drv.deleted = 0\nORDER BY agg.latest_bucket DESC NULLS LAST"
+        }
+      ]
+    }
+  ]
+}

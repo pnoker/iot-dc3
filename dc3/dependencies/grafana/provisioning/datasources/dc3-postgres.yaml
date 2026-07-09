@@ -1,0 +1,28 @@
+# Provisioned Postgres datasource for the IoT DC3 point-value dashboard.
+#
+# Host resolves via the dc3net Docker network alias (dc3-postgres), so this
+# works when Grafana itself runs in the same compose stack. Credentials mirror
+# the defaults in dc3/env/*.env (POSTGRES_USERNAME / POSTGRES_PASSWORD).
+#
+# `postgresSchema` is set to dc3_history so unqualified hypertable/cagg names
+# resolve; cross-schema metadata (dc3_manager.*) is referenced fully-qualified
+# in dashboard queries, so it works regardless of search_path.
+
+apiVersion: 1
+
+datasources:
+  - name: DC3 Postgres
+    type: postgres
+    uid: dc3-postgres
+    access: proxy
+    url: dc3-postgres:5432
+    user: ${POSTGRES_USERNAME:-dc3}
+    database: ${POSTGRES_DB:-dc3}
+    isDefault: true
+    secureJsonData:
+      password: ${POSTGRES_PASSWORD:-dc3dc3dc3}
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1800
+      timescaledb: true
+      postgresSchema: dc3_history
