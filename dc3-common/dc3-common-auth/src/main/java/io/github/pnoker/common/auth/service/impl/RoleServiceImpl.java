@@ -172,8 +172,10 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * @param entityQuery {@link RoleQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for role search.
+     *
+     * @param entityQuery {@link RoleQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link RoleDO}
      */
     private LambdaQueryWrapper<RoleDO> fuzzyQuery(RoleQuery entityQuery) {
         LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
@@ -186,10 +188,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * @param entityBO       {@link RoleBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
+     * Check whether a role is duplicated by parent role, name, code, and tenant.
+     *
+     * @param entityBO       {@link RoleBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(RoleBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
@@ -210,11 +214,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * Primary key ID
+     * Get role data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link RoleDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link RoleDO} if found, otherwise {@code null} when {@code throwException}
+     * is false
      */
     private RoleDO getDOById(Long id, boolean throwException) {
         RoleDO entityDO = roleManager.getById(id);

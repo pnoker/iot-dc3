@@ -116,8 +116,10 @@ public class TenantServiceImpl implements TenantService {
     }
 
     /**
-     * @param entityQuery {@link TenantQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for tenant search.
+     *
+     * @param entityQuery {@link TenantQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link TenantDO}
      */
     private LambdaQueryWrapper<TenantDO> fuzzyQuery(TenantQuery entityQuery) {
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
@@ -131,10 +133,12 @@ public class TenantServiceImpl implements TenantService {
     }
 
     /**
-     * @param entityBO       {@link TenantBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
+     * Check whether a tenant is duplicated by tenant name and tenant code.
+     *
+     * @param entityBO       {@link TenantBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(TenantBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
@@ -153,11 +157,12 @@ public class TenantServiceImpl implements TenantService {
     }
 
     /**
-     * Primary key ID
+     * Get tenant data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link TenantDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link TenantDO} if found, otherwise {@code null} when {@code throwException}
+     * is false
      */
     private TenantDO getDOById(Long id, boolean throwException) {
         TenantDO entityDO = tenantManager.getById(id);
