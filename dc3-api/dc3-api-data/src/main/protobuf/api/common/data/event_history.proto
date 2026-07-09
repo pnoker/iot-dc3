@@ -21,7 +21,7 @@ package api.common.data;
 
 import "api/common/r.proto";
 import "api/common/page.proto";
-import "api/center/data/command_history.proto";
+import "api/common/data/command_history.proto";
 
 option java_package = "io.github.pnoker.api.center.data";
 option java_outer_classname = "EventHistoryProto";

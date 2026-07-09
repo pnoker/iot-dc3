@@ -22,8 +22,8 @@ package api.common.manager;
 import "api/common/page.proto";
 import "api/common/r.proto";
 import "api/common/entity.proto";
-import "api/center/manager/manager_query.proto";
-import "api/center/manager/manager_query_page.proto";
+import "api/common/manager/manager_query.proto";
+import "api/common/manager/manager_query_page.proto";
 
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "ManagerCommandProto";

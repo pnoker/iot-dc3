@@ -25,38 +25,8 @@
         <version>2026.5.22</version>
     </parent>
 
-    <name>${project.artifactId}</name>
     <artifactId>dc3-api-manager</artifactId>
-    <version>2026.5.22</version>
-    <packaging>jar</packaging>
-
+    <name>${project.artifactId}</name>
     <description>The Manager Service gRPC API of the IoT DC3 platform.</description>
-
-    <developers>
-        <developer>
-            <id>pnoker</id>
-            <name>pnoker</name>
-            <email>pnokers@icloud.com</email>
-            <roles>
-                <role>PMC</role>
-            </roles>
-            <organization>pnoker.github.io</organization>
-            <url>https://github.com/pnoker/iot-dc3</url>
-        </developer>
-    </developers>
-
-    <licenses>
-        <license>
-            <name>GNU Affero General Public License v3.0</name>
-            <url>https://www.gnu.org/licenses/agpl-3.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <scm>
-        <url>https://github.com/pnoker/iot-dc3</url>
-        <connection>scm:git:https://github.com/pnoker/iot-dc3.git</connection>
-        <developerConnection>scm:git:https://github.com/pnoker/iot-dc3.git</developerConnection>
-    </scm>
 
 </project>

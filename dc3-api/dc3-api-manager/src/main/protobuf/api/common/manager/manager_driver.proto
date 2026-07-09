@@ -19,61 +19,62 @@ syntax = "proto3";
 
 package api.common.manager;
 
-import "api/common/page.proto";
 import "api/common/r.proto";
+import "api/common/page.proto";
 import "api/common/entity.proto";
-import "api/center/manager/manager_query.proto";
-import "api/center/manager/manager_query_page.proto";
+import "api/common/manager/manager_query.proto";
+import "api/common/manager/manager_query_page.proto";
 
+// Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.manager";
-option java_outer_classname = "ManagerProfileProto";
+option java_outer_classname = "ManagerDriverProto";
 option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
-// Service interface defining RPC calls related to profile/template management
-service ProfileApi {
-  // Paginated query for profile/template information
-  rpc ListByPage (GrpcPageProfileQuery) returns (GrpcRPageProfileDTO);
-  // Query single profile/template information by Profile ID
-  rpc GetByProfileId (GrpcProfileQuery) returns (GrpcRProfileDTO);
-  // Batch query profile/template information by Profile IDs
-  rpc ListByProfileIds (GrpcProfileIdsQuery) returns (GrpcRProfileListDTO);
-  // Query profiles/templates bound to a Device ID
-  rpc ListByDeviceId (GrpcDeviceQuery) returns (GrpcRProfileListDTO);
+// Service interface defining RPC calls related to driver management
+service DriverApi {
+  // Paginated query for driver information
+  rpc ListByPage (GrpcPageDriverQuery) returns (GrpcRPageDriverDTO);
+  // Query driver information by Driver ID
+  rpc GetByDriverId (GrpcDriverQuery) returns (GrpcRDriverDTO);
+  // Batch query driver information by Driver IDs
+  rpc ListByDriverIds (GrpcDriverIdsQuery) returns (GrpcRDriverListDTO);
+  // Query associated driver information by Device ID
+  rpc GetByDeviceId (GrpcDeviceQuery) returns (GrpcRDriverDTO);
 }
 
-// Response wrapper for paginated profile query
-message GrpcRPageProfileDTO {
+// Response wrapper for paginated driver query
+message GrpcRPageDriverDTO {
   // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  // Returned paginated profile data
-  GrpcPageProfileDTO data = 2;
+  // Returned paginated driver data
+  GrpcPageDriverDTO data = 2;
 }
 
-// Profile page data structure
-message GrpcPageProfileDTO {
+// Driver page data structure
+message GrpcPageDriverDTO {
   // Pagination information including page number, page size, and total count
   GrpcPage page = 1;
 
-  // List of profile data
-  repeated GrpcProfileDTO data = 2;
+  // List of driver data
+  repeated GrpcDriverDTO data = 2;
 }
 
-// Response wrapper for profile list query
-message GrpcRProfileListDTO {
+// Response wrapper for driver list query
+message GrpcRDriverListDTO {
   // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  // Returned profile list data
-  repeated GrpcProfileDTO data = 2;
+  // Returned driver list data
+  repeated GrpcDriverDTO data = 2;
 }
 
-// Response wrapper for single profile query
-message GrpcRProfileDTO {
+// Response wrapper for single driver query
+message GrpcRDriverDTO {
   // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  // Returned single profile data
-  GrpcProfileDTO data = 2;
+  // Returned single driver data
+  GrpcDriverDTO data = 2;
 }

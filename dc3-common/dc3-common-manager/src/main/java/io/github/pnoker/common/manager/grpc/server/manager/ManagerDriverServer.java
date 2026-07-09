@@ -21,13 +21,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.DriverApiGrpc;
 import io.github.pnoker.api.center.manager.GrpcDeviceQuery;
 import io.github.pnoker.api.center.manager.GrpcDriverIdsQuery;
-import io.github.pnoker.api.center.manager.GrpcDriverQuery;
 import io.github.pnoker.api.center.manager.GrpcPageDriverDTO;
 import io.github.pnoker.api.center.manager.GrpcPageDriverQuery;
 import io.github.pnoker.api.center.manager.GrpcRDriverDTO;
 import io.github.pnoker.api.center.manager.GrpcRDriverListDTO;
 import io.github.pnoker.api.center.manager.GrpcRPageDriverDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
+import io.github.pnoker.api.common.GrpcDriverQuery;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.api.common.GrpcRFactory;
@@ -164,7 +164,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
             DriverBO driverBO;
             try {
                 driverBO = driverService.getById(request.getDriverId());
-            } catch (NotFoundException e) {
+            } catch (NotFoundException ignored) {
                 driverBO = null;
             }
             if (Objects.isNull(driverBO)) {

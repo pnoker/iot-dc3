@@ -17,36 +17,19 @@
 
 syntax = "proto3";
 
-package api.common.driver;
+package api.common;
 
-import public "api/common/query.proto";
-
-// Configuration options for code generation
-option java_package = "io.github.pnoker.api.common.driver";
-option java_outer_classname = "DriverQueryProto";
-option objc_class_prefix = "Driver";
+// Config
+option java_package = "io.github.pnoker.api.common";
+option java_outer_classname = "QueryProto";
+option objc_class_prefix = "Common";
 option java_multiple_files = true;
 
-// Device query structure used to query device-related information
-message GrpcDeviceQuery {
-  // Identifier of the driver to which the device belongs
+// Driver query structure used to query driver-related information
+message GrpcDriverQuery {
+  // Identifies specific driver instance
   int64 driver_id = 1;
 
-  // Identifier of the specific device
-  int64 device_id = 2;
-
   // Identifies the tenant
-  int64 tenant_id = 3;
-}
-
-// Point query structure used to query point-related information
-message GrpcPointQuery {
-  // Identifier of the driver to which the point belongs
-  int64 driver_id = 1;
-
-  // Identifier of the specific point
-  int64 point_id = 2;
-
-  // Identifies the tenant
-  int64 tenant_id = 3;
+  int64 tenant_id = 2;
 }
