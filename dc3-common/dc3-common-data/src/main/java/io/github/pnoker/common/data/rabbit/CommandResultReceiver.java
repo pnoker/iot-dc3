@@ -48,6 +48,14 @@ public class CommandResultReceiver {
 
     private final CommandHistoryManager commandHistoryManager;
 
+    /**
+     * Consume a command execution result and update the matching command history record
+     * by record id with its status, error, and result values.
+     *
+     * @param channel   the RabbitMQ channel for manual ack
+     * @param message   the raw message carrying the delivery tag
+     * @param resultDTO the deserialized command result
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{commandResultQueue.name}")
     public void onResult(Channel channel, Message message, CommandCallResultDTO resultDTO) {

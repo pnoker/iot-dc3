@@ -47,6 +47,13 @@ public class PointCommandDeadReceiver {
 
     private final PointCommandHistoryManager pointCommandHistoryManager;
 
+    /**
+     * Consume a point command dead-letter message and mark the matching point command
+     * history record as dead, using the message correlation id as the command id.
+     *
+     * @param channel the RabbitMQ channel for manual ack
+     * @param message the dead-letter message carrying the correlation id
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{pointCommandDeadQueue.name}")
     public void onDeadLetter(Channel channel, Message message) {

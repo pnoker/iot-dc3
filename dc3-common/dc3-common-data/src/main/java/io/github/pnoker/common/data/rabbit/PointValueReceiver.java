@@ -49,6 +49,15 @@ public class PointValueReceiver {
 
     private final PointValueService pointValueService;
 
+    /**
+     * Consume a point value message: route it to the batch buffer when the receive speed
+     * exceeds the threshold, otherwise save it directly. Manual ack on success, requeue
+     * on failure.
+     *
+     * @param channel      the RabbitMQ channel for manual ack
+     * @param message      the raw message carrying the delivery tag
+     * @param pointValueBO the deserialized point value
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{pointValueQueue.name}")
     public void pointValueReceive(Channel channel, Message message, PointValueBO pointValueBO) {

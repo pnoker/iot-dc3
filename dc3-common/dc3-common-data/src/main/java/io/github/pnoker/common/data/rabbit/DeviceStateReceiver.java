@@ -45,6 +45,14 @@ public class DeviceStateReceiver {
 
     private final DeviceStateService deviceStateService;
 
+    /**
+     * Consume a device state message and forward it as a heartbeat to the device state
+     * service.
+     *
+     * @param channel   the RabbitMQ channel for manual ack
+     * @param message   the raw message carrying the delivery tag
+     * @param entityDTO the deserialized device state
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{deviceStateQueue.name}")
     public void deviceStateReceive(Channel channel, Message message, DeviceStateDTO entityDTO) {

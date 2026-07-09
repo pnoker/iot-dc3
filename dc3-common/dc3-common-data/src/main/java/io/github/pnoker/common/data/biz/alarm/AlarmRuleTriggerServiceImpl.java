@@ -153,6 +153,12 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
                 RuleFactValues.eventReport(entityDTO)));
     }
 
+    /**
+     * Dispatch a single fact into the alarm pipeline, swallowing exceptions so a failed
+     * fact never breaks the message consumer.
+     *
+     * @param fact the rule fact to evaluate
+     */
     private void process(RuleFact fact) {
         try {
             alarmRulePipelineService.process(fact);
@@ -162,10 +168,22 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
         }
     }
 
+    /**
+     * Resolve the fact timestamp, defaulting to now when the payload carries none.
+     *
+     * @param time the payload timestamp, may be null
+     * @return the timestamp to use for the rule fact
+     */
     private LocalDateTime factTime(LocalDateTime time) {
         return Objects.nonNull(time) ? time : LocalDateTimeUtil.now();
     }
 
+    /**
+     * Return whether the given id is a valid reference (non-null and positive).
+     *
+     * @param id the id to test
+     * @return {@code true} if the id is a positive non-null value
+     */
     private boolean isValidId(Long id) {
         return Objects.nonNull(id) && id > 0;
     }

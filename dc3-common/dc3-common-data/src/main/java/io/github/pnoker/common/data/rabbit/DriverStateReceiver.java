@@ -45,6 +45,14 @@ public class DriverStateReceiver {
 
     private final DriverStateService driverStateService;
 
+    /**
+     * Consume a driver state message and forward it as a heartbeat to the driver state
+     * service.
+     *
+     * @param channel   the RabbitMQ channel for manual ack
+     * @param message   the raw message carrying the delivery tag
+     * @param entityDTO the deserialized driver state
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{driverStateQueue.name}")
     public void driverStateReceive(Channel channel, Message message, DriverStateDTO entityDTO) {

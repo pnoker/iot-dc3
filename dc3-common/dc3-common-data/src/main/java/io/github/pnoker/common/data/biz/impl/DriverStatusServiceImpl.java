@@ -132,6 +132,13 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         return list;
     }
 
+    /**
+     * Resolve the current status code for each driver, mapping expired or missing states
+     * to offline.
+     *
+     * @param drivers the drivers to resolve status for
+     * @return map from driver id to its status code
+     */
     private Map<Long, String> getStatusMap(List<FacadeDriverBO> drivers) {
         Map<Long, String> statusMap = new HashMap<>(16);
         LocalDateTime now = LocalDateTime.now();

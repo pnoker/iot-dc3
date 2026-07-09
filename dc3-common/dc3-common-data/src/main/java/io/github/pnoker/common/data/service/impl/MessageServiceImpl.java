@@ -120,8 +120,10 @@ public class MessageServiceImpl implements MessageService {
     }
 
     /**
-     * @param entityQuery {@link MessageQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for alarm message search.
+     *
+     * @param entityQuery {@link MessageQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link MessageDO}
      */
     private LambdaQueryWrapper<MessageDO> fuzzyQuery(MessageQuery entityQuery) {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
@@ -137,10 +139,12 @@ public class MessageServiceImpl implements MessageService {
     }
 
     /**
-     * @param entityBO       {@link MessageBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
+     * Check whether an alarm message is duplicated by message name and code.
+     *
+     * @param entityBO       {@link MessageBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(MessageBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
@@ -159,11 +163,12 @@ public class MessageServiceImpl implements MessageService {
     }
 
     /**
-     * Primary key ID
+     * Get alarm message data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link MessageDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link MessageDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private MessageDO getDOById(Long id, boolean throwException) {
         MessageDO entityDO = messageManager.getById(id);

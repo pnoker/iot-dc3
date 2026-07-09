@@ -45,6 +45,13 @@ public class DeviceAlarmReceiver {
 
     private final DeviceAlarmService deviceAlarmService;
 
+    /**
+     * Consume a device alarm message and forward it to the alarm service for processing.
+     *
+     * @param channel   the RabbitMQ channel for manual ack
+     * @param message   the raw message carrying the delivery tag
+     * @param entityDTO the deserialized device alarm
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{deviceAlarmQueue.name}")
     public void deviceAlarmReceive(Channel channel, Message message, DeviceAlarmDTO entityDTO) {

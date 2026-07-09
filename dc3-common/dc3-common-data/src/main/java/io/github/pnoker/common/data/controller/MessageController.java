@@ -56,7 +56,7 @@ import java.util.Objects;
  * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "message", description = "Platform messages: query messages exchanged between services and devices over the message bus including data reports, commands, and system notifications")
+@Tag(name = "message", description = "Alarm message templates: manage reusable message templates (name, code, level, enabled flag) that alarm rules and notifications can reference")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.MESSAGE_URL_PREFIX)

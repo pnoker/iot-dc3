@@ -45,6 +45,13 @@ public class EventReportReceiver {
 
     private final EventHistoryService eventHistoryService;
 
+    /**
+     * Consume an event report message and forward it to the event history service.
+     *
+     * @param channel   the RabbitMQ channel for manual ack
+     * @param message   the raw message carrying the delivery tag
+     * @param entityDTO the deserialized event report
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{eventReportQueue.name}")
     public void onEventReport(Channel channel, Message message, EventReportDTO entityDTO) {

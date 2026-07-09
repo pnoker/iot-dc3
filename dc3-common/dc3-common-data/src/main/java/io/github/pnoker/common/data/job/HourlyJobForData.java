@@ -36,13 +36,10 @@ import org.springframework.stereotype.Component;
 public class HourlyJobForData extends QuartzJobBean {
 
     /**
+     * Hourly maintenance tick for the data service.
      *
-     * *
-     * <p>
-     * * biz service
-     *
-     * @param context JobExecutionContext
-     * @throws JobExecutionException JobExecutionException
+     * @param context the Quartz job execution context
+     * @throws JobExecutionException if the job fails
      */
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {

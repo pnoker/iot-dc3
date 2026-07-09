@@ -48,6 +48,14 @@ public class PointCommandResultReceiver {
 
     private final PointCommandHistoryManager pointCommandHistoryManager;
 
+    /**
+     * Consume a point command execution result and update the matching point command
+     * history record by command id with its status, error, and response value.
+     *
+     * @param channel   the RabbitMQ channel for manual ack
+     * @param message   the raw message carrying the delivery tag
+     * @param resultDTO the deserialized point command result
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{pointCommandResultQueue.name}")
     public void onResult(Channel channel, Message message, PointCommandResultDTO resultDTO) {
