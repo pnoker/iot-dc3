@@ -107,7 +107,8 @@ async function testPagination(page, watch, pageDef, result) {
       result.actions.push('page size 24');
       await assertClean(`${pageDef.name} page size`, watch, mark);
     } else {
-      await page.keyboard.press('Escape').catch(() => {});
+      await page.keyboard.press('Escape').catch(() => {
+      });
     }
   }
 }

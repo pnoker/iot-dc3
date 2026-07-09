@@ -160,7 +160,12 @@ export const useEntityNames = () => {
     id == null ? '' : (cache.point[String(id)] ?? String(id));
 
   /** Resolve a mixed batch of (source, id) rows in one call. */
-  const resolveBySource = async (rows: Array<{source: AlertSourceKind; sourceId: string | number}>): Promise<void> => {
+  const resolveBySource = async (
+    rows: Array<{
+      source: AlertSourceKind;
+      sourceId: string | number;
+    }>
+  ): Promise<void> => {
     const ptIds: Array<string | number> = [];
     const devIds: Array<string | number> = [];
     const drvIds: Array<string | number> = [];

@@ -20,6 +20,7 @@ import i18n from '@/config/i18n';
 import plugins from '@/config/plugins/index';
 import router from '@/config/router';
 import {createApp} from 'vue';
+import {logger} from '@/utils/log';
 
 import '@/styles/global.scss'; // config app
 
@@ -29,8 +30,8 @@ app.use(router);
 app.use(createPinia());
 app.use(i18n);
 plugins(app);
-app.config.errorHandler = (err, instance, info) => {
-  console.error('Global error:', err, 'Component:', instance, 'Info:', info);
+app.config.errorHandler = (err, _instance, info) => {
+  logger.error('Global error:', err, 'Info:', info);
 };
 app.mount('#app');
 

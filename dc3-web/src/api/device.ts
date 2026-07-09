@@ -51,7 +51,12 @@ export const listDeviceStatusByProfileId = (profileId: string) =>
   httpGet(`${API_DATA_BASE}/device/status/list_by_profile_id`, {params: {profile_id: profileId}});
 
 export const listDeviceByPointId = (pointId: string) =>
-  httpGet<R<{count: number; devices: DeviceRecord[]}>>(`${API_MANAGER_BASE}/point/list_device_statistics_by_point_id`, {
+  httpGet<
+    R<{
+      count: number;
+      devices: DeviceRecord[];
+    }>
+  >(`${API_MANAGER_BASE}/point/list_device_statistics_by_point_id`, {
     params: {point_id: pointId},
   });
 

@@ -191,7 +191,8 @@ async function openFirstSelectOption(root, page, selector = '.el-select:visible'
   await page.waitForTimeout(250);
   const option = page.locator('.el-select-dropdown:visible .el-select-dropdown__item:not(.is-disabled)').first();
   if (!(await option.count())) {
-    await page.keyboard.press('Escape').catch(() => {});
+    await page.keyboard.press('Escape').catch(() => {
+    });
     return false;
   }
   await option.click();
@@ -212,7 +213,8 @@ async function expandAppScrollForFullCapture(page) {
     .evaluate((el) => {
       el.scrollTop = 0;
     })
-    .catch(() => {});
+    .catch(() => {
+    });
 
   return page.addStyleTag({
     content: `
@@ -258,7 +260,8 @@ async function captureScreenshot(page, shot, target) {
   try {
     await page.screenshot({path: target, fullPage: true});
   } finally {
-    await style.evaluate((node) => node.remove()).catch(() => {});
+    await style.evaluate((node) => node.remove()).catch(() => {
+    });
   }
 }
 

@@ -69,6 +69,7 @@ import {listPointByProfileId} from '@/api/point';
 import {listCommandByProfileId} from '@/api/command';
 import {listEventByProfileId} from '@/api/event';
 import {nameRules, remarkRules} from '@/utils/formRuleUtil';
+import {logger} from '@/utils/log';
 import {type ComposerTranslation, useI18n} from 'vue-i18n';
 
 type AttributeConfigValue = string | number | boolean | null;
@@ -1101,9 +1102,7 @@ export default defineComponent({
           } catch (error) {
             failedCount++;
             cell.error = t('device.edit.pointSaveCellFailed');
-            if ('dev' === import.meta.env.MODE) {
-              console.error(error);
-            }
+            logger.debug(error);
           } finally {
             cell.saving = false;
           }
@@ -1220,9 +1219,7 @@ export default defineComponent({
           } catch (error) {
             failedCount++;
             cell.error = t('device.edit.commandSaveCellFailed');
-            if ('dev' === import.meta.env.MODE) {
-              console.error(error);
-            }
+            logger.debug(error);
           } finally {
             cell.saving = false;
           }
@@ -1337,9 +1334,7 @@ export default defineComponent({
           } catch (error) {
             failedCount++;
             cell.error = t('device.edit.eventSaveCellFailed');
-            if ('dev' === import.meta.env.MODE) {
-              console.error(error);
-            }
+            logger.debug(error);
           } finally {
             cell.saving = false;
           }

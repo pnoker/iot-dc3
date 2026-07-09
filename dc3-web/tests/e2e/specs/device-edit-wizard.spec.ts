@@ -213,9 +213,13 @@ test.describe('device edit tabs', () => {
         '/api/v3/manager/driver_attribute_config/list_by_device_id',
         {device_id: deviceId}
       );
-      const matchingConfigs = ((configsAfterUpdate.data as {data?: Array<{attributeId?: unknown}>}).data || []).filter(
-        (item) => String(item.attributeId) === attributeId
-      );
+      const matchingConfigs = (
+        (
+          configsAfterUpdate.data as {
+            data?: Array<{attributeId?: unknown}>;
+          }
+        ).data || []
+      ).filter((item) => String(item.attributeId) === attributeId);
       expect(matchingConfigs).toHaveLength(1);
     } finally {
       if (deviceId) await apiPost(page, '/api/v3/manager/device/delete', {}, {id: deviceId}).catch(() => {});

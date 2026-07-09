@@ -41,8 +41,10 @@ export function shortText(text, size = 260) {
 }
 
 export async function waitPage(page) {
-  await page.waitForLoadState('domcontentloaded').catch(() => {});
-  await page.waitForLoadState('networkidle', {timeout: 6000}).catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {
+  });
+  await page.waitForLoadState('networkidle', {timeout: 6000}).catch(() => {
+  });
   await delay(500);
 }
 
@@ -55,7 +57,8 @@ export async function login(page, base) {
     await page.getByPlaceholder('Please enter username').fill(E2E_CREDENTIALS.name);
     await page.locator('.login-form input[type="password"]').fill(E2E_CREDENTIALS.password);
     await loginButton.click();
-    await page.waitForURL((url) => !url.hash.includes('/login'), {timeout: 15000}).catch(() => {});
+    await page.waitForURL((url) => !url.hash.includes('/login'), {timeout: 15000}).catch(() => {
+    });
   }
   await waitPage(page);
   if (page.url().includes('/login')) {
@@ -152,12 +155,14 @@ export async function closeModal(page) {
   if (await modal.count()) {
     const cancel = modal.getByRole('button', {name: /Cancel|Close|No|取消|关闭|否/}).last();
     if (await cancel.count()) {
-      await cancel.click().catch(() => {});
+      await cancel.click().catch(() => {
+      });
       await delay(300);
       return;
     }
   }
-  await page.keyboard.press('Escape').catch(() => {});
+  await page.keyboard.press('Escape').catch(() => {
+  });
   await delay(300);
 }
 
@@ -260,7 +265,8 @@ export async function createEntity(page, cleanupStack, seed) {
   }
 
   cleanupStack.push(async () => {
-    await apiPost(page, seed.deleteUrl, {}, {id}).catch(() => {});
+    await apiPost(page, seed.deleteUrl, {}, {id}).catch(() => {
+    });
   });
   return id;
 }

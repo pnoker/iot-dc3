@@ -16,6 +16,7 @@
 
 import {ElNotification} from 'element-plus';
 import i18n from '@/config/i18n';
+import {logger} from './log';
 import {isNull} from './validationUtil';
 
 /**
@@ -53,8 +54,8 @@ export const warnMessage = (
     message = i18n.global.t('common.notification.warningDefault');
   }
 
-  if ('dev' === import.meta.env.MODE && error) {
-    console.error(error);
+  if (error) {
+    logger.debug(error);
   }
 
   ElNotification({
@@ -81,8 +82,8 @@ export const failMessage = (
     message = i18n.global.t('common.notification.errorDefault');
   }
 
-  if ('dev' === import.meta.env.MODE && error) {
-    console.error(error);
+  if (error) {
+    logger.debug(error);
   }
 
   ElNotification({
