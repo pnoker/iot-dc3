@@ -109,7 +109,9 @@ class TenantContextHolderTest {
     void runIgnoreActionRestoresOnException() {
         assertThat(TenantContextHolder.isIgnored()).isFalse();
         assertThatThrownBy(() ->
-            TenantContextHolder.runIgnoreAction(() -> { throw new IllegalStateException("boom"); })
+                TenantContextHolder.runIgnoreAction(() -> {
+                    throw new IllegalStateException("boom");
+                })
         ).isInstanceOf(IllegalStateException.class);
         assertThat(TenantContextHolder.isIgnored()).isFalse();
     }

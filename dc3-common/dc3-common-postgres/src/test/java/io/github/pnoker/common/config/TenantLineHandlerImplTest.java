@@ -46,7 +46,7 @@ class TenantLineHandlerImplTest {
     void getTenantIdThrowsWhenNullAndNotIgnored() {
         // no setTenantId, not ignored → fail-closed
         assertThatThrownBy(() -> handler.getTenantId())
-            .isInstanceOf(TenantNotScopedException.class);
+                .isInstanceOf(TenantNotScopedException.class);
     }
 
     @Test
