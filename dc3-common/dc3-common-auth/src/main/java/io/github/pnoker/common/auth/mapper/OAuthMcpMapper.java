@@ -121,16 +121,16 @@ public interface OAuthMcpMapper {
      * Stores the new and previous refresh-token hashes so rotated refresh tokens can be
      * detected on replay.
      *
-     * @param id                   the authorization record id
-     * @param codeHash             the authorization-code hash (marks the code consumed)
-     * @param accessTokenJti       the issued access-token JTI
-     * @param accessIssued         access-token issuance time
-     * @param accessExpires        access-token expiry time
-     * @param refreshHash          the issued refresh-token hash
-     * @param previousRefreshHash  the prior refresh-token hash (for replay detection)
-     * @param refreshIssued        refresh-token issuance time
-     * @param refreshExpires       refresh-token expiry time
-     * @param tokenClaims          the serialized token claims
+     * @param id                  the authorization record id
+     * @param codeHash            the authorization-code hash (marks the code consumed)
+     * @param accessTokenJti      the issued access-token JTI
+     * @param accessIssued        access-token issuance time
+     * @param accessExpires       access-token expiry time
+     * @param refreshHash         the issued refresh-token hash
+     * @param previousRefreshHash the prior refresh-token hash (for replay detection)
+     * @param refreshIssued       refresh-token issuance time
+     * @param refreshExpires      refresh-token expiry time
+     * @param tokenClaims         the serialized token claims
      * @return the number of affected rows
      */
     int activateAuthorizationTokens(@Param("id") Long id,
@@ -317,10 +317,10 @@ public interface OAuthMcpMapper {
      * List the tools visible to a connection given the caller's tenant, principal, and
      * whether high-risk tools are allowed by scope.
      *
-     * @param tenantId       the connection's tenant
-     * @param principalId    the connection's principal
-     * @param connectionId   the connection id
-     * @param allowHighRisk  whether high-risk tools are included
+     * @param tenantId      the connection's tenant
+     * @param principalId   the connection's principal
+     * @param connectionId  the connection id
+     * @param allowHighRisk whether high-risk tools are included
      * @return the visible tool records
      */
     List<McpToolRecord> listVisibleTools(@Param("tenantId") Long tenantId,
@@ -413,8 +413,8 @@ public interface OAuthMcpMapper {
      * Look up a confirmation already consumed for an idempotency key, so a replayed
      * high-risk call is detected and rejected.
      *
-     * @param connectionId    the connection id
-     * @param idempotencyKey  the idempotency key
+     * @param connectionId   the connection id
+     * @param idempotencyKey the idempotency key
      * @return the consumed confirmation record, or {@code null} if not consumed yet
      */
     McpToolConfirmationRecord selectConsumedByIdempotencyKey(@Param("connectionId") Long connectionId,

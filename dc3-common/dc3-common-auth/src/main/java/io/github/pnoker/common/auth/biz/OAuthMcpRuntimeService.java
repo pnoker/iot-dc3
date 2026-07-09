@@ -90,9 +90,9 @@ public interface OAuthMcpRuntimeService {
      * then issues a single-use authorization code. Runs before tenant context is
      * established, so membership is validated explicitly.
      *
-     * @param params           OAuth authorization request parameters (response_type,
-     *                         client_id, redirect_uri, scope, code_challenge, state, etc.)
-     * @param principalHeader  authenticated caller principal and tenant
+     * @param params          OAuth authorization request parameters (response_type,
+     *                        client_id, redirect_uri, scope, code_challenge, state, etc.)
+     * @param principalHeader authenticated caller principal and tenant
      * @return the redirect URI carrying the authorization code (and echoed state)
      */
     URI authorize(Map<String, String> params, RequestHeader.PrincipalHeader principalHeader);
@@ -103,7 +103,7 @@ public interface OAuthMcpRuntimeService {
      * authentication; the issued token's tenant claim is the authorization basis and is
      * validated explicitly.
      *
-     * @param form               token request form (grant_type and grant-specific fields)
+     * @param form                token request form (grant_type and grant-specific fields)
      * @param authorizationHeader client credentials for confidential clients
      * @return the token response as a JSON-serializable map
      */
@@ -124,7 +124,7 @@ public interface OAuthMcpRuntimeService {
      * Revoke an access or refresh token (RFC 7009). Resolves the authorization by the
      * presented token only and marks it revoked, regardless of tenant context.
      *
-     * @param form               revocation request form carrying the token to revoke
+     * @param form                revocation request form carrying the token to revoke
      * @param authorizationHeader client credentials
      * @return a JSON-serializable map with the revoked flag
      */
@@ -162,8 +162,8 @@ public interface OAuthMcpRuntimeService {
      * Create a new MCP connection binding a principal to an OAuth client. The connection
      * is scoped to the authenticated caller's tenant.
      *
-     * @param connection       connection definition carrying name, client id, principal, etc.
-     * @param principalHeader  authenticated caller principal and tenant
+     * @param connection      connection definition carrying name, client id, principal, etc.
+     * @param principalHeader authenticated caller principal and tenant
      * @return the created connection
      */
     McpConnectionVO createConnection(McpConnectionAddBO connection,
@@ -173,8 +173,8 @@ public interface OAuthMcpRuntimeService {
      * Revoke an MCP connection so it can no longer mint tokens. Tenant-scoped: only the
      * caller's own connection within their tenant can be revoked.
      *
-     * @param connectionId     the connection to revoke
-     * @param principalHeader  authenticated caller principal and tenant
+     * @param connectionId    the connection to revoke
+     * @param principalHeader authenticated caller principal and tenant
      */
     void revokeConnection(Long connectionId, RequestHeader.PrincipalHeader principalHeader);
 
@@ -183,9 +183,9 @@ public interface OAuthMcpRuntimeService {
      * are deleted before the new set is inserted; each tool id must exist and be enabled.
      * Tenant-scoped: the connection must belong to the caller's tenant and principal.
      *
-     * @param connectionId     the connection to update
-     * @param toolIds          the complete new set of enabled tool ids
-     * @param principalHeader  authenticated caller principal and tenant
+     * @param connectionId    the connection to update
+     * @param toolIds         the complete new set of enabled tool ids
+     * @param principalHeader authenticated caller principal and tenant
      */
     void replaceConnectionTools(Long connectionId, List<String> toolIds,
                                 RequestHeader.PrincipalHeader principalHeader);
@@ -193,8 +193,8 @@ public interface OAuthMcpRuntimeService {
     /**
      * List the tool ids enabled for an MCP connection. Tenant-scoped to the caller.
      *
-     * @param connectionId     the connection to query
-     * @param principalHeader  authenticated caller principal and tenant
+     * @param connectionId    the connection to query
+     * @param principalHeader authenticated caller principal and tenant
      * @return the enabled tool ids for the connection
      */
     List<String> listConnectionToolIds(Long connectionId, RequestHeader.PrincipalHeader principalHeader);
@@ -203,10 +203,10 @@ public interface OAuthMcpRuntimeService {
      * List the tools visible to a connection given its granted scopes. Requires the
      * tools/list or tools/call scope; the tools/call_high scope gates high-risk tools in.
      *
-     * @param tenantId      the connection's tenant
-     * @param principalId   the connection's principal
-     * @param connectionId  the connection id
-     * @param scopes        the access token's granted scopes
+     * @param tenantId     the connection's tenant
+     * @param principalId  the connection's principal
+     * @param connectionId the connection id
+     * @param scopes       the access token's granted scopes
      * @return the visible tool definitions
      */
     List<McpToolDefinitionDTO> listVisibleTools(Long tenantId, Long principalId, Long connectionId,
@@ -217,11 +217,11 @@ public interface OAuthMcpRuntimeService {
      * last-used timestamp. Requires the tools/call scope; high-risk visibility follows the
      * tools/call_high scope.
      *
-     * @param tenantId      the connection's tenant
-     * @param principalId   the connection's principal
-     * @param connectionId  the connection id
-     * @param toolName      the tool name to resolve
-     * @param scopes        the access token's granted scopes
+     * @param tenantId     the connection's tenant
+     * @param principalId  the connection's principal
+     * @param connectionId the connection id
+     * @param toolName     the tool name to resolve
+     * @param scopes       the access token's granted scopes
      * @return the resolved tool definition
      */
     McpToolResolveResponseDTO resolveVisibleTool(Long tenantId, Long principalId, Long connectionId, String toolName,
@@ -250,12 +250,12 @@ public interface OAuthMcpRuntimeService {
      * List MCP tool-call audit entries filtered by tenant, principal, tool, status, and
      * risk level. The result limit is bounded to a safe maximum.
      *
-     * @param tenantId   tenant scope
+     * @param tenantId    tenant scope
      * @param principalId optional principal filter
-     * @param toolId     optional tool filter
-     * @param status     optional status filter
-     * @param riskLevel  optional risk-level filter
-     * @param limit      maximum number of results (bounded to 1-500, defaults to 200)
+     * @param toolId      optional tool filter
+     * @param status      optional status filter
+     * @param riskLevel   optional risk-level filter
+     * @param limit       maximum number of results (bounded to 1-500, defaults to 200)
      * @return the matching audit entries
      */
     List<McpAuditVO> listAudit(Long tenantId, Long principalId, String toolId, String status,
