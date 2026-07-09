@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -101,7 +102,7 @@
           :width="column.width"
         >
           <template #default="{row}">
-            <enable-tag v-if="column.kind === 'enable'" :value="getCellValue(row, column.prop)" />
+            <enable-tag v-if="column.kind === 'enable'" :value="getCellValue(row, column.prop)"/>
             <span v-else-if="column.kind === 'color'" class="entity-list-page__color-cell">
               <span
                 :style="{background: getCellValue(row, column.prop) || '#F4F4F5'}"
@@ -111,7 +112,7 @@
             </span>
             <span v-else-if="column.kind === 'icon'" class="entity-list-page__icon-cell">
               <template v-if="cellIcon(row, column.prop)">
-                <el-icon><component :is="cellIcon(row, column.prop)" /></el-icon>
+                <el-icon><component :is="cellIcon(row, column.prop)"/></el-icon>
               </template>
               {{ getCellValue(row, column.prop) }}
             </span>
@@ -173,7 +174,7 @@
           </template>
         </el-table-column>
         <template #empty>
-          <el-empty :description="config.emptyText || t('common.empty')" />
+          <el-empty :description="config.emptyText || t('common.empty')"/>
         </template>
       </el-table>
     </blank-card>
@@ -280,144 +281,144 @@
 </template>
 
 <script lang="ts" setup>
-  import {computed, reactive, watch} from 'vue';
-  import {Plus} from '@element-plus/icons-vue';
+import {computed, reactive, watch} from 'vue';
+import {Plus} from '@element-plus/icons-vue';
 
-  import BlankCard from '@/components/card/blank/BlankCard.vue';
-  import ToolCard from '@/components/card/tool/ToolCard.vue';
-  import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import SearchSegmented from '@/components/segmented/SearchSegmented.vue';
-  import EnableTag from '@/components/tag/EnableTag.vue';
-  import {resolveIcon} from '@/config/constant/icons';
-  import type {EntityListConfig} from '@/config/types/entityList';
-  import {useEntityListPage} from '@/composables/useEntityListPage';
+import BlankCard from '@/components/card/blank/BlankCard.vue';
+import ToolCard from '@/components/card/tool/ToolCard.vue';
+import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
+import SearchSegmented from '@/components/segmented/SearchSegmented.vue';
+import EnableTag from '@/components/tag/EnableTag.vue';
+import {resolveIcon} from '@/config/constant/icons';
+import type {EntityListConfig} from '@/config/types/entityList';
+import {useEntityListPage} from '@/composables/useEntityListPage';
 
-  const props = defineProps<{config: EntityListConfig}>();
+const props = defineProps<{ config: EntityListConfig }>();
 
-  const {
-    t,
-    config,
-    state,
-    searchForm,
-    formVisible,
-    editing,
-    setFormRef,
-    formModel,
-    formRules,
-    dialogTitle,
-    load,
-    search,
-    reset,
-    sort,
-    sizeChange,
-    currentChange,
-    openAdd,
-    openEdit,
-    openDetail,
-    resetForm,
-    submit,
-    remove,
-    formatCell,
-    tagType,
-    canEdit,
-    canDelete,
-  } = useEntityListPage(props.config);
+const {
+  t,
+  config,
+  state,
+  searchForm,
+  formVisible,
+  editing,
+  setFormRef,
+  formModel,
+  formRules,
+  dialogTitle,
+  load,
+  search,
+  reset,
+  sort,
+  sizeChange,
+  currentChange,
+  openAdd,
+  openEdit,
+  openDetail,
+  resetForm,
+  submit,
+  remove,
+  formatCell,
+  tagType,
+  canEdit,
+  canDelete,
+} = useEntityListPage(props.config);
 
-  // treeSelect: raw rows loaded once on dialog open; transform applied reactively via treeOptionsFor
-  const rawTreeData = reactive<Record<string, any[]>>({});
-  let treeLoadGen = 0;
+// treeSelect: raw rows loaded once on dialog open; transform applied reactively via treeOptionsFor
+const rawTreeData = reactive<Record<string, any[]>>({});
+let treeLoadGen = 0;
 
-  watch(formVisible, async (visible) => {
-    if (!visible) return;
-    const myGen = ++treeLoadGen;
-    for (const field of config.value.fields) {
-      if (field.kind === 'treeSelect' && field.tree) {
-        const result = await field.tree.load();
-        if (myGen === treeLoadGen) {
-          rawTreeData[field.prop] = result as any[];
-        }
+watch(formVisible, async (visible) => {
+  if (!visible) return;
+  const myGen = ++treeLoadGen;
+  for (const field of config.value.fields) {
+    if (field.kind === 'treeSelect' && field.tree) {
+      const result = await field.tree.load();
+      if (myGen === treeLoadGen) {
+        rawTreeData[field.prop] = result as any[];
       }
     }
-  });
+  }
+});
 
-  /** Returns tree options for a treeSelect field, applying transform with the live form model. */
-  const treeOptionsFor = (field: {
-    prop: string;
-    tree?: {transform?: (rows: any[], form: Record<string, any>) => unknown[]};
-  }) => {
-    const raw = rawTreeData[field.prop] || [];
-    return field.tree?.transform ? field.tree.transform(raw, formModel) : raw;
-  };
+/** Returns tree options for a treeSelect field, applying transform with the live form model. */
+const treeOptionsFor = (field: {
+  prop: string;
+  tree?: { transform?: (rows: any[], form: Record<string, any>) => unknown[] };
+}) => {
+  const raw = rawTreeData[field.prop] || [];
+  return field.tree?.transform ? field.tree.transform(raw, formModel) : raw;
+};
 
-  // Get a nested value by dot-path without going through formatCell
-  const getCellValue = (row: Record<string, any>, prop: string): any =>
-    prop.split('.').reduce((obj: any, key) => (obj != null ? obj[key] : undefined), row);
+// Get a nested value by dot-path without going through formatCell
+const getCellValue = (row: Record<string, any>, prop: string): any =>
+  prop.split('.').reduce((obj: any, key) => (obj != null ? obj[key] : undefined), row);
 
-  // Resolve icon component once per cell to avoid double call in v-if + :is
-  const cellIcon = (row: Record<string, any>, prop: string) => resolveIcon(getCellValue(row, prop));
+// Resolve icon component once per cell to avoid double call in v-if + :is
+const cellIcon = (row: Record<string, any>, prop: string) => resolveIcon(getCellValue(row, prop));
 
-  // Operation column width based on number of visible action buttons
-  const operationWidth = computed(() => {
-    if (config.value.operationWidth) return config.value.operationWidth;
-    let count = 0;
-    if (config.value.detail) count++;
-    if (config.value.extraActions) count += config.value.extraActions.length;
-    if (config.value.editable) count += 2; // edit + delete
-    if (count <= 1) return 100;
-    if (count <= 3) return 180;
-    if (count === 4) return 260;
-    return 320;
-  });
+// Operation column width based on number of visible action buttons
+const operationWidth = computed(() => {
+  if (config.value.operationWidth) return config.value.operationWidth;
+  let count = 0;
+  if (config.value.detail) count++;
+  if (config.value.extraActions) count += config.value.extraActions.length;
+  if (config.value.editable) count += 2; // edit + delete
+  if (count <= 1) return 100;
+  if (count <= 3) return 180;
+  if (count === 4) return 260;
+  return 320;
+});
 
-  // 供父页在配套弹窗保存 / 工具栏动作完成后刷新表格
-  defineExpose({reload: load});
+// 供父页在配套弹窗保存 / 工具栏动作完成后刷新表格
+defineExpose({reload: load});
 </script>
 
 <style lang="scss" scoped>
-  .entity-list-page {
-    min-width: 0;
+.entity-list-page {
+  min-width: 0;
 
-    &__table {
-      margin-top: 1px;
-      border-radius: 4px;
-    }
+  &__table {
+    margin-top: 1px;
+    border-radius: 4px;
+  }
 
-    &__form {
-      :deep(.el-input),
-      :deep(.el-select),
-      :deep(.el-input-number),
-      :deep(.el-tree-select),
-      :deep(.el-color-picker) {
-        width: 100%;
-      }
-    }
-
-    &__inline-code {
-      padding: 2px 5px;
-      border-radius: 4px;
-      color: var(--el-text-color-regular);
-      background: var(--el-fill-color-light);
-      font-size: 12px;
-    }
-
-    &__color-cell {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    &__swatch {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border-radius: 4px;
-      flex-shrink: 0;
-    }
-
-    &__icon-cell {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+  &__form {
+    :deep(.el-input),
+    :deep(.el-select),
+    :deep(.el-input-number),
+    :deep(.el-tree-select),
+    :deep(.el-color-picker) {
+      width: 100%;
     }
   }
+
+  &__inline-code {
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: var(--el-text-color-regular);
+    background: var(--el-fill-color-light);
+    font-size: 12px;
+  }
+
+  &__color-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__swatch {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  &__icon-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
 </style>

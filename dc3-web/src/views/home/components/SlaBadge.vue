@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <!--
@@ -26,7 +27,7 @@
 <template>
   <div v-if="visible" :class="{'sla-badge--warn': warn}" class="sla-badge">
     <el-icon class="sla-badge__icon">
-      <Warning />
+      <Warning/>
     </el-icon>
     <div v-if="backlog.over24h > 0" class="sla-badge__chip sla-badge__chip--sla" @click="jumpTo('sla')">
       <span class="sla-badge__value">{{ backlog.over24h }}</span>
@@ -40,94 +41,95 @@
 </template>
 
 <script lang="ts" setup>
-  import {computed, onMounted, reactive, ref} from 'vue';
-  import {useRouter} from 'vue-router';
-  import {Warning} from '@element-plus/icons-vue';
+import {computed, onMounted, reactive, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {Warning} from '@element-plus/icons-vue';
 
-  import {alertAging, silentSources} from '@/api/dashboard';
-  import type {AgingBacklog, SilentSource} from '@/config/types/dashboard';
-  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {alertAging, silentSources} from '@/api/dashboard';
+import type {AgingBacklog, SilentSource} from '@/config/types/dashboard';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
-  const router = useRouter();
-  const {run} = useAsyncLoader();
+const router = useRouter();
+const {run} = useAsyncLoader();
 
-  const backlog = reactive<AgingBacklog>({under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
-  const silentCount = ref(0);
+const backlog = reactive<AgingBacklog>({under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
+const silentCount = ref(0);
 
-  const visible = computed(() => backlog.over24h > 0 || silentCount.value > 0);
-  const warn = computed(() => backlog.over24h > 0);
+const visible = computed(() => backlog.over24h > 0 || silentCount.value > 0);
+const warn = computed(() => backlog.over24h > 0);
 
-  const load = () =>
-    run(async () => {
-      const [a, s]: [{data?: AgingBacklog}, {data?: SilentSource[]}] = await Promise.all([
-        alertAging(),
-        silentSources(7, 15, 200),
-      ]);
-      Object.assign(backlog, a?.data ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
-      silentCount.value = (s?.data ?? []).length;
-    });
+const load = () =>
+  run(async () => {
+    const [a, s]: [{ data?: AgingBacklog }, { data?: SilentSource[] }] = await Promise.all([
+      alertAging(),
+      silentSources(7, 15, 200),
+    ]);
+    Object.assign(backlog, a?.data ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
+    silentCount.value = (s?.data ?? []).length;
+  });
 
-  const jumpTo = (tab: 'sla' | 'availability') => {
-    router.push({name: 'settingsAlarmOverview', query: {tab}}).catch(() => {});
-  };
+const jumpTo = (tab: 'sla' | 'availability') => {
+  router.push({name: 'settingsAlarmOverview', query: {tab}}).catch(() => {
+  });
+};
 
-  onMounted(load);
-  defineExpose({refresh: load});
+onMounted(load);
+defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>
-  .sla-badge {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 14px;
-    border-radius: 6px;
-    background: #fdf6ec;
-    border: 1px solid #faecd8;
-    color: #e6a23c;
-    font-size: 13px;
+.sla-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: #fdf6ec;
+  border: 1px solid #faecd8;
+  color: #e6a23c;
+  font-size: 13px;
 
-    &--warn {
-      background: #fef0f0;
-      border-color: #fde2e2;
-      color: #f56c6c;
-    }
+  &--warn {
+    background: #fef0f0;
+    border-color: #fde2e2;
+    color: #f56c6c;
+  }
 
-    .sla-badge__icon {
-      font-size: 18px;
-    }
+  .sla-badge__icon {
+    font-size: 18px;
+  }
 
-    .sla-badge__chip {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 6px;
-      padding: 2px 10px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.5);
-      cursor: pointer;
-      transition: background-color 0.12s ease;
+  .sla-badge__chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background-color 0.12s ease;
 
-      &:hover {
-        background: #ffffff;
-      }
-    }
-
-    .sla-badge__chip--sla {
-      color: #f56c6c;
-    }
-
-    .sla-badge__chip--avail {
-      color: #e6a23c;
-    }
-
-    .sla-badge__value {
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    .sla-badge__label {
-      font-size: 12px;
-      opacity: 0.9;
+    &:hover {
+      background: #ffffff;
     }
   }
+
+  .sla-badge__chip--sla {
+    color: #f56c6c;
+  }
+
+  .sla-badge__chip--avail {
+    color: #e6a23c;
+  }
+
+  .sla-badge__value {
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .sla-badge__label {
+    font-size: 12px;
+    opacity: 0.9;
+  }
+}
 </style>

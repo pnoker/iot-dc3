@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -23,29 +24,29 @@
             <el-card class="skeleton-card__body" shadow="hover">
               <div class="skeleton-card__container">
                 <div class="skeleton-card__header">
-                  <el-skeleton-item class="skeleton-card-icon" variant="image" />
-                  <el-skeleton-item class="skeleton-card-name" variant="text" />
+                  <el-skeleton-item class="skeleton-card-icon" variant="image"/>
+                  <el-skeleton-item class="skeleton-card-name" variant="text"/>
                 </div>
                 <div class="skeleton-card__body">
                   <div class="skeleton-card-content">
                     <ul>
-                      <el-skeleton-item class="skeleton-card-text" variant="text" />
-                      <el-skeleton-item class="skeleton-card-text" variant="text" />
-                      <el-skeleton-item class="skeleton-card-text" variant="text" />
-                      <el-skeleton-item class="skeleton-card-text" variant="text" />
+                      <el-skeleton-item class="skeleton-card-text" variant="text"/>
+                      <el-skeleton-item class="skeleton-card-text" variant="text"/>
+                      <el-skeleton-item class="skeleton-card-text" variant="text"/>
+                      <el-skeleton-item class="skeleton-card-text" variant="text"/>
                     </ul>
                   </div>
                   <div class="skeleton-card-content">
-                    <el-skeleton-item class="skeleton-card-description" variant="text" />
+                    <el-skeleton-item class="skeleton-card-description" variant="text"/>
                   </div>
                 </div>
                 <div v-if="props.footer" class="skeleton-card__footer">
                   <div class="skeleton-card-operation">
-                    <el-skeleton-item class="skeleton-card-button" variant="button" />
-                    <el-skeleton-item class="skeleton-card-button" variant="button" />
-                    <el-skeleton-item class="skeleton-card-button" variant="button" />
-                    <el-skeleton-item class="skeleton-card-button" variant="button" />
-                    <el-skeleton-item class="skeleton-card-button" variant="button" />
+                    <el-skeleton-item class="skeleton-card-button" variant="button"/>
+                    <el-skeleton-item class="skeleton-card-button" variant="button"/>
+                    <el-skeleton-item class="skeleton-card-button" variant="button"/>
+                    <el-skeleton-item class="skeleton-card-button" variant="button"/>
+                    <el-skeleton-item class="skeleton-card-button" variant="button"/>
                   </div>
                 </div>
               </div>
@@ -55,113 +56,113 @@
       </el-row>
     </template>
     <template #default>
-      <slot />
+      <slot/>
     </template>
   </el-skeleton>
 </template>
 
 <script lang="ts" setup>
-  const props = defineProps({
-    loading: {
-      type: Boolean,
-      default: () => {
-        return false;
-      },
+const props = defineProps({
+  loading: {
+    type: Boolean,
+    default: () => {
+      return false;
     },
-    footer: {
-      type: Boolean,
-      default: () => {
-        return true;
-      },
+  },
+  footer: {
+    type: Boolean,
+    default: () => {
+      return true;
     },
-  });
+  },
+});
 </script>
 
 <style lang="scss" scoped>
-  .skeleton-card {
-    border-radius: 4px;
-    box-sizing: border-box;
-    margin: 0 3px 6px;
-  }
+.skeleton-card {
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin: 0 3px 6px;
+}
 
-  .skeleton-card__container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+.skeleton-card__container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
-  .skeleton-card__header {
+.skeleton-card__header {
+  width: 100%;
+  height: 55px;
+  display: flex;
+  border-bottom: 1px solid var(--el-border-color);
+}
+
+.skeleton-card-icon {
+  width: 55px;
+  height: 48px;
+  margin-right: 12px;
+  border-radius: 4px;
+  overflow: hidden;
+
+  img {
     width: 100%;
-    height: 55px;
-    display: flex;
-    border-bottom: 1px solid var(--el-border-color);
+    height: 100%;
   }
+}
 
-  .skeleton-card-icon {
-    width: 55px;
-    height: 48px;
-    margin-right: 12px;
-    border-radius: 4px;
-    overflow: hidden;
+.skeleton-card-name {
+  height: 28px;
+  margin-top: 10px;
+  line-height: 48px;
+}
 
-    img {
-      width: 100%;
-      height: 100%;
+.skeleton-card__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-card-content {
+  display: flex;
+  justify-content: space-around;
+
+  ul {
+    width: 100%;
+    padding-inline-start: 25px;
+    list-style: none;
+
+    li {
+      font-size: 13px;
+      margin-top: 8px;
     }
   }
+}
 
-  .skeleton-card-name {
-    height: 28px;
-    margin-top: 10px;
-    line-height: 48px;
-  }
+.skeleton-card-text {
+  margin-top: 2px;
+}
 
-  .skeleton-card__body {
-    display: flex;
-    flex-direction: column;
-  }
+.skeleton-card-description {
+  margin-top: 10px;
+}
 
-  .skeleton-card-content {
-    display: flex;
-    justify-content: space-around;
+.skeleton-card__footer {
+  height: 35px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-top: 1px solid var(--el-border-color);
+}
 
-    ul {
-      width: 100%;
-      padding-inline-start: 25px;
-      list-style: none;
+.skeleton-card-operation {
+  display: flex;
+}
 
-      li {
-        font-size: 13px;
-        margin-top: 8px;
-      }
-    }
-  }
-
-  .skeleton-card-text {
-    margin-top: 2px;
-  }
-
-  .skeleton-card-description {
-    margin-top: 10px;
-  }
-
-  .skeleton-card__footer {
-    height: 35px;
-    margin-top: 10px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    border-top: 1px solid var(--el-border-color);
-  }
-
-  .skeleton-card-operation {
-    display: flex;
-  }
-
-  .skeleton-card-button {
-    width: 28px;
-    height: 20px;
-    margin-right: 10px;
-  }
+.skeleton-card-button {
+  width: 28px;
+  height: 20px;
+  margin-right: 10px;
+}
 </style>

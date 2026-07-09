@@ -1,50 +1,51 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
   <el-config-provider :locale="elementLocale">
     <div id="app">
-      <router-view />
+      <router-view/>
     </div>
   </el-config-provider>
 </template>
 
 <script lang="ts" setup>
-  import {computed} from 'vue';
-  import zhCn from 'element-plus/es/locale/lang/zh-cn';
-  import en from 'element-plus/es/locale/lang/en';
-  import {useI18n} from 'vue-i18n';
+import {computed} from 'vue';
+import zhCn from 'element-plus/es/locale/lang/zh-cn';
+import en from 'element-plus/es/locale/lang/en';
+import {useI18n} from 'vue-i18n';
 
-  const {locale} = useI18n();
+const {locale} = useI18n();
 
-  const elementLocale = computed(() => {
-    return locale.value === 'zh' ? zhCn : en;
-  });
+const elementLocale = computed(() => {
+  return locale.value === 'zh' ? zhCn : en;
+});
 </script>
 
 <style lang="scss" scoped>
-  #app {
-    width: 100%;
-    height: 100%;
-    // Don't clip horizontally — body has min-width: 1280px in global.scss,
-    // so when the viewport narrows we want a page-level scroll bar that
-    // carries the header + body together instead of hiding the right edge.
-  }
+#app {
+  width: 100%;
+  height: 100%;
+  // Don't clip horizontally — body has min-width: 1280px in global.scss,
+  // so when the viewport narrows we want a page-level scroll bar that
+  // carries the header + body together instead of hiding the right edge.
+}
 
-  #nprogress .bar {
-    background: var(--el-color-primary) !important;
-  }
+#nprogress .bar {
+  background: var(--el-color-primary) !important;
+}
 </style>

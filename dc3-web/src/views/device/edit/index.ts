@@ -1,17 +1,18 @@
 /*
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import {computed, defineComponent, onBeforeUnmount, onMounted, reactive, watch} from 'vue';
@@ -718,7 +719,7 @@ export default defineComponent({
       listDriverInfoByDeviceId(reactiveData.id)
         .then((res) => {
           const formData: AttributeFormData = reactiveData.driverFormData;
-          res.data.forEach((info: {attributeId: string | number; id: any; configValue: any}) => {
+          res.data.forEach((info: { attributeId: string | number; id: any; configValue: any }) => {
             const attributeCode = reactiveData.driverAttributeTable[info.attributeId];
             const attribute = reactiveData.driverAttributes.find((item) => item.attributeCode === attributeCode);
             if (attribute) {
@@ -776,7 +777,7 @@ export default defineComponent({
           return listPointInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
               (infoRes.data || []).forEach(
-                (info: {pointId: string; attributeId: string | number; id: string; configValue: unknown}) => {
+                (info: { pointId: string; attributeId: string | number; id: string; configValue: unknown }) => {
                   const attributeCode = reactiveData.pointAttributeTable[info.attributeId];
                   const attribute = reactiveData.pointAttributes.find((item) => item.attributeCode === attributeCode);
                   const row = rowTable[info.pointId];
@@ -840,7 +841,7 @@ export default defineComponent({
           return listCommandInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
               (infoRes.data || []).forEach(
-                (info: {commandId: string; attributeId: string | number; id: string; configValue: unknown}) => {
+                (info: { commandId: string; attributeId: string | number; id: string; configValue: unknown }) => {
                   const attributeCode = reactiveData.commandAttributeTable[info.attributeId];
                   const attribute = reactiveData.commandAttributes.find((item) => item.attributeCode === attributeCode);
                   const row = rowTable[String(info.commandId)];
@@ -901,7 +902,7 @@ export default defineComponent({
           return listEventInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
               (infoRes.data || []).forEach(
-                (info: {eventId: string; attributeId: string | number; id: string; configValue: unknown}) => {
+                (info: { eventId: string; attributeId: string | number; id: string; configValue: unknown }) => {
                   const attributeCode = reactiveData.eventAttributeTable[info.attributeId];
                   const attribute = reactiveData.eventAttributes.find((item) => item.attributeCode === attributeCode);
                   const row = rowTable[String(info.eventId)];
@@ -995,7 +996,7 @@ export default defineComponent({
       return isNull(cell.error);
     };
 
-    const validateDirtyCells = (dirtyCells: Array<{attribute: Attribute; cell: PointAttributeCell}>): boolean => {
+    const validateDirtyCells = (dirtyCells: Array<{ attribute: Attribute; cell: PointAttributeCell }>): boolean => {
       let valid = true;
       dirtyCells.forEach(({attribute, cell}) => {
         if (!validateAttributeCell(attribute, cell)) {
@@ -1062,7 +1063,7 @@ export default defineComponent({
       return 'info';
     };
 
-    const pointMatrixRowClassName = ({row}: {row: PointInfoMatrixRow}) => {
+    const pointMatrixRowClassName = ({row}: { row: PointInfoMatrixRow }) => {
       return isPointRowDirty(row) ? 'point-matrix-row-dirty' : '';
     };
 
@@ -1179,7 +1180,7 @@ export default defineComponent({
       return 'info';
     };
 
-    const commandMatrixRowClassName = ({row}: {row: CommandInfoMatrixRow}) => {
+    const commandMatrixRowClassName = ({row}: { row: CommandInfoMatrixRow }) => {
       return isCommandRowDirty(row) ? 'point-matrix-row-dirty' : '';
     };
 
@@ -1294,7 +1295,7 @@ export default defineComponent({
       return 'info';
     };
 
-    const eventMatrixRowClassName = ({row}: {row: EventInfoMatrixRow}) => {
+    const eventMatrixRowClassName = ({row}: { row: EventInfoMatrixRow }) => {
       return isEventRowDirty(row) ? 'point-matrix-row-dirty' : '';
     };
 

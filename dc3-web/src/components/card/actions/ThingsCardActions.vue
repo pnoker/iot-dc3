@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -65,33 +66,33 @@
 </template>
 
 <script lang="ts" setup>
-  import {CircleCheck, CircleClose, SwitchButton} from '@element-plus/icons-vue';
-  import {useI18n} from 'vue-i18n';
+import {CircleCheck, CircleClose, SwitchButton} from '@element-plus/icons-vue';
+import {useI18n} from 'vue-i18n';
 
-  defineProps({
-    enabled: {type: Boolean, required: true},
-    disableTitle: {type: String, required: true},
-    enableTitle: {type: String, required: true},
-    deleteTitle: {type: String, required: true},
-    detailDisabled: {type: Boolean, default: false},
-  });
+defineProps({
+  enabled: {type: Boolean, required: true},
+  disableTitle: {type: String, required: true},
+  enableTitle: {type: String, required: true},
+  deleteTitle: {type: String, required: true},
+  detailDisabled: {type: Boolean, default: false},
+});
 
-  defineEmits(['disable', 'enable', 'delete', 'edit', 'detail']);
+defineEmits(['disable', 'enable', 'delete', 'edit', 'detail']);
 
-  const {t} = useI18n();
+const {t} = useI18n();
 </script>
 
 <style lang="scss" scoped>
-  .things-card__footer {
-    height: 35px;
-    margin-top: 2px;
-    display: flex;
-    justify-content: flex-end;
-    border-top: 1px solid var(--el-border-color);
-  }
+.things-card__footer {
+  height: 35px;
+  margin-top: 2px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--el-border-color);
+}
 
-  .things-card-footer-operation {
-    height: 35px;
-    display: flex;
-  }
+.things-card-footer-operation {
+  height: 35px;
+  display: flex;
+}
 </style>

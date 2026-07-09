@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -79,7 +80,7 @@
                 </el-select>
               </el-form-item>
               <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-                <enable-flag-segmented v-model="reactiveData.deviceFormData.enableFlag" />
+                <enable-flag-segmented v-model="reactiveData.deviceFormData.enableFlag"/>
               </el-form-item>
               <el-form-item :label="$t('device.edit.description')" class="info-card-item-full" prop="remark">
                 <el-input
@@ -104,7 +105,7 @@
             @discard="driverInfoReset"
             @save="saveDriverMatrix"
           />
-          <el-empty v-if="!hasDriverAttributes" :description="$t('device.edit.driverAttributeEmpty')" />
+          <el-empty v-if="!hasDriverAttributes" :description="$t('device.edit.driverAttributeEmpty')"/>
           <el-table
             v-else
             v-loading="reactiveData.loading"
@@ -113,7 +114,7 @@
             row-key="id"
             stripe
           >
-            <el-table-column :label="$t('device.edit.attributeName')" min-width="140" prop="attributeName" />
+            <el-table-column :label="$t('device.edit.attributeName')" min-width="140" prop="attributeName"/>
             <el-table-column :label="$t('device.edit.attributeType')" width="90">
               <template #default="{row}">
                 <el-tag effect="plain" size="small">{{ row.attributeTypeFlag }}</el-tag>
@@ -180,7 +181,7 @@
                 />
               </el-form-item>
               <el-form-item :label="$t('device.edit.configStatus')" prop="pointMatrixStatus">
-                <matrix-status-segmented v-model="reactiveData.pointMatrixStatus" />
+                <matrix-status-segmented v-model="reactiveData.pointMatrixStatus"/>
               </el-form-item>
             </template>
             <template #trailing>
@@ -196,7 +197,7 @@
             </template>
           </matrix-toolbar>
 
-          <el-empty v-if="!hasPointAttributes" :description="$t('device.edit.pointAttributeEmpty')" />
+          <el-empty v-if="!hasPointAttributes" :description="$t('device.edit.pointAttributeEmpty')"/>
           <el-table
             v-else
             v-loading="reactiveData.loading"
@@ -297,7 +298,7 @@
                 />
               </el-form-item>
               <el-form-item :label="$t('device.edit.configStatus')" prop="commandMatrixStatus">
-                <matrix-status-segmented v-model="reactiveData.commandMatrixStatus" />
+                <matrix-status-segmented v-model="reactiveData.commandMatrixStatus"/>
               </el-form-item>
             </template>
             <template #trailing>
@@ -313,7 +314,7 @@
             </template>
           </matrix-toolbar>
 
-          <el-empty v-if="!hasCommandAttributes" :description="$t('device.edit.commandAttributeEmpty')" />
+          <el-empty v-if="!hasCommandAttributes" :description="$t('device.edit.commandAttributeEmpty')"/>
           <el-table
             v-else
             v-loading="reactiveData.loading"
@@ -414,7 +415,7 @@
                 />
               </el-form-item>
               <el-form-item :label="$t('device.edit.configStatus')" prop="eventMatrixStatus">
-                <matrix-status-segmented v-model="reactiveData.eventMatrixStatus" />
+                <matrix-status-segmented v-model="reactiveData.eventMatrixStatus"/>
               </el-form-item>
             </template>
             <template #trailing>
@@ -430,7 +431,7 @@
             </template>
           </matrix-toolbar>
 
-          <el-empty v-if="!hasEventAttributes" :description="$t('device.edit.eventAttributeEmpty')" />
+          <el-empty v-if="!hasEventAttributes" :description="$t('device.edit.eventAttributeEmpty')"/>
           <el-table
             v-else
             v-loading="reactiveData.loading"
@@ -516,77 +517,77 @@
   </div>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" src="./index.ts"/>
 
 <style lang="scss" scoped>
-  @use '@/styles/edit-card.scss';
+@use '@/styles/edit-card.scss';
 
-  .driver-info-card {
-    margin-top: 12px;
+.driver-info-card {
+  margin-top: 12px;
+}
+
+.attribute-type {
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.attribute-hint {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+  line-height: 18px;
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+}
+
+.matrix-table {
+  width: 100%;
+
+  :deep(.point-matrix-row-dirty) {
+    --el-table-tr-bg-color: var(--el-color-warning-light-9);
+  }
+}
+
+.point-matrix-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--el-text-color-primary);
+}
+
+.point-matrix-attribute-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.matrix-cell {
+  &.is-dirty :deep(.el-input__wrapper) {
+    box-shadow: 0 0 0 1px var(--el-color-warning) inset;
   }
 
-  .attribute-type {
-    margin-left: 8px;
-    vertical-align: middle;
+  &.is-error :deep(.el-input__wrapper) {
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
   }
+}
 
-  .attribute-hint {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 6px;
-    line-height: 18px;
-    color: var(--el-text-color-secondary);
-    font-size: 12px;
-  }
+.matrix-cell__meta {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 10px;
+  line-height: 1;
+}
 
-  .matrix-table {
-    width: 100%;
+.matrix-cell__dirty {
+  color: var(--el-color-warning);
+}
 
-    :deep(.point-matrix-row-dirty) {
-      --el-table-tr-bg-color: var(--el-color-warning-light-9);
-    }
-  }
-
-  .point-matrix-name {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--el-text-color-primary);
-  }
-
-  .point-matrix-attribute-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 13px;
-  }
-
-  .matrix-cell {
-    &.is-dirty :deep(.el-input__wrapper) {
-      box-shadow: 0 0 0 1px var(--el-color-warning) inset;
-    }
-
-    &.is-error :deep(.el-input__wrapper) {
-      box-shadow: 0 0 0 1px var(--el-color-danger) inset;
-    }
-  }
-
-  .matrix-cell__meta {
-    display: flex;
-    gap: 4px;
-    margin-top: 2px;
-    font-size: 10px;
-    line-height: 1;
-  }
-
-  .matrix-cell__dirty {
-    color: var(--el-color-warning);
-  }
-
-  .matrix-cell__error {
-    margin-top: 2px;
-    font-size: 10px;
-    color: var(--el-color-danger);
-  }
+.matrix-cell__error {
+  margin-top: 2px;
+  font-size: 10px;
+  color: var(--el-color-danger);
+}
 </style>

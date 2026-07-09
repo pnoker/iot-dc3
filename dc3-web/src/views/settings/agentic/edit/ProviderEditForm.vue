@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -41,7 +42,7 @@
           :placeholder="$t('settings.agentic.providerTypePlaceholder')"
           style="width: 100%"
         >
-          <el-option v-for="pt in providerTypes" :key="pt.value" :label="pt.label" :value="pt.value" />
+          <el-option v-for="pt in providerTypes" :key="pt.value" :label="pt.label" :value="pt.value"/>
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.baseUrl')" prop="baseUrl">
@@ -72,10 +73,10 @@
         />
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')">
-        <enable-flag-segmented v-model="form.enableFlag" />
+        <enable-flag-segmented v-model="form.enableFlag"/>
       </el-form-item>
       <el-form-item :label="$t('common.remark')" prop="remark">
-        <el-input v-model="form.remark" :rows="3" maxlength="300" show-word-limit type="textarea" />
+        <el-input v-model="form.remark" :rows="3" maxlength="300" show-word-limit type="textarea"/>
       </el-form-item>
     </el-form>
     <div class="things-dialog-footer">
@@ -89,85 +90,85 @@
 </template>
 
 <script lang="ts" setup>
-  import {computed, reactive, ref} from 'vue';
-  import {useI18n} from 'vue-i18n';
-  import type {FormInstance, FormRules} from 'element-plus';
+import {computed, reactive, ref} from 'vue';
+import {useI18n} from 'vue-i18n';
+import type {FormInstance, FormRules} from 'element-plus';
 
-  import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-  import type {AgenticProvider} from '@/config/types';
-  import {remarkRules} from '@/utils/formRuleUtil';
+import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
+import type {AgenticProvider} from '@/config/types';
+import {remarkRules} from '@/utils/formRuleUtil';
 
-  import {AGENTIC_PROVIDER_TYPES} from '../providerTypes';
+import {AGENTIC_PROVIDER_TYPES} from '../providerTypes';
 
-  const providerTypes = AGENTIC_PROVIDER_TYPES;
+const providerTypes = AGENTIC_PROVIDER_TYPES;
 
-  const emit = defineEmits<{
-    (e: 'save', form: AgenticProvider & {apiKey?: string}, done: () => void): void;
-  }>();
+const emit = defineEmits<{
+  (e: 'save', form: AgenticProvider & { apiKey?: string }, done: () => void): void;
+}>();
 
-  const visible = ref(false);
-  const isEdit = ref(false);
-  const submitting = ref(false);
-  const formRef = ref<FormInstance>();
-  const {t} = useI18n();
+const visible = ref(false);
+const isEdit = ref(false);
+const submitting = ref(false);
+const formRef = ref<FormInstance>();
+const {t} = useI18n();
 
-  const initialForm = (): AgenticProvider & {apiKey?: string} => ({
-    name: '',
-    providerType: 'OPENAI_COMPATIBLE',
-    baseUrl: '',
-    apiKey: '',
-    defaultFlag: 'NOT_DEFAULT',
-    enableFlag: 'ENABLE',
-    remark: '',
-  });
+const initialForm = (): AgenticProvider & { apiKey?: string } => ({
+  name: '',
+  providerType: 'OPENAI_COMPATIBLE',
+  baseUrl: '',
+  apiKey: '',
+  defaultFlag: 'NOT_DEFAULT',
+  enableFlag: 'ENABLE',
+  remark: '',
+});
 
-  const form = reactive(initialForm());
+const form = reactive(initialForm());
 
-  const rules = computed<FormRules>(() => ({
-    name: [{required: true, whitespace: true, message: t('settings.agentic.nameRequired'), trigger: 'blur'}],
-    baseUrl: [{required: true, whitespace: true, message: t('settings.agentic.baseUrlRequired'), trigger: 'blur'}],
-    remark: remarkRules(t),
-  }));
+const rules = computed<FormRules>(() => ({
+  name: [{required: true, whitespace: true, message: t('settings.agentic.nameRequired'), trigger: 'blur'}],
+  baseUrl: [{required: true, whitespace: true, message: t('settings.agentic.baseUrlRequired'), trigger: 'blur'}],
+  remark: remarkRules(t),
+}));
 
-  const show = () => {
-    isEdit.value = false;
+const show = () => {
+  isEdit.value = false;
+  Object.assign(form, initialForm());
+  visible.value = true;
+};
+
+const showEdit = (row: AgenticProvider & { apiKey?: string }) => {
+  isEdit.value = true;
+  Object.assign(form, initialForm(), row);
+  visible.value = true;
+};
+
+const onClosed = () => {
+  formRef.value?.resetFields();
+};
+
+const onReset = () => {
+  if (isEdit.value) {
+    formRef.value?.clearValidate();
+  } else {
     Object.assign(form, initialForm());
-    visible.value = true;
-  };
-
-  const showEdit = (row: AgenticProvider & {apiKey?: string}) => {
-    isEdit.value = true;
-    Object.assign(form, initialForm(), row);
-    visible.value = true;
-  };
-
-  const onClosed = () => {
     formRef.value?.resetFields();
-  };
+  }
+};
 
-  const onReset = () => {
-    if (isEdit.value) {
-      formRef.value?.clearValidate();
-    } else {
-      Object.assign(form, initialForm());
-      formRef.value?.resetFields();
-    }
-  };
+const onSubmit = async () => {
+  if (submitting.value) return;
+  submitting.value = true;
+  try {
+    await formRef.value?.validate();
+  } catch {
+    submitting.value = false;
+    return;
+  }
+  emit('save', {...form}, () => {
+    submitting.value = false;
+    visible.value = false;
+  });
+};
 
-  const onSubmit = async () => {
-    if (submitting.value) return;
-    submitting.value = true;
-    try {
-      await formRef.value?.validate();
-    } catch {
-      submitting.value = false;
-      return;
-    }
-    emit('save', {...form}, () => {
-      submitting.value = false;
-      visible.value = false;
-    });
-  };
-
-  defineExpose({show, showEdit});
+defineExpose({show, showEdit});
 </script>

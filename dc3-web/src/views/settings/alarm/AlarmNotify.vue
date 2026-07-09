@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -29,7 +30,7 @@
     >
       <template #filters>
         <el-form-item :label="activeConfig.searchLabel" prop="keyword">
-          <el-input v-model="searchForm.keyword" :placeholder="activeConfig.searchPlaceholder" clearable />
+          <el-input v-model="searchForm.keyword" :placeholder="activeConfig.searchPlaceholder" clearable/>
         </el-form-item>
         <el-form-item v-if="activeConfig.filterProp" :label="activeConfig.filterLabel" prop="filterValue">
           <enable-flag-segmented
@@ -38,7 +39,7 @@
             include-all
           />
           <el-select v-else v-model="searchForm.filterValue" :placeholder="activeConfig.filterPlaceholder" clearable>
-            <el-option v-for="option in activeConfig.filterOptions" :key="option.value" v-bind="option" />
+            <el-option v-for="option in activeConfig.filterOptions" :key="option.value" v-bind="option"/>
           </el-select>
         </el-form-item>
       </template>
@@ -93,7 +94,7 @@
           </template>
         </el-table-column>
         <template #empty>
-          <el-empty :description="t('settings.alarm.empty')" />
+          <el-empty :description="t('settings.alarm.empty')"/>
         </template>
       </el-table>
     </blank-card>
@@ -121,7 +122,7 @@
                 clearable
                 filterable
               >
-                <el-option v-for="option in field.options || []" :key="option.value" v-bind="option" />
+                <el-option v-for="option in field.options || []" :key="option.value" v-bind="option"/>
               </el-select>
               <el-select
                 v-else-if="field.kind === 'remoteSelect'"
@@ -146,7 +147,7 @@
                 controls-position="right"
                 style="width: 100%"
               />
-              <enable-flag-segmented v-else-if="field.kind === 'enableFlag'" v-model="formModel[field.prop]" />
+              <enable-flag-segmented v-else-if="field.kind === 'enableFlag'" v-model="formModel[field.prop]"/>
               <el-input
                 v-else-if="field.kind === 'json' || field.kind === 'textarea'"
                 v-model="formModel[field.prop]"
@@ -155,7 +156,7 @@
                 resize="vertical"
                 type="textarea"
               />
-              <el-input v-else v-model="formModel[field.prop]" :placeholder="field.placeholder" clearable />
+              <el-input v-else v-model="formModel[field.prop]" :placeholder="field.placeholder" clearable/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -172,88 +173,88 @@
 </template>
 
 <script lang="ts" setup>
-  import {reactive, watch} from 'vue';
-  import {Plus} from '@element-plus/icons-vue';
+import {reactive, watch} from 'vue';
+import {Plus} from '@element-plus/icons-vue';
 
-  import BlankCard from '@/components/card/blank/BlankCard.vue';
-  import ToolCard from '@/components/card/tool/ToolCard.vue';
-  import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
+import BlankCard from '@/components/card/blank/BlankCard.vue';
+import ToolCard from '@/components/card/tool/ToolCard.vue';
+import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 
-  import type {AlarmFieldConfig, AlarmOption} from './alarmEntityConfig';
-  import {type AlarmEntityPageProps, useAlarmEntityPage} from './useAlarmEntityPage';
+import type {AlarmFieldConfig, AlarmOption} from './alarmEntityConfig';
+import {type AlarmEntityPageProps, useAlarmEntityPage} from './useAlarmEntityPage';
 
-  const props = defineProps<AlarmEntityPageProps>();
+const props = defineProps<AlarmEntityPageProps>();
 
-  const {
-    t,
-    formVisible,
-    setFormRef,
-    formModel,
-    searchForm,
-    state,
-    activeConfig,
-    dialogTitle,
-    formRules,
-    load,
-    search,
-    reset,
-    sort,
-    sizeChange,
-    currentChange,
-    openAdd,
-    resetForm,
-    openEdit,
-    openDetail,
-    submit,
-    remove,
-    tagType,
-    formatCell,
-  } = useAlarmEntityPage(props);
+const {
+  t,
+  formVisible,
+  setFormRef,
+  formModel,
+  searchForm,
+  state,
+  activeConfig,
+  dialogTitle,
+  formRules,
+  load,
+  search,
+  reset,
+  sort,
+  sizeChange,
+  currentChange,
+  openAdd,
+  resetForm,
+  openEdit,
+  openDetail,
+  submit,
+  remove,
+  tagType,
+  formatCell,
+} = useAlarmEntityPage(props);
 
-  // remoteSelect option cache keyed by field.prop. Loaded when the dialog opens
-  // (so edit-mode values render as names) and on each dropdown expand (so entityId
-  // reflects the currently selected alarmTargetTypeFlag).
-  const remoteOptions = reactive<Record<string, AlarmOption[]>>({});
-  const loadRemote = async (field: AlarmFieldConfig) => {
-    if (!field.loadOptions) return;
-    remoteOptions[field.prop] = await field.loadOptions(formModel);
-  };
-  watch(formVisible, (visible) => {
-    if (!visible) return;
-    activeConfig.value.fields
-      .filter((field) => field.kind === 'remoteSelect')
-      .forEach((field) => {
-        if (formModel[field.prop] != null && formModel[field.prop] !== '') {
-          formModel[field.prop] = String(formModel[field.prop]);
-        }
-        loadRemote(field);
-      });
-  });
+// remoteSelect option cache keyed by field.prop. Loaded when the dialog opens
+// (so edit-mode values render as names) and on each dropdown expand (so entityId
+// reflects the currently selected alarmTargetTypeFlag).
+const remoteOptions = reactive<Record<string, AlarmOption[]>>({});
+const loadRemote = async (field: AlarmFieldConfig) => {
+  if (!field.loadOptions) return;
+  remoteOptions[field.prop] = await field.loadOptions(formModel);
+};
+watch(formVisible, (visible) => {
+  if (!visible) return;
+  activeConfig.value.fields
+    .filter((field) => field.kind === 'remoteSelect')
+    .forEach((field) => {
+      if (formModel[field.prop] != null && formModel[field.prop] !== '') {
+        formModel[field.prop] = String(formModel[field.prop]);
+      }
+      loadRemote(field);
+    });
+});
 </script>
 
 <style lang="scss" scoped>
-  .alarm-notify {
-    min-width: 0;
+.alarm-notify {
+  min-width: 0;
 
-    &__table {
-      margin-top: 1px;
-      border-radius: 4px;
-    }
+  &__table {
+    margin-top: 1px;
+    border-radius: 4px;
+  }
 
-    &__form {
-      :deep(.el-input),
-      :deep(.el-select),
-      :deep(.el-input-number) {
-        width: 100%;
-      }
-    }
-
-    &__inline-code {
-      padding: 2px 5px;
-      border-radius: 4px;
-      color: var(--el-text-color-regular);
-      background: var(--el-fill-color-light);
-      font-size: 12px;
+  &__form {
+    :deep(.el-input),
+    :deep(.el-select),
+    :deep(.el-input-number) {
+      width: 100%;
     }
   }
+
+  &__inline-code {
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: var(--el-text-color-regular);
+    background: var(--el-fill-color-light);
+    font-size: 12px;
+  }
+}
 </style>

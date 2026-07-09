@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -97,146 +98,146 @@
 </template>
 
 <script lang="ts" setup>
-  import {reactive, ref, unref} from 'vue';
-  import type {FormInstance, FormRules} from 'element-plus';
-  import {useI18n} from 'vue-i18n';
+import {reactive, ref, unref} from 'vue';
+import type {FormInstance, FormRules} from 'element-plus';
+import {useI18n} from 'vue-i18n';
 
-  import type {Dictionary} from '@/config/types';
+import type {Dictionary} from '@/config/types';
 
-  import {successMessage} from '@/utils/notificationUtil';
-  import {nameRules, remarkRules} from '@/utils/formRuleUtil';
-  import {listDriverDictionary, listProfileDictionary} from '@/api/dictionary';
+import {successMessage} from '@/utils/notificationUtil';
+import {nameRules, remarkRules} from '@/utils/formRuleUtil';
+import {listDriverDictionary, listProfileDictionary} from '@/api/dictionary';
 
-  interface DeviceAddFormData {
-    deviceName: string;
-    driverId: string;
-    profileId: string;
-    remark: string;
+interface DeviceAddFormData {
+  deviceName: string;
+  driverId: string;
+  profileId: string;
+  remark: string;
+}
+
+interface DictionaryPage {
+  records: Dictionary[];
+}
+
+type DictionaryResponse = R<DictionaryPage>;
+
+const emit = defineEmits<{
+  (e: 'add', formData: DeviceAddFormData, done: () => void): void;
+}>();
+
+const {t} = useI18n();
+const formDataRef = ref<FormInstance>();
+
+const reactiveData = reactive({
+  formData: {
+    deviceName: '',
+    driverId: '',
+    profileId: '',
+    remark: '',
+  } as DeviceAddFormData,
+  formVisible: false,
+  driverDictionary: [] as Dictionary[],
+  driverLoading: false,
+  profileDictionary: [] as Dictionary[],
+  profileLoading: false,
+});
+
+const formRule = reactive<FormRules>({
+  deviceName: nameRules(t, t('common.entityDevice')),
+  driverId: [
+    {
+      required: true,
+      message: () => t('device.add.driverRequired'),
+      trigger: 'change',
+    },
+  ],
+  profileId: [
+    {
+      required: true,
+      message: () => t('device.add.profileRequired'),
+      trigger: 'change',
+    },
+  ],
+  remark: remarkRules(t),
+});
+
+const driverDictionary = async (query = '') => {
+  reactiveData.driverLoading = true;
+  try {
+    const res = await listDriverDictionary<DictionaryResponse>({
+      page: {size: 50, current: 1},
+      label: query,
+    });
+    reactiveData.driverDictionary = res.data.records ?? [];
+  } catch {
+    // nothing to do
+  } finally {
+    reactiveData.driverLoading = false;
+  }
+};
+
+const driverDictionaryVisible = (visible: boolean) => {
+  if (visible) {
+    void driverDictionary();
+  }
+};
+
+const profileDictionary = async (query = '') => {
+  reactiveData.profileLoading = true;
+  try {
+    const res = await listProfileDictionary<DictionaryResponse>({
+      page: {size: 50, current: 1},
+      label: query,
+    });
+    reactiveData.profileDictionary = res.data.records ?? [];
+  } catch {
+    // nothing to do
+  } finally {
+    reactiveData.profileLoading = false;
+  }
+};
+
+const profileDictionaryVisible = (visible: boolean) => {
+  if (visible) {
+    void profileDictionary();
+  }
+};
+
+const show = () => {
+  reactiveData.formVisible = true;
+};
+
+const cancel = () => {
+  reactiveData.formVisible = false;
+};
+
+const reset = () => {
+  const form = unref(formDataRef);
+  form?.resetFields();
+};
+
+const addThing = async () => {
+  const form = unref(formDataRef);
+  if (!form) {
+    return;
   }
 
-  interface DictionaryPage {
-    records: Dictionary[];
+  try {
+    await form.validate();
+    emit('add', {...reactiveData.formData}, () => {
+      cancel();
+      reset();
+      successMessage();
+    });
+  } catch {
+    // validation errors are displayed by Element Plus
   }
+};
 
-  type DictionaryResponse = R<DictionaryPage>;
-
-  const emit = defineEmits<{
-    (e: 'add', formData: DeviceAddFormData, done: () => void): void;
-  }>();
-
-  const {t} = useI18n();
-  const formDataRef = ref<FormInstance>();
-
-  const reactiveData = reactive({
-    formData: {
-      deviceName: '',
-      driverId: '',
-      profileId: '',
-      remark: '',
-    } as DeviceAddFormData,
-    formVisible: false,
-    driverDictionary: [] as Dictionary[],
-    driverLoading: false,
-    profileDictionary: [] as Dictionary[],
-    profileLoading: false,
-  });
-
-  const formRule = reactive<FormRules>({
-    deviceName: nameRules(t, t('common.entityDevice')),
-    driverId: [
-      {
-        required: true,
-        message: () => t('device.add.driverRequired'),
-        trigger: 'change',
-      },
-    ],
-    profileId: [
-      {
-        required: true,
-        message: () => t('device.add.profileRequired'),
-        trigger: 'change',
-      },
-    ],
-    remark: remarkRules(t),
-  });
-
-  const driverDictionary = async (query = '') => {
-    reactiveData.driverLoading = true;
-    try {
-      const res = await listDriverDictionary<DictionaryResponse>({
-        page: {size: 50, current: 1},
-        label: query,
-      });
-      reactiveData.driverDictionary = res.data.records ?? [];
-    } catch {
-      // nothing to do
-    } finally {
-      reactiveData.driverLoading = false;
-    }
-  };
-
-  const driverDictionaryVisible = (visible: boolean) => {
-    if (visible) {
-      void driverDictionary();
-    }
-  };
-
-  const profileDictionary = async (query = '') => {
-    reactiveData.profileLoading = true;
-    try {
-      const res = await listProfileDictionary<DictionaryResponse>({
-        page: {size: 50, current: 1},
-        label: query,
-      });
-      reactiveData.profileDictionary = res.data.records ?? [];
-    } catch {
-      // nothing to do
-    } finally {
-      reactiveData.profileLoading = false;
-    }
-  };
-
-  const profileDictionaryVisible = (visible: boolean) => {
-    if (visible) {
-      void profileDictionary();
-    }
-  };
-
-  const show = () => {
-    reactiveData.formVisible = true;
-  };
-
-  const cancel = () => {
-    reactiveData.formVisible = false;
-  };
-
-  const reset = () => {
-    const form = unref(formDataRef);
-    form?.resetFields();
-  };
-
-  const addThing = async () => {
-    const form = unref(formDataRef);
-    if (!form) {
-      return;
-    }
-
-    try {
-      await form.validate();
-      emit('add', {...reactiveData.formData}, () => {
-        cancel();
-        reset();
-        successMessage();
-      });
-    } catch {
-      // validation errors are displayed by Element Plus
-    }
-  };
-
-  defineExpose({
-    show,
-    cancel,
-    reset,
-    addThing,
-  });
+defineExpose({
+  show,
+  cancel,
+  reset,
+  addThing,
+});
 </script>
