@@ -17,5 +17,4 @@
   -->
 
 <configuration>
-    <logger name="io.github.pnoker.common.annotation.LogsAspect" level="OFF"/>
 </configuration>
