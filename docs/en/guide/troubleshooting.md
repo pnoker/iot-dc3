@@ -194,7 +194,7 @@ protected request must carry the three headers `X-Auth-Tenant`, `X-Auth-Login`, 
 the real endpoints below (swap the example values for your environment's actual values):
 
 ```bash
-# 1) Fetch the salt (valid for 5 minutes)
+# 1) Fetch the salt (public endpoint; use within 5 minutes)
 curl -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'

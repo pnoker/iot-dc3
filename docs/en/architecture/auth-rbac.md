@@ -44,9 +44,11 @@ salt stops a plaintext password or a fixed hash from being replayed over the wir
 Both endpoints are public and need no authentication:
 
 - `POST /api/v3/auth/token/salt`: send `tenant` and `name`. It first confirms the tenant exists, then returns a random
-  salt (a UUID), **valid for 5 minutes**.
-- `POST /api/v3/auth/token/generate`: send `tenant`, `name`, `salt`, and the `password` hashed with the salt. On success
-  it returns an access token, **valid for 12 hours** (`TOKEN_CACHE_TIMEOUT = 12` hours).
+  salt (a UUID); the response text suggests **use within 5 minutes** (the server does not store the salt or enforce the
+  timeout — "5 minutes" is only a client-side hint).
+- `POST /api/v3/auth/token/generate`: send `tenant`, `name`, `salt`, and the **plaintext `password`** (the salt is NOT
+  mixed into the password — it is concatenated with the server-side key to sign the token). On success it returns an
+  access token, **valid for 12 hours** (`TOKEN_CACHE_TIMEOUT = 12` hours).
 
 `generateToken` runs its checks in a fixed order. Any failure returns the same "no available authentication" error, so
 the caller can't tell which step failed:
@@ -73,7 +75,7 @@ issued before the logout point.
 curl -s -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'
-# Example response (valid for 5 minutes): "a1b2c3d4-...-e5f6"
+# Example response (use within 5 minutes): "a1b2c3d4-...-e5f6"
 
 # 2) Hash password with salt, then exchange for token
 curl -s -X POST http://localhost:8000/api/v3/auth/token/generate \
@@ -280,7 +282,7 @@ The hard constraints scattered through the page, gathered in one place for a pre
 
 | Item                         | Value / behavior                                                            | Source                           |
 |------------------------------|-----------------------------------------------------------------------------|----------------------------------|
-| Salt validity                | 5 minutes                                                                   | `POST /api/v3/auth/token/salt`   |
+| Salt validity                | Use within 5 minutes client-side (server does not enforce)                  | `POST /api/v3/auth/token/salt`   |
 | Token validity               | 12 hours                                                                    | `TOKEN_CACHE_TIMEOUT=12` hours   |
 | JWT binding                  | `principal_id` + `tenant_id`                                                | `generateToken`                  |
 | HMAC secret                  | `AUTH_HMAC_SECRET` / `dc3.auth.hmac.secret`, default `io.github.pnoker.dc3` | `HmacAuthConfig`                 |

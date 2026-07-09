@@ -189,7 +189,7 @@ API，需经网关——但网关在 `app` 栈不对外，通常在 `dev` 栈（
 curl -s -X POST http://127.0.0.1:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'
-# → 返回 5 分钟有效的盐字符串（示例）
+# → 返回盐字符串（示例；建议 5 分钟内使用）
 
 # 2) 用盐对密码哈希后换取 token（公开），返回 12 小时有效的访问令牌
 curl -s -X POST http://127.0.0.1:8000/api/v3/auth/token/generate \

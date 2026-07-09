@@ -93,7 +93,7 @@ source dc3/env/dev.env.sh
 入口网关（默认 `8000`）。
 
 ```bash
-# 1) 取盐（5 分钟有效，公开端点；以下租户/用户名为示例值）
+# 1) 取盐（公开端点，建议 5 分钟内使用；以下租户/用户名为示例值）
 curl -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'

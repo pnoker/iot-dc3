@@ -34,7 +34,7 @@ dc3 device list                                # 列出设备
 ## 鉴权：三段式 token 如何拿到与保鲜
 
 `dc3 auth login` 背后是一条三段式的 token 链路，与平台 [黄金路径](../quickstart/first-device) 里 curl 登录用的是同一对端点，只是
-CLI 帮你串好了。先 `POST /api/v3/auth/token/salt` 用租户名 + 用户名换一个**盐（salt）**；再把密码取 `MD5(password)` 连同盐
+CLI 帮你串好了。先 `POST /api/v3/auth/token/salt` 用租户名 + 用户名换一个**盐（salt）**；再把**明文密码**连同盐
 `POST /api/v3/auth/token/generate`，换回一个 JWT。拿到 JWT 后，CLI 解出其中的 `iat` / `exp`，把
 `{ token, salt, tenant, username, issuedAt, expiresAt }` 写入 `~/.dc3/tokens.json`（文件权限 `0600`，每个 profile 一条）。
 
@@ -45,9 +45,8 @@ sequenceDiagram
     participant Auth as 鉴权中心 dc3-center-auth
     CLI->>GW: "POST /api/v3/auth/token/salt (tenant, name)"
     GW->>Auth: 转发取盐请求
-    Auth-->>CLI: "返回 salt (5 分钟有效)"
-    CLI->>CLI: "计算 MD5(password)"
-    CLI->>GW: "POST /api/v3/auth/token/generate (tenant, name, salt, MD5 密码)"
+    Auth-->>CLI: "返回 salt (建议 5 分钟内使用)"
+    CLI->>GW: "POST /api/v3/auth/token/generate (tenant, name, salt, 明文密码)"
     GW->>Auth: 转发生成 token
     Auth-->>CLI: "返回 JWT 访问令牌 (12 小时有效)"
     CLI->>CLI: "解析 iat/exp 并写入 ~/.dc3/tokens.json (0600)"

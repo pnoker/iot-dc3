@@ -40,11 +40,11 @@ infrastructure.
 
 The team evaluated three approaches before committing to Spring AI:
 
-| Approach | Pros | Cons | Verdict |
-|----------|------|------|---------|
-| **LangChain (Python)** | Huge ecosystem, fast prototyping | Python/JVM interop overhead, separate deployment, security boundary blur | Too heavy for a JVM-native platform |
-| **Custom `@Tool` framework** | Full control, zero dependency | Months of engineering, maintenance burden, no community | Reinventing the wheel |
-| **Spring AI** | Native JVM, Spring Boot integration, OpenAI-compatible, type-safe tool definitions | Newer ecosystem (2024+) | ✅ Best fit |
+| Approach                     | Pros                                                                               | Cons                                                                     | Verdict                             |
+|------------------------------|------------------------------------------------------------------------------------|--------------------------------------------------------------------------|-------------------------------------|
+| **LangChain (Python)**       | Huge ecosystem, fast prototyping                                                   | Python/JVM interop overhead, separate deployment, security boundary blur | Too heavy for a JVM-native platform |
+| **Custom `@Tool` framework** | Full control, zero dependency                                                      | Months of engineering, maintenance burden, no community                  | Reinventing the wheel               |
+| **Spring AI**                | Native JVM, Spring Boot integration, OpenAI-compatible, type-safe tool definitions | Newer ecosystem (2024+)                                                  | ✅ Best fit                          |
 
 Spring AI won on three decisive points:
 
@@ -166,18 +166,18 @@ Four things make this architecture production-grade:
 The Agentic Center ships with 10 tool classes covering every domain object in the platform. Each tool method wraps
 an existing service-layer method — there's no duplicated business logic.
 
-| Tool Class | Domain | Key Methods | Risk |
-|-----------|--------|-------------|------|
-| `TenantTool` | Tenant | `getCurrentTenantInfo()` | Low |
-| `UserTool` | User | `getCurrentUserProfile()` | Low |
-| `DeviceTool` | Device | `lookupDeviceById()`, `searchDevices()` | Low |
-| `DriverTool` | Driver | `lookupDriverById()`, `searchDrivers()` | Low |
-| `ProfileTool` | Profile | `lookupProfileById()`, `searchProfiles()` | Low |
-| `PointTool` | Point | `lookupPointById()`, `searchPoints()` | Low |
+| Tool Class       | Domain      | Key Methods                                                                                | Risk             |
+|------------------|-------------|--------------------------------------------------------------------------------------------|------------------|
+| `TenantTool`     | Tenant      | `getCurrentTenantInfo()`                                                                   | Low              |
+| `UserTool`       | User        | `getCurrentUserProfile()`                                                                  | Low              |
+| `DeviceTool`     | Device      | `lookupDeviceById()`, `searchDevices()`                                                    | Low              |
+| `DriverTool`     | Driver      | `lookupDriverById()`, `searchDrivers()`                                                    | Low              |
+| `ProfileTool`    | Profile     | `lookupProfileById()`, `searchProfiles()`                                                  | Low              |
+| `PointTool`      | Point       | `lookupPointById()`, `searchPoints()`                                                      | Low              |
 | `PointValueTool` | Point Value | `getLatestPointValue()`, `getPointValueHistory()`, `readPointValue()`, `writePointValue()` | **High (write)** |
-| `SystemTool` | System | `getSystemHealth()` | Low |
-| `CommandTool` | Command | `lookupCommandById()`, `searchCommands()` | Low |
-| `EventTool` | Event | `lookupEventById()`, `searchEvents()` | Low |
+| `SystemTool`     | System      | `getSystemHealth()`                                                                        | Low              |
+| `CommandTool`    | Command     | `lookupCommandById()`, `searchCommands()`                                                  | Low              |
+| `EventTool`      | Event       | `lookupEventById()`, `searchEvents()`                                                      | Low              |
 
 The tool methods deliberately use different naming from the REST/gRPC layer. REST endpoints follow the project's
 `getXxx`/`listXxx` convention; tool methods use `lookupXxx`/`searchXxx`. This separation lets the model

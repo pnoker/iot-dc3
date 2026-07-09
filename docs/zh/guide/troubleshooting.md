@@ -162,7 +162,7 @@ Stop-Process -Id <PID>        # 核实后结束占用进程
 **定位与处理**：先走登录拿 token，再带头访问。下面是黄金路径的真实接口（示例值需替换为你环境的实际值）：
 
 ```bash
-# 1) 取盐（5 分钟有效）
+# 1) 取盐（公开端点，建议 5 分钟内使用）
 curl -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'

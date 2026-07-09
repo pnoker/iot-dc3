@@ -28,7 +28,9 @@ flowchart LR
 
 ::: info 约定
 下文所有 `id`、token、返回值都是**示例**——你环境里生成的是雪花 ID（一长串数字），请用上一步真实返回的值替换。每个写接口返回的都是平台统一信封
-`{ "ok": true, "code": "...", "message": "...", "data": "..." }`，新建实体的 ID 在 `data` 字段里。
+`{ "ok": true, "code": "...", "message": "...", "data": "..." }`。注意 `add` 类接口**只返回成功状态、不回传新建实体的 ID**
+——需要 ID 时，调对应的
+`list` 接口按名称查回（下文每步都会给出回查命令）。
 :::
 
 ## 第 0 步：起栈
@@ -49,7 +51,8 @@ make up-db && make up-dev
 
 ## 第 1–2 步：登录拿 token
 
-登录分两步：先用租户 + 用户名取**盐（salt，5 分钟有效）**，再用盐把密码哈希后换取**访问 token（12 小时有效）**。拿到 token
+登录分两步：先用租户 + 用户名取**盐（salt，建议 5 分钟内使用）**，再把**明文密码**连同盐一起提交换取**访问 token（12 小时有效）
+**。拿到 token
 后，后续所有受保护请求都要带三个鉴权头：`X-Auth-Tenant`、`X-Auth-Login`、`X-Auth-Token`。
 
 ::: code-group
@@ -129,16 +132,23 @@ curl -s -X POST http://localhost:8000/api/v3/manager/profile/add \
   -H "$H_TENANT" -H "$H_LOGIN" -H "$H_TOKEN" \
   -H 'Content-Type: application/json' \
   -d '{"profileName":"虚拟温控模板","profileShareFlag":"TENANT","enableFlag":"ENABLE"}'
-# 示例返回：{"ok":true,"code":"...","data":"81010100000000001"}
+# 示例返回：{"ok":true,"code":"ADD","message":"Added successfully","data":"Added successfully"}
+# add 只回成功状态、不回传 ID。下一步要用 profileId，先按名称查回：
+curl -s -X POST http://localhost:8000/api/v3/manager/profile/list \
+  -H "$H_TENANT" -H "$H_LOGIN" -H "$H_TOKEN" -H 'Content-Type: application/json' \
+  -d '{"profileName":"虚拟温控模板","page":{"current":1,"size":1}}'
+# 从 records[0].id 拿到 profileId
 ```
 
 ```bash [dc3 CLI]
 dc3 profile create --name "虚拟温控模板"
+dc3 profile list --name "虚拟温控模板"   # 查回 profileId
 ```
 
 :::
 
-**你应当看到**：返回 `data` 为新建模板 ID，记作 `<PROFILE_ID>`（示例：`81010100000000001`）。
+**你应当看到**：`add` 返回成功状态（`data` 为提示文案，不是 ID）；用 `profile/list` 按 `profileName`
+回查，从 `records[0].id` 拿到模板 ID，记作 `<PROFILE_ID>`（示例：`81010100000000001`）。
 
 ::: tip profileShareFlag 取值
 `ProfileShareTypeEnum` 为 `TENANT` / `DRIVER` / `USER`，决定该模板在租户内、驱动内还是用户内共享。
@@ -164,16 +174,23 @@ curl -s -X POST http://localhost:8000/api/v3/manager/point/add \
         "unit":"°C",
         "enableFlag":"ENABLE"
       }'
-# 示例返回：{"ok":true,"code":"...","data":"82010100000000001"}
+# 示例返回：{"ok":true,"code":"ADD","message":"Added successfully","data":"Added successfully"}
+# add 不回传 ID。下一步要用 pointId，按 pointName 查回：
+curl -s -X POST http://localhost:8000/api/v3/manager/point/list \
+  -H "$H_TENANT" -H "$H_LOGIN" -H "$H_TOKEN" -H 'Content-Type: application/json' \
+  -d '{"pointName":"温度","page":{"current":1,"size":1}}'
+# 从 records[0].id 拿到 pointId
 ```
 
 ```bash [dc3 CLI]
 dc3 point create --name "温度" --profile-id "81010100000000001"
+dc3 point list --name "温度"   # 查回 pointId
 ```
 
 :::
 
-**你应当看到**：返回新建位号 ID，记作 `<POINT_ID>`（示例：`82010100000000001`）。
+**你应当看到**：`add` 返回成功状态；用 `point/list` 按 `pointName` 回查，从 `records[0].id` 拿到位号 ID，记作
+`<POINT_ID>`（示例：`82010100000000001`）。
 
 ::: tip rwFlag 与 pointTypeFlag 取值
 `RwTypeEnum` 为 `READ_ONLY` / `WRITE_ONLY` / `READ_WRITE`；对 `READ_ONLY` 位号下发写命令会被拒绝。`PointTypeEnum` 共 8 个值：
@@ -197,18 +214,25 @@ curl -s -X POST http://localhost:8000/api/v3/manager/device/add \
         "profileId":"81010100000000001",
         "enableFlag":"ENABLE"
       }'
-# 示例返回：{"ok":true,"code":"...","data":"83010100000000001"}
+# 示例返回：{"ok":true,"code":"ADD","message":"Added successfully","data":"Added successfully"}
+# add 不回传 ID。下一步要用 deviceId，按 deviceName 查回：
+curl -s -X POST http://localhost:8000/api/v3/manager/device/list \
+  -H "$H_TENANT" -H "$H_LOGIN" -H "$H_TOKEN" -H 'Content-Type: application/json' \
+  -d '{"deviceName":"虚拟温控设备-01","page":{"current":1,"size":1}}'
+# 从 records[0].id 拿到 deviceId
 ```
 
 ```bash [dc3 CLI]
 dc3 device create --name "虚拟温控设备-01" \
   --driver-id "92010100000000001" \
   --profile-id "81010100000000001"
+dc3 device list --name "虚拟温控设备-01"   # 查回 deviceId
 ```
 
 :::
 
-**你应当看到**：返回新建设备 ID，记作 `<DEVICE_ID>`（示例：`83010100000000001`）。
+**你应当看到**：`add` 返回成功状态；用 `device/list` 按 `deviceName` 回查，从 `records[0].id` 拿到设备 ID，记作
+`<DEVICE_ID>`（示例：`83010100000000001`）。
 
 ## 第 7 步：配置位号属性
 
@@ -229,7 +253,8 @@ curl -s -X POST http://localhost:8000/api/v3/manager/point_attribute_config/add 
         "configValue":"25.0",
         "enableFlag":"ENABLE"
       }'
-# 示例返回：{"ok":true,"code":"...","data":"84010100000000001"}
+# 示例返回：{"ok":true,"code":"ADD","message":"Added successfully","data":"Added successfully"}
+# add 不回传 ID。配置写入后即生效，无需单独回查。
 ```
 
 ```bash [dc3 CLI]
@@ -238,7 +263,7 @@ curl -s -X POST http://localhost:8000/api/v3/manager/point_attribute_config/add 
 
 :::
 
-**你应当看到**：返回新建配置 ID。配置生效后，virtual 驱动开始为该位号产生值。
+**你应当看到**：`add` 返回成功状态（不回传 ID）。配置生效后，virtual 驱动开始为该位号产生值。
 
 ::: info attributeId 从哪来
 `attributeId` 指向 virtual 驱动在管理中心注册的某个位号属性（`PointAttribute`

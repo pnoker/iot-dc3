@@ -77,7 +77,7 @@ we give each one's role in the pipeline.
 | `X-Auth-Tenant`        | HTTP auth header          | The tenant identifier carried on protected endpoints, feeding downstream tenant isolation                                        | Auth         |
 | `X-Auth-Login`         | HTTP auth header          | The login-identity identifier carried on protected endpoints                                                                     | Auth         |
 | `X-Auth-Token`         | HTTP auth header          | The access token carried on protected endpoints                                                                                  | Auth         |
-| `POST /token/salt`     | HTTP endpoint (public)    | Login step one: send `tenant` and `name` to get the salt; the salt is valid for 5 minutes                                        | Login        |
+| `POST /token/salt`     | HTTP endpoint (public)    | Login step one: send `tenant` and `name` to get the salt; use it within 5 minutes (server does not enforce the timeout)          | Login        |
 | `POST /token/generate` | HTTP endpoint (public)    | Login step two: send `tenant`, `name`, `salt`, and the salt-hashed `password` to get an access token valid for 12 hours          | Login        |
 
 ::: info Login is a two-step token exchange

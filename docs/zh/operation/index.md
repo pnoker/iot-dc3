@@ -85,7 +85,7 @@ API / curl 为准描述操作，UI 上的对应入口与之一一对应。
 ::: code-group
 
 ```bash [1. 取盐 + 换 token]
-# 取登录盐（5 分钟有效）
+# 取登录盐（公开端点，建议 5 分钟内使用）
 curl -s -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'

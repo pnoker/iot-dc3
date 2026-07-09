@@ -252,7 +252,8 @@
         <text x="1069" y="539" fill="#334155" font-size="9" font-weight="600" text-anchor="middle">Protocol Expand...
         </text>
 
-        <text x="700" y="590" fill="#059669" font-size="13" font-weight="700" text-anchor="middle">Perception Layer</text>
+        <text x="700" y="590" fill="#059669" font-size="13" font-weight="700" text-anchor="middle">Perception Layer
+        </text>
 
         <!-- ============================================================
              DATA LAYER → DRIVER LAYER CONNECTIONS

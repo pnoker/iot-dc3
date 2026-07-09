@@ -68,7 +68,7 @@ title: 术语表
 | `X-Auth-Tenant`        | HTTP 鉴权头     | 受保护端点上携带的租户标识，参与下游租户隔离                                           | 鉴权  |
 | `X-Auth-Login`         | HTTP 鉴权头     | 受保护端点上携带的登录身份标识                                                  | 鉴权  |
 | `X-Auth-Token`         | HTTP 鉴权头     | 受保护端点上携带的访问令牌                                                    | 鉴权  |
-| `POST /token/salt`     | HTTP 端点（公开）  | 登录第一步：传 `tenant`、`name` 取盐，盐 5 分钟有效                              | 登录  |
+| `POST /token/salt`     | HTTP 端点（公开）  | 登录第一步：传 `tenant`、`name` 取盐，建议 5 分钟内使用（服务端不强制过期）                  | 登录  |
 | `POST /token/generate` | HTTP 端点（公开）  | 登录第二步：传 `tenant`、`name`、`salt`、用盐哈希后的 `password` 取访问令牌，有效期 12 小时 | 登录  |
 
 ::: info 登录是两步换取令牌

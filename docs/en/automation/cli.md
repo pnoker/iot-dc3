@@ -41,8 +41,8 @@ dc3 device list                                # list devices
 
 `dc3 auth login` runs a three-stage token chain built on the same pair of endpoints the
 platform's [golden path](../quickstart/first-device) uses for curl login — the CLI just wires them together. First,
-`POST /api/v3/auth/token/salt` exchanges a tenant name and username for a **salt**. The CLI then takes `MD5(password)`
-together with the salt and calls `POST /api/v3/auth/token/generate`, which returns a JWT. From the JWT it parses the
+`POST /api/v3/auth/token/salt` exchanges a tenant name and username for a **salt**. The CLI then submits the **plaintext
+password** together with the salt to `POST /api/v3/auth/token/generate`, which returns a JWT. From the JWT it parses the
 embedded `iat` and `exp`, then writes `{ token, salt, tenant, username, issuedAt, expiresAt }` to `~/.dc3/tokens.json` (
 file mode `0600`, one entry per profile).
 
@@ -53,9 +53,8 @@ sequenceDiagram
     participant Auth as Auth center dc3-center-auth
     CLI->>GW: "POST /api/v3/auth/token/salt (tenant, name)"
     GW->>Auth: Forward salt request
-    Auth-->>CLI: "Return salt (valid 5 minutes)"
-    CLI->>CLI: "Compute MD5(password)"
-    CLI->>GW: "POST /api/v3/auth/token/generate (tenant, name, salt, MD5 password)"
+    Auth-->>CLI: "Return salt (use within 5 minutes)"
+    CLI->>GW: "POST /api/v3/auth/token/generate (tenant, name, salt, plaintext password)"
     GW->>Auth: Forward token generation
     Auth-->>CLI: "Return JWT access token (valid 12 hours)"
     CLI->>CLI: "Parse iat/exp and write ~/.dc3/tokens.json (0600)"

@@ -33,8 +33,10 @@ flowchart LR
 ::: info Conventions
 All `id` values, tokens, and return values below are **examples**. Your environment generates snowflake IDs (long
 strings of digits), so replace them with the real values returned by the previous step. Every write endpoint returns the
-unified envelope `{ "ok": true, "code": "...", "message": "...", "data": "..." }`, and the new entity's ID sits in the
-`data` field.
+unified envelope `{ "ok": true, "code": "...", "message": "...", "data": "..." }`. Note that `add` endpoints **return
+only
+a success status — they do NOT return the new entity's ID**. When you need an ID, query it back via the matching `list`
+endpoint by name (each step below shows the lookup command).
 :::
 
 ## Step 0: Start the Stack
@@ -57,9 +59,9 @@ If you use the `dc3` CLI, tell it the gateway address first (once is enough):
 
 ## Steps 1–2: Log In for a Token
 
-Login takes two steps. First, fetch a **salt (valid 5 minutes)** with the tenant + username. Then hash the password with
-the salt and exchange it for an **access token (valid 12 hours)**. After that, every protected request must carry three
-auth headers: `X-Auth-Tenant`, `X-Auth-Login`, `X-Auth-Token`.
+Login takes two steps. First, fetch a **salt (use within 5 minutes)** with the tenant + username. Then submit the
+**plaintext password** together with the salt to exchange it for an **access token (valid 12 hours)**. After that, every
+protected request must carry three auth headers: `X-Auth-Tenant`, `X-Auth-Login`, `X-Auth-Token`.
 
 ::: code-group
 
@@ -142,16 +144,24 @@ curl -s -X POST http://localhost:8000/api/v3/manager/profile/add \
   -H "$H_TENANT" -H "$H_LOGIN" -H "$H_TOKEN" \
   -H 'Content-Type: application/json' \
   -d '{"profileName":"Virtual Thermo Profile","profileShareFlag":"TENANT","enableFlag":"ENABLE"}'
-# Example response: {"ok":true,"code":"...","data":"81010100000000001"}
+# Example response: {"ok":true,"code":"ADD","message":"Added successfully","data":"Added successfully"}
+# add returns only a success status, not the ID. When a later step needs profileId, look it up by name:
+curl -s -X POST http://localhost:8000/api/v3/manager/profile/list \
+  -H "$H_TENANT" -H "$H_LOGIN" -H "$H_TOKEN" -H 'Content-Type: application/json' \
+  -d '{"profileName":"Virtual Thermo Profile","page":{"current":1,"size":1}}'
+# Get profileId from records[0].id
 ```
 
 ```bash [dc3 CLI]
 dc3 profile create --name "Virtual Thermo Profile"
+dc3 profile list --name "Virtual Thermo Profile"   # look up profileId
 ```
 
 :::
 
-**What you should see**: `data` holds the new profile ID, called `<PROFILE_ID>` below (example: `81010100000000001`).
+**What you should see**: `add` returns a success status (`data` is a message string, not an ID); use `profile/list`
+filtered by `profileName` to look it up, and read the profile ID from `records[0].id` — call it `<PROFILE_ID>` below
+(example: `81010100000000001`).
 
 ::: tip profileShareFlag Values
 `ProfileShareTypeEnum` is `TENANT` / `DRIVER` / `USER` — whether the profile is shared within the tenant, the driver, or
@@ -179,17 +189,23 @@ curl -s -X POST http://localhost:8000/api/v3/manager/point/add \
         "unit":"°C",
         "enableFlag":"ENABLE"
       }'
-# Example response: {"ok":true,"code":"...","data":"82010100000000001"}
+# Example response: {"ok":true,"code":"ADD","message":"Added successfully","data":"Added successfully"}
+# add does not return the ID. When a later step needs pointId, look it up by name:
+curl -s -X POST http://localhost:8000/api/v3/manager/point/list \
+  -H "$H_TENANT" -H "$H_LOGIN" -H "$H_TOKEN" -H 'Content-Type: application/json' \
+  -d '{"pointName":"Temperature","page":{"current":1,"size":1}}'
+# Get pointId from records[0].id
 ```
 
 ```bash [dc3 CLI]
 dc3 point create --name "Temperature" --profile-id "81010100000000001"
+dc3 point list --name "Temperature"   # look up pointId
 ```
 
 :::
 
-**What you should see**: the response returns the new point ID, called `<POINT_ID>` below (example:
-`82010100000000001`).
+**What you should see**: `add` returns a success status; use `point/list` filtered by `pointName` to look it up, and
+read the point ID from `records[0].id` — call it `<POINT_ID>` below (example: `82010100000000001`).
 
 ::: tip rwFlag and pointTypeFlag Values
 `RwTypeEnum` is `READ_ONLY` / `WRITE_ONLY` / `READ_WRITE`; a write command against a `READ_ONLY` point is rejected.
@@ -214,19 +230,25 @@ curl -s -X POST http://localhost:8000/api/v3/manager/device/add \
         "profileId":"81010100000000001",
         "enableFlag":"ENABLE"
       }'
-# Example response: {"ok":true,"code":"...","data":"83010100000000001"}
+# Example response: {"ok":true,"code":"ADD","message":"Added successfully","data":"Added successfully"}
+# add does not return the ID. When a later step needs deviceId, look it up by name:
+curl -s -X POST http://localhost:8000/api/v3/manager/device/list \
+  -H "$H_TENANT" -H "$H_LOGIN" -H "$H_TOKEN" -H 'Content-Type: application/json' \
+  -d '{"deviceName":"Virtual Thermo Device-01","page":{"current":1,"size":1}}'
+# Get deviceId from records[0].id
 ```
 
 ```bash [dc3 CLI]
 dc3 device create --name "Virtual Thermo Device-01" \
   --driver-id "92010100000000001" \
   --profile-id "81010100000000001"
+dc3 device list --name "Virtual Thermo Device-01"   # look up deviceId
 ```
 
 :::
 
-**What you should see**: the response returns the new device ID, called `<DEVICE_ID>` below (example:
-`83010100000000001`).
+**What you should see**: `add` returns a success status; use `device/list` filtered by `deviceName` to look it up, and
+read the device ID from `records[0].id` — call it `<DEVICE_ID>` below (example: `83010100000000001`).
 
 ## Step 7: Configure Point Attributes
 
@@ -248,7 +270,8 @@ curl -s -X POST http://localhost:8000/api/v3/manager/point_attribute_config/add 
         "configValue":"25.0",
         "enableFlag":"ENABLE"
       }'
-# Example response: {"ok":true,"code":"...","data":"84010100000000001"}
+# Example response: {"ok":true,"code":"ADD","message":"Added successfully","data":"Added successfully"}
+# add does not return the ID. The config takes effect immediately upon write, no separate lookup needed.
 ```
 
 ```bash [dc3 CLI]
@@ -257,7 +280,7 @@ curl -s -X POST http://localhost:8000/api/v3/manager/point_attribute_config/add 
 
 :::
 
-**What you should see**: the response returns the new config ID. Once the config takes effect, the virtual driver starts
+**What you should see**: `add` returns a success status (no ID). Once the config takes effect, the virtual driver starts
 producing values for that point.
 
 ::: info Where attributeId Comes From

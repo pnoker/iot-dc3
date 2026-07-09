@@ -156,7 +156,7 @@ To verify: once the stack is up, run the login golden path against the gateway. 
 salt, then exchange the salt-hashed password for a 12-hour access token:
 
 ```bash
-# 1) Fetch the salt (public endpoint, valid for 5 minutes)
+# 1) Fetch the salt (public endpoint; use within 5 minutes)
 curl -s -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'      # returns the salt string (sample value)

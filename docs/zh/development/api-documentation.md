@@ -54,9 +54,10 @@ flowchart LR
 ## 登录与鉴权：取盐 → 取 token → 带 X-Auth-* 头
 
 除 `/api/v3/auth/token/**`（取盐、生成 token、改密）这类公开端点外，网关后的所有业务接口都要求携带三个鉴权头：`X-Auth-Tenant`、
-`X-Auth-Login`、`X-Auth-Token`。登录本身是一个两步握手：先用用户名+租户向服务端要一个临时盐（5 分钟有效），再把
-`md5(password)` 连同这枚盐一起提交换取 token（12 小时有效）。盐不参与密码哈希——它作为独立字段单独传给服务端，服务端用它给
-token 签名；密码本身只做单次 `md5`，由后端 `PasswordUtil.verify` 校验。
+`X-Auth-Login`、`X-Auth-Token`。登录本身是一个两步握手：先用用户名+租户向服务端要一枚随机盐（建议 5 分钟内使用，服务端不强制过期），再把
+**明文密码**连同这枚盐一起提交换取 token（12 小时有效）。盐不参与密码哈希——它与服务端密钥
+`DC3_SECURITY_KEY` 拼接后，作为 JWT 的 HMAC-SHA256 签名密钥；密码本身以明文提交（依赖 HTTPS 保护传输），由后端
+`PasswordUtil.verify` 用 Argon2id（不可用时回退 BCrypt）校验。
 
 ```mermaid
 sequenceDiagram
@@ -65,9 +66,9 @@ sequenceDiagram
   participant Auth as 鉴权中心 dc3-center-auth
   Client->>GW: 取盐（tenant, name）
   GW->>Auth: 转发取盐请求
-  Auth-->>Client: "salt 字符串 (5 分钟有效)"
-  Note over Client: "本地计算 md5(password)；salt 单独提交"
-  Client->>GW: 换 token（tenant, name, salt, 加盐口令）
+  Auth-->>Client: "salt 字符串 (建议 5 分钟内使用)"
+  Note over Client: "密码无需本地哈希，明文提交（依赖 HTTPS）"
+  Client->>GW: 换 token（tenant, name, salt, 明文密码）
   GW->>Auth: 转发生成 token 请求
   Auth-->>Client: "access token (12 小时有效)"
   Client->>GW: "POST /api/v3/... 带 X-Auth-Tenant / X-Auth-Login / X-Auth-Token"
@@ -85,12 +86,12 @@ sequenceDiagram
 curl -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'
-# → R<String>：data 即 salt（示例："f3a9c1..."），5 分钟有效
+# → R<String>：data 即 salt（示例："f3a9c1..."），建议 5 分钟内使用
 
-# 2. 本地计算 md5(password)，连同 salt 一起换 token
+# 2. 连同 salt 一起提交明文密码（依赖 HTTPS 保护传输）换 token
 curl -X POST http://localhost:8000/api/v3/auth/token/generate \
   -H 'Content-Type: application/json' \
-  -d '{"tenant":"default","name":"dc3","salt":"f3a9c1...","password":"<md5(password)>"}'
+  -d '{"tenant":"default","name":"dc3","salt":"f3a9c1...","password":"<明文密码>"}'
 # → R<String>：data 即 access token（示例："eyJ..."），12 小时有效
 
 # 3. 带鉴权头调用业务接口
@@ -103,7 +104,7 @@ curl -X POST http://localhost:8000/api/v3/manager/device/list \
 ```
 
 ```bash [dc3 CLI]
-# CLI 封装了取盐→哈希→换 token→保存凭据的全过程
+# CLI 封装了取盐→换 token→保存凭据的全过程
 dc3 config set gateway http://localhost:8000
 dc3 auth login --tenant default --username dc3
 ```

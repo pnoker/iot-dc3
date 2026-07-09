@@ -179,7 +179,7 @@ make up-dev-cn
 验证：栈起来后，对网关跑一次登录黄金路径。登录分两步——先取盐，再用盐哈希后的密码换 12 小时有效的 access token：
 
 ```bash
-# 1) 取盐（公开端点，5 分钟有效）
+# 1) 取盐（公开端点，建议 5 分钟内使用）
 curl -s -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'      # 返回字符串 salt（示例值）
