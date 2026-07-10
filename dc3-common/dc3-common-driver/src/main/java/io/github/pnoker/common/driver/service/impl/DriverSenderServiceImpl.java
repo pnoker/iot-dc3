@@ -210,6 +210,16 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 RabbitConstant.ROUTING_EVENT_PREFIX + driverProperties.getService(), entityDTO);
     }
 
+    /**
+     * Assemble and publish a device state, filling driver/tenant context from the
+     * registered driver metadata (warn-and-skip when the driver is not registered yet).
+     *
+     * @param deviceId         target device
+     * @param status           device status to report
+     * @param timeout          lease timeout value
+     * @param timeoutUnit      lease timeout unit
+     * @param stateDescription optional structured description, may be null
+     */
     private void sendDeviceStatus(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit,
                                   String stateDescription) {
         DeviceStateDTO deviceState = new DeviceStateDTO(deviceId, status, timeout, timeoutUnit);

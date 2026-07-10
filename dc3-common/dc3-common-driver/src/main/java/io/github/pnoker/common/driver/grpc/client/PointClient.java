@@ -55,6 +55,12 @@ public class PointClient {
 
     private final PointBuilder pointBuilder;
 
+    /**
+     * Fetch all points via paginated gRPC calls, looping through every page and
+     * accumulating the results.
+     *
+     * @return all points
+     */
     public List<PointBO> list() {
         long current = 1;
         GrpcRPagePointDTO rPagePointDTO = getGrpcRPagePointDTO(current);

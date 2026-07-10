@@ -80,6 +80,12 @@ public class DeviceClient {
 
     private final GrpcEventAttributeConfigBuilder grpcEventAttributeConfigBuilder;
 
+    /**
+     * Fetch all devices via paginated gRPC calls, looping through every page and
+     * accumulating the results.
+     *
+     * @return all devices
+     */
     public List<DeviceBO> list() {
         long current = 1;
         GrpcRPageDeviceDTO rPageDeviceDTO = getGrpcRPageDeviceDTO(current);
