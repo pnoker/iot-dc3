@@ -34,6 +34,10 @@
 </p>
 
 <p align="center">
+  <a href="https://docs.dc3.site">https://docs.dc3.site</a>
+</p>
+
+<p align="center">
   🔌 <strong>Kết nối đa giao thức</strong> &nbsp;·&nbsp;
   🤖 <strong>AI Agentic Center</strong> &nbsp;·&nbsp;
   ☁️ <strong>Microservice cloud-native</strong>

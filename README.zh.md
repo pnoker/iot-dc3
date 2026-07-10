@@ -34,6 +34,10 @@
 </p>
 
 <p align="center">
+  <a href="https://docs.dc3.site">https://docs.dc3.site</a>
+</p>
+
+<p align="center">
   🔌 <strong>多协议接入</strong> &nbsp;·&nbsp;
   🤖 <strong>AI Agentic 中心</strong> &nbsp;·&nbsp;
   ☁️ <strong>云原生微服务</strong>
