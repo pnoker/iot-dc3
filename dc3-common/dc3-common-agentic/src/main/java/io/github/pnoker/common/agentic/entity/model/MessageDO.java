@@ -52,18 +52,33 @@ public class MessageDO implements Serializable {
     @TableField("conversation_id")
     private String conversationId;
 
+    /**
+     * Message role: user, assistant, system, or tool.
+     */
     @TableField("role")
     private String role;
 
+    /**
+     * Message content stored as JSON (text, reasoning, tool trace, tokens).
+     */
     @TableField(value = "content", typeHandler = JacksonTypeHandler.class)
     private AgenticMessageContent content;
 
+    /**
+     * Model that produced an assistant message, null for other roles.
+     */
     @TableField("model")
     private String model;
 
+    /**
+     * Zero-based position of the message within its conversation.
+     */
     @TableField("message_index")
     private Long messageIndex;
 
+    /**
+     * Persistence status, 0:Ok.
+     */
     @TableField("status")
     private Byte status;
 

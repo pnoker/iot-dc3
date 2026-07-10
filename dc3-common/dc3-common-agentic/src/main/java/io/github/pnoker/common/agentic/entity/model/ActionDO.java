@@ -50,27 +50,52 @@ public class ActionDO implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
+    /**
+     * External action identifier (e.g. UUID).
+     */
     @TableField("action_id")
     private String actionId;
 
+    /**
+     * Conversation the action belongs to.
+     */
     @TableField("conversation_id")
     private String conversationId;
 
+    /**
+     * Action type string, e.g. {@code writePointValue}.
+     */
     @TableField("action_type")
     private String actionType;
 
+    /**
+     * Short action title.
+     */
     @TableField("title")
     private String title;
 
+    /**
+     * Longer action description.
+     */
     @TableField("description")
     private String description;
 
+    /**
+     * Action payload as a JSON map; shape varies by action type (e.g. deviceId,
+     * pointId, value for writePointValue).
+     */
     @TableField(value = "payload", typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> payload;
 
+    /**
+     * Lifecycle status, 0:Pending, 1:Confirmed, 2:Rejected, 3:Executed, 4:Failed.
+     */
     @TableField("status")
     private Byte status;
 
+    /**
+     * Time at which a pending action expires and can no longer be confirmed.
+     */
     @TableField("expire_time")
     private LocalDateTime expireTime;
 

@@ -167,6 +167,15 @@ public class PointValueTool {
         }
     }
 
+    /**
+     * Build a line history chart from a numeric series, mapping each row to an
+     * (index, value) data point. Returns null when the series is empty.
+     *
+     * @param deviceId      the device id, for the chart title
+     * @param pointId       the point id, for the chart title
+     * @param numericSeries the numeric series to plot
+     * @return the history chart, or null when there is no data
+     */
     private HistoryChart buildHistoryChart(Long deviceId, Long pointId,
                                            AgenticVisualizationUtil.NumericSeries numericSeries) {
         if (Objects.isNull(numericSeries) || numericSeries.dataset().isEmpty()) {
@@ -185,6 +194,16 @@ public class PointValueTool {
                 List.of(new ChartSeries("value", dataPoints)));
     }
 
+    /**
+     * Build line and stat visualization specs for a point-value history, including a
+     * y-axis average annotation when the series summary has one. Returns an empty list
+     * when the series is empty.
+     *
+     * @param deviceId the device id
+     * @param pointId  the point id
+     * @param series   the numeric series to visualize
+     * @return the visualization specs, or an empty list when there is no data
+     */
     private List<AgenticVisualizationSpec> buildHistoryVisualizations(Long deviceId, Long pointId,
                                                                       AgenticVisualizationUtil.NumericSeries series) {
         if (Objects.isNull(series) || series.dataset().isEmpty()) {

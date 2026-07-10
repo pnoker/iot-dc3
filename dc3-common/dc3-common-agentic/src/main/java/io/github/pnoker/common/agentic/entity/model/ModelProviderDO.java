@@ -45,25 +45,46 @@ public class ModelProviderDO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Primary key ID.
+     */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
+    /**
+     * Provider display name.
+     */
     @TableField("name")
     private String name;
 
+    /**
+     * Provider type, 0:OpenAI-compatible, 1:Anthropic.
+     */
     @TableField("provider_type")
     private Byte providerType;
 
+    /**
+     * Base URL of the provider API.
+     */
     @TableField("base_url")
     private String baseUrl;
 
+    /**
+     * API key for the provider; excluded from toString to avoid leaking secrets.
+     */
     @ToString.Exclude
     @TableField("api_key")
     private String apiKey;
 
+    /**
+     * Default flag, 0:Not default, 1:Default.
+     */
     @TableField("default_flag")
     private Byte defaultFlag;
 
+    /**
+     * Enable flag, 0:Enable, 1:Disable.
+     */
     @TableField("enable_flag")
     private Byte enableFlag;
 

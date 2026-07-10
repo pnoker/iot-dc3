@@ -97,6 +97,13 @@ public class ChatClientFactory {
         this.properties = properties;
     }
 
+    /**
+     * Resolve the model identifier with a three-level fallback: the requested model if
+     * configured, then the default model, then the Spring AI fallback model.
+     *
+     * @param requestedModel the model identifier from the request, may be null/blank
+     * @return the resolved model identifier
+     */
     public String resolveModel(String requestedModel) {
         String candidate = StringUtils.trimToNull(requestedModel);
         if (StringUtils.isNotBlank(candidate)) {
@@ -124,6 +131,13 @@ public class ChatClientFactory {
         return candidate;
     }
 
+    /**
+     * Get or create a cached ChatClient for the given model, resolving its config and
+     * provider. Falls back to the Spring AI ChatClient when no config is found.
+     *
+     * @param model the model identifier, may be null/blank to use the default config
+     * @return a ChatClient for the model
+     */
     public ChatClient getOrCreate(String model) {
         ModelConfigBO config = null;
         if (StringUtils.isNotBlank(model)) {
@@ -151,6 +165,13 @@ public class ChatClientFactory {
         return Objects.nonNull(provider) ? provider.getProviderType() : null;
     }
 
+    /**
+     * Resolve the provider backing a model, defaulting to the default model's provider
+     * when the model is unknown.
+     *
+     * @param model the model identifier, may be null/blank to use the default config
+     * @return the provider, or null when none is found
+     */
     public ModelProviderBO resolveProviderForModel(String model) {
         ModelConfigBO config = StringUtils.isNotBlank(model) ? resolveConfig(model) : null;
         if (Objects.isNull(config)) {
@@ -162,6 +183,13 @@ public class ChatClientFactory {
         return resolveProvider(config.getProviderId());
     }
 
+    /**
+     * Return whether a model supports tool calling. Falls back to the Spring AI
+     * fallback model's tool-calling flag when the model is unconfigured.
+     *
+     * @param model the model identifier, may be null/blank
+     * @return true if the model supports tool calling
+     */
     public boolean supportsToolCall(String model) {
         ModelConfigBO config = StringUtils.isNotBlank(model) ? resolveConfig(model) : null;
         if (Objects.isNull(config)) {
