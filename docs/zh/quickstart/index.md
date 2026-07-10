@@ -18,7 +18,7 @@ JDK/构建工具，外加一个容器运行时。
 
 - **JDK 21** —— 平台强制 Java 21，低版本编译会直接失败。
 - **Maven 3.9+** —— 仓库内置 `.mvn/settings.xml` 与并行构建配置；多模块打包用它。
-- **pnpm** —— 前端 `iot-dc3-web` 与 `dc3-cli` 都用 pnpm（不要用 npm/yarn）。仅做后端开发可跳过。
+- **pnpm** —— 前端 `dc3-web/` 与同级目录 `dc3-cli/` 都用 pnpm（不要用 npm/yarn）。仅做后端开发可跳过。
 - **Podman** —— 本仓库容器操作一律用 `podman`（`make` 默认 `podman compose`）。
 
 ## 在 JetBrains IDEA 中开发

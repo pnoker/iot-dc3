@@ -104,7 +104,7 @@ mind when writing integration tests for executable modules like drivers.
 
 ## Frontend test commands
 
-The frontend (`iot-dc3-web/`) uses pnpm + Vitest (unit/api/component/view) and Playwright (E2E), independent of the
+The frontend (`dc3-web/`) uses pnpm + Vitest (unit/api/component/view) and Playwright (E2E), independent of the
 backend:
 
 ::: code-group

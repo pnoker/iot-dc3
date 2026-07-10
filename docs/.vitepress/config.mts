@@ -39,7 +39,7 @@ const PILLARS: ReadonlyArray<Pillar> = [
         navKey: 'pillar.overview', landing: 'introduction',
         paths: ['introduction', 'quickstart'], activeMatch: '^/(zh|en)/(introduction|quickstart)/',
         groups: [
-            {key: '', items: [['introduction'], ['introduction/concepts'], ['introduction/paths']]},
+            {key: '', items: [['introduction'], ['introduction/concepts'], ['introduction/paths'], ['introduction/technology-stack']]},
             {
                 key: 'group.objects-data',
                 items: [['introduction/concepts/profile'], ['introduction/concepts/device'], ['introduction/concepts/driver'], ['introduction/concepts/point'], ['introduction/concepts/point-value']]

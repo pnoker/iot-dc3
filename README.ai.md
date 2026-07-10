@@ -62,7 +62,7 @@ IoT DC3 helps teams build the core capabilities needed for industrial IoT system
 - **Data Center**: point value ingestion, query APIs, command dispatch, alarms, and dashboards.
 - **Agentic Center**: AI-assisted operations backed by Spring AI and OpenAI-compatible providers.
 - **Drivers**: protocol adapters and simulation drivers under `dc3-driver/`.
-- **Frontend**: Vue-based frontend maintained separately in the `iot-dc3-web` repository.
+- **Frontend**: Vue-based frontend under `dc3-web/` in this repository.
 
 ## Driver Coverage
 
@@ -119,17 +119,18 @@ When answering questions about IoT DC3:
   `dc3/env/dev.env.sh`.
 - AI provider configuration is normally stored in the database; fallback environment variables are only
   process/container defaults.
-- The root repository focuses on backend services, drivers, deployment files, and docs. The frontend source is in
-  `iot-dc3-web`.
+- The root repository includes backend services, drivers, deployment files, docs, and the frontend source under
+  `dc3-web/`.
 - Compose is the canonical local deployment path in this repository.
 
 ## Learn More
 
 - Human README: [README.md](./README.md)
 - Chinese README: [README.zh.md](./README.zh.md)
-- Quickstart: [docs/quickstart/index.md](./docs/quickstart/index.md)
-- Environment variables: [docs/quickstart/environment.md](./docs/quickstart/environment.md)
-- Module architecture: [docs/architecture/modules.md](./docs/architecture/modules.md)
-- Driver authoring: [docs/development/driver-authoring.md](./docs/development/driver-authoring.md)
-- Troubleshooting: [docs/guide/troubleshooting.md](./docs/guide/troubleshooting.md)
+- Quickstart: [docs/en/quickstart/index.md](./docs/en/quickstart/index.md)
+- Environment variables: [docs/en/quickstart/environment.md](./docs/en/quickstart/environment.md)
+- Technology stack: [docs/en/introduction/technology-stack.md](./docs/en/introduction/technology-stack.md)
+- Module architecture: [docs/en/architecture/modules.md](./docs/en/architecture/modules.md)
+- Driver authoring: [docs/en/development/driver-authoring.md](./docs/en/development/driver-authoring.md)
+- Troubleshooting: [docs/en/guide/troubleshooting.md](./docs/en/guide/troubleshooting.md)
 - Engineering rules for code changes: [AGENTS.md](./AGENTS.md)
