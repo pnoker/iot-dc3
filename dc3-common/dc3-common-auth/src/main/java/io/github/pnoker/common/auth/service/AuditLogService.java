@@ -32,9 +32,35 @@ import java.util.List;
  */
 public interface AuditLogService {
 
+    /**
+     * Persist one audit event for an identity or authorization change.
+     *
+     * @param tenantId      tenant scope
+     * @param principalId   the actor principal id
+     * @param principalType the actor principal type (USER/SERVICE_ACCOUNT)
+     * @param action        the action performed (e.g. create/update/delete/login)
+     * @param resourceType  the affected resource type
+     * @param resourceId    the affected resource id, may be null
+     * @param resourceName  the affected resource name, may be null
+     * @param status        the outcome status (success/failed)
+     * @param errorCode     an error code on failure, may be null
+     */
     void log(Long tenantId, Long principalId, String principalType, String action,
              String resourceType, Long resourceId, String resourceName, String status, String errorCode);
 
+    /**
+     * Query audit events by any combination of filters, scoped to a tenant. Null filter
+     * arguments match all values.
+     *
+     * @param tenantId     tenant scope
+     * @param principalId  optional principal filter
+     * @param action       optional action filter
+     * @param resourceType optional resource type filter
+     * @param resourceId   optional resource id filter
+     * @param status       optional status filter
+     * @param limit        maximum number of events
+     * @return the matching audit events
+     */
     List<IdentityAuditLogBO> list(Long tenantId, Long principalId, String action, String resourceType,
                                   Long resourceId, String status, int limit);
 

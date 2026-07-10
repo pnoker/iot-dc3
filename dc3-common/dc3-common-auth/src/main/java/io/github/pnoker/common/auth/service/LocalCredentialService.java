@@ -30,6 +30,13 @@ import io.github.pnoker.common.base.service.BaseService;
  */
 public interface LocalCredentialService extends BaseService<LocalCredentialBO, LocalCredentialQuery> {
 
+    /**
+     * Get a local credential by login name.
+     *
+     * @param loginName      login name to look up
+     * @param throwException whether to throw {@code NotFoundException} when not found
+     * @return the credential, or {@code null} when not found and throwException is false
+     */
     LocalCredentialBO getByLoginName(String loginName, boolean throwException);
 
     boolean isLoginNameAvailable(String loginName);

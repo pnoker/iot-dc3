@@ -30,6 +30,13 @@ import io.github.pnoker.common.base.service.BaseService;
  */
 public interface ServiceAccountService extends BaseService<ServiceAccountBO, ServiceAccountQuery> {
 
+    /**
+     * Get a service account by principal id.
+     *
+     * @param principalId    principal id to look up
+     * @param throwException whether to throw {@code NotFoundException} when not found
+     * @return the service account, or {@code null} when not found and throwException is false
+     */
     ServiceAccountBO getByPrincipalId(Long principalId, boolean throwException);
 
 }
