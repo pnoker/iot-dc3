@@ -158,6 +158,14 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Get or create the cached McPLC connection for a device, parsing host/port/series
+     * from the driver config and falling back to QnA on an unknown series.
+     *
+     * @param deviceId     the device to connect to
+     * @param driverConfig driver attribute config carrying host/port/series
+     * @return the wrapped McPLC connection
+     */
     private MyMcPLC getMcPLC(Long deviceId, Map<String, AttributeBO> driverConfig) {
         return connectMap.computeIfAbsent(deviceId, id -> {
             String host = driverConfig.get("host").getValue(String.class);
@@ -190,12 +198,26 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
         });
     }
 
+    /**
+     * Build a point variable from the point config's address and optional length.
+     *
+     * @param pointConfig point attribute config
+     * @param type        value type code
+     * @return the resolved point variable
+     */
     private MelsecPointVariable buildVariable(Map<String, AttributeBO> pointConfig, String type) {
         String address = pointConfig.get("address").getValue(String.class);
         int length = pointConfig.containsKey("length") ? pointConfig.get("length").getValue(Integer.class) : 0;
         return new MelsecPointVariable(address, type, length);
     }
 
+    /**
+     * Read a value from the PLC, dispatching to the type-specific reader.
+     *
+     * @param plc      the McPLC connection
+     * @param variable the point variable to read
+     * @return the read value
+     */
     private Object readByType(McPLC plc, MelsecPointVariable variable) {
         AttributeTypeEnum type = AttributeTypeEnum.ofCode(variable.getType());
         if (Objects.isNull(type)) {
@@ -224,6 +246,14 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Write a value to the PLC, parsing the string value and dispatching to the
+     * type-specific writer.
+     *
+     * @param plc      the McPLC connection
+     * @param variable the point variable to write
+     * @param value    the value as a string
+     */
     private void writeByType(McPLC plc, MelsecPointVariable variable, String value) {
         AttributeTypeEnum type = AttributeTypeEnum.ofCode(variable.getType());
         if (Objects.isNull(type)) {
@@ -259,11 +289,24 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Remove a connection from the cache and close it, used when a connection goes bad.
+     *
+     * @param deviceId the device id
+     * @param myMcPLC  the connection to invalidate
+     */
     private void invalidateConnection(Long deviceId, MyMcPLC myMcPLC) {
         connectMap.remove(deviceId, myMcPLC);
         closeConnection(deviceId, myMcPLC);
     }
 
+    /**
+     * Close the underlying PLC connection under its lock, logging (not throwing) on
+     * failure.
+     *
+     * @param deviceId the device id
+     * @param myMcPLC  the connection to close
+     */
     private void closeConnection(Long deviceId, MyMcPLC myMcPLC) {
         myMcPLC.lock.lock();
         try {

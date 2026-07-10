@@ -162,6 +162,14 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Get or create the cached S7PLC connection for a device, parsing host/port/plcType
+     * from the driver config and falling back to S1200 on an unknown plcType.
+     *
+     * @param deviceId      the device to connect to
+     * @param driverConfig  driver attribute config carrying host/port/plcType
+     * @return the wrapped S7PLC connection
+     */
     private MyS7PLC getS7PLC(Long deviceId, Map<String, AttributeBO> driverConfig) {
         return connectMap.computeIfAbsent(deviceId, id -> {
             String host = driverConfig.get("host").getValue(String.class);
@@ -195,6 +203,14 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         });
     }
 
+    /**
+     * Build a point variable from the point config's dbNum/byteOffset/bitOffset and the
+     * value type.
+     *
+     * @param pointConfig point attribute config
+     * @param type        value type code
+     * @return the resolved point variable
+     */
     private PlcS7PointVariable buildVariable(Map<String, AttributeBO> pointConfig, String type) {
         int dbNum = pointConfig.get("dbNum").getValue(Integer.class);
         int byteOffset = pointConfig.get("byteOffset").getValue(Integer.class);
@@ -202,6 +218,13 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         return new PlcS7PointVariable(dbNum, byteOffset, bitOffset, type);
     }
 
+    /**
+     * Read a value from the PLC, dispatching to the type-specific reader.
+     *
+     * @param plc      the S7PLC connection
+     * @param variable the point variable to read
+     * @return the read value
+     */
     private Object readByType(S7PLC plc, PlcS7PointVariable variable) {
         String address = variable.getAddress();
         AttributeTypeEnum type = AttributeTypeEnum.ofCode(variable.getType());
@@ -230,6 +253,14 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Write a value to the PLC, parsing the string value and dispatching to the
+     * type-specific writer.
+     *
+     * @param plc      the S7PLC connection
+     * @param variable the point variable to write
+     * @param value    the value as a string
+     */
     private void writeByType(S7PLC plc, PlcS7PointVariable variable, String value) {
         String address = variable.getAddress();
         AttributeTypeEnum type = AttributeTypeEnum.ofCode(variable.getType());
@@ -266,11 +297,24 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Remove a connection from the cache and close it, used when a connection goes bad.
+     *
+     * @param deviceId the device id
+     * @param myS7PLC  the connection to invalidate
+     */
     private void invalidateConnection(Long deviceId, MyS7PLC myS7PLC) {
         connectMap.remove(deviceId, myS7PLC);
         closeConnection(deviceId, myS7PLC);
     }
 
+    /**
+     * Close the underlying PLC connection under its lock, logging (not throwing) on
+     * failure.
+     *
+     * @param deviceId the device id
+     * @param myS7PLC  the connection to close
+     */
     private void closeConnection(Long deviceId, MyS7PLC myS7PLC) {
         myS7PLC.lock.lock();
         try {
