@@ -297,6 +297,15 @@ public class PointAttributeConfigController implements BaseController {
         }));
     }
 
+    /**
+     * Validate that device, point, and (optional) attribute belong to the tenant, share
+     * a profile, and that the attribute's driver matches the device's driver.
+     *
+     * @param tenantId    tenant scope
+     * @param deviceId    the device to validate
+     * @param pointId     the point to validate
+     * @param attributeId the attribute to validate, may be null to skip
+     */
     private void requirePointConfigRelations(Long tenantId, Long deviceId, Long pointId, Long attributeId) {
         DeviceBO deviceBO = requireTenant(tenantId, deviceService.getById(deviceId));
         PointBO pointBO = requireTenant(tenantId, pointService.getById(pointId));
