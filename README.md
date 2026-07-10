@@ -71,6 +71,37 @@
   </tr>
 </table>
 
+## 🏗️ Architecture Overview
+
+### Architecture at a Glance
+
+![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-en.png)
+
+Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 28 protocol
+drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack
+(ELK + Prometheus + Grafana) laid out in one view.
+
+### Four-Layer Reference Architecture Mapping
+
+![IoT DC3 Four-Layer Reference Architecture](docs/public/images/architecture-en.png)
+
+Industry-standard IoT four-layer reference — Application, Platform, Network, Perception — plus security as a
+cross-cutting concern.
+
+| Layer           | IoT Reference Responsibilities            | DC3 Implementation                         |
+|-----------------|-------------------------------------------|--------------------------------------------|
+| **Application** | Operations · Alarms · Analytics · AIoT    | Operations · Agentic Center · MCP          |
+| **Platform**    | Device mgmt · Storage · Rules & compute   | Center services · Data plane · TimescaleDB |
+| **Network**     | Fieldbus · IoT protocols · Wireless / WAN | 28 protocol drivers · Gateway · RabbitMQ   |
+| **Perception**  | Sensing · Auto-ID · Actuators             | Profile · Device · Point                   |
+
+🧱 **Design principles** — cross-service calls always go through Facade interfaces; the DO/BO/VO three-tier model keeps
+persistence, business, and API shapes strictly separated; and tenant isolation runs end to end across database, cache,
+and API paths. Clear boundaries that scale across services and teams.
+
+> 📖 For the full architecture documentation,
+> see [System Architecture Overview](https://pnoker.github.io/iot-dc3/en/architecture/).
+
 ## ✨ Core Features
 
 ### 🔌 Multi-Protocol Device Connectivity
@@ -127,7 +158,7 @@ Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 20
 ### 🧩 Developer Friendly
 
 - **Driver SDK** - A complete driver development toolkit. See
-  the [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring)
+  the [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/en/development/driver-authoring)
 - **Separated frontend and backend** - Vue 3 + TypeScript frontend, RESTful and gRPC APIs
 - **Containerized deployment** - One-command startup with Podman / Docker Compose, with a path toward Kubernetes and
   other container platforms
@@ -135,146 +166,36 @@ Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 20
 
 ## ⚡ Quick Start
 
-### Prerequisites
-
-| Dependency       | Version       |
-|------------------|---------------|
-| Java (JDK)       | 21+           |
-| Maven            | 3.9+          |
-| Podman or Docker | Latest stable |
-
-### Start in Three Steps
-
-**① Clone the repository**
+For source-based local development, start PostgreSQL and RabbitMQ, load local environment variables, then build:
 
 ```bash
-git clone https://github.com/pnoker/iot-dc3.git
-cd iot-dc3
-```
-
-**② Start base dependencies** (PostgreSQL + RabbitMQ)
-
-```bash
-# Global registry
 make up-db
-
-# Mainland China users (Alibaba Cloud registry)
-make up-db-cn
-```
-
-**③ Load local environment variables, build, and start**
-
-```bash
 source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-`dc3/env/dev.env.sh` points local Java processes to the PostgreSQL, RabbitMQ, and gRPC ports published on `localhost`.
-Run the following `java -jar` commands in the same terminal session.
-
-Start services in order:
-
-```bash
-java -jar dc3-gateway/target/dc3-gateway.jar                          # API Gateway
-java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar        # Auth Center
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar  # Manager Center
-java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar        # Data Center
-java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar  # Agentic Center
-java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar  # Virtual Driver for demos
-```
-
-> 📖 For full local setup, see the [Quickstart](https://pnoker.github.io/iot-dc3/quickstart/) and
-> [Environment Variables](https://pnoker.github.io/iot-dc3/quickstart/environment) docs.
-
-<details>
-<summary>🔧 More startup options (optional dependencies, single-service startup, environment variables)</summary>
-
-**Start optional infrastructure** (EMQX, ELK/APM, Prometheus, Grafana, etc.):
-
-```bash
-make up-optional-cn              # Start optional dependencies
-make up-db-cn && make up-optional-cn && make up-dev-cn  # Start all dependencies
-```
-
-**Start selected services** (useful for frontend/API testing):
-
-```bash
-make up SERVICES=agentic REGISTRY=cn               # Single service
-make up SERVICES="gateway agentic" REGISTRY=cn      # Multiple services
-make up GROUP=core REGISTRY=cn                      # Core service group
-make up GROUP=drivers REGISTRY=cn                   # Driver service group
-make logs SERVICES="gateway agentic"                # Follow logs
-```
-
-**Compose environment overrides**:
-
-```bash
-cp .env.example .env    # Copy the template
-```
-
-The root `.env` file is used for Compose variable interpolation, such as image registry, image tag, and published ports.
-Application runtime variables are configured in `dc3/env/dev.env`. See
-the [environment documentation](https://pnoker.github.io/iot-dc3/quickstart/environment).
-
-</details>
-
-## 🏗️ Architecture Overview
-
-### Architecture at a Glance
-
-![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-en.png)
-
-Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 28 protocol
-drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack
-(ELK + Prometheus + Grafana) laid out in one view.
-
-### Four-Layer Reference Architecture Mapping
-
-![IoT DC3 Four-Layer Reference Architecture](docs/public/images/architecture-en.png)
-
-Industry-standard IoT four-layer reference — Application, Platform, Network, Perception — plus security as a
-cross-cutting concern.
-
-| Layer           | IoT Reference Responsibilities            | DC3 Implementation                         |
-|-----------------|-------------------------------------------|--------------------------------------------|
-| **Application** | Operations · Alarms · Analytics · AIoT    | Operations · Agentic Center · MCP          |
-| **Platform**    | Device mgmt · Storage · Rules & compute   | Center services · Data plane · TimescaleDB |
-| **Network**     | Fieldbus · IoT protocols · Wireless / WAN | 28 protocol drivers · Gateway · RabbitMQ   |
-| **Perception**  | Sensing · Auto-ID · Actuators             | Profile · Device · Point                   |
-
-🧱 **Design principles** — cross-service calls always go through Facade interfaces; the DO/BO/VO three-tier model keeps
-persistence, business, and API shapes strictly separated; and tenant isolation runs end to end across database, cache,
-and API paths. Clear boundaries that scale across services and teams.
-
-> 📖 For the full architecture documentation,
-> see [System Architecture Overview](https://pnoker.github.io/iot-dc3/architecture/).
+Use `make up-db-cn` if you prefer the Alibaba Cloud registry in Mainland China. For service startup order, IDE setup,
+verification commands, and common pitfalls, read the [full quickstart guide](https://pnoker.github.io/iot-dc3/en/quickstart/).
 
 ## 🛠️ Technology Stack
 
-| Category                        | Technologies                                                |
-|---------------------------------|-------------------------------------------------------------|
-| **Language and frameworks**     | Java 21 · Spring Boot 4 · Spring Cloud 2025 · Spring AI 2.0 |
-| **Data, cache, and scheduling** | PostgreSQL · Caffeine · MyBatis-Plus · Quartz               |
-| **Messaging and communication** | RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf             |
-| **Security and authentication** | Spring Security · JWT · BouncyCastle                        |
-| **Observability**               | Micrometer · Prometheus · Grafana · ELK                     |
-| **Frontend**                    | Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6   |
-| **Desktop**                     | Tauri 2                                                     |
-| **Deployment**                  | Podman · Docker Compose                                     |
+IoT DC3 is built on Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
+TypeScript, and Vite.
 
-> 💡 Frontend source code is in the `dc3-web/` directory of this repository (the standalone `iot-dc3-web` repo is
-> archived).
+See [Technology Stack](https://pnoker.github.io/iot-dc3/en/introduction/technology-stack) for component details and
+where each technology is used.
 
 ## 📖 Documentation and Community
 
 | Resource              | Link                                                                                    |
 |-----------------------|-----------------------------------------------------------------------------------------|
 | 📚 Online docs        | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                           |
-| 🚀 Quickstart         | [Quickstart Guide](https://pnoker.github.io/iot-dc3/quickstart/)                        |
-| 🏗️ Architecture      | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/architecture/modules)       |
-| 🔧 Driver development | [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/development/driver-authoring) |
-| 🐛 Troubleshooting    | [Troubleshooting](https://pnoker.github.io/iot-dc3/guide/troubleshooting)               |
-| 📋 Changelog          | [Release Changelog](https://pnoker.github.io/iot-dc3/development/changelog)             |
+| 🚀 Quickstart         | [Quickstart Guide](https://pnoker.github.io/iot-dc3/en/quickstart/)                     |
+| 🛠️ Technology stack  | [Technology Stack](https://pnoker.github.io/iot-dc3/en/introduction/technology-stack)   |
+| 🏗️ Architecture      | [Modules and Dependencies](https://pnoker.github.io/iot-dc3/en/architecture/modules)    |
+| 🔧 Driver development | [Driver Authoring Guide](https://pnoker.github.io/iot-dc3/en/development/driver-authoring) |
+| 🐛 Troubleshooting    | [Troubleshooting](https://pnoker.github.io/iot-dc3/en/guide/troubleshooting)            |
+| 📋 Changelog          | [Release Changelog](https://pnoker.github.io/iot-dc3/en/development/changelog)          |
 | 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                               |
 | 🇨🇳 Gitee mirror     | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                                   |
 

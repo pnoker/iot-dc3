@@ -91,7 +91,7 @@ dc3-coverage/target/site/jacoco-aggregate/index.html
 
 ## 前端测试命令
 
-前端（`iot-dc3-web/`）用 pnpm + Vitest（单元/接口/组件/视图）与 Playwright（E2E），与后端独立：
+前端（`dc3-web/`）用 pnpm + Vitest（单元/接口/组件/视图）与 Playwright（E2E），与后端独立：
 
 ::: code-group
 

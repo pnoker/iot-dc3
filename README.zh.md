@@ -71,6 +71,33 @@
   </tr>
 </table>
 
+## 🏗️ 架构概览
+
+### 产品架构全景
+
+![IoT DC3 产品架构全景](docs/public/images/architecture-panorama-zh.png)
+
+六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 28 协议驱动 → 现场设备。
+PostgreSQL（TimescaleDB + pgvector + AGE）持久层与可选运维栈（ELK + Prometheus + Grafana）一并铺开。
+
+### 四层参考架构映射
+
+![IoT DC3 四层参考架构](docs/public/images/architecture-zh.png)
+
+IoT 业界标准四层参考架构——应用层、平台层、网络层、感知层——外加贯穿四层的安全。
+
+| 层级      | IoT 参考职责              | DC3 落地                             |
+|---------|-----------------------|------------------------------------|
+| **应用层** | 运营 · 告警 · 数据分析 · AIoT | 运营中心 · Agentic 中心 · MCP            |
+| **平台层** | 设备管理 · 数据存储 · 规则与计算   | 中心服务 · 数据平面 · TimescaleDB          |
+| **网络层** | 现场总线 · IoT 协议 · 无线广域  | 28 协议驱动 · API 网关 · RabbitMQ        |
+| **感知层** | 传感测量 · 自动识别 · 执行器     | 物模型 Profile · 设备 Device · 位号 Point |
+
+🧱 **设计原则** — 跨服务调用统一经 Facade 接口；DO/BO/VO 三层模型严格分离持久化、业务与接口形态；租户隔离贯穿数据库、缓存到
+API 全链路。边界清晰，易于规模化扩展与多团队协作。
+
+> 📖 完整架构文档请参阅 [系统架构总览](https://pnoker.github.io/iot-dc3/zh/architecture/)。
+
 ## ✨ 核心特性
 
 ### 🔌 多协议设备接入
@@ -123,147 +150,42 @@
 ### 🧩 开发者友好
 
 - **Driver SDK** —
-  完善的驱动开发工具包，参考 [驱动开发指南](https://pnoker.github.io/iot-dc3/development/driver-authoring.html)
+  完善的驱动开发工具包，参考 [驱动开发指南](https://pnoker.github.io/iot-dc3/zh/development/driver-authoring)
 - **前后端分离** — Vue 3 + TypeScript 前端，RESTful + gRPC 双协议 API
 - **容器化部署** — Podman / Docker Compose 一键启动，便于迁移到 Kubernetes 等容器平台
 - **完整文档** — 在线文档站 + 快速开始指南 + 故障排查手册
 
 ## ⚡ 快速开始
 
-### 前置条件
-
-| 依赖              | 版本要求  |
-|-----------------|-------|
-| Java (JDK)      | 21+   |
-| Maven           | 3.9+  |
-| Podman 或 Docker | 最新稳定版 |
-
-### 三步启动
-
-**① 克隆项目**
+源码本地开发时，先启动 PostgreSQL 与 RabbitMQ，再加载本地环境变量并构建：
 
 ```bash
-git clone https://github.com/pnoker/iot-dc3.git
-cd iot-dc3
-```
-
-**② 启动基础依赖**（PostgreSQL + RabbitMQ）
-
-```bash
-# 全球镜像
 make up-db
-
-# 中国大陆用户（阿里云镜像）
-make up-db-cn
-```
-
-**③ 加载本地环境变量，构建并启动**
-
-```bash
 source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-`dc3/env/dev.env.sh` 会把本地 Java 进程连接到 `localhost` 上已发布的 PostgreSQL、RabbitMQ 和 gRPC 端口。
-后续 `java -jar` 命令请在同一个终端会话中执行。
-
-按顺序启动服务：
-
-```bash
-java -jar dc3-gateway/target/dc3-gateway.jar                          # API 网关
-java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar        # 认证中心
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar  # 管理中心
-java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar        # 数据中心
-java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar  # AI 智能体中心
-java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar  # 虚拟驱动（演示用）
-```
-
-> 📖 完整开发环境搭建请参阅 [快速开始](https://pnoker.github.io/iot-dc3/quickstart/) 和
-> [环境变量说明](https://pnoker.github.io/iot-dc3/quickstart/environment.html)。
-
-<details>
-<summary>🔧 更多启动选项（可选依赖、单服务启动、环境变量配置）</summary>
-
-**启动可选基础设施**（EMQX、ELK/APM、Prometheus、Grafana 等）：
-
-```bash
-make up-optional-cn              # 启动可选依赖
-make up-db-cn && make up-optional-cn && make up-dev-cn  # 启动全部依赖
-```
-
-**按需启动单个服务**（适用于前端/接口测试）：
-
-```bash
-make up SERVICES=agentic REGISTRY=cn               # 单个服务
-make up SERVICES="gateway agentic" REGISTRY=cn      # 多个服务
-make up GROUP=core REGISTRY=cn                      # 核心服务组
-make up GROUP=drivers REGISTRY=cn                   # 驱动服务组
-make logs SERVICES="gateway agentic"                # 查看日志
-```
-
-**Compose 环境变量覆盖**：
-
-```bash
-cp .env.example .env    # 复制模板文件
-```
-
-根目录 `.env` 用于 Compose 变量插值（镜像仓库、版本、端口等），应用运行时变量在 `dc3/env/dev.env` 中配置。
-详见 [环境变量文档](https://pnoker.github.io/iot-dc3/quickstart/environment.html)。
-
-</details>
-
-## 🏗️ 架构概览
-
-### 产品架构全景
-
-![IoT DC3 产品架构全景](docs/public/images/architecture-panorama-zh.png)
-
-六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 28 协议驱动 → 现场设备。
-PostgreSQL（TimescaleDB + pgvector + AGE）持久层与可选运维栈（ELK + Prometheus + Grafana）一并铺开。
-
-### 四层参考架构映射
-
-![IoT DC3 四层参考架构](docs/public/images/architecture-zh.png)
-
-IoT 业界标准四层参考架构——应用层、平台层、网络层、感知层——外加贯穿四层的安全。
-
-| 层级      | IoT 参考职责              | DC3 落地                             |
-|---------|-----------------------|------------------------------------|
-| **应用层** | 运营 · 告警 · 数据分析 · AIoT | 运营中心 · Agentic 中心 · MCP            |
-| **平台层** | 设备管理 · 数据存储 · 规则与计算   | 中心服务 · 数据平面 · TimescaleDB          |
-| **网络层** | 现场总线 · IoT 协议 · 无线广域  | 28 协议驱动 · API 网关 · RabbitMQ        |
-| **感知层** | 传感测量 · 自动识别 · 执行器     | 物模型 Profile · 设备 Device · 位号 Point |
-
-🧱 **设计原则** — 跨服务调用统一经 Facade 接口；DO/BO/VO 三层模型严格分离持久化、业务与接口形态；租户隔离贯穿数据库、缓存到
-API 全链路。边界清晰，易于规模化扩展与多团队协作。
-
-> 📖 完整架构文档请参阅 [系统架构总览](https://pnoker.github.io/iot-dc3/architecture/)。
+中国大陆网络环境可改用 `make up-db-cn`。服务启动顺序、IDEA 配置、验证命令和常见坑请阅读
+[完整快速开始](https://pnoker.github.io/iot-dc3/zh/quickstart/)。
 
 ## 🛠️ 技术栈
 
-| 分类           | 技术                                                          |
-|--------------|-------------------------------------------------------------|
-| **语言与框架**    | Java 21 · Spring Boot 4 · Spring Cloud 2025 · Spring AI 2.0 |
-| **数据、缓存与调度** | PostgreSQL · Caffeine · MyBatis-Plus · Quartz               |
-| **消息与通信**    | RabbitMQ · gRPC · MQTT (Paho + EMQX) · Protobuf             |
-| **安全与认证**    | Spring Security · JWT · BouncyCastle                        |
-| **可观测性**     | Micrometer · Prometheus · Grafana · ELK                     |
-| **前端**       | Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6   |
-| **桌面端**      | Tauri 2                                                     |
-| **部署**       | Podman · Docker Compose                                     |
+IoT DC3 基于 Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、
+TypeScript 与 Vite 构建。
 
-> 💡 前端源码在本仓库 `dc3-web/` 目录（原独立仓库 `iot-dc3-web` 已归档）。
+完整组件说明与适用位置请看 [技术栈](https://pnoker.github.io/iot-dc3/zh/introduction/technology-stack)。
 
 ## 📖 文档与社区
 
 | 资源        | 链接                                                                           |
 |-----------|------------------------------------------------------------------------------|
 | 📚 在线文档   | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                |
-| 🚀 快速开始   | [快速开始指南](https://pnoker.github.io/iot-dc3/quickstart/)                       |
-| 🏗️ 架构说明  | [模块与依赖](https://pnoker.github.io/iot-dc3/architecture/modules.html)          |
-| 🔧 驱动开发   | [驱动开发指南](https://pnoker.github.io/iot-dc3/development/driver-authoring.html) |
-| 🐛 故障排查   | [常见问题与解决方案](https://pnoker.github.io/iot-dc3/guide/troubleshooting.html)     |
-| 📋 变更日志   | [版本更新记录](https://pnoker.github.io/iot-dc3/development/changelog.html)        |
+| 🚀 快速开始   | [快速开始指南](https://pnoker.github.io/iot-dc3/zh/quickstart/)                    |
+| 🛠️ 技术栈   | [技术栈说明](https://pnoker.github.io/iot-dc3/zh/introduction/technology-stack)     |
+| 🏗️ 架构说明  | [模块与依赖](https://pnoker.github.io/iot-dc3/zh/architecture/modules)             |
+| 🔧 驱动开发   | [驱动开发指南](https://pnoker.github.io/iot-dc3/zh/development/driver-authoring)    |
+| 🐛 故障排查   | [常见问题与解决方案](https://pnoker.github.io/iot-dc3/zh/guide/troubleshooting)      |
+| 📋 变更日志   | [版本更新记录](https://pnoker.github.io/iot-dc3/zh/development/changelog)           |
 | 🐛 问题反馈   | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                    |
 | 🇨🇳 码云镜像 | [Gitee GVP 最有价值开源项目](https://gitee.com/pnoker/iot-dc3)                       |
 

@@ -70,11 +70,10 @@ flowchart LR
 | Swagger UI     | `http://localhost:8000/swagger-ui.html`                     | 开发环境查看网关聚合后的 API（生产环境一般关闭）                                                           |
 | 各中心直连调试        | Auth `8300` / Manager `8400` / Data `8500` / Agentic `8600` | 单独调试某个中心时直连其 HTTP 端口，绕过网关                                                            |
 | MCP / OAuth 入口 | `POST /mcp`、`GET /.well-known/oauth-protected-resource`     | 供 AI Agent 经 OAuth 2.1 访问 MCP 工具（均在网关根路径，不经 `/api/v3`），见 [Agentic 中心](../ai/agentic) |
-| Web UI         | 前端源码在独立的 `iot-dc3-web` 仓库                                   | 图形化操作界面，后端接口同样通过 Gateway 访问                                                          |
+| Web UI         | 前端源码在本仓库 `dc3-web/` 目录                                      | 图形化操作界面，后端接口同样通过 Gateway 访问                                                          |
 
-::: info Web UI 不在本仓库
-本仓库（`iot-dc3`）只含后端与文档；图形界面是独立的 `iot-dc3-web` 仓库里的 Vue 前端工程，它通过 Gateway 调用同一套 API。本手册以
-API / curl 为准描述操作，UI 上的对应入口与之一一对应。
+::: info Web UI 与 API 共用同一入口
+图形界面位于本仓库 `dc3-web/` 目录，通过 Gateway 调用同一套 API。本手册以 API / curl 为准描述操作，UI 上的对应入口与之一一对应。
 :::
 
 ## 从登录到一条命令：最小可跑示例

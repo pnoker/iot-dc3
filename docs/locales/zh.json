@@ -9,6 +9,7 @@
   "introduction": "总览",
   "introduction/concepts": "核心概念",
   "introduction/paths": "按角色选择路径",
+  "introduction/technology-stack": "技术栈",
   "introduction/concepts/profile": "物模型",
   "introduction/concepts/device": "设备",
   "introduction/concepts/driver": "驱动",
