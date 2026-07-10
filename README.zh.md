@@ -84,23 +84,10 @@
 六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 28 协议驱动 → 现场设备。
 PostgreSQL（TimescaleDB + pgvector + AGE）持久层与可选运维栈（ELK + Prometheus + Grafana）一并铺开。
 
-### 四层参考架构映射
-
-![IoT DC3 四层参考架构](docs/public/images/architecture-zh.png)
-
-IoT 业界标准四层参考架构——应用层、平台层、网络层、感知层——外加贯穿四层的安全。
-
-| 层级      | IoT 参考职责              | DC3 落地                             |
-|---------|-----------------------|------------------------------------|
-| **应用层** | 运营 · 告警 · 数据分析 · AIoT | 运营中心 · Agentic 中心 · MCP            |
-| **平台层** | 设备管理 · 数据存储 · 规则与计算   | 中心服务 · 数据平面 · TimescaleDB          |
-| **网络层** | 现场总线 · IoT 协议 · 无线广域  | 28 协议驱动 · API 网关 · RabbitMQ        |
-| **感知层** | 传感测量 · 自动识别 · 执行器     | 物模型 Profile · 设备 Device · 位号 Point |
-
 🧱 **设计原则** — 跨服务调用统一经 Facade 接口；DO/BO/VO 三层模型严格分离持久化、业务与接口形态；租户隔离贯穿数据库、缓存到
 API 全链路。边界清晰，易于规模化扩展与多团队协作。
 
-> 📖 完整架构文档请参阅 [系统架构总览](https://pnoker.github.io/iot-dc3/zh/architecture/)。
+> 📖 完整架构文档请参阅 [系统架构总览](https://docs.dc3.site/zh/architecture/)。
 
 ## ✨ 核心特性
 
@@ -154,7 +141,7 @@ API 全链路。边界清晰，易于规模化扩展与多团队协作。
 ### 🧩 开发者友好
 
 - **Driver SDK** —
-  完善的驱动开发工具包，参考 [驱动开发指南](https://pnoker.github.io/iot-dc3/zh/development/driver-authoring)
+  完善的驱动开发工具包，参考 [驱动开发指南](https://docs.dc3.site/zh/development/driver-authoring)
 - **前后端分离** — Vue 3 + TypeScript 前端，RESTful + gRPC 双协议 API
 - **容器化部署** — Podman / Docker Compose 一键启动，便于迁移到 Kubernetes 等容器平台
 - **完整文档** — 在线文档站 + 快速开始指南 + 故障排查手册
@@ -169,27 +156,28 @@ source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-中国大陆网络环境可改用 `make up-db-cn`。服务启动顺序、IDEA 配置、验证命令和常见坑请阅读
-[完整快速开始](https://pnoker.github.io/iot-dc3/zh/quickstart/)。
+中国大陆网络环境可改用 `make up-db-cn`。
+
+> 📖 服务启动顺序、IDEA 配置、验证命令和常见坑请参阅 [完整快速开始](https://docs.dc3.site/zh/quickstart/)。
 
 ## 🛠️ 技术栈
 
 IoT DC3 基于 Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、
 TypeScript 与 Vite 构建。
 
-完整组件说明与适用位置请看 [技术栈](https://pnoker.github.io/iot-dc3/zh/introduction/technology-stack)。
+完整组件说明与适用位置请看 [技术栈](https://docs.dc3.site/zh/introduction/technology-stack)。
 
 ## 📖 文档与社区
 
 | 资源        | 链接                                                                           |
 |-----------|------------------------------------------------------------------------------|
-| 📚 在线文档   | [pnoker.github.io/iot-dc3](https://pnoker.github.io/iot-dc3/)                |
-| 🚀 快速开始   | [快速开始指南](https://pnoker.github.io/iot-dc3/zh/quickstart/)                    |
-| 🛠️ 技术栈   | [技术栈说明](https://pnoker.github.io/iot-dc3/zh/introduction/technology-stack)     |
-| 🏗️ 架构说明  | [模块与依赖](https://pnoker.github.io/iot-dc3/zh/architecture/modules)             |
-| 🔧 驱动开发   | [驱动开发指南](https://pnoker.github.io/iot-dc3/zh/development/driver-authoring)    |
-| 🐛 故障排查   | [常见问题与解决方案](https://pnoker.github.io/iot-dc3/zh/guide/troubleshooting)      |
-| 📋 变更日志   | [版本更新记录](https://pnoker.github.io/iot-dc3/zh/development/changelog)           |
+| 📚 在线文档   | [docs.dc3.site](https://docs.dc3.site/)                |
+| 🚀 快速开始   | [快速开始指南](https://docs.dc3.site/zh/quickstart/)                    |
+| 🛠️ 技术栈   | [技术栈说明](https://docs.dc3.site/zh/introduction/technology-stack)     |
+| 🏗️ 架构说明  | [模块与依赖](https://docs.dc3.site/zh/architecture/modules)             |
+| 🔧 驱动开发   | [驱动开发指南](https://docs.dc3.site/zh/development/driver-authoring)    |
+| 🐛 故障排查   | [常见问题与解决方案](https://docs.dc3.site/zh/guide/troubleshooting)      |
+| 📋 变更日志   | [版本更新记录](https://docs.dc3.site/zh/development/changelog)           |
 | 🐛 问题反馈   | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                    |
 | 🇨🇳 码云镜像 | [Gitee GVP 最有价值开源项目](https://gitee.com/pnoker/iot-dc3)                       |
 
