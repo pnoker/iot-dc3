@@ -31,12 +31,40 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
  */
 public interface FilterService {
 
+    /**
+     * Resolve the tenant from the request's tenant header, requiring it to be enabled.
+     *
+     * @param request the incoming request
+     * @return the resolved tenant
+     */
     FacadeTenantBO getTenant(ServerHttpRequest request);
 
+    /**
+     * Resolve the local credential from the request's login header.
+     *
+     * @param request the incoming request
+     * @return the resolved credential
+     */
     FacadeLocalCredentialBO getLocalCredential(ServerHttpRequest request);
 
+    /**
+     * Assemble the principal header forwarded to downstream services from the resolved
+     * credential and tenant.
+     *
+     * @param credential the local credential
+     * @param tenant     the tenant
+     * @return the principal header for downstream
+     */
     RequestHeader.PrincipalHeader getUser(FacadeLocalCredentialBO credential, FacadeTenantBO tenant);
 
+    /**
+     * Validate the request's token (salt + token) against the resolved tenant and
+     * credential.
+     *
+     * @param request    the incoming request
+     * @param tenant     the resolved tenant
+     * @param credential the resolved credential
+     */
     void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeLocalCredentialBO credential);
 
 }

@@ -107,18 +107,36 @@ public class MqttScheduleJob extends QuartzJobBean {
         }
     }
 
+    /**
+     * Increment the received-message counter, sampled each batch tick to derive the
+     * receive speed.
+     */
     public static void recordMessage() {
         MESSAGE_COUNT.getAndIncrement();
     }
 
+    /**
+     * Return the cumulative count of messages received since the last reset.
+     *
+     * @return the received message count
+     */
     public static long getMessageCount() {
         return MESSAGE_COUNT.get();
     }
 
+    /**
+     * Return the message receive speed (messages per second) computed at the last batch
+     * tick.
+     *
+     * @return the receive speed in messages per second
+     */
     public static long getMessageSpeed() {
         return MESSAGE_SPEED.get();
     }
 
+    /**
+     * Reset both the received-count and receive-speed counters to zero.
+     */
     public static void resetMetrics() {
         MESSAGE_COUNT.set(0);
         MESSAGE_SPEED.set(0);
