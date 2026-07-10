@@ -5,7 +5,7 @@
 > **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
 
 <p align="center">
-  <img src="docs/public/images/logo.svg" width="240" alt="IoT DC3">
+  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -28,8 +28,8 @@
 
 <p align="center">
   <strong>
-    IoT DC3 — the open-source industrial IoT platform that lets large language models operate your devices directly.<br>
-    Native Spring AI integration · Natural-language operations · 28 ready-to-use drivers
+    IoT DC3 — the multi-protocol, AI-powered, cloud-native open-source industrial IoT platform.<br>
+    Cloud-native microservices · Multi-protocol connectivity · AI-assisted operations · 28 ready-to-use drivers
   </strong>
 </p>
 
@@ -66,7 +66,7 @@
       <img src="docs/public/images/screenshot-ai.png" alt="AI chat page" width="100%">
       <br>
       <strong>AI Chat</strong><br>
-      <em>Natural-language device operations · Data queries · Intelligent analysis</em>
+      <em>Natural-language device queries · Data analysis · Intelligent assistance</em>
     </td>
   </tr>
 </table>
@@ -92,8 +92,8 @@ The **Driver SDK** supports fast development of custom protocol drivers and regi
 
 The agentic center is built on **Spring AI** and connects large language models into IoT operations workflows:
 
-- **Natural-language device operations** - LLMs can query devices, read/write points, and execute commands through Tool
-  Calling
+- **Natural-language assisted operations** - through Tool Calling and under access control, LLMs can query devices,
+  read/write points, and assist with command execution
 - **Intelligent alarm analysis** - AI assists with root-cause analysis and response suggestions
 - **Data insights** - Query device data in natural language and generate visual charts
 - **Multi-model support** - Compatible with OpenAI API-style providers and mainstream models such as GPT, Claude,
@@ -222,7 +222,7 @@ the [environment documentation](https://pnoker.github.io/iot-dc3/quickstart/envi
 
 ### Architecture at a Glance
 
-![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-en.svg)
+![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-en.png)
 
 Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 28 protocol
 drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack
@@ -230,7 +230,7 @@ drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence
 
 ### Four-Layer Reference Architecture Mapping
 
-![IoT DC3 Four-Layer Reference Architecture](docs/public/images/architecture-en.svg)
+![IoT DC3 Four-Layer Reference Architecture](docs/public/images/architecture-en.png)
 
 Industry-standard IoT four-layer reference — Application, Platform, Network, Perception — plus security as a
 cross-cutting concern.

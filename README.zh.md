@@ -5,7 +5,7 @@
 > **AI 助手：** 请先阅读 [README.ai.md](./README.ai.md) 获取 IoT DC3 的 AI 友好概述。
 
 <p align="center">
-  <img src="docs/public/images/logo.svg" width="240" alt="IoT DC3">
+  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -28,8 +28,8 @@
 
 <p align="center">
   <strong>
-    IoT DC3 — 让大模型直接操控设备的开源工业物联网平台<br>
-    Spring AI 原生集成 · 自然语言运维 · 28 个开箱即用驱动
+    IoT DC3 — 多协议接入、AI 赋能的云原生开源工业物联网平台<br>
+    云原生微服务 · 多协议接入 · AI 辅助运维 · 28 个开箱即用驱动
   </strong>
 </p>
 
@@ -66,7 +66,7 @@
       <img src="docs/public/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
       <br>
       <strong>AI 智能对话页面</strong><br>
-      <em>自然语言操控设备 · 数据查询 · 智能分析</em>
+      <em>自然语言查询设备 · 数据分析 · 智能辅助</em>
     </td>
   </tr>
 </table>
@@ -91,7 +91,7 @@
 
 基于 **Spring AI** 构建的智能体中心，将大语言模型接入 IoT 运营流程：
 
-- **自然语言操控设备** — LLM 通过 Tool-Calling 机制直接查询设备、读写数据点、执行命令
+- **自然语言辅助运维** — LLM 通过 Tool-Calling 机制，在权限受控下查询设备、读写数据点、辅助执行命令
 - **智能告警分析** — AI 辅助分析告警原因，提供处置建议
 - **数据洞察** — 自然语言查询设备数据，自动生成可视化图表
 - **多模型支持** — 兼容 OpenAI API 标准，可接入 GPT、Claude、DeepSeek、通义千问等主流模型
@@ -216,14 +216,14 @@ cp .env.example .env    # 复制模板文件
 
 ### 产品架构全景
 
-![IoT DC3 产品架构全景](docs/public/images/architecture-panorama-zh.svg)
+![IoT DC3 产品架构全景](docs/public/images/architecture-panorama-zh.png)
 
 六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 28 协议驱动 → 现场设备。
 PostgreSQL（TimescaleDB + pgvector + AGE）持久层与可选运维栈（ELK + Prometheus + Grafana）一并铺开。
 
 ### 四层参考架构映射
 
-![IoT DC3 四层参考架构](docs/public/images/architecture-zh.svg)
+![IoT DC3 四层参考架构](docs/public/images/architecture-zh.png)
 
 IoT 业界标准四层参考架构——应用层、平台层、网络层、感知层——外加贯穿四层的安全。
 
