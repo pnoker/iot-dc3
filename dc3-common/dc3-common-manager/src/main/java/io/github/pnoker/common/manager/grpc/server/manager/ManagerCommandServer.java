@@ -139,7 +139,7 @@ public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {
             CommandBO entityBO;
             try {
                 entityBO = commandService.getById(request.getCommandId());
-            } catch (NotFoundException e) {
+            } catch (NotFoundException ignored) {
                 entityBO = null;
             }
             if (Objects.isNull(entityBO)) {

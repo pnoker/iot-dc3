@@ -168,6 +168,13 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         return commandHistoryBuilder.buildVOPageByDOPage(page);
     }
 
+    /**
+     * Verify the driver serving the command is online, throwing {@link ServiceException}
+     * when no online state exists for the driver.
+     *
+     * @param tenantId tenant scope
+     * @param driverId the driver to check
+     */
     private void checkDriverOnline(Long tenantId, Long driverId) {
         EntityStateDO driverState = entityStateMapper.selectOne(
                 new LambdaQueryWrapper<EntityStateDO>()
@@ -179,6 +186,16 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         }
     }
 
+    /**
+     * Validate the device exists and is enabled within the tenant, then resolve and
+     * validate the command, requiring the command share the device's profile.
+     *
+     * @param tenantId    tenant scope
+     * @param deviceId    the device to validate
+     * @param commandId   the command id, preferred when present
+     * @param commandCode the command code, used as fallback
+     * @return the resolved, enabled command
+     */
     private FacadeCommandBO validateCommandScope(Long tenantId, Long deviceId, Long commandId, String commandCode) {
         FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
         if (Objects.isNull(device)) {
@@ -201,6 +218,16 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         return command;
     }
 
+    /**
+     * Resolve a command by id when present, otherwise by code within the device's profile.
+     * Requires at least one of command id or code.
+     *
+     * @param tenantId    tenant scope
+     * @param device      the device whose profile scopes the lookup
+     * @param commandId   the command id, used when present
+     * @param commandCode the command code, used as fallback
+     * @return the resolved command, or {@code null} when none matches
+     */
     private FacadeCommandBO resolveCommand(Long tenantId, FacadeDeviceBO device, Long commandId, String commandCode) {
         if (Objects.nonNull(commandId)) {
             return commandFacade.getById(tenantId, commandId);
@@ -223,6 +250,13 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         return commandPage.getRecords().get(0);
     }
 
+    /**
+     * Resolve the command timeout in seconds. Falls back to the default when missing or
+     * non-positive, and interprets legacy millisecond values as seconds.
+     *
+     * @param command the command carrying the raw timeout
+     * @return the timeout in seconds
+     */
     private int resolveCommandTimeout(FacadeCommandBO command) {
         if (Objects.isNull(command) || Objects.isNull(command.getTimeout()) || command.getTimeout() <= 0) {
             return DEFAULT_COMMAND_TIMEOUT_SECONDS;
@@ -237,6 +271,13 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         return timeout;
     }
 
+    /**
+     * Publish a command call to the driver via RabbitMQ, correlating by record id.
+     *
+     * @param dto         the command call payload
+     * @param serviceName the target driver's service name
+     * @param recordId    the command history record id, used as the correlation id
+     */
     private void publishCommand(CommandCallDTO dto, String serviceName, String recordId) {
         CorrelationData correlationData = new CorrelationData(recordId);
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND,

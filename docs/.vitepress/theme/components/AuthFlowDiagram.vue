@@ -61,89 +61,92 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 <template>
   <DiagramFrame>
     <div class="dc3-diagram">
-    <svg :aria-label="s.aria" role="img" viewBox="0 0 1180 300">
-      <defs>
-        <marker id="af-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-          <polygon fill="var(--dc3-arrow)" points="0 0, 10 3.5, 0 7"/>
-        </marker>
-        <marker id="af-ah-rose" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-          <polygon fill="var(--dc3-rose-stroke)" points="0 0, 10 3.5, 0 7"/>
-        </marker>
-      </defs>
+      <svg :aria-label="s.aria" role="img" viewBox="0 0 1180 300">
+        <defs>
+          <marker id="af-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
+            <polygon fill="var(--dc3-arrow)" points="0 0, 10 3.5, 0 7"/>
+          </marker>
+          <marker id="af-ah-rose" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
+            <polygon fill="var(--dc3-rose-stroke)" points="0 0, 10 3.5, 0 7"/>
+          </marker>
+        </defs>
 
-      <!-- ① client -> auth center: get salt -->
-      <line marker-end="url(#af-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="190" x2="248" y1="142" y2="142"/>
-      <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="219" y="134">{{ s.e1 }}</text>
-      <!-- ② auth center -> client with token: generate token -->
-      <line marker-end="url(#af-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="412" x2="470" y1="158" y2="158"/>
-      <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="441" y="176">{{ s.e2 }}</text>
+        <!-- ① client -> auth center: get salt -->
+        <line marker-end="url(#af-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="190" x2="248" y1="142"
+              y2="142"/>
+        <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="219" y="134">{{ s.e1 }}</text>
+        <!-- ② auth center -> client with token: generate token -->
+        <line marker-end="url(#af-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="412" x2="470" y1="158"
+              y2="158"/>
+        <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="441" y="176">{{ s.e2 }}</text>
 
-      <!-- ③ client with token -> gateway: call /api with auth headers -->
-      <line marker-end="url(#af-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="640" x2="698" y1="150" y2="150"/>
-      <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="669" y="120">{{ s.e3 }}</text>
+        <!-- ③ client with token -> gateway: call /api with auth headers -->
+        <line marker-end="url(#af-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="640" x2="698" y1="150"
+              y2="150"/>
+        <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="669" y="120">{{ s.e3 }}</text>
 
-      <!-- ④ gateway -> center services: verified (rose emphasis) -->
-      <line marker-end="url(#af-ah-rose)" stroke="var(--dc3-rose-stroke)" stroke-dasharray="5,4" stroke-width="1.5"
-            x1="902" x2="960"
-            y1="150" y2="150"/>
-      <text fill="var(--dc3-rose-stroke)" font-size="10" text-anchor="middle" x="931" y="134">{{ s.e4 }}</text>
+        <!-- ④ gateway -> center services: verified (rose emphasis) -->
+        <line marker-end="url(#af-ah-rose)" stroke="var(--dc3-rose-stroke)" stroke-dasharray="5,4" stroke-width="1.5"
+              x1="902" x2="960"
+              y1="150" y2="150"/>
+        <text fill="var(--dc3-rose-stroke)" font-size="10" text-anchor="middle" x="931" y="134">{{ s.e4 }}</text>
 
-      <!-- client (fe / cyan) -->
-      <rect fill="var(--dc3-fe-fill)" height="68" rx="9" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="162"
-            x="28"
-            y="116"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="109" y="146">{{
-          s.cli
-        }}
-      </text>
-      <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="109" y="165">{{ s.cliSub }}</text>
+        <!-- client (fe / cyan) -->
+        <rect fill="var(--dc3-fe-fill)" height="68" rx="9" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="162"
+              x="28"
+              y="116"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="109" y="146">{{
+            s.cli
+          }}
+        </text>
+        <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="109" y="165">{{ s.cliSub }}</text>
 
-      <!-- dc3-center-auth (be / green) -->
-      <rect fill="var(--dc3-be-fill)" height="68" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="162"
-            x="250"
-            y="116"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="331" y="146">{{
-          s.auth
-        }}
-      </text>
-      <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="331" y="165">{{ s.authSub }}</text>
+        <!-- dc3-center-auth (be / green) -->
+        <rect fill="var(--dc3-be-fill)" height="68" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="162"
+              x="250"
+              y="116"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="331" y="146">{{
+            s.auth
+          }}
+        </text>
+        <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="331" y="165">{{ s.authSub }}</text>
 
-      <!-- client with token (fe / cyan) -->
-      <rect fill="var(--dc3-fe-fill)" height="68" rx="9" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="168"
-            x="472"
-            y="116"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="556" y="146">{{
-          s.token
-        }}
-      </text>
-      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="556" y="165">{{ s.tokenSub }}</text>
+        <!-- client with token (fe / cyan) -->
+        <rect fill="var(--dc3-fe-fill)" height="68" rx="9" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="168"
+              x="472"
+              y="116"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="556" y="146">{{
+            s.token
+          }}
+        </text>
+        <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="556" y="165">{{ s.tokenSub }}</text>
 
-      <!-- dc3-gateway (be / green) -->
-      <rect fill="var(--dc3-be-fill)" height="68" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="202"
-            x="700"
-            y="116"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="801" y="146">{{
-          s.gw
-        }}
-      </text>
-      <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="801" y="165">{{ s.gwSub }}</text>
+        <!-- dc3-gateway (be / green) -->
+        <rect fill="var(--dc3-be-fill)" height="68" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="202"
+              x="700"
+              y="116"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="801" y="146">{{
+            s.gw
+          }}
+        </text>
+        <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="801" y="165">{{ s.gwSub }}</text>
 
-      <!-- center services (db / violet) -->
-      <rect fill="var(--dc3-db-fill)" height="68" rx="9" stroke="var(--dc3-db-stroke)" stroke-width="1.5" width="190"
-            x="962"
-            y="116"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="1057" y="146">{{
-          s.svc
-        }}
-      </text>
-      <text fill="var(--dc3-db-text)" font-size="9.5" text-anchor="middle" x="1057" y="165">{{ s.svcSub }}</text>
+        <!-- center services (db / violet) -->
+        <rect fill="var(--dc3-db-fill)" height="68" rx="9" stroke="var(--dc3-db-stroke)" stroke-width="1.5" width="190"
+              x="962"
+              y="116"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="1057" y="146">{{
+            s.svc
+          }}
+        </text>
+        <text fill="var(--dc3-db-text)" font-size="9.5" text-anchor="middle" x="1057" y="165">{{ s.svcSub }}</text>
 
-      <!-- fact footnotes -->
-      <text fill="var(--dc3-text2)" font-size="10" x="28" y="232">• {{ s.f1 }}</text>
-      <text fill="var(--dc3-text2)" font-size="10" x="28" y="250">• {{ s.f2 }}</text>
-      <text fill="var(--dc3-text2)" font-size="10" x="600" y="232">• {{ s.f3 }}</text>
-      <text fill="var(--dc3-text2)" font-size="10" x="600" y="250">• {{ s.f4 }}</text>
-    </svg>
+        <!-- fact footnotes -->
+        <text fill="var(--dc3-text2)" font-size="10" x="28" y="232">• {{ s.f1 }}</text>
+        <text fill="var(--dc3-text2)" font-size="10" x="28" y="250">• {{ s.f2 }}</text>
+        <text fill="var(--dc3-text2)" font-size="10" x="600" y="232">• {{ s.f3 }}</text>
+        <text fill="var(--dc3-text2)" font-size="10" x="600" y="250">• {{ s.f4 }}</text>
+      </svg>
     </div>
   </DiagramFrame>
 </template>

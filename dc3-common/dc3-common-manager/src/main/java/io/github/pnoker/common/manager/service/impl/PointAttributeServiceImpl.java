@@ -189,8 +189,10 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     /**
-     * @param entityQuery {@link PointAttributeQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for point attribute search.
+     *
+     * @param entityQuery {@link PointAttributeQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link PointAttributeDO}
      */
     private LambdaQueryWrapper<PointAttributeDO> fuzzyQuery(PointAttributeQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
@@ -210,10 +212,12 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     /**
-     * @param entityBO       {@link PointAttributeBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
+     * Check whether a point attribute is duplicated by attribute code and driver.
+     *
+     * @param entityBO       {@link PointAttributeBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(PointAttributeBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
@@ -248,11 +252,12 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     /**
-     * Primary key ID
+     * Get point attribute data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link PointAttributeDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link PointAttributeDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private PointAttributeDO getDOById(Long id, boolean throwException) {
         PointAttributeDO entityDO = pointAttributeManager.getById(id);

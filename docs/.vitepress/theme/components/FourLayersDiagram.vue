@@ -71,84 +71,86 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 <template>
   <DiagramFrame>
     <div class="dc3-diagram">
-    <svg :aria-label="s.aria" role="img" viewBox="0 0 1180 470">
-      <defs>
-        <marker id="fl-ah" markerHeight="7" markerWidth="9" orient="auto" refX="8" refY="3.5">
-          <polygon fill="var(--dc3-arrow)" points="0 0, 9 3.5, 0 7"/>
-        </marker>
-      </defs>
+      <svg :aria-label="s.aria" role="img" viewBox="0 0 1180 470">
+        <defs>
+          <marker id="fl-ah" markerHeight="7" markerWidth="9" orient="auto" refX="8" refY="3.5">
+            <polygon fill="var(--dc3-arrow)" points="0 0, 9 3.5, 0 7"/>
+          </marker>
+        </defs>
 
-      <!-- left direction axis: data up / command down -->
-      <line marker-end="url(#fl-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="30" x2="30" y1="404" y2="60"/>
-      <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" transform="rotate(-90 22 240)" x="22"
-            y="240">{{ s.up }}
-      </text>
-      <line marker-end="url(#fl-ah)" stroke="var(--dc3-arrow)" stroke-dasharray="5,4" stroke-width="1.2" x1="52" x2="52"
-            y1="60"
-            y2="404"/>
-      <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" transform="rotate(-90 62 240)" x="62"
-            y="240">{{ s.down }}
-      </text>
+        <!-- left direction axis: data up / command down -->
+        <line marker-end="url(#fl-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="30" x2="30" y1="404" y2="60"/>
+        <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" transform="rotate(-90 22 240)" x="22"
+              y="240">{{ s.up }}
+        </text>
+        <line marker-end="url(#fl-ah)" stroke="var(--dc3-arrow)" stroke-dasharray="5,4" stroke-width="1.2" x1="52"
+              x2="52"
+              y1="60"
+              y2="404"/>
+        <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" transform="rotate(-90 62 240)" x="62"
+              y="240">{{ s.down }}
+        </text>
 
-      <!-- application layer -->
-      <rect fill="var(--dc3-db-fill)" height="84" rx="10" stroke="var(--dc3-db-stroke)" stroke-width="1.5" width="852"
-            x="84"
-            y="48"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="15" x="108" y="82">{{ s.appName }}</text>
-      <text fill="var(--dc3-text2)" font-size="11" x="108" y="106">{{ s.appSub }}</text>
-      <line opacity="0.6" stroke="var(--dc3-db-stroke)" stroke-dasharray="3,3" stroke-width="1" x1="556" x2="556"
-            y1="62"
-            y2="118"/>
-      <text fill="var(--dc3-text2)" font-size="10" x="576" y="80">{{ s.dcLabel }}</text>
-      <text fill="var(--dc3-db-text)" font-size="12.5" x="576" y="104">{{ s.appDc }}</text>
+        <!-- application layer -->
+        <rect fill="var(--dc3-db-fill)" height="84" rx="10" stroke="var(--dc3-db-stroke)" stroke-width="1.5" width="852"
+              x="84"
+              y="48"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="15" x="108" y="82">{{ s.appName }}</text>
+        <text fill="var(--dc3-text2)" font-size="11" x="108" y="106">{{ s.appSub }}</text>
+        <line opacity="0.6" stroke="var(--dc3-db-stroke)" stroke-dasharray="3,3" stroke-width="1" x1="556" x2="556"
+              y1="62"
+              y2="118"/>
+        <text fill="var(--dc3-text2)" font-size="10" x="576" y="80">{{ s.dcLabel }}</text>
+        <text fill="var(--dc3-db-text)" font-size="12.5" x="576" y="104">{{ s.appDc }}</text>
 
-      <!-- platform layer -->
-      <rect fill="var(--dc3-be-fill)" height="84" rx="10" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="852"
-            x="84"
-            y="144"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="15" x="108" y="178">{{ s.platName }}</text>
-      <text fill="var(--dc3-text2)" font-size="11" x="108" y="202">{{ s.platSub }}</text>
-      <line opacity="0.6" stroke="var(--dc3-be-stroke)" stroke-dasharray="3,3" stroke-width="1" x1="556" x2="556"
-            y1="158"
-            y2="214"/>
-      <text fill="var(--dc3-text2)" font-size="10" x="576" y="176">{{ s.dcLabel }}</text>
-      <text fill="var(--dc3-be-text)" font-size="12.5" x="576" y="200">{{ s.platDc }}</text>
+        <!-- platform layer -->
+        <rect fill="var(--dc3-be-fill)" height="84" rx="10" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="852"
+              x="84"
+              y="144"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="15" x="108" y="178">{{ s.platName }}</text>
+        <text fill="var(--dc3-text2)" font-size="11" x="108" y="202">{{ s.platSub }}</text>
+        <line opacity="0.6" stroke="var(--dc3-be-stroke)" stroke-dasharray="3,3" stroke-width="1" x1="556" x2="556"
+              y1="158"
+              y2="214"/>
+        <text fill="var(--dc3-text2)" font-size="10" x="576" y="176">{{ s.dcLabel }}</text>
+        <text fill="var(--dc3-be-text)" font-size="12.5" x="576" y="200">{{ s.platDc }}</text>
 
-      <!-- network layer -->
-      <rect fill="var(--dc3-bus-fill)" height="84" rx="10" stroke="var(--dc3-bus-stroke)" stroke-width="1.5" width="852"
-            x="84"
-            y="240"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="15" x="108" y="274">{{ s.netName }}</text>
-      <text fill="var(--dc3-text2)" font-size="11" x="108" y="298">{{ s.netSub }}</text>
-      <line opacity="0.6" stroke="var(--dc3-bus-stroke)" stroke-dasharray="3,3" stroke-width="1" x1="556" x2="556"
-            y1="254"
-            y2="310"/>
-      <text fill="var(--dc3-text2)" font-size="10" x="576" y="272">{{ s.dcLabel }}</text>
-      <text fill="var(--dc3-bus-text)" font-size="12.5" x="576" y="296">{{ s.netDc }}</text>
+        <!-- network layer -->
+        <rect fill="var(--dc3-bus-fill)" height="84" rx="10" stroke="var(--dc3-bus-stroke)" stroke-width="1.5"
+              width="852"
+              x="84"
+              y="240"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="15" x="108" y="274">{{ s.netName }}</text>
+        <text fill="var(--dc3-text2)" font-size="11" x="108" y="298">{{ s.netSub }}</text>
+        <line opacity="0.6" stroke="var(--dc3-bus-stroke)" stroke-dasharray="3,3" stroke-width="1" x1="556" x2="556"
+              y1="254"
+              y2="310"/>
+        <text fill="var(--dc3-text2)" font-size="10" x="576" y="272">{{ s.dcLabel }}</text>
+        <text fill="var(--dc3-bus-text)" font-size="12.5" x="576" y="296">{{ s.netDc }}</text>
 
-      <!-- perception layer -->
-      <rect fill="var(--dc3-fe-fill)" height="84" rx="10" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="852"
-            x="84"
-            y="336"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="15" x="108" y="370">{{ s.percName }}</text>
-      <text fill="var(--dc3-text2)" font-size="11" x="108" y="394">{{ s.percSub }}</text>
-      <line opacity="0.6" stroke="var(--dc3-fe-stroke)" stroke-dasharray="3,3" stroke-width="1" x1="556" x2="556"
-            y1="350"
-            y2="406"/>
-      <text fill="var(--dc3-text2)" font-size="10" x="576" y="368">{{ s.dcLabel }}</text>
-      <text fill="var(--dc3-fe-text, var(--dc3-fe-stroke))" font-size="12.5" x="576" y="392">{{ s.percDc }}</text>
+        <!-- perception layer -->
+        <rect fill="var(--dc3-fe-fill)" height="84" rx="10" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="852"
+              x="84"
+              y="336"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="15" x="108" y="370">{{ s.percName }}</text>
+        <text fill="var(--dc3-text2)" font-size="11" x="108" y="394">{{ s.percSub }}</text>
+        <line opacity="0.6" stroke="var(--dc3-fe-stroke)" stroke-dasharray="3,3" stroke-width="1" x1="556" x2="556"
+              y1="350"
+              y2="406"/>
+        <text fill="var(--dc3-text2)" font-size="10" x="576" y="368">{{ s.dcLabel }}</text>
+        <text fill="var(--dc3-fe-text, var(--dc3-fe-stroke))" font-size="12.5" x="576" y="392">{{ s.percDc }}</text>
 
-      <!-- security: cross-cutting across all four layers -->
-      <rect fill="var(--dc3-amber-fill)" height="372" rx="10" stroke="var(--dc3-amber-stroke)" stroke-dasharray="8,4"
-            stroke-width="1.5"
-            width="200" x="952" y="48"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="14" text-anchor="middle" x="1052" y="210">{{
-          s.secName
-        }}
-      </text>
-      <text fill="var(--dc3-text2)" font-size="10.5" text-anchor="middle" x="1052" y="234">{{ s.secSub }}</text>
-      <text fill="var(--dc3-amber-stroke)" font-size="11" text-anchor="middle" x="1052" y="262">{{ s.secDc }}</text>
-    </svg>
+        <!-- security: cross-cutting across all four layers -->
+        <rect fill="var(--dc3-amber-fill)" height="372" rx="10" stroke="var(--dc3-amber-stroke)" stroke-dasharray="8,4"
+              stroke-width="1.5"
+              width="200" x="952" y="48"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="14" text-anchor="middle" x="1052" y="210">{{
+            s.secName
+          }}
+        </text>
+        <text fill="var(--dc3-text2)" font-size="10.5" text-anchor="middle" x="1052" y="234">{{ s.secSub }}</text>
+        <text fill="var(--dc3-amber-stroke)" font-size="11" text-anchor="middle" x="1052" y="262">{{ s.secDc }}</text>
+      </svg>
     </div>
   </DiagramFrame>
 </template>

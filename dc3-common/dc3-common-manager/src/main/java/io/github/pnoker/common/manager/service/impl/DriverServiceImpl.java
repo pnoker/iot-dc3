@@ -183,8 +183,10 @@ public class DriverServiceImpl implements DriverService {
     }
 
     /**
-     * @param entityQuery {@link DriverQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for driver search.
+     *
+     * @param entityQuery {@link DriverQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link DriverDO}
      */
     private LambdaQueryWrapper<DriverDO> fuzzyQuery(DriverQuery entityQuery) {
         LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
@@ -219,10 +221,12 @@ public class DriverServiceImpl implements DriverService {
     }
 
     /**
-     * @param entityBO       {@link DriverBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
+     * Check whether a driver is duplicated by driver name and code.
+     *
+     * @param entityBO       {@link DriverBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(DriverBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
@@ -241,11 +245,12 @@ public class DriverServiceImpl implements DriverService {
     }
 
     /**
-     * Primary key ID
+     * Get driver data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link DriverDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link DriverDO} if found, otherwise {@code null} when {@code throwException}
+     * is false
      */
     private DriverDO getDOById(Long id, boolean throwException) {
         DriverDO entityDO = driverManager.getById(id);

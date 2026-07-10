@@ -66,7 +66,7 @@ public enum RuleStatusEnum {
     public static RuleStatusEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

@@ -102,7 +102,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
             ProfileBO profile;
             try {
                 profile = profileService.getById(request.getProfileId());
-            } catch (NotFoundException e) {
+            } catch (NotFoundException ignored) {
                 profile = null;
             }
             if (Objects.isNull(profile)) {

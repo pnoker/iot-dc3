@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -44,7 +45,7 @@
           />
         </el-form-item>
         <el-form-item :label="$t('settings.event.timeRange')" prop="rangeKey">
-          <range-segmented v-model="fd.rangeKey" include-all />
+          <range-segmented v-model="fd.rangeKey" include-all/>
         </el-form-item>
       </template>
       <template v-if="selection.length > 0" #actions>
@@ -89,14 +90,14 @@
         stripe
         @selection-change="onSelectionChange"
       >
-        <el-table-column type="selection" width="44" />
+        <el-table-column type="selection" width="44"/>
         <!-- @vue-generic {Row} -->
         <el-table-column :label="entityLabel" min-width="180" show-overflow-tooltip>
           <template #default="{row}">
             <span>{{ nameFor(row) }}</span>
           </template>
         </el-table-column>
-        <el-table-column v-if="source === 'point'" :label="$t('settings.event.sourceId')" prop="sourceId" width="140" />
+        <el-table-column v-if="source === 'point'" :label="$t('settings.event.sourceId')" prop="sourceId" width="140"/>
         <el-table-column
           v-if="source === 'device' || source === 'point'"
           :label="$t('settings.event.pointId')"
@@ -117,7 +118,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('settings.event.message')" min-width="240" prop="message" show-overflow-tooltip />
+        <el-table-column :label="$t('settings.event.message')" min-width="240" prop="message" show-overflow-tooltip/>
         <el-table-column :label="$t('settings.event.confirmFlag')" width="110">
           <template #default="{row}">
             <el-tag :type="row.confirmFlag === 'CONFIRMED' ? 'success' : 'warning'" size="small">
@@ -159,7 +160,7 @@
           </template>
         </el-table-column>
         <template #empty>
-          <el-empty :description="$t('settings.event.empty')" />
+          <el-empty :description="$t('settings.event.empty')"/>
         </template>
       </el-table>
     </blank-card>
@@ -167,282 +168,282 @@
 </template>
 
 <script lang="ts" setup>
-  import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
-  import {useI18n} from 'vue-i18n';
-  import {useRoute} from 'vue-router';
+import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
+import {useRoute} from 'vue-router';
 
-  import {alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm} from '@/api/dashboard';
-  import {listDeviceByIds} from '@/api/device';
-  import {listDriverByIds} from '@/api/driver';
-  import {listPointByIds} from '@/api/point';
-  import {timestampColumn} from '@/utils/dateUtil';
-  import {successMessage} from '@/utils/notificationUtil';
-  import {
-    ALARM_TYPE_OPTIONS,
-    alarmLevelLabel,
-    alarmLevelTag,
-    alarmTypeLabel,
-    alarmTypeTag,
-  } from '@/utils/thingModelFormatUtil';
-  import BlankCard from '@/components/card/blank/BlankCard.vue';
-  import ToolCard from '@/components/card/tool/ToolCard.vue';
-  import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
-  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
+import {alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm} from '@/api/dashboard';
+import {listDeviceByIds} from '@/api/device';
+import {listDriverByIds} from '@/api/driver';
+import {listPointByIds} from '@/api/point';
+import {timestampColumn} from '@/utils/dateUtil';
+import {successMessage} from '@/utils/notificationUtil';
+import {
+  ALARM_TYPE_OPTIONS,
+  alarmLevelLabel,
+  alarmLevelTag,
+  alarmTypeLabel,
+  alarmTypeTag,
+} from '@/utils/thingModelFormatUtil';
+import BlankCard from '@/components/card/blank/BlankCard.vue';
+import ToolCard from '@/components/card/tool/ToolCard.vue';
+import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
+import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
-  interface Row {
-    id: number | string;
-    source: 'point' | 'device' | 'driver';
-    sourceId: number | string;
-    pointId: number | string;
-    eventTypeFlag: number;
-    alarmLevelFlag?: number;
-    confirmFlag: string;
-    createTime: string;
-    message: string;
+interface Row {
+  id: number | string;
+  source: 'point' | 'device' | 'driver';
+  sourceId: number | string;
+  pointId: number | string;
+  eventTypeFlag: number;
+  alarmLevelFlag?: number;
+  confirmFlag: string;
+  createTime: string;
+  message: string;
+}
+
+const props = defineProps<{
+  source: 'point' | 'device' | 'driver';
+}>();
+
+const {t} = useI18n();
+const route = useRoute();
+
+const loading = ref(false);
+const bulkRunning = ref(false);
+const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
+const lastRefreshTime = ref<number>(Date.now());
+const AUTO_REFRESH_INTERVAL = 30000;
+
+const lastRefreshText = computed(() => {
+  const d = new Date(lastRefreshTime.value);
+  return d.toLocaleTimeString();
+});
+const selection = ref<Row[]>([]);
+const rows = ref<Row[]>([]);
+const nameMap = reactive<Record<string, string>>({});
+
+const alarmTypeOptions = ALARM_TYPE_OPTIONS;
+
+const readQuery = () => {
+  const q = route.query;
+  const parseEnum = (v: unknown, pool: readonly (number | '')[]): number | '' => {
+    if (v == null) return '';
+    const n = Number(v);
+    return pool.includes(n as number) ? (n as number) : '';
+  };
+  const rangeCandidates = ['', 'today', '24h', '7d', '30d'] as const;
+  const rawRange = typeof q.rangeKey === 'string' ? q.rangeKey : '';
+  const rangeKey = (rangeCandidates as readonly string[]).includes(rawRange) ? (rawRange as RangeKey) : '';
+  return {
+    alarmTypeFlag: parseEnum(q.alarmTypeFlag, [0, 1, 2, 3, 4]) as number | '',
+    confirmFlag: parseEnum(q.confirmFlag, [0, 1]) as number | '',
+    rangeKey,
+  };
+};
+
+const initial = readQuery();
+const formData = reactive<{ alarmTypeFlag: number | ''; confirmFlag: number | ''; rangeKey: RangeKey }>({
+  alarmTypeFlag: initial.alarmTypeFlag,
+  confirmFlag: initial.confirmFlag,
+  rangeKey: initial.rangeKey,
+});
+const page = reactive({current: 1, size: 20, total: 0});
+
+const entityLabel = computed(() => {
+  switch (props.source) {
+    case 'point':
+      return t('settings.event.sourcePoint');
+    case 'device':
+      return t('settings.event.sourceDevice');
+    case 'driver':
+      return t('settings.event.sourceDriver');
+    default:
+      return '';
   }
+});
 
-  const props = defineProps<{
-    source: 'point' | 'device' | 'driver';
-  }>();
+const load = async () => {
+  loading.value = true;
+  try {
+    const res: any = await alertPage({
+      source: props.source,
+      eventTypeFlag: formData.alarmTypeFlag === '' ? null : Number(formData.alarmTypeFlag),
+      confirmFlag: formData.confirmFlag === '' ? null : Number(formData.confirmFlag),
+      rangeKey: formData.rangeKey || null,
+      current: page.current,
+      size: page.size,
+    });
+    const data = res?.data ?? {};
+    rows.value = data.records ?? [];
+    page.total = Number(data.total ?? 0);
+    await resolveNames(rows.value);
+  } catch {
+    // handled globally
+  } finally {
+    loading.value = false;
+    lastRefreshTime.value = Date.now();
+  }
+};
 
-  const {t} = useI18n();
-  const route = useRoute();
-
-  const loading = ref(false);
-  const bulkRunning = ref(false);
-  const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
-  const lastRefreshTime = ref<number>(Date.now());
-  const AUTO_REFRESH_INTERVAL = 30000;
-
-  const lastRefreshText = computed(() => {
-    const d = new Date(lastRefreshTime.value);
-    return d.toLocaleTimeString();
-  });
-  const selection = ref<Row[]>([]);
-  const rows = ref<Row[]>([]);
-  const nameMap = reactive<Record<string, string>>({});
-
-  const alarmTypeOptions = ALARM_TYPE_OPTIONS;
-
-  const readQuery = () => {
-    const q = route.query;
-    const parseEnum = (v: unknown, pool: readonly (number | '')[]): number | '' => {
-      if (v == null) return '';
-      const n = Number(v);
-      return pool.includes(n as number) ? (n as number) : '';
-    };
-    const rangeCandidates = ['', 'today', '24h', '7d', '30d'] as const;
-    const rawRange = typeof q.rangeKey === 'string' ? q.rangeKey : '';
-    const rangeKey = (rangeCandidates as readonly string[]).includes(rawRange) ? (rawRange as RangeKey) : '';
-    return {
-      alarmTypeFlag: parseEnum(q.alarmTypeFlag, [0, 1, 2, 3, 4]) as number | '',
-      confirmFlag: parseEnum(q.confirmFlag, [0, 1]) as number | '',
-      rangeKey,
-    };
-  };
-
-  const initial = readQuery();
-  const formData = reactive<{alarmTypeFlag: number | ''; confirmFlag: number | ''; rangeKey: RangeKey}>({
-    alarmTypeFlag: initial.alarmTypeFlag,
-    confirmFlag: initial.confirmFlag,
-    rangeKey: initial.rangeKey,
-  });
-  const page = reactive({current: 1, size: 20, total: 0});
-
-  const entityLabel = computed(() => {
-    switch (props.source) {
-      case 'point':
-        return t('settings.event.sourcePoint');
-      case 'device':
-        return t('settings.event.sourceDevice');
-      case 'driver':
-        return t('settings.event.sourceDriver');
-      default:
-        return '';
+const resolveNames = async (batch: Row[]) => {
+  const ids = Array.from(new Set(batch.map((r) => String(r.sourceId)).filter((id) => id && !nameMap[id])));
+  if (ids.length === 0) return;
+  try {
+    let res: any;
+    if (props.source === 'point') {
+      res = await listPointByIds(ids);
+    } else if (props.source === 'device') {
+      res = await listDeviceByIds(ids);
+    } else {
+      res = await listDriverByIds(ids);
     }
-  });
-
-  const load = async () => {
-    loading.value = true;
-    try {
-      const res: any = await alertPage({
-        source: props.source,
-        eventTypeFlag: formData.alarmTypeFlag === '' ? null : Number(formData.alarmTypeFlag),
-        confirmFlag: formData.confirmFlag === '' ? null : Number(formData.confirmFlag),
-        rangeKey: formData.rangeKey || null,
-        current: page.current,
-        size: page.size,
-      });
-      const data = res?.data ?? {};
-      rows.value = data.records ?? [];
-      page.total = Number(data.total ?? 0);
-      await resolveNames(rows.value);
-    } catch {
-      // handled globally
-    } finally {
-      loading.value = false;
-      lastRefreshTime.value = Date.now();
-    }
-  };
-
-  const resolveNames = async (batch: Row[]) => {
-    const ids = Array.from(new Set(batch.map((r) => String(r.sourceId)).filter((id) => id && !nameMap[id])));
-    if (ids.length === 0) return;
-    try {
-      let res: any;
-      if (props.source === 'point') {
-        res = await listPointByIds(ids);
-      } else if (props.source === 'device') {
-        res = await listDeviceByIds(ids);
-      } else {
-        res = await listDriverByIds(ids);
-      }
-      const data = res?.data || {};
-      for (const id of ids) {
-        const item = data[id];
-        if (item) {
-          if (props.source === 'point') {
-            nameMap[id] = item.pointName || id;
-          } else if (props.source === 'device') {
-            nameMap[id] = item.deviceName || id;
-          } else {
-            nameMap[id] = item.driverName || id;
-          }
+    const data = res?.data || {};
+    for (const id of ids) {
+      const item = data[id];
+      if (item) {
+        if (props.source === 'point') {
+          nameMap[id] = item.pointName || id;
+        } else if (props.source === 'device') {
+          nameMap[id] = item.deviceName || id;
+        } else {
+          nameMap[id] = item.driverName || id;
         }
       }
-    } catch {
-      // handled globally
     }
-  };
+  } catch {
+    // handled globally
+  }
+};
 
-  const nameFor = (r: Row) => nameMap[String(r.sourceId)] || String(r.sourceId);
+const nameFor = (r: Row) => nameMap[String(r.sourceId)] || String(r.sourceId);
 
-  const onSearch = () => {
-    page.current = 1;
-    load();
-  };
-
-  const onReset = () => {
-    formData.alarmTypeFlag = '';
-    formData.confirmFlag = '';
-    formData.rangeKey = '';
-    page.current = 1;
-    load();
-  };
-
-  const sizeChange = (v: number) => {
-    page.size = v;
-    page.current = 1;
-    load();
-  };
-
-  const currentChange = (v: number) => {
-    page.current = v;
-    load();
-  };
-
-  const confirmRow = async (row: Row) => {
-    try {
-      await alertConfirm(row.source, row.id);
-      successMessage();
-      load();
-    } catch {
-      // handled globally
-    }
-  };
-
-  const unconfirmRow = async (row: Row) => {
-    try {
-      await alertUnconfirm(row.source, row.id);
-      successMessage();
-      load();
-    } catch {
-      // handled globally
-    }
-  };
-
-  const onSelectionChange = (selected: Row[]) => {
-    selection.value = selected;
-  };
-
-  const bulkConfirm = async (confirm: boolean) => {
-    if (selection.value.length === 0) return;
-    bulkRunning.value = true;
-    try {
-      const items = selection.value.map((r) => ({source: r.source, id: r.id}));
-      await alertBulkConfirm(items, confirm);
-      successMessage();
-      selection.value = [];
-      load();
-    } catch {
-      // handled globally
-    } finally {
-      bulkRunning.value = false;
-    }
-  };
-
-  watch(
-    () => props.source,
-    () => {
-      page.current = 1;
-      load();
-    }
-  );
-
-  watch(
-    () => [route.query.rangeKey, route.query.confirmFlag, route.query.alarmTypeFlag],
-    () => {
-      const next = readQuery();
-      formData.alarmTypeFlag = next.alarmTypeFlag;
-      formData.confirmFlag = next.confirmFlag;
-      formData.rangeKey = next.rangeKey;
-      page.current = 1;
-      load();
-    }
-  );
-
-  onMounted(() => {
-    autoRefreshTimer.value = setInterval(() => {
-      if (!loading.value && !bulkRunning.value) {
-        load();
-      }
-    }, AUTO_REFRESH_INTERVAL);
-  });
-
-  onBeforeUnmount(() => {
-    if (autoRefreshTimer.value) {
-      clearInterval(autoRefreshTimer.value);
-      autoRefreshTimer.value = null;
-    }
-  });
-
+const onSearch = () => {
+  page.current = 1;
   load();
+};
+
+const onReset = () => {
+  formData.alarmTypeFlag = '';
+  formData.confirmFlag = '';
+  formData.rangeKey = '';
+  page.current = 1;
+  load();
+};
+
+const sizeChange = (v: number) => {
+  page.size = v;
+  page.current = 1;
+  load();
+};
+
+const currentChange = (v: number) => {
+  page.current = v;
+  load();
+};
+
+const confirmRow = async (row: Row) => {
+  try {
+    await alertConfirm(row.source, row.id);
+    successMessage();
+    load();
+  } catch {
+    // handled globally
+  }
+};
+
+const unconfirmRow = async (row: Row) => {
+  try {
+    await alertUnconfirm(row.source, row.id);
+    successMessage();
+    load();
+  } catch {
+    // handled globally
+  }
+};
+
+const onSelectionChange = (selected: Row[]) => {
+  selection.value = selected;
+};
+
+const bulkConfirm = async (confirm: boolean) => {
+  if (selection.value.length === 0) return;
+  bulkRunning.value = true;
+  try {
+    const items = selection.value.map((r) => ({source: r.source, id: r.id}));
+    await alertBulkConfirm(items, confirm);
+    successMessage();
+    selection.value = [];
+    load();
+  } catch {
+    // handled globally
+  } finally {
+    bulkRunning.value = false;
+  }
+};
+
+watch(
+  () => props.source,
+  () => {
+    page.current = 1;
+    load();
+  }
+);
+
+watch(
+  () => [route.query.rangeKey, route.query.confirmFlag, route.query.alarmTypeFlag],
+  () => {
+    const next = readQuery();
+    formData.alarmTypeFlag = next.alarmTypeFlag;
+    formData.confirmFlag = next.confirmFlag;
+    formData.rangeKey = next.rangeKey;
+    page.current = 1;
+    load();
+  }
+);
+
+onMounted(() => {
+  autoRefreshTimer.value = setInterval(() => {
+    if (!loading.value && !bulkRunning.value) {
+      load();
+    }
+  }, AUTO_REFRESH_INTERVAL);
+});
+
+onBeforeUnmount(() => {
+  if (autoRefreshTimer.value) {
+    clearInterval(autoRefreshTimer.value);
+    autoRefreshTimer.value = null;
+  }
+});
+
+load();
 </script>
 
 <style lang="scss" scoped>
-  .settings-table__sub {
-    margin-left: 6px;
-    color: #909399;
-    font-size: 12px;
+.settings-table__sub {
+  margin-left: 6px;
+  color: #909399;
+  font-size: 12px;
+}
+
+.auto-refresh-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 12px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  background: var(--el-fill-color-light);
+  border-radius: 4px;
+
+  &__label {
+    font-weight: 500;
   }
 
-  .auto-refresh-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 4px 12px;
-    margin-bottom: 4px;
-    font-size: 12px;
-    color: var(--el-text-color-secondary);
-    background: var(--el-fill-color-light);
-    border-radius: 4px;
-
-    &__label {
-      font-weight: 500;
-    }
-
-    &__time {
-      color: var(--el-text-color-placeholder);
-    }
+  &__time {
+    color: var(--el-text-color-placeholder);
   }
+}
 </style>

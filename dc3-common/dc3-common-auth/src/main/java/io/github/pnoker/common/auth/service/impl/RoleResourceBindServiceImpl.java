@@ -222,8 +222,11 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     /**
-     * @param entityQuery {@link RoleResourceBindQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for role-resource binding search.
+     *
+     * @param entityQuery {@link RoleResourceBindQuery} query parameters
+     * @param tenantId    tenant scope
+     * @return {@link LambdaQueryWrapper} for {@link RoleResourceBindDO}
      */
     private LambdaQueryWrapper<RoleResourceBindDO> fuzzyQuery(RoleResourceBindQuery entityQuery, Long tenantId) {
         LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
@@ -246,9 +249,13 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     /**
-     * @param entityBO {@link RoleResourceBindBO}
-     * @param isUpdate
-     * @return
+     * Check whether a role-resource binding is duplicated by role and resource.
+     * Unlike the throwing variant, this only reports the duplicate without raising
+     * an exception.
+     *
+     * @param entityBO {@link RoleResourceBindBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(RoleResourceBindBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
@@ -263,11 +270,12 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     /**
-     * Primary key ID
+     * Get role-resource binding data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link RoleResourceBindDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link RoleResourceBindDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private RoleResourceBindDO getDOById(Long id, boolean throwException) {
         RoleResourceBindDO entityDO = roleResourceBindManager.getById(id);

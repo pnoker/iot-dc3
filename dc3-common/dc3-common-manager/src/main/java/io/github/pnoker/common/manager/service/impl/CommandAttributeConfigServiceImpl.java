@@ -222,8 +222,10 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
     }
 
     /**
-     * @param entityQuery {@link CommandAttributeConfigQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for command attribute config search.
+     *
+     * @param entityQuery {@link CommandAttributeConfigQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link CommandAttributeConfigDO}
      */
     private LambdaQueryWrapper<CommandAttributeConfigDO> fuzzyQuery(CommandAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<CommandAttributeConfigDO> wrapper = Wrappers.<CommandAttributeConfigDO>query().lambda();
@@ -241,9 +243,13 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
     }
 
     /**
-     * @param entityBO {@link CommandAttributeConfigBO}
-     * @param isUpdate
-     * @return
+     * Check whether a command attribute config is duplicated by attribute, device, and
+     * command. Unlike the throwing variant, this only reports the duplicate without
+     * raising an exception.
+     *
+     * @param entityBO {@link CommandAttributeConfigBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(CommandAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<CommandAttributeConfigDO> wrapper = Wrappers.<CommandAttributeConfigDO>query().lambda();
@@ -273,11 +279,12 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
     }
 
     /**
-     * Primary key ID
+     * Get command attribute config data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link CommandAttributeConfigDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link CommandAttributeConfigDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private CommandAttributeConfigDO getDOById(Long id, boolean throwException) {
         CommandAttributeConfigDO entityDO = commandAttributeConfigManager.getById(id);

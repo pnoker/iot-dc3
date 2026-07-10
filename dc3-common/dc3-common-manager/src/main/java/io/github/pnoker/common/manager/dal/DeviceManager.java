@@ -18,7 +18,6 @@
 package io.github.pnoker.common.manager.dal;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 
 /**
@@ -33,15 +32,22 @@ import io.github.pnoker.common.manager.entity.model.DeviceDO;
 public interface DeviceManager extends IService<DeviceDO> {
 
     /**
-     * @param entityDO {@link DeviceDO}
-     * @param isUpdate
-     * @return
+     * Check whether a device is duplicated by device name, device code (when present),
+     * and tenant. Unlike the throwing variant, this only reports the duplicate without
+     * raising an exception.
+     *
+     * @param entityDO {@link DeviceDO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     boolean checkDuplicate(DeviceDO entityDO, boolean isUpdate);
 
     /**
-     * @param entityDO {@link DeviceBO}
-     * @return {@link DeviceDO}
+     * Create a device after a duplicate check, throwing {@code DuplicateException} on
+     * conflict. Returns the persisted record on success.
+     *
+     * @param entityDO {@link DeviceDO} to create
+     * @return the persisted {@link DeviceDO}
      */
     DeviceDO innerSave(DeviceDO entityDO);
 

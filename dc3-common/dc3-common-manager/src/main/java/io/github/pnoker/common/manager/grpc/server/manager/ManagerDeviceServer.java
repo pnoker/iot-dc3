@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.DeviceApiGrpc;
 import io.github.pnoker.api.center.manager.GrpcDeviceIdsQuery;
 import io.github.pnoker.api.center.manager.GrpcDeviceQuery;
-import io.github.pnoker.api.center.manager.GrpcDriverQuery;
 import io.github.pnoker.api.center.manager.GrpcPageDeviceDTO;
 import io.github.pnoker.api.center.manager.GrpcPageDeviceQuery;
 import io.github.pnoker.api.center.manager.GrpcProfileQuery;
@@ -29,6 +28,7 @@ import io.github.pnoker.api.center.manager.GrpcRDeviceDTO;
 import io.github.pnoker.api.center.manager.GrpcRDeviceListDTO;
 import io.github.pnoker.api.center.manager.GrpcRPageDeviceDTO;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
+import io.github.pnoker.api.common.GrpcDriverQuery;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.api.common.GrpcRFactory;
@@ -197,7 +197,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             DeviceBO entityBO;
             try {
                 entityBO = deviceService.getById(request.getDeviceId());
-            } catch (NotFoundException e) {
+            } catch (NotFoundException ignored) {
                 entityBO = null;
             }
             if (Objects.isNull(entityBO)) {

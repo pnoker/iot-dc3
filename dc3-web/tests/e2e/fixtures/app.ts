@@ -1,17 +1,18 @@
 /*
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import {expect, type Locator, type Page} from '@playwright/test';
@@ -21,7 +22,7 @@ import type {RouteIds} from './routes';
 export interface PageHealth {
   pageErrors: string[];
   consoleErrors: string[];
-  badResponses: Array<{status: number; url: string; body: string}>;
+  badResponses: Array<{ status: number; url: string; body: string }>;
   businessApiRequests: string[];
 }
 
@@ -82,7 +83,8 @@ export function isBusinessApi(url: string) {
  * responsible for asserting page-specific elements.
  */
 export async function waitForAppSettled(page: Page) {
-  await page.waitForLoadState('domcontentloaded').catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {
+  });
   // Wait until Vue's mount target has rendered something — that's the
   // earliest deterministic signal that Element Plus / vue-router have
   // wired up. Falls back gracefully if the app shell is unusually slow.
@@ -252,26 +254,26 @@ export async function apiGet<T = unknown>(
 
 function idOf(record: unknown) {
   if (!record || typeof record !== 'object' || !('id' in record)) return undefined;
-  const id = (record as {id?: unknown}).id;
+  const id = (record as { id?: unknown }).id;
   return id == null ? undefined : String(id);
 }
 
 async function firstRecord(page: Page, url: string) {
   const response = await apiPost(page, url, {page: {current: 1, size: 1}});
-  const payload = response.data as {ok?: boolean; data?: {records?: unknown[]}};
+  const payload = response.data as { ok?: boolean; data?: { records?: unknown[] } };
   if (!payload?.ok) return undefined;
   return payload.data?.records?.[0];
 }
 
 async function firstArrayRecord(page: Page, url: string) {
   const response = await apiGet<unknown[]>(page, url);
-  const payload = response.data as {ok?: boolean; data?: unknown[]};
+  const payload = response.data as { ok?: boolean; data?: unknown[] };
   if (!payload?.ok) return undefined;
   return payload.data?.[0];
 }
 
 async function listByName(page: Page, url: string, nameField: string, name: string) {
-  const response = await apiPost<{records?: unknown[]}>(page, url, {
+  const response = await apiPost<{ records?: unknown[] }>(page, url, {
     page: {current: 1, size: 1},
     [nameField]: name,
   });
@@ -281,7 +283,7 @@ async function listByName(page: Page, url: string, nameField: string, name: stri
 
 async function arrayRecordByName(page: Page, url: string, nameField: string, name: string) {
   const response = await apiGet<unknown[]>(page, url);
-  const payload = response.data as {ok?: boolean; data?: unknown[]};
+  const payload = response.data as { ok?: boolean; data?: unknown[] };
   if (!payload?.ok) return undefined;
   return payload.data?.find((record) => {
     if (!record || typeof record !== 'object') return false;
@@ -544,7 +546,7 @@ async function ensureMenuSeed(page: Page, seed: MenuSeed, cleanupStack: Array<()
     if (
       existing &&
       typeof existing === 'object' &&
-      (existing as {remark?: unknown}).remark === 'created by e2e route fixture'
+      (existing as { remark?: unknown }).remark === 'created by e2e route fixture'
     ) {
       cleanupStack.push(async () => {
         await apiPost(page, '/api/v3/auth/menu/delete', {}, {id: existingId}).catch(() => undefined);
@@ -652,7 +654,7 @@ async function discoverRouteIds(page: Page): Promise<RouteIds> {
 
   const pointProfileId =
     point && typeof point === 'object' && 'profileId' in point
-      ? String((point as {profileId?: unknown}).profileId || '')
+      ? String((point as { profileId?: unknown }).profileId || '')
       : undefined;
 
   return {
@@ -712,8 +714,8 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
     driver_id: driverId,
   });
   const driverAttributes =
-    (driverAttributeResponse.data as {ok?: boolean; data?: unknown[]})?.ok === true
-      ? ((driverAttributeResponse.data as {data?: unknown[]}).data ?? [])
+    (driverAttributeResponse.data as { ok?: boolean; data?: unknown[] })?.ok === true
+      ? ((driverAttributeResponse.data as { data?: unknown[] }).data ?? [])
       : [];
   if (driverAttributes.length === 0) {
     const attributeName = `e2e_attr_${Date.now().toString(36).slice(-6)}`;

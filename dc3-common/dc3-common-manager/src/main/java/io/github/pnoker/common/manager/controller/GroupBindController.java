@@ -198,6 +198,13 @@ public class GroupBindController implements BaseController {
         }));
     }
 
+    /**
+     * Validate a group binding: the group belongs to the tenant, its type matches the
+     * entity type, and the bound entity itself belongs to the tenant.
+     *
+     * @param tenantId tenant scope
+     * @param entityBO the binding to validate
+     */
     private void validateBind(Long tenantId, GroupBindBO entityBO) {
         EntityTypeEnum entityTypeFlag = entityBO.getEntityTypeFlag();
         GroupBO groupBO = requireTenant(tenantId, groupService.getById(entityBO.getGroupId()));

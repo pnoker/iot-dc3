@@ -35,6 +35,14 @@ import java.util.List;
  */
 public interface RolePrincipalBindService extends BaseService<RolePrincipalBindBO, RolePrincipalBindQuery> {
 
+    /**
+     * Paginated query filtered by tenant: only bindings whose role belongs to the given
+     * tenant.
+     *
+     * @param entityQuery query conditions
+     * @param tenantId    tenant id, null means no tenant filtering
+     * @return paginated bindings
+     */
     Page<RolePrincipalBindBO> list(RolePrincipalBindQuery entityQuery, Long tenantId);
 
     List<RoleBO> listRoleByTenantIdAndPrincipalId(Long tenantId, Long principalId);

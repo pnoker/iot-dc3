@@ -38,9 +38,12 @@ public class ExceptionUtil {
     }
 
     /**
-     * @param service Name
-     * @param message
-     * @return
+     * Build a "service unavailable" message. Returns the supplied message when present,
+     * otherwise formats one from the service name.
+     *
+     * @param service the unavailable service name
+     * @param message an optional custom message; when blank a default is generated
+     * @return the resolved message
      */
     public static String getNotAvailableServiceMessage(String service, String message) {
         if (StringUtils.isEmpty(message)) {

@@ -71,6 +71,14 @@ public class ApiAnnotationValidator {
         return false;
     }
 
+    /**
+     * Validate an {@code @Operation} annotation: presence, description length, and the
+     * {@code x-dc3-ai} extension keys (riskLevel and boolean flags).
+     *
+     * @param apiCode   the API code, for defect messages
+     * @param operation the Operation annotation, may be null
+     * @return the list of detected defects
+     */
     public List<String> validate(String apiCode, Operation operation) {
         List<String> defects = new ArrayList<>();
         if (operation == null) {

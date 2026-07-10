@@ -21,7 +21,6 @@ import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
@@ -44,7 +43,7 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
 
     @Override
     public void onApplicationEvent(MetadataEvent metadataEvent) {
-        log.info("Metadata event listener received: {}", JsonUtil.toJsonString(metadataEvent));
+        log.debug("Metadata event listener received: id={}, type={}", metadataEvent.getId(), metadataEvent.getMetadataType());
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             MetadataEventDTO entityEvent = new MetadataEventDTO();

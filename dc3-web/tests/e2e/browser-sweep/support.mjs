@@ -1,17 +1,18 @@
 /*
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import JSONBigInt from 'json-bigint';
@@ -41,8 +42,10 @@ export function shortText(text, size = 260) {
 }
 
 export async function waitPage(page) {
-  await page.waitForLoadState('domcontentloaded').catch(() => {});
-  await page.waitForLoadState('networkidle', {timeout: 6000}).catch(() => {});
+  await page.waitForLoadState('domcontentloaded').catch(() => {
+  });
+  await page.waitForLoadState('networkidle', {timeout: 6000}).catch(() => {
+  });
   await delay(500);
 }
 
@@ -55,7 +58,8 @@ export async function login(page, base) {
     await page.getByPlaceholder('Please enter username').fill(E2E_CREDENTIALS.name);
     await page.locator('.login-form input[type="password"]').fill(E2E_CREDENTIALS.password);
     await loginButton.click();
-    await page.waitForURL((url) => !url.hash.includes('/login'), {timeout: 15000}).catch(() => {});
+    await page.waitForURL((url) => !url.hash.includes('/login'), {timeout: 15000}).catch(() => {
+    });
   }
   await waitPage(page);
   if (page.url().includes('/login')) {
@@ -152,12 +156,14 @@ export async function closeModal(page) {
   if (await modal.count()) {
     const cancel = modal.getByRole('button', {name: /Cancel|Close|No|取消|关闭|否/}).last();
     if (await cancel.count()) {
-      await cancel.click().catch(() => {});
+      await cancel.click().catch(() => {
+      });
       await delay(300);
       return;
     }
   }
-  await page.keyboard.press('Escape').catch(() => {});
+  await page.keyboard.press('Escape').catch(() => {
+  });
   await delay(300);
 }
 
@@ -260,7 +266,8 @@ export async function createEntity(page, cleanupStack, seed) {
   }
 
   cleanupStack.push(async () => {
-    await apiPost(page, seed.deleteUrl, {}, {id}).catch(() => {});
+    await apiPost(page, seed.deleteUrl, {}, {id}).catch(() => {
+    });
   });
   return id;
 }

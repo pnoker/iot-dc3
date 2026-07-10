@@ -24,7 +24,7 @@ import java.util.Set;
  *
  * @author pnoker
  * @version 2026.6.0
- * @since 2016.10.1
+ * @since 2026.6.0
  */
 public interface PermissionFacade {
 

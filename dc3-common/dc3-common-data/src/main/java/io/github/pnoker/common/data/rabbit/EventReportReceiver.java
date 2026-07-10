@@ -45,6 +45,13 @@ public class EventReportReceiver {
 
     private final EventHistoryService eventHistoryService;
 
+    /**
+     * Consume an event report message and forward it to the event history service.
+     *
+     * @param channel   the RabbitMQ channel for manual ack
+     * @param message   the raw message carrying the delivery tag
+     * @param entityDTO the deserialized event report
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{eventReportQueue.name}")
     public void onEventReport(Channel channel, Message message, EventReportDTO entityDTO) {
@@ -53,7 +60,10 @@ public class EventReportReceiver {
             log.debug("Receive event report: {}", JsonUtil.toJsonString(entityDTO));
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
                     || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.eventId())) {
-                log.error("Invalid event report: {}", entityDTO);
+                log.warn("Invalid event report, some required fields are null, recordId={}, deviceId={}, eventId={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.eventId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

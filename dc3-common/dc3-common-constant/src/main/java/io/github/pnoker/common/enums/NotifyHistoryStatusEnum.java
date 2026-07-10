@@ -70,7 +70,7 @@ public enum NotifyHistoryStatusEnum {
     public static NotifyHistoryStatusEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

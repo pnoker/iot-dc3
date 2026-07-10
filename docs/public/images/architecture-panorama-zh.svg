@@ -2,245 +2,267 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the GNU Affero General Public License v3.0.
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <svg xmlns="http://www.w3.org/2000/svg" aria-label="IoT DC3 Architecture Panorama" role="img" viewBox="0 0 1200 768">
-      <defs>
+    <defs>
         <marker id="dc3-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-          <polygon fill="#94a3b8" points="0 0, 10 3.5, 0 7"/>
+            <polygon fill="#94a3b8" points="0 0, 10 3.5, 0 7"/>
         </marker>
         <marker id="dc3-ah-amber" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-          <polygon fill="#d97706" points="0 0, 10 3.5, 0 7"/>
+            <polygon fill="#d97706" points="0 0, 10 3.5, 0 7"/>
         </marker>
         <marker id="dc3-ah-rose" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-          <polygon fill="#e11d48" points="0 0, 10 3.5, 0 7"/>
+            <polygon fill="#e11d48" points="0 0, 10 3.5, 0 7"/>
         </marker>
         <pattern id="dc3-grid" height="40" patternUnits="userSpaceOnUse" width="40">
-          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#cbd5e1" stroke-width="0.5"/>
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#cbd5e1" stroke-width="0.5"/>
         </pattern>
-      </defs>
+    </defs>
 
-      <rect fill="url(#dc3-grid)" height="100%" width="100%"/>
+    <rect fill="url(#dc3-grid)" height="100%" width="100%"/>
 
-      <!-- regions -->
-      <rect fill="rgba(5, 150, 105, 0.05)" height="108" rx="12" stroke="#059669" stroke-dasharray="6,3"
-            stroke-width="0.8" width="756"
-            x="52" y="262"/>
-      <text fill="#059669" font-size="10" font-weight="600" x="64" y="280">中心服务 Center Services · gRPC 互联 (Facade: api / grpc / local)</text>
-      <rect fill="rgba(5, 150, 105, 0.05)" height="108" rx="12" stroke="#059669" stroke-dasharray="6,3"
-            stroke-width="0.8" width="756"
-            x="52" y="496"/>
-      <text fill="#059669" font-size="10" font-weight="600" x="64" y="514">驱动层 Driver Layer · 28+ 协议驱动 (gRPC ↔ manager, RabbitMQ 收发)</text>
-      <rect fill="rgba(217, 119, 6, 0.06)" height="200" rx="12" stroke="#d97706" stroke-dasharray="6,3"
-            stroke-width="0.8"
-            width="300" x="840" y="502"/>
-      <text fill="#d97706" font-size="10" font-weight="600" x="852" y="520">可选运维 Observability</text>
+    <!-- regions -->
+    <rect fill="rgba(5, 150, 105, 0.05)" height="108" rx="12" stroke="#059669" stroke-dasharray="6,3"
+          stroke-width="0.8" width="756"
+          x="52" y="262"/>
+    <text fill="#059669" font-size="10" font-weight="600" x="64" y="280">中心服务 Center Services · gRPC 互联 (Facade:
+        api / grpc / local)
+    </text>
+    <rect fill="rgba(5, 150, 105, 0.05)" height="108" rx="12" stroke="#059669" stroke-dasharray="6,3"
+          stroke-width="0.8" width="756"
+          x="52" y="496"/>
+    <text fill="#059669" font-size="10" font-weight="600" x="64" y="514">驱动层 Driver Layer · 28+ 协议驱动 (gRPC ↔
+        manager, RabbitMQ 收发)
+    </text>
+    <rect fill="rgba(217, 119, 6, 0.06)" height="200" rx="12" stroke="#d97706" stroke-dasharray="6,3"
+          stroke-width="0.8"
+          width="300" x="840" y="502"/>
+    <text fill="#d97706" font-size="10" font-weight="600" x="852" y="520">可选运维 Observability</text>
 
-      <!-- arrows -->
-      <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="175" x2="175" y1="134" y2="171"/>
-      <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="412" x2="412" y1="134" y2="171"/>
-      <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="667" x2="667" y1="134" y2="171"/>
-      <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="415" x2="415" y1="232" y2="289"/>
-      <text fill="#64748b" font-size="9" x="423" y="252">HTTP /api</text>
-      <line marker-end="url(#dc3-ah-rose)" stroke="#e11d48" stroke-dasharray="4,4" stroke-width="0.8"
-            x1="120" x2="120"
-            y1="232" y2="289"/>
-      <text fill="#e11d48" font-size="8" x="58" y="258">JWT校验 gRPC</text>
-      <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="398" x2="398" y1="372" y2="406"/>
-      <text fill="#64748b" font-size="8" x="352" y="392">命令▼</text>
-      <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="462" x2="462" y1="406" y2="374"/>
-      <text fill="#64748b" font-size="8" x="470" y="392">▲数据</text>
-      <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="398" x2="398" y1="466" y2="494"/>
-      <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="462" x2="462" y1="494" y2="468"/>
-      <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="398" x2="398" y1="604" y2="642"/>
-      <text fill="#64748b" font-size="8" x="352" y="626">写▼</text>
-      <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="462" x2="462" y1="642" y2="606"/>
-      <text fill="#64748b" font-size="8" x="470" y="626">▲读</text>
-      <line marker-end="url(#dc3-ah)" marker-start="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="808"
-            x2="838" y1="330"
-            y2="330"/>
-      <text fill="#64748b" font-size="8" x="812" y="322">JDBC</text>
-      <line marker-end="url(#dc3-ah-amber)" stroke="#d97706" stroke-dasharray="4,4" stroke-width="0.8"
-            x1="980" x2="980"
-            y1="466" y2="501"/>
-      <text fill="#d97706" font-size="8" x="986" y="487">metrics/logs</text>
+    <!-- arrows -->
+    <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="175" x2="175" y1="134" y2="171"/>
+    <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="412" x2="412" y1="134" y2="171"/>
+    <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="667" x2="667" y1="134" y2="171"/>
+    <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="415" x2="415" y1="232" y2="289"/>
+    <text fill="#64748b" font-size="9" x="423" y="252">HTTP /api</text>
+    <line marker-end="url(#dc3-ah-rose)" stroke="#e11d48" stroke-dasharray="4,4" stroke-width="0.8"
+          x1="120" x2="120"
+          y1="232" y2="289"/>
+    <text fill="#e11d48" font-size="8" x="58" y="258">JWT校验 gRPC</text>
+    <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="398" x2="398" y1="372" y2="406"/>
+    <text fill="#64748b" font-size="8" x="352" y="392">命令▼</text>
+    <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="462" x2="462" y1="406" y2="374"/>
+    <text fill="#64748b" font-size="8" x="470" y="392">▲数据</text>
+    <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="398" x2="398" y1="466" y2="494"/>
+    <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="462" x2="462" y1="494" y2="468"/>
+    <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="398" x2="398" y1="604" y2="642"/>
+    <text fill="#64748b" font-size="8" x="352" y="626">写▼</text>
+    <line marker-end="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="462" x2="462" y1="642" y2="606"/>
+    <text fill="#64748b" font-size="8" x="470" y="626">▲读</text>
+    <line marker-end="url(#dc3-ah)" marker-start="url(#dc3-ah)" stroke="#94a3b8" stroke-width="0.8" x1="808"
+          x2="838" y1="330"
+          y2="330"/>
+    <text fill="#64748b" font-size="8" x="812" y="322">JDBC</text>
+    <line marker-end="url(#dc3-ah-amber)" stroke="#d97706" stroke-dasharray="4,4" stroke-width="0.8"
+          x1="980" x2="980"
+          y1="466" y2="501"/>
+    <text fill="#d97706" font-size="8" x="986" y="487">metrics/logs</text>
 
-      <!-- Band 1: clients -->
-      <rect fill="rgba(8, 145, 178, 0.07)" height="64" rx="6" stroke="#0891b2" stroke-width="0.8" width="230"
-            x="60"
-            y="70"/>
-      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="175" y="98">Web 控制台
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="175" y="116">Vue3 · Vite8 · Element Plus · :8080</text>
-      <rect fill="rgba(8, 145, 178, 0.07)" height="64" rx="6" stroke="#0891b2" stroke-width="0.8" width="215"
-            x="305"
-            y="70"/>
-      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="412" y="98">dc3-cli
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="412" y="116">TypeScript CLI (HTTP)</text>
-      <rect fill="rgba(8, 145, 178, 0.07)" height="64" rx="6" stroke="#0891b2" stroke-width="0.8" width="265"
-            x="535"
-            y="70"/>
-      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="667" y="98">
+    <!-- Band 1: clients -->
+    <rect fill="rgba(8, 145, 178, 0.07)" height="64" rx="6" stroke="#0891b2" stroke-width="0.8" width="230"
+          x="60"
+          y="70"/>
+    <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="175" y="98">Web 控制台
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="175" y="116">Vue3 · Vite8 · Element Plus · :8080</text>
+    <rect fill="rgba(8, 145, 178, 0.07)" height="64" rx="6" stroke="#0891b2" stroke-width="0.8" width="215"
+          x="305"
+          y="70"/>
+    <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="412" y="98">dc3-cli
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="412" y="116">TypeScript CLI (HTTP)</text>
+    <rect fill="rgba(8, 145, 178, 0.07)" height="64" rx="6" stroke="#0891b2" stroke-width="0.8" width="265"
+          x="535"
+          y="70"/>
+    <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="667" y="98">
         AI Agent / MCP Client
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="667" y="116">对话 · 工具调用 · OAuth2</text>
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="667" y="116">对话 · 工具调用 · OAuth2</text>
 
-      <!-- Band 2: gateway -->
-      <rect fill="rgba(5, 150, 105, 0.07)" height="58" rx="6" stroke="#059669" stroke-width="0.8" width="740"
-            x="60"
-            y="174"/>
-      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="430" y="200">dc3-gateway · API 网关  :8000
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="218">Spring Cloud Gateway (WebFlux) · 统一路由 + 鉴权过滤 + 限流</text>
+    <!-- Band 2: gateway -->
+    <rect fill="rgba(5, 150, 105, 0.07)" height="58" rx="6" stroke="#059669" stroke-width="0.8" width="740"
+          x="60"
+          y="174"/>
+    <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="430" y="200">dc3-gateway · API 网关
+        :8000
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="218">Spring Cloud Gateway (WebFlux) · 统一路由 +
+        鉴权过滤 + 限流
+    </text>
 
-      <!-- Band 3: center services -->
-      <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="176"
-            x="60"
-            y="292"/>
-      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="148" y="316">auth</text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="148" y="332">认证 · 租户 · RBAC</text>
-      <text fill="#059669" font-size="8" text-anchor="middle" x="148" y="346">:8300 / gRPC 9300</text>
-      <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="176"
-            x="246"
-            y="292"/>
-      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="334" y="316">manager
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="334" y="332">Driver/Device/Point/Profile</text>
-      <text fill="#059669" font-size="8" text-anchor="middle" x="334" y="346">:8400 / gRPC 9400</text>
-      <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="176"
-            x="432"
-            y="292"/>
-      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="520" y="316">data</text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="520" y="332">点位值 · 命令 · 历史</text>
-      <text fill="#059669" font-size="8" text-anchor="middle" x="520" y="346">:8500 / gRPC 9500</text>
-      <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="182"
-            x="618"
-            y="292"/>
-      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="709" y="316">agentic
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="709" y="332">AI 工具调用 · 会话</text>
-      <text fill="#059669" font-size="8" text-anchor="middle" x="709" y="346">:8600 · Spring AI</text>
+    <!-- Band 3: center services -->
+    <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="176"
+          x="60"
+          y="292"/>
+    <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="148" y="316">auth</text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="148" y="332">认证 · 租户 · RBAC</text>
+    <text fill="#059669" font-size="8" text-anchor="middle" x="148" y="346">:8300 / gRPC 9300</text>
+    <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="176"
+          x="246"
+          y="292"/>
+    <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="334" y="316">manager
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="334" y="332">Driver/Device/Point/Profile</text>
+    <text fill="#059669" font-size="8" text-anchor="middle" x="334" y="346">:8400 / gRPC 9400</text>
+    <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="176"
+          x="432"
+          y="292"/>
+    <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="520" y="316">data</text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="520" y="332">点位值 · 命令 · 历史</text>
+    <text fill="#059669" font-size="8" text-anchor="middle" x="520" y="346">:8500 / gRPC 9500</text>
+    <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="182"
+          x="618"
+          y="292"/>
+    <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="709" y="316">agentic
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="709" y="332">AI 工具调用 · 会话</text>
+    <text fill="#059669" font-size="8" text-anchor="middle" x="709" y="346">:8600 · Spring AI</text>
 
-      <!-- Band 4: message bus -->
-      <rect fill="rgba(217, 119, 6, 0.06)" height="56" rx="6" stroke="#d97706" stroke-width="0.8" width="740"
-            x="60"
-            y="410"/>
-      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="430" y="435">
+    <!-- Band 4: message bus -->
+    <rect fill="rgba(217, 119, 6, 0.06)" height="56" rx="6" stroke="#d97706" stroke-width="0.8" width="740"
+          x="60"
+          y="410"/>
+    <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="430" y="435">
         RabbitMQ 消息总线
-      </text>
-      <text fill="#d97706" font-size="9" text-anchor="middle" x="430" y="453">point_value · point_command · result · event · notify    |    MQTT :1883</text>
+    </text>
+    <text fill="#d97706" font-size="9" text-anchor="middle" x="430" y="453">point_value · point_command · result · event
+        · notify | MQTT :1883
+    </text>
 
-      <!-- Band 5: drivers -->
-      <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="150"
-            x="60"
-            y="526"/>
-      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="135" y="552">Modbus
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="135" y="570">TCP / RTU</text>
-      <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="140"
-            x="220"
-            y="526"/>
-      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="290" y="552">
+    <!-- Band 5: drivers -->
+    <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="150"
+          x="60"
+          y="526"/>
+    <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="135" y="552">Modbus
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="135" y="570">TCP / RTU</text>
+    <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="140"
+          x="220"
+          y="526"/>
+    <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="290" y="552">
         OPC
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="290" y="570">UA / DA</text>
-      <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="120"
-            x="370"
-            y="526"/>
-      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="430" y="552">S7 PLC
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="570">Siemens</text>
-      <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="120"
-            x="500"
-            y="526"/>
-      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="560" y="552">
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="290" y="570">UA / DA</text>
+    <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="120"
+          x="370"
+          y="526"/>
+    <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="430" y="552">S7 PLC
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="570">Siemens</text>
+    <rect fill="rgba(5, 150, 105, 0.07)" height="62" rx="6" stroke="#059669" stroke-width="0.8" width="120"
+          x="500"
+          y="526"/>
+    <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="560" y="552">
         MQTT
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="560" y="570">Broker</text>
-      <rect fill="rgba(100, 116, 139, 0.03)" height="62" rx="6" stroke="#64748b" stroke-width="0.8" width="170"
-            x="630"
-            y="526"/>
-      <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="715" y="552">
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="560" y="570">Broker</text>
+    <rect fill="rgba(100, 116, 139, 0.03)" height="62" rx="6" stroke="#64748b" stroke-width="0.8" width="170"
+          x="630"
+          y="526"/>
+    <text fill="#334155" font-size="11" font-weight="600" text-anchor="middle" x="715" y="552">
         + 24 协议
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="715" y="570">BACnet·SNMP·IEC104·CoAP…</text>
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="715" y="570">BACnet·SNMP·IEC104·CoAP…</text>
 
-      <!-- Band 6: devices -->
-      <rect fill="rgba(100, 116, 139, 0.03)" height="58" rx="6" stroke="#64748b" stroke-width="0.8" width="740"
-            x="60"
-            y="644"/>
-      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="430" y="670">
+    <!-- Band 6: devices -->
+    <rect fill="rgba(100, 116, 139, 0.03)" height="58" rx="6" stroke="#64748b" stroke-width="0.8" width="740"
+          x="60"
+          y="644"/>
+    <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="430" y="670">
         现场设备 Field Devices
-      </text>
-      <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="688">PLC · 传感器 · 电表 · 网关 · 仪表  (Modbus / OPC / S7 / MQTT)</text>
+    </text>
+    <text fill="#334155" font-size="9" text-anchor="middle" x="430" y="688">PLC · 传感器 · 电表 · 网关 · 仪表 (Modbus /
+        OPC / S7 / MQTT)
+    </text>
 
-      <!-- PostgreSQL -->
-      <rect fill="rgba(99, 102, 241, 0.05)" height="204" rx="6" stroke="#6366f1" stroke-width="0.8" width="300"
-            x="840"
-            y="262"/>
-      <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="990" y="290">
+    <!-- PostgreSQL -->
+    <rect fill="rgba(99, 102, 241, 0.05)" height="204" rx="6" stroke="#6366f1" stroke-width="0.8" width="300"
+          x="840"
+          y="262"/>
+    <text fill="#334155" font-size="12" font-weight="600" text-anchor="middle" x="990" y="290">
         PostgreSQL 持久层
-      </text>
-      <text fill="#6366f1" font-size="9" x="858" y="318">• TimescaleDB — 点位值 / 历史 (时序)</text>
-      <text fill="#6366f1" font-size="9" x="858" y="338">• pgvector — AI 向量检索 / 记忆</text>
-      <text fill="#6366f1" font-size="9" x="858" y="358">• AGE — 图数据 (设备关系)</text>
-      <text fill="#334155" font-size="9" x="858" y="384">schema:</text>
-      <text fill="#334155" font-size="8" x="858" y="402">dc3_auth · dc3_manager · dc3_data</text>
-      <text fill="#334155" font-size="8" x="858" y="416">dc3_agentic · dc3_common</text>
-      <text fill="#6366f1" font-size="9" text-anchor="middle" x="990" y="446">:35432 → 5432</text>
+    </text>
+    <text fill="#6366f1" font-size="9" x="858" y="318">• TimescaleDB — 点位值 / 历史 (时序)</text>
+    <text fill="#6366f1" font-size="9" x="858" y="338">• pgvector — AI 向量检索 / 记忆</text>
+    <text fill="#6366f1" font-size="9" x="858" y="358">• AGE — 图数据 (设备关系)</text>
+    <text fill="#334155" font-size="9" x="858" y="384">schema:</text>
+    <text fill="#334155" font-size="8" x="858" y="402">dc3_auth · dc3_manager · dc3_data</text>
+    <text fill="#334155" font-size="8" x="858" y="416">dc3_agentic · dc3_common</text>
+    <text fill="#6366f1" font-size="9" text-anchor="middle" x="990" y="446">:35432 → 5432</text>
 
-      <!-- Observability -->
-      <rect fill="rgba(2, 132, 199, 0.05)" height="44" rx="6" stroke="#d97706" stroke-width="0.8"
-            width="276" x="852"
-            y="528"/>
-      <text fill="#334155" font-size="10" font-weight="600" text-anchor="middle" x="990" y="548">EMQX · MQTT
+    <!-- Observability -->
+    <rect fill="rgba(2, 132, 199, 0.05)" height="44" rx="6" stroke="#d97706" stroke-width="0.8"
+          width="276" x="852"
+          y="528"/>
+    <text fill="#334155" font-size="10" font-weight="600" text-anchor="middle" x="990" y="548">EMQX · MQTT
         Broker
-      </text>
-      <text fill="#334155" font-size="8" text-anchor="middle" x="990" y="562">:31883 · Dashboard :18083</text>
-      <rect fill="rgba(2, 132, 199, 0.05)" height="44" rx="6" stroke="#d97706" stroke-width="0.8"
-            width="276" x="852"
-            y="584"/>
-      <text fill="#334155" font-size="10" font-weight="600" text-anchor="middle" x="990" y="604">
+    </text>
+    <text fill="#334155" font-size="8" text-anchor="middle" x="990" y="562">:31883 · Dashboard :18083</text>
+    <rect fill="rgba(2, 132, 199, 0.05)" height="44" rx="6" stroke="#d97706" stroke-width="0.8"
+          width="276" x="852"
+          y="584"/>
+    <text fill="#334155" font-size="10" font-weight="600" text-anchor="middle" x="990" y="604">
         ELK 日志管道
-      </text>
-      <text fill="#334155" font-size="8" text-anchor="middle" x="990" y="618">ES · Logstash · Kibana :5601 · APM</text>
-      <rect fill="rgba(2, 132, 199, 0.05)" height="44" rx="6" stroke="#d97706" stroke-width="0.8"
-            width="276" x="852"
-            y="640"/>
-      <text fill="#334155" font-size="10" font-weight="600" text-anchor="middle" x="990" y="660">
+    </text>
+    <text fill="#334155" font-size="8" text-anchor="middle" x="990" y="618">ES · Logstash · Kibana :5601 · APM</text>
+    <rect fill="rgba(2, 132, 199, 0.05)" height="44" rx="6" stroke="#d97706" stroke-width="0.8"
+          width="276" x="852"
+          y="640"/>
+    <text fill="#334155" font-size="10" font-weight="600" text-anchor="middle" x="990" y="660">
         Prometheus + Grafana
-      </text>
-      <text fill="#334155" font-size="8" text-anchor="middle" x="990" y="674">指标采集 · 监控仪表盘 :3000</text>
+    </text>
+    <text fill="#334155" font-size="8" text-anchor="middle" x="990" y="674">指标采集 · 监控仪表盘 :3000</text>
 
-      <!-- legend -->
-      <rect fill="rgba(8, 145, 178, 0.07)" height="11" rx="2" stroke="#0891b2" stroke-width="0.8" width="16"
-            x="60"
-            y="724"/>
-      <text fill="#334155" font-size="9" x="82" y="733">接入层</text>
-      <rect fill="rgba(5, 150, 105, 0.07)" height="11" rx="2" stroke="#059669" stroke-width="0.8" width="16"
-            x="160"
-            y="724"/>
-      <text fill="#334155" font-size="9" x="182" y="733">服务 / 驱动</text>
-      <rect fill="rgba(217, 119, 6, 0.06)" height="11" rx="2" stroke="#d97706" stroke-width="0.8" width="16"
-            x="300"
-            y="724"/>
-      <text fill="#334155" font-size="9" x="322" y="733">消息总线</text>
-      <rect fill="rgba(99, 102, 241, 0.05)" height="11" rx="2" stroke="#6366f1" stroke-width="0.8" width="16"
-            x="430"
-            y="724"/>
-      <text fill="#334155" font-size="9" x="452" y="733">数据存储</text>
-      <rect fill="rgba(2, 132, 199, 0.05)" height="11" rx="2" stroke="#d97706" stroke-width="0.8" width="16"
-            x="560"
-            y="724"/>
-      <text fill="#334155" font-size="9" x="582" y="733">运维 (可选)</text>
-      <rect fill="rgba(100, 116, 139, 0.03)" height="11" rx="2" stroke="#64748b" stroke-width="0.8" width="16"
-            x="700"
-            y="724"/>
-      <text fill="#334155" font-size="9" x="722" y="733">现场设备 / 外部</text>
-      <line stroke="#e11d48" stroke-dasharray="4,3" stroke-width="0.8" x1="870" x2="886" y1="730"
-            y2="730"/>
-      <text fill="#334155" font-size="9" x="892" y="733">鉴权流</text>
-      <text fill="#64748b" font-size="9" x="960" y="733">▼ 命令下行   ▲ 数据上行</text>
-    </svg>
+    <!-- legend -->
+    <rect fill="rgba(8, 145, 178, 0.07)" height="11" rx="2" stroke="#0891b2" stroke-width="0.8" width="16"
+          x="60"
+          y="724"/>
+    <text fill="#334155" font-size="9" x="82" y="733">接入层</text>
+    <rect fill="rgba(5, 150, 105, 0.07)" height="11" rx="2" stroke="#059669" stroke-width="0.8" width="16"
+          x="160"
+          y="724"/>
+    <text fill="#334155" font-size="9" x="182" y="733">服务 / 驱动</text>
+    <rect fill="rgba(217, 119, 6, 0.06)" height="11" rx="2" stroke="#d97706" stroke-width="0.8" width="16"
+          x="300"
+          y="724"/>
+    <text fill="#334155" font-size="9" x="322" y="733">消息总线</text>
+    <rect fill="rgba(99, 102, 241, 0.05)" height="11" rx="2" stroke="#6366f1" stroke-width="0.8" width="16"
+          x="430"
+          y="724"/>
+    <text fill="#334155" font-size="9" x="452" y="733">数据存储</text>
+    <rect fill="rgba(2, 132, 199, 0.05)" height="11" rx="2" stroke="#d97706" stroke-width="0.8" width="16"
+          x="560"
+          y="724"/>
+    <text fill="#334155" font-size="9" x="582" y="733">运维 (可选)</text>
+    <rect fill="rgba(100, 116, 139, 0.03)" height="11" rx="2" stroke="#64748b" stroke-width="0.8" width="16"
+          x="700"
+          y="724"/>
+    <text fill="#334155" font-size="9" x="722" y="733">现场设备 / 外部</text>
+    <line stroke="#e11d48" stroke-dasharray="4,3" stroke-width="0.8" x1="870" x2="886" y1="730"
+          y2="730"/>
+    <text fill="#334155" font-size="9" x="892" y="733">鉴权流</text>
+    <text fill="#64748b" font-size="9" x="960" y="733">▼ 命令下行 ▲ 数据上行</text>
+</svg>

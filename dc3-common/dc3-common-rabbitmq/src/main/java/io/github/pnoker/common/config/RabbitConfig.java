@@ -40,12 +40,19 @@ import java.nio.charset.StandardCharsets;
  * <p>
  * Configures the shared {@link RabbitTemplate}, the default
  * {@link RabbitListenerContainerFactory} used by every {@code @RabbitListener}, and a
- * dedicated {@link #highThroughputRabbitListenerContainerFactory} for high-volume
+ * dedicated {@code #highThroughputRabbitListenerContainerFactory} for high-volume
  * streams (point values, mqtt fan-out) that need a wider prefetch / concurrency
  * window than the default factory's metadata-and-command friendly defaults.
+ * <p>
+ * Also wires the request id (traceId) propagation across the broker hop: the publish
+ * post-processor stamps the current MDC {@code requestId} onto every outbound message's
+ * {@code X-Request-Id} header, and a {@link MdcRequestIdListenerAdvice} on each listener
+ * container factory restores it into the MDC during handling. Together with the HTTP
+ * filter and gRPC interceptors this keeps the traceId chain continuous across the
+ * HTTP&nbsp;→&nbsp;gRPC&nbsp;→&nbsp;RabbitMQ path.
  *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.7.8
  * @since 2016.10.1
  */
 @Slf4j
@@ -100,7 +107,7 @@ public class RabbitConfig {
         rabbitTemplate.setBeforePublishPostProcessors(message -> {
             message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
             return message;
-        });
+        }, new MdcRequestIdMessagePostProcessor());
         return rabbitTemplate;
     }
 
@@ -151,6 +158,10 @@ public class RabbitConfig {
         factory.setConcurrentConsumers(concurrent);
         factory.setMaxConcurrentConsumers(maxConcurrent);
         factory.setPrefetchCount(prefetch);
+        // Restore the request id (carried in the X-Request-Id message header) into the MDC for
+        // the duration of each message handling, then clear it. Covers every @RabbitListener
+        // without touching individual receivers.
+        factory.setAdviceChain(new MdcRequestIdListenerAdvice());
         return factory;
     }
 

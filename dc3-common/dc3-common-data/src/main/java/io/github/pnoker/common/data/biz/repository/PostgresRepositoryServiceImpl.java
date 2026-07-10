@@ -157,8 +157,8 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     /**
      * Construct a fuzzy query wrapper for point value retrieval
      *
-     * @param entityQuery {@link PointValueQuery}
-     * @return {@link LambdaQueryWrapper}
+     * @param entityQuery {@link PointValueQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link PointValueDO}
      */
     private LambdaQueryWrapper<PointValueDO> fuzzyQuery(PointValueQuery entityQuery) {
         LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();

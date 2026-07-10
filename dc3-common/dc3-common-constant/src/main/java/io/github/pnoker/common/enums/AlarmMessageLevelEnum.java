@@ -107,7 +107,7 @@ public enum AlarmMessageLevelEnum {
     public static AlarmMessageLevelEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

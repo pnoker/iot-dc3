@@ -171,7 +171,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     private DriverBO selectDriver(Long driverId) {
         try {
             return driverService.getById(driverId);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return null;
         }
     }
@@ -179,7 +179,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     private DeviceBO selectDevice(Long deviceId) {
         try {
             return deviceService.getById(deviceId);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return null;
         }
     }

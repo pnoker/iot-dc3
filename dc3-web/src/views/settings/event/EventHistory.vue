@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -56,7 +57,7 @@
         <el-table-column :label="$t('eventHistory.device')" min-width="160" show-overflow-tooltip>
           <template #default="{row}">{{ deviceNameFor(row) }}</template>
         </el-table-column>
-        <el-table-column :label="$t('eventHistory.eventCode')" min-width="140" prop="eventCode" />
+        <el-table-column :label="$t('eventHistory.eventCode')" min-width="140" prop="eventCode"/>
         <el-table-column :label="$t('eventHistory.type')" width="110">
           <template #default="{row}">{{ eventTypeLabel(row.eventTypeFlag) }}</template>
         </el-table-column>
@@ -67,15 +68,15 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('eventHistory.ack')" prop="acknowledgeFlag" width="90" />
-        <el-table-column :label="$t('eventHistory.message')" min-width="200" prop="message" show-overflow-tooltip />
+        <el-table-column :label="$t('eventHistory.ack')" prop="acknowledgeFlag" width="90"/>
+        <el-table-column :label="$t('eventHistory.message')" min-width="200" prop="message" show-overflow-tooltip/>
         <el-table-column
           :formatter="timestampColumn"
           :label="$t('eventHistory.occurTime')"
           prop="occurTime"
           width="165"
         />
-        <el-table-column :formatter="timestampColumn" :label="$t('common.createTime')" prop="createTime" width="165" />
+        <el-table-column :formatter="timestampColumn" :label="$t('common.createTime')" prop="createTime" width="165"/>
         <!-- @vue-generic {EventHistoryRecord} -->
         <el-table-column :label="$t('common.operation')" fixed="right" width="100">
           <template #default="{row}">
@@ -83,7 +84,7 @@
           </template>
         </el-table-column>
         <template #empty>
-          <el-empty :description="$t('common.description')" />
+          <el-empty :description="$t('common.description')"/>
         </template>
       </el-table>
     </blank-card>
@@ -103,10 +104,10 @@
         <el-descriptions-item :label="$t('eventHistory.eventId')">{{ detailRow.eventId }}</el-descriptions-item>
         <el-descriptions-item :label="$t('eventHistory.eventCode')">{{ detailRow.eventCode }}</el-descriptions-item>
         <el-descriptions-item :label="$t('eventHistory.type')"
-          >{{ eventTypeLabel(detailRow.eventTypeFlag) }}
+        >{{ eventTypeLabel(detailRow.eventTypeFlag) }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('eventHistory.level')"
-          >{{ eventLevelLabel(detailRow.eventLevelFlag) }}
+        >{{ eventLevelLabel(detailRow.eventLevelFlag) }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('eventHistory.message')" :span="2">
           {{ detailRow.message || '-' }}
@@ -141,134 +142,134 @@
 </template>
 
 <script lang="ts" setup>
-  import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
-  import {listDeviceByIds} from '@/api/device';
-  import {getEventHistoryByRecordId, listEventHistory} from '@/api/event';
-  import {usePagedList} from '@/composables/usePagedList';
-  import {timestampColumn, timestampLabel} from '@/utils/dateUtil';
-  import {prettyJson} from '@/utils/jsonUtil';
-  import {eventLevelLabel, eventLevelTag, eventTypeLabel} from '@/utils/thingModelFormatUtil';
-  import type {EventHistoryRecord} from '@/config/types';
-  import ToolCard from '@/components/card/tool/ToolCard.vue';
-  import BlankCard from '@/components/card/blank/BlankCard.vue';
-  import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
+import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
+import {listDeviceByIds} from '@/api/device';
+import {getEventHistoryByRecordId, listEventHistory} from '@/api/event';
+import {usePagedList} from '@/composables/usePagedList';
+import {timestampColumn, timestampLabel} from '@/utils/dateUtil';
+import {prettyJson} from '@/utils/jsonUtil';
+import {eventLevelLabel, eventLevelTag, eventTypeLabel} from '@/utils/thingModelFormatUtil';
+import type {EventHistoryRecord} from '@/config/types';
+import ToolCard from '@/components/card/tool/ToolCard.vue';
+import BlankCard from '@/components/card/blank/BlankCard.vue';
+import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
-  const {
-    state: reactiveData,
-    load,
-    search,
-    reset,
-    sizeChange,
-    currentChange,
-  } = usePagedList<EventHistoryRecord, Record<string, unknown>>({
-    request: (query) => listEventHistory(query),
-  });
+const {
+  state: reactiveData,
+  load,
+  search,
+  reset,
+  sizeChange,
+  currentChange,
+} = usePagedList<EventHistoryRecord, Record<string, unknown>>({
+  request: (query) => listEventHistory(query),
+});
 
-  const formData = reactive<Record<string, string>>({});
-  const detailVisible = ref(false);
-  const detailRow = ref<EventHistoryRecord | null>(null);
-  const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
-  const lastRefreshTime = ref<number>(Date.now());
-  const AUTO_REFRESH_INTERVAL = 30000;
+const formData = reactive<Record<string, string>>({});
+const detailVisible = ref(false);
+const detailRow = ref<EventHistoryRecord | null>(null);
+const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
+const lastRefreshTime = ref<number>(Date.now());
+const AUTO_REFRESH_INTERVAL = 30000;
 
-  const lastRefreshText = computed(() => {
-    const d = new Date(lastRefreshTime.value);
-    return d.toLocaleTimeString();
-  });
+const lastRefreshText = computed(() => {
+  const d = new Date(lastRefreshTime.value);
+  return d.toLocaleTimeString();
+});
 
-  const formatJson = (value: unknown) => prettyJson(value);
+const formatJson = (value: unknown) => prettyJson(value);
 
-  // Resolve deviceId → deviceName for the list column, reusing the same
-  // listDeviceByIds source EventTable uses. Filled as rows arrive.
-  const deviceNameMap = reactive<Record<string, string>>({});
-  const resolveDeviceNames = async (rows: EventHistoryRecord[]) => {
-    const ids = Array.from(
-      new Set(rows.map((r) => String(r.deviceId ?? '')).filter((id) => id && id !== '0' && !deviceNameMap[id]))
-    );
-    if (!ids.length) return;
-    try {
-      const res: any = await listDeviceByIds(ids);
-      const data = res?.data || {};
-      ids.forEach((id) => {
-        if (data[id]) deviceNameMap[id] = data[id].deviceName || id;
-      });
-    } catch {
-      // handled globally
-    }
-  };
-  watch(
-    () => reactiveData.listData,
-    (rows) => resolveDeviceNames((rows as EventHistoryRecord[]) || []),
-    {
-      immediate: true,
-    }
+// Resolve deviceId → deviceName for the list column, reusing the same
+// listDeviceByIds source EventTable uses. Filled as rows arrive.
+const deviceNameMap = reactive<Record<string, string>>({});
+const resolveDeviceNames = async (rows: EventHistoryRecord[]) => {
+  const ids = Array.from(
+    new Set(rows.map((r) => String(r.deviceId ?? '')).filter((id) => id && id !== '0' && !deviceNameMap[id]))
   );
-  const deviceNameFor = (row: EventHistoryRecord) => deviceNameMap[String(row.deviceId)] || String(row.deviceId ?? '-');
+  if (!ids.length) return;
+  try {
+    const res: any = await listDeviceByIds(ids);
+    const data = res?.data || {};
+    ids.forEach((id) => {
+      if (data[id]) deviceNameMap[id] = data[id].deviceName || id;
+    });
+  } catch {
+    // handled globally
+  }
+};
+watch(
+  () => reactiveData.listData,
+  (rows) => resolveDeviceNames((rows as EventHistoryRecord[]) || []),
+  {
+    immediate: true,
+  }
+);
+const deviceNameFor = (row: EventHistoryRecord) => deviceNameMap[String(row.deviceId)] || String(row.deviceId ?? '-');
 
-  const onSearch = (data: Record<string, string>) => {
-    search(cleanSearchParams(data));
-  };
+const onSearch = (data: Record<string, string>) => {
+  search(cleanSearchParams(data));
+};
 
-  const onReset = () => {
-    resetSearchForm(formData, {});
-    reset();
-  };
+const onReset = () => {
+  resetSearchForm(formData, {});
+  reset();
+};
 
-  const doRefresh = async () => {
-    await load();
-    lastRefreshTime.value = Date.now();
-  };
+const doRefresh = async () => {
+  await load();
+  lastRefreshTime.value = Date.now();
+};
 
-  const refresh = () => doRefresh();
+const refresh = () => doRefresh();
 
-  const openDetail = (row: EventHistoryRecord) => {
-    getEventHistoryByRecordId(row.recordId)
-      .then((res) => {
-        detailRow.value = res.data || row;
-        detailVisible.value = true;
-      })
-      .catch(() => {
-        detailRow.value = row;
-        detailVisible.value = true;
-      });
-  };
+const openDetail = (row: EventHistoryRecord) => {
+  getEventHistoryByRecordId(row.recordId)
+    .then((res) => {
+      detailRow.value = res.data || row;
+      detailVisible.value = true;
+    })
+    .catch(() => {
+      detailRow.value = row;
+      detailVisible.value = true;
+    });
+};
 
-  onMounted(() => {
-    autoRefreshTimer.value = setInterval(async () => {
-      if (!reactiveData.loading) {
-        await doRefresh();
-      }
-    }, AUTO_REFRESH_INTERVAL);
-  });
-
-  onBeforeUnmount(() => {
-    if (autoRefreshTimer.value) {
-      clearInterval(autoRefreshTimer.value);
-      autoRefreshTimer.value = null;
+onMounted(() => {
+  autoRefreshTimer.value = setInterval(async () => {
+    if (!reactiveData.loading) {
+      await doRefresh();
     }
-  });
+  }, AUTO_REFRESH_INTERVAL);
+});
 
-  doRefresh();
+onBeforeUnmount(() => {
+  if (autoRefreshTimer.value) {
+    clearInterval(autoRefreshTimer.value);
+    autoRefreshTimer.value = null;
+  }
+});
+
+doRefresh();
 </script>
 
 <style lang="scss" scoped>
-  .auto-refresh-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 4px 12px;
-    margin-bottom: 4px;
-    font-size: 12px;
-    color: var(--el-text-color-secondary);
-    background: var(--el-fill-color-light);
-    border-radius: 4px;
+.auto-refresh-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 12px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  background: var(--el-fill-color-light);
+  border-radius: 4px;
 
-    &__label {
-      font-weight: 500;
-    }
-
-    &__time {
-      color: var(--el-text-color-placeholder);
-    }
+  &__label {
+    font-weight: 500;
   }
+
+  &__time {
+    color: var(--el-text-color-placeholder);
+  }
+}
 </style>

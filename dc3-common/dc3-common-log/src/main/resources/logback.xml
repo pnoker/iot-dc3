@@ -20,7 +20,7 @@
 <configuration scan="true">
     <!-- Override the parameter configurations in base.xml. -->
     <property name="CONSOLE_LOG_PATTERN"
-              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){magenta} [%clr(%4line){magenta}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"/>
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr([%X{requestId:-}]){faint} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){magenta} [%clr(%4line){magenta}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"/>
     <property name="LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START" value="false"/>
     <property name="LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE" value="200MB"/>
     <property name="LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP" value="20GB"/>
@@ -32,7 +32,7 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>${FILE_LOG_THRESHOLD}</level>
+            <level>${FILE_LOG_THRESHOLD:-INFO}</level>
         </filter>
         <file>${LOG_FILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -60,7 +60,8 @@
         </encoder>
     </appender>
 
-    <root level="INFO">
+    <!-- Root level is overridable via DC3_LOG_LEVEL env var (defaults to INFO) -->
+    <root level="${DC3_LOG_LEVEL:-INFO}">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>

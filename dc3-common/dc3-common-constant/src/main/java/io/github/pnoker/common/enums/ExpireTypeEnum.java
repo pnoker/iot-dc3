@@ -127,7 +127,7 @@ public enum ExpireTypeEnum {
     public static ExpireTypeEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

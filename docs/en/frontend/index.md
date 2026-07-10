@@ -4,14 +4,15 @@ title: Frontend Development
 
 # Frontend Development
 
-The IoT DC3 frontend is built on **Vue 3 + TypeScript + Vite + Element Plus**. Source code lives in the `dc3-web/` directory.
+The IoT DC3 frontend is built on **Vue 3 + TypeScript + Vite + Element Plus**. Source code lives in the `dc3-web/`
+directory.
 
 ## Environment Setup
 
-| Tool      | Minimum Version | Notes                                    |
-|-----------|-----------------|------------------------------------------|
-| Node.js   | 20 LTS          | Use fnm / nvm to manage versions         |
-| pnpm      | 9+              | Package manager, version locked in `packageManager` field |
+| Tool    | Minimum Version | Notes                                                     |
+|---------|-----------------|-----------------------------------------------------------|
+| Node.js | 20 LTS          | Use fnm / nvm to manage versions                          |
+| pnpm    | 9+              | Package manager, version locked in `packageManager` field |
 
 ```bash
 # Install pnpm (if not already)
@@ -42,7 +43,8 @@ Once the dev server is running:
 - To change the backend address: edit the proxy config in `vite.config.ts`
 
 ::: tip Backend dependency
-Frontend development requires backend services to be running. At minimum, you need the gateway `dc3-gateway` (port 8000). Start the full stack with docker-compose:
+Frontend development requires backend services to be running. At minimum, you need the gateway `dc3-gateway` (port
+8000). Start the full stack with docker-compose:
 
 ```bash
 # From the repo root
@@ -99,19 +101,20 @@ The full chain for adding a new menu item:
 Write to dc3_menu table -> Register frontend route -> i18n translation -> Bind permission point
 ```
 
-All four layers must be updated; missing any one breaks the menu. See the [Contributing Guide](../community/contributing).
+All four layers must be updated; missing any one breaks the menu. See
+the [Contributing Guide](../community/contributing).
 
 ## Common Commands
 
-| Command            | Description                              |
-|--------------------|------------------------------------------|
-| `pnpm dev`         | Start dev server                         |
-| `pnpm build`       | Production build                         |
-| `pnpm preview`     | Preview production build                 |
-| `pnpm test`        | Run unit tests                           |
-| `pnpm test:e2e`    | Run E2E tests (Playwright)               |
-| `pnpm lint`        | ESLint check                             |
-| `pnpm type-check`  | TypeScript type check                    |
+| Command           | Description                |
+|-------------------|----------------------------|
+| `pnpm dev`        | Start dev server           |
+| `pnpm build`      | Production build           |
+| `pnpm preview`    | Preview production build   |
+| `pnpm test`       | Run unit tests             |
+| `pnpm test:e2e`   | Run E2E tests (Playwright) |
+| `pnpm lint`       | ESLint check               |
+| `pnpm type-check` | TypeScript type check      |
 
 ## Testing
 

@@ -38,6 +38,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class PointValueDeadReceiver {
 
+    /**
+     * Consume a point value dead-letter message (TTL-expired) and log it for diagnostics;
+     * no record is updated, the message is simply acknowledged.
+     *
+     * @param channel the RabbitMQ channel for manual ack
+     * @param message the dead-letter message
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{pointValueDeadQueue.name}")
     public void onDeadPointValue(Channel channel, Message message) {

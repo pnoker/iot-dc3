@@ -67,7 +67,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author pnoker
  * @version 2026.5.22
- * @since 2026.6.2
+ * @since 2026.5.22
  */
 @Slf4j
 @Service
@@ -425,7 +425,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         String value = getConfigValue(config, code, String.valueOf(defaultValue));
         try {
             return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             log.warn("Failed to parse int config value for code={}, using default={}", code, defaultValue);
             return defaultValue;
         }

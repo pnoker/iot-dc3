@@ -21,4 +21,3 @@ minimumReleaseAgeExclude:
   - '@typescript-eslint/visitor-keys@8.62.0'
   - axios@1.18.1
   - globals@17.7.0
-  - prettier@3.9.1

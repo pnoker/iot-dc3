@@ -19,20 +19,13 @@ syntax = "proto3";
 
 package api.common.driver;
 
+import public "api/common/query.proto";
+
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.common.driver";
 option java_outer_classname = "DriverQueryProto";
 option objc_class_prefix = "Driver";
 option java_multiple_files = true;
-
-// Driver query structure used to query driver-related information
-message GrpcDriverQuery {
-  // Identifier of the specific driver instance
-  int64 driver_id = 1;
-
-  // Identifies the tenant
-  int64 tenant_id = 2;
-}
 
 // Device query structure used to query device-related information
 message GrpcDeviceQuery {

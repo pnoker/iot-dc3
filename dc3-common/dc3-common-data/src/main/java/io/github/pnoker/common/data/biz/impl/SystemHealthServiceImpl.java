@@ -114,11 +114,11 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         try {
             return future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS) ? DataConstant.Health.STATUS_UP
                     : DataConstant.Health.STATUS_DOWN;
-        } catch (TimeoutException e) {
+        } catch (TimeoutException ignored) {
             future.cancel(true);
             log.debug("Probe timed out after {}ms", PROBE_TIMEOUT_MS);
             return DataConstant.Health.STATUS_DOWN;
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
             return DataConstant.Health.STATUS_DOWN;
         } catch (ExecutionException e) {
@@ -137,6 +137,12 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         return vo;
     }
 
+    /**
+     * Probe the reachability of each center service: data is up by definition (this code
+     * runs there), auth and manager are probed through their facades with a timeout.
+     *
+     * @return map from center name to its up/down status code
+     */
     private Map<String, String> probeCenter() {
         Map<String, String> out = new LinkedHashMap<>();
         out.put(CENTER_AUTH, probe(() -> Objects.nonNull(tenantFacade.getByCode(DefaultFlagEnum.DEFAULT.getCode()))));
@@ -148,6 +154,13 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         return out;
     }
 
+    /**
+     * Probe the reachability of infrastructure dependencies: database via a test
+     * connection, message queue via a test connection, gateway by inference (the request
+     * reached this server through it).
+     *
+     * @return map from infra name to its up/down status code
+     */
     private Map<String, String> probeInfra() {
         Map<String, String> out = new LinkedHashMap<>();
         out.put(INFRA_DATABASE, probe(() -> {
@@ -164,6 +177,14 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         return out;
     }
 
+    /**
+     * Summarize the driver fleet for a tenant: total count and how many are currently
+     * online. The driver page is fetched asynchronously with a timeout, then each
+     * driver's entity state is checked against its lease expiry.
+     *
+     * @param tenantId tenant scope
+     * @return fleet summary with total and online driver counts
+     */
     private SystemHealthVO.FleetSummary summariseDrivers(Long tenantId) {
         SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
         CompletableFuture<List<FacadeDriverBO>> future = CompletableFuture.supplyAsync(() -> {
@@ -203,6 +224,13 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         return summary;
     }
 
+    /**
+     * Summarize the device fleet for a tenant: total count and how many are currently
+     * online. Structured like {@link #summariseDrivers} but scoped to devices.
+     *
+     * @param tenantId tenant scope
+     * @return fleet summary with total and online device counts
+     */
     private SystemHealthVO.FleetSummary summariseDevices(Long tenantId) {
         SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
         CompletableFuture<List<FacadeDeviceBO>> future = CompletableFuture.supplyAsync(() -> {

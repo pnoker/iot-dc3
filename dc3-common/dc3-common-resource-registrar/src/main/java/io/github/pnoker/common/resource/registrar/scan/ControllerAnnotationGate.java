@@ -56,6 +56,13 @@ public class ControllerAnnotationGate {
         return false;
     }
 
+    /**
+     * Scan a base package for {@code @RestController} classes and validate each handler
+     * method's API annotations, aggregating all defects.
+     *
+     * @param basePackage the package to scan
+     * @return the aggregated list of defects
+     */
     public List<String> validatePackage(String basePackage) {
         List<String> defects = new ArrayList<>();
         ClassPathScanningCandidateComponentProvider scanner =
@@ -65,7 +72,7 @@ public class ControllerAnnotationGate {
             Class<?> controller;
             try {
                 controller = Class.forName(bean.getBeanClassName());
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException ignored) {
                 defects.add(bean.getBeanClassName() + ": cannot load controller class");
                 return;
             }

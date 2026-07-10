@@ -39,19 +39,21 @@ import java.util.Set;
 @Component
 public class TenantLineHandlerImpl implements TenantLineHandler {
 
-    /** Tables without a tenant_id column — interceptor must NOT inject for these. */
+    /**
+     * Tables without a tenant_id column — interceptor must NOT inject for these.
+     */
     private static final Set<String> IGNORE_TABLES = Set.of(
-        "dc3_tenant",
-        "dc3_principal",
-        "dc3_user",
-        "dc3_local_credential",
-        "dc3_external_identity",
-        "dc3_resource",
-        "dc3_role_resource_bind",
-        "dc3_api",
-        "dc3_mcp_tool_catalog",
-        "dc3_mcp_connection_tool",
-        "dc3_menu"
+            "dc3_tenant",
+            "dc3_principal",
+            "dc3_user",
+            "dc3_local_credential",
+            "dc3_external_identity",
+            "dc3_resource",
+            "dc3_role_resource_bind",
+            "dc3_api",
+            "dc3_mcp_tool_catalog",
+            "dc3_mcp_connection_tool",
+            "dc3_menu"
     );
 
     @Override
@@ -60,8 +62,8 @@ public class TenantLineHandlerImpl implements TenantLineHandler {
         if (tenantId == null) {
             // isIgnored() paths are routed through ignoreTable (returns true) and never reach here.
             throw new TenantNotScopedException(
-                "Tenant-scoped query executed without tenant id on thread; "
-                + "wrap cross-tenant/tenant-free work in TenantContextHolder.runIgnore/runIgnoreAction");
+                    "Tenant-scoped query executed without tenant id on thread; "
+                            + "wrap cross-tenant/tenant-free work in TenantContextHolder.runIgnore/runIgnoreAction");
         }
         return new LongValue(tenantId);
     }

@@ -186,8 +186,10 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     /**
-     * @param entityQuery {@link ProfileQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for profile search.
+     *
+     * @param entityQuery {@link ProfileQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link ProfileDO}
      */
     private LambdaQueryWrapper<ProfileDO> fuzzyQuery(ProfileQuery entityQuery) {
         QueryWrapper<ProfileDO> wrapper = Wrappers.query();
@@ -222,9 +224,12 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     /**
-     * @param entityBO {@link ProfileBO}
-     * @param isUpdate
-     * @return
+     * Check whether a profile is duplicated by profile name and type. Returns
+     * {@code false} when the profile name is blank.
+     *
+     * @param entityBO {@link ProfileBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(ProfileBO entityBO, boolean isUpdate) {
         if (StringUtils.isEmpty(entityBO.getProfileName())) {
@@ -264,11 +269,12 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     /**
-     * Primary key ID
+     * Get profile data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link ProfileDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link ProfileDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private ProfileDO getDOById(Long id, boolean throwException) {
         ProfileDO entityDO = profileManager.getById(id);

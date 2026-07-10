@@ -55,6 +55,13 @@ public class AgenticPromptBuilder {
         this.toolCallAdvisor = toolCallAdvisor;
     }
 
+    /**
+     * Build the Spring AI prompt spec for a prepared chat: user message, tool context,
+     * memory advisor, system prompt, tool callbacks, and request options.
+     *
+     * @param prepared the prepared chat
+     * @return the assembled prompt spec
+     */
     public ChatClient.ChatClientRequestSpec build(AgenticPreparedChatBO prepared) {
         ChatClient chatClient = chatClientFactory.getOrCreate(prepared.model());
         ChatClient.ChatClientRequestSpec promptSpec = chatClient.prompt()
@@ -85,6 +92,13 @@ public class AgenticPromptBuilder {
         return Objects.nonNull(optionsBuilder) ? promptSpec.options(optionsBuilder) : promptSpec;
     }
 
+    /**
+     * Assemble the system prompt from the base prompt, the tool prompt (when tool
+     * calling is enabled), and the request-specific context.
+     *
+     * @param prepared the prepared chat
+     * @return the joined system prompt
+     */
     public String buildSystemPrompt(AgenticPreparedChatBO prepared) {
         List<String> sections = new ArrayList<>();
         sections.add(ChatClientConfig.BASE_SYSTEM_PROMPT);

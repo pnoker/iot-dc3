@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -28,7 +29,7 @@
     @refresh="load"
   >
     <template #tools>
-      <el-segmented v-model="daysKey" :options="daysOptions" size="small" />
+      <el-segmented v-model="daysKey" :options="daysOptions" size="small"/>
     </template>
 
     <el-timeline class="change-impact__timeline">
@@ -49,92 +50,92 @@
 </template>
 
 <script lang="ts" setup>
-  import {onMounted, ref, watch} from 'vue';
-  import {useI18n} from 'vue-i18n';
-  import {useRouter} from 'vue-router';
+import {onMounted, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
+import {useRouter} from 'vue-router';
 
-  import {alertChangeImpact} from '@/api/dashboard';
-  import type {ChangeImpact} from '@/config/types/dashboard';
-  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-  import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
-  import {useEntityNames} from '@/composables/useEntityNames';
-  import {resolveDashboardColour} from '@/config/constant/palette';
-  import {jumpToEntity} from '@/utils/jumpUtil';
-  import {formatDateTime} from '@/utils/timeUtil';
+import {alertChangeImpact} from '@/api/dashboard';
+import type {ChangeImpact} from '@/config/types/dashboard';
+import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {useEntityNames} from '@/composables/useEntityNames';
+import {resolveDashboardColour} from '@/config/constant/palette';
+import {jumpToEntity} from '@/utils/jumpUtil';
+import {formatDateTime} from '@/utils/timeUtil';
 
-  const {t} = useI18n();
-  const router = useRouter();
-  const {loading, run} = useAsyncLoader();
-  const {resolveDevices, resolveDrivers, resolveProfiles, deviceName, driverName, profileName} = useEntityNames();
+const {t} = useI18n();
+const router = useRouter();
+const {loading, run} = useAsyncLoader();
+const {resolveDevices, resolveDrivers, resolveProfiles, deviceName, driverName, profileName} = useEntityNames();
 
-  const daysOptions = [
-    {label: '1d', value: '1'},
-    {label: '7d', value: '7'},
-    {label: '30d', value: '30'},
-  ];
-  const daysKey = ref<string>('7');
+const daysOptions = [
+  {label: '1d', value: '1'},
+  {label: '7d', value: '7'},
+  {label: '30d', value: '30'},
+];
+const daysKey = ref<string>('7');
 
-  const rows = ref<ChangeImpact[]>([]);
+const rows = ref<ChangeImpact[]>([]);
 
-  const load = () =>
-    run(async () => {
-      const res: {data?: ChangeImpact[]} = await alertChangeImpact(Number(daysKey.value), 30);
-      rows.value = res?.data ?? [];
-      // Each entityId goes through its kind-specific batch endpoint.
-      await Promise.all([
-        resolveDrivers(rows.value.filter((r) => r.kind === 'driver').map((r) => r.entityId)),
-        resolveDevices(rows.value.filter((r) => r.kind === 'device').map((r) => r.entityId)),
-        resolveProfiles(rows.value.filter((r) => r.kind === 'profile').map((r) => r.entityId)),
-      ]);
-    });
+const load = () =>
+  run(async () => {
+    const res: { data?: ChangeImpact[] } = await alertChangeImpact(Number(daysKey.value), 30);
+    rows.value = res?.data ?? [];
+    // Each entityId goes through its kind-specific batch endpoint.
+    await Promise.all([
+      resolveDrivers(rows.value.filter((r) => r.kind === 'driver').map((r) => r.entityId)),
+      resolveDevices(rows.value.filter((r) => r.kind === 'device').map((r) => r.entityId)),
+      resolveProfiles(rows.value.filter((r) => r.kind === 'profile').map((r) => r.entityId)),
+    ]);
+  });
 
-  watch(daysKey, load);
-  onMounted(load);
+watch(daysKey, load);
+onMounted(load);
 
-  const entityName = (r: ChangeImpact) => {
-    if (r.kind === 'driver') return driverName(r.entityId);
-    if (r.kind === 'device') return deviceName(r.entityId);
-    return profileName(r.entityId);
-  };
+const entityName = (r: ChangeImpact) => {
+  if (r.kind === 'driver') return driverName(r.entityId);
+  if (r.kind === 'device') return deviceName(r.entityId);
+  return profileName(r.entityId);
+};
 
-  const kindLabel = (k: string) => {
-    if (k === 'driver') return t('settings.event.overview.kindDriver');
-    if (k === 'device') return t('settings.event.overview.kindDevice');
-    return t('settings.event.overview.kindProfile');
-  };
+const kindLabel = (k: string) => {
+  if (k === 'driver') return t('settings.event.overview.kindDriver');
+  if (k === 'device') return t('settings.event.overview.kindDevice');
+  return t('settings.event.overview.kindProfile');
+};
 
-  const tagTypeFor = (k: string): 'primary' | 'warning' | 'success' | 'info' => {
-    if (k === 'driver') return 'info';
-    if (k === 'device') return 'primary';
-    return 'warning';
-  };
+const tagTypeFor = (k: string): 'primary' | 'warning' | 'success' | 'info' => {
+  if (k === 'driver') return 'info';
+  if (k === 'device') return 'primary';
+  return 'warning';
+};
 
-  const onJump = (r: ChangeImpact) => jumpToEntity(router, r.kind, r.entityId);
+const onJump = (r: ChangeImpact) => jumpToEntity(router, r.kind, r.entityId);
 
-  defineExpose({refresh: load});
+defineExpose({refresh: load});
 </script>
 
 <style lang="scss" scoped>
-  .change-impact {
-    .change-impact__timeline {
-      padding: 12px 16px 0;
-    }
+.change-impact {
+  .change-impact__timeline {
+    padding: 12px 16px 0;
+  }
 
-    .change-impact__row {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
+  .change-impact__row {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
 
-      &:hover .change-impact__name {
-        color: #409eff;
-      }
-    }
-
-    .change-impact__name {
-      font-size: 13px;
-      color: #303133;
-      font-weight: 500;
+    &:hover .change-impact__name {
+      color: #409eff;
     }
   }
+
+  .change-impact__name {
+    font-size: 13px;
+    color: #303133;
+    font-weight: 500;
+  }
+}
 </style>

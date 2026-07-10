@@ -48,7 +48,7 @@ public class RegexUtil {
         try {
             new BigDecimal(content);
             return true;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             return false;
         }
     }

@@ -65,16 +65,6 @@
         <developerConnection>scm:git:https://github.com/pnoker/iot-dc3.git</developerConnection>
     </scm>
 
-    <properties>
-        <!-- Test execution toggles (consumed by surefire/failsafe) -->
-        <skip.unit.tests>false</skip.unit.tests>
-        <skip.integration.tests>false</skip.integration.tests>
-        <mockito.version>5.20.0</mockito.version>
-        <mockito.javaagent.argLine>
-            -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
-        </mockito.javaagent.argLine>
-    </properties>
-
     <modules>
         <module>dc3-api-auth</module>
         <module>dc3-api-data</module>
@@ -119,90 +109,6 @@
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${surefire.version}</version>
-                <configuration>
-                    <skip>${skip.unit.tests}</skip>
-                    <argLine>@{argLine} ${mockito.javaagent.argLine} -Xshare:off -Duser.language=en -Duser.country=US
-                    </argLine>
-                    <includes>
-                        <include>**/*Test.java</include>
-                        <include>**/*Tests.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                        <exclude>**/Abstract*.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${surefire.version}</version>
-                <configuration>
-                    <skip>${skip.integration.tests}</skip>
-                    <argLine>@{failsafe.argLine} ${mockito.javaagent.argLine} -Xshare:off -Duser.language=en
-                        -Duser.country=US
-                    </argLine>
-                    <includes>
-                        <include>**/*IT.java</include>
-                    </includes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>integration-tests</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-                <executions>
-                    <execution>
-                        <id>prepare-unit-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>argLine</propertyName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>prepare-integration-agent</id>
-                        <goals>
-                            <goal>prepare-agent-integration</goal>
-                        </goals>
-                        <configuration>
-                            <propertyName>failsafe.argLine</propertyName>
-                            <destFile>${project.build.directory}/jacoco-it.exec</destFile>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>report-unit</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report-integration</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>report-integration</goal>
-                        </goals>
-                        <configuration>
-                            <dataFile>${project.build.directory}/jacoco-it.exec</dataFile>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

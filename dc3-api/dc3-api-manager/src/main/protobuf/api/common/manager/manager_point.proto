@@ -1,0 +1,78 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package api.common.manager;
+
+import "api/common/page.proto";
+import "api/common/r.proto";
+import "api/common/entity.proto";
+import "api/common/manager/manager_query.proto";
+import "api/common/manager/manager_query_page.proto";
+
+// Configuration options for code generation
+option java_package = "io.github.pnoker.api.center.manager";
+option java_outer_classname = "ManagerPointProto";
+option objc_class_prefix = "Manager";
+option java_multiple_files = true;
+
+// Service interface defining RPC calls related to point management
+service PointApi {
+  // Paginated query for point information
+  rpc ListByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
+  // Query single point information by point ID
+  rpc GetById (GrpcPointQuery) returns (GrpcRPointDTO);
+  // Batch query point information by point IDs
+  rpc ListByIds (GrpcPointIdsQuery) returns (GrpcRPointListDTO);
+}
+
+// Response wrapper for paginated point query
+message GrpcRPagePointDTO {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Returned paginated point data
+  GrpcPagePointDTO data = 2;
+}
+
+// Point pagination data structure
+message GrpcPagePointDTO {
+  // Pagination information including page number, page size, and total count
+  GrpcPage page = 1;
+
+  // List of point data
+  repeated GrpcPointDTO data = 2;
+}
+
+// Response wrapper for point list query
+message GrpcRPointListDTO {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Returned point list data
+  repeated GrpcPointDTO data = 2;
+}
+
+// Response wrapper for single point query
+message GrpcRPointDTO {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Returned single point data
+  GrpcPointDTO data = 2;
+}

@@ -15,4 +15,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-io.github.pnoker.common.annotation.LogsAspect
+# No auto-configurations are registered here. The former LogsAspect (dead code,
+# zero usages repository-wide) was removed; this module now only contributes the
+# shared logback.xml configuration and the logstash-logback-encoder dependency.

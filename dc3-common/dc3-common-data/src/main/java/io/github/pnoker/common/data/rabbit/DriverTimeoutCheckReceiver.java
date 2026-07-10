@@ -70,6 +70,15 @@ public class DriverTimeoutCheckReceiver {
         return Objects.equals(stateFlag, status.getIndex());
     }
 
+    /**
+     * Consume a driver timeout check and, after re-verifying the lease version and
+     * expiry to avoid racing a newer heartbeat, marks an expired driver offline and
+     * raises a driver alarm.
+     *
+     * @param channel the RabbitMQ channel for manual ack
+     * @param message the raw message carrying the delivery tag
+     * @param dto     the driver timeout check carrying tenant, driver id, and lease version
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{driverTimeoutCheckQueue.name}")
     public void driverTimeoutCheck(Channel channel, Message message, DriverTimeoutCheckDTO dto) {

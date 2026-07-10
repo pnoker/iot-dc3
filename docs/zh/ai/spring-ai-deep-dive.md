@@ -5,7 +5,8 @@ title: "为什么选择 Spring AI：DC3 如何让大模型操控你的工厂"
 # 为什么选择 Spring AI：DC3 如何让大模型操控你的工厂
 
 2025 年，大语言模型（LLM）不再只是聊天机器人，它们正在成为运维操作员。GPT-4o、Claude 4、DeepSeek、Qwen —
-这些模型已经能够读取传感器数据、推理设备状态，并判断是否需要开启某个阀门。唯一的缺失环节，是"模型理解"与"模型执行"之间的桥梁。这座桥梁就是 Spring AI，也是 IoT DC3 选择它作为 Agentic Center 基座的根本原因。
+这些模型已经能够读取传感器数据、推理设备状态，并判断是否需要开启某个阀门。唯一的缺失环节，是"模型理解"与"模型执行"
+之间的桥梁。这座桥梁就是 Spring AI，也是 IoT DC3 选择它作为 Agentic Center 基座的根本原因。
 
 ## 问题所在：AI 想行动，平台说不行
 
@@ -33,11 +34,11 @@ title: "为什么选择 Spring AI：DC3 如何让大模型操控你的工厂"
 
 团队在选定 Spring AI 之前，评估了三种方案：
 
-| 方案 | 优势 | 劣势 | 结论 |
-|------|------|------|------|
-| **LangChain (Python)** | 生态庞大，原型开发快 | Python/JVM 互操作开销、独立部署、安全边界模糊 | 对 JVM 原生平台过于沉重 |
-| **自研 @Tool 框架** | 完全掌控，零依赖 | 数月工程投入，长期维护负担，无社区支撑 | 重复造轮子 |
-| **Spring AI** | 原生 JVM、Spring Boot 深度集成、OpenAI 兼容、类型安全的工具定义 | 生态较新（2024+） | ✅ 最佳选择 |
+| 方案                     | 优势                                          | 劣势                           | 结论             |
+|------------------------|---------------------------------------------|------------------------------|----------------|
+| **LangChain (Python)** | 生态庞大，原型开发快                                  | Python/JVM 互操作开销、独立部署、安全边界模糊 | 对 JVM 原生平台过于沉重 |
+| **自研 @Tool 框架**        | 完全掌控，零依赖                                    | 数月工程投入，长期维护负担，无社区支撑          | 重复造轮子          |
+| **Spring AI**          | 原生 JVM、Spring Boot 深度集成、OpenAI 兼容、类型安全的工具定义 | 生态较新（2024+）                  | ✅ 最佳选择         |
 
 Spring AI 在三个决定性维度上胜出：
 
@@ -157,18 +158,18 @@ sequenceDiagram
 Agentic Center 出厂自带 10 个工具类，覆盖平台每个领域对象。每个工具方法包装已有的服务层方法——
 不存在重复的业务逻辑。
 
-| 工具类 | 领域 | 关键方法 | 风险等级 |
-|--------|------|----------|----------|
-| `TenantTool` | 租户 | `getCurrentTenantInfo()` | 低 |
-| `UserTool` | 用户 | `getCurrentUserProfile()` | 低 |
-| `DeviceTool` | 设备 | `lookupDeviceById()`, `searchDevices()` | 低 |
-| `DriverTool` | 驱动 | `lookupDriverById()`, `searchDrivers()` | 低 |
-| `ProfileTool` | 模板 | `lookupProfileById()`, `searchProfiles()` | 低 |
-| `PointTool` | 位号 | `lookupPointById()`, `searchPoints()` | 低 |
+| 工具类              | 领域  | 关键方法                                                                                       | 风险等级       |
+|------------------|-----|--------------------------------------------------------------------------------------------|------------|
+| `TenantTool`     | 租户  | `getCurrentTenantInfo()`                                                                   | 低          |
+| `UserTool`       | 用户  | `getCurrentUserProfile()`                                                                  | 低          |
+| `DeviceTool`     | 设备  | `lookupDeviceById()`, `searchDevices()`                                                    | 低          |
+| `DriverTool`     | 驱动  | `lookupDriverById()`, `searchDrivers()`                                                    | 低          |
+| `ProfileTool`    | 模板  | `lookupProfileById()`, `searchProfiles()`                                                  | 低          |
+| `PointTool`      | 位号  | `lookupPointById()`, `searchPoints()`                                                      | 低          |
 | `PointValueTool` | 位号值 | `getLatestPointValue()`, `getPointValueHistory()`, `readPointValue()`, `writePointValue()` | **高 (写入)** |
-| `SystemTool` | 系统 | `getSystemHealth()` | 低 |
-| `CommandTool` | 指令 | `lookupCommandById()`, `searchCommands()` | 低 |
-| `EventTool` | 事件 | `lookupEventById()`, `searchEvents()` | 低 |
+| `SystemTool`     | 系统  | `getSystemHealth()`                                                                        | 低          |
+| `CommandTool`    | 指令  | `lookupCommandById()`, `searchCommands()`                                                  | 低          |
+| `EventTool`      | 事件  | `lookupEventById()`, `searchEvents()`                                                      | 低          |
 
 工具方法刻意使用与 REST/gRPC 层不同的命名规范。REST 端点遵循项目的 `getXxx`/`listXxx` 约定；
 工具方法使用 `lookupXxx`/`searchXxx`。这种分离让模型能够区分"按 ID 获取一个"

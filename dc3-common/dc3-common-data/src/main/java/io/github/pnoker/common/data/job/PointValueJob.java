@@ -62,9 +62,9 @@ public class PointValueJob extends QuartzJobBean {
     private final ExecutorService virtualThreadExecutor;
 
     /**
-     * PointValue
+     * Return the number of point values currently buffered, awaiting the next batch flush.
      *
-     * @return Point Value Size
+     * @return the buffered point value count
      */
     public static int getPointValuesSize() {
         VALUE_LOCK.readLock().lock();
@@ -76,7 +76,7 @@ public class PointValueJob extends QuartzJobBean {
     }
 
     /**
-     * PointValue
+     * Clear all buffered point values without flushing them to the repository.
      */
     public static void clearPointValues() {
         VALUE_LOCK.writeLock().lock();
@@ -88,9 +88,9 @@ public class PointValueJob extends QuartzJobBean {
     }
 
     /**
-     * PointValue
+     * Append a single point value to the in-memory batch buffer.
      *
-     * @param pointValueBO PointValue
+     * @param pointValueBO the point value to buffer
      */
     public static void addPointValues(PointValueBO pointValueBO) {
         VALUE_LOCK.writeLock().lock();
@@ -101,18 +101,36 @@ public class PointValueJob extends QuartzJobBean {
         }
     }
 
+    /**
+     * Increment the received-point-value counter, sampled each batch tick to derive the
+     * receive speed.
+     */
     public static void recordPointValue() {
         VALUE_COUNT.getAndIncrement();
     }
 
+    /**
+     * Return the cumulative count of point values received since the last reset.
+     *
+     * @return the received point value count
+     */
     public static long getValueCount() {
         return VALUE_COUNT.get();
     }
 
+    /**
+     * Return the point value receive speed (values per second) computed at the last batch
+     * tick.
+     *
+     * @return the receive speed in values per second
+     */
     public static long getValueSpeed() {
         return VALUE_SPEED.get();
     }
 
+    /**
+     * Reset both the received-count and receive-speed counters to zero.
+     */
     public static void resetMetrics() {
         VALUE_COUNT.set(0);
         VALUE_SPEED.set(0);

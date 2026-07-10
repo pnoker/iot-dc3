@@ -33,8 +33,20 @@ import java.util.Set;
  */
 public interface CommandParamService extends BaseService<CommandParamBO, CommandParamQuery> {
 
+    /**
+     * Query command params belonging to a command.
+     *
+     * @param commandId Command ID
+     * @return CommandParamBO list
+     */
     List<CommandParamBO> listByCommandId(Long commandId);
 
+    /**
+     * Query command params by a set of param IDs.
+     *
+     * @param ids Param ID set
+     * @return CommandParamBO list
+     */
     List<CommandParamBO> listByIds(Set<Long> ids);
 
 }

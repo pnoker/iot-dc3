@@ -209,7 +209,7 @@ headers `X-Auth-Tenant` / `X-Auth-Login` / `X-Auth-Token`.
 curl -s -X POST http://127.0.0.1:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'
-# → returns a salt string valid for 5 minutes (example)
+# → returns a salt string (example; use within 5 minutes)
 
 # 2) Hash the password with the salt to exchange for a token (public), returning an access token valid for 12 hours
 curl -s -X POST http://127.0.0.1:8000/api/v3/auth/token/generate \

@@ -121,8 +121,10 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     /**
-     * @param entityQuery {@link NotifyQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for alarm notify search.
+     *
+     * @param entityQuery {@link NotifyQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link NotifyDO}
      */
     private LambdaQueryWrapper<NotifyDO> fuzzyQuery(NotifyQuery entityQuery) {
         LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
@@ -141,10 +143,12 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     /**
-     * @param entityBO       {@link NotifyBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
+     * Check whether an alarm notify is duplicated by notify name and code.
+     *
+     * @param entityBO       {@link NotifyBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(NotifyBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
@@ -163,11 +167,12 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     /**
-     * Primary key ID
+     * Get alarm notify data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link NotifyDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link NotifyDO} if found, otherwise {@code null} when {@code throwException}
+     * is false
      */
     private NotifyDO getDOById(Long id, boolean throwException) {
         NotifyDO entityDO = notifyManager.getById(id);

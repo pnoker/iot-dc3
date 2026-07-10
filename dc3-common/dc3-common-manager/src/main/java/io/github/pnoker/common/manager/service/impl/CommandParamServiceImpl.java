@@ -163,6 +163,12 @@ public class CommandParamServiceImpl implements CommandParamService {
         return commandParamBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * Build fuzzy query wrapper for command param search.
+     *
+     * @param entityQuery {@link CommandParamQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link CommandParamDO}
+     */
     private LambdaQueryWrapper<CommandParamDO> fuzzyQuery(CommandParamQuery entityQuery) {
         QueryWrapper<CommandParamDO> wrapper = Wrappers.query();
         wrapper.eq("deleted", 0);
@@ -225,7 +231,7 @@ public class CommandParamServiceImpl implements CommandParamService {
         CommandBO commandBO;
         try {
             commandBO = commandService.getById(commandId);
-        } catch (NotFoundException e) {
+        } catch (NotFoundException ignored) {
             return;
         }
         if (Objects.isNull(commandBO)) {

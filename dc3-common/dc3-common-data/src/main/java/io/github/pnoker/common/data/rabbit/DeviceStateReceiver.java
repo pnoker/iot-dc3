@@ -45,6 +45,14 @@ public class DeviceStateReceiver {
 
     private final DeviceStateService deviceStateService;
 
+    /**
+     * Consume a device state message and forward it as a heartbeat to the device state
+     * service.
+     *
+     * @param channel   the RabbitMQ channel for manual ack
+     * @param message   the raw message carrying the delivery tag
+     * @param entityDTO the deserialized device state
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{deviceStateQueue.name}")
     public void deviceStateReceive(Channel channel, Message message, DeviceStateDTO entityDTO) {
@@ -55,7 +63,9 @@ public class DeviceStateReceiver {
                     || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getTenantId())
                     || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeoutUnit())
                     || entityDTO.getTimeout() <= 0) {
-                log.error("Invalid device state: {}", entityDTO);
+                log.warn("Invalid device state, some required fields are null, deviceId={}, driverId={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

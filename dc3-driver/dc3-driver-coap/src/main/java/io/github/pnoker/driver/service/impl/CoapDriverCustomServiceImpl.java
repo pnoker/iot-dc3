@@ -78,7 +78,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public void initial() {
-        log.info("CoAP driver initialized");
+        log.info("CoAP driver initialized, protocol={}", driverCode);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
 
         CoapResult response = coapClientManager.get(uri, readPath);
         if (response == null || !response.isSuccess()) {
-            log.warn("CoAP read failed, uri={}, path={}, statusCode={}", uri, readPath,
+            log.error("CoAP read failed, protocol={}, uri={}, path={}, statusCode={}", driverCode, uri, readPath,
                     response != null ? response.getStatusCode() : "timeout");
             return null;
         }
@@ -139,7 +139,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
 
         CoapResult response = coapClientManager.put(uri, writePath, value);
         if (response == null || !response.isSuccess()) {
-            log.warn("CoAP write failed, uri={}, path={}, statusCode={}", uri, writePath,
+            log.error("CoAP write failed, protocol={}, uri={}, path={}, statusCode={}", driverCode, uri, writePath,
                     response != null ? response.getStatusCode() : "timeout");
             return false;
         }
@@ -166,7 +166,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
         }
         try {
             return attribute.getValue(Integer.class);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return defaultValue;
         }
     }

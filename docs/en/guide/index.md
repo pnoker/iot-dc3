@@ -105,7 +105,7 @@ the salt, then exchange the salted credential for a token. Every external reques
 gateway (default `8000`).
 
 ```bash
-# 1) Fetch the salt (valid for 5 minutes; the tenant/username below are example values)
+# 1) Fetch the salt (public endpoint; use within 5 minutes; the tenant/username below are example values)
 curl -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'

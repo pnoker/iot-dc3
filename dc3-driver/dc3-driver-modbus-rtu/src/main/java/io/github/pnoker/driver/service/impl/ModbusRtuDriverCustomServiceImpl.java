@@ -233,9 +233,9 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
             } catch (ModbusInitException e) {
                 try {
                     modbusMaster.destroy();
-                } catch (Exception destroyException) {
+                } catch (Exception e1) {
                     log.warn("Driver connection destroy failed after init error, protocol={}, deviceId={}, port={}", driverCode,
-                            deviceId, port, destroyException);
+                            deviceId, port, e1);
                 }
                 // Record failure for backoff
                 failureMap.compute(deviceId, (k, v) ->

@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -87,7 +88,7 @@
         drag
       >
         <el-icon class="el-upload__icon">
-          <UploadFilled />
+          <UploadFilled/>
         </el-icon>
         <div class="el-upload__text" v-html="$t('device.import.upload')"></div>
       </el-upload>
@@ -104,192 +105,192 @@
 </template>
 
 <script lang="ts" setup>
-  import {UploadFilled} from '@element-plus/icons-vue';
-  import type {
-    FormInstance,
-    FormRules,
-    UploadInstance,
-    UploadProps,
-    UploadRawFile,
-    UploadRequestOptions,
-  } from 'element-plus';
-  import {genFileId} from 'element-plus';
-  import {reactive, ref, unref} from 'vue';
-  import {useI18n} from 'vue-i18n';
+import {UploadFilled} from '@element-plus/icons-vue';
+import type {
+  FormInstance,
+  FormRules,
+  UploadInstance,
+  UploadProps,
+  UploadRawFile,
+  UploadRequestOptions,
+} from 'element-plus';
+import {genFileId} from 'element-plus';
+import {reactive, ref, unref} from 'vue';
+import {useI18n} from 'vue-i18n';
 
-  import type {Dictionary} from '@/config/types';
+import type {Dictionary} from '@/config/types';
 
-  import {listDriverDictionary, listProfileDictionary} from '@/api/dictionary';
-  import {successMessage} from '@/utils/notificationUtil';
+import {listDriverDictionary, listProfileDictionary} from '@/api/dictionary';
+import {successMessage} from '@/utils/notificationUtil';
 
-  interface DictionaryPage {
-    records: Dictionary[];
+interface DictionaryPage {
+  records: Dictionary[];
+}
+
+interface DeviceImportFormData {
+  driverId: string;
+  profileId: string;
+  file?: UploadRawFile;
+}
+
+type DictionaryResponse = R<DictionaryPage>;
+
+const emit = defineEmits<{
+  (e: 'import-template', formData: DeviceImportFormData, done: () => void): void;
+  (e: 'import', formData: DeviceImportFormData, done: () => void): void;
+}>();
+
+const {t} = useI18n();
+const formDataRef = ref<FormInstance>();
+const formUploadRef = ref<UploadInstance>();
+
+const reactiveData = reactive({
+  formData: {
+    driverId: '',
+    profileId: '',
+  } as DeviceImportFormData,
+  formVisible: false,
+  formLoading: false,
+  driverDictionary: [] as Dictionary[],
+  driverLoading: false,
+  profileDictionary: [] as Dictionary[],
+  profileLoading: false,
+});
+
+const formRule = reactive<FormRules>({
+  driverId: [
+    {
+      required: true,
+      message: () => t('device.add.driverRequired'),
+      trigger: 'change',
+    },
+  ],
+  profileId: [
+    {
+      required: true,
+      message: () => t('device.add.profileRequired'),
+      trigger: 'change',
+    },
+  ],
+});
+
+const driverDictionary = async (query = '') => {
+  reactiveData.driverLoading = true;
+  try {
+    const res = await listDriverDictionary<DictionaryResponse>({
+      page: {size: 50, current: 1},
+      label: query,
+    });
+    reactiveData.driverDictionary = res.data.records ?? [];
+  } catch {
+    // nothing to do
+  } finally {
+    reactiveData.driverLoading = false;
+  }
+};
+
+const driverDictionaryVisible = (visible: boolean) => {
+  if (visible) {
+    void driverDictionary();
+  }
+};
+
+const profileDictionary = async (query = '') => {
+  reactiveData.profileLoading = true;
+  try {
+    const res = await listProfileDictionary<DictionaryResponse>({
+      page: {size: 50, current: 1},
+      label: query,
+    });
+    reactiveData.profileDictionary = res.data.records ?? [];
+  } catch {
+    // nothing to do
+  } finally {
+    reactiveData.profileLoading = false;
+  }
+};
+
+const profileDictionaryVisible = (visible: boolean) => {
+  if (visible) {
+    void profileDictionary();
+  }
+};
+
+const show = () => {
+  reactiveData.formVisible = true;
+  reactiveData.formLoading = false;
+};
+
+const cancel = () => {
+  reactiveData.formVisible = false;
+  reactiveData.formLoading = false;
+};
+
+const reset = () => {
+  const form = unref(formDataRef);
+  form?.resetFields();
+  formUploadRef.value?.clearFiles();
+};
+
+const importTemplate = async () => {
+  const form = unref(formDataRef);
+  if (!form) {
+    return;
   }
 
-  interface DeviceImportFormData {
-    driverId: string;
-    profileId: string;
-    file?: UploadRawFile;
+  try {
+    await form.validate();
+    emit('import-template', {...reactiveData.formData}, () => {
+      successMessage(t('device.import.templateSuccess'));
+    });
+  } catch {
+    // validation errors are displayed by Element Plus
+  }
+};
+
+const uploadRequest = (param: UploadRequestOptions): Promise<unknown> => {
+  emit(
+    'import',
+    {
+      ...reactiveData.formData,
+      file: param.file as UploadRawFile,
+    },
+    () => {
+      cancel();
+      reset();
+      successMessage(t('device.import.importSuccess'));
+    }
+  );
+  return Promise.resolve();
+};
+
+const importThing = async () => {
+  const form = unref(formDataRef);
+  if (!form) {
+    return;
   }
 
-  type DictionaryResponse = R<DictionaryPage>;
+  try {
+    await form.validate();
+    formUploadRef.value?.submit();
+    reactiveData.formLoading = true;
+  } catch {
+    // validation errors are displayed by Element Plus
+  }
+};
 
-  const emit = defineEmits<{
-    (e: 'import-template', formData: DeviceImportFormData, done: () => void): void;
-    (e: 'import', formData: DeviceImportFormData, done: () => void): void;
-  }>();
+const handleExceed: UploadProps['onExceed'] = (files) => {
+  formUploadRef.value?.clearFiles();
+  const file = files[0] as UploadRawFile;
+  file.uid = genFileId();
+  formUploadRef.value?.handleStart(file);
+};
 
-  const {t} = useI18n();
-  const formDataRef = ref<FormInstance>();
-  const formUploadRef = ref<UploadInstance>();
-
-  const reactiveData = reactive({
-    formData: {
-      driverId: '',
-      profileId: '',
-    } as DeviceImportFormData,
-    formVisible: false,
-    formLoading: false,
-    driverDictionary: [] as Dictionary[],
-    driverLoading: false,
-    profileDictionary: [] as Dictionary[],
-    profileLoading: false,
-  });
-
-  const formRule = reactive<FormRules>({
-    driverId: [
-      {
-        required: true,
-        message: () => t('device.add.driverRequired'),
-        trigger: 'change',
-      },
-    ],
-    profileId: [
-      {
-        required: true,
-        message: () => t('device.add.profileRequired'),
-        trigger: 'change',
-      },
-    ],
-  });
-
-  const driverDictionary = async (query = '') => {
-    reactiveData.driverLoading = true;
-    try {
-      const res = await listDriverDictionary<DictionaryResponse>({
-        page: {size: 50, current: 1},
-        label: query,
-      });
-      reactiveData.driverDictionary = res.data.records ?? [];
-    } catch {
-      // nothing to do
-    } finally {
-      reactiveData.driverLoading = false;
-    }
-  };
-
-  const driverDictionaryVisible = (visible: boolean) => {
-    if (visible) {
-      void driverDictionary();
-    }
-  };
-
-  const profileDictionary = async (query = '') => {
-    reactiveData.profileLoading = true;
-    try {
-      const res = await listProfileDictionary<DictionaryResponse>({
-        page: {size: 50, current: 1},
-        label: query,
-      });
-      reactiveData.profileDictionary = res.data.records ?? [];
-    } catch {
-      // nothing to do
-    } finally {
-      reactiveData.profileLoading = false;
-    }
-  };
-
-  const profileDictionaryVisible = (visible: boolean) => {
-    if (visible) {
-      void profileDictionary();
-    }
-  };
-
-  const show = () => {
-    reactiveData.formVisible = true;
-    reactiveData.formLoading = false;
-  };
-
-  const cancel = () => {
-    reactiveData.formVisible = false;
-    reactiveData.formLoading = false;
-  };
-
-  const reset = () => {
-    const form = unref(formDataRef);
-    form?.resetFields();
-    formUploadRef.value?.clearFiles();
-  };
-
-  const importTemplate = async () => {
-    const form = unref(formDataRef);
-    if (!form) {
-      return;
-    }
-
-    try {
-      await form.validate();
-      emit('import-template', {...reactiveData.formData}, () => {
-        successMessage(t('device.import.templateSuccess'));
-      });
-    } catch {
-      // validation errors are displayed by Element Plus
-    }
-  };
-
-  const uploadRequest = (param: UploadRequestOptions): Promise<unknown> => {
-    emit(
-      'import',
-      {
-        ...reactiveData.formData,
-        file: param.file as UploadRawFile,
-      },
-      () => {
-        cancel();
-        reset();
-        successMessage(t('device.import.importSuccess'));
-      }
-    );
-    return Promise.resolve();
-  };
-
-  const importThing = async () => {
-    const form = unref(formDataRef);
-    if (!form) {
-      return;
-    }
-
-    try {
-      await form.validate();
-      formUploadRef.value?.submit();
-      reactiveData.formLoading = true;
-    } catch {
-      // validation errors are displayed by Element Plus
-    }
-  };
-
-  const handleExceed: UploadProps['onExceed'] = (files) => {
-    formUploadRef.value?.clearFiles();
-    const file = files[0] as UploadRawFile;
-    file.uid = genFileId();
-    formUploadRef.value?.handleStart(file);
-  };
-
-  defineExpose({
-    show,
-    cancel,
-    reset,
-    importTemplate,
-    importThing,
-  });
+defineExpose({
+  show,
+  cancel,
+  reset,
+  importTemplate,
+  importThing,
+});
 </script>

@@ -292,6 +292,15 @@ public class EventAttributeConfigController implements BaseController {
         }));
     }
 
+    /**
+     * Validate that device, event, and (optional) attribute belong to the tenant,
+     * share a profile, and that the attribute's driver matches the device's driver.
+     *
+     * @param tenantId    tenant scope
+     * @param deviceId    the device to validate
+     * @param eventId     the event to validate
+     * @param attributeId the attribute to validate, may be null to skip
+     */
     private void requireEventConfigRelations(Long tenantId, Long deviceId, Long eventId, Long attributeId) {
         DeviceBO deviceBO = requireTenant(tenantId, deviceService.getById(deviceId));
         EventBO eventBO = requireTenant(tenantId, eventService.getById(eventId));

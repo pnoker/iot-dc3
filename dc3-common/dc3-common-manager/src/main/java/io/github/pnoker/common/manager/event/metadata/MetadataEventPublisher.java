@@ -18,7 +18,6 @@
 package io.github.pnoker.common.manager.event.metadata;
 
 import io.github.pnoker.common.entity.event.MetadataEvent;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,7 +41,7 @@ public class MetadataEventPublisher {
      * @param metadataEvent MetadataEvent
      */
     public void publishEvent(MetadataEvent metadataEvent) {
-        log.info("Metadata event publisher publishEvent: {}", JsonUtil.toJsonString(metadataEvent));
+        log.debug("Metadata event publisher publishEvent: id={}, type={}", metadataEvent.getId(), metadataEvent.getMetadataType());
         applicationEventPublisher.publishEvent(metadataEvent);
     }
 

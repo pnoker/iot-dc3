@@ -1,17 +1,18 @@
 /*
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import type {FormItemRule} from 'element-plus';
@@ -30,7 +31,7 @@ export interface EntityOption {
 
 export interface EntityTreeSource {
   load: () => Promise<unknown[]>;
-  props?: {label?: string; value?: string; children?: string; disabled?: string};
+  props?: { label?: string; value?: string; children?: string; disabled?: string };
   checkStrictly?: boolean;
   /** Synchronous reactive filter/shaping using the live form model. Called on every render. */
   transform?: (rows: any[], form: Record<string, any>) => unknown[];
@@ -131,7 +132,7 @@ export interface EntityListConfig {
   update?: (payload: Record<string, unknown>) => Promise<R>;
   remove?: (id: string) => Promise<R>;
 
-  detail?: {routeName: string}; // 跳转详情；缺省则无 detail 按钮
+  detail?: { routeName: string }; // 跳转详情；缺省则无 detail 按钮
   extraActions?: EntityRowAction[];
   toolbarActions?: EntityToolbarAction[]; // 工具栏自定义按钮
   operationWidth?: number; // 覆盖操作列宽（自动估算不适配长标签时）

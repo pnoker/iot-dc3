@@ -63,10 +63,16 @@ base-path docs directly.
 Public endpoints like `/api/v3/auth/token/**` (fetch salt, generate token, change password) are open. Every other
 business API behind the gateway requires three auth headers: `X-Auth-Tenant`, `X-Auth-Login`, and `X-Auth-Token`.
 
-Login is a two-step handshake. First, request a temporary salt from the server using the username and tenant (valid 5
-minutes). Then submit `md5(password)` together with that salt to exchange for a token (valid 12 hours). The salt doesn't
-participate in the password hash — it's passed to the server as a separate field that the server uses to sign the token.
-The password itself is hashed with a single `md5` and verified by the backend `PasswordUtil.verify`.
+Login is a two-step handshake. First, request a random salt from the server using the username and tenant (use within 5
+minutes as a guideline; the server does not enforce the timeout). Then submit the **plaintext password** together with
+that
+salt to exchange for a token (valid 12 hours). The salt does not participate in the password hash — it is concatenated
+with
+the server-side `DC3_SECURITY_KEY` to derive the JWT's HMAC-SHA256 signing key. The password itself is submitted in
+plaintext
+(relies on HTTPS for transport protection) and verified by the backend `PasswordUtil.verify` using Argon2id (falling
+back to
+BCrypt when Argon2 is unavailable).
 
 ```mermaid
 sequenceDiagram
@@ -75,9 +81,9 @@ sequenceDiagram
   participant Auth as Auth Center dc3-center-auth
   Client->>GW: Fetch salt (tenant, name)
   GW->>Auth: Forward fetch-salt request
-  Auth-->>Client: "salt string (valid 5 minutes)"
-  Note over Client: "Compute md5(password) locally. Salt submitted separately"
-  Client->>GW: Exchange token (tenant, name, salt, salted credential)
+  Auth-->>Client: "salt string (use within 5 minutes)"
+  Note over Client: "No local hashing — submit the plaintext password"
+  Client->>GW: Exchange token (tenant, name, salt, plaintext password)
   GW->>Auth: Forward generate-token request
   Auth-->>Client: "access token (valid 12 hours)"
   Client->>GW: "POST /api/v3/... with X-Auth-Tenant / X-Auth-Login / X-Auth-Token"
@@ -96,12 +102,12 @@ data):
 curl -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'
-# → R<String>: data is the salt (e.g. "f3a9c1..."), valid 5 minutes
+# → R<String>: data is the salt (e.g. "f3a9c1..."), use within 5 minutes
 
-# 2. Compute md5(password) locally, then exchange for a token together with the salt
+# 2. Submit the plaintext password together with the salt (HTTPS protects transport) to exchange for a token
 curl -X POST http://localhost:8000/api/v3/auth/token/generate \
   -H 'Content-Type: application/json' \
-  -d '{"tenant":"default","name":"dc3","salt":"f3a9c1...","password":"<md5(password)>"}'
+  -d '{"tenant":"default","name":"dc3","salt":"f3a9c1...","password":"<plaintext password>"}'
 # → R<String>: data is the access token (e.g. "eyJ..."), valid 12 hours
 
 # 3. Call a business API with the auth headers
@@ -114,7 +120,7 @@ curl -X POST http://localhost:8000/api/v3/manager/device/list \
 ```
 
 ```bash [dc3 CLI]
-# The CLI wraps the whole process: fetch salt → hash → exchange token → save credentials
+# The CLI wraps the whole process: fetch salt → exchange token → save credentials
 dc3 config set gateway http://localhost:8000
 dc3 auth login --tenant default --username dc3
 ```

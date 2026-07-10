@@ -167,7 +167,7 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
                 return !time.isBefore(start) && time.isBefore(end);
             }
             return !time.isBefore(start) || time.isBefore(end);
-        } catch (DateTimeException e) {
+        } catch (DateTimeException ignored) {
             return false;
         }
     }

@@ -45,6 +45,13 @@ public class DriverAlarmReceiver {
 
     private final DriverAlarmService driverAlarmService;
 
+    /**
+     * Consume a driver alarm message and forward it to the alarm service for processing.
+     *
+     * @param channel   the RabbitMQ channel for manual ack
+     * @param message   the raw message carrying the delivery tag
+     * @param entityDTO the deserialized driver alarm
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{driverAlarmQueue.name}")
     public void driverAlarmReceive(Channel channel, Message message, DriverAlarmDTO entityDTO) {
@@ -52,7 +59,8 @@ public class DriverAlarmReceiver {
         try {
             log.debug("Receive driver alarm: {}", JsonUtil.toJsonString(entityDTO));
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
-                log.error("Invalid driver alarm: {}", entityDTO);
+                log.warn("Invalid driver alarm, driverId is null, driverId={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

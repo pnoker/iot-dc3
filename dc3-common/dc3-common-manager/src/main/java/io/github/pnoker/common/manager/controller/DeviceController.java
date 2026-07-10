@@ -352,6 +352,11 @@ public class DeviceController implements BaseController {
         }));
     }
 
+    /**
+     * Reject the upload unless the file name has an {@code .xlsx} extension.
+     *
+     * @param part the uploaded file part
+     */
     private void assertXlsxFile(FilePart part) {
         String fileName = part.filename();
         if (Objects.isNull(fileName) || !fileName.toLowerCase(Locale.ROOT).endsWith(".xlsx")) {
@@ -359,6 +364,11 @@ public class DeviceController implements BaseController {
         }
     }
 
+    /**
+     * Reject the upload when the declared content length exceeds the import limit.
+     *
+     * @param part the uploaded file part
+     */
     private void assertImportContentLength(FilePart part) {
         long contentLength = part.headers().getContentLength();
         if (contentLength > MAX_IMPORT_BYTES) {
@@ -366,16 +376,27 @@ public class DeviceController implements BaseController {
         }
     }
 
+    /**
+     * Re-check the actual on-disk file size against the import limit after the upload
+     * lands, since the content-length header can be spoofed.
+     *
+     * @param filePath the landed temp file path
+     */
     private void assertImportFileSize(Path filePath) {
         try {
             if (Files.size(filePath) > MAX_IMPORT_BYTES) {
                 throw new RequestException("Import file size exceeds 20 MB");
             }
-        } catch (java.io.IOException e) {
+        } catch (java.io.IOException ignored) {
             throw new RequestException("Import file read failed");
         }
     }
 
+    /**
+     * Best-effort delete of a temporary import file, logging (not throwing) on failure.
+     *
+     * @param filePath the temp file path to delete
+     */
     private void deleteTempFile(Path filePath) {
         try {
             Files.deleteIfExists(filePath);

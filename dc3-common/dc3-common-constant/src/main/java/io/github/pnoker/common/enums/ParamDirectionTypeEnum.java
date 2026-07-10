@@ -97,7 +97,7 @@ public enum ParamDirectionTypeEnum {
     public static ParamDirectionTypeEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

@@ -119,8 +119,10 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     /**
-     * @param entityQuery {@link ResourceQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for resource search.
+     *
+     * @param entityQuery {@link ResourceQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link ResourceDO}
      */
     private LambdaQueryWrapper<ResourceDO> fuzzyQuery(ResourceQuery entityQuery) {
         LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
@@ -207,9 +209,13 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     /**
-     * @param entityBO {@link ResourceBO}
-     * @param isUpdate
-     * @return
+     * Check whether a resource is duplicated by parent resource, name, code, type,
+     * scope, and bound entity. Unlike the throwing variant, this only reports the
+     * duplicate without raising an exception.
+     *
+     * @param entityBO {@link ResourceBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(ResourceBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
@@ -228,11 +234,12 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     /**
-     * Primary key ID
+     * Get resource data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link ResourceDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link ResourceDO} if found, otherwise {@code null} when {@code throwException}
+     * is false
      */
     private ResourceDO getDOById(Long id, boolean throwException) {
         ResourceDO entityDO = resourceManager.getById(id);

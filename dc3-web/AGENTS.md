@@ -44,7 +44,7 @@ via Vite. **The dev server runs without the backend**, but login and data endpoi
 ## Stack
 
 | Concern      | Choice                                                                                      |
-| ------------ | ------------------------------------------------------------------------------------------- |
+|--------------|---------------------------------------------------------------------------------------------|
 | Framework    | Vue 3.5 (`<script setup>`, Composition API)                                                 |
 | Language     | TypeScript 6 (`verbatimModuleSyntax`, strict, noUncheckedIndexedAccess, noImplicitOverride) |
 | Build        | Vite 8 + `@vitejs/plugin-vue` + `@vitejs/plugin-legacy`                                     |

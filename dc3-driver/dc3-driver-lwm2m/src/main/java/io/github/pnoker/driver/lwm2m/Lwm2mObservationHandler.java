@@ -35,7 +35,7 @@ import java.util.Objects;
  *
  * @author pnoker
  * @version 2026.5.22
- * @since 2026.6.2
+ * @since 2026.5.22
  */
 @Slf4j
 @Component
@@ -68,7 +68,7 @@ public class Lwm2mObservationHandler {
         //  A future enhancement should maintain an endpoint -> deviceId mapping and
         //  objectId/objectInstanceId/resourceId -> pointId mapping to enable automatic
         //  point value forwarding from observed resources.
-        log.info("LwM2M observation value received but auto-forwarding not yet implemented: endpoint={}, path=/{}/{}/{}",
+        log.debug("LwM2M observation value received but auto-forwarding not yet implemented: endpoint={}, path=/{}/{}/{}",
                 endpoint, objectId, objectInstanceId, resourceId);
     }
 }

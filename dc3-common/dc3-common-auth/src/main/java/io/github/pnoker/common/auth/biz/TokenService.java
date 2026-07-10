@@ -76,30 +76,33 @@ public interface TokenService {
     void changePassword(String loginName, String currentPassword, String newPassword, String tenantCode);
 
     /**
-     * Validate a token by replaying the salt and tenant lookups, then verifying
-     * the JWT signature and checking the denylist for revoked tokens.
+     * Validate a token by resolving the tenant and credential, verifying the JWT
+     * signature against the session salt, and checking the logout denylist for
+     * tokens issued before a recorded logout.
      *
      * @param loginName  login name
      * @param salt       server-issued salt bound to the login session
      * @param token      JWT token string
      * @param tenantCode tenant code
-     * @return the resolved token validity with principal and tenant info
-     * @throws UnAuthorizedException on invalid token, revoked token, or mismatched tenant
+     * @return token validity result carrying the validity flag and, when available,
+     * the JWT expiry time; never carries principal or tenant identifiers
+     * @throws UnAuthorizedException when the tenant does not resolve
      */
     TokenValid checkValid(String loginName, String salt, String token, String tenantCode);
 
     /**
-     * Attempt to acknowledge a client-initiated logout. The current token implementation
-     * is stateless JWT, so server-side state does not need to change; this hook lets
-     * us record the logout event and gives us a single seam for future token
-     * revocation (denylist, refresh-token cleanup, etc.).
+     * Acknowledge a client-initiated logout by recording the logout instant on the
+     * server-side denylist. Although the token itself is a stateless JWT, this
+     * marks the principal as logged out so that any token issued before the logout
+     * instant is rejected by subsequent {@link #checkValid} calls until it expires
+     * naturally.
      * <p>
      * Returns {@code false} when the tenant or login name does not resolve, since those
      * are normal "nothing-to-cancel" outcomes rather than exceptional states.
      *
      * @param loginName  login name
      * @param tenantCode tenant code
-     * @return {@code true} when the logout was accepted, {@code false} when there was
+     * @return {@code true} when the logout was recorded, {@code false} when there was
      * no matching tenant or user to cancel
      */
     boolean tryCancelToken(String loginName, String tenantCode);

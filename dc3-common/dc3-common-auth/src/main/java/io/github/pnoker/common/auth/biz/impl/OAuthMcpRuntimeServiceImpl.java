@@ -363,72 +363,72 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         // PublicEndpoint (OAuthController.authorize): authorization endpoint runs before tenant
         // context; tenant membership is explicitly validated via tenantMembershipService below.
         return TenantContextHolder.runIgnore(() -> {
-        if (principalHeader == null || principalHeader.getPrincipalId() == null) {
-            throw oauthError(UNAUTHORIZED.value(), "login_required", "authenticated principal is required");
-        }
-        if (!McpConstant.OAuth.RESPONSE_TYPE_CODE.equals(params.get("response_type"))) {
-            throw oauthError(BAD_REQUEST.value(), "unsupported_response_type", "only code is supported");
-        }
-        OAuthRegisteredClientRecord client = requireClient(params.get(McpConstant.Field.CLIENT_ID));
-        requireGrant(client, OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue());
-        String redirectUri = params.get(McpConstant.Field.REDIRECT_URI);
-        if (!splitValues(client.getRedirectUris()).contains(redirectUri)) {
-            throw oauthError(BAD_REQUEST.value(), "invalid_request", "redirect_uri mismatch");
-        }
-        if (one(client.getRequirePkce())) {
-            if (!McpConstant.OAuth.CODE_CHALLENGE_METHOD_S256.equals(
-                    params.get(McpConstant.Field.CODE_CHALLENGE_METHOD))
-                    || StringUtils.isBlank(params.get(McpConstant.Field.CODE_CHALLENGE))) {
-                throw oauthError(BAD_REQUEST.value(), "invalid_request", "PKCE S256 is required");
+            if (principalHeader == null || principalHeader.getPrincipalId() == null) {
+                throw oauthError(UNAUTHORIZED.value(), "login_required", "authenticated principal is required");
             }
-        }
-        Set<String> scopes = requestedScopes(params.get(McpConstant.Field.SCOPE), client);
-        Long tenantId = longValue(params.get(McpConstant.Field.TENANT_ID));
-        if (tenantId == null || tenantId == 0) {
-            tenantId = principalHeader.getTenantId();
-        }
-        if (tenantId == null || !tenantMembershipService.isTenantMember(tenantId, principalHeader.getPrincipalId())) {
-            throw oauthError(BAD_REQUEST.value(), "invalid_request", "principal is not a member of the tenant");
-        }
+            if (!McpConstant.OAuth.RESPONSE_TYPE_CODE.equals(params.get("response_type"))) {
+                throw oauthError(BAD_REQUEST.value(), "unsupported_response_type", "only code is supported");
+            }
+            OAuthRegisteredClientRecord client = requireClient(params.get(McpConstant.Field.CLIENT_ID));
+            requireGrant(client, OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue());
+            String redirectUri = params.get(McpConstant.Field.REDIRECT_URI);
+            if (!splitValues(client.getRedirectUris()).contains(redirectUri)) {
+                throw oauthError(BAD_REQUEST.value(), "invalid_request", "redirect_uri mismatch");
+            }
+            if (one(client.getRequirePkce())) {
+                if (!McpConstant.OAuth.CODE_CHALLENGE_METHOD_S256.equals(
+                        params.get(McpConstant.Field.CODE_CHALLENGE_METHOD))
+                        || StringUtils.isBlank(params.get(McpConstant.Field.CODE_CHALLENGE))) {
+                    throw oauthError(BAD_REQUEST.value(), "invalid_request", "PKCE S256 is required");
+                }
+            }
+            Set<String> scopes = requestedScopes(params.get(McpConstant.Field.SCOPE), client);
+            Long tenantId = longValue(params.get(McpConstant.Field.TENANT_ID));
+            if (tenantId == null || tenantId == 0) {
+                tenantId = principalHeader.getTenantId();
+            }
+            if (tenantId == null || !tenantMembershipService.isTenantMember(tenantId, principalHeader.getPrincipalId())) {
+                throw oauthError(BAD_REQUEST.value(), "invalid_request", "principal is not a member of the tenant");
+            }
 
-        Long connectionId = longValue(params.get(McpConstant.Field.MCP_CONNECTION_ID));
-        McpConnectionRecord connection = connectionId == null || connectionId == 0
-                ? oauthMcpMapper.selectActiveConnection(client.getClientId(), principalHeader.getPrincipalId(),
-                tenantId, OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue())
-                : oauthMcpMapper.selectConnectionById(connectionId);
-        validateConnection(connection, client.getClientId(), principalHeader.getPrincipalId(), tenantId,
-                OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue());
+            Long connectionId = longValue(params.get(McpConstant.Field.MCP_CONNECTION_ID));
+            McpConnectionRecord connection = connectionId == null || connectionId == 0
+                    ? oauthMcpMapper.selectActiveConnection(client.getClientId(), principalHeader.getPrincipalId(),
+                    tenantId, OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue())
+                    : oauthMcpMapper.selectConnectionById(connectionId);
+            validateConnection(connection, client.getClientId(), principalHeader.getPrincipalId(), tenantId,
+                    OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue());
 
-        String code = randomToken();
-        OAuthAuthorizationRecord authorization = new OAuthAuthorizationRecord();
-        authorization.setId(IdWorker.getId());
-        authorization.setRegisteredClientId(client.getId());
-        authorization.setClientId(client.getClientId());
-        authorization.setPrincipalId(principalHeader.getPrincipalId());
-        authorization.setPrincipalType(StringUtils.defaultIfBlank(principalHeader.getPrincipalType(),
-                PrincipalTypeEnum.USER.getValue()));
-        authorization.setTenantId(tenantId);
-        authorization.setMcpConnectionId(connection.getId());
-        authorization.setAuthorizationGrantType(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue());
-        authorization.setAuthorizedScopes(String.join(" ", scopes));
-        authorization.setStateHash(sha256(params.get("state")));
-        authorization.setAuthorizationCodeHash(sha256(code));
-        authorization.setAuthorizationCodeIssued(LocalDateTime.now());
-        authorization.setAuthorizationCodeExpires(LocalDateTime.now().plus(oauthProperties.getAuthorizationCodeTtl()));
-        authorization.setTokenMetadata(JsonUtil.toJsonString(orderedMap(
-                McpConstant.Field.REDIRECT_URI, redirectUri,
-                McpConstant.Field.CODE_CHALLENGE, params.get(McpConstant.Field.CODE_CHALLENGE),
-                McpConstant.Field.CODE_CHALLENGE_METHOD, params.get(McpConstant.Field.CODE_CHALLENGE_METHOD)
-        )));
-        oauthMcpMapper.insertAuthorization(authorization);
+            String code = randomToken();
+            OAuthAuthorizationRecord authorization = new OAuthAuthorizationRecord();
+            authorization.setId(IdWorker.getId());
+            authorization.setRegisteredClientId(client.getId());
+            authorization.setClientId(client.getClientId());
+            authorization.setPrincipalId(principalHeader.getPrincipalId());
+            authorization.setPrincipalType(StringUtils.defaultIfBlank(principalHeader.getPrincipalType(),
+                    PrincipalTypeEnum.USER.getValue()));
+            authorization.setTenantId(tenantId);
+            authorization.setMcpConnectionId(connection.getId());
+            authorization.setAuthorizationGrantType(OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue());
+            authorization.setAuthorizedScopes(String.join(" ", scopes));
+            authorization.setStateHash(sha256(params.get("state")));
+            authorization.setAuthorizationCodeHash(sha256(code));
+            authorization.setAuthorizationCodeIssued(LocalDateTime.now());
+            authorization.setAuthorizationCodeExpires(LocalDateTime.now().plus(oauthProperties.getAuthorizationCodeTtl()));
+            authorization.setTokenMetadata(JsonUtil.toJsonString(orderedMap(
+                    McpConstant.Field.REDIRECT_URI, redirectUri,
+                    McpConstant.Field.CODE_CHALLENGE, params.get(McpConstant.Field.CODE_CHALLENGE),
+                    McpConstant.Field.CODE_CHALLENGE_METHOD, params.get(McpConstant.Field.CODE_CHALLENGE_METHOD)
+            )));
+            oauthMcpMapper.insertAuthorization(authorization);
 
-        StringBuilder target = new StringBuilder(redirectUri)
-                .append(redirectUri.contains("?") ? '&' : '?')
-                .append("code=").append(urlEncode(code));
-        if (StringUtils.isNotBlank(params.get("state"))) {
-            target.append("&state=").append(urlEncode(params.get("state")));
-        }
-        return URI.create(target.toString());
+            StringBuilder target = new StringBuilder(redirectUri)
+                    .append(redirectUri.contains("?") ? '&' : '?')
+                    .append("code=").append(urlEncode(code));
+            if (StringUtils.isNotBlank(params.get("state"))) {
+                target.append("&state=").append(urlEncode(params.get("state")));
+            }
+            return URI.create(target.toString());
         });
     }
 
@@ -439,17 +439,17 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         // the issued token's tenant_id claim is the authorization basis, validated explicitly via
         // tenantMembershipService inside issueAndPersistTokens.
         return TenantContextHolder.runIgnore(() -> {
-        String grantType = form.get(McpConstant.Field.GRANT_TYPE);
-        if (OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue().equals(grantType)) {
-            return authorizationCodeToken(form, authorizationHeader);
-        }
-        if (OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue().equals(grantType)) {
-            return clientCredentialsToken(form, authorizationHeader);
-        }
-        if (OAuthGrantTypeEnum.REFRESH_TOKEN.getValue().equals(grantType)) {
-            return refreshToken(form, authorizationHeader);
-        }
-        throw oauthError(BAD_REQUEST.value(), "unsupported_grant_type", "unsupported grant_type");
+            String grantType = form.get(McpConstant.Field.GRANT_TYPE);
+            if (OAuthGrantTypeEnum.AUTHORIZATION_CODE.getValue().equals(grantType)) {
+                return authorizationCodeToken(form, authorizationHeader);
+            }
+            if (OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue().equals(grantType)) {
+                return clientCredentialsToken(form, authorizationHeader);
+            }
+            if (OAuthGrantTypeEnum.REFRESH_TOKEN.getValue().equals(grantType)) {
+                return refreshToken(form, authorizationHeader);
+            }
+            throw oauthError(BAD_REQUEST.value(), "unsupported_grant_type", "unsupported grant_type");
         });
     }
 
@@ -459,47 +459,47 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         // on every MCP request before tenant context exists; the token's tenant_id claim drives
         // authorization and is re-checked via tenantMembershipService below.
         return TenantContextHolder.runIgnore(() -> {
-        try {
-            Claims claims = parseAccessToken(token);
-            String jti = claims.getId();
-            OAuthAuthorizationRecord authorization = oauthMcpMapper.selectAuthorizationByAccessTokenJti(jti);
-            if (!isActiveAuthorization(authorization, LocalDateTime.now())) {
+            try {
+                Claims claims = parseAccessToken(token);
+                String jti = claims.getId();
+                OAuthAuthorizationRecord authorization = oauthMcpMapper.selectAuthorizationByAccessTokenJti(jti);
+                if (!isActiveAuthorization(authorization, LocalDateTime.now())) {
+                    return McpIntrospectResponseDTO.inactive();
+                }
+                Long tenantId = numberClaim(claims, McpConstant.Field.TENANT_ID);
+                Long principalId = Long.valueOf(claims.getSubject());
+                Long connectionId = numberClaim(claims, McpConstant.Field.MCP_CONNECTION_ID);
+                String clientId = stringValue(claims.get(McpConstant.Field.CLIENT_ID));
+                McpConnectionRecord connection = oauthMcpMapper.selectConnectionById(connectionId);
+                if (!isUsableConnection(connection, clientId, principalId, tenantId)) {
+                    return McpIntrospectResponseDTO.inactive();
+                }
+                PrincipalDO principal = principalManager.getById(principalId);
+                if (principal == null || !enabled(principal.getEnableFlag())
+                        || !tenantMembershipService.isTenantMember(tenantId, principalId)) {
+                    return McpIntrospectResponseDTO.inactive();
+                }
+                return McpIntrospectResponseDTO.builder()
+                        .active(true)
+                        .iss(claims.getIssuer())
+                        .aud(claims.getAudience())
+                        .sub(claims.getSubject())
+                        .jti(jti)
+                        .exp(claims.getExpiration().toInstant().getEpochSecond())
+                        .iat(claims.getIssuedAt().toInstant().getEpochSecond())
+                        .tenantId(tenantId)
+                        .principalId(principalId)
+                        .principalType(stringValue(claims.get(McpConstant.Field.PRINCIPAL_TYPE)))
+                        .principalName(principal.getPrincipalName())
+                        .displayName(principal.getDisplayName())
+                        .clientId(clientId)
+                        .mcpConnectionId(connectionId)
+                        .grantType(stringValue(claims.get(McpConstant.Field.GRANT_TYPE)))
+                        .scope(stringValue(claims.get(McpConstant.Field.SCOPE)))
+                        .build();
+            } catch (RuntimeException ignored) {
                 return McpIntrospectResponseDTO.inactive();
             }
-            Long tenantId = numberClaim(claims, McpConstant.Field.TENANT_ID);
-            Long principalId = Long.valueOf(claims.getSubject());
-            Long connectionId = numberClaim(claims, McpConstant.Field.MCP_CONNECTION_ID);
-            String clientId = stringValue(claims.get(McpConstant.Field.CLIENT_ID));
-            McpConnectionRecord connection = oauthMcpMapper.selectConnectionById(connectionId);
-            if (!isUsableConnection(connection, clientId, principalId, tenantId)) {
-                return McpIntrospectResponseDTO.inactive();
-            }
-            PrincipalDO principal = principalManager.getById(principalId);
-            if (principal == null || !enabled(principal.getEnableFlag())
-                    || !tenantMembershipService.isTenantMember(tenantId, principalId)) {
-                return McpIntrospectResponseDTO.inactive();
-            }
-            return McpIntrospectResponseDTO.builder()
-                    .active(true)
-                    .iss(claims.getIssuer())
-                    .aud(claims.getAudience())
-                    .sub(claims.getSubject())
-                    .jti(jti)
-                    .exp(claims.getExpiration().toInstant().getEpochSecond())
-                    .iat(claims.getIssuedAt().toInstant().getEpochSecond())
-                    .tenantId(tenantId)
-                    .principalId(principalId)
-                    .principalType(stringValue(claims.get(McpConstant.Field.PRINCIPAL_TYPE)))
-                    .principalName(principal.getPrincipalName())
-                    .displayName(principal.getDisplayName())
-                    .clientId(clientId)
-                    .mcpConnectionId(connectionId)
-                    .grantType(stringValue(claims.get(McpConstant.Field.GRANT_TYPE)))
-                    .scope(stringValue(claims.get(McpConstant.Field.SCOPE)))
-                    .build();
-        } catch (RuntimeException e) {
-            return McpIntrospectResponseDTO.inactive();
-        }
         });
     }
 
@@ -509,18 +509,18 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         // PublicEndpoint (OAuthController.revoke): revocation may be called by a client before any
         // tenant context; it resolves the authorization by the presented token only.
         return TenantContextHolder.runIgnore(() -> {
-        String token = form.get("token");
-        if (StringUtils.isBlank(token)) {
-            throw oauthError(BAD_REQUEST.value(), "invalid_request", "token is required");
-        }
-        LocalDateTime now = LocalDateTime.now();
-        try {
-            Claims claims = parseAccessToken(token);
-            oauthMcpMapper.revokeAuthorizationByAccessTokenJti(claims.getId(), "revoke", now);
-        } catch (RuntimeException e) {
-            oauthMcpMapper.revokeAuthorizationByRefreshTokenHash(sha256(token), "revoke", now);
-        }
-        return Map.of("revoked", true);
+            String token = form.get("token");
+            if (StringUtils.isBlank(token)) {
+                throw oauthError(BAD_REQUEST.value(), "invalid_request", "token is required");
+            }
+            LocalDateTime now = LocalDateTime.now();
+            try {
+                Claims claims = parseAccessToken(token);
+                oauthMcpMapper.revokeAuthorizationByAccessTokenJti(claims.getId(), "revoke", now);
+            } catch (RuntimeException ignored) {
+                oauthMcpMapper.revokeAuthorizationByRefreshTokenHash(sha256(token), "revoke", now);
+            }
+            return Map.of("revoked", true);
         });
     }
 
@@ -1091,7 +1091,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             }
             return objectMapper.convertValue(node, new TypeReference<Map<String, Object>>() {
             });
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return McpConstant.ToolDefinition.DEFAULT_INPUT_SCHEMA;
         }
     }

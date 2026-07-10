@@ -96,8 +96,8 @@ public class McpOpenApiAggregator {
         Resource[] resources;
         try {
             resources = new PathMatchingResourcePatternResolver().getResources(SPECS_LOCATION);
-        } catch (Exception ex) {
-            log.warn("MCP aggregator: cannot resolve static OpenAPI specs at {}: {}", SPECS_LOCATION, ex.getMessage());
+        } catch (Exception e) {
+            log.warn("MCP aggregator: cannot resolve static OpenAPI specs at {}", SPECS_LOCATION, e);
             return result;
         }
         for (Resource resource : resources) {
@@ -126,9 +126,8 @@ public class McpOpenApiAggregator {
                         result.put(apiCode, toQuality(operation, root));
                     });
                 });
-            } catch (Exception ex) {
-                log.warn("MCP aggregator: failed to read static OpenAPI spec {}: {}",
-                        resource.getFilename(), ex.getMessage());
+            } catch (Exception e) {
+                log.warn("MCP aggregator: failed to read static OpenAPI spec {}", resource.getFilename(), e);
             }
         }
         return result;

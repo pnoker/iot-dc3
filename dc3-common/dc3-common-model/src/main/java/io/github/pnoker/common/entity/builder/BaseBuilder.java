@@ -36,66 +36,66 @@ import java.util.List;
 public interface BaseBuilder {
 
     /**
-     * VO to BO
+     * Convert a base VO to a base BO.
      *
-     * @param entityVO EntityVO
-     * @return EntityBO
+     * @param entityVO {@link BaseVO} source
+     * @return {@link BaseBO} converted business object
      */
     BaseBO buildBOByVO(BaseVO entityVO);
 
     /**
-     * VOList to BOList
+     * Convert a list of base VOs to a list of base BOs.
      *
-     * @param entityVOList EntityVO collection
-     * @return EntityBO collection
+     * @param entityVOList {@link BaseVO} source collection
+     * @return {@link BaseBO} converted collection
      */
     List<BaseBO> buildBOListByVOList(List<BaseVO> entityVOList);
 
     /**
-     * BO to VO
+     * Convert a base BO to a base VO.
      *
-     * @param entityBO EntityBO
-     * @return EntityVO
+     * @param entityBO {@link BaseBO} source
+     * @return {@link BaseVO} converted view object
      */
     BaseVO buildVOByBO(BaseBO entityBO);
 
     /**
-     * BOList to VOList
+     * Convert a list of base BOs to a list of base VOs.
      *
-     * @param entityBOList EntityBO collection
-     * @return EntityVO collection
+     * @param entityBOList {@link BaseBO} source collection
+     * @return {@link BaseVO} converted collection
      */
     List<BaseVO> buildVOListByBOList(List<BaseBO> entityBOList);
 
     /**
-     * DTO to BO
+     * Convert a base DTO to a base BO.
      *
-     * @param entityDTO EntityDTO
-     * @return EntityBO
+     * @param entityDTO {@link BaseDTO} source
+     * @return {@link BaseBO} converted business object
      */
     BaseBO buildBOByDTO(BaseDTO entityDTO);
 
     /**
-     * DTOList to BOList
+     * Convert a list of base DTOs to a list of base BOs.
      *
-     * @param entityDTOList EntityDTO collection
-     * @return EntityBO collection
+     * @param entityDTOList {@link BaseDTO} source collection
+     * @return {@link BaseBO} converted collection
      */
     List<BaseBO> buildBOListByDTOList(List<BaseDTO> entityDTOList);
 
     /**
-     * BO to DTO
+     * Convert a base BO to a base DTO.
      *
-     * @param entityBO EntityBO
-     * @return EntityDTO
+     * @param entityBO {@link BaseBO} source
+     * @return {@link BaseDTO} converted transfer object
      */
     BaseDTO buildDTOByBO(BaseBO entityBO);
 
     /**
-     * BOList to DTOList
+     * Convert a list of base BOs to a list of base DTOs.
      *
-     * @param entityBOList EntityBO collection
-     * @return EntityDTO collection
+     * @param entityBOList {@link BaseBO} source collection
+     * @return {@link BaseDTO} converted collection
      */
     List<BaseDTO> buildDTOListByBOList(List<BaseBO> entityBOList);
 

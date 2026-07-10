@@ -37,60 +37,69 @@ import java.util.Set;
 public interface PointService extends BaseService<PointBO, PointQuery> {
 
     /**
-     * Profile ID TenantId
+     * Query points belonging to a profile, scoped to a tenant.
      *
-     * @param profileId Point ID
+     * @param profileId Profile ID
      * @param tenantId  Tenant ID
-     * @return Point
+     * @return PointBO list
      */
     List<PointBO> listByProfileId(Long profileId, Long tenantId);
 
     /**
-     * Device ID TenantId
+     * Query points belonging to a device, scoped to a tenant.
      *
      * @param deviceId Device ID
      * @param tenantId Tenant ID
-     * @return Point
+     * @return PointBO list
      */
     List<PointBO> listByDeviceId(Long deviceId, Long tenantId);
 
     /**
-     * ID
+     * Query points belonging to any of a set of profiles.
      *
-     * @param profileIds ID
-     * @return Point
+     * @param profileIds Profile ID set
+     * @return PointBO list
      */
     List<PointBO> listByProfileIds(List<Long> profileIds);
 
     /**
-     * Device ID
+     * Query points by a set of point IDs.
      *
-     * @param ids Point ID
-     * @return Point
+     * @param ids Point ID set
+     * @return PointBO list
      */
     List<PointBO> listByIds(Set<Long> ids);
 
     /**
-     * @param pointIds Point ID
-     * @return Map Long:Unit String
+     * Resolve the unit string for each point id.
+     *
+     * @param pointIds Point ID set
+     * @return map from point ID to its unit string
      */
     Map<Long, String> unit(Set<Long> pointIds);
 
     /**
-     * @param pointId id
-     * @return {@link Set}<{@link Long}>
+     * Query a point together with the statistics of the devices that use it.
+     *
+     * @param pointId Point ID
+     * @return the point with its device statistics
      */
     DeviceByPointBO getPointStatisticsWithDevice(Long pointId);
 
     /**
-     * @param deviceId
-     * @return
+     * Query the default point id bound to a device.
+     *
+     * @param deviceId Device ID
+     * @return the point ID, or {@code 0} when the device or its profile is missing
      */
     Long getPointByDeviceId(Long deviceId);
 
     /**
-     * @param deviceId
-     * @return
+     * Query the point configuration for a device.
+     *
+     * @param deviceId Device ID
+     * @return the device's point configuration, with a zero count when the device or
+     * its profile is missing
      */
     PointConfigByDeviceBO getPointConfigByDeviceId(Long deviceId);
 

@@ -128,7 +128,7 @@ public interface ModelProviderBuilder {
         }
         try {
             return AgenticModelProviderTypeEnum.ofIndex(Byte.valueOf(normalized));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             return AgenticModelProviderTypeEnum.ofName(normalized.toUpperCase().replace('-', '_'));
         }
     }

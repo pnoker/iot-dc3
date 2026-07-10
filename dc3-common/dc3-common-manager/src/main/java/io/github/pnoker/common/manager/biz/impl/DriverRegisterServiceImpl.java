@@ -57,7 +57,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Driver synchronization interface implementation
+ * Driver registration service implementation.
  *
  * @author pnoker
  * @version 2025.9.0

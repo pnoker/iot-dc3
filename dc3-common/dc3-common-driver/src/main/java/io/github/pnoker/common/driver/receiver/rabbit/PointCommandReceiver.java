@@ -27,7 +27,6 @@ import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.entity.dto.PointCommandPayload;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,8 +65,9 @@ public class PointCommandReceiver {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         boolean redelivered = Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
         try {
-            log.info("Receive point command: {}", JsonUtil.toJsonString(entityDTO));
-
+            // Validate first: the debug log below dereferences entityDTO, so a null
+            // payload must be rejected before logging to avoid an NPE that would
+            // otherwise fall through to the nack(requeue) path and requeue garbage.
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.commandId())
                     || Objects.isNull(entityDTO.tenantId()) || Objects.isNull(entityDTO.type())
                     || Objects.isNull(entityDTO.payload())) {
@@ -75,6 +75,8 @@ public class PointCommandReceiver {
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
+
+            log.debug("Receive point command: commandId={}, type={}", entityDTO.commandId(), entityDTO.type());
             if (isInvalidPayload(entityDTO.payload())) {
                 log.error("Invalid point command payload: {}", entityDTO);
                 RabbitAckUtil.reject(channel, deliveryTag);
@@ -179,8 +181,8 @@ public class PointCommandReceiver {
                         .build();
                 driverSenderService.pointCommandResultSender(result);
             }
-        } catch (Exception ex) {
-            log.error("Failed to send command result, commandId={}", commandId, ex);
+        } catch (Exception e) {
+            log.error("Failed to send command result, commandId={}", commandId, e);
         }
         RabbitAckUtil.ack(channel, deliveryTag);
     }

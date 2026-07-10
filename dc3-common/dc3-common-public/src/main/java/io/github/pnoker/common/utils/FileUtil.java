@@ -89,6 +89,13 @@ public class FileUtil {
         return UUID.randomUUID() + SymbolConstant.DOT + "xlsx";
     }
 
+    /**
+     * Sanitize each path segment via {@link #safePathPart}, returning an empty array
+     * for null input.
+     *
+     * @param segments raw path segments
+     * @return sanitized segments
+     */
     private static String[] safePathSegments(String... segments) {
         if (segments == null) {
             return new String[0];
@@ -100,6 +107,13 @@ public class FileUtil {
         return safeSegments;
     }
 
+    /**
+     * Sanitize a single path segment: blank input falls back to {@code "upload"}, and
+     * any character outside {@code [a-zA-Z0-9._-]} is replaced with an underscore.
+     *
+     * @param value raw path segment
+     * @return sanitized segment, never blank
+     */
     private static String safePathPart(String value) {
         if (value == null || value.isBlank()) {
             return "upload";

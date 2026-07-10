@@ -202,6 +202,13 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         return pointCommandHistoryBuilder.buildVOPageByDOPage(page);
     }
 
+    /**
+     * Verify the driver serving the command is online, throwing {@link ServiceException}
+     * when no online state exists for the driver.
+     *
+     * @param tenantId tenant scope
+     * @param driverId the driver to check
+     */
     private void checkDriverOnline(Long tenantId, Long driverId) {
         EntityStateDO driverState = entityStateMapper.selectOne(
                 new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<EntityStateDO>()
@@ -213,6 +220,14 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         }
     }
 
+    /**
+     * Validate the device and point exist within the tenant, are enabled, and share a
+     * profile.
+     *
+     * @param tenantId tenant scope
+     * @param deviceId the device to validate
+     * @param pointId  the point to validate
+     */
     private void validateCommandScope(Long tenantId, Long deviceId, Long pointId) {
         FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
         if (Objects.isNull(device)) {
@@ -234,6 +249,14 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         }
     }
 
+    /**
+     * Validate the command scope and additionally require the point be writable
+     * (write-only or read-write).
+     *
+     * @param tenantId tenant scope
+     * @param deviceId the device to validate
+     * @param pointId  the point to validate for write access
+     */
     private void validateWriteScope(Long tenantId, Long deviceId, Long pointId) {
         validateCommandScope(tenantId, deviceId, pointId);
         FacadePointBO point = pointFacade.getById(tenantId, pointId);
@@ -245,6 +268,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     /**
      * Check whether a caller-supplied commandId already exists.
      *
+     * @param commandId the caller-supplied command id, may be null or blank
      * @return the existing commandId, or null if not provided or not found
      */
     private String checkExistingCommand(String commandId) {

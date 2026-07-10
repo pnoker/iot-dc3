@@ -222,8 +222,10 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     /**
-     * @param entityQuery {@link PointAttributeConfigQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for point attribute config search.
+     *
+     * @param entityQuery {@link PointAttributeConfigQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link PointAttributeConfigDO}
      */
     private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
@@ -241,9 +243,13 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     /**
-     * @param entityBO {@link PointAttributeConfigBO}
-     * @param isUpdate
-     * @return
+     * Check whether a point attribute config is duplicated by attribute, device, and
+     * point. Unlike the throwing variant, this only reports the duplicate without
+     * raising an exception.
+     *
+     * @param entityBO {@link PointAttributeConfigBO} to be validated
+     * @param isUpdate whether the operation is an update (true) or create (false)
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(PointAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
@@ -273,11 +279,12 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     /**
-     * Primary key ID
+     * Get point attribute config data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link PointAttributeConfigDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link PointAttributeConfigDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
      */
     private PointAttributeConfigDO getDOById(Long id, boolean throwException) {
         PointAttributeConfigDO entityDO = pointAttributeConfigManager.getById(id);

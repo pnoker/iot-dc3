@@ -65,6 +65,17 @@ public class AgenticChatRequestPreparer {
 
     private final AgenticProperties properties;
 
+    /**
+     * Prepare a chat turn for runtime execution: validate the request, extract the last
+     * user message and attachment context, scope the conversation id, resolve the model
+     * and tool-calling capability, build the tool context, load chat memory, and touch
+     * the session.
+     *
+     * @param request    the chat completion request
+     * @param userHeader authenticated caller principal and tenant
+     * @param mode       execution mode label (for logging)
+     * @return the assembled prepared chat
+     */
     public AgenticPreparedChatBO prepare(ChatCompletionRequestVO request, RequestHeader.PrincipalHeader userHeader,
                                          String mode) {
         validateRequest(request);

@@ -112,7 +112,7 @@ public enum AgenticActionStatusEnum {
     public static AgenticActionStatusEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

@@ -34,8 +34,10 @@ IoT DC3 的解法是把"认证身份"和"信任身份"分开：
 
 两个端点都公开、无需鉴权：
 
-- `POST /api/v3/auth/token/salt`：传 `tenant`、`name`，先确认租户存在，返回一个随机盐（UUID 形态），**5 分钟内有效**。
-- `POST /api/v3/auth/token/generate`：传 `tenant`、`name`、`salt`、用盐哈希后的 `password`，校验通过返回 access token，**有效期
+- `POST /api/v3/auth/token/salt`：传 `tenant`、`name`，先确认租户存在，返回一个随机盐（UUID 形态），响应文案建议 **5 分钟内使用
+  **（服务端不存储盐、不强制过期，"5 分钟"只是客户端使用提示）。
+- `POST /api/v3/auth/token/generate`：传 `tenant`、`name`、`salt`、**明文 `password`**（盐不参与密码哈希，仅用于与服务端密钥拼接给
+  token 签名），校验通过返回 access token，**有效期
   12 小时**（`TOKEN_CACHE_TIMEOUT = 12` 小时）。
 
 `generateToken` 内部按固定顺序逐项校验，任一不过都返回同一个"无可用认证"错误，不泄露是哪一步失败：
@@ -57,7 +59,7 @@ IoT DC3 的解法是把"认证身份"和"信任身份"分开：
 curl -s -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'
-# 返回示例（5 分钟内有效）："a1b2c3d4-...-e5f6"
+# 返回示例（建议 5 分钟内使用）："a1b2c3d4-...-e5f6"
 
 # 2) 用盐哈希密码后换令牌
 curl -s -X POST http://localhost:8000/api/v3/auth/token/generate \
@@ -237,7 +239,7 @@ default <T extends TenantOwned> T requireTenant(Long tenantId, T entity) {
 
 | 项         | 取值 / 行为                                                               | 来源                               |
 |-----------|-----------------------------------------------------------------------|----------------------------------|
-| 盐有效期      | 5 分钟                                                                  | `POST /api/v3/auth/token/salt`   |
+| 盐有效期      | 建议客户端 5 分钟内使用（服务端不强制过期）                                               | `POST /api/v3/auth/token/salt`   |
 | 令牌有效期     | 12 小时                                                                 | `TOKEN_CACHE_TIMEOUT=12` 小时      |
 | JWT 绑定    | `principal_id` + `tenant_id`                                          | `generateToken`                  |
 | HMAC 密钥   | `AUTH_HMAC_SECRET` / `dc3.auth.hmac.secret`，默认 `io.github.pnoker.dc3` | `HmacAuthConfig`                 |

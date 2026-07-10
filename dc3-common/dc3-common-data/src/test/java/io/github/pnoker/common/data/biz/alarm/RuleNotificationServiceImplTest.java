@@ -261,10 +261,14 @@ class RuleNotificationServiceImplTest {
 
         service.notify(match);
 
-        // Must use LambdaUpdateWrapper with setSql("trigger_count = trigger_count + 1")
+        // Must use LambdaUpdateWrapper with setSql("trigger_count = trigger_count + 1") so
+        // concurrent firings do not lose increments. The captor must inspect the actual SQL
+        // fragment — without this the test cannot distinguish the +1 firing branch from the
+        // recovery branch (setSql("trigger_count = trigger_count")).
         ArgumentCaptor<com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<RuleStateDO>> updateCaptor =
                 ArgumentCaptor.forClass(com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper.class);
         verify(ruleStateManager).update(updateCaptor.capture());
+        assertThat(updateCaptor.getValue().getSqlSet()).contains("trigger_count = trigger_count + 1");
         // State transition uses an atomic wrapper; last-notify-time is persisted separately.
         verify(ruleStateManager).updateById(any());
     }
@@ -295,6 +299,11 @@ class RuleNotificationServiceImplTest {
         ArgumentCaptor<com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<RuleStateDO>> updateCaptor =
                 ArgumentCaptor.forClass(com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper.class);
         verify(ruleStateManager).update(updateCaptor.capture());
+        // Recovery must NOT increment the counter: setSql uses "trigger_count = trigger_count"
+        // (the +1 branch is reserved for firing). Pinning the SQL fragment guards against a
+        // future change that silently counts recoveries.
+        assertThat(updateCaptor.getValue().getSqlSet()).contains("trigger_count = trigger_count");
+        assertThat(updateCaptor.getValue().getSqlSet()).doesNotContain("trigger_count + 1");
         verify(notifyHistoryManager).save(any());
     }
 

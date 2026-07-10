@@ -143,6 +143,13 @@ public class ProfileTool {
         return AgenticToolResult.ok("Profiles loaded for device " + deviceId, profiles);
     }
 
+    /**
+     * Parse a profile type from a free-form string by trying, in order, index (byte),
+     * code, then name. Returns null when the value is blank or matches none.
+     *
+     * @param value the raw profile type value from the tool call
+     * @return the resolved profile type, or null
+     */
     private ProfileTypeEnum parseProfileType(String value) {
         if (StringUtils.isBlank(value)) {
             return null;

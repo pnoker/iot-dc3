@@ -45,39 +45,75 @@ public class ModelConfigDO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Primary key ID.
+     */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
+    /**
+     * Model identifier, as accepted by the provider's API.
+     */
     @TableField("model")
     private String model;
 
+    /**
+     * Human-readable model label shown in the model picker.
+     */
     @TableField("label")
     private String label;
 
+    /**
+     * Provider that serves this model.
+     */
     @TableField("provider_id")
     private Long providerId;
 
+    /**
+     * Whether the model supports streaming responses.
+     */
     @TableField("stream")
     private Boolean stream;
 
+    /**
+     * Whether the model supports tool/function calling.
+     */
     @TableField("tool_call")
     private Boolean toolCall;
 
+    /**
+     * Whether the model supports image/vision inputs.
+     */
     @TableField("vision")
     private Boolean vision;
 
+    /**
+     * Whether the model exposes a separate reasoning trace.
+     */
     @TableField("reasoning")
     private Boolean reasoning;
 
+    /**
+     * Sampling temperature; null lets the provider default apply.
+     */
     @TableField("temperature")
     private Double temperature;
 
+    /**
+     * Maximum output tokens; null lets the provider default apply.
+     */
     @TableField("max_tokens")
     private Integer maxTokens;
 
+    /**
+     * Default flag, 0:Not default, 1:Default.
+     */
     @TableField("default_flag")
     private Byte defaultFlag;
 
+    /**
+     * Enable flag, 0:Enable, 1:Disable.
+     */
     @TableField("enable_flag")
     private Byte enableFlag;
 

@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -28,7 +29,7 @@
     >
       <template #filters>
         <el-form-item :label="t('settings.localCredential.loginName')" prop="loginName">
-          <el-input v-model="filterForm.loginName" class="edit-form-default" clearable />
+          <el-input v-model="filterForm.loginName" class="edit-form-default" clearable/>
         </el-form-item>
       </template>
       <template #actions>
@@ -38,15 +39,15 @@
 
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column :label="t('settings.localCredential.loginName')" min-width="160" prop="loginName" />
+        <el-table-column :label="t('settings.localCredential.loginName')" min-width="160" prop="loginName"/>
         <!-- @vue-generic {import('@/config/types').LocalCredentialRecord} -->
         <el-table-column :label="t('settings.localCredential.principalId')" min-width="140">
           <template #default="{row}">{{ principalNameFor(row) }}</template>
         </el-table-column>
-        <el-table-column :label="t('settings.localCredential.credentialType')" min-width="130" prop="credentialType" />
+        <el-table-column :label="t('settings.localCredential.credentialType')" min-width="130" prop="credentialType"/>
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{row}">
-            <enable-tag :value="row.enableFlag" />
+            <enable-tag :value="row.enableFlag"/>
           </template>
         </el-table-column>
         <el-table-column
@@ -55,7 +56,7 @@
           prop="passwordUpdatedTime"
           width="165"
         />
-        <el-table-column :label="t('settings.localCredential.failedAttempts')" min-width="120" prop="failedAttempts" />
+        <el-table-column :label="t('settings.localCredential.failedAttempts')" min-width="120" prop="failedAttempts"/>
         <!-- @vue-generic {import('@/config/types').LocalCredentialRecord} -->
         <el-table-column :label="t('common.operation')" fixed="right" width="180">
           <template #default="{row}">
@@ -75,7 +76,7 @@
           </template>
         </el-table-column>
         <template #empty>
-          <el-empty :description="t('settings.localCredential.empty')" />
+          <el-empty :description="t('settings.localCredential.empty')"/>
         </template>
       </el-table>
     </blank-card>
@@ -83,15 +84,15 @@
     <el-dialog v-model="addDialog.visible" :title="t('settings.localCredential.addTitle')" width="520px">
       <el-form :model="addDialog.form" label-position="top">
         <el-form-item :label="t('settings.localCredential.loginName')">
-          <el-input v-model="addDialog.form.loginName" />
+          <el-input v-model="addDialog.form.loginName"/>
         </el-form-item>
         <el-form-item :label="t('settings.localCredential.principalId')">
           <el-select v-model="addDialog.form.principalId" filterable style="width: 100%">
-            <el-option v-for="opt in principalOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
+            <el-option v-for="opt in principalOptions" :key="opt.value" :label="opt.label" :value="opt.value"/>
           </el-select>
         </el-form-item>
         <el-form-item :label="t('settings.localCredential.password')">
-          <el-input v-model="addDialog.form.password" show-password type="password" />
+          <el-input v-model="addDialog.form.password" show-password type="password"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -105,10 +106,10 @@
     <el-dialog v-model="resetDialog.visible" :title="t('settings.localCredential.resetTitle')" width="480px">
       <el-form label-position="top">
         <el-form-item :label="t('settings.localCredential.loginName')">
-          <el-input :model-value="resetDialog.loginName" disabled />
+          <el-input :model-value="resetDialog.loginName" disabled/>
         </el-form-item>
         <el-form-item :label="t('settings.localCredential.newPassword')">
-          <el-input v-model="resetDialog.password" show-password type="password" />
+          <el-input v-model="resetDialog.password" show-password type="password"/>
         </el-form-item>
       </el-form>
       <template #footer>

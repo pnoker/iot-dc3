@@ -39,7 +39,7 @@ import java.util.Map;
  *
  * @author pnoker
  * @version 2026.5.22
- * @since 2026.6.2
+ * @since 2026.5.22
  */
 @Slf4j
 @Service

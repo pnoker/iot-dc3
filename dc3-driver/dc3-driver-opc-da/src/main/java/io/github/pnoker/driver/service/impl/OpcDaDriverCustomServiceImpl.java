@@ -178,9 +178,9 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
             } catch (AlreadyConnectedException | UnknownHostException | JIException e) {
                 try {
                     server.dispose();
-                } catch (Exception disposeException) {
+                } catch (Exception e1) {
                     log.warn("Driver connection dispose failed after connect error, protocol={}, deviceId={}, host={}, clsId={}", driverCode,
-                            deviceId, host, clsId, disposeException);
+                            deviceId, host, clsId, e1);
                 }
                 log.error("Driver connection failed, protocol={}, deviceId={}, host={}, clsId={}", driverCode, deviceId, host,
                         clsId, e);
@@ -204,7 +204,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         String groupName = pointConfig.get("group").getValue(String.class);
         try {
             group = server.findGroup(groupName);
-        } catch (UnknownGroupException e) {
+        } catch (UnknownGroupException ignored) {
             group = server.addGroup(groupName);
         }
         return group.addItem(pointConfig.get("tag").getValue(String.class));

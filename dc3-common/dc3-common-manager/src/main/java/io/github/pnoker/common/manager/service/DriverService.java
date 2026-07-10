@@ -34,46 +34,46 @@ import java.util.Set;
 public interface DriverService extends BaseService<DriverBO, DriverQuery> {
 
     /**
-     * ServiceName
+     * Query a driver by its registered service name, scoped to a tenant.
      *
      * @param serviceName Driver service name
      * @param tenantId    Tenant ID
-     * @return Driver
+     * @return DriverBO
      */
     DriverBO getByServiceName(String serviceName, Long tenantId);
 
     /**
-     * Profile ID TenantId
+     * Query drivers serving a profile, scoped to a tenant.
      *
      * @param profileId Profile ID
      * @param tenantId  Tenant ID
-     * @return Driver
+     * @return DriverBO list
      */
     List<DriverBO> listByProfileId(Long profileId, Long tenantId);
 
     /**
-     * Point ID TenantId
+     * Query drivers serving the profile that owns a point, scoped to a tenant.
      *
      * @param pointId  Point ID
      * @param tenantId Tenant ID
-     * @return Driver
+     * @return DriverBO list
      */
     List<DriverBO> listByPointId(Long pointId, Long tenantId);
 
     /**
-     * Device ID TenantId
+     * Query the driver serving the profile bound to a device, scoped to a tenant.
      *
      * @param deviceId Device ID
      * @param tenantId Tenant ID
-     * @return Driver
+     * @return DriverBO
      */
     DriverBO getByDeviceId(Long deviceId, Long tenantId);
 
     /**
-     * Driver ID
+     * Query drivers by a set of driver IDs.
      *
-     * @param ids Driver ID
-     * @return Driver
+     * @param ids Driver ID set
+     * @return DriverBO list
      */
     List<DriverBO> listByIds(Set<Long> ids);
 

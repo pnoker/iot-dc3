@@ -58,7 +58,7 @@ import java.util.Objects;
  *
  * @author pnoker
  * @version 2026.5.22
- * @since 2026.6.2
+ * @since 2026.5.22
  */
 @Slf4j
 @Service
@@ -86,7 +86,7 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         // Lwm2mServerManager auto-starts via @PostConstruct
-        log.info("LwM2M driver initialized");
+        log.info("LwM2M driver initialized, protocol={}", driverCode);
     }
 
     @Override
@@ -206,7 +206,7 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
         }
         try {
             return attribute.getValue(Integer.class);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return defaultValue;
         }
     }

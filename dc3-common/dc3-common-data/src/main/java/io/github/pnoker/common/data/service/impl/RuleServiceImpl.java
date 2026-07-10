@@ -127,8 +127,10 @@ public class RuleServiceImpl implements RuleService {
     }
 
     /**
-     * @param entityQuery {@link RuleQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for alarm rule search.
+     *
+     * @param entityQuery {@link RuleQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link RuleDO}
      */
     private LambdaQueryWrapper<RuleDO> fuzzyQuery(RuleQuery entityQuery) {
         LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
@@ -147,10 +149,12 @@ public class RuleServiceImpl implements RuleService {
     }
 
     /**
-     * @param entityBO       {@link RuleBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
+     * Check whether an alarm rule is duplicated by rule name, code, and bound entity.
+     *
+     * @param entityBO       {@link RuleBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(RuleBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
@@ -191,11 +195,12 @@ public class RuleServiceImpl implements RuleService {
     }
 
     /**
-     * Primary key ID
+     * Get alarm rule data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link RuleDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link RuleDO} if found, otherwise {@code null} when {@code throwException}
+     * is false
      */
     private RuleDO getDOById(Long id, boolean throwException) {
         RuleDO entityDO = ruleManager.getById(id);

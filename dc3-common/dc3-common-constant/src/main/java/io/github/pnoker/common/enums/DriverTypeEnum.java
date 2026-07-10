@@ -107,7 +107,7 @@ public enum DriverTypeEnum {
     public static DriverTypeEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

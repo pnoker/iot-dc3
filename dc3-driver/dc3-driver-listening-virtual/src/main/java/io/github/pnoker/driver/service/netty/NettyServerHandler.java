@@ -167,7 +167,7 @@ public class NettyServerHandler {
     private Long parseDeviceId(String deviceName, ChannelHandlerContext context) {
         try {
             return Long.parseLong(deviceName);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             log.warn("Driver message skipped, protocol={}, remoteAddress={}, deviceName={}, reason=deviceIdInvalid", PROTOCOL,
                     context.channel().remoteAddress(), deviceName);
             return null;

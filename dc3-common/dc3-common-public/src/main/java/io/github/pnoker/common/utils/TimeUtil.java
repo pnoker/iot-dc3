@@ -114,7 +114,7 @@ public class TimeUtil {
         try {
             LocalDateTime ldt = LocalDateTime.parse(dateString, DEFAULT_DATE_FORMATTER);
             return Date.from(ldt.atZone(TimeConstant.DEFAULT_ZONEID).toInstant());
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException ignored) {
             log.debug("Failed to parse date string '{}' with default format", dateString);
             return null;
         }
@@ -130,7 +130,7 @@ public class TimeUtil {
         try {
             LocalDateTime ldt = LocalDateTime.parse(dateString, COMPLETE_DATE_FORMATTER);
             return Date.from(ldt.atZone(TimeConstant.DEFAULT_ZONEID).toInstant());
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException ignored) {
             log.debug("Failed to parse date string '{}' with complete format", dateString);
             return null;
         }

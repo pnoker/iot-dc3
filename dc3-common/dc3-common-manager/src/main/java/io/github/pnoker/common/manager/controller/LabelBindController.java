@@ -198,6 +198,13 @@ public class LabelBindController implements BaseController {
         }));
     }
 
+    /**
+     * Validate a label binding: the label belongs to the tenant, its type matches the
+     * entity type, and the bound entity itself belongs to the tenant.
+     *
+     * @param tenantId tenant scope
+     * @param entityBO the binding to validate
+     */
     private void validateBind(Long tenantId, LabelBindBO entityBO) {
         EntityTypeEnum entityTypeFlag = entityBO.getEntityTypeFlag();
         LabelBO labelBO = requireTenant(tenantId, labelService.getById(entityBO.getLabelId()));

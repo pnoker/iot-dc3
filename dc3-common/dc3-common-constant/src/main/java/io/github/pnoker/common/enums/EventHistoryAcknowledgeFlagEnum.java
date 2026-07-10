@@ -70,7 +70,7 @@ public enum EventHistoryAcknowledgeFlagEnum {
     public static EventHistoryAcknowledgeFlagEnum ofName(String name) {
         try {
             return valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }

@@ -64,10 +64,9 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     }
 
     /**
+     * Build driver registration information from the driver properties.
      *
-     * Build driver registration information from properties
-     *
-     * @return DriverRegisterBO Driver registration business object
+     * @return {@link RegisterBO} the assembled driver registration business object
      */
     private RegisterBO buildRegisterBOByProperty() {
         // Create and populate driver business object with properties

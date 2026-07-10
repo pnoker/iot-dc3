@@ -117,6 +117,9 @@ class CommandReceiverTest {
 
         receiver.commandReceive(channel, message, command("record-2"));
 
+        // A first-time failure must NOT send a result — the command is requeued and will
+        // be retried, so reporting FAILED here would double-report on the redelivery.
+        verify(driverSenderService, never()).commandResultSender(any());
         verify(dedupCache).release("record-2");
         verify(channel).basicNack(eq(9L), eq(false), eq(true));
     }

@@ -50,7 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author pnoker
  * @version 2026.5.22
- * @since 2026.6.2
+ * @since 2026.5.22
  */
 @Slf4j
 @Component
@@ -240,7 +240,8 @@ public class Lwm2mServerManager implements DisposableBean {
     public void destroy() {
         if (server != null) {
             server.destroy();
-            log.info("LwM2M server destroyed");
+            log.info("LwM2M server destroyed on coap://{}:{}", lwm2mProperties.getServerHost(),
+                    lwm2mProperties.getServerPort());
         }
     }
 }

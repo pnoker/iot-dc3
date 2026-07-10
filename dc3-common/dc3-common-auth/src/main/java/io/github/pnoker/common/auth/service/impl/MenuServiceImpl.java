@@ -135,8 +135,10 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /**
-     * @param entityQuery {@link MenuQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for menu search.
+     *
+     * @param entityQuery {@link MenuQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link MenuDO}
      */
     private LambdaQueryWrapper<MenuDO> fuzzyQuery(MenuQuery entityQuery) {
         LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
@@ -194,10 +196,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /**
-     * @param entityBO       {@link MenuBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
+     * Check whether a menu is duplicated by parent menu, type, name, and code.
+     *
+     * @param entityBO       {@link MenuBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(MenuBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
@@ -218,11 +222,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /**
-     * Primary key ID
+     * Get menu data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link MenuDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link MenuDO} if found, otherwise {@code null} when {@code throwException}
+     * is false
      */
     private MenuDO getDOById(Long id, boolean throwException) {
         MenuDO entityDO = menuManager.getById(id);

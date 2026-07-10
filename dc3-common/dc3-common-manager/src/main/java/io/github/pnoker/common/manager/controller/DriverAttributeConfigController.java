@@ -261,6 +261,13 @@ public class DriverAttributeConfigController implements BaseController {
         }));
     }
 
+    /**
+     * Validate that device and attribute belong to the tenant and share a driver.
+     *
+     * @param tenantId    tenant scope
+     * @param deviceId    the device to validate
+     * @param attributeId the attribute to validate
+     */
     private void requireDriverConfigRelations(Long tenantId, Long deviceId, Long attributeId) {
         DeviceBO deviceBO = requireTenant(tenantId, deviceService.getById(deviceId));
         DriverAttributeBO attributeBO = requireTenant(tenantId, driverAttributeService.getById(attributeId));

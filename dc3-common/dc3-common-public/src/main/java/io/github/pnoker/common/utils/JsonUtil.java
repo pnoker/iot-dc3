@@ -420,7 +420,7 @@ public final class JsonUtil {
         try {
             OBJECT_MAPPER.readTree(text);
             return true;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return false;
         }
     }

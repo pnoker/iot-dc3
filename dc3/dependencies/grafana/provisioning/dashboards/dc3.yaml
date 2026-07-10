@@ -1,0 +1,18 @@
+# Provisioned dashboard provider for IoT DC3.
+# Dashboards live under /var/lib/grafana/dashboards (bind-mounted from the
+# repo at dc3/dependencies/grafana/dashboards) and are loaded into the
+# "IoT DC3" folder on startup. Grafana watches for file changes.
+
+apiVersion: 1
+
+providers:
+  - name: dc3
+    orgId: 1
+    folder: IoT DC3
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

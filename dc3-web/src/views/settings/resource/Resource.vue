@@ -1,41 +1,42 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
-  <entity-list-page :config="config" />
+  <entity-list-page :config="config"/>
 </template>
 
 <script lang="ts" setup>
-  import {useI18n} from 'vue-i18n';
-  import {useRouter} from 'vue-router';
+import {useI18n} from 'vue-i18n';
+import {useRouter} from 'vue-router';
 
-  import EntityListPage from '@/components/entity/EntityListPage.vue';
+import EntityListPage from '@/components/entity/EntityListPage.vue';
 
-  import {createResourceConfig, resolveEntityRoute} from './resourceConfig';
+import {createResourceConfig, resolveEntityRoute} from './resourceConfig';
 
-  const {t} = useI18n();
-  const router = useRouter();
+const {t} = useI18n();
+const router = useRouter();
 
-  const goEntityDetail = (row: Record<string, any>) => {
-    const routeName = resolveEntityRoute(row);
-    if (!routeName) return;
-    router.push({name: routeName, query: {id: String(row.entityId)}}).catch(() => {
-      // handled globally
-    });
-  };
+const goEntityDetail = (row: Record<string, any>) => {
+  const routeName = resolveEntityRoute(row);
+  if (!routeName) return;
+  router.push({name: routeName, query: {id: String(row.entityId)}}).catch(() => {
+    // handled globally
+  });
+};
 
-  const config = createResourceConfig(t, {onEntityClick: goEntityDetail});
+const config = createResourceConfig(t, {onEntityClick: goEntityDetail});
 </script>

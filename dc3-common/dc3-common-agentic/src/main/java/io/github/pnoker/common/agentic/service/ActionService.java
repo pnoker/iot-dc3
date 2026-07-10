@@ -31,13 +31,45 @@ import java.util.List;
  */
 public interface ActionService {
 
+    /**
+     * Create a pending write-point-value action awaiting user confirmation.
+     *
+     * @param conversationId the conversation the action belongs to
+     * @param deviceId       target device
+     * @param pointId        target point
+     * @param value          value to write
+     * @param header         authenticated caller principal and tenant
+     * @return the created action id
+     */
     String createWritePointValueAction(String conversationId, Long deviceId, Long pointId, String value,
                                        RequestHeader.PrincipalHeader header);
 
+    /**
+     * List pending, non-expired actions for a conversation.
+     *
+     * @param conversationId the conversation to query
+     * @param header         authenticated caller principal and tenant
+     * @return pending actions for the conversation
+     */
     List<ActionBO> listPending(String conversationId, RequestHeader.PrincipalHeader header);
 
+    /**
+     * Confirm a pending action and execute it. For a write-point-value action this
+     * dispatches the write command and transitions the action to EXECUTED or FAILED.
+     *
+     * @param actionId the action to confirm
+     * @param header   authenticated caller principal and tenant
+     * @return the updated action
+     */
     ActionBO confirm(String actionId, RequestHeader.PrincipalHeader header);
 
+    /**
+     * Reject a pending action, transitioning it to REJECTED without executing it.
+     *
+     * @param actionId the action to reject
+     * @param header   authenticated caller principal and tenant
+     * @return the updated action
+     */
     ActionBO reject(String actionId, RequestHeader.PrincipalHeader header);
 
 }

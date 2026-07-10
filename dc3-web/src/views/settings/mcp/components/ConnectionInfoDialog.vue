@@ -1,17 +1,18 @@
 <!--
   - Copyright 2016-present the IoT DC3 original author or authors.
   -
-  - Licensed under the Apache License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License.
-  - You may obtain a copy of the License at
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
   -
-  -      https://www.apache.org/licenses/LICENSE-2.0
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
   -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <template>
@@ -31,27 +32,27 @@
 </template>
 
 <script lang="ts" setup>
-  import {computed, ref} from 'vue';
-  import {useI18n} from 'vue-i18n';
+import {computed, ref} from 'vue';
+import {useI18n} from 'vue-i18n';
 
-  import {getMcpMetadata} from '@/api/mcp';
-  import {MCP_SERVER_PATH} from '@/config/constant/api';
-  import type {McpConnectionRecord} from '@/config/types';
+import {getMcpMetadata} from '@/api/mcp';
+import {MCP_SERVER_PATH} from '@/config/constant/api';
+import type {McpConnectionRecord} from '@/config/types';
 
-  const {t} = useI18n();
+const {t} = useI18n();
 
-  const visible = ref(false);
-  const clientId = ref('');
-  const metadata = ref<Record<string, any>>({});
+const visible = ref(false);
+const clientId = ref('');
+const metadata = ref<Record<string, any>>({});
 
-  const mcpServerUrl = computed(() => `${window.location.origin}${MCP_SERVER_PATH}`);
+const mcpServerUrl = computed(() => `${window.location.origin}${MCP_SERVER_PATH}`);
 
-  const open = async (row: McpConnectionRecord) => {
-    clientId.value = row.clientId || '';
-    visible.value = true;
-    const res = await getMcpMetadata();
-    metadata.value = res.data || {};
-  };
+const open = async (row: McpConnectionRecord) => {
+  clientId.value = row.clientId || '';
+  visible.value = true;
+  const res = await getMcpMetadata();
+  metadata.value = res.data || {};
+};
 
-  defineExpose({open});
+defineExpose({open});
 </script>

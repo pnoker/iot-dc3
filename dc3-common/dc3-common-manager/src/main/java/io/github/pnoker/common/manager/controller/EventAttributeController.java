@@ -195,7 +195,7 @@ public class EventAttributeController implements BaseController {
                 List<EventAttributeBO> entityBOList = filterTenant(tenantId, eventAttributeService.listByDriverId(driverId));
                 List<EventAttributeVO> entityVO = eventAttributeBuilder.buildVOListByBOList(entityBOList);
                 return R.ok(entityVO);
-            } catch (NotFoundException ne) {
+            } catch (NotFoundException ignored) {
                 return R.ok(Collections.emptyList());
             }
         }));

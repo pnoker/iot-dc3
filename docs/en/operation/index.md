@@ -105,7 +105,7 @@ Replace them with your own.
 ::: code-group
 
 ```bash [1. Get salt + exchange for token]
-# Get the login salt (valid for 5 minutes)
+# Get the login salt (public endpoint; use within 5 minutes)
 curl -s -X POST http://localhost:8000/api/v3/auth/token/salt \
   -H 'Content-Type: application/json' \
   -d '{"tenant":"default","name":"dc3"}'

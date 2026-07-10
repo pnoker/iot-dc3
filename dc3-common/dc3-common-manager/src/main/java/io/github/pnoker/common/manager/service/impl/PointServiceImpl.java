@@ -305,8 +305,10 @@ public class PointServiceImpl implements PointService {
     }
 
     /**
-     * @param entityQuery {@link PointQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for point search.
+     *
+     * @param entityQuery {@link PointQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link PointDO}
      */
     private LambdaQueryWrapper<PointDO> fuzzyQuery(PointQuery entityQuery) {
         QueryWrapper<PointDO> wrapper = Wrappers.query();
@@ -339,10 +341,13 @@ public class PointServiceImpl implements PointService {
     }
 
     /**
-     * @param entityBO       {@link PointBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
+     * Check whether a point is duplicated within its profile by point name or point code.
+     * Returns {@code false} when neither name nor code is supplied.
+     *
+     * @param entityBO       {@link PointBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(PointBO entityBO, boolean isUpdate, boolean throwException) {
         boolean hasName = StringUtils.isNotEmpty(entityBO.getPointName());
@@ -424,11 +429,12 @@ public class PointServiceImpl implements PointService {
     }
 
     /**
-     * Primary key ID
+     * Get point data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link PointDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link PointDO} if found, otherwise {@code null} when {@code throwException}
+     * is false
      */
     private PointDO getDOById(Long id, boolean throwException) {
         PointDO entityDO = pointManager.getById(id);

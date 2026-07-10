@@ -1,0 +1,80 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package api.common.manager;
+
+import "api/common/r.proto";
+import "api/common/page.proto";
+import "api/common/entity.proto";
+import "api/common/manager/manager_query.proto";
+import "api/common/manager/manager_query_page.proto";
+
+// Configuration options for code generation
+option java_package = "io.github.pnoker.api.center.manager";
+option java_outer_classname = "ManagerDriverProto";
+option objc_class_prefix = "Manager";
+option java_multiple_files = true;
+
+// Service interface defining RPC calls related to driver management
+service DriverApi {
+  // Paginated query for driver information
+  rpc ListByPage (GrpcPageDriverQuery) returns (GrpcRPageDriverDTO);
+  // Query driver information by Driver ID
+  rpc GetByDriverId (GrpcDriverQuery) returns (GrpcRDriverDTO);
+  // Batch query driver information by Driver IDs
+  rpc ListByDriverIds (GrpcDriverIdsQuery) returns (GrpcRDriverListDTO);
+  // Query associated driver information by Device ID
+  rpc GetByDeviceId (GrpcDeviceQuery) returns (GrpcRDriverDTO);
+}
+
+// Response wrapper for paginated driver query
+message GrpcRPageDriverDTO {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Returned paginated driver data
+  GrpcPageDriverDTO data = 2;
+}
+
+// Driver page data structure
+message GrpcPageDriverDTO {
+  // Pagination information including page number, page size, and total count
+  GrpcPage page = 1;
+
+  // List of driver data
+  repeated GrpcDriverDTO data = 2;
+}
+
+// Response wrapper for driver list query
+message GrpcRDriverListDTO {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Returned driver list data
+  repeated GrpcDriverDTO data = 2;
+}
+
+// Response wrapper for single driver query
+message GrpcRDriverDTO {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Returned single driver data
+  GrpcDriverDTO data = 2;
+}

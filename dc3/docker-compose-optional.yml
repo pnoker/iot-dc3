@@ -181,6 +181,10 @@ services:
     hostname: dc3-grafana
     volumes:
       - grafana:/var/lib/grafana
+      # Provisioned datasources + dashboards for point-value observation.
+      # See dc3/dependencies/grafana/ in the repo.
+      - ./dependencies/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./dependencies/grafana/dashboards:/var/lib/grafana/dashboards:ro
     logging: *default-logging
     networks:
       dc3net:

@@ -32,8 +32,23 @@ import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
  */
 public interface DashboardService {
 
+    /**
+     * Aggregate driver statistics for the dashboard home view: driver counts grouped by
+     * enable status and protocol type.
+     *
+     * @param tenantId caller's tenant id
+     * @return driver statistics for the tenant
+     */
     DriverStatsVO driverStats(Long tenantId);
 
+    /**
+     * Aggregate device statistics for the dashboard home view: device counts plus the
+     * top-N most active devices by point-value volume.
+     *
+     * @param tenantId caller's tenant id
+     * @param topN     number of top devices to return, ranked by point-value volume
+     * @return device statistics for the tenant
+     */
     DeviceStatsVO deviceStats(Long tenantId, int topN);
 
     /**

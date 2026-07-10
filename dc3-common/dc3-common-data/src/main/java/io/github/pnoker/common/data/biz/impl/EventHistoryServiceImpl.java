@@ -154,6 +154,16 @@ public class EventHistoryServiceImpl implements EventHistoryService {
         return eventHistoryBuilder.buildVOPageByDOPage(page);
     }
 
+    /**
+     * Validate the device exists and is enabled within the tenant, then resolve and
+     * validate the event, requiring the event share the device's profile.
+     *
+     * @param tenantId  tenant scope
+     * @param deviceId  the device to validate
+     * @param eventId   the event id, preferred when present
+     * @param eventCode the event code, used as fallback
+     * @return the resolved, enabled event
+     */
     private FacadeEventBO validateEventScope(Long tenantId, Long deviceId, Long eventId, String eventCode) {
         FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
         if (Objects.isNull(device)) {
@@ -176,6 +186,16 @@ public class EventHistoryServiceImpl implements EventHistoryService {
         return event;
     }
 
+    /**
+     * Resolve an event by id when present, otherwise by code within the device's profile.
+     * Requires at least one of event id or code.
+     *
+     * @param tenantId  tenant scope
+     * @param device    the device whose profile scopes the lookup
+     * @param eventId   the event id, used when present
+     * @param eventCode the event code, used as fallback
+     * @return the resolved event, or {@code null} when none matches
+     */
     private FacadeEventBO resolveEvent(Long tenantId, FacadeDeviceBO device, Long eventId, String eventCode) {
         if (Objects.nonNull(eventId)) {
             return eventFacade.getById(tenantId, eventId);

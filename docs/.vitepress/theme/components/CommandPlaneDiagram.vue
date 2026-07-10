@@ -55,104 +55,116 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 <template>
   <DiagramFrame>
     <div class="dc3-diagram">
-    <svg :aria-label="s.aria" role="img" viewBox="0 0 1180 320">
-      <defs>
-        <marker id="cp-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
-          <polygon fill="var(--dc3-arrow)" points="0 0, 10 3.5, 0 7"/>
-        </marker>
-      </defs>
+      <svg :aria-label="s.aria" role="img" viewBox="0 0 1180 320">
+        <defs>
+          <marker id="cp-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
+            <polygon fill="var(--dc3-arrow)" points="0 0, 10 3.5, 0 7"/>
+          </marker>
+        </defs>
 
-      <!-- direction legend (top) -->
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="476" x2="512" y1="42" y2="42"/>
-      <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="end" x="468" y="46">{{ s.down }}</text>
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="640" x2="604" y1="42" y2="42"/>
-      <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="start" x="648" y="46">{{ s.up }}</text>
+        <!-- direction legend (top) -->
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="476" x2="512" y1="42" y2="42"/>
+        <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="end" x="468" y="46">{{ s.down }}</text>
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="640" x2="604" y1="42" y2="42"/>
+        <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="start" x="648" y="46">{{ s.up }}</text>
 
-      <!-- arrows: each gap has ▼ command dispatch (top, rightward) + ▲ result receipt (bottom, leftward) -->
-      <!-- client <-> gateway -->
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="178" x2="216" y1="124" y2="124"/>
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="216" x2="178" y1="152" y2="152"/>
-      <!-- gateway <-> center-data -->
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="374" x2="412" y1="124" y2="124"/>
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="412" x2="374" y1="152" y2="152"/>
-      <!-- center-data <-> rabbitmq -->
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="582" x2="620" y1="124" y2="124"/>
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="620" x2="582" y1="152" y2="152"/>
-      <!-- rabbitmq <-> driver -->
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="790" x2="828" y1="124" y2="124"/>
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="828" x2="790" y1="152" y2="152"/>
-      <!-- driver <-> device -->
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="986" x2="1024" y1="124" y2="124"/>
-      <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="1024" x2="986" y1="152" y2="152"/>
+        <!-- arrows: each gap has ▼ command dispatch (top, rightward) + ▲ result receipt (bottom, leftward) -->
+        <!-- client <-> gateway -->
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="178" x2="216" y1="124"
+              y2="124"/>
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="216" x2="178" y1="152"
+              y2="152"/>
+        <!-- gateway <-> center-data -->
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="374" x2="412" y1="124"
+              y2="124"/>
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="412" x2="374" y1="152"
+              y2="152"/>
+        <!-- center-data <-> rabbitmq -->
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="582" x2="620" y1="124"
+              y2="124"/>
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="620" x2="582" y1="152"
+              y2="152"/>
+        <!-- rabbitmq <-> driver -->
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="790" x2="828" y1="124"
+              y2="124"/>
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="828" x2="790" y1="152"
+              y2="152"/>
+        <!-- driver <-> device -->
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="986" x2="1024" y1="124"
+              y2="124"/>
+        <line marker-end="url(#cp-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="1024" x2="986" y1="152"
+              y2="152"/>
 
-      <!-- client -->
-      <rect fill="var(--dc3-fe-fill)" height="80" rx="9" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="158"
-            x="20"
-            y="98"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="99" y="133">{{
-          s.client
-        }}
-      </text>
-      <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="99" y="152">{{ s.clientSub }}</text>
+        <!-- client -->
+        <rect fill="var(--dc3-fe-fill)" height="80" rx="9" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="158"
+              x="20"
+              y="98"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="99" y="133">{{
+            s.client
+          }}
+        </text>
+        <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="99" y="152">{{ s.clientSub }}</text>
 
-      <!-- gateway -->
-      <rect fill="var(--dc3-be-fill)" height="80" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="158"
-            x="216"
-            y="98"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="295" y="133">{{
-          s.gw
-        }}
-      </text>
-      <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="295" y="152">{{ s.gwSub }}</text>
+        <!-- gateway -->
+        <rect fill="var(--dc3-be-fill)" height="80" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="158"
+              x="216"
+              y="98"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="295" y="133">{{
+            s.gw
+          }}
+        </text>
+        <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="295" y="152">{{ s.gwSub }}</text>
 
-      <!-- center-data -->
-      <rect fill="var(--dc3-be-fill)" height="96" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="170"
-            x="412"
-            y="90"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="497" y="120">{{
-          s.data
-        }}
-      </text>
-      <text fill="var(--dc3-be-text)" font-size="9.5" text-anchor="middle" x="497" y="140">{{ s.dataSub1 }}</text>
-      <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="497" y="157">{{ s.dataSub2 }}</text>
+        <!-- center-data -->
+        <rect fill="var(--dc3-be-fill)" height="96" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="170"
+              x="412"
+              y="90"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="497" y="120">{{
+            s.data
+          }}
+        </text>
+        <text fill="var(--dc3-be-text)" font-size="9.5" text-anchor="middle" x="497" y="140">{{ s.dataSub1 }}</text>
+        <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="497" y="157">{{ s.dataSub2 }}</text>
 
-      <!-- rabbitmq -->
-      <rect fill="var(--dc3-bus-fill)" height="96" rx="9" stroke="var(--dc3-bus-stroke)" stroke-width="1.5" width="170"
-            x="620"
-            y="90"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="705" y="120">{{
-          s.bus
-        }}
-      </text>
-      <text fill="var(--dc3-bus-text)" font-size="9" text-anchor="middle" x="705" y="141">{{ s.busSub1 }}</text>
-      <text fill="var(--dc3-text2)" font-size="8.5" text-anchor="middle" x="705" y="157">{{ s.busSub2 }}</text>
+        <!-- rabbitmq -->
+        <rect fill="var(--dc3-bus-fill)" height="96" rx="9" stroke="var(--dc3-bus-stroke)" stroke-width="1.5"
+              width="170"
+              x="620"
+              y="90"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="705" y="120">{{
+            s.bus
+          }}
+        </text>
+        <text fill="var(--dc3-bus-text)" font-size="9" text-anchor="middle" x="705" y="141">{{ s.busSub1 }}</text>
+        <text fill="var(--dc3-text2)" font-size="8.5" text-anchor="middle" x="705" y="157">{{ s.busSub2 }}</text>
 
-      <!-- driver -->
-      <rect fill="var(--dc3-be-fill)" height="96" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="158"
-            x="828"
-            y="90"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="907" y="120">{{
-          s.drv
-        }}
-      </text>
-      <text fill="var(--dc3-be-text)" font-size="9" text-anchor="middle" x="907" y="140">{{ s.drvSub1 }}</text>
-      <text fill="var(--dc3-text2)" font-size="8.5" text-anchor="middle" x="907" y="157">{{ s.drvSub2 }}</text>
+        <!-- driver -->
+        <rect fill="var(--dc3-be-fill)" height="96" rx="9" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="158"
+              x="828"
+              y="90"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="907" y="120">{{
+            s.drv
+          }}
+        </text>
+        <text fill="var(--dc3-be-text)" font-size="9" text-anchor="middle" x="907" y="140">{{ s.drvSub1 }}</text>
+        <text fill="var(--dc3-text2)" font-size="8.5" text-anchor="middle" x="907" y="157">{{ s.drvSub2 }}</text>
 
-      <!-- field device -->
-      <rect fill="var(--dc3-ext-fill)" height="80" rx="9" stroke="var(--dc3-ext-stroke)" stroke-width="1.5" width="136"
-            x="1024"
-            y="98"/>
-      <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="1092" y="133">{{
-          s.dev
-        }}
-      </text>
-      <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="1092" y="152">{{ s.devSub }}</text>
+        <!-- field device -->
+        <rect fill="var(--dc3-ext-fill)" height="80" rx="9" stroke="var(--dc3-ext-stroke)" stroke-width="1.5"
+              width="136"
+              x="1024"
+              y="98"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="1092" y="133">{{
+            s.dev
+          }}
+        </text>
+        <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="1092" y="152">{{ s.devSub }}</text>
 
-      <!-- key facts (verified against command-plane.md) -->
-      <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="590" y="240">{{ s.note1 }}</text>
-      <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="590" y="262">{{ s.note2 }}</text>
-      <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="590" y="290">{{ s.note3 }}</text>
-    </svg>
+        <!-- key facts (verified against command-plane.md) -->
+        <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="590" y="240">{{ s.note1 }}</text>
+        <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="590" y="262">{{ s.note2 }}</text>
+        <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="590" y="290">{{ s.note3 }}</text>
+      </svg>
     </div>
   </DiagramFrame>
 </template>

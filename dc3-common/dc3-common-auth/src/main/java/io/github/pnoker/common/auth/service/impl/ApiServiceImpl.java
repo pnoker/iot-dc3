@@ -107,8 +107,10 @@ public class ApiServiceImpl implements ApiService {
     }
 
     /**
-     * @param entityQuery {@link ApiQuery}
-     * @return {@link LambdaQueryWrapper}
+     * Build fuzzy query wrapper for api search.
+     *
+     * @param entityQuery {@link ApiQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link ApiDO}
      */
     private LambdaQueryWrapper<ApiDO> fuzzyQuery(ApiQuery entityQuery) {
         LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
@@ -125,10 +127,12 @@ public class ApiServiceImpl implements ApiService {
     }
 
     /**
-     * @param entityBO       {@link ApiBO}
-     * @param isUpdate
-     * @param throwException
-     * @return
+     * Check whether an api is duplicated by api type, name, and code.
+     *
+     * @param entityBO       {@link ApiBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(ApiBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
@@ -148,11 +152,12 @@ public class ApiServiceImpl implements ApiService {
     }
 
     /**
-     * Primary key ID
+     * Get api data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException
-     * @return {@link ApiDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link ApiDO} if found, otherwise {@code null} when {@code throwException}
+     * is false
      */
     private ApiDO getDOById(Long id, boolean throwException) {
         ApiDO entityDO = apiManager.getById(id);

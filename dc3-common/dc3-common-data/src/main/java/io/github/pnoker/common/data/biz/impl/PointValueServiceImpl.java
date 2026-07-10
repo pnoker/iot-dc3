@@ -243,6 +243,15 @@ public class PointValueServiceImpl implements PointValueService {
         }
     }
 
+    /**
+     * Validate that the device and point exist within the tenant and that the point
+     * belongs to the device's profile. A no-op when {@code tenantId} is null; throws
+     * {@link NotFoundException} on any missing or mismatched entity.
+     *
+     * @param tenantId tenant scope
+     * @param deviceId device id to validate, skipped when not a positive id
+     * @param pointId  point id to validate, skipped when not a positive id
+     */
     private void validateMetadataScope(Long tenantId, Long deviceId, Long pointId) {
         if (Objects.isNull(tenantId)) {
             return;
@@ -270,10 +279,24 @@ public class PointValueServiceImpl implements PointValueService {
         }
     }
 
+    /**
+     * Return whether the given id is a valid reference (non-null and positive).
+     *
+     * @param id the id to test
+     * @return {@code true} if the id is a positive non-null value
+     */
     private boolean isValidId(Long id) {
         return Objects.nonNull(id) && id > 0;
     }
 
+    /**
+     * Build a placeholder point value indicating no latest value is available.
+     *
+     * @param tenantId tenant scope
+     * @param deviceId device id
+     * @param pointId  point id
+     * @return a point value marked as having no latest value
+     */
     private PointValueBO noLatestPointValue(Long tenantId, Long deviceId, Long pointId) {
         return PointValueBO.builder()
                 .tenantId(tenantId)
@@ -285,6 +308,12 @@ public class PointValueServiceImpl implements PointValueService {
                 .build();
     }
 
+    /**
+     * Mark a resolved point value as having a latest value.
+     *
+     * @param pointValueBO the point value to flag
+     * @return the same point value, marked as having a latest value
+     */
     private PointValueBO latestPointValue(PointValueBO pointValueBO) {
         pointValueBO.setHasLatestValue(true);
         return pointValueBO;
