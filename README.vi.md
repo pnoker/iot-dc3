@@ -162,8 +162,10 @@ source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-Nếu cần registry Alibaba Cloud cho Trung Quốc đại lục, dùng `make up-db-cn`. Thứ tự khởi động service, cấu hình IDE,
-lệnh kiểm tra và các lỗi thường gặp nằm trong [Quickstart đầy đủ](https://docs.dc3.site/en/quickstart/).
+Nếu cần registry Alibaba Cloud cho Trung Quốc đại lục, dùng `make up-db-cn`.
+
+> 📖 Xem [Quickstart đầy đủ](https://docs.dc3.site/en/quickstart/) để biết thứ tự khởi động service, cấu hình IDE,
+> lệnh kiểm tra và các lỗi thường gặp.
 
 ## 🛠️ Công nghệ sử dụng
 

@@ -164,8 +164,10 @@ source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-Use `make up-db-cn` if you prefer the Alibaba Cloud registry in Mainland China. For service startup order, IDE setup,
-verification commands, and common pitfalls, read the [full quickstart guide](https://docs.dc3.site/en/quickstart/).
+Use `make up-db-cn` if you prefer the Alibaba Cloud registry in Mainland China.
+
+> 📖 For service startup order, IDE setup, verification commands, and common pitfalls,
+> see the [full Quickstart](https://docs.dc3.site/en/quickstart/).
 
 ## 🛠️ Technology Stack
 

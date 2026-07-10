@@ -156,8 +156,9 @@ source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-中国大陆网络环境可改用 `make up-db-cn`。服务启动顺序、IDEA 配置、验证命令和常见坑请阅读
-[完整快速开始](https://docs.dc3.site/zh/quickstart/)。
+中国大陆网络环境可改用 `make up-db-cn`。
+
+> 📖 服务启动顺序、IDEA 配置、验证命令和常见坑请参阅 [完整快速开始](https://docs.dc3.site/zh/quickstart/)。
 
 ## 🛠️ 技术栈
 

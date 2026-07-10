@@ -160,8 +160,10 @@ source dc3/env/dev.env.sh
 mvn -s .mvn/settings.xml clean package
 ```
 
-中国大陸向けの Alibaba Cloud レジストリを使う場合は `make up-db-cn` を利用してください。サービスの起動順序、IDE 設定、検証コマンド、よくある落とし穴は
-[完全なクイックスタート](https://docs.dc3.site/en/quickstart/)を参照してください。
+中国大陸向けの Alibaba Cloud レジストリを使う場合は `make up-db-cn` を利用してください。
+
+> 📖 サービスの起動順序、IDE 設定、検証コマンド、よくある落とし穴については、
+> [完全なクイックスタート](https://docs.dc3.site/en/quickstart/)を参照してください。
 
 ## 🛠️ 技術スタック
 
