@@ -52,6 +52,16 @@ public class AgenticMessageRecorder {
         persistAssistantMessage(prepared, content, null, userHeader);
     }
 
+    /**
+     * Persist the assistant message for a turn. Builds the assistant content (text,
+     * reasoning, tool trace), and skips persistence entirely when nothing is
+     * persistable.
+     *
+     * @param prepared         the prepared chat
+     * @param content          the assistant text content
+     * @param reasoningContent the reasoning trace, may be null
+     * @param userHeader       authenticated caller principal and tenant
+     */
     public void persistAssistantMessage(AgenticPreparedChatBO prepared, String content, String reasoningContent,
                                         RequestHeader.PrincipalHeader userHeader) {
         AgenticMessageContent messageContent = buildAssistantContent(prepared, StringUtils.defaultString(content),

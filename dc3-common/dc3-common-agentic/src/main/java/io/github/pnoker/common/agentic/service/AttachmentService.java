@@ -33,10 +33,34 @@ import java.util.List;
  */
 public interface AttachmentService {
 
+    /**
+     * Upload a file attachment for a conversation, persisting it under the caller's
+     * tenant/user directory.
+     *
+     * @param conversationId the conversation the attachment belongs to
+     * @param filePart       the uploaded file part
+     * @param header         authenticated caller principal and tenant
+     * @return the persisted attachment
+     */
     Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.PrincipalHeader header);
 
+    /**
+     * List attachments for a conversation.
+     *
+     * @param conversationId the conversation to query
+     * @param header         authenticated caller principal and tenant
+     * @return the conversation's attachments
+     */
     List<AttachmentBO> list(String conversationId, RequestHeader.PrincipalHeader header);
 
+    /**
+     * Summarize the given attachments into a metadata text suitable for inclusion in a
+     * prompt.
+     *
+     * @param attachmentIds the attachments to summarize
+     * @param header        authenticated caller principal and tenant
+     * @return the summary text
+     */
     String summarize(List<Long> attachmentIds, RequestHeader.PrincipalHeader header);
 
 }

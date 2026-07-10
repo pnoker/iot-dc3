@@ -32,9 +32,26 @@ import java.util.List;
  */
 public interface MessageService {
 
+    /**
+     * Persist a message, auto-assigning the next message index in the conversation.
+     *
+     * @param conversationId the conversation the message belongs to
+     * @param role           message role (user/assistant/system/tool)
+     * @param content        message content
+     * @param model          model that produced the message, if any
+     * @param header         authenticated caller principal and tenant
+     * @return the persisted message
+     */
     MessageBO save(String conversationId, String role, AgenticMessageContent content, String model,
                    RequestHeader.PrincipalHeader header);
 
+    /**
+     * List messages for a conversation.
+     *
+     * @param conversationId the conversation to query
+     * @param header         authenticated caller principal and tenant
+     * @return the conversation's messages
+     */
     List<MessageBO> list(String conversationId, RequestHeader.PrincipalHeader header);
 
     /**

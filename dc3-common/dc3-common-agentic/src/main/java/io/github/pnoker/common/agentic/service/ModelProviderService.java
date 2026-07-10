@@ -31,12 +31,36 @@ import java.util.List;
  */
 public interface ModelProviderService {
 
+    /**
+     * List all registered model providers.
+     *
+     * @return all model providers
+     */
     List<ModelProviderBO> list();
 
+    /**
+     * Register a model provider.
+     *
+     * @param entityBO the provider to add
+     * @param header   authenticated caller principal and tenant
+     * @return the added provider
+     */
     ModelProviderBO add(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header);
 
+    /**
+     * Update a model provider, evicting any cached ChatClient built from it.
+     *
+     * @param entityBO the provider to update
+     * @param header   authenticated caller principal and tenant
+     * @return the updated provider
+     */
     ModelProviderBO update(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header);
 
+    /**
+     * Delete a model provider and clean up its cached ChatClient.
+     *
+     * @param id the provider id
+     */
     void delete(Long id);
 
 }

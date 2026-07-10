@@ -28,8 +28,21 @@ import reactor.core.publisher.Flux;
  */
 public interface AgenticRuntime {
 
+    /**
+     * Run the model/tool loop as a stream, emitting one frame per delta until the model
+     * stops calling tools.
+     *
+     * @param prepared the prepared chat request
+     * @return a flux of stream frames
+     */
     Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatBO prepared);
 
+    /**
+     * Run the model/tool loop to completion, returning the final assistant answer.
+     *
+     * @param prepared the prepared chat request
+     * @return the final result and finish reason
+     */
     AgenticRuntimeResult call(AgenticPreparedChatBO prepared);
 
 }
