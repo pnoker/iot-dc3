@@ -120,6 +120,14 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
         return new FacadeSystemHealthBO.FleetSummary(source.getTotal(), source.getOnline());
     }
 
+    /**
+     * Resolve a device's status code from its entity state, returning OFFLINE when the
+     * state is missing or its lease has expired.
+     *
+     * @param tenantId tenant scope
+     * @param deviceId device id
+     * @return the status code
+     */
     private String deviceStatus(Long tenantId, Long deviceId) {
         EntityStateDO state = entityStateManager.lambdaQuery()
                 .eq(EntityStateDO::getTenantId, tenantId)
@@ -133,6 +141,14 @@ public class StatusHealthLocalFacade implements StatusHealthFacade {
         return Objects.nonNull(e) ? e.getCode() : EntityStatusEnum.OFFLINE.getCode();
     }
 
+    /**
+     * Resolve a driver's status code from its entity state, returning OFFLINE when the
+     * state is missing or its lease has expired.
+     *
+     * @param tenantId tenant scope
+     * @param driverId driver id
+     * @return the status code
+     */
     private String driverStatus(Long tenantId, Long driverId) {
         EntityStateDO state = entityStateManager.lambdaQuery()
                 .eq(EntityStateDO::getTenantId, tenantId)

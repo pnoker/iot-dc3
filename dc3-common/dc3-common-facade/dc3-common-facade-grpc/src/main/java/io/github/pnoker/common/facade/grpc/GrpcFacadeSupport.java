@@ -42,6 +42,17 @@ public class GrpcFacadeSupport {
 
     private final GrpcFacadeProperties properties;
 
+    /**
+     * Invoke a gRPC call with a deadline, translating {@link StatusRuntimeException}
+     * into a {@link ServiceException} carrying the operation name and status.
+     *
+     * @param operation human-readable operation name for error messages
+     * @param stub      the gRPC stub to invoke
+     * @param invocation the call to apply on the stub
+     * @param <S>       stub type
+     * @param <T>       return type
+     * @return the invocation result
+     */
     public <S extends AbstractStub<S>, T> T call(String operation, S stub, Function<S, T> invocation) {
         try {
             return invocation.apply(withDeadline(stub));
@@ -52,6 +63,14 @@ public class GrpcFacadeSupport {
         }
     }
 
+    /**
+     * Apply the configured deadline to a stub, returning it unchanged when no deadline
+     * is configured.
+     *
+     * @param stub the gRPC stub
+     * @param <S>  stub type
+     * @return the stub with a deadline applied, or the original stub
+     */
     private <S extends AbstractStub<S>> S withDeadline(S stub) {
         long deadlineMs = properties.getDeadlineMs();
         if (deadlineMs <= 0) {

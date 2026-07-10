@@ -32,14 +32,48 @@ import java.util.Map;
  */
 public interface StatusHealthFacade {
 
+    /**
+     * Resolve the status code for each device id, scoped to a tenant.
+     *
+     * @param tenantId  tenant scope
+     * @param deviceIds device ids to resolve
+     * @return map from device id to its status code
+     */
     Map<Long, String> listDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds);
 
+    /**
+     * Resolve the status code for each device sharing a profile, scoped to a tenant.
+     *
+     * @param tenantId  tenant scope
+     * @param profileId profile whose devices to resolve
+     * @return map from device id to its status code
+     */
     Map<Long, String> listDeviceStatusesByProfileId(Long tenantId, Long profileId);
 
+    /**
+     * Resolve the status code for each driver id, scoped to a tenant.
+     *
+     * @param tenantId  tenant scope
+     * @param driverIds driver ids to resolve
+     * @return map from driver id to its status code
+     */
     Map<Long, String> listDriverStatusesByIds(Long tenantId, Collection<Long> driverIds);
 
+    /**
+     * Summarize the status of a driver and its devices, scoped to a tenant.
+     *
+     * @param tenantId tenant scope
+     * @param driverId driver id
+     * @return the driver/device status summary
+     */
     FacadeDriverDeviceStatusSummaryBO getDriverDeviceStatusSummary(Long tenantId, Long driverId);
 
+    /**
+     * Snapshot the system health (centers, infrastructure, fleet) for a tenant.
+     *
+     * @param tenantId tenant scope
+     * @return the system health snapshot
+     */
     FacadeSystemHealthBO systemHealth(Long tenantId);
 
 }
