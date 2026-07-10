@@ -48,6 +48,14 @@ public class KeyStoreUtil {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
+    /**
+     * Import a certificate into the JDK default cacerts keystore. The certificate is
+     * resolved from {@code classpath:/ssl/} then {@code file:./ssl/}, and the keystore
+     * passphrase is the JDK default {@code changeit}.
+     *
+     * @param crtFileName  certificate file name
+     * @param crtNameAlias alias under which to store the certificate
+     */
     public static void importKeystore(String crtFileName, String crtNameAlias) {
         DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
         String[] resourcePaths = new String[]{"classpath:/ssl/", "file:./ssl/"};
@@ -59,6 +67,16 @@ public class KeyStoreUtil {
         }
     }
 
+    /**
+     * Locate a resource by trying each base path in turn, returning the first that
+     * exists.
+     *
+     * @param resourceLoader the resource loader
+     * @param resourcePaths  base paths to try in order
+     * @param fileName       the file name to append to each base path
+     * @return the first existing resource
+     * @throws NotFoundException if no path yields an existing resource
+     */
     private static Resource getResource(ResourceLoader resourceLoader, String[] resourcePaths, String fileName) {
         for (String path : resourcePaths) {
             Resource resource = resourceLoader.getResource(path + fileName);
@@ -69,6 +87,15 @@ public class KeyStoreUtil {
         throw new NotFoundException("Certificate file '{}' doesn't exist", fileName);
     }
 
+    /**
+     * Load the JDK cacerts keystore, skip the import when the alias already exists, and
+     * otherwise write the certificate(s) from the stream under the alias.
+     *
+     * @param crtInputStream certificate input stream
+     * @param crtAliasName   alias to store under
+     * @param passphrase     keystore passphrase
+     * @throws Exception on keystore load/store or certificate parsing failure
+     */
     private static void importKeystore(InputStream crtInputStream, String crtAliasName, String passphrase)
             throws Exception {
         log.info("Importing certificate '{}'", crtAliasName);

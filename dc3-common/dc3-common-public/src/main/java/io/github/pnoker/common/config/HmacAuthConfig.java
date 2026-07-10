@@ -47,6 +47,14 @@ public class HmacAuthConfig {
 
     private static final String WEAK_DEFAULT_SECRET = "io.github.pnoker.dc3";
 
+    /**
+     * Build the HMAC signer bean, resolving the secret from properties or the
+     * environment variable and validating it in protected environments.
+     *
+     * @param properties  HMAC auth properties
+     * @param environment Spring environment
+     * @return the HMAC signer
+     */
     @Bean
     @ConditionalOnMissingBean
     public HmacAuthSigner hmacAuthSigner(HmacAuthProperties properties, Environment environment) {
@@ -56,6 +64,13 @@ public class HmacAuthConfig {
         return new HmacAuthSigner(secret);
     }
 
+    /**
+     * Validate the HMAC secret in protected (pre/pro) environments: it must be set and
+     * must not be the weak development default. No-op in other environments.
+     *
+     * @param secret      the resolved secret
+     * @param environment Spring environment
+     */
     private void validateSecret(String secret, Environment environment) {
         if (!isProtectedEnvironment(environment)) {
             return;
@@ -71,6 +86,13 @@ public class HmacAuthConfig {
         }
     }
 
+    /**
+     * Return whether the runtime is a protected environment (pre or pro), determined
+     * from the active Spring profiles and the {@code spring.env} property.
+     *
+     * @param environment Spring environment
+     * @return true if running under the pre or pro profile
+     */
     private boolean isProtectedEnvironment(Environment environment) {
         Set<String> names = Arrays.stream(environment.getActiveProfiles())
                 .filter(Objects::nonNull)
