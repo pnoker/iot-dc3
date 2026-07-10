@@ -33,8 +33,20 @@ import java.util.Set;
  */
 public interface EventParamService extends BaseService<EventParamBO, EventParamQuery> {
 
+    /**
+     * Query event params belonging to an event.
+     *
+     * @param eventId Event ID
+     * @return EventParamBO list
+     */
     List<EventParamBO> listByEventId(Long eventId);
 
+    /**
+     * Query event params by a set of param IDs.
+     *
+     * @param ids Param ID set
+     * @return EventParamBO list
+     */
     List<EventParamBO> listByIds(Set<Long> ids);
 
 }

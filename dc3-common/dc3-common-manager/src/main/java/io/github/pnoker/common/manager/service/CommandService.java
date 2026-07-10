@@ -33,12 +33,38 @@ import java.util.Set;
  */
 public interface CommandService extends BaseService<CommandBO, CommandQuery> {
 
+    /**
+     * Query commands belonging to a profile, scoped to a tenant.
+     *
+     * @param profileId Profile ID
+     * @param tenantId  Tenant ID
+     * @return CommandBO list
+     */
     List<CommandBO> listByProfileId(Long profileId, Long tenantId);
 
+    /**
+     * Query commands belonging to a device, scoped to a tenant.
+     *
+     * @param deviceId Device ID
+     * @param tenantId Tenant ID
+     * @return CommandBO list
+     */
     List<CommandBO> listByDeviceId(Long deviceId, Long tenantId);
 
+    /**
+     * Query commands belonging to any of a set of profiles.
+     *
+     * @param profileIds Profile ID list
+     * @return CommandBO list
+     */
     List<CommandBO> listByProfileIds(List<Long> profileIds);
 
+    /**
+     * Query commands by a set of command IDs.
+     *
+     * @param ids Command ID set
+     * @return CommandBO list
+     */
     List<CommandBO> listByIds(Set<Long> ids);
 
 }

@@ -33,12 +33,38 @@ import java.util.Set;
  */
 public interface EventService extends BaseService<EventBO, EventQuery> {
 
+    /**
+     * Query events belonging to a profile, scoped to a tenant.
+     *
+     * @param profileId Profile ID
+     * @param tenantId  Tenant ID
+     * @return EventBO list
+     */
     List<EventBO> listByProfileId(Long profileId, Long tenantId);
 
+    /**
+     * Query events belonging to a device, scoped to a tenant.
+     *
+     * @param deviceId Device ID
+     * @param tenantId Tenant ID
+     * @return EventBO list
+     */
     List<EventBO> listByDeviceId(Long deviceId, Long tenantId);
 
+    /**
+     * Query events belonging to any of a set of profiles.
+     *
+     * @param profileIds Profile ID list
+     * @return EventBO list
+     */
     List<EventBO> listByProfileIds(List<Long> profileIds);
 
+    /**
+     * Query events by a set of event IDs.
+     *
+     * @param ids Event ID set
+     * @return EventBO list
+     */
     List<EventBO> listByIds(Set<Long> ids);
 
 }
