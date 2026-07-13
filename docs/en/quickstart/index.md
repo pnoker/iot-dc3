@@ -22,7 +22,8 @@ build toolchain plus a container runtime.
 - **JDK 21** — the platform requires Java 21. Compiling on a lower version fails outright.
 - **Maven 3.9+** — the repository ships `.mvn/settings.xml` and a parallel-build configuration; use it for multi-module
   packaging.
-- **pnpm** — both the `dc3-web/` frontend and sibling `dc3-cli/` use pnpm (not npm or yarn). Skip this for backend-only work.
+- **pnpm** — both the `dc3-web/` frontend and sibling `dc3-cli/` use pnpm (not npm or yarn). Skip this for backend-only
+  work.
 - **Podman** — every container operation in this repository uses `podman` (`make` defaults to `podman compose`).
 
 ## Why These Five Steps

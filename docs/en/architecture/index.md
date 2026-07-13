@@ -32,13 +32,13 @@ stands on the "from sensor to AI operations" full map.
 
 Legend colors: purple=Application · green=Platform · orange=Network · cyan=Perception · amber=Security.
 
-| Layer | IoT Reference Responsibilities | DC3 Implementation |
-|-------|--------------------------------|--------------------|
-| **Application** | Operations, alarms, analytics, AIoT, and third-party system integration | Web console, public APIs, dc3 CLI, Agentic Center, MCP tools, and alarm analysis |
-| **Platform** | Device management, storage, rule computation, identity, and business orchestration | Gateway, Auth / Manager / Data / Agentic center services, PostgreSQL, TimescaleDB, domain model, and command state machine |
-| **Network** | Fieldbus, IoT protocols, wireless / WAN, and message transport | 28 protocol drivers, RabbitMQ async message bus, gRPC facades, and southbound read/write command channels |
-| **Perception** | Sensing, auto-ID, actuators, field devices, and data sources | Profile / Device / Point normalize physical equipment, measurement points, and raw signals into semantic platform data |
-| **Cross-cutting Security** | Identity, authorization, tenant isolation, trusted transport, and call integrity | JWT, RBAC, tenantId propagation, HMAC gateway signing, TLS / secret configuration, and audit logs |
+| Layer                      | IoT Reference Responsibilities                                                     | DC3 Implementation                                                                                                         |
+|----------------------------|------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| **Application**            | Operations, alarms, analytics, AIoT, and third-party system integration            | Web console, public APIs, dc3 CLI, Agentic Center, MCP tools, and alarm analysis                                           |
+| **Platform**               | Device management, storage, rule computation, identity, and business orchestration | Gateway, Auth / Manager / Data / Agentic center services, PostgreSQL, TimescaleDB, domain model, and command state machine |
+| **Network**                | Fieldbus, IoT protocols, wireless / WAN, and message transport                     | 28 protocol drivers, RabbitMQ async message bus, gRPC facades, and southbound read/write command channels                  |
+| **Perception**             | Sensing, auto-ID, actuators, field devices, and data sources                       | Profile / Device / Point normalize physical equipment, measurement points, and raw signals into semantic platform data     |
+| **Cross-cutting Security** | Identity, authorization, tenant isolation, trusted transport, and call integrity   | JWT, RBAC, tenantId propagation, HMAC gateway signing, TLS / secret configuration, and audit logs                          |
 
 Read this diagram as a **responsibility view**, not as a process deployment diagram. For example, the Gateway is both a
 northbound entry point and part of platform governance; RabbitMQ supports protocol decoupling in the network layer and
