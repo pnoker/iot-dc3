@@ -42,43 +42,16 @@ GROUP ?=
 
 GROUP_SERVICES_center := auth manager data agentic
 GROUP_SERVICES_core := $(GROUP_SERVICES_center) gateway
-GROUP_SERVICES_drivers := bacnet-ip ble can coap dlms ethernet-ip fins http iec104 listening-virtual lwm2m melsec modbus-rtu modbus-tcp mqtt mysql opc-da opc-ua oracle plcs7 postgresql serial sl651 snmp sqlserver tcp-udp virtual zigbee
+GROUP_SERVICES_drivers := $(patsubst dc3-driver/dc3-driver-%,%,$(sort $(wildcard dc3-driver/dc3-driver-*)))
 SELECTED_SERVICES := $(strip $(SERVICES) $(GROUP_SERVICES_$(GROUP)))
 
 RUN_SERVICE ?= $(or $(SERVICE),gateway)
 RUN_MODULE_gateway := dc3-gateway
-RUN_MODULE_auth := dc3-center/dc3-center-auth
+RUN_MODULE_auth    := dc3-center/dc3-center-auth
 RUN_MODULE_manager := dc3-center/dc3-center-manager
-RUN_MODULE_data := dc3-center/dc3-center-data
+RUN_MODULE_data    := dc3-center/dc3-center-data
 RUN_MODULE_agentic := dc3-center/dc3-center-agentic
-RUN_MODULE_listening-virtual := dc3-driver/dc3-driver-listening-virtual
-RUN_MODULE_modbus-tcp := dc3-driver/dc3-driver-modbus-tcp
-RUN_MODULE_modbus-rtu := dc3-driver/dc3-driver-modbus-rtu
-RUN_MODULE_mqtt := dc3-driver/dc3-driver-mqtt
-RUN_MODULE_opc-da := dc3-driver/dc3-driver-opc-da
-RUN_MODULE_opc-ua := dc3-driver/dc3-driver-opc-ua
-RUN_MODULE_plcs7 := dc3-driver/dc3-driver-plcs7
-RUN_MODULE_virtual := dc3-driver/dc3-driver-virtual
-RUN_MODULE_bacnet-ip := dc3-driver/dc3-driver-bacnet-ip
-RUN_MODULE_ble := dc3-driver/dc3-driver-ble
-RUN_MODULE_can := dc3-driver/dc3-driver-can
-RUN_MODULE_coap := dc3-driver/dc3-driver-coap
-RUN_MODULE_dlms := dc3-driver/dc3-driver-dlms
-RUN_MODULE_ethernet-ip := dc3-driver/dc3-driver-ethernet-ip
-RUN_MODULE_fins := dc3-driver/dc3-driver-fins
-RUN_MODULE_http := dc3-driver/dc3-driver-http
-RUN_MODULE_iec104 := dc3-driver/dc3-driver-iec104
-RUN_MODULE_lwm2m := dc3-driver/dc3-driver-lwm2m
-RUN_MODULE_melsec := dc3-driver/dc3-driver-melsec
-RUN_MODULE_mysql := dc3-driver/dc3-driver-mysql
-RUN_MODULE_oracle := dc3-driver/dc3-driver-oracle
-RUN_MODULE_postgresql := dc3-driver/dc3-driver-postgresql
-RUN_MODULE_serial := dc3-driver/dc3-driver-serial
-RUN_MODULE_sl651 := dc3-driver/dc3-driver-sl651
-RUN_MODULE_snmp := dc3-driver/dc3-driver-snmp
-RUN_MODULE_sqlserver := dc3-driver/dc3-driver-sqlserver
-RUN_MODULE_tcp-udp := dc3-driver/dc3-driver-tcp-udp
-RUN_MODULE_zigbee := dc3-driver/dc3-driver-zigbee
+$(foreach d,$(GROUP_SERVICES_drivers),$(eval RUN_MODULE_$(d) := dc3-driver/dc3-driver-$(d)))
 RUN_MODULE := $(RUN_MODULE_$(RUN_SERVICE))
 
 MVN_SETTINGS ?= .mvn/settings.xml
@@ -279,8 +252,11 @@ deploy: package
 
 tag:
 	@dc3/bin/tag.sh $(filter-out $@,$(MAKECMDGOALS))
+
+# Catch-all for tag's extra words (e.g. `make tag minor` passes "minor" as a goal).
+# Reject genuine typos like `make pakcage` instead of silently succeeding.
 %:
-	@:
+	@$(if $(MAKECMDGOALS),$(if $(filter tag,$(MAKECMDGOALS)),,echo "Unknown target '$@'. Run 'make help' for available targets." && exit 1))
 
 changelog:
 	@FROM="$(FROM)" TO="$(TO)" VERSION="$(VERSION)" CHANGE_FILE="$(CHANGE_FILE)" dc3/bin/changelog.py
