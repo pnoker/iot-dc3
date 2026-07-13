@@ -215,11 +215,10 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 **Allowed types**: `feat`, `fix`, `perf`, `refactor`, `docs`, `build`, `ci`, `test`, `chore`, `style`, `security`,
 `revert`. Max 100 chars, English only. Install hooks with `make install-hooks` (from `iot-dc3/`).
 
-## Cross-Repo References
+## Related Documentation
 
-The canonical project instructions are in `../AGENTS.md` (shared across AI tools). The backend lives in `../iot-dc3/`;
-container/compose infrastructure and the parent POM also live under `../iot-dc3/` (see `iot-dc3/dc3/` and
-`iot-dc3/pom.xml`). See the root `CLAUDE.md` for the full monorepo map.
+The canonical project instructions are in `../AGENTS.md` (shared across AI tools). Container/compose infrastructure
+lives in `../dc3/` and the parent POM in `../pom.xml`. See the root `CLAUDE.md` for the full monorepo map.
 
 ### Menu system (frontend ↔ backend)
 
