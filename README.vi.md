@@ -1,5 +1,5 @@
 <p align="right">
-  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
+  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a> | <a href="./README.ko.md">한국어</a> | <a href="./README.es.md">Español</a> | <a href="./README.ru.md">Русский</a>
 </p>
 
 > **Trợ lý AI:** Đọc [README.ai.md](./README.ai.md) trước để có tổng quan ngắn gọn về IoT DC3 dành cho AI.
@@ -172,21 +172,22 @@ Nếu cần registry Alibaba Cloud cho Trung Quốc đại lục, dùng `make up
 IoT DC3 được xây dựng trên Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
 TypeScript và Vite.
 
-Xem [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) để biết chi tiết từng thành phần và vị trí sử dụng.
+Xem [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) để biết chi tiết từng thành phần và vị
+trí sử dụng.
 
 ## 📖 Tài liệu và cộng đồng
 
-| Tài nguyên           | Liên kết                                                                                |
-|----------------------|-----------------------------------------------------------------------------------------|
-| 📚 Tài liệu online   | [docs.dc3.site](https://docs.dc3.site/)                           |
-| 🚀 Quickstart        | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                     |
-| 🛠️ Công nghệ        | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack)   |
-| 🏗️ Kiến trúc        | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)    |
+| Tài nguyên           | Liên kết                                                                        |
+|----------------------|---------------------------------------------------------------------------------|
+| 📚 Tài liệu online   | [docs.dc3.site](https://docs.dc3.site/)                                         |
+| 🚀 Quickstart        | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                        |
+| 🛠️ Công nghệ        | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack)      |
+| 🏗️ Kiến trúc        | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
 | 🔧 Phát triển driver | [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring) |
-| 🐛 Khắc phục sự cố   | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)            |
-| 📋 Changelog         | [Release Changelog](https://docs.dc3.site/en/development/changelog)          |
-| 🐛 Phản hồi issue    | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                               |
-| 🇨🇳 Gitee mirror    | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                                   |
+| 🐛 Khắc phục sự cố   | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)               |
+| 📋 Changelog         | [Release Changelog](https://docs.dc3.site/en/development/changelog)             |
+| 🐛 Phản hồi issue    | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                       |
+| 🇨🇳 Gitee mirror    | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
 
 ## 🌍 Trường hợp ứng dụng
 

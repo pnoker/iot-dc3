@@ -1,5 +1,5 @@
 <p align="right">
-  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
+  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a> | <a href="./README.ko.md">한국어</a> | <a href="./README.es.md">Español</a> | <a href="./README.ru.md">Русский</a>
 </p>
 
 > **AI 助手：** 请先阅读 [README.ai.md](./README.ai.md) 获取 IoT DC3 的 AI 友好概述。
@@ -169,17 +169,17 @@ TypeScript 与 Vite 构建。
 
 ## 📖 文档与社区
 
-| 资源        | 链接                                                                           |
-|-----------|------------------------------------------------------------------------------|
-| 📚 在线文档   | [docs.dc3.site](https://docs.dc3.site/)                |
-| 🚀 快速开始   | [快速开始指南](https://docs.dc3.site/zh/quickstart/)                    |
-| 🛠️ 技术栈   | [技术栈说明](https://docs.dc3.site/zh/introduction/technology-stack)     |
-| 🏗️ 架构说明  | [模块与依赖](https://docs.dc3.site/zh/architecture/modules)             |
-| 🔧 驱动开发   | [驱动开发指南](https://docs.dc3.site/zh/development/driver-authoring)    |
-| 🐛 故障排查   | [常见问题与解决方案](https://docs.dc3.site/zh/guide/troubleshooting)      |
-| 📋 变更日志   | [版本更新记录](https://docs.dc3.site/zh/development/changelog)           |
-| 🐛 问题反馈   | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                    |
-| 🇨🇳 码云镜像 | [Gitee GVP 最有价值开源项目](https://gitee.com/pnoker/iot-dc3)                       |
+| 资源        | 链接                                                              |
+|-----------|-----------------------------------------------------------------|
+| 📚 在线文档   | [docs.dc3.site](https://docs.dc3.site/)                         |
+| 🚀 快速开始   | [快速开始指南](https://docs.dc3.site/zh/quickstart/)                  |
+| 🛠️ 技术栈   | [技术栈说明](https://docs.dc3.site/zh/introduction/technology-stack) |
+| 🏗️ 架构说明  | [模块与依赖](https://docs.dc3.site/zh/architecture/modules)          |
+| 🔧 驱动开发   | [驱动开发指南](https://docs.dc3.site/zh/development/driver-authoring) |
+| 🐛 故障排查   | [常见问题与解决方案](https://docs.dc3.site/zh/guide/troubleshooting)     |
+| 📋 变更日志   | [版本更新记录](https://docs.dc3.site/zh/development/changelog)        |
+| 🐛 问题反馈   | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)       |
+| 🇨🇳 码云镜像 | [Gitee GVP 最有价值开源项目](https://gitee.com/pnoker/iot-dc3)          |
 
 ## 🌍 应用场景
 
