@@ -21,24 +21,24 @@
     <select id="selectClientByClientId"
             resultType="io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord">
         SELECT id,
-               client_id,
-               client_name,
-               client_type,
-               owner_principal_id,
-               service_account_principal_id,
-               tenant_id,
-               client_secret_hash,
-               client_secret_expires_at,
-               client_auth_methods,
-               authorization_grant_types,
-               redirect_uris,
-               scopes,
-               require_pkce,
-               require_consent,
-               enable_flag
+        client_id,
+        client_name,
+        client_type,
+        owner_principal_id,
+        service_account_principal_id,
+        tenant_id,
+        client_secret_hash,
+        client_secret_expires_at,
+        client_auth_methods,
+        authorization_grant_types,
+        redirect_uris,
+        scopes,
+        require_pkce,
+        require_consent,
+        enable_flag
         FROM dc3_oauth_registered_client
         WHERE client_id = #{clientId}
-          AND deleted = 0
+        AND deleted = 0
         LIMIT 1
     </select>
 
@@ -46,38 +46,38 @@
             parameterType="io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord">
         INSERT INTO dc3_oauth_registered_client
         (id, client_id, client_name, client_type, owner_principal_id, service_account_principal_id, tenant_id,
-         client_secret_hash, client_secret_expires_at, client_auth_methods, authorization_grant_types,
-         redirect_uris, scopes, require_pkce, require_consent, enable_flag, client_settings, token_settings,
-         creator_id, creator_name, operator_id, operator_name)
+        client_secret_hash, client_secret_expires_at, client_auth_methods, authorization_grant_types,
+        redirect_uris, scopes, require_pkce, require_consent, enable_flag, client_settings, token_settings,
+        creator_id, creator_name, operator_id, operator_name)
         VALUES (#{id}, #{clientId}, #{clientName}, #{clientType}, #{ownerPrincipalId}, #{serviceAccountPrincipalId},
-                #{tenantId}, #{clientSecretHash}, #{clientSecretExpiresAt}, #{clientAuthMethods},
-                #{authorizationGrantTypes}, #{redirectUris}, #{scopes}, #{requirePkce}, #{requireConsent},
-                #{enableFlag}, '{}'::JSON, '{}'::JSON, #{ownerPrincipalId}, #{clientName}, #{ownerPrincipalId},
-                #{clientName})
+        #{tenantId}, #{clientSecretHash}, #{clientSecretExpiresAt}, #{clientAuthMethods},
+        #{authorizationGrantTypes}, #{redirectUris}, #{scopes}, #{requirePkce}, #{requireConsent},
+        #{enableFlag}, '{}'::JSON, '{}'::JSON, #{ownerPrincipalId}, #{clientName}, #{ownerPrincipalId},
+        #{clientName})
     </insert>
 
     <select id="listClientsByOwner"
             resultType="io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord">
         SELECT id,
-               client_id,
-               client_name,
-               client_type,
-               owner_principal_id,
-               service_account_principal_id,
-               tenant_id,
-               '' AS client_secret_hash,
-               client_secret_expires_at,
-               client_auth_methods,
-               authorization_grant_types,
-               redirect_uris,
-               scopes,
-               require_pkce,
-               require_consent,
-               enable_flag
+        client_id,
+        client_name,
+        client_type,
+        owner_principal_id,
+        service_account_principal_id,
+        tenant_id,
+        '' AS client_secret_hash,
+        client_secret_expires_at,
+        client_auth_methods,
+        authorization_grant_types,
+        redirect_uris,
+        scopes,
+        require_pkce,
+        require_consent,
+        enable_flag
         FROM dc3_oauth_registered_client
         WHERE owner_principal_id = #{ownerPrincipalId}
-          AND (tenant_id = 0 OR tenant_id = #{tenantId})
-          AND deleted = 0
+        AND (tenant_id = 0 OR tenant_id = #{tenantId})
+        AND deleted = 0
         ORDER BY create_time DESC, id DESC
         LIMIT 200
     </select>
@@ -85,118 +85,118 @@
     <select id="selectAuthorizationByCodeHash"
             resultType="io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord">
         SELECT id,
-               registered_client_id,
-               client_id,
-               principal_id,
-               principal_type,
-               tenant_id,
-               mcp_connection_id,
-               authorization_grant_type,
-               authorized_scopes,
-               state_hash,
-               authorization_code_hash,
-               authorization_code_issued,
-               authorization_code_expires,
-               access_token_jti,
-               access_token_issued,
-               access_token_expires,
-               refresh_token_hash,
-               refresh_token_issued,
-               refresh_token_expires,
-               token_metadata::TEXT AS token_metadata, revoked_time,
-               revoke_reason
+        registered_client_id,
+        client_id,
+        principal_id,
+        principal_type,
+        tenant_id,
+        mcp_connection_id,
+        authorization_grant_type,
+        authorized_scopes,
+        state_hash,
+        authorization_code_hash,
+        authorization_code_issued,
+        authorization_code_expires,
+        access_token_jti,
+        access_token_issued,
+        access_token_expires,
+        refresh_token_hash,
+        refresh_token_issued,
+        refresh_token_expires,
+        token_metadata::TEXT AS token_metadata, revoked_time,
+        revoke_reason
         FROM dc3_oauth_authorization
         WHERE authorization_code_hash = #{codeHash}
-          AND deleted = 0
+        AND deleted = 0
         LIMIT 1
     </select>
 
     <select id="selectAuthorizationByAccessTokenJti"
             resultType="io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord">
         SELECT id,
-               registered_client_id,
-               client_id,
-               principal_id,
-               principal_type,
-               tenant_id,
-               mcp_connection_id,
-               authorization_grant_type,
-               authorized_scopes,
-               state_hash,
-               authorization_code_hash,
-               authorization_code_issued,
-               authorization_code_expires,
-               access_token_jti,
-               access_token_issued,
-               access_token_expires,
-               refresh_token_hash,
-               refresh_token_issued,
-               refresh_token_expires,
-               token_metadata::TEXT AS token_metadata, revoked_time,
-               revoke_reason
+        registered_client_id,
+        client_id,
+        principal_id,
+        principal_type,
+        tenant_id,
+        mcp_connection_id,
+        authorization_grant_type,
+        authorized_scopes,
+        state_hash,
+        authorization_code_hash,
+        authorization_code_issued,
+        authorization_code_expires,
+        access_token_jti,
+        access_token_issued,
+        access_token_expires,
+        refresh_token_hash,
+        refresh_token_issued,
+        refresh_token_expires,
+        token_metadata::TEXT AS token_metadata, revoked_time,
+        revoke_reason
         FROM dc3_oauth_authorization
         WHERE access_token_jti = #{jti}
-          AND deleted = 0
+        AND deleted = 0
         LIMIT 1
     </select>
 
     <select id="selectAuthorizationByRefreshTokenHash"
             resultType="io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord">
         SELECT id,
-               registered_client_id,
-               client_id,
-               principal_id,
-               principal_type,
-               tenant_id,
-               mcp_connection_id,
-               authorization_grant_type,
-               authorized_scopes,
-               state_hash,
-               authorization_code_hash,
-               authorization_code_issued,
-               authorization_code_expires,
-               access_token_jti,
-               access_token_issued,
-               access_token_expires,
-               refresh_token_hash,
-               previous_refresh_token_hash,
-               refresh_token_issued,
-               refresh_token_expires,
-               token_metadata::TEXT AS token_metadata, revoked_time,
-               revoke_reason
+        registered_client_id,
+        client_id,
+        principal_id,
+        principal_type,
+        tenant_id,
+        mcp_connection_id,
+        authorization_grant_type,
+        authorized_scopes,
+        state_hash,
+        authorization_code_hash,
+        authorization_code_issued,
+        authorization_code_expires,
+        access_token_jti,
+        access_token_issued,
+        access_token_expires,
+        refresh_token_hash,
+        previous_refresh_token_hash,
+        refresh_token_issued,
+        refresh_token_expires,
+        token_metadata::TEXT AS token_metadata, revoked_time,
+        revoke_reason
         FROM dc3_oauth_authorization
         WHERE refresh_token_hash = #{refreshHash}
-          AND deleted = 0
+        AND deleted = 0
         LIMIT 1
     </select>
 
     <select id="selectAuthorizationByPreviousRefreshTokenHash"
             resultType="io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord">
         SELECT id,
-               registered_client_id,
-               client_id,
-               principal_id,
-               principal_type,
-               tenant_id,
-               mcp_connection_id,
-               authorization_grant_type,
-               authorized_scopes,
-               state_hash,
-               authorization_code_hash,
-               authorization_code_issued,
-               authorization_code_expires,
-               access_token_jti,
-               access_token_issued,
-               access_token_expires,
-               refresh_token_hash,
-               previous_refresh_token_hash,
-               refresh_token_issued,
-               refresh_token_expires,
-               token_metadata::TEXT AS token_metadata, revoked_time,
-               revoke_reason
+        registered_client_id,
+        client_id,
+        principal_id,
+        principal_type,
+        tenant_id,
+        mcp_connection_id,
+        authorization_grant_type,
+        authorized_scopes,
+        state_hash,
+        authorization_code_hash,
+        authorization_code_issued,
+        authorization_code_expires,
+        access_token_jti,
+        access_token_issued,
+        access_token_expires,
+        refresh_token_hash,
+        previous_refresh_token_hash,
+        refresh_token_issued,
+        refresh_token_expires,
+        token_metadata::TEXT AS token_metadata, revoked_time,
+        revoke_reason
         FROM dc3_oauth_authorization
         WHERE previous_refresh_token_hash = #{previousRefreshHash}
-          AND deleted = 0
+        AND deleted = 0
         LIMIT 1
     </select>
 
@@ -204,91 +204,91 @@
             parameterType="io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord">
         INSERT INTO dc3_oauth_authorization
         (id, registered_client_id, client_id, principal_id, principal_type, tenant_id, mcp_connection_id,
-         authorization_grant_type, authorized_scopes, state_hash, authorization_code_hash,
-         authorization_code_issued, authorization_code_expires, token_claims, token_metadata)
+        authorization_grant_type, authorized_scopes, state_hash, authorization_code_hash,
+        authorization_code_issued, authorization_code_expires, token_claims, token_metadata)
         VALUES (#{id}, #{registeredClientId}, #{clientId}, #{principalId}, #{principalType}, #{tenantId},
-                #{mcpConnectionId}, #{authorizationGrantType}, #{authorizedScopes}, #{stateHash},
-                #{authorizationCodeHash}, #{authorizationCodeIssued}, #{authorizationCodeExpires}, '{}'::JSON,
-                CAST(#{tokenMetadata} AS JSON))
+        #{mcpConnectionId}, #{authorizationGrantType}, #{authorizedScopes}, #{stateHash},
+        #{authorizationCodeHash}, #{authorizationCodeIssued}, #{authorizationCodeExpires}, '{}'::JSON,
+        CAST(#{tokenMetadata} AS JSON))
     </insert>
 
     <update id="activateAuthorizationTokens">
         UPDATE dc3_oauth_authorization
-        SET authorization_code_hash     = #{codeHash},
-            access_token_jti            = #{accessTokenJti},
-            access_token_issued         = #{accessIssued},
-            access_token_expires        = #{accessExpires},
-            refresh_token_hash          = #{refreshHash},
-            previous_refresh_token_hash = #{previousRefreshHash},
-            refresh_token_issued        = #{refreshIssued},
-            refresh_token_expires       = #{refreshExpires},
-            token_claims                = CAST(#{tokenClaims} AS JSON),
-            operate_time                = CURRENT_TIMESTAMP
+        SET authorization_code_hash = #{codeHash},
+        access_token_jti = #{accessTokenJti},
+        access_token_issued = #{accessIssued},
+        access_token_expires = #{accessExpires},
+        refresh_token_hash = #{refreshHash},
+        previous_refresh_token_hash = #{previousRefreshHash},
+        refresh_token_issued = #{refreshIssued},
+        refresh_token_expires = #{refreshExpires},
+        token_claims = CAST(#{tokenClaims} AS JSON),
+        operate_time = CURRENT_TIMESTAMP
         WHERE id = #{id}
-          AND deleted = 0
+        AND deleted = 0
     </update>
 
     <update id="revokeAuthorizationByAccessTokenJti">
         UPDATE dc3_oauth_authorization
-        SET revoked_time  = #{revokedTime},
-            revoke_reason = #{reason},
-            operate_time  = CURRENT_TIMESTAMP
+        SET revoked_time = #{revokedTime},
+        revoke_reason = #{reason},
+        operate_time = CURRENT_TIMESTAMP
         WHERE access_token_jti = #{jti}
-          AND deleted = 0
+        AND deleted = 0
     </update>
 
     <update id="revokeAuthorizationByRefreshTokenHash">
         UPDATE dc3_oauth_authorization
-        SET revoked_time  = #{revokedTime},
-            revoke_reason = #{reason},
-            operate_time  = CURRENT_TIMESTAMP
+        SET revoked_time = #{revokedTime},
+        revoke_reason = #{reason},
+        operate_time = CURRENT_TIMESTAMP
         WHERE refresh_token_hash = #{refreshHash}
-          AND deleted = 0
+        AND deleted = 0
     </update>
 
     <select id="selectConnectionById"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord">
         SELECT id,
-               connection_name,
-               client_id,
-               principal_id,
-               principal_type,
-               tenant_id,
-               grant_type,
-               enable_flag,
-               expire_time,
-               revoke_time,
-               last_used_time,
-               creator_id,
-               creator_name
+        connection_name,
+        client_id,
+        principal_id,
+        principal_type,
+        tenant_id,
+        grant_type,
+        enable_flag,
+        expire_time,
+        revoke_time,
+        last_used_time,
+        creator_id,
+        creator_name
         FROM dc3_mcp_connection
         WHERE id = #{id}
-          AND deleted = 0
+        AND deleted = 0
         LIMIT 1
     </select>
 
     <select id="selectActiveConnection"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord">
         SELECT id,
-               connection_name,
-               client_id,
-               principal_id,
-               principal_type,
-               tenant_id,
-               grant_type,
-               enable_flag,
-               expire_time,
-               revoke_time,
-               last_used_time
+        connection_name,
+        client_id,
+        principal_id,
+        principal_type,
+        tenant_id,
+        grant_type,
+        enable_flag,
+        expire_time,
+        revoke_time,
+        last_used_time
         FROM dc3_mcp_connection
         WHERE client_id = #{clientId}
-          AND principal_id = #{principalId}
-          AND tenant_id = #{tenantId}
-          AND grant_type = #{grantType}
-          AND enable_flag = 0
-          AND revoke_time IS NULL
-          AND (expire_time IS NULL OR expire_time > CURRENT_TIMESTAMP)
-          AND deleted = 0
+        AND principal_id = #{principalId}
+        AND tenant_id = #{tenantId}
+        AND grant_type = #{grantType}
+        AND enable_flag = 0
+        AND revoke_time IS NULL
+        AND (expire_time IS NULL OR expire_time > CURRENT_TIMESTAMP)
+        AND deleted = 0
         ORDER BY id ASC
         LIMIT 1
     </select>
@@ -296,22 +296,22 @@
     <select id="listConnectionsByPrincipal"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord">
         SELECT id,
-               connection_name,
-               client_id,
-               principal_id,
-               principal_type,
-               tenant_id,
-               grant_type,
-               enable_flag,
-               expire_time,
-               revoke_time,
-               last_used_time,
-               creator_id,
-               creator_name
+        connection_name,
+        client_id,
+        principal_id,
+        principal_type,
+        tenant_id,
+        grant_type,
+        enable_flag,
+        expire_time,
+        revoke_time,
+        last_used_time,
+        creator_id,
+        creator_name
         FROM dc3_mcp_connection
         WHERE tenant_id = #{tenantId}
-          AND creator_id = #{principalId}
-          AND deleted = 0
+        AND creator_id = #{principalId}
+        AND deleted = 0
         ORDER BY create_time DESC, id DESC
         LIMIT 200
     </select>
@@ -320,59 +320,59 @@
             parameterType="io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord">
         INSERT INTO dc3_mcp_connection
         (id, connection_name, client_id, principal_id, principal_type, tenant_id, grant_type, enable_flag,
-         expire_time, connection_ext, remark, creator_id, creator_name, operator_id, operator_name)
+        expire_time, connection_ext, remark, creator_id, creator_name, operator_id, operator_name)
         VALUES (#{id}, #{connectionName}, #{clientId}, #{principalId}, #{principalType}, #{tenantId}, #{grantType},
-                #{enableFlag}, #{expireTime}, '{}'::JSON, #{remark}, #{creatorId}, #{creatorName}, #{creatorId},
-                #{creatorName})
+        #{enableFlag}, #{expireTime}, '{}'::JSON, #{remark}, #{creatorId}, #{creatorName}, #{creatorId},
+        #{creatorName})
     </insert>
 
     <update id="revokeConnection">
         UPDATE dc3_mcp_connection
-        SET revoke_time  = #{revokeTime},
-            operate_time = CURRENT_TIMESTAMP
+        SET revoke_time = #{revokeTime},
+        operate_time = CURRENT_TIMESTAMP
         WHERE id = #{id}
-          AND tenant_id = #{tenantId}
-          AND creator_id = #{principalId}
-          AND deleted = 0
+        AND tenant_id = #{tenantId}
+        AND creator_id = #{principalId}
+        AND deleted = 0
     </update>
 
     <select id="listRegistryToolCandidates"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
         SELECT NULL::BIGINT AS id, api.api_code AS tool_id,
-               lower(regexp_replace(api.service_name || '_' || api.api_name || '_' ||
-                                    CASE api.api_type_flag
-                                        WHEN 0 THEN 'post'
-                                        WHEN 1 THEN 'delete'
-                                        WHEN 2 THEN 'put'
-                                        ELSE 'get'
-                                        END, '[^a-zA-Z0-9]+', '_', 'g')) AS tool_name,
-               COALESCE(
-                       NULLIF((api.api_ext ->> 'content')::json ->> 'title', ''),
-                       NULLIF(api.api_name, ''), api.api_code)           AS tool_title,
-               api.service_name                                          AS tool_category,
-               api.service_name,
-               api.api_code,
-               resource.resource_code                                    AS permission_code,
-               CASE api.api_type_flag
-                   WHEN 0 THEN 'POST'
-                   WHEN 1 THEN 'DELETE'
-                   WHEN 2 THEN 'PUT'
-                   ELSE 'GET'
-                   END                                                   AS http_method,
-               regexp_replace(api.api_code, '^[^:]+:[^:]+:', '')         AS api_path,
-               md5(api.api_code || ':' || api.api_name)                  AS schema_hash,
-               0                                                         AS enable_flag,
-               COALESCE(
-                       NULLIF((api.api_ext ->> 'content')::json ->> 'remark', ''),
-                       NULLIF(api.remark, ''), api.api_group)            AS remark
+        lower(regexp_replace(api.service_name || '_' || api.api_name || '_' ||
+        CASE api.api_type_flag
+        WHEN 0 THEN 'post'
+        WHEN 1 THEN 'delete'
+        WHEN 2 THEN 'put'
+        ELSE 'get'
+        END, '[^a-zA-Z0-9]+', '_', 'g')) AS tool_name,
+        COALESCE(
+        NULLIF((api.api_ext ->> 'content')::json ->> 'title', ''),
+        NULLIF(api.api_name, ''), api.api_code) AS tool_title,
+        api.service_name AS tool_category,
+        api.service_name,
+        api.api_code,
+        resource.resource_code AS permission_code,
+        CASE api.api_type_flag
+        WHEN 0 THEN 'POST'
+        WHEN 1 THEN 'DELETE'
+        WHEN 2 THEN 'PUT'
+        ELSE 'GET'
+        END AS http_method,
+        regexp_replace(api.api_code, '^[^:]+:[^:]+:', '') AS api_path,
+        md5(api.api_code || ':' || api.api_name) AS schema_hash,
+        0 AS enable_flag,
+        COALESCE(
+        NULLIF((api.api_ext ->> 'content')::json ->> 'remark', ''),
+        NULLIF(api.remark, ''), api.api_group) AS remark
         FROM dc3_api api
-                 JOIN dc3_resource resource
-                      ON resource.entity_id = api.id
-                          AND resource.resource_type_flag = 6
-                          AND resource.deleted = 0
+        JOIN dc3_resource resource
+        ON resource.entity_id = api.id
+        AND resource.resource_type_flag = 6
+        AND resource.deleted = 0
         WHERE api.deleted = 0
-          AND api.enable_flag = 0
-          AND api.api_code != ''
+        AND api.enable_flag = 0
+        AND api.api_code != ''
     </select>
 
     <select id="selectToolByToolId"
@@ -380,7 +380,7 @@
         SELECT *
         FROM dc3_mcp_tool_catalog
         WHERE tool_id = #{toolId}
-          AND deleted = 0
+        AND deleted = 0
         LIMIT 1
     </select>
 
@@ -389,16 +389,16 @@
         SELECT *
         FROM dc3_mcp_tool_catalog
         WHERE deleted = 0
-          AND enable_flag = 0
-          AND (#{riskLevel}::text IS NULL OR #{riskLevel}::text = ''
-               OR risk_level = #{riskLevel}::text)
-          AND (
-            #{keyword}::text IS NULL
-                OR #{keyword}::text = ''
-                OR lower(tool_name) LIKE concat('%', lower(#{keyword}::text), '%')
-                OR lower(tool_title) LIKE concat('%', lower(#{keyword}::text), '%')
-                OR lower(permission_code) LIKE concat('%', lower(#{keyword}::text), '%')
-            )
+        AND enable_flag = 0
+        AND (#{riskLevel}::text IS NULL OR #{riskLevel}::text = ''
+        OR risk_level = #{riskLevel}::text)
+        AND (
+        #{keyword}::text IS NULL
+        OR #{keyword}::text = ''
+        OR lower(tool_name) LIKE concat('%', lower(#{keyword}::text), '%')
+        OR lower(tool_title) LIKE concat('%', lower(#{keyword}::text), '%')
+        OR lower(permission_code) LIKE concat('%', lower(#{keyword}::text), '%')
+        )
         ORDER BY tool_category, tool_name
         LIMIT #{limit}
     </select>
@@ -407,53 +407,53 @@
             parameterType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
         INSERT INTO dc3_mcp_tool_catalog
         (id, tool_id, tool_name, tool_title, tool_category, service_name, api_code, permission_code,
-         http_method, api_path, schema_hash, risk_level, read_only_hint, destructive_hint, idempotent_hint,
-         open_world_hint, enable_flag, tool_ext, remark, creator_id, creator_name, operator_id, operator_name)
+        http_method, api_path, schema_hash, risk_level, read_only_hint, destructive_hint, idempotent_hint,
+        open_world_hint, enable_flag, tool_ext, remark, creator_id, creator_name, operator_id, operator_name)
         VALUES (#{id}, #{toolId}, #{toolName}, #{toolTitle}, #{toolCategory}, #{serviceName}, #{apiCode},
-                #{permissionCode}, #{httpMethod}, #{apiPath}, #{schemaHash}, #{riskLevel}, #{readOnlyHint},
-                #{destructiveHint}, #{idempotentHint}, #{openWorldHint}, #{enableFlag},
-                COALESCE(NULLIF(#{toolExt}, '')::json, '{}'::json), #{remark},
-                0, 'system', 0, 'system')
+        #{permissionCode}, #{httpMethod}, #{apiPath}, #{schemaHash}, #{riskLevel}, #{readOnlyHint},
+        #{destructiveHint}, #{idempotentHint}, #{openWorldHint}, #{enableFlag},
+        COALESCE(NULLIF(#{toolExt}, '')::json, '{}'::json), #{remark},
+        0, 'system', 0, 'system')
     </insert>
 
     <update id="updateTool"
             parameterType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
         UPDATE dc3_mcp_tool_catalog
-        SET tool_name        = #{toolName},
-            tool_title       = #{toolTitle},
-            tool_category    = #{toolCategory},
-            service_name     = #{serviceName},
-            api_code         = #{apiCode},
-            permission_code  = #{permissionCode},
-            http_method      = #{httpMethod},
-            api_path         = #{apiPath},
-            schema_hash      = #{schemaHash},
-            risk_level       = #{riskLevel},
-            read_only_hint   = #{readOnlyHint},
-            destructive_hint = #{destructiveHint},
-            idempotent_hint  = #{idempotentHint},
-            open_world_hint  = #{openWorldHint},
-            enable_flag      = #{enableFlag},
-            tool_ext         = COALESCE(NULLIF(#{toolExt}, '')::json, '{}'::json),
-            remark           = #{remark},
-            operate_time     = CURRENT_TIMESTAMP
+        SET tool_name = #{toolName},
+        tool_title = #{toolTitle},
+        tool_category = #{toolCategory},
+        service_name = #{serviceName},
+        api_code = #{apiCode},
+        permission_code = #{permissionCode},
+        http_method = #{httpMethod},
+        api_path = #{apiPath},
+        schema_hash = #{schemaHash},
+        risk_level = #{riskLevel},
+        read_only_hint = #{readOnlyHint},
+        destructive_hint = #{destructiveHint},
+        idempotent_hint = #{idempotentHint},
+        open_world_hint = #{openWorldHint},
+        enable_flag = #{enableFlag},
+        tool_ext = COALESCE(NULLIF(#{toolExt}, '')::json, '{}'::json),
+        remark = #{remark},
+        operate_time = CURRENT_TIMESTAMP
         WHERE id = #{id}
-          AND deleted = 0
+        AND deleted = 0
     </update>
 
     <sql id="principalPermissionCodes">
         SELECT DISTINCT resource.resource_code
         FROM dc3_role_principal_bind role_principal
-                 JOIN dc3_role_resource_bind role_resource
-                      ON role_resource.role_id = role_principal.role_id
-                          AND role_resource.deleted = 0
-                 JOIN dc3_resource resource
-                      ON resource.id = role_resource.resource_id
-                          AND resource.deleted = 0
-                          AND resource.enable_flag = 0
+        JOIN dc3_role_resource_bind role_resource
+        ON role_resource.role_id = role_principal.role_id
+        AND role_resource.deleted = 0
+        JOIN dc3_resource resource
+        ON resource.id = role_resource.resource_id
+        AND resource.deleted = 0
+        AND resource.enable_flag = 0
         WHERE role_principal.tenant_id = #{tenantId}
-          AND role_principal.principal_id = #{principalId}
-          AND role_principal.deleted = 0
+        AND role_principal.principal_id = #{principalId}
+        AND role_principal.deleted = 0
     </sql>
 
     <select id="listVisibleTools"
@@ -522,30 +522,30 @@
     <update id="updateConnectionLastUsed">
         UPDATE dc3_mcp_connection
         SET last_used_time = #{lastUsedTime},
-            operate_time   = CURRENT_TIMESTAMP
+        operate_time = CURRENT_TIMESTAMP
         WHERE id = #{id}
-          AND deleted = 0
+        AND deleted = 0
     </update>
 
     <update id="deleteConnectionTools">
         UPDATE dc3_mcp_connection_tool
-        SET deleted      = 1,
-            operate_time = CURRENT_TIMESTAMP
+        SET deleted = 1,
+        operate_time = CURRENT_TIMESTAMP
         WHERE connection_id = #{connectionId}
-          AND deleted = 0
+        AND deleted = 0
     </update>
 
     <select id="listConnectionToolIds" resultType="java.lang.String">
         SELECT whitelist.tool_id
         FROM dc3_mcp_connection connection
-                 JOIN dc3_mcp_connection_tool whitelist
-                      ON whitelist.connection_id = connection.id
-                          AND whitelist.enable_flag = 0
-                          AND whitelist.deleted = 0
+        JOIN dc3_mcp_connection_tool whitelist
+        ON whitelist.connection_id = connection.id
+        AND whitelist.enable_flag = 0
+        AND whitelist.deleted = 0
         WHERE connection.id = #{connectionId}
-          AND connection.tenant_id = #{tenantId}
-          AND connection.creator_id = #{principalId}
-          AND connection.deleted = 0
+        AND connection.tenant_id = #{tenantId}
+        AND connection.creator_id = #{principalId}
+        AND connection.deleted = 0
         ORDER BY whitelist.tool_id
     </select>
 
@@ -553,19 +553,19 @@
         INSERT INTO dc3_mcp_connection_tool
         (id, connection_id, tool_id, enable_flag, remark, creator_id, creator_name, operator_id, operator_name)
         VALUES (#{id}, #{connectionId}, #{toolId}, 0, '', #{operatorId}, #{operatorName}, #{operatorId},
-                #{operatorName})
+        #{operatorName})
     </insert>
 
     <insert id="insertAudit"
             parameterType="io.github.pnoker.common.auth.entity.oauth.McpAuditCommand">
         INSERT INTO dc3_mcp_audit_log
         (id, trace_id, tenant_id, principal_id, principal_type, client_id, connection_id, tool_id, tool_name,
-         permission_code, risk_level, confirm_id, idempotency_key, argument_digest, status, error_code,
-         duration_ms, client_name, client_version, remote_ip, audit_ext)
+        permission_code, risk_level, confirm_id, idempotency_key, argument_digest, status, error_code,
+        duration_ms, client_name, client_version, remote_ip, audit_ext)
         VALUES (#{id}, #{traceId}, #{tenantId}, #{principalId}, #{principalType}, #{clientId}, #{connectionId},
-                #{toolId}, #{toolName}, #{permissionCode}, #{riskLevel}, #{confirmId}, #{idempotencyKey},
-                #{argumentDigest}, #{status}, #{errorCode}, #{durationMs}, #{clientName}, #{clientVersion},
-                #{remoteIp}, '{}'::JSON)
+        #{toolId}, #{toolName}, #{permissionCode}, #{riskLevel}, #{confirmId}, #{idempotencyKey},
+        #{argumentDigest}, #{status}, #{errorCode}, #{durationMs}, #{clientName}, #{clientVersion},
+        #{remoteIp}, '{}'::JSON)
     </insert>
 
     <select id="listAudit"
@@ -608,62 +608,62 @@
             parameterType="io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord">
         INSERT INTO dc3_mcp_tool_confirmation
         (id, confirm_id, tenant_id, principal_id, connection_id, tool_id, argument_digest, idempotency_key,
-         risk_level, status, expire_time)
+        risk_level, status, expire_time)
         VALUES (#{id}, #{confirmId}, #{tenantId}, #{principalId}, #{connectionId}, #{toolId}, #{argumentDigest},
-                #{idempotencyKey}, #{riskLevel}, #{status}, #{expireTime})
+        #{idempotencyKey}, #{riskLevel}, #{status}, #{expireTime})
     </insert>
 
     <select id="selectConfirmationByConfirmId"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord">
         SELECT id,
-               confirm_id,
-               tenant_id,
-               principal_id,
-               connection_id,
-               tool_id,
-               argument_digest,
-               idempotency_key,
-               risk_level,
-               status,
-               expire_time,
-               consumed_time,
-               create_time
+        confirm_id,
+        tenant_id,
+        principal_id,
+        connection_id,
+        tool_id,
+        argument_digest,
+        idempotency_key,
+        risk_level,
+        status,
+        expire_time,
+        consumed_time,
+        create_time
         FROM dc3_mcp_tool_confirmation
         WHERE confirm_id = #{confirmId}
-          AND deleted = 0
+        AND deleted = 0
         LIMIT 1
     </select>
 
     <select id="selectConsumedByIdempotencyKey"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord">
         SELECT id,
-               confirm_id,
-               tenant_id,
-               principal_id,
-               connection_id,
-               tool_id,
-               argument_digest,
-               idempotency_key,
-               risk_level,
-               status,
-               expire_time,
-               consumed_time,
-               create_time
+        confirm_id,
+        tenant_id,
+        principal_id,
+        connection_id,
+        tool_id,
+        argument_digest,
+        idempotency_key,
+        risk_level,
+        status,
+        expire_time,
+        consumed_time,
+        create_time
         FROM dc3_mcp_tool_confirmation
         WHERE connection_id = #{connectionId}
-          AND idempotency_key = #{idempotencyKey}
-          AND status = 'CONSUMED'
-          AND deleted = 0
+        AND idempotency_key = #{idempotencyKey}
+        AND status = 'CONSUMED'
+        AND deleted = 0
         LIMIT 1
     </select>
 
     <update id="consumeConfirmation">
         UPDATE dc3_mcp_tool_confirmation
-        SET status        = 'CONSUMED',
-            consumed_time = #{consumedTime}
+        SET status = 'CONSUMED',
+        consumed_time = #{consumedTime}
         WHERE id = #{id}
-          AND status = 'PENDING'
-          AND deleted = 0
+        AND status = 'PENDING'
+        AND deleted = 0
     </update>
 
 </mapper>
