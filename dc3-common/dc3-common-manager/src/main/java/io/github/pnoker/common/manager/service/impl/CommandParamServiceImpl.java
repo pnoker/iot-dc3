@@ -185,6 +185,15 @@ public class CommandParamServiceImpl implements CommandParamService {
         return wrapper.lambda();
     }
 
+    /**
+     * Check whether a command param is duplicated within its command by param name or
+     * code. Returns {@code false} when neither name nor code is supplied.
+     *
+     * @param entityBO       {@link CommandParamBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
+     */
     private boolean checkDuplicate(CommandParamBO entityBO, boolean isUpdate, boolean throwException) {
         boolean hasName = StringUtils.isNotEmpty(entityBO.getParamName());
         boolean hasCode = StringUtils.isNotEmpty(entityBO.getParamCode());
@@ -217,6 +226,11 @@ public class CommandParamServiceImpl implements CommandParamService {
         return duplicate;
     }
 
+    /**
+     * Validate that the param's command belongs to the same tenant via its profile.
+     *
+     * @param entityBO the param to validate
+     */
     private void validateTenantRelations(CommandParamBO entityBO) {
         CommandBO commandBO = commandService.getById(entityBO.getCommandId());
         if (Objects.isNull(commandBO) || !Objects.equals(entityBO.getTenantId(), commandBO.getTenantId())) {
@@ -224,6 +238,12 @@ public class CommandParamServiceImpl implements CommandParamService {
         }
     }
 
+    /**
+     * Publish a command-update metadata event to the devices sharing the command's
+     * profile.
+     *
+     * @param commandId the command that changed
+     */
     private void publishCommandUpdate(Long commandId) {
         if (Objects.isNull(commandId)) {
             return;
@@ -245,6 +265,11 @@ public class CommandParamServiceImpl implements CommandParamService {
         publishDeviceUpdateEvents(deviceIds);
     }
 
+    /**
+     * Publish a device-update metadata event to each affected device's driver.
+     *
+     * @param deviceIds the devices that changed
+     */
     private void publishDeviceUpdateEvents(Collection<Long> deviceIds) {
         if (CollectionUtils.isEmpty(deviceIds)) {
             return;
@@ -254,6 +279,12 @@ public class CommandParamServiceImpl implements CommandParamService {
                         driverServiceNamesByDeviceId(deviceId))));
     }
 
+    /**
+     * Resolve the union of driver service names serving the given devices.
+     *
+     * @param deviceIds the devices to look up drivers for
+     * @return the set of driver service names
+     */
     private Set<String> driverServiceNamesByDeviceIds(Collection<Long> deviceIds) {
         if (CollectionUtils.isEmpty(deviceIds)) {
             return Collections.emptySet();
@@ -264,6 +295,12 @@ public class CommandParamServiceImpl implements CommandParamService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Resolve the driver service name serving a single device.
+     *
+     * @param deviceId the device to look up
+     * @return the driver service name, or empty when none
+     */
     private Set<String> driverServiceNamesByDeviceId(Long deviceId) {
         if (Objects.isNull(deviceId)) {
             return Collections.emptySet();
@@ -275,6 +312,12 @@ public class CommandParamServiceImpl implements CommandParamService {
         return Set.of(driverBO.getServiceName());
     }
 
+    /**
+     * List the device ids sharing a profile.
+     *
+     * @param profileId the profile id
+     * @return the device ids
+     */
     private List<Long> listDeviceIdsByProfileId(Long profileId) {
         if (Objects.isNull(profileId)) {
             return Collections.emptyList();
@@ -284,6 +327,14 @@ public class CommandParamServiceImpl implements CommandParamService {
         return deviceMapper.selectList(wrapper).stream().map(DeviceDO::getId).toList();
     }
 
+    /**
+     * Get command param data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link CommandParamDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
     private CommandParamDO getDOById(Long id, boolean throwException) {
         CommandParamDO entityDO = commandParamManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
