@@ -87,9 +87,9 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('point.card.profile')">
           {{
-            reactiveData.detailRecord.profileId
-              ? reactiveData.profileTable[reactiveData.detailRecord.profileId]?.profileName || '-'
-              : '-'
+          reactiveData.detailRecord.profileId
+          ? reactiveData.profileTable[reactiveData.detailRecord.profileId]?.profileName || '-'
+          : '-'
           }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('point.detail.relatedDevices')" :span="2">

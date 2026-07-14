@@ -145,7 +145,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               stroke-width="1.5"
               width="200" x="952" y="48"/>
         <text class="d-name" fill="var(--dc3-box-name)" font-size="14" text-anchor="middle" x="1052" y="210">{{
-            s.secName
+          s.secName
           }}
         </text>
         <text fill="var(--dc3-text2)" font-size="10.5" text-anchor="middle" x="1052" y="234">{{ s.secSub }}</text>

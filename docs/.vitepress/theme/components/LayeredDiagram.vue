@@ -153,7 +153,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
             <line x1="9" x2="14" y1="10.5" y2="9"/>
           </g>
           <text fill="var(--ad-text-bright)" font-size="13" font-weight="700" text-anchor="middle" x="470" y="107">{{
-              s.gw
+            s.gw
             }}
           </text>
           <line marker-end="url(#ad-arrow-down)" stroke="var(--ad-blue)" stroke-width="2" x1="470" x2="470" y1="119"
@@ -183,7 +183,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="165" x="43"
                 y="110"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="125" y="141">{{
-              s.sec1
+            s.sec1
             }}
           </text>
 
@@ -191,7 +191,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="165" x="43"
                 y="212"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="125" y="243">{{
-              s.sec2
+            s.sec2
             }}
           </text>
 
@@ -199,7 +199,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="165" x="43"
                 y="314"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="125" y="345">{{
-              s.sec3
+            s.sec3
             }}
           </text>
 
@@ -207,7 +207,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="165" x="43"
                 y="416"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="125" y="447">{{
-              s.sec4
+            s.sec4
             }}
           </text>
 
@@ -226,7 +226,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="165"
                 x="1192" y="110"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1274" y="139">{{
-              s.dep1
+            s.dep1
             }}
           </text>
 
@@ -234,7 +234,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="165"
                 x="1192" y="198"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1274" y="227">{{
-              s.dep2
+            s.dep2
             }}
           </text>
 
@@ -242,7 +242,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="165"
                 x="1192" y="286"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1274" y="315">{{
-              s.dep3
+            s.dep3
             }}
           </text>
 
@@ -250,7 +250,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="165"
                 x="1192" y="374"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1274" y="403">{{
-              s.dep4
+            s.dep4
             }}
           </text>
 
@@ -258,15 +258,15 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="165"
                 x="1192" y="462"/>
           <text fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle" x="1274" y="478">{{
-              s.dep5a
+            s.dep5a
             }}
           </text>
           <text fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle" x="1274" y="492">{{
-              s.dep5b
+            s.dep5b
             }}
           </text>
           <text fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle" x="1274" y="506">{{
-              s.dep5c
+            s.dep5c
             }}
           </text>
 
@@ -287,7 +287,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 x="266"
                 y="154"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="368" y="179">{{
-              s.L1a
+            s.L1a
             }}
           </text>
 
@@ -295,7 +295,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 x="487"
                 y="154"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="589" y="179">{{
-              s.L1b
+            s.L1b
             }}
           </text>
 
@@ -303,7 +303,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 x="708"
                 y="154"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="810" y="179">{{
-              s.L1c
+            s.L1c
             }}
           </text>
 
@@ -311,12 +311,12 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 x="929"
                 y="154"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1031" y="179">{{
-              s.L1d
+            s.L1d
             }}
           </text>
 
           <text fill="var(--dc3-fe-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="700" y="230">{{
-              s.L1
+            s.L1
             }}
           </text>
 
@@ -329,7 +329,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="160"
                 x="268" y="274"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="348" y="299">{{
-              s.L2a
+            s.L2a
             }}
           </text>
 
@@ -337,7 +337,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="160"
                 x="444" y="274"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="524" y="299">{{
-              s.L2b
+            s.L2b
             }}
           </text>
 
@@ -345,7 +345,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="160"
                 x="620" y="274"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="700" y="299">{{
-              s.L2c
+            s.L2c
             }}
           </text>
 
@@ -353,7 +353,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="160"
                 x="796" y="274"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="876" y="299">{{
-              s.L2d
+            s.L2d
             }}
           </text>
 
@@ -361,7 +361,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="162"
                 x="972" y="274"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1053" y="299">{{
-              s.L2e
+            s.L2e
             }}
           </text>
 
@@ -378,7 +378,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="160"
                 x="268" y="394"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="348" y="419">{{
-              s.L3a
+            s.L3a
             }}
           </text>
 
@@ -386,7 +386,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="160"
                 x="444" y="394"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="524" y="419">{{
-              s.L3b
+            s.L3b
             }}
           </text>
 
@@ -394,7 +394,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="160"
                 x="620" y="394"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="700" y="419">{{
-              s.L3c
+            s.L3c
             }}
           </text>
 
@@ -402,7 +402,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="160"
                 x="796" y="394"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="876" y="419">{{
-              s.L3d
+            s.L3d
             }}
           </text>
 
@@ -410,7 +410,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 width="162"
                 x="972" y="394"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="1053" y="419">{{
-              s.L3e
+            s.L3e
             }}
           </text>
 
@@ -427,7 +427,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 x="273"
                 y="514"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="339" y="539">{{
-              s.L4a
+            s.L4a
             }}
           </text>
 
@@ -435,7 +435,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 x="419"
                 y="514"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="485" y="539">{{
-              s.L4b
+            s.L4b
             }}
           </text>
 
@@ -443,7 +443,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 x="565"
                 y="514"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="631" y="539">{{
-              s.L4c
+            s.L4c
             }}
           </text>
 
@@ -451,7 +451,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 x="711"
                 y="514"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="777" y="539">{{
-              s.L4d
+            s.L4d
             }}
           </text>
 
@@ -459,7 +459,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 x="857"
                 y="514"/>
           <text fill="var(--ad-text)" font-size="10" font-weight="600" text-anchor="middle" x="923" y="539">{{
-              s.L4e
+            s.L4e
             }}
           </text>
 
@@ -467,12 +467,12 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
                 x="1003"
                 y="514"/>
           <text fill="var(--ad-text)" font-size="9" font-weight="600" text-anchor="middle" x="1069" y="539">{{
-              s.L4f
+            s.L4f
             }}
           </text>
 
           <text fill="var(--dc3-be-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="700" y="590">{{
-              s.L4
+            s.L4
             }}
           </text>
 

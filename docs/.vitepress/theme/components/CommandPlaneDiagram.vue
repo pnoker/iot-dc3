@@ -100,7 +100,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               x="20"
               y="98"/>
         <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="99" y="133">{{
-            s.client
+          s.client
           }}
         </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="99" y="152">{{ s.clientSub }}</text>
@@ -110,7 +110,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               x="216"
               y="98"/>
         <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="295" y="133">{{
-            s.gw
+          s.gw
           }}
         </text>
         <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="295" y="152">{{ s.gwSub }}</text>
@@ -120,7 +120,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               x="412"
               y="90"/>
         <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="497" y="120">{{
-            s.data
+          s.data
           }}
         </text>
         <text fill="var(--dc3-be-text)" font-size="9.5" text-anchor="middle" x="497" y="140">{{ s.dataSub1 }}</text>
@@ -132,7 +132,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               x="620"
               y="90"/>
         <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="705" y="120">{{
-            s.bus
+          s.bus
           }}
         </text>
         <text fill="var(--dc3-bus-text)" font-size="9" text-anchor="middle" x="705" y="141">{{ s.busSub1 }}</text>
@@ -143,7 +143,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               x="828"
               y="90"/>
         <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="907" y="120">{{
-            s.drv
+          s.drv
           }}
         </text>
         <text fill="var(--dc3-be-text)" font-size="9" text-anchor="middle" x="907" y="140">{{ s.drvSub1 }}</text>
@@ -155,7 +155,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               x="1024"
               y="98"/>
         <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="1092" y="133">{{
-            s.dev
+          s.dev
           }}
         </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="1092" y="152">{{ s.devSub }}</text>
