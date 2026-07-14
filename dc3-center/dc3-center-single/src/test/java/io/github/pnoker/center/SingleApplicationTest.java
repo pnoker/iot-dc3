@@ -18,7 +18,6 @@
 package io.github.pnoker.center;
 
 import org.junit.jupiter.api.Test;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,19 +27,6 @@ class SingleApplicationTest {
     @Test
     void applicationIsSpringBootEntryPoint() {
         assertThat(SingleApplication.class.isAnnotationPresent(SpringBootApplication.class)).isTrue();
-    }
-
-    @Test
-    void applicationScansAllCenterMapperPackages() {
-        MapperScan mapperScan = SingleApplication.class.getAnnotation(MapperScan.class);
-
-        assertThat(mapperScan).isNotNull();
-        assertThat(mapperScan.basePackages())
-                .containsExactlyInAnyOrder(
-                        "io.github.pnoker.common.dal.mapper",
-                        "io.github.pnoker.common.auth.mapper",
-                        "io.github.pnoker.common.data.mapper",
-                        "io.github.pnoker.common.manager.mapper");
     }
 
 }

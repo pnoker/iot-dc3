@@ -17,7 +17,6 @@
 
 package io.github.pnoker.center;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -33,8 +32,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 2016.10.1
  */
 @SpringBootApplication
-@MapperScan(basePackages = {"io.github.pnoker.common.dal.mapper", "io.github.pnoker.common.auth.mapper",
-        "io.github.pnoker.common.data.mapper", "io.github.pnoker.common.manager.mapper"})
 public class SingleApplication {
 
     /**
