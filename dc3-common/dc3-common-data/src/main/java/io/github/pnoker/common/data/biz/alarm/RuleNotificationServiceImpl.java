@@ -242,6 +242,16 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         return notifyConfigCache.getChannel(channelId, tenantId);
     }
 
+    /**
+     * Persist the rule state transition for a match. Loads (or creates) the state by
+     * fingerprint, skips a recovery when no FIRING state exists, and transitions to
+     * RECOVERED or FIRING with the corresponding timestamps.
+     *
+     * @param match     the rule match
+     * @param notify    the notify policy
+     * @param variables the rendered variables
+     * @return the persisted state, or null when a recovery was skipped
+     */
     private RuleStateBO persistRuleState(RuleMatch match, NotifyBO notify, Map<String, Object> variables) {
         RuleBO rule = match.getRule();
         RuleFact fact = match.getFact();
@@ -286,6 +296,16 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                 fact.getEntityId(), fingerprint, fact.getTenantId());
     }
 
+    /**
+     * Load a rule state by rule, target type, entity, and fingerprint, scoped to a tenant.
+     *
+     * @param ruleId             the rule id
+     * @param alarmTargetTypeFlag the alarm target type flag
+     * @param entityId           the entity id
+     * @param fingerprint        the state fingerprint
+     * @param tenantId           tenant scope
+     * @return the state, or null when none matches
+     */
     private RuleStateBO loadState(long ruleId, byte alarmTargetTypeFlag, long entityId,
                                   String fingerprint, long tenantId) {
         LambdaQueryWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>query().lambda()
@@ -372,6 +392,16 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         return ext;
     }
 
+    /**
+     * Compute the dedup fingerprint for a match: when the notify policy enables dedup
+     * with a key template, render it from the variables; otherwise derive a default
+     * fingerprint from the rule and entity.
+     *
+     * @param match     the rule match
+     * @param notify    the notify policy
+     * @param variables the rendered variables
+     * @return the fingerprint string
+     */
     private String fingerprint(RuleMatch match, NotifyBO notify, Map<String, Object> variables) {
         NotifyExt.Dedup dedup = null;
         if (Objects.nonNull(notify) && Objects.nonNull(notify.getNotifyExt())

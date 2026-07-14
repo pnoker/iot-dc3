@@ -115,6 +115,15 @@ public class WindowedRuleEvaluator {
         return evaluate(spec, fact, ConditionEvaluator.recoveryConditionOf(condition, recovery));
     }
 
+    /**
+     * Evaluate a windowed condition by dispatching on the window mode: aggregate modes
+     * (AVG/MIN/MAX/SUM/COUNT) reduce then test; fold modes (ALL/ANY) test each sample.
+     *
+     * @param spec      the window spec
+     * @param fact      the rule fact
+     * @param condition the condition to evaluate
+     * @return true if the condition is met
+     */
     private boolean evaluate(WindowSpec spec, RuleFact fact, RuleExt.Condition condition) {
         if (Objects.isNull(condition)) {
             return false;
@@ -127,6 +136,16 @@ public class WindowedRuleEvaluator {
         };
     }
 
+    /**
+     * Evaluate an aggregate window mode (AVG/MIN/MAX/SUM/COUNT): aggregate the samples,
+     * require the minimum sample count, then test the aggregate against the condition.
+     *
+     * @param spec      the window spec
+     * @param fact      the rule fact
+     * @param mode      the aggregate mode
+     * @param condition the condition to evaluate
+     * @return true if the condition is met
+     */
     private boolean evaluateAggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
         WindowDataSource.AggregateOutcome outcome = windowDataSource.aggregate(spec, fact, mode);
         if (outcome.sampleCount() < spec.minSamples()) {
@@ -135,6 +154,16 @@ public class WindowedRuleEvaluator {
         return ConditionEvaluator.evaluate(condition, outcome.value());
     }
 
+    /**
+     * Evaluate a fold window mode (ALL/ANY): require the minimum sample count, then test
+     * each sample against the condition, requiring all (ALL) or any (ANY) to match.
+     *
+     * @param spec      the window spec
+     * @param fact      the rule fact
+     * @param mode      the fold mode
+     * @param condition the condition to evaluate
+     * @return true if the condition is met
+     */
     private boolean evaluateFold(WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
         List<WindowSample> samples = windowDataSource.samples(spec, fact);
         if (samples.size() < spec.minSamples()) {
