@@ -91,4 +91,31 @@ class FinsDriverCustomServiceImplTest {
         assertThatNoException().isThrownBy(() -> service.schedule());
     }
 
+    @Test
+    void wordCountIsTwoFor32BitTypesAndOneOtherwise() {
+        assertThat(service.wordCount("INT32")).isEqualTo(2);
+        assertThat(service.wordCount("UINT32")).isEqualTo(2);
+        assertThat(service.wordCount("FLOAT")).isEqualTo(2);
+        assertThat(service.wordCount("float")).isEqualTo(2);
+        assertThat(service.wordCount("INT16")).isEqualTo(1);
+        assertThat(service.wordCount("UINT16")).isEqualTo(1);
+        assertThat(service.wordCount("STRING")).isEqualTo(1);
+    }
+
+    @Test
+    void floatEncodeDecodeRoundTrips() {
+        byte[] encoded = service.encodeWriteData("3.14", "FLOAT");
+
+        assertThat(encoded).hasSize(4);
+        assertThat(Float.parseFloat(service.decodeValue(encoded, "FLOAT"))).isEqualTo(3.14f);
+    }
+
+    @Test
+    void int32EncodeDecodeRoundTrips() {
+        byte[] encoded = service.encodeWriteData("70000", "INT32");
+
+        assertThat(encoded).hasSize(4);
+        assertThat(service.decodeValue(encoded, "INT32")).isEqualTo("70000");
+    }
+
 }
