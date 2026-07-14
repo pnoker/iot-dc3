@@ -75,10 +75,25 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     private final ResourceManager resourceManager;
     private final ResourceRegistryLockMapper resourceRegistryLockMapper;
 
+    /**
+     * Build the stable API code from service name, HTTP-method-derived type, and path:
+     * {@code <service>:<TYPE>:<path>}.
+     *
+     * @param serviceName the owning service name
+     * @param method      the HTTP method
+     * @param path        the API path
+     * @return the API code
+     */
     private static String apiCodeOf(String serviceName, String method, String path) {
         return serviceName + SymbolConstant.COLON + methodToTypeFlag(method).name() + SymbolConstant.COLON + path;
     }
 
+    /**
+     * Map an HTTP method to its API type enum, throwing on unsupported methods.
+     *
+     * @param method the HTTP method
+     * @return the API type enum
+     */
     private static ApiTypeEnum methodToTypeFlag(String method) {
         String m = Objects.requireNonNullElse(method, "").toUpperCase();
         return switch (m) {
@@ -90,6 +105,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         };
     }
 
+    /**
+     * Map an API type flag to its default resource scope, defaulting to LIST when unknown.
+     *
+     * @param apiTypeFlag the API type flag
+     * @return the resource scope
+     */
     private static ResourceScopeTypeEnum methodToScopeFlag(Byte apiTypeFlag) {
         ApiTypeEnum type = ApiTypeEnum.ofIndex(apiTypeFlag);
         if (Objects.isNull(type)) {
@@ -103,11 +124,25 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         };
     }
 
+    /**
+     * Resolve an API's resource scope: prefer an explicit scope encoded in the API name
+     * suffix, otherwise derive it from the API type flag.
+     *
+     * @param api the API record
+     * @return the resource scope
+     */
     private static ResourceScopeTypeEnum apiToScopeFlag(ApiDO api) {
         ResourceScopeTypeEnum explicitScope = resolveScopeFromApiName(api.getApiName());
         return Objects.nonNull(explicitScope) ? explicitScope : methodToScopeFlag(api.getApiTypeFlag());
     }
 
+    /**
+     * Extract an explicit scope from the API name suffix after the last colon, returning
+     * null when the name carries no recognizable scope suffix.
+     *
+     * @param apiName the API name
+     * @return the scope, or null
+     */
     private static ResourceScopeTypeEnum resolveScopeFromApiName(String apiName) {
         if (StringUtils.isBlank(apiName)) {
             return null;
@@ -119,6 +154,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return ResourceScopeTypeEnum.ofCode(apiName.substring(idx + 1));
     }
 
+    /**
+     * Build a resource code from service name and API name: {@code <service>:<apiName>}.
+     *
+     * @param serviceName the owning service name
+     * @param apiName     the API name
+     * @return the resource code
+     */
     private static String buildResourceCode(String serviceName, String apiName) {
         return Objects.requireNonNullElse(serviceName, "") + SymbolConstant.COLON
                 + Objects.requireNonNullElse(apiName, "");
@@ -229,6 +271,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
                 .build();
     }
 
+    /**
+     * Load existing APIs for a service, indexed by API code.
+     *
+     * @param serviceName the service name
+     * @return map from API code to API record
+     */
     private Map<String, ApiDO> loadExisting(String serviceName) {
         List<ApiDO> existing = apiManager.list(Wrappers.<ApiDO>lambdaQuery().eq(ApiDO::getServiceName, serviceName));
         Map<String, ApiDO> map = new HashMap<>(existing.size());
@@ -238,6 +286,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return map;
     }
 
+    /**
+     * Load leaf API resources (excluding grouping nodes with entity_id=0) by their API
+     * entity ids, indexed by entity id.
+     *
+     * @param entityIds the API entity ids
+     * @return map from entity id to resource
+     */
     private Map<Long, ResourceDO> loadResourcesByEntityIds(List<Long> entityIds) {
         if (entityIds.isEmpty()) {
             return Map.of();
@@ -254,6 +309,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return map;
     }
 
+    /**
+     * Load leaf API resources for a service, indexed by {@code resourceCode|serviceName}.
+     *
+     * @param serviceName the service name
+     * @return map from composite key to resource
+     */
     private Map<String, ResourceDO> loadResourcesByCodes(String serviceName) {
         List<ResourceDO> rows = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
                 .eq(ResourceDO::getResourceTypeFlag, ResourceTypeEnum.API.getIndex())
@@ -280,6 +341,11 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return map;
     }
 
+    /**
+     * Validate a scanned API spec: non-null, with a supported method and a non-blank path.
+     *
+     * @param spec the scanned API spec
+     */
     private void validateScannedApi(ResourceRegistryScannedApi spec) {
         if (Objects.isNull(spec)) {
             throw new IllegalArgumentException("Scanned API must not be null");
@@ -321,6 +387,14 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return resource;
     }
 
+    /**
+     * Reconcile leaf API resources against the current API records: insert new leaves,
+     * update changed ones, and remove orphans whose APIs no longer exist.
+     *
+     * @param apis          the current API records (ids required)
+     * @param groupNodeIds  map from group name to its parent resource node id
+     * @return the insert and update counts
+     */
     private ResourceRepairResult reconcileLeafResources(List<ApiDO> apis, Map<String, Long> groupNodeIds) {
         if (apis.isEmpty()) {
             return new ResourceRepairResult(0, 0);
@@ -376,6 +450,16 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return new ResourceRepairResult(resourcesToInsert.size(), resourcesToUpdate.size());
     }
 
+    /**
+     * Return whether an existing API record differs from the scanned spec (code, name,
+     * type, or content) and needs an update.
+     *
+     * @param existing    the existing API record
+     * @param spec        the scanned spec
+     * @param apiCode     the computed API code
+     * @param serviceName the owning service name
+     * @return true if an update is needed
+     */
     private boolean needsUpdate(ApiDO existing, ResourceRegistryScannedApi spec, String apiCode, String serviceName) {
         byte expectedType = methodToTypeFlag(spec.getMethod()).getIndex();
         if (Objects.isNull(existing.getApiTypeFlag()) || existing.getApiTypeFlag() != expectedType) {
@@ -403,6 +487,14 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return !Objects.equals(Objects.requireNonNullElse(existing.getRemark(), ""), expectedRemark);
     }
 
+    /**
+     * Apply the scanned spec's changes onto an existing API record.
+     *
+     * @param existing    the API record to update
+     * @param spec        the scanned spec
+     * @param apiCode     the computed API code
+     * @param serviceName the owning service name
+     */
     private void applyApiUpdates(ApiDO existing, ResourceRegistryScannedApi spec, String apiCode, String serviceName) {
         existing.setServiceName(serviceName);
         existing.setApiCode(apiCode);
@@ -414,6 +506,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         existing.setOperateTime(null);
     }
 
+    /**
+     * Apply API-derived fields (code, name, scope, parent node) onto a leaf resource.
+     *
+     * @param resource    the resource to update
+     * @param api         the API record
+     * @param groupNodeId the parent group node id
+     */
     private void applyLeafResourceUpdates(ResourceDO resource, ApiDO api, Long groupNodeId) {
         resource.setParentResourceId(Objects.requireNonNullElse(groupNodeId, 0L));
         resource.setResourceName(api.getApiName());
@@ -429,6 +528,15 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         resource.setOperateTime(null);
     }
 
+    /**
+     * Return whether a leaf resource differs from its API (name, scope, parent node) and
+     * needs an update.
+     *
+     * @param resource    the resource
+     * @param api         the API record
+     * @param groupNodeId the expected parent group node id
+     * @return true if an update is needed
+     */
     private boolean needsLeafResourceUpdate(ResourceDO resource, ApiDO api, Long groupNodeId) {
         if (!Objects.equals(resource.getParentResourceId(), Objects.requireNonNullElse(groupNodeId, 0L))) {
             return true;
@@ -458,6 +566,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return !Objects.equals(Objects.requireNonNullElse(resource.getRemark(), ""), expectedRemark);
     }
 
+    /**
+     * Ensure the service-level resource node exists for a service, creating it if missing.
+     *
+     * @param serviceName the service name
+     * @return the service node resource id
+     */
     private Long ensureServiceNode(String serviceName) {
         String code = API_SERVICE_NODE_CODE_PREFIX + serviceName;
         ResourceDO existing = findByResourceCode(code);
@@ -482,6 +596,15 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return node.getId();
     }
 
+    /**
+     * Ensure group resource nodes exist under a service node for each target group,
+     * creating missing ones and removing stale ones.
+     *
+     * @param serviceName    the service name
+     * @param serviceNodeId  the parent service node id
+     * @param targetGroups   the group names that should exist
+     * @return map from group name to its resource node id
+     */
     private Map<String, Long> ensureGroupNodes(String serviceName, Long serviceNodeId, Set<String> targetGroups) {
         Map<String, Long> result = new HashMap<>(targetGroups.size());
 
@@ -592,6 +715,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         node.setOperateTime(null);
     }
 
+    /**
+     * Find a single resource by its resource code.
+     *
+     * @param code the resource code
+     * @return the resource, or null if not found
+     */
     private ResourceDO findByResourceCode(String code) {
         return resourceManager
                 .getOne(Wrappers.<ResourceDO>lambdaQuery().eq(ResourceDO::getResourceCode, code).last("LIMIT 1"));
