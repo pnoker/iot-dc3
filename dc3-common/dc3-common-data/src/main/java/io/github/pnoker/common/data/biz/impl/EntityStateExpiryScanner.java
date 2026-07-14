@@ -124,6 +124,11 @@ public class EntityStateExpiryScanner {
         }
     }
 
+    /**
+     * Claim a batch of expired online device leases, build offline alarms for each,
+     * persist them in bulk, then complete each device's expiry (state update + event
+     * publish).
+     */
     private void scanExpiredDevices() {
         List<EntityStateDO> expired = entityStateMapper.claimExpiredDevices(
                 EntityTypeEnum.DEVICE.getIndex(),
@@ -164,6 +169,13 @@ public class EntityStateExpiryScanner {
         }
     }
 
+    /**
+     * Build an offline alarm row for an expired device, recording its previous state and
+     * a P1-level timeout message.
+     *
+     * @param scanned the expired device's state row
+     * @return the assembled alarm row
+     */
     private EntityAlarmDO buildOfflineAlarm(EntityStateDO scanned) {
         EntityStatusEnum prev = EntityStatusEnum.ofIndex(scanned.getLastStateFlag());
         String prevCode = Objects.nonNull(prev) ? prev.getCode() : DataConstant.STATUS_UNKNOWN;
@@ -187,6 +199,12 @@ public class EntityStateExpiryScanner {
         return alarm;
     }
 
+    /**
+     * Complete an expired device's transition: mark its state offline, publish a device
+     * alarm event, and publish a device-state event to the message bus.
+     *
+     * @param ctx the expired device context carrying its state and alarm
+     */
     private void completeExpiredDevice(ExpiredDeviceContext ctx) {
         EntityStateDO scanned = ctx.state;
         EntityAlarmDO alarm = ctx.alarm;
