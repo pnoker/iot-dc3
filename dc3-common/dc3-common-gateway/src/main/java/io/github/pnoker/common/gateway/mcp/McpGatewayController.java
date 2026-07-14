@@ -257,12 +257,20 @@ public class McpGatewayController {
                     return invokeBackend(context, tool, arguments, controls)
                             .flatMap(result -> audit(context, tool, traceId, arguments, controls,
                                     McpConstant.Audit.SUCCESS, "", start, exchange)
+                                    // Audit is post-hoc telemetry: a failed SUCCESS audit must not turn an
+                                    // already-executed backend call into a client-visible error.
+                                    .onErrorResume(auditError -> {
+                                        log.warn("MCP success audit failed for tool '{}'", tool.getToolName(),
+                                                auditError);
+                                        return Mono.empty();
+                                    })
                                     .thenReturn(orderedMap(McpConstant.ToolResult.CONTENT, List.of(orderedMap(
                                             McpConstant.ToolResult.TYPE, McpConstant.ToolResult.TYPE_TEXT,
                                             McpConstant.ToolResult.TEXT, JsonUtil.toJsonString(result)
                                     )))))
                             .onErrorResume(e -> audit(context, tool, traceId, arguments, controls,
                                     McpConstant.Audit.ERROR, e.getClass().getSimpleName(), start, exchange)
+                                    .onErrorResume(auditError -> Mono.empty())
                                     .thenReturn(toolError(e.getMessage())));
                 });
             });
