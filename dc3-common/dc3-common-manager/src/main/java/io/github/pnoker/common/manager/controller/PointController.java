@@ -358,10 +358,10 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_count_by_device_id")
-    public Mono<R<Long>> getPointByDeviceId(@Parameter(description = "Identifier of the device whose point count should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+    public Mono<R<Long>> getCountByDeviceId(@Parameter(description = "Identifier of the device whose point count should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             requireTenant(tenantId, deviceService.getById(deviceId));
-            Long count = pointService.getPointByDeviceId(deviceId);
+            Long count = pointService.getCountByDeviceId(deviceId);
             return R.ok(count);
         }));
     }

@@ -255,7 +255,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public Long getPointByDeviceId(Long deviceId) {
+    public Long getCountByDeviceId(Long deviceId) {
         DeviceDO deviceDO = deviceMapper.selectById(deviceId);
         if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return 0L;
