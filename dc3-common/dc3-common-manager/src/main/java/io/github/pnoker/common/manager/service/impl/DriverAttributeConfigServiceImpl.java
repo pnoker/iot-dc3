@@ -231,6 +231,12 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
+    /**
+     * Validate that the config's device and attribute belong to the same tenant and
+     * share a driver.
+     *
+     * @param entityBO the config to validate
+     */
     private void validateTenantRelations(DriverAttributeConfigBO entityBO) {
         DeviceDO deviceDO = deviceManager.getById(entityBO.getDeviceId());
         DriverAttributeDO attributeDO = driverAttributeManager.getById(entityBO.getAttributeId());

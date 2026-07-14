@@ -235,6 +235,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         return duplicate;
     }
 
+    /**
+     * Validate that the attribute's driver belongs to the same tenant.
+     *
+     * @param entityBO the attribute to validate
+     */
     private void validateTenantRelations(PointAttributeBO entityBO) {
         DriverBO driverBO = driverService.getById(entityBO.getDriverId());
         if (Objects.isNull(driverBO) || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
@@ -242,6 +247,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         }
     }
 
+    /**
+     * Publish a driver-update metadata event for the given driver.
+     *
+     * @param driverId the driver that changed
+     */
     private void publishDriverMetadataEvent(Long driverId) {
         DriverBO driverBO = driverService.getById(driverId);
         if (Objects.isNull(driverBO) || StringUtils.isBlank(driverBO.getServiceName())) {

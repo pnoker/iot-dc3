@@ -456,6 +456,11 @@ public class DeviceServiceImpl implements DeviceService {
         return path;
     }
 
+    /**
+     * Validate that the device's driver and profile belong to the same tenant.
+     *
+     * @param entityBO the device to validate
+     */
     private void validateTenantRelations(DeviceBO entityBO) {
         Long tenantId = entityBO.getTenantId();
         DriverBO driverBO = driverService.getById(entityBO.getDriverId());
@@ -541,6 +546,12 @@ public class DeviceServiceImpl implements DeviceService {
         return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
+    /**
+     * Resolve the service names of the given drivers, skipping null ids.
+     *
+     * @param driverIds the driver ids to resolve
+     * @return the set of driver service names
+     */
     private Set<String> driverServiceNames(Long... driverIds) {
         Set<String> services = new HashSet<>();
         if (Objects.isNull(driverIds)) {
