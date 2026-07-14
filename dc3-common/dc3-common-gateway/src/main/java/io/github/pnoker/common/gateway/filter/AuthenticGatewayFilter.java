@@ -87,6 +87,13 @@ public class AuthenticGatewayFilter implements GatewayFilter {
                 });
     }
 
+    /**
+     * Resolve the principal header by running the full auth chain: tenant, credential,
+     * token validation, then principal assembly.
+     *
+     * @param request the incoming request
+     * @return the resolved principal header
+     */
     private RequestHeader.PrincipalHeader resolvePrincipalHeader(ServerHttpRequest request) {
         FacadeTenantBO tenant = filterService.getTenant(request);
         FacadeLocalCredentialBO credential = filterService.getLocalCredential(request);
@@ -94,6 +101,14 @@ public class AuthenticGatewayFilter implements GatewayFilter {
         return filterService.getUser(credential, tenant);
     }
 
+    /**
+     * Write a JSON error response with the given status and message.
+     *
+     * @param exchange current server exchange
+     * @param status   the HTTP status to set
+     * @param message  the error message
+     * @return a mono completing when the response is written
+     */
     private Mono<Void> writeErrorResponse(ServerWebExchange exchange, HttpStatus status, String message) {
         ServerHttpResponse response = exchange.getResponse();
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
