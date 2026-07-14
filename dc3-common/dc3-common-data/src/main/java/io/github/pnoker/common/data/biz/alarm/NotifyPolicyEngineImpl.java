@@ -71,6 +71,14 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
         return StringUtils.equalsIgnoreCase(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY);
     }
 
+    /**
+     * Return whether recovery notifications are enabled, requiring both the notify
+     * policy and the channel binding to allow them.
+     *
+     * @param notify the notify policy
+     * @param bind   the channel binding
+     * @return true if recovery notifications are enabled
+     */
     private boolean recoveryEnabled(NotifyBO notify, NotifyChannelBindBO bind) {
         NotifyExt.Content notifyContent = content(notify);
         boolean policyEnabled = Objects.nonNull(notifyContent)
@@ -103,6 +111,17 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
         return false;
     }
 
+    /**
+     * Return whether a notification passes rate limiting: allowed on the first fire or
+     * when no interval is configured, otherwise gated by the elapsed time since the last
+     * notification.
+     *
+     * @param notify the notify policy
+     * @param bind   the channel binding
+     * @param state  the rule state carrying the last notify time
+     * @param now    the current instant
+     * @return true if rate limiting allows the notification
+     */
     private boolean rateLimitAllowed(NotifyBO notify, NotifyChannelBindBO bind, RuleStateBO state, LocalDateTime now) {
         if (Objects.isNull(state) || Objects.isNull(state.getLastNotifyTime())) {
             return true;
@@ -129,6 +148,14 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
         return notify.getNotifyInterval();
     }
 
+    /**
+     * Return whether the notify policy is currently silenced by any of its silence
+     * windows.
+     *
+     * @param notify the notify policy
+     * @param now    the current instant
+     * @return true if silenced
+     */
     private boolean isSilenced(NotifyBO notify, LocalDateTime now) {
         NotifyExt.Content notifyContent = content(notify);
         if (Objects.isNull(notifyContent) || Objects.isNull(notifyContent.getSilence())
@@ -144,6 +171,15 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
         return false;
     }
 
+    /**
+     * Return whether the current instant falls inside a silence window, converting to
+     * the window's timezone and matching its days-of-week. Handles three window shapes:
+     * start==end (all day), start&lt;end (same-day), and start&gt;end (cross-midnight).
+     *
+     * @param window the silence window
+     * @param now    the current instant
+     * @return true if the instant is inside the window
+     */
     private boolean inWindow(NotifyExt.Window window, LocalDateTime now) {
         if (Objects.isNull(window) || StringUtils.isBlank(window.getStart()) || StringUtils.isBlank(window.getEnd())) {
             return false;
@@ -172,6 +208,15 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
         }
     }
 
+    /**
+     * Return whether the current day-of-week is allowed by the window's day list,
+     * matching either the enum name or the short display name. An empty list allows
+     * every day.
+     *
+     * @param daysOfWeek the allowed days
+     * @param current    the current day-of-week
+     * @return true if the day is allowed
+     */
     private boolean dayAllowed(List<String> daysOfWeek, DayOfWeek current) {
         if (Objects.isNull(daysOfWeek) || daysOfWeek.isEmpty()) {
             return true;
