@@ -72,6 +72,13 @@ public class UserGrpcFacade implements UserFacade {
         return facadeGrpcUserBuilder.toFacadeBO(response.getData());
     }
 
+    /**
+     * Guard a gRPC result: NOT_FOUND is treated as a normal empty outcome, any other
+     * error code throws a service exception.
+     *
+     * @param result the gRPC result envelope
+     * @param op     the operation name, for error messages
+     */
     private void guardOrThrow(GrpcR result, String op) {
         String code = result.getCode();
         if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
