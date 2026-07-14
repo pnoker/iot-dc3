@@ -164,12 +164,23 @@ public class LabelServiceImpl implements LabelService {
         return duplicate;
     }
 
+    /**
+     * Validate that the entity type supports labelling.
+     *
+     * @param entityTypeFlag the entity type to check
+     */
     private void validateEntityType(EntityTypeEnum entityTypeFlag) {
         if (!isSupportedEntityType(entityTypeFlag)) {
             throw new RequestException("Label entity type is not supported");
         }
     }
 
+    /**
+     * Return whether an entity type supports labelling (driver, profile, point, device).
+     *
+     * @param entityTypeFlag the entity type to check
+     * @return true if supported
+     */
     private boolean isSupportedEntityType(EntityTypeEnum entityTypeFlag) {
         return EntityTypeEnum.DRIVER == entityTypeFlag
                 || EntityTypeEnum.PROFILE == entityTypeFlag
