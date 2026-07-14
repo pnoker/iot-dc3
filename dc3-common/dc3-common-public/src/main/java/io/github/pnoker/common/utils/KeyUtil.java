@@ -232,6 +232,12 @@ public class KeyUtil {
         return DecodeUtil.byteToString(cipher.doFinal(inputByte));
     }
 
+    /**
+     * Resolve the JWT signing key from the {@code DC3_SECURITY_KEY} environment variable
+     * or the {@code dc3.security.key} system property, throwing when neither is set.
+     *
+     * @return the security key
+     */
     private static String getSecurityKey() {
         String key = System.getenv("DC3_SECURITY_KEY");
         if (key == null || key.isBlank()) {

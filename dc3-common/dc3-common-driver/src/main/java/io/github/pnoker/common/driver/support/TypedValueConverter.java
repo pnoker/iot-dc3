@@ -142,6 +142,18 @@ public final class TypedValueConverter {
     }
 
     @SuppressWarnings("unchecked")
+    /**
+     * Convert a raw string value to the target scalar type, dispatching by type and
+     * applying range/exactness validation on numeric values.
+     *
+     * @param value      the raw string value
+     * @param type       the resolved scalar type
+     * @param typeCode   the original type code, for error messages
+     * @param targetType the expected boxed return type
+     * @param label      the value label, for error messages
+     * @param <T>        the return type
+     * @return the converted value
+     */
     private static <T> T convert(String value, ScalarType type, String typeCode, Class<T> targetType, String label) {
         requireTarget(type, typeCode, targetType, label);
         return switch (type) {
@@ -157,6 +169,17 @@ public final class TypedValueConverter {
         };
     }
 
+    /**
+     * Apply a linear transform (value × multiple + base) to a raw value, short-circuiting
+     * when the multiple and base are at their identity defaults (1 and 0).
+     *
+     * @param multiple the multiplier
+     * @param rawValue the raw string value
+     * @param base     the additive base
+     * @param label    the value label, for error messages
+     * @param typeCode the type code, for error messages
+     * @return the transformed value
+     */
     private static BigDecimal linearValue(BigDecimal multiple, String rawValue, BigDecimal base, String label,
                                           String typeCode) {
         BigDecimal value = decimal(rawValue, ScalarType.DOUBLE, label, typeCode);

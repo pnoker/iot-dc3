@@ -80,6 +80,12 @@ public class DeviceHealthScheduleJob extends QuartzJobBean {
         }
     }
 
+    /**
+     * Check and report the health of one device: skip disabled devices or those with
+     * incomplete driver config, invoke the driver health check, then report the state.
+     *
+     * @param deviceId the device to health-check
+     */
     private void reportDeviceHealth(Long deviceId) {
         DeviceBO device = deviceMetadata.getCache(deviceId);
         if (Objects.isNull(device) || !EnableFlagEnum.ENABLE.equals(device.getEnableFlag())) {
@@ -101,6 +107,13 @@ public class DeviceHealthScheduleJob extends QuartzJobBean {
         reportDeviceState(deviceId, healthState);
     }
 
+    /**
+     * Report a device's resolved state, applying its timeout and description overrides
+     * over the configured defaults.
+     *
+     * @param deviceId     the device id
+     * @param healthState  the resolved health state
+     */
     private void reportDeviceState(Long deviceId, DeviceHealthState healthState) {
         EntityStatusEnum status = EntityStatusEnum.OFFLINE;
         int timeout = driverProperties.getHealth().getDevice().getTimeout();

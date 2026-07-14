@@ -79,6 +79,13 @@ public class DriverReadScheduleJob extends QuartzJobBean {
         CompletableFuture.allOf(tasks).join();
     }
 
+    /**
+     * Return whether a device is ready for scheduled reads: enabled, with a profile,
+     * point ids, and non-empty driver/point attribute config maps.
+     *
+     * @param entityBO the device to check
+     * @return true if the device can be read
+     */
     private boolean isReadableDevice(DeviceBO entityBO) {
         return Objects.nonNull(entityBO) && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
                 && Objects.nonNull(entityBO.getProfileId())
@@ -91,6 +98,13 @@ public class DriverReadScheduleJob extends QuartzJobBean {
         device.getPointIds().forEach(pointId -> readPoint(device.getId(), pointId));
     }
 
+    /**
+     * Read a single point on a device, logging (not rethrowing) on failure so one bad
+     * point does not abort the whole schedule round.
+     *
+     * @param deviceId the device to read from
+     * @param pointId  the point to read
+     */
     private void readPoint(Long deviceId, Long pointId) {
         try {
             driverReadService.read(deviceId, pointId);

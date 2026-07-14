@@ -81,6 +81,12 @@ public class DeviceLockManager {
         }
     }
 
+    /**
+     * Acquire (or increment the reference count on) the lock ref for a device.
+     *
+     * @param deviceId the device to lock
+     * @return the lock ref
+     */
     private LockRef acquire(Long deviceId) {
         return locks.compute(deviceId, (id, current) -> {
             LockRef ref = Objects.nonNull(current) ? current : new LockRef();
@@ -89,6 +95,13 @@ public class DeviceLockManager {
         });
     }
 
+    /**
+     * Release the lock ref for a device, decrementing its reference count and removing
+     * it when the count reaches zero. Stale refs (from a different acquire) are ignored.
+     *
+     * @param deviceId the device to unlock
+     * @param ref      the lock ref returned by acquire
+     */
     private void release(Long deviceId, LockRef ref) {
         locks.computeIfPresent(deviceId, (id, current) -> {
             if (current != ref) {
