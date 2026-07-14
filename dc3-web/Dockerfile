@@ -40,7 +40,9 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 COPY dc3/dependencies/nginx/ /etc/nginx/
 COPY --from=builder /build/dist/ /usr/share/nginx/html/
-COPY dc3/dependencies/conf.crt/ /etc/letsencrypt/live/
+# nginx.conf references /etc/letsencrypt/live/dc3.site/ (the acme.sh layout),
+# so the certs shipped under nginx/certs/ are placed there.
+COPY dc3/dependencies/nginx/certs/ /etc/letsencrypt/live/
 
 EXPOSE 80 443
 VOLUME /var/log/nginx
