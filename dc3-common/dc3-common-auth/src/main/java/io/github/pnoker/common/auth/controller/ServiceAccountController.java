@@ -200,6 +200,14 @@ public class ServiceAccountController implements BaseController {
         return toggleEnableFlag(id, EnableFlagEnum.DISABLE);
     }
 
+    /**
+     * Toggle a service account's enable flag via the full update path (keeping the
+     * linked Principal in sync) and record an audit entry.
+     *
+     * @param id     the service account id
+     * @param target the target enable flag
+     * @return update-success result
+     */
     private Mono<R<String>> toggleEnableFlag(Long id, EnableFlagEnum target) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             // Reuse the full update path so the linked Principal row stays in sync; only the
@@ -263,6 +271,12 @@ public class ServiceAccountController implements BaseController {
         }));
     }
 
+    /**
+     * Stamp the creator and operator audit fields from the authenticated principal.
+     *
+     * @param entityBO the service account to stamp
+     * @param header   the authenticated principal header
+     */
     private void fillCreateAudit(ServiceAccountBO entityBO, RequestHeader.PrincipalHeader header) {
         entityBO.setCreatorId(header.getUserId());
         entityBO.setCreatorName(header.getNickName());

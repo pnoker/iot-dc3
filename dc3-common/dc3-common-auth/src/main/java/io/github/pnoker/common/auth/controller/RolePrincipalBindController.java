@@ -215,6 +215,12 @@ public class RolePrincipalBindController implements BaseController {
         }));
     }
 
+    /**
+     * Stamp the creator and operator audit fields from the authenticated principal.
+     *
+     * @param entityBO the binding to stamp
+     * @param header   the authenticated principal header
+     */
     private void fillCreateAudit(RolePrincipalBindBO entityBO, RequestHeader.PrincipalHeader header) {
         entityBO.setCreatorId(header.getUserId());
         entityBO.setCreatorName(header.getNickName());
