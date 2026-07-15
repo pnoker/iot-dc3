@@ -359,6 +359,15 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         }
     }
 
+    /**
+     * Build an API DO from a scanned spec, setting its type, group, extension, and
+     * defaults.
+     *
+     * @param spec        the scanned API spec
+     * @param apiCode     the computed API code
+     * @param serviceName the owning service name
+     * @return the assembled API DO
+     */
     private ApiDO buildApiDO(ResourceRegistryScannedApi spec, String apiCode, String serviceName) {
         ApiDO api = new ApiDO();
         api.setServiceName(serviceName);
@@ -372,6 +381,14 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return api;
     }
 
+    /**
+     * Build a leaf API resource DO from an API record, deriving its code, scope, and
+     * parent group node from the API.
+     *
+     * @param api         the API record
+     * @param groupNodeId the parent group node id, or null for root
+     * @return the assembled leaf resource DO
+     */
     private ResourceDO buildLeafResourceDO(ApiDO api, Long groupNodeId) {
         ResourceDO resource = new ResourceDO();
         resource.setParentResourceId(Objects.requireNonNullElse(groupNodeId, 0L));
@@ -670,6 +687,17 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return result;
     }
 
+    /**
+     * Return whether a grouping node differs from its desired state (parent, name,
+     * code, type, scope, remark).
+     *
+     * @param node             the existing grouping node
+     * @param parentResourceId the desired parent id
+     * @param name             the desired name
+     * @param code             the desired code
+     * @param remark           the desired remark
+     * @return true if an update is needed
+     */
     private boolean needsGroupingNodeUpdate(ResourceDO node, Long parentResourceId, String name, String code,
                                             String remark) {
         if (!Objects.equals(node.getParentResourceId(), parentResourceId)) {
@@ -699,6 +727,15 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return !Objects.equals(Objects.requireNonNullElse(node.getRemark(), ""), remark);
     }
 
+    /**
+     * Apply the desired state onto a grouping node in place.
+     *
+     * @param node             the grouping node to update
+     * @param parentResourceId the desired parent id
+     * @param name             the desired name
+     * @param code             the desired code
+     * @param remark           the desired remark
+     */
     private void applyGroupingNodeUpdates(ResourceDO node, Long parentResourceId, String name, String code,
                                           String remark) {
         node.setParentResourceId(parentResourceId);
@@ -768,6 +805,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return removed;
     }
 
+    /**
+     * Build the JSON extension for an API from its scanned spec, carrying the content
+     * and version metadata.
+     *
+     * @param spec the scanned API spec
+     * @return the assembled JSON extension
+     */
     private JsonExt buildApiExt(ResourceRegistryScannedApi spec) {
         JsonExt ext = new JsonExt();
         ext.setVersion(1);
@@ -775,6 +819,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return ext;
     }
 
+    /**
+     * Build the content block (summary, description, deprecated, ai metadata) from a
+     * scanned API spec.
+     *
+     * @param spec the scanned API spec
+     * @return the content block
+     */
     private ApiExt.Content buildContent(ResourceRegistryScannedApi spec) {
         ApiExt.Content content = new ApiExt.Content();
         content.setTitle(spec.getTitle());
@@ -783,6 +834,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return content;
     }
 
+    /**
+     * Parse the content block from an API's JSON extension, returning null when absent.
+     *
+     * @param ext the JSON extension
+     * @return the parsed content, or null
+     */
     private ApiExt.Content parseContent(JsonExt ext) {
         if (Objects.isNull(ext) || StringUtils.isBlank(ext.getContent())) {
             return null;
@@ -790,6 +847,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return JsonUtil.parseObject(ext.getContent(), ApiExt.Content.class);
     }
 
+    /**
+     * Return whether two content blocks are equal (both null counts as equal).
+     *
+     * @param a the first content block
+     * @param b the second content block
+     * @return true if equal
+     */
     private boolean equalsContent(ApiExt.Content a, ApiExt.Content b) {
         if (Objects.isNull(a) || Objects.isNull(b)) {
             return Objects.isNull(a) && Objects.isNull(b);
@@ -851,6 +915,13 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         }
     }
 
+    /**
+     * Resolve the parent resource id for a menu, returning 0 when the parent menu id is
+     * null or zero.
+     *
+     * @param parentMenuId the parent menu id
+     * @return the resolved parent resource id
+     */
     private Long resolveMenuParentResourceId(Long parentMenuId) {
         if (Objects.isNull(parentMenuId) || parentMenuId == 0L) {
             return 0L;
