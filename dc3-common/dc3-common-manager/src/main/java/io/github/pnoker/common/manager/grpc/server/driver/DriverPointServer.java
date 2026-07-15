@@ -136,6 +136,14 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
         }
     }
 
+    /**
+     * Page points scoped to a driver: resolve the driver's profiles, load and filter the
+     * points by tenant and optional point-id, then paginate in memory.
+     *
+     * @param request the gRPC query request (driver/device/profile/point filters)
+     * @param query   the internal point query carrying tenant and page
+     * @return the paginated points, or null when the driver is missing or cross-tenant
+     */
     private Page<PointBO> selectDriverScopedPage(GrpcPagePointQuery request, PointQuery query) {
         Page<PointBO> page = new Page<>(query.getPage().getCurrent(), query.getPage().getSize());
         DriverBO driverBO = selectDriver(request.getDriverId());
@@ -166,6 +174,14 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
         return page;
     }
 
+    /**
+     * Resolve the profile ids a driver can access: when a device is requested, use its
+     * profile; otherwise collect profiles from all of the driver's devices.
+     *
+     * @param request  the gRPC query request
+     * @param driverBO the driver
+     * @return the accessible profile ids, filtered by the optional profile-id filter
+     */
     private Set<Long> resolveDriverProfileIds(GrpcPagePointQuery request, DriverBO driverBO) {
         if (request.getDeviceId() > 0) {
             DeviceBO deviceBO = selectDevice(request.getDeviceId());
@@ -202,6 +218,13 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
         return profileIds.contains(request.getProfileId()) ? Set.of(request.getProfileId()) : Collections.emptySet();
     }
 
+    /**
+     * Return whether a driver serves the profile that owns a point.
+     *
+     * @param driverBO the driver
+     * @param pointBO  the point
+     * @return true if the driver has a device sharing the point's profile
+     */
     private boolean driverHasPoint(DriverBO driverBO, PointBO pointBO) {
         return deviceService.listByDriverId(driverBO.getId(), driverBO.getTenantId())
                 .stream()
