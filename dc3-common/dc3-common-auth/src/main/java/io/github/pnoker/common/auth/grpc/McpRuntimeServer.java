@@ -164,6 +164,13 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
         responseObserver.onCompleted();
     }
 
+    /**
+     * Convert an introspection response DTO to its gRPC form, defaulting nulls to
+     * empty/zero.
+     *
+     * @param source the DTO
+     * @return the gRPC introspection DTO
+     */
     private GrpcMcpIntrospectDTO toGrpc(McpIntrospectResponseDTO source) {
         GrpcMcpIntrospectDTO.Builder builder = GrpcMcpIntrospectDTO.newBuilder()
                 .setActive(source.isActive());
@@ -188,6 +195,12 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .build();
     }
 
+    /**
+     * Convert a tool definition DTO to its gRPC form, including annotations and metadata.
+     *
+     * @param source the DTO
+     * @return the gRPC tool definition DTO
+     */
     private GrpcMcpToolDefinitionDTO toGrpc(McpToolDefinitionDTO source) {
         return GrpcMcpToolDefinitionDTO.newBuilder()
                 .setName(StringUtils.defaultString(source.getName()))
@@ -198,6 +211,12 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .build();
     }
 
+    /**
+     * Convert tool annotation hints to their gRPC form, defaulting null to empty.
+     *
+     * @param source the annotations
+     * @return the gRPC annotations DTO
+     */
     private GrpcMcpToolAnnotationsDTO toGrpc(McpToolDefinitionDTO.Annotations source) {
         if (source == null) {
             return GrpcMcpToolAnnotationsDTO.getDefaultInstance();
@@ -210,6 +229,13 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .build();
     }
 
+    /**
+     * Convert tool metadata (tool id, permission code, risk level) to its gRPC form,
+     * defaulting null to empty.
+     *
+     * @param source the metadata
+     * @return the gRPC metadata DTO
+     */
     private GrpcMcpToolMetadataDTO toGrpc(McpToolDefinitionDTO.Metadata source) {
         if (source == null) {
             return GrpcMcpToolMetadataDTO.getDefaultInstance();
@@ -221,6 +247,12 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .build();
     }
 
+    /**
+     * Convert a resolved tool response DTO to its gRPC form.
+     *
+     * @param source the DTO
+     * @return the gRPC resolved tool DTO
+     */
     private GrpcMcpToolResolveDTO toGrpc(McpToolResolveResponseDTO source) {
         return GrpcMcpToolResolveDTO.newBuilder()
                 .setToolId(StringUtils.defaultString(source.getToolId()))
@@ -233,6 +265,12 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .build();
     }
 
+    /**
+     * Convert an authorization decision DTO to its gRPC form.
+     *
+     * @param source the DTO
+     * @return the gRPC authorization DTO
+     */
     private GrpcMcpToolAuthorizeDTO toGrpc(McpToolAuthorizeResponseDTO source) {
         return GrpcMcpToolAuthorizeDTO.newBuilder()
                 .setDecision(StringUtils.defaultString(source.getDecision()))
@@ -242,6 +280,12 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .build();
     }
 
+    /**
+     * Convert a gRPC audit command to its DTO form.
+     *
+     * @param source the gRPC audit command
+     * @return the audit command DTO
+     */
     private McpAuditCommandDTO toDTO(GrpcMcpAuditCommand source) {
         return McpAuditCommandDTO.builder()
                 .traceId(source.getTraceId())
@@ -266,6 +310,12 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .build();
     }
 
+    /**
+     * Parse a space-delimited scope string into a set, returning empty for blank input.
+     *
+     * @param value the raw scope string
+     * @return the parsed scope set
+     */
     private Set<String> scopes(String value) {
         if (StringUtils.isBlank(value)) {
             return Set.of();
