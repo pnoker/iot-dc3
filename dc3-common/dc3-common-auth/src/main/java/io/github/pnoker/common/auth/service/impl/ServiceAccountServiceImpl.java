@@ -162,6 +162,12 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
         return serviceAccountBuilder.buildBOByDO(entityDO);
     }
 
+    /**
+     * Build fuzzy query wrapper for service account search.
+     *
+     * @param entityQuery {@link ServiceAccountQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link ServiceAccountDO}
+     */
     private LambdaQueryWrapper<ServiceAccountDO> fuzzyQuery(ServiceAccountQuery entityQuery) {
         LambdaQueryWrapper<ServiceAccountDO> wrapper = Wrappers.<ServiceAccountDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getTenantId()), ServiceAccountDO::getTenantId,
@@ -177,6 +183,12 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
         return wrapper;
     }
 
+    /**
+     * Validate required fields (tenant, name, owner, purpose) and default the enable
+     * flag before create.
+     *
+     * @param entityBO the service account to prepare
+     */
     private void prepareForCreate(ServiceAccountBO entityBO) {
         if (Objects.isNull(entityBO.getTenantId())) {
             throw new EmptyException("The tenant id is empty");
@@ -193,6 +205,12 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
         entityBO.setEnableFlag(Objects.requireNonNullElse(entityBO.getEnableFlag(), EnableFlagEnum.ENABLE));
     }
 
+    /**
+     * Backfill immutable and blank fields from the current record before update.
+     *
+     * @param entityBO the service account being updated
+     * @param current  the persisted record
+     */
     private void prepareForUpdate(ServiceAccountBO entityBO, ServiceAccountDO current) {
         entityBO.setPrincipalId(current.getPrincipalId());
         entityBO.setTenantId(current.getTenantId());
@@ -210,6 +228,12 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
         }
     }
 
+    /**
+     * Build the linked Principal DO from a service account BO.
+     *
+     * @param entityBO the service account
+     * @return the assembled Principal DO
+     */
     private PrincipalDO buildPrincipal(ServiceAccountBO entityBO) {
         PrincipalDO principal = new PrincipalDO();
         principal.setPrincipalType(PrincipalTypeEnum.SERVICE_ACCOUNT.getValue());
@@ -225,6 +249,13 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
         return principal;
     }
 
+    /**
+     * Build the tenant membership BO linking the service account's principal to its
+     * tenant.
+     *
+     * @param entityBO the service account
+     * @return the assembled membership BO
+     */
     private TenantMembershipBO buildMembership(ServiceAccountBO entityBO) {
         TenantMembershipBO membership = new TenantMembershipBO();
         membership.setTenantId(entityBO.getTenantId());
@@ -238,6 +269,14 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
         return membership;
     }
 
+    /**
+     * Check whether a service account is duplicated by tenant and name.
+     *
+     * @param entityBO       {@link ServiceAccountBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
+     */
     private boolean checkDuplicate(ServiceAccountBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<ServiceAccountDO> wrapper = Wrappers.<ServiceAccountDO>query().lambda();
         wrapper.eq(ServiceAccountDO::getTenantId, entityBO.getTenantId());
@@ -251,6 +290,14 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
         return duplicate;
     }
 
+    /**
+     * Get service account data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link ServiceAccountDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
     private ServiceAccountDO getDOById(Long id, boolean throwException) {
         ServiceAccountDO entityDO = serviceAccountManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
@@ -259,6 +306,13 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
         return entityDO;
     }
 
+    /**
+     * Build the unique principal name for a service account from tenant id and name.
+     *
+     * @param tenantId           tenant id
+     * @param serviceAccountName service account name
+     * @return the composite principal name
+     */
     private String principalName(Long tenantId, String serviceAccountName) {
         return tenantId + ":" + serviceAccountName;
     }
