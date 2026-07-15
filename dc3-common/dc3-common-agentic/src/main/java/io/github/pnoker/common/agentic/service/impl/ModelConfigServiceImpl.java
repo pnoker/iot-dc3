@@ -129,6 +129,11 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         modelConfigManager.removeById(id);
     }
 
+    /**
+     * List enabled model configs, with the default one ordered first.
+     *
+     * @return enabled model configs
+     */
     private List<ModelConfigBO> enabledConfigs() {
         LambdaQueryWrapper<ModelConfigDO> wrapper = Wrappers.<ModelConfigDO>query()
                 .lambda()
@@ -138,6 +143,12 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         return modelConfigBuilder.buildBOListByDOList(modelConfigManager.list(wrapper));
     }
 
+    /**
+     * Validate a model config: model and provider are required, the provider must exist,
+     * temperature (when set) must be in [0, 2], and maxTokens (when set) must be positive.
+     *
+     * @param entityBO the model config to validate
+     */
     private void validate(ModelConfigBO entityBO) {
         if (Objects.isNull(entityBO) || StringUtils.isBlank(entityBO.getModel())) {
             throw new RequestException("Model is required");
@@ -158,6 +169,13 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         }
     }
 
+    /**
+     * Copy fields from the source BO onto the target, applying defaults for blank
+     * capability flags, temperature, maxTokens, and remark.
+     *
+     * @param targetBO the target to populate
+     * @param sourceBO the source carrying the user-supplied values
+     */
     private void apply(ModelConfigBO targetBO, ModelConfigBO sourceBO) {
         targetBO.setModel(sourceBO.getModel().trim());
         targetBO.setLabel(StringUtils.defaultIfBlank(sourceBO.getLabel(), sourceBO.getModel()).trim());
@@ -177,6 +195,12 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         targetBO.setRemark(StringUtils.defaultString(sourceBO.getRemark()));
     }
 
+    /**
+     * Stamp the creator, operator, tenant, and timestamps for a new model config.
+     *
+     * @param entityBO the model config to stamp
+     * @param header   the authenticated principal header
+     */
     private void fillCreateAudit(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
         LocalDateTime now = LocalDateTime.now();
         entityBO.setCreateTime(now);
@@ -188,12 +212,24 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         entityBO.setTenantId(header.getTenantId());
     }
 
+    /**
+     * Stamp the operator and operate timestamp for an updated model config.
+     *
+     * @param entityBO the model config to stamp
+     * @param header   the authenticated principal header
+     */
     private void fillOperateAudit(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
         entityBO.setOperateTime(LocalDateTime.now());
         entityBO.setOperatorId(header.getUserId());
         entityBO.setOperatorName(header.getUserName());
     }
 
+    /**
+     * Enforce the single-default invariant: when a config is marked default, clear the
+     * default flag on every other config.
+     *
+     * @param entityDO the config being saved as default
+     */
     private void normalizeDefault(ModelConfigDO entityDO) {
         if (!Objects.equals(entityDO.getDefaultFlag(), DefaultFlagEnum.DEFAULT.getIndex())) {
             return;
@@ -212,11 +248,23 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         return Boolean.TRUE.equals(value);
     }
 
+    /**
+     * Fill the provider display name onto a model config BO.
+     *
+     * @param entityBO the model config
+     * @return the same BO, with providerName set
+     */
     private ModelConfigBO fillProviderName(ModelConfigBO entityBO) {
         entityBO.setProviderName(resolveProviderName(entityBO.getProviderId()));
         return entityBO;
     }
 
+    /**
+     * Resolve the provider display name by id, returning null for a missing or zero id.
+     *
+     * @param providerId the provider id
+     * @return the provider name, or null
+     */
     private String resolveProviderName(Long providerId) {
         if (Objects.isNull(providerId) || providerId == 0) {
             return null;
