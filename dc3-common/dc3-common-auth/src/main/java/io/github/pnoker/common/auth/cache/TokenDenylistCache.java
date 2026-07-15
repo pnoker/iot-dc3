@@ -85,6 +85,13 @@ public class TokenDenylistCache {
         return Objects.nonNull(logoutAt) && issuedAtEpochMs <= logoutAt;
     }
 
+    /**
+     * Build the cache key for a login-name + tenant-code pair.
+     *
+     * @param loginName  the login name
+     * @param tenantCode the tenant code
+     * @return the composite cache key
+     */
     private String buildKey(String loginName, String tenantCode) {
         return tenantCode + SymbolConstant.COLON + loginName;
     }

@@ -179,6 +179,11 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
+    /**
+     * Stamp the last-login time on a principal after a successful login.
+     *
+     * @param principalId the principal that logged in
+     */
     private void markPrincipalLogin(Long principalId) {
         PrincipalDO principal = principalManager.getById(principalId);
         if (Objects.isNull(principal)) {
