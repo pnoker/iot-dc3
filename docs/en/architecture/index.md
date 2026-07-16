@@ -2,6 +2,11 @@
 title: System Architecture Overview
 ---
 
+<script setup>
+import ArchitectureIndexFlowDiagram from '../../.vitepress/theme/components/ArchitectureIndexFlowDiagram.vue'
+</script>
+
+
 # System Architecture Overview
 
 IoT DC3 runs the "collect → normalize → analyze → act → feedback" loop as a layered, multi-tenant microservice
@@ -58,37 +63,7 @@ and drivers and the data center **never call each other directly**. They exchang
 RabbitMQ — point values flow northbound (upstream), commands flow southbound (downstream). All persistence lands in
 PostgreSQL, where time-series data (point value history) is stored in TimescaleDB hypertables.
 
-```mermaid
-flowchart TB
-    Client["Caller<br/>API / Web / dc3 CLI / AI Agent"]
-    subgraph PlatformLayer["Platform Layer (interconnected via gRPC facades, tenantId throughout)"]
-        GW["Gateway dc3-gateway (:8000)<br/>Sole external HTTP entry + HMAC signing"]
-        Auth["Auth Center dc3-center-auth<br/>Authentication / Tenant / RBAC / OAuth"]
-        Mgr["Management Center dc3-center-manager<br/>Driver / Profile / Device / Point"]
-        Data["Data Center dc3-center-data<br/>Point value / Command dispatch / Alarm"]
-        AI["Agentic Center dc3-center-agentic<br/>Conversation / Tool calls / MCP"]
-    end
-    subgraph AccessLayer["Access Layer · Southbound"]
-        Drv["Protocol Drivers dc3-driver-*<br/>(28)"]
-        Field["Field Devices / Data Sources"]
-    end
-    subgraph StorageMessaging["Storage & Messaging"]
-        MQ["RabbitMQ<br/>(async decoupling)"]
-        PG[("PostgreSQL<br/>+ TimescaleDB")]
-    end
-    Client --> GW
-    GW -.->|gRPC facade| Auth
-    GW -.->|gRPC facade| Mgr
-    GW -.->|gRPC facade| Data
-    GW -.->|gRPC facade| AI
-    Field --> Drv
-    Drv <-->|"upstream point values / downstream commands"| MQ
-    MQ <--> Data
-    Auth --> PG
-    Mgr --> PG
-    Data --> PG
-    AI --> PG
-```
+<ArchitectureIndexFlowDiagram lang="en" />
 
 The dashed lines are gRPC facade calls; the bidirectional solid lines are RabbitMQ exchanges. The difference between
 those two connection styles is exactly what the four designs below explain. For each service's ports, startup order, and
@@ -206,7 +181,7 @@ needed.
 The data center's throughput bottleneck is on the consumption side, and consumption concurrency is tunable.
 `PointValueReceiver` consumes `dc3.q.value.point` with a high-throughput listener container, switching between "
 immediate write" and "`PointValueJob` batch write" based on the inbound rate. The batch threshold is controlled by
-`POINT_BATCH_SPEED` (default 100 records) and `POINT_BATCH_INTERVAL` (default 5 ms) — whichever is met first flushes to
+`POINT_BATCH_SPEED` (default 100 records) and `POINT_BATCH_INTERVAL` (default 5 s) — whichever is met first flushes to
 disk. Under a collection flood, RabbitMQ absorbs the burst first, and concurrent consumption plus batch writes then
 handle it.
 

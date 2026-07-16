@@ -2,6 +2,14 @@
 title: "Domain Model: DO / BO / VO and Object Relationships"
 ---
 
+<script setup>
+import DomainModelErDiagram from '../../.vitepress/theme/components/DomainModelErDiagram.vue'
+import DomainModelLayerDiagram from '../../.vitepress/theme/components/DomainModelLayerDiagram.vue'
+import DomainModelClassDiagram from '../../.vitepress/theme/components/DomainModelClassDiagram.vue'
+import DomainModelSequenceDiagram from '../../.vitepress/theme/components/DomainModelSequenceDiagram.vue'
+</script>
+
+
 # Domain Model: DO / BO / VO and Object Relationships
 
 This page is for anyone writing code on the platform. It maps out how Profile, Point, Command, Event, Device, and Driver
@@ -56,53 +64,7 @@ relationships from the "three-tier configuration" into one picture. It's more co
 in [Core Concepts](../introduction/concepts) — it also shows the protocol-tier `*Attribute` and the instance-tier
 `*AttributeConfig`.
 
-```mermaid
-erDiagram
-    PROFILE ||--o{ POINT : "contains points"
-    PROFILE ||--o{ COMMAND : "contains commands"
-    PROFILE ||--o{ EVENT : "contains events"
-    DEVICE }o--|| PROFILE : "binds unique template (profileId)"
-    DEVICE }o--|| DRIVER : "accessed via one driver"
-    DRIVER ||--o{ DRIVER_ATTRIBUTE : "registers driver-level attributes"
-    DRIVER ||--o{ POINT_ATTRIBUTE : "registers point-level attributes"
-    COMMAND ||--o{ COMMAND_PARAM : "defines command params"
-    EVENT ||--o{ EVENT_PARAM : "defines event params"
-    DEVICE ||--o{ POINT_ATTRIBUTE_CONFIG : "fills instance values for attributes"
-    POINT ||--o{ POINT_ATTRIBUTE_CONFIG : "fills values per point"
-    POINT_ATTRIBUTE ||--o{ POINT_ATTRIBUTE_CONFIG : "is instantiated"
-    PROFILE {
-        long id
-        string profileName
-        enum profileShareFlag "TENANT/DRIVER/USER"
-    }
-    POINT {
-        long id
-        string pointName
-        byte pointTypeFlag "STRING..BOOLEAN (0-7)"
-        byte rwFlag "READ_ONLY/WRITE_ONLY/READ_WRITE"
-        string unit
-        double baseValue
-        double multiple
-    }
-    DEVICE {
-        long id
-        string deviceName
-        long profileId "single foreign key"
-        long driverId
-    }
-    POINT_ATTRIBUTE {
-        long id
-        string attributeName
-        long driverId
-    }
-    POINT_ATTRIBUTE_CONFIG {
-        long id
-        long attributeId
-        long deviceId
-        long pointId
-        string configValue
-    }
-```
+<DomainModelErDiagram lang="en" />
 
 `profileShareFlag` (`ProfileShareTypeEnum`: `TENANT / DRIVER / USER`) controls a template's sharing scope. An `Event`'s
 `event_type_flag` (`0=info / 1=alert / 2=fault / 3=lifecycle`) classifies the event **definition** and lives in the
@@ -115,22 +77,7 @@ This is the most-misunderstood part of the domain model. The platform splits "co
 different scopes**. Each tier answers a different question, is produced by a different person or process, and maps to a
 different DO class:
 
-```mermaid
-flowchart TB
-    subgraph BusinessTier["Business Tier · Param (defined in the template model)"]
-        P1["CommandParam (CommandParamDO)<br/>which input/output params this command has"]
-        P2["EventParam (EventParamDO)<br/>which params this event carries"]
-    end
-    subgraph ProtocolTier["Protocol Tier · Attribute (registered when the driver starts)"]
-        A1["DriverAttribute / PointAttribute<br/>CommandAttribute / EventAttribute"]
-        A2["which config items this driver has<br/>from the driver application.yml"]
-    end
-    subgraph InstanceTier["Instance Tier · Config (values filled in by the user for a device)"]
-        C1["PointAttributeConfig (PointAttributeConfigDO) etc."]
-        C2["the concrete values this device fills for those config items<br/>attributeId + deviceId + pointId + configValue"]
-    end
-    ProtocolTier -.->|"attributes are instantiated"| InstanceTier
-```
+<DomainModelLayerDiagram lang="en" />
 
 - **Param (business tier)** — `CommandParamDO` / `EventParamDO`. Describes the input/output params of a command or event
   in the template. It's **business semantics**, independent of any specific protocol.
@@ -169,34 +116,7 @@ A domain object takes three forms in the system, one per tier and per concern. U
 The diagram shows where the three tiers sit in the call chain and the conversion directions handled by the MapStruct
 `*Builder`.
 
-```mermaid
-classDiagram
-    class PointController {
-        +add(PointVO) String
-        +listByProfileId(...) List~PointVO~
-    }
-    class PointService {
-        +add(PointBO) void
-        +listByProfileId(...) List~PointBO~
-    }
-    class PointManager {
-        +save(PointDO) boolean
-        +list(...) List~PointDO~
-    }
-    class PointBuilder {
-        <<MapStruct Mapper>>
-        +buildBOByVO(PointVO) PointBO
-        +buildDOByBO(PointBO) PointDO
-        +buildBOByDO(PointDO) PointBO
-        +buildVOByBO(PointBO) PointVO
-    }
-    note for PointBuilder "@AfterMapping handles enums and JSON extensions"
-    PointController --> PointService : "passes BO"
-    PointService --> PointManager : "passes DO"
-    PointController ..> PointBuilder : "VO↔BO"
-    PointService ..> PointBuilder : "BO↔DO"
-    PointManager ..> PointDO : "MyBatis-Plus persistence"
-```
+<DomainModelClassDiagram lang="en" />
 
 When `PointController` receives a `PointVO`, it calls `PointBuilder.buildBOByVO()` to get a `PointBO` and hands that to
 `PointService`. The Service calls `buildDOByBO()` to get a `PointDO` and hands that to `PointManager` for persistence.
@@ -214,22 +134,7 @@ The contract on both ends of an enum is fixed: the `Byte` stored in the DO is th
 the enum. DO→BO uses `XxxEnum.ofIndex(byte)` to turn the number into an enum; BO→DO uses `enum.getIndex()` to get the
 number back. The sequence below is what happens in `PointBuilder` when it reads a row of point data:
 
-```mermaid
-sequenceDiagram
-    participant DB as Database dc3_point
-    participant DO as PointDO
-    participant B as PointBuilder
-    participant BO as PointBO
-    participant VO as PointVO
-    DB->>DO: rwFlag = (Byte) 2
-    Note over DO: field is raw Byte<br/>@EnumValue index
-    DO->>B: buildBOByDO(PointDO)
-    B->>B: "@AfterMapping: RwTypeEnum.ofIndex((byte)2)"
-    B->>BO: rwFlag = READ_WRITE
-    Note over BO: business tier is a domain enum
-    BO->>B: buildVOByBO(PointBO)
-    B->>VO: rwFlag = READ_WRITE
-```
+<DomainModelSequenceDiagram lang="en" />
 
 Mapped onto the real code in `PointBuilder.java`: in `buildBOByDO`, `pointTypeFlag` / `rwFlag` / `enableFlag` are marked
 `@Mapping(ignore = true)` and then assigned one by one in `@AfterMapping` via

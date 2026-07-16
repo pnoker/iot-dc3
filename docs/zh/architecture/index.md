@@ -2,6 +2,11 @@
 title: 系统架构总览
 ---
 
+<script setup>
+import ArchitectureIndexFlowDiagram from '../../.vitepress/theme/components/ArchitectureIndexFlowDiagram.vue'
+</script>
+
+
 # 系统架构总览
 
 IoT DC3 把"采集—归一—分析—执行—反馈"
@@ -47,37 +52,7 @@ gRPC facade 跨进程协作。
 南向是另一套节奏：现场设备由协议驱动（`dc3-driver-*`，共 28 个）接入，驱动与数据中心之间**不直接调用**，而是经 RabbitMQ
 异步收发——位号值往北上行、命令往南下行。所有持久化最终落到 PostgreSQL，其中时序数据（位号值历史）由 TimescaleDB 超表承载。
 
-```mermaid
-flowchart TB
-    Client["调用方<br/>API / Web / dc3 CLI / AI Agent"]
-    subgraph 平台层["平台层（gRPC facade 互联，tenantId 贯穿）"]
-        GW["网关 dc3-gateway (:8000)<br/>唯一对外 HTTP 入口 + HMAC 签名"]
-        Auth["鉴权中心 dc3-center-auth<br/>认证 / 租户 / RBAC / OAuth"]
-        Mgr["管理中心 dc3-center-manager<br/>驱动 / 模板 / 设备 / 位号"]
-        Data["数据中心 dc3-center-data<br/>位号值 / 命令分发 / 告警"]
-        AI["智能中心 dc3-center-agentic<br/>会话 / 工具调用 / MCP"]
-    end
-    subgraph 接入层["接入层 · 南向"]
-        Drv["协议驱动 dc3-driver-*<br/>(28 个)"]
-        Field["现场设备 / 数据源"]
-    end
-    subgraph 存储消息["存储与消息"]
-        MQ["RabbitMQ<br/>(异步解耦)"]
-        PG[("PostgreSQL<br/>+ TimescaleDB")]
-    end
-    Client --> GW
-    GW -.->|gRPC facade| Auth
-    GW -.->|gRPC facade| Mgr
-    GW -.->|gRPC facade| Data
-    GW -.->|gRPC facade| AI
-    Field --> Drv
-    Drv <-->|"上行位号值 / 下行命令"| MQ
-    MQ <--> Data
-    Auth --> PG
-    Mgr --> PG
-    Data --> PG
-    AI --> PG
-```
+<ArchitectureIndexFlowDiagram lang="zh" />
 
 这张图的"虚线"是 gRPC facade 调用、"双向实线"是 RabbitMQ
 异步收发——两种连接方式的差别，正是下面四个设计要解释的重点。各服务的端口、启动顺序与健康检查见 [服务与拓扑](./services)。
@@ -164,7 +139,7 @@ principal 头。
 
 数据中心的吞吐瓶颈在消费侧，而消费并发是可调的：`PointValueReceiver` 用高吞吐监听容器消费 `dc3.q.value.point`
 ，按入站速率在"即时落库"与"`PointValueJob` 批量落库"之间切换；批量阈值由 `POINT_BATCH_SPEED`（默认 100 条）/
-`POINT_BATCH_INTERVAL`（默认 5 ms）控制，谁先满足谁先刷盘。面对采集洪峰，先由 RabbitMQ 削峰，再靠并发消费与批量写入消化。
+`POINT_BATCH_INTERVAL`（默认 5 秒）控制，谁先满足谁先刷盘。面对采集洪峰，先由 RabbitMQ 削峰，再靠并发消费与批量写入消化。
 
 ::: info 强一致与最终一致并存
 租户隔离、权限判定、命令状态机这些在请求路径上的环节是强一致的（同步校验、即时拒绝）；而位号值的上行落库是经 MQ

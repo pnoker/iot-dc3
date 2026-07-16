@@ -2,6 +2,11 @@
 title: 故障排查
 ---
 
+<script setup>
+import TroubleshootingDiagram from '../../.vitepress/theme/components/TroubleshootingDiagram.vue'
+</script>
+
+
 # 故障排查
 
 这页帮你在本地起不来、连不上、被拒绝时快速定位：每条问题都按 **症状 → 根因 → 定位** 展开，不只给解法，还告诉你"
@@ -16,22 +21,7 @@ title: 故障排查
 HTTP 入口（`8000`），中心服务靠 gRPC facade 互联、驱动与数据中心靠 RabbitMQ 解耦，所以一旦底层依赖（PostgreSQL /
 RabbitMQ）没起，上层会连环失败。
 
-```mermaid
-flowchart TB
-  Start["服务起不来 / 连不上"] --> Dep{"依赖就绪？<br/>PostgreSQL + RabbitMQ"}
-  Dep -->|"否"| FixDep["make ps STACK=db<br/>等健康检查通过"]
-  Dep -->|"是"| Env{"环境变量已加载？<br/>(本地源码)"}
-  Env -->|"否"| FixEnv["source dc3/env/dev.env.sh"]
-  Env -->|"是"| Port{"端口被占用？<br/>8000 / 8300-8600 / 9300-9500"}
-  Port -->|"是"| FixPort["lsof / ss 查 PID<br/>改 .env 端口覆盖"]
-  Port -->|"否"| Order{"依赖服务顺序就绪？<br/>Gateway → Auth → Manager → Data → Agentic → Driver"}
-  Order -->|"否"| FixOrder["按序启动<br/>等上游就绪再起下游"]
-  Order -->|"是"| Log["读日志关键字<br/>Connection refused / 401 / HMAC / UnknownHost"]
-  FixDep --> Log
-  FixEnv --> Log
-  FixPort --> Log
-  FixOrder --> Log
-```
+<TroubleshootingDiagram lang="zh" />
 
 这条决策链的顺序不是随意的：变量没加载会让所有连接指向错误主机，端口占用会让进程在绑定阶段就退出，而依赖服务的启动顺序决定了
 gRPC facade 和驱动注册能否成功。把前四关排掉之后，剩下的几乎都能在日志关键字里看到根因。

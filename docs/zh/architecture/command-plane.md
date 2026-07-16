@@ -2,6 +2,12 @@
 title: 命令平面：读写命令的下发与回执
 ---
 
+<script setup>
+import CommandStateDiagram from '../../.vitepress/theme/components/CommandStateDiagram.vue'
+import CommandFlowDiagram from '../../.vitepress/theme/components/CommandFlowDiagram.vue'
+</script>
+
+
 # 命令平面：读写命令的下发与回执
 
 数据平面把设备的值采上来，命令平面做相反的事：把一次"读这个位号"或"给这个位号写值"的请求，从 HTTP
@@ -94,24 +100,7 @@ public record PointCommandDTO(
 一条命令的状态由 `PointCommandStatusEnum` 定义，从提交到终态的流转如下图。提交侧负责 `PENDING → SENT`
 ；其余终态都由驱动消费时产生的回执、经结果队列写回。
 
-```mermaid
-stateDiagram-v2
-    [*] --> PENDING: 落库
-    PENDING --> SENT: 发布到 broker
-    SENT --> SUCCESS: 驱动执行成功
-    SENT --> FAILED: 驱动返回失败/重投后异常
-    SENT --> EXPIRED: 消费时 now 超过 expireAt
-    SENT --> DUPLICATE: 去重命中
-    SENT --> TIMEOUT: 枚举预留未产生
-    SENT --> DEAD: 进入死信 DLX
-    SUCCESS --> [*]
-    FAILED --> [*]
-    EXPIRED --> [*]
-    DUPLICATE --> [*]
-    TIMEOUT --> [*]
-    DEAD --> [*]
-    note right of TIMEOUT: 枚举已预留<br/>当前链路尚不产生
-```
+<CommandStateDiagram lang="zh" />
 
 各状态对应的枚举索引与含义（`PointCommandStatusEnum`，括号内是落库的 `status` 值）：
 
@@ -150,17 +139,7 @@ stateDiagram-v2
 命令链路用两组交换机/队列：一组把命令从数据中心送到对应驱动，一组把回执从驱动送回数据中心。命令队列按驱动 `serviceName`
 分队，带 30 秒 TTL 与死信交换机；结果队列带 60 秒 TTL。
 
-```mermaid
-flowchart LR
-    Data["数据中心<br/>dc3-center-data"] -->|"routing dc3.r.point_command.{serviceName}"| EX["命令交换机<br/>dc3.e.point_command (topic)"]
-    EX --> Q["命令队列<br/>dc3.q.point_command.{serviceName}<br/>TTL 30s + DLX"]
-    Q --> Driver["驱动<br/>PointCommandReceiver"]
-    Q -.超时/reject.-> DLX["死信交换机<br/>dc3.e.point_command_dead"]
-    DLX --> DLQ["死信队列<br/>dc3.q.point_command_dead"]
-    Driver -->|"routing dc3.r.point_command_result.{serviceName}"| REX["结果交换机<br/>dc3.e.point_command_result (topic)"]
-    REX --> RQ["结果队列<br/>dc3.q.point_command_result<br/>TTL 60s"]
-    RQ --> Recv["数据中心<br/>PointCommandResultReceiver"]
-```
+<CommandFlowDiagram lang="zh" />
 
 命令队列 `dc3.q.point_command.{serviceName}` 是 durable、`ttl(30000)`，死信指向 `dc3.e.point_command_dead`
 ——两条路径会进死信：一是命令在驱动侧 30 秒内没被消费（TTL 到期），二是基本校验失败时驱动直接 `reject`（不重投）把消息打入

@@ -2,6 +2,12 @@
 title: Platform Positioning
 ---
 
+<script setup>
+import IntroductionLoopDiagram from '../../.vitepress/theme/components/IntroductionLoopDiagram.vue'
+import IntroductionArchitectureDiagram from '../../.vitepress/theme/components/IntroductionArchitectureDiagram.vue'
+</script>
+
+
 # Platform Positioning
 
 IoT DC3 is an open-source distributed IoT platform built for AI scenarios. It spans device connectivity, data
@@ -32,16 +38,7 @@ Turn that goal into a runnable pipeline and you get the core of how IoT DC3 work
 normalizes and stores → the LLM reads and analyzes → commands go out through tool calls → devices execute and
 acknowledge.
 
-```mermaid
-flowchart LR
-    Dev["Field Device"] -->|Collect| Drv["Driver dc3-driver-*"]
-    Drv -->|"Normalize to PointValue<br/>(semantics/unit/timestamp/tenant)"| Data["Data Center"]
-    Data --> Store[("Time-Series Storage<br/>TimescaleDB")]
-    AI["Agentic Center<br/>Spring AI + @Tool"] -->|Read Data| Data
-    AI -->|"Issue Command"| Data
-    Data -->|"Command via RabbitMQ"| Drv
-    Drv -->|Execute Write| Dev
-```
+<IntroductionLoopDiagram lang="en" />
 
 The key to the loop is what a point value is. It's not raw data — it's a structured `PointValue` that carries semantic
 tags, a unit, a timestamp, and tenant context. The LLM calls platform APIs through Spring AI's native `@Tool`, so it can
@@ -108,29 +105,7 @@ The platform exposes one HTTP entry point — the gateway. Four centers sit behi
 onboard devices on the southbound side. The diagram shows how the roles fit together; for a layer-by-layer walkthrough,
 see [System Architecture](../architecture/).
 
-```mermaid
-flowchart TB
-    subgraph Callers
-        U["User / Third Party / AI Agent"]
-    end
-    U --> GW["Gateway dc3-gateway<br/>Sole External HTTP :8000"]
-    subgraph CenterServices["Center Services (interconnected via gRPC facades, multi-tenant)"]
-        Auth["Auth Center<br/>Authentication / Tenant / RBAC / OAuth"]
-        Mgr["Management Center<br/>Driver / Template / Device / Point"]
-        Data["Data Center<br/>Point Value / Command Dispatch / Alarm"]
-        AI["Agentic Center<br/>Session / Tool Call / MCP"]
-    end
-    GW --> Auth
-    GW --> Mgr
-    GW --> Data
-    GW --> AI
-    subgraph AccessLayer["Access Layer"]
-        Drv["Protocol Driver dc3-driver-*"]
-    end
-    Field["Field Device / Data Source"] --> Drv
-    Drv <-->|RabbitMQ| Data
-    Data --> DB[("PostgreSQL + TimescaleDB")]
-```
+<IntroductionArchitectureDiagram lang="en" />
 
 ## Further Reading
 

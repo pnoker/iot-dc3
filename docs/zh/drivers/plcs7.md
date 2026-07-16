@@ -2,6 +2,11 @@
 title: PLC S7 驱动
 ---
 
+<script setup>
+import PlcS7Diagram from '../../.vitepress/theme/components/PlcS7Diagram.vue'
+</script>
+
+
 # PLC S7 驱动
 
 `dc3-driver-plcs7` 把西门子 S7 系列 PLC 接入 IoT DC3：它作为 S7 客户端通过 TCP 连到一台或多台
@@ -21,16 +26,7 @@ S7（也叫 S7comm / ISO-on-TCP）是西门子 PLC（S7-200/300/400/1200/1500、
 在物联网四层架构里，S7 属于**网络层**的工业有线侧：它解决的是「PLC
 内部的数据怎么经以太网被外部系统读到」这最后一公里。关于工业总线协议的通信模型、寻址方式与字节序权衡，见[工业总线与协议](../foundations/fieldbus)。
 
-```mermaid
-flowchart LR
-  subgraph DC3["IoT DC3"]
-    Drv["dc3-driver-plcs7<br/>S7 客户端 (master)"]
-  end
-  Drv -->|"TCP:102 读写请求<br/>地址 DB{n}.{byte}[.{bit}]"| PLC1["S7-1200 PLC<br/>host=192.168.0.20"]
-  Drv -->|"TCP:102"| PLC2["S7-1500 PLC<br/>host=192.168.0.21"]
-  PLC1 -.->|"应答 DB 字节"| Drv
-  PLC2 -.-> Drv
-```
+<PlcS7Diagram lang="zh" />
 
 一个驱动进程可同时连多台 PLC，连接按 `deviceId` 复用，每台 PLC 由各自[设备](../introduction/concepts/device)上的 `host` 与
 `plcType` 区分。

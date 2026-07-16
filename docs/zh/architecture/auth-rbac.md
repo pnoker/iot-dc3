@@ -2,6 +2,13 @@
 title: 鉴权 · 租户 · RBAC
 ---
 
+<script setup>
+import AuthSequenceDiagram from '../../.vitepress/theme/components/AuthSequenceDiagram.vue'
+import AuthErDiagram from '../../.vitepress/theme/components/AuthErDiagram.vue'
+import AuthDecisionFlowDiagram from '../../.vitepress/theme/components/AuthDecisionFlowDiagram.vue'
+</script>
+
+
 # 鉴权 · 租户 · RBAC
 
 平台对外只有网关一个入口，但每一次受保护的调用，背后都要回答三个问题：你是谁、你属于哪个租户、你能不能做这件事。这页讲清登录如何换取令牌、网关如何把身份签名后透传给后端、身份模型怎么组织，以及
@@ -81,20 +88,7 @@ curl -s -X POST http://localhost:8000/api/v3/manager/device/add \
 拿到令牌之后，每次受保护调用都带 `X-Auth-Tenant` / `X-Auth-Login` / `X-Auth-Token` 三个头到网关。网关的
 `AuthenticGatewayFilter` 负责把这三个头换成一段可被后端信任的、带签名的身份。
 
-```mermaid
-sequenceDiagram
-    participant Client as 调用方
-    participant GW as 网关 AuthenticGatewayFilter
-    participant Backend as 后端 GatewayJwtConverter
-    Client->>GW: "请求 + X-Auth-Tenant/Login/Token"
-    GW->>GW: "解析身份 → PrincipalHeader(tenantId, principalId)"
-    GW->>GW: "序列化为 X-Auth-Principal (JSON)"
-    GW->>GW: "HMAC-SHA256 签名 → X-Auth-Sign"
-    GW->>Backend: "透传 X-Auth-Principal + X-Auth-Sign"
-    Backend->>Backend: "验签 verify(principal, sign)"
-    Backend->>Backend: "提取 principal → @PreAuthorize 判定"
-    Backend-->>Client: 返回统一响应 R
-```
+<AuthSequenceDiagram lang="zh" />
 
 网关侧（`AuthenticGatewayFilter`）：身份解析是阻塞式 gRPC 调用，整体放到 `boundedElastic` 线程池执行，避免占住 Netty 事件循环。解析出
 `PrincipalHeader` 后序列化为 `X-Auth-Principal`；若 HMAC 已启用，再写入 `X-Auth-Sign`；*
@@ -124,34 +118,7 @@ sequenceDiagram
 很多平台把"用户"当作鉴权的根对象，结果服务账号、系统身份只能硬塞进用户表。IoT DC3 反过来——根身份是 **`dc3_principal`**
 ，用户只是其中一种类型。
 
-```mermaid
-erDiagram
-    PRINCIPAL ||--o{ TENANT_MEMBERSHIP : "属于（可多租户）"
-    PRINCIPAL ||--o{ LOCAL_CREDENTIAL : "挂载凭据"
-    TENANT ||--o{ TENANT_MEMBERSHIP : "包含成员"
-    PRINCIPAL {
-        long id
-        string principal_type "USER / SERVICE_ACCOUNT / SYSTEM"
-        string source_type "LOCAL / EXTERNAL / SYSTEM"
-        smallint enable_flag
-        smallint locked_flag
-    }
-    LOCAL_CREDENTIAL {
-        long id
-        long principal_id "外键指向 principal"
-        string login_name
-        string password_hash "哈希串"
-        string password_algorithm "ARGON2ID / BCRYPT"
-        smallint require_password_change
-    }
-    TENANT_MEMBERSHIP {
-        long id
-        long tenant_id
-        long principal_id
-        string principal_type
-        string membership_status "ACTIVE / SUSPENDED / INVITED"
-    }
-```
+<AuthErDiagram lang="zh" />
 
 - **`dc3_principal`** 是统一身份表，`principal_type` 取 `USER`（人）、`SERVICE_ACCOUNT`（服务账号）、`SYSTEM`（系统身份）三种之一。
 - **凭据挂在 principal 上**：`dc3_local_credential.principal_id` 指向 principal，而不是某个 `user_id`。密码哈希默认
@@ -171,16 +138,7 @@ erDiagram
 验签拿到 principal 之后，要决定它"能做什么"。IoT DC3 用经典的"主体—角色—资源"三段绑定，但刻意把两段的作用域分开：角色归属是*
 *租户内**的，资源授权是**全局**的。
 
-```mermaid
-flowchart LR
-    P["principal<br/>(tenantId : principalId)"] --> RPB["dc3_role_principal_bind<br/>租户内（含 tenant_id）"]
-    RPB --> RRB["dc3_role_resource_bind<br/>全局（无 tenant_id）"]
-    RRB --> RES["dc3_resource<br/>resource_code = service:domain:scope"]
-    RES --> Cache["权限集缓存<br/>key=(tenantId:principalId)，TTL 5 分钟"]
-    Cache --> Decision{"@PreAuthorize 判定"}
-    Decision -->|命中权限码| Allow["放行"]
-    Decision -->|"查不到 / 加载失败"| Deny["fail-closed → 403"]
-```
+<AuthDecisionFlowDiagram lang="zh" />
 
 链路是：`dc3_role_principal_bind`（带 `tenant_id`，决定这个 principal 在该租户内有哪些角色）→ `dc3_role_resource_bind`（无
 `tenant_id`，把角色映射到资源）→ `dc3_resource`

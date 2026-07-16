@@ -2,6 +2,13 @@
 title: Alarms and Notifications
 ---
 
+<script setup>
+import AlarmSourceFlowDiagram from '../../.vitepress/theme/components/AlarmSourceFlowDiagram.vue'
+import AlarmErDiagram from '../../.vitepress/theme/components/AlarmErDiagram.vue'
+import AlarmNotifyFlowDiagram from '../../.vitepress/theme/components/AlarmNotifyFlowDiagram.vue'
+</script>
+
+
 # Alarms and Notifications
 
 IoT DC3 folds "something went wrong" and "who needs to know" into a single runtime alarm table and one notification
@@ -30,15 +37,7 @@ All five alarm sources write to `dc3_entity_alarm`; only the flag value differs.
 `AlarmSourceTypeEnum` — note that `EVENT_REPORT=5` and `SYSTEM=4` (5 is reserved for persistence compatibility and sits
 after 4 in the enum):
 
-```mermaid
-flowchart LR
-  Rule["Rule Engine<br/>dc3_rule match"] -->|"source=0 RULE"| EA[("dc3_entity_alarm<br/>unified runtime alarms")]
-  Offline["Offline timeout<br/>dc3_entity_state lease expired"] -->|"source=1 STATE_TIMEOUT"| EA
-  DevRep["Device report<br/>(embedded with value update)"] -->|"source=2 DEVICE_REPORT"| EA
-  DrvRep["Driver report"] -->|"source=3 DRIVER_REPORT"| EA
-  EvtRep["Event report<br/>dc3_event_history triggers rule"] -->|"source=5 EVENT_REPORT"| EA
-  EA --> Notify["Notification pipeline<br/>email / SMS / webhook"]
-```
+<AlarmSourceFlowDiagram lang="en" />
 
 `alarm_source_flag` (where it came from) and `alarm_type_flag` (what happened) are two independent dimensions — don't
 conflate them:
@@ -72,65 +71,7 @@ machine) → `dc3_notify` (notification config) → `dc3_notify_channel` (channe
 The diagram below shows how these tables relate to `dc3_event_history`. These are logical associations — linked by id
 columns, with no foreign-key constraints in the database:
 
-```mermaid
-erDiagram
-    RULE ||--o{ RULE_STATE : "runtime state tracking"
-    RULE ||--o{ ENTITY_ALARM : "triggers alarms"
-    RULE }o--|| NOTIFY : "notify_id binds notification"
-    NOTIFY ||--o{ NOTIFY_CHANNEL_BIND : "binds channel"
-    NOTIFY_CHANNEL ||--o{ NOTIFY_CHANNEL_BIND : "is bound"
-    NOTIFY ||--o{ NOTIFY_HISTORY : "produces delivery records"
-    NOTIFY_CHANNEL ||--o{ NOTIFY_HISTORY : "delivered via this channel"
-    ENTITY_ALARM ||--o{ NOTIFY_HISTORY : "alarm_id link"
-    EVENT_HISTORY ||--o{ ENTITY_ALARM : "event triggers alarm"
-    RULE {
-        long id
-        string rule_code
-        byte alarm_target_type_flag
-        long notify_id
-        long message_id
-        byte enable_flag
-    }
-    RULE_STATE {
-        long id
-        long rule_id
-        string fingerprint
-        byte entity_state_flag "0pending 1firing 2recovered 3closed"
-        int trigger_count
-        long alarm_id
-    }
-    NOTIFY {
-        long id
-        string notify_code
-        long notify_interval
-        byte auto_confirm_flag
-    }
-    NOTIFY_CHANNEL {
-        long id
-        string channel_code
-        byte channel_type_flag "0email 1SMS 2webhook"
-    }
-    NOTIFY_HISTORY {
-        long id
-        long alarm_id
-        long channel_id
-        byte status_flag "0pending 1sent 2success 3failed 4retry"
-        int retry_count
-    }
-    ENTITY_ALARM {
-        long id
-        byte alarm_source_flag
-        byte alarm_target_type_flag
-        long rule_id
-        long rule_state_id
-    }
-    EVENT_HISTORY {
-        long id
-        long event_id
-        byte event_type_flag
-        byte acknowledge_flag
-    }
-```
+<AlarmErDiagram lang="en" />
 
 ### Trigger state machine: pending → firing → recovered → closed
 
@@ -148,16 +89,7 @@ After a rule matches, alarm writing and notification sending run in this order. 
 `dc3_notify_history` is persisted synchronously inside the transaction; only then does dispatch happen asynchronously
 over RabbitMQ, with the status written back afterward:
 
-```mermaid
-flowchart TB
-  Change["dc3_rule_state.entity_state_flag changes"] --> Svc["AlarmRuleTriggerService.processXxx()"]
-  Svc --> Ins1[("dc3_entity_alarm INSERT")]
-  Svc --> Ins2[("dc3_notify_history INSERT<br/>(synchronous pending within transaction)")]
-  Ins2 --> Send["NotifyTaskSender publishes<br/>NotifyTaskDTO via RabbitMQ (async)"]
-  Send --> Bind["dc3_notify → dc3_notify_channel_bind → dc3_notify_channel"]
-  Bind --> Deliver["Channel delivery email / SMS / webhook"]
-  Deliver --> Status["write back status_flag<br/>0pending→1sent→2success / 3failed→4retry"]
-```
+<AlarmNotifyFlowDiagram lang="en" />
 
 `dc3_notify_channel.channel_type_flag` is constrained by `CHECK (channel_type_flag BETWEEN 0 AND 2)`, so `0=email`,
 `1=SMS`, `2=webhook`. `dc3_notify_history.status_flag` is constrained by `CHECK (status_flag BETWEEN 0 AND 4)`, covering

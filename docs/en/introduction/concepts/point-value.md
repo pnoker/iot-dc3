@@ -2,6 +2,11 @@
 title: PointValue
 ---
 
+<script setup>
+import PointValueRelationDiagram from '../../../.vitepress/theme/components/PointValueRelationDiagram.vue'
+import PointValueFlowDiagram from '../../../.vitepress/theme/components/PointValueFlowDiagram.vue'
+</script>
+
 # PointValue
 
 > **A point value is a single snapshot of one [point](./point) at one instant in time**—"the outlet temperature of pump
@@ -59,14 +64,7 @@ NULL, and aggregate queries use `num_value IS NOT NULL` to skip them outright.
 
 ## Relationship to Other Concepts
 
-```mermaid
-flowchart LR
-    PR["Profile"] -->|defines| PT["Point"]
-    DEV["Device"] -->|belongs to| PR
-    DRV["Driver"] -->|collects| PV[("PointValue dc3_point_value")]
-    DEV -->|produces| PV
-    PT -->|reads into| PV
-```
+<PointValueRelationDiagram lang="en" />
 
 - A point value is located jointly by `deviceId + pointId`: **which device's** **which measurement**.
 - A [point](./point) gives the column definition (type, unit, conversion rule); a point value is the runtime reading of
@@ -75,14 +73,7 @@ flowchart LR
 
 ## Collection and Upstream Flow
 
-```mermaid
-flowchart LR
-    D["Device"] --> DRV["Driver collect + convert"]
-    DRV -->|"raw → cal → num"| MQ["RabbitMQ point-value queue"]
-    MQ --> DC["Data Center"]
-    DC -->|"persist"| TS[("TimescaleDB dc3_point_value")]
-    TS -->|"latest / aggregate query"| APP["App / Dashboard"]
-```
+<PointValueFlowDiagram lang="en" />
 
 The driver reads `rawValue` from the device, computes `calValue` via the point's conversion rule, fills `numValue` when
 it parses as a number, and ships it upstream together with `deviceId` / `pointId` / `driverId` / `tenantId` /

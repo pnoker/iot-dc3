@@ -2,6 +2,11 @@
 title: OPC DA Driver
 ---
 
+<script setup>
+import OpcDaDiagram from '../../.vitepress/theme/components/OpcDaDiagram.vue'
+</script>
+
+
 # OPC DA Driver
 
 `dc3-driver-opc-da` acts as an OPC DA client: it connects to a field OPC DA Server over Windows DCOM and periodically
@@ -28,12 +33,7 @@ port; it is **DCOM (Distributed COM)**: the client locates a Server by a COM cla
 as DCOM remote procedure calls. This is why deploying and debugging OPC DA carries a heavy Windows footprint — and why
 the cross-platform [OPC UA](./opc-ua) was created later.
 
-```mermaid
-flowchart LR
-  PLC["Field PLC / instrument"] --> SRV["OPC DA Server<br/>(SCADA / config software)"]
-  SRV -->|"DCOM (CLSID)"| DRV["dc3-driver-opc-da<br/>OPC DA client"]
-  DRV -->|"PointValue"| DC3["IoT DC3 Data Center"]
-```
+<OpcDaDiagram lang="en" />
 
 OPC DA organizes tags as "items under a group": the client first creates or finds a group on the Server, then adds the
 items to read/write into that group, and reads or writes their values on demand. Each item value carries a COM variant

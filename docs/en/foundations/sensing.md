@@ -2,6 +2,11 @@
 title: Sensing & Measurement
 ---
 
+<script setup>
+import SensingDiagram from '../../.vitepress/theme/components/SensingDiagram.vue'
+</script>
+
+
 # Sensing & Measurement
 
 The perception layer is the IoT's "skin and nerve endings" — it turns invisible, intangible physical quantities like
@@ -49,14 +54,7 @@ turns the quantity into a weak electrical signal, **signal conditioning** amplif
 suitable range, and the **A/D converter (ADC)** quantizes the continuous analog voltage into a discrete digital code.
 Every hop on this pipeline shapes the quality of the final reading.
 
-```mermaid
-flowchart LR
-    Phy["Physical quantity<br/>(temp/pressure/vibration)"] --> Sen["Sensing element<br/>(energy conversion)"]
-    Sen --> Cond["Signal conditioning<br/>(amplify/filter/linearize)"]
-    Cond --> ADC["A/D conversion<br/>(sample + quantize)"]
-    ADC --> Dig["Digital value<br/>(raw code)"]
-    Dig --> Eng["Engineering value<br/>(calibration + scaling)"]
-```
+<SensingDiagram lang="en" />
 
 **Signal conditioning** is the analog world's preprocessing. A sensing element's output is often just millivolts,
 high-impedance, and noisy — not something an ADC can take directly. The conditioning circuit must: amplify (an

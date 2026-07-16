@@ -2,6 +2,11 @@
 title: PLC S7 Driver
 ---
 
+<script setup>
+import PlcS7Diagram from '../../.vitepress/theme/components/PlcS7Diagram.vue'
+</script>
+
+
 # PLC S7 Driver
 
 `dc3-driver-plcs7` connects Siemens S7 series PLCs to IoT DC3: acting as an S7 client, it connects over TCP to one or
@@ -28,16 +33,7 @@ mile of "how data inside a PLC gets read by an external system over Ethernet". F
 schemes, and byte-order trade-offs of industrial bus protocols,
 see [Industrial Bus and Protocols](../foundations/fieldbus).
 
-```mermaid
-flowchart LR
-  subgraph DC3["IoT DC3"]
-    Drv["dc3-driver-plcs7<br/>S7 client (master)"]
-  end
-  Drv -->|"TCP:102 read/write request<br/>address DB{n}.{byte}[.{bit}]"| PLC1["S7-1200 PLC<br/>host=192.168.0.20"]
-  Drv -->|"TCP:102"| PLC2["S7-1500 PLC<br/>host=192.168.0.21"]
-  PLC1 -.->|"reply DB bytes"| Drv
-  PLC2 -.-> Drv
-```
+<PlcS7Diagram lang="en" />
 
 A single driver process can connect to multiple PLCs; connections are reused per `deviceId`, and each PLC is
 distinguished by the `host` and `plcType` on its own [Device](../introduction/concepts/device).

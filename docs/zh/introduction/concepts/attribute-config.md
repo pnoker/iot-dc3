@@ -2,6 +2,11 @@
 title: 属性与配置 Attribute & Config
 ---
 
+<script setup>
+import AttributeConfigRelationDiagram from '../../../.vitepress/theme/components/AttributeConfigRelationDiagram.vue'
+import AttributeConfigFlowDiagram from '../../../.vitepress/theme/components/AttributeConfigFlowDiagram.vue'
+</script>
+
 # 属性与配置 Attribute & Config
 
 > **属性（Attribute）是[驱动](./driver)声明"接入一台设备需要填哪些配置项"的定义，配置（Config）是某台[设备](./device)
@@ -15,11 +20,11 @@ URL、MQTT 要订阅哪个 Topic。这些细节因协议而异、因设备而异
 
 | 层                  | 归属                       | 回答的问题         | 谁来填         |
 |--------------------|--------------------------|---------------|-------------|
-| **Param 业务参数**     | [物模型 Profile](./profile) | 指令/事件携带哪些业务字段 | 建模者，在模板里定义  |
+| **Param 业务参数**     | [模板 Profile](./profile) | 指令/事件携带哪些业务字段 | 建模者，在模板里定义  |
 | **Attribute 属性定义** | [驱动 Driver](./driver)    | 接这种协议需要哪些配置项  | 驱动开发者，启动时注册 |
 | **Config 配置值**     | [设备 Device](./device)    | 这台设备这些配置项填什么  | 集成者，在设备编辑页填 |
 
-`Param` 是"业务语义"（温度、模式、故障码），属于[物模型](./profile)，和具体协议无关；`Attribute` / `Config` 是"协议映射"
+`Param` 是"业务语义"（温度、模式、故障码），属于[模板](./profile)，和具体协议无关；`Attribute` / `Config` 是"协议映射"
 （寄存器地址、Topic、报文模板），属于驱动和设备。本页只讲后两层，Param 见[指令](./command)与[事件](./event)。
 
 ## 经典例子：一句话讲清 Attribute vs Config
@@ -96,29 +101,14 @@ dc3:
 
 ## 与其它概念的关系
 
-```mermaid
-flowchart LR
-    DRV["驱动 Driver"] -->|"启动注册"| DA["DriverAttribute"]
-    DRV -->|"启动注册"| PA["PointAttribute"]
-    DEV["设备 Device"] -->|"填值"| DC["DriverAttributeConfig"]
-    DEV -->|"每个位号填值"| PC["PointAttributeConfig"]
-    DA -.->|"attributeId"| DC
-    PA -.->|"attributeId"| PC
-    PT["位号 Point"] -.->|"pointId"| PC
-```
+<AttributeConfigRelationDiagram lang="zh" />
 
-属性挂在驱动下、被设备配置引用；位号配置还额外绑定到具体[位号](./point)。建模时定义[物模型](./profile)
+属性挂在驱动下、被设备配置引用；位号配置还额外绑定到具体[位号](./point)。建模时定义[模板](./profile)
 （含位号、指令、事件），接入时由驱动声明属性、设备填配置，两条线在设备处汇合。
 
 ## 注册与配置流程
 
-```mermaid
-flowchart LR
-    YML["application.yml<br/>属性定义"] -->|"驱动启动上报"| MGR["Manager 落库<br/>Attribute 表"]
-    MGR -->|"设备编辑页加载"| UI["配置矩阵<br/>列=Attribute"]
-    UI -->|"填值保存"| CFG["Config 表<br/>configValue"]
-    CFG -->|"运行时下发"| RT["驱动组装协议报文"]
-```
+<AttributeConfigFlowDiagram lang="zh" />
 
 1. 驱动从 `application.yml` 读取 `driver-attribute` / `point-attribute`，启动时上报。
 2. Manager 按唯一键写入或更新属性定义。
@@ -128,13 +118,13 @@ flowchart LR
 ## Attribute / Config 能解决什么、不能解决什么
 
 `Attribute + Config` 解决的是**协议映射**：把"这台设备的这个位号/连接"翻译成驱动能执行的具体地址、Topic、模板。它**不能**
-单独表达"位号本身是什么""指令要传哪些业务参数"——那是[物模型](./profile)与 Param 的职责。
+单独表达"位号本身是什么""指令要传哪些业务参数"——那是[模板](./profile)与 Param 的职责。
 
 | 能解决                  | 不能单独解决（需要其它模型）                                 |
 |----------------------|------------------------------------------------|
-| 连这台设备网关用什么 Host / 端口 | 这类设备有哪些位号、指令、事件 → [物模型 Profile](./profile)     |
+| 连这台设备网关用什么 Host / 端口 | 这类设备有哪些位号、指令、事件 → [模板 Profile](./profile)     |
 | 采这个位号读哪个寄存器 / 路径     | 指令携带哪些业务入参出参 → [指令 Command](./command) 的 Param |
-| 同一物模型在不同驱动下填不同映射值    | 事件上报哪些业务字段 → [事件 Event](./event) 的 Param       |
+| 同一模板在不同驱动下填不同映射值    | 事件上报哪些业务字段 → [事件 Event](./event) 的 Param       |
 
 ::: tip 一句话定位
 缺采集？多半是 **Config 没填或填错**（地址/Topic 写错）。缺能力？那是 **Attribute 没声明**（驱动根本没注册这个配置项）——后者要改驱动

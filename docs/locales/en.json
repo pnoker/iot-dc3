@@ -10,7 +10,7 @@
   "introduction/concepts": "Core Concepts",
   "introduction/paths": "Choose Your Path",
   "introduction/technology-stack": "Technology Stack",
-  "introduction/concepts/profile": "Profile",
+  "introduction/concepts/profile": "Profile <span class=\"dc3-sb-badge VPBadge tip\">Thing Model+</span>",
   "introduction/concepts/device": "Device",
   "introduction/concepts/driver": "Driver",
   "introduction/concepts/point": "Point",

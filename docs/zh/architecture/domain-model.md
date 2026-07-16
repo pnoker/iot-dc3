@@ -2,6 +2,14 @@
 title: 领域模型：DO / BO / VO 与对象关系
 ---
 
+<script setup>
+import DomainModelErDiagram from '../../.vitepress/theme/components/DomainModelErDiagram.vue'
+import DomainModelLayerDiagram from '../../.vitepress/theme/components/DomainModelLayerDiagram.vue'
+import DomainModelClassDiagram from '../../.vitepress/theme/components/DomainModelClassDiagram.vue'
+import DomainModelSequenceDiagram from '../../.vitepress/theme/components/DomainModelSequenceDiagram.vue'
+</script>
+
+
 # 领域模型：DO / BO / VO 与对象关系
 
 这页写给要在平台上写代码的人：理清 Profile / Point / Command / Event / Device / Driver
@@ -47,53 +55,7 @@ IoT DC3 的领域模型有一个根：**模板 Profile**。它不是一台设备
 里的属性/配置关系画在一起。它比 [核心概念](../introduction/concepts) 里的那张更全——多出了协议层 `*Attribute` 与实例层
 `*AttributeConfig`。
 
-```mermaid
-erDiagram
-    PROFILE ||--o{ POINT : "包含位号"
-    PROFILE ||--o{ COMMAND : "包含命令"
-    PROFILE ||--o{ EVENT : "包含事件"
-    DEVICE }o--|| PROFILE : "绑定唯一模板 (profileId)"
-    DEVICE }o--|| DRIVER : "由一个驱动接入"
-    DRIVER ||--o{ DRIVER_ATTRIBUTE : "注册驱动级属性"
-    DRIVER ||--o{ POINT_ATTRIBUTE : "注册位号级属性"
-    COMMAND ||--o{ COMMAND_PARAM : "定义命令参数"
-    EVENT ||--o{ EVENT_PARAM : "定义事件参数"
-    DEVICE ||--o{ POINT_ATTRIBUTE_CONFIG : "为属性填实例值"
-    POINT ||--o{ POINT_ATTRIBUTE_CONFIG : "按位号填值"
-    POINT_ATTRIBUTE ||--o{ POINT_ATTRIBUTE_CONFIG : "被实例化"
-    PROFILE {
-        long id
-        string profileName
-        enum profileShareFlag "TENANT/DRIVER/USER"
-    }
-    POINT {
-        long id
-        string pointName
-        byte pointTypeFlag "STRING..BOOLEAN (0-7)"
-        byte rwFlag "READ_ONLY/WRITE_ONLY/READ_WRITE"
-        string unit
-        double baseValue
-        double multiple
-    }
-    DEVICE {
-        long id
-        string deviceName
-        long profileId "单一外键"
-        long driverId
-    }
-    POINT_ATTRIBUTE {
-        long id
-        string attributeName
-        long driverId
-    }
-    POINT_ATTRIBUTE_CONFIG {
-        long id
-        long attributeId
-        long deviceId
-        long pointId
-        string configValue
-    }
-```
+<DomainModelErDiagram lang="zh" />
 
 `profileShareFlag`（`ProfileShareTypeEnum`：`TENANT / DRIVER / USER`）控制模板的共享范围；`Event` 的 `event_type_flag`（
 `0=info / 1=alert / 2=fault / 3=lifecycle`）是事件**定义**上的分类，存在 `dc3_event` 表（管理域，由 `04-iot-dc3-manager.sql`
@@ -104,22 +66,7 @@ erDiagram
 这是领域模型里最容易混的地方。平台把"配置"拆成**三个作用域完全不同**的层，每层回答不同的问题、由不同的人/流程产生、对应不同的
 DO 类：
 
-```mermaid
-flowchart TB
-    subgraph 业务层["业务层 · Param（在模板模型里定义）"]
-        P1["CommandParam (CommandParamDO)<br/>这个命令有哪些输入输出参数"]
-        P2["EventParam (EventParamDO)<br/>这个事件携带哪些参数"]
-    end
-    subgraph 协议层["协议层 · Attribute（驱动启动时注册）"]
-        A1["DriverAttribute / PointAttribute<br/>CommandAttribute / EventAttribute"]
-        A2["这个驱动有哪些配置项<br/>来自驱动 application.yml"]
-    end
-    subgraph 实例层["实例层 · Config（用户为设备填值）"]
-        C1["PointAttributeConfig (PointAttributeConfigDO) 等"]
-        C2["这台设备给这些配置项填的具体值<br/>attributeId + deviceId + pointId + configValue"]
-    end
-    协议层 -.->|"属性被实例化"| 实例层
-```
+<DomainModelLayerDiagram lang="zh" />
 
 - **Param（业务层）** —— `CommandParamDO` / `EventParamDO`。它描述模板里一个命令/事件的输入输出参数，是**业务语义**，和具体协议无关。
 - **Attribute（协议层）** —— `DriverAttributeDO` / `PointAttributeDO` / `CommandAttributeDO` / `EventAttributeDO`。它由驱动在
@@ -151,34 +98,7 @@ flowchart TB
 
 下图是三层在调用链里的站位，以及 MapStruct `*Builder` 负责的转换方向。
 
-```mermaid
-classDiagram
-    class PointController {
-        +add(PointVO) String
-        +listByProfileId(...) List~PointVO~
-    }
-    class PointService {
-        +add(PointBO) void
-        +listByProfileId(...) List~PointBO~
-    }
-    class PointManager {
-        +save(PointDO) boolean
-        +list(...) List~PointDO~
-    }
-    class PointBuilder {
-        <<MapStruct Mapper>>
-        +buildBOByVO(PointVO) PointBO
-        +buildDOByBO(PointBO) PointDO
-        +buildBOByDO(PointDO) PointBO
-        +buildVOByBO(PointBO) PointVO
-    }
-    note for PointBuilder "@AfterMapping 处理枚举与 JSON 扩展"
-    PointController --> PointService : "传 BO"
-    PointService --> PointManager : "传 DO"
-    PointController ..> PointBuilder : "VO↔BO"
-    PointService ..> PointBuilder : "BO↔DO"
-    PointManager ..> PointDO : "MyBatis-Plus 落库"
-```
+<DomainModelClassDiagram lang="zh" />
 
 `PointController` 收到 `PointVO` 后用 `PointBuilder.buildBOByVO()` 转成 `PointBO` 交给 `PointService`；Service 用
 `buildDOByBO()` 转成 `PointDO` 交给 `PointManager` 落库；读取时反向走 `buildBOByDO()` → `buildVOByBO()`。`select*` 这类原始
@@ -193,22 +113,7 @@ MapStruct 能自动映射同名同类型字段，但 `Byte ↔ 域枚举`、`JSO
 枚举两端的契约很固定：DO 里存的 `Byte` 就是枚举上 `@EnumValue` 标注的 `index`；DO→BO 用 `XxxEnum.ofIndex(byte)`
 把数值变枚举，BO→DO 用 `enum.getIndex()` 取回数值。下面这条时序就是 `PointBuilder` 里读一行位号时真实发生的事：
 
-```mermaid
-sequenceDiagram
-    participant DB as 数据库 dc3_point
-    participant DO as PointDO
-    participant B as PointBuilder
-    participant BO as PointBO
-    participant VO as PointVO
-    DB->>DO: rwFlag = (Byte) 2
-    Note over DO: 字段是裸 Byte<br/>@EnumValue index
-    DO->>B: buildBOByDO(PointDO)
-    B->>B: "@AfterMapping: RwTypeEnum.ofIndex((byte)2)"
-    B->>BO: rwFlag = READ_WRITE
-    Note over BO: 业务层是域枚举
-    BO->>B: buildVOByBO(PointBO)
-    B->>VO: rwFlag = READ_WRITE
-```
+<DomainModelSequenceDiagram lang="zh" />
 
 对应到 `PointBuilder.java` 里的真实代码：`buildBOByDO` 上把 `pointTypeFlag` / `rwFlag` / `enableFlag` 标了
 `@Mapping(ignore = true)`，再在 `@AfterMapping` 里逐个 `RwTypeEnum.ofIndex(entityDO.getRwFlag())` 赋回；反方向

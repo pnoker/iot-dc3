@@ -2,6 +2,11 @@
 title: Industrial Buses & Protocols
 ---
 
+<script setup>
+import FieldbusDiagram from '../../.vitepress/theme/components/FieldbusDiagram.vue'
+</script>
+
+
 # Industrial Buses & Protocols
 
 Devices on the industrial floor speak dozens of mutually unintelligible "dialects" — PLCs use vendor-proprietary
@@ -83,30 +88,7 @@ points are often grouped by importance: critical quantities polled often, auxili
 The diagram below groups this chapter's protocols by **application domain**, each domain mapping to a typical
 communication model and addressing style:
 
-```mermaid
-flowchart TB
-  Root["Industrial protocols<br/>by domain and model"]
-
-  Root --> PLC["PLC / fieldbus<br/>master-slave · request-response"]
-  Root --> SCADA["SCADA / power · building<br/>client-server / master polling"]
-  Root --> Meter["metering / energy<br/>meter reading · mostly read-only"]
-  Root --> Bus["embedded bus / broadcast<br/>publish-subscribe"]
-
-  PLC --> Modbus["Modbus RTU/TCP<br/>register + function code"]
-  PLC --> S7["Siemens S7<br/>DB/area address"]
-  PLC --> Melsec["Mitsubishi MELSEC<br/>device address"]
-  PLC --> Fins["Omron FINS<br/>memory-area address"]
-  PLC --> Eip["EtherNet/IP (CIP)<br/>tag-name addressing"]
-
-  SCADA --> OpcUa["OPC UA<br/>NodeId + subscription"]
-  SCADA --> OpcDa["OPC DA<br/>ItemId (Windows)"]
-  SCADA --> Iec104["IEC 60870-5-104<br/>IOA + ASDU"]
-  SCADA --> Bacnet["BACnet/IP<br/>object + attribute"]
-
-  Meter --> Dlms["DLMS/COSEM<br/>OBIS code"]
-
-  Bus --> Can["CAN<br/>CAN ID broadcast"]
-```
+<FieldbusDiagram lang="en" />
 
 ::: tip There is no "best" protocol, only the "most suitable"
 Start from what the device itself supports — most field device protocols are fixed by the vendor, and you can only

@@ -2,6 +2,15 @@
 title: 驱动开发
 ---
 
+<script setup>
+import DriverAuthoringStateDiagram from '../../.vitepress/theme/components/DriverAuthoringStateDiagram.vue'
+import DriverAuthoringFlow1Diagram from '../../.vitepress/theme/components/DriverAuthoringFlow1Diagram.vue'
+import DriverAuthoringFlow2Diagram from '../../.vitepress/theme/components/DriverAuthoringFlow2Diagram.vue'
+import DriverAuthoringSeqDiagram from '../../.vitepress/theme/components/DriverAuthoringSeqDiagram.vue'
+import DriverAuthoringFlow3Diagram from '../../.vitepress/theme/components/DriverAuthoringFlow3Diagram.vue'
+</script>
+
+
 # 驱动开发
 
 驱动是 IoT DC3 的南向 I/O 层：它把 Modbus、OPC UA、MQTT、S7、BACnet 等异构协议设备，统一接入到平台的数据平面和命令平面。本页带你从
@@ -48,17 +57,7 @@ title: 驱动开发
 `DriverInitRunner.registerWithRetry()` 用**带上限的指数退避**重试——初始 2 秒，每次翻倍，封顶 30 秒，最多 30
 次；全部失败才抛异常退出。没有它，管理中心的一次短暂抖动就会把驱动拖进 CrashLoopBackOff。
 
-```mermaid
-stateDiagram-v2
-  [*] --> STARTING : 进程启动 DriverInitRunner.run()
-  STARTING --> REGISTERING : registerWithRetry()
-  REGISTERING --> REGISTERING : 注册失败<br/>指数退避 2s→30s, 最多 30 次
-  REGISTERING --> INITIAL : 注册成功<br/>driverCustomService.initial()
-  REGISTERING --> [*] : 30 次仍失败, 抛异常退出
-  INITIAL --> SCHEDULING : driverScheduleService.initialize()
-  SCHEDULING --> RUNNING : 读/自定义/健康任务装配完成
-  RUNNING --> RUNNING : 周期读 read() + 周期上报状态
-```
+<DriverAuthoringStateDiagram lang="zh" />
 
 源码：`dc3-common/dc3-common-driver/.../init/DriverInitRunner.java`（`REGISTER_MAX_ATTEMPTS=30`、
 `REGISTER_INITIAL_BACKOFF=2s`、`REGISTER_MAX_BACKOFF=30s`）。`initial()` 只在启动时跑一次，适合建连接池、订阅关系；
@@ -68,13 +67,7 @@ stateDiagram-v2
 
 新驱动的工作量集中在四处：拷贝模板、改 `pom.xml`、改 `application.yml`、实现 `DriverCustomService`。下图是整体路径，随后逐步展开。
 
-```mermaid
-flowchart LR
-  A["拷贝模板<br/>dc3-driver-virtual → dc3-driver-knx"] --> B["改 pom.xml<br/>继承 dc3-driver 父模块<br/>加协议库依赖"]
-  B --> C["改 application.yml<br/>dc3.driver code/name<br/>driver/point-attribute"]
-  C --> D["实现 DriverCustomService<br/>read() / write() / schedule()..."]
-  D --> E["package + 运行<br/>自动注册到管理中心"]
-```
+<DriverAuthoringFlow1Diagram lang="zh" />
 
 ### 第 1 步：拷贝模板并重命名
 
@@ -211,14 +204,7 @@ device health 的 `enabled` 默认为 `false`，需显式置 `true` 才启用。
 
 属性注册的链路是：`application.yml` 的 `dc3.driver` → SDK 解析为 `RegisterBO` → 经 gRPC 提交到管理中心。下图给出这条注册流的实体关系：
 
-```mermaid
-flowchart LR
-  YML["application.yml<br/>dc3.driver.*-attribute"] --> Props["DriverProperties<br/>(SDK 绑定)"]
-  Props --> Reg["RegisterBO<br/>code/name/service/tenant + 属性定义"]
-  Reg -->|"gRPC"| MGR["管理中心 dc3-center-manager"]
-  MGR --> DB[("dc3_driver_attribute<br/>dc3_point_attribute")]
-  MGR --> UI["管理侧渲染<br/>设备/位号配置表单"]
-```
+<DriverAuthoringFlow2Diagram lang="zh" />
 
 ### 第 4 步：实现 `DriverCustomService`
 
@@ -295,44 +281,12 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
 **写（入站）**：数据中心把读/写命令经 RabbitMQ 下发到本驱动的命令队列；`PointCommandReceiver` 做去重、按设备加锁后，反向调用你的
 `read()` 或 `write()`，结果再发回数据中心。
 
-```mermaid
-sequenceDiagram
-  participant Quartz as Quartz 读调度
-  participant Meta as DriverMetadata 缓存
-  participant Impl as DriverCustomService.read()
-  participant MQ as RabbitMQ
-  participant Data as 数据中心 dc3-center-data
-
-  Note over Quartz,Data: 出站：周期采集
-  Quartz->>Meta: 遍历本驱动设备
-  Meta-->>Quartz: deviceIds
-  Quartz->>Impl: read(driverConfig, pointConfig, device, point)
-  Impl-->>Quartz: ReadPointValue
-  Quartz->>MQ: pointValueSender(PointValue)
-  MQ->>Data: 落库 dc3_point_value
-
-  Note over Data,Impl: 入站：写命令
-  Data->>MQ: 下发 dc3.e.point_command
-  MQ->>Impl: write(..., WritePointValue)
-  Impl-->>MQ: Boolean(true/false)
-  MQ->>Data: pointCommandResultSender(结果)
-```
+<DriverAuthoringSeqDiagram lang="zh" />
 
 入站写命令在驱动侧的处理不是裸调用 `write()`，而是一条带校验、去重、加锁的流水线。下图展开 `PointCommandReceiver`
 的处理管线（含错误路径）：
 
-```mermaid
-flowchart TB
-  In["收到命令<br/>dc3.q.point_command.{service}"] --> Exp{"已过期?<br/>now 超过 expireAt"}
-  Exp -->|是| Expired["标记 EXPIRED, ack"]
-  Exp -->|否| Dedup{"去重命中?<br/>Caffeine 5 分钟"}
-  Dedup -->|命中| Dup["标记 DUPLICATE, ack"]
-  Dedup -->|未命中| Lock["按设备加锁<br/>DeviceLockManager (ReentrantLock)"]
-  Lock --> Exec["执行 read() / write()"]
-  Exec -->|成功| OK["回结果 SUCCESS/FAILED"]
-  Exec -->|异常, 首次投递| Nack["nack 重入队 + 释放去重"]
-  Exec -->|异常, 重投| Fail["回结果 FAILED + ack<br/>避免死循环"]
-```
+<DriverAuthoringFlow3Diagram lang="zh" />
 
 发送侧统一走 `DriverSenderService`（源码 `DriverSenderService.java`），常用方法：
 

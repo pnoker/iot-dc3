@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta charset="UTF-8"><title>IoT DC3 — 驱动在体系中的位置</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'JetBrains Mono',monospace;background:#020617;padding:2rem;color:#fff}.w{max-width:1140px;margin:0 auto}h1{font-size:1.4rem;margin-bottom:1rem}.b{background:rgba(15,23,42,.5);border:1px solid #1e293b;border-radius:1rem;padding:1.5rem;overflow-x:auto}svg{width:100%;min-width:960px;display:block}</style></head>
+<body><div class="w"><h1>驱动 Driver 在体系中的位置</h1><div class="b">
+<svg viewBox="0 0 1120 480">
+<defs><marker id="ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#64748b"/></marker>
+<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0L0 0 0 40" fill="none" stroke="#1e293b" stroke-width=".5"/></pattern>
+<filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="7"/></filter></defs>
+<rect width="100%" height="100%" fill="url(#grid)"/>
+<line x1="240" y1="215" x2="340" y2="110" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="265" y="150" fill="#94a3b8" font-size="9" text-anchor="middle">注册身份</text>
+<line x1="240" y1="240" x2="340" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="290" y="232" fill="#94a3b8" font-size="9" text-anchor="middle">注册声明</text>
+<line x1="240" y1="265" x2="340" y2="390" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="265" y="345" fill="#94a3b8" font-size="9" text-anchor="middle">采集承载</text>
+<line x1="520" y1="380" x2="640" y2="180" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="600" y="275" fill="#94a3b8" font-size="9" text-anchor="middle">归属</text>
+<line x1="520" y1="400" x2="640" y2="390" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="580" y="392" fill="#94a3b8" font-size="9" text-anchor="middle">按声明填值</text>
+<line x1="725" y1="210" x2="720" y2="250" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="760" y="234" fill="#94a3b8" font-size="9" text-anchor="middle">定义</text>
+<path d="M240,275 Q560,470 920,290" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="580" y="462" fill="#94a3b8" font-size="9" text-anchor="middle">采集翻译</text>
+<rect x="40" y="180" width="200" height="110" rx="12" fill="#fb923c" opacity=".2" filter="url(#glow)"/>
+<rect x="50" y="190" width="180" height="90" rx="10" fill="#0f172a"/><rect x="50" y="190" width="180" height="90" rx="10" fill="rgba(251,146,60,.3)" stroke="#fb923c" stroke-width="2.5"/><text x="140" y="225" fill="#fff" font-size="15" font-weight="700" text-anchor="middle">驱动 Driver</text><text x="140" y="246" fill="#94a3b8" font-size="9.5" text-anchor="middle">dc3-driver-*</text><text x="140" y="262" fill="#94a3b8" font-size="9.5" text-anchor="middle">协议适配</text>
+<rect x="340" y="80" width="200" height="62" rx="8" fill="#0f172a"/><rect x="340" y="80" width="200" height="62" rx="8" fill="rgba(6,78,59,.4)" stroke="#34d399" stroke-width="1.5"/><text x="440" y="108" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">管理中心 Manager</text><text x="440" y="126" fill="#94a3b8" font-size="9" text-anchor="middle">注册入口</text>
+<rect x="340" y="210" width="220" height="62" rx="8" fill="#0f172a"/><rect x="340" y="210" width="220" height="62" rx="8" fill="rgba(8,51,68,.4)" stroke="#22d3ee" stroke-width="1.5"/><text x="450" y="237" fill="#fff" font-size="12" font-weight="600" text-anchor="middle">DriverAttribute</text><text x="450" y="255" fill="#94a3b8" font-size="9" text-anchor="middle">驱动配置项</text>
+<rect x="340" y="360" width="180" height="62" rx="8" fill="#0f172a"/><rect x="340" y="360" width="180" height="62" rx="8" fill="rgba(30,41,59,.5)" stroke="#94a3b8" stroke-width="1.5"/><text x="430" y="387" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">设备 Device</text><text x="430" y="405" fill="#94a3b8" font-size="9" text-anchor="middle">1..N</text>
+<rect x="640" y="150" width="170" height="62" rx="8" fill="#0f172a"/><rect x="640" y="150" width="170" height="62" rx="8" fill="rgba(6,78,59,.4)" stroke="#34d399" stroke-width="1.5"/><text x="725" y="178" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">模板 Profile</text><text x="725" y="196" fill="#94a3b8" font-size="9" text-anchor="middle">归属根</text>
+<rect x="640" y="250" width="160" height="62" rx="8" fill="#0f172a"/><rect x="640" y="250" width="160" height="62" rx="8" fill="rgba(8,51,68,.4)" stroke="#22d3ee" stroke-width="1.5"/><text x="720" y="278" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">位号 Point</text><text x="720" y="296" fill="#94a3b8" font-size="9" text-anchor="middle">采集项</text>
+<rect x="640" y="360" width="220" height="62" rx="8" fill="#0f172a"/><rect x="640" y="360" width="220" height="62" rx="8" fill="rgba(120,53,15,.3)" stroke="#fbbf24" stroke-width="1.5"/><text x="750" y="387" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">DriverAttributeConfig</text><text x="750" y="405" fill="#94a3b8" font-size="9" text-anchor="middle">连接配置</text>
+<path d="M920,200 a80,16 0 0 0 160,0 v100 a80,16 0 0 1 -160,0 z" fill="#0f172a"/><path d="M920,200 a80,16 0 0 0 160,0 v100 a80,16 0 0 1 -160,0 z" fill="rgba(76,29,149,.4)" stroke="#a78bfa" stroke-width="1.5"/><ellipse cx="1000" cy="200" rx="80" ry="16" fill="none" stroke="#a78bfa" stroke-width="1.5"/><text x="1000" y="255" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">位号值 PointValue</text>
+</svg></div></div></body></html>

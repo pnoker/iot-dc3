@@ -2,6 +2,11 @@
 title: Logging Conventions
 ---
 
+<script setup>
+import LoggingDiagram from '../../.vitepress/theme/components/LoggingDiagram.vue'
+</script>
+
+
 # Logging Conventions
 
 IoT DC3 logs are read by two audiences: you, during local development, and machines, during production troubleshooting.
@@ -33,15 +38,7 @@ Loki, ...), you change the Appender, not hundreds of `log.info` calls.
 The diagram below traces the full path from code to a persisted or collected log: the application emits an event, it
 passes through MDC context slots, and is then formatted by two separate Appenders.
 
-```mermaid
-flowchart LR
-  App["Business code<br/>log.info(event, args...)"] --> MDC["MDC context slots<br/>(mdc provider reserved by encoder)"]
-  MDC --> CONSOLE["CONSOLE Appender<br/>colored text"]
-  MDC --> FILE["FILE Appender<br/>JSON (logstash encoder)"]
-  CONSOLE --> Dev["Local terminal / podman logs"]
-  FILE --> Roll["Rolling files *.gz<br/>(in-app logback rotation)"]
-  FILE --> Collect["Log collection<br/>(ELK / Loki, optional)"]
-```
+<LoggingDiagram lang="en" />
 
 Both Appenders attach to `root` (default level `INFO`) and are configured by the `logback.xml` in `dc3-common-log`. The
 JSON Appender uses `net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder`, emitting `timestamp`, `version`,

@@ -2,6 +2,11 @@
 title: Troubleshooting
 ---
 
+<script setup>
+import TroubleshootingDiagram from '../../.vitepress/theme/components/TroubleshootingDiagram.vue'
+</script>
+
+
 # Troubleshooting
 
 This page walks you through the most common startup and connection failures, and helps you tell them apart fast. Each
@@ -22,22 +27,7 @@ top to bottom beats guessing one by one. The platform exposes a single HTTP entr
 the center services talk to each other over gRPC facades; drivers and the data center are decoupled through RabbitMQ. So
 when the dependencies underneath them (PostgreSQL / RabbitMQ) fail to come up, everything above cascades into failure.
 
-```mermaid
-flowchart TB
-  Start["Service won't start / won't connect"] --> Dep{"Dependencies ready?<br/>PostgreSQL + RabbitMQ"}
-  Dep -->|"No"| FixDep["make ps STACK=db<br/>wait for health checks to pass"]
-  Dep -->|"Yes"| Env{"Environment variables loaded?<br/>(local source)"}
-  Env -->|"No"| FixEnv["source dc3/env/dev.env.sh"]
-  Env -->|"Yes"| Port{"Port in use?<br/>8000 / 8300-8600 / 9300-9500"}
-  Port -->|"Yes"| FixPort["lsof / ss to find PID<br/>override port via .env"]
-  Port -->|"No"| Order{"Dependency services ready in order?<br/>Gateway → Auth → Manager → Data → Agentic → Driver"}
-  Order -->|"No"| FixOrder["start in order<br/>wait for upstream before downstream"]
-  Order -->|"Yes"| Log["read log keywords<br/>Connection refused / 401 / HMAC / UnknownHost"]
-  FixDep --> Log
-  FixEnv --> Log
-  FixPort --> Log
-  FixOrder --> Log
-```
+<TroubleshootingDiagram lang="en" />
 
 The order of this chain is deliberate. Unloaded variables point every connection at the wrong host. A port in use kills
 the process during the bind phase. And the startup order of dependency services decides whether the gRPC facades and

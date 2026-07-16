@@ -2,6 +2,13 @@
 title: CLI User Guide
 ---
 
+<script setup>
+import CliSequenceDiagram from '../../.vitepress/theme/components/CliSequenceDiagram.vue'
+import CliCredentialFlowDiagram from '../../.vitepress/theme/components/CliCredentialFlowDiagram.vue'
+import CliClassDiagram from '../../.vitepress/theme/components/CliClassDiagram.vue'
+</script>
+
+
 # CLI User Guide
 
 `dc3-cli` is the command-line client for IoT DC3 — a standalone TypeScript package (Node ≥ 20) that exposes the platform
@@ -46,19 +53,7 @@ password** together with the salt to `POST /api/v3/auth/token/generate`, which r
 embedded `iat` and `exp`, then writes `{ token, salt, tenant, username, issuedAt, expiresAt }` to `~/.dc3/tokens.json` (
 file mode `0600`, one entry per profile).
 
-```mermaid
-sequenceDiagram
-    participant CLI as dc3 (CLI)
-    participant GW as Gateway dc3-gateway
-    participant Auth as Auth center dc3-center-auth
-    CLI->>GW: "POST /api/v3/auth/token/salt (tenant, name)"
-    GW->>Auth: Forward salt request
-    Auth-->>CLI: "Return salt (use within 5 minutes)"
-    CLI->>GW: "POST /api/v3/auth/token/generate (tenant, name, salt, plaintext password)"
-    GW->>Auth: Forward token generation
-    Auth-->>CLI: "Return JWT access token (valid 12 hours)"
-    CLI->>CLI: "Parse iat/exp and write ~/.dc3/tokens.json (0600)"
-```
+<CliSequenceDiagram lang="en" />
 
 Before each later API call, the CLI does two things so you almost never hit a 401:
 
@@ -90,17 +85,7 @@ looks up the password in a fixed order: OS keychain first, then the encrypted fi
 finally an interactive prompt. The first tier that's available and has a value wins. Set the backend for the current
 profile with `dc3 config set auth.store <type>`.
 
-```mermaid
-flowchart LR
-    Start["Password needed (renewal/login)"] --> KC{"keychain available?"}
-    KC -->|hit| Use["Use this password for salt/generate"]
-    KC -->|"unavailable/miss"| ENC{"Encrypted file (AES-256-GCM)"}
-    ENC -->|hit| Use
-    ENC -->|"unavailable/miss"| ENV{"Env var DC3_PASSWORD"}
-    ENV -->|hit| Use
-    ENV -->|"unavailable/miss"| Prompt["Interactive prompt fallback"]
-    Prompt --> Use
-```
+<CliCredentialFlowDiagram lang="en" />
 
 What each of the four backends is for:
 
@@ -154,37 +139,7 @@ Under the hood, the `dc3` entry point parses the command line into those 14 modu
 core components: the HTTP client, config management, token management, and credential storage. The modules only describe
 what to do; the gateway requests, profile resolution, renewal, and password retrieval all live in the core layer.
 
-```mermaid
-classDiagram
-    class Entry["dc3 entry (index.ts)"] {
-        +parseAsync(argv)
-    }
-    class Commands["14 command modules"] {
-        config / auth / device / driver
-        point / profile / group / label
-        event / command / alert
-        dashboard / topic / chat
-    }
-    class Client["HTTP client (client.ts)"] {
-        +post(path, body)
-        +get(path)
-    }
-    class Config["Config management (config-manager.ts)"] {
-        gateway / tenant / profile
-    }
-    class Token["Token management (token-manager.ts)"] {
-        +ensureToken()
-        salt + JWT renewal
-    }
-    class Credential["Credential storage (credential-store.ts)"] {
-        keychain / encrypted / env / prompt
-    }
-    Entry --> Commands : Route subcommands
-    Commands --> Client : Issue gateway requests
-    Client --> Token : Get/renew token
-    Token --> Config : Read profile
-    Token --> Credential : Get password
-```
+<CliClassDiagram lang="en" />
 
 Global options apply to every module: `--profile <name>` switches the config profile; `--format json|table|yaml` picks
 the output format (table by default on a TTY, json by default in a pipe); `--verbose` prints request and response

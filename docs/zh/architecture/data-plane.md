@@ -2,6 +2,12 @@
 title: 数据平面：位号值如何落库
 ---
 
+<script setup>
+import DataPlaneClassDiagram from '../../.vitepress/theme/components/DataPlaneClassDiagram.vue'
+import DataPlaneSequenceDiagram from '../../.vitepress/theme/components/DataPlaneSequenceDiagram.vue'
+</script>
+
+
 # 数据平面：位号值如何落库
 
 设备侧采到的原始寄存器值，要经过驱动归一、消息总线、数据中心，最终写进时序库并对外可查。这页追踪一条位号值的完整旅程：用到的交换机与队列、消费者怎么持久化、模型变换经过哪几层、以及读取最新值时缓存如何命中。读完你能看懂一条值"
@@ -78,50 +84,7 @@ RabbitMQ 管理台按名检索。
 同一条"位号值"在链路上换了六次外衣，每一层各有职责与序列化形态。**最容易混淆的是 `PointValue` 与 `PointValueBO` 不是同一个类
 **——前者是驱动侧的发送 bean，后者是消息/业务侧的对象，分属不同层。
 
-```mermaid
-classDiagram
-    class ReadPointValue {
-        <<驱动 读取原始>>
-        +calculate() CalculatedPointValue
-    }
-    class CalculatedPointValue {
-        <<驱动 换算/投影>>
-        +getFinalValue()
-        +getNumericValue()
-    }
-    class PointValue {
-        <<驱动 发送 bean>>
-        +Long deviceId
-        +Long pointId
-        +rawValue
-        +calValue
-        +numValue
-    }
-    class PointValueBO {
-        <<消息 / 业务>>
-        +Long tenantId
-        +createTime
-        +operateTime
-    }
-    class PointValueDO {
-        <<持久 DB 形态>>
-        +num_value DOUBLE
-    }
-    class PointValueVO {
-        <<API 响应形态>>
-        +rawValue
-        +calValue
-        +numValue
-        +createTime
-        +operateTime
-        +hasLatestValue
-    }
-    ReadPointValue --> CalculatedPointValue : calculate()
-    CalculatedPointValue --> PointValue : 构造
-    PointValue --> PointValueBO : 经 RabbitMQ 传输
-    PointValueBO --> PointValueDO : 落库
-    PointValueDO --> PointValueVO : 读 API 映射
-```
+<DataPlaneClassDiagram lang="zh" />
 
 逐层说明：
 
@@ -204,19 +167,7 @@ chunk。业务需要更长留存时，在部署侧调整这两条策略的间隔
 `PointValueServiceImpl.latest()`：先用 `pointValueLocalCacheService.selectLatestPointValue(tenantId, deviceId, pointIds)`
 批量查缓存，把缓存未命中的 pointId 收集起来，再一次性回源 TimescaleDB（`repositoryService.listLatestPointValues`）补齐。
 
-```mermaid
-sequenceDiagram
-    participant Client as 客户端
-    participant Data as 数据中心 dc3-center-data
-    participant Cache as Caffeine 最新值缓存
-    participant TS as TimescaleDB dc3_point_value
-    Client->>Data: "POST /api/v3/data/point_value/latest (deviceId, pointId)"
-    Data->>Cache: selectLatestPointValue(tenant, device, points)
-    Cache-->>Data: 命中的位号最新值
-    Data->>TS: listLatestPointValues(未命中的 pointIds)
-    TS-->>Data: 回源补齐
-    Data-->>Client: 分页 PointValueVO（租户隔离）
-```
+<DataPlaneSequenceDiagram lang="zh" />
 
 历史区间查询 `POST /api/v3/data/point_value/list` 不走缓存，直接 `repositoryService.listPagePointValue(query)` 扫时序库，按
 `startTime`/`endTime` 过滤。两个读接口都受 `@PreAuthorize("@perm.can('point_value', 'list')")` 保护，返回

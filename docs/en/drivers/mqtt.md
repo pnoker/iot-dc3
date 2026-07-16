@@ -2,6 +2,11 @@
 title: MQTT Driver
 ---
 
+<script setup>
+import MqttDiagram from '../../.vitepress/theme/components/MqttDiagram.vue'
+</script>
+
+
 # MQTT Driver
 
 > **`dc3-driver-mqtt` onboards MQTT devices into IoT DC3**—the driver acts as a server, stays subscribed to MQTT topics,
@@ -60,7 +65,7 @@ variables. Key items:
 | Username / password | `MQTT_USERNAME` / `MQTT_PASSWORD`                     | `dc3` / empty (the docker-compose stack injects `dc3dc3dc3`) | Auth credentials (auth types: `NONE` / `USERNAME` / `CLIENT_ID` / `X509`); the password falls back to empty in app config and is injected by the deployment |
 | Keep-alive          | no env binding (`dc3.driver.mqtt.keep-alive`)         | `15` (s)                                                     | Client heartbeat interval, hard-coded default                                                                                                               |
 | Completion timeout  | no env binding (`dc3.driver.mqtt.completion-timeout`) | `3000` (ms)                                                  | Wait timeout for a publish operation, hard-coded default                                                                                                    |
-| Batch thresholds    | `MQTT_BATCH_SPEED` / `MQTT_BATCH_INTERVAL`            | `100` / `5`                                                  | Ingest batching: flush at 100 messages or 5 ms, whichever comes first                                                                                       |
+| Batch thresholds    | `MQTT_BATCH_SPEED` / `MQTT_BATCH_INTERVAL`            | `100` / `5`                                                  | Ingest batching: flush at 100 messages or 5 s, whichever comes first                                                                                       |
 
 ::: info The broker defaults to the RabbitMQ MQTT plugin
 The default MQTT broker is the **RabbitMQ MQTT plugin** (`dc3-rabbitmq`), addressed via `MQTT_BROKER_HOST` /
@@ -120,14 +125,7 @@ report and sends it to the Data Center.
 In MQTT, a "read" is not an outbound request but a callback fired when a subscribed message arrives. The diagram below
 traces a reported value from device to platform—both device and driver only talk to the broker:
 
-```mermaid
-flowchart LR
-  Dev["Field device"] -->|"publish device/1001/up"| Broker["MQTT Broker<br/>(RabbitMQ MQTT plugin)"]
-  Broker -->|"subscribe (per point/event topic)"| Recv["MqttReceiveServiceImpl<br/>receiveValue()"]
-  Recv -->|"parse to PointValue<br/>(needs deviceId + pointId)"| Sender["DriverSenderService<br/>pointValueSender()"]
-  Recv -.->|"when topic matches sourceTopic"| Event["event report<br/>eventReportSender()"]
-  Sender --> Data["Data Center dc3-center-data"]
-```
+<MqttDiagram lang="en" />
 
 For a payload to become a [PointValue](../introduction/concepts/point-value), it must resolve a `deviceId` and a
 `pointId` (otherwise that message is skipped); a parse failure only logs a warn and does not affect other messages.
@@ -170,13 +168,13 @@ here (`schedule.read.enable=false`).
 - **Capabilities** (consistent with the [driver capability matrix](./matrix)): read `—`, write `✓`, subscribe/report `✓`
   —values arrive passively via subscription, with no active read; commands can be dispatched and events reported.
 
-::: info Implementation status: ingestion and command dispatch are implemented, some hooks are skeleton
+::: info Implementation status: ingestion, command dispatch, and health check are implemented; `initial()` is a skeleton
 Per the `MqttDriverCustomServiceImpl` and `MqttReceiveServiceImpl` source: **data reception** (parse to point value and
-forward, event report with topic matching) and **write commands** (`write()` / `execute()` publishing the payload, QoS
-fallback, template rendering) are implemented; `read()` returns `null` by pub/sub semantics (data arrives passively via
-subscription—not a defect). Still reference stubs: `health()` always reports online (the broker-connection health check
-is marked TODO and not done) and `initial()` is an empty initialization template. When using it as an onboarding and
-configuration reference, note that the online state does not currently reflect the real broker connection.
+forward, event report with topic matching), **write commands** (`write()` / `execute()` publishing the payload, QoS
+fallback, template rendering), and the **`health()` check** (listening to `MqttSubscribedEvent` /
+`MqttConnectionFailedEvent` to reflect the broker connection state in real time) are implemented; `read()` returns
+`null` by pub/sub semantics (data arrives passively via subscription—not a defect). The only reference stub left is
+`initial()`, an empty initialization template.
 :::
 
 Minimal onboarding example—onboard a device that reports to `device/1001/up` and receives commands on

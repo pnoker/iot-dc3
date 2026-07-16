@@ -2,13 +2,17 @@
 title: 位号 Point
 ---
 
+<script setup>
+import PointRelationDiagram from '../../../.vitepress/theme/components/PointRelationDiagram.vue'
+</script>
+
 # 位号 Point
 
-> **位号是一个数据项**——一类设备身上要采集或要写入的**一个具体的量**。定义归属[物模型](./profile)
+> **位号是一个数据项**——一类设备身上要采集或要写入的**一个具体的量**。定义归属[模板](./profile)
 > ，运行态取值即[位号值](./point-value)。
 
 位号回答的是"这类设备身上有哪些量可以读、可以写"。一台空调上的"室温""设定温度""开关状态"
-，各自就是一个位号；它们的瞬时数值快照是[位号值](./point-value)。可以这样类比：[物模型](./profile)是一张表格的表头定义，每个位号就是其中的一
+，各自就是一个位号；它们的瞬时数值快照是[位号值](./point-value)。可以这样类比：[模板](./profile)是一张表格的表头定义，每个位号就是其中的一
 **列**，而[位号值](./point-value)是某台设备某时刻填进这一列的那个**单元格**。
 
 容易混淆的两点：
@@ -25,14 +29,14 @@ title: 位号 Point
 | 字段              | 类型             | 含义                          |
 |-----------------|----------------|-----------------------------|
 | `pointName`     | String         | 位号名称（展示用，如"室温"）             |
-| `pointCode`     | String         | 位号标识符，同一[物模型](./profile)下唯一 |
+| `pointCode`     | String         | 位号标识符，同一[模板](./profile)下唯一 |
 | `pointTypeFlag` | PointTypeEnum  | 数据类型，见下                     |
 | `rwFlag`        | RwTypeEnum     | 读写能力，见下                     |
 | `unit`          | String         | 工程单位，如 `℃`、`kPa`            |
 | `baseValue`     | BigDecimal     | 线性换算的偏移量（默认 `0`）            |
 | `multiple`      | BigDecimal     | 线性换算的倍率（默认 `1`）             |
 | `valueDecimal`  | Byte           | 小数精度，浮点取值的保留位数（默认 `6`）      |
-| `profileId`     | Long           | 归属的[物模型](./profile)         |
+| `profileId`     | Long           | 归属的[模板](./profile)         |
 | `pointExt`      | PointExt       | 扩展配置（协议映射、约束、采集策略等）         |
 | `enableFlag`    | EnableFlagEnum | 启停状态                        |
 | `tenantId`      | Long           | 归属[租户](./tenant)            |
@@ -72,22 +76,15 @@ title: 位号 Point
 
 ## 与其它概念的关系
 
-```mermaid
-flowchart LR
-    PR["物模型 Profile"] -->|"定义"| PT["位号 Point"]
-    PR -->|"定义"| CMD["指令 Command"]
-    DEV["设备 Device"] -->|"归属"| PR
-    DEV -->|"运行态取值"| PV[("位号值 PointValue")]
-    PT -.->|"point_id"| PV
-```
+<PointRelationDiagram lang="zh" />
 
-- 位号**定义**挂在[物模型](./profile)下，与[指令](./command)、[事件](./event)并列，共同描述"这类设备有什么能力"。
-- [设备](./device)归属一个物模型，因此自动拥有该物模型下的全部位号；运行态数据按 `device_id + point_id`
+- 位号**定义**挂在[模板](./profile)下，与[指令](./command)、[事件](./event)并列，共同描述"这类设备有什么能力"。
+- [设备](./device)归属一个模板，因此自动拥有该模板下的全部位号；运行态数据按 `device_id + point_id`
   落成[位号值](./point-value)。
 
 ## 示例
 
-给空调物模型配三个位号：
+给空调模板配三个位号：
 
 | pointCode     | pointName | pointTypeFlag | rwFlag       | unit | 说明                       |
 |---------------|-----------|---------------|--------------|------|--------------------------|
@@ -105,8 +102,8 @@ flowchart LR
 
 ## 延伸阅读
 
-- [物模型 Profile](./profile) — 位号定义挂在物模型下
+- [模板 Profile](./profile) — 位号定义挂在模板下
 - [位号值 PointValue](./point-value) — 位号的运行态取值快照
 - [指令 Command](./command) — 动作型能力；位号读写不在此表
 - [事件 Event](./event) — 与位号并列的另一类能力
-- [设备接入](../../operation/device-onboarding) — 设备如何选定物模型并继承其位号
+- [设备接入](../../operation/device-onboarding) — 设备如何选定模板并继承其位号

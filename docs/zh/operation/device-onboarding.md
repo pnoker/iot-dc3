@@ -2,6 +2,12 @@
 title: 设备接入
 ---
 
+<script setup>
+import DeviceOnboardingSelectDiagram from '../../.vitepress/theme/components/DeviceOnboardingSelectDiagram.vue'
+import DeviceOnboardingFlowDiagram from '../../.vitepress/theme/components/DeviceOnboardingFlowDiagram.vue'
+</script>
+
+
 # 设备接入
 
 把一台现场设备接入 IoT DC3，本质是五步：按协议选一个驱动 → 建模板与位号 → 建设备并绑定模板和驱动 →
@@ -18,19 +24,7 @@ title: 设备接入
 
 平台内置 28 个驱动，覆盖工业现场总线、IoT 无线、数据库桥接和基础通信。下面这张图按协议把常见选择收敛到一个驱动模块：
 
-```mermaid
-flowchart TB
-  Start{"设备用什么协议通信?"}
-  Start -->|"Modbus TCP"| ModbusTcp["dc3-driver-modbus-tcp"]
-  Start -->|"Modbus 串口 (RTU)"| ModbusRtu["dc3-driver-modbus-rtu"]
-  Start -->|"OPC UA"| OpcUa["dc3-driver-opc-ua"]
-  Start -->|"西门子 S7"| S7["dc3-driver-plcs7"]
-  Start -->|"MQTT 订阅/发布"| Mqtt["dc3-driver-mqtt"]
-  Start -->|"HTTP REST 拉取"| Http["dc3-driver-http"]
-  Start -->|"外部系统主动推送 (TCP/UDP)"| Listening["dc3-driver-listening-virtual"]
-  Start -->|"还没有真设备 / 想先跑通链路"| Virtual["dc3-driver-virtual"]
-  Start -->|"其它协议"| More["见驱动目录: BACnet/IEC104/SNMP/CoAP/CAN/..."]
-```
+<DeviceOnboardingSelectDiagram lang="zh" />
 
 ::: tip 选不准时的两条经验
 
@@ -50,14 +44,7 @@ flowchart TB
 ，经 RabbitMQ 进数据中心（Data Center / `dc3-center-data`）落库，最终通过网关（Gateway / `dc3-gateway`，对外唯一入口，端口
 `8000`）对外可查。
 
-```mermaid
-flowchart LR
-  Dev["现场设备<br/>(或 virtual 合成值)"] --> Drv["驱动 dc3-driver-*"]
-  Drv -->|"PointValue 经 RabbitMQ"| Data["数据中心 dc3-center-data"]
-  Data --> TS[("TimescaleDB<br/>dc3_point_value")]
-  Data --> GW["网关 dc3-gateway :8000"]
-  GW -->|"POST /api/v3/data/point_value/latest"| Client["调用方 / Web / dc3 CLI"]
-```
+<DeviceOnboardingFlowDiagram lang="zh" />
 
 所以"接入成功"的判据不是"驱动启动了"，而是**这条链路打通、能在数据中心查到这台设备最新的位号值**。这条数据平面的交换机、队列、TTL
 等细节见 [数据与命令](./data-commands)。

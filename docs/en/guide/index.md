@@ -2,6 +2,11 @@
 title: "Deployment & Operations"
 ---
 
+<script setup>
+import GuideIndexDiagram from '../../.vitepress/theme/components/GuideIndexDiagram.vue'
+</script>
+
+
 # Deployment & Operations
 
 This section takes IoT DC3 from a `java -jar` on your laptop to a fleet of orchestrated containers — and then makes it
@@ -36,14 +41,7 @@ connection.
 The four sub-pages each cover one stage of the operations lifecycle: bring the services up (deployment and image
 registries), make them visible (observability, logging), and make them fixable when something breaks (troubleshooting).
 
-```mermaid
-flowchart LR
-  Start["You are here<br/>Deployment & Operations portal"] --> Deploy["Deployment Modes & Image Registries<br/>compose orchestration / global·cn registries"]
-  Deploy --> Obs["Observability<br/>Grafana / Prometheus / ELK"]
-  Deploy --> Log["Logging Conventions<br/>colored console + rolling JSON"]
-  Obs --> Trouble["Troubleshooting<br/>ports / DB / MQ / 401·403 / driver registration"]
-  Log --> Trouble
-```
+<GuideIndexDiagram lang="en" />
 
 - **[Deployment Modes & Image Registries](./usage)** — container image selection, registry switching, and Compose
   orchestration. `make` picks the registry through `REGISTRY` (`auto`/`global`/`cn`): `global` uses the default

@@ -2,6 +2,11 @@
 title: Deployment Modes and Image Registries
 ---
 
+<script setup>
+import UsageStackDiagram from '../../.vitepress/theme/components/UsageStackDiagram.vue'
+</script>
+
+
 # Deployment Modes and Image Registries
 
 IoT DC3 runs as four Compose stacks: `db` brings up dependencies, `dev` builds from source, `app` pulls prebuilt images,
@@ -44,45 +49,7 @@ stack), only `dc3-web` and `dc3-driver-listening-virtual` are published to the h
 live on the internal `dc3net` network, reached through the frontend reverse proxy or internal calls — never exposed
 directly.
 
-```mermaid
-flowchart TB
-  subgraph Ingress["External Ingress (only these two are published to the host)"]
-    Web["Frontend dc3-web<br/>(8080 / 8443)"]
-    LV["Listening Driver dc3-driver-listening-virtual<br/>(TCP 6270 / UDP 6271)"]
-  end
-
-  subgraph App["app stack: prebuilt images"]
-    GW["Gateway dc3-gateway<br/>(internal 8000)"]
-    Auth["Auth Center dc3-center-auth"]
-    Mgr["Manager Center dc3-center-manager"]
-    Data["Data Center dc3-center-data"]
-    Agt["Agentic Center dc3-center-agentic"]
-    Drv["Driver Container Group<br/>modbus-tcp / opc-ua / mqtt / ..."]
-  end
-
-  subgraph Dev["dev stack: source build (replaces app)"]
-    DevBuild["Build gateway and the four centers on the spot"]
-  end
-
-  subgraph DB["db stack: infrastructure"]
-    PG[("dc3-postgres<br/>PostgreSQL + Timescale")]
-    MQ["dc3-rabbitmq<br/>Message Bus"]
-  end
-
-  subgraph Opt["optional stack: observability (on demand)"]
-    Obs["EMQX / ELK / Prometheus / Grafana"]
-  end
-
-  Web --> GW
-  GW --> Auth & Mgr & Data & Agt
-  Data --> MQ
-  Drv --> MQ
-  LV --> Drv
-  Auth & Mgr & Data & Agt --> PG
-  App -.depends on.-> DB
-  Dev -.depends on.-> DB
-  Opt -.layers on.-> App
-```
+<UsageStackDiagram lang="en" />
 
 ::: danger Only web and listening-virtual are exposed
 In the `app` (production) stack, only `dc3-web` (8080/8443) and `dc3-driver-listening-virtual` (TCP 6270 / UDP 6271) are

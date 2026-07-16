@@ -2,6 +2,13 @@
 title: Authentication · Tenancy · RBAC
 ---
 
+<script setup>
+import AuthSequenceDiagram from '../../.vitepress/theme/components/AuthSequenceDiagram.vue'
+import AuthErDiagram from '../../.vitepress/theme/components/AuthErDiagram.vue'
+import AuthDecisionFlowDiagram from '../../.vitepress/theme/components/AuthDecisionFlowDiagram.vue'
+</script>
+
+
 # Authentication · Tenancy · RBAC
 
 Only the gateway faces the outside world. But every protected call still has to answer three questions before it reaches
@@ -98,20 +105,7 @@ Once you hold a token, every protected call sends the three headers `X-Auth-Tena
 the gateway. The gateway's `AuthenticGatewayFilter` turns those three headers into a signed identity the backend can
 trust.
 
-```mermaid
-sequenceDiagram
-    participant Client as Caller
-    participant GW as Gateway AuthenticGatewayFilter
-    participant Backend as Backend GatewayJwtConverter
-    Client->>GW: "Request + X-Auth-Tenant/Login/Token"
-    GW->>GW: "Resolve identity -> PrincipalHeader(tenantId, principalId)"
-    GW->>GW: "Serialize to X-Auth-Principal (JSON)"
-    GW->>GW: "HMAC-SHA256 sign -> X-Auth-Sign"
-    GW->>Backend: "Pass through X-Auth-Principal + X-Auth-Sign"
-    Backend->>Backend: "Verify signature verify(principal, sign)"
-    Backend->>Backend: "Extract principal -> @PreAuthorize decision"
-    Backend-->>Client: Return unified response R
-```
+<AuthSequenceDiagram lang="en" />
 
 On the gateway side (`AuthenticGatewayFilter`): identity resolution is a blocking gRPC call, so it runs on the
 `boundedElastic` thread pool to keep the Netty event loop free. After resolving `PrincipalHeader`, it's serialized into
@@ -148,34 +142,7 @@ Many platforms make the "user" the root object of authentication, so service acc
 crammed into the user table. IoT DC3 flips that: the root identity is **`dc3_principal`**, and a user is just one of its
 types.
 
-```mermaid
-erDiagram
-    PRINCIPAL ||--o{ TENANT_MEMBERSHIP : "belongs to (multi-tenant)"
-    PRINCIPAL ||--o{ LOCAL_CREDENTIAL : "holds credential"
-    TENANT ||--o{ TENANT_MEMBERSHIP : "contains members"
-    PRINCIPAL {
-        long id
-        string principal_type "USER / SERVICE_ACCOUNT / SYSTEM"
-        string source_type "LOCAL / EXTERNAL / SYSTEM"
-        smallint enable_flag
-        smallint locked_flag
-    }
-    LOCAL_CREDENTIAL {
-        long id
-        long principal_id "foreign key to principal"
-        string login_name
-        string password_hash "hash string"
-        string password_algorithm "ARGON2ID / BCRYPT"
-        smallint require_password_change
-    }
-    TENANT_MEMBERSHIP {
-        long id
-        long tenant_id
-        long principal_id
-        string principal_type
-        string membership_status "ACTIVE / SUSPENDED / INVITED"
-    }
-```
+<AuthErDiagram lang="en" />
 
 - **`dc3_principal`** is the unified identity table. `principal_type` is one of `USER` (a person), `SERVICE_ACCOUNT` (a
   service account), or `SYSTEM` (a system identity).
@@ -201,16 +168,7 @@ Once verification yields the principal, the next question is "what can it do." I
 subject — role — resource" binding, but deliberately splits the scope of two legs: role assignment is **per tenant**,
 while resource authorization is **global**.
 
-```mermaid
-flowchart LR
-    P["principal<br/>(tenantId : principalId)"] --> RPB["dc3_role_principal_bind<br/>within tenant (has tenant_id)"]
-    RPB --> RRB["dc3_role_resource_bind<br/>global (no tenant_id)"]
-    RRB --> RES["dc3_resource<br/>resource_code = service:domain:scope"]
-    RES --> Cache["permission set cache<br/>key=(tenantId:principalId), TTL 5 min"]
-    Cache --> Decision{"@PreAuthorize decision"}
-    Decision -->|permission code hit| Allow["allow"]
-    Decision -->|"not found / load failure"| Deny["fail-closed -> 403"]
-```
+<AuthDecisionFlowDiagram lang="en" />
 
 The chain is: `dc3_role_principal_bind` (carries `tenant_id`, so it picks the roles this principal has *within that
 tenant*) → `dc3_role_resource_bind` (no `tenant_id`, so it maps roles to resources) → `dc3_resource` (a resource is a

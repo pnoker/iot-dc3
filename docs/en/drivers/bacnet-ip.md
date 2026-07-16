@@ -2,6 +2,11 @@
 title: BACnet/IP Driver
 ---
 
+<script setup>
+import BacnetIpDiagram from '../../.vitepress/theme/components/BacnetIpDiagram.vue'
+</script>
+
+
 # BACnet/IP Driver
 
 `dc3-driver-bacnet-ip` connects BACnet/IP devices to IoT DC3. It joins the network as a local BACnet device, discovers
@@ -36,12 +41,7 @@ remote devices and polling on a cron cycle; remote devices do not report on thei
 
 BACnet addressing is a three-level structure, and understanding it is understanding how to configure a Point:
 
-```mermaid
-flowchart LR
-  Drv["dc3-driver-bacnet-ip<br/>(local device, LocalDevice)"] -->|"broadcast discovery, remoteDeviceId"| Dev["remote device<br/>(device instance number)"]
-  Dev --> Obj["object<br/>(objectType + objectInstance)"]
-  Obj --> Prop["property<br/>(propertyId, e.g. PRESENT_VALUE)"]
-```
+<BacnetIpDiagram lang="en" />
 
 A physical device is identified by a unique **device instance number**; it contains a number of **objects** (such as
 `ANALOG_INPUT`, `BINARY_OUTPUT`), each located by "object type + object instance number"; and each object exposes

@@ -2,6 +2,11 @@
 title: 操作手册
 ---
 
+<script setup>
+import OperationIndexDiagram from '../../.vitepress/theme/components/OperationIndexDiagram.vue'
+</script>
+
+
 # 操作手册
 
 这页是操作手册的门户：按"接入设备 → 看数据 → 下命令 → 收告警 → AI 运营"
@@ -15,18 +20,7 @@ title: 操作手册
 平台的日常使用其实是一条线性任务流：先让一个驱动把现场设备接进来，确认能采到位号值；再下发读/写命令并验证回执；最后让规则引擎把异常变成告警，并可选地交给
 Agentic Center 做自然语言运营。每一步都依赖前一步的产物——没有在线的设备，就没有位号值；没有位号值，命令和告警都无从谈起。
 
-```mermaid
-flowchart LR
-  A["接设备<br/>(设备接入)"] --> B["看数据<br/>(位号值采集)"]
-  B --> C["下命令<br/>(读/写 point_command)"]
-  C --> D["收告警<br/>(规则与通知)"]
-  D --> E["AI 运营<br/>(Agentic Center)"]
-  A -.->|"对应页面"| A1["device-onboarding"]
-  B -.-> B1["data-commands"]
-  C -.-> C1["data-commands"]
-  D -.-> D1["alarms"]
-  E -.-> E1["agentic"]
-```
+<OperationIndexDiagram lang="zh" />
 
 图里实线是任务推进顺序，虚线指向承载该动作的文档页。前四步是平台核心功能，第五步（AI 运营）是可选的进阶能力。
 

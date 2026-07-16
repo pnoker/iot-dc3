@@ -2,6 +2,11 @@
 title: 串口 驱动
 ---
 
+<script setup>
+import SerialDiagram from '../../.vitepress/theme/components/SerialDiagram.vue'
+</script>
+
+
 # 串口 驱动
 
 `dc3-driver-serial` 把跑私有报文的 RS232/RS485/RS422 串口设备接入 IoT
@@ -146,20 +151,7 @@ HEX 字符串再作为命令参数传入。
 的[位号值 PointValue](../introduction/concepts/point-value)。串口驱动以 `dc3.driver.code = SerialDriver`
 注册，这是稳定的路由标识，平台据此把读/写命令分发到本驱动。
 
-```mermaid
-flowchart LR
-  Dev["串口设备<br/>RS232/RS485/RS422"]
-  subgraph Driver["dc3-driver-serial (SerialDriver)"]
-    Conn["SerialPortConnection<br/>jSerialComm 每设备一连接"]
-    Parser["SerialFrameParser<br/>定位帧/校验/切数据区"]
-    Fmt["formatValue<br/>HEX/ASCII/BINARY/FLOAT"]
-  end
-  PV["位号值 PointValue"]
-  Dev -->|"回包原始字节"| Conn
-  Conn --> Parser --> Fmt --> PV
-  PV -->|"写命令 sendCommand 渲染 ${value}"| Conn
-  Conn -->|"HEX 指令字节"| Dev
-```
+<SerialDiagram lang="zh" />
 
 按[驱动能力矩阵](./matrix)，本驱动的能力为：
 
@@ -181,7 +173,7 @@ CRC16/XOR/NONE 回包校验；连接按设备缓存，设备元数据 UPDATE/DEL
 
 1. 选 `Serial Port Driver` 创建[设备](../introduction/concepts/device)，driver 属性填 `port=/dev/ttyUSB0`、
    `baudRate=9600`、`dataBits=8`、`stopBits=1`、`parity=0`。
-2. 给设备绑定的[物模型](../introduction/concepts/profile)加一个温度[位号](../introduction/concepts/point)（`READ_ONLY`
+2. 给设备绑定的[模板](../introduction/concepts/profile)加一个温度[位号](../introduction/concepts/point)（`READ_ONLY`
    ），point 属性填 `sendCommand=01 03 00 00 00 01 84 0A`、`dataOffset=3`、`dataLength=2`、`dataFormat=BINARY`、
    `byteOrder=BIG`（不配 `frameHeader`，`dataOffset` 从回包第 0 字节数起，跳过 `01 03 02` 三个字节，正好落在数据区）。
 3. 启动驱动，30 秒内就能在[位号值](../introduction/concepts/point-value)里看到采集值。

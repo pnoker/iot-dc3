@@ -2,6 +2,13 @@
 title: AI Agent / MCP Integration
 ---
 
+<script setup>
+import McpFilterFlowDiagram from '../../.vitepress/theme/components/McpFilterFlowDiagram.vue'
+import McpOAuthSequenceDiagram from '../../.vitepress/theme/components/McpOAuthSequenceDiagram.vue'
+import McpConfirmSequenceDiagram from '../../.vitepress/theme/components/McpConfirmSequenceDiagram.vue'
+</script>
+
+
 # AI Agent / MCP Integration
 
 IoT DC3 turns the platform's entire HTTP surface into a single MCP (Model Context Protocol) tool catalog. An external AI
@@ -31,7 +38,7 @@ the first two.
 The tool catalog is generated, not hand-written. The auth center's `McpOpenApiAggregator` pulls the OpenAPI specs of the
 four centers — auth / manager / data / agentic — at runtime, joins them with `dc3_api` (`api_code` / `api_name`) and
 `dc3_resource` (`resource_code` / `permission_code`), creates one tool record per endpoint, and stores them in
-`dc3_mcp_tool_catalog`. The scale is roughly **150+ tools**, generated from **302+ OpenAPI operations** across the four
+`dc3_mcp_tool_catalog`. The scale is roughly **330+ tools**, generated from **330+ OpenAPI operations** across the four
 centers.
 
 Each tool has a **stable `tool_id`** (equal to `dc3_api.api_code`), formatted as
@@ -69,16 +76,7 @@ Being in the catalog doesn't mean the Agent can use it. Whether a tool is **visi
 it's **callable**, depends on OAuth verification first (to get the principal and scope), then on the intersection of
 RBAC, the connection allowlist, and the risk policy.
 
-```mermaid
-flowchart TB
-  Token["access_token<br/>(JWT: principal/scope/tenant/mcp_connection_id)"] --> Verify["Gateway introspection<br/>introspect (gRPC)"]
-  Verify --> Catalog["Tool catalog<br/>dc3_mcp_tool_catalog (~150+)"]
-  Catalog --> F1["① principal RBAC<br/>PermissionProvider.listPermissionCodes"]
-  F1 --> F2["② MCP connection allowlist<br/>dc3_mcp_connection_tool (enable_flag=0)"]
-  F2 --> F3["③ Risk policy<br/>HIGH hidden by default unless explicitly enabled"]
-  F3 --> F4["④ OAuth scope<br/>mcp:tools:list / call / call:high"]
-  F4 --> Visible["Visible / callable tool set<br/>(intersection)"]
-```
+<McpFilterFlowDiagram lang="en" />
 
 `tools/list` returns the intersection of three sets: **the principal's permission codes ∩ this MCP connection's
 allowlist ∩ the risk policy**. `tools/call` adds the OAuth scope and a per-call risk confirmation. So even if
@@ -130,24 +128,7 @@ hard-code a "permanent MCP key" in a script — it doesn't exist.
 The sequence below shows the whole path: the Agent gets a token, calls `/mcp`, and the gateway introspects and forwards
 the signed request.
 
-```mermaid
-sequenceDiagram
-  participant Agent as AI Agent
-  participant Auth as Auth Center dc3-center-auth
-  participant GW as Gateway dc3-gateway (/mcp)
-  participant Backend as Backend (manager/data/agentic)
-  Agent->>Auth: GET /oauth2/authorize (Auth Code + PKCE)
-  Auth-->>Agent: authorization_code (login + consent + select connection)
-  Agent->>Auth: POST /oauth2/token (code + code_verifier)
-  Auth-->>Agent: access_token + refresh_token
-  Agent->>GW: POST /mcp  with Bearer access_token  (tools/call)
-  GW->>Auth: introspect (gRPC) validate JWT + connection status
-  Auth-->>GW: tenantId·principalId·connectionId·scopes·active
-  GW->>GW: re-validate RBAC ∩ allowlist ∩ risk ∩ confirm
-  GW->>Backend: internal WebClient POST + X-Auth-Principal + HMAC signature
-  Backend-->>GW: unified response R business result
-  GW-->>Agent: MCP CallToolResult
-```
+<McpOAuthSequenceDiagram lang="en" />
 
 Note the gateway-to-backend hop. The gateway uses `McpGatewayClient.invokeBackend()` to go straight through an internal
 WebClient (**bypassing** the gateway's own routing), building `X-Auth-Principal` and applying an HMAC signature. The
@@ -223,20 +204,7 @@ Phase two: the Agent calls again with the `confirmId` + `idempotency_key`. The s
 `parameter_digest` matches the first call, the principal / connection / tool are unchanged, and it's consumed exactly
 once. `status=PENDING` is the SQL-layer concurrency guard, so a replayed `confirmId` loses the race.
 
-```mermaid
-sequenceDiagram
-  participant Agent as AI Agent
-  participant GW as Gateway /mcp
-  participant Auth as Auth Center
-  Agent->>GW: tools/call (HIGH tool, no confirmId)
-  GW->>Auth: authorization decision
-  Auth-->>GW: CONFIRM_REQUIRED + confirmId (TTL PT5M)
-  GW-->>Agent: confirmId
-  Agent->>GW: tools/call + confirmId + idempotency_key
-  GW->>Auth: validate (not expired / digest matches / consumed once)
-  Auth-->>GW: AUTHORIZED
-  GW-->>Agent: execute and return result
-```
+<McpConfirmSequenceDiagram lang="en" />
 
 The confirmation ticket is stored in `dc3_mcp_tool_confirmation` (`confirm_id`, `tool_id`, `parameter_digest`,
 `idempotency_key`, `status` PENDING/CONSUMED/EXPIRED, `ttl_expires`), with the TTL set by `dc3.mcp.confirm-ttl` (default

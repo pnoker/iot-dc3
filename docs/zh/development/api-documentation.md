@@ -2,6 +2,12 @@
 title: API 文档
 ---
 
+<script setup>
+import ApiDocFlowDiagram from '../../.vitepress/theme/components/ApiDocFlowDiagram.vue'
+import ApiDocSequenceDiagram from '../../.vitepress/theme/components/ApiDocSequenceDiagram.vue'
+</script>
+
+
 # API 文档
 
 IoT DC3 的 REST 接口文档由代码注解自动生成，经网关聚合成一个统一的 Swagger
@@ -21,14 +27,7 @@ Center / `dc3-center-data`）、智能中心（Agentic Center / `dc3-center-agen
 `dc3-gateway`）本身没有业务 Controller，它通过 `springdoc.swagger-ui.urls` 把这四份文档聚合到一个带服务下拉选择器的
 Swagger UI 里，对外只暴露一个入口。
 
-```mermaid
-flowchart LR
-  Browser["浏览器<br/>/swagger-ui.html"] --> GW["网关 dc3-gateway (:8000)<br/>聚合 Swagger UI"]
-  GW -->|"/v3/api-docs/auth"| Auth["鉴权中心 dc3-center-auth (:8300)<br/>group=auth"]
-  GW -->|"/v3/api-docs/manager"| Mgr["管理中心 dc3-center-manager (:8400)<br/>group=manager"]
-  GW -->|"/v3/api-docs/data"| Data["数据中心 dc3-center-data (:8500)<br/>group=data"]
-  GW -->|"/v3/api-docs/agentic"| Agentic["智能中心 dc3-center-agentic (:8600)<br/>group=agentic"]
-```
+<ApiDocFlowDiagram lang="zh" />
 
 分组靠两层配置完成：`dc3-common-web` 的 `SpringDocConfig` 提供全局元信息（标题、版本、联系人、许可证、安全方案），各业务模块在自己已扫描的包下声明
 `GroupedOpenApi` Bean，只扫描本模块 Controller。各中心服务的 `spring.webflux.base-path`（如 `/auth`、`/manager`）会加到文档路径前，例如
@@ -59,23 +58,7 @@ flowchart LR
 `DC3_SECURITY_KEY` 拼接后，作为 JWT 的 HMAC-SHA256 签名密钥；密码本身以明文提交（依赖 HTTPS 保护传输），由后端
 `PasswordUtil.verify` 用 Argon2id（不可用时回退 BCrypt）校验。
 
-```mermaid
-sequenceDiagram
-  participant Client as 客户端
-  participant GW as 网关 dc3-gateway
-  participant Auth as 鉴权中心 dc3-center-auth
-  Client->>GW: 取盐（tenant, name）
-  GW->>Auth: 转发取盐请求
-  Auth-->>Client: "salt 字符串 (建议 5 分钟内使用)"
-  Note over Client: "密码无需本地哈希，明文提交（依赖 HTTPS）"
-  Client->>GW: 换 token（tenant, name, salt, 明文密码）
-  GW->>Auth: 转发生成 token 请求
-  Auth-->>Client: "access token (12 小时有效)"
-  Client->>GW: "POST /api/v3/... 带 X-Auth-Tenant / X-Auth-Login / X-Auth-Token"
-  GW->>GW: 校验鉴权头，注入 principal 上下文
-  GW->>Auth: 下游按租户隔离 + 权限校验
-  Auth-->>Client: 返回统一响应 R
-```
+<ApiDocSequenceDiagram lang="zh" />
 
 实际调用形如下面这样（示例值仅作演示，`default`/`dc3` 是种子数据自带的默认租户与用户）：
 
@@ -172,7 +155,7 @@ ID，后续若需要这个 id，得用 `device/list` 按名称查回。需要 `d
 
 以鉴权中心 `TokenController` 为例，取盐接口标注 `riskLevel=LOW, destructive=false, idempotent=false, openWorld=false`，而生成
 token 接口标注 `riskLevel=HIGH`——两者都属公开端点、对 AI 工具目录隐藏（`hidden=true`），但风险等级如实区分。智能中心的
-`POST /api/v3/agentic/v1/chat/completions` 则标注
+`POST /api/v3/agentic/chat/completions` 则标注
 `riskLevel=MEDIUM, destructive=false, idempotent=false, openWorld=true`。
 
 聚合器还会从 HTTP 方法补出 `read_only_hint`（`GET` → 1，`POST` → 0），把全部提示位（`destructive_hint`/`idempotent_hint`/

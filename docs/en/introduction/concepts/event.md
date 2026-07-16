@@ -2,6 +2,11 @@
 title: Event
 ---
 
+<script setup>
+import EventRelationDiagram from '../../../.vitepress/theme/components/EventRelationDiagram.vue'
+import EventFlowDiagram from '../../../.vitepress/theme/components/EventFlowDiagram.vue'
+</script>
+
 # Event
 
 > **An event is a business occurrence reported proactively by a device**—a fault, an alert, a mode switch, a lifecycle
@@ -57,13 +62,7 @@ event parameter is exactly identical to a [Point](./point) data type.
 
 ## Relationship to Other Concepts
 
-```mermaid
-flowchart LR
-    PR["Profile"] -->|defines| EV["Event"]
-    EV -->|contains| EP["EventParam"]
-    DEV["Device"] -->|reports instance| REC[("dc3_event_history")]
-    REC -->|matches rule| AL[("dc3_entity_alarm")]
-```
+<EventRelationDiagram lang="en" />
 
 - The event **definition** hangs under the Profile, side by side with [Point](./point) and [Command](./command),
   together describing "what capabilities this kind of device has".
@@ -72,15 +71,7 @@ flowchart LR
 
 ## Reporting Path and Lifecycle
 
-```mermaid
-flowchart LR
-    D["Device"] --> DRV["Driver eventReportSender"]
-    DRV -->|EventReportDTO| MQ["RabbitMQ dc3.e.event"]
-    MQ --> DC["Data Center EventReportReceiver"]
-    DC -->|persist| REC[("dc3_event_history")]
-    DC -->|submit for evaluation| RULE["Alarm Rule Engine"]
-    RULE -->|matches| ALARM[("dc3_entity_alarm")]
-```
+<EventFlowDiagram lang="en" />
 
 A single report (`EventReportDTO`) carries: `recordId` (UUID), `deviceId`, `eventId`, `eventCode`, `eventTypeFlag`,
 `eventLevelFlag`, `paramValues`, `message`, `occurTime`. The data center first persists it as a **raw record** in

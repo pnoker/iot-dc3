@@ -2,6 +2,11 @@
 title: 第一个设备：端到端
 ---
 
+<script setup>
+import FirstDeviceDiagram from '../../.vitepress/theme/components/FirstDeviceDiagram.vue'
+</script>
+
+
 # 第一个设备：端到端
 
 这页带你用平台自带的 **virtual（虚拟）驱动**走通一条完整链路：从登录拿
@@ -15,16 +20,7 @@ token，到建模板、建位号、建设备、配属性，再到读实时位号
 整条黄金路径是一串前后依赖的 HTTP 调用，全部经过网关 `dc3-gateway`（`:8000`）这唯一入口。前两步换到 token，中间四步在管理中心（Manager
 Center）建好元数据，最后几步在数据中心（Data Center）读值与下发命令。先有这张全景图，后面每一步你都知道自己走到哪了。
 
-```mermaid
-flowchart LR
-  Login["登录拿 token<br/>POST /api/v3/auth/token/salt + /token/generate"] --> Profile["加模板 Profile<br/>POST /api/v3/manager/profile/add"]
-  Profile --> Point["加位号 Point<br/>POST /api/v3/manager/point/add"]
-  Point --> Device["加设备 Device<br/>POST /api/v3/manager/device/add"]
-  Device --> Config["配位号属性<br/>POST /api/v3/manager/point_attribute_config/add"]
-  Config --> Read["读实时值<br/>POST /api/v3/data/point_value/latest"]
-  Config --> Write["下发写命令<br/>POST /api/v3/data/point_command/write"]
-  Write --> Poll["轮询命令回执<br/>GET /api/v3/data/point_command_history/get_by_command_id"]
-```
+<FirstDeviceDiagram lang="zh" />
 
 ::: info 约定
 下文所有 `id`、token、返回值都是**示例**——你环境里生成的是雪花 ID（一长串数字），请用上一步真实返回的值替换。每个写接口返回的都是平台统一信封

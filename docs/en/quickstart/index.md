@@ -2,6 +2,11 @@
 title: Local Development from Source
 ---
 
+<script setup>
+import QuickstartIndexDiagram from '../../.vitepress/theme/components/QuickstartIndexDiagram.vue'
+</script>
+
+
 # Local Development from Source
 
 This page walks you through running IoT DC3 from source: bring up PostgreSQL and RabbitMQ with Compose, point the Java
@@ -33,14 +38,7 @@ the previous one: you need the infrastructure up before you can load the environ
 need the jars built before you can start the dev stack; and only once the services are up does it make sense to run
 tests.
 
-```mermaid
-flowchart LR
-  A["make up-db<br/>Start PostgreSQL + RabbitMQ"] -->|"Containers ready<br/>localhost:35432 / 35672"| B["source dc3/env/dev.env.sh<br/>Load local env vars"]
-  B -->|"Java processes point at localhost"| C["make package<br/>Multi-module build"]
-  C -->|"Produces per-service jars"| D["make up-dev<br/>Start local dev stack"]
-  D -->|"Center services running<br/>Gateway:8000"| E["make test<br/>Run unit tests"]
-  E -->|"Verified"| F["Onboard the first device"]
-```
+<QuickstartIndexDiagram lang="en" />
 
 Each step is expanded below, with both what to do and how to verify it.
 

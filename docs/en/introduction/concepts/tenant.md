@@ -2,6 +2,11 @@
 title: Tenant
 ---
 
+<script setup>
+import TenantRelationDiagram from '../../../.vitepress/theme/components/TenantRelationDiagram.vue'
+import TenantAuthDiagram from '../../../.vitepress/theme/components/TenantAuthDiagram.vue'
+</script>
+
 # Tenant
 
 > **A tenant is the isolation boundary for business data on the platform**—within a single deployment, company
@@ -57,13 +62,7 @@ By design a `SERVICE_ACCOUNT` belongs to only one tenant.
 
 ## Relationship to Other Concepts
 
-```mermaid
-flowchart LR
-    T["Tenant<br/>tenant_id"] -->|owns| DEV["Device / Point / Data"]
-    T -->|via membership| TM["TenantMembership"]
-    TM -->|N:1| P["Principal<br/>USER / SERVICE_ACCOUNT / SYSTEM"]
-    P -->|bound within tenant| ROLE["Role → resource code"]
-```
+<TenantRelationDiagram lang="en" />
 
 - Every business entity implementing `TenantOwned` (which provides `getTenantId()`) is owned by some tenant and is the
   subject on which isolation is applied.
@@ -75,12 +74,7 @@ flowchart LR
 Tenant isolation lands at the controller layer: after fetching, it compares the entity's `tenantId` against the caller's
 tenant, and cross-tenant access is reported as nonexistent or dropped.
 
-```mermaid
-flowchart LR
-    REQ["Request (token bound to tenantId)"] --> CTRL["Controller requireTenant()<br/>compare entity tenantId"]
-    CTRL -->|mismatch/absent| NF["NotFoundException → 404"]
-    CTRL -->|bulk| FT["filterTenant()<br/>drop non-tenant entries"]
-```
+<TenantAuthDiagram lang="en" />
 
 - **Controller layer (single by ID)**: after fetching an entity, `BaseController.requireTenant()` compares the entity's
   `tenantId` against the caller's tenant; on mismatch (or a missing entity) it throws `NotFoundException`, returning *

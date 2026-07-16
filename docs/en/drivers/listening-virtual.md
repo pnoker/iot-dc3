@@ -2,6 +2,11 @@
 title: Listening Virtual Driver
 ---
 
+<script setup>
+import ListeningVirtualDiagram from '../../.vitepress/theme/components/ListeningVirtualDiagram.vue'
+</script>
+
+
 # Listening Virtual Driver
 
 > `dc3-driver-listening-virtual` onboards TCP/UDP devices that push data into IoT DC3 on their own. The driver opens a
@@ -40,18 +45,7 @@ Before you start, two driver-specific concepts come first, since the config tabl
 
 Every packet has a fixed structure: a 22-byte device name + a 1-byte keyword + a variable-length payload.
 
-```mermaid
-flowchart LR
-  Dev["Device (GPS/sensor)"] -->|"TCP 6270 / UDP 6271"| Srv["Listening port<br/>Netty Server"]
-  Srv --> Parse["NettyServerHandler<br/>parse per frame"]
-  Parse -->|"first 22 bytes"| DevId["match device ID"]
-  Parse -->|"23rd byte"| Key["compare keyword key"]
-  Parse -->|"payload start..end"| Val["parse value by point name"]
-  DevId --> Send["pointValueSender"]
-  Key --> Send
-  Val --> Send
-  Send --> PV["PointValue"]
-```
+<ListeningVirtualDiagram lang="en" />
 
 - The first 22 bytes are the device name; the driver parses it into a [device](../introduction/concepts/device) ID via
   `Long.parseLong` (it must map one-to-one to a device on the platform).

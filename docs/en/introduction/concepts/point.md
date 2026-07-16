@@ -2,6 +2,10 @@
 title: Point
 ---
 
+<script setup>
+import PointRelationDiagram from '../../../.vitepress/theme/components/PointRelationDiagram.vue'
+</script>
+
 # Point
 
 > **A Point is a single data item**—one concrete quantity to be collected from, or written to, a class of devices. Its
@@ -80,14 +84,7 @@ The defaults `multiple = 1`, `baseValue = 0` mean the raw value equals the engin
 
 ## Relationship to Other Concepts
 
-```mermaid
-flowchart LR
-    PR["Profile"] -->|"defines"| PT["Point"]
-    PR -->|"defines"| CMD["Command"]
-    DEV["Device"] -->|"belongs to"| PR
-    DEV -->|"runtime value"| PV[("PointValue")]
-    PT -.->|"point_id"| PV
-```
+<PointRelationDiagram lang="en" />
 
 - A Point **definition** hangs under a [Profile](./profile), alongside [Command](./command) and [Event](./event),
   together describing "what capabilities this kind of device has."

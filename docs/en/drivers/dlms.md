@@ -2,6 +2,11 @@
 title: DLMS/COSEM Driver
 ---
 
+<script setup>
+import DlmsDiagram from '../../.vitepress/theme/components/DlmsDiagram.vue'
+</script>
+
+
 # DLMS/COSEM Driver
 
 `dc3-driver-dlms` connects DLMS/COSEM metering devices (electricity, water, gas, and heat meters) to IoT DC3: it targets
@@ -38,20 +43,7 @@ meter sends metering data out with standard semantics," sitting above the sensin
 below the platform layer (IoT DC3 aggregation). The diagram below places OBIS code-based addressing within a single
 collection:
 
-```mermaid
-flowchart LR
-  Meter["DLMS/COSEM meter<br/>object 1.0.1.8.0.255 = total active energy"]
-  subgraph Net["Network layer (DLMS/COSEM, IEC 62056)"]
-    Link["transport<br/>TCP port 4059 / serial"]
-    Cosem["COSEM object model<br/>OBIS code + attribute number"]
-  end
-  Drv["dc3-driver-dlms<br/>code=DlmsDriver"]
-  Plat["IoT DC3<br/>PointValue"]
-  Meter --- Link
-  Link --- Cosem
-  Cosem -->|"read attribute 2 by logicalName"| Drv
-  Drv -->|"collected value"| Plat
-```
+<DlmsDiagram lang="en" />
 
 The driver uses the **Gurux DLMS library** (`GXDLMSClient`) to build and decode DLMS frames, acting as a client over TCP
 or serial to connect to the meter, reading the matching attribute value by the OBIS code configured on each point and

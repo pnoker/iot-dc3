@@ -78,7 +78,7 @@ dc3-web/
 │       ├── home/      #   仪表盘
 │       ├── login/     #   登录
 │       ├── point/     #   位号管理
-│       ├── profile/   #   物模型管理
+│       ├── profile/   #   模板管理
 │       └── settings/  #   系统设置
 ├── tests/             # 测试（Vitest + Playwright）
 ├── vite.config.ts     # Vite 配置

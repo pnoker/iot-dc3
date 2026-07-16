@@ -2,6 +2,11 @@
 title: "Your First Device: End to End"
 ---
 
+<script setup>
+import FirstDeviceDiagram from '../../.vitepress/theme/components/FirstDeviceDiagram.vue'
+</script>
+
+
 # Your First Device: End to End
 
 This page walks you through a complete data path with the built-in **virtual driver**: log in to get a token, create a
@@ -19,16 +24,7 @@ The golden path is a chain of HTTP calls with front-to-back dependencies, all go
 `:8000`). The first two steps get a token. The next four build metadata in the Manager Center. The last two read values
 and send commands through the Data Center. Keep this map in mind — each step below tells you where you are in it.
 
-```mermaid
-flowchart LR
-  Login["Log in for token<br/>POST /api/v3/auth/token/salt + /token/generate"] --> Profile["Add Profile<br/>POST /api/v3/manager/profile/add"]
-  Profile --> Point["Add Point<br/>POST /api/v3/manager/point/add"]
-  Point --> Device["Add Device<br/>POST /api/v3/manager/device/add"]
-  Device --> Config["Configure Point Attributes<br/>POST /api/v3/manager/point_attribute_config/add"]
-  Config --> Read["Read Live Values<br/>POST /api/v3/data/point_value/latest"]
-  Config --> Write["Issue Write Command<br/>POST /api/v3/data/point_command/write"]
-  Write --> Poll["Poll Command Receipt<br/>GET /api/v3/data/point_command_history/get_by_command_id"]
-```
+<FirstDeviceDiagram lang="en" />
 
 ::: info Conventions
 All `id` values, tokens, and return values below are **examples**. Your environment generates snowflake IDs (long

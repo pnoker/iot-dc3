@@ -2,6 +2,11 @@
 title: Attribute & Config
 ---
 
+<script setup>
+import AttributeConfigRelationDiagram from '../../../.vitepress/theme/components/AttributeConfigRelationDiagram.vue'
+import AttributeConfigFlowDiagram from '../../../.vitepress/theme/components/AttributeConfigFlowDiagram.vue'
+</script>
+
 # Attribute & Config
 
 > **An Attribute is a [Driver](./driver)'s declaration of "which config items must be filled in to connect a device",
@@ -107,16 +112,7 @@ having different scopes.
 
 ## Relationship to other concepts
 
-```mermaid
-flowchart LR
-    DRV["Driver"] -->|"registers at startup"| DA["DriverAttribute"]
-    DRV -->|"registers at startup"| PA["PointAttribute"]
-    DEV["Device"] -->|"fills value"| DC["DriverAttributeConfig"]
-    DEV -->|"fills value per point"| PC["PointAttributeConfig"]
-    DA -.->|"attributeId"| DC
-    PA -.->|"attributeId"| PC
-    PT["Point"] -.->|"pointId"| PC
-```
+<AttributeConfigRelationDiagram lang="en" />
 
 Attributes hang under a driver and are referenced by device configs; a point config is additionally bound to a
 specific [Point](./point). At modeling time you define a [Profile](./profile) (with points, commands, events); at
@@ -124,13 +120,7 @@ onboarding time the driver declares attributes and the device fills configs — 
 
 ## Registration and configuration flow
 
-```mermaid
-flowchart LR
-    YML["application.yml<br/>attribute definitions"] -->|"reported at driver startup"| MGR["Manager persists<br/>Attribute tables"]
-    MGR -->|"loaded on device edit page"| UI["config matrix<br/>columns = Attribute"]
-    UI -->|"fill & save"| CFG["Config tables<br/>configValue"]
-    CFG -->|"applied at runtime"| RT["driver builds protocol payload"]
-```
+<AttributeConfigFlowDiagram lang="en" />
 
 1. The driver reads `driver-attribute` / `point-attribute` from `application.yml` and reports them at startup.
 2. The Manager inserts or updates the attribute definitions by unique key.

@@ -2,6 +2,11 @@
 title: TCP/UDP Driver
 ---
 
+<script setup>
+import TcpUdpDiagram from '../../.vitepress/theme/components/TcpUdpDiagram.vue'
+</script>
+
+
 # TCP/UDP Driver
 
 `dc3-driver-tcp-udp` connects any device that "exchanges a raw byte stream over a TCP or UDP port" to IoT DC3: for
@@ -87,17 +92,7 @@ parse as numbers (multi-byte values are governed by `byteOrder`, `BIG` for big-e
 
 The flow below strings together the key hops of "one poll" from sending the command to landing a value:
 
-```mermaid
-flowchart LR
-  Sched["driver SDK<br/>one poll every 30s"] --> Read["read()"]
-  Read -->|"protocol=TCP"| Tcp["sendTcp()<br/>reuse cached connection"]
-  Read -->|"protocol=UDP"| Udp["sendUdp()<br/>temporary DatagramSocket"]
-  Tcp --> Raw["raw reply HEX"]
-  Udp --> Raw
-  Raw --> Parse["parseFrame()<br/>slice by dataOffset/dataLength"]
-  Parse --> Conv["parseDataValue()<br/>convert by dataFormat + byteOrder"]
-  Conv --> PV["PointValue"]
-```
+<TcpUdpDiagram lang="en" />
 
 ### Write Command Attributes (`command-attribute`)
 

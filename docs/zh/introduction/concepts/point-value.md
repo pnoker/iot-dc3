@@ -2,6 +2,11 @@
 title: 位号值 PointValue
 ---
 
+<script setup>
+import PointValueRelationDiagram from '../../../.vitepress/theme/components/PointValueRelationDiagram.vue'
+import PointValueFlowDiagram from '../../../.vitepress/theme/components/PointValueFlowDiagram.vue'
+</script>
+
 # 位号值 PointValue
 
 > **位号值是某个[位号](./point)在某一时刻的一次取值快照**——"3 号水泵的出水温度在 14:05:03 这一瞬间是 25.3℃"。它归属
@@ -51,14 +56,7 @@ NULL，聚合查询用 `num_value IS NOT NULL` 直接跳过它们。
 
 ## 与其它概念的关系
 
-```mermaid
-flowchart LR
-    PR["物模型 Profile"] -->|定义| PT["位号 Point"]
-    DEV["设备 Device"] -->|归属| PR
-    DRV["驱动 Driver"] -->|采集| PV[("位号值 dc3_point_value")]
-    DEV -->|产生| PV
-    PT -->|取数| PV
-```
+<PointValueRelationDiagram lang="zh" />
 
 - 位号值由 `deviceId + pointId` 共同定位：**哪台设备**的**哪个测点**。
 - [位号](./point)给出列定义（类型、单位、换算规则），位号值是这列的一行行运行态取数。
@@ -66,14 +64,7 @@ flowchart LR
 
 ## 采集与上行链路
 
-```mermaid
-flowchart LR
-    D["设备"] --> DRV["驱动 采集 + 换算"]
-    DRV -->|"raw → cal → num"| MQ["RabbitMQ 位号值队列"]
-    MQ --> DC["数据中心"]
-    DC -->|"持久化"| TS[("TimescaleDB dc3_point_value")]
-    TS -->|"latest / 聚合查询"| APP["应用 / 看板"]
-```
+<PointValueFlowDiagram lang="zh" />
 
 驱动从设备读到 `rawValue`，按位号换算规则算出 `calValue`，能解析为数字时再填 `numValue`，连同 `deviceId` / `pointId` /
 `driverId` / `tenantId` / `createTime` 打包上行；数据中心把它**追加**写入 `dc3_point_value` 超表（hypertable，按

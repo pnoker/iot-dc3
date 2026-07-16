@@ -2,6 +2,11 @@
 title: Testing
 ---
 
+<script setup>
+import TestingDiagram from '../../.vitepress/theme/components/TestingDiagram.vue'
+</script>
+
+
 # Testing
 
 This page covers how the IoT DC3 backend layers its tests, when a test is required, and which command runs each layer.
@@ -34,21 +39,7 @@ entire chain.
 The diagram maps the three layers, each layer's scope and startup mode, and the command that triggers it. The
 executors (Surefire/Failsafe) and the gate (`DC3_E2E`) decide which layers a single `mvn` run reaches.
 
-```mermaid
-flowchart TB
-    subgraph E2E["E2E · Fewest · Slowest"]
-      E["dc3-e2e<br/>End-to-end business chain<br/>Command dispatch / Event routing / Time-series tables"]
-    end
-    subgraph IT["Integration · Medium · Medium speed"]
-      I["*IT.java (run by Failsafe)<br/>DAL / gRPC InProcess / Message contracts<br/>Real PostgreSQL / RabbitMQ / MQTT"]
-    end
-    subgraph UT["Unit · Most · Fastest"]
-      U["*Test.java (run by Surefire)<br/>Isolated business logic<br/>No Spring context startup"]
-    end
-    U -->|"make test"| I
-    I -->|"make test-it (needs container runtime)"| E
-    E -->|"make test-e2e (DC3_E2E=true + stack up)"| Done["Before merge: make coverage aggregates JaCoCo"]
-```
+<TestingDiagram lang="en" />
 
 ::: warning Integration and E2E require a container runtime
 Both `make test-it` and `make test-e2e` use Testcontainers to start PostgreSQL/TimescaleDB, RabbitMQ, and other

@@ -2,6 +2,11 @@
 title: Operations Manual
 ---
 
+<script setup>
+import OperationIndexDiagram from '../../.vitepress/theme/components/OperationIndexDiagram.vue'
+</script>
+
+
 # Operations Manual
 
 This page is the entry to the operations manual. It follows one main thread — onboard a device, see data, issue
@@ -21,18 +26,7 @@ into alarms, and you can optionally hand things off to the Agentic Center for na
 feeds the next — no online device means no point values, and without point values commands and alarms have nothing to
 act on.
 
-```mermaid
-flowchart LR
-  A["Onboard device<br/>(Device Onboarding)"] --> B["See data<br/>(Point Value Collection)"]
-  B --> C["Issue command<br/>(Read/Write point_command)"]
-  C --> D["Receive alarm<br/>(Rules and Notifications)"]
-  D --> E["AI Operations<br/>(Agentic Center)"]
-  A -.->|"Corresponding page"| A1["device-onboarding"]
-  B -.-> B1["data-commands"]
-  C -.-> C1["data-commands"]
-  D -.-> D1["alarms"]
-  E -.-> E1["agentic"]
-```
+<OperationIndexDiagram lang="en" />
 
 Solid lines are the task order; dashed lines point to the page that covers each action. The first four steps are the
 platform's core. The fifth, AI Operations, is optional.

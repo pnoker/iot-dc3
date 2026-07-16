@@ -2,6 +2,11 @@
 title: SNMP Driver
 ---
 
+<script setup>
+import SnmpDiagram from '../../.vitepress/theme/components/SnmpDiagram.vue'
+</script>
+
+
 # SNMP Driver
 
 `dc3-driver-snmp` connects SNMP-capable network and data-center devices to IoT DC3: it targets an OID on the device's
@@ -35,22 +40,7 @@ device.
 The typical use case is data-center and network monitoring — bandwidth, port up/down, CPU/memory utilization, room
 temperature/humidity, UPS battery, etc. Any SNMP-capable device can be managed once its OIDs are configured.
 
-```mermaid
-flowchart LR
-  subgraph DC3["IoT DC3"]
-    Drv["dc3-driver-snmp<br/>SNMP Manager (SNMP4J)"]
-  end
-  subgraph Net["Network-layer devices (SNMP Agent)"]
-    SW["Switch / Router"]
-    UPS["UPS / PDU"]
-    SRV["Server NIC"]
-  end
-  Drv -->|"GET oid (UDP 161)"| SW
-  Drv -->|"SET oid (UDP 161)"| UPS
-  SW -.->|"response: VariableBinding"| Drv
-  UPS -.-> Drv
-  SRV -.-> Drv
-```
+<SnmpDiagram lang="en" />
 
 ## Attribute configuration
 

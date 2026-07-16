@@ -2,6 +2,11 @@
 title: "Facade Modes: grpc and local"
 ---
 
+<script setup>
+import FacadeModesDiagram from '../../.vitepress/theme/components/FacadeModesDiagram.vue'
+</script>
+
+
 # Facade Modes: grpc and local
 
 Inter-center calls between center services — the Data Center asking the Manager Center for devices, the Agentic Center
@@ -44,19 +49,7 @@ Wiring relies on Spring Boot's `@ConditionalOnProperty`. The gRPC auto-configura
 effect only when `dc3.facade.mode=local`. For any given `*Facade` interface, the switch alone decides which
 implementation gets wired.
 
-```mermaid
-flowchart TB
-    Caller["Business code<br/>(injects the DeviceFacade interface)"] --> Iface["DeviceFacade<br/>protocol-neutral contract (facade-api)"]
-    Iface -.->|"dc3.facade.mode=grpc<br/>(default / matchIfMissing)"| Grpc["DeviceGrpcFacade<br/>(facade-grpc)"]
-    Iface -.->|"dc3.facade.mode=local"| Local["DeviceLocalFacade<br/>(facade-local-manager)"]
-    subgraph Distributed["grpc mode · distributed multi-process"]
-        Grpc -->|"cross-process gRPC :9400"| Mgr["Manager Center dc3-center-manager<br/>(separate process)"]
-        Mgr --> Svc1["DeviceService"]
-    end
-    subgraph Monolith["local mode · in-process monolith"]
-        Local -->|"in-process method call<br/>(no network)"| Svc2["DeviceService<br/>(same process)"]
-    end
-```
+<FacadeModesDiagram lang="en" />
 
 In the diagram, `9400` is the Manager Center's gRPC port (in grpc mode the Data Center reaches it across processes). In
 local mode the Manager Center's `DeviceService` lives in the same JVM as the caller, `DeviceLocalFacade` makes a direct

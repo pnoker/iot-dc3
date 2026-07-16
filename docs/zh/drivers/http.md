@@ -161,7 +161,7 @@ HTTP 方法只来自位号的 `method`，缺省时回退到硬编码的 `GET`，
 
 1. 选 `HTTP REST Client Driver` 创建[设备](../introduction/concepts/device)，驱动属性填
    `baseUrl=https://api.example.com`、`method=GET`、`timeout=5000`。
-2. 给设备绑定的[物模型](../introduction/concepts/profile)加一个温度[位号](../introduction/concepts/point)（
+2. 给设备绑定的[模板](../introduction/concepts/profile)加一个温度[位号](../introduction/concepts/point)（
    `pointTypeFlag=FLOAT`、`READ_ONLY`），位号属性填 `path=/api/v1/sensor/1`、`method=GET`、`responsePath=$.data.temperature`。
 3. 启动驱动，数秒内就能在[位号值](../introduction/concepts/point-value)里看到抽取出的 `25.6`（默认 `dev` profile 每 5
    秒采一轮）。

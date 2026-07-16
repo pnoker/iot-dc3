@@ -2,6 +2,11 @@
 title: 可观测性
 ---
 
+<script setup>
+import ObservabilityDiagram from '../../.vitepress/theme/components/ObservabilityDiagram.vue'
+</script>
+
+
 # 可观测性
 
 IoT DC3 的日志聚合与指标监控是一套**可选**栈：一条命令 `make up-optional` 拉起 EMQX、ELK（Elasticsearch + Logstash +
@@ -62,21 +67,7 @@ exporter 都**不对宿主机发布端口**，只在 `dc3net` 内部互通——
 服务以 JSON 文件形式落日志（消息风格见[日志规范](./logging)），落盘目录通过名为 `logs` 的 Docker 卷共享：核心栈把日志写进该卷，Logstash
 把同一个卷挂载到 `/usr/share/logstash/dc3/logs` 读取。Logstash 解析、打标后写入 Elasticsearch，最终在 Kibana 里检索。
 
-```mermaid
-flowchart LR
-  subgraph App["核心服务（dev/app 栈）"]
-    Svc["dc3-gateway / dc3-center-*<br/>JSON 文件日志"]
-    Metric["Micrometer 指标端点<br/>(/actuator/prometheus)"]
-  end
-  Svc -->|"共享卷 logs"| LS["Logstash<br/>dc3-logstash"]
-  LS --> ES[("Elasticsearch<br/>dc3-elasticsearch")]
-  ES --> KB["Kibana<br/>dc3-kibana (:5601)"]
-  Metric -->|"周期抓取 scrape"| Prom[("Prometheus<br/>dc3-prometheus (7d)")]
-  PgExp["postgres-exporter"] --> Prom
-  NgxExp["nginx-exporter"] --> Prom
-  Prom --> Graf["Grafana<br/>dc3-grafana (:3000)"]
-  Dev["现场设备 / MQTT 客户端"] -->|"MQTT 31883"| EMQX["EMQX<br/>dc3-emqx (dashboard 18083)"]
-```
+<ObservabilityDiagram lang="zh" />
 
 接入步骤就是把这条链路跑起来：
 

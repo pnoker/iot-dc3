@@ -2,6 +2,11 @@
 title: Data Intelligence & AIoT
 ---
 
+<script setup>
+import AiotDiagram from '../../.vitepress/theme/components/AiotDiagram.vue'
+</script>
+
+
 # Data Intelligence & AIoT
 
 Once data is collected and stored in the time-series database, the real value is only beginning: turning a flood of
@@ -55,16 +60,7 @@ Application-layer intelligence is not a single algorithm but a pipeline: **colle
 then feed the outcome back into collection to form a loop. The diagram below is the skeleton of this universal pattern —
 across industry, energy, buildings, and cities the concrete shape varies, but the loop structure is the same.
 
-```mermaid
-flowchart LR
-  Collect["Collect<br/>point-value stream / history store"] --> Analyze["Analyze / Model<br/>rules · stats · models · LLM"]
-  Analyze --> Decide["Decide<br/>excursion / anomaly / forecast / advice"]
-  Decide --> Act["Act<br/>alarm · notify · issue command"]
-  Act -->|"acts on the physical world"| Field["field device"]
-  Field -->|"new collected values"| Collect
-  Decide -.->|"human confirms high-risk action"| Human["operator"]
-  Human -.-> Act
-```
+<AiotDiagram lang="en" />
 
 Take the loop apart and every hop carries a trade-off:
 
@@ -185,7 +181,7 @@ gateway's risk gating below — see the [Agentic Center](../ai/agentic) for deta
 :::
 
 **Path two: [AI Agent / MCP](../ai/mcp) (exposing tools safely to external agents).** The gateway offers a JSON-RPC 2.0
-MCP Resource Server at `POST /mcp`; the tool catalog is auto-aggregated from the OpenAPI of the four centers (~150+
+MCP Resource Server at `POST /mcp`; the tool catalog is auto-aggregated from the OpenAPI of the four centers (~330+
 tools), with an external agent deciding which to call. It targets the "build your own agent and let the model
 orchestrate autonomously" scenario, with stricter constraints than the conversational path:
 

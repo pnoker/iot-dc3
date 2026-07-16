@@ -143,7 +143,7 @@ yml 中虽配了一条 `custom` cron（`0/5 * * * * ?`），但驱动的 `schedu
 
 1. 选 `Bluetooth LE Driver` 创建[设备](../introduction/concepts/device)，driver 属性填 `adapterName=hci0`、
    `deviceAddress=AA:BB:CC:DD:EE:FF`（`connectionTimeout` 当前未被读取，留默认即可）。
-2. 给设备绑定的[物模型](../introduction/concepts/profile)加一个温度[位号](../introduction/concepts/point)（`READ_ONLY`
+2. 给设备绑定的[模板](../introduction/concepts/profile)加一个温度[位号](../introduction/concepts/point)（`READ_ONLY`
    ），point 属性填 `serviceUuid`、`characteristicUuid` 为该温度特征的 UUID，`readFormat=FLOAT`、`byteOrder=LITTLE`（按外设手册定）。
 3. 启动驱动，30 秒内就能在[位号值](../introduction/concepts/point-value)里看到采集值。
 4. 若该位号需可写，给它配写[命令](../introduction/concepts/command)即可——写入复用该位号上已配的 `serviceUuid`/

@@ -2,6 +2,12 @@
 title: Time-Series Data & Stream Processing
 ---
 
+<script setup>
+import DataPipelineFlowDiagram from '../../.vitepress/theme/components/DataPipelineFlowDiagram.vue'
+import DataPipelineIngestDiagram from '../../.vitepress/theme/components/DataPipelineIngestDiagram.vue'
+</script>
+
+
 # Time-Series Data & Stream Processing
 
 The real test of the IoT platform layer is **how to store, compute over, and query an endless stream of point values**.
@@ -43,17 +49,7 @@ Getting time-series data right relies on a pipeline, not a single component. A t
 four stages: the acquisition side publishes readings to a **message bus** for decoupling, the consumer side **persists**
 the messages into time-series storage, and on top of that storage a **query** layer serves applications and algorithms.
 
-```mermaid
-flowchart LR
-  Dev["Field device<br/>sensor / actuator"] --> Acq["Acquisition<br/>driver / gateway"]
-  Acq -->|"batched push (backpressure)"| Bus["Message bus<br/>queue / topic"]
-  Bus --> Stream["Stream processing<br/>real-time aggregation / alarm eval"]
-  Bus --> Sink["Consume & persist"]
-  Sink --> TSDB[("Time-series DB<br/>hypertable / partitioned")]
-  TSDB -->|"downsample / retain"| Cold[("Cold data / compressed archive")]
-  TSDB --> Query["Query layer<br/>dashboard / API / AI"]
-  Stream --> Query
-```
+<DataPipelineFlowDiagram lang="en" />
 
 A few key technologies and trade-offs sit along this pipeline:
 
@@ -124,15 +120,7 @@ IoT DC3's [data plane](../architecture/data-plane) is one concrete implementatio
 value goes from device to queryable through exactly those four stages — "acquisition → message bus → consume & persist →
 cache/query":
 
-```mermaid
-flowchart LR
-  Drv["Driver<br/>dc3-driver-*"] -->|"exchange dc3.e.value<br/>routing dc3.r.value.point.{driver}"| Q["queue dc3.q.value.point<br/>TTL 7 days + DLX"]
-  Q --> Recv["PointValueReceiver<br/>dc3-center-data"]
-  Recv --> TS[("TimescaleDB hypertable<br/>dc3_point_value")]
-  Recv --> Cache[("Caffeine latest-value cache")]
-  TS --> API["read endpoints<br/>latest / list"]
-  Cache --> API
-```
+<DataPipelineIngestDiagram lang="en" />
 
 **Message bus: asynchronous RabbitMQ delivery + 7-day TTL + dead letters.** A point value a driver acquires is not
 written straight to the database; it is published to RabbitMQ's topic exchange `dc3.e.value`, and the data center
