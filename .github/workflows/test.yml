@@ -21,10 +21,10 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: liberica
           java-version: 21
@@ -38,7 +38,7 @@ jobs:
 
       - name: Upload surefire reports
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: surefire-reports
           path: '**/target/surefire-reports/'
@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload jacoco unit data
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: jacoco-unit-exec
           path: '**/target/jacoco.exec'
@@ -60,10 +60,10 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: liberica
           java-version: 21
@@ -84,7 +84,7 @@ jobs:
 
       - name: Upload failsafe reports
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: failsafe-reports
           path: '**/target/failsafe-reports/'
@@ -93,7 +93,7 @@ jobs:
 
       - name: Upload jacoco integration data
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: jacoco-it-exec
           path: '**/target/jacoco-it.exec'
@@ -109,10 +109,10 @@ jobs:
       - integration
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: liberica
           java-version: 21
@@ -120,13 +120,13 @@ jobs:
           cache-dependency-path: "**/pom.xml"
 
       - name: Download unit jacoco data
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: jacoco-unit-exec
           path: ./
 
       - name: Download integration jacoco data
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: jacoco-it-exec
           path: ./
@@ -138,7 +138,7 @@ jobs:
 
       - name: Upload aggregate report
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: jacoco-aggregate
           path: dc3-coverage/target/site/jacoco-aggregate/

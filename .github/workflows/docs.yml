@@ -30,18 +30,18 @@ jobs:
         working-directory: docs
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa
         with:
           package_json_file: docs/package.json
           run_install: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: 22
           cache: pnpm
@@ -54,7 +54,7 @@ jobs:
         run: pnpm run build
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
         with:
           path: docs/.vitepress/dist
 
@@ -67,4 +67,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128
