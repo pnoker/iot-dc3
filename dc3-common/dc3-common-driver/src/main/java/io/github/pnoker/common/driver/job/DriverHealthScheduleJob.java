@@ -52,6 +52,9 @@ public class DriverHealthScheduleJob extends QuartzJobBean {
 
     private final DriverSenderService driverSenderService;
 
+    /**
+     * Evaluates the current driver health and reports its state to the platform on each scheduled trigger.
+     */
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         DriverBO driver = driverMetadata.getDriver();

@@ -83,10 +83,12 @@ public class PointClient {
     }
 
     /**
-     * Point ID
+     * Performs a gRPC getById lookup scoped to the current tenant and driver,
+     * returning null after logging when the response is not OK, otherwise
+     * returning a {@link PointBO} built from the gRPC payload.
      *
      * @param id Point ID
-     * @return PointDTO
+     * @return PointBO
      */
     public PointBO getById(Long id) {
         GrpcPointQuery.Builder query = GrpcPointQuery.newBuilder();

@@ -52,6 +52,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointCommandReceiver {
 
+    /**
+     * Message schema version stamped on outgoing command results, used by the data center to drive compatibility handling.
+     */
     private static final int SCHEMA_VERSION = 1;
     private final DriverReadService driverReadService;
     private final DriverWriteService driverWriteService;
@@ -59,6 +62,15 @@ public class PointCommandReceiver {
     private final CommandDedupCache dedupCache;
     private final DeviceLockManager deviceLockManager;
 
+    /**
+     * Handles an incoming point command by validating the payload, rejecting duplicates,
+     * dispatching the read or write under a per-device lock, and sending a result receipt
+     * before acknowledging the delivery (or nack-ing for retry on transient failure).
+     *
+     * @param channel   RabbitMQ channel used to ack, nack, or reject the delivery
+     * @param message   Spring AMQP message carrying the delivery tag and redelivery flag
+     * @param entityDTO deserialized point command payload (type, command id, tenant, value)
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{pointCommandQueue.name}")
     public void pointCommandReceive(Channel channel, Message message, PointCommandDTO entityDTO) {

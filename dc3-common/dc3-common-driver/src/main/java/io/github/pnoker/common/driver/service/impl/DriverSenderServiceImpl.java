@@ -57,10 +57,19 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class DriverSenderServiceImpl implements DriverSenderService {
 
+    /**
+     * Tenant-scoped driver configuration (service name, health timeouts, etc.).
+     */
     private final DriverProperties driverProperties;
 
+    /**
+     * Runtime driver registration context (driver id / tenant id) stamped onto outbound payloads.
+     */
     private final DriverMetadata driverMetadata;
 
+    /**
+     * RabbitMQ publisher used to deliver every outbound message to the data-center exchanges.
+     */
     private final RabbitTemplate rabbitTemplate;
 
     @PostConstruct
@@ -73,6 +82,11 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         });
     }
 
+    /**
+     * Publish the driver's lifecycle state to the state exchange.
+     *
+     * @param entityDTO driver state payload
+     */
     @Override
     public void driverStateSender(DriverStateDTO entityDTO) {
         if (Objects.isNull(entityDTO)) {
@@ -82,6 +96,11 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 RabbitConstant.ROUTING_DRIVER_STATE_PREFIX + driverProperties.getService(), entityDTO);
     }
 
+    /**
+     * Publish a device lifecycle state to the state exchange.
+     *
+     * @param entityDTO device state payload
+     */
     @Override
     public void deviceStateSender(DeviceStateDTO entityDTO) {
         if (Objects.isNull(entityDTO)) {
@@ -91,23 +110,37 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 RabbitConstant.ROUTING_DEVICE_STATE_PREFIX + driverProperties.getService(), entityDTO);
     }
 
+    /**
+     * Report a device status using the configured default health timeout.
+     */
     @Override
     public void deviceStatusSender(Long deviceId, EntityStatusEnum status) {
         sendDeviceStatus(deviceId, status, driverProperties.getHealth().getDevice().getTimeout(),
                 driverProperties.getHealth().getDevice().getTimeoutUnit(), null);
     }
 
+    /**
+     * Report a device status with an explicit lease timeout.
+     */
     @Override
     public void deviceStatusSender(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit) {
         sendDeviceStatus(deviceId, status, timeout, timeoutUnit, null);
     }
 
+    /**
+     * Report a device status with an explicit lease timeout and structured description.
+     */
     @Override
     public void deviceStatusSender(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit,
                                    String stateDescription) {
         sendDeviceStatus(deviceId, status, timeout, timeoutUnit, stateDescription);
     }
 
+    /**
+     * Publish a driver-scoped alarm enriched with tenant/driver context from the registered driver.
+     *
+     * @param message human-readable alarm message
+     */
     @Override
     public void driverAlarmSender(String message) {
         DriverBO driver = driverMetadata.getDriver();
@@ -125,6 +158,12 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 RabbitConstant.ROUTING_DRIVER_ALARM_PREFIX + driverProperties.getService(), alarm);
     }
 
+    /**
+     * Publish a device-scoped alarm, stamping tenant/driver context when the driver is registered.
+     *
+     * @param deviceId target device
+     * @param message  human-readable alarm message
+     */
     @Override
     public void deviceAlarmSender(Long deviceId, String message) {
         if (Objects.isNull(deviceId)) {
@@ -144,6 +183,11 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 RabbitConstant.ROUTING_DEVICE_ALARM_PREFIX + driverProperties.getService(), alarm);
     }
 
+    /**
+     * Publish a single point value, filling tenant/driver context and attaching a publisher-confirm correlation.
+     *
+     * @param entityDTO point value payload
+     */
     @Override
     public void pointValueSender(PointValue entityDTO) {
         if (Objects.isNull(entityDTO)) {
@@ -176,6 +220,11 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
     }
 
+    /**
+     * Publish each point value in the supplied list individually.
+     *
+     * @param entityDTOList point value payloads, may be null
+     */
     @Override
     public void pointValueSender(List<PointValue> entityDTOList) {
         if (Objects.nonNull(entityDTOList)) {
@@ -183,6 +232,11 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
     }
 
+    /**
+     * Publish the result of a point-level command invocation.
+     *
+     * @param resultDTO point command result payload
+     */
     @Override
     public void pointCommandResultSender(PointCommandResultDTO resultDTO) {
         if (Objects.isNull(resultDTO)) {
@@ -192,6 +246,11 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 RabbitConstant.ROUTING_POINT_COMMAND_RESULT_PREFIX + driverProperties.getService(), resultDTO);
     }
 
+    /**
+     * Publish the result of a device-level command invocation.
+     *
+     * @param resultDTO command call result payload
+     */
     @Override
     public void commandResultSender(CommandCallResultDTO resultDTO) {
         if (Objects.isNull(resultDTO)) {
@@ -201,6 +260,11 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 RabbitConstant.ROUTING_COMMAND_RESULT_PREFIX + driverProperties.getService(), resultDTO);
     }
 
+    /**
+     * Publish a driver/device event report to the event exchange.
+     *
+     * @param entityDTO event report payload
+     */
     @Override
     public void eventReportSender(EventReportDTO entityDTO) {
         if (Objects.isNull(entityDTO)) {
@@ -243,7 +307,13 @@ public class DriverSenderServiceImpl implements DriverSenderService {
      */
     private static class PointValueCorrelation extends CorrelationData {
 
+        /**
+         * Device owning the point value, included so the NACK callback can log actionable context.
+         */
         final Long deviceId;
+        /**
+         * Point whose value failed to publish, included so the NACK callback can log actionable context.
+         */
         final Long pointId;
 
         PointValueCorrelation(String id, Long deviceId, Long pointId) {

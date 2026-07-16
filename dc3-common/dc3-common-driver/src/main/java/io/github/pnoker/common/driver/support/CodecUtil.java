@@ -63,6 +63,9 @@ public class CodecUtil {
 
     /**
      * Converts BCD bytes to a decimal string.
+     *
+     * @param bytes BCD bytes
+     * @return decimal string
      */
     public static String bcdBytesToString(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);
@@ -75,6 +78,9 @@ public class CodecUtil {
 
     /**
      * Converts a decimal string to BCD bytes.
+     *
+     * @param decimalString decimal string
+     * @return BCD bytes
      */
     public static byte[] strToBcdBytes(String decimalString) {
         int length = decimalString.length();
@@ -112,6 +118,9 @@ public class CodecUtil {
 
     /**
      * Converts bytes to a hexadecimal string.
+     *
+     * @param bytes byte array
+     * @return hexadecimal string
      */
     public static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();

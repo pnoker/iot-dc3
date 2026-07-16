@@ -39,8 +39,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MetadataEventListener implements ApplicationListener<MetadataEvent> {
 
+    /** Custom driver service that receives the forwarded metadata change events. */
     private final DriverCustomService driverCustomService;
 
+    /**
+     * Handles an internal metadata event and forwards device, point, driver, command and
+     * event changes to the custom driver service as a {@link MetadataEventDTO}.
+     *
+     * @param metadataEvent received metadata event
+     */
     @Override
     public void onApplicationEvent(MetadataEvent metadataEvent) {
         log.debug("Metadata event listener received: id={}, type={}", metadataEvent.getId(), metadataEvent.getMetadataType());

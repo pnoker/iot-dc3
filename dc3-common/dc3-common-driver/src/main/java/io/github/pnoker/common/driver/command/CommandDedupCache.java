@@ -34,6 +34,9 @@ import java.time.Duration;
 @Component
 public class CommandDedupCache {
 
+    /**
+     * Recently-seen command keys with bounded size and 5-minute expiry, used to suppress duplicate command processing.
+     */
     private final Cache<String, Boolean> cache = Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofMinutes(5))
             .maximumSize(50_000)

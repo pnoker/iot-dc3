@@ -43,6 +43,10 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveDriverProfileConfig implements EnvironmentPostProcessor {
 
+    /**
+     * Activates the {@code driver} Spring profile on startup unless explicitly disabled via
+     * {@code dc3.driver.auto-profile=false}.
+     */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         if (Boolean.FALSE.equals(environment.getProperty(EnvironmentConstant.DRIVER_AUTO_PROFILE, Boolean.class,

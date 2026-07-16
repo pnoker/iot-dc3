@@ -51,8 +51,11 @@ import java.time.Duration;
 @EnableConfigurationProperties({DriverProperties.class})
 public class DriverInitRunner implements ApplicationRunner {
 
+    /** Maximum number of driver registration attempts before giving up. */
     private static final int REGISTER_MAX_ATTEMPTS = 30;
+    /** Initial backoff delay before the first registration retry. */
     private static final Duration REGISTER_INITIAL_BACKOFF = Duration.ofSeconds(2);
+    /** Upper bound the doubling backoff delay is capped at. */
     private static final Duration REGISTER_MAX_BACKOFF = Duration.ofSeconds(30);
 
     private final DriverRegisterService driverRegisterService;
@@ -61,6 +64,13 @@ public class DriverInitRunner implements ApplicationRunner {
 
     private final DriverScheduleService driverScheduleService;
 
+    /**
+     * Runs the driver bootstrap sequence on startup: register with the manager center
+     * (with retry), execute custom initialization, then initialize scheduled tasks.
+     *
+     * @param args application arguments
+     * @throws Exception if registration ultimately fails or initialization errors out
+     */
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // Initialize driver registration and synchronize basic information with the

@@ -105,7 +105,9 @@ public final class ConnectionBackoff {
      * Immutable snapshot of the backoff state for a single device.
      */
     private static class State {
+        /** Wall-clock timestamp (ms) when the next connection attempt becomes permitted. */
         final long nextAttemptAt;
+        /** Current backoff delay (ms) used as the seed for the next failure's window. */
         final long delay;
 
         State(long nextAttemptAt, long delay) {
