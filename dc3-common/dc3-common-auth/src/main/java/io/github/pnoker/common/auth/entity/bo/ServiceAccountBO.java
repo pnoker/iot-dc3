@@ -45,6 +45,7 @@ public class ServiceAccountBO extends BaseBO implements TenantOwned {
 
     private Long principalId;
 
+    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private String serviceAccountName;

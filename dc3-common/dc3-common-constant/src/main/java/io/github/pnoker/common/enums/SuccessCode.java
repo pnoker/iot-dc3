@@ -42,8 +42,11 @@ public enum SuccessCode implements ResponseCode {
     UPDATE(200, "R200", "Updated successfully"),
     ;
 
+    @Getter(onMethod_ = {@Override})
     private final int httpStatus;
+    @Getter(onMethod_ = {@Override})
     private final String code;
+    @Getter(onMethod_ = {@Override})
     private final String remark;
 
 }

@@ -54,6 +54,7 @@ public class ModelProviderBO extends BaseBO implements TenantOwned {
 
     private EnableFlagEnum enableFlag;
 
+    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
 }

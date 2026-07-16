@@ -58,6 +58,7 @@ public class ActionBO extends BaseBO implements TenantOwned {
 
     private LocalDateTime expireTime;
 
+    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private Long userId;

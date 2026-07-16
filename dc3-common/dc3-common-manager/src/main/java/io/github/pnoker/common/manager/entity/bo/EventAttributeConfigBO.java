@@ -74,6 +74,7 @@ public class EventAttributeConfigBO extends BaseBO implements TenantOwned {
     /**
      * Tenant ID
      */
+    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     /**

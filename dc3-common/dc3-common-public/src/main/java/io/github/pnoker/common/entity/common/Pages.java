@@ -22,6 +22,7 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -38,6 +39,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@ToString
 @Schema(description = "Pagination parameters for data queries")
 public class Pages implements Serializable {
 

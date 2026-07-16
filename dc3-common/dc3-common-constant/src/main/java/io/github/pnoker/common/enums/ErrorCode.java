@@ -50,8 +50,11 @@ public enum ErrorCode implements ResponseCode {
     FAILURE(500, "R500", "Service exception"),
     ;
 
+    @Getter(onMethod_ = {@Override})
     private final int httpStatus;
+    @Getter(onMethod_ = {@Override})
     private final String code;
+    @Getter(onMethod_ = {@Override})
     private final String remark;
 
 }

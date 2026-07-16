@@ -68,6 +68,7 @@ public class RuleStateBO extends BaseBO implements TenantOwned {
 
     private RuleStateExt entityStateExt;
 
+    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
 }

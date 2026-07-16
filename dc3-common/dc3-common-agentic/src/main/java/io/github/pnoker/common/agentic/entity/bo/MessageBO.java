@@ -52,6 +52,7 @@ public class MessageBO extends BaseBO implements TenantOwned {
 
     private AgenticMessageStatusEnum status;
 
+    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private Long userId;
