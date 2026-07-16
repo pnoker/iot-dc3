@@ -320,7 +320,15 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
             }
             case "DINT" -> {
                 buf = ByteBuffer.allocate(4);
-                buf.order(ByteOrder.LITTLE_ENDIAN).putInt(Integer.parseInt(value));
+                try {
+
+                    buf.order(ByteOrder.LITTLE_ENDIAN).putInt(Integer.parseInt(value));
+
+                } catch (NumberFormatException e) {
+
+                    buf.order(ByteOrder.LITTLE_ENDIAN).putInt(0);
+
+                }
             }
             case "REAL" -> {
                 buf = ByteBuffer.allocate(4);

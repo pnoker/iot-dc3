@@ -264,10 +264,10 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
      */
     private Variable createVariable(String snmpType, String value) {
         return switch (snmpType.toUpperCase()) {
-            case "INTEGER", "INTEGER32" -> new org.snmp4j.smi.Integer32(Integer.parseInt(value));
-            case "UNSIGNED_INTEGER32", "GAUGE32", "COUNTER32" -> new org.snmp4j.smi.Gauge32(Long.parseLong(value));
-            case "COUNTER64" -> new org.snmp4j.smi.Counter64(Long.parseLong(value));
-            case "TIMETICKS" -> new org.snmp4j.smi.TimeTicks(Long.parseLong(value));
+            case "INTEGER", "INTEGER32" -> parseAsnInteger(value);
+            case "UNSIGNED_INTEGER32", "GAUGE32", "COUNTER32" -> new org.snmp4j.smi.Gauge32(parseAsnLong(value));
+            case "COUNTER64" -> new org.snmp4j.smi.Counter64(parseAsnLong(value));
+            case "TIMETICKS" -> new org.snmp4j.smi.TimeTicks(parseAsnLong(value));
             case "OID" -> new OID(value);
             case "IPADDRESS" -> new org.snmp4j.smi.IpAddress(value);
             case "NULL" -> new org.snmp4j.smi.Null();
@@ -312,4 +312,20 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
                 .issues(issues).build();
     }
 
+
+    private static org.snmp4j.smi.Integer32 parseAsnInteger(String value) {
+            try {
+                return new org.snmp4j.smi.Integer32(Integer.parseInt(value));
+            } catch (NumberFormatException e) {
+                return new org.snmp4j.smi.Integer32(0);
+            }
+        }
+
+        private static long parseAsnLong(String value) {
+            try {
+                return Long.parseLong(value);
+            } catch (NumberFormatException e) {
+                return 0L;
+            }
+        }
 }

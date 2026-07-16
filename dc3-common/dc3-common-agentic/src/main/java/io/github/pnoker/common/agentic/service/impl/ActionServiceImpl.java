@@ -216,7 +216,11 @@ public class ActionServiceImpl implements ActionService {
             return number.longValue();
         }
         if (Objects.nonNull(value)) {
-            return Long.valueOf(value.toString());
+            try {
+                return Long.valueOf(value.toString());
+            } catch (NumberFormatException e) {
+                throw new RequestException("Agentic action payload ID is not a valid number", e);
+            }
         }
         throw new RequestException("Agentic action payload is missing required ID");
     }

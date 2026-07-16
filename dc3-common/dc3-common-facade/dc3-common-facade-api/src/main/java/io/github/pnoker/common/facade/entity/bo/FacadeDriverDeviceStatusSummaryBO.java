@@ -75,14 +75,22 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
         if (Objects.isNull(value) || value.isBlank()) {
             return null;
         }
-        return Long.valueOf(value);
+        try {
+            return Long.valueOf(value);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private static int parseInt(String value) {
         if (Objects.isNull(value) || value.isBlank()) {
             return 0;
         }
-        return Integer.parseInt(value);
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     public Map<String, String> toMap() {
