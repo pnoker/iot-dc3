@@ -34,10 +34,12 @@ public class EventHandlerImpl implements EventHandler {
 
     private IJIComObject object = null;
 
+    @Override
     public String getIdentifier() {
         return this.identifier;
     }
 
+    @Override
     public synchronized IJIComObject getObject() {
         return this.object;
     }
@@ -47,6 +49,7 @@ public class EventHandlerImpl implements EventHandler {
         this.identifier = identifier;
     }
 
+    @Override
     public synchronized void detach() throws JIException {
         if (this.object != null && this.identifier != null) {
             try {

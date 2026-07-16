@@ -151,6 +151,7 @@ public class Server {
         final JISession destructSession = this.session;
         final Thread destructor = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 final long ts = System.currentTimeMillis();
                 try {

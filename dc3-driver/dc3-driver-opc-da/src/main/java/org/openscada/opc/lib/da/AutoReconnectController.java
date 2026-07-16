@@ -115,6 +115,7 @@ public class AutoReconnectController implements ServerConnectionStateListener {
         return this._state != AutoReconnectState.DISABLED;
     }
 
+    @Override
     public synchronized void connectionStateChanged(final boolean connected) {
         log.debug("Connection state changed: " + connected);
 
@@ -142,6 +143,7 @@ public class AutoReconnectController implements ServerConnectionStateListener {
 
         this._connectTask = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 boolean result = false;
                 try {

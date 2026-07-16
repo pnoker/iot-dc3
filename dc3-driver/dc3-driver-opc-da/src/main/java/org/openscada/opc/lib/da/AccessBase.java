@@ -164,6 +164,7 @@ public abstract class AccessBase implements ServerConnectionStateListener {
         }
     }
 
+    @Override
     public void connectionStateChanged(final boolean connected) {
         try {
             if (connected) {

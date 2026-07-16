@@ -96,9 +96,11 @@ public class Async20Access extends AccessBase implements IOPCDataCallback {
         super.stop();
     }
 
+    @Override
     public void cancelComplete(final int transactionId, final int serverGroupHandle) {
     }
 
+    @Override
     public void dataChange(final int transactionId, final int serverGroupHandle, final int masterQuality,
                            final int masterErrorCode, final KeyedResultSet<Integer, ValueData> result) {
         log.debug("dataChange - transId {}, items: {}", transactionId, result.size());
@@ -116,11 +118,13 @@ public class Async20Access extends AccessBase implements IOPCDataCallback {
         }
     }
 
+    @Override
     public void readComplete(final int transactionId, final int serverGroupHandle, final int masterQuality,
                              final int masterErrorCode, final KeyedResultSet<Integer, ValueData> result) {
         log.debug("readComplete - transId {}", transactionId);
     }
 
+    @Override
     public void writeComplete(final int transactionId, final int serverGroupHandle, final int masterErrorCode,
                               final ResultSet<Integer> result) {
         log.debug("writeComplete - transId {}", transactionId);
