@@ -30,14 +30,6 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:dc3}
     password: ${RABBITMQ_PASSWORD:}
-  grpc:
-    client:
-      channels:
-        dc3-center-manager:
-          address: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9400'
-          enable-keep-alive: true
-          keep-alive-without-calls: true
-          negotiation-type: PLAINTEXT
 
 logging:
   level:

@@ -50,18 +50,6 @@ spring:
           keep-alive-without-calls: true
           negotiation-type: PLAINTEXT
 
-dc3:
-  driver:
-    mqtt:
-      url: tcp://${MQTT_BROKER_HOST:dc3-rabbitmq}:${MQTT_BROKER_PORT:2883}
-      auth-type: USERNAME
-      username: ${MQTT_USERNAME:dc3}
-      password: ${MQTT_PASSWORD:}
-      topic-prefix: dc3/${spring.application.name}/
-      default-send-topic:
-        qos: 1
-        name: device
-
 logging:
   level:
     io.github.pnoker: DEBUG
