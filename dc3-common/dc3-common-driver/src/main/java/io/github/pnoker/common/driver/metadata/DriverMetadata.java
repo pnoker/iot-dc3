@@ -116,42 +116,91 @@ public final class DriverMetadata {
         }
     }
 
+    /**
+     * Replaces the contents of the device id set in place so existing references stay valid.
+     *
+     * @param deviceIds device identifiers to publish; {@code null} clears the set
+     */
     public void setDeviceIds(Set<Long> deviceIds) {
         replaceContents(this.deviceIds, deviceIds);
     }
 
+    /**
+     * Replaces the contents of the driver attribute map keyed by id in place so existing references stay valid.
+     *
+     * @param driverAttributeIdMap driver attributes to publish; {@code null} clears the map
+     */
     public void setDriverAttributeIdMap(Map<Long, DriverAttributeDTO> driverAttributeIdMap) {
         replaceContents(this.driverAttributeIdMap, driverAttributeIdMap);
     }
 
+    /**
+     * Replaces the contents of the driver attribute map keyed by code in place so existing references stay valid.
+     *
+     * @param driverAttributeNameMap driver attributes to publish; {@code null} clears the map
+     */
     public void setDriverAttributeNameMap(Map<String, DriverAttributeDTO> driverAttributeNameMap) {
         replaceContents(this.driverAttributeNameMap, driverAttributeNameMap);
     }
 
+    /**
+     * Replaces the contents of the point attribute map keyed by id in place so existing references stay valid.
+     *
+     * @param pointAttributeIdMap point attributes to publish; {@code null} clears the map
+     */
     public void setPointAttributeIdMap(Map<Long, PointAttributeDTO> pointAttributeIdMap) {
         replaceContents(this.pointAttributeIdMap, pointAttributeIdMap);
     }
 
+    /**
+     * Replaces the contents of the point attribute map keyed by code in place so existing references stay valid.
+     *
+     * @param pointAttributeNameMap point attributes to publish; {@code null} clears the map
+     */
     public void setPointAttributeNameMap(Map<String, PointAttributeDTO> pointAttributeNameMap) {
         replaceContents(this.pointAttributeNameMap, pointAttributeNameMap);
     }
 
+    /**
+     * Replaces the contents of the command attribute map keyed by id in place so existing references stay valid.
+     *
+     * @param commandAttributeIdMap command attributes to publish; {@code null} clears the map
+     */
     public void setCommandAttributeIdMap(Map<Long, CommandAttributeDTO> commandAttributeIdMap) {
         replaceContents(this.commandAttributeIdMap, commandAttributeIdMap);
     }
 
+    /**
+     * Replaces the contents of the command attribute map keyed by code in place so existing references stay valid.
+     *
+     * @param commandAttributeNameMap command attributes to publish; {@code null} clears the map
+     */
     public void setCommandAttributeNameMap(Map<String, CommandAttributeDTO> commandAttributeNameMap) {
         replaceContents(this.commandAttributeNameMap, commandAttributeNameMap);
     }
 
+    /**
+     * Replaces the contents of the event attribute map keyed by id in place so existing references stay valid.
+     *
+     * @param eventAttributeIdMap event attributes to publish; {@code null} clears the map
+     */
     public void setEventAttributeIdMap(Map<Long, EventAttributeDTO> eventAttributeIdMap) {
         replaceContents(this.eventAttributeIdMap, eventAttributeIdMap);
     }
 
+    /**
+     * Replaces the contents of the event attribute map keyed by code in place so existing references stay valid.
+     *
+     * @param eventAttributeNameMap event attributes to publish; {@code null} clears the map
+     */
     public void setEventAttributeNameMap(Map<String, EventAttributeDTO> eventAttributeNameMap) {
         replaceContents(this.eventAttributeNameMap, eventAttributeNameMap);
     }
 
+    /**
+     * Clears every metadata collection, sets the registered driver to {@code null}, and resets
+     * the driver status to {@link EntityStatusEnum#OFFLINE}.
+     */
     public void clear() {
         deviceIds.clear();
         driverAttributeIdMap.clear();

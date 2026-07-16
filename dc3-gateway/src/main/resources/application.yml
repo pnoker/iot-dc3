@@ -49,7 +49,6 @@ dc3:
 # Disabled in production via the shared application-web.yml "pro" block.
 springdoc:
   swagger-ui:
-    path: /swagger-ui.html
     urls:
       - name: Auth Center
         url: /v3/api-docs/auth
@@ -59,21 +58,6 @@ springdoc:
         url: /v3/api-docs/data
       - name: Agentic Center
         url: /v3/api-docs/agentic
-
-management:
-  endpoint:
-    health:
-      probes:
-        enabled: true
-  health:
-    livenessstate:
-      enabled: true
-    readinessstate:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: health,prometheus
 
 # Logging configuration
 logging:

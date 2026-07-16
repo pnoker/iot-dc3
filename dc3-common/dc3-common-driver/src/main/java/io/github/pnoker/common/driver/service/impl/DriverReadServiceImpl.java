@@ -49,14 +49,29 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DriverReadServiceImpl implements DriverReadService {
 
+    /**
+     * Source of cached device and driver/point configuration lookups used to validate the read request.
+     */
     private final DeviceMetadata deviceMetadata;
 
+    /**
+     * Source of cached point metadata (name, type, unit, etc.) for the point being read.
+     */
     private final PointMetadata pointMetadata;
 
+    /**
+     * Publishes the resolved point value downstream after a successful read.
+     */
     private final DriverSenderService driverSenderService;
 
+    /**
+     * Protocol-specific delegate that performs the actual read against the device.
+     */
     private final DriverCustomService driverCustomService;
 
+    /**
+     * Performs a single point read for the given device, applying backoff and publishing the resulting value.
+     */
     @Override
     public void read(Long deviceId, Long pointId) {
         if (!ConnectionBackoff.shouldAttempt(deviceId)) {

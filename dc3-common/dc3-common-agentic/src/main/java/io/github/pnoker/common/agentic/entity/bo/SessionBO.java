@@ -45,6 +45,7 @@ public class SessionBO extends BaseBO implements TenantOwned {
 
     private SessionExt sessionExt;
 
+    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private Long userId;

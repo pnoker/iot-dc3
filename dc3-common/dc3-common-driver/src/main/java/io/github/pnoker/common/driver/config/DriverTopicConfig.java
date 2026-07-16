@@ -46,12 +46,16 @@ import org.springframework.context.annotation.Bean;
 @RequiredArgsConstructor
 public class DriverTopicConfig {
 
+    /** Driver identity properties used to name queues and routing keys. */
     private final DriverProperties driverProperties;
 
+    /** Exchange for driver metadata synchronization events. */
     private final TopicExchange metadataExchange;
 
+    /** Exchange for point read and write commands. */
     private final TopicExchange pointCommandExchange;
 
+    /** Exchange for custom command calls. */
     private final TopicExchange commandExchange;
 
     /**

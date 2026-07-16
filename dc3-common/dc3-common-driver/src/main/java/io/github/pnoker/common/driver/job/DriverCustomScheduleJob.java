@@ -42,6 +42,9 @@ public class DriverCustomScheduleJob extends QuartzJobBean {
 
     private final DriverCustomService driverCustomService;
 
+    /**
+     * Runs the driver's custom scheduled task on each Quartz trigger, logging any failure without propagating it.
+     */
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         try {

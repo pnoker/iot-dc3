@@ -110,7 +110,7 @@ public class DashboardServiceImpl implements DashboardService {
     private static String enableKey(Object raw) {
         if (Objects.isNull(raw))
             return TopologyLimits.UNKNOWN_BUCKET;
-        Byte b = raw instanceof Number n ? n.byteValue() : Byte.parseByte(raw.toString());
+        Byte b = raw instanceof Number n ? n.byteValue() : parseByteSafe(raw.toString());
         EnableFlagEnum e = EnableFlagEnum.ofIndex(b);
         return Objects.isNull(e) ? TopologyLimits.UNKNOWN_BUCKET : e.name();
     }
@@ -128,7 +128,7 @@ public class DashboardServiceImpl implements DashboardService {
     private static String driverTypeKey(Object raw) {
         if (Objects.isNull(raw))
             return TopologyLimits.UNKNOWN_BUCKET;
-        Byte b = raw instanceof Number n ? n.byteValue() : Byte.parseByte(raw.toString());
+        Byte b = raw instanceof Number n ? n.byteValue() : parseByteSafe(raw.toString());
         DriverTypeEnum e = DriverTypeEnum.ofIndex(b);
         return Objects.isNull(e) ? TopologyLimits.UNKNOWN_BUCKET : e.name();
     }
@@ -678,4 +678,12 @@ public class DashboardServiceImpl implements DashboardService {
 
     }
 
+
+    private static Byte parseByteSafe(String s) {
+            try {
+                return Byte.parseByte(s);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
 }

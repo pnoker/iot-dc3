@@ -1362,7 +1362,11 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         if (StringUtils.isBlank(text)) {
             return null;
         }
-        return Long.parseLong(text);
+        try {
+            return Long.parseLong(text);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private Long numberClaim(Claims claims, String name) {
@@ -1370,7 +1374,11 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         if (value instanceof Number number) {
             return number.longValue();
         }
-        return Long.valueOf(String.valueOf(value));
+        try {
+            return Long.valueOf(String.valueOf(value));
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private String stringValue(Object value) {

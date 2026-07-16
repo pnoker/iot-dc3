@@ -46,6 +46,7 @@ public class SyncAccess extends AccessBase implements Runnable {
         super(server, period, logTag);
     }
 
+    @Override
     public void run() {
         while (this.active) {
             try {

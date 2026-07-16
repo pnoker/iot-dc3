@@ -42,10 +42,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DriverRegisterServiceImpl implements DriverRegisterService {
 
+    /** Driver configuration properties used to assemble the registration payload. */
     private final DriverProperties driverProperties;
 
+    /** gRPC client used to register the driver with the manager center. */
     private final DriverClient driverClient;
 
+    /**
+     * Registers this driver with the manager center using the configured driver
+     * properties.
+     */
     @Override
     public void initial() {
         try {

@@ -35,11 +35,13 @@ import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 
 /**
  * Implements session touch, query, update, and logical delete with chat memory cleanup.
@@ -102,7 +104,7 @@ public class SessionServiceImpl implements SessionService {
         sessionManager.removeById(entityDO.getId());
         int removedMessages = messageService.deleteByConversationId(conversationId);
         agenticChatMemory.clear(conversationId);
-        log.info("Agentic session removed, conversationId={}, messagesRemoved={}", conversationId, removedMessages);
+        log.info("Agentic session removed, conversationId={}, messagesRemoved={}", sanitize(conversationId), removedMessages);
     }
 
     @Override

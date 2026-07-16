@@ -64,6 +64,12 @@ public class DriverReadScheduleJob extends QuartzJobBean {
 
     private final ThreadPoolExecutor threadPoolExecutor;
 
+    /**
+     * Scheduled read job: concurrently reads every readable device's points via the
+     * driver read service and waits for all read tasks to finish.
+     *
+     * @param jobExecutionContext Quartz job execution context
+     */
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         Set<Long> deviceIds = driverMetadata.getDeviceIds();

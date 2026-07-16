@@ -69,6 +69,7 @@ public class ServerStateReader {
 
         this._job = this._scheduler.scheduleAtFixedRate(new Runnable() {
 
+            @Override
             public void run() {
                 once();
             }

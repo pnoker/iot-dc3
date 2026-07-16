@@ -50,12 +50,29 @@ import java.util.function.Function;
 @Slf4j
 public abstract class AbstractMetadataCache<V> {
 
+    /**
+     * Underlying Caffeine cache that loads values asynchronously on miss.
+     */
     private final AsyncLoadingCache<Long, V> cache;
 
+    /**
+     * Maximum time, in seconds, {@link #getCache(long)} blocks waiting for a load to finish.
+     */
     private final long loadTimeoutSeconds;
 
+    /**
+     * Short human-readable label used to identify this cache instance in log messages.
+     */
     private final String name;
 
+    /**
+     * Builds the underlying Caffeine {@link AsyncLoadingCache} from the supplied
+     * tuning properties, applying the loader asynchronously off the caller's thread.
+     *
+     * @param cacheProps tuning knobs (max size, load timeout, stats) for the new cache
+     * @param name       short label used in log lines to distinguish this cache
+     * @param loader     source-of-truth function invoked on cache miss for a given key
+     */
     protected AbstractMetadataCache(DriverProperties.MetadataProperties.CacheProperties cacheProps,
                                     String name,
                                     Function<Long, V> loader) {

@@ -57,8 +57,18 @@ import java.util.stream.Collectors;
 @Component
 public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
 
+    /** Shared driver-level metadata; pruned here of orphan device ids when the upstream loader returns {@code null}. */
     private final DriverMetadata driverMetadata;
 
+    /**
+     * Builds a device metadata cache backed by the supplied gRPC client and retains
+     * a reference to the shared driver metadata for orphan-id pruning.
+     *
+     * @param driverProperties driver runtime configuration supplying cache sizing
+     * @param driverMetadata   shared driver-level metadata used to drop orphan device
+     *                         ids when the upstream loader returns {@code null}
+     * @param deviceClient     gRPC client used to resolve a {@link DeviceBO} by id
+     */
     public DeviceMetadata(DriverProperties driverProperties,
                           DriverMetadata driverMetadata,
                           DeviceClient deviceClient) {
@@ -66,6 +76,11 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
         this.driverMetadata = driverMetadata;
     }
 
+    /**
+     * Drops the device id from {@link DriverMetadata#getDeviceIds()} when the upstream loader
+     * returns {@code null}, so the periodic read scan stops re-fetching a record the manager has
+     * already removed.
+     */
     @Override
     protected void postLoad(long id, DeviceBO value) {
         if (value == null) {

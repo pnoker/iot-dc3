@@ -37,4 +37,3 @@ spring:
 logging:
   level:
     io.github.pnoker: DEBUG
-    io.github.pnoker.driver.sdk: DEBUG

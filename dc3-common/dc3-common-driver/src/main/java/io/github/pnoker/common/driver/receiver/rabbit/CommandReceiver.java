@@ -59,6 +59,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CommandReceiver {
 
+    /**
+     * Message schema version stamped on outbound command results for forward/backward compatibility.
+     */
     private static final int SCHEMA_VERSION = 1;
     private final DriverCustomService driverCustomService;
     private final DriverSenderService driverSenderService;
@@ -67,6 +70,18 @@ public class CommandReceiver {
     private final CommandDedupCache dedupCache;
     private final DeviceLockManager deviceLockManager;
 
+    /**
+     * Dispatch a custom command call to the driver: validate the payload, drop
+     * expired calls, deduplicate by record id, execute the command under a
+     * per-device lock to prevent protocol interleaving, then send the result
+     * receipt back to the data center and ack. On failure the call is nacked
+     * with requeue unless this is a redelivery, in which case a FAILED result
+     * is reported and the message is acked.
+     *
+     * @param channel   the RabbitMQ channel used for ack/nack
+     * @param message   the inbound RabbitMQ message carrying the delivery tag and redelivery flag
+     * @param entityDTO the deserialized command call payload
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{commandQueue.name}")
     public void commandReceive(Channel channel, Message message, CommandCallDTO entityDTO) {
@@ -173,6 +188,13 @@ public class CommandReceiver {
         RabbitAckUtil.ack(channel, deliveryTag);
     }
 
+    /**
+     * Build a JSON snapshot of the command attribute config used for a call, for audit
+     * trail. Returns null when the config is empty.
+     *
+     * @param commandConfig the command attribute config map
+     * @return the JSON snapshot, or null
+     */
     private String buildConfigSnapshot(Map<String, AttributeBO> commandConfig) {
         if (Objects.isNull(commandConfig) || commandConfig.isEmpty()) {
             return null;
@@ -190,6 +212,14 @@ public class CommandReceiver {
         return JsonUtil.toJsonString(snapshot);
     }
 
+    /**
+     * Outcome of a command executed under the per-device lock, pairing the
+     * raw result values returned by the driver with a JSON snapshot of the
+     * command attribute config that produced them, captured for audit.
+     *
+     * @param resultValues   map of point name to value produced by the driver
+     * @param configSnapshot JSON snapshot of the command config in effect at execution time
+     */
     private record CommandExecutionResult(Map<String, String> resultValues, String configSnapshot) {
     }
 

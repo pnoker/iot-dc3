@@ -31,6 +31,7 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicReference;
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 
 /**
  * Default agentic chat orchestration service.
@@ -93,14 +95,14 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                                 assistantReasoningContent.toString(), userHeader);
                         log.info(
                                 "Agentic stream complete, conversationId={}, model={}, contentLen={}, finishReason={}",
-                                prepared.scopedConversationId(), prepared.model(), assistantContent.length(),
+                                prepared.scopedConversationId(), sanitize(prepared.model()), assistantContent.length(),
                                 lastFinishReason.get());
                     });
 
             Flux<ServerSentEvent<String>> initialEvents = Flux.fromIterable(responseCodec.initialEvents(prepared));
             Flux<ServerSentEvent<String>> responseEvents = runtimeEvents.onErrorResume(error -> {
                 log.warn("Agentic stream chat failed, conversationId={}, model={}",
-                        prepared.scopedConversationId(), prepared.model(), error);
+                        prepared.scopedConversationId(), sanitize(prepared.model()), error);
                 lastFinishReason.set(AgenticConstant.Chat.FINISH_REASON_ERROR);
                 prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
                 return Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created, AgenticStreamDelta.empty()))
@@ -137,7 +139,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             String assistantText = StringUtils.defaultString(result.content());
             messageRecorder.persistAssistantMessage(prepared, assistantText, userHeader);
             log.info("Agentic blocking complete, conversationId={}, model={}, contentLen={}, finishReason={}",
-                    prepared.scopedConversationId(), prepared.model(), assistantText.length(), result.finishReason());
+                    prepared.scopedConversationId(), sanitize(prepared.model()), assistantText.length(), result.finishReason());
 
             return responseCodec.blockingResponse(prepared, assistantText, result.finishReason());
         }).subscribeOn(Schedulers.boundedElastic());

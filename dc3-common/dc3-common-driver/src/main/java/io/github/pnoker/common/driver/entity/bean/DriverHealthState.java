@@ -59,22 +59,48 @@ public class DriverHealthState implements Serializable {
      */
     private String description;
 
+    /**
+     * Build a health state reporting that the driver is online.
+     *
+     * @return DriverHealthState instance
+     */
     public static DriverHealthState online() {
         return of(EntityStatusEnum.ONLINE);
     }
 
+    /**
+     * Build a health state reporting that the driver is offline.
+     *
+     * @return DriverHealthState instance
+     */
     public static DriverHealthState offline() {
         return of(EntityStatusEnum.OFFLINE);
     }
 
+    /**
+     * Build a health state reporting that the driver is under maintenance.
+     *
+     * @return DriverHealthState instance
+     */
     public static DriverHealthState maintain() {
         return of(EntityStatusEnum.MAINTAIN);
     }
 
+    /**
+     * Build a health state reporting that the driver is in a fault condition.
+     *
+     * @return DriverHealthState instance
+     */
     public static DriverHealthState fault() {
         return of(EntityStatusEnum.FAULT);
     }
 
+    /**
+     * Build a health state carrying the given driver status.
+     *
+     * @param status Driver state to report
+     * @return DriverHealthState instance
+     */
     public static DriverHealthState of(EntityStatusEnum status) {
         return DriverHealthState.builder()
                 .status(status)

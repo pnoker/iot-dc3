@@ -451,7 +451,17 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             case "INT32":
             case "UINT32": {
                 data = new byte[4];
-                int i = Integer.parseInt(value);
+                int i;
+
+                try {
+
+                    i = Integer.parseInt(value);
+
+                } catch (NumberFormatException e) {
+
+                    i = 0;
+
+                }
                 ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putInt(i);
                 break;
             }

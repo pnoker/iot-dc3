@@ -75,38 +75,94 @@ public class DeviceHealthState implements Serializable {
      */
     private String description;
 
+    /**
+     * Build an {@link EntityStatusEnum#ONLINE} health state with no per-device lease timeout (falls back to SDK config).
+     *
+     * @return a new {@link DeviceHealthState} using the default SDK lease fallback
+     */
     public static DeviceHealthState online() {
         return of(EntityStatusEnum.ONLINE, null, null);
     }
 
+    /**
+     * Build an {@link EntityStatusEnum#ONLINE} health state with a per-device lease timeout.
+     *
+     * @param timeout     per-device lease timeout value; {@code null} falls back to SDK config
+     * @param timeoutUnit unit of {@code timeout}; {@code null} falls back to SDK config
+     * @return a new {@link DeviceHealthState} carrying the configured timeout
+     */
     public static DeviceHealthState online(int timeout, TimeUnit timeoutUnit) {
         return of(EntityStatusEnum.ONLINE, timeout, timeoutUnit);
     }
 
+    /**
+     * Build an {@link EntityStatusEnum#OFFLINE} health state with no per-device lease timeout (falls back to SDK config).
+     *
+     * @return a new {@link DeviceHealthState} using the default SDK lease fallback
+     */
     public static DeviceHealthState offline() {
         return of(EntityStatusEnum.OFFLINE, null, null);
     }
 
+    /**
+     * Build an {@link EntityStatusEnum#OFFLINE} health state with a per-device lease timeout.
+     *
+     * @param timeout     per-device lease timeout value; {@code null} falls back to SDK config
+     * @param timeoutUnit unit of {@code timeout}; {@code null} falls back to SDK config
+     * @return a new {@link DeviceHealthState} carrying the configured timeout
+     */
     public static DeviceHealthState offline(int timeout, TimeUnit timeoutUnit) {
         return of(EntityStatusEnum.OFFLINE, timeout, timeoutUnit);
     }
 
+    /**
+     * Build a {@link EntityStatusEnum#MAINTAIN} health state with no per-device lease timeout (falls back to SDK config).
+     *
+     * @return a new {@link DeviceHealthState} using the default SDK lease fallback
+     */
     public static DeviceHealthState maintain() {
         return of(EntityStatusEnum.MAINTAIN, null, null);
     }
 
+    /**
+     * Build a {@link EntityStatusEnum#MAINTAIN} health state with a per-device lease timeout.
+     *
+     * @param timeout     per-device lease timeout value; {@code null} falls back to SDK config
+     * @param timeoutUnit unit of {@code timeout}; {@code null} falls back to SDK config
+     * @return a new {@link DeviceHealthState} carrying the configured timeout
+     */
     public static DeviceHealthState maintain(int timeout, TimeUnit timeoutUnit) {
         return of(EntityStatusEnum.MAINTAIN, timeout, timeoutUnit);
     }
 
+    /**
+     * Build a {@link EntityStatusEnum#FAULT} health state with no per-device lease timeout (falls back to SDK config).
+     *
+     * @return a new {@link DeviceHealthState} using the default SDK lease fallback
+     */
     public static DeviceHealthState fault() {
         return of(EntityStatusEnum.FAULT, null, null);
     }
 
+    /**
+     * Build a {@link EntityStatusEnum#FAULT} health state with a per-device lease timeout.
+     *
+     * @param timeout     per-device lease timeout value; {@code null} falls back to SDK config
+     * @param timeoutUnit unit of {@code timeout}; {@code null} falls back to SDK config
+     * @return a new {@link DeviceHealthState} carrying the configured timeout
+     */
     public static DeviceHealthState fault(int timeout, TimeUnit timeoutUnit) {
         return of(EntityStatusEnum.FAULT, timeout, timeoutUnit);
     }
 
+    /**
+     * Build a {@link DeviceHealthState} for the given status and per-device lease timeout.
+     *
+     * @param status      device status to report; must not be {@code null}
+     * @param timeout     per-device lease timeout value; {@code null} falls back to SDK config
+     * @param timeoutUnit unit of {@code timeout}; {@code null} falls back to SDK config
+     * @return a new {@link DeviceHealthState} populated via the Lombok builder
+     */
     public static DeviceHealthState of(EntityStatusEnum status, Integer timeout, TimeUnit timeoutUnit) {
         return DeviceHealthState.builder()
                 .status(status)

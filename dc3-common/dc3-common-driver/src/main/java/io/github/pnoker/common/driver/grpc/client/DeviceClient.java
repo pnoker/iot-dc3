@@ -108,7 +108,10 @@ public class DeviceClient {
     }
 
     /**
-     * Device ID
+     * Performs a gRPC getById lookup scoped to the current tenant and driver, returning
+     * null (after logging) when the response result is not OK, otherwise a DeviceBO
+     * populated with point ids and the driver, point, command and event attribute
+     * configuration maps.
      *
      * @param id Device ID
      * @return DeviceBO

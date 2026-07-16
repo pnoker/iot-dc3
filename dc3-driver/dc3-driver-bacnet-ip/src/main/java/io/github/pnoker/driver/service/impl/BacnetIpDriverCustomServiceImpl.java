@@ -217,7 +217,15 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
         }
         if (upperName.startsWith("MULTI_STATE_") || upperName.startsWith("DEVICE")) {
             try {
-                return new UnsignedInteger(Integer.parseInt(value));
+                try {
+
+                    return new UnsignedInteger(Integer.parseInt(value));
+
+                } catch (NumberFormatException e) {
+
+                    return new UnsignedInteger(0);
+
+                }
             } catch (NumberFormatException ignored) {
                 log.warn("BACnet write: multi-state/device value '{}' is not an integer, falling back to Real", value);
                 return new Real(Float.parseFloat(value));

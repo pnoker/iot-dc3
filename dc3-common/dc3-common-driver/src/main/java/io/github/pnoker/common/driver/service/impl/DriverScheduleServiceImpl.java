@@ -46,10 +46,16 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DriverScheduleServiceImpl implements DriverScheduleService {
 
+    /** Driver configuration properties supplying the schedule definitions. */
     private final DriverProperties driverProperties;
 
+    /** Quartz service used to create and register the scheduled jobs. */
     private final QuartzService quartzService;
 
+    /**
+     * Initializes the driver's scheduled jobs (driver health, device health, read and
+     * custom tasks) from the configured schedule properties.
+     */
     @Override
     public void initialize() {
         // Get schedule properties from driver configuration

@@ -141,7 +141,6 @@ public final class TypedValueConverter {
         };
     }
 
-    @SuppressWarnings("unchecked")
     /**
      * Convert a raw string value to the target scalar type, dispatching by type and
      * applying range/exactness validation on numeric values.
@@ -154,6 +153,7 @@ public final class TypedValueConverter {
      * @param <T>        the return type
      * @return the converted value
      */
+    @SuppressWarnings("unchecked")
     private static <T> T convert(String value, ScalarType type, String typeCode, Class<T> targetType, String label) {
         requireTarget(type, typeCode, targetType, label);
         return switch (type) {
@@ -363,6 +363,9 @@ public final class TypedValueConverter {
         return value.stripTrailingZeros().scale() <= 0;
     }
 
+    /**
+     * Set of supported scalar value types handled by the converter.
+     */
     private enum ScalarType {
         STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN
     }

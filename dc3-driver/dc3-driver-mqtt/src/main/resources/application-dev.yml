@@ -27,7 +27,6 @@ dc3:
       auth-type: USERNAME
       username: ${MQTT_USERNAME:dc3}
       password: ${MQTT_PASSWORD:}
-      topic-prefix: dc3/${dc3.driver.tenant}/${spring.application.name}/
       receive-topics:
         - qos: 1
           name: data

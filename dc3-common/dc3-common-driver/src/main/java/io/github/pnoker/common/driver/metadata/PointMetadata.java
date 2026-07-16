@@ -36,6 +36,15 @@ import org.springframework.stereotype.Component;
 @Component
 public final class PointMetadata extends AbstractMetadataCache<PointBO> {
 
+    /**
+     * Initializes the point metadata cache with the configured cache properties and a
+     * gRPC-based loader that fetches {@link PointBO} records by id.
+     *
+     * @param driverProperties driver configuration whose metadata cache properties
+     *                         (max size, load timeout, stats) drive the underlying
+     *                         {@link com.github.benmanes.caffeine.cache.AsyncLoadingCache}
+     * @param pointClient      gRPC client used to load point records on cache miss
+     */
     public PointMetadata(DriverProperties driverProperties, PointClient pointClient) {
         super(driverProperties.getMetadata().getCache(), "point", pointClient::getById);
     }

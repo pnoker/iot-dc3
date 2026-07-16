@@ -57,7 +57,11 @@ public class TopicServiceImpl implements TopicService {
         Long deviceIdL = null;
         if (Objects.nonNull(topic) && topic.length() > 0) {
             String[] parts = topic.split(SymbolConstant.SLASH);
-            deviceIdL = Long.parseLong(parts[parts.length - 1]);
+            try {
+                deviceIdL = Long.parseLong(parts[parts.length - 1]);
+            } catch (NumberFormatException e) {
+                deviceIdL = 0L;
+            }
         }
         String dName = topicQuery.getDeviceName();
         List<DeviceDO> deviceList = Db.lambdaQuery(DeviceDO.class)

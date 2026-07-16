@@ -67,6 +67,7 @@ public class NotifyHistoryBO extends BaseBO implements TenantOwned {
 
     private Integer retryCount;
 
+    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
 }

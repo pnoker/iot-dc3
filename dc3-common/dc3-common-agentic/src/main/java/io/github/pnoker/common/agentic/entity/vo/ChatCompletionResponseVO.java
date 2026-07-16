@@ -25,6 +25,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -89,6 +90,7 @@ public class ChatCompletionResponseVO {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @ToString
     public static class Message {
 
         @Schema(description = "Role of the message author; always 'assistant' for generated responses.", example = "assistant")
@@ -110,6 +112,7 @@ public class ChatCompletionResponseVO {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @ToString
     public static class Usage {
 
         @Schema(description = "Number of tokens consumed by the input prompt.", example = "42")

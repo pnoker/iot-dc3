@@ -41,6 +41,7 @@ import java.util.function.Supplier;
 @Component
 public class DeviceLockManager {
 
+    /** Per-device lock registry, keyed by device id; entries are created lazily and evicted when unreferenced. */
     private final ConcurrentHashMap<Long, LockRef> locks = new ConcurrentHashMap<>();
 
     /**
@@ -113,7 +114,9 @@ public class DeviceLockManager {
     }
 
     private static class LockRef {
+        /** The actual per-device ReentrantLock serializing commands for this device. */
         private final ReentrantLock lock = new ReentrantLock();
+        /** Reference count of in-flight callers; the entry is evicted once this drops to zero. */
         private int references;
     }
 

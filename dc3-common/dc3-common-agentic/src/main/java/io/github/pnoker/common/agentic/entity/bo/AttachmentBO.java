@@ -48,6 +48,7 @@ public class AttachmentBO extends BaseBO implements TenantOwned {
 
     private String filePath;
 
+    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private Long userId;

@@ -57,6 +57,7 @@ public class EventBO extends BaseBO implements TenantOwned {
 
     private EnableFlagEnum enableFlag;
 
+    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private String signature;

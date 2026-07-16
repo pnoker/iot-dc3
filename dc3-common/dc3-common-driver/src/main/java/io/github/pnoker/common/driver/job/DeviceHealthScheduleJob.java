@@ -68,6 +68,9 @@ public class DeviceHealthScheduleJob extends QuartzJobBean {
 
     private final DriverSenderService driverSenderService;
 
+    /**
+     * Iterates over every known device and renews its health lease by reporting current status.
+     */
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         Set<Long> deviceIds = driverMetadata.getDeviceIds();

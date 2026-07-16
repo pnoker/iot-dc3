@@ -39,21 +39,6 @@ dc3:
   facade:
     mode: local
 
-management:
-  endpoint:
-    health:
-      probes:
-        enabled: true
-  health:
-    livenessstate:
-      enabled: true
-    readinessstate:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: health,prometheus
-
 # Logging configuration
 logging:
   file:

@@ -98,6 +98,12 @@ public class PointValue implements Serializable {
      */
     private LocalDateTime createTime;
 
+    /**
+     * Builds a {@link PointValue} from a {@link ReadPointValue}, calculating the calibrated
+     * and numeric values and stamping the current time as the creation time.
+     *
+     * @param readPointValue source read point value
+     */
     public PointValue(ReadPointValue readPointValue) {
         CalculatedPointValue calculatedValue = readPointValue.calculate();
         this.deviceId = readPointValue.getDevice().getId();

@@ -50,16 +50,30 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DriverWriteServiceImpl implements DriverWriteService {
 
+    /** Driver-scoped metadata registry exposing the running driver's configuration. */
     private final DriverMetadata driverMetadata;
 
+    /** Device-scoped metadata cache providing device, profile and attribute lookups. */
     private final DeviceMetadata deviceMetadata;
 
+    /** Point-scoped metadata cache supplying point definitions and type information. */
     private final PointMetadata pointMetadata;
 
+    /** Custom protocol hook invoked to perform the device-specific write. */
     private final DriverCustomService driverCustomService;
 
+    /** Outbound sender used to publish acknowledged writes back to the platform. */
     private final DriverSenderService driverSenderService;
 
+    /**
+     * Resolves metadata for the device/point, invokes the custom driver write, and echoes
+     * the value back to the platform only when the device acknowledges the write.
+     *
+     * @param deviceId target device identifier
+     * @param pointId  target point identifier
+     * @param value    raw value to write to the device
+     * @return {@code true} when the driver acknowledged the write
+     */
     @Override
     public boolean write(Long deviceId, Long pointId, String value) {
         if (!ConnectionBackoff.shouldAttempt(deviceId)) {

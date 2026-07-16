@@ -1,0 +1,10 @@
+name: IoT DC3 CodeQL Configuration
+
+paths-ignore:
+  # Exclude Maven build output (protobuf-generated sources, compiled classes, etc.)
+  - "**/target/**"
+  # Exclude Node.js dependency directories
+  - "**/node_modules/**"
+  # Exclude docs build output
+  - "docs/.vitepress/dist/**"
+  - "docs/.vitepress/cache/**"

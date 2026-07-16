@@ -48,6 +48,13 @@ import java.util.Map;
 @Order(Ordered.LOWEST_PRECEDENCE - 100)
 public class DriverEnvironmentConfig implements EnvironmentPostProcessor {
 
+    /**
+     * Registers legacy {@code driver.*} → {@code dc3.*} property aliases and adds
+     * the driver node/service/host/client identifiers to the {@link ConfigurableEnvironment}.
+     *
+     * @param environment the Spring environment being customized
+     * @param application the current Spring application
+     */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         addLegacyDriverAliases(environment);

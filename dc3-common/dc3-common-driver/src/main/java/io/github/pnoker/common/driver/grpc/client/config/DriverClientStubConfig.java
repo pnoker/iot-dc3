@@ -36,16 +36,34 @@ import org.springframework.grpc.client.GrpcChannelFactory;
 @Configuration
 public class DriverClientStubConfig {
 
+    /**
+     * Provides a blocking stub for the driver API exposed by the manager center.
+     *
+     * @param channels gRPC channel factory used to create the manager service channel
+     * @return blocking stub bound to the manager driver service
+     */
     @Bean
     public DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub(GrpcChannelFactory channels) {
         return DriverApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
+    /**
+     * Provides a blocking stub for the device API exposed by the manager center.
+     *
+     * @param channels gRPC channel factory used to create the manager service channel
+     * @return blocking stub bound to the manager device service
+     */
     @Bean
     public DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub(GrpcChannelFactory channels) {
         return DeviceApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
+    /**
+     * Provides a blocking stub for the point API exposed by the manager center.
+     *
+     * @param channels gRPC channel factory used to create the manager service channel
+     * @return blocking stub bound to the manager point service
+     */
     @Bean
     public PointApiGrpc.PointApiBlockingStub pointApiBlockingStub(GrpcChannelFactory channels) {
         return PointApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));

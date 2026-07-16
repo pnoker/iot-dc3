@@ -37,6 +37,7 @@ import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.extern.slf4j.Slf4j;
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
@@ -116,7 +117,7 @@ public class ChatClientFactory {
         if (Objects.nonNull(defaultConfig) && StringUtils.isNotBlank(defaultConfig.getModel())) {
             if (StringUtils.isNotBlank(candidate)) {
                 log.warn("Agentic requested model is not configured, falling back to default model, requestedModel={}, defaultModel={}",
-                        candidate, defaultConfig.getModel());
+                        sanitize(candidate), defaultConfig.getModel());
             }
             return defaultConfig.getModel();
         }
@@ -147,7 +148,7 @@ public class ChatClientFactory {
             config = resolveDefaultConfig();
         }
         if (Objects.isNull(config)) {
-            log.debug("Agentic model config not found, using fallback ChatClient, model={}", model);
+            log.debug("Agentic model config not found, using fallback ChatClient, model={}", sanitize(model));
             return fallbackBuilder.build();
         }
         return getOrCreateByProvider(config.getProviderId());

@@ -24,6 +24,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -86,6 +87,7 @@ public class ChatCompletionChunkVO {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @ToString
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Delta {
 

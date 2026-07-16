@@ -152,9 +152,15 @@ public class DriverProperties {
     @Setter
     public static class MetadataProperties {
 
+        /**
+         * Caffeine cache settings for driver-side metadata lookups.
+         */
         @Valid
         private CacheProperties cache = new CacheProperties();
 
+        /**
+         * Caffeine-backed metadata cache tuning (size, lookup timeout, stats).
+         */
         @Getter
         @Setter
         public static class CacheProperties {

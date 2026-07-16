@@ -264,6 +264,20 @@ export default defineConfig({
     head: [
         ['link', {rel: 'icon', href: '/images/logo.svg', type: 'image/svg+xml'}],
         ['meta', {name: 'theme-color', content: '#1296db'}],
+        // Google Analytics (GA4)
+        ['script', {async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0S37KX68Y3'}],
+        ['script', {}, `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-0S37KX68Y3');`],
+        // Baidu Tongji (百度统计)
+        ['script', {}, `var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "https://hm.baidu.com/hm.js?bd41b7a1501a288245f375eaef8f97cc";
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();`],
         ['script', {}, LANG_DETECT]
     ],
 
