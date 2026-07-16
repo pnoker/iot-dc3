@@ -31,6 +31,7 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -169,7 +170,7 @@ public class NettyServerHandler {
             return Long.parseLong(deviceName);
         } catch (NumberFormatException ignored) {
             log.warn("Driver message skipped, protocol={}, remoteAddress={}, deviceName={}, reason=deviceIdInvalid", PROTOCOL,
-                    context.channel().remoteAddress(), deviceName);
+                    context.channel().remoteAddress(), sanitize(deviceName));
             return null;
         }
     }

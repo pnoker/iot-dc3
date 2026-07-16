@@ -34,6 +34,7 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 
 /**
  * Converts an API chat request into validated, tenant-scoped orchestration state.
@@ -92,7 +94,7 @@ public class AgenticChatRequestPreparer {
         if (!toolCallingEnabled) {
             log.warn(
                     "Agentic tool calling disabled for request, requestedModel={}, resolvedModel={}, globalEnabled={}, modelSupportsToolCall={}",
-                    request.getModel(), model, properties.isToolCallingEnabled(), modelSupportsToolCall);
+                    sanitize(request.getModel()), sanitize(model), properties.isToolCallingEnabled(), modelSupportsToolCall);
         }
         AgenticRunTrace runTrace = new AgenticRunTrace();
         Map<String, Object> toolContext = buildToolContext(userHeader, scopedConversationId, runTrace);
@@ -107,7 +109,7 @@ public class AgenticChatRequestPreparer {
 
         log.debug(
                 "Agentic chat request received, mode={}, requestedModel={}, resolvedModel={}, toolCallingEnabled={}, messageCount={}, conversationIdPresent={}, tenantId={}, userId={}",
-                mode, request.getModel(), model, toolCallingEnabled, request.getMessages().size(),
+                mode, sanitize(request.getModel()), sanitize(model), toolCallingEnabled, request.getMessages().size(),
                 StringUtils.isNotBlank(request.getConversationId()), userHeader.getTenantId(), userHeader.getUserId());
 
         touchSession(scopedConversationId, conversationId, userHeader, buildSessionExt(request, model));
