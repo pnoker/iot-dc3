@@ -107,6 +107,16 @@ public final class ConditionEvaluator {
         }
     }
 
+    /**
+     * Evaluate a numeric condition against the actual value, dispatching by operator
+     * ({@code > >= < <= == != between outside}). Returns false when the actual value or
+     * the required thresholds are null.
+     *
+     * @param operator  the comparison operator
+     * @param actual    the actual numeric value
+     * @param condition the condition carrying thresholds
+     * @return true if the condition is met
+     */
     private static boolean evaluateNumeric(String operator, BigDecimal actual, RuleExt.Condition condition) {
         if (Objects.isNull(actual)) {
             return false;
@@ -126,6 +136,15 @@ public final class ConditionEvaluator {
         };
     }
 
+    /**
+     * Evaluate a text condition against the actual value, dispatching by operator
+     * ({@code == eq != ne contains}).
+     *
+     * @param operator  the comparison operator
+     * @param value     the actual value
+     * @param condition the condition carrying the expected text
+     * @return true if the condition is met
+     */
     private static boolean evaluateText(String operator, Object value, RuleExt.Condition condition) {
         String actual = Objects.toString(value, "");
         String expected = Objects.toString(condition.getExpected(), "");
@@ -137,6 +156,14 @@ public final class ConditionEvaluator {
         };
     }
 
+    /**
+     * Return whether an operator is numeric: the comparison and range operators always
+     * are; {@code ==}/{@code !=} are numeric only when a threshold is set.
+     *
+     * @param operator  the operator
+     * @param condition the condition
+     * @return true if the operator is numeric
+     */
     private static boolean isNumericOperator(String operator, RuleExt.Condition condition) {
         return switch (operator) {
             case ">", ">=", "<", "<=", "between", "outside" -> true;

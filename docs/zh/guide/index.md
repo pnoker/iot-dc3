@@ -2,6 +2,11 @@
 title: 部署运维
 ---
 
+<script setup>
+import GuideIndexDiagram from '../../.vitepress/theme/components/GuideIndexDiagram.vue'
+</script>
+
+
 # 部署运维
 
 把 IoT DC3 从一台开发机的 `java -jar`
@@ -30,14 +35,7 @@ title: 部署运维
 四个子页各管一段运维生命周期：先把服务**起起来**（部署与镜像源），再让它**看得见**（可观测性、日志），最后在出问题时**修得动**
 （故障排查）。
 
-```mermaid
-flowchart LR
-  Start["你在这<br/>部署运维门户"] --> Deploy["部署模式与镜像源<br/>compose 编排 / global·cn 镜像源"]
-  Deploy --> Obs["可观测性<br/>Grafana / Prometheus / ELK"]
-  Deploy --> Log["日志规范<br/>控制台彩色 + 滚动 JSON"]
-  Obs --> Trouble["故障排查<br/>端口 / DB / MQ / 401·403 / 驱动注册"]
-  Log --> Trouble
-```
+<GuideIndexDiagram lang="zh" />
 
 - **[部署模式与镜像源](./usage)** — 容器镜像选择、镜像仓库切换、Compose 编排。`make` 选择镜像源用 `REGISTRY`（`auto`/
   `global`/`cn`），`global` 走默认仓库、`cn` 走中国大陆镜像；最快验证起栈是 `make up-db`，国内网络改用 `make up-db-cn`。

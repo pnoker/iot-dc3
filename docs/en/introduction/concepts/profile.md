@@ -2,9 +2,14 @@
 title: Profile (Thing Model)
 ---
 
-# Profile (Thing Model)
+<script setup>
+import ProfileRelationDiagram from '../../../.vitepress/theme/components/ProfileRelationDiagram.vue'
+import ProfileLifecycleDiagram from '../../../.vitepress/theme/components/ProfileLifecycleDiagram.vue'
+</script>
 
-> **A Profile is the "capability template for one kind of device"**—it aggregates
+# Profile (Thing Model) <Badge type="tip" text="Thing Model+" />
+
+> **A Profile is the "capability template for one kind of device"** <Badge type="tip" text="Thing Model+" />—it aggregates
 > the [Points](./point), [Commands](./command), and [Events](./event) shared by devices of the same model, describing "
 > what this kind of device can sample, control, and report". A [Device](./device) belongs to exactly one Profile, and
 > many
@@ -19,9 +24,31 @@ that device instances merely reference.
 
 An analogy with product vs. physical units: a Profile is like a "product spec sheet / factory specification", and a
 device is like "one physical unit manufactured to that spec". You write the spec once and can build many units from it.
-In its own domain language DC3 names this template `Profile` rather than the industry-generic `Product` / `ThingModel`
-—different name, but it plays exactly the "product / thing model" role (see
+
+::: tip How Profile relates to the "Thing Model"
+The "Thing Model" is a common industry design for modeling device capabilities. DC3's **Profile** is a **peer
+abstraction**—both answer "what capabilities does a kind of device have". DC3 did not adopt the `Product` / `ThingModel`
+naming; it chose **Profile**, and its capabilities are **stronger** than a typical thing model: a Profile supports
+[sharing scopes](#enumerations) (reuse across tenant / driver / user), version evolution, a weakly-structured `profileExt`
+extension, and more—more flexible than the fixed "one product, one thing model" structure. Think of it as
+**Profile ⊇ Thing Model**: anything a thing model can express, a Profile can too, but not vice versa (see
 the [design philosophy](../../architecture/domain-model)).
+:::
+
+**Profile vs. Thing Model (see the "plus" at a glance):**
+
+| Dimension        | Thing Model (industry-generic) | Profile (DC3) <Badge type="tip" text="Thing Model+" />        |
+|------------------|--------------------------------|--------------------------------------------------------------|
+| Positioning      | An abstraction for device-capability modeling | Peer abstraction, stronger (a superset)       |
+| Capability set   | Properties / services / events | [Points](./point) / [Commands](./command) / [Events](./event) |
+| Reuse scope      | Usually fixed per product      | Three sharing scopes: tenant / driver / user (`profileShareFlag`) |
+| Versioning       | Typically no explicit version  | Explicit `version`, queryable and evolvable                  |
+| Extension fields | Relatively fixed structure     | `profileExt` weakly-structured extension (can carry category / tags) |
+| Creation source  | —                              | `profileTypeFlag`: system / driver / user                    |
+| Device binding   | Implementation-dependent       | Exactly one (`Device.profileId`, single foreign key)         |
+
+> In one line: **a Profile is the enhanced version of a thing model**—it keeps the peer "capability template for a class
+> of devices" abstraction and layers platform capabilities (sharing, versioning, extension) on top.
 
 **Three pairs that are easy to confuse:**
 
@@ -75,14 +102,7 @@ rather than reading a field on `ProfileBO`.
 
 ## Relationship with other concepts
 
-```mermaid
-flowchart LR
-    PR["Profile"] -->|"aggregates"| PT["Point"]
-    PR -->|"aggregates"| CMD["Command"]
-    PR -->|"aggregates"| EV["Event"]
-    DEV["Device"] -->|"profileId single FK"| PR
-    DEV -->|"connect"| DRV["Driver"]
-```
+<ProfileRelationDiagram lang="en" />
 
 A Profile is the owning root of three kinds of capability—[Point](./point), [Command](./command), and [Event](./event)
 —which side by side answer "what this kind of device can do". A [Device](./device) binds **exactly one** Profile via
@@ -91,12 +111,7 @@ its [Driver](./driver), orthogonal to the Profile.
 
 ## Lifecycle
 
-```mermaid
-flowchart LR
-    A["Model: create Profile<br/>add Point/Command/Event"] --> B["Reuse: many Devices<br/>bind the same profileId"]
-    B --> C["Run: devices sample/<br/>command/report per template"]
-    C --> D["Evolve: change capabilities<br/>bump version"]
-```
+<ProfileLifecycleDiagram lang="en" />
 
 First create the Profile and fill in its points / commands / events, then have many devices of the same model bind it;
 at runtime devices sample point values, receive commands, and report events according to the template; when capabilities

@@ -2,6 +2,11 @@
 title: Observability
 ---
 
+<script setup>
+import ObservabilityDiagram from '../../.vitepress/theme/components/ObservabilityDiagram.vue'
+</script>
+
+
 # Observability
 
 Log aggregation and metrics monitoring in IoT DC3 are an **optional** stack: a single command, `make up-optional`,
@@ -74,21 +79,7 @@ shared through a Docker volume named `logs`: the core stack writes into this vol
 `/usr/share/logstash/dc3/logs` to read from it. Logstash parses and tags the logs, writes them to Elasticsearch, and you
 search them in Kibana.
 
-```mermaid
-flowchart LR
-  subgraph App["Core services (dev/app stack)"]
-    Svc["dc3-gateway / dc3-center-*<br/>JSON file logs"]
-    Metric["Micrometer metrics endpoint<br/>(/actuator/prometheus)"]
-  end
-  Svc -->|"shared volume logs"| LS["Logstash<br/>dc3-logstash"]
-  LS --> ES[("Elasticsearch<br/>dc3-elasticsearch")]
-  ES --> KB["Kibana<br/>dc3-kibana (:5601)"]
-  Metric -->|"periodic scrape"| Prom[("Prometheus<br/>dc3-prometheus (7d)")]
-  PgExp["postgres-exporter"] --> Prom
-  NgxExp["nginx-exporter"] --> Prom
-  Prom --> Graf["Grafana<br/>dc3-grafana (:3000)"]
-  Dev["Field devices / MQTT clients"] -->|"MQTT 31883"| EMQX["EMQX<br/>dc3-emqx (dashboard 18083)"]
-```
+<ObservabilityDiagram lang="en" />
 
 To run the chain:
 

@@ -197,6 +197,13 @@ public class DecodeUtil {
         return HexFormat.of().parseHex(content);
     }
 
+    /**
+     * Strip the leading sign byte that {@code BigInteger.toByteArray()} prepends for
+     * positive numbers, so RSA modulus/exponent encodings stay clean for Base64-URL.
+     *
+     * @param bytes the raw big-integer bytes
+     * @return the bytes without the leading zero sign byte
+     */
     private static byte[] stripLeadingZero(byte[] bytes) {
         if (bytes.length > 1 && bytes[0] == 0) {
             return Arrays.copyOfRange(bytes, 1, bytes.length);

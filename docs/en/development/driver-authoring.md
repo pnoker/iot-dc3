@@ -2,6 +2,15 @@
 title: Driver Development
 ---
 
+<script setup>
+import DriverAuthoringStateDiagram from '../../.vitepress/theme/components/DriverAuthoringStateDiagram.vue'
+import DriverAuthoringFlow1Diagram from '../../.vitepress/theme/components/DriverAuthoringFlow1Diagram.vue'
+import DriverAuthoringFlow2Diagram from '../../.vitepress/theme/components/DriverAuthoringFlow2Diagram.vue'
+import DriverAuthoringSeqDiagram from '../../.vitepress/theme/components/DriverAuthoringSeqDiagram.vue'
+import DriverAuthoringFlow3Diagram from '../../.vitepress/theme/components/DriverAuthoringFlow3Diagram.vue'
+</script>
+
+
 # Driver Development
 
 Drivers are the southbound I/O layer of IoT DC3. They bring heterogeneous protocol devices — Modbus, OPC UA, MQTT, S7,
@@ -60,17 +69,7 @@ backoff** — starting at 2 seconds, doubling each time, capped at 30 seconds, u
 it throw and exit. Without this retry, a brief blip in the management center would drag the driver into
 CrashLoopBackOff.
 
-```mermaid
-stateDiagram-v2
-  [*] --> STARTING : process starts DriverInitRunner.run()
-  STARTING --> REGISTERING : registerWithRetry()
-  REGISTERING --> REGISTERING : registration failed<br/>exponential backoff 2s→30s, up to 30 attempts
-  REGISTERING --> INITIAL : registration succeeded<br/>driverCustomService.initial()
-  REGISTERING --> [*] : still failing after 30 attempts, throw and exit
-  INITIAL --> SCHEDULING : driverScheduleService.initialize()
-  SCHEDULING --> RUNNING : read/custom/health tasks wired up
-  RUNNING --> RUNNING : periodic read() + periodic status report
-```
+<DriverAuthoringStateDiagram lang="en" />
 
 Source: `dc3-common/dc3-common-driver/.../init/DriverInitRunner.java` (`REGISTER_MAX_ATTEMPTS=30`,
 `REGISTER_INITIAL_BACKOFF=2s`, `REGISTER_MAX_BACKOFF=30s`). `initial()` runs only once at startup — use it to build
@@ -81,13 +80,7 @@ connection pools and subscriptions. `schedule()` fires on the cron defined in `d
 The work for a new driver concentrates in four places: copy the template, edit `pom.xml`, edit `application.yml`, and
 implement `DriverCustomService`. The diagram shows the overall path, expanded step by step afterward.
 
-```mermaid
-flowchart LR
-  A["copy template<br/>dc3-driver-virtual → dc3-driver-knx"] --> B["edit pom.xml<br/>inherit dc3-driver parent module<br/>add protocol library dependency"]
-  B --> C["edit application.yml<br/>dc3.driver code/name<br/>driver/point-attribute"]
-  C --> D["implement DriverCustomService<br/>read() / write() / schedule()..."]
-  D --> E["package + run<br/>auto-register with management center"]
-```
+<DriverAuthoringFlow1Diagram lang="en" />
 
 ### Step 1: Copy the template and rename
 
@@ -230,14 +223,7 @@ health's `enabled` defaults to `false` and must be explicitly set to `true` to t
 The attribute registration chain: `dc3.driver` in `application.yml` → SDK parses it into a `RegisterBO` → submitted to
 the management center over gRPC. The diagram shows the entity relationships of this flow:
 
-```mermaid
-flowchart LR
-  YML["application.yml<br/>dc3.driver.*-attribute"] --> Props["DriverProperties<br/>(SDK binding)"]
-  Props --> Reg["RegisterBO<br/>code/name/service/tenant + attribute definitions"]
-  Reg -->|"gRPC"| MGR["management center dc3-center-manager"]
-  MGR --> DB[("dc3_driver_attribute<br/>dc3_point_attribute")]
-  MGR --> UI["management-side rendering<br/>device/point config forms"]
-```
+<DriverAuthoringFlow2Diagram lang="en" />
 
 ### Step 4: Implement `DriverCustomService`
 
@@ -320,44 +306,12 @@ gRPC plumbing yourself.
 `PointCommandReceiver` deduplicates them, locks per device, then calls your `read()` or `write()` in turn and sends the
 result back to the data center.
 
-```mermaid
-sequenceDiagram
-  participant Quartz as Quartz read scheduler
-  participant Meta as DriverMetadata cache
-  participant Impl as DriverCustomService.read()
-  participant MQ as RabbitMQ
-  participant Data as data center dc3-center-data
-
-  Note over Quartz,Data: Outbound: periodic collection
-  Quartz->>Meta: iterate this driver's devices
-  Meta-->>Quartz: deviceIds
-  Quartz->>Impl: read(driverConfig, pointConfig, device, point)
-  Impl-->>Quartz: ReadPointValue
-  Quartz->>MQ: pointValueSender(PointValue)
-  MQ->>Data: persist to dc3_point_value
-
-  Note over Data,Impl: Inbound: write command
-  Data->>MQ: dispatch dc3.e.point_command
-  MQ->>Impl: write(..., WritePointValue)
-  Impl-->>MQ: Boolean(true/false)
-  MQ->>Data: pointCommandResultSender(result)
-```
+<DriverAuthoringSeqDiagram lang="en" />
 
 Inbound write handling on the driver side is not a bare `write()` call — it is a pipeline with validation,
 deduplication, and locking. The diagram below expands `PointCommandReceiver`'s pipeline, including error paths:
 
-```mermaid
-flowchart TB
-  In["command received<br/>dc3.q.point_command.{service}"] --> Exp{"expired?<br/>now past expireAt"}
-  Exp -->|yes| Expired["mark EXPIRED, ack"]
-  Exp -->|no| Dedup{"dedup hit?<br/>Caffeine 5 minutes"}
-  Dedup -->|hit| Dup["mark DUPLICATE, ack"]
-  Dedup -->|miss| Lock["lock per device<br/>DeviceLockManager (ReentrantLock)"]
-  Lock --> Exec["execute read() / write()"]
-  Exec -->|success| OK["return result SUCCESS/FAILED"]
-  Exec -->|exception, first delivery| Nack["nack requeue + release dedup"]
-  Exec -->|exception, redelivery| Fail["return result FAILED + ack<br/>avoid infinite loop"]
-```
+<DriverAuthoringFlow3Diagram lang="en" />
 
 The send side goes through `DriverSenderService` (source `DriverSenderService.java`). Common methods:
 

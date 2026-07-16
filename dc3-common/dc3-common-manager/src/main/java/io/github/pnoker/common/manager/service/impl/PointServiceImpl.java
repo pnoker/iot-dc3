@@ -255,7 +255,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public Long getPointByDeviceId(Long deviceId) {
+    public Long getCountByDeviceId(Long deviceId) {
         DeviceDO deviceDO = deviceMapper.selectById(deviceId);
         if (Objects.isNull(deviceDO) || Objects.isNull(deviceDO.getProfileId())) {
             return 0L;
@@ -381,6 +381,11 @@ public class PointServiceImpl implements PointService {
         return duplicate;
     }
 
+    /**
+     * Validate that the point's profile belongs to the same tenant.
+     *
+     * @param entityBO the point to validate
+     */
     private void validateTenantRelations(PointBO entityBO) {
         ProfileBO profileBO = profileService.getById(entityBO.getProfileId());
         if (Objects.isNull(profileBO) || !Objects.equals(entityBO.getTenantId(), profileBO.getTenantId())) {
@@ -388,6 +393,11 @@ public class PointServiceImpl implements PointService {
         }
     }
 
+    /**
+     * Publish a device-update metadata event to each affected device's driver.
+     *
+     * @param deviceIds the devices that changed
+     */
     private void publishDeviceUpdateEvents(Collection<Long> deviceIds) {
         if (CollectionUtils.isEmpty(deviceIds)) {
             return;
@@ -397,6 +407,12 @@ public class PointServiceImpl implements PointService {
                         driverServiceNamesByDeviceId(deviceId))));
     }
 
+    /**
+     * Resolve the union of driver service names serving the given devices.
+     *
+     * @param deviceIds the devices to look up drivers for
+     * @return the set of driver service names
+     */
     private Set<String> driverServiceNamesByDeviceIds(Collection<Long> deviceIds) {
         if (CollectionUtils.isEmpty(deviceIds)) {
             return Collections.emptySet();
@@ -407,6 +423,12 @@ public class PointServiceImpl implements PointService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Resolve the driver service name serving a single device.
+     *
+     * @param deviceId the device to look up
+     * @return the driver service name, or empty when none
+     */
     private Set<String> driverServiceNamesByDeviceId(Long deviceId) {
         if (Objects.isNull(deviceId)) {
             return Collections.emptySet();
@@ -419,6 +441,12 @@ public class PointServiceImpl implements PointService {
         return Set.of(driverBO.getServiceName());
     }
 
+    /**
+     * List the device ids sharing a profile.
+     *
+     * @param profileId the profile id
+     * @return the device ids
+     */
     private List<Long> listDeviceIdsByProfileId(Long profileId) {
         if (Objects.isNull(profileId)) {
             return Collections.emptyList();

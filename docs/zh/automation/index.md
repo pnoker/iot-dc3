@@ -2,6 +2,11 @@
 title: 自动化
 ---
 
+<script setup>
+import AutomationIndexDiagram from '../../.vitepress/theme/components/AutomationIndexDiagram.vue'
+</script>
+
+
 # 自动化
 
 确定性的、可重复的程序化操作，用 `dc3` CLI 完成——不涉及大模型，结果可预测、可脚本化。AI 栏目（Agentic 中心、MCP）解决"
@@ -19,15 +24,7 @@ title: 自动化
 - **脚本与 CI**——批量建设备、定时拉历史、把平台操作编进部署流水线。
 - **AI 编码工具**——让 Claude Code、Codex、Gemini CLI 等经 shell 调用平台；每条命令都支持 `--format json`，输出可供程序可靠解析。
 
-```mermaid
-flowchart LR
-    Human["人 / 运维"] --> CLI["dc3 CLI"]
-    Script["脚本 / CI"] --> CLI
-    AICoder["AI 编码工具"] --> CLI
-    CLI -->|"X-Auth-Tenant / Login / Token"| GW["网关 dc3-gateway :8000"]
-    GW --> RBAC["RBAC + 租户校验<br/>dc3-center-auth"]
-    RBAC --> Svc["管理 / 数据中心"]
-```
+<AutomationIndexDiagram lang="zh" />
 
 CLI 的鉴权用登录令牌：先取盐、再换 12 小时有效的 access token，每个请求带 `X-Auth-Tenant` / `X-Auth-Login` / `X-Auth-Token`
 三个鉴权头。和 AI 栏目一样，CLI 拿不到比登录账号更多的权限，跨租户数据看不到（返回 404 而非数据）。

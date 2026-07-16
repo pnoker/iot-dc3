@@ -109,6 +109,12 @@ public class NotifyWorker {
         }
     }
 
+    /**
+     * Dispatch a notify task: resolve and validate the channel, find its adapter, send
+     * the payload, then persist the terminal or retrying result.
+     *
+     * @param task the notify task to dispatch
+     */
     private void dispatch(NotifyTaskDTO task) {
         NotifyChannelBO channel = loadChannel(task.getChannelId(), task.getTenantId());
         if (Objects.isNull(channel)) {
@@ -161,6 +167,14 @@ public class NotifyWorker {
         notifyTaskSender.publish(retry);
     }
 
+    /**
+     * Load a notify channel by id, requiring it to belong to the tenant and carry a
+     * channel type.
+     *
+     * @param channelId the channel id
+     * @param tenantId  tenant scope
+     * @return the channel, or null when missing, cross-tenant, or untyped
+     */
     private NotifyChannelBO loadChannel(Long channelId, Long tenantId) {
         NotifyChannelDO entityDO = notifyChannelManager.getById(channelId);
         if (Objects.isNull(entityDO) || !Objects.equals(entityDO.getTenantId(), tenantId)

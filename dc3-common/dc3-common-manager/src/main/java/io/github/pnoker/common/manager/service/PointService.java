@@ -87,12 +87,12 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     DeviceByPointBO getPointStatisticsWithDevice(Long pointId);
 
     /**
-     * Query the default point id bound to a device.
+     * Count the points bound to a device's profile.
      *
      * @param deviceId Device ID
-     * @return the point ID, or {@code 0} when the device or its profile is missing
+     * @return the point count, or {@code 0} when the device or its profile is missing
      */
-    Long getPointByDeviceId(Long deviceId);
+    Long getCountByDeviceId(Long deviceId);
 
     /**
      * Query the point configuration for a device.

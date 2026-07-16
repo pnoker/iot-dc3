@@ -77,6 +77,14 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
         }
     }
 
+    /**
+     * Persist an entity alarm row for a rule match, resolving the driver/device/point
+     * ids from the match by target type, and defaulting missing ids. Returns null when
+     * the entity id is missing or the save fails.
+     *
+     * @param match the rule match
+     * @return the persisted alarm id, or null
+     */
     private Long persistEntityAlarm(RuleMatch match) {
         RuleFact fact = match.getFact();
         AlarmTargetTypeEnum targetType = fact.getAlarmTargetTypeFlag();
@@ -159,6 +167,13 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
         return ext;
     }
 
+    /**
+     * Resolve the currently-firing alarm id for a match via the rule-state lookup,
+     * returning null when any required key field is missing.
+     *
+     * @param match the rule match
+     * @return the firing alarm id, or null
+     */
     private Long getFiringAlarmId(RuleMatch match) {
         RuleFact fact = match.getFact();
         if (!isValidId(match.getRule().getId()) || !isValidId(fact.getTenantId())

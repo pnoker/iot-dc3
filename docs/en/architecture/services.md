@@ -2,6 +2,12 @@
 title: Services and Topology
 ---
 
+<script setup>
+import ServicesFlowDiagram from '../../.vitepress/theme/components/ServicesFlowDiagram.vue'
+import ServicesSequenceDiagram from '../../.vitepress/theme/components/ServicesSequenceDiagram.vue'
+</script>
+
+
 # Services and Topology
 
 IoT DC3 isn't one big process. It's a set of independently deployable services that talk to each other over gRPC and
@@ -33,8 +39,8 @@ process:
 - **Data Center (`dc3-center-data`)** — point-value persistence, command dispatch and acknowledgment, and the alarm
   engine.
 - **Agentic Center (`dc3-center-agentic`)** — Spring AI conversations, tool calls, and chat persistence.
-- **Protocol Drivers (`dc3-driver-*`)** — the driver catalog has 28 protocol adapters; `docker-compose.yml` ships 8 by
-  default (`listening-virtual`/`modbus-tcp`/`modbus-rtu`/`mqtt`/`opc-da`/`opc-ua`/`plcs7`/`virtual`). Southbound they
+- **Protocol Drivers (`dc3-driver-*`)** — the driver catalog has 28 protocol adapters; `docker-compose.yml` ships 22 by
+  default (the 6 not included — `ble`/`iec104`/`lwm2m`/`sl651`/`zigbee`/`can` — can be started on demand). Southbound they
   connect to devices; northbound they're decoupled from the data center through RabbitMQ.
 - **Single Monolith (`dc3-center-single`)** — folds all four centers into one process, wired in-process via
   `dc3.facade.mode: local`. Good for local development and lightweight deployments (see [Facade Modes](./facade-modes)).
@@ -57,38 +63,7 @@ the other center ports) to the host. In production, don't map backend ports to t
 The diagram below maps the topology by "who depends on whom being ready first." Solid arrows are `depends_on` health
 dependencies, labeled with each service's HTTP / gRPC ports.
 
-```mermaid
-flowchart TB
-    Client["Caller<br/>API / Web / dc3 CLI / AI Agent"] --> GW["Gateway dc3-gateway<br/>HTTP :8000 (sole API entry, not published directly in app stack)"]
-    subgraph Centers["Centers (internal HTTP + gRPC facade interconnect)"]
-        Auth["Auth Center dc3-center-auth<br/>HTTP :8300 / gRPC :9300"]
-        Mgr["Manager Center dc3-center-manager<br/>HTTP :8400 / gRPC :9400"]
-        Data["Data Center dc3-center-data<br/>HTTP :8500 / gRPC :9500"]
-        AI["Agentic Center dc3-center-agentic<br/>HTTP :8600"]
-    end
-    subgraph Drivers["Access Layer · Southbound"]
-        Drv["Protocol Drivers dc3-driver-*<br/>(8 built into compose by default)"]
-    end
-    Infra["Infrastructure<br/>PostgreSQL :5432 / RabbitMQ :5672"]
-
-    GW -->|"depends_on"| Auth
-    GW -->|"depends_on"| Mgr
-    GW -->|"depends_on"| Data
-    GW -->|"depends_on"| AI
-    Mgr -->|"depends_on"| Auth
-    Data -->|"depends_on"| Auth
-    Data -->|"depends_on"| Mgr
-    AI -->|"depends_on"| Auth
-    AI -->|"depends_on"| Mgr
-    AI -->|"depends_on"| Data
-    Drv -->|"depends_on"| Mgr
-    Field["Field Devices / Data Sources"] --> Drv
-    Drv <-->|"RabbitMQ"| Data
-    Auth --> Infra
-    Mgr --> Infra
-    Data --> Infra
-    AI --> Infra
-```
+<ServicesFlowDiagram lang="en" />
 
 The port allocation follows a pattern: HTTP ports `83/84/85/86xx` map one-to-one with gRPC ports `93/94/95xx` for
 auth/manager/data. The Agentic Center currently exposes only HTTP `8600`. The single monolith claims HTTP `8100` / gRPC
@@ -139,29 +114,7 @@ the centers' readiness paths carry a base-path prefix while the gateway's does n
 The diagram below traces the full readiness timeline along the dependency chain, from infrastructure to drivers — each
 hop begins only after the upstream readiness passes.
 
-```mermaid
-sequenceDiagram
-    participant Infra as PG / RabbitMQ
-    participant Auth as Auth Center dc3-center-auth
-    participant Mgr as Manager Center dc3-center-manager
-    participant Data as Data Center dc3-center-data
-    participant AI as Agentic Center dc3-center-agentic
-    participant GW as Gateway dc3-gateway
-    participant Drv as Drivers dc3-driver-*
-
-    Note over Infra: pg_isready / rabbitmq-diagnostics ping passes
-    Infra->>Auth: Dependencies ready, start Auth
-    Note over Auth: readiness passes (/auth/...)
-    Auth->>Mgr: Start Manager
-    Note over Mgr: readiness passes (/manager/...)
-    Mgr->>Data: Start Data (needs Auth + Manager)
-    Note over Data: readiness passes (/data/...)
-    Data->>AI: Start Agentic (needs Auth + Manager + Data)
-    Note over AI: readiness passes (/agentic/...)
-    AI->>GW: All four centers ready, start Gateway
-    Note over GW: readiness passes, opens :8000 externally
-    Mgr->>Drv: Drivers depend only on Manager, register metadata then schedule collection
-```
+<ServicesSequenceDiagram lang="en" />
 
 This diagram also explains a common observation: **drivers depend only on manager**, not on the gateway or the data
 center. Once a driver is up, it registers itself with the Manager Center over gRPC (carrying its protocol attribute

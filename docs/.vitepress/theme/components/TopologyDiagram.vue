@@ -162,7 +162,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               x="60"
               y="70"/>
         <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="175" y="98">{{
-            s.webName
+          s.webName
           }}
         </text>
         <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="175" y="116">{{ s.webSub }}</text>
@@ -170,7 +170,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               x="305"
               y="70"/>
         <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="412" y="98">{{
-            s.cliName
+          s.cliName
           }}
         </text>
         <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="412" y="116">{{ s.cliSub }}</text>
@@ -187,7 +187,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               x="60"
               y="174"/>
         <text fill="var(--dc3-box-name)" font-size="12" font-weight="600" text-anchor="middle" x="430" y="200">{{
-            s.gwName
+          s.gwName
           }}
         </text>
         <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="430" y="218">{{ s.gwSub }}</text>
@@ -249,7 +249,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
               x="370"
               y="526"/>
         <text fill="var(--dc3-box-name)" font-size="11" font-weight="600" text-anchor="middle" x="430" y="552">{{
-            s.s7Name
+          s.s7Name
           }}
         </text>
         <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="430" y="570">{{ s.s7Sub }}</text>

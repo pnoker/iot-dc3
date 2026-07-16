@@ -2,6 +2,12 @@
 title: Auto-Identification & Positioning
 ---
 
+<script setup>
+import IdentificationChoiceDiagram from '../../.vitepress/theme/components/IdentificationChoiceDiagram.vue'
+import IdentificationEntityDiagram from '../../.vitepress/theme/components/IdentificationEntityDiagram.vue'
+</script>
+
+
 # Auto-Identification & Positioning
 
 The first step in any IoT system is letting machines recognize every object and every place in the physical world. This
@@ -68,25 +74,7 @@ accuracy is usually meter-level, fit for zone-level ("which exhibit area") rathe
 
 Place both groups on a "range vs. cost" trade-off plane and the picture clears up:
 
-```mermaid
-flowchart LR
-    subgraph ID["Auto-Identification (identity)"]
-      direction TB
-      BC["Barcode / 2D code<br/>close range · ultra-low cost · needs sight"]
-      NFC["NFC<br/>~4cm · bidirectional · built into phones"]
-      RFL["RFID LF/HF<br/>centimeters · robust / basis of NFC"]
-      RFU["RFID UHF<br/>meters · batch inventory · metal/liquid-shy"]
-    end
-    subgraph POS["Positioning (location)"]
-      direction TB
-      BLE["Bluetooth beacon<br/>meter-level · zone · cheap to deploy"]
-      UWB["UWB<br/>10–30cm · indoor precision · needs anchors"]
-      CELL["Cell-tower<br/>tens–hundreds of m · indoor/outdoor fallback"]
-      GNSS["GNSS (GPS / BeiDou)<br/>meter-level · outdoor · fails indoors"]
-    end
-    NEED["Need: identify or locate?<br/>indoor or outdoor?<br/>accuracy & cost budget?"] --> ID
-    NEED --> POS
-```
+<IdentificationChoiceDiagram lang="en" />
 
 ::: tip There is no "best," only "best fit"
 Batch warehouse inventory → UHF RFID; outdoor fleet dispatch → GNSS; precise indoor people-tracking → UWB; lightweight
@@ -145,12 +133,7 @@ devices, points, and data are invisible to company B. If `deviceId` answers "whi
 whose device is it, who may see it." The "identity + ownership" duality of identification technology (an EPC number plus
 the manufacturer prefix it belongs to) is, in DC3, exactly the `deviceId + tenantId` combination.
 
-```mermaid
-flowchart LR
-    PHY["Field device<br/>PLC / meter / thermostat"] -->|onboard & register| DEV["Device<br/>deviceId unique identifier"]
-    DEV -->|belongs to| T["Tenant<br/>tenantId isolation boundary"]
-    T -->|owns| DATA["Point / PointValue / Command / Event"]
-```
+<IdentificationEntityDiagram lang="en" />
 
 ::: info DC3 does not do "RFID tag management"
 DC3's identity model is platform-level device registration and tenant isolation; it does not bundle field-side

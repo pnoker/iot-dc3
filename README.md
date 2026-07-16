@@ -1,5 +1,5 @@
 <p align="right">
-  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
+  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a> | <a href="./README.ko.md">한국어</a> | <a href="./README.es.md">Español</a> | <a href="./README.ru.md">Русский</a>
 </p>
 
 > **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
@@ -179,17 +179,17 @@ where each technology is used.
 
 ## 📖 Documentation and Community
 
-| Resource              | Link                                                                                    |
-|-----------------------|-----------------------------------------------------------------------------------------|
-| 📚 Online docs        | [docs.dc3.site](https://docs.dc3.site/)                           |
-| 🚀 Quickstart         | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                     |
-| 🛠️ Technology stack  | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack)   |
-| 🏗️ Architecture      | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)    |
+| Resource              | Link                                                                            |
+|-----------------------|---------------------------------------------------------------------------------|
+| 📚 Online docs        | [docs.dc3.site](https://docs.dc3.site/)                                         |
+| 🚀 Quickstart         | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                        |
+| 🛠️ Technology stack  | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack)      |
+| 🏗️ Architecture      | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
 | 🔧 Driver development | [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring) |
-| 🐛 Troubleshooting    | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)            |
-| 📋 Changelog          | [Release Changelog](https://docs.dc3.site/en/development/changelog)          |
-| 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                               |
-| 🇨🇳 Gitee mirror     | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                                   |
+| 🐛 Troubleshooting    | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)               |
+| 📋 Changelog          | [Release Changelog](https://docs.dc3.site/en/development/changelog)             |
+| 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                       |
+| 🇨🇳 Gitee mirror     | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
 
 ## 🌍 Use Cases
 

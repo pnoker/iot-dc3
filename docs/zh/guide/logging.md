@@ -2,6 +2,11 @@
 title: 日志规范
 ---
 
+<script setup>
+import LoggingDiagram from '../../.vitepress/theme/components/LoggingDiagram.vue'
+</script>
+
+
 # 日志规范
 
 IoT DC3 的日志要同时服务两个读者：本地开发时的人，和线上排障时的机器。这页讲清两者怎么兼顾——结构化消息、MDC
@@ -26,15 +31,7 @@ ID 缺失、上下文不可关联，排障就退化成大海捞针。
 
 下图是一条日志从代码到落盘/采集的完整路径：应用写出事件，经 MDC 上下文槽位，再由两个 Appender 分别格式化。
 
-```mermaid
-flowchart LR
-  App["业务代码<br/>log.info(事件, 参数...)"] --> MDC["MDC 上下文槽位<br/>(encoder 预留 mdc provider)"]
-  MDC --> CONSOLE["CONSOLE Appender<br/>彩色文本"]
-  MDC --> FILE["FILE Appender<br/>JSON (logstash encoder)"]
-  CONSOLE --> Dev["本地终端 / podman logs"]
-  FILE --> Roll["滚动文件 *.gz<br/>(应用内 logback 轮转)"]
-  FILE --> Collect["日志采集<br/>(ELK / Loki, 可选)"]
-```
+<LoggingDiagram lang="zh" />
 
 两个 Appender 都挂在 `root`（默认级别 `INFO`），由 `dc3-common-log` 的 `logback.xml` 配置。JSON Appender 用
 `net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder`，逐字段输出 `timestamp`、`version`、`message`、`loggerName`、

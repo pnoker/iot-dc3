@@ -2,6 +2,11 @@
 title: FINS 驱动
 ---
 
+<script setup>
+import FinsDiagram from '../../.vitepress/theme/components/FinsDiagram.vue'
+</script>
+
+
 # FINS 驱动
 
 `dc3-driver-fins` 把欧姆龙（Omron）PLC 通过 FINS 协议接入 IoT DC3：作为 FINS 客户端主动 TCP 连接
@@ -32,18 +37,7 @@ FINS 区代码：`D`=0x82、`W`=0xB1、`H`=0xB0、`C`=0x83。
 驱动不依赖第三方协议库，而是手工按字节拼装 FINS 帧。读 1 个字的请求帧由 4 字节 TCP 长度前缀 + 10 字节 FINS 头 + 2
 字节命令码 + 4 字节读参数组成：
 
-```mermaid
-flowchart LR
-  subgraph TCP["FINS/TCP 帧"]
-    Len["TCP 长度前缀<br/>4 字节"]
-    subgraph FINS["FINS 帧"]
-      Hdr["FINS 头 10 字节（驱动实现）<br/>ICF 0x80 / RSV / GCT 0x02<br/>destNode destUnit 0x00 / srcNode srcUnit 0x00 / SID"]
-      Cmd["命令码 2 字节<br/>MRC 0x01 / SRC 0x01 (内存读)"]
-      Par["读参数 4 字节<br/>区代码 + 字地址 + 位 + 长度"]
-    end
-  end
-  Len --> Hdr --> Cmd --> Par
-```
+<FinsDiagram lang="zh" />
 
 响应帧在 FINS 头与命令码之后带 2 字节**结束码（end code）**：非 0 表示 PLC 拒绝或出错，驱动据此抛出 `ReadPointException`；为
 0 时数据从第 14 字节开始，按 `dataType` 解码（见下文的实现状态说明）。
@@ -82,11 +76,9 @@ FINS 的接入参数分两类：连到哪台 PLC 由设备级的 **driver 属性
 | Data Type    | `dataType`    | STRING | `UINT16` | `INT16`/`UINT16`/`INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD` |
 | Bit Position | `bitPosition` | INT    | `0`      | 字内位偏移（当前读路径未使用，固定按 `0` 处理）                               |
 
-::: warning 当前读路径只读 1 个字，`dataType` 不决定读几个字
-读取时固定只读 **1 个字（2 字节）**，与 `dataType` 无关。因此**只有 `INT16`/`UINT16` 能正确读出**；`INT32`/`UINT32`/`FLOAT` 的
-`decodeValue` 会调用 `getInt()`/`getFloat()` 从 2 字节缓冲读 4 字节，触发 BufferUnderflow，当前实际读不出值；`STRING`/`BCD`
-也只能拿到 2
-字节。这些是已声明、待补的协议语义。驱动按大端序（Big-Endian）解码读回的字节；位号的数据类型（[Point](../introduction/concepts/point)
+::: tip 读取字长由 `dataType` 决定
+读取时按 `dataType` 请求对应字长：`INT32`/`UINT32`/`FLOAT` 读 **2 个字（4 字节）**，其余类型读 **1 个字（2 字节）**（见
+`wordCount()`）。解码支持 `INT16`/`UINT16`/`INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD`，均按大端序（Big-Endian）解码；位号的数据类型（[Point](../introduction/concepts/point)
 的 `pointTypeFlag`）应与这里的 `dataType` 对得上。
 :::
 
@@ -119,12 +111,11 @@ FINS 的接入参数分两类：连到哪台 PLC 由设备级的 **driver 属性
 
 - **连不上 / 一直离线**：先确认 PLC 已启用 FINS/TCP 且端口为 `9600`（驱动只走 TCP，不会回退 UDP）。连接失败时驱动记
   `Driver FINS connection failed` 日志并把该设备置为离线，下个健康检查周期会重试。检查 `host`、网络可达性、PLC 侧是否限制了客户端连接数。
-- **读到的值不对 / 报 BufferUnderflow**：多半是 `dataType` 配成了 `INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD`——当前读路径只取
-  1 个字（2 字节），仅 `INT16`/`UINT16` 可用。多字类型属待补实现，请先用 16 位类型验证链路。
+- **读到的值不对**：确认 `dataType` 与 PLC 侧寄存器的实际类型/字长一致（`INT32`/`UINT32`/`FLOAT` 会读 2 个字），且字节序为大端；类型不匹配会解出错误数值。
 - **endCode 非 0**：响应帧第 12–13 字节是 FINS 结束码，非 0 表示 PLC 拒绝（如地址越界、内存区不存在、权限不足）。驱动会抛
   `FINS command failed, endCode=0x...`，按 FINS 手册查该码含义并核对 `memoryArea`/`address` 是否落在 PLC 实际内存范围内。
-- **写浮点写进去是错的**：写命令对 `INT32`/`UINT32`/`FLOAT` 都按 `Integer.parseInt` 解析后写 4 字节大端整数，**不会**把
-  `12.5` 当浮点编码。写浮点前需自行把目标值转成整数位模式下发，或确认 PLC 侧期望的就是整数。
+- **写浮点**：写命令对 `INT32`/`UINT32` 按整数解析（`Integer.parseInt`）写 4 字节大端整数，对 `FLOAT` 按
+  `Float.parseFloat` 编码为 4 字节 IEEE 754 大端浮点。请确保下发的字符串与 `dataType` 匹配（给 `FLOAT` 下发 `12.5` 即可）。
 - **超时频繁**：`timeout` 同时管连接与读（默认 5000ms）。链路抖动或 PLC 响应慢时适当调大；注意每次读写异常都会主动关闭并移除该设备的缓存连接，下次访问重建。
 - **节点号寻址失败**：跨网关/路由的 FINS 场景需要正确的 `sourceNode`/`destNode`。注意当前实现：驱动在 GCT 之后直接写出
   `destNode`/`destUnit` 与 `srcNode`/`srcUnit`，并未单独写出置 0 的 DNA/SNA 网络地址字节——帧头未严格区分网络地址与节点号（节点号占据了规范里
@@ -133,14 +124,10 @@ FINS 的接入参数分两类：连到哪台 PLC 由设备级的 **driver 属性
 ## 在 IoT DC3 中如何落地
 
 - **dc3.driver.code**：`FinsDriver`（稳定路由标识，注册、命令分发都靠它，不要随意改）。
-- **读能力**：✓ 已落地——周期轮询单字读取，`INT16`/`UINT16` 可用。
-- **写能力**：✓ 已落地——`INT16`/`UINT16`/`STRING` 可正常写；32 位/浮点按整数编码（见上文故障排查）。
+- **读能力**：✓ 已落地——周期轮询，读取字长随 `dataType`，解码支持
+  `INT16`/`UINT16`/`INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD`。
+- **写能力**：✓ 已落地——`INT16`/`UINT16`/`INT32`/`UINT32`/`STRING` 与 `FLOAT`（IEEE 754）均可正确写入。
 - **订阅/上报能力**：— 不提供。FINS 是主动轮询型，驱动不监听设备推送，与[驱动能力矩阵](./matrix)中标注一致。
-
-::: warning 多字数据类型尚未落地
-读路径固定只读 1 个字，`INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD` 的解码分支虽已写好，但因为只取到 2 字节而无法正确产出值；写路径的
-32 位/浮点按整数编码。当前**可用范围是 16 位整数（含 STRING 写）**，多字类型属设计已规划、实现待补，请勿当作已支持。
-:::
 
 ::: tip 一个驱动实例可接多台 PLC
 同一个 FINS 驱动进程可服务多台设备，每台设备各自维护一条 TCP 连接（`clientMap` 按设备 ID 缓存）。多台 PLC 用各自的 `host`、
@@ -153,7 +140,7 @@ FINS 的接入参数分两类：连到哪台 PLC 由设备级的 **driver 属性
 
 1. 选 `Omron FINS Driver` 创建[设备](../introduction/concepts/device)，driver 属性填 `host=192.168.1.20`、`port=9600`，其余（
    `protocol`、节点/单元号、`timeout`）保持默认。
-2. 给设备绑定的[物模型](../introduction/concepts/profile)加一个[位号](../introduction/concepts/point)（
+2. 给设备绑定的[模板](../introduction/concepts/profile)加一个[位号](../introduction/concepts/point)（
    `pointTypeFlag=INT`、`READ_ONLY`），point 属性填 `memoryArea=D`、`address=100`、`dataType=INT16`。
 3. 启动驱动，30 秒内就能在[位号值](../introduction/concepts/point-value)里看到 `D100` 的采集值。
 

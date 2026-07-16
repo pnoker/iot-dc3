@@ -56,6 +56,14 @@ public class MessageRenderServiceImpl implements MessageRenderService {
         return new MessagePayload(channelTypeFlag, template.getPayloadType(), rendered, missingVariables);
     }
 
+    /**
+     * Select the first message template matching the target channel type, or null when
+     * none matches.
+     *
+     * @param message          the message definition
+     * @param channelTypeFlag  the target channel type
+     * @return the matching template, or null
+     */
     private MessageExt.Template selectTemplate(MessageBO message, NotifyChannelTypeEnum channelTypeFlag) {
         if (Objects.isNull(message) || Objects.isNull(channelTypeFlag) || Objects.isNull(message.getMessageExt())
                 || Objects.isNull(message.getMessageExt().getContent())
@@ -79,6 +87,13 @@ public class MessageRenderServiceImpl implements MessageRenderService {
                 || StringUtils.equalsIgnoreCase(template.getChannelType(), channelTypeFlag.getCode());
     }
 
+    /**
+     * Return the names of message-declared variables not present in the rendered set.
+     *
+     * @param message   the message definition
+     * @param variables the rendered variables
+     * @return the missing variable names, or empty when none declared
+     */
     private List<String> missingVariables(MessageBO message, Map<String, Object> variables) {
         if (Objects.isNull(message) || Objects.isNull(message.getMessageExt())
                 || Objects.isNull(message.getMessageExt().getContent())

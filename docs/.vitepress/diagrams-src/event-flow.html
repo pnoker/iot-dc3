@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta charset="UTF-8"><title>IoT DC3 — 事件上报与告警评估</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'JetBrains Mono',monospace;background:#020617;padding:2rem;color:#fff}.w{max-width:1140px;margin:0 auto}h1{font-size:1.4rem;margin-bottom:1rem}.b{background:rgba(15,23,42,.5);border:1px solid #1e293b;border-radius:1rem;padding:1.5rem;overflow-x:auto}svg{width:100%;min-width:940px;display:block}</style></head>
+<body><div class="w"><h1>事件上报与告警评估链路</h1><div class="b">
+<svg viewBox="0 0 1080 440">
+<defs><marker id="ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#64748b"/></marker>
+<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0L0 0 0 40" fill="none" stroke="#1e293b" stroke-width=".5"/></pattern></defs>
+<rect width="100%" height="100%" fill="url(#grid)"/>
+<line x1="140" y1="200" x2="190" y2="200" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="390" y1="200" x2="440" y2="200" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="415" y="192" fill="#94a3b8" font-size="9" text-anchor="middle">EventReportDTO</text>
+<line x1="620" y1="200" x2="660" y2="200" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+<line x1="880" y1="180" x2="930" y2="190" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="905" y="172" fill="#94a3b8" font-size="9" text-anchor="middle">持久化</text>
+<line x1="770" y1="240" x2="770" y2="320" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="812" y="284" fill="#94a3b8" font-size="9" text-anchor="middle">提交评估</text>
+<line x1="880" y1="350" x2="930" y2="350" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="905" y="342" fill="#94a3b8" font-size="9" text-anchor="middle">匹配</text>
+<rect x="30" y="172" width="110" height="55" rx="6" fill="#0f172a"/><rect x="30" y="172" width="110" height="55" rx="6" fill="rgba(30,41,59,.5)" stroke="#94a3b8" stroke-width="1.5"/><text x="85" y="196" fill="#fff" font-size="12" font-weight="600" text-anchor="middle">设备</text><text x="85" y="212" fill="#94a3b8" font-size="9" text-anchor="middle">Device</text>
+<rect x="190" y="168" width="200" height="65" rx="8" fill="#0f172a"/><rect x="190" y="168" width="200" height="65" rx="8" fill="rgba(251,146,60,.3)" stroke="#fb923c" stroke-width="1.5"/><text x="290" y="194" fill="#fff" font-size="12" font-weight="600" text-anchor="middle">驱动</text><text x="290" y="212" fill="#94a3b8" font-size="9" text-anchor="middle">eventReportSender</text>
+<rect x="440" y="172" width="180" height="55" rx="6" fill="#0f172a"/><rect x="440" y="172" width="180" height="55" rx="6" fill="rgba(251,146,60,.3)" stroke="#fb923c" stroke-width="1.5"/><text x="530" y="194" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">RabbitMQ</text><text x="530" y="212" fill="#94a3b8" font-size="9" text-anchor="middle">dc3.e.event</text>
+<rect x="660" y="165" width="220" height="75" rx="8" fill="#0f172a"/><rect x="660" y="165" width="220" height="75" rx="8" fill="rgba(6,78,59,.4)" stroke="#34d399" stroke-width="1.5"/><text x="770" y="192" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">数据中心</text><text x="770" y="210" fill="#94a3b8" font-size="9" text-anchor="middle">EventReportReceiver</text><text x="770" y="226" fill="#94a3b8" font-size="9" text-anchor="middle">消费 + 评估</text>
+<path d="M930,150 a75,15 0 0 0 150,0 v95 a75,15 0 0 1 -150,0 z" fill="#0f172a"/><path d="M930,150 a75,15 0 0 0 150,0 v95 a75,15 0 0 1 -150,0 z" fill="rgba(76,29,149,.4)" stroke="#a78bfa" stroke-width="1.5"/><ellipse cx="1005" cy="150" rx="75" ry="15" fill="none" stroke="#a78bfa" stroke-width="1.5"/><text x="1005" y="205" fill="#fff" font-size="10.5" font-weight="600" text-anchor="middle">dc3_event_history</text>
+<rect x="660" y="320" width="220" height="60" rx="8" fill="#0f172a"/><rect x="660" y="320" width="220" height="60" rx="8" fill="rgba(120,53,15,.3)" stroke="#fbbf24" stroke-width="1.5"/><text x="770" y="346" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">告警规则引擎</text><text x="770" y="363" fill="#94a3b8" font-size="9" text-anchor="middle">Alarm rule engine</text>
+<path d="M930,310 a75,15 0 0 0 150,0 v85 a75,15 0 0 1 -150,0 z" fill="#0f172a"/><path d="M930,310 a75,15 0 0 0 150,0 v85 a75,15 0 0 1 -150,0 z" fill="rgba(136,19,55,.4)" stroke="#fb7185" stroke-width="1.5"/><ellipse cx="1005" cy="310" rx="75" ry="15" fill="none" stroke="#fb7185" stroke-width="1.5"/><text x="1005" y="360" fill="#fff" font-size="10.5" font-weight="600" text-anchor="middle">dc3_entity_alarm</text>
+</svg></div></div></body></html>

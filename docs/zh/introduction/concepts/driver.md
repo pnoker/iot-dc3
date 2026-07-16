@@ -2,6 +2,11 @@
 title: 驱动 Driver
 ---
 
+<script setup>
+import DriverRelationDiagram from '../../../.vitepress/theme/components/DriverRelationDiagram.vue'
+import DriverLifecycleDiagram from '../../../.vitepress/theme/components/DriverLifecycleDiagram.vue'
+</script>
+
 # 驱动 Driver
 
 > **驱动是一个独立运行的协议适配服务实例（`dc3-driver-*`）**——它把某种工业协议（Modbus、OPC UA、MQTT……）翻译成 DC3
@@ -68,32 +73,15 @@ Web 不用改。
 
 ## 与其它概念的关系
 
-```mermaid
-flowchart LR
-    DRV["驱动 Driver (dc3-driver-*)"] -->|注册身份| MGR["管理中心 Manager"]
-    DRV -->|注册声明| DA["驱动配置项 DriverAttribute"]
-    DRV -->|采集承载| DEV["设备 Device (1..N)"]
-    DEV -->|按声明填值| CFG["连接配置 DriverAttributeConfig"]
-    DEV -->|归属| PR["物模型 Profile"]
-    PR -->|定义| PT["位号 Point"]
-    DRV -->|采集翻译| PV[("位号值 PointValue")]
-```
+<DriverRelationDiagram lang="zh" />
 
 - 一个驱动**注册一次身份**，可承载**多台**[设备](./device)的采集。
 - 驱动注册的 `DriverAttribute` 是模板；每台设备用[连接配置](./attribute-config)按这份模板填值。
-- 驱动按[物模型](./profile)定义的[位号](./point)采集，把结果翻译成[位号值](./point-value)上报。
+- 驱动按[模板](./profile)定义的[位号](./point)采集，把结果翻译成[位号值](./point-value)上报。
 
 ## 启动注册与在线状态
 
-```mermaid
-flowchart LR
-    START["驱动进程启动"] --> RUN["DriverInitRunner.run()"]
-    RUN -->|RegisterBO 带退避重试| MGR["管理中心 Manager"]
-    MGR -->|落库| META[("dc3_driver / dc3_driver_attribute")]
-    RUN --> HB["DriverHealth 周期心跳"]
-    HB -->|续租 45s| ST[("dc3_entity_state (driver=3)")]
-    ST -->|租约到期未续| OFF["判定离线 offline"]
-```
+<DriverLifecycleDiagram lang="zh" />
 
 驱动启动时由 `DriverInitRunner`（`ApplicationRunner`）触发注册：构造 `RegisterBO`（含 `tenant`、`driver`=`DriverBO`、
 `driverAttributes` 等）调用 `DriverRegisterService.initial()` 上报管理中心，注册失败按指数退避重试直至成功。注册后驱动并非"
@@ -115,7 +103,7 @@ flowchart LR
    `DriverBO{ serviceName: "dc3-driver-modbus-tcp", driverTypeFlag: DRIVER_CLIENT }`，并声明配置项
    `DriverAttribute{ attributeCode: "host", type: string }`、`{ attributeCode: "port", type: int }`。
 2. 在 Web 上新建[设备](./device)挂到该驱动，按声明填[连接配置](./attribute-config)：`host=192.168.1.10`、`port=502`。
-3. 驱动据此建立 Modbus 会话，按[物模型](./profile)里的[位号](./point)
+3. 驱动据此建立 Modbus 会话，按[模板](./profile)里的[位号](./point)
    周期读寄存器，把读到的原始值翻译成[位号值](./point-value)上报数据中心。
 4. 驱动每 15 秒上报一次心跳续租；某天该服务进程被 kill，45 秒后租约到期，平台把这个驱动标记为 `offline`，它名下设备随之转入离线扫描。
 

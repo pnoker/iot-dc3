@@ -2,11 +2,15 @@
 .m2/
 target/
 build/
+dist/
+dist-ssr/
 out/
 *.class
 *.jar
 *.war
 *.ear
+*.tgz
+*.tar.gz
 dependency-reduced-pom.xml
 .flattened-pom.xml
 release.properties
@@ -14,6 +18,9 @@ buildNumber.properties
 
 # ===== Test artifacts =====
 test-results/
+coverage/
+.nyc_output/
+playwright-report/
 **/target/test-classes/
 **/target/surefire-reports/
 **/target/failsafe-reports/
@@ -41,6 +48,8 @@ core.*
 *.pem
 *.p12
 *.pfx
+*.crt
+*.csr
 secrets/
 
 # ===== IntelliJ IDEA =====
@@ -54,6 +63,7 @@ secrets/
 .project
 .settings/
 .factorypath
+.loadpath
 .springBeans
 .apt_generated/
 
@@ -62,14 +72,23 @@ secrets/
 .vs/
 *.code-workspace
 
+# ===== Sublime Text =====
+*.sublime-workspace
+*.sublime-project
+
 # ===== Editor temp / swap / backup =====
 *.swp
 *.swo
 *~
 *.bak
+*.backup
 *.tmp
+*.temp
 *.orig
 *.rej
+
+# ===== History =====
+.history/
 
 # ===== OS junk =====
 .DS_Store
@@ -90,10 +109,37 @@ venv/
 node_modules/
 .pnpm-store/
 .parcel-cache/
+.pnp/
+.yarn/
+.yarn-integrity/
+.npm
+.eslintcache
+.node_repl_history
 
 # ===== VitePress build output =====
 docs/.vitepress/cache/
 docs/.vitepress/dist/
+
+# ===== Vite / Vue =====
+.vite/
+.temp/
+.cache/
+*.tsbuildinfo
+*.d.ts.map
+components.d.ts
+auto-imports.d.ts
+
+# ===== Database =====
+*.db
+*.sqlite
+*.sqlite3
+
+# ===== Docker =====
+.docker/
+
+# ===== Tauri (desktop build) =====
+src-tauri/target/
+src-tauri/Cargo.lock
 
 # ===== Project-local data =====
 dc3/data/

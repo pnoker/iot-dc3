@@ -2,6 +2,11 @@
 title: 从源码本地开发
 ---
 
+<script setup>
+import QuickstartIndexDiagram from '../../.vitepress/theme/components/QuickstartIndexDiagram.vue'
+</script>
+
+
 # 从源码本地开发
 
 这页带你把 IoT DC3 从源码跑起来：先用 Compose 起好 PostgreSQL 与 RabbitMQ，再用一组本地环境变量把 Java
@@ -66,14 +71,7 @@ JDK/构建工具，外加一个容器运行时。
 本地起栈的最短闭环是五步，每一步都有明确产物，下一步依赖上一步的产物：先有基础设施（容器），才能加载指向它们的环境变量；先构建出
 jar，才能启动开发栈；服务起来后才谈得上跑测试。
 
-```mermaid
-flowchart LR
-  A["make up-db<br/>起 PostgreSQL + RabbitMQ"] -->|"容器就绪<br/>localhost:35432 / 35672"| B["source dc3/env/dev.env.sh<br/>加载本地环境变量"]
-  B -->|"Java 进程指向 localhost"| C["make package<br/>多模块构建"]
-  C -->|"产出各服务 jar"| D["make up-dev<br/>起本地开发栈"]
-  D -->|"中心服务运行<br/>Gateway:8000"| E["make test<br/>跑单元测试"]
-  E -->|"验证通过"| F["接入第一个设备"]
-```
+<QuickstartIndexDiagram lang="zh" />
 
 下面逐步展开，每步都给出"做什么"和"怎么验证"。
 

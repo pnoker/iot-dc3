@@ -2,6 +2,11 @@
 title: SNMP 驱动
 ---
 
+<script setup>
+import SnmpDiagram from '../../.vitepress/theme/components/SnmpDiagram.vue'
+</script>
+
+
 # SNMP 驱动
 
 `dc3-driver-snmp` 把支持 SNMP 的网络与机房设备接入 IoT DC3：以设备 MIB 树上的 OID 为目标，周期性发 SNMP GET 采数，并支持向
@@ -27,22 +32,7 @@ SET，每台设备复用一个常驻的 SNMP 会话。
 
 典型用途是机房与网络监控——带宽、端口 up/down、CPU/内存利用率、机房温湿度、UPS 电量等，凡是支持 SNMP 的设备，配好 OID 即可纳管。
 
-```mermaid
-flowchart LR
-  subgraph DC3["IoT DC3"]
-    Drv["dc3-driver-snmp<br/>SNMP Manager (SNMP4J)"]
-  end
-  subgraph Net["网络层设备 (SNMP Agent)"]
-    SW["交换机 / 路由器"]
-    UPS["UPS / PDU"]
-    SRV["服务器网卡"]
-  end
-  Drv -->|"GET oid (UDP 161)"| SW
-  Drv -->|"SET oid (UDP 161)"| UPS
-  SW -.->|"response: VariableBinding"| Drv
-  UPS -.-> Drv
-  SRV -.-> Drv
-```
+<SnmpDiagram lang="zh" />
 
 ## 属性配置
 
@@ -174,7 +164,7 @@ SNMPv3，用本驱动连不上，且不会有"版本不支持"的明确报错，
 
 1. 选 `SNMP Driver` 创建[设备](../introduction/concepts/device)，driver 属性填 `host=192.168.1.20`、`port=161`、
    `version=v2c`、`community=public`。
-2. 给设备绑定的[物模型](../introduction/concepts/profile)加一个描述[位号](../introduction/concepts/point)（
+2. 给设备绑定的[模板](../introduction/concepts/profile)加一个描述[位号](../introduction/concepts/point)（
    `pointTypeFlag=STRING`、`READ_ONLY`），point 属性填 `oid=1.3.6.1.2.1.1.1.0`。
 3. 启动驱动，30 秒内就能在[位号值](../introduction/concepts/point-value)里看到设备的系统描述字符串。
 

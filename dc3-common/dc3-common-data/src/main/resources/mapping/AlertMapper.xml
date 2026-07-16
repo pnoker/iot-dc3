@@ -28,19 +28,19 @@
 
     <select id="countAll" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow">
         SELECT COUNT(*) AS total,
-               COUNT(*)    FILTER (WHERE confirm_flag = 0) AS unconfirmed
+        COUNT(*) FILTER (WHERE confirm_flag = 0) AS unconfirmed
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
     </select>
 
     <select id="countBySource" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow">
         SELECT CASE alarm_target_type_flag
-                   WHEN 0 THEN 'point'
-                   WHEN 1 THEN 'device'
-                   ELSE 'driver'
-                   END  AS source,
-               COUNT(*) AS total,
-               COUNT(*)    FILTER (WHERE confirm_flag = 0)              AS unconfirmed
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        COUNT(*) AS total,
+        COUNT(*) FILTER (WHERE confirm_flag = 0) AS unconfirmed
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
         GROUP BY alarm_target_type_flag
@@ -58,17 +58,17 @@
 
     <select id="latest" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow">
         SELECT id,
-               CASE alarm_target_type_flag
-                   WHEN 0 THEN 'point'
-                   WHEN 1 THEN 'device'
-                   ELSE 'driver'
-                   END                               AS source,
-               entity_id                             AS source_id,
-               point_id,
-               alarm_type_flag                       AS alarm_type_flag,
-               confirm_flag,
-               create_time,
-               COALESCE(alarm_ext ->> 'content', '') AS message
+        CASE alarm_target_type_flag
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        entity_id AS source_id,
+        point_id,
+        alarm_type_flag AS alarm_type_flag,
+        confirm_flag,
+        create_time,
+        COALESCE(alarm_ext ->> 'content', '') AS message
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
         ORDER BY create_time DESC
@@ -79,7 +79,7 @@
         SELECT date_trunc('hour', create_time) AS bucket, COUNT(*) AS count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
+        AND create_time &gt;= #{from}
         GROUP BY bucket
         ORDER BY bucket ASC
     </select>
@@ -123,15 +123,15 @@
 
     <select id="todayBySource" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow">
         SELECT CASE alarm_target_type_flag
-                   WHEN 0 THEN 'point'
-                   WHEN 1 THEN 'device'
-                   ELSE 'driver'
-                   END  AS source,
-               COUNT(*) AS total,
-               COUNT(*)    FILTER (WHERE confirm_flag = 0)         AS unconfirmed
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        COUNT(*) AS total,
+        COUNT(*) FILTER (WHERE confirm_flag = 0) AS unconfirmed
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
+        AND create_time &gt;= #{from}
         GROUP BY alarm_target_type_flag
         ORDER BY alarm_target_type_flag
     </select>
@@ -157,40 +157,40 @@
     </update>
 
     <select id="dailyTrend" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow">
-        SELECT d.day ::text                                                                   AS date, COALESCE(
-                SUM(CASE WHEN a.alarm_target_type_flag IN (0, 1) THEN 1 ELSE 0 END), 0) AS device_count,
-               COALESCE(SUM(CASE WHEN a.alarm_target_type_flag = 2 THEN 1 ELSE 0 END), 0) AS driver_count
+        SELECT d.day ::text AS date, COALESCE(
+        SUM(CASE WHEN a.alarm_target_type_flag IN (0, 1) THEN 1 ELSE 0 END), 0) AS device_count,
+        COALESCE(SUM(CASE WHEN a.alarm_target_type_flag = 2 THEN 1 ELSE 0 END), 0) AS driver_count
         FROM (SELECT generate_series(date_trunc('day', #{from})::date,
-                                     CURRENT_DATE, '1 day') ::date AS day) d
-                 LEFT JOIN dc3_entity_alarm a
-                           ON date_trunc('day', a.create_time)::date = d.day
-                               AND a.tenant_id = #{tenantId}
-            AND a.create_time &gt;= #{from}
+        CURRENT_DATE, '1 day') ::date AS day) d
+        LEFT JOIN dc3_entity_alarm a
+        ON date_trunc('day', a.create_time)::date = d.day
+        AND a.tenant_id = #{tenantId}
+        AND a.create_time &gt;= #{from}
         GROUP BY d.day
         ORDER BY d.day ASC
     </select>
 
     <select id="topSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow">
         SELECT CASE alarm_target_type_flag
-                   WHEN 0 THEN 'point'
-                   WHEN 1 THEN 'device'
-                   ELSE 'driver'
-                   END   AS source,
-               entity_id AS source_id,
-               COUNT(*)  AS count
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        entity_id AS source_id,
+        COUNT(*) AS count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
+        AND create_time &gt;= #{from}
         GROUP BY alarm_target_type_flag, entity_id
         ORDER BY count DESC
         LIMIT #{limit}
     </select>
 
     <select id="activityHeatmap" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow">
-        SELECT EXTRACT(DOW FROM create_time)::int  AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS count
+        SELECT EXTRACT(DOW FROM create_time)::int AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
+        AND create_time &gt;= #{from}
         GROUP BY dow, hour
     </select>
 
@@ -198,8 +198,8 @@
         SELECT alarm_ext ->> 'type' AS key, COUNT (*) AS count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
-          AND alarm_ext ->> 'type' IS NOT NULL
+        AND create_time &gt;= #{from}
+        AND alarm_ext ->> 'type' IS NOT NULL
         GROUP BY key
         ORDER BY count
         DESC
@@ -207,15 +207,15 @@
 
     <select id="stormSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow">
         SELECT CASE alarm_target_type_flag
-                   WHEN 0 THEN 'point'
-                   WHEN 1 THEN 'device'
-                   ELSE 'driver'
-                   END   AS source,
-               entity_id AS source_id,
-               COUNT(*)  AS count
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        entity_id AS source_id,
+        COUNT(*) AS count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
+        AND create_time &gt;= #{from}
         GROUP BY alarm_target_type_flag, entity_id
         HAVING COUNT(*) &gt;= #{minCount}
         ORDER BY count DESC
@@ -228,16 +228,16 @@
 
     <select id="flappingSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.FlappingRow">
         SELECT CASE alarm_target_type_flag
-                   WHEN 0 THEN 'point'
-                   WHEN 1 THEN 'device'
-                   ELSE 'driver'
-                   END         AS source,
-               entity_id       AS source_id,
-               alarm_type_flag AS alarm_type_flag,
-               COUNT(*)        AS count
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        entity_id AS source_id,
+        alarm_type_flag AS alarm_type_flag,
+        COUNT(*) AS count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
+        AND create_time &gt;= #{from}
         GROUP BY alarm_target_type_flag, entity_id, alarm_type_flag
         HAVING COUNT(*) &gt;= #{minCount}
         ORDER BY count DESC
@@ -246,90 +246,90 @@
 
     <select id="correlationPairs" resultType="io.github.pnoker.common.data.entity.bo.dashboard.CorrelationPairRow">
         WITH ev AS (SELECT CASE alarm_target_type_flag
-                               WHEN 0 THEN 'point'
-                               WHEN 1 THEN 'device'
-                               ELSE 'driver'
-                               END         AS source,
-                           entity_id       AS source_id,
-                           alarm_type_flag AS alarm_type_flag,
-                           create_time,
-                           id
-                    FROM dc3_entity_alarm
-                    WHERE tenant_id = #{tenantId}
-                      AND create_time &gt;= #{from})
-        SELECT e1.source          AS a_source,
-               e1.source_id       AS a_source_id,
-               e1.alarm_type_flag AS a_event_type,
-               e2.source          AS b_source,
-               e2.source_id       AS b_source_id,
-               e2.alarm_type_flag AS b_event_type,
-               COUNT(*)           AS co_count
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        entity_id AS source_id,
+        alarm_type_flag AS alarm_type_flag,
+        create_time,
+        id
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+        AND create_time &gt;= #{from})
+        SELECT e1.source AS a_source,
+        e1.source_id AS a_source_id,
+        e1.alarm_type_flag AS a_event_type,
+        e2.source AS b_source,
+        e2.source_id AS b_source_id,
+        e2.alarm_type_flag AS b_event_type,
+        COUNT(*) AS co_count
         FROM ev e1
-                 JOIN ev e2 ON abs(EXTRACT(EPOCH FROM (e1.create_time - e2.create_time))) &lt;= #{windowSec}
-            AND (e1.source &lt;&gt; e2.source OR e1.source_id &lt;&gt; e2.source_id)
-            AND (e1.source, e1.source_id, e1.alarm_type_flag) &lt; (e2.source, e2.source_id, e2.alarm_type_flag)
+        JOIN ev e2 ON abs(EXTRACT(EPOCH FROM (e1.create_time - e2.create_time))) &lt;= #{windowSec}
+        AND (e1.source &lt;&gt; e2.source OR e1.source_id &lt;&gt; e2.source_id)
+        AND (e1.source, e1.source_id, e1.alarm_type_flag) &lt; (e2.source, e2.source_id, e2.alarm_type_flag)
         GROUP BY e1.source, e1.source_id, e1.alarm_type_flag,
-                 e2.source, e2.source_id, e2.alarm_type_flag
+        e2.source, e2.source_id, e2.alarm_type_flag
         ORDER BY co_count DESC
         LIMIT #{limit}
     </select>
 
     <select id="peerAlarmCounts" resultType="io.github.pnoker.common.data.entity.bo.dashboard.PeerAlarmRow">
         SELECT d.profile_id AS profile_id,
-               ea.device_id AS device_id,
-               COUNT(*)     AS alarm_count
+        ea.device_id AS device_id,
+        COUNT(*) AS alarm_count
         FROM dc3_entity_alarm ea
-                 JOIN dc3_manager.dc3_device d
-                      ON d.id = ea.device_id
-                          AND d.tenant_id = ea.tenant_id
-                          AND d.deleted = 0
+        JOIN dc3_manager.dc3_device d
+        ON d.id = ea.device_id
+        AND d.tenant_id = ea.tenant_id
+        AND d.deleted = 0
         WHERE ea.tenant_id = #{tenantId}
-          AND ea.alarm_target_type_flag IN (0, 1)
-          AND ea.create_time &gt;= #{from}
+        AND ea.alarm_target_type_flag IN (0, 1)
+        AND ea.create_time &gt;= #{from}
         GROUP BY d.profile_id, ea.device_id
     </select>
 
     <select id="agingBuckets" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow">
-        SELECT COALESCE(SUM(CASE WHEN age &lt; INTERVAL '1 hour' THEN 1 ELSE 0 END), 0)    AS under_1h,
-               COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '1 hour' AND age &lt; INTERVAL '6 hours' THEN 1 ELSE 0 END),
-                        0)                                                                 AS h1_to_6,
-               COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '6 hours' AND age &lt; INTERVAL '24 hours' THEN 1 ELSE 0 END),
-                        0)                                                                 AS h6_to_24,
-               COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '24 hours' THEN 1 ELSE 0 END), 0) AS over_24h,
-               COUNT(*)                                                                    AS total
+        SELECT COALESCE(SUM(CASE WHEN age &lt; INTERVAL '1 hour' THEN 1 ELSE 0 END), 0) AS under_1h,
+        COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '1 hour' AND age &lt; INTERVAL '6 hours' THEN 1 ELSE 0 END),
+        0) AS h1_to_6,
+        COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '6 hours' AND age &lt; INTERVAL '24 hours' THEN 1 ELSE 0 END),
+        0) AS h6_to_24,
+        COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '24 hours' THEN 1 ELSE 0 END), 0) AS over_24h,
+        COUNT(*) AS total
         FROM (SELECT NOW() - create_time AS age
-              FROM dc3_entity_alarm
-              WHERE tenant_id = #{tenantId}
-                AND confirm_flag = 0) ages
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+        AND confirm_flag = 0) ages
     </select>
 
     <select id="mttaByDay" resultType="io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow">
-        SELECT to_char(DATE(create_time), 'YYYY-MM-DD')                                                        AS date,
-               PERCENTILE_CONT(0.5)
-                               WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000) AS p50_ms,
-               PERCENTILE_CONT(0.95)
-                               WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000) AS p95_ms,
-               COUNT(*)                                                                                        AS confirmed_count
+        SELECT to_char(DATE(create_time), 'YYYY-MM-DD') AS date,
+        PERCENTILE_CONT(0.5)
+        WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000) AS p50_ms,
+        PERCENTILE_CONT(0.95)
+        WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000) AS p95_ms,
+        COUNT(*) AS confirmed_count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
-          AND confirm_flag = 1
-          AND create_time &gt;= #{from}
+        AND confirm_flag = 1
+        AND create_time &gt;= #{from}
         GROUP BY DATE(create_time)
         ORDER BY date ASC
     </select>
 
     <select id="protocolHealth" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ProtocolHealthRow">
-        SELECT d.service_name                                            AS service_name,
-               COUNT(DISTINCT d.id)                                      AS driver_count,
-               COUNT(DISTINCT CASE WHEN d.enable_flag = 1 THEN d.id END) AS enabled_count,
-               COUNT(DISTINCT dev.id)                                    AS device_count
+        SELECT d.service_name AS service_name,
+        COUNT(DISTINCT d.id) AS driver_count,
+        COUNT(DISTINCT CASE WHEN d.enable_flag = 1 THEN d.id END) AS enabled_count,
+        COUNT(DISTINCT dev.id) AS device_count
         FROM dc3_manager.dc3_driver d
-                 LEFT JOIN dc3_manager.dc3_device dev
-                           ON dev.driver_id = d.id
-                               AND dev.tenant_id = d.tenant_id
-                               AND dev.deleted = 0
+        LEFT JOIN dc3_manager.dc3_device dev
+        ON dev.driver_id = d.id
+        AND dev.tenant_id = d.tenant_id
+        AND dev.deleted = 0
         WHERE d.deleted = 0
-          AND d.tenant_id = #{tenantId}
+        AND d.tenant_id = #{tenantId}
         GROUP BY d.service_name
         ORDER BY device_count DESC, driver_count DESC
     </select>
@@ -337,25 +337,25 @@
     <select id="recentChanges" resultType="io.github.pnoker.common.data.entity.bo.dashboard.RecentChangeRow">
         SELECT kind, id AS entity_id, operate_time
         FROM (SELECT 'driver'::text AS kind, id, operate_time, create_time
-              FROM dc3_manager.dc3_driver
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND operate_time &gt; create_time
-                AND operate_time &gt;= #{from}
-              UNION ALL
-              SELECT 'device'::text, id, operate_time, create_time
-              FROM dc3_manager.dc3_device
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND operate_time &gt; create_time
-                AND operate_time &gt;= #{from}
-              UNION ALL
-              SELECT 'profile'::text, id, operate_time, create_time
-              FROM dc3_manager.dc3_profile
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND operate_time &gt; create_time
-                AND operate_time &gt;= #{from}) u
+        FROM dc3_manager.dc3_driver
+        WHERE deleted = 0
+        AND tenant_id = #{tenantId}
+        AND operate_time &gt; create_time
+        AND operate_time &gt;= #{from}
+        UNION ALL
+        SELECT 'device'::text, id, operate_time, create_time
+        FROM dc3_manager.dc3_device
+        WHERE deleted = 0
+        AND tenant_id = #{tenantId}
+        AND operate_time &gt; create_time
+        AND operate_time &gt;= #{from}
+        UNION ALL
+        SELECT 'profile'::text, id, operate_time, create_time
+        FROM dc3_manager.dc3_profile
+        WHERE deleted = 0
+        AND tenant_id = #{tenantId}
+        AND operate_time &gt; create_time
+        AND operate_time &gt;= #{from}) u
         ORDER BY operate_time DESC
         LIMIT #{limit}
     </select>

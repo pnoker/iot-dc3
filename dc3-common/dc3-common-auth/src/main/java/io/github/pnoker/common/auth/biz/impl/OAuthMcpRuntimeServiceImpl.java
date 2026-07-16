@@ -820,6 +820,15 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         oauthMcpMapper.insertAudit(command);
     }
 
+    /**
+     * Exchange an authorization code for tokens (RFC 6749). Validates the code is active,
+     * authenticates the client, checks the redirect URI matches, verifies PKCE when
+     * required, then issues access and refresh tokens.
+     *
+     * @param form               token request form (code, redirect_uri, code_verifier)
+     * @param authorizationHeader client credentials for confidential clients
+     * @return the token response map
+     */
     private Map<String, Object> authorizationCodeToken(Map<String, String> form, String authorizationHeader) {
         String code = form.get("code");
         OAuthAuthorizationRecord authorization = oauthMcpMapper.selectAuthorizationByCodeHash(sha256(code));
@@ -842,6 +851,15 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         return issueAndPersistTokens(authorization, client, true, "");
     }
 
+    /**
+     * Issue tokens for the client-credentials grant. Authenticates the client, requires
+     * a bound service account and an active connection, creates an authorization record,
+     * then issues access (and refresh) tokens.
+     *
+     * @param form               token request form (scope)
+     * @param authorizationHeader client credentials
+     * @return the token response map
+     */
     private Map<String, Object> clientCredentialsToken(Map<String, String> form, String authorizationHeader) {
         OAuthRegisteredClientRecord client = requireClient(resolveClientId(form, authorizationHeader));
         authenticateClient(client, form, authorizationHeader, true);
@@ -871,6 +889,15 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         return issueAndPersistTokens(authorization, client, false, "");
     }
 
+    /**
+     * Exchange a refresh token for new tokens (RFC 6749). Detects replay of a rotated
+     * refresh token and revokes the whole authorization chain on suspicion of theft;
+     * otherwise rotates the refresh token and reissues access and refresh tokens.
+     *
+     * @param form               token request form (refresh_token)
+     * @param authorizationHeader client credentials
+     * @return the token response map
+     */
     private Map<String, Object> refreshToken(Map<String, String> form, String authorizationHeader) {
         String refreshToken = form.get(McpConstant.Field.REFRESH_TOKEN);
         String presentedHash = sha256(refreshToken);
@@ -897,6 +924,17 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         return issueAndPersistTokens(authorization, client, true, presentedHash);
     }
 
+    /**
+     * Issue and persist access (and optionally refresh) tokens for an authorization,
+     * verifying the principal is active and still a tenant member, signing the JWT, and
+     * activating the authorization record with the new token hashes.
+     *
+     * @param authorization      the authorization to issue for
+     * @param client             the registered client
+     * @param issueRefreshToken  whether to issue a refresh token
+     * @param previousRefreshHash the prior refresh-token hash, for rotation tracking
+     * @return the token response map
+     */
     private Map<String, Object> issueAndPersistTokens(OAuthAuthorizationRecord authorization,
                                                       OAuthRegisteredClientRecord client,
                                                       boolean issueRefreshToken,
@@ -951,6 +989,12 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         return response;
     }
 
+    /**
+     * Parse and verify an access token's JWT signature, issuer, and audience.
+     *
+     * @param token the access token
+     * @return the verified JWT claims
+     */
     private Claims parseAccessToken(String token) {
         return Jwts.parser()
                 .requireIssuer(oauthProperties.getIssuer())
@@ -961,6 +1005,13 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                 .getPayload();
     }
 
+    /**
+     * Validate that a service account is bound, enabled, and not expired, required for
+     * the client-credentials grant.
+     *
+     * @param serviceAccountPrincipalId the service account principal id
+     * @param tenantId                  tenant scope
+     */
     private void validateServiceAccountClient(Long serviceAccountPrincipalId, Long tenantId) {
         if (serviceAccountPrincipalId == null || serviceAccountPrincipalId == 0 || tenantId == null || tenantId == 0) {
             throw oauthError(BAD_REQUEST.value(), "invalid_client_metadata",
@@ -977,6 +1028,12 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         }
     }
 
+    /**
+     * Require an authenticated principal carrying principal and tenant ids, throwing a
+     * login_required OAuth error otherwise.
+     *
+     * @param principalHeader the principal header from the request
+     */
     private void requireAuthenticatedPrincipal(RequestHeader.PrincipalHeader principalHeader) {
         if (principalHeader == null
                 || principalHeader.getPrincipalId() == null
@@ -993,6 +1050,16 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         return StringUtils.defaultIfBlank(name, String.valueOf(principalHeader.getPrincipalId()));
     }
 
+    /**
+     * Validate an MCP connection matches the client, principal, tenant, and grant type
+     * and is still usable.
+     *
+     * @param connection the connection to validate
+     * @param clientId   the expected client id
+     * @param principalId the expected principal id
+     * @param tenantId   the expected tenant id
+     * @param grantType  the expected grant type
+     */
     private void validateConnection(McpConnectionRecord connection, String clientId, Long principalId, Long tenantId,
                                     String grantType) {
         if (!isUsableConnection(connection, clientId, principalId, tenantId)
@@ -1001,6 +1068,16 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         }
     }
 
+    /**
+     * Return whether a connection is usable: matches the client/principal/tenant, is
+     * enabled, not revoked, and not expired.
+     *
+     * @param connection  the connection to test
+     * @param clientId    the expected client id
+     * @param principalId the expected principal id
+     * @param tenantId    the expected tenant id
+     * @return true if the connection is usable
+     */
     private boolean isUsableConnection(McpConnectionRecord connection, String clientId, Long principalId,
                                        Long tenantId) {
         return connection != null
@@ -1012,6 +1089,12 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                 && (connection.getExpireTime() == null || connection.getExpireTime().isAfter(LocalDateTime.now()));
     }
 
+    /**
+     * Look up a registered client by its client id, requiring it to exist and be enabled.
+     *
+     * @param clientId the public client id
+     * @return the registered client record
+     */
     private OAuthRegisteredClientRecord requireClient(String clientId) {
         OAuthRegisteredClientRecord client = oauthMcpMapper.selectClientByClientId(clientId);
         if (client == null || !enabled(client.getEnableFlag())) {
@@ -1020,6 +1103,16 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         return client;
     }
 
+    /**
+     * Authenticate a client: public clients must allow the none method (and may be
+     * rejected when a confidential client is required); confidential clients must
+     * present a verifiable, non-expired secret.
+     *
+     * @param client              the registered client
+     * @param form                the token request form (client_secret in body)
+     * @param authorizationHeader the Authorization header (client_secret_basic)
+     * @param confidentialRequired whether a confidential client is required
+     */
     private void authenticateClient(OAuthRegisteredClientRecord client, Map<String, String> form,
                                     String authorizationHeader, boolean confidentialRequired) {
         if (OAuthClientTypeEnum.PUBLIC.getValue().equals(client.getClientType())) {
@@ -1039,12 +1132,27 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         }
     }
 
+    /**
+     * Require a client to allow the given grant type.
+     *
+     * @param client    the registered client
+     * @param grantType the grant type to check
+     */
     private void requireGrant(OAuthRegisteredClientRecord client, String grantType) {
         if (!splitValues(client.getAuthorizationGrantTypes()).contains(grantType)) {
             throw oauthError(BAD_REQUEST.value(), "unauthorized_client", "grant type is not allowed");
         }
     }
 
+    /**
+     * Resolve the requested scopes against the client's allowed scopes, defaulting to all
+     * allowed scopes when none are requested, and rejecting any scope the client does not
+     * allow.
+     *
+     * @param rawScopes the raw space-delimited scope string
+     * @param client    the registered client
+     * @return the resolved scope set
+     */
     private Set<String> requestedScopes(String rawScopes, OAuthRegisteredClientRecord client) {
         Set<String> allowed = splitValues(client.getScopes());
         Set<String> requested = StringUtils.isBlank(rawScopes) ? allowed : splitValues(rawScopes);
@@ -1132,6 +1240,13 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         return target;
     }
 
+    /**
+     * Return whether an authorization code is still active: not revoked, present, and
+     * unexpired.
+     *
+     * @param authorization the authorization record
+     * @return true if the code is active
+     */
     private boolean isActiveCode(OAuthAuthorizationRecord authorization) {
         return authorization.getRevokedTime() == null
                 && StringUtils.isNotBlank(authorization.getAuthorizationCodeHash())
@@ -1139,6 +1254,14 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                 && authorization.getAuthorizationCodeExpires().isAfter(LocalDateTime.now());
     }
 
+    /**
+     * Return whether an authorization is active at the given instant: present, not
+     * revoked, and the access token has not expired.
+     *
+     * @param authorization the authorization record
+     * @param now           the instant to check against
+     * @return true if the authorization is active
+     */
     private boolean isActiveAuthorization(OAuthAuthorizationRecord authorization, LocalDateTime now) {
         return authorization != null
                 && authorization.getRevokedTime() == null
@@ -1270,6 +1393,12 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         return map;
     }
 
+    /**
+     * Return the RSA key material, loading and caching it lazily under double-checked
+     * locking.
+     *
+     * @return the cached key material
+     */
     private KeyMaterial keyMaterial() {
         KeyMaterial current = keyMaterial;
         if (current != null) {
@@ -1284,6 +1413,12 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         }
     }
 
+    /**
+     * Load the RSA key pair from configured PEM keys, generating an ephemeral 2048-bit
+     * pair when neither is configured. Both keys must be provided together.
+     *
+     * @return the loaded key material
+     */
     private KeyMaterial loadKeyMaterial() {
         try {
             String privateKeyBase64 = oauthProperties.getJwt().getPrivateKey();

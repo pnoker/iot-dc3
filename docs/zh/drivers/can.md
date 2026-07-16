@@ -103,7 +103,7 @@ ID、字节切分、可选请求帧），以及可写位号的 `command-attribut
 
 1. 选 `CAN Bus Driver` 创建[设备](../introduction/concepts/device)，driver 属性填 `interfaceName=can0`、`bitrate=500000`、
    `frameFormat=STANDARD`。
-2. 给设备绑定的[物模型](../introduction/concepts/profile)加一个温度[位号](../introduction/concepts/point)（`READ_ONLY`
+2. 给设备绑定的[模板](../introduction/concepts/profile)加一个温度[位号](../introduction/concepts/point)（`READ_ONLY`
    ），point 属性填 `canId=123`、`dataOffset=0`、`dataLength=2`、`dataFormat=INT`、`byteOrder=LITTLE`，`requestCanId`/
    `requestData` 留空（被动监听）。
 3. 启动驱动，30 秒内就能在[位号值](../introduction/concepts/point-value)里看到采集值。

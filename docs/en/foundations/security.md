@@ -2,6 +2,11 @@
 title: IoT Security
 ---
 
+<script setup>
+import SecurityDiagram from '../../.vitepress/theme/components/SecurityDiagram.vue'
+</script>
+
+
 # IoT Security
 
 IoT wires "things that can go online" to "a physical world you can act on," so a single gap threatens data and control
@@ -89,30 +94,7 @@ minimal retention (delete on expiry), so that "even if exfiltrated, what's taken
 Security design needs targets, so align the four layers' countermeasures to concrete threats. The diagram below labels
 five typical threats and their defenses along the data flow:
 
-```mermaid
-flowchart LR
-  subgraph Device["Device (physically reachable)"]
-    D["sensor / actuator<br/>firmware + keys"]
-  end
-  subgraph Net["Link (network-exposed)"]
-    L["TLS / DTLS<br/>auth + anti-replay"]
-  end
-  subgraph Platform["Platform (high-value target)"]
-    G["gateway (single entry)"]
-    A["auth + RBAC<br/>tenant isolation + audit"]
-  end
-  subgraph Data["Data (privacy + compliance)"]
-    S["masking + encryption<br/>minimal retention"]
-  end
-  D -->|collect| L --> G --> A --> S
-
-  T1["device spoofing"] -.counter.-> D
-  T2["firmware tampering"] -.secure boot + signed OTA.-> D
-  T3["replay"] -.timestamp + nonce.-> L
-  T4["MITM"] -.mutual auth.-> L
-  T5["DDoS"] -.rate limit + single entry.-> G
-  T6["priv-esc / cross-tenant"] -.fail-closed + isolation.-> A
-```
+<SecurityDiagram lang="en" />
 
 - **Device spoofing**: impersonating a legitimate device to report fake data or solicit commands — defeated by strong
   device-side authentication (one-device-one-secret, certificates).

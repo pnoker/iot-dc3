@@ -29,7 +29,7 @@
         SELECT enable_flag AS key, COUNT(*) AS count
         FROM dc3_driver
         WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        AND tenant_id = #{tenantId}
         GROUP BY enable_flag
     </select>
 
@@ -38,7 +38,7 @@
         SELECT driver_type_flag AS key, COUNT(*) AS count
         FROM dc3_driver
         WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        AND tenant_id = #{tenantId}
         GROUP BY driver_type_flag
     </select>
 
@@ -52,7 +52,7 @@
         SELECT service_name AS key, COUNT(*) AS count
         FROM dc3_driver
         WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        AND tenant_id = #{tenantId}
         GROUP BY service_name
         ORDER BY count
         DESC
@@ -63,7 +63,7 @@
         SELECT enable_flag AS key, COUNT(*) AS count
         FROM dc3_device
         WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        AND tenant_id = #{tenantId}
         GROUP BY enable_flag
     </select>
 
@@ -72,11 +72,11 @@
         SELECT driver_id AS key, COUNT(*) AS count
         FROM dc3_device
         WHERE deleted = 0
-          AND tenant_id = #{tenantId}
+        AND tenant_id = #{tenantId}
         GROUP BY driver_id
         ORDER BY count
         DESC
-            LIMIT #{limit}
+        LIMIT #{limit}
     </select>
 
     <!--
@@ -88,12 +88,12 @@
         SELECT d.profile_id AS key, COUNT(*) AS count
         FROM dc3_device d
         WHERE d.deleted = 0
-          AND d.tenant_id = #{tenantId}
-          AND d.profile_id IS NOT NULL
+        AND d.tenant_id = #{tenantId}
+        AND d.profile_id IS NOT NULL
         GROUP BY d.profile_id
         ORDER BY count
         DESC
-            LIMIT #{limit}
+        LIMIT #{limit}
     </select>
 
     <!--
@@ -106,9 +106,9 @@
         SELECT DATE(create_time) AS day, COUNT(*) AS count
         FROM ${table}
         WHERE deleted = 0
-          AND tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
-          AND create_time &lt; #{to}
+        AND tenant_id = #{tenantId}
+        AND create_time &gt;= #{from}
+        AND create_time &lt; #{to}
         GROUP BY DATE(create_time)
         ORDER BY day ASC
     </select>
@@ -123,16 +123,16 @@
 
     <select id="topologyDrivers"
             resultType="io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDriverRow">
-        SELECT d.id          AS id,
-               d.driver_name AS driver_name,
-               COUNT(dev.id) AS device_count
+        SELECT d.id AS id,
+        d.driver_name AS driver_name,
+        COUNT(dev.id) AS device_count
         FROM dc3_driver d
-                 LEFT JOIN dc3_device dev
-                           ON dev.driver_id = d.id
-                               AND dev.tenant_id = d.tenant_id
-                               AND dev.deleted = 0
+        LEFT JOIN dc3_device dev
+        ON dev.driver_id = d.id
+        AND dev.tenant_id = d.tenant_id
+        AND dev.deleted = 0
         WHERE d.deleted = 0
-          AND d.tenant_id = #{tenantId}
+        AND d.tenant_id = #{tenantId}
         GROUP BY d.id, d.driver_name
     </select>
 
@@ -202,11 +202,11 @@
     <select id="topologyPointVolumes"
             resultType="io.github.pnoker.common.manager.entity.bo.dashboard.PointVolumeRow">
         SELECT device_id AS device_id,
-               point_id  AS point_id,
-               COUNT(*)  AS cnt
+        point_id AS point_id,
+        COUNT(*) AS cnt
         FROM dc3_history.dc3_point_value
         WHERE tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
+        AND create_time &gt;= #{from}
         GROUP BY device_id, point_id
     </select>
 

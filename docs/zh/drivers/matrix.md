@@ -29,7 +29,7 @@ title: 驱动能力矩阵
 | [OPC DA](./opc-da) (`OpcDaDriver`)                | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 经典 OPC 数据访问（DCOM）  |
 | [S7](./plcs7) (`PlcS7Driver`)                     | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 西门子 PLC            |
 | [MELSEC](./melsec) (`MelsecDriver`)               | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 三菱 PLC（MC 协议）      |
-| [FINS](./fins) (`FinsDriver`)                     | 工业总线/PLC | ✓ | ✓ | —     | 可用   | 欧姆龙 PLC，当前限 16 位整数 |
+| [FINS](./fins) (`FinsDriver`)                     | 工业总线/PLC | ✓ | ✓ | —     | 可用   | 欧姆龙 PLC，支持 16/32 位整数、浮点、字符串与 BCD |
 | [EtherNet/IP](./ethernet-ip) (`EthernetIpDriver`) | 工业总线/PLC | — | — | —     | 骨架   | 罗克韦尔 / CIP，组帧待补    |
 
 ## SCADA / 电力 / 计量
@@ -54,7 +54,7 @@ Observe 订阅尚未实现；
 
 | 驱动 (dc3.driver.code)                | 类别     | 读 | 写 | 订阅/上报 | 实现状态 | 备注                        |
 |-------------------------------------|--------|---|---|-------|------|---------------------------|
-| [MQTT](./mqtt) (`MqttDriver`)       | IoT/无线 | — | ✓ | ✓     | 可用   | 发布/订阅，值经订阅到达；部分健康钩子为骨架    |
+| [MQTT](./mqtt) (`MqttDriver`)       | IoT/无线 | — | ✓ | ✓     | 可用   | 发布/订阅，值经订阅到达；`initial()` 钩子为骨架    |
 | [CoAP](./coap) (`CoapDriver`)       | IoT/无线 | ✓ | ✓ | —     | 可用   | 受限设备 RESTful，Observe 未实现  |
 | [LwM2M](./lwm2m) (`Lwm2mDriver`)    | IoT/无线 | ✓ | ✓ | —     | 可用   | 内嵌服务端，读写已落地，Observe 订阅未实现 |
 | [HTTP](./http) (`HttpDriver`)       | IoT/无线 | ✓ | ✓ | —     | 完整   | 通用 HTTP 采集                |

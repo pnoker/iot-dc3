@@ -240,6 +240,15 @@ public class CommandServiceImpl implements CommandService {
         return wrapper.lambda();
     }
 
+    /**
+     * Check whether a command is duplicated within its profile by command name or code.
+     * Returns {@code false} when neither name nor code is supplied.
+     *
+     * @param entityBO       {@link CommandBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
+     */
     private boolean checkDuplicate(CommandBO entityBO, boolean isUpdate, boolean throwException) {
         boolean hasName = StringUtils.isNotEmpty(entityBO.getCommandName());
         boolean hasCode = StringUtils.isNotEmpty(entityBO.getCommandCode());
@@ -272,6 +281,11 @@ public class CommandServiceImpl implements CommandService {
         return duplicate;
     }
 
+    /**
+     * Validate that the command's profile belongs to the same tenant.
+     *
+     * @param entityBO the command to validate
+     */
     private void validateTenantRelations(CommandBO entityBO) {
         ProfileBO profileBO = profileService.getById(entityBO.getProfileId());
         if (Objects.isNull(profileBO) || !Objects.equals(entityBO.getTenantId(), profileBO.getTenantId())) {
@@ -279,6 +293,11 @@ public class CommandServiceImpl implements CommandService {
         }
     }
 
+    /**
+     * Delete all params belonging to a command (cascade on command delete).
+     *
+     * @param commandId the command whose params to delete
+     */
     private void cascadeDeleteParams(Long commandId) {
         LambdaQueryChainWrapper<CommandParamDO> wrapper = commandParamManager.lambdaQuery()
                 .eq(CommandParamDO::getCommandId, commandId);
@@ -288,6 +307,11 @@ public class CommandServiceImpl implements CommandService {
         }
     }
 
+    /**
+     * Publish a device-update metadata event to each affected device's driver.
+     *
+     * @param deviceIds the devices that changed
+     */
     private void publishDeviceUpdateEvents(Collection<Long> deviceIds) {
         if (CollectionUtils.isEmpty(deviceIds)) {
             return;
@@ -297,6 +321,12 @@ public class CommandServiceImpl implements CommandService {
                         driverServiceNamesByDeviceId(deviceId))));
     }
 
+    /**
+     * Resolve the union of driver service names serving the given devices.
+     *
+     * @param deviceIds the devices to look up drivers for
+     * @return the set of driver service names
+     */
     private Set<String> driverServiceNamesByDeviceIds(Collection<Long> deviceIds) {
         if (CollectionUtils.isEmpty(deviceIds)) {
             return Collections.emptySet();
@@ -307,6 +337,12 @@ public class CommandServiceImpl implements CommandService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Resolve the driver service name serving a single device.
+     *
+     * @param deviceId the device to look up
+     * @return the driver service name, or empty when none
+     */
     private Set<String> driverServiceNamesByDeviceId(Long deviceId) {
         if (Objects.isNull(deviceId)) {
             return Collections.emptySet();
@@ -318,6 +354,12 @@ public class CommandServiceImpl implements CommandService {
         return Set.of(driverBO.getServiceName());
     }
 
+    /**
+     * List the device ids sharing a profile.
+     *
+     * @param profileId the profile id
+     * @return the device ids
+     */
     private List<Long> listDeviceIdsByProfileId(Long profileId) {
         if (Objects.isNull(profileId)) {
             return Collections.emptyList();
@@ -327,6 +369,14 @@ public class CommandServiceImpl implements CommandService {
         return deviceMapper.selectList(wrapper).stream().map(DeviceDO::getId).toList();
     }
 
+    /**
+     * Get command data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link CommandDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
     private CommandDO getDOById(Long id, boolean throwException) {
         CommandDO entityDO = commandManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {

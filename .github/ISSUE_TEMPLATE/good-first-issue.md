@@ -1,23 +1,23 @@
 ---
-name: Good First Issue
-about: Entry-level task suitable for community contributors
+name: Good First Issue / 新手任务
+about: 适合社区贡献者的入门任务 / Entry-level task suitable for community contributors
 labels: ["good first issue"]
 ---
 
-## Background
+## 背景 / Background
 
-(What problem or feature this addresses.)
+（该任务针对什么问题或功能。 / What problem or feature this addresses.）
 
-## Tasks
+## 任务 / Tasks
 
-(Describe the specific work, with directional guidance where possible.)
+（描述具体工作，尽量给出方向指引。 / Describe the specific work, with directional guidance where possible.）
 
-## Affected Modules
+## 影响模块 / Affected Modules
 
-- Backend:
-- Frontend:
-- Docs:
+- 后端 / Backend:
+- 前端 / Frontend:
+- 文档 / Docs:
 
-## References
+## 参考 / References
 
-(Relevant code paths, doc links, similar implementations.)
+（相关代码路径、文档链接、相似实现。 / Relevant code paths, doc links, similar implementations.）

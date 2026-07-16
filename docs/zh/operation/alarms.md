@@ -2,6 +2,13 @@
 title: 告警与通知
 ---
 
+<script setup>
+import AlarmSourceFlowDiagram from '../../.vitepress/theme/components/AlarmSourceFlowDiagram.vue'
+import AlarmErDiagram from '../../.vitepress/theme/components/AlarmErDiagram.vue'
+import AlarmNotifyFlowDiagram from '../../.vitepress/theme/components/AlarmNotifyFlowDiagram.vue'
+</script>
+
+
 # 告警与通知
 
 平台把"什么时候出问题、谁该被告知"统一收敛到一张运行告警表和一条通知链路。读完这页，你能看懂五类告警来源如何汇入
@@ -23,15 +30,7 @@ DC3 的选择是：**所有运行告警，无论来源，统一落在 `dc3_entit
 五类告警来源最终都写入 `dc3_entity_alarm`，区别只在标志位。`alarm_source_flag` 的取值来自 `AlarmSourceTypeEnum`，注意
 `EVENT_REPORT=5`、`SYSTEM=4`（5 号为持久化兼容保留，枚举里排在 4 之后）：
 
-```mermaid
-flowchart LR
-  Rule["规则引擎<br/>dc3_rule 命中"] -->|"source=0 RULE"| EA[("dc3_entity_alarm<br/>统一运行告警")]
-  Offline["离线超时<br/>dc3_entity_state 租约过期"] -->|"source=1 STATE_TIMEOUT"| EA
-  DevRep["设备上报<br/>(随值更新内嵌)"] -->|"source=2 DEVICE_REPORT"| EA
-  DrvRep["驱动上报"] -->|"source=3 DRIVER_REPORT"| EA
-  EvtRep["事件上报<br/>dc3_event_history 触发规则"] -->|"source=5 EVENT_REPORT"| EA
-  EA --> Notify["通知链路<br/>email / SMS / webhook"]
-```
+<AlarmSourceFlowDiagram lang="zh" />
 
 `alarm_source_flag`（来自哪里）和 `alarm_type_flag`（发生了什么）是两个独立维度，不要混淆：
 
@@ -62,65 +61,7 @@ flowchart LR
 `dc3_rule_state`（运行状态机）→ `dc3_notify`（通知配置）→ `dc3_notify_channel`（渠道）→ `dc3_notify_history`（送达审计）这条链路。下图是这些表与
 `dc3_event_history` 的关系（这些是逻辑关联，库内通过 id 列关联，未建外键约束）：
 
-```mermaid
-erDiagram
-    RULE ||--o{ RULE_STATE : "运行状态跟踪"
-    RULE ||--o{ ENTITY_ALARM : "触发产生告警"
-    RULE }o--|| NOTIFY : "notify_id 绑定通知"
-    NOTIFY ||--o{ NOTIFY_CHANNEL_BIND : "绑定渠道"
-    NOTIFY_CHANNEL ||--o{ NOTIFY_CHANNEL_BIND : "被绑定"
-    NOTIFY ||--o{ NOTIFY_HISTORY : "产生送达记录"
-    NOTIFY_CHANNEL ||--o{ NOTIFY_HISTORY : "经此渠道送达"
-    ENTITY_ALARM ||--o{ NOTIFY_HISTORY : "alarm_id 关联"
-    EVENT_HISTORY ||--o{ ENTITY_ALARM : "事件触发告警"
-    RULE {
-        long id
-        string rule_code
-        byte alarm_target_type_flag
-        long notify_id
-        long message_id
-        byte enable_flag
-    }
-    RULE_STATE {
-        long id
-        long rule_id
-        string fingerprint
-        byte entity_state_flag "0pending 1firing 2recovered 3closed"
-        int trigger_count
-        long alarm_id
-    }
-    NOTIFY {
-        long id
-        string notify_code
-        long notify_interval
-        byte auto_confirm_flag
-    }
-    NOTIFY_CHANNEL {
-        long id
-        string channel_code
-        byte channel_type_flag "0email 1SMS 2webhook"
-    }
-    NOTIFY_HISTORY {
-        long id
-        long alarm_id
-        long channel_id
-        byte status_flag "0pending 1sent 2success 3failed 4retry"
-        int retry_count
-    }
-    ENTITY_ALARM {
-        long id
-        byte alarm_source_flag
-        byte alarm_target_type_flag
-        long rule_id
-        long rule_state_id
-    }
-    EVENT_HISTORY {
-        long id
-        long event_id
-        byte event_type_flag
-        byte acknowledge_flag
-    }
-```
+<AlarmErDiagram lang="zh" />
 
 ### 触发状态机：pending → firing → recovered → closed
 
@@ -136,16 +77,7 @@ erDiagram
 规则命中后，告警写入与通知发送的次序如下（`dc3_notify_history` 的 pending 记录在事务内同步落库，随后才经 RabbitMQ
 异步投递渠道并回写状态）：
 
-```mermaid
-flowchart TB
-  Change["dc3_rule_state.entity_state_flag 变化"] --> Svc["AlarmRuleTriggerService.processXxx()"]
-  Svc --> Ins1[("dc3_entity_alarm INSERT")]
-  Svc --> Ins2[("dc3_notify_history INSERT<br/>(事务内同步落 pending)")]
-  Ins2 --> Send["NotifyTaskSender 经 RabbitMQ<br/>发布 NotifyTaskDTO (异步)"]
-  Send --> Bind["dc3_notify → dc3_notify_channel_bind → dc3_notify_channel"]
-  Bind --> Deliver["渠道送达 email / SMS / webhook"]
-  Deliver --> Status["回写 status_flag<br/>0pending→1sent→2success / 3failed→4retry"]
-```
+<AlarmNotifyFlowDiagram lang="zh" />
 
 `dc3_notify_channel.channel_type_flag` 受约束 `CHECK (channel_type_flag BETWEEN 0 AND 2)`，即 `0=email`、`1=SMS`、
 `2=webhook`；`dc3_notify_history.status_flag` 受约束 `CHECK (status_flag BETWEEN 0 AND 4)`，覆盖

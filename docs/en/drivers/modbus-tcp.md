@@ -2,6 +2,11 @@
 title: Modbus TCP Driver
 ---
 
+<script setup>
+import ModbusTcpDiagram from '../../.vitepress/theme/components/ModbusTcpDiagram.vue'
+</script>
+
+
 # Modbus TCP Driver
 
 `dc3-driver-modbus-tcp` connects Modbus TCP slave devices to IoT DC3. It acts as the Modbus master (client),
@@ -32,15 +37,7 @@ request/response** — a slave stays silent until polled, so the IoT DC3 driver,
 
 Modbus data is organized into four register spaces, distinguished on read by the **function code**:
 
-```mermaid
-flowchart LR
-  Drv["dc3-driver-modbus-tcp<br/>(Modbus master)"] -->|"FC01 read coils"| Coil["Coils<br/>(read/write, bit)"]
-  Drv -->|"FC02 read discrete inputs"| DI["Discrete Inputs<br/>(read-only, bit)"]
-  Drv -->|"FC03 read holding registers"| HR["Holding Registers<br/>(read/write, 16-bit)"]
-  Drv -->|"FC04 read input registers"| IR["Input Registers<br/>(read-only, 16-bit)"]
-  Drv -.->|"FC05 write coil / FC06 write register"| Coil
-  Drv -.-> HR
-```
+<ModbusTcpDiagram lang="en" />
 
 Coils and discrete inputs are single bits (digital), while holding and input registers are 16-bit words (analog). A
 32-bit `FLOAT` or `LONG` occupies two consecutive registers, and a 64-bit `DOUBLE` occupies four — the driver assembles

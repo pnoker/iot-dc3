@@ -2,6 +2,11 @@
 title: Development Overview and Conventions
 ---
 
+<script setup>
+import DevIndexDiagram from '../../.vitepress/theme/components/DevIndexDiagram.vue'
+</script>
+
+
 # Development Overview and Conventions
 
 This page is for developers about to write backend code for IoT DC3. By the end you'll know where the authoritative
@@ -67,17 +72,7 @@ They only call the contract interfaces in `dc3-common-facade-api`, and the deplo
 implementation behind them is gRPC (`dc3-common-facade-grpc`) or in-process (`dc3-common-facade-local-*`). Distributed
 deployments default to `grpc` (`DC3_FACADE_MODE=grpc`).
 
-```mermaid
-flowchart LR
-  Client["Client (VO request/response)"] --> Ctrl["Controller<br/>VO only"]
-  Ctrl -->|"MapStruct *Builder"| Svc["Service (BaseService(B,Q))<br/>BO only"]
-  Svc -->|"in-service data"| Mgr["Manager / Mapper<br/>DO only"]
-  Mgr --> DB[("PostgreSQL")]
-  Svc -->|"cross-service data<br/>must go through facade"| Fac["*Facade interface<br/>dc3-common-facade-api"]
-  Fac -.->|"distributed grpc"| Grpc["dc3-common-facade-grpc"]
-  Fac -.->|"monolith local"| Local["dc3-common-facade-local-*"]
-  Grpc -->|"gRPC"| Other["other center services"]
-```
+<DevIndexDiagram lang="en" />
 
 The dashed line labeled "must go through facade" is the boundary itself. The left half is the in-service VO→BO→DO
 drop-through; the right half is any cross-service read or write, which must first be abstracted into a facade contract

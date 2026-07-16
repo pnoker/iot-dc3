@@ -2,6 +2,11 @@
 title: "Why Spring AI: How DC3 Lets LLMs Operate Your Factory"
 ---
 
+<script setup>
+import SpringAiSequenceDiagram from '../../.vitepress/theme/components/SpringAiSequenceDiagram.vue'
+</script>
+
+
 # Why Spring AI: How DC3 Lets LLMs Operate Your Factory
 
 In 2025, large language models stopped being chatbots and started becoming operators. GPT-4o, Claude 4, DeepSeek,
@@ -93,52 +98,7 @@ safety net that Python tool-calling frameworks cannot provide.
 
 Here's the full path of a typical AI-assisted operation in DC3, end to end:
 
-```mermaid
-sequenceDiagram
-    participant User as 👤 Operator
-    participant GW as 🌐 dc3-gateway :8000
-    participant Auth as 🔐 dc3-center-auth
-    participant Agentic as 🤖 dc3-center-agentic
-    participant Tools as 🔧 10x @Tool Beans
-    participant Manager as 📋 dc3-center-manager
-    participant Data as 💾 dc3-center-data
-    participant DB as 🗄️ PostgreSQL + MongoDB
-
-    User->>GW: POST /api/v3/agentic/v1/chat/completions<br/>"Read boiler temp and fan speed"
-    GW->>Auth: Validate X-Auth-Tenant + X-Auth-Token
-    Auth-->>GW: Principal + tenant_id + permissions
-    GW->>Agentic: Forward chat request
-
-    Agentic->>Agentic: ChatClient.call(prompt, tools)
-    Note over Agentic: Model decides: call getLatestPointValue() + getLatestPointValue()
-
-    Agentic->>Tools: PointValueTool.getLatestPointValue(pointId=42)
-    Tools->>Tools: requireTenantId(toolContext) → tenant=acme-corp
-    Tools->>Data: selectLatestByPointId(42, acme-corp)
-    Data->>DB: MongoDB query (point_id=42, tenant_id=acme-corp)
-    DB-->>Data: {value: 86.4, unit: "°C", ts: "2026-06-28T10:00:00Z"}
-    Data-->>Tools: PointValueBO
-    Tools-->>Agentic: Tool result
-
-    Agentic->>Agentic: Model synthesizes response
-    Agentic-->>GW: ChatCompletion (natural language answer)
-    GW-->>User: "Boiler #3 temperature: 86.4°C (collected 2 min ago).<br/>Fan speed: 60%."
-
-    User->>GW: "Set fan to 100%"
-    GW->>Auth: Validate
-    GW->>Agentic: Forward
-
-    Agentic->>Agentic: Model intends writePointValue()
-    Note over Agentic: ⚠️ Write tool → generate pending Action
-    Agentic->>Agentic: ActionService.createWritePointValueAction()
-    Agentic-->>User: ⚠️ Pending confirmation: Action #abc123<br/>"Set Boiler #3 fan to 100%"
-
-    User->>GW: POST /action/confirm (action_id=abc123)
-    GW->>Agentic: Confirm action
-    Agentic->>Data: PointCommandFacade.submitWrite()
-    Data-->>Agentic: Command accepted
-    Agentic-->>User: ✅ Fan set to 100%. Command dispatched.
-```
+<SpringAiSequenceDiagram lang="en" />
 
 Four things make this architecture production-grade:
 

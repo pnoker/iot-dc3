@@ -183,6 +183,15 @@ public class EventParamServiceImpl implements EventParamService {
         return wrapper.lambda();
     }
 
+    /**
+     * Check whether an event param is duplicated within its event by param name or code.
+     * Returns {@code false} when neither name nor code is supplied.
+     *
+     * @param entityBO       {@link EventParamBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
+     */
     private boolean checkDuplicate(EventParamBO entityBO, boolean isUpdate, boolean throwException) {
         boolean hasName = StringUtils.isNotEmpty(entityBO.getParamName());
         boolean hasCode = StringUtils.isNotEmpty(entityBO.getParamCode());
@@ -215,6 +224,11 @@ public class EventParamServiceImpl implements EventParamService {
         return duplicate;
     }
 
+    /**
+     * Validate that the param's event belongs to the same tenant via its profile.
+     *
+     * @param entityBO the param to validate
+     */
     private void validateTenantRelations(EventParamBO entityBO) {
         EventBO eventBO = eventService.getById(entityBO.getEventId());
         if (Objects.isNull(eventBO) || !Objects.equals(entityBO.getTenantId(), eventBO.getTenantId())) {
@@ -222,6 +236,11 @@ public class EventParamServiceImpl implements EventParamService {
         }
     }
 
+    /**
+     * Publish an event-update metadata event to the devices sharing the event's profile.
+     *
+     * @param eventId the event that changed
+     */
     private void publishEventUpdate(Long eventId) {
         if (Objects.isNull(eventId)) {
             return;
@@ -243,6 +262,11 @@ public class EventParamServiceImpl implements EventParamService {
         publishDeviceUpdateEvents(deviceIds);
     }
 
+    /**
+     * Publish a device-update metadata event to each affected device's driver.
+     *
+     * @param deviceIds the devices that changed
+     */
     private void publishDeviceUpdateEvents(Collection<Long> deviceIds) {
         if (CollectionUtils.isEmpty(deviceIds)) {
             return;
@@ -252,6 +276,12 @@ public class EventParamServiceImpl implements EventParamService {
                         driverServiceNamesByDeviceId(deviceId))));
     }
 
+    /**
+     * Resolve the union of driver service names serving the given devices.
+     *
+     * @param deviceIds the devices to look up drivers for
+     * @return the set of driver service names
+     */
     private Set<String> driverServiceNamesByDeviceIds(Collection<Long> deviceIds) {
         if (CollectionUtils.isEmpty(deviceIds)) {
             return Collections.emptySet();
@@ -262,6 +292,12 @@ public class EventParamServiceImpl implements EventParamService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Resolve the driver service name serving a single device.
+     *
+     * @param deviceId the device to look up
+     * @return the driver service name, or empty when none
+     */
     private Set<String> driverServiceNamesByDeviceId(Long deviceId) {
         if (Objects.isNull(deviceId)) {
             return Collections.emptySet();
@@ -273,6 +309,12 @@ public class EventParamServiceImpl implements EventParamService {
         return Set.of(driverBO.getServiceName());
     }
 
+    /**
+     * List the device ids sharing a profile.
+     *
+     * @param profileId the profile id
+     * @return the device ids
+     */
     private List<Long> listDeviceIdsByProfileId(Long profileId) {
         if (Objects.isNull(profileId)) {
             return Collections.emptyList();
@@ -282,6 +324,14 @@ public class EventParamServiceImpl implements EventParamService {
         return deviceMapper.selectList(wrapper).stream().map(DeviceDO::getId).toList();
     }
 
+    /**
+     * Get event param data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link EventParamDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
     private EventParamDO getDOById(Long id, boolean throwException) {
         EventParamDO entityDO = eventParamManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {

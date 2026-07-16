@@ -2,6 +2,11 @@
 title: Environment Variables Explained
 ---
 
+<script setup>
+import EnvironmentDiagram from '../../.vitepress/theme/components/EnvironmentDiagram.vue'
+</script>
+
+
 # Environment Variables Explained
 
 IoT DC3 has two separate sets of environment files, and they target different consumers. The root `.env` feeds Docker
@@ -39,19 +44,7 @@ container's runtime environment.
 The diagram shows how each file set takes effect along its own path. The key point: these two paths **never cross**.
 Compose does not read `dev.env.sh`, and local Java processes do not read the root `.env`.
 
-```mermaid
-flowchart LR
-  subgraph ComposePath["Compose Path"]
-    Env[".env (root)"] -->|"Compose interpolation"| Yml["docker-compose*.yml"]
-    Yml -->|"environment / env_file"| Ctn["Container process<br/>sees dc3-postgres:5432"]
-  end
-  subgraph LocalPath["Local Source Path"]
-    Sh["dc3/env/dev.env.sh"] -->|"source (export)"| Proc["Local Java process<br/>sees localhost:35432"]
-    DevEnv["dc3/env/dev.env"] -->|"IDE EnvFile plugin"| Proc
-  end
-  Field["host ports 35432/35672/31883"] -.->|"host-published"| Proc
-  Ctn -.->|"internal ports 5432/5672/1883"| Field
-```
+<EnvironmentDiagram lang="en" />
 
 The mapping between host ports and internal ports is the core of this diagram:
 

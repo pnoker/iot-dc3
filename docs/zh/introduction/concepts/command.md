@@ -2,9 +2,14 @@
 title: 指令 Command
 ---
 
+<script setup>
+import CommandRelationDiagram from '../../../.vitepress/theme/components/CommandRelationDiagram.vue'
+import CommandFlowDiagram from '../../../.vitepress/theme/components/CommandFlowDiagram.vue'
+</script>
+
 # 指令 Command
 
-> **指令是下发给设备的一次动作请求**——重启、校准、切换模式、设定温度……定义归属[物模型 Profile](./profile)
+> **指令是下发给设备的一次动作请求**——重启、校准、切换模式、设定温度……定义归属[模板 Profile](./profile)
 > ，调用归属[设备](./device)，带一组输入/输出参数，由[驱动](./driver)执行后回执结果。
 
 指令回答的是"让设备做一件事"，它是[事件](./event)的对偶：事件上行（设备说"发生了什么"），指令下行（平台说"去做什么"）。
@@ -12,7 +17,7 @@ title: 指令 Command
 ## 它是什么、为什么需要
 
 工业设备除了"上报数值"和"被读写某个量"，还需要被触发**动作型能力**：重启、固件升级、模式切换、按模板下发一段配置。这些动作往往带参数、需要回执、要做超时与审计——把它们建模成
-`Profile` 下的结构化子资源，就是**指令 Command**。定义沉淀在物模型里（这类设备能做哪些动作、每个动作收哪些参数），调用落到具体设备实例（某台设备某时刻执行了一次）。
+`Profile` 下的结构化子资源，就是**指令 Command**。定义沉淀在模板里（这类设备能做哪些动作、每个动作收哪些参数），调用落到具体设备实例（某台设备某时刻执行了一次）。
 
 ### 最关键的区分：两类下行不要混淆
 
@@ -27,7 +32,7 @@ DC3 有两条独立的下行链路，初学者最容易混淆：
 | DTO  | `PointCommandDTO`                   | `CommandCallDTO` / `CommandCallResultDTO` |
 | 队列前缀 | `dc3.e.point_command`               | `dc3.e.command`                           |
 
-一句话边界（见设计稿 point-command.md §1.2）：**写位号是属性维度的运行态访问，自定义指令是物模型层的动作能力。**
+一句话边界（见设计稿 point-command.md §1.2）：**写位号是属性维度的运行态访问，自定义指令是模板层的动作能力。**
 
 ::: tip 一个例子讲清边界
 给空调"把目标温度设为 26℃"——这是**写位号**：`targetTemp` 是一个可写 Point，写入 `26` 即可，本质是改一个量。
@@ -50,7 +55,7 @@ DC3 有两条独立的下行链路，初学者最容易混淆：
 | `callTypeFlag`    | CallTypeEnum    | 调用方式：`sync` / `async`                                |
 | `timeout`         | Integer         | 调用超时时间（秒）                                            |
 | `commandExt`      | CommandExt      | 扩展配置（协议映射、驱动指令模板、幂等等）                                |
-| `profileId`       | Long            | 归属的[物模型](./profile)                                  |
+| `profileId`       | Long            | 归属的[模板](./profile)                                  |
 | `enableFlag`      | EnableFlagEnum  | 启停状态                                                 |
 | `tenantId`        | Long            | 归属[租户](./tenant)                                     |
 
@@ -83,15 +88,9 @@ DC3 有两条独立的下行链路，初学者最容易混淆：
 
 ## 与其它概念的关系
 
-```mermaid
-flowchart LR
-    PR["物模型 Profile"] -->|定义| CMD["指令 Command"]
-    CMD -->|含| CP["指令参数 CommandParam"]
-    DEV["设备 Device"] -->|调用 CommandCall| REC[("dc3_command_history")]
-    REC -->|经驱动执行| DRV["驱动 Driver"]
-```
+<CommandRelationDiagram lang="zh" />
 
-- 指令**定义**挂在物模型下，与[位号](./point)、[事件](./event)并列，共同描述"这类设备有什么能力"。
+- 指令**定义**挂在模板下，与[位号](./point)、[事件](./event)并列，共同描述"这类设备有什么能力"。
 - 指令**调用**由[设备](./device)发起；驱动执行所需的协议映射由 [指令属性配置](./attribute-config)（`CommandConfig`
   ）提供，与业务参数 `CommandParam` 分属两层。
 
@@ -101,15 +100,7 @@ flowchart LR
 `occurredAt`、`expireAt`。数据中心持久化为一条 `dc3_command_history` 记录（PENDING），投递到 RabbitMQ，驱动执行后回执
 `CommandCallResultDTO`（`status`、`resultValues`、`errorCode`、`errorMessage`、`finishedAt`）。
 
-```mermaid
-flowchart LR
-    APP["调用方"] -->|CommandCallDTO| DC["数据中心 CommandHistoryService"]
-    DC -->|持久化 PENDING→SENT| REC[("dc3_command_history")]
-    DC -->|dc3.e.command| DRV["驱动 CommandReceiver"]
-    DRV -->|execute| DEV["设备"]
-    DRV -->|CommandCallResultDTO| DC
-    DC -->|推进终态| REC
-```
+<CommandFlowDiagram lang="zh" />
 
 调用状态机（`PointCommandStatusEnum`，与写位号共用）：
 
@@ -132,7 +123,7 @@ PENDING → SENT → SUCCESS / FAILED / TIMEOUT / EXPIRED / DUPLICATE / DEAD
 
 ## 示例
 
-空调的物模型里定义一个指令：`commandCode = setTemperature`、`commandTypeFlag = action`、`callTypeFlag = sync`、
+空调的模板里定义一个指令：`commandCode = setTemperature`、`commandTypeFlag = action`、`callTypeFlag = sync`、
 `timeout = 10`，带一个输入参数 `temperature`（`paramDirectionFlag = input`、`paramTypeFlag = DOUBLE`、`requiredFlag = true`
 ）和一个输出参数 `resultCode`（`output`、`STRING`）。
 
@@ -152,7 +143,7 @@ PENDING → SENT → SUCCESS / FAILED / TIMEOUT / EXPIRED / DUPLICATE / DEAD
 
 ## 延伸阅读
 
-- [物模型 Profile](./profile) — 指令定义挂在物模型下
+- [模板 Profile](./profile) — 指令定义挂在模板下
 - [位号 Point](./point) — 写位号 vs 自定义指令的边界另一侧
 - [事件 Event](./event) — 下行的对偶：指令下行、事件上行
 - [指令/事件属性配置](./attribute-config) — `CommandConfig` 如何把参数映射成协议报文

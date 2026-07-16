@@ -2,6 +2,11 @@
 title: 变更日志
 ---
 
+<script setup>
+import ChangelogDiagram from '../../.vitepress/theme/components/ChangelogDiagram.vue'
+</script>
+
+
 # 变更日志
 
 下面这份变更日志不是手写的——它由 `make changelog` 从 git 提交历史按 Conventional Commits
@@ -19,12 +24,7 @@ title: 变更日志
 生成器是 `dc3/bin/changelog.py`（Python，无第三方依赖），由 Makefile 目标 `make changelog` 驱动，产出文件为
 `dc3/doc/CHANGE.md`——也就是本页底部内联的那份。整条生成链路如下：
 
-```mermaid
-flowchart LR
-  Commits["git 提交历史<br/>Conventional Commits"] -->|"make changelog"| Gen["dc3/bin/changelog.py<br/>解析类型/作用域并按版本聚合"]
-  Gen -->|"覆盖写回"| Change["dc3/doc/CHANGE.md<br/>分版本分类的清单"]
-  Change -->|"VitePress @include"| Page["本页《完整变更清单》小节"]
-```
+<ChangelogDiagram lang="zh" />
 
 链路是单向的：提交历史是唯一原始数据，脚本聚合产物落在 `CHANGE.md`，本页只是把它内联展示——所以**不要在本页手工编辑条目**
 ，改动会在下次 `make changelog` 时被覆盖。

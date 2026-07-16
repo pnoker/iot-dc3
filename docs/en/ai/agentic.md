@@ -2,6 +2,12 @@
 title: "Agentic Center: AI-Assisted Operations"
 ---
 
+<script setup>
+import AgenticSequenceDiagram from '../../.vitepress/theme/components/AgenticSequenceDiagram.vue'
+import AgenticErDiagram from '../../.vitepress/theme/components/AgenticErDiagram.vue'
+</script>
+
+
 # Agentic Center: AI-Assisted Operations
 
 The Agentic Center (`dc3-center-agentic`) connects an OpenAI-compatible large language model to IoT DC3's devices,
@@ -38,8 +44,8 @@ environment, turn it off.
 The Agentic Center exposes a single core entry point shaped like OpenAI's Chat Completions, so any OpenAI client can
 connect directly:
 
-- Path: `POST /api/v3/agentic/v1/chat/completions` through the gateway. The gateway's `StripPrefix=2` removes `/api/v3`
-  and forwards to the Agentic Center's `/v1/chat/completions`.
+- Path: `POST /api/v3/agentic/chat/completions` through the gateway. The gateway's `StripPrefix=2` removes `/api/v3`
+  and forwards to the Agentic Center's `/chat/completions`.
 - Two response modes: with `stream=true` it returns token-by-token over **SSE**; otherwise it returns a single **JSON**
   response.
 - Permission: `@PreAuthorize("@perm.can('chat', 'list')")` — the caller must carry the platform auth headers
@@ -53,7 +59,7 @@ the real token you get after logging in.
 ::: code-group
 
 ```bash [curl]
-curl -X POST http://localhost:8000/api/v3/agentic/v1/chat/completions \
+curl -X POST http://localhost:8000/api/v3/agentic/chat/completions \
   -H "Content-Type: application/json" \
   -H "X-Auth-Tenant: <tenant>" \
   -H "X-Auth-Login: <login>" \
@@ -97,27 +103,7 @@ The model doesn't answer out of thin air. During the conversation it calls built
 below shows a mixed "read + write" operation: read-type tools execute directly, while write-type (high-risk) tools pause
 for human confirmation before continuing.
 
-```mermaid
-sequenceDiagram
-    participant User as User
-    participant Chat as ChatClient dc3-center-agentic
-    participant Tool as Built-in Tool @Tool
-    participant Backend as Data Center dc3-center-data
-    User->>Chat: Ask ("read temperature and shut down the fan")
-    Chat->>Tool: Call PointValueTool.getLatestPointValue()
-    Tool->>Backend: Read latest point value (tenant-isolated)
-    Backend-->>Tool: PointValueBO
-    Tool-->>Chat: Return tool result
-    Chat->>Tool: Intend to call PointValueTool.writePointValue (write command)
-    Note over Chat,User: Write tool not executed directly, generates pending Action
-    Chat-->>User: Return pendingConfirmation + actionId
-    User->>Chat: POST /action/confirm (action_id)
-    Chat->>Tool: Execute write command via PointCommandFacade
-    Tool->>Backend: submitWrite (facade gRPC)
-    Backend-->>Tool: Command acceptance result
-    Tool-->>Chat: Return execution result
-    Chat-->>User: Natural-language answer (value read + command issued)
-```
+<AgenticSequenceDiagram lang="en" />
 
 Key facts along the critical path:
 
@@ -171,33 +157,7 @@ history back from `dc3_message` by `conversation_id`. Conversations survive rest
 
 Here's how the three tables relate:
 
-```mermaid
-erDiagram
-    SESSION ||--o{ MESSAGE : "contains multiple turns"
-    SESSION ||--o{ ATTACHMENT : "mounts attachments"
-    SESSION {
-        text conversation_id "Unique conversation identifier"
-        text title "Conversation title"
-        json session_ext "Preferences such as model/temperature/maxTokens"
-        bigint tenant_id "Tenant isolation"
-        bigint user_id "Owning user"
-    }
-    MESSAGE {
-        text conversation_id "Owning conversation"
-        text role "user/assistant/system"
-        json content "Structured message content"
-        text model "Model used for this turn"
-        bigint message_index "Monotonically increasing index within the conversation"
-        smallint status "Message status"
-    }
-    ATTACHMENT {
-        text conversation_id "Owning conversation"
-        text file_name "Original file name"
-        text content_type "MIME type"
-        bigint size "Size in bytes"
-        text file_path "Storage path"
-    }
-```
+<AgenticErDiagram lang="en" />
 
 - The retrieval window size is controlled by `dc3.agentic.historyWindowSize` (default `30`): only the most recent few
   turns are fed to the model, saving tokens while keeping context.
@@ -267,6 +227,14 @@ last line of defense when there's no DB configuration.
 | `AGENTIC_MEMORY_MAX_MESSAGES`         | `50`                           | Max messages in a single conversation window                                 |
 | `AGENTIC_MEMORY_SCHEMA_INIT`          | `never`                        | Memory table schema initialization (`always`/`never`/`create_if_not_exists`) |
 | `AGENTIC_ATTACHMENT_STORAGE_PATH`     | `dc3/data/agentic/attachments` | Attachment storage directory                                                 |
+
+::: tip Defaults reflect compose / `dev.env`, not the Spring bare defaults
+The defaults above are the values injected by compose / `dev.env`, which **differ** from the bare Spring defaults in
+`application-agentic.yml`: e.g. `AGENTIC_MEMORY_ENABLED` defaults to `true` in Spring (compose injects `false`), and
+`AGENTIC_ATTACHMENT_STORAGE_PATH` defaults to `dc3/data/upload/agentic/attachment` in Spring (compose injects
+`dc3/data/agentic/attachments`). When you start via compose / `make up-*`, this table applies; if you run Spring
+directly in an IDE without compose, the yml bare defaults apply instead.
+:::
 
 See [Environment Variables](../quickstart/environment) for the full reference.
 

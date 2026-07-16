@@ -2,6 +2,11 @@
 title: Local Development from Source
 ---
 
+<script setup>
+import QuickstartIndexDiagram from '../../.vitepress/theme/components/QuickstartIndexDiagram.vue'
+</script>
+
+
 # Local Development from Source
 
 This page walks you through running IoT DC3 from source: bring up PostgreSQL and RabbitMQ with Compose, point the Java
@@ -22,7 +27,8 @@ build toolchain plus a container runtime.
 - **JDK 21** — the platform requires Java 21. Compiling on a lower version fails outright.
 - **Maven 3.9+** — the repository ships `.mvn/settings.xml` and a parallel-build configuration; use it for multi-module
   packaging.
-- **pnpm** — both the `dc3-web/` frontend and sibling `dc3-cli/` use pnpm (not npm or yarn). Skip this for backend-only work.
+- **pnpm** — both the `dc3-web/` frontend and sibling `dc3-cli/` use pnpm (not npm or yarn). Skip this for backend-only
+  work.
 - **Podman** — every container operation in this repository uses `podman` (`make` defaults to `podman compose`).
 
 ## Why These Five Steps
@@ -32,14 +38,7 @@ the previous one: you need the infrastructure up before you can load the environ
 need the jars built before you can start the dev stack; and only once the services are up does it make sense to run
 tests.
 
-```mermaid
-flowchart LR
-  A["make up-db<br/>Start PostgreSQL + RabbitMQ"] -->|"Containers ready<br/>localhost:35432 / 35672"| B["source dc3/env/dev.env.sh<br/>Load local env vars"]
-  B -->|"Java processes point at localhost"| C["make package<br/>Multi-module build"]
-  C -->|"Produces per-service jars"| D["make up-dev<br/>Start local dev stack"]
-  D -->|"Center services running<br/>Gateway:8000"| E["make test<br/>Run unit tests"]
-  E -->|"Verified"| F["Onboard the first device"]
-```
+<QuickstartIndexDiagram lang="en" />
 
 Each step is expanded below, with both what to do and how to verify it.
 

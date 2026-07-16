@@ -100,6 +100,12 @@ public class NotifyHistoryServiceImpl implements NotifyHistoryService {
         return notifyHistoryBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * Build fuzzy query wrapper for notify history search.
+     *
+     * @param entityQuery {@link NotifyHistoryQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link NotifyHistoryDO}
+     */
     private LambdaQueryWrapper<NotifyHistoryDO> fuzzyQuery(NotifyHistoryQuery entityQuery) {
         LambdaQueryWrapper<NotifyHistoryDO> wrapper = Wrappers.<NotifyHistoryDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRuleId()), NotifyHistoryDO::getRuleId,
@@ -122,6 +128,14 @@ public class NotifyHistoryServiceImpl implements NotifyHistoryService {
         return wrapper;
     }
 
+    /**
+     * Get notify history data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link NotifyHistoryDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
     private NotifyHistoryDO getDOById(Long id, boolean throwException) {
         NotifyHistoryDO entityDO = notifyHistoryManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {

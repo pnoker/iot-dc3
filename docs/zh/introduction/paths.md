@@ -2,24 +2,18 @@
 title: 按角色选择路径
 ---
 
+<script setup>
+import PathsDecisionDiagram from '../../.vitepress/theme/components/PathsDecisionDiagram.vue'
+</script>
+
+
 # 按角色选择路径
 
 文档覆盖了从评估到贡献的全过程，但不同角色的最短路径不同。先找到最像你的那一行，照着给的顺序读，少走弯路。
 
 下面这张决策图帮你快速对号入座，每条路径的详细阅读顺序见后续小节。
 
-```mermaid
-flowchart LR
-  Start["你想做什么？"] --> Q1{"评估平台？"}
-  Q1 -->|"是"| P1["评估路径<br/>定位→概念→架构→demo"]
-  Q1 -->|"否"| Q2{"接入设备 / 运维？"}
-  Q2 -->|"是"| P2["运营路径<br/>概念→首设备→接入→命令→告警"]
-  Q2 -->|"否"| Q3{"二次开发？"}
-  Q3 -->|"是"| P3["开发路径<br/>架构→平面→领域模型→驱动"]
-  Q3 -->|"否"| Q4{"自动化 / 接 AI？"}
-  Q4 -->|"是"| P4["集成路径<br/>CLI→MCP→Agentic"]
-  Q4 -->|"否"| P5["贡献路径<br/>规范→测试→贡献指南"]
-```
+<PathsDecisionDiagram lang="zh" />
 
 ## 我想先评估这个平台
 

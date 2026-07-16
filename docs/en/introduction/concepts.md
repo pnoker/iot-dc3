@@ -2,6 +2,12 @@
 title: Core Concepts and Mental Model
 ---
 
+<script setup>
+import ConceptsDomainDiagram from '../../.vitepress/theme/components/ConceptsDomainDiagram.vue'
+import ConceptsFlowDiagram from '../../.vitepress/theme/components/ConceptsFlowDiagram.vue'
+</script>
+
+
 # Core Concepts and Mental Model
 
 To use IoT DC3 well, you need a simple object model in your head. This page gives you that: a one-sentence summary, an
@@ -26,39 +32,7 @@ These relationships are fixed: a profile contains multiple points, commands, and
 ** profile (since Phase-1, `Device.profileId` is a single foreign key, no longer many-to-many) and one driver. A point
 produces many point values.
 
-```mermaid
-erDiagram
-    PROFILE ||--o{ POINT : "contains points"
-    PROFILE ||--o{ COMMAND : "contains commands"
-    PROFILE ||--o{ EVENT : "contains events"
-    DEVICE }o--|| PROFILE : "binds one profile"
-    DEVICE }o--|| DRIVER : "connected by one driver"
-    POINT ||--o{ POINTVALUE : "produces values"
-    DEVICE ||--o{ POINTVALUE : "owns"
-    PROFILE {
-        long id
-        string profileName
-        enum profileShareFlag "TENANT/DRIVER/USER"
-    }
-    POINT {
-        long id
-        string pointName
-        enum pointTypeFlag "STRING/BYTE/SHORT/INT/LONG/FLOAT/DOUBLE/BOOLEAN"
-        enum rwFlag "READ_ONLY/WRITE_ONLY/READ_WRITE"
-        string unit
-    }
-    DEVICE {
-        long id
-        string deviceName
-        long profileId
-        long driverId
-    }
-    DRIVER {
-        long id
-        string driverName
-        string serviceName
-    }
-```
+<ConceptsDomainDiagram lang="en" />
 
 ## Object by Object
 
@@ -98,15 +72,7 @@ in [Device Onboarding](../operation/device-onboarding) makes sense.
 Around these objects, the platform runs two opposing pipelines. The **data flow** pulls device values up, stores them,
 and exposes them for querying. The **command flow** sends read/write requests back down to devices for execution.
 
-```mermaid
-flowchart LR
-    subgraph DataFlow["Data Flow (Southbound to Northbound)"]
-        D1[Device] --> D2[Driver] --> D3[RabbitMQ] --> D4[Data Center] --> D5[(TimescaleDB)]
-    end
-    subgraph CommandFlow["Command Flow (Northbound to Southbound)"]
-        C1["Caller / Web / AI"] --> C2[Gateway] --> C3[Data Center] --> C4[RabbitMQ] --> C5[Driver] --> C6[Device]
-    end
-```
+<ConceptsFlowDiagram lang="en" />
 
 For the full implementation of both pipelines (exchanges, queues, lifecycle, acknowledgements), see
 the [Data Plane](../architecture/data-plane) and [Command Plane](../architecture/command-plane).

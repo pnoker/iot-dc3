@@ -2,6 +2,11 @@
 title: SQL Server Driver
 ---
 
+<script setup>
+import SqlserverDiagram from '../../.vitepress/theme/components/SqlserverDiagram.vue'
+</script>
+
+
 # SQL Server Driver
 
 `dc3-driver-sqlserver` onboards a Microsoft SQL Server database into IoT DC3 as a data source: acting as a database
@@ -36,12 +41,7 @@ MySQL, PostgreSQL, Oracle, SQL Server), each of which only supplies JDBC URL con
 
 Two driver-specific concepts that the configuration tables below rely on:
 
-```mermaid
-flowchart LR
-  Drv["dc3-driver-sqlserver<br/>(JDBC client)"] -->|"readQuery (SELECT)"| DB[("SQL Server instance<br/>business / history tables")]
-  Drv -.->|"writeQuery (UPDATE/INSERT, ? placeholder)"| DB
-  DB -->|"first row, first column"| PV["PointValue"]
-```
+<SqlserverDiagram lang="en" />
 
 - **Read Query**: a `SELECT` configured on the point; the driver runs it on each polling cycle and takes the **first
   column of the first row** of the result as the point's value.

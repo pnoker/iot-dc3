@@ -2,6 +2,11 @@
 title: Serial Driver
 ---
 
+<script setup>
+import SerialDiagram from '../../.vitepress/theme/components/SerialDiagram.vue'
+</script>
+
+
 # Serial Driver
 
 `dc3-driver-serial` connects RS232/RS485/RS422 serial devices that speak proprietary frames to IoT DC3: acting as the
@@ -175,20 +180,7 @@ the [PointValue](../introduction/concepts/point-value) of a single [Point](../in
 driver registers with `dc3.driver.code = SerialDriver`, a stable routing identifier the platform uses to dispatch
 read/write commands to this driver.
 
-```mermaid
-flowchart LR
-  Dev["Serial device<br/>RS232/RS485/RS422"]
-  subgraph Driver["dc3-driver-serial (SerialDriver)"]
-    Conn["SerialPortConnection<br/>jSerialComm, one per device"]
-    Parser["SerialFrameParser<br/>locate frame / verify / slice data"]
-    Fmt["formatValue<br/>HEX/ASCII/BINARY/FLOAT"]
-  end
-  PV["PointValue"]
-  Dev -->|"raw response bytes"| Conn
-  Conn --> Parser --> Fmt --> PV
-  PV -->|"write command renders ${value}"| Conn
-  Conn -->|"HEX command bytes"| Dev
-```
+<SerialDiagram lang="en" />
 
 Per the [driver capability matrix](./matrix), this driver's capabilities are:
 

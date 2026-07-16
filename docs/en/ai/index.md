@@ -2,6 +2,11 @@
 title: AI
 ---
 
+<script setup>
+import AiIndexDiagram from '../../.vitepress/theme/components/AiIndexDiagram.vue'
+</script>
+
+
 # AI
 
 IoT DC3 plugs large language models into operations, so a model can do more than read data — it can act on devices. This
@@ -11,7 +16,7 @@ section covers two ways an LLM drives those actions; the difference is who initi
   the LLM query devices, read and write points, and run commands through Tool Calling. It speaks the OpenAI API, so you
   can point GPT, Claude, DeepSeek, Qwen, and friends at it. Good when you want a UI-driven, multi-turn assistant.
 - **MCP** — exposes platform tools safely to external AI agents. The gateway serves a JSON-RPC 2.0 MCP resource server
-  at `POST /mcp`; the tool catalog is aggregated from the four centers' OpenAPI (150+ tools) and gated by OAuth 2.1, a
+  at `POST /mcp`; the tool catalog is aggregated from the four centers' OpenAPI (330+ tools) and gated by OAuth 2.1, a
   per-connection tool whitelist, and risk tiers. Good when you run your own agent and want the model to pick which tool
   to call.
 
@@ -30,16 +35,7 @@ In other words: the AI gets no more privilege than the account behind it, and cr
 a 404, not the data). The README's "tenant-level isolation across database, cache, and API paths" and "JWT + Spring
 Security + RBAC" apply equally to both.
 
-```mermaid
-flowchart LR
-    User["Operator"] --> Agentic["Agentic Center<br/>(conversational / 10 built-in @Tool)"]
-    Agent["External AI Agent"] -->|"Bearer access_token"| MCP["MCP endpoint (POST /mcp)"]
-    Agentic --> GW["Gateway dc3-gateway :8000"]
-    MCP --> GW
-    GW --> RBAC["RBAC + tenant check<br/>dc3-center-auth"]
-    RBAC -->|"allow"| Svc["Manager / Data / Agentic centers"]
-    RBAC -.->|"over-permission / cross-tenant"| Deny["Deny (403 / 404)"]
-```
+<AiIndexDiagram lang="en" />
 
 Auth differs, but the destination is the same — before any business service runs, the call clears the `@PreAuthorize`
 permission point and the tenant boundary:

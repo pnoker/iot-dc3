@@ -2,6 +2,11 @@
 title: CoAP Driver
 ---
 
+<script setup>
+import CoapDiagram from '../../.vitepress/theme/components/CoapDiagram.vue'
+</script>
+
+
 # CoAP Driver
 
 `dc3-driver-coap` connects CoAP devices to IoT DC3. Built on Eclipse Californium, it can act as a **CoAP client** that
@@ -30,16 +35,7 @@ of which wireless carries it underneath—the same CoAP message can run over Wi-
 communication model supports both a client **actively requesting** a resource and a server **passively receiving** a
 client's POST. This driver implements both sides:
 
-```mermaid
-flowchart LR
-  subgraph Client["Client mode CLIENT (default)"]
-    Drv1["dc3-driver-coap<br/>(CoAP client)"] -->|"GET readPath periodic poll"| Dev1["CoAP device<br/>(resource path)"]
-    Drv1 -.->|"PUT writePath issue write"| Dev1
-  end
-  subgraph Server["Server mode SERVER / BOTH"]
-    Dev2["CoAP device"] -->|"POST /data active report"| Drv2["dc3-driver-coap<br/>(CoAP server)"]
-  end
-```
+<CoapDiagram lang="en" />
 
 Client mode is the default shape: IoT DC3's [collection schedule](../introduction/concepts/driver) sends a GET on each
 point's `readPath` per cron cycle, and sends a PUT on `writePath` when a write command is issued. Server mode is the

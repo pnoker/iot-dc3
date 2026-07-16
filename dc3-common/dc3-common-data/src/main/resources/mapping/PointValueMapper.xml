@@ -61,10 +61,10 @@
         SELECT num_value, cal_value, create_time
         FROM dc3_point_value
         WHERE tenant_id = #{tenantId}
-          AND device_id = #{deviceId}
-          AND point_id = #{pointId}
-          AND create_time &gt;= #{from}
-          AND create_time &lt; #{to}
+        AND device_id = #{deviceId}
+        AND point_id = #{pointId}
+        AND create_time &gt;= #{from}
+        AND create_time &lt; #{to}
         ORDER BY create_time
     </select>
 

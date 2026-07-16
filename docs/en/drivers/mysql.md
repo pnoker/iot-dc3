@@ -2,6 +2,11 @@
 title: MySQL Driver
 ---
 
+<script setup>
+import MysqlDiagram from '../../.vitepress/theme/components/MysqlDiagram.vue'
+</script>
+
+
 # MySQL Driver
 
 `dc3-driver-mysql` onboards a MySQL database into IoT DC3 as a data source: acting as a database client, it runs a
@@ -36,12 +41,7 @@ queried, and consumed by alarms and AI just like values collected from real devi
 
 Two driver-specific concepts that the configuration tables below rely on:
 
-```mermaid
-flowchart LR
-  Drv["dc3-driver-mysql<br/>(JDBC client)"] -->|"readQuery (SELECT)"| DB[("MySQL database<br/>business / history tables")]
-  Drv -.->|"writeQuery (UPDATE/INSERT, ? placeholder)"| DB
-  DB -->|"first row, first column"| PV["PointValue"]
-```
+<MysqlDiagram lang="en" />
 
 - **Read Query**: a `SELECT` configured on the point; the driver runs it on each polling cycle and takes the **first
   column of the first row** of the result as the point's value.

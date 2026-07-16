@@ -121,6 +121,12 @@ public class TenantMembershipServiceImpl implements TenantMembershipService {
         return tenantMembershipBuilder.buildBOPageByDOPage(page);
     }
 
+    /**
+     * Build fuzzy query wrapper for tenant membership search.
+     *
+     * @param entityQuery {@link TenantMembershipQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link TenantMembershipDO}
+     */
     private LambdaQueryWrapper<TenantMembershipDO> fuzzyQuery(TenantMembershipQuery entityQuery) {
         LambdaQueryWrapper<TenantMembershipDO> wrapper = Wrappers.<TenantMembershipDO>query().lambda();
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), TenantMembershipDO::getTenantId,

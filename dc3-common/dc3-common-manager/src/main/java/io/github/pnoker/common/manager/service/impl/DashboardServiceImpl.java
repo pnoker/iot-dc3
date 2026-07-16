@@ -83,6 +83,13 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final DashboardMapper dashboardMapper;
 
+    /**
+     * Convert bucket rows to bucket VOs, formatting each key with the given formatter.
+     *
+     * @param rows the raw bucket rows
+     * @param fmt  the key formatter
+     * @return the bucket VOs
+     */
     private static List<BucketVO> buckets(List<BucketRow> rows, KeyFormatter fmt) {
         List<BucketVO> out = new ArrayList<>(rows.size());
         for (BucketRow row : rows) {
@@ -94,6 +101,12 @@ public class DashboardServiceImpl implements DashboardService {
         return out;
     }
 
+    /**
+     * Map a raw enable-flag value to its enum name, falling back to the unknown bucket.
+     *
+     * @param raw the raw flag value
+     * @return the enable-flag name or unknown bucket
+     */
     private static String enableKey(Object raw) {
         if (Objects.isNull(raw))
             return TopologyLimits.UNKNOWN_BUCKET;
@@ -106,6 +119,12 @@ public class DashboardServiceImpl implements DashboardService {
     // Topology (GET /dashboard/topology)
     // ================================================================
 
+    /**
+     * Map a raw driver-type value to its enum name, falling back to the unknown bucket.
+     *
+     * @param raw the raw type value
+     * @return the driver-type name or unknown bucket
+     */
     private static String driverTypeKey(Object raw) {
         if (Objects.isNull(raw))
             return TopologyLimits.UNKNOWN_BUCKET;
@@ -156,6 +175,13 @@ public class DashboardServiceImpl implements DashboardService {
         };
     }
 
+    /**
+     * Normalise a range key to one of the supported values, defaulting to 7d on blank or
+     * unknown input.
+     *
+     * @param rangeKey the raw range key
+     * @return the normalised range key
+     */
     private static String normaliseRange(String rangeKey) {
         if (Objects.isNull(rangeKey) || rangeKey.isBlank())
             return TopologyLimits.RANGE_DEFAULT;
@@ -166,6 +192,12 @@ public class DashboardServiceImpl implements DashboardService {
         };
     }
 
+    /**
+     * Resolve the lookback start instant for a range key (today/24h/7d/30d).
+     *
+     * @param rangeKey the range key
+     * @return the range start instant
+     */
     private static LocalDateTime fromOfRange(String rangeKey) {
         LocalDateTime now = LocalDateTime.now();
         return switch (rangeKey) {
@@ -176,6 +208,12 @@ public class DashboardServiceImpl implements DashboardService {
         };
     }
 
+    /**
+     * Resolve a human-readable label for a range key.
+     *
+     * @param rangeKey the range key
+     * @return the display label
+     */
     private static String rangeLabel(String rangeKey) {
         return switch (rangeKey) {
             case TopologyLimits.RANGE_TODAY -> "Today";
@@ -275,6 +313,16 @@ public class DashboardServiceImpl implements DashboardService {
         return out;
     }
 
+    /**
+     * Compute the four-layer topology (driver → device → profile → point) for a tenant,
+     * in cardinality or volume mode, cropping each layer to a Top-N with overflow rolled
+     * into "others" nodes.
+     *
+     * @param tenantId tenant scope
+     * @param mode     cardinality or volume
+     * @param rangeKey time window for volume mode
+     * @return the assembled topology
+     */
     private TopologyVO computeTopology(Long tenantId, String mode, String rangeKey) {
         TopologyVO out = new TopologyVO();
         boolean volumeMode = TopologyLimits.MODE_VOLUME.equals(mode);

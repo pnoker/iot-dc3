@@ -172,6 +172,13 @@ public class ResourceServiceImpl implements ResourceService {
         return assembleTree(rows);
     }
 
+    /**
+     * Assemble flat resource rows into a tree, linking children to parents by id and
+     * sorting each level by type then name.
+     *
+     * @param rows the flat resource rows
+     * @return the assembled tree roots
+     */
     private List<ResourceTreeBO> assembleTree(List<ResourceDO> rows) {
         if (CollectionUtils.isEmpty(rows)) {
             return List.of();
@@ -198,6 +205,12 @@ public class ResourceServiceImpl implements ResourceService {
         return roots;
     }
 
+    /**
+     * Recursively sort each level of the resource tree by the given comparator.
+     *
+     * @param nodes the tree nodes to sort
+     * @param order the comparator
+     */
     private void sortRecursive(List<ResourceTreeBO> nodes, Comparator<ResourceTreeBO> order) {
         if (CollectionUtils.isEmpty(nodes)) {
             return;

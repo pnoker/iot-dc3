@@ -2,6 +2,11 @@
 title: LwM2M Driver
 ---
 
+<script setup>
+import Lwm2mDiagram from '../../.vitepress/theme/components/Lwm2mDiagram.vue'
+</script>
+
+
 # LwM2M Driver
 
 `dc3-driver-lwm2m` embeds an Eclipse Leshan LwM2M server: devices act as clients and register with their own `endpoint`
@@ -32,14 +37,7 @@ sensors—anywhere both remote management and low power consumption are needed.
 Unlike drivers such as Modbus or CoAP that **actively connect to devices**, this driver works the other way around—it
 embeds a **LwM2M server**:
 
-```mermaid
-flowchart LR
-  Dev["LwM2M device<br/>(client)"] -->|"register endpoint name"| Srv["Embedded LwM2M server<br/>(Eclipse Leshan)"]
-  Srv -->|"maintain endpoint→Registration map"| Reg["registry<br/>registrations"]
-  Drv["LwM2M driver<br/>Lwm2mDriver"] -->|"read: send ReadRequest<br/>/objectId/instId/resId"| Srv
-  Drv -->|"write: send WriteRequest"| Srv
-  Srv -->|"CoAP over UDP 5683"| Dev
-```
+<Lwm2mDiagram lang="en" />
 
 The device first registers to this server with its own endpoint name; only after a successful registration can the
 driver issue reads/writes to it by the point's path. Whether a device is online depends on whether its endpoint is still

@@ -60,8 +60,8 @@ public class AgenticChatResponseCodec {
      * Assemble a non-streaming chat completion response, estimating token usage from the
      * prepared input tokens and the assistant content.
      *
-     * @param prepared    the prepared chat
-     * @param content     the assistant content
+     * @param prepared     the prepared chat
+     * @param content      the assistant content
      * @param finishReason the finish reason
      * @return the chat completion response
      */
@@ -119,9 +119,9 @@ public class AgenticChatResponseCodec {
      * Build the SSE events for one streaming step: drain pending run-trace events and
      * visualizations, then append a content chunk when the delta carries one.
      *
-     * @param prepared   the prepared chat
-     * @param chatId     the stream chat id
-     * @param created    the stream creation epoch second
+     * @param prepared    the prepared chat
+     * @param chatId      the stream chat id
+     * @param created     the stream creation epoch second
      * @param streamDelta the delta for this step, may be null or content-less
      * @return the SSE events to emit for this step
      */

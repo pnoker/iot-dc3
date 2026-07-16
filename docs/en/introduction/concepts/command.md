@@ -2,6 +2,11 @@
 title: Command
 ---
 
+<script setup>
+import CommandRelationDiagram from '../../../.vitepress/theme/components/CommandRelationDiagram.vue'
+import CommandFlowDiagram from '../../../.vitepress/theme/components/CommandFlowDiagram.vue'
+</script>
+
 # Command
 
 > **A Command is one action request issued to a device**—restart, calibrate, switch mode, set temperature… Its
@@ -93,13 +98,7 @@ Invocation body `CommandCallBO` (the submit payload for one call): `deviceId`, `
 
 ## Relationship to other concepts
 
-```mermaid
-flowchart LR
-    PR["Profile"] -->|defines| CMD["Command"]
-    CMD -->|contains| CP["CommandParam"]
-    DEV["Device"] -->|invokes CommandCall| REC[("dc3_command_history")]
-    REC -->|executed via driver| DRV["Driver"]
-```
+<CommandRelationDiagram lang="en" />
 
 - A command **definition** hangs under a Profile, alongside [Point](./point) and [Event](./event), together describing "
   what this kind of device can do".
@@ -114,15 +113,7 @@ One invocation (`CommandCallDTO`) carries: `recordId`, `tenantId`, `deviceId`, `
 PENDING), publishes it to RabbitMQ, and after the driver executes it the driver returns `CommandCallResultDTO` (
 `status`, `resultValues`, `errorCode`, `errorMessage`, `finishedAt`).
 
-```mermaid
-flowchart LR
-    APP["Caller"] -->|CommandCallDTO| DC["Data Center CommandHistoryService"]
-    DC -->|persist PENDING→SENT| REC[("dc3_command_history")]
-    DC -->|dc3.e.command| DRV["Driver CommandReceiver"]
-    DRV -->|execute| DEV["Device"]
-    DRV -->|CommandCallResultDTO| DC
-    DC -->|advance to terminal| REC
-```
+<CommandFlowDiagram lang="en" />
 
 Invocation state machine (`PointCommandStatusEnum`, shared with write-point):
 

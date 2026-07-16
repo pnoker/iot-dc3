@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IoT DC3 — 模板与其它概念的关系</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'JetBrains Mono', monospace; background: #020617; min-height: 100vh; padding: 2rem; color: white; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .pulse-dot { width: 12px; height: 12px; background: #34d399; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+    h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .diagram-container { background: rgba(15,23,42,0.5); border-radius: 1rem; border: 1px solid #1e293b; padding: 1.5rem; overflow-x: auto; }
+    svg { width: 100%; min-width: 820px; display: block; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 1rem; margin-top: 2rem; }
+    .card { background: rgba(15,23,42,0.5); border-radius: 0.75rem; border: 1px solid #1e293b; padding: 1.25rem; }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.emerald { background: #34d399; } .card-dot.cyan { background: #22d3ee; } .card-dot.orange { background: #fb923c; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.75rem; }
+    .card li { margin-bottom: 0.375rem; }
+    .footer { text-align: center; margin-top: 1.5rem; color: #475569; font-size: 0.75rem; }
+    .toolbar { display: flex; gap: 0.5rem; margin-left: auto; flex-shrink: 0; align-items: center; }
+    .toolbar-toggle { background: transparent; border: none; color: #475569; cursor: pointer; font-size: 1.25rem; line-height: 1; padding: 0.25rem 0.5rem; border-radius: 0.375rem; transition: color .2s, background .2s; }
+    .toolbar-toggle:hover { color: #94a3b8; background: rgba(30,41,59,0.5); }
+    .toolbar-actions { display: none; gap: 0.5rem; }
+    .toolbar.expanded .toolbar-actions { display: flex; }
+    .toolbar-actions button { background: rgba(30,41,59,0.8); border: 1px solid #334155; color: #94a3b8; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-family: inherit; font-size: 0.75rem; cursor: pointer; transition: all .2s; white-space: nowrap; }
+    .toolbar-actions button:hover { background: rgba(51,65,85,0.8); color: white; border-color: #475569; }
+    @media print { body { background: #020617; padding: 1rem; } .toolbar { display: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="container" id="report-container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>模板与其它概念的关系</h1>
+        <div class="toolbar">
+          <div class="toolbar-actions">
+            <button onclick="copyAsImage(this)">📋 Copy</button>
+            <button onclick="downloadPNG(this)">🖼️ PNG</button>
+            <button onclick="downloadPDF(this)">📄 PDF</button>
+          </div>
+          <button class="toolbar-toggle" onclick="this.parentElement.classList.toggle('expanded')" title="Export options" aria-label="Export options">⋯</button>
+        </div>
+      </div>
+      <p class="subtitle">Profile 是位号 / 指令 / 事件的归属根；一个 Device 恰好绑定一个 Profile 与一个 Driver</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1000 440">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+          <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- arrows (drawn first → behind boxes) -->
+        <!-- Device -> Profile -->
+        <line x1="210" y1="222" x2="376" y2="222" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="293" y="214" fill="#94a3b8" font-size="9" text-anchor="middle">profileId 单一外键</text>
+        <!-- Profile -> Point / Command / Event -->
+        <line x1="582" y1="200" x2="756" y2="108" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="648" y="150" fill="#94a3b8" font-size="9" text-anchor="middle">聚合</text>
+        <line x1="582" y1="222" x2="756" y2="222" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="668" y="214" fill="#94a3b8" font-size="9" text-anchor="middle">聚合</text>
+        <line x1="582" y1="244" x2="756" y2="336" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="648" y="300" fill="#94a3b8" font-size="9" text-anchor="middle">聚合</text>
+        <!-- Device -> Driver -->
+        <path d="M 135 256 L 135 362 Q 135 362 155 362 L 376 362" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="250" y="354" fill="#94a3b8" font-size="9" text-anchor="middle">connect</text>
+
+        <!-- Device (external/slate) -->
+        <rect x="60" y="190" width="150" height="64" rx="6" fill="#0f172a"/>
+        <rect x="60" y="190" width="150" height="64" rx="6" fill="rgba(30,41,59,0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="135" y="218" fill="white" font-size="13" font-weight="600" text-anchor="middle">设备 Device</text>
+        <text x="135" y="236" fill="#94a3b8" font-size="9" text-anchor="middle">设备实例</text>
+
+        <!-- Profile (backend/emerald, hero) -->
+        <rect x="380" y="180" width="204" height="84" rx="8" fill="rgba(52,211,153,0.10)" stroke="#34d399" stroke-width="1" filter="url(#glow)"/>
+        <rect x="380" y="180" width="204" height="84" rx="8" fill="#0f172a"/>
+        <rect x="380" y="180" width="204" height="84" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="2.5"/>
+        <text x="482" y="214" fill="white" font-size="15" font-weight="700" text-anchor="middle">模板 Profile</text>
+        <text x="482" y="234" fill="#94a3b8" font-size="9" text-anchor="middle">能力模板 · 归属根</text>
+        <text x="482" y="250" fill="#34d399" font-size="8" text-anchor="middle">物模型+</text>
+
+        <!-- Point / Command / Event (frontend/cyan) -->
+        <rect x="760" y="72" width="184" height="62" rx="6" fill="#0f172a"/>
+        <rect x="760" y="72" width="184" height="62" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="852" y="100" fill="white" font-size="12" font-weight="600" text-anchor="middle">位号 Point</text>
+        <text x="852" y="117" fill="#94a3b8" font-size="9" text-anchor="middle">数据点 / 控制点</text>
+
+        <rect x="760" y="192" width="184" height="62" rx="6" fill="#0f172a"/>
+        <rect x="760" y="192" width="184" height="62" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="852" y="220" fill="white" font-size="12" font-weight="600" text-anchor="middle">指令 Command</text>
+        <text x="852" y="237" fill="#94a3b8" font-size="9" text-anchor="middle">动作型能力</text>
+
+        <rect x="760" y="312" width="184" height="62" rx="6" fill="#0f172a"/>
+        <rect x="760" y="312" width="184" height="62" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="852" y="340" fill="white" font-size="12" font-weight="600" text-anchor="middle">事件 Event</text>
+        <text x="852" y="357" fill="#94a3b8" font-size="9" text-anchor="middle">上报型能力</text>
+
+        <!-- Driver (message bus/orange) -->
+        <rect x="380" y="330" width="204" height="64" rx="6" fill="#0f172a"/>
+        <rect x="380" y="330" width="204" height="64" rx="6" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="482" y="358" fill="white" font-size="13" font-weight="600" text-anchor="middle">驱动 Driver</text>
+        <text x="482" y="376" fill="#94a3b8" font-size="9" text-anchor="middle">协议连接</text>
+      </svg>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header"><div class="card-dot emerald"></div><h3>模板 Profile</h3></div>
+        <ul><li>• 同型号设备的能力模板</li><li>• 位号 / 指令 / 事件的归属根</li><li>• 共享范围 · 版本 · profileExt</li></ul>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-dot cyan"></div><h3>三类子能力</h3></div>
+        <ul><li>• 位号 Point：采集 / 写入的数据项</li><li>• 指令 Command：动作型能力</li><li>• 事件 Event：上报型能力</li></ul>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-dot orange"></div><h3>设备如何接入</h3></div>
+        <ul><li>• Device 绑定一个 Profile（profileId）</li><li>• Device 经 Driver connect 现场</li><li>• 能力与连接正交</li></ul>
+      </div>
+    </div>
+
+    <p class="footer">IoT DC3 • 领域模型 · 模板关系</p>
+  </div>
+
+  <script>
+    async function copyAsImage(btn){const orig=btn.textContent;try{const el=document.getElementById('report-container');const r=el.getBoundingClientRect();const pad=32;const canvas=await html2canvas(document.body,{backgroundColor:'#020617',scale:2,useCORS:true,ignoreElements:(e)=>e.classList&&e.classList.contains('toolbar'),x:r.left+window.scrollX-pad,y:r.top+window.scrollY-pad,width:r.width+pad*2,height:r.height+pad*2});const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);btn.textContent='✓ Copied!';}catch(e){btn.textContent='✗ Failed';}setTimeout(()=>btn.textContent=orig,2000);}
+    async function downloadPNG(btn){const orig=btn.textContent;btn.textContent='⏳ ...';try{const el=document.getElementById('report-container');const r=el.getBoundingClientRect();const pad=32;const canvas=await html2canvas(document.body,{backgroundColor:'#020617',scale:2,useCORS:true,ignoreElements:(e)=>e.classList&&e.classList.contains('toolbar'),x:r.left+window.scrollX-pad,y:r.top+window.scrollY-pad,width:r.width+pad*2,height:r.height+pad*2});const link=document.createElement('a');link.download='profile-relation.png';link.href=canvas.toDataURL('image/png');link.click();btn.textContent='✓ Done!';}catch(e){btn.textContent='✗ Failed';}setTimeout(()=>btn.textContent=orig,2000);}
+    async function downloadPDF(btn){const orig=btn.textContent;btn.textContent='⏳ ...';try{const el=document.getElementById('report-container');const r=el.getBoundingClientRect();const pad=32;const canvas=await html2canvas(document.body,{backgroundColor:'#020617',scale:2,useCORS:true,ignoreElements:(e)=>e.classList&&e.classList.contains('toolbar'),x:r.left+window.scrollX-pad,y:r.top+window.scrollY-pad,width:r.width+pad*2,height:r.height+pad*2});const imgData=canvas.toDataURL('image/png');const {jsPDF}=window.jspdf;const orientation=canvas.width>canvas.height?'landscape':'portrait';const pdf=new jsPDF({orientation,unit:'px',format:[canvas.width,canvas.height],hotfixes:['px_scaling']});pdf.addImage(imgData,'PNG',0,0,canvas.width,canvas.height);pdf.save('profile-relation.pdf');btn.textContent='✓ Done!';}catch(e){btn.textContent='✗ Failed';}setTimeout(()=>btn.textContent=orig,2000);}
+  </script>
+</body>
+</html>

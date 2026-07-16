@@ -2,6 +2,12 @@
 title: 自动识别与定位
 ---
 
+<script setup>
+import IdentificationChoiceDiagram from '../../.vitepress/theme/components/IdentificationChoiceDiagram.vue'
+import IdentificationEntityDiagram from '../../.vitepress/theme/components/IdentificationEntityDiagram.vue'
+</script>
+
+
 # 自动识别与定位
 
 物联网的第一步，是让物理世界里的每一个物、每一个位置都能被机器"认出来"。这一章讲感知层里两类不靠传感器测物理量、而靠**身份**
@@ -61,25 +67,7 @@ UWB（超宽带）**用纳秒级窄脉冲测飞行时间，室内精度可达 **
 
 把这两组技术放进"距离—成本"的取舍平面，脉络就清楚了：
 
-```mermaid
-flowchart LR
-    subgraph ID["自动识别（身份）"]
-      direction TB
-      BC["条码 / 二维码<br/>近距 · 极低成本 · 需视线"]
-      NFC["NFC<br/>约 4cm · 双向 · 手机内置"]
-      RFL["RFID LF/HF<br/>厘米级 · 抗干扰 / NFC 基础"]
-      RFU["RFID UHF<br/>数米 · 批量盘点 · 怕金属液体"]
-    end
-    subgraph POS["定位（位置）"]
-      direction TB
-      BLE["蓝牙信标<br/>米级 · 区域级 · 部署便宜"]
-      UWB["UWB<br/>10–30cm · 室内高精度 · 需锚点"]
-      CELL["基站定位<br/>几十–几百米 · 室内外兜底"]
-      GNSS["GNSS（GPS / 北斗）<br/>米级 · 室外 · 室内失效"]
-    end
-    NEED["需求：识别还是定位？<br/>室内还是室外？<br/>精度与成本预算？"] --> ID
-    NEED --> POS
-```
+<IdentificationChoiceDiagram lang="zh" />
 
 ::: tip 没有"最好"，只有"最合适"
 仓库批量盘点选 UHF RFID，户外车辆调度选 GNSS，室内人员精确追踪选 UWB，移动端轻配网选 NFC。同一个场景常常组合使用——例如 UWB
@@ -129,12 +117,7 @@ DC3 用 **[租户 Tenant](../introduction/concepts/tenant)（`tenantId`）划定
 `tenantId` 就回答"这个设备归谁、谁能看见它"。识别技术里"身份 + 归属"的二元结构（一个 EPC 编号 + 它属于哪个厂商前缀），在 DC3
 里正是 `deviceId + tenantId` 的组合。
 
-```mermaid
-flowchart LR
-    PHY["现场设备<br/>PLC / 电表 / 温控器"] -->|接入登记| DEV["设备 Device<br/>deviceId 唯一标识"]
-    DEV -->|归属| T["租户 Tenant<br/>tenantId 隔离边界"]
-    T -->|拥有| DATA["位号 / 位号值 / 指令 / 事件"]
-```
+<IdentificationEntityDiagram lang="zh" />
 
 ::: info DC3 不做"RFID 标签管理"
 DC3 的身份模型是平台层的设备登记与租户隔离，并不内置 RFID 标签发卡、读卡器管理或扫码出入库这类现场识别功能。本章把识别技术与

@@ -128,6 +128,15 @@ public class ActionServiceImpl implements ActionService {
         return actionBuilder.buildBOByDO(action);
     }
 
+    /**
+     * Load a pending, non-expired action by action id, scoped to the caller.
+     *
+     * @param actionId the action id
+     * @param header   the authenticated principal header
+     * @return the pending action
+     * @throws NotFoundException  when the action does not exist
+     * @throws RequestException   when the action is not pending or has expired
+     */
     private ActionDO getPending(String actionId, RequestHeader.PrincipalHeader header) {
         LambdaQueryWrapper<ActionDO> wrapper = scopedWrapper(header)
                 .eq(ActionDO::getActionId, actionId)
@@ -145,6 +154,16 @@ public class ActionServiceImpl implements ActionService {
         return action;
     }
 
+    /**
+     * Atomically transition a pending action to the next status using an optimistic
+     * update guarded by the PENDING status and expiry, preventing concurrent
+     * confirm/reject races.
+     *
+     * @param action         the action to transition
+     * @param header         the authenticated principal header
+     * @param nextStatus     the target status
+     * @param failureMessage the error message when the optimistic update loses the race
+     */
     private void claimPending(ActionDO action, RequestHeader.PrincipalHeader header, AgenticActionStatusEnum nextStatus,
                               String failureMessage) {
         LocalDateTime now = LocalDateTime.now();
@@ -164,6 +183,12 @@ public class ActionServiceImpl implements ActionService {
         action.setOperateTime(now);
     }
 
+    /**
+     * Stamp the creator, operator, and timestamps for a new action.
+     *
+     * @param entityBO the action to stamp
+     * @param header   the authenticated principal header
+     */
     private void fillCreateAudit(ActionBO entityBO, RequestHeader.PrincipalHeader header) {
         LocalDateTime now = LocalDateTime.now();
         entityBO.setCreateTime(now);
@@ -174,6 +199,12 @@ public class ActionServiceImpl implements ActionService {
         entityBO.setOperatorName(header.getUserName());
     }
 
+    /**
+     * Build a query wrapper scoped to the caller's user id.
+     *
+     * @param header the authenticated principal header
+     * @return a user-scoped query wrapper
+     */
     private LambdaQueryWrapper<ActionDO> scopedWrapper(RequestHeader.PrincipalHeader header) {
         return Wrappers.<ActionDO>query()
                 .lambda()

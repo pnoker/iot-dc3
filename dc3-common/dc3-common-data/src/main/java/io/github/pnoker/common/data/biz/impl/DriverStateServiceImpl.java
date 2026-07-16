@@ -58,10 +58,24 @@ public class DriverStateServiceImpl implements DriverStateService {
 
     private final RabbitTemplate rabbitTemplate;
 
+    /**
+     * Return whether the online/offline side changed between the previous state index
+     * and the current status code (ONLINE and MAINTAIN count as the online side).
+     *
+     * @param prevIndex   the previous state flag index
+     * @param currentCode the current status code
+     * @return true if the online/offline side flipped
+     */
     private static boolean isFlip(byte prevIndex, String currentCode) {
         return online(prevIndex) != online(currentCode);
     }
 
+    /**
+     * Return whether a state index is on the online side (ONLINE or MAINTAIN).
+     *
+     * @param index the state flag index
+     * @return true if online or maintain
+     */
     private static boolean online(byte index) {
         return index == EntityStatusEnum.ONLINE.getIndex() || index == EntityStatusEnum.MAINTAIN.getIndex();
     }

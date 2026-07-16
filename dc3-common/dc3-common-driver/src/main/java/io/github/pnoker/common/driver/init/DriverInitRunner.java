@@ -75,6 +75,12 @@ public class DriverInitRunner implements ApplicationRunner {
         driverScheduleService.initialize();
     }
 
+    /**
+     * Register the driver with the manager center, retrying with exponential backoff
+     * (doubling up to a cap) until the max attempt count is reached.
+     *
+     * @throws InterruptedException if the backoff sleep is interrupted
+     */
     private void registerWithRetry() throws InterruptedException {
         long backoffMs = REGISTER_INITIAL_BACKOFF.toMillis();
         for (int attempt = 1; attempt <= REGISTER_MAX_ATTEMPTS; attempt++) {

@@ -2,6 +2,12 @@
 title: API Documentation
 ---
 
+<script setup>
+import ApiDocFlowDiagram from '../../.vitepress/theme/components/ApiDocFlowDiagram.vue'
+import ApiDocSequenceDiagram from '../../.vitepress/theme/components/ApiDocSequenceDiagram.vue'
+</script>
+
+
 # API Documentation
 
 IoT DC3's REST API docs are generated from code annotations, then aggregated by the gateway into a single Swagger UI. By
@@ -24,14 +30,7 @@ Data Center (`dc3-center-data`), and Agentic Center (`dc3-center-agentic`). The 
 Controllers of its own; through `springdoc.swagger-ui.urls` it pulls all four documents into one Swagger UI with a
 service dropdown, so only a single entry point faces outward.
 
-```mermaid
-flowchart LR
-  Browser["Browser<br/>/swagger-ui.html"] --> GW["Gateway dc3-gateway (:8000)<br/>aggregated Swagger UI"]
-  GW -->|"/v3/api-docs/auth"| Auth["Auth Center dc3-center-auth (:8300)<br/>group=auth"]
-  GW -->|"/v3/api-docs/manager"| Mgr["Manager Center dc3-center-manager (:8400)<br/>group=manager"]
-  GW -->|"/v3/api-docs/data"| Data["Data Center dc3-center-data (:8500)<br/>group=data"]
-  GW -->|"/v3/api-docs/agentic"| Agentic["Agentic Center dc3-center-agentic (:8600)<br/>group=agentic"]
-```
+<ApiDocFlowDiagram lang="en" />
 
 Grouping works in two layers. `dc3-common-web`'s `SpringDocConfig` supplies the global metadata — title, version,
 contact, license, security schemes. Each business module then declares a `GroupedOpenApi` Bean under its already-scanned
@@ -74,23 +73,7 @@ plaintext
 back to
 BCrypt when Argon2 is unavailable).
 
-```mermaid
-sequenceDiagram
-  participant Client as Client
-  participant GW as Gateway dc3-gateway
-  participant Auth as Auth Center dc3-center-auth
-  Client->>GW: Fetch salt (tenant, name)
-  GW->>Auth: Forward fetch-salt request
-  Auth-->>Client: "salt string (use within 5 minutes)"
-  Note over Client: "No local hashing — submit the plaintext password"
-  Client->>GW: Exchange token (tenant, name, salt, plaintext password)
-  GW->>Auth: Forward generate-token request
-  Auth-->>Client: "access token (valid 12 hours)"
-  Client->>GW: "POST /api/v3/... with X-Auth-Tenant / X-Auth-Login / X-Auth-Token"
-  GW->>GW: Validate auth headers, inject principal context
-  GW->>Auth: Downstream tenant isolation + permission check
-  Auth-->>Client: Return unified response R
-```
+<ApiDocSequenceDiagram lang="en" />
 
 A real call looks like this (values are illustrative only; `default`/`dc3` are the tenant and user shipped in the seed
 data):
@@ -200,7 +183,7 @@ What each property means:
 Take Auth Center's `TokenController`. The fetch-salt endpoint is annotated
 `riskLevel=LOW, destructive=false, idempotent=false, openWorld=false`, while generate-token is annotated
 `riskLevel=HIGH`. Both are public endpoints hidden from the AI tool catalog (`hidden=true`), but their risk levels are
-still faithfully distinguished. The Agentic Center's `POST /api/v3/agentic/v1/chat/completions` is annotated
+still faithfully distinguished. The Agentic Center's `POST /api/v3/agentic/chat/completions` is annotated
 `riskLevel=MEDIUM, destructive=false, idempotent=false, openWorld=true`.
 
 The aggregator also derives `read_only_hint` from the HTTP method (`GET` → 1, `POST` → 0) and persists all hint bits (

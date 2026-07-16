@@ -89,6 +89,14 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
         return body;
     }
 
+    /**
+     * Build the Feishu message body from the payload, dispatching by payload type:
+     * TEXT wraps into a text message, JSON passes through, and anything else becomes an
+     * interactive card. A payload already carrying {@code msg_type} passes through as-is.
+     *
+     * @param payload the message payload
+     * @return the Feishu message body
+     */
     private Map<String, Object> buildFeishuMessage(MessagePayload payload) {
         Map<String, Object> renderedPayload = Objects.requireNonNullElse(payload.getPayload(), Map.of());
         if (renderedPayload.containsKey("msg_type")) {
@@ -129,6 +137,13 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
                 && Boolean.TRUE.equals(channel.getChannelExt().getContent().getSignEnabled());
     }
 
+    /**
+     * Compute the Feishu bot HMAC-SHA256 signature for the given timestamp and secret.
+     *
+     * @param timestamp the timestamp string
+     * @param secret    the bot secret
+     * @return the base64-encoded signature
+     */
     private String sign(String timestamp, String secret) {
         try {
             String stringToSign = timestamp + "\n" + secret;

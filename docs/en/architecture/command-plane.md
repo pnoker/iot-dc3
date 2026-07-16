@@ -2,6 +2,12 @@
 title: "Command Plane: Dispatching Read/Write Commands and Their Receipts"
 ---
 
+<script setup>
+import CommandStateDiagram from '../../.vitepress/theme/components/CommandStateDiagram.vue'
+import CommandFlowDiagram from '../../.vitepress/theme/components/CommandFlowDiagram.vue'
+</script>
+
+
 # Command Plane: Dispatching Read/Write Commands and Their Receipts
 
 The data plane pulls values up from devices. The command plane runs the other way: it takes a "read this point" or "
@@ -116,24 +122,7 @@ A command's status is defined by `PointCommandStatusEnum`. The flow from submiss
 submission side owns `PENDING -> SENT`; every terminal state after that is produced by the receipt the driver emits on
 consumption and written back through the result queue.
 
-```mermaid
-stateDiagram-v2
-    [*] --> PENDING: Persisted
-    PENDING --> SENT: Published to broker
-    SENT --> SUCCESS: Driver executed successfully
-    SENT --> FAILED: Driver returned failure / exception after requeue
-    SENT --> EXPIRED: now exceeded expireAt on consumption
-    SENT --> DUPLICATE: Dedup hit
-    SENT --> TIMEOUT: Reserved in enum, not produced
-    SENT --> DEAD: Entered dead-letter DLX
-    SUCCESS --> [*]
-    FAILED --> [*]
-    EXPIRED --> [*]
-    DUPLICATE --> [*]
-    TIMEOUT --> [*]
-    DEAD --> [*]
-    note right of TIMEOUT: Reserved in enum<br/>not yet produced by the current chain
-```
+<CommandStateDiagram lang="en" />
 
 The index and meaning of each status (`PointCommandStatusEnum`, with the persisted `status` value in parentheses):
 
@@ -178,17 +167,7 @@ The command chain uses two sets of exchanges and queues. One set carries command
 the other carries receipts back. Command queues are partitioned by the driver's `serviceName`, with a 30-second TTL and
 a dead-letter exchange. The result queue has a 60-second TTL.
 
-```mermaid
-flowchart LR
-    Data["Data Center<br/>dc3-center-data"] -->|"routing dc3.r.point_command.{serviceName}"| EX["Command Exchange<br/>dc3.e.point_command (topic)"]
-    EX --> Q["Command Queue<br/>dc3.q.point_command.{serviceName}<br/>TTL 30s + DLX"]
-    Q --> Driver["Driver<br/>PointCommandReceiver"]
-    Q -.timeout/reject.-> DLX["Dead-letter Exchange<br/>dc3.e.point_command_dead"]
-    DLX --> DLQ["Dead-letter Queue<br/>dc3.q.point_command_dead"]
-    Driver -->|"routing dc3.r.point_command_result.{serviceName}"| REX["Result Exchange<br/>dc3.e.point_command_result (topic)"]
-    REX --> RQ["Result Queue<br/>dc3.q.point_command_result<br/>TTL 60s"]
-    RQ --> Recv["Data Center<br/>PointCommandResultReceiver"]
-```
+<CommandFlowDiagram lang="en" />
 
 The command queue `dc3.q.point_command.{serviceName}` is durable with `ttl(30000)` and dead-letters to
 `dc3.e.point_command_dead`. Two paths reach the dead-letter queue: a command the driver never consumes within 30

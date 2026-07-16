@@ -36,9 +36,19 @@ public class AlgorithmConstant {
     public static final String ALGORITHM_AES = "AES";
 
     /**
+     * AES transform: AES/GCM/NoPadding (authenticated encryption with a random IV)
+     */
+    public static final String TRANSFORM_AES_GCM = "AES/GCM/NoPadding";
+
+    /**
      * Asymmetric encryption algorithm: RSA
      */
     public static final String ALGORITHM_RSA = "RSA";
+
+    /**
+     * RSA transform: RSA/ECB/OAEPWithSHA-256AndMGF1Padding (explicit OAEP padding)
+     */
+    public static final String TRANSFORM_RSA_OAEP = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
     /**
      * Encryption algorithm: SHA256withRSA

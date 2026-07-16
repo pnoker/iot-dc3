@@ -166,8 +166,8 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
      * Get or create the cached S7PLC connection for a device, parsing host/port/plcType
      * from the driver config and falling back to S1200 on an unknown plcType.
      *
-     * @param deviceId      the device to connect to
-     * @param driverConfig  driver attribute config carrying host/port/plcType
+     * @param deviceId     the device to connect to
+     * @param driverConfig driver attribute config carrying host/port/plcType
      * @return the wrapped S7PLC connection
      */
     private MyS7PLC getS7PLC(Long deviceId, Map<String, AttributeBO> driverConfig) {

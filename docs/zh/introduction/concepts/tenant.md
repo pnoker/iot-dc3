@@ -2,6 +2,11 @@
 title: 租户 Tenant
 ---
 
+<script setup>
+import TenantRelationDiagram from '../../../.vitepress/theme/components/TenantRelationDiagram.vue'
+import TenantAuthDiagram from '../../../.vitepress/theme/components/TenantAuthDiagram.vue'
+</script>
+
 # 租户 Tenant
 
 > **租户是平台里业务数据的隔离边界**——同一套部署里，A 公司的[设备](./device)、位号、数据和 B 公司的彼此看不见。每一条业务记录都带一个
@@ -50,13 +55,7 @@ title: 租户 Tenant
 
 ## 与其它概念的关系
 
-```mermaid
-flowchart LR
-    T["租户 Tenant<br/>tenant_id"] -->|拥有| DEV["设备 / 位号 / 数据"]
-    T -->|经成员关系| TM["租户成员 TenantMembership"]
-    TM -->|N:1| P["主体 Principal<br/>USER / SERVICE_ACCOUNT / SYSTEM"]
-    P -->|租户内绑定| ROLE["角色 Role → 资源码"]
-```
+<TenantRelationDiagram lang="zh" />
 
 - 一切实现了 `TenantOwned`（提供 `getTenantId()`）的业务实体都归某个租户拥有，是隔离的施加对象。
 - 主体经 `dc3_tenant_membership` 加入租户；进入租户后再由 RBAC（`dc3_role_principal_bind`
@@ -66,12 +65,7 @@ flowchart LR
 
 租户隔离落在控制器层：取数后比对实体 `tenantId` 与调用方租户，跨租户访问被判为不存在或被剔除。
 
-```mermaid
-flowchart LR
-    REQ["请求（令牌绑定 tenantId）"] --> CTRL["控制器 requireTenant()<br/>比对实体 tenantId"]
-    CTRL -->|不一致/不存在| NF["NotFoundException → 404"]
-    CTRL -->|批量| FT["filterTenant()<br/>剔除非本租户条目"]
-```
+<TenantAuthDiagram lang="zh" />
 
 - **控制器层（单条按 ID）**：查到实体后，`BaseController.requireTenant()` 比对实体的 `tenantId` 与调用方租户，不一致（或实体不存在）就抛
   `NotFoundException`，对外返回 **404**。

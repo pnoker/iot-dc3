@@ -24,10 +24,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.config.CoapConfig;
+import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.elements.config.Configuration;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -62,6 +64,13 @@ public class CoapServerManager implements CommandLineRunner {
         configuration.set(CoapConfig.EXCHANGE_LIFETIME, coapProperties.getClientTimeout(), TimeUnit.MILLISECONDS);
 
         coapServer = new CoapServer(configuration);
+        // Bind to the configured host explicitly; the default endpoint would listen on all
+        // interfaces regardless of serverHost, making the property (and the startup log) misleading.
+        coapServer.addEndpoint(new CoapEndpoint.Builder()
+                .setConfiguration(configuration)
+                .setInetSocketAddress(new InetSocketAddress(
+                        coapProperties.getServerHost(), coapProperties.getServerPort()))
+                .build());
         coapServer.add(new DataResource("data", coapReceiveService));
 
         coapServer.start();

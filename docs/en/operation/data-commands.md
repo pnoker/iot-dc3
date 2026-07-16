@@ -2,6 +2,12 @@
 title: Data and Commands
 ---
 
+<script setup>
+import DataCommandsFlowDiagram from '../../.vitepress/theme/components/DataCommandsFlowDiagram.vue'
+import DataCommandsStateDiagram from '../../.vitepress/theme/components/DataCommandsStateDiagram.vue'
+</script>
+
+
 # Data and Commands
 
 Once a device is connected, there are two things to verify: can you read its values, and can you push commands to it?
@@ -30,24 +36,7 @@ driver. After the driver runs it against the device, the result comes back throu
 command interface **returns a `commandId` immediately** — actual success or failure is determined by polling with that
 ID. This is an **asynchronous write path with side effects**.
 
-```mermaid
-flowchart LR
-  subgraph Read=["Data flow: read values (no side effects)"]
-    direction LR
-    Dev1["Field device"] --> Drv1["Driver"]
-    Drv1 -->|"dc3.e.value"| Data1["Data Center<br/>dc3-center-data"]
-    Data1 --> TS[("TimescaleDB<br/>dc3_point_value")]
-    You1["You (HTTP)"] -->|"POST /api/v3/data/point_value/latest<br/>POST /api/v3/data/point_value/list"| Data1
-  end
-  subgraph Write=["Command flow: issue commands (async, with side effects)"]
-    direction LR
-    You2["You (HTTP)"] -->|"POST /api/v3/data/point_command/read or /write"| Data2["Data Center<br/>dc3-center-data"]
-    Data2 -->|"dc3.e.point_command"| Drv2["Driver"]
-    Drv2 --> Dev2["Field device"]
-    Drv2 -->|"dc3.e.point_command_result"| Data2
-    You2 -.->|"Poll GET /api/v3/data/point_command_history/get_by_command_id"| Data2
-  end
-```
+<DataCommandsFlowDiagram lang="en" />
 
 For the field-level details, model transformations, and RabbitMQ topology of each pipeline,
 see [Data Plane](../architecture/data-plane) and [Command Plane](../architecture/command-plane). This page only covers
@@ -173,23 +162,7 @@ been persisted and is waiting to be published; once the RabbitMQ publisher-confi
 waiting for the driver). From there the driver's execution receipt decides the terminal state. Understand this diagram
 and you can work backwards from any status to see which hop it's stuck on.
 
-```mermaid
-stateDiagram-v2
-  [*] --> PENDING
-  PENDING --> SENT: publisher confirm (broker ACK)
-  SENT --> SUCCESS: driver confirms success
-  SENT --> FAILED: driver reports failure
-  SENT --> TIMEOUT: application-level timeout
-  SENT --> EXPIRED: expireAt already passed at consume time
-  SENT --> DUPLICATE: hit driver dedup cache
-  SENT --> DEAD: routed to dead-letter queue (DLX)
-  SUCCESS --> [*]
-  FAILED --> [*]
-  TIMEOUT --> [*]
-  EXPIRED --> [*]
-  DUPLICATE --> [*]
-  DEAD --> [*]
-```
+<DataCommandsStateDiagram lang="en" />
 
 There are six terminal states, matching values `2`–`7` of `PointCommandStatusEnum`: `SUCCESS(2)` succeeded; `FAILED(3)`
 the driver explicitly failed; `TIMEOUT(4)` the application layer never received a receipt; `EXPIRED(5)` consumed only

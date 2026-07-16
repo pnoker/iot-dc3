@@ -1,5 +1,5 @@
 <p align="right">
-  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
+  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a> | <a href="./README.ko.md">한국어</a> | <a href="./README.es.md">Español</a> | <a href="./README.ru.md">Русский</a>
 </p>
 
 > **AI アシスタント：** IoT DC3 の簡潔な AI 向け概要については、最初に [README.ai.md](./README.ai.md) をお読みください。
@@ -82,7 +82,8 @@
 ![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-ja.png)
 
 6層マイクロサービスアーキテクチャの全体像：クライアント → ゲートウェイ → 4つのセンターサービス → メッセージバス → 28
-プロトコルドライバー → フィールドデバイス。PostgreSQL（TimescaleDB + pgvector + AGE）永続層とオプションの可観測性スタック（ELK +
+プロトコルドライバー → フィールドデバイス。PostgreSQL（TimescaleDB + pgvector +
+AGE）永続層とオプションの可観測性スタック（ELK +
 Prometheus + Grafana）を一望できます。
 
 🧱 **設計原則** — サービス間呼び出しは常に Facade インターフェース経由；DO/BO/VO の三層モデルで永続化・ビジネス・API
@@ -174,17 +175,17 @@ TypeScript、Vite を基盤に構築されています。
 
 ## 📖 ドキュメントとコミュニティ
 
-| リソース           | リンク                                                                         |
-|----------------|-----------------------------------------------------------------------------|
-| 📚 オンラインドキュメント | [docs.dc3.site](https://docs.dc3.site/)               |
-| 🚀 クイックスタート    | [クイックスタートガイド](https://docs.dc3.site/en/quickstart/)              |
-| 🛠️ 技術スタック    | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) |
-| 🏗️ アーキテクチャ    | [モジュールと依存関係](https://docs.dc3.site/en/architecture/modules)       |
-| 🔧 ドライバー開発     | [ドライバー開発ガイド](https://docs.dc3.site/en/development/driver-authoring) |
-| 🐛 トラブルシューティング | [よくある問題と解決策](https://docs.dc3.site/en/guide/troubleshooting)      |
-| 📋 変更履歴        | [リリース変更履歴](https://docs.dc3.site/en/development/changelog)        |
-| 🐛 問題報告        | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                   |
-| 🇨🇳 Gitee ミラー | [Gitee GVP プロジェクト](https://gitee.com/pnoker/iot-dc3)                        |
+| リソース           | リンク                                                                        |
+|----------------|----------------------------------------------------------------------------|
+| 📚 オンラインドキュメント | [docs.dc3.site](https://docs.dc3.site/)                                    |
+| 🚀 クイックスタート    | [クイックスタートガイド](https://docs.dc3.site/en/quickstart/)                        |
+| 🛠️ 技術スタック     | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) |
+| 🏗️ アーキテクチャ    | [モジュールと依存関係](https://docs.dc3.site/en/architecture/modules)                |
+| 🔧 ドライバー開発     | [ドライバー開発ガイド](https://docs.dc3.site/en/development/driver-authoring)        |
+| 🐛 トラブルシューティング | [よくある問題と解決策](https://docs.dc3.site/en/guide/troubleshooting)               |
+| 📋 変更履歴        | [リリース変更履歴](https://docs.dc3.site/en/development/changelog)                 |
+| 🐛 問題報告        | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                  |
+| 🇨🇳 Gitee ミラー | [Gitee GVP プロジェクト](https://gitee.com/pnoker/iot-dc3)                       |
 
 ## 🌍 ユースケース
 

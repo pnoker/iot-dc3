@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta charset="UTF-8"><title>IoT DC3 — 命令下发与回执</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'JetBrains Mono',monospace;background:#020617;padding:2rem;color:#fff}.w{max-width:1100px;margin:0 auto}h1{font-size:1.4rem;margin-bottom:1rem}.b{background:rgba(15,23,42,.5);border:1px solid #1e293b;border-radius:1rem;padding:1.5rem;overflow-x:auto}svg{width:100%;min-width:900px;display:block}</style></head>
+<body><div class="w"><h1>命令下发与回执流程</h1><div class="b">
+<svg viewBox="0 0 1060 440">
+<defs><marker id="ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#64748b"/></marker>
+<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0L0 0 0 40" fill="none" stroke="#1e293b" stroke-width=".5"/></pattern></defs>
+<rect width="100%" height="100%" fill="url(#grid)"/>
+<!-- APP -> DC -->
+<line x1="180" y1="210" x2="250" y2="210" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="215" y="202" fill="#94a3b8" font-size="9" text-anchor="middle">CommandCallDTO</text>
+<!-- DC -> REC (two parallel) -->
+<line x1="460" y1="190" x2="560" y2="190" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="510" y="182" fill="#94a3b8" font-size="9" text-anchor="middle">持久化 PENDING→SENT</text>
+<line x1="460" y1="230" x2="560" y2="230" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="510" y="248" fill="#94a3b8" font-size="9" text-anchor="middle">推进终态</text>
+<!-- DC <-> DRV loop -->
+<line x1="330" y1="255" x2="330" y2="340" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="258" y="300" fill="#94a3b8" font-size="9" text-anchor="middle">dc3.e.command</text>
+<line x1="390" y1="340" x2="390" y2="255" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="470" y="300" fill="#94a3b8" font-size="9" text-anchor="middle">CommandCallResultDTO</text>
+<!-- DRV -> DEV -->
+<line x1="480" y1="370" x2="570" y2="370" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="525" y="362" fill="#94a3b8" font-size="9" text-anchor="middle">execute</text>
+<!-- APP -->
+<rect x="40" y="180" width="140" height="60" rx="6" fill="#0f172a"/><rect x="40" y="180" width="140" height="60" rx="6" fill="rgba(30,41,59,.5)" stroke="#94a3b8" stroke-width="1.5"/><text x="110" y="206" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">调用方</text><text x="110" y="223" fill="#94a3b8" font-size="9" text-anchor="middle">Caller</text>
+<!-- DC -->
+<rect x="250" y="165" width="210" height="90" rx="8" fill="#0f172a"/><rect x="250" y="165" width="210" height="90" rx="8" fill="rgba(6,78,59,.4)" stroke="#34d399" stroke-width="1.5"/><text x="355" y="195" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">数据中心</text><text x="355" y="213" fill="#94a3b8" font-size="9" text-anchor="middle">CommandHistoryService</text><text x="355" y="230" fill="#94a3b8" font-size="9" text-anchor="middle">枢纽</text>
+<!-- REC cylinder -->
+<path d="M570,160 a85,15 0 0 0 170,0 v100 a85,15 0 0 1 -170,0 z" fill="#0f172a"/><path d="M570,160 a85,15 0 0 0 170,0 v100 a85,15 0 0 1 -170,0 z" fill="rgba(76,29,149,.4)" stroke="#a78bfa" stroke-width="1.5"/><ellipse cx="655" cy="160" rx="85" ry="15" fill="none" stroke="#a78bfa" stroke-width="1.5"/><text x="655" y="215" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">dc3_command_history</text>
+<!-- DRV -->
+<rect x="250" y="340" width="230" height="60" rx="8" fill="#0f172a"/><rect x="250" y="340" width="230" height="60" rx="8" fill="rgba(251,146,60,.3)" stroke="#fb923c" stroke-width="1.5"/><text x="365" y="366" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">驱动 CommandReceiver</text><text x="365" y="383" fill="#94a3b8" font-size="9" text-anchor="middle">接收并执行</text>
+<!-- DEV -->
+<rect x="570" y="340" width="160" height="60" rx="8" fill="#0f172a"/><rect x="570" y="340" width="160" height="60" rx="8" fill="rgba(30,41,59,.5)" stroke="#94a3b8" stroke-width="1.5"/><text x="650" y="366" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">设备</text><text x="650" y="383" fill="#94a3b8" font-size="9" text-anchor="middle">Device</text>
+</svg></div></div></body></html>

@@ -2,6 +2,11 @@
 title: FINS Driver
 ---
 
+<script setup>
+import FinsDiagram from '../../.vitepress/theme/components/FinsDiagram.vue'
+</script>
+
+
 # FINS Driver
 
 `dc3-driver-fins` onboards Omron PLCs into IoT DC3 over the FINS protocol: as a FINS client it actively opens a TCP
@@ -38,18 +43,7 @@ connection these usually stay at their defaults.
 The driver uses no third-party protocol library; it assembles FINS frames byte by byte. A request to read 1 word
 consists of a 4-byte TCP length prefix + a 10-byte FINS header + a 2-byte command code + 4 bytes of read parameters:
 
-```mermaid
-flowchart LR
-  subgraph TCP["FINS/TCP frame"]
-    Len["TCP length prefix<br/>4 bytes"]
-    subgraph FINS["FINS frame"]
-      Hdr["FINS header 10 bytes (driver implementation)<br/>ICF 0x80 / RSV / GCT 0x02<br/>destNode destUnit 0x00 / srcNode srcUnit 0x00 / SID"]
-      Cmd["command code 2 bytes<br/>MRC 0x01 / SRC 0x01 (memory read)"]
-      Par["read params 4 bytes<br/>area code + word address + bit + length"]
-    end
-  end
-  Len --> Hdr --> Cmd --> Par
-```
+<FinsDiagram lang="en" />
 
 The response frame carries a 2-byte **end code** after the FINS header and command code: non-zero means the PLC rejected
 or errored, and the driver raises a `ReadPointException` accordingly; when it is zero, data starts at byte 14 and is
@@ -93,12 +87,11 @@ decoding; `bitPosition` is the bit offset within the word.
 | Data Type    | `dataType`    | STRING | `UINT16` | `INT16`/`UINT16`/`INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD`                     |
 | Bit Position | `bitPosition` | INT    | `0`      | Bit offset within the word (unused on the current read path; treated as `0`) |
 
-::: warning The current read path reads exactly 1 word; `dataType` does not decide how many words are read
-A read always fetches exactly **1 word (2 bytes)**, regardless of `dataType`. So **only `INT16`/`UINT16` read back
-correctly**; for `INT32`/`UINT32`/`FLOAT`, `decodeValue` calls `getInt()`/`getFloat()` to read 4 bytes from a 2-byte
-buffer, triggering a BufferUnderflow, so no value is produced today; `STRING`/`BCD` likewise only receive 2 bytes. These
-are declared but pending protocol semantics. The driver decodes the returned bytes Big-Endian; the Point's data
-type ([Point](../introduction/concepts/point)'s `pointTypeFlag`) should match the `dataType` set here.
+::: tip The word count read is determined by `dataType`
+A read fetches the word count matching `dataType`: `INT32`/`UINT32`/`FLOAT` read **2 words (4 bytes)**, other types
+read **1 word (2 bytes)** (see `wordCount()`). Decoding supports `INT16`/`UINT16`/`INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD`,
+all Big-Endian; the Point's data type ([Point](../introduction/concepts/point)'s `pointTypeFlag`) should match the
+`dataType` set here.
 :::
 
 ### Write command configuration (`command-attribute`)
@@ -137,16 +130,15 @@ device:
   and does not fall back to UDP). On a failed connection the driver logs `Driver FINS connection failed` and marks the
   device offline, retrying on the next health-check cycle. Check `host`, network reachability, and whether the PLC
   limits the number of client connections.
-- **Wrong value / BufferUnderflow**: usually `dataType` is set to `INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD`——the current
-  read path takes only 1 word (2 bytes), so only `INT16`/`UINT16` work. Multi-word types are pending implementation;
-  validate the link with a 16-bit type first.
+- **Wrong value**: confirm `dataType` matches the actual type/word length of the PLC register (`INT32`/`UINT32`/`FLOAT`
+  read 2 words) and that byte order is Big-Endian; a type mismatch decodes to a wrong number.
 - **Non-zero endCode**: bytes 12–13 of the response frame are the FINS end code; non-zero means the PLC rejected the
   request (e.g. address out of range, memory area absent, insufficient permission). The driver throws
   `FINS command failed, endCode=0x...`; look the code up in the FINS manual and verify `memoryArea`/`address` fall
   within the PLC's actual memory range.
-- **Float writes land wrong**: the write command parses `INT32`/`UINT32`/`FLOAT` all via `Integer.parseInt` before
-  writing 4 big-endian bytes, and does **not** encode `12.5` as a float. To write a float, convert the target to its
-  integer bit pattern yourself, or confirm the PLC actually expects an integer.
+- **Float writes**: the write command parses `INT32`/`UINT32` as integers (`Integer.parseInt`) into 4 big-endian bytes,
+  and encodes `FLOAT` via `Float.parseFloat` as a 4-byte IEEE 754 big-endian float. Make sure the value string matches
+  `dataType` (send `12.5` for a `FLOAT`).
 - **Frequent timeouts**: `timeout` governs both connect and read (default 5000ms). Increase it for a jittery link or a
   slow PLC; note that any read/write exception actively closes and evicts that device's cached connection, which is
   rebuilt on next access.
@@ -160,18 +152,12 @@ device:
 
 - **dc3.driver.code**: `FinsDriver` (stable routing identifier used for registration and command dispatch; do not change
   it casually).
-- **Read capability**: ✓ implemented——periodic single-word polling, `INT16`/`UINT16` work.
-- **Write capability**: ✓ implemented——`INT16`/`UINT16`/`STRING` write correctly; 32-bit/float are encoded as integers (
-  see Troubleshooting above).
+- **Read capability**: ✓ implemented——periodic polling; word count follows `dataType`, decoding
+  `INT16`/`UINT16`/`INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD`.
+- **Write capability**: ✓ implemented——`INT16`/`UINT16`/`INT32`/`UINT32`/`STRING` and `FLOAT` (IEEE 754) all encode
+  correctly.
 - **Subscribe/report capability**: — not provided. FINS is active-poll only; the driver does not listen for device
   pushes, consistent with the [Driver Capability Matrix](./matrix).
-
-::: warning Multi-word data types are not yet implemented
-The read path always reads exactly 1 word; the `INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD` decode branches are written but
-cannot produce correct values because only 2 bytes are fetched, and the write path encodes 32-bit/float as integers. The
-**usable range today is 16-bit integers (plus STRING writes)**; multi-word types are designed but pending, so do not
-treat them as supported.
-:::
 
 ::: tip One driver instance can serve multiple PLCs
 A single FINS driver process can serve multiple devices, each holding its own TCP connection (cached by device ID in

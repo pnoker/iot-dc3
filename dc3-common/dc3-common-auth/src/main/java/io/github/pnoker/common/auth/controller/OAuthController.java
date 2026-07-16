@@ -215,6 +215,13 @@ public class OAuthController {
                 .onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 
+    /**
+     * Build an OAuth error response entity carrying the error code and description at the
+     * exception's status code.
+     *
+     * @param exception the OAuth protocol exception
+     * @return the error response entity
+     */
     private Mono<ResponseEntity<Map<String, Object>>> oauthError(OAuthProtocolException exception) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(McpConstant.Field.ERROR, exception.getError());
@@ -226,12 +233,25 @@ public class OAuthController {
         return oauthError(exception).map(response -> response);
     }
 
+    /**
+     * Collapse a multi-value map to a single-value map, keeping the first value of each
+     * key (empty string when none).
+     *
+     * @param values the multi-value map
+     * @return the collapsed single-value map
+     */
     private Map<String, String> firstValues(MultiValueMap<String, String> values) {
         Map<String, String> map = new LinkedHashMap<>();
         values.forEach((key, value) -> map.put(key, value.isEmpty() ? "" : value.get(0)));
         return map;
     }
 
+    /**
+     * Deserialize the principal header JSON, returning null when blank.
+     *
+     * @param principalJson the principal header JSON string
+     * @return the parsed principal header, or null
+     */
     private RequestHeader.PrincipalHeader parsePrincipal(String principalJson) {
         if (StringUtils.isBlank(principalJson)) {
             return null;

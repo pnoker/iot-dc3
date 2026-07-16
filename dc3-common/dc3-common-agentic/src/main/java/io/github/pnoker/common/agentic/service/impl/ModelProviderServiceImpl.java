@@ -102,6 +102,11 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         chatClientFactory.evict(id);
     }
 
+    /**
+     * Validate a provider: name and base URL are required.
+     *
+     * @param entityBO the provider to validate
+     */
     private void validate(ModelProviderBO entityBO) {
         if (Objects.isNull(entityBO) || StringUtils.isBlank(entityBO.getName())) {
             throw new RequestException("Provider name is required");
@@ -111,6 +116,15 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         }
     }
 
+    /**
+     * Copy fields from the source BO onto the target, applying defaults. The API key is
+     * replaced when a new one is supplied; otherwise it is kept only when
+     * {@code keepExistingApiKey} is true.
+     *
+     * @param targetBO           the target to populate
+     * @param sourceBO           the source carrying user-supplied values
+     * @param keepExistingApiKey whether to retain the existing key when none is supplied
+     */
     private void apply(ModelProviderBO targetBO, ModelProviderBO sourceBO, boolean keepExistingApiKey) {
         targetBO.setName(sourceBO.getName().trim());
         targetBO.setProviderType(Objects.nonNull(sourceBO.getProviderType()) ? sourceBO.getProviderType()
@@ -128,6 +142,12 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         targetBO.setRemark(StringUtils.defaultString(sourceBO.getRemark()));
     }
 
+    /**
+     * Stamp the creator, operator, tenant, and timestamps for a new provider.
+     *
+     * @param entityBO the provider to stamp
+     * @param header   the authenticated principal header
+     */
     private void fillCreateAudit(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
         LocalDateTime now = LocalDateTime.now();
         entityBO.setCreateTime(now);
@@ -139,12 +159,24 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         entityBO.setTenantId(header.getTenantId());
     }
 
+    /**
+     * Stamp the operator and operate timestamp for an updated provider.
+     *
+     * @param entityBO the provider to stamp
+     * @param header   the authenticated principal header
+     */
     private void fillOperateAudit(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
         entityBO.setOperateTime(LocalDateTime.now());
         entityBO.setOperatorId(header.getUserId());
         entityBO.setOperatorName(header.getUserName());
     }
 
+    /**
+     * Enforce the single-default invariant: when a provider is marked default, clear the
+     * default flag on every other provider.
+     *
+     * @param entityDO the provider being saved as default
+     */
     private void normalizeDefault(ModelProviderDO entityDO) {
         if (!Objects.equals(entityDO.getDefaultFlag(), DefaultFlagEnum.DEFAULT.getIndex())) {
             return;

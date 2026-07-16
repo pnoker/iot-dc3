@@ -30,9 +30,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.util.Collection;
 
 /**
  * Imports SSL certificates into the JDK default keystore.
@@ -113,14 +115,33 @@ public class KeyStoreUtil {
             }
         }
 
-        try (OutputStream outputStream = Files.newOutputStream(path)) {
-            BufferedInputStream bis = new BufferedInputStream(crtInputStream);
+        // Parse all certificates up front, so a malformed stream fails before cacerts is touched.
+        Collection<? extends Certificate> certificates;
+        try (BufferedInputStream bis = new BufferedInputStream(crtInputStream)) {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            while (bis.available() > 0) {
-                Certificate cert = cf.generateCertificate(bis);
-                keystore.setCertificateEntry(crtAliasName, cert);
+            certificates = cf.generateCertificates(bis);
+        }
+        if (certificates.isEmpty()) {
+            throw new NotFoundException("No X.509 certificate found in stream for alias '{}'", crtAliasName);
+        }
+        int index = 0;
+        for (Certificate cert : certificates) {
+            // Use a distinct alias per certificate so multiple certs are not collapsed into one entry.
+            String alias = certificates.size() == 1 ? crtAliasName : crtAliasName + "_" + index++;
+            keystore.setCertificateEntry(alias, cert);
+        }
+
+        // Write to a temp file and atomically replace cacerts, so a store() failure never
+        // leaves the JVM-wide trust store truncated or partially written.
+        Path tempPath = Files.createTempFile(path.getParent(), "cacerts", ".tmp");
+        try {
+            try (OutputStream outputStream = Files.newOutputStream(tempPath)) {
+                keystore.store(outputStream, passphraseArray);
             }
-            keystore.store(outputStream, passphraseArray);
+            Files.move(tempPath, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (Exception e) {
+            Files.deleteIfExists(tempPath);
+            throw e;
         }
         log.info("Certificate '{}' imported successfully", crtAliasName);
     }

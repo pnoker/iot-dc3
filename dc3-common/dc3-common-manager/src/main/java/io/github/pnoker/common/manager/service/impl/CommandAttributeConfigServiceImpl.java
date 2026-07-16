@@ -264,6 +264,12 @@ public class CommandAttributeConfigServiceImpl implements CommandAttributeConfig
         return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
+    /**
+     * Validate that the config's device, command, and attribute all belong to the same
+     * tenant, share a driver, and that the device and command share a profile.
+     *
+     * @param entityBO the config to validate
+     */
     private void validateTenantRelations(CommandAttributeConfigBO entityBO) {
         DeviceDO deviceDO = deviceManager.getById(entityBO.getDeviceId());
         CommandDO commandDO = commandManager.getById(entityBO.getCommandId());

@@ -134,6 +134,15 @@ public class AttachmentServiceImpl implements AttachmentService {
         return "Attachment metadata:\n" + summary;
     }
 
+    /**
+     * Resolve and create the storage path for an attachment under the tenant/user/
+     * conversation directory, guarding against path traversal.
+     *
+     * @param conversationId the conversation id
+     * @param header         the authenticated principal header
+     * @param fileName       the original file name
+     * @return the resolved file path
+     */
     private Path resolveFilePath(String conversationId, RequestHeader.PrincipalHeader header, String fileName) {
         Path storageRoot = Paths.get(properties.getAttachmentStoragePath()).toAbsolutePath().normalize();
         Path directory = storageRoot
@@ -155,6 +164,12 @@ public class AttachmentServiceImpl implements AttachmentService {
         return filePath;
     }
 
+    /**
+     * Reject the upload when the declared content length exceeds the attachment size
+     * limit.
+     *
+     * @param filePart the uploaded file part
+     */
     private void assertContentLength(FilePart filePart) {
         long contentLength = filePart.headers().getContentLength();
         if (contentLength > MAX_BYTES) {
@@ -162,6 +177,11 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
     }
 
+    /**
+     * Best-effort delete of an attachment file, logging (not throwing) on failure.
+     *
+     * @param filePath the file path to delete
+     */
     private void deleteFile(Path filePath) {
         try {
             Files.deleteIfExists(filePath);
@@ -170,12 +190,25 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
     }
 
+    /**
+     * Sanitize a path segment: blank input falls back to "attachment", and any
+     * character outside {@code [a-zA-Z0-9._-]} is replaced with an underscore.
+     *
+     * @param value raw path segment
+     * @return sanitized segment, never blank
+     */
     private String safePathPart(String value) {
         String sanitized = StringUtils.defaultIfBlank(value, "attachment")
                 .replaceAll("[^a-zA-Z0-9._-]", SymbolConstant.UNDERSCORE);
         return StringUtils.defaultIfBlank(sanitized, "attachment");
     }
 
+    /**
+     * Stamp the creator, operator, tenant, and timestamps for a new attachment.
+     *
+     * @param entityBO the attachment to stamp
+     * @param header   the authenticated principal header
+     */
     private void fillCreateAudit(AttachmentBO entityBO, RequestHeader.PrincipalHeader header) {
         LocalDateTime now = LocalDateTime.now();
         entityBO.setCreateTime(now);

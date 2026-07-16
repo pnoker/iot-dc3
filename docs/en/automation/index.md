@@ -2,6 +2,11 @@
 title: Automation
 ---
 
+<script setup>
+import AutomationIndexDiagram from '../../.vitepress/theme/components/AutomationIndexDiagram.vue'
+</script>
+
+
 # Automation
 
 Deterministic, repeatable, programmatic operations through the `dc3` CLI — no LLM involved, so results are predictable
@@ -21,15 +26,7 @@ It fits three audiences:
 - **AI coding tools** — let Claude Code, Codex, Gemini CLI drive the platform through the shell; every command supports
   `--format json`, so the output is safe for programs to parse.
 
-```mermaid
-flowchart LR
-    Human["Person / ops"] --> CLI["dc3 CLI"]
-    Script["Script / CI"] --> CLI
-    AICoder["AI coding tool"] --> CLI
-    CLI -->|"X-Auth-Tenant / Login / Token"| GW["Gateway dc3-gateway :8000"]
-    GW --> RBAC["RBAC + tenant check<br/>dc3-center-auth"]
-    RBAC --> Svc["Manager / Data centers"]
-```
+<AutomationIndexDiagram lang="en" />
 
 The CLI authenticates with a login token: fetch a salt, exchange it for a 12-hour access token, then send
 `X-Auth-Tenant` / `X-Auth-Login` / `X-Auth-Token` on every request. Like the AI section, it gets no more privilege than

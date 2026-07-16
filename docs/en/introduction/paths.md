@@ -2,6 +2,11 @@
 title: Choose a Path by Role
 ---
 
+<script setup>
+import PathsDecisionDiagram from '../../.vitepress/theme/components/PathsDecisionDiagram.vue'
+</script>
+
+
 # Choose a Path by Role
 
 The docs cover everything from first evaluation to contributing, but the shortest path through them depends on what
@@ -10,18 +15,7 @@ you're here to do. Pick the role that fits you and read the pages in the order l
 This decision diagram points you to the right lane at a glance; the detailed reading order for each is in the sections
 below.
 
-```mermaid
-flowchart LR
-  Start["What do you want to do?"] --> Q1{"Evaluating?"}
-  Q1 -->|"yes"| P1["Evaluate<br/>positioning → concepts → architecture → demo"]
-  Q1 -->|"no"| Q2{"Onboarding / ops?"}
-  Q2 -->|"yes"| P2["Operate<br/>concepts → first device → onboard → commands → alarms"]
-  Q2 -->|"no"| Q3{"Custom development?"}
-  Q3 -->|"yes"| P3["Develop<br/>architecture → planes → domain model → driver"]
-  Q3 -->|"no"| Q4{"Automation / AI?"}
-  Q4 -->|"yes"| P4["Integrate<br/>CLI → MCP → Agentic"]
-  Q4 -->|"no"| P5["Contribute<br/>conventions → testing → contributing"]
-```
+<PathsDecisionDiagram lang="en" />
 
 ## I want to evaluate the platform first
 

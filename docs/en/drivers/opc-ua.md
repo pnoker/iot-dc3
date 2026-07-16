@@ -2,6 +2,11 @@
 title: OPC UA Driver
 ---
 
+<script setup>
+import OpcUaDiagram from '../../.vitepress/theme/components/OpcUaDiagram.vue'
+</script>
+
+
 # OPC UA Driver
 
 `dc3-driver-opc-ua` connects OPC UA servers to IoT DC3: acting as an OPC UA client, it connects to one or more servers,
@@ -35,20 +40,7 @@ collection cycle.
 - **Driver name / code**: `OPC UA Driver` / `OpcUaDriver`
 - **Type**: `DRIVER_CLIENT` (actively connects to the server)
 
-```mermaid
-flowchart LR
-  subgraph Server["OPC UA Server (PLC / SCADA / Gateway)"]
-    direction TB
-    Tree["Node Tree"]
-    N1["Node ns=2;s=Demo.Static.Float"]
-    N2["Node ns=2;s=Demo.Static.Bool"]
-    Tree --> N1
-    Tree --> N2
-  end
-  Drv["dc3-driver-opc-ua<br/>OPC UA client (Eclipse Milo)"]
-  Drv -->|"opc.tcp://host:port/path<br/>readValue / writeValue"| Server
-  Drv -->|"PointValue report"| DC3["IoT DC3 Data Center"]
-```
+<OpcUaDiagram lang="en" />
 
 ## Attribute configuration
 

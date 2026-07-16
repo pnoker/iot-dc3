@@ -34,7 +34,10 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.ByteBuffer;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -61,6 +64,18 @@ import java.util.Date;
 @Slf4j
 public class KeyUtil {
 
+    /**
+     * GCM initialization vector length in bytes (96-bit, the recommended size).
+     */
+    private static final int GCM_IV_LENGTH = 12;
+
+    /**
+     * GCM authentication tag length in bits.
+     */
+    private static final int GCM_TAG_LENGTH_BITS = 128;
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private KeyUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
@@ -79,51 +94,69 @@ public class KeyUtil {
     }
 
     /**
-     * Encrypt content using an AES key.
+     * Encrypt content using an AES key (AES/GCM/NoPadding with a random IV).
+     * <p>
+     * The output is Base64({@code IV || ciphertext+tag}); a fresh random IV is prepended so
+     * every call produces distinct ciphertext for the same plaintext.
      *
      * @param content    String
      * @param privateKey Private key in Base64 encoding
      * @return Encrypted AES content
-     * @throws NoSuchPaddingException    NoSuchPaddingException
-     * @throws NoSuchAlgorithmException  NoSuchAlgorithmException
-     * @throws InvalidKeyException       InvalidKeyException
-     * @throws IllegalBlockSizeException IllegalBlockSizeException
-     * @throws BadPaddingException       BadPaddingException
+     * @throws NoSuchPaddingException             NoSuchPaddingException
+     * @throws NoSuchAlgorithmException            NoSuchAlgorithmException
+     * @throws InvalidKeyException                InvalidKeyException
+     * @throws IllegalBlockSizeException          IllegalBlockSizeException
+     * @throws BadPaddingException                BadPaddingException
+     * @throws InvalidAlgorithmParameterException InvalidAlgorithmParameterException
      */
     public static String encryptAes(String content, String privateKey) throws NoSuchPaddingException,
-            NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+            NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException,
+            InvalidAlgorithmParameterException {
         // Base64-encoded private key
         byte[] keyBytes = DecodeUtil.decode(privateKey);
         Key key = new SecretKeySpec(keyBytes, AlgorithmConstant.ALGORITHM_AES);
-        // AES encryption
-        Cipher cipher = Cipher.getInstance(AlgorithmConstant.ALGORITHM_AES);
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        return DecodeUtil.byteToString(DecodeUtil.encode(cipher.doFinal(DecodeUtil.stringToByte(content))));
+        // Random IV per encryption
+        byte[] iv = new byte[GCM_IV_LENGTH];
+        SECURE_RANDOM.nextBytes(iv);
+        // AES-GCM encryption
+        Cipher cipher = Cipher.getInstance(AlgorithmConstant.TRANSFORM_AES_GCM);
+        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH_BITS, iv));
+        byte[] ciphertext = cipher.doFinal(DecodeUtil.stringToByte(content));
+        // Prepend IV so the ciphertext is self-contained: IV || ciphertext+tag
+        byte[] output = ByteBuffer.allocate(iv.length + ciphertext.length).put(iv).put(ciphertext).array();
+        return DecodeUtil.byteToString(DecodeUtil.encode(output));
     }
 
     /**
-     * Decrypt content using an AES key.
+     * Decrypt content using an AES key (AES/GCM/NoPadding with a prepended IV).
      *
      * @param content    String
      * @param privateKey Private key in Base64 encoding
      * @return Decrypted AES content
-     * @throws NoSuchPaddingException    NoSuchPaddingException
-     * @throws NoSuchAlgorithmException  NoSuchAlgorithmException
-     * @throws InvalidKeyException       InvalidKeyException
-     * @throws IllegalBlockSizeException IllegalBlockSizeException
-     * @throws BadPaddingException       BadPaddingException
+     * @throws NoSuchPaddingException             NoSuchPaddingException
+     * @throws NoSuchAlgorithmException            NoSuchAlgorithmException
+     * @throws InvalidKeyException                InvalidKeyException
+     * @throws IllegalBlockSizeException          IllegalBlockSizeException
+     * @throws BadPaddingException                BadPaddingException
+     * @throws InvalidAlgorithmParameterException InvalidAlgorithmParameterException
      */
     public static String decryptAes(String content, String privateKey) throws NoSuchPaddingException,
-            NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+            NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException,
+            InvalidAlgorithmParameterException {
         // Base64-encoded private key
         byte[] keyBytes = DecodeUtil.decode(privateKey);
         Key key = new SecretKeySpec(keyBytes, AlgorithmConstant.ALGORITHM_AES);
-        // AES decryption
-        Cipher cipher = Cipher.getInstance(AlgorithmConstant.ALGORITHM_AES);
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        // Decode the encrypted string from Base64
+        // Decode the encrypted string from Base64 and split IV || ciphertext+tag
         byte[] inputByte = DecodeUtil.decode(DecodeUtil.stringToByte(content));
-        return DecodeUtil.byteToString(cipher.doFinal(inputByte));
+        ByteBuffer buffer = ByteBuffer.wrap(inputByte);
+        byte[] iv = new byte[GCM_IV_LENGTH];
+        buffer.get(iv);
+        byte[] ciphertext = new byte[buffer.remaining()];
+        buffer.get(ciphertext);
+        // AES-GCM decryption
+        Cipher cipher = Cipher.getInstance(AlgorithmConstant.TRANSFORM_AES_GCM);
+        cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH_BITS, iv));
+        return DecodeUtil.byteToString(cipher.doFinal(ciphertext));
     }
 
     /**
@@ -165,7 +198,7 @@ public class KeyUtil {
         RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(AlgorithmConstant.ALGORITHM_RSA)
                 .generatePublic(keySpec);
         // RSA encryption
-        Cipher cipher = Cipher.getInstance(AlgorithmConstant.ALGORITHM_RSA);
+        Cipher cipher = Cipher.getInstance(AlgorithmConstant.TRANSFORM_RSA_OAEP);
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
         return DecodeUtil.byteToString(DecodeUtil.encode(cipher.doFinal(DecodeUtil.stringToByte(content))));
     }
@@ -192,13 +225,19 @@ public class KeyUtil {
         RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(AlgorithmConstant.ALGORITHM_RSA)
                 .generatePrivate(keySpec);
         // RSA decryption
-        Cipher cipher = Cipher.getInstance(AlgorithmConstant.ALGORITHM_RSA);
+        Cipher cipher = Cipher.getInstance(AlgorithmConstant.TRANSFORM_RSA_OAEP);
         cipher.init(Cipher.DECRYPT_MODE, priKey);
         // Decode the encrypted string from Base64
         byte[] inputByte = DecodeUtil.decode(DecodeUtil.stringToByte(content));
         return DecodeUtil.byteToString(cipher.doFinal(inputByte));
     }
 
+    /**
+     * Resolve the JWT signing key from the {@code DC3_SECURITY_KEY} environment variable
+     * or the {@code dc3.security.key} system property, throwing when neither is set.
+     *
+     * @return the security key
+     */
     private static String getSecurityKey() {
         String key = System.getenv("DC3_SECURITY_KEY");
         if (key == null || key.isBlank()) {

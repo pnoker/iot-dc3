@@ -163,6 +163,13 @@ public class RolePrincipalBindServiceImpl implements RolePrincipalBindService {
         return userBuilder.buildBOListByDOList(userManager.list(userWrapper));
     }
 
+    /**
+     * Build fuzzy query wrapper for role-principal binding search.
+     *
+     * @param entityQuery {@link RolePrincipalBindQuery} query parameters
+     * @param tenantId    optional tenant filter
+     * @return {@link LambdaQueryWrapper} for {@link RolePrincipalBindDO}
+     */
     private LambdaQueryWrapper<RolePrincipalBindDO> fuzzyQuery(RolePrincipalBindQuery entityQuery, Long tenantId) {
         LambdaQueryWrapper<RolePrincipalBindDO> wrapper = Wrappers.<RolePrincipalBindDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getTenantId()), RolePrincipalBindDO::getTenantId,
@@ -177,6 +184,14 @@ public class RolePrincipalBindServiceImpl implements RolePrincipalBindService {
         return wrapper;
     }
 
+    /**
+     * Check whether a role-principal binding is duplicated by tenant, role, and principal.
+     *
+     * @param entityBO       {@link RolePrincipalBindBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
+     */
     private boolean checkDuplicate(RolePrincipalBindBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<RolePrincipalBindDO> wrapper = Wrappers.<RolePrincipalBindDO>query().lambda();
         wrapper.eq(RolePrincipalBindDO::getTenantId, entityBO.getTenantId());
@@ -191,6 +206,14 @@ public class RolePrincipalBindServiceImpl implements RolePrincipalBindService {
         return duplicate;
     }
 
+    /**
+     * Get role-principal binding data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link RolePrincipalBindDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
     private RolePrincipalBindDO getDOById(Long id, boolean throwException) {
         RolePrincipalBindDO entityDO = rolePrincipalBindManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {

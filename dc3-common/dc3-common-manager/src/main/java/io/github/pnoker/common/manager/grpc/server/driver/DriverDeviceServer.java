@@ -163,6 +163,13 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         }
     }
 
+    /**
+     * Return whether a driver exists and belongs to the given tenant.
+     *
+     * @param tenantId tenant scope
+     * @param driverId the driver to check
+     * @return true if the driver belongs to the tenant
+     */
     private boolean driverInTenant(Long tenantId, Long driverId) {
         DriverBO driverBO = selectDriver(driverId);
         return Objects.nonNull(driverBO) && Objects.equals(tenantId, driverBO.getTenantId());
@@ -184,6 +191,13 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         }
     }
 
+    /**
+     * Build the device-attach DTO carrying the device, its point ids, point attribute
+     * config, and driver attribute config.
+     *
+     * @param entityBO the device
+     * @return the assembled builder
+     */
     private GrpcRDeviceAttachDTO.Builder getDeviceAttachDTO(DeviceBO entityBO) {
         GrpcRDeviceAttachDTO.Builder builder = GrpcRDeviceAttachDTO.newBuilder();
         GrpcDeviceDTO entityGrpcDTO = grpcDeviceBuilder.buildGrpcDTOByBO(entityBO);

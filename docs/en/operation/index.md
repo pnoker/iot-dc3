@@ -2,6 +2,11 @@
 title: Operations Manual
 ---
 
+<script setup>
+import OperationIndexDiagram from '../../.vitepress/theme/components/OperationIndexDiagram.vue'
+</script>
+
+
 # Operations Manual
 
 This page is the entry to the operations manual. It follows one main thread — onboard a device, see data, issue
@@ -21,18 +26,7 @@ into alarms, and you can optionally hand things off to the Agentic Center for na
 feeds the next — no online device means no point values, and without point values commands and alarms have nothing to
 act on.
 
-```mermaid
-flowchart LR
-  A["Onboard device<br/>(Device Onboarding)"] --> B["See data<br/>(Point Value Collection)"]
-  B --> C["Issue command<br/>(Read/Write point_command)"]
-  C --> D["Receive alarm<br/>(Rules and Notifications)"]
-  D --> E["AI Operations<br/>(Agentic Center)"]
-  A -.->|"Corresponding page"| A1["device-onboarding"]
-  B -.-> B1["data-commands"]
-  C -.-> C1["data-commands"]
-  D -.-> D1["alarms"]
-  E -.-> E1["agentic"]
-```
+<OperationIndexDiagram lang="en" />
 
 Solid lines are the task order; dashed lines point to the page that covers each action. The first four steps are the
 platform's core. The fifth, AI Operations, is optional.
@@ -81,13 +75,13 @@ debug. In production, traffic always goes through the gateway.
 
 The table below is a reference index. For how to use each entry point, see its own page.
 
-| Entry point                         | Address / Description                                              | Purpose                                                                                                                              |
-|-------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| Gateway API                         | `http://localhost:8000/api/v3/...`                                 | The only external HTTP entry point; the curl examples below all hit this                                                             |
-| Swagger UI                          | `http://localhost:8000/swagger-ui.html`                            | Browse the gateway-aggregated API in development (usually disabled in production)                                                    |
-| Direct-connect debugging per center | Auth `8300` / Manager `8400` / Data `8500` / Agentic `8600`        | When debugging a single center, connect straight to its HTTP port, bypassing the gateway                                             |
-| MCP / OAuth entry                   | `POST /mcp`, `GET /.well-known/oauth-protected-resource`           | For AI Agents to reach MCP tools over OAuth 2.1 (both at the gateway root, not under `/api/v3`); see [Agentic Center](../ai/agentic) |
-| Web UI                              | The frontend source lives under `dc3-web/` in this repository      | The graphical interface; its backend calls go through the Gateway too                                                                |
+| Entry point                         | Address / Description                                         | Purpose                                                                                                                              |
+|-------------------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| Gateway API                         | `http://localhost:8000/api/v3/...`                            | The only external HTTP entry point; the curl examples below all hit this                                                             |
+| Swagger UI                          | `http://localhost:8000/swagger-ui.html`                       | Browse the gateway-aggregated API in development (usually disabled in production)                                                    |
+| Direct-connect debugging per center | Auth `8300` / Manager `8400` / Data `8500` / Agentic `8600`   | When debugging a single center, connect straight to its HTTP port, bypassing the gateway                                             |
+| MCP / OAuth entry                   | `POST /mcp`, `GET /.well-known/oauth-protected-resource`      | For AI Agents to reach MCP tools over OAuth 2.1 (both at the gateway root, not under `/api/v3`); see [Agentic Center](../ai/agentic) |
+| Web UI                              | The frontend source lives under `dc3-web/` in this repository | The graphical interface; its backend calls go through the Gateway too                                                                |
 
 ::: info The Web UI uses the same API entry point
 The graphical interface lives under `dc3-web/` in this repository and calls the same set of APIs through the Gateway.

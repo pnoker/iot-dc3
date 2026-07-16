@@ -2,6 +2,12 @@
 title: Module Map
 ---
 
+<script setup>
+import ModulesFlowDiagram from '../../.vitepress/theme/components/ModulesFlowDiagram.vue'
+import ModulesClassDiagram from '../../.vitepress/theme/components/ModulesClassDiagram.vue'
+</script>
+
+
 # Module Map
 
 IoT DC3's code splits into three kinds of modules: deployment units, shared contracts, and protocol drivers. This page
@@ -37,36 +43,7 @@ of who depends on whom. The gateway and the four centers each build on their own
 Cross-service calls all go through facade contracts, and drivers fetch metadata from the management center through
 facades while exchanging values and commands with the data center over RabbitMQ.
 
-```mermaid
-flowchart TB
-    GW["Gateway dc3-gateway"]
-    subgraph Centers["Four Centers (deployment units)"]
-        Auth["Auth Center<br/>dc3-center-auth"]
-        Mgr["Management Center<br/>dc3-center-manager"]
-        Data["Data Center<br/>dc3-center-data"]
-        AI["Agentic Center<br/>dc3-center-agentic"]
-    end
-    subgraph Facade["Cross-service contract (facade three-state)"]
-        FApi["dc3-common-facade-api<br/>interface"]
-        FGrpc["dc3-common-facade-grpc<br/>gRPC implementation"]
-        FLocal["dc3-common-facade-local-*<br/>local implementation"]
-    end
-    subgraph Commons["Shared and contract libraries"]
-        Api["dc3-api-*<br/>protobuf contract"]
-        Common["dc3-common-constant / model<br/>dal / postgres / rabbitmq ..."]
-    end
-    Drv["28 protocol drivers<br/>dc3-driver-*"]
-
-    GW --> Facade
-    Centers --> Facade
-    Facade --> FApi
-    FGrpc --> Api
-    Centers --> Commons
-    GW --> Commons
-    Drv -->|"fetch metadata"| Facade
-    Drv -->|"values / commands (RabbitMQ)"| Data
-    Drv --> Common
-```
+<ModulesFlowDiagram lang="en" />
 
 The facade sits as a middle layer that many sides depend on. Business code only has a compile-time dependency on the
 interfaces in `dc3-common-facade-api`; at runtime the `grpc` or `local` implementation gets injected, and the caller
@@ -184,51 +161,7 @@ The SDK shared by all drivers lives in `dc3-common-driver`. Its extension point 
 interfaces a driver typically implements. The SDK injects it when it wants the union of all driver hooks. A new driver
 that needs only a subset can implement the smaller individual interfaces instead.
 
-```mermaid
-classDiagram
-    class DriverCustomService {
-        <<interface>>
-        aggregate interface, no new methods
-    }
-    class DriverLifecycle {
-        <<interface>>
-        initial startup initialization
-        schedule register scheduling
-    }
-    class DriverMetadataListener {
-        <<interface>>
-        event metadata change ADD/DELETE/UPDATE
-    }
-    class DriverHealth {
-        <<interface>>
-        health driver health ONLINE/OFFLINE/FAULT/MAINTAIN
-    }
-    class DeviceHealth {
-        <<interface>>
-        health per-device health
-    }
-    class DriverProtocol {
-        <<interface>>
-        read returns ReadPointValue
-        write returns Boolean
-    }
-    class DriverCommand {
-        <<interface>>
-        custom command handling
-    }
-    class DriverValidator {
-        <<interface>>
-        validate validation
-        simulate generate synthetic value
-    }
-    DriverCustomService --|> DriverLifecycle
-    DriverCustomService --|> DriverMetadataListener
-    DriverCustomService --|> DriverHealth
-    DriverCustomService --|> DeviceHealth
-    DriverCustomService --|> DriverProtocol
-    DriverCustomService --|> DriverCommand
-    DriverCustomService --|> DriverValidator
-```
+<ModulesClassDiagram lang="en" />
 
 The seven contracts each cover a segment of the driver's life. `DriverLifecycle` handles startup initialization and
 schedule registration. `DriverMetadataListener.event(...)` receives metadata changes to refresh the local cache.

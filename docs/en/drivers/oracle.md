@@ -2,6 +2,11 @@
 title: Oracle Driver
 ---
 
+<script setup>
+import OracleDiagram from '../../.vitepress/theme/components/OracleDiagram.vue'
+</script>
+
+
 # Oracle Driver
 
 `dc3-driver-oracle` onboards an Oracle database into IoT DC3 as a data source: acting as a database client, it runs a
@@ -41,14 +46,7 @@ Oracle's biggest difference from the other databases is **how it identifies a da
 instance by either SID (System Identifier) or Service Name, and the driver builds a differently-shaped JDBC URL
 accordingly. Three driver-specific concepts that the configuration tables below rely on:
 
-```mermaid
-flowchart LR
-  Drv["dc3-driver-oracle<br/>(JDBC client)"] -->|"connectionType=SID<br/>jdbc:oracle:thin:@host:port:sid"| DB[("Oracle database<br/>business / history tables")]
-  Drv -.->|"connectionType=ServiceName<br/>jdbc:oracle:thin:@//host:port/serviceName"| DB
-  Drv -->|"readQuery (SELECT)"| DB
-  Drv -.->|"writeQuery (UPDATE/INSERT, ? placeholder)"| DB
-  DB -->|"first row, first column"| PV["PointValue"]
-```
+<OracleDiagram lang="en" />
 
 - **Connection Type**: `SID` or `ServiceName`. The driver builds a differently-shaped JDBC URL accordingly (see the
   diagram above); the two correspond to Oracle's different naming methods.

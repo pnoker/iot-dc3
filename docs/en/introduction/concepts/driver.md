@@ -2,6 +2,11 @@
 title: Driver
 ---
 
+<script setup>
+import DriverRelationDiagram from '../../../.vitepress/theme/components/DriverRelationDiagram.vue'
+import DriverLifecycleDiagram from '../../../.vitepress/theme/components/DriverLifecycleDiagram.vue'
+</script>
+
 # Driver
 
 > **A Driver is a standalone protocol-adapter service instance (`dc3-driver-*`)**—it translates an industrial protocol (
@@ -77,16 +82,7 @@ former is produced by driver registration, the latter by you when configuring a 
 
 ## Relationship to other concepts
 
-```mermaid
-flowchart LR
-    DRV["Driver (dc3-driver-*)"] -->|registers identity| MGR["Management Center"]
-    DRV -->|registers declaration| DA["DriverAttribute"]
-    DRV -->|carries collection for| DEV["Device (1..N)"]
-    DEV -->|fills values per declaration| CFG["DriverAttributeConfig"]
-    DEV -->|belongs to| PR["Profile"]
-    PR -->|defines| PT["Point"]
-    DRV -->|collects & translates| PV[("PointValue")]
-```
+<DriverRelationDiagram lang="en" />
 
 - A driver **registers its identity once** and can carry collection for **many** [Devices](./device).
 - The `DriverAttribute` a driver registers is a template; each device fills values against it
@@ -96,15 +92,7 @@ flowchart LR
 
 ## Startup registration and online status
 
-```mermaid
-flowchart LR
-    START["Driver process starts"] --> RUN["DriverInitRunner.run()"]
-    RUN -->|RegisterBO with backoff retry| MGR["Management Center"]
-    MGR -->|persists| META[("dc3_driver / dc3_driver_attribute")]
-    RUN --> HB["DriverHealth periodic heartbeat"]
-    HB -->|renews 45s lease| ST[("dc3_entity_state (driver=3)")]
-    ST -->|lease expires unrenewed| OFF["judged offline"]
-```
+<DriverLifecycleDiagram lang="en" />
 
 On startup, registration is triggered by `DriverInitRunner` (an `ApplicationRunner`): it builds a `RegisterBO` (carrying
 `tenant`, `driver`=`DriverBO`, `driverAttributes`, etc.) and calls `DriverRegisterService.initial()` to report to the

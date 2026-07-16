@@ -2,6 +2,11 @@
 title: Edge & Cloud Architecture
 ---
 
+<script setup>
+import EdgeCloudDiagram from '../../.vitepress/theme/components/EdgeCloudDiagram.vue'
+</script>
+
+
 # Edge & Cloud Architecture
 
 The IoT platform layer is not "a server" — it is a continuum stretching from the field to the data center. Where each
@@ -72,28 +77,7 @@ we use "edge" to mean "the near-source compute tier between device and cloud."
 The diagram below lays out each tier's responsibilities and the data/command flows. What matters is not what sits in
 each box, but **which edge is a LAN and which is a WAN** — that is what decides where each piece of computation belongs.
 
-```mermaid
-flowchart LR
-    subgraph Device["Device · Field"]
-        Sensor["Sensor / Actuator<br/>PLC / Meter"]
-    end
-    subgraph Edge["Edge · Near-Field (one LAN hop)"]
-        GW["Edge Gateway<br/>protocol adapt / filter / aggregate / cache"]
-        Local["Local Autonomy<br/>offline collect / local interlock / edge alarm"]
-    end
-    subgraph Cloud["Cloud · Data Center (WAN)"]
-        Platform["Cloud Platform<br/>device mgmt / connection mgmt"]
-        Engine["Rule Engine / Data Service"]
-        Twin["Digital Twin / Global Analytics"]
-    end
-    Sensor -->|"raw signal (field protocol)"| GW
-    GW --> Local
-    GW -->|"aggregated / desensitized uplink"| Platform
-    Platform --> Engine
-    Engine --> Twin
-    Platform -.->|"downlink command / config"| GW
-    GW -.->|"write to register"| Sensor
-```
+<EdgeCloudDiagram lang="en" />
 
 Solid lines are uplink data, dashed lines are downlink commands; device-to-edge is "one LAN hop," edge-to-cloud is the
 WAN crossing. Once that boundary is clear, the "where does it go" answer surfaces on its own: latency-sensitive logic

@@ -264,6 +264,12 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
+    /**
+     * Validate that the config's device, point, and attribute all belong to the same
+     * tenant, share a driver, and that the device and point share a profile.
+     *
+     * @param entityBO the config to validate
+     */
     private void validateTenantRelations(PointAttributeConfigBO entityBO) {
         DeviceDO deviceDO = deviceManager.getById(entityBO.getDeviceId());
         PointDO pointDO = pointManager.getById(entityBO.getPointId());

@@ -106,6 +106,12 @@ public class RuleStateServiceImpl implements RuleStateService {
         return ruleStateBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * Build fuzzy query wrapper for rule state search.
+     *
+     * @param entityQuery {@link RuleStateQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link RuleStateDO}
+     */
     private LambdaQueryWrapper<RuleStateDO> fuzzyQuery(RuleStateQuery entityQuery) {
         LambdaQueryWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRuleId()), RuleStateDO::getRuleId,
@@ -124,6 +130,15 @@ public class RuleStateServiceImpl implements RuleStateService {
         return wrapper;
     }
 
+    /**
+     * Check whether a rule state is duplicated by rule, target type, entity, and
+     * fingerprint.
+     *
+     * @param entityBO       {@link RuleStateBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
+     */
     private boolean checkDuplicate(RuleStateBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<RuleStateDO> wrapper = Wrappers.<RuleStateDO>query().lambda();
         wrapper.eq(RuleStateDO::getRuleId, entityBO.getRuleId());
@@ -145,6 +160,14 @@ public class RuleStateServiceImpl implements RuleStateService {
         return duplicate;
     }
 
+    /**
+     * Get rule state data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link RuleStateDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
     private RuleStateDO getDOById(Long id, boolean throwException) {
         RuleStateDO entityDO = ruleStateManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {

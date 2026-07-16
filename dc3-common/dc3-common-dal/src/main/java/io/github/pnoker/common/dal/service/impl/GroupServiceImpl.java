@@ -181,12 +181,23 @@ public class GroupServiceImpl implements GroupService {
         return duplicate;
     }
 
+    /**
+     * Validate that the entity type supports grouping.
+     *
+     * @param entityTypeFlag the entity type to check
+     */
     private void validateGroupType(EntityTypeEnum entityTypeFlag) {
         if (!isGroupable(entityTypeFlag)) {
             throw new RequestException("Group type is not supported");
         }
     }
 
+    /**
+     * Return whether an entity type supports grouping (driver, profile, point, device).
+     *
+     * @param entityTypeFlag the entity type to check
+     * @return true if groupable
+     */
     private boolean isGroupable(EntityTypeEnum entityTypeFlag) {
         return EntityTypeEnum.DRIVER == entityTypeFlag
                 || EntityTypeEnum.PROFILE == entityTypeFlag
@@ -194,6 +205,12 @@ public class GroupServiceImpl implements GroupService {
                 || EntityTypeEnum.DEVICE == entityTypeFlag;
     }
 
+    /**
+     * Validate and normalize the parent group: default to root (id 0, level 0) when no
+     * parent is set, otherwise load the parent and derive the group level.
+     *
+     * @param entityBO the group to validate
+     */
     private void validateParent(GroupBO entityBO) {
         Long parentGroupId = entityBO.getParentGroupId();
         if (!FieldUtil.isValidIdField(parentGroupId)) {

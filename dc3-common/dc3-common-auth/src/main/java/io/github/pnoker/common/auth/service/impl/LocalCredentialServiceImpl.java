@@ -236,6 +236,13 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
         localCredentialManager.updateById(credential);
     }
 
+    /**
+     * Build fuzzy query wrapper for local credential search. Tenant filtering joins
+     * through tenant membership since credentials have no tenant_id column.
+     *
+     * @param entityQuery {@link LocalCredentialQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link LocalCredentialDO}
+     */
     private LambdaQueryWrapper<LocalCredentialDO> fuzzyQuery(LocalCredentialQuery entityQuery) {
         LambdaQueryWrapper<LocalCredentialDO> wrapper = Wrappers.<LocalCredentialDO>query().lambda();
         wrapper.eq(Objects.nonNull(entityQuery.getPrincipalId()), LocalCredentialDO::getPrincipalId,
@@ -257,6 +264,12 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
         return wrapper;
     }
 
+    /**
+     * Validate required fields (principal, login name, password) and populate the
+     * normalized login name, password hash, algorithm, and defaults before create.
+     *
+     * @param entityBO the credential to prepare
+     */
     private void prepareForCreate(LocalCredentialBO entityBO) {
         if (Objects.isNull(entityBO.getPrincipalId())) {
             throw new EmptyException("The principal id is empty");
@@ -279,6 +292,13 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
         entityBO.setEnableFlag(Objects.requireNonNullElse(entityBO.getEnableFlag(), EnableFlagEnum.ENABLE));
     }
 
+    /**
+     * Backfill immutable and blank fields from the current record before update,
+     * re-hashing the password only when a new raw password is supplied.
+     *
+     * @param entityBO the credential being updated
+     * @param current  the persisted record
+     */
     private void prepareForUpdate(LocalCredentialBO entityBO, LocalCredentialDO current) {
         if (Objects.isNull(entityBO.getPrincipalId())) {
             entityBO.setPrincipalId(current.getPrincipalId());
@@ -309,6 +329,15 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
         }
     }
 
+    /**
+     * Check whether a credential is duplicated by normalized login name or by principal
+     * id within the same credential type.
+     *
+     * @param entityBO       {@link LocalCredentialBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
+     */
     private boolean checkDuplicate(LocalCredentialBO entityBO, boolean isUpdate, boolean throwException) {
         boolean duplicateLogin = existsDuplicate(Wrappers.<LocalCredentialDO>query().lambda()
                 .eq(LocalCredentialDO::getCredentialType, entityBO.getCredentialType().getValue())
@@ -325,11 +354,28 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
         return duplicate;
     }
 
+    /**
+     * Return whether a query matches an existing credential, excluding the entity's own
+     * id on update.
+     *
+     * @param wrapper  the query wrapper
+     * @param id       the entity id (used for update exclusion)
+     * @param isUpdate whether the operation is an update
+     * @return true if a duplicate exists
+     */
     private boolean existsDuplicate(LambdaQueryWrapper<LocalCredentialDO> wrapper, Long id, boolean isUpdate) {
         LocalCredentialDO one = localCredentialManager.getOne(wrapper);
         return Objects.nonNull(one) && (!isUpdate || !one.getId().equals(id));
     }
 
+    /**
+     * Get local credential data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link LocalCredentialDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
     private LocalCredentialDO getDOById(Long id, boolean throwException) {
         LocalCredentialDO entityDO = localCredentialManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
@@ -338,6 +384,12 @@ public class LocalCredentialServiceImpl implements LocalCredentialService {
         return entityDO;
     }
 
+    /**
+     * Normalize a login name to trimmed lowercase for case-insensitive matching.
+     *
+     * @param loginName the raw login name
+     * @return the normalized login name
+     */
     private String normalize(String loginName) {
         return StringUtils.trimToEmpty(loginName).toLowerCase(Locale.ROOT);
     }

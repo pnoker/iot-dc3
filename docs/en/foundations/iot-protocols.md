@@ -2,6 +2,12 @@
 title: IoT Protocols & Wireless Networks
 ---
 
+<script setup>
+import IotProtocolsMqttDiagram from '../../.vitepress/theme/components/IotProtocolsMqttDiagram.vue'
+import IotProtocolsWirelessDiagram from '../../.vitepress/theme/components/IotProtocolsWirelessDiagram.vue'
+</script>
+
+
 # IoT Protocols & Wireless Networks
 
 Fieldbuses connect the machines on a shop floor, but the wider Internet of Things—battery-powered sensors, water meters
@@ -70,15 +76,7 @@ auto-enable its features.
 
 The diagram below shows the basic pub/sub topology—both devices and platform talk only to the broker:
 
-```mermaid
-flowchart LR
-  Dev1["Device A<br/>publish device/1001/up"] --> Broker
-  Dev2["Device B<br/>publish device/1002/up"] --> Broker
-  Broker["MQTT Broker<br/>(EMQX / Mosquitto)"]
-  Broker -->|"subscribe device/+/up"| Plat["Platform / subscriber<br/>(DC3 MQTT driver)"]
-  Plat -->|"publish device/1001/down<br/>(QoS / retain)"| Broker
-  Broker -->|"downstream command topic"| Dev1
-```
+<IotProtocolsMqttDiagram lang="en" />
 
 **CoAP (Constrained Application Protocol)** takes another route: it keeps the familiar HTTP **request/response +
 methods (GET/PUT/POST/DELETE) + resource path** model, but squeezes the message down to a few dozen bytes over **UDP** (
@@ -115,25 +113,7 @@ use or the slower it gets; the more power-efficient it is, the more bandwidth it
 but are prone to congestion. Grouping the mainstream technologies into three coverage tiers makes their niches visible
 at a glance—within a tier they further split by rate and power:
 
-```mermaid
-flowchart LR
-  subgraph Short["Short range (meters~hundreds of meters)"]
-    BLE["BLE<br/>low rate · ultra-low power"]
-    Zigbee["Zigbee<br/>low rate · low power · mesh"]
-    WiFi["Wi-Fi<br/>high rate · high power"]
-  end
-  subgraph WAN["Wide-area LPWAN (kilometers)"]
-    LoRa["LoRaWAN<br/>very low rate · ultra-low power · self-built"]
-    NB["NB-IoT<br/>low rate · low power · carrier net"]
-  end
-  subgraph Cell["Cellular high-performance"]
-    FiveG["5G<br/>high rate · low latency · high power"]
-  end
-  Short --> Agg["Gateway / broker aggregation"]
-  WAN --> Agg
-  Cell --> Agg
-  Agg --> Plat["IoT platform"]
-```
+<IotProtocolsWirelessDiagram lang="en" />
 
 Quantifying the trade-off into a reference table makes it easier to work backward from a scenario:
 

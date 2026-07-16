@@ -2,6 +2,12 @@
 title: 核心概念与心智模型
 ---
 
+<script setup>
+import ConceptsDomainDiagram from '../../.vitepress/theme/components/ConceptsDomainDiagram.vue'
+import ConceptsFlowDiagram from '../../.vitepress/theme/components/ConceptsFlowDiagram.vue'
+</script>
+
+
 # 核心概念与心智模型
 
 要用好 IoT DC3，先要在脑子里建立一个简单的对象模型。这页用一句话心智模型 +
@@ -22,39 +28,7 @@ title: 核心概念与心智模型
 这些对象的关系是固定的：一个模板下挂多个位号/命令/事件；一个设备**只绑定一个**模板（自 Phase-1 起，`Device.profileId`
 是单一外键，不再是多对多）和一个驱动；一个位号会产生很多位号值。
 
-```mermaid
-erDiagram
-    PROFILE ||--o{ POINT : "包含位号"
-    PROFILE ||--o{ COMMAND : "包含命令"
-    PROFILE ||--o{ EVENT : "包含事件"
-    DEVICE }o--|| PROFILE : "绑定一个模板"
-    DEVICE }o--|| DRIVER : "由一个驱动接入"
-    POINT ||--o{ POINTVALUE : "产生值"
-    DEVICE ||--o{ POINTVALUE : "归属"
-    PROFILE {
-        long id
-        string profileName
-        enum profileShareFlag "TENANT/DRIVER/USER"
-    }
-    POINT {
-        long id
-        string pointName
-        enum pointTypeFlag "STRING/BYTE/SHORT/INT/LONG/FLOAT/DOUBLE/BOOLEAN"
-        enum rwFlag "READ_ONLY/WRITE_ONLY/READ_WRITE"
-        string unit
-    }
-    DEVICE {
-        long id
-        string deviceName
-        long profileId
-        long driverId
-    }
-    DRIVER {
-        long id
-        string driverName
-        string serviceName
-    }
-```
+<ConceptsDomainDiagram lang="zh" />
 
 ## 逐个对象
 
@@ -86,15 +60,7 @@ Config，设备实例填的值）。理解这层区分，才能看懂 [设备接
 
 围绕这些对象，平台跑着两条相反的链路：**数据流**把设备的值采上来存好、对外可查；**命令流**把读写请求下发到设备执行。
 
-```mermaid
-flowchart LR
-    subgraph 数据流["数据流（南向 → 北向）"]
-        D1[设备] --> D2[驱动] --> D3[RabbitMQ] --> D4[数据中心] --> D5[(TimescaleDB)]
-    end
-    subgraph 命令流["命令流（北向 → 南向）"]
-        C1["调用方 / Web / AI"] --> C2[网关] --> C3[数据中心] --> C4[RabbitMQ] --> C5[驱动] --> C6[设备]
-    end
-```
+<ConceptsFlowDiagram lang="zh" />
 
 两条链路的完整实现（交换机、队列、生命周期、回执）分别见 [数据平面](../architecture/data-plane)
 和 [命令平面](../architecture/command-plane)。
@@ -109,7 +75,7 @@ flowchart LR
 
 每个核心概念都有独立词条，讲清定义、关键字段、与其它概念的关系、生命周期与易错点：
 
-- [物模型 Profile](./concepts/profile) — 同类设备的能力模板，聚合位号 / 指令 / 事件
+- [模板 Profile](./concepts/profile) — 同类设备的能力模板，聚合位号 / 指令 / 事件
 - [设备 Device](./concepts/device) — 现场一台设备的平台镜像
 - [驱动 Driver](./concepts/driver) — 协议适配服务，负责和设备通信
 - [位号 Point](./concepts/point) — 一个数据项（要采集或写入的量）

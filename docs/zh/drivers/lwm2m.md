@@ -2,6 +2,11 @@
 title: LwM2M 驱动
 ---
 
+<script setup>
+import Lwm2mDiagram from '../../.vitepress/theme/components/Lwm2mDiagram.vue'
+</script>
+
+
 # LwM2M 驱动
 
 `dc3-driver-lwm2m` 内嵌一个基于 Eclipse Leshan 的 LwM2M 服务端：设备作为客户端用自己的 `endpoint` 名注册上来，驱动再按位号配置的
@@ -26,14 +31,7 @@ LwM2M 在**电信级、需要远程运维**的终端里很常见：NB-IoT 模组
 
 与 Modbus、CoAP 这类驱动**主动去连设备**不同，本驱动反过来——它内嵌一个 **LwM2M 服务端**：
 
-```mermaid
-flowchart LR
-  Dev["LwM2M 设备<br/>(客户端)"] -->|"注册 endpoint 名"| Srv["内嵌 LwM2M 服务端<br/>(Eclipse Leshan)"]
-  Srv -->|"维护 endpoint→Registration 映射"| Reg["注册表<br/>registrations"]
-  Drv["LwM2M 驱动<br/>Lwm2mDriver"] -->|"read: send ReadRequest<br/>/objectId/instId/resId"| Srv
-  Drv -->|"write: send WriteRequest"| Srv
-  Srv -->|"CoAP over UDP 5683"| Dev
-```
+<Lwm2mDiagram lang="zh" />
 
 设备先用自己的 endpoint 名注册到这个服务端，注册成功后驱动才能按位号路径对它发起读/写。设备的在线与否，就取决于其 endpoint
 是否仍在注册表里。

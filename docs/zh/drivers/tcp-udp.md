@@ -2,6 +2,11 @@
 title: TCP/UDP 驱动
 ---
 
+<script setup>
+import TcpUdpDiagram from '../../.vitepress/theme/components/TcpUdpDiagram.vue'
+</script>
+
+
 # TCP/UDP 驱动
 
 `dc3-driver-tcp-udp` 把任意"在一个 TCP 或 UDP 端口上裸收发字节流"的设备接入 IoT
@@ -77,17 +82,7 @@ TCP 与 UDP 在本驱动里的行为差异很重要：
 
 下面这张状态/数据流图把"一次采集"从发指令到落值的关键跳串起来：
 
-```mermaid
-flowchart LR
-  Sched["驱动 SDK<br/>每 30 秒一轮"] --> Read["read()"]
-  Read -->|"protocol=TCP"| Tcp["sendTcp()<br/>复用缓存长连接"]
-  Read -->|"protocol=UDP"| Udp["sendUdp()<br/>临时 DatagramSocket"]
-  Tcp --> Raw["原始回包 HEX"]
-  Udp --> Raw
-  Raw --> Parse["parseFrame()<br/>按 dataOffset/dataLength 切片"]
-  Parse --> Conv["parseDataValue()<br/>按 dataFormat + byteOrder 转值"]
-  Conv --> PV["位号值 PointValue"]
-```
+<TcpUdpDiagram lang="zh" />
 
 ### 写命令属性（`command-attribute`）
 

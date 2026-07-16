@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta charset="UTF-8"><title>IoT DC3 — 属性声明与配置</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'JetBrains Mono',monospace;background:#020617;padding:2rem;color:#fff}.w{max-width:1140px;margin:0 auto}h1{font-size:1.4rem;margin-bottom:1rem}.b{background:rgba(15,23,42,.5);border:1px solid #1e293b;border-radius:1rem;padding:1.5rem;overflow-x:auto}svg{width:100%;min-width:940px;display:block}</style></head>
+<body><div class="w"><h1>属性声明 → 配置实例</h1><div class="b">
+<svg viewBox="0 0 1080 400">
+<defs><marker id="ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#64748b"/></marker>
+<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0L0 0 0 40" fill="none" stroke="#1e293b" stroke-width=".5"/></pattern>
+<filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="7"/></filter></defs>
+<rect width="100%" height="100%" fill="url(#grid)"/>
+<!-- driver registers attributes -->
+<line x1="180" y1="180" x2="280" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="205" y="128" fill="#94a3b8" font-size="9" text-anchor="middle">注册</text>
+<line x1="180" y1="210" x2="280" y2="300" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="205" y="272" fill="#94a3b8" font-size="9" text-anchor="middle">注册</text>
+<!-- attributeId dashed -->
+<line x1="480" y1="100" x2="580" y2="100" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ah)"/><text x="530" y="92" fill="#94a3b8" font-size="9" text-anchor="middle">attributeId</text>
+<line x1="480" y1="300" x2="580" y2="300" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ah)"/><text x="530" y="292" fill="#94a3b8" font-size="9" text-anchor="middle">attributeId</text>
+<!-- device fills config -->
+<line x1="870" y1="180" x2="810" y2="110" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="858" y="142" fill="#94a3b8" font-size="9" text-anchor="middle">填值</text>
+<line x1="870" y1="200" x2="810" y2="290" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/><text x="858" y="252" fill="#94a3b8" font-size="9" text-anchor="middle">每位号填值</text>
+<!-- point -> PC -->
+<line x1="870" y1="335" x2="812" y2="320" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#ah)"/><text x="848" y="340" fill="#94a3b8" font-size="9" text-anchor="middle">pointId</text>
+<!-- driver HERO orange -->
+<rect x="20" y="150" width="160" height="90" rx="12" fill="#fb923c" opacity=".2" filter="url(#glow)"/>
+<rect x="30" y="160" width="140" height="70" rx="8" fill="#0f172a"/><rect x="30" y="160" width="140" height="70" rx="8" fill="rgba(251,146,60,.3)" stroke="#fb923c" stroke-width="2.5"/><text x="100" y="190" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">驱动 Driver</text><text x="100" y="208" fill="#94a3b8" font-size="9" text-anchor="middle">启动注册声明</text>
+<!-- DriverAttribute / PointAttribute (cyan, declarations) -->
+<rect x="280" y="72" width="200" height="58" rx="8" fill="#0f172a"/><rect x="280" y="72" width="200" height="58" rx="8" fill="rgba(8,51,68,.4)" stroke="#22d3ee" stroke-width="1.5"/><text x="380" y="97" fill="#fff" font-size="12" font-weight="600" text-anchor="middle">DriverAttribute</text><text x="380" y="114" fill="#94a3b8" font-size="9" text-anchor="middle">驱动属性声明</text>
+<rect x="280" y="272" width="200" height="58" rx="8" fill="#0f172a"/><rect x="280" y="272" width="200" height="58" rx="8" fill="rgba(8,51,68,.4)" stroke="#22d3ee" stroke-width="1.5"/><text x="380" y="297" fill="#fff" font-size="12" font-weight="600" text-anchor="middle">PointAttribute</text><text x="380" y="314" fill="#94a3b8" font-size="9" text-anchor="middle">位号属性声明</text>
+<!-- DriverAttributeConfig / PointAttributeConfig (amber, instances) -->
+<rect x="580" y="72" width="230" height="58" rx="8" fill="#0f172a"/><rect x="580" y="72" width="230" height="58" rx="8" fill="rgba(120,53,15,.3)" stroke="#fbbf24" stroke-width="1.5"/><text x="695" y="97" fill="#fff" font-size="12" font-weight="600" text-anchor="middle">DriverAttributeConfig</text><text x="695" y="114" fill="#94a3b8" font-size="9" text-anchor="middle">连接配置值</text>
+<rect x="580" y="272" width="230" height="58" rx="8" fill="#0f172a"/><rect x="580" y="272" width="230" height="58" rx="8" fill="rgba(120,53,15,.3)" stroke="#fbbf24" stroke-width="1.5"/><text x="695" y="297" fill="#fff" font-size="12" font-weight="600" text-anchor="middle">PointAttributeConfig</text><text x="695" y="314" fill="#94a3b8" font-size="9" text-anchor="middle">位号配置值</text>
+<!-- Device (slate) -->
+<rect x="870" y="150" width="170" height="70" rx="8" fill="#0f172a"/><rect x="870" y="150" width="170" height="70" rx="8" fill="rgba(30,41,59,.5)" stroke="#94a3b8" stroke-width="1.5"/><text x="955" y="180" fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle">设备 Device</text><text x="955" y="198" fill="#94a3b8" font-size="9" text-anchor="middle">填配置值</text>
+<!-- Point (cyan) -->
+<rect x="870" y="305" width="170" height="55" rx="8" fill="#0f172a"/><rect x="870" y="305" width="170" height="55" rx="8" fill="rgba(8,51,68,.4)" stroke="#22d3ee" stroke-width="1.5"/><text x="955" y="328" fill="#fff" font-size="12" font-weight="600" text-anchor="middle">位号 Point</text><text x="955" y="345" fill="#94a3b8" font-size="9" text-anchor="middle">关联位号配置</text>
+</svg></div></div></body></html>

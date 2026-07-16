@@ -86,6 +86,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         getDOById(id, true);
 
@@ -95,6 +96,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void update(DriverBO entityBO) {
         DriverDO current = getDOById(entityBO.getId(), true);
         if (!Objects.equals(entityBO.getTenantId(), current.getTenantId())) {

@@ -2,6 +2,11 @@
 title: Device
 ---
 
+<script setup>
+import DeviceRelationDiagram from '../../../.vitepress/theme/components/DeviceRelationDiagram.vue'
+import DeviceStateDiagram from '../../../.vitepress/theme/components/DeviceStateDiagram.vue'
+</script>
+
 # Device
 
 > **A Device is the platform-side mirror of one concrete field device**—a PLC, a thermostat, an electricity meter maps
@@ -58,15 +63,7 @@ device is polled by the driver and has its heartbeat lease maintained.
 
 ## Relationships With Other Concepts
 
-```mermaid
-flowchart LR
-    PR["Profile"] -->|"capability model"| DEV["Device"]
-    DRV["Driver"] -->|"communication channel"| DEV
-    DEV -->|"obtained via profileId"| PT["Point"]
-    DEV -->|"produced at runtime"| PV[("PointValue")]
-    DEV -->|"actively reports"| EV["Event"]
-    T["Tenant"] -->|"isolation"| DEV
-```
+<DeviceRelationDiagram lang="en" />
 
 - A device obtains its [Point](./point), [Command](./command), and [Event](./event) definitions via `profileId`.
 - A device produces [PointValues](./point-value) (`device_id + point_id`) and event instances at runtime.
@@ -78,13 +75,7 @@ A device's "online/offline" is not a field on `dc3_device`, but a separate **run
 device/driver timeout-management mechanism, whose source of truth is the `dc3_entity_state` table (
 `entity_type_flag = 6` denotes a device). The mechanism is "heartbeat renewal + timeout maintenance":
 
-```mermaid
-flowchart LR
-    DRV["Driver DeviceHealth"] -->|"DeviceStateDTO renew"| DC["Data Center"]
-    DC -->|"upsert expire_time"| ST[("dc3_entity_state")]
-    SCAN["Scanner device_scan tick"] -->|"query expire_time <= now"| ST
-    SCAN -->|"expired = offline"| ST
-```
+<DeviceStateDiagram lang="en" />
 
 - **Renewal**: the driver health-checks the device on a configured cycle and reports `DeviceStateDTO`; the Data Center
   pushes `expire_time` forward (`now + timeout`) and increments `lease_version`.

@@ -229,6 +229,16 @@ public class MenuController implements BaseController {
         }));
     }
 
+    /**
+     * Filter the menu tree to nodes the principal can access. A wildcard resource code
+     * grants the full tree; otherwise each node is pruned by its {@code menu:<code>}
+     * resource, keeping a parent when any child remains visible.
+     *
+     * @param nodes       the full menu tree
+     * @param principalId the principal to filter for
+     * @param tenantId    tenant scope
+     * @return the access-filtered menu tree
+     */
     private List<MenuTreeBO> filterByPrincipalMenuResources(List<MenuTreeBO> nodes, Long principalId, Long tenantId) {
         List<ResourceBO> resources = roleResourceBindService.listResourceByPrincipalId(principalId, tenantId);
         Set<String> visibleMenuCodes = resources.stream()
@@ -244,6 +254,14 @@ public class MenuController implements BaseController {
                 .toList();
     }
 
+    /**
+     * Recursively retain a menu node when it or any descendant is visible, dropping
+     * leaf nodes the principal cannot access.
+     *
+     * @param node              the node to evaluate
+     * @param visibleMenuCodes  the set of visible {@code menu:<code>} codes
+     * @return the retained node, or null when neither it nor any child is visible
+     */
     private MenuTreeBO retainAccessibleMenuNode(MenuTreeBO node, Set<String> visibleMenuCodes) {
         List<MenuTreeBO> children = Objects.requireNonNullElse(node.getChildren(), List.<MenuTreeBO>of())
                 .stream()

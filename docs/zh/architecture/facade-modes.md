@@ -2,6 +2,11 @@
 title: Facade 模式：grpc 与 local
 ---
 
+<script setup>
+import FacadeModesDiagram from '../../.vitepress/theme/components/FacadeModesDiagram.vue'
+</script>
+
+
 # Facade 模式：grpc 与 local
 
 中心服务之间相互调用（数据中心问管理中心要设备、智能中心问数据中心要位号值）有两种装配方式：`grpc`（各服务独立进程、跨进程调用）和
@@ -34,19 +39,7 @@ title: Facade 模式：grpc 与 local
 装配靠 Spring Boot 的 `@ConditionalOnProperty`。gRPC 自动配置在 `dc3.facade.mode=grpc` 或该属性缺省时生效（
 `matchIfMissing = true`）；local 自动配置只在 `dc3.facade.mode=local` 时生效。同一个 `*Facade` 接口，最终被装配成哪一套实现，完全由这个开关决定。
 
-```mermaid
-flowchart TB
-    Caller["业务代码<br/>(注入 DeviceFacade 接口)"] --> Iface["DeviceFacade<br/>协议中立契约 (facade-api)"]
-    Iface -.->|"dc3.facade.mode=grpc<br/>(默认 / matchIfMissing)"| Grpc["DeviceGrpcFacade<br/>(facade-grpc)"]
-    Iface -.->|"dc3.facade.mode=local"| Local["DeviceLocalFacade<br/>(facade-local-manager)"]
-    subgraph 分布式["grpc 模式 · 分布式多进程"]
-        Grpc -->|"跨进程 gRPC :9400"| Mgr["管理中心 dc3-center-manager<br/>(独立进程)"]
-        Mgr --> Svc1["DeviceService"]
-    end
-    subgraph 单体["local 模式 · 进程内单体"]
-        Local -->|"进程内方法调用<br/>(无网络)"| Svc2["DeviceService<br/>(同一进程)"]
-    end
-```
+<FacadeModesDiagram lang="zh" />
 
 图里 `9400` 是管理中心的 gRPC 端口（grpc 模式下数据中心要跨进程访问它）；local 模式下管理中心的 `DeviceService` 和调用方在同一个
 JVM 里，`DeviceLocalFacade` 直接方法调用，连端口都不需要。

@@ -164,7 +164,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
 
         try {
             byte areaCode = resolveMemoryAreaCode(memoryArea);
-            byte[] finsFrame = buildMemoryReadFrame(driverConfig, areaCode, address, 1);
+            byte[] finsFrame = buildMemoryReadFrame(driverConfig, areaCode, address, wordCount(dataType));
             byte[] response = sendFinsCommand(socket, finsFrame);
 
             String value = parseReadResponse(response, dataType);
@@ -402,7 +402,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
      * @param dataType data type identifier
      * @return decoded value string
      */
-    private String decodeValue(byte[] data, String dataType) {
+    String decodeValue(byte[] data, String dataType) {
         return switch (dataType.toUpperCase()) {
             case "INT16" -> String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getShort());
             case "UINT16" ->
@@ -418,13 +418,27 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
+     * Resolve the FINS memory read length in words (2 bytes each) for a data type.
+     * 32-bit types (INT32/UINT32/FLOAT) span 2 words; all others read a single word.
+     *
+     * @param dataType data type identifier
+     * @return word count to request
+     */
+    int wordCount(String dataType) {
+        return switch (dataType.toUpperCase()) {
+            case "INT32", "UINT32", "FLOAT" -> 2;
+            default -> 1;
+        };
+    }
+
+    /**
      * Encode a string value to bytes for FINS write operations.
      *
      * @param value    string value
      * @param dataType data type identifier
      * @return encoded bytes
      */
-    private byte[] encodeWriteData(String value, String dataType) {
+    byte[] encodeWriteData(String value, String dataType) {
         byte[] data;
         switch (dataType.toUpperCase()) {
             case "INT16":
@@ -435,11 +449,16 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                 break;
             }
             case "INT32":
-            case "UINT32":
-            case "FLOAT": {
+            case "UINT32": {
                 data = new byte[4];
                 int i = Integer.parseInt(value);
                 ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putInt(i);
+                break;
+            }
+            case "FLOAT": {
+                data = new byte[4];
+                float f = Float.parseFloat(value);
+                ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putFloat(f);
                 break;
             }
             case "STRING": {

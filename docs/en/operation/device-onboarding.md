@@ -2,6 +2,12 @@
 title: Device Onboarding
 ---
 
+<script setup>
+import DeviceOnboardingSelectDiagram from '../../.vitepress/theme/components/DeviceOnboardingSelectDiagram.vue'
+import DeviceOnboardingFlowDiagram from '../../.vitepress/theme/components/DeviceOnboardingFlowDiagram.vue'
+</script>
+
+
 # Device Onboarding
 
 Onboarding a field device into IoT DC3 takes five steps: pick a driver by protocol, build a profile and its points,
@@ -23,19 +29,7 @@ line up.
 The platform ships 28 built-in drivers covering industrial fieldbus, IoT wireless, database bridging, and basic
 communication. The diagram maps common choices to a single driver module by protocol:
 
-```mermaid
-flowchart TB
-  Start{"Which protocol does the device use?"}
-  Start -->|"Modbus TCP"| ModbusTcp["dc3-driver-modbus-tcp"]
-  Start -->|"Modbus Serial (RTU)"| ModbusRtu["dc3-driver-modbus-rtu"]
-  Start -->|"OPC UA"| OpcUa["dc3-driver-opc-ua"]
-  Start -->|"Siemens S7"| S7["dc3-driver-plcs7"]
-  Start -->|"MQTT subscribe/publish"| Mqtt["dc3-driver-mqtt"]
-  Start -->|"HTTP REST polling"| Http["dc3-driver-http"]
-  Start -->|"External system push (TCP/UDP)"| Listening["dc3-driver-listening-virtual"]
-  Start -->|"No real device yet / want to validate the chain first"| Virtual["dc3-driver-virtual"]
-  Start -->|"Other protocols"| More["See driver catalog: BACnet/IEC104/SNMP/CoAP/CAN/..."]
-```
+<DeviceOnboardingSelectDiagram lang="en" />
 
 ::: tip Two tips when you're unsure
 
@@ -59,14 +53,7 @@ driver reads raw values over the protocol, normalizes them into a `PointValue`, 
 Center / `dc3-center-data`) through RabbitMQ, and exposes them through the Gateway (Gateway / `dc3-gateway`, the single
 external entry point, port `8000`).
 
-```mermaid
-flowchart LR
-  Dev["Field device<br/>(or virtual synthetic value)"] --> Drv["Driver dc3-driver-*"]
-  Drv -->|"PointValue via RabbitMQ"| Data["Data Center dc3-center-data"]
-  Data --> TS[("TimescaleDB<br/>dc3_point_value")]
-  Data --> GW["Gateway dc3-gateway :8000"]
-  GW -->|"POST /api/v3/data/point_value/latest"| Client["Caller / Web / dc3 CLI"]
-```
+<DeviceOnboardingFlowDiagram lang="en" />
 
 So a device is successfully onboarded not when the driver starts, but **when this chain is fully connected and the
 device's latest point values are queryable in the Data Center**. The switches, queues, and TTLs in this data plane are

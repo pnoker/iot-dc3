@@ -120,6 +120,12 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
         return notifyChannelBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * Build fuzzy query wrapper for notify channel search.
+     *
+     * @param entityQuery {@link NotifyChannelQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link NotifyChannelDO}
+     */
     private LambdaQueryWrapper<NotifyChannelDO> fuzzyQuery(NotifyChannelQuery entityQuery) {
         LambdaQueryWrapper<NotifyChannelDO> wrapper = Wrappers.<NotifyChannelDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getChannelName()), NotifyChannelDO::getChannelName,
@@ -134,6 +140,14 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
         return wrapper;
     }
 
+    /**
+     * Check whether a notify channel is duplicated by channel code.
+     *
+     * @param entityBO       {@link NotifyChannelBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
+     */
     private boolean checkDuplicate(NotifyChannelBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<NotifyChannelDO> wrapper = Wrappers.<NotifyChannelDO>query().lambda();
         wrapper.eq(NotifyChannelDO::getChannelCode, entityBO.getChannelCode());
@@ -149,6 +163,14 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
         return duplicate;
     }
 
+    /**
+     * Get notify channel data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link NotifyChannelDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
     private NotifyChannelDO getDOById(Long id, boolean throwException) {
         NotifyChannelDO entityDO = notifyChannelManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {

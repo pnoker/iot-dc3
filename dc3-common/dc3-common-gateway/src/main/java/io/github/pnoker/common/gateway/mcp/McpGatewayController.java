@@ -135,6 +135,16 @@ public class McpGatewayController {
                 });
     }
 
+    /**
+     * Dispatch a single JSON-RPC request by method: initialize, ping, tools/list, and
+     * tools/call are handled; notifications/initialized is acknowledged; anything else
+     * returns a method-not-found error.
+     *
+     * @param request  the JSON-RPC request body
+     * @param context  the introspected token context (tenant, principal, connection, scope)
+     * @param exchange current server exchange, threaded for headers during tool calls
+     * @return a JSON-RPC result or error entity
+     */
     private Mono<ResponseEntity<Map<String, Object>>> dispatch(Map<String, Object> request,
                                                                McpIntrospectResponseDTO context,
                                                                ServerWebExchange exchange) {
@@ -169,6 +179,12 @@ public class McpGatewayController {
         return Mono.just(jsonRpcError(id, McpConstant.JsonRpc.ERROR_METHOD_NOT_FOUND, "Method not found"));
     }
 
+    /**
+     * Build a 401 challenge response carrying a WWW-Authenticate header pointing the
+     * client at the protected-resource metadata.
+     *
+     * @return the unauthorized response entity
+     */
     private ResponseEntity<Map<String, Object>> challenge() {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .header(HttpHeaders.WWW_AUTHENTICATE,
@@ -177,11 +193,26 @@ public class McpGatewayController {
                 .body(Map.of(McpConstant.Field.ERROR, "invalid_token"));
     }
 
+    /**
+     * Wrap a value as a JSON-RPC success result entity.
+     *
+     * @param id     the request id
+     * @param result the result payload
+     * @return a 200 entity carrying the JSON-RPC result
+     */
     private ResponseEntity<Map<String, Object>> jsonRpcResult(Object id, Object result) {
         return ResponseEntity.ok(orderedMap(McpConstant.JsonRpc.FIELD_JSONRPC, McpConstant.JsonRpc.VERSION,
                 McpConstant.JsonRpc.FIELD_ID, id, McpConstant.JsonRpc.FIELD_RESULT, result));
     }
 
+    /**
+     * Wrap an error code and message as a JSON-RPC error entity.
+     *
+     * @param id      the request id
+     * @param code    the JSON-RPC error code
+     * @param message the error message
+     * @return a 200 entity carrying the JSON-RPC error
+     */
     private ResponseEntity<Map<String, Object>> jsonRpcError(Object id, int code, String message) {
         return ResponseEntity.ok(orderedMap(McpConstant.JsonRpc.FIELD_JSONRPC, McpConstant.JsonRpc.VERSION,
                 McpConstant.JsonRpc.FIELD_ID, id,
@@ -189,6 +220,13 @@ public class McpGatewayController {
                         McpConstant.JsonRpc.ERROR_FIELD_MESSAGE, message)));
     }
 
+    /**
+     * Extract the bearer token from the Authorization header, returning an empty string
+     * when the header is missing or not a bearer token.
+     *
+     * @param exchange current server exchange
+     * @return the bearer token, or empty string
+     */
     private String bearerToken(ServerWebExchange exchange) {
         String header = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String prefix = McpConstant.OAuth.TOKEN_TYPE_BEARER + ' ';
@@ -221,15 +259,40 @@ public class McpGatewayController {
 
         private final WebClient.Builder webClientBuilder = WebClient.builder();
 
+        /**
+         * Introspect a bearer token against the auth center.
+         *
+         * @param token the bearer token
+         * @return the introspected token context
+         */
         Mono<McpIntrospectResponseDTO> introspect(String token) {
             return blocking(() -> mcpRuntimeFacade.introspect(token));
         }
 
+        /**
+         * List the tools visible to the connection behind the introspected context.
+         *
+         * @param context the introspected token context
+         * @return the visible tool list response
+         */
         Mono<McpToolListResponseDTO> listTools(McpIntrospectResponseDTO context) {
             return blocking(() -> mcpRuntimeFacade.listTools(context.getTenantId(), context.getPrincipalId(),
                     context.getMcpConnectionId(), context.getScope()));
         }
 
+        /**
+         * Resolve, authorize, invoke, and audit a single tool call. The chain:
+         * resolve the tool definition, authorize it (incl. high-risk confirmation),
+         * invoke the backend HTTP endpoint, then record a success or error audit.
+         * A failed success-audit never turns an executed call into a client error.
+         *
+         * @param context   the introspected token context
+         * @param toolName  the tool to call
+         * @param arguments the tool arguments
+         * @param callMeta  optional call metadata (confirmId, idempotencyKey)
+         * @param exchange  current server exchange, for header-based controls and audit
+         * @return the tool result, or a tool-error on denial or backend failure
+         */
         Mono<Map<String, Object>> callTool(McpIntrospectResponseDTO context, String toolName,
                                            Map<String, Object> arguments, Map<String, Object> callMeta,
                                            ServerWebExchange exchange) {
@@ -257,12 +320,20 @@ public class McpGatewayController {
                     return invokeBackend(context, tool, arguments, controls)
                             .flatMap(result -> audit(context, tool, traceId, arguments, controls,
                                     McpConstant.Audit.SUCCESS, "", start, exchange)
+                                    // Audit is post-hoc telemetry: a failed SUCCESS audit must not turn an
+                                    // already-executed backend call into a client-visible error.
+                                    .onErrorResume(auditError -> {
+                                        log.warn("MCP success audit failed for tool '{}'", tool.getToolName(),
+                                                auditError);
+                                        return Mono.empty();
+                                    })
                                     .thenReturn(orderedMap(McpConstant.ToolResult.CONTENT, List.of(orderedMap(
                                             McpConstant.ToolResult.TYPE, McpConstant.ToolResult.TYPE_TEXT,
                                             McpConstant.ToolResult.TEXT, JsonUtil.toJsonString(result)
                                     )))))
                             .onErrorResume(e -> audit(context, tool, traceId, arguments, controls,
                                     McpConstant.Audit.ERROR, e.getClass().getSimpleName(), start, exchange)
+                                    .onErrorResume(auditError -> Mono.empty())
                                     .thenReturn(toolError(e.getMessage())));
                 });
             });
@@ -284,6 +355,17 @@ public class McpGatewayController {
             return StringUtils.defaultString(decision.getMessage());
         }
 
+        /**
+         * Invoke the resolved backend HTTP endpoint for a tool, forwarding principal
+         * headers, idempotency key, and confirmation id. GET/DELETE send arguments as
+         * query params; other methods send them as a JSON body.
+         *
+         * @param context   the introspected token context
+         * @param tool      the resolved tool definition (service, path, method)
+         * @param arguments the tool arguments
+         * @param controls  confirmation and idempotency controls
+         * @return the backend response body
+         */
         private Mono<Map<String, Object>> invokeBackend(McpIntrospectResponseDTO context,
                                                         McpToolResolveResponseDTO tool,
                                                         Map<String, Object> arguments,
@@ -324,6 +406,13 @@ public class McpGatewayController {
                     });
         }
 
+        /**
+         * Build the downstream principal headers (JSON payload + HMAC signature when
+         * signing is enabled) from the introspected context.
+         *
+         * @param context the introspected token context
+         * @return the headers to forward to the backend
+         */
         private HttpHeaders principalHeaders(McpIntrospectResponseDTO context) {
             RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
             principal.setPrincipalId(context.getPrincipalId());
@@ -343,6 +432,21 @@ public class McpGatewayController {
             return headers;
         }
 
+        /**
+         * Record a tool-call audit entry (success, denial, or error) with trace id,
+         * duration, argument digest, and client metadata from the exchange.
+         *
+         * @param context    the introspected token context
+         * @param tool       the resolved tool definition
+         * @param traceId    the call trace id
+         * @param arguments  the tool arguments
+         * @param controls   confirmation and idempotency controls
+         * @param status     audit status (success/denied/error)
+         * @param errorCode  error code on failure, empty otherwise
+         * @param start      the call start nanos, for duration
+         * @param exchange   current server exchange, for client metadata and remote ip
+         * @return a mono completing when the audit is recorded
+         */
         private Mono<Void> audit(McpIntrospectResponseDTO context, McpToolResolveResponseDTO tool, String traceId,
                                  Map<String, Object> arguments, McpToolCallControls controls, String status,
                                  String errorCode, long start, ServerWebExchange exchange) {
@@ -376,6 +480,14 @@ public class McpGatewayController {
             }).then();
         }
 
+        /**
+         * Resolve the confirmation id and idempotency key, preferring call metadata over
+         * request headers.
+         *
+         * @param callMeta optional call metadata
+         * @param exchange current server exchange, for header fallbacks
+         * @return the resolved controls
+         */
         private McpToolCallControls controlValues(Map<String, Object> callMeta, ServerWebExchange exchange) {
             return new McpToolCallControls(
                     firstNonBlank(callMeta.get(McpConstant.Field.CONFIRM_ID_META),

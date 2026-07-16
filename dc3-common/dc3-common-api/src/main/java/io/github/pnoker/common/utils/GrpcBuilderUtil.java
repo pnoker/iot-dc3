@@ -53,7 +53,7 @@ public class GrpcBuilderUtil {
         if (Objects.isNull(page)) {
             GrpcPage.Builder builder = GrpcPage.newBuilder();
             builder.setCurrent(1);
-            builder.setPages(DefaultConstant.PAGE_SIZE);
+            builder.setSize(DefaultConstant.PAGE_SIZE);
             page = builder.build();
         }
 

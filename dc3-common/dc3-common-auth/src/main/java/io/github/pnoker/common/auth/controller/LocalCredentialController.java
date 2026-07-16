@@ -245,6 +245,12 @@ public class LocalCredentialController implements BaseController {
         }));
     }
 
+    /**
+     * Stamp the creator and operator audit fields from the authenticated principal.
+     *
+     * @param entityBO the credential to stamp
+     * @param header   the authenticated principal header
+     */
     private void fillCreateAudit(LocalCredentialBO entityBO, RequestHeader.PrincipalHeader header) {
         entityBO.setCreatorId(header.getUserId());
         entityBO.setCreatorName(header.getNickName());

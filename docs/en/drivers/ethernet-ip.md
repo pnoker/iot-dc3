@@ -2,6 +2,11 @@
 title: EtherNet/IP Driver
 ---
 
+<script setup>
+import EthernetIpDiagram from '../../.vitepress/theme/components/EthernetIpDiagram.vue'
+</script>
+
+
 # EtherNet/IP Driver
 
 `dc3-driver-ethernet-ip` connects EtherNet/IP (CIP) Rockwell Allen-Bradley PLCs to IoT DC3: it targets **tag names**,
@@ -37,20 +42,7 @@ solves "how a field device sends a data point out over Ethernet," sitting above 
 and below the platform layer (IoT DC3 aggregation). The diagram below places CIP name-based addressing within a single
 collection:
 
-```mermaid
-flowchart LR
-  PLC["Allen-Bradley PLC<br/>tag Motor_Speed = 1500"]
-  subgraph Net["Network layer (EtherNet/IP / CIP)"]
-    Sock["TCP socket<br/>port 44818"]
-    CIP["CIP services<br/>Read Tag (0x4C) / Write Tag (0x4D)"]
-  end
-  Drv["dc3-driver-ethernet-ip<br/>code=EthernetIpDriver"]
-  Plat["IoT DC3<br/>PointValue"]
-  PLC --- Sock
-  Sock --- CIP
-  CIP -->|"read/write by tagName"| Drv
-  Drv -->|"collected value"| Plat
-```
+<EthernetIpDiagram lang="en" />
 
 CIP does not rely on physical addresses, so a point carries a `tagName` rather than an offset; the driver decodes the
 bytes the PLC returns into a concrete value according to the point's `tagType` and unifies it as

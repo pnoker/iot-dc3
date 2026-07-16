@@ -73,6 +73,12 @@ public class DriverHealthScheduleJob extends QuartzJobBean {
         driverSenderService.driverStateSender(driverState);
     }
 
+    /**
+     * Resolve the driver's health state via the driver health check, defaulting to FAULT
+     * when the check fails or returns no status.
+     *
+     * @return the resolved driver health state
+     */
     private DriverHealthState resolveDriverHealth() {
         try {
             DriverHealthState healthState = driverCustomService.health();

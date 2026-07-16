@@ -46,11 +46,11 @@ public class GrpcFacadeSupport {
      * Invoke a gRPC call with a deadline, translating {@link StatusRuntimeException}
      * into a {@link ServiceException} carrying the operation name and status.
      *
-     * @param operation human-readable operation name for error messages
-     * @param stub      the gRPC stub to invoke
+     * @param operation  human-readable operation name for error messages
+     * @param stub       the gRPC stub to invoke
      * @param invocation the call to apply on the stub
-     * @param <S>       stub type
-     * @param <T>       return type
+     * @param <S>        stub type
+     * @param <T>        return type
      * @return the invocation result
      */
     public <S extends AbstractStub<S>, T> T call(String operation, S stub, Function<S, T> invocation) {

@@ -10,7 +10,7 @@
   "introduction/concepts": "核心概念",
   "introduction/paths": "按角色选择路径",
   "introduction/technology-stack": "技术栈",
-  "introduction/concepts/profile": "物模型",
+  "introduction/concepts/profile": "模板 <span class=\"dc3-sb-badge VPBadge tip\">物模型+</span>",
   "introduction/concepts/device": "设备",
   "introduction/concepts/driver": "驱动",
   "introduction/concepts/point": "位号",

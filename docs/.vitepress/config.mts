@@ -16,7 +16,6 @@
  */
 
 import {defineConfig} from 'vitepress'
-import {withMermaid} from 'vitepress-plugin-mermaid'
 import {Lang, t} from './i18n'
 
 // ── i18n via locales/{lang}.json ──
@@ -39,7 +38,10 @@ const PILLARS: ReadonlyArray<Pillar> = [
         navKey: 'pillar.overview', landing: 'introduction',
         paths: ['introduction', 'quickstart'], activeMatch: '^/(zh|en)/(introduction|quickstart)/',
         groups: [
-            {key: '', items: [['introduction'], ['introduction/concepts'], ['introduction/paths'], ['introduction/technology-stack']]},
+            {
+                key: '',
+                items: [['introduction'], ['introduction/concepts'], ['introduction/paths'], ['introduction/technology-stack']]
+            },
             {
                 key: 'group.objects-data',
                 items: [['introduction/concepts/profile'], ['introduction/concepts/device'], ['introduction/concepts/driver'], ['introduction/concepts/point'], ['introduction/concepts/point-value']]
@@ -246,59 +248,10 @@ function localeThemeConfig(lang: Lang) {
     }
 }
 
-// Mermaid rendering: brand-blue theme in light mode; dark mode is forced by the plugin. A unified CJK-capable technical font stack avoids text clipping.
-const MERMAID = {
-    theme: 'base',
-    themeVariables: {
-        fontFamily: '"Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif',
-        fontSize: '14px',
-        // primary node: light teal fill + brand teal border + deep ink text (close to the Architecture card look)
-        primaryColor: '#ecfdf6',
-        primaryBorderColor: '#0e9f6e',
-        primaryTextColor: '#0f2231',
-        // edges and secondary elements: restrained neutral blue-gray, no flashiness
-        lineColor: '#7c93ab',
-        secondaryColor: '#eef4fb',
-        secondaryBorderColor: '#3f7fb8',
-        secondaryTextColor: '#0f2231',
-        tertiaryColor: '#f6f9fc',
-        tertiaryBorderColor: '#9bb2c7',
-        tertiaryTextColor: '#0f2231',
-        // groups/subgraphs: very light fill + dashed-feel border (consistent with the Architecture region)
-        clusterBkg: 'rgba(14, 159, 110, 0.05)',
-        clusterBorder: '#9cc7b4',
-        // edge labels: blend with the card fill, neutral text
-        edgeLabelBackground: '#f6f9fc',
-        labelBoxBorderColor: '#9bb2c7',
-        // notes: warm yellow
-        noteBkgColor: '#fff7e6',
-        noteBorderColor: '#d8a544',
-        noteTextColor: '#5b4a1f',
-        // sequence-diagram actor boxes
-        actorBkg: '#ecfdf6',
-        actorBorder: '#0e9f6e',
-        actorTextColor: '#0f2231',
-        signalColor: '#5f7a90',
-        signalTextColor: '#33485c'
-    },
-    flowchart: {curve: 'basis', useMaxWidth: true, nodeSpacing: 60, rankSpacing: 66, padding: 24, htmlLabels: false},
-    sequence: {
-        useMaxWidth: true,
-        mirrorActors: false,
-        actorMargin: 64,
-        boxMargin: 12,
-        noteMargin: 12,
-        messageMargin: 44
-    },
-    state: {useMaxWidth: true, padding: 18},
-    er: {useMaxWidth: true},
-    class: {useMaxWidth: true}
-}
-
 // The root path (language gate) always redirects to /zh/ or /en/ by preference: localStorage first, otherwise browser language; the language-selection page is only a fallback for when JS is disabled
 const LANG_DETECT = `(function(){var K='dc3-lang',B='/';var p;try{p=localStorage.getItem(K);}catch(e){}var r=location.pathname;if(r.length&&r[r.length-1]!=='/')r=r+'/';var rel=r.indexOf(B)===0?r.slice(B.length):r;var onEn=rel.indexOf('en/')===0;var onZh=rel.indexOf('zh/')===0;if(!onEn&&!onZh){if(!p){p=/^en/i.test(navigator.language)?'en':'zh';try{localStorage.setItem(K,p);}catch(e){}}location.replace(B+p+'/');}})();`
 
-export default withMermaid(defineConfig({
+export default defineConfig({
     base: '/',
     lang: 'zh-CN',
     title: 'IoT DC3',
@@ -347,10 +300,5 @@ export default withMermaid(defineConfig({
         image: {
             lazyLoading: true
         }
-    },
-
-    mermaid: MERMAID,
-    mermaidPlugin: {
-        class: 'dc3-mermaid'
     }
-}))
+})

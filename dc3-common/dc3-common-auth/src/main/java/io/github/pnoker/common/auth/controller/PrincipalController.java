@@ -173,6 +173,13 @@ public class PrincipalController implements BaseController {
         return toggleEnableFlag(id, EnableFlagEnum.DISABLE);
     }
 
+    /**
+     * Toggle a principal's enable flag and record an audit entry for the change.
+     *
+     * @param id     the principal id
+     * @param target the target enable flag
+     * @return update-success result
+     */
     private Mono<R<String>> toggleEnableFlag(Long id, EnableFlagEnum target) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             principalService.setEnableFlag(id, target, header.getUserId(), header.getNickName());

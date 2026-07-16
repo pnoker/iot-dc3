@@ -246,6 +246,12 @@ public class ProfileServiceImpl implements ProfileService {
         return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
+    /**
+     * Reject profile deletion when any devices, points, commands, or events still
+     * reference it.
+     *
+     * @param profileId the profile to check
+     */
     private void validateNoAssociations(Long profileId) {
         long deviceCount = deviceManager.count(Wrappers.<DeviceDO>lambdaQuery().eq(DeviceDO::getProfileId, profileId));
         if (deviceCount > 0) {

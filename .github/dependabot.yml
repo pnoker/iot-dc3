@@ -39,20 +39,9 @@ updates:
   - package-ecosystem: docker
     directories:
       - /
-      - /dc3-gateway
-      - /dc3-center/dc3-center-agentic
-      - /dc3-center/dc3-center-auth
-      - /dc3-center/dc3-center-data
-      - /dc3-center/dc3-center-manager
-      - /dc3-center/dc3-center-single
-      - /dc3-driver/dc3-driver-listening-virtual
-      - /dc3-driver/dc3-driver-modbus-tcp
-      - /dc3-driver/dc3-driver-modbus-rtu
-      - /dc3-driver/dc3-driver-mqtt
-      - /dc3-driver/dc3-driver-opc-da
-      - /dc3-driver/dc3-driver-opc-ua
-      - /dc3-driver/dc3-driver-plcs7
-      - /dc3-driver/dc3-driver-virtual
+      - /dc3-web
+      - /dc3/dependencies/rabbitmq
+      - /dc3/dependencies/postgres
     schedule:
       interval: weekly
       day: monday

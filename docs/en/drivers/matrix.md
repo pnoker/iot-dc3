@@ -36,7 +36,7 @@ listen for pushes. `ethernet-ip` is currently a protocol skeleton — CIP framin
 | [OPC DA](./opc-da) (`OpcDaDriver`)                | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Classic OPC Data Access (DCOM)              |
 | [S7](./plcs7) (`PlcS7Driver`)                     | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Siemens PLC                                 |
 | [MELSEC](./melsec) (`MelsecDriver`)               | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Mitsubishi PLC (MC protocol)                |
-| [FINS](./fins) (`FinsDriver`)                     | Industrial Bus/PLC | ✓    | ✓     | —                | Usable   | Omron PLC, currently limited to 16-bit ints |
+| [FINS](./fins) (`FinsDriver`)                     | Industrial Bus/PLC | ✓    | ✓     | —                | Usable   | Omron PLC, supports 16/32-bit ints, float, string, and BCD |
 | [EtherNet/IP](./ethernet-ip) (`EthernetIpDriver`) | Industrial Bus/PLC | —    | —     | —                | Skeleton | Rockwell / CIP, framing pending             |
 
 ## SCADA / Power / Metering
@@ -63,7 +63,7 @@ coordinator network state (not node join or attribute reports), and `can` is bac
 
 | Driver (dc3.driver.code)            | Category     | Read | Write | Subscribe/Report | Status   | Notes                                                                      |
 |-------------------------------------|--------------|------|-------|------------------|----------|----------------------------------------------------------------------------|
-| [MQTT](./mqtt) (`MqttDriver`)       | IoT/Wireless | —    | ✓     | ✓                | Usable   | Publish/subscribe, values via subscription; some health hooks are skeleton |
+| [MQTT](./mqtt) (`MqttDriver`)       | IoT/Wireless | —    | ✓     | ✓                | Usable   | Publish/subscribe, values via subscription; `initial()` hook is skeleton |
 | [CoAP](./coap) (`CoapDriver`)       | IoT/Wireless | ✓    | ✓     | —                | Usable   | RESTful for constrained devices, Observe not implemented                   |
 | [LwM2M](./lwm2m) (`Lwm2mDriver`)    | IoT/Wireless | ✓    | ✓     | —                | Usable   | Embedded server, read/write ready, Observe not implemented                 |
 | [HTTP](./http) (`HttpDriver`)       | IoT/Wireless | ✓    | ✓     | —                | Complete | Generic HTTP polling                                                       |

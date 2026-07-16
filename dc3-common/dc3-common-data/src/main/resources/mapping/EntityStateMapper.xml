@@ -41,111 +41,111 @@
 
     <select id="upsertEntityState" resultMap="EntityStateResultMap" flushCache="true" useCache="false">
         INSERT INTO dc3_entity_state (id,
-                                      entity_type_flag,
-                                      entity_id,
-                                      parent_entity_id,
-                                      entity_state_flag,
-                                      last_state_flag,
-                                      lease_version,
-                                      expire_time,
-                                      timeout_seconds,
-                                      last_heartbeat_time,
-                                      last_alarm_id,
-                                      timeout_source_flag,
-                                      entity_state_ext,
-                                      tenant_id)
+        entity_type_flag,
+        entity_id,
+        parent_entity_id,
+        entity_state_flag,
+        last_state_flag,
+        lease_version,
+        expire_time,
+        timeout_seconds,
+        last_heartbeat_time,
+        last_alarm_id,
+        timeout_source_flag,
+        entity_state_ext,
+        tenant_id)
         VALUES (#{id},
-                #{entityTypeFlag},
-                #{entityId},
-                #{parentEntityId},
-                #{stateFlag},
-                #{initialLastStateFlag},
-                1,
-                #{expireTime},
-                #{timeoutSeconds},
-                CURRENT_TIMESTAMP,
-                0,
-                #{timeoutSourceFlag},
-                json_build_object('type', #{stateExtType}::text, 'content',
-                                  COALESCE(#{stateDescription}::text, ''), 'version', 1),
-                #{tenantId})
+        #{entityTypeFlag},
+        #{entityId},
+        #{parentEntityId},
+        #{stateFlag},
+        #{initialLastStateFlag},
+        1,
+        #{expireTime},
+        #{timeoutSeconds},
+        CURRENT_TIMESTAMP,
+        0,
+        #{timeoutSourceFlag},
+        json_build_object('type', #{stateExtType}::text, 'content',
+        COALESCE(#{stateDescription}::text, ''), 'version', 1),
+        #{tenantId})
         ON CONFLICT
-            (tenant_id, entity_type_flag, entity_id)
+        (tenant_id, entity_type_flag, entity_id)
         DO UPDATE SET
-            parent_entity_id = EXCLUDED.parent_entity_id,
-            entity_state_flag = EXCLUDED.entity_state_flag,
-            last_state_flag = dc3_entity_state.entity_state_flag,
-            lease_version = dc3_entity_state.lease_version + 1,
-            expire_time = EXCLUDED.expire_time,
-            timeout_seconds = EXCLUDED.timeout_seconds,
-            last_heartbeat_time = CURRENT_TIMESTAMP,
-            timeout_source_flag = EXCLUDED.timeout_source_flag,
-            entity_state_ext = CASE
-            WHEN COALESCE (#{stateDescription}:: text, '') != ''
-            THEN json_build_object(
-            'type', dc3_entity_state.entity_state_ext->>'type',
-            'content', #{stateDescription}:: text,
-            'version', COALESCE ((dc3_entity_state.entity_state_ext->>'version'):: int, 0) + 1
-            )
-            ELSE dc3_entity_state.entity_state_ext
-            END,
-            operate_time = CURRENT_TIMESTAMP
-            RETURNING
-            id,
-            entity_type_flag,
-            entity_id,
-            parent_entity_id,
-            entity_state_flag,
-            last_state_flag,
-            lease_version,
-            expire_time,
-            timeout_seconds,
-            last_heartbeat_time,
-            last_alarm_id,
-            timeout_source_flag,
-            entity_state_ext,
-            tenant_id,
-            create_time,
-            operate_time
+        parent_entity_id = EXCLUDED.parent_entity_id,
+        entity_state_flag = EXCLUDED.entity_state_flag,
+        last_state_flag = dc3_entity_state.entity_state_flag,
+        lease_version = dc3_entity_state.lease_version + 1,
+        expire_time = EXCLUDED.expire_time,
+        timeout_seconds = EXCLUDED.timeout_seconds,
+        last_heartbeat_time = CURRENT_TIMESTAMP,
+        timeout_source_flag = EXCLUDED.timeout_source_flag,
+        entity_state_ext = CASE
+        WHEN COALESCE (#{stateDescription}:: text, '') != ''
+        THEN json_build_object(
+        'type', dc3_entity_state.entity_state_ext->>'type',
+        'content', #{stateDescription}:: text,
+        'version', COALESCE ((dc3_entity_state.entity_state_ext->>'version'):: int, 0) + 1
+        )
+        ELSE dc3_entity_state.entity_state_ext
+        END,
+        operate_time = CURRENT_TIMESTAMP
+        RETURNING
+        id,
+        entity_type_flag,
+        entity_id,
+        parent_entity_id,
+        entity_state_flag,
+        last_state_flag,
+        lease_version,
+        expire_time,
+        timeout_seconds,
+        last_heartbeat_time,
+        last_alarm_id,
+        timeout_source_flag,
+        entity_state_ext,
+        tenant_id,
+        create_time,
+        operate_time
     </select>
 
     <select id="claimExpiredDevices" resultMap="EntityStateResultMap" flushCache="true" useCache="false">
         WITH picked AS (SELECT id,
-                               entity_state_flag AS previous_state_flag,
-                               lease_version     AS previous_lease_version
-                        FROM dc3_entity_state
-                        WHERE entity_type_flag = #{entityTypeFlag}
-                          AND entity_state_flag IN (#{onlineFlag}, #{maintainFlag}, #{faultFlag})
-                          AND expire_time &lt;= CURRENT_TIMESTAMP
-                        ORDER BY expire_time ASC
-                        LIMIT #{batchSize}
-                        FOR
-                        UPDATE SKIP LOCKED)
+        entity_state_flag AS previous_state_flag,
+        lease_version AS previous_lease_version
+        FROM dc3_entity_state
+        WHERE entity_type_flag = #{entityTypeFlag}
+        AND entity_state_flag IN (#{onlineFlag}, #{maintainFlag}, #{faultFlag})
+        AND expire_time &lt;= CURRENT_TIMESTAMP
+        ORDER BY expire_time ASC
+        LIMIT #{batchSize}
+        FOR
+        UPDATE SKIP LOCKED)
         UPDATE dc3_entity_state s
-        SET lease_version     = picked.previous_lease_version + 1,
-            entity_state_flag = #{offlineFlag},
-            last_state_flag   = picked.previous_state_flag,
-            expire_time       = CURRENT_TIMESTAMP + (#{offlineRenewSeconds} * INTERVAL '1 second'),
-            operate_time      = CURRENT_TIMESTAMP
+        SET lease_version = picked.previous_lease_version + 1,
+        entity_state_flag = #{offlineFlag},
+        last_state_flag = picked.previous_state_flag,
+        expire_time = CURRENT_TIMESTAMP + (#{offlineRenewSeconds} * INTERVAL '1 second'),
+        operate_time = CURRENT_TIMESTAMP
         FROM picked
         WHERE s.id = picked.id
-            RETURNING
-            s.id
-            , s.entity_type_flag
-            , s.entity_id
-            , s.parent_entity_id
-            , s.entity_state_flag
-            , s.last_state_flag
-            , s.lease_version
-            , s.expire_time
-            , s.timeout_seconds
-            , s.last_heartbeat_time
-            , s.last_alarm_id
-            , s.timeout_source_flag
-            , s.entity_state_ext
-            , s.tenant_id
-            , s.create_time
-            , s.operate_time
+        RETURNING
+        s.id
+        , s.entity_type_flag
+        , s.entity_id
+        , s.parent_entity_id
+        , s.entity_state_flag
+        , s.last_state_flag
+        , s.lease_version
+        , s.expire_time
+        , s.timeout_seconds
+        , s.last_heartbeat_time
+        , s.last_alarm_id
+        , s.timeout_source_flag
+        , s.entity_state_ext
+        , s.tenant_id
+        , s.create_time
+        , s.operate_time
     </select>
 
 </mapper>

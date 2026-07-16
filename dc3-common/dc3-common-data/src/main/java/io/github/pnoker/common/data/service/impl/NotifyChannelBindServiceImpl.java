@@ -123,6 +123,12 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
         return notifyChannelBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * Build fuzzy query wrapper for notify-channel binding search.
+     *
+     * @param entityQuery {@link NotifyChannelBindQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link NotifyChannelBindDO}
+     */
     private LambdaQueryWrapper<NotifyChannelBindDO> fuzzyQuery(NotifyChannelBindQuery entityQuery) {
         LambdaQueryWrapper<NotifyChannelBindDO> wrapper = Wrappers.<NotifyChannelBindDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getNotifyId()), NotifyChannelBindDO::getNotifyId,
@@ -134,6 +140,14 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
         return wrapper;
     }
 
+    /**
+     * Check whether a notify-channel binding is duplicated by notify and channel.
+     *
+     * @param entityBO       {@link NotifyChannelBindBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
+     */
     private boolean checkDuplicate(NotifyChannelBindBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<NotifyChannelBindDO> wrapper = Wrappers.<NotifyChannelBindDO>query().lambda();
         wrapper.eq(NotifyChannelBindDO::getNotifyId, entityBO.getNotifyId());
@@ -150,6 +164,12 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
         return duplicate;
     }
 
+    /**
+     * Validate that the bound notify policy and channel exist and belong to the same
+     * tenant.
+     *
+     * @param entityBO the binding to validate
+     */
     private void requireReferences(NotifyChannelBindBO entityBO) {
         NotifyDO notify = notifyManager.getById(entityBO.getNotifyId());
         if (Objects.isNull(notify) || !Objects.equals(notify.getTenantId(), entityBO.getTenantId())) {
@@ -162,6 +182,14 @@ public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
         }
     }
 
+    /**
+     * Get notify-channel binding data object by primary key ID.
+     *
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link NotifyChannelBindDO} if found, otherwise {@code null} when
+     * {@code throwException} is false
+     */
     private NotifyChannelBindDO getDOById(Long id, boolean throwException) {
         NotifyChannelBindDO entityDO = notifyChannelBindManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {

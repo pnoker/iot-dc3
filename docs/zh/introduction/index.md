@@ -2,6 +2,12 @@
 title: 平台定位
 ---
 
+<script setup>
+import IntroductionLoopDiagram from '../../.vitepress/theme/components/IntroductionLoopDiagram.vue'
+import IntroductionArchitectureDiagram from '../../.vitepress/theme/components/IntroductionArchitectureDiagram.vue'
+</script>
+
+
 # 平台定位
 
 IoT DC3 是一个开源、面向 AI 场景演进的分布式物联网平台，覆盖设备接入、数据采集、运营管理与智能分析。它把"设备接入"和"AI 运营"
@@ -25,16 +31,7 @@ IoT 平台到底差在哪。
 把上面的目标拆成可运行的链路，就是 IoT DC3 的核心工作方式：驱动采集 → 数据中心归一存储 → 大模型读取分析 →
 通过工具调用下发命令 → 设备执行并回执。
 
-```mermaid
-flowchart LR
-    Dev["现场设备"] -->|采集| Drv["驱动 dc3-driver-*"]
-    Drv -->|"归一为 PointValue<br/>(语义/单位/时间戳/租户)"| Data["数据中心"]
-    Data --> Store[("时序存储<br/>TimescaleDB")]
-    AI["智能中心 Agentic<br/>Spring AI + @Tool"] -->|读数据| Data
-    AI -->|"下发命令"| Data
-    Data -->|"命令经 RabbitMQ"| Drv
-    Drv -->|执行写入| Dev
-```
+<IntroductionLoopDiagram lang="zh" />
 
 闭环的关键在于：位号值不是裸数据，而是带语义标签、单位、时间戳和租户上下文的结构化 `PointValue`；大模型通过 Spring AI 的原生
 `@Tool` 调用平台 API，既能查也能写，且每一步都受权限与确认机制约束（见 [Agentic 中心](../ai/agentic)）。
@@ -91,29 +88,7 @@ RabbitMQ · gRPC / Protobuf · MyBatis-Plus（Snowflake ID）。
 平台对外只暴露网关一个 HTTP
 入口；四个中心各司其职，驱动在南向接入设备。下图是各角色的协作全景，逐层展开见 [系统架构](../architecture/)。
 
-```mermaid
-flowchart TB
-    subgraph 调用方
-        U["用户 / 第三方 / AI Agent"]
-    end
-    U --> GW["网关 dc3-gateway<br/>唯一对外 HTTP :8000"]
-    subgraph 中心服务["中心服务（gRPC facade 互联，多租户）"]
-        Auth["鉴权中心<br/>认证 / 租户 / RBAC / OAuth"]
-        Mgr["管理中心<br/>驱动 / 模板 / 设备 / 位号"]
-        Data["数据中心<br/>位号值 / 命令分发 / 告警"]
-        AI["智能中心<br/>会话 / 工具调用 / MCP"]
-    end
-    GW --> Auth
-    GW --> Mgr
-    GW --> Data
-    GW --> AI
-    subgraph 接入层
-        Drv["协议驱动 dc3-driver-*"]
-    end
-    Field["现场设备 / 数据源"] --> Drv
-    Drv <-->|RabbitMQ| Data
-    Data --> DB[("PostgreSQL + TimescaleDB")]
-```
+<IntroductionArchitectureDiagram lang="zh" />
 
 ## 延伸阅读
 

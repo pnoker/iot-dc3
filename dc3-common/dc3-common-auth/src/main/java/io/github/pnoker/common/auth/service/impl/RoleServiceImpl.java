@@ -161,6 +161,12 @@ public class RoleServiceImpl implements RoleService {
         return roots;
     }
 
+    /**
+     * Recursively sort each level of the role tree by the given comparator.
+     *
+     * @param nodes the tree nodes to sort
+     * @param order the comparator
+     */
     private void sortRecursive(List<RoleTreeBO> nodes, Comparator<RoleTreeBO> order) {
         if (CollectionUtils.isEmpty(nodes)) {
             return;

@@ -2,6 +2,12 @@
 title: "Data Plane: How a Point Value Lands in Storage"
 ---
 
+<script setup>
+import DataPlaneClassDiagram from '../../.vitepress/theme/components/DataPlaneClassDiagram.vue'
+import DataPlaneSequenceDiagram from '../../.vitepress/theme/components/DataPlaneSequenceDiagram.vue'
+</script>
+
+
 # Data Plane: How a Point Value Lands in Storage
 
 A raw register read on a device has a long way to go before it becomes a queryable value. It passes through driver
@@ -96,50 +102,7 @@ The same "point value" changes form six times along the link, and each layer own
 part that trips people up: **`PointValue` and `PointValueBO` are not the same class.** The first is the sending bean on
 the driver side; the second is the message/business object on the consumer side. They belong to different layers.
 
-```mermaid
-classDiagram
-    class ReadPointValue {
-        <<Driver raw read>>
-        +calculate() CalculatedPointValue
-    }
-    class CalculatedPointValue {
-        <<Driver scaling/projection>>
-        +getFinalValue()
-        +getNumericValue()
-    }
-    class PointValue {
-        <<Driver sending bean>>
-        +Long deviceId
-        +Long pointId
-        +rawValue
-        +calValue
-        +numValue
-    }
-    class PointValueBO {
-        <<Message / business>>
-        +Long tenantId
-        +createTime
-        +operateTime
-    }
-    class PointValueDO {
-        <<Persistent DB form>>
-        +num_value DOUBLE
-    }
-    class PointValueVO {
-        <<API response form>>
-        +rawValue
-        +calValue
-        +numValue
-        +createTime
-        +operateTime
-        +hasLatestValue
-    }
-    ReadPointValue --> CalculatedPointValue : calculate()
-    CalculatedPointValue --> PointValue : construct
-    PointValue --> PointValueBO : transported via RabbitMQ
-    PointValueBO --> PointValueDO : persist
-    PointValueDO --> PointValueVO : read-API mapping
-```
+<DataPlaneClassDiagram lang="en" />
 
 Layer by layer:
 
@@ -238,19 +201,7 @@ first. `POST /api/v3/data/point_value/latest` enters `PointValueServiceImpl.late
 `pointValueLocalCacheService.selectLatestPointValue(tenantId, deviceId, pointIds)`, collects the pointIds that missed,
 and then falls back to TimescaleDB in a single pass (`repositoryService.listLatestPointValues`) to fill in the rest.
 
-```mermaid
-sequenceDiagram
-    participant Client as Client
-    participant Data as Data Center dc3-center-data
-    participant Cache as Caffeine latest-value cache
-    participant TS as TimescaleDB dc3_point_value
-    Client->>Data: "POST /api/v3/data/point_value/latest (deviceId, pointId)"
-    Data->>Cache: selectLatestPointValue(tenant, device, points)
-    Cache-->>Data: latest values of hit points
-    Data->>TS: listLatestPointValues(missed pointIds)
-    TS-->>Data: fall back to fill in
-    Data-->>Client: paginated PointValueVO (tenant-isolated)
-```
+<DataPlaneSequenceDiagram lang="en" />
 
 The historical-range query `POST /api/v3/data/point_value/list` skips the cache. It scans the time-series store directly
 via `repositoryService.listPagePointValue(query)`, filtered by `startTime`/`endTime`. Both read endpoints are guarded by
