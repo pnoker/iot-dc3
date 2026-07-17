@@ -80,7 +80,7 @@ For how each hop works and why it's designed that way, see [Architecture](/en/ar
 - **Frontend**: Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6 (source in `dc3-web/` directory of this repo;
   the standalone `iot-dc3-web` repo is archived)
 
-See [Technology Stack](./introduction/technology-stack) for the full breakdown.
+See [Technology Stack](./development/technology-stack) for the full breakdown.
 
 ## License
 

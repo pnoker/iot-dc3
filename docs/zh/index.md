@@ -77,7 +77,7 @@ RabbitMQ 异步解耦。
 - **前端**：Vue 3 · TypeScript 6 · Vite 8 · Element Plus · AntV G2/G6（源码在本仓库 `dc3-web/` 目录，原独立仓库
   `iot-dc3-web` 已归档）
 
-完整说明见 [技术栈](./introduction/technology-stack)。
+完整说明见 [技术栈](./development/technology-stack)。
 
 ## 开源协议
 
