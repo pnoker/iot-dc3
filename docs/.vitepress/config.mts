@@ -256,6 +256,10 @@ export default defineConfig({
     lang: 'zh-CN',
     title: 'IoT DC3',
     cleanUrls: true,
+
+    sitemap: {
+        hostname: 'https://docs.dc3.site'
+    },
     lastUpdated: true,
 
     // maintainer-internal material is excluded from the public site build
@@ -264,6 +268,18 @@ export default defineConfig({
     head: [
         ['link', {rel: 'icon', href: '/images/logo.svg', type: 'image/svg+xml'}],
         ['meta', {name: 'theme-color', content: '#1296db'}],
+        // SEO + social sharing cards
+        ['meta', {name: 'description', content: 'IoT DC3 is an open-source, cloud-native IoT platform for device connectivity, multi-protocol data acquisition, and edge-to-cloud delivery.'}],
+        ['meta', {property: 'og:type', content: 'website'}],
+        ['meta', {property: 'og:site_name', content: 'IoT DC3'}],
+        ['meta', {property: 'og:title', content: 'IoT DC3'}],
+        ['meta', {property: 'og:description', content: 'IoT DC3 is an open-source, cloud-native IoT platform for device connectivity, multi-protocol data acquisition, and edge-to-cloud delivery.'}],
+        ['meta', {property: 'og:url', content: 'https://docs.dc3.site/'}],
+        ['meta', {property: 'og:image', content: 'https://docs.dc3.site/images/logo.png'}],
+        ['meta', {name: 'twitter:card', content: 'summary_large_image'}],
+        ['meta', {name: 'twitter:title', content: 'IoT DC3'}],
+        ['meta', {name: 'twitter:description', content: 'IoT DC3 is an open-source, cloud-native IoT platform for device connectivity, multi-protocol data acquisition, and edge-to-cloud delivery.'}],
+        ['meta', {name: 'twitter:image', content: 'https://docs.dc3.site/images/logo.png'}],
         // Google Analytics (GA4)
         ['script', {async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0S37KX68Y3'}],
         ['script', {}, `window.dataLayer = window.dataLayer || [];
