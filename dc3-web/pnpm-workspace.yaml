@@ -24,3 +24,4 @@ minimumReleaseAgeExclude:
   - '@typescript-eslint/visitor-keys@8.62.0'
   - axios@1.18.1
   - globals@17.7.0
+  - happy-dom@20.11.0
