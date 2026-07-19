@@ -47,7 +47,7 @@
         <leshan.version>2.0.0-M14</leshan.version>
 
         <!-- BACnet -->
-        <bacnet4j.version>6.0.1</bacnet4j.version>
+        <bacnet4j.version>6.1.0</bacnet4j.version>
 
         <!-- DLMS/COSEM -->
         <gurux.dlms.version>4.0.79</gurux.dlms.version>
