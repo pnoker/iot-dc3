@@ -270,7 +270,7 @@ describe('AI coding guardrails', () => {
   });
 
   it('documents the mandatory AI testing policy', () => {
-    const policy = readProjectFile('docs/frontend-testing-guardrails.md');
+    const policy = readProjectFile('../docs/zh/frontend/frontend-testing-guardrails.md');
 
     for (const section of [
       'Required Test Mapping',
