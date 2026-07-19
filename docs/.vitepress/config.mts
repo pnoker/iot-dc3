@@ -280,6 +280,9 @@ export default defineConfig({
         ['meta', {name: 'twitter:title', content: 'IoT DC3'}],
         ['meta', {name: 'twitter:description', content: 'IoT DC3 is an open-source, cloud-native IoT platform for device connectivity, multi-protocol data acquisition, and edge-to-cloud delivery.'}],
         ['meta', {name: 'twitter:image', content: 'https://docs.dc3.site/images/logo.png'}],
+        // Google AdSense (Auto Ads)
+        ['meta', {name: 'google-adsense-account', content: 'ca-pub-7573143232245283'}],
+        ['script', {async: '', crossorigin: 'anonymous', src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7573143232245283'}],
         // Google Analytics (GA4)
         ['script', {async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0S37KX68Y3'}],
         ['script', {}, `window.dataLayer = window.dataLayer || [];
