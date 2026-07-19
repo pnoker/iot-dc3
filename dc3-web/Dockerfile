@@ -17,7 +17,7 @@
 # builder
 # Build context is the repository root so that dc3/dependencies/ (nginx
 # configs, SSL certs) is reachable at runtime.
-FROM pnoker/dc3-node:2025.2 AS builder
+FROM pnoker/dc3-node:2025.9 AS builder
 LABEL dc3.author=pnokers
 LABEL dc3.author.email=pnokers.icloud.com
 
