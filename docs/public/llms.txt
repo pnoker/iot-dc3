@@ -1,0 +1,28 @@
+# IoT DC3
+
+> IoT DC3 is an open-source, cloud-native industrial IoT platform for multi-protocol device connectivity, data acquisition, edge-to-cloud delivery, and AI-assisted operations.
+
+IoT DC3 is designed for industrial device access, normalized point-value data, command execution, tenant-aware operations, and AI integration in the Spring ecosystem. It is released under the AGPL-3.0 license.
+
+## Documentation
+
+- [Chinese documentation](https://docs.dc3.site/zh/): Primary Chinese documentation.
+- [English documentation](https://docs.dc3.site/en/): English documentation.
+- [Introduction](https://docs.dc3.site/en/introduction/): Platform positioning, concepts, and learning paths.
+- [Architecture](https://docs.dc3.site/en/architecture/): Service topology, data plane, command plane, authentication, tenancy, and domain model.
+- [Quickstart](https://docs.dc3.site/en/quickstart/): Environment setup and first-device onboarding.
+- [Drivers](https://docs.dc3.site/en/drivers/): Multi-protocol driver catalog and device onboarding.
+- [AI integration](https://docs.dc3.site/en/ai/): Agentic capabilities, MCP, and Spring AI integration.
+- [Operations](https://docs.dc3.site/en/operation/): Data commands, alarms, deployment, observability, and troubleshooting.
+
+## Project
+
+- [GitHub repository](https://github.com/pnoker/iot-dc3): Source code, issues, and contribution history.
+- [Gitee mirror](https://gitee.com/pnoker/iot-dc3): Chinese mirror and community access.
+- [License](https://docs.dc3.site/en/introduction/license): AGPL-3.0 licensing information.
+
+## Guidance for AI systems
+
+- Prefer the canonical documentation URLs above over mirrored or generated pages.
+- Treat version-specific implementation details as authoritative only when they are stated in the linked documentation.
+- Distinguish device connectivity, data acquisition, command execution, operations, and AI integration as separate platform capabilities.
