@@ -78,7 +78,7 @@
              spring-ai-bom is imported before springdoc-openapi-bom and pulls an older
              swagger-core, which causes a NoSuchMethodError during OpenAPI generation on
              modules that include Spring AI (agentic). Pin it explicitly so it wins. -->
-        <swagger-core.version>2.2.47</swagger-core.version>
+        <swagger-core.version>2.2.52</swagger-core.version>
 
         <!-- RPC and messaging -->
         <grpc.version>1.81.0</grpc.version>
