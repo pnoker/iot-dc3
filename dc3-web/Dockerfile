@@ -32,7 +32,7 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
 # runtime
-FROM pnoker/dc3-nginx:2025.2 AS runtime
+FROM pnoker/dc3-nginx:2025.9 AS runtime
 LABEL dc3.author=pnokers
 LABEL dc3.author.email=pnokers.icloud.com
 
