@@ -60,6 +60,14 @@
 
 html {
     background: var(--vp-c-bg);
+    /* Always reserve the scrollbar gutter so short pages (and 404) don't gain
+       ~15px of width that longer pages lack. Without this the navbar's
+       right-aligned menu shifts horizontally when navigating between a page
+       that scrolls and one that doesn't.
+       scrollbar-gutter is the modern approach; overflow-y: scroll is the
+       cross-browser fallback that forces the track to always take space. */
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
 }
 
 body {
@@ -69,24 +77,54 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Remove the old site-wide bottom border; on the home page the top header blends in transparently (the hero is not covered by frosted glass),
-   turning frosted on scroll; doc pages keep VitePress's default bottom divider, echoing the sidebar's vertical line (so it doesn't look "bald"). */
+/* Remove the old site-wide bottom border. */
 .VPNav {
     border-bottom: none;
 }
 
+/* One frosted layer for the whole navbar, identical in every layout state
+   (home / sidebar doc / 404, at the top or scrolled). The default theme paints
+   opaque per-element backgrounds — .content-body on every non-home-top page, and
+   the whole bar on no-sidebar pages — at a higher specificity than a plain
+   .VPNavBar rule, and it also leaves the home hero fully transparent at the top.
+   We force a single translucent layer here so the logo/title area and the menu
+   area share the same background everywhere, and the header never jumps between
+   opaque white and transparent. !important is deliberate: it overrides the
+   theme's conditional rules without a multi-class specificity war. */
 .VPNavBar {
-    background: color-mix(in srgb, var(--vp-c-bg) 85%, transparent);
-    backdrop-filter: saturate(1.4) blur(12px);
+    background: color-mix(in srgb, var(--vp-c-bg) 85%, transparent) !important;
+    backdrop-filter: saturate(1.4) blur(12px) !important;
 }
 
-.VPNavBar.home.top {
-    background-color: transparent;
-    backdrop-filter: none;
+/* Clear the child backgrounds the default theme fills in, so only the single
+   .VPNavBar layer above shows through — keeping title and menu visually uniform. */
+.VPNavBar .title,
+.VPNavBar .content,
+.VPNavBar .content-body {
+    background-color: transparent !important;
 }
 
-.VPNavBar.has-sidebar .content {
-    background: transparent;
+/* Align the right-aligned menu group (search / nav / lang / theme) to the SAME
+   right edge on sidebar doc pages as on the home page, at every viewport width.
+
+   The default theme positions the doc-page menu with
+     padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + 32px)
+   which (a) uses 100vw — including the scrollbar — and (b) switches on at its
+   own hard-coded @media(min-width:1440px), while the home layout caps its
+   centered container at --vp-layout-max-width (1504px here). That mismatch makes
+   the menu jump +32px at 1440px and sit ~8px off on wide screens.
+
+   The home menu's inset from the content-box right edge is
+     max(32px, 50% - (max-width - 64px)/2)
+   — 32px until the centered container hits its cap, then half the leftover
+   margin. Percentage padding resolves against the navbar container (clientWidth,
+   scrollbar excluded), so reusing that exact expression here makes the doc menu
+   track the home menu pixel-for-pixel across all widths. !important overrides the
+   scoped-component rules (which outrank a plain selector via their [data-v-*]). */
+@media (min-width: 960px) {
+    .VPNavBar.has-sidebar .content {
+        padding-right: max(32px, calc(50% - (var(--vp-layout-max-width) - 64px) / 2)) !important;
+    }
 }
 
 .VPNavBarTitle .title {
@@ -497,6 +535,40 @@ body {
     border-right: 1px solid var(--vp-c-divider);
 }
 
+/* Move the sidebar's scroll from the fixed aside to its inner .nav container.
+   The default theme makes .VPSidebar itself the scroll box (position:fixed;
+   top:0; overflow-y:auto) and pushes content below the header with
+   padding-top: var(--vp-nav-height). But the scrollbar the browser draws sits on
+   the aside's own edge, running from top:0 downward — so its top ~64px lands
+   behind the header. That was hidden while the navbar was opaque; now that the
+   navbar is translucent frosted glass, the scrollbar shows through into it.
+   Fix: the aside stops scrolling (background still fills to the very top), and
+   .nav becomes the scroll box, sized to the viewport minus the header. Its
+   scrollbar then starts at the header's bottom edge and never enters it. */
+@media (min-width: 960px) {
+    .VPSidebar {
+        padding-top: var(--vp-nav-height);
+        padding-bottom: 0;
+        overflow: hidden;
+    }
+
+    .VPSidebar .nav {
+        height: 100%;
+        /* Widen .nav to also cover the aside's 32px right padding (negative
+           margin + matching padding, the same trick the theme's .curtain uses),
+           so the scrollbar sits in that padding band — exactly where the theme
+           originally drew it — instead of eating into the 208px content width.
+           Without this, moving the scroll onto .nav shrinks the usable width by
+           the scrollbar's ~15px and every menu row (and its active pill) overflows
+           under the scrollbar. */
+        margin-right: -32px;
+        padding: 6px 32px 24px 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+}
+
 .VPSidebarItem .item .text {
     line-height: 1.5;
 }
@@ -505,11 +577,24 @@ body {
     font-weight: 650;
 }
 
-/* active item: light-blue pill + bold blue text, replacing the default left vertical-bar indicator for greater prominence */
-.VPSidebarItem.is-active > .item {
-    margin: 0 -12px;
-    padding: 5px 12px;
-    border-radius: 7px;
+/* Active/hover highlight — a rounded pill, applied to .link so both states share
+   the exact same box and align perfectly. The default theme's markup puts .link
+   inside .item (a full-width flex row); we give .link its own padding + a small
+   negative left margin so the tint bleeds slightly left of the text (a "wrapped"
+   look) while keeping the right edge inside the scroll area — it never reaches
+   the scrollbar track. Replaces the default left vertical-bar indicator. */
+.VPSidebarItem.is-link > .item > .link {
+    margin: 2px -8px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.VPSidebarItem.is-link:not(.is-active) > .item > .link:hover {
+    background: color-mix(in srgb, var(--vp-c-brand-soft) 45%, transparent);
+}
+
+.VPSidebarItem.is-active > .item > .link {
     background: var(--vp-c-brand-soft);
 }
 
