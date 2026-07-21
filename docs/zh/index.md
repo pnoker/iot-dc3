@@ -1,5 +1,6 @@
 ---
 layout: home
+title: IoT DC3 · 分布式工业物联网平台
 
 hero:
   name: IoT DC3
@@ -7,7 +8,7 @@ hero:
   tagline: 覆盖设备接入、数据采集、运营管理与智能分析。28 个多协议驱动接入异构设备，通过 Spring AI 让大模型读写设备数据、下发命令，形成"感知—决策—执行—反馈"闭环。分布式、多租户、全开源。
   image:
     src: /images/logo.svg
-    alt: IoT DC3
+    alt: IoT DC3 平台 logo —— 分布式多协议设备接入与数据采集架构
   actions:
     - theme: brand
       text: 跑通第一个设备
@@ -32,6 +33,11 @@ features:
     details: 28 个多协议驱动接入异构设备，含设备接入流程与驱动能力矩阵。
     link: ./drivers/
     linkText: 浏览驱动
+  - icon: 🤖
+    title: AI 集成
+    details: 基于 Spring AI 接入大语言模型，AI Agent 与 MCP 工具调用让模型查询设备、读写位号、下发命令、分析告警。
+    link: ./ai/
+    linkText: 探索 AI
   - icon: 📚
     title: 基础
     details: 物联网四层技术体系——感知、网络、平台、应用与安全，每一层都接回 DC3 怎么实现。
