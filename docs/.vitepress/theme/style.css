@@ -26,7 +26,7 @@
     --vp-c-bg-soft: #f2f5f8;
     --vp-c-text-1: #1b2733;
     --vp-c-text-2: #475563;
-    --vp-c-text-3: #6b7a89;
+    --vp-c-text-3: #5b6976;
     --vp-c-divider: #e2e7ec;
     --vp-c-gutter: #e6eaef;
     --vp-code-block-bg: #f2f5f8;
@@ -462,7 +462,7 @@ body {
     --dc3-ext-fill: #f1f5f9;
     --dc3-ext-stroke: #64748b;
     --dc3-arrow: #94a3b8;
-    --dc3-arrow-label: #64748b;
+    --dc3-arrow-label: #475569;
     --dc3-fe-text: #0e7490;
     --dc3-region-amber: rgba(251, 191, 36, 0.06);
     --dc3-region-be: rgba(6, 78, 59, 0.04);

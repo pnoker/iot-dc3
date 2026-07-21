@@ -109,6 +109,8 @@ function init() {
   cv = document.createElement('canvas')
   cv.className = 'hero-waves-canvas'
   cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none'
+  cv.setAttribute('aria-hidden', 'true')
+  cv.setAttribute('role', 'presentation')
   hero.insertBefore(cv, hero.firstChild)
   resize()
   if (reduced) {
