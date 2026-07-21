@@ -268,9 +268,9 @@ export default defineConfig({
     head: [
         ['link', {rel: 'icon', href: '/images/logo.svg', type: 'image/svg+xml'}],
         ['meta', {name: 'theme-color', content: '#1296db'}],
-        // Google AdSense (Auto Ads)
-        ['meta', {name: 'google-adsense-account', content: 'ca-pub-7573143232245283'}],
-        ['script', {async: '', crossorigin: 'anonymous', src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7573143232245283'}],
+        // Preconnect to analytics origins so the first request isn't blocked on a cold DNS/TLS handshake
+        ['link', {rel: 'preconnect', href: 'https://www.googletagmanager.com'}],
+        ['link', {rel: 'preconnect', href: 'https://hm.baidu.com'}],
         // Google Analytics (GA4)
         ['script', {async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0S37KX68Y3'}],
         ['script', {}, `window.dataLayer = window.dataLayer || [];
