@@ -83,6 +83,15 @@
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-public</artifactId>
         </dependency>
+        <!-- OpenTelemetry API for tracing context propagation -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-context</artifactId>
+        </dependency>
 
     </dependencies>
 

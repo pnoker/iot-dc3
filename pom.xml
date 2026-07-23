@@ -121,6 +121,7 @@
         <jwt.version>0.13.0</jwt.version>
         <bouncycastle.version>1.84</bouncycastle.version>
         <micrometer.version>1.16.5</micrometer.version>
+        <opentelemetry.version>1.45.0</opentelemetry.version>
 
         <!-- Legacy integration -->
         <j.interop.version>2.0.4</j.interop.version>
@@ -284,6 +285,19 @@
                 <version>${grpc.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- OpenTelemetry BOM -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-bom</artifactId>
+                <version>${opentelemetry.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-semconv</artifactId>
+                <version>${opentelemetry.version}-alpha</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
