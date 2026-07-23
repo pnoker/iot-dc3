@@ -22,6 +22,8 @@ import io.grpc.Metadata;
 import io.grpc.ServerCall;
 import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
 import org.slf4j.MDC;
 import org.springframework.grpc.server.GlobalServerInterceptor;
 import org.springframework.stereotype.Component;
@@ -34,9 +36,18 @@ import java.util.UUID;
  * every log line emitted by the service implementation carries the same id as the
  * originating HTTP request.
  *
- * <p>When the caller did not send an {@code X-Request-Id} (e.g. a driver registering itself,
- * or any gRPC call not initiated from an HTTP request), a fresh UUID is generated so the
- * request is still traceable within this service.
+ * <p><b>Production-grade OpenTelemetry Integration:</b> This interceptor now integrates
+ * with OpenTelemetry. It will use (in order of priority):
+ * <ol>
+ *   <li>X-Request-Id from gRPC metadata (backward compatibility)</li>
+ *   <li>OpenTelemetry Trace ID (if available)</li>
+ *   <li>A fresh UUID as last resort</li>
+ * </ol>
+ * This ensures full compatibility with both systems while maintaining backward compatibility.
+ *
+ * <p>When no id is available (e.g. a driver registering itself, or any gRPC call not
+ * initiated from an HTTP request), a fresh UUID is generated so the request is still
+ * traceable within this service.
  *
  * <p>MDC is set on {@code onHalfClose} (right before the service method runs) and cleared on
  * completion or cancellation, to avoid leaking the entry across pooled netty threads. It is
@@ -70,9 +81,22 @@ public class RequestIdGrpcServerInterceptor implements ServerInterceptor {
         // Read the id supplied by the caller (set by RequestIdGrpcClientInterceptor upstream),
         // or mint one when absent so the call is still self-consistent in this service's logs.
         String requestId = headers.get(REQUEST_ID_KEY);
+        
+        // Priority 1: Use X-Request-Id from header
+        // Priority 2: Use OpenTelemetry Trace ID if available
+        if (requestId == null || requestId.isBlank()) {
+            Span currentSpan = Span.current();
+            SpanContext spanContext = currentSpan.getSpanContext();
+            if (spanContext.isValid()) {
+                requestId = spanContext.getTraceId();
+            }
+        }
+        
+        // Priority 3: Fall back to UUID
         if (requestId == null || requestId.isBlank()) {
             requestId = UUID.randomUUID().toString();
         }
+        
         return new RequestIdListener<>(next.startCall(call, headers), requestId);
     }
 

@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.config;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
 import org.slf4j.MDC;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
@@ -27,7 +29,15 @@ import org.springframework.amqp.core.MessagePostProcessor;
  * {@link MdcRequestIdListenerAdvice} and keep the traceId chain continuous across the broker
  * hop.
  *
- * <p>When MDC has no request id (a publish not driven by an HTTP request — driver
+ * <p><b>Production-grade OpenTelemetry Integration:</b> This post processor now integrates
+ * with OpenTelemetry. It will use (in order of priority):
+ * <ol>
+ *   <li>MDC requestId (from existing RequestId mechanism)</li>
+ *   <li>OpenTelemetry Trace ID (if available and no MDC value)</li>
+ * </ol>
+ * This ensures full compatibility with both systems while maintaining backward compatibility.
+ *
+ * <p>When no id is available (a publish not driven by an HTTP request — driver
  * registration, Quartz job, …), nothing is stamped and the consumer mints its own id.
  *
  * <p>Extracted as a named class (rather than a lambda in {@link RabbitConfig}) so it can be
@@ -52,6 +62,16 @@ public class MdcRequestIdMessagePostProcessor implements MessagePostProcessor {
     @Override
     public Message postProcessMessage(Message message) {
         String requestId = MDC.get(MDC_REQUEST_ID);
+        
+        // If MDC doesn't have requestId, try to get it from OpenTelemetry
+        if (requestId == null || requestId.isBlank()) {
+            Span currentSpan = Span.current();
+            SpanContext spanContext = currentSpan.getSpanContext();
+            if (spanContext.isValid()) {
+                requestId = spanContext.getTraceId();
+            }
+        }
+        
         if (requestId != null && !requestId.isBlank()) {
             message.getMessageProperties().setHeader(HEADER_REQUEST_ID, requestId);
         }
