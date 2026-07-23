@@ -127,6 +127,25 @@ services:
         aliases:
           - dc3-apm
 
+  # ---------- Distributed Tracing (Jaeger) ----------
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    restart: always
+    container_name: dc3-jaeger
+    hostname: dc3-jaeger
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_JAEGER_UI_PORT:-16686}:16686" # Jaeger UI
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_JAEGER_OTLP_GRPC_PORT:-4317}:4317" # OTLP gRPC
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_JAEGER_OTLP_HTTP_PORT:-4318}:4318" # OTLP HTTP
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - LOG_LEVEL=info
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-jaeger
+
   # ---------- Monitoring (Prometheus + exporters + Grafana) ----------
   prometheus:
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-prometheus:${DC3_IMAGE_TAG:-2026.6}
