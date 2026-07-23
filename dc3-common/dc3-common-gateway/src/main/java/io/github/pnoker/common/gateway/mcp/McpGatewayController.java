@@ -436,15 +436,15 @@ public class McpGatewayController {
          * Record a tool-call audit entry (success, denial, or error) with trace id,
          * duration, argument digest, and client metadata from the exchange.
          *
-         * @param context    the introspected token context
-         * @param tool       the resolved tool definition
-         * @param traceId    the call trace id
-         * @param arguments  the tool arguments
-         * @param controls   confirmation and idempotency controls
-         * @param status     audit status (success/denied/error)
-         * @param errorCode  error code on failure, empty otherwise
-         * @param start      the call start nanos, for duration
-         * @param exchange   current server exchange, for client metadata and remote ip
+         * @param context   the introspected token context
+         * @param tool      the resolved tool definition
+         * @param traceId   the call trace id
+         * @param arguments the tool arguments
+         * @param controls  confirmation and idempotency controls
+         * @param status    audit status (success/denied/error)
+         * @param errorCode error code on failure, empty otherwise
+         * @param start     the call start nanos, for duration
+         * @param exchange  current server exchange, for client metadata and remote ip
          * @return a mono completing when the audit is recorded
          */
         private Mono<Void> audit(McpIntrospectResponseDTO context, McpToolResolveResponseDTO tool, String traceId,
