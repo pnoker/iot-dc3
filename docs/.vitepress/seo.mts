@@ -2,6 +2,9 @@ import {existsSync, readFileSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
 import {resolve} from 'node:path'
 import type {HeadConfig, TransformContext} from 'vitepress'
+import {resolveVersion} from './version.mts'
+
+const versionInfo = resolveVersion()
 
 const SITE_URL = 'https://docs.dc3.site'
 const DOCS_ROOT = fileURLToPath(new URL('..', import.meta.url))
@@ -271,7 +274,7 @@ export function transformHead(context: TransformContext): HeadConfig[] {
 
     return [
         ['meta', {name: 'description', content: description}],
-        ['meta', {name: 'robots', content: 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'}],
+        ['meta', {name: 'robots', content: versionInfo.isLatest ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' : 'noindex,follow'}],
         ['meta', {name: 'author', content: 'IoT DC3 Contributors'}],
         ['link', {rel: 'canonical', href: canonicalUrl}],
         ['link', {rel: 'alternate', type: 'text/plain', href: `${SITE_URL}/llms.txt`, title: 'AI-readable site summary'}],

@@ -18,6 +18,9 @@
 import {defineConfig} from 'vitepress'
 import {Lang, t} from './i18n'
 import {transformHead} from './seo.mts'
+import {resolveVersion} from './version.mts'
+
+const versionInfo = resolveVersion()
 
 // ── i18n via locales/{lang}.json ──
 // All user-facing strings are resolved through t(lang, key).
@@ -270,6 +273,11 @@ export default defineConfig({
     head: [
         ['link', {rel: 'icon', href: '/images/logo.svg', type: 'image/svg+xml'}],
         ['meta', {name: 'theme-color', content: '#1296db'}],
+        // Version meta — read at runtime by VersionSwitcher and VersionBanner
+        ['meta', {name: 'dc3-doc-version', content: versionInfo.version}],
+        ['meta', {name: 'dc3-doc-full-version', content: versionInfo.fullVersion}],
+        ['meta', {name: 'dc3-doc-is-latest', content: String(versionInfo.isLatest)}],
+        ['meta', {name: 'dc3-doc-latest-url', content: 'https://docs.dc3.site'}],
         // Google AdSense (Auto Ads)
         ['meta', {name: 'google-adsense-account', content: 'ca-pub-7573143232245283'}],
         ['script', {async: '', crossorigin: 'anonymous', src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7573143232245283'}],

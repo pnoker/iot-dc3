@@ -30,6 +30,8 @@ import FourLayersDiagram from './components/FourLayersDiagram.vue'
 import HeroLogo from './components/HeroLogo.vue'
 import HeroParticles from './components/HeroParticles.vue'
 import HeroWaves from './components/HeroWaves.vue'
+import VersionSwitcher from './components/VersionSwitcher.vue'
+import VersionBanner from './components/VersionBanner.vue'
 
 // The language preference is written back to localStorage after internal navigation (including the top language switcher), so the head inline script can keep it on refresh.
 function persistLang(path: string) {
@@ -46,8 +48,10 @@ const theme: Theme = {
     // Home hero: two background layers (HeroWaves wave dot-matrix at the bottom + full-width converging particles HeroParticles above it, home-hero-before), and the image area is the logo particle animation (home-hero-image)
     Layout() {
         return h(DefaultTheme.Layout, null, {
+            'layout-top': () => h(VersionBanner),
             'home-hero-before': () => [h(HeroWaves), h(HeroParticles)],
-            'home-hero-image': () => h(HeroLogo)
+            'home-hero-image': () => h(HeroLogo),
+            'nav-bar-content-after': () => h(VersionSwitcher)
         })
     },
 
