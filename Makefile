@@ -134,6 +134,12 @@ help:
 	@printf '  %s\n' 'make up GROUP=core'
 	@printf '  %s\n' 'make up STACK=optional SERVICES="prometheus grafana"'
 	@printf '  %s\n' 'make logs SERVICES="gateway agentic"'
+	@printf '%s\n' ''
+	@printf '%s\n' 'Documentation:'
+	@printf '  %-24s %s\n' 'make docs-dev' 'Start VitePress dev server (localhost:5173)'
+	@printf '  %-24s %s\n' 'make docs-build' 'Build static site to docs/.vitepress/dist/'
+	@printf '  %-24s %s\n' 'make docs-preview' 'Preview the built site'
+	@printf '  %-24s %s\n' 'make docs-version VERSION=X' 'Build versioned docs (archived, noindex)'
 
 env:
 	@printf 'ENV_FILE=%s\n' "$(ENV_FILE)"
@@ -265,5 +271,20 @@ changelog:
 # OPENAPI_BASE overrides the gateway URL; OPENAPI_OUT the output directory.
 openapi:
 	@OPENAPI_BASE="$(OPENAPI_BASE)" dc3/bin/export_openapi.sh $(OPENAPI_OUT)
+
+.PHONY: docs-dev docs-build docs-preview docs-version
+
+docs-dev:
+	cd docs && pnpm dev
+
+docs-build:
+	cd docs && pnpm build
+
+docs-preview:
+	cd docs && pnpm preview
+
+docs-version:
+	@test -n "$(VERSION)" || { echo 'Usage: make docs-version VERSION=2025.9'; exit 1; }
+	cd docs && DC3_DOCS_VERSION=$(VERSION) DC3_DOCS_IS_LATEST=false pnpm build
 
 
