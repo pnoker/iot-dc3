@@ -18,6 +18,8 @@
 package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.constant.driver.RabbitConstant;
+import io.github.pnoker.common.driver.buffer.BufferService;
+import io.github.pnoker.common.driver.buffer.PointValueCorrelation;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
@@ -72,12 +74,30 @@ public class DriverSenderServiceImpl implements DriverSenderService {
      */
     private final RabbitTemplate rabbitTemplate;
 
+    /**
+     * Local buffer for point values that fail to reach RabbitMQ, republished once the broker recovers.
+     */
+    private final BufferService bufferService;
+
     @PostConstruct
     void init() {
         rabbitTemplate.setConfirmCallback((correlation, ack, reason) -> {
-            if (!ack && correlation instanceof PointValueCorrelation ctx) {
-                log.warn("Point value publish NACKed: deviceId={}, pointId={}, reason={}",
-                        ctx.deviceId, ctx.pointId, reason);
+            if (ack) {
+                return;
+            }
+            if (correlation instanceof PointValueCorrelation ctx) {
+                log.warn("Point value publish NACKed, buffering for retry: deviceId={}, pointId={}, attempt={}, reason={}",
+                        ctx.getDeviceId(), ctx.getPointId(), ctx.getAttempt(), reason);
+                try {
+                    PointValue pointValue = JsonUtil.parseObject(ctx.getPayloadJson(), PointValue.class);
+                    bufferService.offer(pointValue, ctx.getRoutingKey(), ctx.getId(), ctx.getAttempt());
+                } catch (Exception e) {
+                    log.error("Failed to re-queue NACKed point value, payload corrupted, correlationId={}",
+                            ctx.getId(), e);
+                }
+            } else {
+                log.error("RabbitMQ publisher confirm NACK, correlationId={}, cause={}",
+                        Objects.nonNull(correlation) ? correlation.getId() : null, reason);
             }
         });
     }
@@ -210,13 +230,22 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
 
         String routingKey = RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService();
-        CorrelationData correlationData = new PointValueCorrelation(
-                UUID.randomUUID().toString(), entityDTO.getDeviceId(), entityDTO.getPointId());
+        boolean buffering = bufferService.isEnabled();
+        CorrelationData correlationData = buffering
+                ? new PointValueCorrelation(UUID.randomUUID().toString(), entityDTO.getDeviceId(),
+                        entityDTO.getPointId(), 1, JsonUtil.toJsonString(entityDTO), routingKey)
+                : new CorrelationData(UUID.randomUUID().toString());
         try {
             rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE, routingKey, entityDTO, correlationData);
         } catch (AmqpException e) {
-            log.error("Point value publish rejected: deviceId={}, pointId={}",
-                    entityDTO.getDeviceId(), entityDTO.getPointId(), e);
+            if (buffering) {
+                log.warn("Point value publish rejected, buffering for retry: deviceId={}, pointId={}",
+                        entityDTO.getDeviceId(), entityDTO.getPointId(), e);
+                bufferService.offer(entityDTO, routingKey, correlationData.getId(), 1);
+            } else {
+                log.error("Point value publish rejected: deviceId={}, pointId={}",
+                        entityDTO.getDeviceId(), entityDTO.getPointId(), e);
+            }
         }
     }
 
@@ -300,27 +329,6 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
         log.info("Report device state: {}, deviceId={}", status.getCode(), deviceId);
         deviceStateSender(deviceState);
-    }
-
-    /**
-     * Carries device/point context through the publisher-confirm callback.
-     */
-    private static class PointValueCorrelation extends CorrelationData {
-
-        /**
-         * Device owning the point value, included so the NACK callback can log actionable context.
-         */
-        final Long deviceId;
-        /**
-         * Point whose value failed to publish, included so the NACK callback can log actionable context.
-         */
-        final Long pointId;
-
-        PointValueCorrelation(String id, Long deviceId, Long pointId) {
-            super(id);
-            this.deviceId = deviceId;
-            this.pointId = pointId;
-        }
     }
 
 }
