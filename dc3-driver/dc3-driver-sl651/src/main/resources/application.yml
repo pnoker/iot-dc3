@@ -52,6 +52,10 @@ dc3:
         default-value: 0
         remark: Zero-based index into the telemetry body element list
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/sl651/buffer.db
+
 spring:
   application:
     name: @project.artifactId@
