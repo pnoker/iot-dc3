@@ -19,6 +19,7 @@ package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
+import io.github.pnoker.common.driver.job.BufferRepublishScheduleJob;
 import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
 import io.github.pnoker.common.driver.job.DriverHealthScheduleJob;
@@ -101,6 +102,17 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
                 quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
                         ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB, property.getCustom().getCron(),
                         DriverCustomScheduleJob.class);
+            }
+
+            // Create and schedule the buffer republish job if enabled
+            DriverProperties.BufferProperties buffer = driverProperties.getBuffer();
+            if (Objects.nonNull(buffer) && Boolean.TRUE.equals(buffer.getEnabled())) {
+                if (!CronExpression.isValidExpression(buffer.getRepublishCron())) {
+                    throw new CronException("Buffer republish schedule cron expression is invalid");
+                }
+                quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                        ScheduleConstant.BUFFER_REPUBLISH_SCHEDULE_JOB, buffer.getRepublishCron(),
+                        BufferRepublishScheduleJob.class);
             }
 
             // Start the scheduler after all jobs are configured
