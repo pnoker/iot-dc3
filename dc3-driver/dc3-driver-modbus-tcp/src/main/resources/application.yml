@@ -85,6 +85,10 @@ dc3:
         default-value: '${value}'
         remark: Value template rendered with command params
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/modbus-tcp/buffer.db
+
 spring:
   application:
     name: @project.artifactId@
