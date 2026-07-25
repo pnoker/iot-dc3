@@ -91,6 +91,9 @@
         <!-- Data access -->
         <mybatis.plus.version>3.5.16</mybatis.plus.version>
         <mybatis.plus.dynamic.version>4.5.0</mybatis.plus.dynamic.version>
+        
+        <!-- Embedded database for the driver local point-value buffer -->
+        <sqlite-jdbc.version>3.53.2.0</sqlite-jdbc.version>
 
         <!-- Serialization and data formats -->
         <tools.jackson.version>3.1.4</tools.jackson.version>
@@ -305,6 +308,13 @@
                 <version>${okhttp.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- Embedded database for the driver local point-value buffer -->
+            <dependency>
+                <groupId>org.xerial</groupId>
+                <artifactId>sqlite-jdbc</artifactId>
+                <version>${sqlite-jdbc.version}</version>
             </dependency>
 
             <!-- Test toolchain -->
