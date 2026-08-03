@@ -104,7 +104,13 @@ public class PointValueServiceImpl implements PointValueService {
         }).collect(Collectors.groupingBy(PointValueBO::getDeviceId));
 
         group.forEach(this::savePointValuesToRepository);
-        alarmRuleTriggerService.processPointValues(pointValueBOList);
+        try {
+            alarmRuleTriggerService.processPointValues(pointValueBOList);
+        } catch (Exception e) {
+            // Alarm evaluation runs after persistence: a failure here must not trigger a
+            // re-queue that would re-insert the already-persisted rows.
+            log.warn("Alarm rule evaluation failed, size={}, skipped", pointValueBOList.size(), e);
+        }
     }
 
     @Override
@@ -232,14 +238,15 @@ public class PointValueServiceImpl implements PointValueService {
             // local hot cache
             pointValueLocalCacheService.savePointValue(deviceId, pointValueBOList);
 
-            // other repository
+            // Repository persistence — wrap any failure (incl. checked IOException) so the
+            // ingest buffer can re-queue the batch for retry instead of silently dropping it.
             RepositoryService repositoryService = getFirstRepositoryService();
             List<List<PointValueBO>> splitPointValueBOList = ListUtils.partition(pointValueBOList, 100);
             for (List<PointValueBO> splitPointValueBO : splitPointValueBOList) {
                 repositoryService.savePointValues(splitPointValueBO);
             }
         } catch (Exception e) {
-            log.error("Save point values failed, deviceId={}, size={}", deviceId, pointValueBOList.size(), e);
+            throw new RepositoryException(e);
         }
     }
 

@@ -52,7 +52,8 @@ const DICT = {
     metricsLogs: 'metrics/logs',
     legAccess: '接入层', legService: '服务 / 驱动', legBus: '消息总线',
     legData: '数据存储', legOps: '运维 (可选)', legDevice: '现场设备 / 外部',
-    legAuth: '鉴权流', legPlane: '▼ 命令下行   ▲ 数据上行'
+    legAuth: '鉴权流', legPlane: '▼ 命令下行   ▲ 数据上行',
+    aria: 'IoT DC3 整体服务拓扑：一个网关、四个中心服务与一组协议驱动，经 RabbitMQ 消息总线串联数据上行与命令下行，PostgreSQL 持久化，并可选 ELK 与 Prometheus 运维'
   },
   en: {
     centerRegion: 'Center Services · gRPC interconnect (Facade: api / grpc / local)',
@@ -85,7 +86,8 @@ const DICT = {
     metricsLogs: 'metrics/logs',
     legAccess: 'Access', legService: 'Services / Drivers', legBus: 'Message Bus',
     legData: 'Data Store', legOps: 'Ops (optional)', legDevice: 'Devices / External',
-    legAuth: 'Auth flow', legPlane: '▼ Command down   ▲ Data up'
+    legAuth: 'Auth flow', legPlane: '▼ Command down   ▲ Data up',
+    aria: 'IoT DC3 end-to-end service topology: one gateway, four center services and a set of protocol drivers linked by the RabbitMQ message bus for data uplink and command downlink, with PostgreSQL storage and optional ELK and Prometheus ops'
   }
 } as const
 
@@ -95,7 +97,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 <template>
   <DiagramFrame>
     <div class="dc3-arch">
-      <svg :aria-label="s.busName" role="img" viewBox="0 0 1200 768">
+      <svg :aria-label="s.aria" role="img" viewBox="0 0 1200 768">
         <defs>
           <marker id="dc3-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
             <polygon fill="var(--dc3-arrow)" points="0 0, 10 3.5, 0 7"/>
