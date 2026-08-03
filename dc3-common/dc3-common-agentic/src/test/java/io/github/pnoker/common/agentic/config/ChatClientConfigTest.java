@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
+import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
@@ -139,8 +139,8 @@ class ChatClientConfigTest {
     void agenticToolCallAdvisorRunsAfterMemoryAdvisor() {
         ChatClientConfig config = new ChatClientConfig();
         assertThat(config.agenticToolCallAdvisor(ToolCallingManager.builder().build()))
-                .isInstanceOf(ToolCallAdvisor.class)
-                .extracting(ToolCallAdvisor.class::cast)
+                .isInstanceOf(ToolCallingAdvisor.class)
+                .extracting(ToolCallingAdvisor.class::cast)
                 .satisfies(advisor -> {
                     assertThat(advisor.getName()).isEqualTo("Tool Calling Advisor");
                     assertThat(advisor.getOrder()).isEqualTo(Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER + 100);

@@ -76,12 +76,12 @@ class AgenticPromptBuilderTest {
 
     @Test
     void buildAttachesToolCallbacksAndExplicitToolCallAdvisorWhenToolCallingIsEnabled() {
-        when(promptSpec.toolCallbacks(toolCallbackProvider)).thenReturn(promptSpec);
+        when(promptSpec.tools(toolCallbackProvider)).thenReturn(promptSpec);
         when(promptSpec.advisors(toolCallAdvisor)).thenReturn(promptSpec);
 
         promptBuilder.build(prepared(true));
 
-        verify(promptSpec).toolCallbacks(toolCallbackProvider);
+        verify(promptSpec).tools(toolCallbackProvider);
         verify(promptSpec).advisors(toolCallAdvisor);
     }
 
@@ -104,7 +104,7 @@ class AgenticPromptBuilderTest {
 
     @Test
     void buildAdvertisesPlatformToolsWhenToolCallingIsEnabled() {
-        when(promptSpec.toolCallbacks(toolCallbackProvider)).thenReturn(promptSpec);
+        when(promptSpec.tools(toolCallbackProvider)).thenReturn(promptSpec);
         when(promptSpec.advisors(toolCallAdvisor)).thenReturn(promptSpec);
 
         promptBuilder.build(prepared(true));

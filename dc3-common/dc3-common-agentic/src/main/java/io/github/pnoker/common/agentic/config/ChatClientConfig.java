@@ -28,7 +28,7 @@ import io.github.pnoker.common.agentic.tools.TenantTool;
 import io.github.pnoker.common.agentic.tools.UserTool;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
+import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
@@ -95,7 +95,7 @@ public class ChatClientConfig {
 
     @Bean
     public Advisor agenticToolCallAdvisor(ToolCallingManager toolCallingManager) {
-        return ToolCallAdvisor.builder()
+        return ToolCallingAdvisor.builder()
                 .toolCallingManager(toolCallingManager)
                 .advisorOrder(Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER + 100)
                 .build();
