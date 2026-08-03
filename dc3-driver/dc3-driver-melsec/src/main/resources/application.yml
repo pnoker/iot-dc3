@@ -64,6 +64,10 @@ dc3:
         default-value: 0
         remark: String read length (0 for non-string types)
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/melsec/buffer.db
+
 spring:
   application:
     name: @project.artifactId@

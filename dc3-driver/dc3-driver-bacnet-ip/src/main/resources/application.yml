@@ -105,6 +105,10 @@ dc3:
         default-value: PRESENT_VALUE
         remark: Property identifier
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/bacnet-ip/buffer.db
+
 spring:
   application:
     name: @project.artifactId@

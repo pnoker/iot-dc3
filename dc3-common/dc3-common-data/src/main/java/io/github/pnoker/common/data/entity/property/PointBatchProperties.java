@@ -24,11 +24,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Point-value batch processing thresholds.
+ * Point-value ingest buffer tuning. Replaces the legacy speed/interval threshold pair: every
+ * received point value enters a bounded queue and is flushed to the repository by worker
+ * threads on a size-or-time trigger.
  *
  * @author pnoker
- * @version 2026.5.10
- * @since 2026.5.10
+ * @version 2026.7.8
+ * @since 2026.7.8
  */
 @Getter
 @Setter
@@ -36,10 +38,15 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "dc3.data.point.batch")
 public class PointBatchProperties {
 
-    @Min(value = 1, message = "Point batch speed must be greater than 0")
-    private int speed = 100;
+    @Min(value = 1, message = "Point batch queue capacity must be greater than 0")
+    private int queueCapacity = 100000;
 
-    @Min(value = 1, message = "Point batch interval must be greater than 0")
-    private int interval = 5;
+    @Min(value = 1, message = "Point batch size must be greater than 0")
+    private int batchSize = 1000;
 
+    @Min(value = 1, message = "Point batch flush interval must be greater than 0")
+    private long flushIntervalMillis = 500;
+
+    @Min(value = 1, message = "Point batch worker count must be greater than 0")
+    private int workerCount = 4;
 }

@@ -215,6 +215,8 @@ RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 EXPOSE ${TCP_PORT}
 EXPOSE ${UDP_PORT}
 VOLUME /dc3-driver/dc3-driver-listening-virtual/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-listening-virtual/dc3/data/driver/listening-virtual
+VOLUME /dc3-driver/dc3-driver-listening-virtual/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-listening-virtual.jar"]
 
@@ -229,6 +231,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-modbus-tcp/dc3/logs/driver/modbus-tcp/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-modbus-tcp/target/dc3-driver-modbus-tcp.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-modbus-tcp/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-modbus-tcp/dc3/data/driver/modbus-tcp
+VOLUME /dc3-driver/dc3-driver-modbus-tcp/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-modbus-tcp.jar"]
 
@@ -243,6 +247,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-modbus-rtu/dc3/logs/driver/modbus-rtu/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-modbus-rtu/target/dc3-driver-modbus-rtu.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-modbus-rtu/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-modbus-rtu/dc3/data/driver/modbus-rtu
+VOLUME /dc3-driver/dc3-driver-modbus-rtu/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-modbus-rtu.jar"]
 
@@ -257,6 +263,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-mqtt/dc3/logs/driver/mqtt/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-mqtt/target/dc3-driver-mqtt.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-mqtt/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-mqtt/dc3/data/driver/mqtt
+VOLUME /dc3-driver/dc3-driver-mqtt/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-mqtt.jar"]
 
@@ -271,6 +279,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-opc-da/dc3/logs/driver/opc-da/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-opc-da/target/dc3-driver-opc-da.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-opc-da/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-opc-da/dc3/data/driver/opc-da
+VOLUME /dc3-driver/dc3-driver-opc-da/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-opc-da.jar"]
 
@@ -285,6 +295,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-opc-ua/dc3/logs/driver/opc-ua/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-opc-ua/target/dc3-driver-opc-ua.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-opc-ua/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-opc-ua/dc3/data/driver/opc-ua
+VOLUME /dc3-driver/dc3-driver-opc-ua/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-opc-ua.jar"]
 
@@ -299,6 +311,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-plcs7/dc3/logs/driver/plcs7/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-plcs7/target/dc3-driver-plcs7.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-plcs7/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-plcs7/dc3/data/driver/plcs7
+VOLUME /dc3-driver/dc3-driver-plcs7/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-plcs7.jar"]
 
@@ -313,6 +327,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-virtual/dc3/logs/driver/virtual/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-virtual/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-virtual/dc3/data/driver/virtual
+VOLUME /dc3-driver/dc3-driver-virtual/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-virtual.jar"]
 # ---------- dc3-driver-bacnet-ip ----------
@@ -325,6 +341,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-bacnet-ip/dc3/logs/driver/bacnet-ip/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-bacnet-ip/target/dc3-driver-bacnet-ip.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-bacnet-ip/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-bacnet-ip/dc3/data/driver/bacnet-ip
+VOLUME /dc3-driver/dc3-driver-bacnet-ip/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-bacnet-ip.jar"]
 
@@ -338,6 +356,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-ble/dc3/logs/driver/ble/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-ble/target/dc3-driver-ble.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-ble/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-ble/dc3/data/driver/ble
+VOLUME /dc3-driver/dc3-driver-ble/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-ble.jar"]
 
@@ -351,6 +371,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-can/dc3/logs/driver/can/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-can/target/dc3-driver-can.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-can/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-can/dc3/data/driver/can
+VOLUME /dc3-driver/dc3-driver-can/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-can.jar"]
 
@@ -364,6 +386,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-coap/dc3/logs/driver/coap/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-coap/target/dc3-driver-coap.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-coap/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-coap/dc3/data/driver/coap
+VOLUME /dc3-driver/dc3-driver-coap/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-coap.jar"]
 
@@ -377,6 +401,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-dlms/dc3/logs/driver/dlms/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-dlms/target/dc3-driver-dlms.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-dlms/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-dlms/dc3/data/driver/dlms
+VOLUME /dc3-driver/dc3-driver-dlms/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-dlms.jar"]
 
@@ -390,6 +416,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-ethernet-ip/dc3/logs/driver/ethernet-ip/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-ethernet-ip/target/dc3-driver-ethernet-ip.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-ethernet-ip/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-ethernet-ip/dc3/data/driver/ethernet-ip
+VOLUME /dc3-driver/dc3-driver-ethernet-ip/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-ethernet-ip.jar"]
 
@@ -403,6 +431,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-fins/dc3/logs/driver/fins/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-fins/target/dc3-driver-fins.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-fins/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-fins/dc3/data/driver/fins
+VOLUME /dc3-driver/dc3-driver-fins/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-fins.jar"]
 
@@ -416,6 +446,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-http/dc3/logs/driver/http/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-http/target/dc3-driver-http.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-http/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-http/dc3/data/driver/http
+VOLUME /dc3-driver/dc3-driver-http/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-http.jar"]
 
@@ -429,6 +461,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-iec104/dc3/logs/driver/iec104/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-iec104/target/dc3-driver-iec104.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-iec104/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-iec104/dc3/data/driver/iec104
+VOLUME /dc3-driver/dc3-driver-iec104/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-iec104.jar"]
 
@@ -442,6 +476,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-lwm2m/dc3/logs/driver/lwm2m/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-lwm2m/target/dc3-driver-lwm2m.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-lwm2m/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-lwm2m/dc3/data/driver/lwm2m
+VOLUME /dc3-driver/dc3-driver-lwm2m/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-lwm2m.jar"]
 
@@ -455,6 +491,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-melsec/dc3/logs/driver/melsec/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-melsec/target/dc3-driver-melsec.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-melsec/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-melsec/dc3/data/driver/melsec
+VOLUME /dc3-driver/dc3-driver-melsec/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-melsec.jar"]
 
@@ -468,6 +506,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-mysql/dc3/logs/driver/mysql/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-mysql/target/dc3-driver-mysql.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-mysql/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-mysql/dc3/data/driver/mysql
+VOLUME /dc3-driver/dc3-driver-mysql/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-mysql.jar"]
 
@@ -481,6 +521,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-oracle/dc3/logs/driver/oracle/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-oracle/target/dc3-driver-oracle.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-oracle/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-oracle/dc3/data/driver/oracle
+VOLUME /dc3-driver/dc3-driver-oracle/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-oracle.jar"]
 
@@ -494,6 +536,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-postgresql/dc3/logs/driver/postgresql/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-postgresql/target/dc3-driver-postgresql.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-postgresql/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-postgresql/dc3/data/driver/postgresql
+VOLUME /dc3-driver/dc3-driver-postgresql/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-postgresql.jar"]
 
@@ -507,6 +551,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-serial/dc3/logs/driver/serial/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-serial/target/dc3-driver-serial.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-serial/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-serial/dc3/data/driver/serial
+VOLUME /dc3-driver/dc3-driver-serial/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-serial.jar"]
 
@@ -520,6 +566,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-sl651/dc3/logs/driver/sl651/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-sl651/target/dc3-driver-sl651.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-sl651/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-sl651/dc3/data/driver/sl651
+VOLUME /dc3-driver/dc3-driver-sl651/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-sl651.jar"]
 
@@ -533,6 +581,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-snmp/dc3/logs/driver/snmp/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-snmp/target/dc3-driver-snmp.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-snmp/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-snmp/dc3/data/driver/snmp
+VOLUME /dc3-driver/dc3-driver-snmp/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-snmp.jar"]
 
@@ -546,6 +596,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-sqlserver/dc3/logs/driver/sqlserver/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-sqlserver/target/dc3-driver-sqlserver.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-sqlserver/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-sqlserver/dc3/data/driver/sqlserver
+VOLUME /dc3-driver/dc3-driver-sqlserver/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-sqlserver.jar"]
 
@@ -559,6 +611,8 @@ RUN mkdir -p /dc3-driver/dc3-driver-tcp-udp/dc3/logs/driver/tcp-udp/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-tcp-udp/target/dc3-driver-tcp-udp.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-tcp-udp/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-tcp-udp/dc3/data/driver/tcp-udp
+VOLUME /dc3-driver/dc3-driver-tcp-udp/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-tcp-udp.jar"]
 
@@ -572,5 +626,7 @@ RUN mkdir -p /dc3-driver/dc3-driver-zigbee/dc3/logs/driver/zigbee/gc
 COPY --from=builder /build/dc3-driver/dc3-driver-zigbee/target/dc3-driver-zigbee.jar ./
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 VOLUME /dc3-driver/dc3-driver-zigbee/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-zigbee/dc3/data/driver/zigbee
+VOLUME /dc3-driver/dc3-driver-zigbee/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-zigbee.jar"]
