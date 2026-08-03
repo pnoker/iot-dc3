@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.agentic.dal.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import io.github.pnoker.common.agentic.dal.ModelConfigManager;
 import io.github.pnoker.common.agentic.entity.model.ModelConfigDO;
 import io.github.pnoker.common.agentic.mapper.ModelConfigMapper;
