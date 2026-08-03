@@ -103,7 +103,7 @@ public class AgenticChatRequestPreparer {
         String requestSystemContext = buildRequestSystemContext(contexts);
         List<MessageBO> memoryHistory = loadMemoryHistory(scopedConversationId);
         log.debug("Agentic memory loaded, scopedConversationId={}, memoryEnabled={}, count={}",
-                scopedConversationId, properties.isMemoryEnabled(), memoryHistory.size());
+                sanitize(scopedConversationId), properties.isMemoryEnabled(), memoryHistory.size());
         AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, contexts, memoryHistory,
                 toolCallingEnabled);
 
@@ -212,7 +212,7 @@ public class AgenticChatRequestPreparer {
         try {
             return messageService.loadHistory(scopedConversationId, properties.getHistoryWindowSize());
         } catch (Exception e) {
-            log.debug("Agentic memory history load failed, conversationId={}", scopedConversationId, e);
+            log.debug("Agentic memory history load failed, conversationId={}", sanitize(scopedConversationId), e);
             return List.of();
         }
     }
@@ -249,7 +249,7 @@ public class AgenticChatRequestPreparer {
         } catch (Exception e) {
             log.warn(
                     "Agentic session touch failed, tenantId={}, userId={}, conversationId={}",
-                    userHeader.getTenantId(), userHeader.getUserId(), conversationId, e);
+                    userHeader.getTenantId(), userHeader.getUserId(), sanitize(conversationId), e);
         }
     }
 

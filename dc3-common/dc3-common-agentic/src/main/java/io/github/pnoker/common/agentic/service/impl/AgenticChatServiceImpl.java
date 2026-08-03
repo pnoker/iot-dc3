@@ -95,14 +95,14 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                                 assistantReasoningContent.toString(), userHeader);
                         log.info(
                                 "Agentic stream complete, conversationId={}, model={}, contentLen={}, finishReason={}",
-                                prepared.scopedConversationId(), sanitize(prepared.model()), assistantContent.length(),
+                                sanitize(prepared.scopedConversationId()), sanitize(prepared.model()), assistantContent.length(),
                                 lastFinishReason.get());
                     });
 
             Flux<ServerSentEvent<String>> initialEvents = Flux.fromIterable(responseCodec.initialEvents(prepared));
             Flux<ServerSentEvent<String>> responseEvents = runtimeEvents.onErrorResume(error -> {
                 log.warn("Agentic stream chat failed, conversationId={}, model={}",
-                        prepared.scopedConversationId(), sanitize(prepared.model()), error);
+                        sanitize(prepared.scopedConversationId()), sanitize(prepared.model()), error);
                 lastFinishReason.set(AgenticConstant.Chat.FINISH_REASON_ERROR);
                 prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
                 return Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created, AgenticStreamDelta.empty()))
@@ -139,7 +139,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             String assistantText = StringUtils.defaultString(result.content());
             messageRecorder.persistAssistantMessage(prepared, assistantText, userHeader);
             log.info("Agentic blocking complete, conversationId={}, model={}, contentLen={}, finishReason={}",
-                    prepared.scopedConversationId(), sanitize(prepared.model()), assistantText.length(), result.finishReason());
+                    sanitize(prepared.scopedConversationId()), sanitize(prepared.model()), assistantText.length(), result.finishReason());
 
             return responseCodec.blockingResponse(prepared, assistantText, result.finishReason());
         }).subscribeOn(Schedulers.boundedElastic());

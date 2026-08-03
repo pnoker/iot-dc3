@@ -125,7 +125,7 @@ public class ChatClientFactory {
         if (StringUtils.isNotBlank(fallback)) {
             if (StringUtils.isNotBlank(candidate) && !StringUtils.equals(candidate, fallback)) {
                 log.warn("Agentic requested model is not configured, falling back to Spring AI model, requestedModel={}, fallbackModel={}",
-                        candidate, fallback);
+                        sanitize(candidate), sanitize(fallback));
             }
             return fallback;
         }
