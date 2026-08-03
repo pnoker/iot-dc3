@@ -18,11 +18,8 @@
 package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.biz.PointValueService;
-import io.github.pnoker.common.data.entity.property.PointBatchProperties;
-import io.github.pnoker.common.data.job.PointValueJob;
+import io.github.pnoker.common.data.buffer.PointValueIngestBuffer;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +33,12 @@ import java.util.Objects;
 /**
  * RabbitMQ receiver for point value ingestion events.
  *
+ * <p>Every valid message is handed to {@link PointValueIngestBuffer}; ack when accepted,
+ * nack-requeue when the buffer is full so RabbitMQ back-pressures instead of the center
+ * OOM-ing. Uses the high-throughput container factory (wider prefetch / concurrency).
+ *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.7.8
  * @since 2016.10.1
  */
 @Slf4j
@@ -45,21 +46,19 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointValueReceiver {
 
-    private final PointBatchProperties pointBatchProperties;
-
-    private final PointValueService pointValueService;
+    private final PointValueIngestBuffer pointValueIngestBuffer;
 
     /**
-     * Consume a point value message: route it to the batch buffer when the receive speed
-     * exceeds the threshold, otherwise save it directly. Manual ack on success, requeue
-     * on failure.
+     * Consume a point value message: validate, offer to the ingest buffer, ack on success or
+     * nack-requeue when the buffer is full (back-pressure). Invalid messages are rejected.
      *
      * @param channel      the RabbitMQ channel for manual ack
      * @param message      the raw message carrying the delivery tag
      * @param pointValueBO the deserialized point value
      */
     @RabbitHandler
-    @RabbitListener(queues = "#{pointValueQueue.name}")
+    @RabbitListener(queues = "#{pointValueQueue.name}",
+            containerFactory = "highThroughputRabbitListenerContainerFactory")
     public void pointValueReceive(Channel channel, Message message, PointValueBO pointValueBO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
@@ -69,27 +68,19 @@ public class PointValueReceiver {
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
-            PointValueJob.recordPointValue();
-            log.debug("Receive point value from: {}, {}", message.getMessageProperties().getReceivedRoutingKey(),
-                    JsonUtil.toJsonString(pointValueBO));
-
-            // Judge whether to process data in batch according to the data transmission
-            // speed
-            if (PointValueJob.getValueSpeed() < pointBatchProperties.getSpeed()) {
-                // Save point value to local latest-value cache and repository storage
-                pointValueService.save(pointValueBO);
+            if (pointValueIngestBuffer.offer(pointValueBO)) {
+                RabbitAckUtil.ack(channel, deliveryTag);
             } else {
-                // Save point value to schedule
-                PointValueJob.addPointValues(pointValueBO);
+                log.warn("Point value ingest buffer full, nack-requeue to back-pressure, deviceId={}, pointId={}",
+                        pointValueBO.getDeviceId(), pointValueBO.getPointId());
+                RabbitAckUtil.nack(channel, deliveryTag, true);
             }
-            RabbitAckUtil.ack(channel, deliveryTag);
         } catch (Exception e) {
-            log.error("Point value consume failed, deviceId={}, pointId={}, deliveryTag={}, routingKey={}",
+            log.error("Point value consume failed, deviceId={}, pointId={}, deliveryTag={}",
                     Objects.nonNull(pointValueBO) ? pointValueBO.getDeviceId() : null,
                     Objects.nonNull(pointValueBO) ? pointValueBO.getPointId() : null,
-                    deliveryTag, message.getMessageProperties().getReceivedRoutingKey(), e);
+                    deliveryTag, e);
             RabbitAckUtil.nack(channel, deliveryTag, true);
         }
     }
-
 }

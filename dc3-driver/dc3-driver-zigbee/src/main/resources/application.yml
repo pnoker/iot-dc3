@@ -105,6 +105,10 @@ dc3:
         default-value: 0
         remark: Attribute ID for writing
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/zigbee/buffer.db
+
 spring:
   application:
     name: @project.artifactId@

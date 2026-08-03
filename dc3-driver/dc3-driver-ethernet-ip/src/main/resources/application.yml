@@ -71,6 +71,10 @@ dc3:
         attribute-type-flag: STRING
         default-value: '${value}'
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/ethernet-ip/buffer.db
+
 spring:
   application:
     name: @project.artifactId@

@@ -46,8 +46,32 @@ management:
   endpoints:
     web:
       exposure:
-        # Expose health and Prometheus endpoints for readiness and metrics scraping.
-        include: health,prometheus
+        # Expose health, Prometheus, and additional observability endpoints.
+        include: health,prometheus,info,metrics
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+  # OpenTelemetry Tracing Configuration (Production-grade)
+  tracing:
+    enabled: ${OTEL_TRACING_ENABLED:true}
+    sampling:
+      probability: ${OTEL_TRACING_SAMPLING_PROBABILITY:1.0} # 1.0 for development, reduce to 0.1-0.3 in production
+    propagation:
+      type: B3,W3C # B3 for legacy systems, W3C for standard trace context
+    baggage:
+      enabled: true
+    export:
+      otlp:
+        enabled: ${OTEL_OTLP_EXPORTER_ENABLED:true} # Enable OTLP exporter by default
+  # OTLP tracing export endpoint (Spring Boot: management.otlp.tracing.*, NOT management.tracing.otlp.*)
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://dc3-jaeger:4318/v1/traces}
+      timeout: ${OTEL_EXPORTER_OTLP_TIMEOUT:10s}
+      compression: gzip
 
 # OpenAPI / Swagger UI baseline, shared by every web service (auth, manager,
 # data, agentic, single) through the auto-activated "web" profile. Document
