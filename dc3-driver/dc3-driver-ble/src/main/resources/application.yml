@@ -85,6 +85,10 @@ dc3:
         default-value: ''
         remark: GATT Characteristic UUID for writing
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/ble/buffer.db
+
 spring:
   application:
     name: @project.artifactId@
