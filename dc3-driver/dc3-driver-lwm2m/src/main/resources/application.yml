@@ -100,6 +100,10 @@ dc3:
     secure-port: 5684
     security-mode: NOSEC
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/lwm2m/buffer.db
+
 spring:
   application:
     name: @project.artifactId@

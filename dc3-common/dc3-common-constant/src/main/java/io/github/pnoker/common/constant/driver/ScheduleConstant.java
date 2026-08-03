@@ -55,6 +55,11 @@ public class ScheduleConstant {
     public static final String DEVICE_HEALTH_SCHEDULE_JOB = "device-health-schedule-job";
 
     /**
+     * Buffer republish schedule job
+     */
+    public static final String BUFFER_REPUBLISH_SCHEDULE_JOB = "buffer-republish-schedule-job";
+
+    /**
      * Driver health schedule cron
      */
     public static final String DRIVER_HEALTH_SCHEDULE_CRON = "0/15 * * * * ?";

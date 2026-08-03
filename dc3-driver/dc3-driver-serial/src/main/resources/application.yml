@@ -128,6 +128,10 @@ dc3:
         remark:
           Byte order for encoding value: BIG, LITTLE
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/serial/buffer.db
+
 spring:
   application:
     name: @project.artifactId@
