@@ -312,11 +312,23 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
             }
             case "SINT" -> {
                 buf = ByteBuffer.allocate(1);
-                buf.put(Byte.parseByte(value));
+                byte b;
+                try {
+                    b = Byte.parseByte(value);
+                } catch (NumberFormatException e) {
+                    b = 0;
+                }
+                buf.put(b);
             }
             case "INT" -> {
                 buf = ByteBuffer.allocate(2);
-                buf.order(ByteOrder.LITTLE_ENDIAN).putShort(Short.parseShort(value));
+                short s;
+                try {
+                    s = Short.parseShort(value);
+                } catch (NumberFormatException e) {
+                    s = 0;
+                }
+                buf.order(ByteOrder.LITTLE_ENDIAN).putShort(s);
             }
             case "DINT" -> {
                 buf = ByteBuffer.allocate(4);
@@ -332,7 +344,13 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
             }
             case "REAL" -> {
                 buf = ByteBuffer.allocate(4);
-                buf.order(ByteOrder.LITTLE_ENDIAN).putFloat(Float.parseFloat(value));
+                float f;
+                try {
+                    f = Float.parseFloat(value);
+                } catch (NumberFormatException e) {
+                    f = 0f;
+                }
+                buf.order(ByteOrder.LITTLE_ENDIAN).putFloat(f);
             }
             default -> buf = ByteBuffer.wrap(value.getBytes(StandardCharsets.US_ASCII));
         }

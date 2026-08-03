@@ -63,7 +63,7 @@ class Sl651DriverCustomServiceImplTest {
 
     @Test
     void forwardTelemetryMapsStationElementsToConfiguredPoints() {
-        driverMetadata.getDeviceIds().add(10L);
+        driverMetadata.addDeviceId(10L);
         DeviceBO device = new DeviceBO();
         device.setId(10L);
         device.setDeviceCode("01020304");

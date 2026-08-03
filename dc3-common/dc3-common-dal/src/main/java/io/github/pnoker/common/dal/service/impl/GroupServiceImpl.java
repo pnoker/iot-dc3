@@ -241,7 +241,8 @@ public class GroupServiceImpl implements GroupService {
             }
         }
 
-        Byte parentLevel = Objects.isNull(parent.getGroupLevel()) ? 0 : parent.getGroupLevel();
+        Byte groupLevel = parent.getGroupLevel();
+        byte parentLevel = groupLevel == null ? 0 : groupLevel;
         entityBO.setGroupLevel((byte) (parentLevel + 1));
     }
 

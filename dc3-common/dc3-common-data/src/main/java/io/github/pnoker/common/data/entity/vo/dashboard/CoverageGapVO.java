@@ -26,6 +26,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -55,6 +56,25 @@ public class CoverageGapVO implements Serializable {
 
     @Schema(description = "capped list of offending point/profile ids")
     private List<Item> items = new ArrayList<>();
+
+    /**
+     * Unmodifiable view of the offending items, so callers cannot mutate internal state
+     * through the getter. Use {@link #addItem(Item)} to append.
+     *
+     * @return unmodifiable view of the items list
+     */
+    public List<Item> getItems() {
+        return Collections.unmodifiableList(items);
+    }
+
+    /**
+     * Append one offending item to the internal list.
+     *
+     * @param item item to append
+     */
+    public void addItem(Item item) {
+        items.add(item);
+    }
 
     @Getter
     @Setter

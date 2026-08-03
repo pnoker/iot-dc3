@@ -683,7 +683,7 @@ public class DashboardServiceImpl implements DashboardService {
             CoverageGapVO.Item it = new CoverageGapVO.Item();
             it.setPointId(r.getPointId());
             it.setProfileId(r.getProfileId());
-            vo.getItems().add(it);
+            vo.addItem(it);
         }
         // missingPoints = actual count; items may be capped. Use a second
         // query only if we hit the cap — otherwise items.size() is authoritative.

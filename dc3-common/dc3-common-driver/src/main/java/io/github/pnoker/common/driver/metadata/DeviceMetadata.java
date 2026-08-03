@@ -86,7 +86,7 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
         if (value == null) {
             // Manager has dropped this device; drop the orphan id so the Quartz read
             // scan stops attempting to read a record that no longer exists.
-            if (driverMetadata.getDeviceIds().remove(id)) {
+            if (driverMetadata.removeDeviceId(id)) {
                 log.info("Drop orphan device id={} after upstream returned null", id);
             }
         }
@@ -114,7 +114,7 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
         }
 
         Map<Long, DriverAttributeConfigDTO> attributeConfigMap = device.getDriverAttributeConfigIdMap();
-        if (MapUtils.isEmpty(attributeConfigMap)
+        if (attributeConfigMap == null || attributeConfigMap.isEmpty()
                 || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
             log.warn("Driver config incomplete, deviceId={}, required={}, configured={}",
                     deviceId, attributeMap.keySet(),
@@ -200,7 +200,7 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
         }
 
         Map<Long, PointAttributeConfigDTO> attributeConfigMap = pointAttributeConfigMap.get(pointId);
-        if (MapUtils.isEmpty(attributeConfigMap)
+        if (attributeConfigMap == null || attributeConfigMap.isEmpty()
                 || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
             log.warn("Point config incomplete, deviceId={}, pointId={}, required={}, configured={}",
                     deviceId, pointId, attributeMap.keySet(),
@@ -288,7 +288,7 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
         }
 
         Map<Long, CommandAttributeConfigDTO> attributeConfigMap = commandAttributeConfigMap.get(commandId);
-        if (MapUtils.isEmpty(attributeConfigMap)
+        if (attributeConfigMap == null || attributeConfigMap.isEmpty()
                 || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
             log.warn("Command config incomplete, deviceId={}, commandId={}, required={}, configured={}",
                     deviceId, commandId, attributeMap.keySet(),
@@ -375,7 +375,7 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
         }
 
         Map<Long, EventAttributeConfigDTO> attributeConfigMap = eventAttributeConfigMap.get(eventId);
-        if (MapUtils.isEmpty(attributeConfigMap)
+        if (attributeConfigMap == null || attributeConfigMap.isEmpty()
                 || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
             log.warn("Event config incomplete, deviceId={}, eventId={}, required={}, configured={}",
                     deviceId, eventId, attributeMap.keySet(),
