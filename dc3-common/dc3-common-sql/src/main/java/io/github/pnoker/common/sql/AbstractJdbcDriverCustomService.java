@@ -181,9 +181,6 @@ public abstract class AbstractJdbcDriverCustomService implements DriverCustomSer
      */
     protected HikariDataSource getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         return connectMap.computeIfAbsent(deviceId, id -> {
-            String host = getConfigValue(driverConfig, "host", "localhost");
-            int port = getConfigIntValue(driverConfig, "port", getDefaultPort());
-            String database = getRequiredConfig(driverConfig, "database");
             String username = getConfigValue(driverConfig, "username", "root");
             String password = getConfigValue(driverConfig, "password", "");
             int queryTimeout = getConfigIntValue(driverConfig, "queryTimeout", 30);

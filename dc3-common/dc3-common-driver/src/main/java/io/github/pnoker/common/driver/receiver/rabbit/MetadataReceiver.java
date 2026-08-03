@@ -78,7 +78,10 @@ public class MetadataReceiver {
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getId())
                     || Objects.isNull(entityDTO.getMetadataType())
                     || Objects.isNull(entityDTO.getOperateType())) {
-                log.error("Invalid driver metadata: {}", entityDTO);
+                log.error("Invalid driver metadata: id={}, type={}, operate={}",
+                        Objects.nonNull(entityDTO) ? entityDTO.getId() : null,
+                        Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
+                        Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null);
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

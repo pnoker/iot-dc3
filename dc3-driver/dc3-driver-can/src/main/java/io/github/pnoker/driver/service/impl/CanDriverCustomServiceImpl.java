@@ -26,7 +26,6 @@ import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
-import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
@@ -79,17 +78,14 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
             java.util.regex.Pattern.compile("^[A-Za-z0-9_]+$");
 
     private final DriverMetadata driverMetadata;
-    private final DriverSenderService driverSenderService;
 
     @Value("${dc3.driver.code}")
     private String driverCode;
 
     private Map<Long, Boolean> deviceMap;
 
-    public CanDriverCustomServiceImpl(DriverMetadata driverMetadata,
-                                      DriverSenderService driverSenderService) {
+    public CanDriverCustomServiceImpl(DriverMetadata driverMetadata) {
         this.driverMetadata = driverMetadata;
-        this.driverSenderService = driverSenderService;
     }
 
     private static void checkRequired(Map<String, AttributeBO> config, String code,

@@ -60,11 +60,6 @@ public class MqttConfig {
     private final MqttProperties mqttProperties;
 
     /**
-     * Constructor for MQTT configuration
-     *
-     * @param mqttProperties MQTT configuration properties
-     */
-    /**
      * MQTT inbound message channel bean
      *
      * @return DirectChannel for inbound MQTT messages

@@ -55,16 +55,6 @@ public class ResourceRegistrar {
     private final Environment environment;
 
     /**
-     * Create a registrar that scans the current service and submits the inventory through
-     * the active facade implementation.
-     *
-     * @param scanner     endpoint scanner for the local WebFlux mappings
-     * @param facade      transport-neutral resource registry facade
-     * @param properties  registrar runtime options
-     * @param environment Spring environment used for service-name fallback
-     */
-
-    /**
      * Register scanned endpoints after the application is ready and all WebFlux handler
      * mappings have been built. Failures abort startup only when
      * {@code dc3.resource-registrar.fail-fast=true}; otherwise the service keeps running
