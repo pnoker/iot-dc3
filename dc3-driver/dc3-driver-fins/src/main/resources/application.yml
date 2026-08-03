@@ -102,6 +102,10 @@ dc3:
         attribute-type-flag: STRING
         default-value: UINT16
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/fins/buffer.db
+
 spring:
   application:
     name: @project.artifactId@

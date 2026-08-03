@@ -18,11 +18,8 @@
 package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.biz.PointValueService;
-import io.github.pnoker.common.data.entity.property.PointBatchProperties;
-import io.github.pnoker.common.data.job.PointValueJob;
+import io.github.pnoker.common.data.buffer.PointValueIngestBuffer;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,91 +28,70 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
+/**
+ * Verifies the receiver routes messages to the ingest buffer and applies back-pressure
+ * (nack-requeue) when the buffer is full.
+ *
+ * @author pnoker
+ * @version 2026.7.8
+ * @since 2026.7.8
+ */
 @ExtendWith(MockitoExtension.class)
 class PointValueReceiverTest {
 
     @Mock
-    private PointValueService pointValueService;
+    private PointValueIngestBuffer buffer;
 
     @Mock
     private Channel channel;
 
     private PointValueReceiver receiver;
     private Message message;
-    private PointBatchProperties properties;
 
     @BeforeEach
     void setUp() {
-        properties = new PointBatchProperties();
-        properties.setSpeed(100);
-        properties.setInterval(5);
-        receiver = new PointValueReceiver(properties, pointValueService);
-
+        receiver = new PointValueReceiver(buffer);
         MessageProperties props = new MessageProperties();
         props.setDeliveryTag(7L);
         message = new Message(new byte[0], props);
-        // Reset shared state used by the rate-throttling branch
-        PointValueJob.resetMetrics();
-        PointValueJob.clearPointValues();
-    }
-
-    @AfterEach
-    void resetSharedState() {
-        PointValueJob.resetMetrics();
-        PointValueJob.clearPointValues();
     }
 
     @Test
     void rejectsNullPayload() throws Exception {
         receiver.pointValueReceive(channel, message, null);
-        verifyNoInteractions(pointValueService);
+        verifyNoInteractions(buffer);
         verify(channel).basicReject(eq(7L), eq(false));
-        verify(channel, never()).basicAck(eq(7L), eq(false));
     }
 
     @Test
     void rejectsPayloadWithoutDeviceId() throws Exception {
         PointValueBO bo = PointValueBO.builder().pointId(20L).build();
         receiver.pointValueReceive(channel, message, bo);
-        verifyNoInteractions(pointValueService);
+        verifyNoInteractions(buffer);
         verify(channel).basicReject(eq(7L), eq(false));
     }
 
     @Test
-    void belowSpeedThresholdSavesImmediatelyAndAcks() throws Exception {
+    void offersAndAcks() throws Exception {
         PointValueBO bo = PointValueBO.builder().deviceId(10L).pointId(20L).rawValue("v").build();
-        // VALUE_SPEED defaults to 0 in setUp, below the 100 threshold
+        when(buffer.offer(bo)).thenReturn(true);
         receiver.pointValueReceive(channel, message, bo);
-        verify(pointValueService).save(bo);
+        verify(buffer).offer(bo);
         verify(channel).basicAck(eq(7L), eq(false));
-        // Counter is incremented per message — pinned so the job-side rate calculation
-        // stays accurate.
-        assertThat(PointValueJob.getValueCount()).isEqualTo(1);
     }
 
     @Test
-    void aboveSpeedThresholdBuffersToScheduleAndAcks() throws Exception {
-        properties.setSpeed(0);
+    void nacksAndRequeuesWhenBufferFull() throws Exception {
         PointValueBO bo = PointValueBO.builder().deviceId(10L).pointId(20L).rawValue("v").build();
+        when(buffer.offer(bo)).thenReturn(false);
         receiver.pointValueReceive(channel, message, bo);
-        verify(pointValueService, never()).save(any(PointValueBO.class));
-        verify(channel).basicAck(eq(7L), eq(false));
-        assertThat(PointValueJob.getPointValuesSize()).isEqualTo(1);
-    }
-
-    @Test
-    void nacksAndRequeuesOnServiceFailure() throws Exception {
-        PointValueBO bo = PointValueBO.builder().deviceId(10L).pointId(20L).rawValue("v").build();
-        org.mockito.Mockito.doThrow(new RuntimeException("downstream offline"))
-                .when(pointValueService).save(any(PointValueBO.class));
-        receiver.pointValueReceive(channel, message, bo);
+        verify(buffer).offer(bo);
         verify(channel).basicNack(eq(7L), eq(false), eq(true));
         verify(channel, never()).basicAck(eq(7L), eq(false));
     }

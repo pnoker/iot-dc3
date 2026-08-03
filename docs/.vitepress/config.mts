@@ -18,6 +18,9 @@
 import {defineConfig} from 'vitepress'
 import {Lang, t} from './i18n'
 import {transformHead} from './seo.mts'
+import {resolveVersion} from './version.mts'
+
+const versionInfo = resolveVersion()
 
 // ── i18n via locales/{lang}.json ──
 // All user-facing strings are resolved through t(lang, key).
@@ -33,17 +36,15 @@ type Pillar = {
     groups: ReadonlyArray<Group>
 }
 
-// Pillar order: 架构 → 驱动 → AI → 基础 → 开发 (after nav 首页)
+// Pillar order: 总览 → 架构 → 驱动 → AI → 基础 → 开发 → 运维 (after nav 首页)
 const PILLARS: ReadonlyArray<Pillar> = [
-    {   // ①
-        navKey: 'pillar.architecture', landing: 'architecture',
-        paths: ['architecture', 'modules', 'introduction'],
-        activeMatch: '^/(zh|en)/(architecture|modules|introduction)/',
+    {   // ① 总览
+        navKey: 'pillar.overview', landing: 'introduction',
+        paths: ['introduction', 'quickstart'], activeMatch: '^/(zh|en)/(introduction|quickstart)/',
         groups: [
-            {key: '', items: [['architecture']]},
             {
-                key: 'group.project-overview',
-                items: [['introduction'], ['introduction/concepts'], ['introduction/paths'], ['introduction/concepts/tenant']]
+                key: '',
+                items: [['introduction'], ['introduction/concepts'], ['introduction/paths']]
             },
             {
                 key: 'group.objects-data',
@@ -51,18 +52,26 @@ const PILLARS: ReadonlyArray<Pillar> = [
             },
             {
                 key: 'group.capabilities-boundaries',
-                items: [['introduction/concepts/command'], ['introduction/concepts/event'], ['introduction/concepts/attribute-config']]
+                items: [['introduction/concepts/command'], ['introduction/concepts/event'], ['introduction/concepts/attribute-config'], ['introduction/concepts/tenant']]
             },
+            {key: 'group.quickstart', items: [['quickstart'], ['quickstart/environment'], ['quickstart/first-device']]},
+            {key: 'group.appendix', items: [['introduction/glossary'], ['introduction/license']]}
+        ]
+    },
+    {   // ② 架构
+        navKey: 'pillar.architecture', landing: 'architecture',
+        paths: ['architecture', 'modules'], activeMatch: '^/(zh|en)/(architecture|modules)/',
+        groups: [
+            {key: '', items: [['architecture']]},
             {key: 'group.services-collab', items: [['architecture/services'], ['architecture/facade-modes']]},
             {
                 key: 'group.pipelines-model',
                 items: [['architecture/data-plane'], ['architecture/command-plane'], ['architecture/auth-rbac'], ['architecture/domain-model']]
             },
-            {key: 'group.modules', items: [['architecture/modules'], ['modules']]},
-            {key: 'group.appendix', items: [['introduction/glossary'], ['introduction/license']]}
+            {key: 'group.modules', items: [['architecture/modules'], ['modules']]}
         ]
     },
-    {   // ②
+    {   // ③ 驱动
         navKey: 'pillar.drivers', landing: 'drivers',
         paths: ['drivers', 'operation/device-onboarding'],
         activeMatch: '^/(zh|en)/(drivers/|operation/device-onboarding)',
@@ -89,7 +98,7 @@ const PILLARS: ReadonlyArray<Pillar> = [
             {key: 'group.appendix-drivers', items: [['drivers/matrix']]}
         ]
     },
-    {   // ③
+    {   // ④ AI
         navKey: 'pillar.ai',
         landing: 'ai',
         paths: ['ai'],
@@ -99,7 +108,7 @@ const PILLARS: ReadonlyArray<Pillar> = [
             {key: 'group.ai-integration', items: [['ai/agentic'], ['ai/mcp'], ['ai/spring-ai-deep-dive']]}
         ]
     },
-    {   // ④
+    {   // ⑤ 基础
         navKey: 'pillar.foundations', landing: 'foundations',
         paths: ['foundations'], activeMatch: '^/(zh|en)/foundations/',
         groups: [
@@ -111,24 +120,29 @@ const PILLARS: ReadonlyArray<Pillar> = [
             {key: 'group.security', items: [['foundations/security']]}
         ]
     },
-    {   // ⑤
+    {   // ⑥ 开发
         navKey: 'pillar.develop',
         landing: 'development',
-        paths: ['development', 'frontend', 'automation', 'quickstart', 'operation', 'guide'],
-        activeMatch: '^/(zh|en)/(development|frontend|automation|quickstart|operation|guide)/',
+        paths: ['development', 'frontend', 'automation'],
+        activeMatch: '^/(zh|en)/(development|frontend|automation)/',
         groups: [
-            {key: 'group.quickstart', items: [['quickstart'], ['quickstart/environment'], ['quickstart/first-device']]},
-            {
-                key: 'group.deploy-ops',
-                items: [['guide/usage'], ['guide/observability'], ['guide/logging'], ['guide/troubleshooting']]
-            },
             {
                 key: 'group.development',
                 items: [['development'], ['development/driver-authoring'], ['development/api-documentation'], ['development/technology-stack'], ['development/testing'], ['development/changelog']]
             },
             {key: 'group.frontend', items: [['frontend'], ['frontend/test-debugging']]},
-            {key: 'group.automation', items: [['automation/cli']]},
-            {key: 'group.operations', items: [['operation'], ['operation/data-commands'], ['operation/alarms']]}
+            {key: 'group.automation', items: [['automation/cli']]}
+        ]
+    },
+    {   // ⑦ 运维
+        navKey: 'pillar.operations', landing: 'operation',
+        paths: ['operation', 'guide'], activeMatch: '^/(zh|en)/(operation|guide)/',
+        groups: [
+            {key: 'group.operations', items: [['operation'], ['operation/data-commands'], ['operation/alarms']]},
+            {
+                key: 'group.deploy-ops',
+                items: [['guide/usage'], ['guide/observability'], ['guide/logging'], ['guide/troubleshooting']]
+            }
         ]
     }
 ]
@@ -271,6 +285,11 @@ export default defineConfig({
         // Preconnect to analytics origins so the first request isn't blocked on a cold DNS/TLS handshake
         ['link', {rel: 'preconnect', href: 'https://www.googletagmanager.com'}],
         ['link', {rel: 'preconnect', href: 'https://hm.baidu.com'}],
+        // Version meta — read at runtime by VersionSwitcher and VersionBanner
+        ['meta', {name: 'dc3-doc-version', content: versionInfo.version}],
+        ['meta', {name: 'dc3-doc-full-version', content: versionInfo.fullVersion}],
+        ['meta', {name: 'dc3-doc-is-latest', content: String(versionInfo.isLatest)}],
+        ['meta', {name: 'dc3-doc-latest-url', content: 'https://docs.dc3.site'}],
         // Google Analytics (GA4)
         ['script', {async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0S37KX68Y3'}],
         ['script', {}, `window.dataLayer = window.dataLayer || [];

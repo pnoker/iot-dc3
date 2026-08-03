@@ -85,6 +85,10 @@ dc3:
         default-value:
         remark: SQL query to execute for command
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/postgresql/buffer.db
+
 spring:
   application:
     name: @project.artifactId@
