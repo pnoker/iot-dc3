@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.init;
 
+import io.github.pnoker.common.driver.buffer.BufferService;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverRegisterService;
@@ -64,6 +65,9 @@ public class DriverInitRunner implements ApplicationRunner {
 
     private final DriverScheduleService driverScheduleService;
 
+    /** Local point-value buffer, initialized before registration so readings survive a manager outage. */
+    private final BufferService bufferService;
+
     /**
      * Runs the driver bootstrap sequence on startup: register with the manager center
      * (with retry), execute custom initialization, then initialize scheduled tasks.
@@ -73,6 +77,10 @@ public class DriverInitRunner implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        // Initialize the local point-value buffer before registration so collected
+        // readings can be persisted even if the manager center is unreachable.
+        bufferService.initialize();
+
         // Initialize driver registration and synchronize basic information with the
         // platform; tolerate manager center being temporarily unavailable.
         registerWithRetry();

@@ -1,48 +1,36 @@
-# Test Debugging FAQ
+# 测试调试常见问题
 
-Quick answers to the failures that recur most often when writing or running
-the frontend tests. Pair this with `tests/README.md` (in the `dc3-web/` project) for
-the conventions, and `tests/guardrails/ai-guardrails.test.ts` for the
-mechanically-enforced rules.
+这里汇总编写或运行前端测试时最常反复出现的报错，并给出快速解答。测试约定参见 `dc3-web/` 项目下的 `tests/README.md`，机械执行的规则参见
+`tests/guardrails/ai-guardrails.test.ts`。
 
-## "Unexpected Vue warning: ..." thrown from a test
+## 测试抛出 "Unexpected Vue warning: ..."
 
-The setup file in `tests/setup/vitest.setup.ts` promotes `[Vue warn]` /
-`[Vue error]` to thrown errors. The most common causes:
+`tests/setup/vitest.setup.ts` 这个 setup 文件会把 `[Vue warn]` / `[Vue error]` 提升为抛出的错误。最常见的几类原因：
 
-- **Failed to resolve component: el-xxx** — the component template uses an
-  Element Plus component you haven't stubbed. Add it to `layoutStubs` in
-  `tests/setup/stubs/element-plus.ts` (preferred) or pass it under
-  `global.stubs` in the mount call.
-- **injection "Symbol(router)" not found** — the component calls
-  `useRouter()` / `useRoute()` but the test didn't mount with a router.
-  Use a memory router:
+- **Failed to resolve component: el-xxx** —— 组件模板里用到了一个你还没有 stub 的 Element Plus 组件。把它加到 `tests/setup/stubs/element-plus.ts`
+  的 `layoutStubs` 中（推荐），或在挂载时通过 `global.stubs` 传入。
+- **injection "Symbol(router)" not found** —— 组件调用了 `useRouter()` / `useRoute()`，但测试挂载时没有提供 router。使用内存 router：
   ```ts
   import { createMemoryHistory, createRouter } from 'vue-router';
   const router = createRouter({ history: createMemoryHistory(), routes: [...] });
   mount(Comp, { global: { plugins: [i18n, router] } });
   ```
-- **Failed setting prop "modelValue"** — already in the allowlist; if you
-  see a different prop, add the regex to `VUE_WARN_ALLOWLIST` with a comment
-  explaining why it can't be fixed at the source.
+- **Failed setting prop "modelValue"** —— 已在允许名单中；如果报的是别的 prop，把对应的正则加到 `VUE_WARN_ALLOWLIST`，并附注释说明为何无法在源头修复。
 
-To temporarily bypass while debugging locally:
+本地调试时如需临时绕过：
 
 ```bash
 VITEST_ALLOW_VUE_WARN=1 pnpm test
 ```
 
-Don't commit code that needs the bypass — the warning indicates a real
-contract gap.
+不要提交需要绕过的代码 —— 这条警告意味着存在真实的契约缺口。
 
-## "Cannot access X before initialization" in vi.mock factory
+## vi.mock 工厂里出现 "Cannot access X before initialization"
 
-Symptom: `ReferenceError: Cannot access 'someMock' before initialization`
-pointing at a `vi.mock(...)` call. Root cause: the factory references a
-top-level `const`, but `vi.mock` is hoisted to the top of the file by
-Vitest, so the const isn't initialized yet.
+现象：`ReferenceError: Cannot access 'someMock' before initialization`，指向某个 `vi.mock(...)` 调用。根因是：工厂函数引用了一个顶层 `const`，而
+`vi.mock` 会被 Vitest 提升到文件顶部，此时这个 const 尚未初始化。
 
-Fix: wrap the spies in `vi.hoisted`:
+修复方式：用 `vi.hoisted` 包裹 spy：
 
 ```ts
 const apiMocks = vi.hoisted(() => ({
@@ -51,46 +39,32 @@ const apiMocks = vi.hoisted(() => ({
 vi.mock('@/api/foo', () => apiMocks);
 ```
 
-The shared-mocks guardrail enforces this for files with more than one
-`vi.mock`.
+对于包含多个 `vi.mock` 的文件，shared-mocks guardrail 会强制要求这种写法。
 
-## Test passes locally but fails on CI for "leftover state"
+## 本地通过、CI 上因 "leftover state" 失败
 
-Look for module-level state that survives between tests:
+排查在测试之间残留的模块级状态：
 
-- **Module-level reactive cache** (e.g. `useEntityNames`'s `cache` /
-  `inflight` objects). Reset by `vi.resetModules()` + re-importing in
-  `beforeEach`.
-- **Pinia store persisted across tests**. Always
-  `setActivePinia(createPinia())` in `beforeEach`.
-- **localStorage / sessionStorage**. The global setup clears these in
-  `afterEach`, but if your test relies on data being absent at the start
-  of the run, clear in `beforeEach` too.
+- **模块级响应式缓存**（例如 `useEntityNames` 的 `cache` / `inflight` 对象）。用 `vi.resetModules()` 并在 `beforeEach` 中重新 import 来重置。
+- **Pinia store 在测试间持久化**。始终在 `beforeEach` 中 `setActivePinia(createPinia())`。
+- **localStorage / sessionStorage**。全局 setup 会在 `afterEach` 清理它们，但如果你的测试依赖"运行开始时数据不存在"，也要在 `beforeEach` 中清理。
 
-## "as unknown as T" or "as never" guardrail failure
+## "as unknown as T" 或 "as never" guardrail 失败
 
-The guardrail forbids erasing types via double assertion. Replace with:
+这条 guardrail 禁止用双重断言抹除类型。改为：
 
-- A typed fixture builder: `function makeRequest(): Request { return { … }; }`
-- `// @ts-expect-error — intentionally invalid input for whitelist test`
-  on the single line that violates the contract.
+- 类型化的 fixture 构造器：`function makeRequest(): Request { return { … }; }`
+- 在违反契约的那一行单点标注 `// @ts-expect-error — intentionally invalid input for whitelist test`
 
-If the test really needs `as never` to satisfy a generic constraint, that
-usually means the production code is mistyped; fix it at the source.
+如果测试确实需要 `as never` 才能满足某个泛型约束，通常说明生产代码的类型标注有误，应在源头修复。
 
-## "tests/component/foo.test.ts contains wrapper.vm.x()" guardrail failure
+## "tests/component/foo.test.ts contains wrapper.vm.x()" guardrail 失败
 
-Drive the component through its public surface — props, slots, emits, DOM
-events. Calling `wrapper.vm.someMethod()` couples the test to internals
-that change whenever the component is refactored. If you genuinely need
-an escape hatch, use `defineExpose` in the component and call through the
-expose surface (still `wrapper.vm.someMethod()`, but tests survive the
-refactor because expose is part of the contract).
+请通过组件的公开表面驱动它 —— props、slots、emits、DOM 事件。调用 `wrapper.vm.someMethod()` 会让测试耦合到内部实现，一旦组件重构就会失效。如果确实需要逃生口，在组件里用 `defineExpose` 暴露，再通过 expose 表面调用（仍然是 `wrapper.vm.someMethod()`，但因为 expose 属于契约的一部分，测试在重构后仍能存活）。
 
-## "describe must use lowercase verb (no should...)" guardrail failure
+## "describe must use lowercase verb (no should...)" guardrail 失败
 
-Rephrase. The describe block names the subject, the it block names the
-behaviour:
+改写措辞。describe 块命名主语，it 块命名行为：
 
 ```ts
 // ❌
@@ -100,32 +74,22 @@ it('should validate before searching', …);
 it('validates before searching', …);
 ```
 
-## Coverage drops below threshold
+## 覆盖率低于阈值
 
-Run `pnpm test:coverage` locally. The console report shows per-file gaps.
-If you genuinely added new untested code, add the test; if you removed
-covered code (intentional refactor), the percentage may rise enough to
-hide the drop, otherwise lower the threshold in `vitest.config.ts` and
-flag it in the PR description.
+本地运行 `pnpm test:coverage`。控制台报告会显示每个文件的缺口。如果确实新增了未覆盖的代码，补上测试；如果你删除了被覆盖的代码（有意的重构），百分比可能足以掩盖下降，否则在 `vitest.config.ts` 中调低阈值并在 PR 描述中说明。
 
-Don't game the threshold by writing tautological tests — the
-"forbids tautological assertions" guardrail catches `expect(true).toBe(true)`.
+不要靠写同义反复的测试来应付阈值 —— "forbids tautological assertions" guardrail 会捕获 `expect(true).toBe(true)` 这类写法。
 
-## Snapshot diff is huge after a small API change
+## 一次小的 API 改动引发巨大的 snapshot diff
 
-The `tests/api/api-contracts.test.ts.snap` file is ~2800 lines because it
-covers every API wrapper. A small change to a wrapper triggers a small
-focused diff inside it; a giant diff means many wrappers shifted. Ask:
+`tests/api/api-contracts.test.ts.snap` 大约 2800 行，因为它覆盖了每一个 API wrapper。对某个 wrapper的小改动会触发其中一小段聚焦的 diff；如果出现巨大 diff，说明很多 wrapper 都发生了变化。自检：
 
-- Did the auth headers change shape? (storage-format change)
-- Did the URL prefix move? (proxy / version bump)
-- Was a new wrapper added to a tracked module?
+- 鉴权头的结构变了吗？（存储格式变更）
+- URL 前缀移动了吗？（代理 / 版本升级）
+- 是否往被追踪的模块里新增了 wrapper？
 
-Run `pnpm test:api -u` to update only after manually reading the diff.
+只有在人工阅读过 diff 之后，才运行 `pnpm test:api -u` 更新快照。
 
-## Where do new fixtures go?
+## 新的 fixture 应该放在哪里？
 
-`tests/fixtures/`. Don't inline a 30-line sample tree in a test if a
-sibling test could use the same shape. The guardrail checks the directory
-exists; convention asks you to keep adding files (`auth.ts`, `menu.ts`,
-`rows.ts` as starting points).
+放在 `tests/fixtures/`。如果某个兄弟测试可以复用同样的数据结构，就不要在测试里内联一个 30 行的样例树。guardrail 会检查该目录是否存在；约定要求你持续往里添加文件（`auth.ts`、`menu.ts`、`rows.ts` 可作为起点）。
