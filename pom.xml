@@ -96,7 +96,7 @@
         <sqlite-jdbc.version>3.53.2.0</sqlite-jdbc.version>
 
         <!-- Serialization and data formats -->
-        <tools.jackson.version>3.1.4</tools.jackson.version>
+        <tools.jackson.version>3.1.5</tools.jackson.version>
         <jackson.version>2.21.3</jackson.version>
         <jackson.annotations.version>2.21</jackson.annotations.version>
         <jaxb.version>4.0.9</jaxb.version>
