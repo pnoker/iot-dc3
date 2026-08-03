@@ -89,7 +89,7 @@
         <paho.mqttv3.version>1.2.5</paho.mqttv3.version>
 
         <!-- Data access -->
-        <mybatis.plus.version>3.5.16</mybatis.plus.version>
+        <mybatis.plus.version>3.5.17</mybatis.plus.version>
         <mybatis.plus.dynamic.version>4.5.0</mybatis.plus.dynamic.version>
         
         <!-- Embedded database for the driver local point-value buffer -->

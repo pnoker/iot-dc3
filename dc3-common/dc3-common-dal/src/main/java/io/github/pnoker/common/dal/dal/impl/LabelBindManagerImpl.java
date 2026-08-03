@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.dal.dal.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import io.github.pnoker.common.dal.dal.LabelBindManager;
 import io.github.pnoker.common.dal.entity.model.LabelBindDO;
 import io.github.pnoker.common.dal.mapper.LabelBindMapper;
