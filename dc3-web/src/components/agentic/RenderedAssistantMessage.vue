@@ -27,6 +27,7 @@
 
 <script lang="ts" setup>
 import {marked} from 'marked';
+import DOMPurify from 'dompurify';
 import {computed} from 'vue';
 import ChartBlock from './ChartBlock.vue';
 import {parseAssistantContent} from './assistantContent';
@@ -37,15 +38,11 @@ const props = defineProps<{ content: string; charts?: AgenticVisualizationSpec[]
 const segments = computed(() => parseAssistantContent(props.content).segments);
 const charts = computed(() => props.charts || []);
 
+// Assistant content is model output rendered via v-html, so it must be sanitized with
+// DOMPurify (script blocks, on* handlers, javascript:, data:/vbscript: schemes, mutation
+// XSS). The previous hand-rolled regex sanitizer missed several of these (CodeQL
+// js/bad-tag-filter, incomplete-*, url-scheme-check).
 const renderMarkdown = (text: string) => {
-  return sanitizeHtml(String(marked.parse(text)));
-};
-
-const sanitizeHtml = (html: string) => {
-  return html
-    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
-    .replace(/\son\w+="[^"]*"/gi, '')
-    .replace(/\son\w+='[^']*'/gi, '')
-    .replace(/javascript:/gi, '');
+  return DOMPurify.sanitize(String(marked.parse(text)), {USE_PROFILES: {html: true}});
 };
 </script>
