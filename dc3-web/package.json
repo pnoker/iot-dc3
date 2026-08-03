@@ -58,6 +58,7 @@
     "@element-plus/icons-vue": "^2.3.2",
     "axios": "^1.18.1",
     "dayjs": "^1.11.21",
+    "dompurify": "^3.4.12",
     "element-plus": "^2.14.3",
     "highlight.js": "^11.11.1",
     "js-base64": "^3.9.1",
