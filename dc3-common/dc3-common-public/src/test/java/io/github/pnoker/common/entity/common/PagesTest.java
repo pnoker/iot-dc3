@@ -37,17 +37,17 @@ class PagesTest {
         Pages pages = new Pages();
         pages.setStartTime(100L);
         pages.setEndTime(200L);
-        pages.getOrders().add(OrderItem.asc("name"));
+        pages.addOrder(OrderItem.asc("name"));
         assertThat(pages.getStartTime()).isEqualTo(100L);
         assertThat(pages.getEndTime()).isEqualTo(200L);
         assertThat(pages.getOrders()).hasSize(1);
     }
 
     @Test
-    void ordersListIsMutableInitially() {
+    void addOrderAppendsToInternalList() {
         Pages pages = new Pages();
         assertThat(pages.getOrders()).isEmpty();
-        pages.getOrders().add(OrderItem.desc("create_time"));
+        pages.addOrder(OrderItem.desc("create_time"));
         assertThat(pages.getOrders()).extracting(OrderItem::getColumn).contains("create_time");
     }
 }

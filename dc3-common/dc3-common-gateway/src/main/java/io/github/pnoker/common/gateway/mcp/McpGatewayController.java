@@ -77,6 +77,9 @@ public class McpGatewayController {
     private final McpGatewayProperties mcpGatewayProperties;
 
     private static Map<String, Object> orderedMap(Object... values) {
+        if (values.length % 2 != 0) {
+            throw new IllegalArgumentException("orderedMap requires key-value pairs (even number of arguments)");
+        }
         Map<String, Object> map = new LinkedHashMap<>();
         for (int i = 0; i < values.length; i += 2) {
             map.put(String.valueOf(values[i]), values[i + 1]);

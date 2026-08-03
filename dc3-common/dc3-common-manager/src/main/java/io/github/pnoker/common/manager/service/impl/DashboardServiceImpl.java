@@ -500,10 +500,10 @@ public class DashboardServiceImpl implements DashboardService {
         // Others never represents "nothing is happening".
         Map<Long, List<TopologyHiddenChildVO>> otherDevicesByDriver = new LinkedHashMap<>();
         for (TopologyDeviceRow r : filteredDevices) {
-            Long deviceId = r.getId();
+            long deviceId = r.getId();
             if (topDeviceIdSet.contains(deviceId))
                 continue;
-            Long drvId = r.getDriverId();
+            long drvId = r.getDriverId();
             TopologyHiddenChildVO hidden = new TopologyHiddenChildVO();
             hidden.setId("device:" + deviceId);
             hidden.setName(r.getDeviceName());
@@ -541,15 +541,15 @@ public class DashboardServiceImpl implements DashboardService {
         List<TopologyLinkVO> links = new ArrayList<>();
 
         for (TopologyDriverRow r : topDrivers) {
-            Long id = r.getId();
+            long id = r.getId();
             nodes.add(node("driver:" + id, driverNameById.get(id), 1, "driver", null));
         }
 
         // Driver → Device links. Edge weight in cardinality mode = 1 (one
         // relationship); in volume mode = that device's total pv count.
         for (TopologyDeviceRow r : topDevices) {
-            Long id = r.getId();
-            Long driverId = r.getDriverId();
+            long id = r.getId();
+            long driverId = r.getDriverId();
             String name = r.getDeviceName();
             nodes.add(node("device:" + id, name, 2, "device", null));
             long w = volumeMode ? nullZero(deviceWeight.get(id)) : 1L;
@@ -563,8 +563,16 @@ public class DashboardServiceImpl implements DashboardService {
             if (volumeMode) {
                 long sum = 0;
                 for (TopologyHiddenChildVO c : children) {
-                    long did = Long.parseLong(c.getId().substring("device:".length()));
-                    sum += nullZero(deviceWeight.get(did));
+                    String cid = c.getId();
+                    if (cid == null || !cid.startsWith("device:")) {
+                        continue;
+                    }
+                    try {
+                        long did = Long.parseLong(cid.substring("device:".length()));
+                        sum += nullZero(deviceWeight.get(did));
+                    } catch (NumberFormatException ignored) {
+                        // skip malformed device ids (shouldn't happen; ids are self-generated above)
+                    }
                 }
                 w = Math.max(1L, sum);
             } else {
@@ -629,7 +637,7 @@ public class DashboardServiceImpl implements DashboardService {
             int keep = Math.min(TopologyLimits.TOP_POINTS_PER_PROFILE, allPoints.size());
             for (int i = 0; i < keep; i++) {
                 TopologyPointRow r = allPoints.get(i);
-                Long id = r.getId();
+                long id = r.getId();
                 String name = r.getPointName();
                 nodes.add(node("point:" + id, name, 4, "point", null));
                 long w = volumeMode ? nullZero(pointWeight.get(id)) : 1L;
@@ -641,7 +649,7 @@ public class DashboardServiceImpl implements DashboardService {
                 long sumW = 0;
                 for (int i = keep; i < allPoints.size(); i++) {
                     TopologyPointRow r = allPoints.get(i);
-                    Long id = r.getId();
+                    long id = r.getId();
                     TopologyHiddenChildVO hidden = new TopologyHiddenChildVO();
                     hidden.setId("point:" + id);
                     hidden.setName(r.getPointName());

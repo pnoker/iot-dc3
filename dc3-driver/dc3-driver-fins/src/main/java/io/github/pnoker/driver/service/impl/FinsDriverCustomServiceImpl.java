@@ -444,7 +444,12 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             case "INT16":
             case "UINT16": {
                 data = new byte[2];
-                short s = Short.parseShort(value);
+                short s;
+                try {
+                    s = Short.parseShort(value);
+                } catch (NumberFormatException e) {
+                    s = 0;
+                }
                 ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putShort(s);
                 break;
             }
@@ -467,7 +472,12 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             }
             case "FLOAT": {
                 data = new byte[4];
-                float f = Float.parseFloat(value);
+                float f;
+                try {
+                    f = Float.parseFloat(value);
+                } catch (NumberFormatException e) {
+                    f = 0f;
+                }
                 ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putFloat(f);
                 break;
             }
