@@ -73,6 +73,11 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CanDriverCustomServiceImpl implements DriverCustomService {
 
+    private static final java.util.regex.Pattern CAN_COMMAND_PATTERN =
+            java.util.regex.Pattern.compile("^[A-Za-z0-9 _#,.=%/\\-]+$");
+    private static final java.util.regex.Pattern INTERFACE_NAME_PATTERN =
+            java.util.regex.Pattern.compile("^[A-Za-z0-9_]+$");
+
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
 
@@ -113,6 +118,9 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
             return DeviceHealthState.offline();
         }
         String interfaceName = getConfigValue(driverConfig, "interfaceName", "can0");
+            if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
+                throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
+            }
         try {
             Process process = new ProcessBuilder("ip", "link", "show", interfaceName)
                     .redirectErrorStream(true)
@@ -150,6 +158,9 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                                DeviceBO device, PointBO point) {
         String interfaceName = getConfigValue(driverConfig, "interfaceName", "can0");
+            if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
+                throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
+            }
         String canId = getConfigValue(pointConfig, "canId", "");
         String requestCanId = getConfigValue(pointConfig, "requestCanId", "");
         String requestData = getConfigValue(pointConfig, "requestData", "");
@@ -176,6 +187,9 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                          DeviceBO device, PointBO point, WritePointValue writePointValue) {
         String interfaceName = getConfigValue(driverConfig, "interfaceName", "can0");
+            if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
+                throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
+            }
         String canId = getConfigValue(pointConfig, "canId", "");
         String data = getConfigValue(pointConfig, "data", "");
 
@@ -198,6 +212,12 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
      * @return the trimmed stdout output
      */
     private String executeCommand(String command) throws Exception {
+        // Reject shell metacharacters: command is built from driver config (interfaceName)
+        // and request data (canId, frame data) and run via `sh -c`, so any ;|&`$()<> would
+        // be command injection. CAN commands (cansend/candump/timeout) only use these chars.
+        if (!CAN_COMMAND_PATTERN.matcher(command).matches()) {
+            throw new ReadPointException("Unsafe CAN command rejected, command={}", command);
+        }
         log.debug("Executing CAN command: {}", command);
         Process process = new ProcessBuilder("sh", "-c", command)
                 .redirectErrorStream(true)
