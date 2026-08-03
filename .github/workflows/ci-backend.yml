@@ -7,8 +7,9 @@ on:
       - dc3-web/**
   pull_request:
     branches: [ develop, main ]
-    paths-ignore:
-      - dc3-web/**
+    # no paths-ignore here: required checks (compile/Unit/Integration/coverage)
+    # must run on every PR, including dc3-web-only ones (they compile the
+    # unchanged backend — fast with the maven cache — so the PR isn't left BLOCKED)
 
 permissions:
   contents: read
