@@ -69,6 +69,10 @@ dc3:
         default-value: TAG
         remark: OPC DA item tag name
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/opc-da/buffer.db
+
 spring:
   application:
     name: @project.artifactId@

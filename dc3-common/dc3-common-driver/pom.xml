@@ -77,6 +77,16 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
+        <!-- Embedded database for the local point-value buffer (resume on broker outage) -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+
         <!-- DC3 API Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
