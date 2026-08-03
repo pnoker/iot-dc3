@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.config;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.MDC;
@@ -29,13 +31,22 @@ import java.util.UUID;
  * Restores the request id into the MDC for the duration of a RabbitMQ message handling, so the
  * traceId chain is continuous across the HTTP&nbsp;→&nbsp;gRPC&nbsp;→&nbsp;RabbitMQ hops.
  *
+ * <p><b>Production-grade OpenTelemetry Integration:</b> This advice now integrates
+ * with OpenTelemetry. It will use (in order of priority):
+ * <ol>
+ *   <li>X-Request-Id from message header (backward compatibility)</li>
+ *   <li>OpenTelemetry Trace ID (if available)</li>
+ *   <li>A fresh UUID as last resort</li>
+ * </ol>
+ * This ensures full compatibility with both systems while maintaining backward compatibility.
+ *
  * <p>The id is carried in the {@value #HEADER_REQUEST_ID} message header, stamped on the
  * producer side by the {@code beforePublish} post-processor in {@link RabbitConfig}. On the
  * consumer side, the listener container runs on a pooled thread; this advice reads the header
  * before the listener runs, publishes it into the MDC, and removes it afterwards — guaranteeing
  * the entry never leaks to the next message processed on the same pooled thread.
  *
- * <p>When the header is absent (e.g. a driver registration, a Quartz-triggered publish, or a
+ * <p>When no id is available (e.g. a driver registration, a Quartz-triggered publish, or a
  * producer that predates this wiring), a fresh UUID is minted so the consumer's logs are still
  * self-consistent within that single message's handling.
  *
@@ -88,10 +99,18 @@ public class MdcRequestIdListenerAdvice implements MethodInterceptor {
     }
 
     /**
-     * Read the request id from the message header, falling back to a fresh UUID so the consumer
-     * is always traceable within itself even when the producer did not stamp one.
+     * Read the request id from the message header, falling back to OpenTelemetry Trace ID,
+     * and finally a fresh UUID so the consumer is always traceable.
+     * <p>
+     * Priority order:
+     * <ol>
+     *   <li>X-Request-Id from message header (backward compatibility)</li>
+     *   <li>OpenTelemetry Trace ID (if available)</li>
+     *   <li>Fresh UUID as last resort</li>
+     * </ol>
      */
     private String readRequestId(Message message) {
+        // Priority 1: Use X-Request-Id from header
         if (message != null) {
             MessageProperties properties = message.getMessageProperties();
             if (properties != null) {
@@ -101,6 +120,15 @@ public class MdcRequestIdListenerAdvice implements MethodInterceptor {
                 }
             }
         }
+        
+        // Priority 2: Use OpenTelemetry Trace ID if available
+        Span currentSpan = Span.current();
+        SpanContext spanContext = currentSpan.getSpanContext();
+        if (spanContext.isValid()) {
+            return spanContext.getTraceId();
+        }
+        
+        // Priority 3: Fall back to UUID
         return UUID.randomUUID().toString();
     }
 }

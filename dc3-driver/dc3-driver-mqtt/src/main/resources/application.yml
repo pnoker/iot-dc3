@@ -80,6 +80,10 @@ dc3:
         default-value: $.payload
         remark: JSON path used to resolve event payload
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/mqtt/buffer.db
+
 spring:
   application:
     name: @project.artifactId@

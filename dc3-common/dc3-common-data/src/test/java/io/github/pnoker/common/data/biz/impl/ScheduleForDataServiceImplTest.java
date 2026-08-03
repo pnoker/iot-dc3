@@ -18,9 +18,7 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
-import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import io.github.pnoker.common.data.job.HourlyJobForData;
-import io.github.pnoker.common.data.job.PointValueJob;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.quartz.QuartzService;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.quartz.DateBuilder;
 import org.quartz.SchedulerException;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -37,32 +34,31 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+/**
+ * Point-value ingestion no longer has a Quartz tick (it is driven by PointValueIngestBuffer),
+ * so only the hourly cron job registration is asserted here.
+ *
+ * @author pnoker
+ * @version 2026.7.8
+ * @since 2026.7.8
+ */
 @ExtendWith(MockitoExtension.class)
 class ScheduleForDataServiceImplTest {
 
     @Mock
     private QuartzService quartzService;
 
-    private PointBatchProperties properties;
     private ScheduleForDataServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        properties = new PointBatchProperties();
-        properties.setInterval(5);
-        service = new ScheduleForDataServiceImpl(properties, quartzService);
+        service = new ScheduleForDataServiceImpl(quartzService);
     }
 
     @Test
-    void initialRegistersIntervalAndCronJobsAndStartsScheduler() throws Exception {
+    void initialRegistersHourlyJobAndStartsScheduler() throws Exception {
         service.initial();
 
-        verify(quartzService).createJobWithInterval(
-                eq(ScheduleConstant.DATA_SCHEDULE_GROUP),
-                eq("data-point-value-schedule-job"),
-                eq(5),
-                eq(DateBuilder.IntervalUnit.SECOND),
-                eq(PointValueJob.class));
         verify(quartzService).createJobWithCron(
                 eq(ScheduleConstant.DATA_SCHEDULE_GROUP),
                 eq("hourly-job"),
@@ -74,7 +70,7 @@ class ScheduleForDataServiceImplTest {
     @Test
     void initialThrowsServiceExceptionOnSchedulerFailure() throws Exception {
         doThrow(new SchedulerException("scheduler down")).when(quartzService)
-                .createJobWithInterval(any(), any(), any(int.class), any(), any());
+                .createJobWithCron(any(), any(), any(), any());
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.initial())
                 .isInstanceOf(ServiceException.class)
                 .hasMessageContaining("Failed to initialize data scheduler")

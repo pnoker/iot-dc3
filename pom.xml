@@ -91,6 +91,9 @@
         <!-- Data access -->
         <mybatis.plus.version>3.5.16</mybatis.plus.version>
         <mybatis.plus.dynamic.version>4.5.0</mybatis.plus.dynamic.version>
+        
+        <!-- Embedded database for the driver local point-value buffer -->
+        <sqlite-jdbc.version>3.53.2.0</sqlite-jdbc.version>
 
         <!-- Serialization and data formats -->
         <tools.jackson.version>3.1.5</tools.jackson.version>
@@ -121,6 +124,7 @@
         <jwt.version>0.13.0</jwt.version>
         <bouncycastle.version>1.84</bouncycastle.version>
         <micrometer.version>1.16.5</micrometer.version>
+        <opentelemetry.version>1.45.0</opentelemetry.version>
 
         <!-- Legacy integration -->
         <j.interop.version>2.0.4</j.interop.version>
@@ -285,12 +289,32 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- OpenTelemetry BOM -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-bom</artifactId>
+                <version>${opentelemetry.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-semconv</artifactId>
+                <version>${opentelemetry.version}-alpha</version>
+            </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp-bom</artifactId>
                 <version>${okhttp.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- Embedded database for the driver local point-value buffer -->
+            <dependency>
+                <groupId>org.xerial</groupId>
+                <artifactId>sqlite-jdbc</artifactId>
+                <version>${sqlite-jdbc.version}</version>
             </dependency>
 
             <!-- Test toolchain -->

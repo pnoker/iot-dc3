@@ -24,6 +24,8 @@ import io.grpc.ClientInterceptor;
 import io.grpc.ForwardingClientCall;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
 import org.slf4j.MDC;
 import org.springframework.grpc.client.GlobalClientInterceptor;
 import org.springframework.stereotype.Component;
@@ -34,9 +36,17 @@ import org.springframework.stereotype.Component;
  * the same id in its log lines. This closes the traceId gap across the
  * HTTP&nbsp;→&nbsp;Gateway&nbsp;→&nbsp;gRPC&nbsp;→&nbsp;center-services hop.
  *
- * <p>The header name mirrors the HTTP {@code X-Request-Id} convention. When the MDC has no
- * request id (e.g. a gRPC call triggered outside any HTTP request, such as a Quartz job or
- * a driver registration), nothing is attached and the call proceeds unchanged.
+ * <p><b>Production-grade OpenTelemetry Integration:</b> This interceptor now integrates
+ * with OpenTelemetry. It will use:
+ * <ol>
+ *   <li>MDC requestId (from existing RequestId mechanism)</li>
+ *   <li>OpenTelemetry Trace ID (if available and no MDC value)</li>
+ * </ol>
+ * This ensures full compatibility with both systems while maintaining backward compatibility.
+ *
+ * <p>The header name mirrors the HTTP {@code X-Request-Id} convention. When no id is available
+ * (e.g. a gRPC call triggered outside any HTTP request, such as a Quartz job or a driver
+ * registration), nothing is attached and the call proceeds unchanged.
  *
  * <p>Registered as a {@code @GlobalClientInterceptor} bean so spring-grpc applies it to every
  * client channel automatically.
@@ -65,13 +75,25 @@ public class RequestIdGrpcClientInterceptor implements ClientInterceptor {
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(MethodDescriptor<ReqT, RespT> method,
                                                                CallOptions callOptions, Channel next) {
         String requestId = MDC.get(MDC_REQUEST_ID);
+        
+        // If MDC doesn't have requestId, try to get it from OpenTelemetry
+        if (requestId == null || requestId.isBlank()) {
+            Span currentSpan = Span.current();
+            SpanContext spanContext = currentSpan.getSpanContext();
+            if (spanContext.isValid()) {
+                requestId = spanContext.getTraceId();
+            }
+        }
+        
         if (requestId == null || requestId.isBlank()) {
             return next.newCall(method, callOptions);
         }
+        
+        final String finalRequestId = requestId;
         return new ForwardingClientCall.SimpleForwardingClientCall<>(next.newCall(method, callOptions)) {
             @Override
             public void start(Listener<RespT> responseListener, Metadata headers) {
-                headers.put(REQUEST_ID_KEY, requestId);
+                headers.put(REQUEST_ID_KEY, finalRequestId);
                 super.start(responseListener, headers);
             }
         };
