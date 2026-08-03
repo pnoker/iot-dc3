@@ -69,6 +69,10 @@ dc3:
         default-value: 0
         remark: Bit offset (only used for boolean type)
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/plcs7/buffer.db
+
 spring:
   application:
     name: @project.artifactId@

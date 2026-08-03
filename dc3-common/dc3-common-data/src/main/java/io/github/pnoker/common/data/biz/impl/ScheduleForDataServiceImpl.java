@@ -19,44 +19,38 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.data.biz.ScheduleForDataService;
-import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import io.github.pnoker.common.data.job.HourlyJobForData;
-import io.github.pnoker.common.data.job.PointValueJob;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.quartz.QuartzService;
 import lombok.RequiredArgsConstructor;
-import org.quartz.DateBuilder;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
 
 /**
  * Business service implementation for data-center scheduled jobs.
  *
+ * <p>Point-value ingestion no longer has a Quartz tick here — it is driven by
+ * {@link io.github.pnoker.common.data.buffer.PointValueIngestBuffer}'s worker threads. Only the
+ * hourly maintenance job remains.
+ *
  * @author pnoker
- * @version 2025.9.0
+ * @version 2026.7.8
  * @since 2016.10.1
  */
 @Service
 @RequiredArgsConstructor
 public class ScheduleForDataServiceImpl implements ScheduleForDataService {
 
-    private final PointBatchProperties pointBatchProperties;
-
     private final QuartzService quartzService;
 
     /**
-     * Initialize data scheduling
+     * Initialize data scheduling.
      */
     @Override
     public void initial() {
         try {
-            quartzService.createJobWithInterval(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-point-value-schedule-job",
-                    pointBatchProperties.getInterval(), DateBuilder.IntervalUnit.SECOND, PointValueJob.class);
-
-            // Custom scheduling
             quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?",
                     HourlyJobForData.class);
-
             quartzService.startScheduler();
         } catch (SchedulerException e) {
             throw new ServiceException("Failed to initialize data scheduler", e);

@@ -100,6 +100,10 @@ dc3:
         remark: Attribute ID (2=Present Value)
     command-attribute: [ ]
 
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/dlms/buffer.db
+
 spring:
   application:
     name: @project.artifactId@
