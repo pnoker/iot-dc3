@@ -109,7 +109,7 @@ public class DriverInitRunner implements ApplicationRunner {
                 }
                 return;
             } catch (Exception e) {
-                if (attempt == REGISTER_MAX_ATTEMPTS) {
+                if (attempt >= REGISTER_MAX_ATTEMPTS) {
                     log.error("Driver register failed after {} attempts, giving up", attempt, e);
                     throw e;
                 }

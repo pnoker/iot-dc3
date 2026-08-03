@@ -78,7 +78,10 @@ public class MetadataReceiver {
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getId())
                     || Objects.isNull(entityDTO.getMetadataType())
                     || Objects.isNull(entityDTO.getOperateType())) {
-                log.error("Invalid driver metadata: {}", entityDTO);
+                log.error("Invalid driver metadata: id={}, type={}, operate={}",
+                        Objects.nonNull(entityDTO) ? entityDTO.getId() : null,
+                        Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
+                        Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null);
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
@@ -94,14 +97,14 @@ public class MetadataReceiver {
                     // Add the id first so a refresh that races with a Quartz scan does
                     // not bypass the just-loaded entry; loadCache below either fills
                     // the cache or, on a null upstream, removes the orphan id again.
-                    driverMetadata.getDeviceIds().add(entityDTO.getId());
+                    driverMetadata.addDeviceId(entityDTO.getId());
                     deviceMetadata.loadCache(entityDTO.getId());
                 } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
                     log.debug("Delete device: {}", entityDTO.getId());
                     // Remove the id before invalidating the cache so a Quartz scan
                     // hitting the cache between the two operations does not re-fetch
                     // the doomed device through the loader.
-                    driverMetadata.getDeviceIds().remove(entityDTO.getId());
+                    driverMetadata.removeDeviceId(entityDTO.getId());
                     deviceMetadata.removeCache(entityDTO.getId());
                 }
 

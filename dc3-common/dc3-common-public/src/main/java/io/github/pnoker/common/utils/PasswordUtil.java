@@ -21,6 +21,7 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.enums.PasswordAlgorithmEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -82,7 +83,7 @@ public class PasswordUtil {
      * @return password algorithm
      */
     public static PasswordAlgorithmEnum algorithmOfHash(String hash) {
-        if (StringUtils.startsWith(hash, "$argon2")) {
+        if (Strings.CS.startsWith(hash, "$argon2")) {
             return PasswordAlgorithmEnum.ARGON2ID;
         }
         return PasswordAlgorithmEnum.BCRYPT;

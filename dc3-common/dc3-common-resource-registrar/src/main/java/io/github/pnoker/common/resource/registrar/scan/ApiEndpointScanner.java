@@ -69,14 +69,6 @@ public class ApiEndpointScanner {
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 
-    /**
-     * Create a scanner bound to the WebFlux handler mapping built by the current
-     * application context.
-     *
-     * @param handlerMapping WebFlux request mapping registry
-     * @param properties     registrar scan configuration
-     */
-
     private static String buildApiName(HandlerMethod handler, String httpMethod, boolean isSingleGet) {
         String protectedApiName = resolvePreAuthorizeApiName(handler);
         if (Objects.nonNull(protectedApiName)) {

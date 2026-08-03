@@ -20,6 +20,7 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -149,9 +150,9 @@ public final class ConditionEvaluator {
         String actual = Objects.toString(value, "");
         String expected = Objects.toString(condition.getExpected(), "");
         return switch (operator) {
-            case "==", "eq" -> StringUtils.equals(actual, expected);
-            case "!=", "ne" -> !StringUtils.equals(actual, expected);
-            case "contains" -> StringUtils.contains(actual, expected);
+            case "==", "eq" -> Strings.CS.equals(actual, expected);
+            case "!=", "ne" -> !Strings.CS.equals(actual, expected);
+            case "contains" -> Strings.CS.contains(actual, expected);
             default -> false;
         };
     }

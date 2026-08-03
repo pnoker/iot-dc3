@@ -25,6 +25,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -66,7 +67,7 @@ public class PageUtil {
         }
         page.setSize(pages.getSize());
 
-        List<OrderItem> orders = pages.getOrders();
+        List<OrderItem> orders = new ArrayList<>(pages.getOrders());
         boolean anyMatch = orders.stream()
                 .filter(order -> Objects.nonNull(order) && StringUtils.isNotEmpty(order.getColumn()))
                 .anyMatch(order -> "create_time".equals(order.getColumn()));

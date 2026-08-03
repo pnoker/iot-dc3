@@ -50,11 +50,6 @@ public class MqttInitRunner implements ApplicationRunner {
     private final ObjectProvider<MqttReceiveService> mqttReceiveServiceProvider;
 
     /**
-     * Creates a new MQTT initialization runner with the specified MQTT schedule service.
-     *
-     * @param mqttScheduleService The MQTT schedule service to be initialized
-     */
-    /**
      * Executes the MQTT initialization process when the application starts. This method
      * is called automatically by Spring Boot after the application context is loaded.
      *

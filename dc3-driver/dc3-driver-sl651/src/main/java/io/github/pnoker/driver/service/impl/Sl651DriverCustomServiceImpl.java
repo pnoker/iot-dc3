@@ -175,8 +175,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             Object listener = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[]{listenerClass},
                     (proxy, method, args) -> {
                         if ("onMessage".equals(method.getName()) && Objects.nonNull(args) && args.length == 3) {
-                            byte[] messageBytes = args[0] instanceof byte[] bytes ? bytes : new byte[0];
-                            handleSl651Message(messageBytes, args[1], args[2]);
+                            handleSl651Message(args[1], args[2]);
                         }
                         return null;
                     });
@@ -268,7 +267,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
-    private void handleSl651Message(byte[] bytes, Object response, Object bodyResponses) {
+    private void handleSl651Message(Object response, Object bodyResponses) {
         String stationAddr = bytesToHex(invokeBytes(response, "getRemoteStationAddress"));
         String funcCode = bytesToHex(invokeBytes(response, "getFunctionCode"));
         List<String> elements = extractBodyElements(bodyResponses);

@@ -28,6 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -59,6 +60,39 @@ public final class DriverMetadata {
      * Identifiers of devices owned by the driver.
      */
     private final Set<Long> deviceIds = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Unmodifiable view of the device ids so callers cannot mutate the internal set
+     * through the getter. The underlying set is still live — reads observe the most
+     * recent state. Use {@link #addDeviceId(Long)} / {@link #removeDeviceId(Long)} to
+     * mutate, or {@link #setDeviceIds(Set)} to replace the contents in place.
+     *
+     * @return unmodifiable live view of the device ids
+     */
+    public Set<Long> getDeviceIds() {
+        return Collections.unmodifiableSet(deviceIds);
+    }
+
+    /**
+     * Add a device id to the live set.
+     *
+     * @param id device id to add
+     * @return {@code true} if the set did not already contain the id
+     */
+    public boolean addDeviceId(Long id) {
+        return deviceIds.add(id);
+    }
+
+    /**
+     * Remove a device id from the live set.
+     *
+     * @param id device id to remove
+     * @return {@code true} if the set contained the id
+     */
+    public boolean removeDeviceId(Long id) {
+        return deviceIds.remove(id);
+    }
+
     /**
      * Driver attributes keyed by attribute identifier.
      */

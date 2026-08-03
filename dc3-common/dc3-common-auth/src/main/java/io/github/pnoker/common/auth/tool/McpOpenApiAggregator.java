@@ -111,12 +111,12 @@ public class McpOpenApiAggregator {
                 if (!paths.isObject()) {
                     continue;
                 }
-                paths.fields().forEachRemaining(pathEntry -> {
+                paths.properties().forEach(pathEntry -> {
                     JsonNode pathItem = pathEntry.getValue();
                     if (!pathItem.isObject()) {
                         return;
                     }
-                    pathItem.fields().forEachRemaining(opEntry -> {
+                    pathItem.properties().forEach(opEntry -> {
                         String method = opEntry.getKey().toUpperCase();
                         JsonNode operation = opEntry.getValue();
                         if (!operation.isObject()) {
@@ -192,7 +192,7 @@ public class McpOpenApiAggregator {
             JsonNode resolved = resolveRefs(bodySchema, root, 0);
             JsonNode bodyProps = resolved.path("properties");
             if (bodyProps.isObject()) {
-                bodyProps.fields().forEachRemaining(f -> properties.set(f.getKey(), f.getValue()));
+                bodyProps.properties().forEach(f -> properties.set(f.getKey(), f.getValue()));
                 resolved.path("required").forEach(required::add);
             }
         }
@@ -251,7 +251,7 @@ public class McpOpenApiAggregator {
                 return node;
             }
             ObjectNode copy = objectMapper.createObjectNode();
-            node.fields().forEachRemaining(e -> copy.set(e.getKey(), resolveRefs(e.getValue(), root, depth + 1)));
+            node.properties().forEach(e -> copy.set(e.getKey(), resolveRefs(e.getValue(), root, depth + 1)));
             return copy;
         }
         if (node.isArray()) {

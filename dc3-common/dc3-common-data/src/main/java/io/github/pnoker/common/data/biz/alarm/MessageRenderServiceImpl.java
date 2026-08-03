@@ -22,6 +22,7 @@ import io.github.pnoker.common.entity.ext.MessageExt;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -83,8 +84,8 @@ public class MessageRenderServiceImpl implements MessageRenderService {
         if (Objects.isNull(template) || StringUtils.isBlank(template.getChannelType())) {
             return false;
         }
-        return StringUtils.equalsIgnoreCase(template.getChannelType(), channelTypeFlag.name())
-                || StringUtils.equalsIgnoreCase(template.getChannelType(), channelTypeFlag.getCode());
+        return Strings.CI.equals(template.getChannelType(), channelTypeFlag.name())
+                || Strings.CI.equals(template.getChannelType(), channelTypeFlag.getCode());
     }
 
     /**
