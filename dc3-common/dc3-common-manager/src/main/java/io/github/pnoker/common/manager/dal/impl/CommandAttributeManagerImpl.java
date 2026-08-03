@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.manager.dal.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import io.github.pnoker.common.manager.dal.CommandAttributeManager;
 import io.github.pnoker.common.manager.entity.model.CommandAttributeDO;
 import io.github.pnoker.common.manager.mapper.CommandAttributeMapper;

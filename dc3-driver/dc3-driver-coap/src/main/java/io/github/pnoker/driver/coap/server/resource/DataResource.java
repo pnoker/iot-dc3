@@ -22,7 +22,7 @@ import io.github.pnoker.driver.coap.service.CoapReceiveService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
-import org.eclipse.californium.core.server.resources.CoapExchange;
+import org.eclipse.californium.core.CoapExchange;
 
 /**
  * CoAP Data Resource

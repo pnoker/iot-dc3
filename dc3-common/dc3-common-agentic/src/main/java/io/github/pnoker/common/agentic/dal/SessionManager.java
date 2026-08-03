@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.agentic.dal;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 
 /**

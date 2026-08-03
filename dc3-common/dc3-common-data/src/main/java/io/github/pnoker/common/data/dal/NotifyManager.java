@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.dal;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 import io.github.pnoker.common.data.entity.model.NotifyDO;
 
 /**
