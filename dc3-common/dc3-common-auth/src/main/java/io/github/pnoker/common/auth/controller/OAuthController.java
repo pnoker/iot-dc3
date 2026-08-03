@@ -164,7 +164,6 @@ public class OAuthController {
     /**
      * Exchange an authorization code (or supported grant) for access and refresh tokens.
      *
-     * @param body                form-encoded token request parameters (grant_type, code, redirect_uri, code_verifier, etc.)
      * @param authorizationHeader optional HTTP Basic client credentials
      * @return a 200 response carrying the token JSON; OAuth protocol errors map to the spec status
      */
@@ -191,7 +190,6 @@ public class OAuthController {
     /**
      * Revoke a previously issued access or refresh token.
      *
-     * @param body                form-encoded revocation parameters (token and token_type_hint)
      * @param authorizationHeader optional HTTP Basic client credentials
      * @return a 200 response confirming the revocation; OAuth protocol errors map to the spec status
      */

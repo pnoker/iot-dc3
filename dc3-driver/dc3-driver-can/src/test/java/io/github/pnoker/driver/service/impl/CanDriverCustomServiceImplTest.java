@@ -21,7 +21,6 @@ import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
-import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,14 +45,11 @@ class CanDriverCustomServiceImplTest {
     @Mock
     private DriverMetadata driverMetadata;
 
-    @Mock
-    private DriverSenderService driverSenderService;
-
     private CanDriverCustomServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        service = new CanDriverCustomServiceImpl(driverMetadata, driverSenderService);
+        service = new CanDriverCustomServiceImpl(driverMetadata);
     }
 
     @Test
