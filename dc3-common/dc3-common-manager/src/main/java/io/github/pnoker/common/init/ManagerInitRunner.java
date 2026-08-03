@@ -45,12 +45,6 @@ public class ManagerInitRunner implements ApplicationRunner {
     private final ScheduleForManagerService scheduleForManagerService;
 
     /**
-     * Constructs a new ManagerInitRunner with the required service dependency.
-     *
-     * @param scheduleForManagerService The service responsible for manager scheduling
-     *                                  operations
-     */
-    /**
      * Executes the initialization process when the application starts. This method
      * initializes the schedule manager service to set up necessary scheduling
      * configurations and tasks.

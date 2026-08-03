@@ -24,6 +24,7 @@ import io.github.pnoker.common.data.entity.bo.RuleStateBO;
 import io.github.pnoker.common.entity.ext.NotifyChannelBindExt;
 import io.github.pnoker.common.entity.ext.NotifyExt;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Service;
 
 import java.time.DateTimeException;
@@ -68,7 +69,7 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
     }
 
     private boolean isRecovery(RuleMatch match) {
-        return StringUtils.equalsIgnoreCase(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY);
+        return Strings.CI.equals(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY);
     }
 
     /**
@@ -104,7 +105,7 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
             return true;
         }
         for (String level : bindContent.getLevels()) {
-            if (StringUtils.equalsIgnoreCase(level, match.getSeverity())) {
+            if (Strings.CI.equals(level, match.getSeverity())) {
                 return true;
             }
         }
@@ -222,8 +223,8 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
             return true;
         }
         for (String day : daysOfWeek) {
-            if (StringUtils.equalsIgnoreCase(day, current.name())
-                    || StringUtils.equalsIgnoreCase(day, current.getDisplayName(java.time.format.TextStyle.SHORT,
+            if (Strings.CI.equals(day, current.name())
+                    || Strings.CI.equals(day, current.getDisplayName(java.time.format.TextStyle.SHORT,
                     Locale.ENGLISH))) {
                 return true;
             }

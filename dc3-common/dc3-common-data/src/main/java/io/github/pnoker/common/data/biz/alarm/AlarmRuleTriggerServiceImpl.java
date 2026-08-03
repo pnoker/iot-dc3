@@ -80,13 +80,11 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
             return;
         }
 
-        List<PointValueBO> valid = new ArrayList<>();
         List<RuleFact> facts = new ArrayList<>();
         for (PointValueBO pointValue : pointValues) {
             if (Objects.isNull(pointValue) || !isValidId(pointValue.getTenantId()) || !isValidId(pointValue.getPointId())) {
                 continue;
             }
-            valid.add(pointValue);
             LocalDateTime ts = factTime(pointValue.getCreateTime());
             windowSampleBuffer.append(
                     WindowSampleKey.of(pointValue.getTenantId(), AlarmTargetTypeEnum.POINT, pointValue.getPointId()),

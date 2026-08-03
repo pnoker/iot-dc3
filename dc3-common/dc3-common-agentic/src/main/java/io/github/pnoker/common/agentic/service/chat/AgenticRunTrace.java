@@ -53,7 +53,7 @@ public class AgenticRunTrace {
 
     public void recordPendingEvent(AgenticRunEvent event) {
         if (Objects.nonNull(event)) {
-            pendingEvents.offer(event);
+            pendingEvents.add(event);
         }
     }
 
@@ -70,7 +70,7 @@ public class AgenticRunTrace {
 
     public void recordPendingVisualization(AgenticVisualizationSpec visualization) {
         if (Objects.nonNull(visualization)) {
-            pendingVisualizations.offer(visualization);
+            pendingVisualizations.add(visualization);
         }
     }
 

@@ -129,7 +129,7 @@ class MetadataReceiverTest {
 
     @Test
     void deviceDeleteRemovesCacheAndDriverDeviceIds() throws Exception {
-        driverMetadata.getDeviceIds().add(99L);
+        driverMetadata.addDeviceId(99L);
         MetadataEventDTO dto = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE, 99L);
         receiver.metadataReceive(channel, message, dto);
         verify(deviceMetadata).removeCache(99L);

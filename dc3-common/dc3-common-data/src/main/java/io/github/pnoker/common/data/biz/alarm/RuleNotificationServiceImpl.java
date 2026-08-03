@@ -47,6 +47,7 @@ import io.github.pnoker.common.enums.RuleStatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -257,7 +258,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         RuleFact fact = match.getFact();
         String fingerprint = fingerprint(match, notify, variables);
         RuleStateBO state = loadState(rule, fact, fingerprint);
-        boolean isRecovery = StringUtils.equalsIgnoreCase(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY);
+        boolean isRecovery = Strings.CI.equals(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY);
         if (isRecovery && (Objects.isNull(state) || !RuleStatusEnum.FIRING.equals(state.getEntityStateFlag()))) {
             log.debug("Skip recovery state transition because no FIRING fingerprint exists, ruleId={}, entityId={}",
                     rule.getId(), fact.getEntityId());

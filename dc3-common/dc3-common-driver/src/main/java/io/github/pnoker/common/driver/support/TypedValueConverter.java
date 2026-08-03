@@ -126,12 +126,12 @@ public final class TypedValueConverter {
             }
             case FLOAT -> {
                 float value = roundedFloat(linearValue(multiple, rawValue, base, "Point", pointType.getCode()),
-                        rawValue, decimal, "Point", pointType.getCode());
+                        rawValue, decimal, "Point");
                 yield new CalculatedPointValue(String.valueOf(value), (double) value);
             }
             case DOUBLE -> {
                 double value = roundedDouble(linearValue(multiple, rawValue, base, "Point", pointType.getCode()),
-                        rawValue, decimal, "Point", pointType.getCode());
+                        rawValue, decimal, "Point");
                 yield new CalculatedPointValue(String.valueOf(value), value);
             }
             case BOOLEAN -> {
@@ -162,9 +162,9 @@ public final class TypedValueConverter {
             case SHORT -> (T) Short.valueOf(exactShort(decimal(value, type, label, typeCode), value, label, typeCode));
             case INT -> (T) Integer.valueOf(exactInt(decimal(value, type, label, typeCode), value, label, typeCode));
             case LONG -> (T) Long.valueOf(exactLong(decimal(value, type, label, typeCode), value, label, typeCode));
-            case FLOAT -> (T) Float.valueOf(finiteFloat(decimal(value, type, label, typeCode), value, label, typeCode));
+            case FLOAT -> (T) Float.valueOf(finiteFloat(decimal(value, type, label, typeCode), value, label));
             case DOUBLE ->
-                    (T) Double.valueOf(finiteDouble(decimal(value, type, label, typeCode), value, label, typeCode));
+                    (T) Double.valueOf(finiteDouble(decimal(value, type, label, typeCode), value, label));
             case BOOLEAN -> (T) Boolean.valueOf(strictBoolean(value, label, typeCode));
         };
     }
@@ -252,15 +252,15 @@ public final class TypedValueConverter {
         return value.longValueExact();
     }
 
-    private static float roundedFloat(BigDecimal value, String rawValue, byte decimal, String label, String typeCode) {
-        return ArithmeticUtil.round(finiteFloat(value, rawValue, label, typeCode), decimal);
+    private static float roundedFloat(BigDecimal value, String rawValue, byte decimal, String label) {
+        return ArithmeticUtil.round(finiteFloat(value, rawValue, label), decimal);
     }
 
-    private static double roundedDouble(BigDecimal value, String rawValue, byte decimal, String label, String typeCode) {
-        return ArithmeticUtil.round(finiteDouble(value, rawValue, label, typeCode), decimal);
+    private static double roundedDouble(BigDecimal value, String rawValue, byte decimal, String label) {
+        return ArithmeticUtil.round(finiteDouble(value, rawValue, label), decimal);
     }
 
-    private static float finiteFloat(BigDecimal value, String rawValue, String label, String typeCode) {
+    private static float finiteFloat(BigDecimal value, String rawValue, String label) {
         float result = value.floatValue();
         if (!Float.isFinite(result)) {
             throw new OutRangeException("{} value out of float range: {} ~ {}, current: {}", label, -Float.MAX_VALUE,
@@ -269,7 +269,7 @@ public final class TypedValueConverter {
         return result;
     }
 
-    private static double finiteDouble(BigDecimal value, String rawValue, String label, String typeCode) {
+    private static double finiteDouble(BigDecimal value, String rawValue, String label) {
         double result = value.doubleValue();
         if (!Double.isFinite(result)) {
             throw new OutRangeException("{} value out of double range: {} ~ {}, current: {}", label, -Double.MAX_VALUE,

@@ -21,6 +21,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -61,7 +62,7 @@ public class McpGatewayProperties {
         if (StringUtils.isBlank(baseUrl)) {
             throw new IllegalArgumentException("Unknown backend service: " + serviceName);
         }
-        return StringUtils.removeEnd(baseUrl, "/");
+        return Strings.CS.removeEnd(baseUrl, "/");
     }
 
 }

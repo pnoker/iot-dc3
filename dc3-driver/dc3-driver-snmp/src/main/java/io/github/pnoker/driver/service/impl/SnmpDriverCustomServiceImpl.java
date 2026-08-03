@@ -114,7 +114,7 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         if (clientMap.containsKey(device.getId())) {
             return DeviceHealthState.online();
         }
-        Snmp snmp = getConnector(device.getId(), driverConfig);
+        Snmp snmp = getConnector(device.getId());
         return Objects.nonNull(snmp) ? DeviceHealthState.online() : DeviceHealthState.offline();
     }
 
@@ -148,10 +148,10 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                                DeviceBO device, PointBO point) {
-        Snmp snmp = getConnector(device.getId(), driverConfig);
+        Snmp snmp = getConnector(device.getId());
         String oid = getConfigValue(pointConfig, "oid", "");
         try {
-            CommunityTarget target = buildTarget(device.getId(), driverConfig);
+            CommunityTarget target = buildTarget(driverConfig);
 
             PDU pdu = new PDU();
             pdu.add(new VariableBinding(new OID(oid)));
@@ -177,11 +177,11 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                          DeviceBO device, PointBO point, WritePointValue writePointValue) {
-        Snmp snmp = getConnector(device.getId(), driverConfig);
+        Snmp snmp = getConnector(device.getId());
         String oid = getConfigValue(pointConfig, "oid", "");
         String snmpType = getConfigValue(pointConfig, "snmpType", "OCTET_STRING");
         try {
-            CommunityTarget target = buildTarget(device.getId(), driverConfig);
+            CommunityTarget target = buildTarget(driverConfig);
 
             PDU pdu = new PDU();
             Variable variable = createVariable(snmpType, writePointValue.getValue(String.class));
@@ -205,11 +205,10 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Get or create an SNMP client for the given device.
      *
-     * @param deviceId     unique device identifier
-     * @param driverConfig driver configuration
+     * @param deviceId unique device identifier
      * @return cached or newly created Snmp instance
      */
-    private Snmp getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
+    private Snmp getConnector(Long deviceId) {
         return clientMap.computeIfAbsent(deviceId, id -> {
             try {
                 TransportMapping<org.snmp4j.smi.UdpAddress> transport = new DefaultUdpTransportMapping();
@@ -228,11 +227,10 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Build an SNMP community target from driver configuration.
      *
-     * @param deviceId     device identifier
      * @param driverConfig driver configuration
      * @return configured CommunityTarget
      */
-    private CommunityTarget buildTarget(Long deviceId, Map<String, AttributeBO> driverConfig) {
+    private CommunityTarget buildTarget(Map<String, AttributeBO> driverConfig) {
         String host = getConfigValue(driverConfig, "host", "127.0.0.1");
         int port = getConfigIntValue(driverConfig, "port", 161);
         String version = getConfigValue(driverConfig, "version", "v2c");

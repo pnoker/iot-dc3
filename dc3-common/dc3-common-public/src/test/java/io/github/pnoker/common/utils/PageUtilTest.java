@@ -65,7 +65,7 @@ class PageUtilTest {
     @Test
     void pagePreservesUserOrdersAndAddsCreateTime() {
         Pages pages = new Pages();
-        pages.getOrders().add(OrderItem.asc("name"));
+        pages.addOrder(OrderItem.asc("name"));
         Page<Object> page = PageUtil.page(pages);
         assertThat(page.orders()).extracting(OrderItem::getColumn)
                 .contains("name", "create_time");
@@ -74,7 +74,7 @@ class PageUtilTest {
     @Test
     void pageDoesNotDuplicateExistingCreateTimeOrder() {
         Pages pages = new Pages();
-        pages.getOrders().add(OrderItem.desc("create_time"));
+        pages.addOrder(OrderItem.desc("create_time"));
         Page<Object> page = PageUtil.page(pages);
         long createTimeOrders = page.orders().stream()
                 .filter(it -> "create_time".equals(it.getColumn()))

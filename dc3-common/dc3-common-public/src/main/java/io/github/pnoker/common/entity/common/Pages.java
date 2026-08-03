@@ -27,6 +27,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -60,5 +61,25 @@ public class Pages implements Serializable {
 
     @Schema(description = "Sort order items applied to the query results")
     private List<OrderItem> orders = new ArrayList<>(2);
+
+    /**
+     * Unmodifiable view of the order items, so callers cannot mutate internal state
+     * through the getter. Use {@link #addOrder(OrderItem)} to append, or
+     * {@link #setOrders(List)} to replace.
+     *
+     * @return unmodifiable view of the order items
+     */
+    public List<OrderItem> getOrders() {
+        return Collections.unmodifiableList(orders);
+    }
+
+    /**
+     * Append one order item to the internal list.
+     *
+     * @param order order item to append
+     */
+    public void addOrder(OrderItem order) {
+        orders.add(order);
+    }
 
 }

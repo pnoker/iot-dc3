@@ -26,6 +26,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -61,12 +65,30 @@ public class FileUtil {
         Path dir = Paths.get(FolderConstant.TEMP_FILE_PATH, safePathSegments(segments));
         if (Files.notExists(dir) || !Files.isDirectory(dir)) {
             try {
-                Files.createDirectories(dir);
+                createSecureTempDirectories(dir);
             } catch (IOException e) {
                 log.error("Failed to create temp directory: {}", dir, e);
             }
         }
         return dir.toString() + SymbolConstant.SLASH;
+    }
+
+    /**
+     * Create the temp directory chain with owner-only permissions (rwx------) to
+     * prevent information disclosure on multi-user hosts. Falls back to platform
+     * defaults on non-POSIX filesystems (e.g. Windows).
+     *
+     * @param dir the directory to create
+     * @throws IOException if directory creation fails
+     */
+    private static void createSecureTempDirectories(Path dir) throws IOException {
+        FileAttribute<Set<PosixFilePermission>> ownerOnly =
+                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
+        try {
+            Files.createDirectories(dir, ownerOnly);
+        } catch (UnsupportedOperationException ignored) {
+            Files.createDirectories(dir);
+        }
     }
 
     /**

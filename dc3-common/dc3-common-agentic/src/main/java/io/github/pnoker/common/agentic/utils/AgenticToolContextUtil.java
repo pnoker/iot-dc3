@@ -107,7 +107,7 @@ public class AgenticToolContextUtil {
         Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.VISUALIZATIONS);
         if (value instanceof Queue<?>) {
             Queue<AgenticVisualizationSpec> queue = (Queue<AgenticVisualizationSpec>) value;
-            visualizations.stream().filter(Objects::nonNull).forEach(queue::offer);
+            visualizations.stream().filter(Objects::nonNull).forEach(queue::add);
         }
     }
 
@@ -118,7 +118,7 @@ public class AgenticToolContextUtil {
         }
         Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.RUN_EVENTS);
         if (value instanceof Queue<?>) {
-            ((Queue<AgenticRunEvent>) value).offer(event);
+            ((Queue<AgenticRunEvent>) value).add(event);
         }
     }
 

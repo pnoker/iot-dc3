@@ -50,11 +50,6 @@ public class DataInitRunner implements ApplicationRunner {
     private final ScheduleForDataService scheduleForDataService;
 
     /**
-     * Constructor for DataInitRunner
-     *
-     * @param scheduleForDataService Service for handling data scheduling operations
-     */
-    /**
      * Executes the data initialization process when the application starts
      *
      * @param args Application arguments passed during startup
