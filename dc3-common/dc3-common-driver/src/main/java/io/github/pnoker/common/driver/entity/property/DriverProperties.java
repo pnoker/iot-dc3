@@ -95,6 +95,12 @@ public class DriverProperties {
     private HealthProperties health = new HealthProperties();
 
     /**
+     * Local buffer configuration for point-value resume on broker outage.
+     */
+    @Valid
+    private BufferProperties buffer = new BufferProperties();
+
+    /**
      * Metadata cache tuning for the driver runtime.
      */
     @Valid
@@ -280,6 +286,67 @@ public class DriverProperties {
             private String cron = "0 */15 * * * ?";
 
         }
+
+    }
+
+    /**
+     * Local point-value buffer options. Failed/NACKed point values are persisted to an
+     * embedded SQLite database and republished by a Quartz job once the broker recovers,
+     * so a RabbitMQ outage no longer loses collected readings.
+     */
+    @Getter
+    @Setter
+    public static class BufferProperties {
+
+        /**
+         * Whether to persist failed/NACKed point values locally for later republish.
+         * On by default so drivers resume broker outages out of the box.
+         */
+        private Boolean enabled = true;
+
+        /**
+         * SQLite database path, relative to the driver working directory. Mirrors the
+         * {@code dc3/logs} layout so each driver writes its own buffer file.
+         */
+        @NotBlank(message = "Buffer db path can't be empty")
+        private String dbPath = "dc3/data/driver/buffer.db";
+
+        /**
+         * Upper bound on the buffer database size in megabytes. When exceeded the oldest
+         * records are evicted to keep the newest readings (capacity over completeness).
+         */
+        @Min(1)
+        private long maxSizeMb = 256;
+
+        /**
+         * Number of buffered point values republished per Quartz tick.
+         */
+        @Min(1)
+        private int batchSize = 200;
+
+        /**
+         * Quartz cron expression for the buffer republish job.
+         */
+        @NotBlank(message = "Buffer republish cron can't be empty")
+        private String republishCron = "0/10 * * * * ?";
+
+        /**
+         * Maximum republish attempts before a buffered record is dropped as poison.
+         */
+        @Min(1)
+        private int maxRetry = 50;
+
+        /**
+         * Initial backoff before the first republish retry, in seconds.
+         */
+        @Min(1)
+        private long backoffSeconds = 10;
+
+        /**
+         * Upper bound the doubling backoff is capped at, in seconds.
+         */
+        @Min(1)
+        private long maxBackoffSeconds = 600;
 
     }
 
