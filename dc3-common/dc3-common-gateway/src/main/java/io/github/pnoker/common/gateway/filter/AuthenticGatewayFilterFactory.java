@@ -33,13 +33,23 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
+public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthenticGatewayFilterFactory.Config> {
 
     private final AuthenticGatewayFilter authenticGatewayFilter;
 
     @Override
-    public GatewayFilter apply(Object config) {
+    public GatewayFilter apply(Config config) {
         return authenticGatewayFilter;
+    }
+
+    /**
+     * Empty configuration marker for the authentic gateway filter.
+     * <p>
+     * The filter has no tunable options; this class exists to give the factory a
+     * dedicated, named config type instead of the overly generic {@code Object},
+     * which produces a confusing method signature.
+     */
+    public static class Config {
     }
 
 }
