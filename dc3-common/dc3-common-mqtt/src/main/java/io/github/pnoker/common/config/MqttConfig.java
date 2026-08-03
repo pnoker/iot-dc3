@@ -24,6 +24,7 @@ import io.github.pnoker.common.utils.MqttUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
@@ -147,7 +148,7 @@ public class MqttConfig {
 
     private String prefixedTopicName(String topicName) {
         String topicPrefix = mqttProperties.getTopicPrefix();
-        if (StringUtils.isBlank(topicPrefix) || StringUtils.startsWith(topicName, topicPrefix)) {
+        if (StringUtils.isBlank(topicPrefix) || Strings.CS.startsWith(topicName, topicPrefix)) {
             return topicName;
         }
         return topicPrefix + topicName;

@@ -31,6 +31,7 @@ import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -67,7 +68,7 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
             fact.setAlarmId(firingAlarmId);
             return;
         }
-        if (!StringUtils.equalsIgnoreCase(AlarmConstant.MATCH_TYPE_FIRING, match.getMatchType())) {
+        if (!Strings.CI.equals(AlarmConstant.MATCH_TYPE_FIRING, match.getMatchType())) {
             return;
         }
 

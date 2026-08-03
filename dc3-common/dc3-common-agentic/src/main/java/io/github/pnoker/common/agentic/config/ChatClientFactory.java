@@ -39,6 +39,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.extern.slf4j.Slf4j;
 import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.chat.client.ChatClient;
@@ -123,7 +124,7 @@ public class ChatClientFactory {
         }
         String fallback = StringUtils.trimToNull(fallbackModel);
         if (StringUtils.isNotBlank(fallback)) {
-            if (StringUtils.isNotBlank(candidate) && !StringUtils.equals(candidate, fallback)) {
+            if (StringUtils.isNotBlank(candidate) && !Strings.CS.equals(candidate, fallback)) {
                 log.warn("Agentic requested model is not configured, falling back to Spring AI model, requestedModel={}, fallbackModel={}",
                         sanitize(candidate), sanitize(fallback));
             }
@@ -199,7 +200,7 @@ public class ChatClientFactory {
         if (Objects.nonNull(config)) {
             return Boolean.TRUE.equals(config.getToolCall());
         }
-        return StringUtils.isNotBlank(fallbackModel) && StringUtils.equals(model, fallbackModel)
+        return StringUtils.isNotBlank(fallbackModel) && Strings.CS.equals(model, fallbackModel)
                 && properties.isFallbackToolCallingEnabled();
     }
 

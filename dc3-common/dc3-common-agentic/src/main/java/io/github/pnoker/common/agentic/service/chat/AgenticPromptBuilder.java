@@ -83,7 +83,7 @@ public class AgenticPromptBuilder {
         if (!prepared.toolCallingEnabled()) {
             return promptSpec;
         }
-        return promptSpec.toolCallbacks(toolCallbackProvider).advisors(toolCallAdvisor);
+        return promptSpec.tools(toolCallbackProvider).advisors(toolCallAdvisor);
     }
 
     private ChatClient.ChatClientRequestSpec applyRequestOptions(ChatClient.ChatClientRequestSpec promptSpec,
