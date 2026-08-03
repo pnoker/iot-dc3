@@ -150,8 +150,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         }
         checkDriverOnline(tenantId, driver.getId());
 
-        FacadePointBO point = pointFacade.getById(tenantId, entityBO.getPointId());
-        pointCommandValidator.validateWriteValue(entityBO.getValue(), Objects.nonNull(point) ? point.getPointExt() : null);
+        pointCommandValidator.validateWriteValue(entityBO.getValue());
 
         String commandId = resolveCommandId(entityBO.getCommandId());
         LocalDateTime nowLocal = LocalDateTime.now();

@@ -48,5 +48,5 @@ export function isNull(val: unknown): boolean {
   if (val !== null && typeof val === 'object') {
     return Object.keys(val as object).length === 0;
   }
-  return val === 'null' || val == null || val === 'undefined' || val === undefined || val === '';
+  return val === 'null' || val == null || val === 'undefined' || val === '';
 }
