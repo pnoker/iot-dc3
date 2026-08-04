@@ -27,11 +27,15 @@ If you find a potential security vulnerability while using **iot-dc3**, **do not
 discussion areas**, but report it through the following private
 channels:
 
-1. **Email report**:  
+1. **GitHub Security Advisory (preferred)**:  
+   Use [private vulnerability reporting](https://github.com/pnoker/iot-dc3/security/advisories/new) on GitHub — this is
+   the recommended channel and reaches the maintainers directly with a tracked, private workflow.
+
+2. **Email report**:  
    Send an email to the project maintenance team, and please include the keyword `Security Vulnerability` in the subject
    line.
 
-2. **Direct message report**:  
+3. **Direct message report**:  
    You can directly contact the project maintainers through the private message function on Gitee or GitHub.
 
 ## Security Best Practices

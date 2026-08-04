@@ -84,19 +84,19 @@
         <grpc.version>1.81.0</grpc.version>
         <protobuf.version>4.35.0</protobuf.version>
         <spring-grpc.version>1.0.3</spring-grpc.version>
-        <okhttp.version>5.3.2</okhttp.version>
+        <okhttp.version>5.4.0</okhttp.version>
         <netty.version>4.2.10.Final</netty.version>
         <paho.mqttv3.version>1.2.5</paho.mqttv3.version>
 
         <!-- Data access -->
-        <mybatis.plus.version>3.5.16</mybatis.plus.version>
+        <mybatis.plus.version>3.5.17</mybatis.plus.version>
         <mybatis.plus.dynamic.version>4.5.0</mybatis.plus.dynamic.version>
         
         <!-- Embedded database for the driver local point-value buffer -->
         <sqlite-jdbc.version>3.53.2.0</sqlite-jdbc.version>
 
         <!-- Serialization and data formats -->
-        <tools.jackson.version>3.1.4</tools.jackson.version>
+        <tools.jackson.version>3.1.5</tools.jackson.version>
         <jackson.version>2.21.3</jackson.version>
         <jackson.annotations.version>2.21</jackson.annotations.version>
         <jaxb.version>4.0.9</jaxb.version>

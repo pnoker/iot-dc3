@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.data.dal.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import io.github.pnoker.common.data.dal.NotifyManager;
 import io.github.pnoker.common.data.entity.model.NotifyDO;
 import io.github.pnoker.common.data.mapper.NotifyMapper;

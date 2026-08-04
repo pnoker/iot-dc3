@@ -2,6 +2,7 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
+    target-branch: develop
     schedule:
       interval: weekly
       day: monday
@@ -11,6 +12,7 @@ updates:
 
   - package-ecosystem: npm
     directory: /docs
+    target-branch: develop
     schedule:
       interval: weekly
       day: monday
@@ -20,6 +22,7 @@ updates:
 
   - package-ecosystem: npm
     directory: /dc3-web
+    target-branch: develop
     schedule:
       interval: weekly
       day: monday
@@ -29,6 +32,7 @@ updates:
 
   - package-ecosystem: maven
     directory: /
+    target-branch: develop
     schedule:
       interval: weekly
       day: monday
@@ -42,6 +46,7 @@ updates:
       - /dc3-web
       - /dc3/dependencies/rabbitmq
       - /dc3/dependencies/postgres
+    target-branch: develop
     schedule:
       interval: weekly
       day: monday

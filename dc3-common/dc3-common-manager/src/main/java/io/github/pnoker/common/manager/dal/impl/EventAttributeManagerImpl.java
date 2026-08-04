@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.manager.dal.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import io.github.pnoker.common.manager.dal.EventAttributeManager;
 import io.github.pnoker.common.manager.entity.model.EventAttributeDO;
 import io.github.pnoker.common.manager.mapper.EventAttributeMapper;

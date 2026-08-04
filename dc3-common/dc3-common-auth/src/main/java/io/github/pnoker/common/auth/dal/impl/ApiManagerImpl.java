@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.auth.dal.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import io.github.pnoker.common.auth.dal.ApiManager;
 import io.github.pnoker.common.auth.entity.model.ApiDO;
 import io.github.pnoker.common.auth.mapper.ApiMapper;
