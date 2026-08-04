@@ -36,15 +36,19 @@ type Pillar = {
     groups: ReadonlyArray<Group>
 }
 
-// Pillar order: 总览 → 架构 → 驱动 → AI → 基础 → 开发 → 运维 (after nav 首页)
+// Pillar order: 架构 → 驱动 → AI → 基础 → 开发 (after nav 首页)
+// Overview is absorbed into Architecture (project-overview group); Operations is
+// absorbed into Develop; AI stands alone — the consolidated 5-pillar design.
 const PILLARS: ReadonlyArray<Pillar> = [
-    {   // ① 总览
-        navKey: 'pillar.overview', landing: 'introduction',
-        paths: ['introduction', 'quickstart'], activeMatch: '^/(zh|en)/(introduction|quickstart)/',
+    {   // ① 架构(吸收总览:introduction 系列 + quickstart 概念在此安家)
+        navKey: 'pillar.architecture', landing: 'architecture',
+        paths: ['architecture', 'modules', 'introduction'],
+        activeMatch: '^/(zh|en)/(architecture|modules|introduction)/',
         groups: [
+            {key: '', items: [['architecture']]},
             {
-                key: '',
-                items: [['introduction'], ['introduction/concepts'], ['introduction/paths']]
+                key: 'group.project-overview',
+                items: [['introduction'], ['introduction/concepts'], ['introduction/paths'], ['introduction/concepts/tenant']]
             },
             {
                 key: 'group.objects-data',
@@ -52,26 +56,18 @@ const PILLARS: ReadonlyArray<Pillar> = [
             },
             {
                 key: 'group.capabilities-boundaries',
-                items: [['introduction/concepts/command'], ['introduction/concepts/event'], ['introduction/concepts/attribute-config'], ['introduction/concepts/tenant']]
+                items: [['introduction/concepts/command'], ['introduction/concepts/event'], ['introduction/concepts/attribute-config']]
             },
-            {key: 'group.quickstart', items: [['quickstart'], ['quickstart/environment'], ['quickstart/first-device']]},
-            {key: 'group.appendix', items: [['introduction/glossary'], ['introduction/license']]}
-        ]
-    },
-    {   // ② 架构
-        navKey: 'pillar.architecture', landing: 'architecture',
-        paths: ['architecture', 'modules'], activeMatch: '^/(zh|en)/(architecture|modules)/',
-        groups: [
-            {key: '', items: [['architecture']]},
             {key: 'group.services-collab', items: [['architecture/services'], ['architecture/facade-modes']]},
             {
                 key: 'group.pipelines-model',
                 items: [['architecture/data-plane'], ['architecture/command-plane'], ['architecture/auth-rbac'], ['architecture/domain-model']]
             },
-            {key: 'group.modules', items: [['architecture/modules'], ['modules']]}
+            {key: 'group.modules', items: [['architecture/modules'], ['modules']]},
+            {key: 'group.appendix', items: [['introduction/glossary'], ['introduction/license']]}
         ]
     },
-    {   // ③ 驱动
+    {   // ② 驱动
         navKey: 'pillar.drivers', landing: 'drivers',
         paths: ['drivers', 'operation/device-onboarding'],
         activeMatch: '^/(zh|en)/(drivers/|operation/device-onboarding)',
@@ -98,7 +94,7 @@ const PILLARS: ReadonlyArray<Pillar> = [
             {key: 'group.appendix-drivers', items: [['drivers/matrix']]}
         ]
     },
-    {   // ④ AI
+    {   // ③ AI(从开发提取为独立顶级 pillar)
         navKey: 'pillar.ai',
         landing: 'ai',
         paths: ['ai'],
@@ -108,7 +104,7 @@ const PILLARS: ReadonlyArray<Pillar> = [
             {key: 'group.ai-integration', items: [['ai/agentic'], ['ai/mcp'], ['ai/spring-ai-deep-dive']]}
         ]
     },
-    {   // ⑤ 基础
+    {   // ④ 基础
         navKey: 'pillar.foundations', landing: 'foundations',
         paths: ['foundations'], activeMatch: '^/(zh|en)/foundations/',
         groups: [
@@ -120,29 +116,24 @@ const PILLARS: ReadonlyArray<Pillar> = [
             {key: 'group.security', items: [['foundations/security']]}
         ]
     },
-    {   // ⑥ 开发
+    {   // ⑤ 开发(吸收运维:quickstart → 部署运维 → 开发 → 前端 → 自动化 → 运营)
         navKey: 'pillar.develop',
         landing: 'development',
-        paths: ['development', 'frontend', 'automation'],
-        activeMatch: '^/(zh|en)/(development|frontend|automation)/',
+        paths: ['development', 'frontend', 'automation', 'quickstart', 'operation', 'guide'],
+        activeMatch: '^/(zh|en)/(development|frontend|automation|quickstart|operation|guide)/',
         groups: [
+            {key: 'group.quickstart', items: [['quickstart'], ['quickstart/environment'], ['quickstart/first-device']]},
+            {
+                key: 'group.deploy-ops',
+                items: [['guide/usage'], ['guide/observability'], ['guide/logging'], ['guide/troubleshooting']]
+            },
             {
                 key: 'group.development',
                 items: [['development'], ['development/driver-authoring'], ['development/api-documentation'], ['development/technology-stack'], ['development/testing'], ['development/changelog']]
             },
             {key: 'group.frontend', items: [['frontend'], ['frontend/test-debugging']]},
-            {key: 'group.automation', items: [['automation/cli']]}
-        ]
-    },
-    {   // ⑦ 运维
-        navKey: 'pillar.operations', landing: 'operation',
-        paths: ['operation', 'guide'], activeMatch: '^/(zh|en)/(operation|guide)/',
-        groups: [
-            {key: 'group.operations', items: [['operation'], ['operation/data-commands'], ['operation/alarms']]},
-            {
-                key: 'group.deploy-ops',
-                items: [['guide/usage'], ['guide/observability'], ['guide/logging'], ['guide/troubleshooting']]
-            }
+            {key: 'group.automation', items: [['automation/cli']]},
+            {key: 'group.operations', items: [['operation'], ['operation/data-commands'], ['operation/alarms']]}
         ]
     }
 ]
