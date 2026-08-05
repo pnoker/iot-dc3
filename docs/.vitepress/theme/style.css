@@ -127,6 +127,27 @@ body {
     }
 }
 
+/* Order the right-side toolbar so the version switcher sits between the
+   language switcher and the appearance (theme) toggle. The version switcher
+   is injected last via the nav-bar-content-after slot (see theme/index.ts);
+   without this it renders after the social links, at the far right. Desktop
+   only — below this breakpoint the translations/appearance controls collapse
+   into the hamburger extra-menu and this reordering does not apply. */
+@media (min-width: 960px) {
+    .VPNavBar .content .content-body .VPNavBarTranslations {
+        order: 6;
+    }
+    .VPNavBar .content .content-body .dc3-version-switcher {
+        order: 7;
+    }
+    .VPNavBar .content .content-body .VPNavBarAppearance {
+        order: 8;
+    }
+    .VPNavBar .content .content-body .VPNavBarSocialLinks {
+        order: 9;
+    }
+}
+
 .VPNavBarTitle .title {
     font-weight: 720;
     letter-spacing: 0;
