@@ -19,7 +19,29 @@ import {ok, okArray, okPage, responseOf} from '../response';
 import type {Handler} from '../types';
 
 /** Endpoints that return a flat array (not a PageResult) on success. */
-const ARRAY_SUFFIXES = /(_by_ids|_list_by_|list_tree|\/list)$/;
+const ARRAY_SUFFIXES = /(_by_ids|_list_by_|list_tree)$/;
+
+const CREATED = '2026-07-15T09:30:00';
+const UPDATED = '2026-08-01T14:20:00';
+
+/**
+ * Generic 3-row stub for unregistered auth/manager list endpoints (most of the
+ * settings family) so those tables aren't blank. Field names stay broad
+ * (id/name/enableFlag/createTime/operateTime/remark) to satisfy common columns;
+ * entity-specific columns may render empty, which is fine for a demo.
+ */
+const stubPage = (url: string) => {
+  const entity = url.split('/').slice(-2, -1)[0] || 'entity';
+  const records = Array.from({length: 3}, (_, i) => ({
+    id: `mock-${entity}-${i + 1}`,
+    name: `Mock ${entity} ${i + 1}`,
+    enableFlag: 'ENABLE',
+    createTime: CREATED,
+    operateTime: UPDATED,
+    remark: 'Demo data',
+  }));
+  return okPage(records);
+};
 
 /**
  * Last-resort handler: shape the response by URL suffix so unregistered
@@ -31,7 +53,10 @@ export const fallbackHandler: Handler = (ctx) => {
   const {url, params, body} = ctx;
 
   if (url.endsWith('/list')) {
-    return responseOf(ctx.config, okPage([] as Record<string, unknown>[], 0));
+    // Settings/manager tables get stubbed rows; data-domain lists (point_value,
+    // command_history, …) stay empty since their consumers expect specific shapes.
+    const isConfigDomain = url.startsWith('api/v3/auth/') || url.startsWith('api/v3/manager/');
+    return responseOf(ctx.config, isConfigDomain ? stubPage(url) : okPage([] as Record<string, unknown>[], 0));
   }
   if (ARRAY_SUFFIXES.test(url)) {
     return responseOf(ctx.config, okArray([]));
@@ -39,7 +64,7 @@ export const fallbackHandler: Handler = (ctx) => {
   if (url.endsWith('/get_by_id')) {
     return responseOf(
       ctx.config,
-      ok({id: String(params.id ?? '0'), name: 'Mock Entity', enableFlag: 'ENABLED'}),
+      ok({id: String(params.id ?? '0'), name: 'Mock Entity', enableFlag: 'ENABLE'}),
     );
   }
   if (/(\/(add|update|delete))$/.test(url)) {

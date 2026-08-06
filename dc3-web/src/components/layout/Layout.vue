@@ -19,7 +19,7 @@
   <div class="container">
     <div class="header">
       <el-col :span="4" class="header_item">
-        <img class="header_logo" src="/images/logo/logo.svg"/>
+        <img class="header_logo" :src="assetUrl('images/logo/logo.svg')"/>
       </el-col>
       <el-col :span="16" class="header_item">
         <el-menu :default-active="handleMenuEnter($route.path)" :router="true" class="header_menu" mode="horizontal">
@@ -58,7 +58,7 @@
         <el-dropdown trigger="click" @command="handleCommand">
           <span class="user_avatar">
             <el-avatar>
-              <img src="/images/common/avatar.png"/>
+              <img :src="assetUrl('images/common/avatar.png')"/>
             </el-avatar>
             <span class="user_name">{{ t('layout.admin') }}</span>
           </span>
@@ -102,7 +102,7 @@
           <router-view/>
         </div>
       </div>
-      <agentic-assistant/>
+      <agentic-assistant v-if="!isMock"/>
       <el-backtop :bottom="40" :right="40" target=".body-main .el-scrollbar__wrap"/>
     </div>
   </div>
@@ -124,12 +124,18 @@ import {
 import {useAgenticStore, useAuthStore, useMenuStore} from '@/store';
 import type {MenuNode} from '@/store/modules/menu';
 import {resolveMenuTitle} from '@/utils/menuUtil';
+import {assetUrl} from '@/utils/assetUrl';
 
 const {t, locale} = useI18n();
 const route = useRoute();
 const authStore = useAuthStore();
 const menuStore = useMenuStore();
 const agenticStore = useAgenticStore();
+
+// Hide the AI assistant in the static demo: its chat streams over a raw fetch
+// (src/api/agentic.ts) that bypasses the axios mock adapter. The build-time
+// MODE literal collapses this to a constant in production.
+const isMock = import.meta.env.MODE === 'mock';
 
 const langOptions = [
   {label: 'EN', value: 'en'},

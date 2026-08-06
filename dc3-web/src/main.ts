@@ -22,8 +22,20 @@ import plugins from '@/config/plugins/index';
 import router from '@/config/router';
 import {createApp} from 'vue';
 import {logger} from '@/utils/log';
+import {AUTH_HEADERS} from '@/config/constant/common';
+import {setStorage} from '@/utils/storageUtil';
 
 import '@/styles/global.scss'; // config app
+
+// Pre-seed auth in mock mode BEFORE the router is installed. Vue Router's
+// initial navigation runs as a microtask, ahead of the async mock-chunk
+// import in bootstrap() below; without this the guard sees empty storage and
+// bounces every route to /login on first load.
+if (import.meta.env.MODE === 'mock') {
+  setStorage(AUTH_HEADERS.TENANT, 'default');
+  setStorage(AUTH_HEADERS.LOGIN, 'dc3');
+  setStorage(AUTH_HEADERS.TOKEN, {salt: 'mock-salt', token: 'mock-token'});
+}
 
 // config app
 const app = createApp(App);

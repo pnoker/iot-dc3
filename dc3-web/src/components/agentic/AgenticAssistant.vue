@@ -31,7 +31,7 @@
         <div class="agentic-header__top">
           <div class="agentic-title">
             <div class="agentic-mark">
-              <img alt="" src="/images/common/llm.svg"/>
+              <img alt="" :src="assetUrl('images/common/llm.svg')"/>
             </div>
             <div>
               <strong>{{ t('agentic.title') }}</strong>
@@ -209,7 +209,7 @@
           <Welcome
             :description="t('agentic.welcomeDescription')"
             :title="t('agentic.title')"
-            icon="/images/logo/logo.svg"
+            :icon="assetUrl('images/logo/logo.svg')"
             variant="borderless"
           />
           <Prompts :items="promptItems" :wrap="true" @item-click="handlePromptClick"/>
@@ -501,6 +501,7 @@ import type {AgenticMessage, AgenticMessageContext, AgenticMessageTokens, Agenti
 import {useAgenticStore} from '@/store';
 import RenderedAssistantMessage from './RenderedAssistantMessage.vue';
 import {toPlainText} from './assistantContent';
+import {assetUrl} from '@/utils/assetUrl';
 
 interface AssistantPromptItem {
   key: string | number;
