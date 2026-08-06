@@ -6,7 +6,6 @@ title: Data Intelligence & AIoT
 import AiotDiagram from '../../.vitepress/theme/components/AiotDiagram.vue'
 </script>
 
-
 # Data Intelligence & AIoT
 
 Once data is collected and stored in the time-series database, the real value is only beginning: turning a flood of

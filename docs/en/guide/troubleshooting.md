@@ -6,7 +6,6 @@ title: Troubleshooting
 import TroubleshootingDiagram from '../../.vitepress/theme/components/TroubleshootingDiagram.vue'
 </script>
 
-
 # Troubleshooting
 
 This page walks you through the most common startup and connection failures, and helps you tell them apart fast. Each

@@ -7,7 +7,6 @@ import CommandStateDiagram from '../../.vitepress/theme/components/CommandStateD
 import CommandFlowDiagram from '../../.vitepress/theme/components/CommandFlowDiagram.vue'
 </script>
 
-
 # 命令平面：读写命令的下发与回执
 
 数据平面把设备的值采上来，命令平面做相反的事：把一次"读这个位号"或"给这个位号写值"的请求，从 HTTP

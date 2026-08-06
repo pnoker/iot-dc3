@@ -7,7 +7,6 @@ import ApiDocFlowDiagram from '../../.vitepress/theme/components/ApiDocFlowDiagr
 import ApiDocSequenceDiagram from '../../.vitepress/theme/components/ApiDocSequenceDiagram.vue'
 </script>
 
-
 # API 文档
 
 IoT DC3 的 REST 接口文档由代码注解自动生成，经网关聚合成一个统一的 Swagger

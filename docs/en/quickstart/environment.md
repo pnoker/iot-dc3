@@ -6,7 +6,6 @@ title: Environment Variables Explained
 import EnvironmentDiagram from '../../.vitepress/theme/components/EnvironmentDiagram.vue'
 </script>
 
-
 # Environment Variables Explained
 
 IoT DC3 has two separate sets of environment files, and they target different consumers. The root `.env` feeds Docker

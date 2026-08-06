@@ -6,7 +6,6 @@ title: 系统架构总览
 import ArchitectureIndexFlowDiagram from '../../.vitepress/theme/components/ArchitectureIndexFlowDiagram.vue'
 </script>
 
-
 # 系统架构总览
 
 IoT DC3 把"采集—归一—分析—执行—反馈"

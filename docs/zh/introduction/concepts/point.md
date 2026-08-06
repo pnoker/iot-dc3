@@ -26,20 +26,20 @@ import PointRelationDiagram from '../../../.vitepress/theme/components/PointRela
 
 位号 `PointBO`（表 `dc3_point`）：
 
-| 字段              | 类型             | 含义                          |
-|-----------------|----------------|-----------------------------|
-| `pointName`     | String         | 位号名称（展示用，如"室温"）             |
+| 字段              | 类型             | 含义                         |
+|-----------------|----------------|----------------------------|
+| `pointName`     | String         | 位号名称（展示用，如"室温"）            |
 | `pointCode`     | String         | 位号标识符，同一[模板](./profile)下唯一 |
-| `pointTypeFlag` | PointTypeEnum  | 数据类型，见下                     |
-| `rwFlag`        | RwTypeEnum     | 读写能力，见下                     |
-| `unit`          | String         | 工程单位，如 `℃`、`kPa`            |
-| `baseValue`     | BigDecimal     | 线性换算的偏移量（默认 `0`）            |
-| `multiple`      | BigDecimal     | 线性换算的倍率（默认 `1`）             |
-| `valueDecimal`  | Byte           | 小数精度，浮点取值的保留位数（默认 `6`）      |
+| `pointTypeFlag` | PointTypeEnum  | 数据类型，见下                    |
+| `rwFlag`        | RwTypeEnum     | 读写能力，见下                    |
+| `unit`          | String         | 工程单位，如 `℃`、`kPa`           |
+| `baseValue`     | BigDecimal     | 线性换算的偏移量（默认 `0`）           |
+| `multiple`      | BigDecimal     | 线性换算的倍率（默认 `1`）            |
+| `valueDecimal`  | Byte           | 小数精度，浮点取值的保留位数（默认 `6`）     |
 | `profileId`     | Long           | 归属的[模板](./profile)         |
-| `pointExt`      | PointExt       | 扩展配置（协议映射、约束、采集策略等）         |
-| `enableFlag`    | EnableFlagEnum | 启停状态                        |
-| `tenantId`      | Long           | 归属[租户](./tenant)            |
+| `pointExt`      | PointExt       | 扩展配置（协议映射、约束、采集策略等）        |
+| `enableFlag`    | EnableFlagEnum | 启停状态                       |
+| `tenantId`      | Long           | 归属[租户](./tenant)           |
 
 ## 数据类型 `pointTypeFlag`
 

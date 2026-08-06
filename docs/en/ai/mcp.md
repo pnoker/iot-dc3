@@ -8,7 +8,6 @@ import McpOAuthSequenceDiagram from '../../.vitepress/theme/components/McpOAuthS
 import McpConfirmSequenceDiagram from '../../.vitepress/theme/components/McpConfirmSequenceDiagram.vue'
 </script>
 
-
 # AI Agent / MCP Integration
 
 IoT DC3 turns the platform's entire HTTP surface into a single MCP (Model Context Protocol) tool catalog. An external AI

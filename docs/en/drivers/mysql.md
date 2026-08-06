@@ -6,7 +6,6 @@ title: MySQL Driver
 import MysqlDiagram from '../../.vitepress/theme/components/MysqlDiagram.vue'
 </script>
 
-
 # MySQL Driver
 
 `dc3-driver-mysql` onboards a MySQL database into IoT DC3 as a data source: acting as a database client, it runs a

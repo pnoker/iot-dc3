@@ -6,7 +6,6 @@ title: 日志规范
 import LoggingDiagram from '../../.vitepress/theme/components/LoggingDiagram.vue'
 </script>
 
-
 # 日志规范
 
 IoT DC3 的日志要同时服务两个读者：本地开发时的人，和线上排障时的机器。这页讲清两者怎么兼顾——结构化消息、MDC

@@ -6,7 +6,6 @@ title: AI
 import AiIndexDiagram from '../../.vitepress/theme/components/AiIndexDiagram.vue'
 </script>
 
-
 # AI
 
 IoT DC3 plugs large language models into operations, so a model can do more than read data — it can act on devices. This

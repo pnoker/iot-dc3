@@ -6,7 +6,6 @@ title: OPC DA 驱动
 import OpcDaDiagram from '../../.vitepress/theme/components/OpcDaDiagram.vue'
 </script>
 
-
 # OPC DA 驱动
 
 `dc3-driver-opc-da` 作为 OPC DA 客户端，通过 Windows DCOM 连接现场的 OPC DA

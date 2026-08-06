@@ -7,7 +7,6 @@ import AgenticSequenceDiagram from '../../.vitepress/theme/components/AgenticSeq
 import AgenticErDiagram from '../../.vitepress/theme/components/AgenticErDiagram.vue'
 </script>
 
-
 # Agentic Center: AI-Assisted Operations
 
 The Agentic Center (`dc3-center-agentic`) connects an OpenAI-compatible large language model to IoT DC3's devices,

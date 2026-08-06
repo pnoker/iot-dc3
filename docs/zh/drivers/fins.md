@@ -6,7 +6,6 @@ title: FINS 驱动
 import FinsDiagram from '../../.vitepress/theme/components/FinsDiagram.vue'
 </script>
 
-
 # FINS 驱动
 
 `dc3-driver-fins` 把欧姆龙（Omron）PLC 通过 FINS 协议接入 IoT DC3：作为 FINS 客户端主动 TCP 连接
@@ -78,7 +77,8 @@ FINS 的接入参数分两类：连到哪台 PLC 由设备级的 **driver 属性
 
 ::: tip 读取字长由 `dataType` 决定
 读取时按 `dataType` 请求对应字长：`INT32`/`UINT32`/`FLOAT` 读 **2 个字（4 字节）**，其余类型读 **1 个字（2 字节）**（见
-`wordCount()`）。解码支持 `INT16`/`UINT16`/`INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD`，均按大端序（Big-Endian）解码；位号的数据类型（[Point](../introduction/concepts/point)
+`wordCount()`）。解码支持 `INT16`/`UINT16`/`INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD`
+，均按大端序（Big-Endian）解码；位号的数据类型（[Point](../introduction/concepts/point)
 的 `pointTypeFlag`）应与这里的 `dataType` 对得上。
 :::
 
@@ -111,7 +111,8 @@ FINS 的接入参数分两类：连到哪台 PLC 由设备级的 **driver 属性
 
 - **连不上 / 一直离线**：先确认 PLC 已启用 FINS/TCP 且端口为 `9600`（驱动只走 TCP，不会回退 UDP）。连接失败时驱动记
   `Driver FINS connection failed` 日志并把该设备置为离线，下个健康检查周期会重试。检查 `host`、网络可达性、PLC 侧是否限制了客户端连接数。
-- **读到的值不对**：确认 `dataType` 与 PLC 侧寄存器的实际类型/字长一致（`INT32`/`UINT32`/`FLOAT` 会读 2 个字），且字节序为大端；类型不匹配会解出错误数值。
+- **读到的值不对**：确认 `dataType` 与 PLC 侧寄存器的实际类型/字长一致（`INT32`/`UINT32`/`FLOAT` 会读 2
+  个字），且字节序为大端；类型不匹配会解出错误数值。
 - **endCode 非 0**：响应帧第 12–13 字节是 FINS 结束码，非 0 表示 PLC 拒绝（如地址越界、内存区不存在、权限不足）。驱动会抛
   `FINS command failed, endCode=0x...`，按 FINS 手册查该码含义并核对 `memoryArea`/`address` 是否落在 PLC 实际内存范围内。
 - **写浮点**：写命令对 `INT32`/`UINT32` 按整数解析（`Integer.parseInt`）写 4 字节大端整数，对 `FLOAT` 按

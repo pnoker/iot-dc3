@@ -6,7 +6,6 @@ title: IoT Security
 import SecurityDiagram from '../../.vitepress/theme/components/SecurityDiagram.vue'
 </script>
 
-
 # IoT Security
 
 IoT wires "things that can go online" to "a physical world you can act on," so a single gap threatens data and control

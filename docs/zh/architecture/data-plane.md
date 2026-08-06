@@ -7,7 +7,6 @@ import DataPlaneClassDiagram from '../../.vitepress/theme/components/DataPlaneCl
 import DataPlaneSequenceDiagram from '../../.vitepress/theme/components/DataPlaneSequenceDiagram.vue'
 </script>
 
-
 # 数据平面：位号值如何落库
 
 设备侧采到的原始寄存器值，要经过驱动归一、消息总线、数据中心，最终写进时序库并对外可查。这页追踪一条位号值的完整旅程：用到的交换机与队列、消费者怎么持久化、模型变换经过哪几层、以及读取最新值时缓存如何命中。读完你能看懂一条值"

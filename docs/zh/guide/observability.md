@@ -6,7 +6,6 @@ title: 可观测性
 import ObservabilityDiagram from '../../.vitepress/theme/components/ObservabilityDiagram.vue'
 </script>
 
-
 # 可观测性
 
 IoT DC3 的日志聚合与指标监控是一套**可选**栈：一条命令 `make up-optional` 拉起 EMQX、ELK（Elasticsearch + Logstash +

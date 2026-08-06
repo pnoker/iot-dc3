@@ -6,7 +6,6 @@ title: CoAP Driver
 import CoapDiagram from '../../.vitepress/theme/components/CoapDiagram.vue'
 </script>
 
-
 # CoAP Driver
 
 `dc3-driver-coap` connects CoAP devices to IoT DC3. Built on Eclipse Californium, it can act as a **CoAP client** that

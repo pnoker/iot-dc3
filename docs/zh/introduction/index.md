@@ -7,7 +7,6 @@ import IntroductionLoopDiagram from '../../.vitepress/theme/components/Introduct
 import IntroductionArchitectureDiagram from '../../.vitepress/theme/components/IntroductionArchitectureDiagram.vue'
 </script>
 
-
 # 平台定位
 
 IoT DC3 是一个开源、面向 AI 场景演进的分布式物联网平台，覆盖设备接入、数据采集、运营管理与智能分析。它把"设备接入"和"AI 运营"

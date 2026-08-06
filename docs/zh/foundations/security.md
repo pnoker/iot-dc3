@@ -6,7 +6,6 @@ title: 物联网安全
 import SecurityDiagram from '../../.vitepress/theme/components/SecurityDiagram.vue'
 </script>
 
-
 # 物联网安全
 
 物联网把"能联网的设备"和"能动手脚的物理世界"

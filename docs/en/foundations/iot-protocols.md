@@ -7,7 +7,6 @@ import IotProtocolsMqttDiagram from '../../.vitepress/theme/components/IotProtoc
 import IotProtocolsWirelessDiagram from '../../.vitepress/theme/components/IotProtocolsWirelessDiagram.vue'
 </script>
 
-
 # IoT Protocols & Wireless Networks
 
 Fieldbuses connect the machines on a shop floor, but the wider Internet of Things—battery-powered sensors, water meters

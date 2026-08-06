@@ -28,7 +28,7 @@ import EventFlowDiagram from '../../../.vitepress/theme/components/EventFlowDiag
 | `eventCode`      | String            | 事件标识符，上报与告警规则按它匹配（如 `DOOR_FORCED`） |
 | `eventTypeFlag`  | EventTypeFlagEnum | 事件类型，见下                            |
 | `eventLevelFlag` | EventLevelEnum    | 事件级别，见下                            |
-| `profileId`      | Long              | 归属的[模板](./profile)                |
+| `profileId`      | Long              | 归属的[模板](./profile)                 |
 | `eventExt`       | JSON              | 扩展配置                               |
 
 事件参数 `EventParamBO`（表 `dc3_event_param`，声明事件携带哪些输出参数）：

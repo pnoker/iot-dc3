@@ -6,7 +6,6 @@ title: MySQL 驱动
 import MysqlDiagram from '../../.vitepress/theme/components/MysqlDiagram.vue'
 </script>
 
-
 # MySQL 驱动
 
 `dc3-driver-mysql` 把一个 MySQL 数据库当作数据源接入 IoT DC3：它作为数据库客户端，按采集周期对库里执行 `SELECT`

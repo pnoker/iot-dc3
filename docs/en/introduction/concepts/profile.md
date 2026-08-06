@@ -9,7 +9,8 @@ import ProfileLifecycleDiagram from '../../../.vitepress/theme/components/Profil
 
 # Profile (Thing Model) <Badge type="tip" text="Thing Model+" />
 
-> **A Profile is the "capability template for one kind of device"** <Badge type="tip" text="Thing Model+" />—it aggregates
+> **A Profile is the "capability template for one kind of device"** <Badge type="tip" text="Thing Model+" />—it
+> aggregates
 > the [Points](./point), [Commands](./command), and [Events](./event) shared by devices of the same model, describing "
 > what this kind of device can sample, control, and report". A [Device](./device) belongs to exactly one Profile, and
 > many
@@ -29,7 +30,8 @@ device is like "one physical unit manufactured to that spec". You write the spec
 The "Thing Model" is a common industry design for modeling device capabilities. DC3's **Profile** is a **peer
 abstraction**—both answer "what capabilities does a kind of device have". DC3 did not adopt the `Product` / `ThingModel`
 naming; it chose **Profile**, and its capabilities are **stronger** than a typical thing model: a Profile supports
-[sharing scopes](#enumerations) (reuse across tenant / driver / user), version evolution, a weakly-structured `profileExt`
+[sharing scopes](#enumerations) (reuse across tenant / driver / user), version evolution, a weakly-structured
+`profileExt`
 extension, and more—more flexible than the fixed "one product, one thing model" structure. Think of it as
 **Profile ⊇ Thing Model**: anything a thing model can express, a Profile can too, but not vice versa (see
 the [design philosophy](../../architecture/domain-model)).
@@ -37,15 +39,15 @@ the [design philosophy](../../architecture/domain-model)).
 
 **Profile vs. Thing Model (see the "plus" at a glance):**
 
-| Dimension        | Thing Model (industry-generic) | Profile (DC3) <Badge type="tip" text="Thing Model+" />        |
-|------------------|--------------------------------|--------------------------------------------------------------|
-| Positioning      | An abstraction for device-capability modeling | Peer abstraction, stronger (a superset)       |
-| Capability set   | Properties / services / events | [Points](./point) / [Commands](./command) / [Events](./event) |
-| Reuse scope      | Usually fixed per product      | Three sharing scopes: tenant / driver / user (`profileShareFlag`) |
-| Versioning       | Typically no explicit version  | Explicit `version`, queryable and evolvable                  |
-| Extension fields | Relatively fixed structure     | `profileExt` weakly-structured extension (can carry category / tags) |
-| Creation source  | —                              | `profileTypeFlag`: system / driver / user                    |
-| Device binding   | Implementation-dependent       | Exactly one (`Device.profileId`, single foreign key)         |
+| Dimension        | Thing Model (industry-generic)                | Profile (DC3) <Badge type="tip" text="Thing Model+" />               |
+|------------------|-----------------------------------------------|----------------------------------------------------------------------|
+| Positioning      | An abstraction for device-capability modeling | Peer abstraction, stronger (a superset)                              |
+| Capability set   | Properties / services / events                | [Points](./point) / [Commands](./command) / [Events](./event)        |
+| Reuse scope      | Usually fixed per product                     | Three sharing scopes: tenant / driver / user (`profileShareFlag`)    |
+| Versioning       | Typically no explicit version                 | Explicit `version`, queryable and evolvable                          |
+| Extension fields | Relatively fixed structure                    | `profileExt` weakly-structured extension (can carry category / tags) |
+| Creation source  | —                                             | `profileTypeFlag`: system / driver / user                            |
+| Device binding   | Implementation-dependent                      | Exactly one (`Device.profileId`, single foreign key)                 |
 
 > In one line: **a Profile is the enhanced version of a thing model**—it keeps the peer "capability template for a class
 > of devices" abstraction and layers platform capabilities (sharing, versioning, extension) on top.

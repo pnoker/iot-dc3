@@ -7,7 +7,6 @@ import DataPlaneClassDiagram from '../../.vitepress/theme/components/DataPlaneCl
 import DataPlaneSequenceDiagram from '../../.vitepress/theme/components/DataPlaneSequenceDiagram.vue'
 </script>
 
-
 # Data Plane: How a Point Value Lands in Storage
 
 A raw register read on a device has a long way to go before it becomes a queryable value. It passes through driver

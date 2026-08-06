@@ -7,7 +7,6 @@ import CommandStateDiagram from '../../.vitepress/theme/components/CommandStateD
 import CommandFlowDiagram from '../../.vitepress/theme/components/CommandFlowDiagram.vue'
 </script>
 
-
 # Command Plane: Dispatching Read/Write Commands and Their Receipts
 
 The data plane pulls values up from devices. The command plane runs the other way: it takes a "read this point" or "

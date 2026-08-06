@@ -6,7 +6,6 @@ title: Serial Driver
 import SerialDiagram from '../../.vitepress/theme/components/SerialDiagram.vue'
 </script>
 
-
 # Serial Driver
 
 `dc3-driver-serial` connects RS232/RS485/RS422 serial devices that speak proprietary frames to IoT DC3: acting as the

@@ -6,7 +6,6 @@ title: DLMS/COSEM 驱动
 import DlmsDiagram from '../../.vitepress/theme/components/DlmsDiagram.vue'
 </script>
 
-
 # DLMS/COSEM 驱动
 
 `dc3-driver-dlms` 把 DLMS/COSEM 计量设备（电表、水表、气表、热表）接入 IoT DC3：它以 **OBIS 编码**为目标，作为 DLMS

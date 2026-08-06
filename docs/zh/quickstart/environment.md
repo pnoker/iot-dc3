@@ -6,7 +6,6 @@ title: 环境变量详解
 import EnvironmentDiagram from '../../.vitepress/theme/components/EnvironmentDiagram.vue'
 </script>
 
-
 # 环境变量详解
 
 IoT DC3 有两套环境变量文件，读取者完全不同：根目录 `.env` 给 Docker Compose 做插值，`dc3/env/dev.env(.sh)` 给本地 Java

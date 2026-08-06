@@ -6,7 +6,6 @@ title: 工业总线与协议
 import FieldbusDiagram from '../../.vitepress/theme/components/FieldbusDiagram.vue'
 </script>
 
-
 # 工业总线与协议
 
 工业现场的设备说着几十种互不相通的"方言"——PLC

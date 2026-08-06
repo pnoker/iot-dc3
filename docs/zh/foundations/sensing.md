@@ -6,7 +6,6 @@ title: 传感与测量
 import SensingDiagram from '../../.vitepress/theme/components/SensingDiagram.vue'
 </script>
 
-
 # 传感与测量
 
 感知层是物联网的"皮肤与神经末梢"

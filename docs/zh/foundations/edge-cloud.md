@@ -6,7 +6,6 @@ title: 边缘与云架构
 import EdgeCloudDiagram from '../../.vitepress/theme/components/EdgeCloudDiagram.vue'
 </script>
 
-
 # 边缘与云架构
 
 物联网的平台层不只是"一台服务器"

@@ -6,7 +6,6 @@ title: "为什么选择 Spring AI：DC3 如何让大模型操控你的工厂"
 import SpringAiSequenceDiagram from '../../.vitepress/theme/components/SpringAiSequenceDiagram.vue'
 </script>
 
-
 # 为什么选择 Spring AI：DC3 如何让大模型操控你的工厂
 
 2025 年，大语言模型（LLM）不再只是聊天机器人，它们正在成为运维操作员。GPT-4o、Claude 4、DeepSeek、Qwen —

@@ -6,7 +6,6 @@ title: AI
 import AiIndexDiagram from '../../.vitepress/theme/components/AiIndexDiagram.vue'
 </script>
 
-
 # AI
 
 IoT DC3 把大语言模型接进了运营流程，让模型不只"看数据"，还能"动设备"。AI 栏目覆盖两种让 LLM 驱动操作的方式，区别在于谁来发起、怎么约束：

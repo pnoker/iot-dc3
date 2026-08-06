@@ -6,7 +6,6 @@ title: Logging Conventions
 import LoggingDiagram from '../../.vitepress/theme/components/LoggingDiagram.vue'
 </script>
 
-
 # Logging Conventions
 
 IoT DC3 logs are read by two audiences: you, during local development, and machines, during production troubleshooting.

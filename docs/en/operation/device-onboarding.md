@@ -7,7 +7,6 @@ import DeviceOnboardingSelectDiagram from '../../.vitepress/theme/components/Dev
 import DeviceOnboardingFlowDiagram from '../../.vitepress/theme/components/DeviceOnboardingFlowDiagram.vue'
 </script>
 
-
 # Device Onboarding
 
 Onboarding a field device into IoT DC3 takes five steps: pick a driver by protocol, build a profile and its points,

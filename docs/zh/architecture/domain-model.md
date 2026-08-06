@@ -9,7 +9,6 @@ import DomainModelClassDiagram from '../../.vitepress/theme/components/DomainMod
 import DomainModelSequenceDiagram from '../../.vitepress/theme/components/DomainModelSequenceDiagram.vue'
 </script>
 
-
 # 领域模型：DO / BO / VO 与对象关系
 
 这页写给要在平台上写代码的人：理清 Profile / Point / Command / Event / Device / Driver

@@ -6,7 +6,6 @@ title: LwM2M Driver
 import Lwm2mDiagram from '../../.vitepress/theme/components/Lwm2mDiagram.vue'
 </script>
 
-
 # LwM2M Driver
 
 `dc3-driver-lwm2m` embeds an Eclipse Leshan LwM2M server: devices act as clients and register with their own `endpoint`

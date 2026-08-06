@@ -21,16 +21,16 @@ title: 驱动能力矩阵
 这一类驱动作为主站（client）主动连设备，按[位号](../introduction/concepts/point)
 轮询读值、按[命令](../introduction/concepts/command)写值，不监听上报。`ethernet-ip` 目前是协议骨架，CIP 组帧尚未补全。
 
-| 驱动 (dc3.driver.code)                              | 类别       | 读 | 写 | 订阅/上报 | 实现状态 | 备注                 |
-|---------------------------------------------------|----------|---|---|-------|------|--------------------|
-| [Modbus TCP](./modbus-tcp) (`ModbusTcpDriver`)    | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 以太网 Modbus 主站      |
-| [Modbus RTU](./modbus-rtu) (`ModbusRtuDriver`)    | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 串口 Modbus 主站       |
-| [OPC UA](./opc-ua) (`OpcUaDriver`)                | 工业总线/PLC | ✓ | ✓ | —     | 完整   | OPC 统一架构客户端        |
-| [OPC DA](./opc-da) (`OpcDaDriver`)                | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 经典 OPC 数据访问（DCOM）  |
-| [S7](./plcs7) (`PlcS7Driver`)                     | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 西门子 PLC            |
-| [MELSEC](./melsec) (`MelsecDriver`)               | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 三菱 PLC（MC 协议）      |
+| 驱动 (dc3.driver.code)                              | 类别       | 读 | 写 | 订阅/上报 | 实现状态 | 备注                               |
+|---------------------------------------------------|----------|---|---|-------|------|----------------------------------|
+| [Modbus TCP](./modbus-tcp) (`ModbusTcpDriver`)    | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 以太网 Modbus 主站                    |
+| [Modbus RTU](./modbus-rtu) (`ModbusRtuDriver`)    | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 串口 Modbus 主站                     |
+| [OPC UA](./opc-ua) (`OpcUaDriver`)                | 工业总线/PLC | ✓ | ✓ | —     | 完整   | OPC 统一架构客户端                      |
+| [OPC DA](./opc-da) (`OpcDaDriver`)                | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 经典 OPC 数据访问（DCOM）                |
+| [S7](./plcs7) (`PlcS7Driver`)                     | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 西门子 PLC                          |
+| [MELSEC](./melsec) (`MelsecDriver`)               | 工业总线/PLC | ✓ | ✓ | —     | 完整   | 三菱 PLC（MC 协议）                    |
 | [FINS](./fins) (`FinsDriver`)                     | 工业总线/PLC | ✓ | ✓ | —     | 可用   | 欧姆龙 PLC，支持 16/32 位整数、浮点、字符串与 BCD |
-| [EtherNet/IP](./ethernet-ip) (`EthernetIpDriver`) | 工业总线/PLC | — | — | —     | 骨架   | 罗克韦尔 / CIP，组帧待补    |
+| [EtherNet/IP](./ethernet-ip) (`EthernetIpDriver`) | 工业总线/PLC | — | — | —     | 骨架   | 罗克韦尔 / CIP，组帧待补                  |
 
 ## SCADA / 电力 / 计量
 
@@ -52,15 +52,15 @@ Observe 订阅尚未实现；
 `coap`、`http`、`ble` 为请求-响应式主动读写（`coap` 的 Observe 未实现）；`can`、`zigbee` 当前为骨架实现，`zigbee`
 仅监听协调器网络状态、尚未监听节点入网与属性上报，`can` 底层走 can-utils。
 
-| 驱动 (dc3.driver.code)                | 类别     | 读 | 写 | 订阅/上报 | 实现状态 | 备注                        |
-|-------------------------------------|--------|---|---|-------|------|---------------------------|
-| [MQTT](./mqtt) (`MqttDriver`)       | IoT/无线 | — | ✓ | ✓     | 可用   | 发布/订阅，值经订阅到达；`initial()` 钩子为骨架    |
-| [CoAP](./coap) (`CoapDriver`)       | IoT/无线 | ✓ | ✓ | —     | 可用   | 受限设备 RESTful，Observe 未实现  |
-| [LwM2M](./lwm2m) (`Lwm2mDriver`)    | IoT/无线 | ✓ | ✓ | —     | 可用   | 内嵌服务端，读写已落地，Observe 订阅未实现 |
-| [HTTP](./http) (`HttpDriver`)       | IoT/无线 | ✓ | ✓ | —     | 完整   | 通用 HTTP 采集                |
-| [BLE](./ble) (`BleDriver`)          | IoT/无线 | ✓ | ✓ | —     | 完整   | 低功耗蓝牙 GATT                |
-| [Zigbee](./zigbee) (`ZigbeeDriver`) | IoT/无线 | ✓ | ✓ | —     | 骨架   | 骨架实现，订阅（入网/上报）未实现         |
-| [CAN](./can) (`CanDriver`)          | IoT/无线 | ✓ | — | —     | 骨架   | 控制器局域网，底层走 can-utils      |
+| 驱动 (dc3.driver.code)                | 类别     | 读 | 写 | 订阅/上报 | 实现状态 | 备注                             |
+|-------------------------------------|--------|---|---|-------|------|--------------------------------|
+| [MQTT](./mqtt) (`MqttDriver`)       | IoT/无线 | — | ✓ | ✓     | 可用   | 发布/订阅，值经订阅到达；`initial()` 钩子为骨架 |
+| [CoAP](./coap) (`CoapDriver`)       | IoT/无线 | ✓ | ✓ | —     | 可用   | 受限设备 RESTful，Observe 未实现       |
+| [LwM2M](./lwm2m) (`Lwm2mDriver`)    | IoT/无线 | ✓ | ✓ | —     | 可用   | 内嵌服务端，读写已落地，Observe 订阅未实现      |
+| [HTTP](./http) (`HttpDriver`)       | IoT/无线 | ✓ | ✓ | —     | 完整   | 通用 HTTP 采集                     |
+| [BLE](./ble) (`BleDriver`)          | IoT/无线 | ✓ | ✓ | —     | 完整   | 低功耗蓝牙 GATT                     |
+| [Zigbee](./zigbee) (`ZigbeeDriver`) | IoT/无线 | ✓ | ✓ | —     | 骨架   | 骨架实现，订阅（入网/上报）未实现              |
+| [CAN](./can) (`CanDriver`)          | IoT/无线 | ✓ | — | —     | 骨架   | 控制器局域网，底层走 can-utils           |
 
 ## 串口 / 通用网络
 

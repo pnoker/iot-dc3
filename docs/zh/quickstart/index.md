@@ -6,7 +6,6 @@ title: 从源码本地开发
 import QuickstartIndexDiagram from '../../.vitepress/theme/components/QuickstartIndexDiagram.vue'
 </script>
 
-
 # 从源码本地开发
 
 这页带你把 IoT DC3 从源码跑起来：先用 Compose 起好 PostgreSQL 与 RabbitMQ，再用一组本地环境变量把 Java

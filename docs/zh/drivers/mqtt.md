@@ -6,7 +6,6 @@ title: MQTT 驱动
 import MqttDiagram from '../../.vitepress/theme/components/MqttDiagram.vue'
 </script>
 
-
 # MQTT 驱动
 
 > **`dc3-driver-mqtt` 把 MQTT 设备接入 IoT DC3**——驱动作为服务端常驻订阅 MQTT 主题，被动接收设备 publish
@@ -52,7 +51,7 @@ MQTT 驱动的配置分两层：**broker 连接**是部署级的（整台驱动�
 | 用户名 / 密码  | `MQTT_USERNAME` / `MQTT_PASSWORD`              | `dc3` / 空（docker-compose 栈注入 `dc3dc3dc3`）     | 认证凭据（认证类型支持 `NONE` / `USERNAME` / `CLIENT_ID` / `X509`）；密码应用级回退为空，随部署注入     |
 | 保活间隔      | 无 env 绑定（`dc3.driver.mqtt.keep-alive`）         | `15`（秒）                                       | 客户端心跳间隔，硬编码默认                                                               |
 | 完成超时      | 无 env 绑定（`dc3.driver.mqtt.completion-timeout`） | `3000`（毫秒）                                    | 发布操作的等待超时，硬编码默认                                                             |
-| 批量阈值      | `MQTT_BATCH_SPEED` / `MQTT_BATCH_INTERVAL`     | `100` / `5`                                   | 上报批量：满 100 条或满 5 秒先到先发                                                     |
+| 批量阈值      | `MQTT_BATCH_SPEED` / `MQTT_BATCH_INTERVAL`     | `100` / `5`                                   | 上报批量：满 100 条或满 5 秒先到先发                                                      |
 
 ::: info broker 默认是 RabbitMQ 的 MQTT 插件
 默认的 MQTT broker 是 **RabbitMQ 的 MQTT 插件**（`dc3-rabbitmq`），由 `MQTT_BROKER_HOST` / `MQTT_BROKER_PORT`

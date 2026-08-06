@@ -28,16 +28,16 @@ These drivers act as masters (clients) that actively connect to the device, poll
 per [Point](../introduction/concepts/point) and write via [commands](../introduction/concepts/command); they do not
 listen for pushes. `ethernet-ip` is currently a protocol skeleton — CIP framing is not yet complete.
 
-| Driver (dc3.driver.code)                          | Category           | Read | Write | Subscribe/Report | Status   | Notes                                       |
-|---------------------------------------------------|--------------------|------|-------|------------------|----------|---------------------------------------------|
-| [Modbus TCP](./modbus-tcp) (`ModbusTcpDriver`)    | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Ethernet Modbus master                      |
-| [Modbus RTU](./modbus-rtu) (`ModbusRtuDriver`)    | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Serial Modbus master                        |
-| [OPC UA](./opc-ua) (`OpcUaDriver`)                | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | OPC Unified Architecture client             |
-| [OPC DA](./opc-da) (`OpcDaDriver`)                | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Classic OPC Data Access (DCOM)              |
-| [S7](./plcs7) (`PlcS7Driver`)                     | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Siemens PLC                                 |
-| [MELSEC](./melsec) (`MelsecDriver`)               | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Mitsubishi PLC (MC protocol)                |
+| Driver (dc3.driver.code)                          | Category           | Read | Write | Subscribe/Report | Status   | Notes                                                      |
+|---------------------------------------------------|--------------------|------|-------|------------------|----------|------------------------------------------------------------|
+| [Modbus TCP](./modbus-tcp) (`ModbusTcpDriver`)    | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Ethernet Modbus master                                     |
+| [Modbus RTU](./modbus-rtu) (`ModbusRtuDriver`)    | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Serial Modbus master                                       |
+| [OPC UA](./opc-ua) (`OpcUaDriver`)                | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | OPC Unified Architecture client                            |
+| [OPC DA](./opc-da) (`OpcDaDriver`)                | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Classic OPC Data Access (DCOM)                             |
+| [S7](./plcs7) (`PlcS7Driver`)                     | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Siemens PLC                                                |
+| [MELSEC](./melsec) (`MelsecDriver`)               | Industrial Bus/PLC | ✓    | ✓     | —                | Complete | Mitsubishi PLC (MC protocol)                               |
 | [FINS](./fins) (`FinsDriver`)                     | Industrial Bus/PLC | ✓    | ✓     | —                | Usable   | Omron PLC, supports 16/32-bit ints, float, string, and BCD |
-| [EtherNet/IP](./ethernet-ip) (`EthernetIpDriver`) | Industrial Bus/PLC | —    | —     | —                | Skeleton | Rockwell / CIP, framing pending             |
+| [EtherNet/IP](./ethernet-ip) (`EthernetIpDriver`) | Industrial Bus/PLC | —    | —     | —                | Skeleton | Rockwell / CIP, framing pending                            |
 
 ## SCADA / Power / Metering
 
@@ -61,15 +61,15 @@ place but its Observe/subscribe is not yet implemented; `coap`, `http`, `ble`, a
 read/write (`coap` Observe not implemented); `can` and `zigbee` are currently skeletons — `zigbee` only listens for
 coordinator network state (not node join or attribute reports), and `can` is backed by can-utils.
 
-| Driver (dc3.driver.code)            | Category     | Read | Write | Subscribe/Report | Status   | Notes                                                                      |
-|-------------------------------------|--------------|------|-------|------------------|----------|----------------------------------------------------------------------------|
+| Driver (dc3.driver.code)            | Category     | Read | Write | Subscribe/Report | Status   | Notes                                                                    |
+|-------------------------------------|--------------|------|-------|------------------|----------|--------------------------------------------------------------------------|
 | [MQTT](./mqtt) (`MqttDriver`)       | IoT/Wireless | —    | ✓     | ✓                | Usable   | Publish/subscribe, values via subscription; `initial()` hook is skeleton |
-| [CoAP](./coap) (`CoapDriver`)       | IoT/Wireless | ✓    | ✓     | —                | Usable   | RESTful for constrained devices, Observe not implemented                   |
-| [LwM2M](./lwm2m) (`Lwm2mDriver`)    | IoT/Wireless | ✓    | ✓     | —                | Usable   | Embedded server, read/write ready, Observe not implemented                 |
-| [HTTP](./http) (`HttpDriver`)       | IoT/Wireless | ✓    | ✓     | —                | Complete | Generic HTTP polling                                                       |
-| [BLE](./ble) (`BleDriver`)          | IoT/Wireless | ✓    | ✓     | —                | Complete | Bluetooth Low Energy GATT                                                  |
-| [Zigbee](./zigbee) (`ZigbeeDriver`) | IoT/Wireless | ✓    | ✓     | —                | Skeleton | Skeleton; subscribe (join/reports) not implemented                         |
-| [CAN](./can) (`CanDriver`)          | IoT/Wireless | ✓    | —     | —                | Skeleton | Controller Area Network, backed by can-utils                               |
+| [CoAP](./coap) (`CoapDriver`)       | IoT/Wireless | ✓    | ✓     | —                | Usable   | RESTful for constrained devices, Observe not implemented                 |
+| [LwM2M](./lwm2m) (`Lwm2mDriver`)    | IoT/Wireless | ✓    | ✓     | —                | Usable   | Embedded server, read/write ready, Observe not implemented               |
+| [HTTP](./http) (`HttpDriver`)       | IoT/Wireless | ✓    | ✓     | —                | Complete | Generic HTTP polling                                                     |
+| [BLE](./ble) (`BleDriver`)          | IoT/Wireless | ✓    | ✓     | —                | Complete | Bluetooth Low Energy GATT                                                |
+| [Zigbee](./zigbee) (`ZigbeeDriver`) | IoT/Wireless | ✓    | ✓     | —                | Skeleton | Skeleton; subscribe (join/reports) not implemented                       |
+| [CAN](./can) (`CanDriver`)          | IoT/Wireless | ✓    | —     | —                | Skeleton | Controller Area Network, backed by can-utils                             |
 
 ## Serial / Generic Network
 

@@ -6,7 +6,6 @@ title: Operations Manual
 import OperationIndexDiagram from '../../.vitepress/theme/components/OperationIndexDiagram.vue'
 </script>
 
-
 # Operations Manual
 
 This page is the entry to the operations manual. It follows one main thread — onboard a device, see data, issue

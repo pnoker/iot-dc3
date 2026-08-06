@@ -7,7 +7,6 @@ import DataPipelineFlowDiagram from '../../.vitepress/theme/components/DataPipel
 import DataPipelineIngestDiagram from '../../.vitepress/theme/components/DataPipelineIngestDiagram.vue'
 </script>
 
-
 # Time-Series Data & Stream Processing
 
 The real test of the IoT platform layer is **how to store, compute over, and query an endless stream of point values**.

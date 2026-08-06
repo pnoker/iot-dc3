@@ -6,7 +6,6 @@ title: OPC UA Driver
 import OpcUaDiagram from '../../.vitepress/theme/components/OpcUaDiagram.vue'
 </script>
 
-
 # OPC UA Driver
 
 `dc3-driver-opc-ua` connects OPC UA servers to IoT DC3: acting as an OPC UA client, it connects to one or more servers,

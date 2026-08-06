@@ -8,7 +8,6 @@ import AuthErDiagram from '../../.vitepress/theme/components/AuthErDiagram.vue'
 import AuthDecisionFlowDiagram from '../../.vitepress/theme/components/AuthDecisionFlowDiagram.vue'
 </script>
 
-
 # 鉴权 · 租户 · RBAC
 
 平台对外只有网关一个入口，但每一次受保护的调用，背后都要回答三个问题：你是谁、你属于哪个租户、你能不能做这件事。这页讲清登录如何换取令牌、网关如何把身份签名后透传给后端、身份模型怎么组织，以及

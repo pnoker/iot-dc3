@@ -6,7 +6,6 @@ title: CoAP 驱动
 import CoapDiagram from '../../.vitepress/theme/components/CoapDiagram.vue'
 </script>
 
-
 # CoAP 驱动
 
 `dc3-driver-coap` 把 CoAP 设备接入 IoT DC3。它基于 Eclipse Californium，既能作为 **CoAP 客户端**主动连设备（读发 GET、写发

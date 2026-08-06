@@ -6,7 +6,6 @@ title: OPC DA Driver
 import OpcDaDiagram from '../../.vitepress/theme/components/OpcDaDiagram.vue'
 </script>
 
-
 # OPC DA Driver
 
 `dc3-driver-opc-da` acts as an OPC DA client: it connects to a field OPC DA Server over Windows DCOM and periodically

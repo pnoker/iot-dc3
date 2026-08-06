@@ -6,7 +6,6 @@ title: 开发概览与规范
 import DevIndexDiagram from '../../.vitepress/theme/components/DevIndexDiagram.vue'
 </script>
 
-
 # 开发概览与规范
 
 这页写给准备给 IoT DC3

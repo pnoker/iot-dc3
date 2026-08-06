@@ -7,7 +7,6 @@ import DeviceOnboardingSelectDiagram from '../../.vitepress/theme/components/Dev
 import DeviceOnboardingFlowDiagram from '../../.vitepress/theme/components/DeviceOnboardingFlowDiagram.vue'
 </script>
 
-
 # 设备接入
 
 把一台现场设备接入 IoT DC3，本质是五步：按协议选一个驱动 → 建模板与位号 → 建设备并绑定模板和驱动 →

@@ -7,7 +7,6 @@ import ServicesFlowDiagram from '../../.vitepress/theme/components/ServicesFlowD
 import ServicesSequenceDiagram from '../../.vitepress/theme/components/ServicesSequenceDiagram.vue'
 </script>
 
-
 # 服务与拓扑
 
 IoT DC3 不是一个单体进程，而是一组可独立部署、靠 gRPC 与 RabbitMQ 协作的服务。这页讲清平台由哪些可部署单元构成、它们之间怎么连线、以及为什么必须按某个固定顺序启动——读完你能看懂

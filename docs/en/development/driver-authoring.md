@@ -10,7 +10,6 @@ import DriverAuthoringSeqDiagram from '../../.vitepress/theme/components/DriverA
 import DriverAuthoringFlow3Diagram from '../../.vitepress/theme/components/DriverAuthoringFlow3Diagram.vue'
 </script>
 
-
 # Driver Development
 
 Drivers are the southbound I/O layer of IoT DC3. They bring heterogeneous protocol devices — Modbus, OPC UA, MQTT, S7,

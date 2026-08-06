@@ -6,7 +6,6 @@ title: Local Development from Source
 import QuickstartIndexDiagram from '../../.vitepress/theme/components/QuickstartIndexDiagram.vue'
 </script>
 
-
 # Local Development from Source
 
 This page walks you through running IoT DC3 from source: bring up PostgreSQL and RabbitMQ with Compose, point the Java

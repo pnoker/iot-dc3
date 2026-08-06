@@ -7,7 +7,6 @@ import ConceptsDomainDiagram from '../../.vitepress/theme/components/ConceptsDom
 import ConceptsFlowDiagram from '../../.vitepress/theme/components/ConceptsFlowDiagram.vue'
 </script>
 
-
 # Core Concepts and Mental Model
 
 To use IoT DC3 well, you need a simple object model in your head. This page gives you that: a one-sentence summary, an

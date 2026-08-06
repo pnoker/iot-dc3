@@ -8,7 +8,6 @@ import AlarmErDiagram from '../../.vitepress/theme/components/AlarmErDiagram.vue
 import AlarmNotifyFlowDiagram from '../../.vitepress/theme/components/AlarmNotifyFlowDiagram.vue'
 </script>
 
-
 # 告警与通知
 
 平台把"什么时候出问题、谁该被告知"统一收敛到一张运行告警表和一条通知链路。读完这页，你能看懂五类告警来源如何汇入

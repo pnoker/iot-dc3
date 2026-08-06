@@ -6,7 +6,6 @@ title: Edge & Cloud Architecture
 import EdgeCloudDiagram from '../../.vitepress/theme/components/EdgeCloudDiagram.vue'
 </script>
 
-
 # Edge & Cloud Architecture
 
 The IoT platform layer is not "a server" — it is a continuum stretching from the field to the data center. Where each

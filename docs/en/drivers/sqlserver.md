@@ -6,7 +6,6 @@ title: SQL Server Driver
 import SqlserverDiagram from '../../.vitepress/theme/components/SqlserverDiagram.vue'
 </script>
 
-
 # SQL Server Driver
 
 `dc3-driver-sqlserver` onboards a Microsoft SQL Server database into IoT DC3 as a data source: acting as a database

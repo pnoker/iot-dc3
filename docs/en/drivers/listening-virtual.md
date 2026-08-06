@@ -6,7 +6,6 @@ title: Listening Virtual Driver
 import ListeningVirtualDiagram from '../../.vitepress/theme/components/ListeningVirtualDiagram.vue'
 </script>
 
-
 # Listening Virtual Driver
 
 > `dc3-driver-listening-virtual` onboards TCP/UDP devices that push data into IoT DC3 on their own. The driver opens a
