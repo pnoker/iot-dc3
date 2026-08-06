@@ -185,7 +185,7 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .setIat(source.getIat() == null ? 0 : source.getIat())
                 .setTenantId(source.getTenantId() == null ? 0 : source.getTenantId())
                 .setPrincipalId(source.getPrincipalId() == null ? 0 : source.getPrincipalId())
-                .setPrincipalType(StringUtils.defaultString(source.getPrincipalType()))
+                .setPrincipalType(toGrpcPrincipalType(source.getPrincipalType()))
                 .setPrincipalName(StringUtils.defaultString(source.getPrincipalName()))
                 .setDisplayName(StringUtils.defaultString(source.getDisplayName()))
                 .setClientId(StringUtils.defaultString(source.getClientId()))
@@ -296,6 +296,14 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
         }
     }
 
+    private GrpcMcpPrincipalType toGrpcPrincipalType(String value) {
+        try {
+            return GrpcMcpPrincipalType.valueOf(StringUtils.defaultIfBlank(value, ""));
+        } catch (IllegalArgumentException e) {
+            return GrpcMcpPrincipalType.MCP_PRINCIPAL_TYPE_UNSPECIFIED;
+        }
+    }
+
     /**
      * Convert a gRPC audit command to its DTO form.
      *
@@ -307,7 +315,7 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .traceId(source.getTraceId())
                 .tenantId(source.getTenantId())
                 .principalId(source.getPrincipalId())
-                .principalType(source.getPrincipalType())
+                .principalType(source.getPrincipalType().name())
                 .clientId(source.getClientId())
                 .connectionId(source.getConnectionId())
                 .toolId(source.getToolId())

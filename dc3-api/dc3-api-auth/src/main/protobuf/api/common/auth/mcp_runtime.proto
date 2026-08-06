@@ -70,13 +70,21 @@ message GrpcMcpIntrospectDTO {
   int64 iat = 7;
   int64 tenant_id = 8;
   int64 principal_id = 9;
-  string principal_type = 10;
+  GrpcMcpPrincipalType principal_type = 10;
   string principal_name = 11;
   string display_name = 12;
   string client_id = 13;
   int64 mcp_connection_id = 14;
   string grant_type = 15;
   string scope = 16;
+}
+
+// MCP principal classification. Names match PrincipalTypeEnum values.
+enum GrpcMcpPrincipalType {
+  MCP_PRINCIPAL_TYPE_UNSPECIFIED = 0;
+  USER = 1;
+  SERVICE_ACCOUNT = 2;
+  SYSTEM = 3;
 }
 
 // Visible tool list request.
@@ -204,7 +212,7 @@ message GrpcMcpAuditCommand {
   string trace_id = 1;
   int64 tenant_id = 2;
   int64 principal_id = 3;
-  string principal_type = 4;
+  GrpcMcpPrincipalType principal_type = 4;
   string client_id = 5;
   int64 connection_id = 6;
   string tool_id = 7;

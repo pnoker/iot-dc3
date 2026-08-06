@@ -141,7 +141,7 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
                 .iat(zeroToNull(source.getIat()))
                 .tenantId(zeroToNull(source.getTenantId()))
                 .principalId(zeroToNull(source.getPrincipalId()))
-                .principalType(source.getPrincipalType())
+                .principalType(source.getPrincipalType().name())
                 .principalName(source.getPrincipalName())
                 .displayName(source.getDisplayName())
                 .clientId(source.getClientId())
@@ -197,7 +197,7 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
                 .setTraceId(StringUtils.defaultString(source.getTraceId()))
                 .setTenantId(value(source.getTenantId()))
                 .setPrincipalId(value(source.getPrincipalId()))
-                .setPrincipalType(StringUtils.defaultString(source.getPrincipalType()))
+                .setPrincipalType(toGrpcPrincipalType(source.getPrincipalType()))
                 .setClientId(StringUtils.defaultString(source.getClientId()))
                 .setConnectionId(value(source.getConnectionId()))
                 .setToolId(StringUtils.defaultString(source.getToolId()))
@@ -235,6 +235,14 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
             return GrpcMcpRiskLevel.valueOf(StringUtils.defaultIfBlank(value, ""));
         } catch (IllegalArgumentException e) {
             return GrpcMcpRiskLevel.MCP_RISK_LEVEL_UNSPECIFIED;
+        }
+    }
+
+    private GrpcMcpPrincipalType toGrpcPrincipalType(String value) {
+        try {
+            return GrpcMcpPrincipalType.valueOf(StringUtils.defaultIfBlank(value, ""));
+        } catch (IllegalArgumentException e) {
+            return GrpcMcpPrincipalType.MCP_PRINCIPAL_TYPE_UNSPECIFIED;
         }
     }
 
