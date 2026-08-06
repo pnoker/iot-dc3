@@ -15,23 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {devices, drivers, points, profiles} from './seed/entities';
-
 /**
- * Mutable in-memory store. add/update/delete handlers mutate these arrays so a
- * demo session reflects user actions without a backend. Initialized from the
- * static seed; copies so mutation never leaks back into the seed modules.
+ * Resolve a `public/` asset path against the deployment base URL.
+ *
+ * Vite rewrites build-time asset imports for `base`, but NOT verbatim
+ * `/images/...` strings written in templates — those resolve against the host
+ * root and 404 under a project-page subpath (e.g. `<user>.github.io/iot-dc3/`).
+ * Building the URL at runtime via `import.meta.env.BASE_URL` makes the same
+ * markup work for root-domain and subpath deployments alike.
  */
-export interface MockDb {
-  drivers: Record<string, unknown>[];
-  devices: Record<string, unknown>[];
-  profiles: Record<string, unknown>[];
-  points: Record<string, unknown>[];
-}
-
-export const db: MockDb = {
-  drivers: [...drivers],
-  devices: [...devices],
-  profiles: [...profiles],
-  points: [...points],
-};
+export const assetUrl = (path: string): string => `${import.meta.env.BASE_URL}${path}`;

@@ -19,7 +19,7 @@
   <div class="login-container">
     <div class="login-wrapper-left animated bounce-in-down">
       <div class="login-left">
-        <img class="img" src="/images/logo/logo-white.svg"/>
+        <img class="img" :src="assetUrl('images/logo/logo-white.svg')"/>
       </div>
     </div>
     <Particles/>
@@ -111,6 +111,7 @@ import {PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
 import {failMessage, successMessage} from '@/utils/notificationUtil';
 
 import Particles from '@/components/particles/Particles.vue';
+import {assetUrl} from '@/utils/assetUrl';
 
 interface LoginFormModel {
   tenant: string;

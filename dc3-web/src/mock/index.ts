@@ -22,6 +22,9 @@ import {getStorage, setStorage} from '@/utils/storageUtil';
 import {createMockAdapter} from './adapter';
 import {setFallback} from './dispatch';
 import {registerAuthHandlers} from './handlers/auth';
+import {registerCoreHandlers} from './handlers/core';
+import {registerDashboardHandlers} from './handlers/dashboard';
+import {registerDictionaryHandlers} from './handlers/dictionary';
 import {registerMenuHandlers} from './handlers/menu';
 import {fallbackHandler} from './handlers/fallback';
 
@@ -42,6 +45,9 @@ export function setupMock(): void {
 
   setFallback(fallbackHandler);
   registerAuthHandlers();
+  registerCoreHandlers();
+  registerDashboardHandlers();
+  registerDictionaryHandlers();
   registerMenuHandlers();
 
   request.defaults.adapter = createMockAdapter();
