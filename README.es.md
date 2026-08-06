@@ -182,7 +182,7 @@ Use `make up-db-cn` si prefiere el registro de Alibaba Cloud en China continenta
 IoT DC3 está construido sobre Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
 TypeScript y Vite.
 
-Consulte [Stack tecnológico](https://docs.dc3.site/en/introduction/technology-stack) para obtener detalles de los
+Consulte [Stack tecnológico](https://docs.dc3.site/en/development/technology-stack) para obtener detalles de los
 componentes y dónde se utiliza cada tecnología.
 
 ## 📖 Documentación y comunidad
@@ -191,7 +191,7 @@ componentes y dónde se utiliza cada tecnología.
 |--------------------------------|--------------------------------------------------------------------------------------------|
 | 📚 Documentación en línea      | [docs.dc3.site](https://docs.dc3.site/)                                                    |
 | 🚀 Inicio rápido               | [Guía de inicio rápido](https://docs.dc3.site/en/quickstart/)                              |
-| 🛠️ Stack tecnológico          | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack)                 |
+| 🛠️ Stack tecnológico          | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)                 |
 | 🏗️ Arquitectura               | [Módulos y dependencias](https://docs.dc3.site/en/architecture/modules)                    |
 | 🔧 Desarrollo de controladores | [Guía de creación de controladores](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Solución de problemas       | [Solución de problemas](https://docs.dc3.site/en/guide/troubleshooting)                    |

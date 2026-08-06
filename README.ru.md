@@ -181,7 +181,7 @@ IoT DC3 построен на Java 21, Spring Boot 4, Spring Cloud 2025, Spring 
 TypeScript и Vite.
 
 Подробности о компонентах и их использовании см.
-в [Технологический стек](https://docs.dc3.site/en/introduction/technology-stack).
+в [Технологический стек](https://docs.dc3.site/en/development/technology-stack).
 
 ## 📖 Документация и сообщество
 
@@ -189,7 +189,7 @@ TypeScript и Vite.
 |--------------------------|--------------------------------------------------------------------------------------------|
 | 📚 Онлайн-документация   | [docs.dc3.site](https://docs.dc3.site/)                                                    |
 | 🚀 Быстрый старт         | [Руководство по быстрому старту](https://docs.dc3.site/en/quickstart/)                     |
-| 🛠️ Технологический стек | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack)                 |
+| 🛠️ Технологический стек | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)                 |
 | 🏗️ Архитектура          | [Модули и зависимости](https://docs.dc3.site/en/architecture/modules)                      |
 | 🔧 Разработка драйверов  | [Руководство по созданию драйверов](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Устранение неполадок  | [Устранение неполадок](https://docs.dc3.site/en/guide/troubleshooting)                     |

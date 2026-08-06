@@ -171,7 +171,7 @@ mvn -s .mvn/settings.xml clean package
 IoT DC3 は Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、
 TypeScript、Vite を基盤に構築されています。
 
-各コンポーネントの役割と詳細は [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) を参照してください。
+各コンポーネントの役割と詳細は [Technology Stack](https://docs.dc3.site/en/development/technology-stack) を参照してください。
 
 ## 📖 ドキュメントとコミュニティ
 
@@ -179,7 +179,7 @@ TypeScript、Vite を基盤に構築されています。
 |----------------|----------------------------------------------------------------------------|
 | 📚 オンラインドキュメント | [docs.dc3.site](https://docs.dc3.site/)                                    |
 | 🚀 クイックスタート    | [クイックスタートガイド](https://docs.dc3.site/en/quickstart/)                        |
-| 🛠️ 技術スタック     | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) |
+| 🛠️ 技術スタック     | [Technology Stack](https://docs.dc3.site/en/development/technology-stack) |
 | 🏗️ アーキテクチャ    | [モジュールと依存関係](https://docs.dc3.site/en/architecture/modules)                |
 | 🔧 ドライバー開発     | [ドライバー開発ガイド](https://docs.dc3.site/en/development/driver-authoring)        |
 | 🐛 トラブルシューティング | [よくある問題と解決策](https://docs.dc3.site/en/guide/troubleshooting)               |

@@ -58,7 +58,7 @@ level of the application.
 4. Reuse stubs from `tests/setup/stubs/element-plus.ts` for any Element
    Plus components.
 5. Run `pnpm test` locally before committing. If it fails with a Vue warn,
-   see [test-debugging.md](../docs/test-debugging.md).
+   see [test-debugging](https://docs.dc3.site/en/frontend/test-debugging).
 
 ## Conventions
 
