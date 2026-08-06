@@ -28,6 +28,7 @@
     "dev:prod": "vite --host --mode production",
     "serve:e2e": "vite build --mode dev && node scripts/testing/e2e-server.mjs",
     "build": "vite build",
+    "build:mock": "vite build --mode mock",
     "preview": "vite preview",
     "check": "vue-tsc --noEmit --skipLibCheck",
     "type-check": "pnpm run check",

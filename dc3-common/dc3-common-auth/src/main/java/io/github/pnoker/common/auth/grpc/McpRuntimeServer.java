@@ -273,11 +273,19 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
      */
     private GrpcMcpToolAuthorizeDTO toGrpc(McpToolAuthorizeResponseDTO source) {
         return GrpcMcpToolAuthorizeDTO.newBuilder()
-                .setDecision(StringUtils.defaultString(source.getDecision()))
+                .setDecision(toGrpcDecision(source.getDecision()))
                 .setConfirmId(StringUtils.defaultString(source.getConfirmId()))
                 .setMessage(StringUtils.defaultString(source.getMessage()))
                 .setRiskLevel(StringUtils.defaultString(source.getRiskLevel()))
                 .build();
+    }
+
+    private GrpcMcpDecision toGrpcDecision(String value) {
+        try {
+            return GrpcMcpDecision.valueOf(StringUtils.defaultIfBlank(value, ""));
+        } catch (IllegalArgumentException e) {
+            return GrpcMcpDecision.MCP_DECISION_UNSPECIFIED;
+        }
     }
 
     /**

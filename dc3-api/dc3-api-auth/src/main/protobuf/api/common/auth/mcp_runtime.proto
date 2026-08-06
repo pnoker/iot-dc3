@@ -170,10 +170,19 @@ message GrpcRMcpToolAuthorizeDTO {
   GrpcMcpToolAuthorizeDTO data = 2;
 }
 
+// Tool call authorization decision values. Names match the auth-side
+// string literals so the Java string <-> enum mapping is a direct valueOf.
+enum GrpcMcpDecision {
+  MCP_DECISION_UNSPECIFIED = 0;
+  AUTHORIZED = 1;
+  CONFIRM_REQUIRED = 2;
+  REJECTED = 3;
+}
+
 // Tool call authorization decision.
 message GrpcMcpToolAuthorizeDTO {
-  // Decision: AUTHORIZED / CONFIRM_REQUIRED / REJECTED.
-  string decision = 1;
+  // Authorization decision.
+  GrpcMcpDecision decision = 1;
   // Confirmation ticket ID issued when decision is CONFIRM_REQUIRED.
   string confirm_id = 2;
   // Human readable reason or confirmation prompt.

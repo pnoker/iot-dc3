@@ -108,7 +108,9 @@ export default (configEnv: ConfigEnv) => {
       outDir: 'dist',
       chunkSizeWarningLimit: 1500,
       // minify defaults to rolldown in Vite 8
-      sourcemap: configEnv.mode === 'production' ? false : true,
+      // Mock builds are deployed publicly as a static demo — drop sourcemaps
+      // to shrink the bundle and avoid exposing source.
+      sourcemap: configEnv.mode === 'production' || configEnv.mode === 'mock' ? false : true,
       reportCompressedSize: false,
       cssCodeSplit: true,
       rollupOptions: {output},
