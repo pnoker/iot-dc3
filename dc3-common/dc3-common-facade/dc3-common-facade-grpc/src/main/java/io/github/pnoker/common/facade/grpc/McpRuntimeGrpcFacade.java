@@ -146,7 +146,7 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
                 .displayName(source.getDisplayName())
                 .clientId(source.getClientId())
                 .mcpConnectionId(zeroToNull(source.getMcpConnectionId()))
-                .grantType(source.getGrantType())
+                .grantType(source.getGrantType().name().toLowerCase())
                 .scope(source.getScope())
                 .build();
     }

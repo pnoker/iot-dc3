@@ -190,7 +190,7 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .setDisplayName(StringUtils.defaultString(source.getDisplayName()))
                 .setClientId(StringUtils.defaultString(source.getClientId()))
                 .setMcpConnectionId(source.getMcpConnectionId() == null ? 0 : source.getMcpConnectionId())
-                .setGrantType(StringUtils.defaultString(source.getGrantType()))
+                .setGrantType(toGrpcGrantType(source.getGrantType()))
                 .setScope(StringUtils.defaultString(source.getScope()))
                 .build();
     }
@@ -301,6 +301,14 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
             return GrpcMcpPrincipalType.valueOf(StringUtils.defaultIfBlank(value, ""));
         } catch (IllegalArgumentException e) {
             return GrpcMcpPrincipalType.MCP_PRINCIPAL_TYPE_UNSPECIFIED;
+        }
+    }
+
+    private GrpcOAuthGrantType toGrpcGrantType(String value) {
+        try {
+            return GrpcOAuthGrantType.valueOf(StringUtils.defaultIfBlank(value, "").toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return GrpcOAuthGrantType.GRPC_OAUTH_GRANT_TYPE_UNSPECIFIED;
         }
     }
 
