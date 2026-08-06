@@ -85,7 +85,7 @@
         <protobuf.version>4.35.0</protobuf.version>
         <spring-grpc.version>1.0.3</spring-grpc.version>
         <okhttp.version>5.4.0</okhttp.version>
-        <netty.version>4.2.10.Final</netty.version>
+        <netty.version>4.2.16.Final</netty.version>
         <paho.mqttv3.version>1.2.5</paho.mqttv3.version>
 
         <!-- Data access -->
