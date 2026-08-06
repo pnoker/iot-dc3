@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type {AxiosRequestConfig} from 'axios';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), warnMessage: vi.fn()}));
@@ -35,7 +36,9 @@ describe('mock adapter', () => {
     setupMock();
   });
 
-  const call = (config: Record<string, unknown>) => request(config as never) as Promise<any>;
+  // The response interceptor unwraps R<T>, so each call resolves to the R
+  // envelope (not an AxiosResponse). Cast once at the boundary.
+  const call = (config: AxiosRequestConfig) => request(config) as Promise<R>;
 
   it('seeds local auth so the router guard treats the session as logged in', () => {
     expect(localStorage.getItem('X-Auth-Tenant')).not.toBeNull();
