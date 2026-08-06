@@ -60,7 +60,7 @@
         <zigbee.version>1.4.16.1</zigbee.version>
 
         <!-- IEC 104 -->
-        <j60870.version>1.7.2</j60870.version>
+        <j60870.version>1.8.0</j60870.version>
 
         <!-- SNMP -->
         <snmp4j.version>3.12.2</snmp4j.version>
