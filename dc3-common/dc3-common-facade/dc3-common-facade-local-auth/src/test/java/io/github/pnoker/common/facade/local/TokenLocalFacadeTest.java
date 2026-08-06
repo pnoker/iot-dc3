@@ -43,23 +43,23 @@ class TokenLocalFacadeTest {
 
     @Test
     void checkValidReturnsFalseWhenServiceReturnsNull() {
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A")).thenReturn(null);
-        assertThat(facade.checkValid("tenant-A", "alice", "salt", "token")).isFalse();
+        when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(null);
+        assertThat(facade.checkValid("tenant-A", "alice", "token")).isFalse();
     }
 
     @Test
     void checkValidReturnsFalseWhenTokenInvalid() {
         TokenValid invalid = new TokenValid();
         invalid.setValid(false);
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A")).thenReturn(invalid);
-        assertThat(facade.checkValid("tenant-A", "alice", "salt", "token")).isFalse();
+        when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(invalid);
+        assertThat(facade.checkValid("tenant-A", "alice", "token")).isFalse();
     }
 
     @Test
     void checkValidReturnsTrueWhenTokenValid() {
         TokenValid valid = new TokenValid();
         valid.setValid(true);
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A")).thenReturn(valid);
-        assertThat(facade.checkValid("tenant-A", "alice", "salt", "token")).isTrue();
+        when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(valid);
+        assertThat(facade.checkValid("tenant-A", "alice", "token")).isTrue();
     }
 }

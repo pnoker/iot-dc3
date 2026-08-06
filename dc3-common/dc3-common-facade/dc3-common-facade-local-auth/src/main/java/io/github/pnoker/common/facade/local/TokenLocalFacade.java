@@ -42,8 +42,8 @@ public class TokenLocalFacade implements TokenFacade {
     private final TokenService tokenService;
 
     @Override
-    public boolean checkValid(String tenant, String name, String salt, String token) {
-        TokenValid entity = tokenService.checkValid(name, salt, token, tenant);
+    public boolean checkValid(String tenant, String name, String token) {
+        TokenValid entity = tokenService.checkValid(name, token, tenant);
         return Objects.nonNull(entity) && entity.isValid();
     }
 

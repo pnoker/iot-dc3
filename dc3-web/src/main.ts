@@ -34,6 +34,20 @@ plugins(app);
 app.config.errorHandler = (err, _instance, info) => {
   logger.error('Global error:', err, 'Info:', info);
 };
-app.mount('#app');
+/**
+ * Static demo build: install a mock axios adapter before mounting so the app
+ * runs on fake data with no backend. Vite replaces import.meta.env.MODE with a
+ * build-time literal, so this branch (and the dynamically imported mock chunk)
+ * is dead-code eliminated from production builds.
+ */
+async function bootstrap(): Promise<void> {
+  if (import.meta.env.MODE === 'mock') {
+    const {setupMock} = await import('@/mock');
+    setupMock();
+  }
+  app.mount('#app');
+}
+
+void bootstrap();
 
 export default app;
