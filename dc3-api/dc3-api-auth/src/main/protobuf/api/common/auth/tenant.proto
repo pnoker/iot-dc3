@@ -60,6 +60,6 @@ message GrpcTenantDTO {
   // Tenant code, unique identifier
   string tenant_code = 3;
 
-  // Enable flag: 1 enabled, 0 disabled
+  // Enable flag: 0 enabled, 1 disabled (EnableFlagEnum)
   int32 enable_flag = 4;
 }
