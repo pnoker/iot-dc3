@@ -34,7 +34,7 @@
 
     <properties>
         <!-- Modbus -->
-        <modbus4j.version>3.0.3</modbus4j.version>
+        <modbus4j.version>3.1.0</modbus4j.version>
         <jserialcomm.version>2.11.0</jserialcomm.version>
 
         <!-- OPC UA -->
