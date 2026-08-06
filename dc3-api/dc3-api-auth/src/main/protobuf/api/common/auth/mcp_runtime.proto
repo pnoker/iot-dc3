@@ -207,6 +207,16 @@ message GrpcMcpToolAuthorizeDTO {
   GrpcMcpRiskLevel risk_level = 4;
 }
 
+// MCP audit outcome. Names match McpAuditStatusEnum values.
+enum GrpcMcpAuditStatus {
+  MCP_AUDIT_STATUS_UNSPECIFIED = 0;
+  SUCCESS = 1;
+  DENIED = 2;
+  POLICY_DENIED = 3;
+  ERROR = 4;
+  UNKNOWN = 5;
+}
+
 // MCP audit insert command.
 message GrpcMcpAuditCommand {
   string trace_id = 1;
@@ -222,7 +232,7 @@ message GrpcMcpAuditCommand {
   string confirm_id = 11;
   string idempotency_key = 12;
   string argument_digest = 13;
-  string status = 14;
+  GrpcMcpAuditStatus status = 14;
   string error_code = 15;
   int64 duration_ms = 16;
   string client_name = 17;

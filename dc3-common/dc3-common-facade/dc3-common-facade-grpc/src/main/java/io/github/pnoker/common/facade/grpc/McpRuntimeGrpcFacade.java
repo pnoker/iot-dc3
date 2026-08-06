@@ -207,7 +207,7 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
                 .setConfirmId(StringUtils.defaultString(source.getConfirmId()))
                 .setIdempotencyKey(StringUtils.defaultString(source.getIdempotencyKey()))
                 .setArgumentDigest(StringUtils.defaultString(source.getArgumentDigest()))
-                .setStatus(StringUtils.defaultString(source.getStatus()))
+                .setStatus(toGrpcAuditStatus(source.getStatus()))
                 .setErrorCode(StringUtils.defaultString(source.getErrorCode()))
                 .setDurationMs(value(source.getDurationMs()))
                 .setClientName(StringUtils.defaultString(source.getClientName()))
@@ -243,6 +243,14 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
             return GrpcMcpPrincipalType.valueOf(StringUtils.defaultIfBlank(value, ""));
         } catch (IllegalArgumentException e) {
             return GrpcMcpPrincipalType.MCP_PRINCIPAL_TYPE_UNSPECIFIED;
+        }
+    }
+
+    private GrpcMcpAuditStatus toGrpcAuditStatus(String value) {
+        try {
+            return GrpcMcpAuditStatus.valueOf(StringUtils.defaultIfBlank(value, ""));
+        } catch (IllegalArgumentException e) {
+            return GrpcMcpAuditStatus.MCP_AUDIT_STATUS_UNSPECIFIED;
         }
     }
 

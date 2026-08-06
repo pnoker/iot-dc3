@@ -325,7 +325,7 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .confirmId(source.getConfirmId())
                 .idempotencyKey(source.getIdempotencyKey())
                 .argumentDigest(source.getArgumentDigest())
-                .status(source.getStatus())
+                .status(source.getStatus().name())
                 .errorCode(source.getErrorCode())
                 .durationMs(source.getDurationMs())
                 .clientName(source.getClientName())
