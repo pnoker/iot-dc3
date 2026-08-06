@@ -75,7 +75,7 @@ public class RequestIdGrpcClientInterceptor implements ClientInterceptor {
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(MethodDescriptor<ReqT, RespT> method,
                                                                CallOptions callOptions, Channel next) {
         String requestId = MDC.get(MDC_REQUEST_ID);
-        
+
         // If MDC doesn't have requestId, try to get it from OpenTelemetry
         if (requestId == null || requestId.isBlank()) {
             Span currentSpan = Span.current();
@@ -84,11 +84,11 @@ public class RequestIdGrpcClientInterceptor implements ClientInterceptor {
                 requestId = spanContext.getTraceId();
             }
         }
-        
+
         if (requestId == null || requestId.isBlank()) {
             return next.newCall(method, callOptions);
         }
-        
+
         final String finalRequestId = requestId;
         return new ForwardingClientCall.SimpleForwardingClientCall<>(next.newCall(method, callOptions)) {
             @Override

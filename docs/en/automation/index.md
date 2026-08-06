@@ -6,7 +6,6 @@ title: Automation
 import AutomationIndexDiagram from '../../.vitepress/theme/components/AutomationIndexDiagram.vue'
 </script>
 
-
 # Automation
 
 Deterministic, repeatable, programmatic operations through the `dc3` CLI — no LLM involved, so results are predictable

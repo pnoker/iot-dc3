@@ -6,7 +6,6 @@ title: 变更日志
 import ChangelogDiagram from '../../.vitepress/theme/components/ChangelogDiagram.vue'
 </script>
 
-
 # 变更日志
 
 下面这份变更日志不是手写的——它由 `make changelog` 从 git 提交历史按 Conventional Commits

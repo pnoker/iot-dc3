@@ -96,6 +96,19 @@ public class PointValueBuffer {
         this.dbPath = dbPath;
     }
 
+    private static void setLong(PreparedStatement ps, int index, Long value) throws SQLException {
+        if (Objects.isNull(value)) {
+            ps.setNull(index, Types.INTEGER);
+        } else {
+            ps.setLong(index, value);
+        }
+    }
+
+    private static Long getNullableLong(ResultSet rs, String column) throws SQLException {
+        long value = rs.getLong(column);
+        return rs.wasNull() ? null : value;
+    }
+
     /**
      * Open the connection pool, apply WAL, and create the buffer table. Idempotent.
      */
@@ -253,18 +266,5 @@ public class PointValueBuffer {
         if (Objects.nonNull(dataSource) && !dataSource.isClosed()) {
             dataSource.close();
         }
-    }
-
-    private static void setLong(PreparedStatement ps, int index, Long value) throws SQLException {
-        if (Objects.isNull(value)) {
-            ps.setNull(index, Types.INTEGER);
-        } else {
-            ps.setLong(index, value);
-        }
-    }
-
-    private static Long getNullableLong(ResultSet rs, String column) throws SQLException {
-        long value = rs.getLong(column);
-        return rs.wasNull() ? null : value;
     }
 }

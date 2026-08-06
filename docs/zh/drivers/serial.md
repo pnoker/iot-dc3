@@ -6,7 +6,6 @@ title: 串口 驱动
 import SerialDiagram from '../../.vitepress/theme/components/SerialDiagram.vue'
 </script>
 
-
 # 串口 驱动
 
 `dc3-driver-serial` 把跑私有报文的 RS232/RS485/RS422 串口设备接入 IoT

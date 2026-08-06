@@ -6,7 +6,6 @@ title: Modbus TCP Driver
 import ModbusTcpDiagram from '../../.vitepress/theme/components/ModbusTcpDiagram.vue'
 </script>
 
-
 # Modbus TCP Driver
 
 `dc3-driver-modbus-tcp` connects Modbus TCP slave devices to IoT DC3. It acts as the Modbus master (client),

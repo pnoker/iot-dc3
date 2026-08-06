@@ -6,7 +6,6 @@ title: 第一个设备：端到端
 import FirstDeviceDiagram from '../../.vitepress/theme/components/FirstDeviceDiagram.vue'
 </script>
 
-
 # 第一个设备：端到端
 
 这页带你用平台自带的 **virtual（虚拟）驱动**走通一条完整链路：从登录拿

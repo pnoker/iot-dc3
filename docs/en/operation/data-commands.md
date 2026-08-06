@@ -7,7 +7,6 @@ import DataCommandsFlowDiagram from '../../.vitepress/theme/components/DataComma
 import DataCommandsStateDiagram from '../../.vitepress/theme/components/DataCommandsStateDiagram.vue'
 </script>
 
-
 # Data and Commands
 
 Once a device is connected, there are two things to verify: can you read its values, and can you push commands to it?

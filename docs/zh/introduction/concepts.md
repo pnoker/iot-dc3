@@ -7,7 +7,6 @@ import ConceptsDomainDiagram from '../../.vitepress/theme/components/ConceptsDom
 import ConceptsFlowDiagram from '../../.vitepress/theme/components/ConceptsFlowDiagram.vue'
 </script>
 
-
 # 核心概念与心智模型
 
 要用好 IoT DC3，先要在脑子里建立一个简单的对象模型。这页用一句话心智模型 +

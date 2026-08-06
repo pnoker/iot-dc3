@@ -50,19 +50,29 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DriverWriteServiceImpl implements DriverWriteService {
 
-    /** Driver-scoped metadata registry exposing the running driver's configuration. */
+    /**
+     * Driver-scoped metadata registry exposing the running driver's configuration.
+     */
     private final DriverMetadata driverMetadata;
 
-    /** Device-scoped metadata cache providing device, profile and attribute lookups. */
+    /**
+     * Device-scoped metadata cache providing device, profile and attribute lookups.
+     */
     private final DeviceMetadata deviceMetadata;
 
-    /** Point-scoped metadata cache supplying point definitions and type information. */
+    /**
+     * Point-scoped metadata cache supplying point definitions and type information.
+     */
     private final PointMetadata pointMetadata;
 
-    /** Custom protocol hook invoked to perform the device-specific write. */
+    /**
+     * Custom protocol hook invoked to perform the device-specific write.
+     */
     private final DriverCustomService driverCustomService;
 
-    /** Outbound sender used to publish acknowledged writes back to the platform. */
+    /**
+     * Outbound sender used to publish acknowledged writes back to the platform.
+     */
     private final DriverSenderService driverSenderService;
 
     /**

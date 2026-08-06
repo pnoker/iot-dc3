@@ -6,7 +6,6 @@ title: Sensing & Measurement
 import SensingDiagram from '../../.vitepress/theme/components/SensingDiagram.vue'
 </script>
 
-
 # Sensing & Measurement
 
 The perception layer is the IoT's "skin and nerve endings" — it turns invisible, intangible physical quantities like

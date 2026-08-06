@@ -6,7 +6,6 @@ title: "Deployment & Operations"
 import GuideIndexDiagram from '../../.vitepress/theme/components/GuideIndexDiagram.vue'
 </script>
 
-
 # Deployment & Operations
 
 This section takes IoT DC3 from a `java -jar` on your laptop to a fleet of orchestrated containers — and then makes it

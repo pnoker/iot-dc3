@@ -34,6 +34,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class PointValueBufferTest {
 
+    private static long epoch() {
+        return System.currentTimeMillis() / 1000;
+    }
+
     @Test
     void upsertSelectDeleteRoundtrip(@TempDir Path tmp) {
         PointValueBuffer buffer = newBuffer(tmp);
@@ -106,9 +110,5 @@ class PointValueBufferTest {
 
     private BufferedPointValue rec(String id, Long deviceId, Long pointId, int attempt, long nextAttemptAt, long createdAt) {
         return new BufferedPointValue(id, deviceId, pointId, 1L, 2L, "{}", "rk", attempt, nextAttemptAt, createdAt);
-    }
-
-    private static long epoch() {
-        return System.currentTimeMillis() / 1000;
     }
 }

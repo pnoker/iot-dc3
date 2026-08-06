@@ -300,11 +300,11 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
     /**
      * Load a rule state by rule, target type, entity, and fingerprint, scoped to a tenant.
      *
-     * @param ruleId             the rule id
+     * @param ruleId              the rule id
      * @param alarmTargetTypeFlag the alarm target type flag
-     * @param entityId           the entity id
-     * @param fingerprint        the state fingerprint
-     * @param tenantId           tenant scope
+     * @param entityId            the entity id
+     * @param fingerprint         the state fingerprint
+     * @param tenantId            tenant scope
      * @return the state, or null when none matches
      */
     private RuleStateBO loadState(long ruleId, byte alarmTargetTypeFlag, long entityId,

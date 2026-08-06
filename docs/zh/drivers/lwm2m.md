@@ -6,7 +6,6 @@ title: LwM2M 驱动
 import Lwm2mDiagram from '../../.vitepress/theme/components/Lwm2mDiagram.vue'
 </script>
 
-
 # LwM2M 驱动
 
 `dc3-driver-lwm2m` 内嵌一个基于 Eclipse Leshan 的 LwM2M 服务端：设备作为客户端用自己的 `endpoint` 名注册上来，驱动再按位号配置的

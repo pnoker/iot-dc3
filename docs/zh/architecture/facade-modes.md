@@ -6,7 +6,6 @@ title: Facade 模式：grpc 与 local
 import FacadeModesDiagram from '../../.vitepress/theme/components/FacadeModesDiagram.vue'
 </script>
 
-
 # Facade 模式：grpc 与 local
 
 中心服务之间相互调用（数据中心问管理中心要设备、智能中心问数据中心要位号值）有两种装配方式：`grpc`（各服务独立进程、跨进程调用）和

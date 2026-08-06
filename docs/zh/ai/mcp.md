@@ -8,7 +8,6 @@ import McpOAuthSequenceDiagram from '../../.vitepress/theme/components/McpOAuthS
 import McpConfirmSequenceDiagram from '../../.vitepress/theme/components/McpConfirmSequenceDiagram.vue'
 </script>
 
-
 # AI Agent / MCP 集成
 
 IoT DC3 把整个平台的 HTTP 能力自动聚合成一份 MCP（Model Context Protocol）工具目录，让外部 AI Agent 经 OAuth 2.1 鉴权后，通过网关的

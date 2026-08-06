@@ -6,7 +6,6 @@ title: DLMS/COSEM Driver
 import DlmsDiagram from '../../.vitepress/theme/components/DlmsDiagram.vue'
 </script>
 
-
 # DLMS/COSEM Driver
 
 `dc3-driver-dlms` connects DLMS/COSEM metering devices (electricity, water, gas, and heat meters) to IoT DC3: it targets

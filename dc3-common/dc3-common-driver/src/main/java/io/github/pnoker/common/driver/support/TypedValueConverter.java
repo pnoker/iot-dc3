@@ -163,8 +163,7 @@ public final class TypedValueConverter {
             case INT -> (T) Integer.valueOf(exactInt(decimal(value, type, label, typeCode), value, label, typeCode));
             case LONG -> (T) Long.valueOf(exactLong(decimal(value, type, label, typeCode), value, label, typeCode));
             case FLOAT -> (T) Float.valueOf(finiteFloat(decimal(value, type, label, typeCode), value, label));
-            case DOUBLE ->
-                    (T) Double.valueOf(finiteDouble(decimal(value, type, label, typeCode), value, label));
+            case DOUBLE -> (T) Double.valueOf(finiteDouble(decimal(value, type, label, typeCode), value, label));
             case BOOLEAN -> (T) Boolean.valueOf(strictBoolean(value, label, typeCode));
         };
     }

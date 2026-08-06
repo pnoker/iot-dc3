@@ -9,7 +9,6 @@ import DomainModelClassDiagram from '../../.vitepress/theme/components/DomainMod
 import DomainModelSequenceDiagram from '../../.vitepress/theme/components/DomainModelSequenceDiagram.vue'
 </script>
 
-
 # Domain Model: DO / BO / VO and Object Relationships
 
 This page is for anyone writing code on the platform. It maps out how Profile, Point, Command, Event, Device, and Driver

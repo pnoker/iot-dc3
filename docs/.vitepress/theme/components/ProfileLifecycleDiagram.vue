@@ -51,39 +51,55 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
         </defs>
 
         <!-- arrows -->
-        <line marker-end="url(#pld-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="240" x2="273" y1="125" y2="125"/>
-        <line marker-end="url(#pld-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="485" x2="518" y1="125" y2="125"/>
-        <line marker-end="url(#pld-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="730" x2="763" y1="125" y2="125"/>
+        <line marker-end="url(#pld-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="240" x2="273" y1="125"
+              y2="125"/>
+        <line marker-end="url(#pld-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="485" x2="518" y1="125"
+              y2="125"/>
+        <line marker-end="url(#pld-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="730" x2="763" y1="125"
+              y2="125"/>
 
         <!-- stage 1 建模 (cyan) -->
-        <rect fill="var(--dc3-fe-fill)" height="110" rx="10" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="210" x="30" y="70"/>
+        <rect fill="var(--dc3-fe-fill)" height="110" rx="10" stroke="var(--dc3-fe-stroke)" stroke-width="1.5"
+              width="210" x="30" y="70"/>
         <circle cx="56" cy="96" fill="none" r="13" stroke="var(--dc3-fe-stroke)" stroke-width="1.5"/>
         <text fill="var(--dc3-fe-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="56" y="101">1</text>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="14.5" font-weight="600" text-anchor="middle" x="146" y="101">{{ s.t1 }}</text>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="14.5" font-weight="600" text-anchor="middle" x="146"
+              y="101">{{ s.t1 }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="135" y="133">{{ s.d1a }}</text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="135" y="151">{{ s.d1b }}</text>
 
         <!-- stage 2 复用 (emerald) -->
-        <rect fill="var(--dc3-be-fill)" height="110" rx="10" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="210" x="275" y="70"/>
+        <rect fill="var(--dc3-be-fill)" height="110" rx="10" stroke="var(--dc3-be-stroke)" stroke-width="1.5"
+              width="210" x="275" y="70"/>
         <circle cx="301" cy="96" fill="none" r="13" stroke="var(--dc3-be-stroke)" stroke-width="1.5"/>
         <text fill="var(--dc3-be-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="301" y="101">2</text>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="14.5" font-weight="600" text-anchor="middle" x="391" y="101">{{ s.t2 }}</text>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="14.5" font-weight="600" text-anchor="middle" x="391"
+              y="101">{{ s.t2 }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="380" y="133">{{ s.d2a }}</text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="380" y="151">{{ s.d2b }}</text>
 
         <!-- stage 3 运行 (amber) -->
-        <rect fill="var(--dc3-amber-fill)" height="110" rx="10" stroke="var(--dc3-amber-stroke)" stroke-width="1.5" width="210" x="520" y="70"/>
+        <rect fill="var(--dc3-amber-fill)" height="110" rx="10" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"
+              width="210" x="520" y="70"/>
         <circle cx="546" cy="96" fill="none" r="13" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"/>
-        <text fill="var(--dc3-amber-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="546" y="101">3</text>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="14.5" font-weight="600" text-anchor="middle" x="636" y="101">{{ s.t3 }}</text>
+        <text fill="var(--dc3-amber-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="546" y="101">3
+        </text>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="14.5" font-weight="600" text-anchor="middle" x="636"
+              y="101">{{ s.t3 }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="625" y="133">{{ s.d3a }}</text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="625" y="151">{{ s.d3b }}</text>
 
         <!-- stage 4 演进 (violet) -->
-        <rect fill="var(--dc3-db-fill)" height="110" rx="10" stroke="var(--dc3-db-stroke)" stroke-width="1.5" width="210" x="765" y="70"/>
+        <rect fill="var(--dc3-db-fill)" height="110" rx="10" stroke="var(--dc3-db-stroke)" stroke-width="1.5"
+              width="210" x="765" y="70"/>
         <circle cx="791" cy="96" fill="none" r="13" stroke="var(--dc3-db-stroke)" stroke-width="1.5"/>
         <text fill="var(--dc3-db-stroke)" font-size="13" font-weight="700" text-anchor="middle" x="791" y="101">4</text>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="14.5" font-weight="600" text-anchor="middle" x="881" y="101">{{ s.t4 }}</text>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="14.5" font-weight="600" text-anchor="middle" x="881"
+              y="101">{{ s.t4 }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="870" y="133">{{ s.d4a }}</text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="870" y="151">{{ s.d4b }}</text>
       </svg>

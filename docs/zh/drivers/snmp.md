@@ -6,7 +6,6 @@ title: SNMP 驱动
 import SnmpDiagram from '../../.vitepress/theme/components/SnmpDiagram.vue'
 </script>
 
-
 # SNMP 驱动
 
 `dc3-driver-snmp` 把支持 SNMP 的网络与机房设备接入 IoT DC3：以设备 MIB 树上的 OID 为目标，周期性发 SNMP GET 采数，并支持向

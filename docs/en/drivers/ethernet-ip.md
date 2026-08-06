@@ -6,7 +6,6 @@ title: EtherNet/IP Driver
 import EthernetIpDiagram from '../../.vitepress/theme/components/EthernetIpDiagram.vue'
 </script>
 
-
 # EtherNet/IP Driver
 
 `dc3-driver-ethernet-ip` connects EtherNet/IP (CIP) Rockwell Allen-Bradley PLCs to IoT DC3: it targets **tag names**,

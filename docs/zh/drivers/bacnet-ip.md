@@ -6,7 +6,6 @@ title: BACnet/IP 驱动
 import BacnetIpDiagram from '../../.vitepress/theme/components/BacnetIpDiagram.vue'
 </script>
 
-
 # BACnet/IP 驱动
 
 `dc3-driver-bacnet-ip` 把 BACnet/IP 设备接入 IoT DC3。它作为本地 BACnet

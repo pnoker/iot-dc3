@@ -6,7 +6,6 @@ title: Development Overview and Conventions
 import DevIndexDiagram from '../../.vitepress/theme/components/DevIndexDiagram.vue'
 </script>
 
-
 # Development Overview and Conventions
 
 This page is for developers about to write backend code for IoT DC3. By the end you'll know where the authoritative

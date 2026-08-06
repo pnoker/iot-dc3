@@ -6,7 +6,6 @@ title: 操作手册
 import OperationIndexDiagram from '../../.vitepress/theme/components/OperationIndexDiagram.vue'
 </script>
 
-
 # 操作手册
 
 这页是操作手册的门户：按"接入设备 → 看数据 → 下命令 → 收告警 → AI 运营"

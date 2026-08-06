@@ -6,7 +6,6 @@ title: Observability
 import ObservabilityDiagram from '../../.vitepress/theme/components/ObservabilityDiagram.vue'
 </script>
 
-
 # Observability
 
 Log aggregation and metrics monitoring in IoT DC3 are an **optional** stack: a single command, `make up-optional`,

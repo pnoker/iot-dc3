@@ -6,7 +6,6 @@ title: "Why Spring AI: How DC3 Lets LLMs Operate Your Factory"
 import SpringAiSequenceDiagram from '../../.vitepress/theme/components/SpringAiSequenceDiagram.vue'
 </script>
 
-
 # Why Spring AI: How DC3 Lets LLMs Operate Your Factory
 
 In 2025, large language models stopped being chatbots and started becoming operators. GPT-4o, Claude 4, DeepSeek,

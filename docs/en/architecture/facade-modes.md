@@ -6,7 +6,6 @@ title: "Facade Modes: grpc and local"
 import FacadeModesDiagram from '../../.vitepress/theme/components/FacadeModesDiagram.vue'
 </script>
 
-
 # Facade Modes: grpc and local
 
 Inter-center calls between center services — the Data Center asking the Manager Center for devices, the Agentic Center

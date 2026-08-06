@@ -6,7 +6,6 @@ title: SNMP Driver
 import SnmpDiagram from '../../.vitepress/theme/components/SnmpDiagram.vue'
 </script>
 
-
 # SNMP Driver
 
 `dc3-driver-snmp` connects SNMP-capable network and data-center devices to IoT DC3: it targets an OID on the device's

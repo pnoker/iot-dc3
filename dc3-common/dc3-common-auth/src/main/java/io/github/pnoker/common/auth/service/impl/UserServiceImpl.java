@@ -230,8 +230,8 @@ public class UserServiceImpl implements UserService {
     /**
      * Query a single user by a dynamic key field, optionally throwing when not found.
      *
-     * @param key           the lambda field reference to match
-     * @param value         the value to match
+     * @param key            the lambda field reference to match
+     * @param value          the value to match
      * @param throwException whether to throw {@link NotFoundException} when not found
      * @return the user BO, or null when not found and throwException is false
      */

@@ -55,7 +55,7 @@ DC3 有两条独立的下行链路，初学者最容易混淆：
 | `callTypeFlag`    | CallTypeEnum    | 调用方式：`sync` / `async`                                |
 | `timeout`         | Integer         | 调用超时时间（秒）                                            |
 | `commandExt`      | CommandExt      | 扩展配置（协议映射、驱动指令模板、幂等等）                                |
-| `profileId`       | Long            | 归属的[模板](./profile)                                  |
+| `profileId`       | Long            | 归属的[模板](./profile)                                   |
 | `enableFlag`      | EnableFlagEnum  | 启停状态                                                 |
 | `tenantId`        | Long            | 归属[租户](./tenant)                                     |
 

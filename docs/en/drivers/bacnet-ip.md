@@ -6,7 +6,6 @@ title: BACnet/IP Driver
 import BacnetIpDiagram from '../../.vitepress/theme/components/BacnetIpDiagram.vue'
 </script>
 
-
 # BACnet/IP Driver
 
 `dc3-driver-bacnet-ip` connects BACnet/IP devices to IoT DC3. It joins the network as a local BACnet device, discovers

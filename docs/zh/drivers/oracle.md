@@ -6,7 +6,6 @@ title: Oracle 驱动
 import OracleDiagram from '../../.vitepress/theme/components/OracleDiagram.vue'
 </script>
 
-
 # Oracle 驱动
 
 `dc3-driver-oracle` 把一个 Oracle 数据库当作数据源接入 IoT DC3：它作为数据库客户端，按采集周期对库里执行 `SELECT`

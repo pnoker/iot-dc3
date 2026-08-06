@@ -7,7 +7,6 @@ import IdentificationChoiceDiagram from '../../.vitepress/theme/components/Ident
 import IdentificationEntityDiagram from '../../.vitepress/theme/components/IdentificationEntityDiagram.vue'
 </script>
 
-
 # 自动识别与定位
 
 物联网的第一步，是让物理世界里的每一个物、每一个位置都能被机器"认出来"。这一章讲感知层里两类不靠传感器测物理量、而靠**身份**

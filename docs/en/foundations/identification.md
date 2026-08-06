@@ -7,7 +7,6 @@ import IdentificationChoiceDiagram from '../../.vitepress/theme/components/Ident
 import IdentificationEntityDiagram from '../../.vitepress/theme/components/IdentificationEntityDiagram.vue'
 </script>
 
-
 # Auto-Identification & Positioning
 
 The first step in any IoT system is letting machines recognize every object and every place in the physical world. This

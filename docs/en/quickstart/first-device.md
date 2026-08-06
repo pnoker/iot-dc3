@@ -6,7 +6,6 @@ title: "Your First Device: End to End"
 import FirstDeviceDiagram from '../../.vitepress/theme/components/FirstDeviceDiagram.vue'
 </script>
 
-
 # Your First Device: End to End
 
 This page walks you through a complete data path with the built-in **virtual driver**: log in to get a token, create a

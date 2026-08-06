@@ -7,7 +7,6 @@ import IntroductionLoopDiagram from '../../.vitepress/theme/components/Introduct
 import IntroductionArchitectureDiagram from '../../.vitepress/theme/components/IntroductionArchitectureDiagram.vue'
 </script>
 
-
 # Platform Positioning
 
 IoT DC3 is an open-source distributed IoT platform built for AI scenarios. It spans device connectivity, data

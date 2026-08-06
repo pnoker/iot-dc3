@@ -7,7 +7,6 @@ import ModulesFlowDiagram from '../../.vitepress/theme/components/ModulesFlowDia
 import ModulesClassDiagram from '../../.vitepress/theme/components/ModulesClassDiagram.vue'
 </script>
 
-
 # 模块地图
 
 IoT DC3 的代码按"部署单元 + 共享契约 + 协议驱动"三类组织。这页从架构视角讲清楚：哪些模块会被打包成独立服务跑起来、它们靠哪些公共库与契约相互协作、28

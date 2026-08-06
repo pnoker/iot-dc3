@@ -7,7 +7,6 @@ import AgenticSequenceDiagram from '../../.vitepress/theme/components/AgenticSeq
 import AgenticErDiagram from '../../.vitepress/theme/components/AgenticErDiagram.vue'
 </script>
 
-
 # Agentic 中心：AI 辅助运营
 
 智能中心（Agentic Center / `dc3-center-agentic`）把一个 OpenAI 兼容的大模型接到 IoT DC3
@@ -196,7 +195,8 @@ Spring AI 的记忆表结构；如需自动建表，预期做法是首次临时�
 ::: tip 默认值以 compose / `dev.env` 为准
 上表默认值取自 compose / `dev.env` 注入值，与 `application-agentic.yml` 里的 Spring 裸默认值**不一致**：如
 `AGENTIC_MEMORY_ENABLED` 的 Spring 默认是 `true`（compose 注入 `false`）、`AGENTIC_ATTACHMENT_STORAGE_PATH` 的 Spring 默认是
-`dc3/data/upload/agentic/attachment`（compose 注入 `dc3/data/agentic/attachments`）。经 compose / `make up-*` 启动时以上表为准；若在 IDE 里直接跑 Spring 而不经过 compose，则用的是 yml 裸默认值。
+`dc3/data/upload/agentic/attachment`（compose 注入 `dc3/data/agentic/attachments`）。经 compose / `make up-*` 启动时以上表为准；若在
+IDE 里直接跑 Spring 而不经过 compose，则用的是 yml 裸默认值。
 :::
 
 完整环境变量说明见 [环境变量](../quickstart/environment)。

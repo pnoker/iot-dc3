@@ -88,19 +88,97 @@ type OgImageCfg = {
 }
 
 const SECTION_OG_IMAGES: Record<string, OgImageCfg> = {
-    ai: {file: () => 'screenshot-ai.png', width: 1920, height: 1080, altZh: 'IoT DC3 AI 集成：Spring AI Agent 与 MCP 工具调用', altEn: 'IoT DC3 AI integration: Spring AI Agent and MCP tool calls'},
-    drivers: {file: () => 'screenshot-device.png', width: 1920, height: 1116, altZh: 'IoT DC3 设备与位号管理', altEn: 'IoT DC3 device and point management'},
-    operation: {file: () => 'screenshot-device.png', width: 1920, height: 1116, altZh: 'IoT DC3 设备运维：采集、命令与告警', altEn: 'IoT DC3 device operations: collection, commands and alarms'},
-    architecture: {file: l => `architecture-panorama-${l}.png`, width: 2400, height: 1536, altZh: 'IoT DC3 架构全景', altEn: 'IoT DC3 architecture panorama'},
-    introduction: {file: () => 'screenshot-overview.png', width: 1920, height: 1080, altZh: 'IoT DC3 平台总览', altEn: 'IoT DC3 platform overview'},
-    foundations: {file: () => 'screenshot-overview.png', width: 1920, height: 1080, altZh: 'IoT DC3 物联网技术体系', altEn: 'IoT DC3 IoT technology stack'},
-    quickstart: {file: () => 'screenshot-overview.png', width: 1920, height: 1080, altZh: 'IoT DC3 快速开始', altEn: 'IoT DC3 quickstart'},
-    guide: {file: () => 'screenshot-overview.png', width: 1920, height: 1080, altZh: 'IoT DC3 运维指南', altEn: 'IoT DC3 operations guide'},
-    development: {file: () => 'screenshot-overview.png', width: 1920, height: 1080, altZh: 'IoT DC3 开发指南', altEn: 'IoT DC3 development guide'},
-    modules: {file: () => 'screenshot-overview.png', width: 1920, height: 1080, altZh: 'IoT DC3 模块地图', altEn: 'IoT DC3 module map'},
-    frontend: {file: () => 'screenshot-overview.png', width: 1920, height: 1080, altZh: 'IoT DC3 前端开发', altEn: 'IoT DC3 frontend'},
-    automation: {file: () => 'screenshot-overview.png', width: 1920, height: 1080, altZh: 'IoT DC3 自动化', altEn: 'IoT DC3 automation'},
-    community: {file: () => 'screenshot-overview.png', width: 1920, height: 1080, altZh: 'IoT DC3 社区', altEn: 'IoT DC3 community'}
+    ai: {
+        file: () => 'screenshot-ai.png',
+        width: 1920,
+        height: 1080,
+        altZh: 'IoT DC3 AI 集成：Spring AI Agent 与 MCP 工具调用',
+        altEn: 'IoT DC3 AI integration: Spring AI Agent and MCP tool calls'
+    },
+    drivers: {
+        file: () => 'screenshot-device.png',
+        width: 1920,
+        height: 1116,
+        altZh: 'IoT DC3 设备与位号管理',
+        altEn: 'IoT DC3 device and point management'
+    },
+    operation: {
+        file: () => 'screenshot-device.png',
+        width: 1920,
+        height: 1116,
+        altZh: 'IoT DC3 设备运维：采集、命令与告警',
+        altEn: 'IoT DC3 device operations: collection, commands and alarms'
+    },
+    architecture: {
+        file: l => `architecture-panorama-${l}.png`,
+        width: 2400,
+        height: 1536,
+        altZh: 'IoT DC3 架构全景',
+        altEn: 'IoT DC3 architecture panorama'
+    },
+    introduction: {
+        file: () => 'screenshot-overview.png',
+        width: 1920,
+        height: 1080,
+        altZh: 'IoT DC3 平台总览',
+        altEn: 'IoT DC3 platform overview'
+    },
+    foundations: {
+        file: () => 'screenshot-overview.png',
+        width: 1920,
+        height: 1080,
+        altZh: 'IoT DC3 物联网技术体系',
+        altEn: 'IoT DC3 IoT technology stack'
+    },
+    quickstart: {
+        file: () => 'screenshot-overview.png',
+        width: 1920,
+        height: 1080,
+        altZh: 'IoT DC3 快速开始',
+        altEn: 'IoT DC3 quickstart'
+    },
+    guide: {
+        file: () => 'screenshot-overview.png',
+        width: 1920,
+        height: 1080,
+        altZh: 'IoT DC3 运维指南',
+        altEn: 'IoT DC3 operations guide'
+    },
+    development: {
+        file: () => 'screenshot-overview.png',
+        width: 1920,
+        height: 1080,
+        altZh: 'IoT DC3 开发指南',
+        altEn: 'IoT DC3 development guide'
+    },
+    modules: {
+        file: () => 'screenshot-overview.png',
+        width: 1920,
+        height: 1080,
+        altZh: 'IoT DC3 模块地图',
+        altEn: 'IoT DC3 module map'
+    },
+    frontend: {
+        file: () => 'screenshot-overview.png',
+        width: 1920,
+        height: 1080,
+        altZh: 'IoT DC3 前端开发',
+        altEn: 'IoT DC3 frontend'
+    },
+    automation: {
+        file: () => 'screenshot-overview.png',
+        width: 1920,
+        height: 1080,
+        altZh: 'IoT DC3 自动化',
+        altEn: 'IoT DC3 automation'
+    },
+    community: {
+        file: () => 'screenshot-overview.png',
+        width: 1920,
+        height: 1080,
+        altZh: 'IoT DC3 社区',
+        altEn: 'IoT DC3 community'
+    }
 }
 
 const ORGANIZATION = {
@@ -208,6 +286,7 @@ function getTitle(context: TransformContext) {
 // Earliest git author date for a file, used as TechArticle.datePublished (schema.org).
 // Cached per build; null when git is unavailable (e.g. shallow CI clone) — falls back to dateModified only.
 const firstCommitCache = new Map<string, string | null>()
+
 function getFirstPublished(filePath: string): string | null {
     if (firstCommitCache.has(filePath)) return firstCommitCache.get(filePath) ?? null
     let result: string | null = null
@@ -395,10 +474,18 @@ export function transformHead(context: TransformContext): HeadConfig[] {
 
     return [
         ['meta', {name: 'description', content: description}],
-        ['meta', {name: 'robots', content: versionInfo.isLatest ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' : 'noindex,follow'}],
+        ['meta', {
+            name: 'robots',
+            content: versionInfo.isLatest ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1' : 'noindex,follow'
+        }],
         ['meta', {name: 'author', content: 'IoT DC3 Contributors'}],
         ['link', {rel: 'canonical', href: canonicalUrl}],
-        ['link', {rel: 'alternate', type: 'text/plain', href: `${SITE_URL}/llms.txt`, title: 'AI-readable site summary'}],
+        ['link', {
+            rel: 'alternate',
+            type: 'text/plain',
+            href: `${SITE_URL}/llms.txt`,
+            title: 'AI-readable site summary'
+        }],
         ...getAlternates(context.pageData.relativePath),
         ['meta', {property: 'og:type', content: isHome ? 'website' : 'article'}],
         ['meta', {property: 'og:site_name', content: 'IoT DC3'}],
@@ -410,7 +497,10 @@ export function transformHead(context: TransformContext): HeadConfig[] {
         ['meta', {property: 'og:image:height', content: String(og.height)}],
         ['meta', {property: 'og:image:alt', content: og.alt}],
         ['meta', {property: 'og:locale', content: LOCALES[locale].hreflang.replace('-', '_')}],
-        ...localeAlternates.map(item => ['meta', {property: 'og:locale:alternate', content: item.hreflang.replace('-', '_')}] as HeadConfig),
+        ...localeAlternates.map(item => ['meta', {
+            property: 'og:locale:alternate',
+            content: item.hreflang.replace('-', '_')
+        }] as HeadConfig),
         ['meta', {name: 'twitter:card', content: 'summary_large_image'}],
         ['meta', {name: 'twitter:title', content: title}],
         ['meta', {name: 'twitter:description', content: description}],

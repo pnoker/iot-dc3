@@ -6,7 +6,6 @@ title: 数据智能与 AIoT
 import AiotDiagram from '../../.vitepress/theme/components/AiotDiagram.vue'
 </script>
 
-
 # 数据智能与 AIoT
 
 数据采上来、存进时序库之后，真正的价值才刚开始：把海量位号值变成"现在怎么了、接下来会怎样、该做什么"

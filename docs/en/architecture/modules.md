@@ -7,7 +7,6 @@ import ModulesFlowDiagram from '../../.vitepress/theme/components/ModulesFlowDia
 import ModulesClassDiagram from '../../.vitepress/theme/components/ModulesClassDiagram.vue'
 </script>
 
-
 # Module Map
 
 IoT DC3's code splits into three kinds of modules: deployment units, shared contracts, and protocol drivers. This page

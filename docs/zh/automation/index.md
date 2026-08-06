@@ -6,7 +6,6 @@ title: 自动化
 import AutomationIndexDiagram from '../../.vitepress/theme/components/AutomationIndexDiagram.vue'
 </script>
 
-
 # 自动化
 
 确定性的、可重复的程序化操作，用 `dc3` CLI 完成——不涉及大模型，结果可预测、可脚本化。AI 栏目（Agentic 中心、MCP）解决"

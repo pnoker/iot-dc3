@@ -7,7 +7,6 @@ import IotProtocolsMqttDiagram from '../../.vitepress/theme/components/IotProtoc
 import IotProtocolsWirelessDiagram from '../../.vitepress/theme/components/IotProtocolsWirelessDiagram.vue'
 </script>
 
-
 # IoT 协议与无线网络
 
 工业总线把车间里的设备连起来，但更广阔的物联网——电池供电的传感器、远在郊野的水表、跑在公网上的智能硬件——靠的是另一套"

@@ -6,7 +6,6 @@ title: OPC UA 驱动
 import OpcUaDiagram from '../../.vitepress/theme/components/OpcUaDiagram.vue'
 </script>
 
-
 # OPC UA 驱动
 
 `dc3-driver-opc-ua` 把 OPC UA 服务端接入 IoT DC3：作为 OPC UA

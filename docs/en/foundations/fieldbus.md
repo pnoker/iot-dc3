@@ -6,7 +6,6 @@ title: Industrial Buses & Protocols
 import FieldbusDiagram from '../../.vitepress/theme/components/FieldbusDiagram.vue'
 </script>
 
-
 # Industrial Buses & Protocols
 
 Devices on the industrial floor speak dozens of mutually unintelligible "dialects" — PLCs use vendor-proprietary

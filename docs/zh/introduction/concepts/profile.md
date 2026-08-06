@@ -9,7 +9,8 @@ import ProfileLifecycleDiagram from '../../../.vitepress/theme/components/Profil
 
 # 模板 Profile (Thing Model) <Badge type="tip" text="物模型+" />
 
-> **模板是"一类设备的能力模板"** <Badge type="tip" text="物模型+" />——它把同型号设备共有的[位号](./point)、[指令](./command)、[事件](./event)
+> **模板是"一类设备的能力模板"** <Badge type="tip" text="物模型+" />
+> ——它把同型号设备共有的[位号](./point)、[指令](./command)、[事件](./event)
 > 聚合在一起，描述"这类设备能采什么、能控什么、会报什么"。一个[设备](./device)恰好归属一个模板，多个设备可以复用同一个模板。
 
 ## 它是什么 / 为什么需要
@@ -20,22 +21,24 @@ import ProfileLifecycleDiagram from '../../../.vitepress/theme/components/Profil
 类比产品和实物：模板像"产品说明书 / 出厂规格"，设备像"按这份规格出厂的一台台实物"。说明书写一遍，实物可以造很多台。
 
 ::: tip 模板与"物模型"的关系
-"物模型（Thing Model）"是行业里常见的设备能力建模设计，DC3 的**模板 `Profile`** 与它属于**同级抽象**——都在回答"一类设备有哪些能力"。DC3
+"物模型（Thing Model）"是行业里常见的设备能力建模设计，DC3 的**模板 `Profile`** 与它属于**同级抽象**——都在回答"
+一类设备有哪些能力"。DC3
 没有沿用 `Product` / `ThingModel` 这类叫法，而是选了**模板**，并且能力比典型物模型**更强**：模板支持[共享范围](#枚举)（租户
-/ 驱动 / 用户三档复用）、版本演进、弱结构化扩展 `profileExt` 等，比"一产品一物模型"的固定结构更灵活。可以理解为：**模板 ⊇ 物模型**——物模型能表达的，模板都能表达，反之未必（见[设计哲学](../../architecture/domain-model)）。
+/ 驱动 / 用户三档复用）、版本演进、弱结构化扩展 `profileExt` 等，比"一产品一物模型"的固定结构更灵活。可以理解为：**模板 ⊇ 物模型
+**——物模型能表达的，模板都能表达，反之未必（见[设计哲学](../../architecture/domain-model)）。
 :::
 
 **模板 vs 物模型（一眼看懂"强在哪"）：**
 
-| 维度       | 物模型 Thing Model（行业通用） | 模板 Profile（DC3） <Badge type="tip" text="物模型+" /> |
-|----------|---------------------|------------------------------------------------|
-| 定位       | 设备能力建模的抽象           | 同级抽象，能力更强（超集）                                  |
-| 能力聚合     | 属性 / 服务 / 事件        | [位号](./point) / [指令](./command) / [事件](./event)    |
-| 复用范围     | 通常按产品固定             | 共享范围三档：租户 / 驱动 / 用户（`profileShareFlag`）         |
-| 版本演进     | 一般无显式版本             | `version` 显式版本，可查询、可演进                          |
-| 扩展字段     | 结构相对固定              | `profileExt` 弱结构化扩展（可承载 category / tags 等）      |
-| 创建来源     | —                   | `profileTypeFlag`：系统 / 驱动 / 用户                  |
-| 设备绑定     | 视实现而定               | 恰好绑定一个（`Device.profileId` 单一外键）                 |
+| 维度   | 物模型 Thing Model（行业通用） | 模板 Profile（DC3） <Badge type="tip" text="物模型+" /> |
+|------|-----------------------|--------------------------------------------------|
+| 定位   | 设备能力建模的抽象             | 同级抽象，能力更强（超集）                                    |
+| 能力聚合 | 属性 / 服务 / 事件          | [位号](./point) / [指令](./command) / [事件](./event)  |
+| 复用范围 | 通常按产品固定               | 共享范围三档：租户 / 驱动 / 用户（`profileShareFlag`）          |
+| 版本演进 | 一般无显式版本               | `version` 显式版本，可查询、可演进                           |
+| 扩展字段 | 结构相对固定                | `profileExt` 弱结构化扩展（可承载 category / tags 等）       |
+| 创建来源 | —                     | `profileTypeFlag`：系统 / 驱动 / 用户                   |
+| 设备绑定 | 视实现而定                 | 恰好绑定一个（`Device.profileId` 单一外键）                  |
 
 > 一句话：**模板是物模型的加强版**——保留"一类设备的能力模板"这一同级抽象，再叠加共享、版本、扩展等平台化能力。
 
@@ -54,8 +57,8 @@ import ProfileLifecycleDiagram from '../../../.vitepress/theme/components/Profil
 
 | 字段                 | 类型                   | 含义                                     |
 |--------------------|----------------------|----------------------------------------|
-| `profileName`      | String               | 模板名称（展示用）                             |
-| `profileCode`      | String               | 模板编码，同租户下唯一，作为模型标识                    |
+| `profileName`      | String               | 模板名称（展示用）                              |
+| `profileCode`      | String               | 模板编码，同租户下唯一，作为模型标识                     |
 | `profileShareFlag` | ProfileShareTypeEnum | 共享范围，见下                                |
 | `profileTypeFlag`  | ProfileTypeEnum      | 创建来源，见下                                |
 | `version`          | Integer              | 模型版本，可查询、由人工设置                         |
@@ -117,8 +120,8 @@ import ProfileLifecycleDiagram from '../../../.vitepress/theme/components/Profil
 
 模板管理接口前缀 `/profile`（Manager 服务）：
 
-| 方法   | 路径                           | 说明         |
-|------|------------------------------|------------|
+| 方法   | 路径                           | 说明        |
+|------|------------------------------|-----------|
 | POST | `/profile/add`               | 新增模板      |
 | POST | `/profile/update`            | 更新模板元数据   |
 | POST | `/profile/delete`            | 删除模板      |

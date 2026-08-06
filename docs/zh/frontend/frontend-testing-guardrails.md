@@ -7,7 +7,7 @@ the behavior being changed.
 ## Required Test Mapping
 
 | Change area                         | Required test layer               | Command                         |
-| ----------------------------------- | --------------------------------- | ------------------------------- |
+|-------------------------------------|-----------------------------------|---------------------------------|
 | `src/api/**`                        | API contract tests                | `pnpm run test:api`             |
 | `src/utils/**`                      | Unit tests                        | `pnpm run test:unit`            |
 | `src/config/axios/**`               | Unit tests                        | `pnpm run test:unit`            |

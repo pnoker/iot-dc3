@@ -8,7 +8,6 @@ import AlarmErDiagram from '../../.vitepress/theme/components/AlarmErDiagram.vue
 import AlarmNotifyFlowDiagram from '../../.vitepress/theme/components/AlarmNotifyFlowDiagram.vue'
 </script>
 
-
 # Alarms and Notifications
 
 IoT DC3 folds "something went wrong" and "who needs to know" into a single runtime alarm table and one notification

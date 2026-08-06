@@ -27,15 +27,15 @@ Profile；但一个设备**只能归属一个** Profile（多对多绑定已在�
 
 设备业务对象 `DeviceBO`（表 `dc3_device`），字段名与类型取自源码：
 
-| 字段           | 类型             | 含义                                 |
-|--------------|----------------|------------------------------------|
-| `deviceName` | String         | 设备名称（展示用，如"1号车间温控器"）               |
-| `deviceCode` | String         | 设备标识符                              |
+| 字段           | 类型             | 含义                                |
+|--------------|----------------|-----------------------------------|
+| `deviceName` | String         | 设备名称（展示用，如"1号车间温控器"）              |
+| `deviceCode` | String         | 设备标识符                             |
 | `profileId`  | Long           | 归属的[模板 Profile](./profile)，决定能力模型 |
-| `driverId`   | Long           | 归属的[驱动 Driver](./driver)，决定通信方式    |
-| `deviceExt`  | DeviceExt      | JSON 扩展，存放协议无关的自定义配置               |
-| `enableFlag` | EnableFlagEnum | 启停标记，见下                            |
-| `tenantId`   | Long           | 归属[租户](./tenant)，多租户隔离             |
+| `driverId`   | Long           | 归属的[驱动 Driver](./driver)，决定通信方式   |
+| `deviceExt`  | DeviceExt      | JSON 扩展，存放协议无关的自定义配置              |
+| `enableFlag` | EnableFlagEnum | 启停标记，见下                           |
+| `tenantId`   | Long           | 归属[租户](./tenant)，多租户隔离            |
 
 继承自 `BaseBO` 的通用字段：`id`、`remark`（描述）、`creatorId`/`creatorName`、`operatorId`/`operatorName`、`createTime`/
 `operateTime`。

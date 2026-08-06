@@ -7,7 +7,6 @@ import DataCommandsFlowDiagram from '../../.vitepress/theme/components/DataComma
 import DataCommandsStateDiagram from '../../.vitepress/theme/components/DataCommandsStateDiagram.vue'
 </script>
 
-
 # 数据与命令
 
 设备接入后，验证只剩两件事：值能不能查到、命令能不能下到。这页把"看数据"和"下命令"连成一条用户故事——先用真实 `curl`

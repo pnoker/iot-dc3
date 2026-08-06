@@ -6,7 +6,6 @@ title: Oracle Driver
 import OracleDiagram from '../../.vitepress/theme/components/OracleDiagram.vue'
 </script>
 
-
 # Oracle Driver
 
 `dc3-driver-oracle` onboards an Oracle database into IoT DC3 as a data source: acting as a database client, it runs a

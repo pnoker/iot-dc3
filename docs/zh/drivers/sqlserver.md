@@ -6,7 +6,6 @@ title: SQL Server 驱动
 import SqlserverDiagram from '../../.vitepress/theme/components/SqlserverDiagram.vue'
 </script>
 
-
 # SQL Server 驱动
 
 `dc3-driver-sqlserver` 把一个 Microsoft SQL Server 数据库当作数据源接入 IoT DC3：它作为数据库客户端，按采集周期对库里执行

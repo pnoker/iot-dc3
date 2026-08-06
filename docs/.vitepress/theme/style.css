@@ -137,12 +137,15 @@ body {
     .VPNavBar .content .content-body .VPNavBarTranslations {
         order: 6;
     }
+
     .VPNavBar .content .content-body .dc3-version-switcher {
         order: 7;
     }
+
     .VPNavBar .content .content-body .VPNavBarAppearance {
         order: 8;
     }
+
     .VPNavBar .content .content-body .VPNavBarSocialLinks {
         order: 9;
     }

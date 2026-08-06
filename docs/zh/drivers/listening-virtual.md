@@ -6,7 +6,6 @@ title: Listening Virtual 驱动
 import ListeningVirtualDiagram from '../../.vitepress/theme/components/ListeningVirtualDiagram.vue'
 </script>
 
-
 # Listening Virtual 驱动
 
 > `dc3-driver-listening-virtual` 把"自己往平台推数据"的 TCP/UDP 设备接入 IoT

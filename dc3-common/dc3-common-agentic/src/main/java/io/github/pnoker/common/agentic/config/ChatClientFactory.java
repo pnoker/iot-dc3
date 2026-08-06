@@ -37,7 +37,6 @@ import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.extern.slf4j.Slf4j;
-import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.springframework.ai.anthropic.AnthropicChatModel;
@@ -55,6 +54,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 
 /**
  * Creates and caches {@link ChatClient} instances per provider.

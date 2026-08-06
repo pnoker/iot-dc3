@@ -6,7 +6,6 @@ title: MQTT Driver
 import MqttDiagram from '../../.vitepress/theme/components/MqttDiagram.vue'
 </script>
 
-
 # MQTT Driver
 
 > **`dc3-driver-mqtt` onboards MQTT devices into IoT DC3**—the driver acts as a server, stays subscribed to MQTT topics,
@@ -65,7 +64,7 @@ variables. Key items:
 | Username / password | `MQTT_USERNAME` / `MQTT_PASSWORD`                     | `dc3` / empty (the docker-compose stack injects `dc3dc3dc3`) | Auth credentials (auth types: `NONE` / `USERNAME` / `CLIENT_ID` / `X509`); the password falls back to empty in app config and is injected by the deployment |
 | Keep-alive          | no env binding (`dc3.driver.mqtt.keep-alive`)         | `15` (s)                                                     | Client heartbeat interval, hard-coded default                                                                                                               |
 | Completion timeout  | no env binding (`dc3.driver.mqtt.completion-timeout`) | `3000` (ms)                                                  | Wait timeout for a publish operation, hard-coded default                                                                                                    |
-| Batch thresholds    | `MQTT_BATCH_SPEED` / `MQTT_BATCH_INTERVAL`            | `100` / `5`                                                  | Ingest batching: flush at 100 messages or 5 s, whichever comes first                                                                                       |
+| Batch thresholds    | `MQTT_BATCH_SPEED` / `MQTT_BATCH_INTERVAL`            | `100` / `5`                                                  | Ingest batching: flush at 100 messages or 5 s, whichever comes first                                                                                        |
 
 ::: info The broker defaults to the RabbitMQ MQTT plugin
 The default MQTT broker is the **RabbitMQ MQTT plugin** (`dc3-rabbitmq`), addressed via `MQTT_BROKER_HOST` /

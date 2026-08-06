@@ -6,7 +6,6 @@ title: System Architecture Overview
 import ArchitectureIndexFlowDiagram from '../../.vitepress/theme/components/ArchitectureIndexFlowDiagram.vue'
 </script>
 
-
 # System Architecture Overview
 
 IoT DC3 runs the "collect → normalize → analyze → act → feedback" loop as a layered, multi-tenant microservice

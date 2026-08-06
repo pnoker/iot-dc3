@@ -6,7 +6,6 @@ title: Choose a Path by Role
 import PathsDecisionDiagram from '../../.vitepress/theme/components/PathsDecisionDiagram.vue'
 </script>
 
-
 # Choose a Path by Role
 
 The docs cover everything from first evaluation to contributing, but the shortest path through them depends on what

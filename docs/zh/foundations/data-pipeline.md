@@ -7,7 +7,6 @@ import DataPipelineFlowDiagram from '../../.vitepress/theme/components/DataPipel
 import DataPipelineIngestDiagram from '../../.vitepress/theme/components/DataPipelineIngestDiagram.vue'
 </script>
 
-
 # 时序数据与流处理
 
 物联网平台层真正的考验，是**怎么把源源不断的位号值存下来、算出来、查得动**。这一层既不是设备，也不是业务应用，而是夹在中间的"

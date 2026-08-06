@@ -6,7 +6,6 @@ title: Testing
 import TestingDiagram from '../../.vitepress/theme/components/TestingDiagram.vue'
 </script>
 
-
 # Testing
 
 This page covers how the IoT DC3 backend layers its tests, when a test is required, and which command runs each layer.

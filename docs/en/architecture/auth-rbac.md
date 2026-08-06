@@ -8,7 +8,6 @@ import AuthErDiagram from '../../.vitepress/theme/components/AuthErDiagram.vue'
 import AuthDecisionFlowDiagram from '../../.vitepress/theme/components/AuthDecisionFlowDiagram.vue'
 </script>
 
-
 # Authentication · Tenancy · RBAC
 
 Only the gateway faces the outside world. But every protected call still has to answer three questions before it reaches

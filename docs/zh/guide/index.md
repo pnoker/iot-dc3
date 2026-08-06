@@ -6,7 +6,6 @@ title: 部署运维
 import GuideIndexDiagram from '../../.vitepress/theme/components/GuideIndexDiagram.vue'
 </script>
 
-
 # 部署运维
 
 把 IoT DC3 从一台开发机的 `java -jar`

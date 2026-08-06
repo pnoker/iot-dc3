@@ -57,7 +57,9 @@ import java.util.stream.Collectors;
 @Component
 public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
 
-    /** Shared driver-level metadata; pruned here of orphan device ids when the upstream loader returns {@code null}. */
+    /**
+     * Shared driver-level metadata; pruned here of orphan device ids when the upstream loader returns {@code null}.
+     */
     private final DriverMetadata driverMetadata;
 
     /**

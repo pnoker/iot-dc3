@@ -6,7 +6,6 @@ title: 按角色选择路径
 import PathsDecisionDiagram from '../../.vitepress/theme/components/PathsDecisionDiagram.vue'
 </script>
 
-
 # 按角色选择路径
 
 文档覆盖了从评估到贡献的全过程，但不同角色的最短路径不同。先找到最像你的那一行，照着给的顺序读，少走弯路。

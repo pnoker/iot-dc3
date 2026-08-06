@@ -81,7 +81,7 @@ public class RequestIdGrpcServerInterceptor implements ServerInterceptor {
         // Read the id supplied by the caller (set by RequestIdGrpcClientInterceptor upstream),
         // or mint one when absent so the call is still self-consistent in this service's logs.
         String requestId = headers.get(REQUEST_ID_KEY);
-        
+
         // Priority 1: Use X-Request-Id from header
         // Priority 2: Use OpenTelemetry Trace ID if available
         if (requestId == null || requestId.isBlank()) {
@@ -91,12 +91,12 @@ public class RequestIdGrpcServerInterceptor implements ServerInterceptor {
                 requestId = spanContext.getTraceId();
             }
         }
-        
+
         // Priority 3: Fall back to UUID
         if (requestId == null || requestId.isBlank()) {
             requestId = UUID.randomUUID().toString();
         }
-        
+
         return new RequestIdListener<>(next.startCall(call, headers), requestId);
     }
 

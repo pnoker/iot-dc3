@@ -91,7 +91,7 @@
         <!-- Data access -->
         <mybatis.plus.version>3.5.17</mybatis.plus.version>
         <mybatis.plus.dynamic.version>4.5.0</mybatis.plus.dynamic.version>
-        
+
         <!-- Embedded database for the driver local point-value buffer -->
         <sqlite-jdbc.version>3.53.2.0</sqlite-jdbc.version>
 

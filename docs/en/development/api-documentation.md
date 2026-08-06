@@ -7,7 +7,6 @@ import ApiDocFlowDiagram from '../../.vitepress/theme/components/ApiDocFlowDiagr
 import ApiDocSequenceDiagram from '../../.vitepress/theme/components/ApiDocSequenceDiagram.vue'
 </script>
 
-
 # API Documentation
 
 IoT DC3's REST API docs are generated from code annotations, then aggregated by the gateway into a single Swagger UI. By

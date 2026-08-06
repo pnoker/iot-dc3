@@ -408,8 +408,8 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
      * Reconcile leaf API resources against the current API records: insert new leaves,
      * update changed ones, and remove orphans whose APIs no longer exist.
      *
-     * @param apis          the current API records (ids required)
-     * @param groupNodeIds  map from group name to its parent resource node id
+     * @param apis         the current API records (ids required)
+     * @param groupNodeIds map from group name to its parent resource node id
      * @return the insert and update counts
      */
     private ResourceRepairResult reconcileLeafResources(List<ApiDO> apis, Map<String, Long> groupNodeIds) {
@@ -617,9 +617,9 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
      * Ensure group resource nodes exist under a service node for each target group,
      * creating missing ones and removing stale ones.
      *
-     * @param serviceName    the service name
-     * @param serviceNodeId  the parent service node id
-     * @param targetGroups   the group names that should exist
+     * @param serviceName   the service name
+     * @param serviceNodeId the parent service node id
+     * @param targetGroups  the group names that should exist
      * @return map from group name to its resource node id
      */
     private Map<String, Long> ensureGroupNodes(String serviceName, Long serviceNodeId, Set<String> targetGroups) {

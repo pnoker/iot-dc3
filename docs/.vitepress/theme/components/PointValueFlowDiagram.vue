@@ -54,50 +54,79 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
           <marker id="pvf-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
             <polygon fill="var(--dc3-arrow)" points="0 0, 10 3.5, 0 7"/>
           </marker>
-          <filter id="pvf-glow" x="-40%" y="-40%" width="180%" height="180%">
+          <filter id="pvf-glow" height="180%" width="180%" x="-40%" y="-40%">
             <feGaussianBlur stdDeviation="8"/>
           </filter>
         </defs>
 
-        <line marker-end="url(#pvf-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="140" x2="200" y1="185" y2="182"/>
-        <line marker-end="url(#pvf-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="400" x2="450" y1="182" y2="182"/>
+        <line marker-end="url(#pvf-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="140" x2="200" y1="185"
+              y2="182"/>
+        <line marker-end="url(#pvf-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="400" x2="450" y1="182"
+              y2="182"/>
         <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" x="425" y="174">{{ s.e1 }}</text>
-        <line marker-end="url(#pvf-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="650" x2="700" y1="182" y2="180"/>
-        <line marker-end="url(#pvf-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="900" x2="960" y1="165" y2="160"/>
+        <line marker-end="url(#pvf-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="650" x2="700" y1="182"
+              y2="180"/>
+        <line marker-end="url(#pvf-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="900" x2="960" y1="165"
+              y2="160"/>
         <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" x="930" y="156">{{ s.e2 }}</text>
-        <path d="M1020,265 Q1020,332 800,330" fill="none" marker-end="url(#pvf-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5"/>
+        <path d="M1020,265 Q1020,332 800,330" fill="none" marker-end="url(#pvf-ah)" stroke="var(--dc3-arrow)"
+              stroke-width="1.5"/>
         <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" x="930" y="324">{{ s.e3 }}</text>
 
         <rect fill="var(--vp-c-bg)" height="55" rx="8" width="110" x="30" y="160"/>
-        <rect fill="var(--dc3-ext-fill)" height="55" rx="8" stroke="var(--dc3-ext-stroke)" stroke-width="1.5" width="110" x="30" y="160"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="85" y="184">{{ s.dev }}</text>
+        <rect fill="var(--dc3-ext-fill)" height="55" rx="8" stroke="var(--dc3-ext-stroke)" stroke-width="1.5"
+              width="110" x="30" y="160"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="85" y="184">{{
+            s.dev
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="85" y="201">{{ s.devSub }}</text>
 
         <rect fill="var(--vp-c-bg)" height="65" rx="8" width="200" x="200" y="150"/>
-        <rect fill="var(--dc3-bus-fill)" height="65" rx="8" stroke="var(--dc3-bus-stroke)" stroke-width="1.5" width="200" x="200" y="150"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="300" y="176">{{ s.drv }}</text>
+        <rect fill="var(--dc3-bus-fill)" height="65" rx="8" stroke="var(--dc3-bus-stroke)" stroke-width="1.5"
+              width="200" x="200" y="150"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="300" y="176">{{
+            s.drv
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="300" y="194">{{ s.drvSub }}</text>
 
         <rect fill="var(--vp-c-bg)" height="55" rx="8" width="200" x="450" y="155"/>
-        <rect fill="var(--dc3-bus-fill)" height="55" rx="8" stroke="var(--dc3-bus-stroke)" stroke-width="1.5" width="200" x="450" y="155"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="12" text-anchor="middle" x="550" y="178">{{ s.mq1 }}</text>
+        <rect fill="var(--dc3-bus-fill)" height="55" rx="8" stroke="var(--dc3-bus-stroke)" stroke-width="1.5"
+              width="200" x="450" y="155"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="12" text-anchor="middle" x="550" y="178">{{
+            s.mq1
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="550" y="195">{{ s.mq2 }}</text>
 
         <rect fill="var(--vp-c-bg)" height="70" rx="8" width="200" x="700" y="145"/>
-        <rect fill="var(--dc3-be-fill)" height="70" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="200" x="700" y="145"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="800" y="172">{{ s.dc }}</text>
+        <rect fill="var(--dc3-be-fill)" height="70" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="200"
+              x="700" y="145"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="800" y="172">{{
+            s.dc
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="800" y="190">{{ s.dcSub }}</text>
 
-        <rect fill="var(--dc3-db-stroke)" height="190" opacity="0.16" rx="14" width="150" x="945" y="80" filter="url(#pvf-glow)"/>
+        <rect fill="var(--dc3-db-stroke)" filter="url(#pvf-glow)" height="190" opacity="0.16" rx="14" width="150" x="945"
+              y="80"/>
         <path d="M960,120 a65,14 0 0 0 120,0 v140 a65,14 0 0 1 -120,0 z" fill="var(--vp-c-bg)"/>
-        <path d="M960,120 a65,14 0 0 0 120,0 v140 a65,14 0 0 1 -120,0 z" fill="var(--dc3-db-fill)" stroke="var(--dc3-db-stroke)" stroke-width="2.5"/>
+        <path d="M960,120 a65,14 0 0 0 120,0 v140 a65,14 0 0 1 -120,0 z" fill="var(--dc3-db-fill)"
+              stroke="var(--dc3-db-stroke)" stroke-width="2.5"/>
         <ellipse cx="1020" cy="120" fill="none" rx="65" ry="14" stroke="var(--dc3-db-stroke)" stroke-width="2.5"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="11.5" font-weight="700" text-anchor="middle" x="1020" y="186">{{ s.ts1 }}</text>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="11.5" font-weight="700" text-anchor="middle" x="1020"
+              y="186">{{ s.ts1 }}
+        </text>
         <text fill="var(--dc3-db-text)" font-size="9" text-anchor="middle" x="1020" y="203">{{ s.ts2 }}</text>
 
         <rect fill="var(--vp-c-bg)" height="55" rx="8" width="200" x="700" y="300"/>
-        <rect fill="var(--dc3-fe-fill)" height="55" rx="8" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="200" x="700" y="300"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="800" y="324">{{ s.app }}</text>
+        <rect fill="var(--dc3-fe-fill)" height="55" rx="8" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="200"
+              x="700" y="300"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="800" y="324">{{
+            s.app
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="800" y="341">{{ s.appSub }}</text>
       </svg>
     </div>

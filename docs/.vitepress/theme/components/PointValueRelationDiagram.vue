@@ -52,47 +52,71 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
           <marker id="pvr-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
             <polygon fill="var(--dc3-arrow)" points="0 0, 10 3.5, 0 7"/>
           </marker>
-          <filter id="pvr-glow" x="-40%" y="-40%" width="180%" height="180%">
+          <filter id="pvr-glow" height="180%" width="180%" x="-40%" y="-40%">
             <feGaussianBlur stdDeviation="8"/>
           </filter>
         </defs>
 
         <line marker-end="url(#pvr-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="200" x2="300" y1="90" y2="85"/>
         <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" x="250" y="78">{{ s.defines }}</text>
-        <line marker-end="url(#pvr-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="120" x2="120" y1="180" y2="120"/>
+        <line marker-end="url(#pvr-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="120" x2="120" y1="180"
+              y2="120"/>
         <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" x="162" y="155">{{ s.belongs }}</text>
-        <line marker-end="url(#pvr-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="190" x2="610" y1="210" y2="200"/>
+        <line marker-end="url(#pvr-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="190" x2="610" y1="210"
+              y2="200"/>
         <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" x="400" y="194">{{ s.produce }}</text>
-        <line marker-end="url(#pvr-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="190" x2="610" y1="330" y2="235"/>
+        <line marker-end="url(#pvr-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="190" x2="610" y1="330"
+              y2="235"/>
         <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" x="360" y="296">{{ s.collect }}</text>
-        <line marker-end="url(#pvr-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="460" x2="610" y1="90" y2="150"/>
+        <line marker-end="url(#pvr-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="460" x2="610" y1="90"
+              y2="150"/>
         <text fill="var(--dc3-arrow-label)" font-size="11" text-anchor="middle" x="545" y="112">{{ s.read }}</text>
 
         <rect fill="var(--vp-c-bg)" height="60" rx="8" width="160" x="40" y="60"/>
-        <rect fill="var(--dc3-be-fill)" height="60" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="160" x="40" y="60"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="120" y="87">{{ s.profile }}</text>
+        <rect fill="var(--dc3-be-fill)" height="60" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="160"
+              x="40" y="60"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="120" y="87">{{
+            s.profile
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="120" y="105">{{ s.profileSub }}</text>
 
         <rect fill="var(--vp-c-bg)" height="60" rx="8" width="160" x="300" y="55"/>
-        <rect fill="var(--dc3-fe-fill)" height="60" rx="8" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="160" x="300" y="55"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="380" y="82">{{ s.point }}</text>
+        <rect fill="var(--dc3-fe-fill)" height="60" rx="8" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="160"
+              x="300" y="55"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="380" y="82">{{
+            s.point
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="380" y="100">{{ s.pointSub }}</text>
 
         <rect fill="var(--vp-c-bg)" height="60" rx="8" width="150" x="40" y="180"/>
-        <rect fill="var(--dc3-ext-fill)" height="60" rx="8" stroke="var(--dc3-ext-stroke)" stroke-width="1.5" width="150" x="40" y="180"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="115" y="207">{{ s.device }}</text>
+        <rect fill="var(--dc3-ext-fill)" height="60" rx="8" stroke="var(--dc3-ext-stroke)" stroke-width="1.5"
+              width="150" x="40" y="180"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="115" y="207">{{
+            s.device
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="115" y="225">{{ s.deviceSub }}</text>
 
         <rect fill="var(--vp-c-bg)" height="60" rx="8" width="150" x="40" y="300"/>
-        <rect fill="var(--dc3-bus-fill)" height="60" rx="8" stroke="var(--dc3-bus-stroke)" stroke-width="1.5" width="150" x="40" y="300"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="115" y="327">{{ s.driver }}</text>
+        <rect fill="var(--dc3-bus-fill)" height="60" rx="8" stroke="var(--dc3-bus-stroke)" stroke-width="1.5"
+              width="150" x="40" y="300"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="115" y="327">{{
+            s.driver
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="10" text-anchor="middle" x="115" y="345">{{ s.driverSub }}</text>
 
-        <rect fill="var(--dc3-db-stroke)" height="200" opacity="0.16" rx="16" width="220" x="600" y="100" filter="url(#pvr-glow)"/>
+        <rect fill="var(--dc3-db-stroke)" filter="url(#pvr-glow)" height="200" opacity="0.16" rx="16" width="220" x="600"
+              y="100"/>
         <path d="M620,130 a90,18 0 0 0 180,0 v150 a90,18 0 0 1 -180,0 z" fill="var(--vp-c-bg)"/>
-        <path d="M620,130 a90,18 0 0 0 180,0 v150 a90,18 0 0 1 -180,0 z" fill="var(--dc3-db-fill)" stroke="var(--dc3-db-stroke)" stroke-width="2.5"/>
+        <path d="M620,130 a90,18 0 0 0 180,0 v150 a90,18 0 0 1 -180,0 z" fill="var(--dc3-db-fill)"
+              stroke="var(--dc3-db-stroke)" stroke-width="2.5"/>
         <ellipse cx="710" cy="130" fill="none" rx="90" ry="18" stroke="var(--dc3-db-stroke)" stroke-width="2.5"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="14" font-weight="700" text-anchor="middle" x="710" y="200">{{ s.pv1 }}</text>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="14" font-weight="700" text-anchor="middle" x="710"
+              y="200">{{ s.pv1 }}
+        </text>
         <text fill="var(--dc3-db-text)" font-size="11" text-anchor="middle" x="710" y="220">{{ s.pv2 }}</text>
         <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="710" y="240">{{ s.pv3 }}</text>
       </svg>

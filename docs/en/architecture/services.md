@@ -7,7 +7,6 @@ import ServicesFlowDiagram from '../../.vitepress/theme/components/ServicesFlowD
 import ServicesSequenceDiagram from '../../.vitepress/theme/components/ServicesSequenceDiagram.vue'
 </script>
 
-
 # Services and Topology
 
 IoT DC3 isn't one big process. It's a set of independently deployable services that talk to each other over gRPC and
@@ -40,7 +39,8 @@ process:
   engine.
 - **Agentic Center (`dc3-center-agentic`)** — Spring AI conversations, tool calls, and chat persistence.
 - **Protocol Drivers (`dc3-driver-*`)** — the driver catalog has 28 protocol adapters; `docker-compose.yml` ships 22 by
-  default (the 6 not included — `ble`/`iec104`/`lwm2m`/`sl651`/`zigbee`/`can` — can be started on demand). Southbound they
+  default (the 6 not included — `ble`/`iec104`/`lwm2m`/`sl651`/`zigbee`/`can` — can be started on demand). Southbound
+  they
   connect to devices; northbound they're decoupled from the data center through RabbitMQ.
 - **Single Monolith (`dc3-center-single`)** — folds all four centers into one process, wired in-process via
   `dc3.facade.mode: local`. Good for local development and lightweight deployments (see [Facade Modes](./facade-modes)).

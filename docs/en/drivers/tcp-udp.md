@@ -6,7 +6,6 @@ title: TCP/UDP Driver
 import TcpUdpDiagram from '../../.vitepress/theme/components/TcpUdpDiagram.vue'
 </script>
 
-
 # TCP/UDP Driver
 
 `dc3-driver-tcp-udp` connects any device that "exchanges a raw byte stream over a TCP or UDP port" to IoT DC3: for

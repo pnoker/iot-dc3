@@ -8,7 +8,6 @@ import CliCredentialFlowDiagram from '../../.vitepress/theme/components/CliCrede
 import CliClassDiagram from '../../.vitepress/theme/components/CliClassDiagram.vue'
 </script>
 
-
 # CLI 使用指南
 
 `dc3-cli` 是 IoT DC3 的命令行客户端：一个独立的 TypeScript 包（Node ≥ 20），把平台的全部能力封装成 `dc3` 命令，全程经网关

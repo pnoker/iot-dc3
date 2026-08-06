@@ -6,7 +6,6 @@ title: 部署模式与镜像源
 import UsageStackDiagram from '../../.vitepress/theme/components/UsageStackDiagram.vue'
 </script>
 
-
 # 部署模式与镜像源
 
 IoT DC3 用四个 Compose 栈拼出完整环境：`db` 起依赖、`dev` 从源码构建、`app` 拉预构建镜像、`optional` 叠可观测性。这页讲清每个栈的用途、

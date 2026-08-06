@@ -6,7 +6,6 @@ title: Deployment Modes and Image Registries
 import UsageStackDiagram from '../../.vitepress/theme/components/UsageStackDiagram.vue'
 </script>
 
-
 # Deployment Modes and Image Registries
 
 IoT DC3 runs as four Compose stacks: `db` brings up dependencies, `dev` builds from source, `app` pulls prebuilt images,

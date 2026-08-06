@@ -6,7 +6,6 @@ title: 测试
 import TestingDiagram from '../../.vitepress/theme/components/TestingDiagram.vue'
 </script>
 
-
 # 测试
 
 这页讲清 IoT DC3 后端的测试怎么分层、什么时候必须补测试、用哪条命令跑哪一层。读完你能选对测试类型、在本地把单元/集成/E2E

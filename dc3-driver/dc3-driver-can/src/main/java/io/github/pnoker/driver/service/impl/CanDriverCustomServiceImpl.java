@@ -114,9 +114,9 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
             return DeviceHealthState.offline();
         }
         String interfaceName = getConfigValue(driverConfig, "interfaceName", "can0");
-            if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
-                throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
-            }
+        if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
+            throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
+        }
         try {
             Process process = new ProcessBuilder("ip", "link", "show", interfaceName)
                     .redirectErrorStream(true)
@@ -154,9 +154,9 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
     public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                                DeviceBO device, PointBO point) {
         String interfaceName = getConfigValue(driverConfig, "interfaceName", "can0");
-            if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
-                throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
-            }
+        if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
+            throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
+        }
         String canId = getConfigValue(pointConfig, "canId", "");
         String requestCanId = getConfigValue(pointConfig, "requestCanId", "");
         String requestData = getConfigValue(pointConfig, "requestData", "");
@@ -183,9 +183,9 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
                          DeviceBO device, PointBO point, WritePointValue writePointValue) {
         String interfaceName = getConfigValue(driverConfig, "interfaceName", "can0");
-            if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
-                throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
-            }
+        if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
+            throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
+        }
         String canId = getConfigValue(pointConfig, "canId", "");
         String data = getConfigValue(pointConfig, "data", "");
 

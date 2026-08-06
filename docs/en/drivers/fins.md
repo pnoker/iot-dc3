@@ -6,7 +6,6 @@ title: FINS Driver
 import FinsDiagram from '../../.vitepress/theme/components/FinsDiagram.vue'
 </script>
 
-
 # FINS Driver
 
 `dc3-driver-fins` onboards Omron PLCs into IoT DC3 over the FINS protocol: as a FINS client it actively opens a TCP
@@ -89,7 +88,8 @@ decoding; `bitPosition` is the bit offset within the word.
 
 ::: tip The word count read is determined by `dataType`
 A read fetches the word count matching `dataType`: `INT32`/`UINT32`/`FLOAT` read **2 words (4 bytes)**, other types
-read **1 word (2 bytes)** (see `wordCount()`). Decoding supports `INT16`/`UINT16`/`INT32`/`UINT32`/`FLOAT`/`STRING`/`BCD`,
+read **1 word (2 bytes)** (see `wordCount()`). Decoding supports `INT16`/`UINT16`/`INT32`/`UINT32`/`FLOAT`/`STRING`/
+`BCD`,
 all Big-Endian; the Point's data type ([Point](../introduction/concepts/point)'s `pointTypeFlag`) should match the
 `dataType` set here.
 :::

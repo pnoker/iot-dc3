@@ -6,7 +6,6 @@ title: PLC S7 Driver
 import PlcS7Diagram from '../../.vitepress/theme/components/PlcS7Diagram.vue'
 </script>
 
-
 # PLC S7 Driver
 
 `dc3-driver-plcs7` connects Siemens S7 series PLCs to IoT DC3: acting as an S7 client, it connects over TCP to one or

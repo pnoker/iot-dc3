@@ -6,7 +6,6 @@ title: 故障排查
 import TroubleshootingDiagram from '../../.vitepress/theme/components/TroubleshootingDiagram.vue'
 </script>
 
-
 # 故障排查
 
 这页帮你在本地起不来、连不上、被拒绝时快速定位：每条问题都按 **症状 → 根因 → 定位** 展开，不只给解法，还告诉你"
