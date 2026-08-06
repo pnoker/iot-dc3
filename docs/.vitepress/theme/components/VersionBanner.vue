@@ -16,7 +16,7 @@
   -->
 
 <script lang="ts" setup>
-import {ref, onMounted, computed} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useData} from 'vitepress'
 
 const {lang} = useData()
@@ -28,26 +28,26 @@ const latestUrl = ref('')
 const isZh = computed(() => lang.value.startsWith('zh'))
 
 onMounted(() => {
-    const metaLatest = document.querySelector('meta[name="dc3-doc-is-latest"]')
-    isLatest.value = metaLatest?.getAttribute('content') !== 'false'
+  const metaLatest = document.querySelector('meta[name="dc3-doc-is-latest"]')
+  isLatest.value = metaLatest?.getAttribute('content') !== 'false'
 
-    const metaVersion = document.querySelector('meta[name="dc3-doc-version"]')
-    currentVersion.value = metaVersion?.getAttribute('content') || ''
+  const metaVersion = document.querySelector('meta[name="dc3-doc-version"]')
+  currentVersion.value = metaVersion?.getAttribute('content') || ''
 
-    const metaLatestUrl = document.querySelector('meta[name="dc3-doc-latest-url"]')
-    latestUrl.value = metaLatestUrl?.getAttribute('content') || '/'
+  const metaLatestUrl = document.querySelector('meta[name="dc3-doc-latest-url"]')
+  latestUrl.value = metaLatestUrl?.getAttribute('content') || '/'
 })
 </script>
 
 <template>
-    <div v-if="!isLatest" class="dc3-version-banner">
-        <svg class="banner-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-            <path
-                fill="currentColor"
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
-            />
-        </svg>
-        <span class="banner-text">
+  <div v-if="!isLatest" class="dc3-version-banner">
+    <svg aria-hidden="true" class="banner-icon" height="16" viewBox="0 0 24 24" width="16">
+      <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+          fill="currentColor"
+      />
+    </svg>
+    <span class="banner-text">
             <template v-if="isZh">
                 你正在查看 <strong>{{ currentVersion }}</strong> 的文档（已归档）。查看
                 <a :href="latestUrl">最新版本</a>。
@@ -57,39 +57,39 @@ onMounted(() => {
                 View the <a :href="latestUrl">latest version</a>.
             </template>
         </span>
-    </div>
+  </div>
 </template>
 
 <style scoped>
 .dc3-version-banner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 7px 16px;
-    font-size: 13px;
-    line-height: 1.4;
-    color: #fff;
-    background: var(--vp-c-brand-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #fff;
+  background: var(--vp-c-brand-1);
 }
 
 .banner-icon {
-    flex-shrink: 0;
-    opacity: 0.85;
+  flex-shrink: 0;
+  opacity: 0.85;
 }
 
 .banner-text strong {
-    font-weight: 700;
+  font-weight: 700;
 }
 
 .banner-text a {
-    color: #fff;
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .banner-text a:hover {
-    opacity: 0.85;
+  opacity: 0.85;
 }
 </style>

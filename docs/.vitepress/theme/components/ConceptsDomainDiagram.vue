@@ -48,7 +48,7 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
           <marker id="cd-ah" markerHeight="7" markerWidth="10" orient="auto" refX="9" refY="3.5">
             <polygon fill="var(--dc3-arrow)" points="0 0, 10 3.5, 0 7"/>
           </marker>
-          <filter id="cd-glow" x="-40%" y="-40%" width="180%" height="180%">
+          <filter id="cd-glow" height="180%" width="180%" x="-40%" y="-40%">
             <feGaussianBlur stdDeviation="8"/>
           </filter>
         </defs>
@@ -56,54 +56,88 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
         <!-- Profile -> Point/Command/Event -->
         <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="390" x2="220" y1="250" y2="68"/>
         <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="285" y="150">{{ s.e1 }}</text>
-        <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="390" x2="220" y1="275" y2="218"/>
+        <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="390" x2="220" y1="275"
+              y2="218"/>
         <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="300" y="250">{{ s.e2 }}</text>
-        <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="390" x2="220" y1="300" y2="368"/>
+        <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="390" x2="220" y1="300"
+              y2="368"/>
         <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="285" y="350">{{ s.e3 }}</text>
         <!-- Device -> Profile / Driver / PointValue -->
-        <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="700" x2="600" y1="125" y2="235"/>
+        <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="700" x2="600" y1="125"
+              y2="235"/>
         <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="675" y="170">{{ s.e4 }}</text>
-        <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="790" x2="790" y1="125" y2="210"/>
+        <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="790" x2="790" y1="125"
+              y2="210"/>
         <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="845" y="172">{{ s.e5 }}</text>
-        <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="890" x2="890" y1="125" y2="400"/>
+        <line marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="890" x2="890" y1="125"
+              y2="400"/>
         <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="935" y="265">{{ s.e7 }}</text>
         <!-- Point -> PointValue (top arc) -->
-        <path d="M140,68 Q470,8 810,455" fill="none" marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5"/>
+        <path d="M140,68 Q470,8 810,455" fill="none" marker-end="url(#cd-ah)" stroke="var(--dc3-arrow)"
+              stroke-width="1.5"/>
         <text fill="var(--dc3-arrow-label)" font-size="10" text-anchor="middle" x="470" y="22">{{ s.e6 }}</text>
 
         <!-- Point / Command / Event -->
         <rect fill="var(--vp-c-bg)" height="55" rx="8" width="160" x="60" y="40"/>
-        <rect fill="var(--dc3-fe-fill)" height="55" rx="8" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="160" x="60" y="40"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="140" y="73">{{ s.point }}</text>
+        <rect fill="var(--dc3-fe-fill)" height="55" rx="8" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="160"
+              x="60" y="40"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="140" y="73">{{
+            s.point
+          }}
+        </text>
         <rect fill="var(--vp-c-bg)" height="55" rx="8" width="160" x="60" y="190"/>
-        <rect fill="var(--dc3-fe-fill)" height="55" rx="8" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="160" x="60" y="190"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="140" y="223">{{ s.command }}</text>
+        <rect fill="var(--dc3-fe-fill)" height="55" rx="8" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="160"
+              x="60" y="190"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="140" y="223">{{
+            s.command
+          }}
+        </text>
         <rect fill="var(--vp-c-bg)" height="55" rx="8" width="160" x="60" y="340"/>
-        <rect fill="var(--dc3-fe-fill)" height="55" rx="8" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="160" x="60" y="340"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="140" y="373">{{ s.event }}</text>
+        <rect fill="var(--dc3-fe-fill)" height="55" rx="8" stroke="var(--dc3-fe-stroke)" stroke-width="1.5" width="160"
+              x="60" y="340"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="140" y="373">{{
+            s.event
+          }}
+        </text>
 
         <!-- Profile HERO -->
-        <rect fill="var(--dc3-be-stroke)" height="110" opacity="0.2" rx="14" width="220" x="380" y="215" filter="url(#cd-glow)"/>
+        <rect fill="var(--dc3-be-stroke)" filter="url(#cd-glow)" height="110" opacity="0.2" rx="14" width="220" x="380"
+              y="215"/>
         <rect fill="var(--vp-c-bg)" height="92" rx="10" width="200" x="390" y="224"/>
-        <rect fill="var(--dc3-be-fill)" height="92" rx="10" stroke="var(--dc3-be-stroke)" stroke-width="2.5" width="200" x="390" y="224"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="16" font-weight="700" text-anchor="middle" x="490" y="262">{{ s.profile }}</text>
+        <rect fill="var(--dc3-be-fill)" height="92" rx="10" stroke="var(--dc3-be-stroke)" stroke-width="2.5" width="200"
+              x="390" y="224"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="16" font-weight="700" text-anchor="middle" x="490"
+              y="262">{{ s.profile }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="490" y="284">能力模板 · 归属根</text>
 
         <!-- Device / Driver -->
         <rect fill="var(--vp-c-bg)" height="65" rx="8" width="180" x="700" y="60"/>
-        <rect fill="var(--dc3-ext-fill)" height="65" rx="8" stroke="var(--dc3-ext-stroke)" stroke-width="1.5" width="180" x="700" y="60"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="790" y="90">{{ s.device }}</text>
+        <rect fill="var(--dc3-ext-fill)" height="65" rx="8" stroke="var(--dc3-ext-stroke)" stroke-width="1.5"
+              width="180" x="700" y="60"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="790" y="90">{{
+            s.device
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="790" y="108">profileId + driverId</text>
         <rect fill="var(--vp-c-bg)" height="65" rx="8" width="180" x="700" y="210"/>
-        <rect fill="var(--dc3-bus-fill)" height="65" rx="8" stroke="var(--dc3-bus-stroke)" stroke-width="1.5" width="180" x="700" y="210"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="790" y="240">{{ s.driver }}</text>
+        <rect fill="var(--dc3-bus-fill)" height="65" rx="8" stroke="var(--dc3-bus-stroke)" stroke-width="1.5"
+              width="180" x="700" y="210"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="790" y="240">{{
+            s.driver
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="9.5" text-anchor="middle" x="790" y="258">协议适配</text>
 
         <!-- PointValue cylinder -->
         <path d="M810,455 a90,16 0 0 0 180,0 v75 a90,16 0 0 1 -180,0 z" fill="var(--vp-c-bg)"/>
-        <path d="M810,455 a90,16 0 0 0 180,0 v75 a90,16 0 0 1 -180,0 z" fill="var(--dc3-db-fill)" stroke="var(--dc3-db-stroke)" stroke-width="1.5"/>
+        <path d="M810,455 a90,16 0 0 0 180,0 v75 a90,16 0 0 1 -180,0 z" fill="var(--dc3-db-fill)"
+              stroke="var(--dc3-db-stroke)" stroke-width="1.5"/>
         <ellipse cx="900" cy="455" fill="none" rx="90" ry="16" stroke="var(--dc3-db-stroke)" stroke-width="1.5"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="900" y="500">{{ s.pv }}</text>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="900" y="500">{{
+            s.pv
+          }}
+        </text>
       </svg>
     </div>
   </DiagramFrame>

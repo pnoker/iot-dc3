@@ -60,59 +60,90 @@ const s = computed(() => DICT[props.lang] ?? DICT.zh)
 
         <!-- start -->
         <rect fill="var(--vp-c-bg)" height="50" rx="25" width="200" x="490" y="20"/>
-        <rect fill="var(--dc3-ext-fill)" height="50" rx="25" stroke="var(--dc3-ext-stroke)" stroke-width="1.5" width="200" x="490" y="20"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="590" y="51">{{ s.start }}</text>
+        <rect fill="var(--dc3-ext-fill)" height="50" rx="25" stroke="var(--dc3-ext-stroke)" stroke-width="1.5"
+              width="200" x="490" y="20"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="13" text-anchor="middle" x="590" y="51">{{
+            s.start
+          }}
+        </text>
 
         <!-- vertical spine of diamonds -->
         <line marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="590" x2="590" y1="70" y2="100"/>
         <!-- diamond Q1 -->
-        <polygon fill="var(--dc3-amber-fill)" points="590,100 700,150 590,200 480,150" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"/>
+        <polygon fill="var(--dc3-amber-fill)" points="590,100 700,150 590,200 480,150" stroke="var(--dc3-amber-stroke)"
+                 stroke-width="1.5"/>
         <text fill="var(--dc3-box-name)" font-size="11.5" text-anchor="middle" x="590" y="154">{{ s.q1 }}</text>
-        <line marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="590" x2="590" y1="200" y2="230"/>
-        <polygon fill="var(--dc3-amber-fill)" points="590,230 700,280 590,330 480,280" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"/>
+        <line marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="590" x2="590" y1="200"
+              y2="230"/>
+        <polygon fill="var(--dc3-amber-fill)" points="590,230 700,280 590,330 480,280" stroke="var(--dc3-amber-stroke)"
+                 stroke-width="1.5"/>
         <text fill="var(--dc3-box-name)" font-size="11.5" text-anchor="middle" x="590" y="284">{{ s.q2 }}</text>
-        <line marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="590" x2="590" y1="330" y2="360"/>
-        <polygon fill="var(--dc3-amber-fill)" points="590,360 700,410 590,460 480,410" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"/>
+        <line marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="590" x2="590" y1="330"
+              y2="360"/>
+        <polygon fill="var(--dc3-amber-fill)" points="590,360 700,410 590,460 480,410" stroke="var(--dc3-amber-stroke)"
+                 stroke-width="1.5"/>
         <text fill="var(--dc3-box-name)" font-size="11.5" text-anchor="middle" x="590" y="414">{{ s.q3 }}</text>
-        <line marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="590" x2="590" y1="460" y2="490"/>
-        <polygon fill="var(--dc3-amber-fill)" points="590,490 700,540 590,590 480,540" stroke="var(--dc3-amber-stroke)" stroke-width="1.5"/>
+        <line marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5" x1="590" x2="590" y1="460"
+              y2="490"/>
+        <polygon fill="var(--dc3-amber-fill)" points="590,490 700,540 590,590 480,540" stroke="var(--dc3-amber-stroke)"
+                 stroke-width="1.5"/>
         <text fill="var(--dc3-box-name)" font-size="11.5" text-anchor="middle" x="590" y="544">{{ s.q4 }}</text>
 
         <!-- yes branches (left) -->
         <path d="M480,150 L300,150" fill="none" marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5"/>
         <text fill="var(--dc3-be-text)" font-size="10" font-weight="600" x="385" y="143">{{ s.yes }}</text>
         <rect fill="var(--vp-c-bg)" height="62" rx="8" width="220" x="60" y="119"/>
-        <rect fill="var(--dc3-be-fill)" height="62" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="220" x="60" y="119"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="170" y="146">{{ s.p1 }}</text>
+        <rect fill="var(--dc3-be-fill)" height="62" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="220"
+              x="60" y="119"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="170" y="146">{{
+            s.p1
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="170" y="165">{{ s.p1d }}</text>
 
         <path d="M480,280 L300,280" fill="none" marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5"/>
         <text fill="var(--dc3-be-text)" font-size="10" font-weight="600" x="385" y="273">{{ s.yes }}</text>
         <rect fill="var(--vp-c-bg)" height="62" rx="8" width="220" x="60" y="249"/>
-        <rect fill="var(--dc3-be-fill)" height="62" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="220" x="60" y="249"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="170" y="276">{{ s.p2 }}</text>
+        <rect fill="var(--dc3-be-fill)" height="62" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="220"
+              x="60" y="249"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="170" y="276">{{
+            s.p2
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="170" y="295">{{ s.p2d }}</text>
 
         <path d="M480,410 L300,410" fill="none" marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5"/>
         <text fill="var(--dc3-be-text)" font-size="10" font-weight="600" x="385" y="403">{{ s.yes }}</text>
         <rect fill="var(--vp-c-bg)" height="62" rx="8" width="220" x="60" y="379"/>
-        <rect fill="var(--dc3-be-fill)" height="62" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="220" x="60" y="379"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="170" y="406">{{ s.p3 }}</text>
+        <rect fill="var(--dc3-be-fill)" height="62" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="220"
+              x="60" y="379"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="170" y="406">{{
+            s.p3
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="170" y="425">{{ s.p3d }}</text>
 
         <path d="M480,540 L300,540" fill="none" marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5"/>
         <text fill="var(--dc3-be-text)" font-size="10" font-weight="600" x="385" y="533">{{ s.yes }}</text>
         <rect fill="var(--vp-c-bg)" height="62" rx="8" width="220" x="60" y="509"/>
-        <rect fill="var(--dc3-be-fill)" height="62" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="220" x="60" y="509"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="170" y="536">{{ s.p4 }}</text>
+        <rect fill="var(--dc3-be-fill)" height="62" rx="8" stroke="var(--dc3-be-stroke)" stroke-width="1.5" width="220"
+              x="60" y="509"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="170" y="536">{{
+            s.p4
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="170" y="555">{{ s.p4d }}</text>
 
         <!-- Q4 no -> contribute (right bottom) -->
         <path d="M700,540 L860,540" fill="none" marker-end="url(#pd-ah)" stroke="var(--dc3-arrow)" stroke-width="1.5"/>
         <text fill="var(--dc3-arrow-label)" font-size="10" x="755" y="533">{{ s.no }}</text>
         <rect fill="var(--vp-c-bg)" height="62" rx="8" width="220" x="860" y="509"/>
-        <rect fill="var(--dc3-rose-fill)" height="62" rx="8" stroke="var(--dc3-rose-stroke)" stroke-width="1.5" width="220" x="860" y="509"/>
-        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="970" y="536">{{ s.p5 }}</text>
+        <rect fill="var(--dc3-rose-fill)" height="62" rx="8" stroke="var(--dc3-rose-stroke)" stroke-width="1.5"
+              width="220" x="860" y="509"/>
+        <text class="d-name" fill="var(--dc3-box-name)" font-size="12.5" text-anchor="middle" x="970" y="536">{{
+            s.p5
+          }}
+        </text>
         <text fill="var(--dc3-text2)" font-size="9" text-anchor="middle" x="970" y="555">{{ s.p5d }}</text>
       </svg>
     </div>
