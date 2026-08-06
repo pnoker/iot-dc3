@@ -81,7 +81,7 @@
         <swagger-core.version>2.2.52</swagger-core.version>
 
         <!-- RPC and messaging -->
-        <grpc.version>1.81.0</grpc.version>
+        <grpc.version>1.83.1</grpc.version>
         <protobuf.version>4.35.0</protobuf.version>
         <spring-grpc.version>1.0.3</spring-grpc.version>
         <okhttp.version>5.4.0</okhttp.version>
