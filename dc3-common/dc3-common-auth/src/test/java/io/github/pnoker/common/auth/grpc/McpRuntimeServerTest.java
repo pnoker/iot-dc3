@@ -18,6 +18,7 @@
 package io.github.pnoker.common.auth.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcMcpAuditCommand;
+import io.github.pnoker.api.center.auth.GrpcMcpAuditStatus;
 import io.github.pnoker.api.center.auth.GrpcMcpRiskLevel;
 import io.github.pnoker.api.center.auth.GrpcMcpIntrospectRequest;
 import io.github.pnoker.api.center.auth.GrpcMcpToolListRequest;
@@ -178,7 +179,7 @@ class McpRuntimeServerTest {
                 .setConnectionId(300L)
                 .setToolId("tool-1")
                 .setToolName("restart_device")
-                .setStatus("SUCCESS")
+                .setStatus(GrpcMcpAuditStatus.SUCCESS)
                 .setDurationMs(20L)
                 .build());
 
