@@ -31,7 +31,6 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
@@ -41,6 +40,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicReference;
+
 import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 
 /**

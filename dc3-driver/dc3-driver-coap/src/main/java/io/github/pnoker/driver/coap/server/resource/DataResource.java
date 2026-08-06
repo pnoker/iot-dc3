@@ -20,9 +20,9 @@ package io.github.pnoker.driver.coap.server.resource;
 import io.github.pnoker.driver.coap.entity.CoapMessage;
 import io.github.pnoker.driver.coap.service.CoapReceiveService;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.californium.core.CoapExchange;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
-import org.eclipse.californium.core.CoapExchange;
 
 /**
  * CoAP Data Resource

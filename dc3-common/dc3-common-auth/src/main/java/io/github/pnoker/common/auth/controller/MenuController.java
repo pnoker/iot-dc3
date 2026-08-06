@@ -258,8 +258,8 @@ public class MenuController implements BaseController {
      * Recursively retain a menu node when it or any descendant is visible, dropping
      * leaf nodes the principal cannot access.
      *
-     * @param node              the node to evaluate
-     * @param visibleMenuCodes  the set of visible {@code menu:<code>} codes
+     * @param node             the node to evaluate
+     * @param visibleMenuCodes the set of visible {@code menu:<code>} codes
      * @return the retained node, or null when neither it nor any child is visible
      */
     private MenuTreeBO retainAccessibleMenuNode(MenuTreeBO node, Set<String> visibleMenuCodes) {

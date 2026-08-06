@@ -96,6 +96,22 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    private static org.snmp4j.smi.Integer32 parseAsnInteger(String value) {
+        try {
+            return new org.snmp4j.smi.Integer32(Integer.parseInt(value));
+        } catch (NumberFormatException e) {
+            return new org.snmp4j.smi.Integer32(0);
+        }
+    }
+
+    private static long parseAsnLong(String value) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return 0L;
+        }
+    }
+
     @Override
     public void initial() {
         clientMap = new ConcurrentHashMap<>(16);
@@ -309,21 +325,4 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
                 .issues(issues).build();
     }
-
-
-    private static org.snmp4j.smi.Integer32 parseAsnInteger(String value) {
-            try {
-                return new org.snmp4j.smi.Integer32(Integer.parseInt(value));
-            } catch (NumberFormatException e) {
-                return new org.snmp4j.smi.Integer32(0);
-            }
-        }
-
-        private static long parseAsnLong(String value) {
-            try {
-                return Long.parseLong(value);
-            } catch (NumberFormatException e) {
-                return 0L;
-            }
-        }
 }

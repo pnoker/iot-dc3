@@ -103,7 +103,7 @@ public class KeyUtil {
      * @param privateKey Private key in Base64 encoding
      * @return Encrypted AES content
      * @throws NoSuchPaddingException             NoSuchPaddingException
-     * @throws NoSuchAlgorithmException            NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException           NoSuchAlgorithmException
      * @throws InvalidKeyException                InvalidKeyException
      * @throws IllegalBlockSizeException          IllegalBlockSizeException
      * @throws BadPaddingException                BadPaddingException
@@ -134,7 +134,7 @@ public class KeyUtil {
      * @param privateKey Private key in Base64 encoding
      * @return Decrypted AES content
      * @throws NoSuchPaddingException             NoSuchPaddingException
-     * @throws NoSuchAlgorithmException            NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException           NoSuchAlgorithmException
      * @throws InvalidKeyException                InvalidKeyException
      * @throws IllegalBlockSizeException          IllegalBlockSizeException
      * @throws BadPaddingException                BadPaddingException

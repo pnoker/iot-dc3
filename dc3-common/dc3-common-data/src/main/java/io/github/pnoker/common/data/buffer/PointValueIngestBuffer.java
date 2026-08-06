@@ -55,11 +55,10 @@ public class PointValueIngestBuffer {
 
     private final PointBatchProperties pointBatchProperties;
     private final PointValueService pointValueService;
-
+    private final AtomicLong droppedCount = new AtomicLong(0);
     private ArrayBlockingQueue<PointValueBO> queue;
     private ExecutorService worker;
     private volatile boolean running;
-    private final AtomicLong droppedCount = new AtomicLong(0);
 
     /**
      * Start the worker pool and begin draining.

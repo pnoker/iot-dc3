@@ -90,7 +90,7 @@ public class RequestIdWebFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         HttpHeaders headers = exchange.getRequest().getHeaders();
         String requestId = headers.getFirst(HEADER_REQUEST_ID);
-        
+
         // Priority 1: Use X-Request-Id from header (backward compatibility)
         // Priority 2: Use OpenTelemetry Trace ID if available
         if (requestId == null || requestId.isBlank()) {
@@ -100,12 +100,12 @@ public class RequestIdWebFilter implements WebFilter {
                 requestId = spanContext.getTraceId();
             }
         }
-        
+
         // Priority 3: Fall back to UUID if no trace or header
         if (requestId == null || requestId.isBlank()) {
             requestId = UUID.randomUUID().toString();
         }
-        
+
         String finalRequestId = requestId;
         // Echo back so callers can correlate a failing request with server-side logs and traces.
         exchange.getResponse().getHeaders().add(HEADER_REQUEST_ID, finalRequestId);

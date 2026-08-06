@@ -120,14 +120,14 @@ public class MdcRequestIdListenerAdvice implements MethodInterceptor {
                 }
             }
         }
-        
+
         // Priority 2: Use OpenTelemetry Trace ID if available
         Span currentSpan = Span.current();
         SpanContext spanContext = currentSpan.getSpanContext();
         if (spanContext.isValid()) {
             return spanContext.getTraceId();
         }
-        
+
         // Priority 3: Fall back to UUID
         return UUID.randomUUID().toString();
     }

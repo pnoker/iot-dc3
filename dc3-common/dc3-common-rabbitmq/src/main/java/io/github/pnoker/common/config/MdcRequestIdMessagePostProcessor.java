@@ -62,7 +62,7 @@ public class MdcRequestIdMessagePostProcessor implements MessagePostProcessor {
     @Override
     public Message postProcessMessage(Message message) {
         String requestId = MDC.get(MDC_REQUEST_ID);
-        
+
         // If MDC doesn't have requestId, try to get it from OpenTelemetry
         if (requestId == null || requestId.isBlank()) {
             Span currentSpan = Span.current();
@@ -71,7 +71,7 @@ public class MdcRequestIdMessagePostProcessor implements MessagePostProcessor {
                 requestId = spanContext.getTraceId();
             }
         }
-        
+
         if (requestId != null && !requestId.isBlank()) {
             message.getMessageProperties().setHeader(HEADER_REQUEST_ID, requestId);
         }

@@ -114,8 +114,8 @@ public class DeviceHealthScheduleJob extends QuartzJobBean {
      * Report a device's resolved state, applying its timeout and description overrides
      * over the configured defaults.
      *
-     * @param deviceId     the device id
-     * @param healthState  the resolved health state
+     * @param deviceId    the device id
+     * @param healthState the resolved health state
      */
     private void reportDeviceState(Long deviceId, DeviceHealthState healthState) {
         EntityStatusEnum status = EntityStatusEnum.OFFLINE;

@@ -52,11 +52,17 @@ import java.time.Duration;
 @EnableConfigurationProperties({DriverProperties.class})
 public class DriverInitRunner implements ApplicationRunner {
 
-    /** Maximum number of driver registration attempts before giving up. */
+    /**
+     * Maximum number of driver registration attempts before giving up.
+     */
     private static final int REGISTER_MAX_ATTEMPTS = 30;
-    /** Initial backoff delay before the first registration retry. */
+    /**
+     * Initial backoff delay before the first registration retry.
+     */
     private static final Duration REGISTER_INITIAL_BACKOFF = Duration.ofSeconds(2);
-    /** Upper bound the doubling backoff delay is capped at. */
+    /**
+     * Upper bound the doubling backoff delay is capped at.
+     */
     private static final Duration REGISTER_MAX_BACKOFF = Duration.ofSeconds(30);
 
     private final DriverRegisterService driverRegisterService;
@@ -65,7 +71,9 @@ public class DriverInitRunner implements ApplicationRunner {
 
     private final DriverScheduleService driverScheduleService;
 
-    /** Local point-value buffer, initialized before registration so readings survive a manager outage. */
+    /**
+     * Local point-value buffer, initialized before registration so readings survive a manager outage.
+     */
     private final BufferService bufferService;
 
     /**

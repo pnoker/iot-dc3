@@ -233,7 +233,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         boolean buffering = bufferService.isEnabled();
         CorrelationData correlationData = buffering
                 ? new PointValueCorrelation(UUID.randomUUID().toString(), entityDTO.getDeviceId(),
-                        entityDTO.getPointId(), 1, JsonUtil.toJsonString(entityDTO), routingKey)
+                entityDTO.getPointId(), 1, JsonUtil.toJsonString(entityDTO), routingKey)
                 : new CorrelationData(UUID.randomUUID().toString());
         try {
             rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE, routingKey, entityDTO, correlationData);

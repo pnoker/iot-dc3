@@ -36,7 +36,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MetadataEventPublisher {
 
-    /** Spring publisher used to broadcast metadata events within the application context. */
+    /**
+     * Spring publisher used to broadcast metadata events within the application context.
+     */
     private final ApplicationEventPublisher applicationEventPublisher;
 
     /**

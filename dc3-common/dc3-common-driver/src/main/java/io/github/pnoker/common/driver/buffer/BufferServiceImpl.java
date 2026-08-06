@@ -54,6 +54,10 @@ public class BufferServiceImpl implements BufferService {
 
     private PointValueBuffer buffer;
 
+    private static long epochSecond() {
+        return System.currentTimeMillis() / 1000;
+    }
+
     @Override
     public void initialize() {
         DriverProperties.BufferProperties config = driverProperties.getBuffer();
@@ -180,10 +184,6 @@ public class BufferServiceImpl implements BufferService {
     private long backoffSeconds(int attempt, DriverProperties.BufferProperties config) {
         long delay = (long) (config.getBackoffSeconds() * Math.pow(2, attempt - 1));
         return Math.min(delay, config.getMaxBackoffSeconds());
-    }
-
-    private static long epochSecond() {
-        return System.currentTimeMillis() / 1000;
     }
 
     @PreDestroy

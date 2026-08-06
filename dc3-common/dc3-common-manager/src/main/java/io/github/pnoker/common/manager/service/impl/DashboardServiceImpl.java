@@ -246,6 +246,14 @@ public class DashboardServiceImpl implements DashboardService {
         return l;
     }
 
+    private static Byte parseByteSafe(String s) {
+        try {
+            return Byte.parseByte(s);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     @Override
     public DriverStatsVO driverStats(Long tenantId) {
         DriverStatsVO out = new DriverStatsVO();
@@ -679,19 +687,11 @@ public class DashboardServiceImpl implements DashboardService {
         return out;
     }
 
+
     @FunctionalInterface
     private interface KeyFormatter {
 
         String format(Object raw);
 
     }
-
-
-    private static Byte parseByteSafe(String s) {
-            try {
-                return Byte.parseByte(s);
-            } catch (NumberFormatException e) {
-                return 0;
-            }
-        }
 }

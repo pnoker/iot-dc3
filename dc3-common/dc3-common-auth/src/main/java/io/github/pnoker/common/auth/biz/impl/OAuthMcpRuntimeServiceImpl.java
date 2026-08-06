@@ -825,7 +825,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
      * authenticates the client, checks the redirect URI matches, verifies PKCE when
      * required, then issues access and refresh tokens.
      *
-     * @param form               token request form (code, redirect_uri, code_verifier)
+     * @param form                token request form (code, redirect_uri, code_verifier)
      * @param authorizationHeader client credentials for confidential clients
      * @return the token response map
      */
@@ -856,7 +856,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
      * a bound service account and an active connection, creates an authorization record,
      * then issues access (and refresh) tokens.
      *
-     * @param form               token request form (scope)
+     * @param form                token request form (scope)
      * @param authorizationHeader client credentials
      * @return the token response map
      */
@@ -894,7 +894,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
      * refresh token and revokes the whole authorization chain on suspicion of theft;
      * otherwise rotates the refresh token and reissues access and refresh tokens.
      *
-     * @param form               token request form (refresh_token)
+     * @param form                token request form (refresh_token)
      * @param authorizationHeader client credentials
      * @return the token response map
      */
@@ -929,9 +929,9 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
      * verifying the principal is active and still a tenant member, signing the JWT, and
      * activating the authorization record with the new token hashes.
      *
-     * @param authorization      the authorization to issue for
-     * @param client             the registered client
-     * @param issueRefreshToken  whether to issue a refresh token
+     * @param authorization       the authorization to issue for
+     * @param client              the registered client
+     * @param issueRefreshToken   whether to issue a refresh token
      * @param previousRefreshHash the prior refresh-token hash, for rotation tracking
      * @return the token response map
      */
@@ -1054,11 +1054,11 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
      * Validate an MCP connection matches the client, principal, tenant, and grant type
      * and is still usable.
      *
-     * @param connection the connection to validate
-     * @param clientId   the expected client id
+     * @param connection  the connection to validate
+     * @param clientId    the expected client id
      * @param principalId the expected principal id
-     * @param tenantId   the expected tenant id
-     * @param grantType  the expected grant type
+     * @param tenantId    the expected tenant id
+     * @param grantType   the expected grant type
      */
     private void validateConnection(McpConnectionRecord connection, String clientId, Long principalId, Long tenantId,
                                     String grantType) {
@@ -1108,9 +1108,9 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
      * rejected when a confidential client is required); confidential clients must
      * present a verifiable, non-expired secret.
      *
-     * @param client              the registered client
-     * @param form                the token request form (client_secret in body)
-     * @param authorizationHeader the Authorization header (client_secret_basic)
+     * @param client               the registered client
+     * @param form                 the token request form (client_secret in body)
+     * @param authorizationHeader  the Authorization header (client_secret_basic)
      * @param confidentialRequired whether a confidential client is required
      */
     private void authenticateClient(OAuthRegisteredClientRecord client, Map<String, String> form,

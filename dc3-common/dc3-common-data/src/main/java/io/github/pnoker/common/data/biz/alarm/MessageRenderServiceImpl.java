@@ -61,8 +61,8 @@ public class MessageRenderServiceImpl implements MessageRenderService {
      * Select the first message template matching the target channel type, or null when
      * none matches.
      *
-     * @param message          the message definition
-     * @param channelTypeFlag  the target channel type
+     * @param message         the message definition
+     * @param channelTypeFlag the target channel type
      * @return the matching template, or null
      */
     private MessageExt.Template selectTemplate(MessageBO message, NotifyChannelTypeEnum channelTypeFlag) {

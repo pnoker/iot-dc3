@@ -134,8 +134,8 @@ public class ActionServiceImpl implements ActionService {
      * @param actionId the action id
      * @param header   the authenticated principal header
      * @return the pending action
-     * @throws NotFoundException  when the action does not exist
-     * @throws RequestException   when the action is not pending or has expired
+     * @throws NotFoundException when the action does not exist
+     * @throws RequestException  when the action is not pending or has expired
      */
     private ActionDO getPending(String actionId, RequestHeader.PrincipalHeader header) {
         LambdaQueryWrapper<ActionDO> wrapper = scopedWrapper(header)
