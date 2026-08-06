@@ -5,7 +5,7 @@
 > **AI 어시스턴트:** IoT DC3의 간결한 AI 친화적 개요를 보려면 먼저 [README.ai.md](./README.ai.md)를 읽어주세요.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="플랫폼 대시보드" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="플랫폼 대시보드" width="100%">
       <br>
       <strong>홈 / 대시보드</strong><br>
       <em>시스템 개요 · 디바이스 온라인 통계 · 데이터 트렌드 차트</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="디바이스 관리 페이지" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="디바이스 관리 페이지" width="100%">
       <br>
       <strong>디바이스 관리</strong><br>
       <em>디바이스 목록 · 온라인 상태 · 검색 및 필터링</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="AI 채팅 페이지" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI 채팅 페이지" width="100%">
       <br>
       <strong>AI 채팅</strong><br>
       <em>자연어 디바이스 쿼리 · 데이터 분석 · 지능형 지원</em>
@@ -79,7 +79,7 @@
 
 ### 아키텍처 한눈에 보기
 
-![IoT DC3 아키텍처 파노라마](docs/public/images/architecture-panorama-ko.png)
+![IoT DC3 아키텍처 파노라마](https://docs.dc3.site/images/architecture-panorama-ko.png)
 
 6계층 마이크로서비스 아키텍처: 클라이언트 → 게이트웨이 → 4개 센터 서비스 → 메시지 버스 → 28개 프로토콜 드라이버 → 현장 디바이스. PostgreSQL(TimescaleDB + pgvector + AGE)
 영속성 계층과 선택적 관찰 가능성 스택(ELK + Prometheus + Grafana)이 한눈에 보입니다.
@@ -164,7 +164,7 @@ mvn -s .mvn/settings.xml clean package
 IoT DC3는 Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3, TypeScript, Vite
 기반으로 구축되었습니다.
 
-구성 요소 세부 정보와 사용 위치는 [기술 스택](https://docs.dc3.site/en/introduction/technology-stack)을 참조하세요.
+구성 요소 세부 정보와 사용 위치는 [기술 스택](https://docs.dc3.site/en/development/technology-stack)을 참조하세요.
 
 ## 📖 문서 및 커뮤니티
 
@@ -172,7 +172,7 @@ IoT DC3는 Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, R
 |---------------|----------------------------------------------------------------------------|
 | 📚 온라인 문서     | [docs.dc3.site](https://docs.dc3.site/)                                    |
 | 🚀 퀵스타트       | [퀵스타트 가이드](https://docs.dc3.site/en/quickstart/)                           |
-| 🛠️ 기술 스택     | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) |
+| 🛠️ 기술 스택     | [Technology Stack](https://docs.dc3.site/en/development/technology-stack) |
 | 🏗️ 아키텍처      | [모듈 및 의존성](https://docs.dc3.site/en/architecture/modules)                  |
 | 🔧 드라이버 개발    | [드라이버 작성 가이드](https://docs.dc3.site/en/development/driver-authoring)       |
 | 🐛 문제 해결      | [문제 해결](https://docs.dc3.site/en/guide/troubleshooting)                    |

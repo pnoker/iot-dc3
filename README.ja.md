@@ -5,7 +5,7 @@
 > **AI アシスタント：** IoT DC3 の簡潔な AI 向け概要については、最初に [README.ai.md](./README.ai.md) をお読みください。
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="プラットフォームダッシュボード" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="プラットフォームダッシュボード" width="100%">
       <br>
       <strong>ホーム / ダッシュボード</strong><br>
       <em>システム概要 · デバイスオンライン統計 · データトレンドチャート</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="デバイス管理ページ" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="デバイス管理ページ" width="100%">
       <br>
       <strong>デバイス管理</strong><br>
       <em>デバイス一覧 · オンライン状態 · 検索とフィルタ</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="AI チャットページ" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI チャットページ" width="100%">
       <br>
       <strong>AI チャット</strong><br>
       <em>自然言語によるデバイス照会 · データ分析 · インテリジェント支援</em>
@@ -79,7 +79,7 @@
 
 ### 製品アーキテクチャ全景
 
-![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-ja.png)
+![IoT DC3 Architecture Panorama](https://docs.dc3.site/images/architecture-panorama-ja.png)
 
 6層マイクロサービスアーキテクチャの全体像：クライアント → ゲートウェイ → 4つのセンターサービス → メッセージバス → 28
 プロトコルドライバー → フィールドデバイス。PostgreSQL（TimescaleDB + pgvector +
@@ -171,7 +171,7 @@ mvn -s .mvn/settings.xml clean package
 IoT DC3 は Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、
 TypeScript、Vite を基盤に構築されています。
 
-各コンポーネントの役割と詳細は [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) を参照してください。
+各コンポーネントの役割と詳細は [Technology Stack](https://docs.dc3.site/en/development/technology-stack) を参照してください。
 
 ## 📖 ドキュメントとコミュニティ
 
@@ -179,7 +179,7 @@ TypeScript、Vite を基盤に構築されています。
 |----------------|----------------------------------------------------------------------------|
 | 📚 オンラインドキュメント | [docs.dc3.site](https://docs.dc3.site/)                                    |
 | 🚀 クイックスタート    | [クイックスタートガイド](https://docs.dc3.site/en/quickstart/)                        |
-| 🛠️ 技術スタック     | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) |
+| 🛠️ 技術スタック     | [Technology Stack](https://docs.dc3.site/en/development/technology-stack) |
 | 🏗️ アーキテクチャ    | [モジュールと依存関係](https://docs.dc3.site/en/architecture/modules)                |
 | 🔧 ドライバー開発     | [ドライバー開発ガイド](https://docs.dc3.site/en/development/driver-authoring)        |
 | 🐛 トラブルシューティング | [よくある問題と解決策](https://docs.dc3.site/en/guide/troubleshooting)               |

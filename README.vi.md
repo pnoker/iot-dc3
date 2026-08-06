@@ -5,7 +5,7 @@
 > **Trợ lý AI:** Đọc [README.ai.md](./README.ai.md) trước để có tổng quan ngắn gọn về IoT DC3 dành cho AI.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="Dashboard nền tảng" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="Dashboard nền tảng" width="100%">
       <br>
       <strong>Trang chủ / Dashboard</strong><br>
       <em>Tổng quan hệ thống · Thống kê thiết bị online · Biểu đồ xu hướng dữ liệu</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="Trang quản lý thiết bị" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="Trang quản lý thiết bị" width="100%">
       <br>
       <strong>Quản lý thiết bị</strong><br>
       <em>Danh sách thiết bị · Trạng thái online · Tìm kiếm và lọc</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="Trang trò chuyện AI" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="Trang trò chuyện AI" width="100%">
       <br>
       <strong>Trò chuyện AI</strong><br>
       <em>Điều khiển thiết bị bằng ngôn ngữ tự nhiên · Truy vấn dữ liệu · Phân tích thông minh</em>
@@ -79,7 +79,7 @@
 
 ### Toàn cảnh kiến trúc sản phẩm
 
-![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-vi.png)
+![IoT DC3 Architecture Panorama](https://docs.dc3.site/images/architecture-panorama-vi.png)
 
 Kiến trúc microservice 6 tầng: clients → gateway → 4 center services → message bus → 28 protocol drivers → field
 devices. PostgreSQL (TimescaleDB + pgvector + AGE) và stack observability tùy chọn (ELK + Prometheus + Grafana).
@@ -172,7 +172,7 @@ Nếu cần registry Alibaba Cloud cho Trung Quốc đại lục, dùng `make up
 IoT DC3 được xây dựng trên Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
 TypeScript và Vite.
 
-Xem [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) để biết chi tiết từng thành phần và vị
+Xem [Technology Stack](https://docs.dc3.site/en/development/technology-stack) để biết chi tiết từng thành phần và vị
 trí sử dụng.
 
 ## 📖 Tài liệu và cộng đồng
@@ -181,7 +181,7 @@ trí sử dụng.
 |----------------------|---------------------------------------------------------------------------------|
 | 📚 Tài liệu online   | [docs.dc3.site](https://docs.dc3.site/)                                         |
 | 🚀 Quickstart        | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                        |
-| 🛠️ Công nghệ        | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack)      |
+| 🛠️ Công nghệ        | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)      |
 | 🏗️ Kiến trúc        | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
 | 🔧 Phát triển driver | [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Khắc phục sự cố   | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)               |

@@ -11,16 +11,6 @@ updates:
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /docs
-    target-branch: develop
-    schedule:
-      interval: weekly
-      day: monday
-      time: "03:10"
-      timezone: Asia/Shanghai
-    open-pull-requests-limit: 5
-
-  - package-ecosystem: npm
     directory: /dc3-web
     target-branch: develop
     schedule:

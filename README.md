@@ -5,7 +5,7 @@
 > **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="Platform dashboard" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="Platform dashboard" width="100%">
       <br>
       <strong>Home / Dashboard</strong><br>
       <em>System overview · Online device metrics · Data trend charts</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="Device management page" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="Device management page" width="100%">
       <br>
       <strong>Device Management</strong><br>
       <em>Device list · Online status · Search and filtering</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="AI chat page" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI chat page" width="100%">
       <br>
       <strong>AI Chat</strong><br>
       <em>Natural-language device queries · Data analysis · Intelligent assistance</em>
@@ -79,7 +79,7 @@
 
 ### Architecture at a Glance
 
-![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-en.png)
+![IoT DC3 Architecture Panorama](https://docs.dc3.site/images/architecture-panorama-en.png)
 
 Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 28 protocol
 drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack
@@ -174,7 +174,7 @@ Use `make up-db-cn` if you prefer the Alibaba Cloud registry in Mainland China.
 IoT DC3 is built on Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
 TypeScript, and Vite.
 
-See [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) for component details and
+See [Technology Stack](https://docs.dc3.site/en/development/technology-stack) for component details and
 where each technology is used.
 
 ## 📖 Documentation and Community
@@ -183,7 +183,7 @@ where each technology is used.
 |-----------------------|---------------------------------------------------------------------------------|
 | 📚 Online docs        | [docs.dc3.site](https://docs.dc3.site/)                                         |
 | 🚀 Quickstart         | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                        |
-| 🛠️ Technology stack  | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack)      |
+| 🛠️ Technology stack  | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)      |
 | 🏗️ Architecture      | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
 | 🔧 Driver development | [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Troubleshooting    | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)               |

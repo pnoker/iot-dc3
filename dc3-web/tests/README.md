@@ -58,7 +58,7 @@ level of the application.
 4. Reuse stubs from `tests/setup/stubs/element-plus.ts` for any Element
    Plus components.
 5. Run `pnpm test` locally before committing. If it fails with a Vue warn,
-   see [test-debugging.md](../docs/test-debugging.md).
+   see [test-debugging](https://docs.dc3.site/en/frontend/test-debugging).
 
 ## Conventions
 
@@ -127,7 +127,7 @@ Style points without a guardrail are listed for reviewer reference.
 
 ## AI Guardrails
 
-The mandatory policy lives in `docs/frontend-testing-guardrails.md`. In short:
+The mandatory policy lives in `tests/frontend-testing-guardrails.md`. In short:
 
 - API wrapper changes require `tests/api` coverage.
 - Shared utility, store, composable, and Axios changes require `tests/unit`.

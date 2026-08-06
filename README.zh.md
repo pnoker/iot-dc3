@@ -5,7 +5,7 @@
 > **AI 助手：** 请先阅读 [README.ai.md](./README.ai.md) 获取 IoT DC3 的 AI 友好概述。
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
       <br>
       <strong>平台首页 / 仪表盘</strong><br>
       <em>系统概览 · 设备在线统计 · 数据趋势图表</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="设备管理页面" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="设备管理页面" width="100%">
       <br>
       <strong>设备管理页面</strong><br>
       <em>设备列表 · 在线状态指示 · 搜索筛选</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
       <br>
       <strong>AI 智能对话页面</strong><br>
       <em>自然语言查询设备 · 数据分析 · 智能辅助</em>
@@ -79,7 +79,7 @@
 
 ### 产品架构全景
 
-![IoT DC3 产品架构全景](docs/public/images/architecture-panorama-zh.png)
+![IoT DC3 产品架构全景](https://docs.dc3.site/images/architecture-panorama-zh.png)
 
 六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 28 协议驱动 → 现场设备。
 PostgreSQL（TimescaleDB + pgvector + AGE）持久层与可选运维栈（ELK + Prometheus + Grafana）一并铺开。
@@ -165,7 +165,7 @@ mvn -s .mvn/settings.xml clean package
 IoT DC3 基于 Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、
 TypeScript 与 Vite 构建。
 
-完整组件说明与适用位置请看 [技术栈](https://docs.dc3.site/zh/introduction/technology-stack)。
+完整组件说明与适用位置请看 [技术栈](https://docs.dc3.site/zh/development/technology-stack)。
 
 ## 📖 文档与社区
 
@@ -173,7 +173,7 @@ TypeScript 与 Vite 构建。
 |-----------|-----------------------------------------------------------------|
 | 📚 在线文档   | [docs.dc3.site](https://docs.dc3.site/)                         |
 | 🚀 快速开始   | [快速开始指南](https://docs.dc3.site/zh/quickstart/)                  |
-| 🛠️ 技术栈   | [技术栈说明](https://docs.dc3.site/zh/introduction/technology-stack) |
+| 🛠️ 技术栈   | [技术栈说明](https://docs.dc3.site/zh/development/technology-stack) |
 | 🏗️ 架构说明  | [模块与依赖](https://docs.dc3.site/zh/architecture/modules)          |
 | 🔧 驱动开发   | [驱动开发指南](https://docs.dc3.site/zh/development/driver-authoring) |
 | 🐛 故障排查   | [常见问题与解决方案](https://docs.dc3.site/zh/guide/troubleshooting)     |
