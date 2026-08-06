@@ -96,7 +96,6 @@ iot-dc3/
 │   ├── docker-compose-optional.yml   #   Optional monitoring/messaging
 │   ├── env/dev.env                   #   IDE-friendly local env vars
 │   └── bin/                          #   changelog.py, tag.sh
-├── docs/                             # VitePress documentation site
 ├── Makefile                          # Preferred command entrypoint
 ├── .husky/                           # Git hooks (pre-commit runs lint-staged)
 └── .mvn/settings.xml                 # Local Maven mirror (mainland China)
@@ -187,7 +186,7 @@ path. CI should prefer public Maven Central defaults.
 - `dc3/env/dev.env`: IDE-friendly local Java process variables without `export`.
 - `dc3/env/dev.env.sh`: shell-friendly local Java process variables with `export`.
 
-Do not treat these files as interchangeable. See `docs/quickstart/environment.md` before changing environment variables.
+Do not treat these files as interchangeable. See https://docs.dc3.site/en/quickstart/environment before changing environment variables.
 
 ## Compose Rules
 
@@ -287,7 +286,7 @@ the SDK runtime.
 ### OpenAPI / Swagger
 
 REST endpoints are documented with springdoc-openapi (annotations only, no
-hand-maintained spec). See `docs/development/api-documentation.md` for the full
+hand-maintained spec). See https://docs.dc3.site/en/development/api-documentation for the full
 guide.
 
 - Annotate controllers (`@Tag`, `@Operation`, `@Parameter`) and DTOs
@@ -390,7 +389,7 @@ not hardcode a prefix list in documentation.
 
 ### Logging
 
-Use the repository logging convention in `docs/guide/logging.md`.
+Use the repository logging convention (https://docs.dc3.site/en/guide/logging).
 
 - Use English, stable event names, and parameterized SLF4J placeholders.
 - Prefer key-value fields such as `tenantId={}, userId={}, deviceId={}` over prose-only messages.
@@ -553,7 +552,7 @@ Run checks proportional to the change:
 - YAML syntax: parse changed YAML after normalizing Maven placeholders such as `@project.artifactId@`
 - Agent or docs changes: check links, command examples, stale filenames, and current workflow names
 
-See `docs/development/testing.md` for the full test pyramid, naming conventions,
+See https://docs.dc3.site/en/development/testing for the full test pyramid, naming conventions,
 Testcontainers strategy and CI workflow expectations.
 
 Before committing code that changes public behavior, mention what was verified and what was not verified.
@@ -571,8 +570,8 @@ Before committing code that changes public behavior, mention what was verified a
 ## Documentation Rules
 
 - Root README files in multiple languages should stay structurally aligned.
-- Runtime and environment changes should update `docs/quickstart/environment.md`.
-- Driver authoring changes should update `docs/development/driver-authoring.md`.
+- Runtime and environment changes should update the environment guide in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/quickstart/environment).
+- Driver authoring changes should update the driver-authoring guide in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/development/driver-authoring).
 - Container changes should update compose examples and `.env.example` if variables change.
-- Test strategy, harness or coverage gate changes should update `docs/development/testing.md`.
+- Test strategy, harness or coverage gate changes should update the testing guide in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/development/testing).
 - Release workflow changes should update `CONTRIBUTING.md` and this file.

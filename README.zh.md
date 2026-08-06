@@ -5,7 +5,7 @@
 > **AI 助手：** 请先阅读 [README.ai.md](./README.ai.md) 获取 IoT DC3 的 AI 友好概述。
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
       <br>
       <strong>平台首页 / 仪表盘</strong><br>
       <em>系统概览 · 设备在线统计 · 数据趋势图表</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="设备管理页面" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="设备管理页面" width="100%">
       <br>
       <strong>设备管理页面</strong><br>
       <em>设备列表 · 在线状态指示 · 搜索筛选</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
       <br>
       <strong>AI 智能对话页面</strong><br>
       <em>自然语言查询设备 · 数据分析 · 智能辅助</em>
@@ -79,7 +79,7 @@
 
 ### 产品架构全景
 
-![IoT DC3 产品架构全景](docs/public/images/architecture-panorama-zh.png)
+![IoT DC3 产品架构全景](https://docs.dc3.site/images/architecture-panorama-zh.png)
 
 六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 28 协议驱动 → 现场设备。
 PostgreSQL（TimescaleDB + pgvector + AGE）持久层与可选运维栈（ELK + Prometheus + Grafana）一并铺开。

@@ -5,7 +5,7 @@
 > **Trợ lý AI:** Đọc [README.ai.md](./README.ai.md) trước để có tổng quan ngắn gọn về IoT DC3 dành cho AI.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="Dashboard nền tảng" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="Dashboard nền tảng" width="100%">
       <br>
       <strong>Trang chủ / Dashboard</strong><br>
       <em>Tổng quan hệ thống · Thống kê thiết bị online · Biểu đồ xu hướng dữ liệu</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="Trang quản lý thiết bị" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="Trang quản lý thiết bị" width="100%">
       <br>
       <strong>Quản lý thiết bị</strong><br>
       <em>Danh sách thiết bị · Trạng thái online · Tìm kiếm và lọc</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="Trang trò chuyện AI" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="Trang trò chuyện AI" width="100%">
       <br>
       <strong>Trò chuyện AI</strong><br>
       <em>Điều khiển thiết bị bằng ngôn ngữ tự nhiên · Truy vấn dữ liệu · Phân tích thông minh</em>
@@ -79,7 +79,7 @@
 
 ### Toàn cảnh kiến trúc sản phẩm
 
-![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-vi.png)
+![IoT DC3 Architecture Panorama](https://docs.dc3.site/images/architecture-panorama-vi.png)
 
 Kiến trúc microservice 6 tầng: clients → gateway → 4 center services → message bus → 28 protocol drivers → field
 devices. PostgreSQL (TimescaleDB + pgvector + AGE) và stack observability tùy chọn (ELK + Prometheus + Grafana).

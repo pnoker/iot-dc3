@@ -5,7 +5,7 @@
 > **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="Platform dashboard" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="Platform dashboard" width="100%">
       <br>
       <strong>Home / Dashboard</strong><br>
       <em>System overview · Online device metrics · Data trend charts</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="Device management page" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="Device management page" width="100%">
       <br>
       <strong>Device Management</strong><br>
       <em>Device list · Online status · Search and filtering</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="AI chat page" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI chat page" width="100%">
       <br>
       <strong>AI Chat</strong><br>
       <em>Natural-language device queries · Data analysis · Intelligent assistance</em>
@@ -79,7 +79,7 @@
 
 ### Architecture at a Glance
 
-![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-en.png)
+![IoT DC3 Architecture Panorama](https://docs.dc3.site/images/architecture-panorama-en.png)
 
 Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 28 protocol
 drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack

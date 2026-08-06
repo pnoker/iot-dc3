@@ -6,7 +6,7 @@
 > для ИИ.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -56,19 +56,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="Панель управления платформой" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="Панель управления платформой" width="100%">
       <br>
       <strong>Главная / Панель управления</strong><br>
       <em>Обзор системы · Статистика онлайн-устройств · Графики трендов данных</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="Страница управления устройствами" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="Страница управления устройствами" width="100%">
       <br>
       <strong>Управление устройствами</strong><br>
       <em>Список устройств · Статус онлайн · Поиск и фильтрация</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="Страница ИИ-чата" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="Страница ИИ-чата" width="100%">
       <br>
       <strong>ИИ-чат</strong><br>
       <em>Запросы устройств на естественном языке · Анализ данных · Интеллектуальная помощь</em>
@@ -80,7 +80,7 @@
 
 ### Архитектура на одном экране
 
-![Панорама архитектуры IoT DC3](docs/public/images/architecture-panorama-ru.png)
+![Панорама архитектуры IoT DC3](https://docs.dc3.site/images/architecture-panorama-ru.png)
 
 Шестиуровневая микросервисная архитектура: клиенты → шлюз → четыре центральных сервиса → шина сообщений → 28
 протокольных драйверов → полевые устройства. PostgreSQL (TimescaleDB + pgvector + AGE) для хранения и опциональный

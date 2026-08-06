@@ -127,7 +127,7 @@ Style points without a guardrail are listed for reviewer reference.
 
 ## AI Guardrails
 
-The mandatory policy lives in `docs/frontend-testing-guardrails.md`. In short:
+The mandatory policy lives in `tests/frontend-testing-guardrails.md`. In short:
 
 - API wrapper changes require `tests/api` coverage.
 - Shared utility, store, composable, and Axios changes require `tests/unit`.

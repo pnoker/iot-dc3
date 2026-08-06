@@ -5,7 +5,7 @@
 > **AI 어시스턴트:** IoT DC3의 간결한 AI 친화적 개요를 보려면 먼저 [README.ai.md](./README.ai.md)를 읽어주세요.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="플랫폼 대시보드" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="플랫폼 대시보드" width="100%">
       <br>
       <strong>홈 / 대시보드</strong><br>
       <em>시스템 개요 · 디바이스 온라인 통계 · 데이터 트렌드 차트</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="디바이스 관리 페이지" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="디바이스 관리 페이지" width="100%">
       <br>
       <strong>디바이스 관리</strong><br>
       <em>디바이스 목록 · 온라인 상태 · 검색 및 필터링</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="AI 채팅 페이지" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI 채팅 페이지" width="100%">
       <br>
       <strong>AI 채팅</strong><br>
       <em>자연어 디바이스 쿼리 · 데이터 분석 · 지능형 지원</em>
@@ -79,7 +79,7 @@
 
 ### 아키텍처 한눈에 보기
 
-![IoT DC3 아키텍처 파노라마](docs/public/images/architecture-panorama-ko.png)
+![IoT DC3 아키텍처 파노라마](https://docs.dc3.site/images/architecture-panorama-ko.png)
 
 6계층 마이크로서비스 아키텍처: 클라이언트 → 게이트웨이 → 4개 센터 서비스 → 메시지 버스 → 28개 프로토콜 드라이버 → 현장 디바이스. PostgreSQL(TimescaleDB + pgvector + AGE)
 영속성 계층과 선택적 관찰 가능성 스택(ELK + Prometheus + Grafana)이 한눈에 보입니다.

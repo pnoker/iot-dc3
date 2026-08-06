@@ -6,7 +6,7 @@
 > amigable para IA de IoT DC3.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
 </p>
 
 <p align="center">
@@ -56,19 +56,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="Panel de control de la plataforma" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="Panel de control de la plataforma" width="100%">
       <br>
       <strong>Inicio / Panel de control</strong><br>
       <em>Resumen del sistema · Métricas de dispositivos en línea · Gráficos de tendencias de datos</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="Página de gestión de dispositivos" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="Página de gestión de dispositivos" width="100%">
       <br>
       <strong>Gestión de dispositivos</strong><br>
       <em>Lista de dispositivos · Estado en línea · Búsqueda y filtrado</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="Página de chat con IA" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="Página de chat con IA" width="100%">
       <br>
       <strong>Chat con IA</strong><br>
       <em>Consultas de dispositivos en lenguaje natural · Análisis de datos · Asistencia inteligente</em>
@@ -80,7 +80,7 @@
 
 ### Arquitectura de un vistazo
 
-![Panorama de Arquitectura de IoT DC3](docs/public/images/architecture-panorama-es.png)
+![Panorama de Arquitectura de IoT DC3](https://docs.dc3.site/images/architecture-panorama-es.png)
 
 Arquitectura de microservicios en seis capas de un vistazo: clientes → puerta de enlace → cuatro servicios centrales →
 bus de mensajes → 28 controladores de protocolo → dispositivos de campo. PostgreSQL (TimescaleDB + pgvector + AGE) para
