@@ -76,7 +76,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String generateToken(String loginName, String salt, String password, String tenantCode) {
+    public String generateToken(String loginName, String password, String tenantCode) {
         TenantBO tenantBO = tenantService.getByCode(tenantCode);
         if (Objects.isNull(tenantBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
@@ -88,10 +88,6 @@ public class TokenServiceImpl implements TokenService {
         if (!tenantMembershipService.isTenantMember(tenantBO.getId(), credential.getPrincipalId())) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
-        if (StringUtils.isEmpty(salt)) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
-
         if (!localCredentialService.verifyPassword(credential, password)) {
             localCredentialService.recordFailedLogin(credential.getId());
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
@@ -107,7 +103,7 @@ public class TokenServiceImpl implements TokenService {
         }
 
         markPrincipalLogin(credential.getPrincipalId());
-        return KeyUtil.generateToken(String.valueOf(credential.getPrincipalId()), salt, tenantBO.getId());
+        return KeyUtil.generateToken(String.valueOf(credential.getPrincipalId()), tenantBO.getId());
     }
 
     @Override
@@ -144,7 +140,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public TokenValid checkValid(String loginName, String salt, String token, String tenantCode) {
+    public TokenValid checkValid(String loginName, String token, String tenantCode) {
         TenantBO tenantBO = tenantService.getByCode(tenantCode);
         if (Objects.isNull(tenantBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
@@ -163,7 +159,7 @@ public class TokenServiceImpl implements TokenService {
 
         try {
             String principalKey = String.valueOf(credential.getPrincipalId());
-            Claims claims = KeyUtil.parserToken(principalKey, salt, token, tenantBO.getId());
+            Claims claims = KeyUtil.parserToken(principalKey, token, tenantBO.getId());
             Date issuedAt = claims.getIssuedAt();
             long issuedAtEpochMs = Objects.nonNull(issuedAt) ? issuedAt.getTime() : 0L;
             if (tokenDenylistCache.isRevoked(principalKey, tenantCode, issuedAtEpochMs)) {

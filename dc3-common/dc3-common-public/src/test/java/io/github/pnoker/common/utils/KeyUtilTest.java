@@ -32,13 +32,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class KeyUtilTest {
 
-    private static final String SALT = "0123456789abcdef0123456789abcdef";
-
-    private static final String OTHER_SALT = "fedcba9876543210fedcba9876543210";
-
     @BeforeAll
     static void setUpSecurityKey() {
-        System.setProperty("dc3.security.key", "test-security-key-for-junit");
+        System.setProperty("dc3.security.key", "test-security-key-for-junit-0123456789abcdef");
     }
 
     @AfterAll
@@ -88,31 +84,24 @@ class KeyUtilTest {
 
     @Test
     void jwtRoundTripsForValidIssuerAndSubject() {
-        String token = KeyUtil.generateToken("alice", SALT, 100L);
-        Claims claims = KeyUtil.parserToken("alice", SALT, token, 100L);
+        String token = KeyUtil.generateToken("alice",100L);
+        Claims claims = KeyUtil.parserToken("alice",token, 100L);
         assertThat(claims.getSubject()).contains("alice");
         assertThat(claims.getIssuer()).contains("100");
         assertThat(claims.getExpiration()).isAfter(claims.getIssuedAt());
     }
 
     @Test
-    void jwtParsingRejectsTokenSignedWithDifferentSalt() {
-        String token = KeyUtil.generateToken("alice", SALT, 100L);
-        assertThatThrownBy(() -> KeyUtil.parserToken("alice", OTHER_SALT, token, 100L))
-                .isInstanceOf(SignatureException.class);
-    }
-
-    @Test
     void jwtParsingRejectsTokenForDifferentSubject() {
-        String token = KeyUtil.generateToken("alice", SALT, 100L);
-        assertThatThrownBy(() -> KeyUtil.parserToken("bob", SALT, token, 100L))
+        String token = KeyUtil.generateToken("alice",100L);
+        assertThatThrownBy(() -> KeyUtil.parserToken("bob",token, 100L))
                 .isInstanceOf(io.jsonwebtoken.IncorrectClaimException.class);
     }
 
     @Test
     void jwtParsingRejectsTokenForDifferentTenant() {
-        String token = KeyUtil.generateToken("alice", SALT, 100L);
-        assertThatThrownBy(() -> KeyUtil.parserToken("alice", SALT, token, 200L))
+        String token = KeyUtil.generateToken("alice",100L);
+        assertThatThrownBy(() -> KeyUtil.parserToken("alice",token, 200L))
                 .isInstanceOf(io.jsonwebtoken.IncorrectClaimException.class);
     }
 

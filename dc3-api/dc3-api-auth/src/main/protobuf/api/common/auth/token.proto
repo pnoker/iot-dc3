@@ -41,14 +41,8 @@ message GrpcLoginQuery {
   // Login name
   string name = 2;
 
-  // Salt used for password encryption
-  string salt = 3;
-
-  // Login password
-  string password = 4;
-
   // Token
-  string token = 5;
+  string token = 3;
 }
 
 // Response wrapper for token validation result
