@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// DOMPurify relies on a full DOM implementation; happy-dom does not strip
+// <script>/on* here (verified), so run this file under jsdom.
+// @vitest-environment jsdom
 import {mount} from '@vue/test-utils';
 import {describe, expect, it, vi} from 'vitest';
 
