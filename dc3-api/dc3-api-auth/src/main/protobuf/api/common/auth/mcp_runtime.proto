@@ -113,11 +113,19 @@ message GrpcMcpToolAnnotationsDTO {
   bool open_world_hint = 4;
 }
 
+// MCP tool risk level. Names match McpRiskLevelEnum values (LOW/MEDIUM/HIGH).
+enum GrpcMcpRiskLevel {
+  MCP_RISK_LEVEL_UNSPECIFIED = 0;
+  LOW = 1;
+  MEDIUM = 2;
+  HIGH = 3;
+}
+
 // MCP tool metadata.
 message GrpcMcpToolMetadataDTO {
   string tool_id = 1;
   string permission_code = 2;
-  string risk_level = 3;
+  GrpcMcpRiskLevel risk_level = 3;
 }
 
 // Visible tool resolve request.
@@ -143,7 +151,7 @@ message GrpcMcpToolResolveDTO {
   string tool_id = 1;
   string tool_name = 2;
   string permission_code = 3;
-  string risk_level = 4;
+  GrpcMcpRiskLevel risk_level = 4;
   string service_name = 5;
   string api_path = 6;
   string http_method = 7;
@@ -188,7 +196,7 @@ message GrpcMcpToolAuthorizeDTO {
   // Human readable reason or confirmation prompt.
   string message = 3;
   // Resolved tool risk level.
-  string risk_level = 4;
+  GrpcMcpRiskLevel risk_level = 4;
 }
 
 // MCP audit insert command.
@@ -202,7 +210,7 @@ message GrpcMcpAuditCommand {
   string tool_id = 7;
   string tool_name = 8;
   string permission_code = 9;
-  string risk_level = 10;
+  GrpcMcpRiskLevel risk_level = 10;
   string confirm_id = 11;
   string idempotency_key = 12;
   string argument_digest = 13;

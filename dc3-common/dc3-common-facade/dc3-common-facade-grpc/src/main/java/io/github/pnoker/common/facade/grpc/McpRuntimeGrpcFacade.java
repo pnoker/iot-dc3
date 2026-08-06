@@ -126,7 +126,7 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
                 .decision(source.getDecision().name())
                 .confirmId(source.getConfirmId())
                 .message(source.getMessage())
-                .riskLevel(source.getRiskLevel())
+                .riskLevel(source.getRiskLevel().name())
                 .build();
     }
 
@@ -175,7 +175,7 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
         return McpToolDefinitionDTO.Metadata.builder()
                 .toolId(source.getToolId())
                 .permissionCode(source.getPermissionCode())
-                .riskLevel(source.getRiskLevel())
+                .riskLevel(source.getRiskLevel().name())
                 .build();
     }
 
@@ -184,7 +184,7 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
                 .toolId(source.getToolId())
                 .toolName(source.getToolName())
                 .permissionCode(source.getPermissionCode())
-                .riskLevel(source.getRiskLevel())
+                .riskLevel(source.getRiskLevel().name())
                 .serviceName(source.getServiceName())
                 .apiPath(source.getApiPath())
                 .httpMethod(source.getHttpMethod())
@@ -203,7 +203,7 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
                 .setToolId(StringUtils.defaultString(source.getToolId()))
                 .setToolName(StringUtils.defaultString(source.getToolName()))
                 .setPermissionCode(StringUtils.defaultString(source.getPermissionCode()))
-                .setRiskLevel(StringUtils.defaultString(source.getRiskLevel()))
+                .setRiskLevel(toGrpcRiskLevel(source.getRiskLevel()))
                 .setConfirmId(StringUtils.defaultString(source.getConfirmId()))
                 .setIdempotencyKey(StringUtils.defaultString(source.getIdempotencyKey()))
                 .setArgumentDigest(StringUtils.defaultString(source.getArgumentDigest()))
@@ -227,6 +227,14 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
     private void requireOk(String operation, GrpcR result) {
         if (!result.getOk()) {
             throw new ServiceException(operation + " failed: [" + result.getCode() + "] " + result.getMessage());
+        }
+    }
+
+    private GrpcMcpRiskLevel toGrpcRiskLevel(String value) {
+        try {
+            return GrpcMcpRiskLevel.valueOf(StringUtils.defaultIfBlank(value, ""));
+        } catch (IllegalArgumentException e) {
+            return GrpcMcpRiskLevel.MCP_RISK_LEVEL_UNSPECIFIED;
         }
     }
 
