@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.grpc.server;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.data.GrpcPointValueCommandQuery;
+import io.github.pnoker.api.center.data.GrpcPointValueDTO;
 import io.github.pnoker.api.center.data.GrpcPointValueHistoryQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueWriteCommand;
@@ -133,13 +134,16 @@ class PointValueServerTest {
     @Test
     void historyValueReturnsListFromService() {
         when(pointValueService.history(eq(1L), eq(10L), eq(20L), eq(50)))
-                .thenReturn(List.of("v1", "v2", "v3"));
+                .thenReturn(List.of(
+                        PointValueBO.builder().calValue("v1").build(),
+                        PointValueBO.builder().calValue("v2").build(),
+                        PointValueBO.builder().calValue("v3").build()));
 
         GrpcRPointValueStringList response = stub.listHistoryValues(GrpcPointValueHistoryQuery.newBuilder()
                 .setTenantId(1L).setDeviceId(10L).setPointId(20L).setCount(50)
                 .build());
         assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getDataList()).containsExactly("v1", "v2", "v3");
+        assertThat(response.getDataList()).map(GrpcPointValueDTO::getValue).containsExactly("v1", "v2", "v3");
     }
 
     @Test

@@ -147,7 +147,7 @@ class RepositoryStrategyFactoryTest {
         }
 
         @Override
-        public List<String> listHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
+        public List<PointValueBO> listHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
             return List.of();
         }
 

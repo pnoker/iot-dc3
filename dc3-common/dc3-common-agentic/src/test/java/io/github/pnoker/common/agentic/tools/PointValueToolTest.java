@@ -23,6 +23,7 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -85,7 +86,11 @@ class PointValueToolTest {
 
     @Test
     void getPointValueHistoryReturnsRawValuesAndChartData() {
-        when(pointValueFacade.history(1L, 10L, 20L, 5)).thenReturn(List.of("24.0", "23.8", "offline", "23.5"));
+        when(pointValueFacade.history(1L, 10L, 20L, 5)).thenReturn(List.of(
+                FacadePointValueBO.builder().value("24.0").build(),
+                FacadePointValueBO.builder().value("23.8").build(),
+                FacadePointValueBO.builder().value("offline").build(),
+                FacadePointValueBO.builder().value("23.5").build()));
 
         AgenticToolResult<PointValueTool.PointValueHistory> result = tool.getPointValueHistory(10L, 20L, 5,
                 toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header)));

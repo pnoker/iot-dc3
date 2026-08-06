@@ -254,14 +254,13 @@ public class KeyUtil {
      * Generate a JWT token.
      *
      * @param subject  token subject, normally principal ID
-     * @param salt     Salt
      * @param tenantId Tenant ID
      * @return Token string
      */
-    public static String generateToken(String subject, String salt, Long tenantId) {
+    public static String generateToken(String subject, Long tenantId) {
         String securityKey = getSecurityKey();
         SecretKey key = io.jsonwebtoken.security.Keys
-                .hmacShaKeyFor(DecodeUtil.stringToByte(securityKey + SymbolConstant.COLON + salt));
+                .hmacShaKeyFor(DecodeUtil.stringToByte(securityKey));
         JwtBuilder builder = Jwts.builder()
                 .issuer(securityKey + SymbolConstant.COLON + tenantId)
                 .subject(securityKey + SymbolConstant.COLON + subject)
@@ -275,15 +274,14 @@ public class KeyUtil {
      * Parse and validate a JWT token.
      *
      * @param subject  token subject, normally principal ID
-     * @param salt     Salt
      * @param token    Token string
      * @param tenantId Tenant ID
      * @return Claims
      */
-    public static Claims parserToken(String subject, String salt, String token, Long tenantId) {
+    public static Claims parserToken(String subject, String token, Long tenantId) {
         String securityKey = getSecurityKey();
         SecretKey key = io.jsonwebtoken.security.Keys
-                .hmacShaKeyFor(DecodeUtil.stringToByte(securityKey + SymbolConstant.COLON + salt));
+                .hmacShaKeyFor(DecodeUtil.stringToByte(securityKey));
         JwtParser parser = Jwts.parser()
                 .requireIssuer(securityKey + SymbolConstant.COLON + tenantId)
                 .requireSubject(securityKey + SymbolConstant.COLON + subject)

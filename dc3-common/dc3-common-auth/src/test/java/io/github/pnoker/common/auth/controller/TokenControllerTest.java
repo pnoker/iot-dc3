@@ -88,7 +88,7 @@ class TokenControllerTest {
     @Test
     void generateTokenSucceedsWithExpiryMessage() {
         when(tokenService.generateToken("alice",
-                "0123456789abcdef0123456789abcdef", "hash", "tenant-A"))
+                "hash", "tenant-A"))
                 .thenReturn("jwt-token");
 
         StepVerifier.create(controller.generateToken(query()))
@@ -103,7 +103,7 @@ class TokenControllerTest {
     @Test
     void generateTokenReturnsFailWhenServiceReturnsNull() {
         when(tokenService.generateToken("alice",
-                "0123456789abcdef0123456789abcdef", "hash", "tenant-A"))
+                "hash", "tenant-A"))
                 .thenReturn(null);
 
         StepVerifier.create(controller.generateToken(query()))
@@ -115,7 +115,7 @@ class TokenControllerTest {
     void checkValidReturnsTrueWithRemainingExpiryMessage() {
         TokenValid valid = new TokenValid(true, new Date(1_700_000_000_000L));
         when(tokenService.checkValid("alice",
-                "0123456789abcdef0123456789abcdef", "token", "tenant-A"))
+                "token", "tenant-A"))
                 .thenReturn(valid);
 
         StepVerifier.create(controller.checkValid(query()))
@@ -131,7 +131,7 @@ class TokenControllerTest {
     void checkValidReturnsFalseWithExpiredMessageWhenExpiryKnown() {
         TokenValid invalidWithExpiry = new TokenValid(false, new Date(1_700_000_000_000L));
         when(tokenService.checkValid("alice",
-                "0123456789abcdef0123456789abcdef", "token", "tenant-A"))
+                "token", "tenant-A"))
                 .thenReturn(invalidWithExpiry);
 
         StepVerifier.create(controller.checkValid(query()))
@@ -147,7 +147,7 @@ class TokenControllerTest {
     void checkValidReturnsFalseWithGenericMessageWhenExpiryUnknown() {
         TokenValid invalidNoExpiry = new TokenValid(false, null);
         when(tokenService.checkValid("alice",
-                "0123456789abcdef0123456789abcdef", "token", "tenant-A"))
+                "token", "tenant-A"))
                 .thenReturn(invalidNoExpiry);
 
         StepVerifier.<R<Boolean>>create(controller.checkValid(query()))

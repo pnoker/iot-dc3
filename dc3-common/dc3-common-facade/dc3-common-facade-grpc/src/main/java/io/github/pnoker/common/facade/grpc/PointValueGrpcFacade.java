@@ -77,7 +77,7 @@ public class PointValueGrpcFacade implements PointValueFacade {
     }
 
     @Override
-    public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
+    public List<FacadePointValueBO> history(Long tenantId, Long deviceId, Long pointId, int count) {
         GrpcPointValueHistoryQuery request = GrpcPointValueHistoryQuery.newBuilder()
                 .setDeviceId(deviceId)
                 .setPointId(pointId)
@@ -90,7 +90,7 @@ public class PointValueGrpcFacade implements PointValueFacade {
             guardOrThrow(response.getResult(), "listHistoryValues");
             return Collections.emptyList();
         }
-        return response.getDataList();
+        return response.getDataList().stream().map(facadeGrpcPointValueBuilder::toFacadeBO).toList();
     }
 
     /**

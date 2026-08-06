@@ -15,39 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-syntax = "proto3";
-
-package api.common;
-
-// Config
-option java_package = "io.github.pnoker.api.common";
-option java_outer_classname = "BaseProto";
-option objc_class_prefix = "Common";
-option java_multiple_files = true;
-
-// Base DTO
-message GrpcBase {
-  // Primary key ID
-  int64 id = 1;
-
-  // Description
-  string remark = 2;
-
-  // Creator ID
-  int64 creator_id = 3;
-
-  // Creator name
-  string creator_name = 4;
-
-  // Creation time, epoch milliseconds
-  int64 create_time = 5;
-
-  // Operator ID
-  int64 operator_id = 6;
-
-  // Operator name
-  string operator_name = 7;
-
-  // Operation time, epoch milliseconds
-  int64 operate_time = 8;
+/**
+ * Mutable in-memory store. add/update/delete handlers mutate these arrays so a
+ * demo session reflects user actions without a backend. Seeded by the
+ * `seed/*` modules at adapter install time.
+ */
+export interface MockDb {
+  drivers: Record<string, unknown>[];
+  devices: Record<string, unknown>[];
+  profiles: Record<string, unknown>[];
+  points: Record<string, unknown>[];
 }
+
+export const db: MockDb = {
+  drivers: [],
+  devices: [],
+  profiles: [],
+  points: [],
+};

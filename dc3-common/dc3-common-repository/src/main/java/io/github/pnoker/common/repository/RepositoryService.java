@@ -66,9 +66,9 @@ public interface RepositoryService {
      * @param deviceId device ID
      * @param pointId  point ID
      * @param count    maximum number of records to retrieve
-     * @return list of serialized point value strings, newest first
+     * @return list of point values (each with create_time), newest first
      */
-    List<String> listHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count);
+    List<PointValueBO> listHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count);
 
     /**
      * Query the latest point value within the tenant scope.

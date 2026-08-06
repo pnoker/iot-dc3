@@ -39,6 +39,6 @@ public interface TokenFacade {
      * @param token  token the client holds
      * @return {@code true} when the triple is valid and unexpired
      */
-    boolean checkValid(String tenant, String name, String salt, String token);
+    boolean checkValid(String tenant, String name, String token);
 
 }

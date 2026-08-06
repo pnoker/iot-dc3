@@ -114,7 +114,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
+    public List<PointValueBO> history(Long tenantId, Long deviceId, Long pointId, int count) {
         if (Objects.isNull(tenantId) || Objects.isNull(deviceId) || Objects.isNull(pointId)) {
             return Collections.emptyList();
         }

@@ -134,12 +134,12 @@ public class PointValueController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list_history_by_device_id_and_point_id")
-    public Mono<R<List<String>>> history(@Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024") @NotNull @RequestParam(name = "device_id") Long deviceId,
+    public Mono<R<List<PointValueBO>>> history(@Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024") @NotNull @RequestParam(name = "device_id") Long deviceId,
                                          @Parameter(description = "Identifier of the point whose history is being queried; must belong to a profile attached to the device", example = "2048") @NotNull @RequestParam(name = "point_id") Long pointId,
                                          @Parameter(description = "Maximum number of historical values to return; defaults to 100 when omitted", example = "100")
                                          @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         return getTenantId().flatMap(tenantId -> async(() -> {
-            List<String> history = pointValueService.history(tenantId, deviceId, pointId, count);
+            List<PointValueBO> history = pointValueService.history(tenantId, deviceId, pointId, count);
             return R.ok(history);
         }));
     }

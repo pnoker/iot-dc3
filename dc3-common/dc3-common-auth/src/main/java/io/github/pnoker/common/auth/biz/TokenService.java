@@ -61,7 +61,7 @@ public interface TokenService {
      * @throws UnAuthorizedException           on bad tenant, credential, membership, salt, or password
      * @throws PasswordChangeRequiredException when password is expired or flagged for change
      */
-    String generateToken(String loginName, String salt, String password, String tenantCode);
+    String generateToken(String loginName, String password, String tenantCode);
 
     /**
      * Self-service password change used during login when a credential is flagged for a
@@ -88,7 +88,7 @@ public interface TokenService {
      * the JWT expiry time; never carries principal or tenant identifiers
      * @throws UnAuthorizedException when the tenant does not resolve
      */
-    TokenValid checkValid(String loginName, String salt, String token, String tenantCode);
+    TokenValid checkValid(String loginName, String token, String tenantCode);
 
     /**
      * Acknowledge a client-initiated logout by recording the logout instant on the

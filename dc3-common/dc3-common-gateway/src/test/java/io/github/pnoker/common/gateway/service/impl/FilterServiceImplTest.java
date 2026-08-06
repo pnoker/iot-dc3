@@ -173,12 +173,12 @@ class FilterServiceImplTest {
         FacadeLocalCredentialBO credential = credential("alice", 100L, EnableFlagEnum.ENABLE);
         String tokenHeader = JsonUtil.toJsonString(new RequestHeader.TokenHeader("salt", "token"));
         ServerHttpRequest request = request("acme", "alice", tokenHeader);
-        when(tokenFacade.checkValid("acme", "alice", "salt", "token")).thenReturn(true);
+        when(tokenFacade.checkValid("acme", "alice", "token")).thenReturn(true);
 
         filterService.checkValid(request, tenant, credential);
         filterService.checkValid(request, tenant, credential);
 
-        verify(tokenFacade, times(2)).checkValid("acme", "alice", "salt", "token");
+        verify(tokenFacade, times(2)).checkValid("acme", "alice", "token");
     }
 
     @Test
@@ -192,7 +192,7 @@ class FilterServiceImplTest {
                 JsonUtil.toJsonString(new RequestHeader.TokenHeader("salt", ""))), tenant, credential))
                 .isInstanceOf(UnAuthorizedException.class);
 
-        when(tokenFacade.checkValid("acme", "alice", "salt", "token")).thenReturn(false);
+        when(tokenFacade.checkValid("acme", "alice", "token")).thenReturn(false);
 
         assertThatThrownBy(() -> filterService.checkValid(request("acme", "alice",
                 JsonUtil.toJsonString(new RequestHeader.TokenHeader("salt", "token"))), tenant, credential))

@@ -74,12 +74,11 @@ class TokenServerTest {
     @Test
     void checkValidReportsOkWithExpiryDataForValidToken() {
         TokenValid valid = new TokenValid(true, new Date(1_700_000_000_000L));
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A")).thenReturn(valid);
+        when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(valid);
 
         GrpcRTokenDTO response = stub.checkValid(GrpcLoginQuery.newBuilder()
                 .setTenant("tenant-A")
                 .setName("alice")
-                .setSalt("salt")
                 .setToken("token")
                 .build());
 
@@ -90,13 +89,12 @@ class TokenServerTest {
 
     @Test
     void checkValidReportsTokenInvalidEnvelopeForInvalidToken() {
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A"))
+        when(tokenService.checkValid("alice", "token", "tenant-A"))
                 .thenReturn(new TokenValid(false, null));
 
         GrpcRTokenDTO response = stub.checkValid(GrpcLoginQuery.newBuilder()
                 .setTenant("tenant-A")
                 .setName("alice")
-                .setSalt("salt")
                 .setToken("token")
                 .build());
 
@@ -107,12 +105,11 @@ class TokenServerTest {
 
     @Test
     void checkValidReportsNoResourceWhenServiceReturnsNull() {
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A")).thenReturn(null);
+        when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(null);
 
         GrpcRTokenDTO response = stub.checkValid(GrpcLoginQuery.newBuilder()
                 .setTenant("tenant-A")
                 .setName("alice")
-                .setSalt("salt")
                 .setToken("token")
                 .build());
 

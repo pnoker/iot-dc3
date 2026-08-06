@@ -57,7 +57,7 @@ public class TokenServer extends TokenApiGrpc.TokenApiImplBase {
             // membership lookup reads dc3_tenant_membership (tenant_id-bearing, not
             // whitelisted), so run it with tenant filtering disabled.
             TokenValid entity = TenantContextHolder.runIgnore(() -> tokenService.checkValid(request.getName(),
-                    request.getSalt(), request.getToken(), request.getTenant()));
+                    request.getToken(), request.getTenant()));
             if (Objects.isNull(entity)) {
                 builder.setResult(GrpcRFactory.notFound());
             } else if (!entity.isValid()) {

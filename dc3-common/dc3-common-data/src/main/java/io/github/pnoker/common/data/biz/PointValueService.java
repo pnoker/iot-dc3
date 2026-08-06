@@ -53,9 +53,9 @@ public interface PointValueService {
      * @param deviceId Device ID
      * @param pointId  Point ID
      * @param count    Number of values to retrieve
-     * @return History Value Array
+     * @return History values (each with create_time), newest first
      */
-    List<String> history(Long tenantId, Long deviceId, Long pointId, int count);
+    List<PointValueBO> history(Long tenantId, Long deviceId, Long pointId, int count);
 
     /**
      * Get latest point values with pagination and sorting

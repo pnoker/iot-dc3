@@ -142,12 +142,12 @@ public class FilterServiceImpl implements FilterService {
         } catch (Exception e) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST, e);
         }
-        if (Objects.isNull(header) || StringUtils.isAnyEmpty(header.getSalt(), header.getToken())) {
+        if (Objects.isNull(header) || StringUtils.isEmpty(header.getToken())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
         // Token validity is intentionally NOT cached — it's the freshness check.
-        boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), credential.getLoginName(), header.getSalt(),
+        boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), credential.getLoginName(),
                 header.getToken());
         if (!valid) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);

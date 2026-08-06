@@ -107,7 +107,7 @@ public class TokenController implements BaseController {
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
-            String token = tokenService.generateToken(entityVO.getName(), entityVO.getSalt(), entityVO.getPassword(),
+            String token = tokenService.generateToken(entityVO.getName(), entityVO.getPassword(),
                     entityVO.getTenant());
             return Objects.nonNull(token) ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
         });
@@ -184,7 +184,7 @@ public class TokenController implements BaseController {
     @PostMapping("/check")
     public Mono<R<Boolean>> checkValid(@Validated @RequestBody TokenQuery entityVO) {
         return async(() -> {
-            TokenValid tokenValid = tokenService.checkValid(entityVO.getName(), entityVO.getSalt(), entityVO.getToken(),
+            TokenValid tokenValid = tokenService.checkValid(entityVO.getName(), entityVO.getToken(),
                     entityVO.getTenant());
 
             boolean valid = tokenValid.isValid();

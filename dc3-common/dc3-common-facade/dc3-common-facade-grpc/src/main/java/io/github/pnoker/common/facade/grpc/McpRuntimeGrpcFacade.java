@@ -123,7 +123,7 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
 
     private McpToolAuthorizeResponseDTO toDTO(GrpcMcpToolAuthorizeDTO source) {
         return McpToolAuthorizeResponseDTO.builder()
-                .decision(source.getDecision())
+                .decision(source.getDecision().name())
                 .confirmId(source.getConfirmId())
                 .message(source.getMessage())
                 .riskLevel(source.getRiskLevel())

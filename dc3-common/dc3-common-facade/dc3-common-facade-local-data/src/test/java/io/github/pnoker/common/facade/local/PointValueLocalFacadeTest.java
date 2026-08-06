@@ -105,8 +105,13 @@ class PointValueLocalFacadeTest {
 
     @Test
     void historyForwardsServiceResultUnchanged() {
-        when(pointValueService.history(1L, 2L, 3L, 10)).thenReturn(List.of("23.5", "24.0"));
-        assertThat(facade.history(1L, 2L, 3L, 10)).containsExactly("23.5", "24.0");
+        when(pointValueService.history(1L, 2L, 3L, 10)).thenReturn(List.of(
+                PointValueBO.builder().calValue("23.5").build(),
+                PointValueBO.builder().calValue("24.0").build()));
+        when(facadePointValueBuilder.toFacadeBO(any(PointValueBO.class))).thenAnswer(inv ->
+                FacadePointValueBO.builder().value(inv.<PointValueBO>getArgument(0).getCalValue()).build());
+        assertThat(facade.history(1L, 2L, 3L, 10))
+                .map(FacadePointValueBO::getValue).containsExactly("23.5", "24.0");
     }
 
 }
