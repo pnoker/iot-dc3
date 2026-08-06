@@ -39,6 +39,9 @@ hs_err_pid*.log
 replay_pid*.log
 *.hprof
 core.*
+# Exception: dc3-web mock core handler (the `core.*` rule above is for JVM
+# crash dumps and would otherwise silently skip this source file).
+!dc3-web/src/mock/handlers/core.ts
 
 # ===== Environment & secrets =====
 .env
