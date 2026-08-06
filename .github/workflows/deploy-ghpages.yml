@@ -71,3 +71,8 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # Tolerate transient Pages-backend queue stalls (the deployment
+          # occasionally lands in deployment_queued and needs extra polls).
+          error_count: 20
+          timeout: 900000
