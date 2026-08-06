@@ -18,6 +18,7 @@
 package io.github.pnoker.common.auth.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcMcpAuditCommand;
+import io.github.pnoker.api.center.auth.GrpcMcpRiskLevel;
 import io.github.pnoker.api.center.auth.GrpcMcpIntrospectRequest;
 import io.github.pnoker.api.center.auth.GrpcMcpToolListRequest;
 import io.github.pnoker.api.center.auth.GrpcMcpToolResolveRequest;
@@ -163,7 +164,7 @@ class McpRuntimeServerTest {
                 .build());
 
         assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getData().getRiskLevel()).isEqualTo("HIGH");
+        assertThat(response.getData().getRiskLevel()).isEqualTo(GrpcMcpRiskLevel.HIGH);
         assertThat(response.getData().getServiceName()).isEqualTo("dc3-center-manager");
         assertThat(response.getData().getApiPath()).isEqualTo("/api/v3/manager/device/restart");
     }

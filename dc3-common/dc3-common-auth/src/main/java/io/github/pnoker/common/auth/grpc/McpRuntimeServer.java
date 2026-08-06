@@ -243,7 +243,7 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
         return GrpcMcpToolMetadataDTO.newBuilder()
                 .setToolId(StringUtils.defaultString(source.getToolId()))
                 .setPermissionCode(StringUtils.defaultString(source.getPermissionCode()))
-                .setRiskLevel(StringUtils.defaultString(source.getRiskLevel()))
+                .setRiskLevel(toGrpcRiskLevel(source.getRiskLevel()))
                 .build();
     }
 
@@ -258,7 +258,7 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .setToolId(StringUtils.defaultString(source.getToolId()))
                 .setToolName(StringUtils.defaultString(source.getToolName()))
                 .setPermissionCode(StringUtils.defaultString(source.getPermissionCode()))
-                .setRiskLevel(StringUtils.defaultString(source.getRiskLevel()))
+                .setRiskLevel(toGrpcRiskLevel(source.getRiskLevel()))
                 .setServiceName(StringUtils.defaultString(source.getServiceName()))
                 .setApiPath(StringUtils.defaultString(source.getApiPath()))
                 .setHttpMethod(StringUtils.defaultString(source.getHttpMethod()))
@@ -276,7 +276,7 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .setDecision(toGrpcDecision(source.getDecision()))
                 .setConfirmId(StringUtils.defaultString(source.getConfirmId()))
                 .setMessage(StringUtils.defaultString(source.getMessage()))
-                .setRiskLevel(StringUtils.defaultString(source.getRiskLevel()))
+                .setRiskLevel(toGrpcRiskLevel(source.getRiskLevel()))
                 .build();
     }
 
@@ -285,6 +285,14 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
             return GrpcMcpDecision.valueOf(StringUtils.defaultIfBlank(value, ""));
         } catch (IllegalArgumentException e) {
             return GrpcMcpDecision.MCP_DECISION_UNSPECIFIED;
+        }
+    }
+
+    private GrpcMcpRiskLevel toGrpcRiskLevel(String value) {
+        try {
+            return GrpcMcpRiskLevel.valueOf(StringUtils.defaultIfBlank(value, ""));
+        } catch (IllegalArgumentException e) {
+            return GrpcMcpRiskLevel.MCP_RISK_LEVEL_UNSPECIFIED;
         }
     }
 
@@ -305,7 +313,7 @@ public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
                 .toolId(source.getToolId())
                 .toolName(source.getToolName())
                 .permissionCode(source.getPermissionCode())
-                .riskLevel(source.getRiskLevel())
+                .riskLevel(source.getRiskLevel().name())
                 .confirmId(source.getConfirmId())
                 .idempotencyKey(source.getIdempotencyKey())
                 .argumentDigest(source.getArgumentDigest())
