@@ -95,15 +95,16 @@ public class PointValueTool {
                 "getPointValueHistory", tenantId, deviceId, pointId, count);
         int size = AgenticToolUtil.clamp(count, 1, AgenticConstant.ToolLimit.MAX_HISTORY_RECORDS);
         try {
-            List<String> history = pointValueFacade.history(tenantId, deviceId, pointId, size);
+            List<FacadePointValueBO> history = pointValueFacade.history(tenantId, deviceId, pointId, size);
             if (AgenticToolUtil.isEmpty(history)) {
                 return AgenticToolResult.empty("No history data found for device " + deviceId + " point " + pointId,
                         new PointValueHistory(deviceId, pointId, size, List.of(), null,
                                 AgenticVisualizationUtil.NumericSummary.empty(0)));
             }
+            List<String> values = history.stream().map(FacadePointValueBO::getValue).toList();
             AgenticVisualizationUtil.NumericSeries numericSeries =
-                    AgenticVisualizationUtil.numericSeriesFromNewestFirst(history);
-            PointValueHistory result = new PointValueHistory(deviceId, pointId, size, history,
+                    AgenticVisualizationUtil.numericSeriesFromNewestFirst(values);
+            PointValueHistory result = new PointValueHistory(deviceId, pointId, size, values,
                     buildHistoryChart(deviceId, pointId, numericSeries), numericSeries.summary());
             return AgenticToolResult.ok("Point value history loaded", result,
                     buildHistoryVisualizations(deviceId, pointId, numericSeries));

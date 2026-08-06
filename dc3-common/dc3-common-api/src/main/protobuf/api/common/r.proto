@@ -27,8 +27,8 @@ option java_multiple_files = true;
 
 // R DTO
 message GrpcR {
-  // Success flag
-  bool ok = 1;
+  // Success flag (explicit presence so "unset" is distinguishable from false)
+  optional bool ok = 1;
 
   // Status code
   string code = 2;

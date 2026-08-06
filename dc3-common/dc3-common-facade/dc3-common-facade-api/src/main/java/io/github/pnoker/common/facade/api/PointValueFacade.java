@@ -50,9 +50,9 @@ public interface PointValueFacade {
     /**
      * Query historical values of a device point.
      *
-     * @return an immutable list of value strings (never {@code null}; empty when nothing
+     * @return an immutable list of point values with timestamps (never {@code null}; empty when nothing
      * matches).
      */
-    List<String> history(Long tenantId, Long deviceId, Long pointId, int count);
+    List<FacadePointValueBO> history(Long tenantId, Long deviceId, Long pointId, int count);
 
 }

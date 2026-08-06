@@ -66,12 +66,12 @@ public class PointValueLocalFacade implements PointValueFacade {
     }
 
     @Override
-    public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
-        List<String> result = pointValueService.history(tenantId, deviceId, pointId, count);
+    public List<FacadePointValueBO> history(Long tenantId, Long deviceId, Long pointId, int count) {
+        List<PointValueBO> result = pointValueService.history(tenantId, deviceId, pointId, count);
         if (Objects.isNull(result) || result.isEmpty()) {
             return Collections.emptyList();
         }
-        return result;
+        return result.stream().map(facadePointValueBuilder::toFacadeBO).toList();
     }
 
 }

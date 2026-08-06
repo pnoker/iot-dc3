@@ -85,7 +85,7 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     @Override
-    public List<String> listHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
+    public List<PointValueBO> listHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
         LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
         wrapper.eq(PointValueDO::getTenantId, tenantId);
         wrapper.eq(PointValueDO::getDeviceId, deviceId);
@@ -97,7 +97,7 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
         wrapper.last("LIMIT " + Math.max(1, count));
 
         List<PointValueDO> entityPageDO = pointValueManager.list(wrapper);
-        return entityPageDO.stream().map(PointValueDO::getCalValue).toList();
+        return entityPageDO.stream().map(pointValueBuilder::buildBOByDO).toList();
     }
 
     @Override

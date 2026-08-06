@@ -102,13 +102,13 @@ message GrpcPointValueHistoryQuery {
   int32 count = 4;
 }
 
-// Response wrapper for historical values (list of raw value strings)
+// Response wrapper for historical values (newest first, each with its timestamp)
 message GrpcRPointValueStringList {
   // Common result wrapper
   GrpcR result = 1;
 
-  // List of historical value strings
-  repeated string data = 2;
+  // Historical point values, each carrying its value and create_time.
+  repeated GrpcPointValueDTO data = 2;
 }
 
 // Request structure for sending a read command

@@ -61,7 +61,7 @@ message GrpcRMcpIntrospectDTO {
 
 // Token introspection result.
 message GrpcMcpIntrospectDTO {
-  bool active = 1;
+  optional bool active = 1;
   string iss = 2;
   repeated string aud = 3;
   string sub = 4;

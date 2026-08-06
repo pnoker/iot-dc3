@@ -82,16 +82,7 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                 response.setResult(GrpcRFactory.ok());
 
                 io.github.pnoker.common.entity.bo.PointValueBO bo = page.getRecords().getFirst();
-                response.setData(GrpcPointValueDTO.newBuilder()
-                        .setId(0)
-                        .setDeviceId(Objects.nonNull(bo.getDeviceId()) ? bo.getDeviceId() : 0)
-                        .setPointId(Objects.nonNull(bo.getPointId()) ? bo.getPointId() : 0)
-                        .setValue(Objects.nonNull(bo.getCalValue()) ? bo.getCalValue() : "")
-                        .setRawValue(Objects.nonNull(bo.getRawValue()) ? bo.getRawValue() : "")
-                        .setNumValue(Objects.nonNull(bo.getNumValue()) ? bo.getNumValue() : 0d)
-                        .setCreateTime(
-                                Objects.nonNull(bo.getCreateTime()) ? bo.getCreateTime().toEpochSecond(java.time.ZoneOffset.UTC) : 0)
-                        .build());
+                response.setData(toGrpcDTO(bo));
             }
             responseObserver.onNext(response.build());
             responseObserver.onCompleted();
@@ -112,14 +103,14 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
                                   StreamObserver<GrpcRPointValueStringList> responseObserver) {
         TenantContextHolder.setTenantId(request.getTenantId());
         try {
-            List<String> history = pointValueService.history(request.getTenantId(), request.getDeviceId(),
+            List<io.github.pnoker.common.entity.bo.PointValueBO> history = pointValueService.history(request.getTenantId(), request.getDeviceId(),
                     request.getPointId(), request.getCount());
 
             GrpcRPointValueStringList.Builder response = GrpcRPointValueStringList.newBuilder()
                     .setResult(GrpcRFactory.ok());
 
             if (Objects.nonNull(history)) {
-                response.addAllData(history);
+                response.addAllData(history.stream().map(this::toGrpcDTO).toList());
             }
             responseObserver.onNext(response.build());
             responseObserver.onCompleted();
@@ -133,6 +124,19 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
         } finally {
             TenantContextHolder.clear();
         }
+    }
+
+    private GrpcPointValueDTO toGrpcDTO(io.github.pnoker.common.entity.bo.PointValueBO bo) {
+        return GrpcPointValueDTO.newBuilder()
+                .setId(0)
+                .setDeviceId(Objects.nonNull(bo.getDeviceId()) ? bo.getDeviceId() : 0)
+                .setPointId(Objects.nonNull(bo.getPointId()) ? bo.getPointId() : 0)
+                .setValue(Objects.nonNull(bo.getCalValue()) ? bo.getCalValue() : "")
+                .setRawValue(Objects.nonNull(bo.getRawValue()) ? bo.getRawValue() : "")
+                .setNumValue(Objects.nonNull(bo.getNumValue()) ? bo.getNumValue() : 0d)
+                .setCreateTime(
+                        Objects.nonNull(bo.getCreateTime()) ? bo.getCreateTime().toEpochSecond(java.time.ZoneOffset.UTC) : 0)
+                .build();
     }
 
     @Override
