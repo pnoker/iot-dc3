@@ -75,7 +75,7 @@ message GrpcMcpIntrospectDTO {
   string display_name = 12;
   string client_id = 13;
   int64 mcp_connection_id = 14;
-  string grant_type = 15;
+  GrpcOAuthGrantType grant_type = 15;
   string scope = 16;
 }
 
@@ -85,6 +85,16 @@ enum GrpcMcpPrincipalType {
   USER = 1;
   SERVICE_ACCOUNT = 2;
   SYSTEM = 3;
+}
+
+// OAuth grant type. Enum names are upper-case (Java enum constants must be);
+// the on-the-wire value is the enum name, which the boundary converts
+// to/from the lowercase OAuth spec form (authorization_code etc.).
+enum GrpcOAuthGrantType {
+  GRPC_OAUTH_GRANT_TYPE_UNSPECIFIED = 0;
+  AUTHORIZATION_CODE = 1;
+  CLIENT_CREDENTIALS = 2;
+  REFRESH_TOKEN = 3;
 }
 
 // Visible tool list request.
