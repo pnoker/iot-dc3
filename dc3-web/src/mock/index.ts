@@ -29,6 +29,7 @@ import {registerBusinessHandlers} from './handlers/business';
 import {registerSettingsHandlers} from './handlers/settings';
 import {registerTimeseriesHandlers} from './handlers/timeseries';
 import {fallbackHandler} from './handlers/fallback';
+import {installAgenticFetchMock} from './fetch';
 
 let installed = false;
 
@@ -57,6 +58,7 @@ export function setupMock(): void {
   registerAgenticHandlers();
 
   request.defaults.adapter = createMockAdapter();
+  installAgenticFetchMock();
 
   // No pre-seeded auth: the demo lands on /login so visitors experience the
   // full sign-in flow. registerAuthHandlers mocks the token endpoints, so any

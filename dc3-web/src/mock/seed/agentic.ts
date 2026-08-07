@@ -15,8 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {AgenticMessage, AgenticModelConfig, AgenticProvider, AgenticSession} from '@/config/types';
+import type {AgenticMessage, AgenticModelConfig, AgenticProvider, AgenticSession, AgenticVisualizationSpec} from '@/config/types';
 import type {McpAuditRecord, McpConnectionRecord, McpToolRecord, OAuthClientRecord} from '@/config/types/auth';
+import {charts} from '../fetch';
 
 /** Stable timestamps so the demo does not regenerate on every load. */
 const CREATED = '2026-07-15T09:30:00';
@@ -250,11 +251,14 @@ interface MessageDef {
   status: number;
   streaming: boolean;
   finishReason?: string;
+  reasoning?: string;
   tokens?: { input: number; output: number };
+  charts?: AgenticVisualizationSpec[];
   createTime: string;
 }
 
 const messageDefs: MessageDef[] = [
+  // Session 0 — Modbus 点位查询
   {
     sessionIndex: 0,
     role: 'user',
@@ -267,29 +271,93 @@ const messageDefs: MessageDef[] = [
   {
     sessionIndex: 0,
     role: 'assistant',
-    content:
-      'DEV-001 共挂载 3 个点位：\n- 温度（FLOAT，READ_ONLY，℃）\n- 湿度（FLOAT，READ_ONLY，%RH）\n- 电池电量（INT，READ_ONLY，%）\n如需修改其中某个点位的单位或读写属性，请告诉我具体的位号。',
     model: 'gpt-4o',
     messageIndex: 1,
     status: 2,
     streaming: false,
     finishReason: 'stop',
     tokens: {input: 1180, output: 726},
+    charts: [charts.pointValues()],
     createTime: T2,
+    content:
+      'DEV-001 挂载 5 个采集点位，当前实时值如上图。温度/湿度/电压/电流为只读量，功率为派生只读量。需要调整某点位的单位或读写属性，告诉我具体位号即可。',
   },
   {
     sessionIndex: 0,
     role: 'user',
-    content: '把温度点位的单位从 ℃ 改成 ℉ 可以吗？',
+    content: '看下最近 24 小时的温度和湿度趋势。',
     messageIndex: 2,
     status: 2,
     streaming: false,
     createTime: T3,
   },
   {
+    sessionIndex: 0,
+    role: 'assistant',
+    model: 'gpt-4o',
+    messageIndex: 3,
+    status: 2,
+    streaming: false,
+    finishReason: 'stop',
+    tokens: {input: 1340, output: 612},
+    charts: [charts.tempTrend(), charts.humidity()],
+    createTime: T3,
+    content:
+      '过去 24h 温度在 71-85℃ 波动，14:00 达到峰值 85.4℃（接近 80℃ 告警阈值）；湿度稳定在 48-60%RH。整体环境正常，建议关注午后温度峰值。',
+  },
+  // Session 1 — 电力仪表数据分析
+  {
+    sessionIndex: 1,
+    role: 'user',
+    content: '统计本周能耗，并分析功率趋势。',
+    messageIndex: 0,
+    status: 2,
+    streaming: false,
+    createTime: T2,
+  },
+  {
+    sessionIndex: 1,
+    role: 'assistant',
+    model: 'deepseek-reasoner',
+    messageIndex: 1,
+    status: 2,
+    streaming: false,
+    finishReason: 'stop',
+    reasoning:
+      '聚合近 7 日 point_value 历史，按日求和得能耗；功率取 24h 均值曲线，识别生产时段（8-18 时）负载抬升。',
+    tokens: {input: 2100, output: 980},
+    charts: [charts.energyWeek(), charts.powerTrend()],
+    createTime: T2,
+    content:
+      '近 7 日总能耗 **340.9 kWh**，工作日均值 55.2 kWh，周末降至 31.9 kWh，周四最高（61.2 kWh）。功率曲线在 8-18 时明显抬升，符合生产节律。建议在谷电时段调度高耗能任务以降低用电成本。',
+  },
+  {
+    sessionIndex: 1,
+    role: 'user',
+    content: '哪个设备能耗最高？',
+    messageIndex: 2,
+    status: 2,
+    streaming: false,
+    createTime: T3,
+  },
+  {
+    sessionIndex: 1,
+    role: 'assistant',
+    model: 'deepseek-reasoner',
+    messageIndex: 3,
+    status: 2,
+    streaming: false,
+    finishReason: 'stop',
+    tokens: {input: 1820, output: 540},
+    createTime: T3,
+    content:
+      '能耗 Top3：① 3 号风机（68.4 kWh，占 20%）② 注塑机 A（54.2 kWh）③ 空压机（41.7 kWh）。3 号风机近期温度偏高，可能与持续高负载相关，建议结合温度告警一并排查。',
+  },
+  // Session 2 — 驱动配置异常排查
+  {
     sessionIndex: 2,
     role: 'user',
-    content: 'OPC-UA 驱动最近频繁掉线，帮我排查一下原因。',
+    content: 'OPC-UA 驱动频繁掉线，帮我排查，顺便看下各驱动负载。',
     messageIndex: 0,
     status: 2,
     streaming: false,
@@ -298,15 +366,40 @@ const messageDefs: MessageDef[] = [
   {
     sessionIndex: 2,
     role: 'assistant',
-    content:
-      '从日志看掉线集中在每小时第 12 分附近，且都伴随 SecureChannel 超时。建议先检查：\n1. 服务端证书是否即将过期；\n2. 网络是否存在周期性抖动（与第 12 分的定时任务重合）；\n3. 把握手超时从 5s 调到 10s 再观察一轮。',
     model: 'claude-3-5-sonnet',
     messageIndex: 1,
     status: 2,
     streaming: false,
     finishReason: 'stop',
     tokens: {input: 1320, output: 580},
+    charts: [charts.driverLoad(), charts.deviceStatus()],
     createTime: T4,
+    content:
+      '日志显示 OPC-UA 掉线集中在每小时第 12 分附近，伴随 SecureChannel 超时。各驱动负载如上：S7 PLC（CPU 41%/内存 64%）、OPC-UA（35%/58%）偏高。建议：1) 检查服务端证书有效期；2) 排查第 12 分定时任务导致的网络抖动；3) 把握手超时从 5s 调到 10s 后观察一轮。',
+  },
+  // Session 3 — 设备总览
+  {
+    sessionIndex: 3,
+    role: 'user',
+    content: '当前平台整体态势如何？',
+    messageIndex: 0,
+    status: 2,
+    streaming: false,
+    createTime: T4,
+  },
+  {
+    sessionIndex: 3,
+    role: 'assistant',
+    model: 'deepseek-chat',
+    messageIndex: 1,
+    status: 2,
+    streaming: false,
+    finishReason: 'stop',
+    tokens: {input: 1560, output: 720},
+    charts: [charts.deviceStatus(), charts.tempTrend(), charts.alarmSummary()],
+    createTime: T4,
+    content:
+      '当前态势：16 台设备中 12 在线、3 离线、1 告警（3 号风机温度异常）。近 24h 共 17 条告警（P0×1 / P1×4 / P2×12），已恢复 9 条。首要风险是 3 号风机温度，建议优先处理散热与负载。',
   },
 ];
 
@@ -315,7 +408,14 @@ export const agenticMessages: AgenticMessage[] = messageDefs.map((m, i) => ({
   conversationId: agenticSessions[m.sessionIndex]?.conversationId ?? '',
   role: m.role,
   content: m.content,
-  contentExt: m.tokens ? {tokens: m.tokens} : undefined,
+  contentExt:
+    m.tokens || m.reasoning || (m.charts && m.charts.length)
+      ? {
+          ...(m.tokens ? {tokens: m.tokens} : {}),
+          ...(m.reasoning ? {reasoningContent: m.reasoning} : {}),
+          ...(m.charts && m.charts.length ? {charts: m.charts} : {}),
+        }
+      : undefined,
   model: m.model,
   messageIndex: m.messageIndex,
   status: m.status,
