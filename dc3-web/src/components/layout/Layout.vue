@@ -105,7 +105,7 @@
           <router-view/>
         </div>
       </div>
-      <agentic-assistant v-if="!isMock"/>
+      <agentic-assistant/>
       <el-backtop :bottom="40" :right="40" target=".body-main .el-scrollbar__wrap"/>
     </div>
   </div>
@@ -135,10 +135,8 @@ const authStore = useAuthStore();
 const menuStore = useMenuStore();
 const agenticStore = useAgenticStore();
 
-// Hide the AI assistant in the static demo: its chat streams over a raw fetch
-// (src/api/agentic.ts) that bypasses the axios mock adapter. The build-time
-// MODE literal collapses this to a constant in production.
-const isMock = import.meta.env.MODE === 'mock';
+// The AI assistant is shown in every build; in mock builds the fetch
+// interceptor (src/mock/fetch.ts) answers its chat completions.
 
 const langOptions = [
   {label: 'EN', value: 'en'},

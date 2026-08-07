@@ -16,10 +16,13 @@
  */
 
 import type {
+  AgingBacklog,
   AlertStatsSummary,
   DailyGrowthSummary,
+  SilentSource,
   StatsTimeBucket,
   StatsTodaySummary,
+  TopDimension,
   TopologyNode,
   TopologyNodeType,
   TopologyResponse,
@@ -164,3 +167,145 @@ export const alertRows: AlertRow[] = [
     message: '电压低于安全范围',
   },
 ];
+
+// ---- Phase-2 insight-card payloads ----------------------------------
+
+/** Mirrors the Row shape declared locally in LiveDataFeed.vue. */
+interface StreamRow {
+  deviceId: string;
+  pointId: string;
+  driverId: string;
+  driverName: string;
+  deviceName: string;
+  pointName: string;
+  rawValue: string;
+  calValue: string;
+  valueType: string;
+  createTime: string;
+}
+
+const driverNameOf = (id: unknown): string =>
+  drivers.find((d) => String(d.id) === String(id))?.driverName ?? '';
+
+/** Deterministic per-unit telemetry value so the live feed looks like real
+ *  sensor readings rather than flat placeholders. */
+const streamValue = (unit: string, i: number): {valueType: string; rawValue: string} => {
+  const r = (base: number, amp: number) => (base + Math.sin(i / 1.7) * amp + (i % 5) * 0.08).toFixed(2);
+  switch (unit) {
+    case '℃':
+      return {valueType: 'FLOAT', rawValue: r(23.4, 1.3)};
+    case '%RH':
+      return {valueType: 'FLOAT', rawValue: r(56.2, 3.1)};
+    case 'V':
+      return {valueType: 'FLOAT', rawValue: r(220.3, 1.4)};
+    case 'A':
+      return {valueType: 'FLOAT', rawValue: r(12.46, 0.5)};
+    case 'kW':
+      return {valueType: 'FLOAT', rawValue: r(3.12, 0.35)};
+    case '%':
+      return {valueType: 'INT', rawValue: String(72 + ((i * 7) % 27))};
+    case 'm³/h':
+      return {valueType: 'FLOAT', rawValue: r(18.6, 2.2)};
+    case 'bar':
+      return {valueType: 'FLOAT', rawValue: r(4.05, 0.18)};
+    default:
+      return {valueType: 'DOUBLE', rawValue: r(0.95, 0.04)};
+  }
+};
+
+// Flatten every (device, point) pair sharing a profile so each feed row is a
+// coherent device/point tuple the server would plausibly emit.
+const devicePointPairs = devices.flatMap((device) =>
+  points
+    .filter((p) => String(p.profileId) === String(device.profileId))
+    .map((point) => ({device, point})),
+);
+
+const STREAM_EPOCH = Date.UTC(2026, 7, 7, 14, 30, 42);
+
+export const streamLatest: StreamRow[] = devicePointPairs.slice(0, 20).map(({device, point}, i) => {
+  const {valueType, rawValue} = streamValue(point.unit ?? '', i);
+  return {
+    deviceId: String(device.id),
+    pointId: String(point.id),
+    driverId: String(device.driverId ?? ''),
+    driverName: driverNameOf(device.driverId),
+    deviceName: device.deviceName ?? '',
+    pointName: point.pointName ?? '',
+    rawValue,
+    calValue: rawValue,
+    valueType,
+    createTime: new Date(STREAM_EPOCH - i * 37000).toISOString(),
+  };
+});
+
+const countBy = <T>(items: T[], keyOf: (item: T) => string): {key: string; count: number}[] => {
+  const map = new Map<string, number>();
+  for (const item of items) {
+    const key = keyOf(item);
+    map.set(key, (map.get(key) ?? 0) + 1);
+  }
+  return [...map.entries()].map(([key, count]) => ({key, count}));
+};
+
+export const deviceStats = {
+  byEnable: countBy(devices, (d) => (d.enableFlag === 'ENABLE' ? 'ENABLED' : 'DISABLED')),
+  byProfile: countBy(devices, (d) => String(d.profileId)),
+  byDriver: countBy(devices, (d) => String(d.driverId)),
+};
+
+// byService is keyed by driver serviceName (e.g. dc3-driver-modbus); the
+// AnalyticsTabs protocol tab strips the `dc3-driver-` prefix before drawing.
+export const driverStats = {
+  byEnable: countBy(drivers, (d) => (d.enableFlag === 'ENABLE' ? 'ENABLED' : 'DISABLED')),
+  byType: countBy(drivers, (d) => String(d.driverTypeFlag ?? 'DRIVER_CLIENT')),
+  byService: countBy(devices, (d) => {
+    const drv = drivers.find((x) => String(x.id) === String(d.driverId));
+    return drv?.serviceName ?? 'unknown';
+  }),
+};
+
+const topRows = (ids: string[], base: number, step: number, jitter: number) =>
+  ids.map((id, i) => ({entityId: id, count: Math.max(1, base - i * step + (i % 3) * jitter)}));
+
+export const statsTop: Record<TopDimension, {entityId: string; count: number}[]> = {
+  device: topRows(devices.slice(0, 10).map((d) => String(d.id)), 342, 28, 6),
+  point: topRows(points.slice(0, 10).map((p) => String(p.id)), 286, 23, 7),
+  driver: topRows(drivers.slice(0, 8).map((d) => String(d.id)), 524, 58, 4),
+};
+
+export const alertAging: AgingBacklog = {under1h: 24, h1to6: 13, h6to24: 6, over24h: 3, total: 46};
+
+const SILENT_BASE = Date.UTC(2026, 7, 7, 14, 5, 0);
+export const silentSources: SilentSource[] = [
+  {deviceId: String(devices[1]?.id ?? 3002), pointId: String(points[0]?.id ?? 5001), lastSeen: new Date(SILENT_BASE - 2_074_000).toISOString(), silentSeconds: 2074},
+  {deviceId: String(devices[3]?.id ?? 3004), pointId: String(points[3]?.id ?? 5004), lastSeen: new Date(SILENT_BASE - 1_536_000).toISOString(), silentSeconds: 1536},
+  {deviceId: String(devices[5]?.id ?? 3006), pointId: String(points[1]?.id ?? 5002), lastSeen: new Date(SILENT_BASE - 1_102_000).toISOString(), silentSeconds: 1102},
+  {deviceId: String(devices[7]?.id ?? 3008), pointId: String(points[6]?.id ?? 5007), lastSeen: new Date(SILENT_BASE - 3_640_000).toISOString(), silentSeconds: 3640},
+  {deviceId: String(devices[9]?.id ?? 3010), pointId: String(points[2]?.id ?? 5003), lastSeen: new Date(SILENT_BASE - 988_000).toISOString(), silentSeconds: 988},
+  {deviceId: String(devices[2]?.id ?? 3003), pointId: String(points[5]?.id ?? 5006), lastSeen: new Date(SILENT_BASE - 2_752_000).toISOString(), silentSeconds: 2752},
+];
+
+// 6 latency buckets: <100ms / 100-500ms / 0.5-1s / 1-5s / 5-30s / >30s.
+export const statsLatency = [
+  {bin: 0, count: 8420},
+  {bin: 1, count: 1284},
+  {bin: 2, count: 312},
+  {bin: 3, count: 87},
+  {bin: 4, count: 19},
+  {bin: 5, count: 4},
+];
+
+// 7 (Sun..Sat) x 24 (hour) activity grid — hot on weekday business hours,
+// cool overnight and on weekends, matching real IoT traffic shape.
+const activityCount = (dow: number, hour: number): number => {
+  const weekend = dow === 0 || dow === 6;
+  const peak = !weekend && hour >= 9 && hour <= 18;
+  const day = !weekend && hour >= 7 && hour <= 21;
+  const base = weekend ? 5 : peak ? 56 : day ? 24 : 3;
+  return Math.max(0, Math.round(base + Math.sin((hour + dow) / 2) * (peak ? 16 : 5)));
+};
+
+export const statsActivity = Array.from({length: 7}, (_, dow) =>
+  Array.from({length: 24}, (_, hour) => ({dow, hour, count: activityCount(dow, hour)})),
+).flat();
