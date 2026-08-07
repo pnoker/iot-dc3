@@ -18,6 +18,7 @@
 import {on} from '../dispatch';
 import {matches, paginate} from '../query';
 import {ok, responseOf} from '../response';
+import {newId, stamp} from '../crud';
 
 const enableFilter = (row: Record<string, unknown>, body: any): boolean => {
   const flag = body?.enableFlag;
@@ -109,4 +110,28 @@ export function registerCoreHandlers(): void {
   on('post', 'api/v3/data/device/status/list', (ctx) =>
     responseOf(ctx.config, ok(statusMap(ctx.db.devices))),
   );
+
+  // ── CUD for mutable entities (driver stays read-only — backend-registered) ──
+  const cud = (url: string, key: 'devices' | 'profiles' | 'points') => {
+    on('post', `${url}/add`, (ctx) => {
+      const row: Record<string, unknown> = {...ctx.body, id: newId(), createTime: stamp(), operateTime: stamp()};
+      ctx.db[key].push(row);
+      return responseOf(ctx.config, ok(String(row.id)));
+    });
+    on('post', `${url}/update`, (ctx) => {
+      const coll = ctx.db[key];
+      const i = coll.findIndex((r) => String(r.id) === String(ctx.body?.id));
+      if (i >= 0) coll[i] = {...coll[i], ...ctx.body, operateTime: stamp()};
+      return responseOf(ctx.config, ok(String(ctx.body?.id ?? '')));
+    });
+    on('post', `${url}/delete`, (ctx) => {
+      const coll = ctx.db[key];
+      const i = coll.findIndex((r) => String(r.id) === String(ctx.params.id));
+      if (i >= 0) coll.splice(i, 1);
+      return responseOf(ctx.config, ok(String(ctx.params.id)));
+    });
+  };
+  cud('api/v3/manager/device', 'devices');
+  cud('api/v3/manager/profile', 'profiles');
+  cud('api/v3/manager/point', 'points');
 }

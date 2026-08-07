@@ -36,6 +36,8 @@ export interface Attribute {
   remark?: string;
   attributeExt?: Record<string, unknown>;
   enableFlag?: string;
+
+  [key: string]: unknown;
 }
 
 /** Dictionary item */

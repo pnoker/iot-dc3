@@ -16,8 +16,6 @@
  */
 
 import request from '@/config/axios';
-import {AUTH_HEADERS} from '@/config/constant/common';
-import {getStorage, setStorage} from '@/utils/storageUtil';
 
 import {createMockAdapter} from './adapter';
 import {setFallback} from './dispatch';
@@ -26,6 +24,10 @@ import {registerCoreHandlers} from './handlers/core';
 import {registerDashboardHandlers} from './handlers/dashboard';
 import {registerDictionaryHandlers} from './handlers/dictionary';
 import {registerMenuHandlers} from './handlers/menu';
+import {registerAgenticHandlers} from './handlers/agentic';
+import {registerBusinessHandlers} from './handlers/business';
+import {registerSettingsHandlers} from './handlers/settings';
+import {registerTimeseriesHandlers} from './handlers/timeseries';
 import {fallbackHandler} from './handlers/fallback';
 
 let installed = false;
@@ -49,15 +51,14 @@ export function setupMock(): void {
   registerDashboardHandlers();
   registerDictionaryHandlers();
   registerMenuHandlers();
+  registerTimeseriesHandlers();
+  registerSettingsHandlers();
+  registerBusinessHandlers();
+  registerAgenticHandlers();
 
   request.defaults.adapter = createMockAdapter();
 
-  // Pre-seed auth so the first navigation lands on /home without a login click.
-  // The real login flow still works (registerAuthHandlers mocks the token
-  // endpoints), so logout → login → home is demoable too.
-  if (getStorage(AUTH_HEADERS.TENANT) == null) {
-    setStorage(AUTH_HEADERS.TENANT, 'default');
-    setStorage(AUTH_HEADERS.LOGIN, 'dc3');
-    setStorage(AUTH_HEADERS.TOKEN, {salt: 'mock-salt', token: 'mock-token'});
-  }
+  // No pre-seeded auth: the demo lands on /login so visitors experience the
+  // full sign-in flow. registerAuthHandlers mocks the token endpoints, so any
+  // tenant/name + a 6+ char password logs in and reaches /home.
 }

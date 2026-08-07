@@ -36,6 +36,7 @@ export interface AgenticProvider {
   remark?: string;
   createTime?: string;
   operateTime?: string;
+  [key: string]: unknown;
 }
 
 export interface AgenticModelConfig {
@@ -63,6 +64,7 @@ export interface AgenticModelConfig {
   remark?: string;
   createTime?: string;
   operateTime?: string;
+  [key: string]: unknown;
 }
 
 export interface AgenticSession {
@@ -71,6 +73,7 @@ export interface AgenticSession {
   sessionExt?: AgenticSessionExt;
   createTime?: string;
   operateTime?: string;
+  [key: string]: unknown;
 }
 
 export interface AgenticSessionExt {
@@ -94,6 +97,7 @@ export interface AgenticMessage {
   reasoning?: string;
   finishReason?: string;
   createTime?: string;
+  [key: string]: unknown;
 }
 
 export interface AgenticMessageContent {

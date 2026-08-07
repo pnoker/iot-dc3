@@ -16,6 +16,48 @@
  */
 
 import {devices, drivers, points, profiles} from './seed/entities';
+import {
+  users,
+  roles,
+  rolePrincipalBinds,
+  roleResourceBinds,
+  principals,
+  serviceAccounts,
+  tenantMemberships,
+  identityAudits,
+  localCredentials,
+} from './seed/auth';
+import {
+  groups,
+  labels,
+  apis,
+  resources,
+  commands,
+  commandParams,
+  events,
+  eventParams,
+  attributes,
+  attributeConfigs,
+} from './seed/manager';
+import {
+  alarmRules,
+  alarmNotifies,
+  alarmMessages,
+  alarmChannels,
+  alarmChannelBinds,
+  alarmRuleStates,
+  alarmHistories,
+} from './seed/data';
+import {
+  agenticProviders,
+  agenticModelConfigs,
+  agenticSessions,
+  agenticMessages,
+  mcpClients,
+  mcpConnections,
+  mcpTools,
+  mcpAudits,
+} from './seed/agentic';
 
 /**
  * Mutable in-memory store. add/update/delete handlers mutate these arrays so a
@@ -27,11 +69,81 @@ export interface MockDb {
   devices: Record<string, unknown>[];
   profiles: Record<string, unknown>[];
   points: Record<string, unknown>[];
+  users: Record<string, unknown>[];
+  roles: Record<string, unknown>[];
+  rolePrincipalBinds: Record<string, unknown>[];
+  roleResourceBinds: Record<string, unknown>[];
+  principals: Record<string, unknown>[];
+  serviceAccounts: Record<string, unknown>[];
+  tenantMemberships: Record<string, unknown>[];
+  identityAudits: Record<string, unknown>[];
+  localCredentials: Record<string, unknown>[];
+  groups: Record<string, unknown>[];
+  labels: Record<string, unknown>[];
+  apis: Record<string, unknown>[];
+  resources: Record<string, unknown>[];
+  commands: Record<string, unknown>[];
+  commandParams: Record<string, unknown>[];
+  events: Record<string, unknown>[];
+  eventParams: Record<string, unknown>[];
+  attributes: Record<string, unknown>[];
+  attributeConfigs: Record<string, unknown>[];
+  alarmRules: Record<string, unknown>[];
+  alarmNotifies: Record<string, unknown>[];
+  alarmMessages: Record<string, unknown>[];
+  alarmChannels: Record<string, unknown>[];
+  alarmChannelBinds: Record<string, unknown>[];
+  alarmRuleStates: Record<string, unknown>[];
+  alarmHistories: Record<string, unknown>[];
+  agenticProviders: Record<string, unknown>[];
+  agenticModelConfigs: Record<string, unknown>[];
+  agenticSessions: Record<string, unknown>[];
+  agenticMessages: Record<string, unknown>[];
+  mcpClients: Record<string, unknown>[];
+  mcpConnections: Record<string, unknown>[];
+  mcpTools: Record<string, unknown>[];
+  mcpAudits: Record<string, unknown>[];
 }
 
+const copy = <T>(rows: T[]): T[] => rows.map((r) => ({...r}));
+
 export const db: MockDb = {
-  drivers: [...drivers],
-  devices: [...devices],
-  profiles: [...profiles],
-  points: [...points],
+  drivers: copy(drivers),
+  devices: copy(devices),
+  profiles: copy(profiles),
+  points: copy(points),
+  users: copy(users),
+  roles: copy(roles),
+  rolePrincipalBinds: copy(rolePrincipalBinds),
+  roleResourceBinds: copy(roleResourceBinds),
+  principals: copy(principals),
+  serviceAccounts: copy(serviceAccounts),
+  tenantMemberships: copy(tenantMemberships),
+  identityAudits: copy(identityAudits),
+  localCredentials: copy(localCredentials),
+  groups: copy(groups),
+  labels: copy(labels),
+  apis: copy(apis),
+  resources: copy(resources),
+  commands: copy(commands),
+  commandParams: copy(commandParams),
+  events: copy(events),
+  eventParams: copy(eventParams),
+  attributes: copy(attributes),
+  attributeConfigs: copy(attributeConfigs),
+  alarmRules: copy(alarmRules),
+  alarmNotifies: copy(alarmNotifies),
+  alarmMessages: copy(alarmMessages),
+  alarmChannels: copy(alarmChannels),
+  alarmChannelBinds: copy(alarmChannelBinds),
+  alarmRuleStates: copy(alarmRuleStates),
+  alarmHistories: copy(alarmHistories),
+  agenticProviders: copy(agenticProviders),
+  agenticModelConfigs: copy(agenticModelConfigs),
+  agenticSessions: copy(agenticSessions),
+  agenticMessages: copy(agenticMessages),
+  mcpClients: copy(mcpClients),
+  mcpConnections: copy(mcpConnections),
+  mcpTools: copy(mcpTools),
+  mcpAudits: copy(mcpAudits),
 };

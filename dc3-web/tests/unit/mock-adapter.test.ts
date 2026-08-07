@@ -40,9 +40,9 @@ describe('mock adapter', () => {
   // envelope (not an AxiosResponse). Cast once at the boundary.
   const call = (config: AxiosRequestConfig) => request(config) as Promise<R>;
 
-  it('seeds local auth so the router guard treats the session as logged in', () => {
-    expect(localStorage.getItem('X-Auth-Tenant')).not.toBeNull();
-    expect(localStorage.getItem('X-Auth-Token')).not.toBeNull();
+  it('does not pre-seed auth so the demo lands on /login', () => {
+    expect(localStorage.getItem('X-Auth-Tenant')).toBeNull();
+    expect(localStorage.getItem('X-Auth-Token')).toBeNull();
   });
 
   it('returns the full menu tree from list_tree', async () => {
@@ -78,16 +78,27 @@ describe('mock adapter', () => {
     expect(token.data).toBe('mock-token');
   });
 
-  it('stubs unregistered config-domain lists instead of erroring', async () => {
+  it('returns the seeded role list with real data', async () => {
     const res = await call({url: 'api/v3/auth/role/list', method: 'post', data: {page: {current: 1, size: 12}}});
     expect(res.ok).toBe(true);
-    expect(res.data.records.length).toBe(3);
+    expect(res.data.records.length).toBeGreaterThanOrEqual(3);
+    expect(res.data.records.some((r: any) => r.roleCode === 'ROLE_ADMIN')).toBe(true);
   });
 
-  it('returns [] for unregistered flat-array endpoints', async () => {
+  it('returns the nested role tree from list_tree', async () => {
     const res = await call({url: 'api/v3/auth/role/list_tree', method: 'post', data: {}});
     expect(res.ok).toBe(true);
-    expect(res.data).toEqual([]);
+    expect(Array.isArray(res.data)).toBe(true);
+    expect(res.data.length).toBeGreaterThan(0);
+    expect(res.data.some((r: any) => r.roleCode === 'ROLE_ADMIN')).toBe(true);
+  });
+
+  it('falls back gracefully for truly unregistered endpoints', async () => {
+    // No handler registers this fictional endpoint — fallback must shape a
+    // safe empty page instead of surfacing an error.
+    const res = await call({url: 'api/v3/data/fictional_metric/list', method: 'post', data: {page: {current: 1, size: 12}}});
+    expect(res.ok).toBe(true);
+    expect(Array.isArray(res.data.records)).toBe(true);
   });
 
   it('returns the dashboard topology with layered nodes', async () => {
