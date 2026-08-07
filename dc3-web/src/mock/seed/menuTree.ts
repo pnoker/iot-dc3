@@ -55,6 +55,7 @@ export const menuTree: MenuNode[] = [
   mk('device', {url: '/device', icon: 'Management', menuIndex: 4}),
   mk('pointValue', {url: '/point_value', icon: 'Histogram', menuIndex: 5}),
   mk('settings', {
+    icon: 'Setting',
     menuIndex: 6,
     children: [
       mk('settingsIdentity', {

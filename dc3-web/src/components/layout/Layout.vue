@@ -42,6 +42,9 @@
                 :key="`menu-child-${child.id}`"
                 :index="child.menuExt?.content?.url || `/${child.menuCode}`"
               >
+                <el-icon v-if="child.menuExt?.content?.icon">
+                  <component :is="child.menuExt.content.icon"/>
+                </el-icon>
                 {{ resolveMenuTitle(child) }}
               </el-menu-item>
             </el-sub-menu>
