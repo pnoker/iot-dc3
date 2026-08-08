@@ -20,12 +20,16 @@ package io.github.pnoker.common.auth.controller;
 import io.github.pnoker.common.auth.biz.TokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.query.TokenQuery;
+import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.R;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.mock.http.server.reactive.MockServerHttpResponse;
 import reactor.test.StepVerifier;
 
 import java.util.Date;
@@ -90,14 +94,24 @@ class TokenControllerTest {
         when(tokenService.generateToken("alice",
                 "hash", "tenant-A"))
                 .thenReturn("jwt-token");
+        ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
-        StepVerifier.create(controller.generateToken(query()))
+        StepVerifier.create(controller.generateToken(query(), httpResponse))
                 .assertNext(response -> {
                     assertThat(response.isOk()).isTrue();
-                    assertThat(response.getData()).isEqualTo("jwt-token");
+                    // Token travels in an httpOnly cookie; body data is just "ok" so it
+                    // never reaches frontend storage.
+                    assertThat(response.getData()).isEqualTo("ok");
                     assertThat(response.getMessage()).contains("12 hours");
                 })
                 .verifyComplete();
+
+        ResponseCookie cookie = httpResponse.getCookies().getFirst(RequestConstant.Header.TOKEN_COOKIE);
+        assertThat(cookie).isNotNull();
+        assertThat(cookie.getValue()).isEqualTo("jwt-token");
+        assertThat(cookie.isHttpOnly()).isTrue();
+        assertThat(cookie.isSecure()).isTrue();
+        assertThat(cookie.getSameSite()).isEqualTo("Strict");
     }
 
     @Test
@@ -105,10 +119,14 @@ class TokenControllerTest {
         when(tokenService.generateToken("alice",
                 "hash", "tenant-A"))
                 .thenReturn(null);
+        ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
-        StepVerifier.create(controller.generateToken(query()))
+        StepVerifier.create(controller.generateToken(query(), httpResponse))
                 .assertNext(response -> assertThat(response.isOk()).isFalse())
                 .verifyComplete();
+
+        // No token means no Set-Cookie: the body alone signals failure.
+        assertThat(httpResponse.getCookies().getFirst(RequestConstant.Header.TOKEN_COOKIE)).isNull();
     }
 
     @Test
