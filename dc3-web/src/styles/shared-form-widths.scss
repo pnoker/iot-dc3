@@ -1,0 +1,71 @@
+/*!
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Mixins shared by ToolCard and InfoCard, which previously duplicated the
+// same selector list and footer layout in their scoped <style> blocks.
+//
+// This file is a plain mixin module — it is NOT injected globally (unlike
+// element-variables.scss), so @use it from the consuming component:
+//
+//   @use "@/styles/shared-form-widths.scss" as *;
+//
+// Vite's scss.additionalData prepends the element-variables @use to every
+// block, so the @use below is still a top-of-file statement (multiple
+// consecutive @use rules are allowed by Sass).
+
+// Force every common Element Plus input surface inside a toolbar/detail grid
+// cell to honour the cell width so rows line up. The `.edit-form-*` overrides
+// are needed because global.scss pins those helper classes to fixed px widths
+// (for standalone forms); inside the flex grid they must stretch to 100%.
+//
+// @include inside a `:deep(.el-form-item) { ... }` block — the nested
+// selectors resolve against the form item, matching the original inlined CSS.
+@mixin form-item-full-width {
+  .el-input,
+  .el-input.edit-form-small,
+  .el-input.edit-form-medium,
+  .el-input.edit-form-default,
+  .el-input.edit-form-special,
+  .el-input.edit-form-large,
+  .el-select,
+  .el-select.edit-form-small,
+  .el-select.edit-form-medium,
+  .el-select.edit-form-default,
+  .el-select.edit-form-special,
+  .el-select.edit-form-large,
+  .el-tree-select,
+  .el-date-editor,
+  .el-input-number,
+  .el-cascader,
+  .el-segmented {
+    width: 100%;
+  }
+}
+
+// Footer strip shared by ToolCard and InfoCard: a flex row separated from the
+// card body by a hairline border, wrapping on narrow viewports. @include on
+// the footer wrapper element (`.tool-card__footer` / `.info-card__footer`).
+@mixin card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--el-border-color-lighter);
+}

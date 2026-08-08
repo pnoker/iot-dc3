@@ -16,24 +16,24 @@
  */
 
 import {httpGet, httpPost} from '@/api/common';
+import {createCrudApi} from '@/api/factory';
 import {API_DATA_BASE, API_MANAGER_BASE} from '@/config/constant/api';
-import type {PageQuery, PageResult} from '@/config/types';
 import type {PointForm, PointRecord} from '@/config/types/manager';
 
-export const addPoint = (point: PointForm) => httpPost<R<PointRecord>>(`${API_MANAGER_BASE}/point/add`, point);
+const crud = createCrudApi<PointForm, PointRecord>({base: API_MANAGER_BASE, entity: 'point'});
 
-export const deletePoint = (id: string) => httpPost(`${API_MANAGER_BASE}/point/delete`, undefined, {params: {id}});
+export const addPoint = crud.add;
 
-export const updatePoint = (point: PointForm) => httpPost<R<PointRecord>>(`${API_MANAGER_BASE}/point/update`, point);
+export const deletePoint = crud.delete;
 
-export const getPointById = (id: string) =>
-  httpGet<R<PointRecord>>(`${API_MANAGER_BASE}/point/get_by_id`, {params: {id}});
+export const updatePoint = crud.update;
+
+export const getPointById = crud.getById;
+
+export const listPoint = crud.list;
 
 export const listPointByIds = (pointIds: string[]) =>
   httpPost<R<Record<string, PointRecord>>>(`${API_MANAGER_BASE}/point/list_by_ids`, pointIds);
-
-export const listPoint = <T = R<PageResult<PointRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_MANAGER_BASE}/point/list`, query);
 
 export const listPointUnit = (pointIds: string[]) => httpPost(`${API_MANAGER_BASE}/point/unit`, pointIds);
 
@@ -51,7 +51,7 @@ export const listPointValue = (pointValue: Record<string, unknown>) =>
 
 export const listPointValueHistory = (deviceId: string, pointId: string, count = 100) =>
   httpGet(`${API_DATA_BASE}/point_value/list_history_by_device_id_and_point_id`, {
-    params: {device_id: deviceId, point_id: pointId, count},
+    params: {device_id: deviceId, point_id: pointId, count}
   });
 
 export const readPointValue = (pointValueReadVO: Record<string, unknown>) =>

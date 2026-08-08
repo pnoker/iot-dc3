@@ -16,14 +16,15 @@
  */
 
 import {httpGet, httpPost} from '@/api/common';
+import {createCrudApi} from '@/api/factory';
 import {API_LOCAL_CREDENTIAL_BASE} from '@/config/constant/api';
-import type {PageQuery, PageResult} from '@/config/types';
 import type {LocalCredentialForm, LocalCredentialRecord} from '@/config/types/auth';
 
-export const addLocalCredential = (body: LocalCredentialForm) => httpPost(`${API_LOCAL_CREDENTIAL_BASE}/add`, body);
+const crud = createCrudApi<LocalCredentialForm, LocalCredentialRecord>({base: API_LOCAL_CREDENTIAL_BASE});
 
-export const deleteLocalCredential = (id: string) =>
-  httpPost(`${API_LOCAL_CREDENTIAL_BASE}/delete`, undefined, {params: {id}});
+export const addLocalCredential = crud.add;
+
+export const deleteLocalCredential = crud.delete;
 
 export const resetLocalCredentialPassword = (id: string, password: string) =>
   httpPost(`${API_LOCAL_CREDENTIAL_BASE}/reset_password`, undefined, {params: {id, password}});
@@ -31,5 +32,4 @@ export const resetLocalCredentialPassword = (id: string, password: string) =>
 export const checkLoginNameAvailable = (name: string) =>
   httpGet<R<boolean>>(`${API_LOCAL_CREDENTIAL_BASE}/check`, {params: {name}});
 
-export const listLocalCredential = <T = R<PageResult<LocalCredentialRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_LOCAL_CREDENTIAL_BASE}/list`, query);
+export const listLocalCredential = crud.list;

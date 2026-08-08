@@ -50,6 +50,7 @@ import type {
   Attribute,
   CommandInfoForm,
   CommandRecord,
+  DeviceRecord,
   Dictionary,
   EventInfoForm,
   EventRecord,
@@ -315,8 +316,8 @@ export default defineComponent({
       id: route.query.id as string,
       active: resolveDeviceTab(route.query.active),
       loading: true,
-      oldDeviceFormData: {} as Record<string, any>,
-      deviceFormData: {} as any,
+      oldDeviceFormData: {} as Partial<DeviceRecord>,
+      deviceFormData: {} as Partial<DeviceRecord>,
       driverAttributes: [] as Attribute[],
       driverAttributeTable: {} as Record<string, any>,
       oldDriverFormData: {} as AttributeFormData,
@@ -595,7 +596,7 @@ export default defineComponent({
           reactiveData.deviceFormData = res.data;
           reactiveData.oldDeviceFormData = {...res.data};
 
-          getDriverById(reactiveData.deviceFormData.driverId).then((res) => {
+          getDriverById(reactiveData.deviceFormData.driverId || '').then((res) => {
             const driver = res.data;
             reactiveData.driverDictionary.push({
               label: driver.driverName,
@@ -614,7 +615,7 @@ export default defineComponent({
             });
           }
 
-          changeAttribute(reactiveData.deviceFormData.driverId);
+          changeAttribute(reactiveData.deviceFormData.driverId || '');
         })
         .catch(() => {
           // nothing to do

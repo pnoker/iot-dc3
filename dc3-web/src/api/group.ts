@@ -15,19 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {createCrudApi} from '@/api/factory';
 import {API_MANAGER_BASE} from '@/config/constant/api';
-import type {PageQuery, PageResult} from '@/config/types';
 import type {GroupForm, GroupRecord} from '@/config/types/manager';
 
-export const addGroup = (group: GroupForm) => httpPost(`${API_MANAGER_BASE}/group/add`, group);
+const crud = createCrudApi<GroupForm, GroupRecord>({base: API_MANAGER_BASE, entity: 'group'});
 
-export const deleteGroup = (id: string) => httpPost(`${API_MANAGER_BASE}/group/delete`, undefined, {params: {id}});
+export const addGroup = crud.add;
 
-export const updateGroup = (group: GroupForm) => httpPost(`${API_MANAGER_BASE}/group/update`, group);
+export const deleteGroup = crud.delete;
 
-export const getGroupById = (id: string) =>
-  httpGet<R<GroupRecord>>(`${API_MANAGER_BASE}/group/get_by_id`, {params: {id}});
+export const updateGroup = crud.update;
 
-export const listGroup = <T = R<PageResult<GroupRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_MANAGER_BASE}/group/list`, query);
+export const getGroupById = crud.getById;
+
+export const listGroup = crud.list;

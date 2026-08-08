@@ -33,6 +33,7 @@ import CommandList from '@/views/settings/command/CommandList.vue';
 import EventList from '@/views/settings/event/definition/EventList.vue';
 
 import {timestamp} from '@/utils/dateUtil';
+import type {DeviceRecord, DriverRecord, ProfileRecord, PointRecord} from '@/config/types/manager';
 
 export default defineComponent({
   components: {
@@ -60,12 +61,12 @@ export default defineComponent({
       active: (route.query.active as string) || 'detail',
       deviceLoading: true,
       pointLoading: true,
-      driverTable: {} as any,
-      profileTable: {} as any,
-      statusTable: {} as any,
-      data: {} as any,
-      listDeviceData: [] as any[],
-      listPointData: [] as any[],
+      driverTable: {} as DriverRecord,
+      profileTable: {} as ProfileRecord,
+      statusTable: {} as Record<string, unknown>,
+      data: {} as ProfileRecord,
+      listDeviceData: [] as DeviceRecord[],
+      listPointData: [] as PointRecord[],
     });
 
     const pointLength = computed(() => {

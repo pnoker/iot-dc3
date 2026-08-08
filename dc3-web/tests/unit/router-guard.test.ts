@@ -191,18 +191,15 @@ describe('router beforeEach guard', () => {
     expect(router.currentRoute.value.name).toBe('login');
   });
 
-  it('redirects to login when the stored token payload is incomplete', async () => {
+  it('redirects to login when the auth flag is missing', async () => {
     setStorage(AUTH_HEADERS.TENANT, 'acme');
     setStorage(AUTH_HEADERS.LOGIN, 'alice');
-    setStorage(AUTH_HEADERS.TOKEN, {salt: 'salt-only'});
+    // No AUTHENTICATED flag → guard treats as logged out (token is httpOnly).
     const router = await loadRouter();
 
     await router.push({name: 'home'});
 
     expect(router.currentRoute.value.name).toBe('login');
-    expect(localStorage.getItem(AUTH_HEADERS.TENANT)).toBeNull();
-    expect(localStorage.getItem(AUTH_HEADERS.LOGIN)).toBeNull();
-    expect(localStorage.getItem(AUTH_HEADERS.TOKEN)).toBeNull();
   });
 
   it('keeps document.title untouched when the route has no meta.title', async () => {

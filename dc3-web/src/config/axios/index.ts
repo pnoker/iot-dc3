@@ -81,10 +81,8 @@ request.interceptors.request.use(
       headers[AUTH_HEADERS.LOGIN] = login;
     }
 
-    const token = getStorage(AUTH_HEADERS.TOKEN);
-    if (!isNull(token)) {
-      headers[AUTH_HEADERS.TOKEN] = JSON.stringify(token);
-    }
+    // Token travels in an httpOnly cookie (withCredentials) — never inject it
+    // into a header the frontend can read.
 
     return config;
   },
@@ -121,10 +119,11 @@ request.interceptors.response.use(
     // Handle unauthorized access
     if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
       warnMessage(AXIOS_ERROR_MESSAGES.UNAUTHORIZED, AXIOS_ERROR_MESSAGES.UNAUTHORIZED_TITLE);
-      // Remove auth keys only — never nuke entire localStorage
+      // Remove auth keys only — never nuke entire localStorage. The token cookie
+      // is cleared server-side on 401; here we just drop the frontend flag.
       removeStorage(AUTH_HEADERS.TENANT);
       removeStorage(AUTH_HEADERS.LOGIN);
-      removeStorage(AUTH_HEADERS.TOKEN);
+      removeStorage(AUTH_HEADERS.AUTHENTICATED, true);
       router.push({name: 'login'}).catch(() => {
       });
     } else if (status >= 500) {

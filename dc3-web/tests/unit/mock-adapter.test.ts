@@ -75,7 +75,7 @@ describe('mock adapter', () => {
     const salt = await call({url: 'api/v3/auth/token/salt', method: 'post', data: {}});
     expect(salt.data).toBe('mock-salt');
     const token = await call({url: 'api/v3/auth/token/generate', method: 'post', data: {}});
-    expect(token.data).toBe('mock-token');
+    expect(token.data).toBe('ok');
   });
 
   it('returns the seeded role list with real data', async () => {

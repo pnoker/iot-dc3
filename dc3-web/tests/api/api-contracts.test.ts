@@ -157,7 +157,7 @@ const coveredApiSourceFiles = new Set([
   'tenantMembership',
 ]);
 
-const apiSourceFileExclusions = new Set(['common', 'dashboard/index']);
+const apiSourceFileExclusions = new Set(['common', 'dashboard/index', 'factory']);
 const excludedExports = new Set(['streamAgenticChatCompletion', 'completeAgenticChatCompletion']);
 
 const pageQuery = {

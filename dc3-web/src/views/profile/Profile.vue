@@ -62,7 +62,7 @@ import {computed, ref} from 'vue';
 
 import {addProfile, deleteProfile, listProfile, updateProfile} from '@/api/profile';
 import {usePagedList} from '@/composables/usePagedList';
-import {failMessage, successMessage} from '@/utils/notificationUtil';
+import {successMessage} from '@/utils/notificationUtil';
 import {isNull} from '@/utils/validationUtil';
 
 import type {ProfileRecord} from '@/config/types/manager';
@@ -125,9 +125,7 @@ const addThing = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -139,9 +137,7 @@ const disableThing = (id: number | string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -153,9 +149,7 @@ const enableThing = (id: number | string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -167,9 +161,7 @@ const deleteThing = (id: number | string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });

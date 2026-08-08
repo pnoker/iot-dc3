@@ -15,53 +15,16 @@
   - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
+<!-- Compatibility shim over CardShell. Kept so existing imports
+     (@/components/card/blank/BlankCard.vue) keep working unchanged.
+     Pins the Blank variant: shadow="hover" (default) + borderless. -->
+
 <template>
-  <div class="blank-card">
-    <el-card class="blank-card__body" shadow="hover">
-      <div class="blank-card__container">
-        <slot/>
-      </div>
-    </el-card>
-  </div>
+  <CardShell borderless>
+    <slot/>
+  </CardShell>
 </template>
 
-<script lang="ts" setup></script>
-
-<style lang="scss" scoped>
-.blank-card {
-  box-sizing: border-box;
-  min-width: 0;
-
-  ul {
-    list-style: none;
-
-    li {
-      font-size: 13px;
-      margin-top: 8px;
-    }
-  }
-
-  :deep(.el-card) {
-    width: 100%;
-    box-sizing: border-box;
-    min-width: 0;
-  }
-
-  :deep(.el-card.blank-card__body) {
-    border: 0;
-  }
-
-  :deep(.el-card__body) {
-    padding: 16px;
-    overflow: hidden;
-  }
-
-  .blank-card__container {
-    min-width: 0;
-  }
-
-  :deep(.el-tabs__nav) {
-    margin: 0 5px;
-  }
-}
-</style>
+<script lang="ts" setup>
+import CardShell from '@/components/card/base/CardShell.vue';
+</script>

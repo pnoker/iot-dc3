@@ -15,17 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {createCrudApi} from '@/api/factory';
 import {API_AUTH_BASE} from '@/config/constant/api';
-import type {PageQuery, PageResult} from '@/config/types';
 import type {ApiForm, ApiRecord} from '@/config/types/auth';
 
-export const addApi = (api: ApiForm) => httpPost<R<ApiRecord>>(`${API_AUTH_BASE}/api/add`, api);
+const crud = createCrudApi<ApiForm, ApiRecord>({base: API_AUTH_BASE, entity: 'api'});
 
-export const deleteApi = (id: string) => httpPost(`${API_AUTH_BASE}/api/delete`, undefined, {params: {id}});
+export const addApi = crud.add;
 
-export const updateApi = (api: ApiForm) => httpPost<R<ApiRecord>>(`${API_AUTH_BASE}/api/update`, api);
+export const deleteApi = crud.delete;
 
-export const getApiById = (id: string) => httpGet<R<ApiRecord>>(`${API_AUTH_BASE}/api/get_by_id`, {params: {id}});
+export const updateApi = crud.update;
 
-export const listApi = (query: PageQuery) => httpPost<R<PageResult<ApiRecord>>>(`${API_AUTH_BASE}/api/list`, query);
+export const getApiById = crud.getById;
+
+export const listApi = crud.list;

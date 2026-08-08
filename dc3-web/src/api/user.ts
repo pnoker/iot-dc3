@@ -15,22 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpGet} from '@/api/common';
+import {createCrudApi} from '@/api/factory';
 import {API_AUTH_BASE} from '@/config/constant/api';
-import type {PageQuery, PageResult} from '@/config/types';
 import type {UserForm, UserRecord} from '@/config/types/auth';
 
-export const addUser = (user: UserForm) => httpPost<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/add`, user);
+const crud = createCrudApi<UserForm, UserRecord>({base: API_AUTH_BASE, entity: 'user_profile'});
 
-export const deleteUser = (id: string) => httpPost(`${API_AUTH_BASE}/user_profile/delete`, undefined, {params: {id}});
+export const addUser = crud.add;
 
-export const updateUser = (user: UserForm) => httpPost<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/update`, user);
+export const deleteUser = crud.delete;
 
-export const getUserById = (id: string) =>
-  httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/get_by_id`, {params: {id}});
+export const updateUser = crud.update;
+
+export const getUserById = crud.getById;
 
 export const getUserByName = (name: string) =>
   httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/get_by_name`, {params: {name}});
 
-export const listUser = <T = R<PageResult<UserRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_AUTH_BASE}/user_profile/list`, query);
+export const listUser = crud.list;

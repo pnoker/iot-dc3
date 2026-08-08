@@ -178,6 +178,6 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
   update: (payload) => updateGroup(normalizeGroupPayload(payload) as Parameters<typeof updateGroup>[0]),
   remove: deleteGroup,
   detail: {routeName: 'settingsGroupDetail'},
-  confirmDeleteText: t('settings.group.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityGroup')}),
   emptyText: t('settings.group.empty'),
 });

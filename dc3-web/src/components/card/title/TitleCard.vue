@@ -15,20 +15,24 @@
   - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
+<!-- Compatibility shim over CardShell. Note: TitleCard currently has no
+     consumers in src/ (verified via rg) — kept for parity / future reuse.
+     Forwards title prop + optional #header slot to CardShell. The
+     v-if="$slots.header" guard lets the title prop fall through when no
+     header slot is supplied. -->
+
 <template>
-  <div class="title-card">
-    <el-card class="title-card__body" shadow="hover">
-      <div class="title-card__container">
-        <slot name="header">
-          <span class="title-card__header">{{ props.title }}</span>
-        </slot>
-        <slot/>
-      </div>
-    </el-card>
-  </div>
+  <CardShell :title="props.title">
+    <template v-if="$slots.header" #header>
+      <slot name="header"/>
+    </template>
+    <slot/>
+  </CardShell>
 </template>
 
 <script lang="ts" setup>
+import CardShell from '@/components/card/base/CardShell.vue';
+
 const props = defineProps({
   title: {
     type: String,
@@ -36,38 +40,3 @@ const props = defineProps({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.title-card {
-  box-sizing: border-box;
-
-  :deep(.el-card) {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  :deep(.el-card__header) {
-    padding: 12px 16px;
-  }
-
-  :deep(.el-card__body) {
-    padding: 16px;
-  }
-
-  :deep(.el-tabs__nav) {
-    margin: 0 5px;
-  }
-
-  .title-card__container {
-    .title-card__header {
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    &:first-child {
-      padding-top: 0;
-      padding-left: 0;
-    }
-  }
-}
-</style>

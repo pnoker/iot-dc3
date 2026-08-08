@@ -38,10 +38,10 @@
               <el-descriptions-item :label="$t('device.detail.commandCount')">{{ commandLength }}</el-descriptions-item>
               <el-descriptions-item :label="$t('device.detail.eventCount')">{{ eventLength }}</el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')"
-              >{{ timestamp(reactiveData.data.createTime) }}
+              >{{ timestamp(reactiveData.data.createTime || '') }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')"
-              >{{ timestamp(reactiveData.data.createTime) }}
+              >{{ timestamp(reactiveData.data.createTime || '') }}
               </el-descriptions-item>
             </el-descriptions>
           </detail-card>
@@ -87,12 +87,13 @@ import pointValue from '@/views/point/value/PointValue.vue';
 import CommandList from '@/views/settings/command/CommandList.vue';
 import EventList from '@/views/settings/event/definition/EventList.vue';
 import {timestamp} from '@/utils/dateUtil';
+import type {DeviceRecord, DriverRecord, ProfileRecord, PointRecord} from '@/config/types/manager';
 
 const route = useRoute();
-const pointViewRef: any = ref<InstanceType<typeof point>>();
+const pointViewRef = ref<InstanceType<typeof point>>();
 const commandViewRef = ref<InstanceType<typeof CommandList>>();
 const eventViewRef = ref<InstanceType<typeof EventList>>();
-const pointValueViewRef: any = ref<InstanceType<typeof pointValue>>();
+const pointValueViewRef = ref<InstanceType<typeof pointValue>>();
 
 // 定义响应式数据
 const reactiveData = reactive({
@@ -101,16 +102,16 @@ const reactiveData = reactive({
   profileLoading: true,
   pointLoading: true,
   pointValueLoading: true,
-  data: {} as any,
-  driver: {} as any,
-  profile: {} as any,
+  data: {} as Partial<DeviceRecord>,
+  driver: {} as Partial<DriverRecord>,
+  profile: {} as Partial<ProfileRecord>,
   profileTable: {} as Record<string, any>,
   pointTable: {} as Record<string, any>,
   deviceTable: {} as Record<string, any>,
   unitTable: {} as Record<string, any>,
-  listProfileData: [] as any[],
-  listPointData: [] as any[],
-  listPointValueData: [] as any[],
+  listProfileData: [] as ProfileRecord[],
+  listPointData: [] as PointRecord[],
+  listPointValueData: [] as Record<string, unknown>[],
   listPointValueHistoryData: {} as Record<string, any>,
   pointValueDetailData: {} as Record<string, any>,
 });
@@ -133,10 +134,10 @@ const device = () => {
   getDeviceById(reactiveData.id)
     .then((res) => {
       reactiveData.data = res.data;
-      reactiveData.deviceTable[reactiveData.data.id] = reactiveData.data.deviceName;
+      reactiveData.deviceTable[res.data.id] = res.data.deviceName;
       reactiveData.profile = {};
 
-      getDriverById(reactiveData.data.driverId)
+      getDriverById(reactiveData.data.driverId || '')
         .then((res) => {
           reactiveData.driver = res.data;
         })

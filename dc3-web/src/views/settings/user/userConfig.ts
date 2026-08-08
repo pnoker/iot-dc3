@@ -130,6 +130,6 @@ export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers)
       onClick: handlers.onAssignRoles,
     },
   ],
-  confirmDeleteText: t('settings.user.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityUser')}),
   emptyText: t('settings.user.empty'),
 });

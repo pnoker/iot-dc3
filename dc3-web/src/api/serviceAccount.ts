@@ -15,19 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpPost} from '@/api/common';
+import {createCrudApi} from '@/api/factory';
 import {API_SERVICE_ACCOUNT_BASE} from '@/config/constant/api';
-import type {PageQuery, PageResult} from '@/config/types';
 import type {ServiceAccountForm, ServiceAccountRecord} from '@/config/types/auth';
 
-export const addServiceAccount = (serviceAccount: ServiceAccountForm) =>
-  httpPost<R<ServiceAccountRecord>>(`${API_SERVICE_ACCOUNT_BASE}/add`, serviceAccount);
+const crud = createCrudApi<ServiceAccountForm, ServiceAccountRecord>({base: API_SERVICE_ACCOUNT_BASE});
 
-export const deleteServiceAccount = (id: string) =>
-  httpPost(`${API_SERVICE_ACCOUNT_BASE}/delete`, undefined, {params: {id}});
+export const addServiceAccount = crud.add;
 
-export const updateServiceAccount = (serviceAccount: ServiceAccountForm) =>
-  httpPost<R<ServiceAccountRecord>>(`${API_SERVICE_ACCOUNT_BASE}/update`, serviceAccount);
+export const deleteServiceAccount = crud.delete;
+
+export const updateServiceAccount = crud.update;
 
 export const enableServiceAccount = (id: string) =>
   httpPost(`${API_SERVICE_ACCOUNT_BASE}/enable`, undefined, {params: {id}});
@@ -35,8 +34,6 @@ export const enableServiceAccount = (id: string) =>
 export const disableServiceAccount = (id: string) =>
   httpPost(`${API_SERVICE_ACCOUNT_BASE}/disable`, undefined, {params: {id}});
 
-export const getServiceAccountById = (id: string) =>
-  httpGet<R<ServiceAccountRecord>>(`${API_SERVICE_ACCOUNT_BASE}/get_by_id`, {params: {id}});
+export const getServiceAccountById = crud.getById;
 
-export const listServiceAccount = <T = R<PageResult<ServiceAccountRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_SERVICE_ACCOUNT_BASE}/list`, query);
+export const listServiceAccount = crud.list;

@@ -94,13 +94,10 @@ describe('auth store', () => {
       expect(tokenPayload.salt).toBe(TEST_CREDENTIALS.salt);
       expect(tokenPayload.password).toBe(TEST_CREDENTIALS.password);
 
-      // Storage now holds the credential triple.
+      // Storage now holds tenant/login + a login flag (token is httpOnly).
       expect(getStorage(AUTH_HEADERS.TENANT)).toBe(TEST_CREDENTIALS.tenant);
       expect(getStorage(AUTH_HEADERS.LOGIN)).toBe(TEST_CREDENTIALS.name);
-      expect(getStorage(AUTH_HEADERS.TOKEN)).toEqual({
-        salt: TEST_CREDENTIALS.salt,
-        token: TEST_CREDENTIALS.token,
-      });
+      expect(getStorage(AUTH_HEADERS.AUTHENTICATED, true)).toBe(true);
 
       // Reactive state is updated.
       expect(store.tenant).toBe(TEST_CREDENTIALS.tenant);
@@ -129,7 +126,7 @@ describe('auth store', () => {
       expect(tokenMocks.generateToken).not.toHaveBeenCalled();
       expect(routerPush).not.toHaveBeenCalled();
       // No partial credentials should be persisted on failure.
-      expect(getStorage(AUTH_HEADERS.TOKEN)).toBeUndefined();
+      expect(getStorage(AUTH_HEADERS.AUTHENTICATED, true)).toBeUndefined();
     });
   });
 
@@ -143,7 +140,7 @@ describe('auth store', () => {
       expect(tokenMocks.cancelToken).toHaveBeenCalledWith({tenant: creds.tenant, name: creds.name});
       expect(getStorage(AUTH_HEADERS.TENANT)).toBeUndefined();
       expect(getStorage(AUTH_HEADERS.LOGIN)).toBeUndefined();
-      expect(getStorage(AUTH_HEADERS.TOKEN)).toBeUndefined();
+      expect(getStorage(AUTH_HEADERS.AUTHENTICATED, true)).toBeUndefined();
     });
 
     it('skips cancelToken when no credentials are stored but still clears storage', async () => {

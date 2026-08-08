@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.biz.TokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.query.TokenQuery;
 import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.TimeUtil;
@@ -34,12 +35,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Objects;
 
 /**
@@ -105,11 +109,18 @@ public class TokenController implements BaseController {
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
     @PostMapping("/generate")
-    public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
+    public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO, ServerHttpResponse response) {
         return async(() -> {
             String token = tokenService.generateToken(entityVO.getName(), entityVO.getPassword(),
                     entityVO.getTenant());
-            return Objects.nonNull(token) ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
+            if (Objects.nonNull(token)) {
+                response.addCookie(ResponseCookie.from(RequestConstant.Header.TOKEN_COOKIE, token)
+                        .httpOnly(true).secure(true).sameSite("Strict").path("/")
+                        .maxAge(Duration.ofHours(12)).build());
+            }
+            // Token travels in the httpOnly cookie above; the body only signals success
+            // so the value never reaches frontend storage.
+            return Objects.nonNull(token) ? R.ok("ok", "The token will expire in 12 hours.") : R.fail();
         });
     }
 
@@ -159,9 +170,14 @@ public class TokenController implements BaseController {
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
     @PostMapping("/cancel")
-    public Mono<R<Boolean>> cancelToken(@Validated @RequestBody TokenQuery entityVO) {
+    public Mono<R<Boolean>> cancelToken(@Validated @RequestBody TokenQuery entityVO, ServerHttpResponse response) {
         return async(() -> {
             boolean ok = tokenService.tryCancelToken(entityVO.getName(), entityVO.getTenant());
+            if (ok) {
+                response.addCookie(ResponseCookie.from(RequestConstant.Header.TOKEN_COOKIE, "")
+                        .httpOnly(true).secure(true).sameSite("Strict").path("/")
+                        .maxAge(Duration.ZERO).build());
+            }
             return ok ? R.ok(true, "Token cancelled") : R.fail("Cancel token failed");
         });
     }

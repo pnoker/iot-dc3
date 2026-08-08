@@ -41,6 +41,7 @@ export function seedAuthStorage(overrides: Partial<typeof TEST_CREDENTIALS> = {}
   const creds = {...TEST_CREDENTIALS, ...overrides};
   setStorage(AUTH_HEADERS.TENANT, creds.tenant);
   setStorage(AUTH_HEADERS.LOGIN, creds.name);
-  setStorage(AUTH_HEADERS.TOKEN, {salt: creds.salt, token: creds.token});
+  // Token is httpOnly; seed only the frontend login flag.
+  setStorage(AUTH_HEADERS.AUTHENTICATED, true, true);
   return creds;
 }

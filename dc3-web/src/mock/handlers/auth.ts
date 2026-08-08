@@ -25,7 +25,7 @@ import {ok, responseOf} from '../response';
  */
 export function registerAuthHandlers(): void {
   on('post', 'api/v3/auth/token/salt', (ctx) => responseOf(ctx.config, ok('mock-salt')));
-  on('post', 'api/v3/auth/token/generate', (ctx) => responseOf(ctx.config, ok('mock-token')));
+  on('post', 'api/v3/auth/token/generate', (ctx) => responseOf(ctx.config, ok('ok')));
   on('post', 'api/v3/auth/token/check', (ctx) => responseOf(ctx.config, ok(true)));
   on('post', 'api/v3/auth/token/cancel', (ctx) => responseOf(ctx.config, ok(true)));
   on('post', 'api/v3/auth/token/change_password', (ctx) => responseOf(ctx.config, ok(true)));

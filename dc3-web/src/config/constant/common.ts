@@ -27,8 +27,10 @@ export const AUTH_HEADERS = {
   TENANT: 'X-Auth-Tenant',
   /** Header name for login information */
   LOGIN: 'X-Auth-Login',
-  /** Header name for authentication token */
+  /** @deprecated Token now travels in an httpOnly cookie; header kept for gateway rollout fallback. */
   TOKEN: 'X-Auth-Token',
+  /** sessionStorage key for the frontend-visible login flag (token itself is httpOnly). */
+  AUTHENTICATED: 'dc3-authenticated',
 } as const;
 
 /**

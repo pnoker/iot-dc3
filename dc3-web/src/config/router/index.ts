@@ -24,7 +24,7 @@ import commonRouters from './common';
 import operateRouters from './operate';
 import settingsRouters from './settings';
 import viewsRouters from './views';
-import {getStorage, removeStorage} from '@/utils/storageUtil';
+import {getStorage} from '@/utils/storageUtil';
 import {isNull} from '@/utils/validationUtil';
 import {AUTH_HEADERS} from '@/config/constant/common';
 import i18n from '@/config/i18n';
@@ -104,22 +104,14 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
     return true;
   }
 
-  // Check if user is authenticated locally
+  // Auth state: tenant/login in localStorage + an httpOnly-cookie login flag in
+  // sessionStorage. The token itself is httpOnly so the frontend can't read it;
+  // the flag is set on login and cleared on logout / 401.
   const tenant = getStorage(AUTH_HEADERS.TENANT) as string | undefined;
   const user = getStorage(AUTH_HEADERS.LOGIN) as string | undefined;
-  const tokenData = getStorage(AUTH_HEADERS.TOKEN) as { salt?: string; token?: string } | undefined;
+  const authed = getStorage(AUTH_HEADERS.AUTHENTICATED, true);
 
-  if (isNull(tenant) || isNull(user) || isNull(tokenData)) {
-    return {name: 'login'};
-  }
-
-  // Do not preflight every route with /token/check. A successful login has
-  // already obtained a signed token; protected API calls are still enforced by
-  // the gateway, and the Axios 401 interceptor clears stale credentials.
-  if (isNull(tokenData?.salt) || isNull(tokenData?.token)) {
-    removeStorage(AUTH_HEADERS.TENANT);
-    removeStorage(AUTH_HEADERS.LOGIN);
-    removeStorage(AUTH_HEADERS.TOKEN);
+  if (isNull(tenant) || isNull(user) || isNull(authed)) {
     return {name: 'login'};
   }
 

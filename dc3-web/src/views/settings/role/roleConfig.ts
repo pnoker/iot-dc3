@@ -107,6 +107,6 @@ export const createRoleConfig = (t: ComposerTranslation, handlers: RoleHandlers)
       onClick: handlers.onAssignResources,
     },
   ],
-  confirmDeleteText: t('settings.role.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityRole')}),
   emptyText: t('settings.role.empty'),
 });

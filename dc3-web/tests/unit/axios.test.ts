@@ -55,12 +55,12 @@ describe('axios request instance', () => {
   it('injects auth headers and parses large integer JSON responses as strings', async () => {
     setStorage(AUTH_HEADERS.TENANT, 'default');
     setStorage(AUTH_HEADERS.LOGIN, 'dc3');
-    setStorage(AUTH_HEADERS.TOKEN, {salt: 'salt', token: 'token'});
 
     const adapter: AxiosAdapter = vi.fn(async (config) => {
       expect(config.headers.get(AUTH_HEADERS.TENANT)).toBe('default');
       expect(config.headers.get(AUTH_HEADERS.LOGIN)).toBe('dc3');
-      expect(config.headers.get(AUTH_HEADERS.TOKEN)).toBe(JSON.stringify({salt: 'salt', token: 'token'}));
+      // Token is NOT injected — it travels in an httpOnly cookie.
+      expect(config.headers.get(AUTH_HEADERS.TOKEN)).toBeUndefined();
 
       return responseOf(config, 200, '{"ok":true,"code":0,"message":"success","data":{"id":9007199254740993}}');
     });
@@ -83,7 +83,7 @@ describe('axios request instance', () => {
   it('removes auth keys and routes to login on unauthorized responses', async () => {
     setStorage(AUTH_HEADERS.TENANT, 'default');
     setStorage(AUTH_HEADERS.LOGIN, 'dc3');
-    setStorage(AUTH_HEADERS.TOKEN, {salt: 'salt', token: 'token'});
+    setStorage(AUTH_HEADERS.AUTHENTICATED, true, true);
 
     const adapter: AxiosAdapter = async (config) => responseOf(config, 401, {ok: false, code: 401});
 
@@ -96,7 +96,7 @@ describe('axios request instance', () => {
     // Only auth keys are removed — not the entire localStorage
     expect(getStorage(AUTH_HEADERS.TENANT)).toBeUndefined();
     expect(getStorage(AUTH_HEADERS.LOGIN)).toBeUndefined();
-    expect(getStorage(AUTH_HEADERS.TOKEN)).toBeUndefined();
+    expect(getStorage(AUTH_HEADERS.AUTHENTICATED, true)).toBeUndefined();
     // Routes via router.push instead of raw hash manipulation
     expect(routerMocks.push).toHaveBeenCalledWith({name: 'login'});
   });

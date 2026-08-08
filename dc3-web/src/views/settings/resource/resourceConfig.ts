@@ -385,6 +385,6 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
   update: updateResource as EntityListConfig['update'],
   remove: deleteResource,
   detail: {routeName: 'settingsResourceDetail'},
-  confirmDeleteText: t('settings.resource.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityResource')}),
   emptyText: t('settings.resource.empty'),
 });

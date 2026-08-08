@@ -15,24 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpPost} from '@/api/common';
+import {createCrudApi} from '@/api/factory';
 import {API_AUTH_BASE} from '@/config/constant/api';
-import type {PageQuery, PageResult} from '@/config/types';
+import type {PageQuery} from '@/config/types';
 import type {ResourceForm, ResourceRecord} from '@/config/types/auth';
 
-export const addResource = (resource: ResourceForm) =>
-  httpPost<R<ResourceRecord>>(`${API_AUTH_BASE}/resource/add`, resource);
+const crud = createCrudApi<ResourceForm, ResourceRecord>({base: API_AUTH_BASE, entity: 'resource'});
 
-export const deleteResource = (id: string) => httpPost(`${API_AUTH_BASE}/resource/delete`, undefined, {params: {id}});
+export const addResource = crud.add;
 
-export const updateResource = (resource: ResourceForm) =>
-  httpPost<R<ResourceRecord>>(`${API_AUTH_BASE}/resource/update`, resource);
+export const deleteResource = crud.delete;
 
-export const getResourceById = (id: string) =>
-  httpGet<R<ResourceRecord>>(`${API_AUTH_BASE}/resource/get_by_id`, {params: {id}});
+export const updateResource = crud.update;
 
-export const listResource = <T = R<PageResult<ResourceRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_AUTH_BASE}/resource/list`, query);
+export const getResourceById = crud.getById;
+
+export const listResource = crud.list;
 
 export const listResourceTree = (query: PageQuery = {}) =>
   httpPost<R<ResourceRecord[]>>(`${API_AUTH_BASE}/resource/list_tree`, query);

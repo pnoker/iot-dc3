@@ -15,19 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {createCrudApi} from '@/api/factory';
 import {API_MANAGER_BASE} from '@/config/constant/api';
-import type {PageQuery, PageResult} from '@/config/types';
 import type {LabelForm, LabelRecord} from '@/config/types/manager';
 
-export const addLabel = (label: LabelForm) => httpPost(`${API_MANAGER_BASE}/label/add`, label);
+const crud = createCrudApi<LabelForm, LabelRecord>({base: API_MANAGER_BASE, entity: 'label'});
 
-export const deleteLabel = (id: string) => httpPost(`${API_MANAGER_BASE}/label/delete`, undefined, {params: {id}});
+export const addLabel = crud.add;
 
-export const updateLabel = (label: LabelForm) => httpPost(`${API_MANAGER_BASE}/label/update`, label);
+export const deleteLabel = crud.delete;
 
-export const getLabelById = (id: string) =>
-  httpGet<R<LabelRecord>>(`${API_MANAGER_BASE}/label/get_by_id`, {params: {id}});
+export const updateLabel = crud.update;
 
-export const listLabel = <T = R<PageResult<LabelRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_MANAGER_BASE}/label/list`, query);
+export const getLabelById = crud.getById;
+
+export const listLabel = crud.list;

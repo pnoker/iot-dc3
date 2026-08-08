@@ -38,10 +38,10 @@
               >{{ deviceLength }} {{ $t('common.count', {count: ''}) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')"
-              >{{ timestamp(reactiveData.data.createTime) }}
+              >{{ timestamp(reactiveData.data.createTime || '') }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')"
-              >{{ timestamp(reactiveData.data.createTime) }}
+              >{{ timestamp(reactiveData.data.createTime || '') }}
               </el-descriptions-item>
             </el-descriptions>
           </detail-card>

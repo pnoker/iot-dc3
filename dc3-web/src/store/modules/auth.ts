@@ -51,19 +51,20 @@ export const useAuthStore = defineStore('auth', () => {
   });
 
   // Actions
-  const setToken = (login: Login) => {
-    setStorage(AUTH_HEADERS.TENANT, login.tenant);
-    setStorage(AUTH_HEADERS.LOGIN, login.name);
-    setStorage(AUTH_HEADERS.TOKEN, {salt: login.salt, token: login.token});
+  const setToken = ({tenant: t, name: n}: Pick<Login, 'tenant' | 'name'>) => {
+    setStorage(AUTH_HEADERS.TENANT, t);
+    setStorage(AUTH_HEADERS.LOGIN, n);
+    // Token is in an httpOnly cookie; store only a frontend-visible login flag.
+    setStorage(AUTH_HEADERS.AUTHENTICATED, true, true);
 
-    tenant.value = login.tenant || 'default';
-    name.value = login.name || 'dc3';
+    tenant.value = t || 'default';
+    name.value = n || 'dc3';
   };
 
   const removeToken = () => {
     removeStorage(AUTH_HEADERS.TENANT);
     removeStorage(AUTH_HEADERS.LOGIN);
-    removeStorage(AUTH_HEADERS.TOKEN);
+    removeStorage(AUTH_HEADERS.AUTHENTICATED, true);
   };
 
   const login = async (form: LoginForm) => {
@@ -86,12 +87,10 @@ export const useAuthStore = defineStore('auth', () => {
       };
 
       const tokenRes = await generateToken(loginWithPassword);
-      setToken({
-        tenant: loginWithPassword.tenant,
-        name: loginWithPassword.name,
-        salt: loginWithPassword.salt,
-        token: tokenRes.data,
-      });
+      // Token is set as an httpOnly cookie by the backend; the response body
+      // only signals success, so we don't persist any token value here.
+      void tokenRes;
+      setToken({tenant: loginWithPassword.tenant, name: loginWithPassword.name});
       await router.push({name: 'home'});
     } catch (error) {
       const code = (error as { code?: string })?.code;

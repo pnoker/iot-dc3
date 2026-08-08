@@ -152,6 +152,8 @@ defineExpose({search, reset});
 </script>
 
 <style lang="scss" scoped>
+@use "@/styles/shared-form-widths.scss" as *;
+
 .tool-card {
   margin: 0 0 4px;
 
@@ -178,30 +180,9 @@ defineExpose({search, reset});
           flex-wrap: nowrap;
         }
 
-        // Force every common input surface to honour the cell width so
-        // rows line up. The extra .edit-form-* overrides are here because
-        // element-variables.scss pins those helper classes to fixed px
-        // widths (used for standalone forms); in the toolbar grid we need
-        // them to stretch.
-        .el-input,
-        .el-input.edit-form-small,
-        .el-input.edit-form-medium,
-        .el-input.edit-form-default,
-        .el-input.edit-form-special,
-        .el-input.edit-form-large,
-        .el-select,
-        .el-select.edit-form-small,
-        .el-select.edit-form-medium,
-        .el-select.edit-form-default,
-        .el-select.edit-form-special,
-        .el-select.edit-form-large,
-        .el-tree-select,
-        .el-date-editor,
-        .el-input-number,
-        .el-cascader,
-        .el-segmented {
-          width: 100%;
-        }
+        // Stretch every input surface to the cell width — shared with
+        // InfoCard via src/styles/shared-form-widths.scss.
+        @include form-item-full-width;
       }
     }
 
@@ -220,14 +201,7 @@ defineExpose({search, reset});
   }
 
   .tool-card__footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px 12px;
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px solid var(--el-border-color-lighter);
+    @include card-footer;
 
     .tool-card-footer-button {
       display: flex;

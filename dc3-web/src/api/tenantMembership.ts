@@ -15,15 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpPost} from '@/api/common';
+import {createCrudApi} from '@/api/factory';
 import {API_TENANT_MEMBERSHIP_BASE} from '@/config/constant/api';
-import type {PageQuery, PageResult} from '@/config/types';
 import type {TenantMembershipForm, TenantMembershipRecord} from '@/config/types/auth';
 
-export const addTenantMembership = (body: TenantMembershipForm) => httpPost(`${API_TENANT_MEMBERSHIP_BASE}/add`, body);
+const crud = createCrudApi<TenantMembershipForm, TenantMembershipRecord>({base: API_TENANT_MEMBERSHIP_BASE});
 
-export const deleteTenantMembership = (id: string) =>
-  httpPost(`${API_TENANT_MEMBERSHIP_BASE}/delete`, undefined, {params: {id}});
+export const addTenantMembership = crud.add;
 
-export const listTenantMembership = <T = R<PageResult<TenantMembershipRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_TENANT_MEMBERSHIP_BASE}/list`, query);
+export const deleteTenantMembership = crud.delete;
+
+export const listTenantMembership = crud.list;

@@ -15,20 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpPost} from '@/api/common';
+import {createCrudApi} from '@/api/factory';
 import {API_AUTH_BASE} from '@/config/constant/api';
-import type {PageQuery, PageResult} from '@/config/types';
+import type {PageQuery} from '@/config/types';
 import type {MenuForm, MenuRecord} from '@/config/types/auth';
 
-export const addMenu = (menu: MenuForm) => httpPost(`${API_AUTH_BASE}/menu/add`, menu);
+const crud = createCrudApi<MenuForm, MenuRecord>({base: API_AUTH_BASE, entity: 'menu'});
 
-export const deleteMenu = (id: string) => httpPost(`${API_AUTH_BASE}/menu/delete`, undefined, {params: {id}});
+export const addMenu = crud.add;
 
-export const updateMenu = (menu: MenuForm) => httpPost(`${API_AUTH_BASE}/menu/update`, menu);
+export const deleteMenu = crud.delete;
 
-export const getMenuById = (id: string) => httpGet(`${API_AUTH_BASE}/menu/get_by_id`, {params: {id}});
+export const updateMenu = crud.update;
 
-export const listMenu = <T = R<PageResult<MenuRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_AUTH_BASE}/menu/list`, query);
+export const getMenuById = crud.getById;
+
+export const listMenu = crud.list;
 
 export const listMenuTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/menu/list_tree`, query);

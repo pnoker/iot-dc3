@@ -189,6 +189,6 @@ export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
   update: updateMenu as EntityListConfig['update'],
   remove: deleteMenu,
   detail: {routeName: 'settingsMenuDetail'},
-  confirmDeleteText: t('settings.menu.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityMenu')}),
   emptyText: t('settings.menu.empty'),
 });

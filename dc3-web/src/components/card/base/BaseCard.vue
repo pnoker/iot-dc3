@@ -15,60 +15,16 @@
   - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
+<!-- Compatibility shim over CardShell. Kept so existing imports
+     (@/components/card/base/BaseCard.vue) keep working unchanged.
+     Pins the Base variant: shadow="never" + borderless. -->
+
 <template>
-  <div class="base-card">
-    <el-card class="base-card__body" shadow="never">
-      <div class="base-card__container">
-        <slot/>
-      </div>
-    </el-card>
-  </div>
+  <CardShell borderless shadow="never">
+    <slot/>
+  </CardShell>
 </template>
 
-<script lang="ts" setup></script>
-
-<style lang="scss" scoped>
-.base-card {
-  box-sizing: border-box;
-  min-width: 0;
-
-  ul {
-    list-style: none;
-
-    li {
-      font-size: 13px;
-      margin-top: 8px;
-    }
-  }
-
-  :deep(.el-card) {
-    width: 100%;
-    box-sizing: border-box;
-    min-width: 0;
-  }
-
-  :deep(.el-card.base-card__body) {
-    border: 0;
-  }
-
-  :deep(.el-tabs__nav) {
-    margin: 0 5px;
-  }
-
-  .base-card__container {
-    min-width: 0;
-
-    :deep(.el-tabs__header) {
-      margin-bottom: 0;
-
-      .el-tabs__nav-wrap:after {
-        height: 1px;
-      }
-    }
-
-    :deep(.el-tab-pane) {
-      background: #f6f7f9;
-    }
-  }
-}
-</style>
+<script lang="ts" setup>
+import CardShell from '@/components/card/base/CardShell.vue';
+</script>

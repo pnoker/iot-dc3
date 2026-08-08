@@ -65,6 +65,13 @@ public class RequestConstant {
         public static final String X_AUTH_TOKEN = "X-Auth-Token";
 
         /**
+         * Name of the httpOnly cookie that carries the auth token server-side.
+         * The frontend never reads it (httpOnly); the browser attaches it
+         * automatically on every same-site request via withCredentials.
+         */
+        public static final String TOKEN_COOKIE = "dc3-token";
+
+        /**
          * Custom principal request header. Used to pass authenticated caller information
          * to backend services.
          */

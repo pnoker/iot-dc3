@@ -71,7 +71,7 @@
             <el-popconfirm
               :cancel-button-text="t('common.cancel')"
               :confirm-button-text="t('common.confirm')"
-              :title="t('settings.serviceAccount.confirmDelete')"
+              :title="t('common.confirmDelete', {name: t('common.entityServiceAccount')})"
               @confirm="remove(row.id)"
             >
               <template #reference>

@@ -15,42 +15,16 @@
   - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
+<!-- Compatibility shim over CardShell. Kept so existing imports
+     (@/components/card/detail/DetailCard.vue) keep working unchanged.
+     Pins the Detail variant: shadow="hover" (default), default border. -->
+
 <template>
-  <div class="detail-card">
-    <el-card class="detail-card__body" shadow="hover">
-      <div class="detail-card__container">
-        <slot/>
-      </div>
-    </el-card>
-  </div>
+  <CardShell>
+    <slot/>
+  </CardShell>
 </template>
 
-<script lang="ts" setup></script>
-
-<style lang="scss" scoped>
-.detail-card {
-  box-sizing: border-box;
-
-  ul {
-    list-style: none;
-
-    li {
-      font-size: 13px;
-      margin-top: 8px;
-    }
-  }
-
-  :deep(.el-card) {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  :deep(.el-card__body) {
-    padding: 16px;
-  }
-
-  :deep(.el-tabs__nav) {
-    margin: 0 5px;
-  }
-}
-</style>
+<script lang="ts" setup>
+import CardShell from '@/components/card/base/CardShell.vue';
+</script>

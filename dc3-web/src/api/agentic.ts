@@ -207,10 +207,7 @@ const buildFetchHeaders = (): HeadersInit => {
     headers[AUTH_HEADERS.LOGIN] = String(login);
   }
 
-  const token = getStorage(AUTH_HEADERS.TOKEN);
-  if (!isNull(token)) {
-    headers[AUTH_HEADERS.TOKEN] = JSON.stringify(token);
-  }
+  // Token travels in an httpOnly cookie via fetch credentials — not injected here.
 
   return headers;
 };

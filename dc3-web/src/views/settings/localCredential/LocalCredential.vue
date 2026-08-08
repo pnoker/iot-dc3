@@ -66,7 +66,7 @@
             <el-popconfirm
               :cancel-button-text="t('common.cancel')"
               :confirm-button-text="t('common.confirm')"
-              :title="t('settings.localCredential.confirmDelete')"
+              :title="t('common.confirmDelete', {name: t('common.entityCredential')})"
               @confirm="remove(row.id)"
             >
               <template #reference>

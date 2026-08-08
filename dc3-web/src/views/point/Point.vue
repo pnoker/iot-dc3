@@ -110,7 +110,7 @@ import {computed, ref, watch} from 'vue';
 import {addPoint, deletePoint, listPoint, updatePoint} from '@/api/point';
 import {listProfileByIds} from '@/api/profile';
 import {usePagedList} from '@/composables/usePagedList';
-import {failMessage, successMessage} from '@/utils/notificationUtil';
+import {successMessage} from '@/utils/notificationUtil';
 import {isNull} from '@/utils/validationUtil';
 import {pointTypeKey, rwFlagKey} from '@/utils/pointFormatUtil';
 
@@ -204,9 +204,7 @@ const onAdd = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -218,9 +216,7 @@ const onUpdate = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -232,9 +228,7 @@ const onDisable = (id: string, profileId: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -246,9 +240,7 @@ const onEnable = (id: string, profileId: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -260,9 +252,7 @@ const onDelete = (id: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });

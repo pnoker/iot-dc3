@@ -86,6 +86,6 @@ export const createTenantMembershipConfig = (t: ComposerTranslation): EntityList
   list: listTenantMembership,
   add: addTenantMembership,
   remove: deleteTenantMembership,
-  confirmDeleteText: t('settings.tenantMembership.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityMember')}),
   emptyText: t('settings.tenantMembership.empty'),
 });

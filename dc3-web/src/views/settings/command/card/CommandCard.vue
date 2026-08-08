@@ -81,9 +81,9 @@
         </div>
         <things-card-actions
           v-if="!embedded"
-          :delete-title="$t('command.card.confirmDelete')"
-          :disable-title="$t('command.card.confirmDisable')"
-          :enable-title="$t('command.card.confirmEnable')"
+          :delete-title="$t('common.confirmDelete', {name: $t('common.entityCommand')})"
+          :disable-title="$t('common.confirmDisable', {name: $t('common.entityCommand')})"
+          :enable-title="$t('common.confirmEnable', {name: $t('common.entityCommand')})"
           :enabled="enabled"
           @delete="emitDelete"
           @detail="$emit('detail-thing', data)"

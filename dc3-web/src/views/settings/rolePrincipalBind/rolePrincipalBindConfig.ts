@@ -81,6 +81,6 @@ export const createRolePrincipalBindConfig = (t: ComposerTranslation): EntityLis
   list: listRolePrincipalBind,
   add: addRolePrincipalBind,
   remove: deleteRolePrincipalBind,
-  confirmDeleteText: t('settings.rolePrincipalBind.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityBinding')}),
   emptyText: t('settings.rolePrincipalBind.empty'),
 });

@@ -135,20 +135,24 @@ public class FilterServiceImpl implements FilterService {
 
     @Override
     public void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeLocalCredentialBO credential) {
-        String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
-        RequestHeader.TokenHeader header;
-        try {
-            header = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
-        } catch (Exception e) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST, e);
+        // Token is carried in an httpOnly cookie the frontend cannot read; fall back to
+        // the X-Auth-Token header for backward compatibility during the rollout.
+        String token = RequestUtil.getRequestCookie(request, RequestConstant.Header.TOKEN_COOKIE);
+        if (StringUtils.isEmpty(token)) {
+            String headerToken = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
+            try {
+                RequestHeader.TokenHeader header = JsonUtil.parseObject(headerToken, RequestHeader.TokenHeader.class);
+                token = Objects.nonNull(header) ? header.getToken() : null;
+            } catch (Exception e) {
+                throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST, e);
+            }
         }
-        if (Objects.isNull(header) || StringUtils.isEmpty(header.getToken())) {
+        if (StringUtils.isEmpty(token)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
         // Token validity is intentionally NOT cached — it's the freshness check.
-        boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), credential.getLoginName(),
-                header.getToken());
+        boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), credential.getLoginName(), token);
         if (!valid) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }

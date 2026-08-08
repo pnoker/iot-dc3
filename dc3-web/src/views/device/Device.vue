@@ -75,7 +75,7 @@ import {
 } from '@/api/device';
 import {listDriverByIds} from '@/api/driver';
 import {usePagedList} from '@/composables/usePagedList';
-import {failMessage, successMessage} from '@/utils/notificationUtil';
+import {successMessage} from '@/utils/notificationUtil';
 import {isNull} from '@/utils/validationUtil';
 
 import type {DeviceRecord} from '@/config/types/manager';
@@ -154,9 +154,7 @@ const onAdd = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -182,9 +180,7 @@ const importTemplate = (form: unknown, done: () => void) => {
       document.body.appendChild(link);
       link.click();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -196,9 +192,7 @@ const onImport = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -210,9 +204,7 @@ const onDisable = (id: string, driverId: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -224,9 +216,7 @@ const onEnable = (id: string, driverId: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -238,9 +228,7 @@ const onDelete = (id: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-      failMessage();
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });

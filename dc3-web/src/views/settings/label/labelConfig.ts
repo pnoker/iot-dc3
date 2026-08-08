@@ -83,6 +83,6 @@ export const createLabelConfig = (t: ComposerTranslation): EntityListConfig => (
   update: updateLabel,
   remove: deleteLabel,
   detail: {routeName: 'settingsLabelDetail'},
-  confirmDeleteText: t('settings.label.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityLabel')}),
   emptyText: t('settings.label.empty'),
 });

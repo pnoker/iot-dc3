@@ -84,7 +84,7 @@
               v-if="activeConfig.editable"
               :cancel-button-text="t('common.cancel')"
               :confirm-button-text="t('common.confirm')"
-              :title="t('settings.alarm.confirmDelete')"
+              :title="t('common.confirmDelete', {name: t('common.entityConfig')})"
               @confirm="remove(row.id)"
             >
               <template #reference>
