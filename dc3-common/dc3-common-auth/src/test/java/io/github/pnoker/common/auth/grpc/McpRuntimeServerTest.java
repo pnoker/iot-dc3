@@ -19,8 +19,8 @@ package io.github.pnoker.common.auth.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcMcpAuditCommand;
 import io.github.pnoker.api.center.auth.GrpcMcpAuditStatus;
-import io.github.pnoker.api.center.auth.GrpcMcpRiskLevel;
 import io.github.pnoker.api.center.auth.GrpcMcpIntrospectRequest;
+import io.github.pnoker.api.center.auth.GrpcMcpRiskLevel;
 import io.github.pnoker.api.center.auth.GrpcMcpToolListRequest;
 import io.github.pnoker.api.center.auth.GrpcMcpToolResolveRequest;
 import io.github.pnoker.api.center.auth.GrpcRMcpBoolean;

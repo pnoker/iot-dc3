@@ -19,7 +19,6 @@ package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.entity.auth.Keys;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -84,8 +83,8 @@ class KeyUtilTest {
 
     @Test
     void jwtRoundTripsForValidIssuerAndSubject() {
-        String token = KeyUtil.generateToken("alice",100L);
-        Claims claims = KeyUtil.parserToken("alice",token, 100L);
+        String token = KeyUtil.generateToken("alice", 100L);
+        Claims claims = KeyUtil.parserToken("alice", token, 100L);
         assertThat(claims.getSubject()).contains("alice");
         assertThat(claims.getIssuer()).contains("100");
         assertThat(claims.getExpiration()).isAfter(claims.getIssuedAt());
@@ -93,15 +92,15 @@ class KeyUtilTest {
 
     @Test
     void jwtParsingRejectsTokenForDifferentSubject() {
-        String token = KeyUtil.generateToken("alice",100L);
-        assertThatThrownBy(() -> KeyUtil.parserToken("bob",token, 100L))
+        String token = KeyUtil.generateToken("alice", 100L);
+        assertThatThrownBy(() -> KeyUtil.parserToken("bob", token, 100L))
                 .isInstanceOf(io.jsonwebtoken.IncorrectClaimException.class);
     }
 
     @Test
     void jwtParsingRejectsTokenForDifferentTenant() {
-        String token = KeyUtil.generateToken("alice",100L);
-        assertThatThrownBy(() -> KeyUtil.parserToken("alice",token, 200L))
+        String token = KeyUtil.generateToken("alice", 100L);
+        assertThatThrownBy(() -> KeyUtil.parserToken("alice", token, 200L))
                 .isInstanceOf(io.jsonwebtoken.IncorrectClaimException.class);
     }
 

@@ -125,10 +125,10 @@ class TokenServiceImplTest {
         principal.setId(PRINCIPAL_ID);
         when(principalManager.getById(PRINCIPAL_ID)).thenReturn(principal);
 
-        String token = tokenService.generateToken(LOGIN,RAW_PASSWORD, TENANT_CODE);
+        String token = tokenService.generateToken(LOGIN, RAW_PASSWORD, TENANT_CODE);
 
         assertThat(token).isNotBlank();
-        assertThat(KeyUtil.parserToken(String.valueOf(PRINCIPAL_ID),token, TENANT_ID)).isNotNull();
+        assertThat(KeyUtil.parserToken(String.valueOf(PRINCIPAL_ID), token, TENANT_ID)).isNotNull();
         verify(localCredentialService).recordSuccessfulLogin(CREDENTIAL_ID);
         verify(localCredentialService, never()).recordFailedLogin(anyLong());
         verify(principalManager).updateById(any(PrincipalDO.class));
@@ -137,7 +137,7 @@ class TokenServiceImplTest {
     @Test
     void generateTokenRejectsUnknownTenant() {
         when(tenantService.getByCode(TENANT_CODE)).thenReturn(null);
-        assertThatThrownBy(() -> tokenService.generateToken(LOGIN,RAW_PASSWORD, TENANT_CODE))
+        assertThatThrownBy(() -> tokenService.generateToken(LOGIN, RAW_PASSWORD, TENANT_CODE))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
@@ -145,7 +145,7 @@ class TokenServiceImplTest {
     void generateTokenRejectsUnknownLogin() {
         when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
         when(localCredentialService.getByLoginName(LOGIN, false)).thenReturn(null);
-        assertThatThrownBy(() -> tokenService.generateToken(LOGIN,RAW_PASSWORD, TENANT_CODE))
+        assertThatThrownBy(() -> tokenService.generateToken(LOGIN, RAW_PASSWORD, TENANT_CODE))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
@@ -154,7 +154,7 @@ class TokenServiceImplTest {
         when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
         when(localCredentialService.getByLoginName(LOGIN, false)).thenReturn(credential);
         when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(false);
-        assertThatThrownBy(() -> tokenService.generateToken(LOGIN,RAW_PASSWORD, TENANT_CODE))
+        assertThatThrownBy(() -> tokenService.generateToken(LOGIN, RAW_PASSWORD, TENANT_CODE))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
@@ -165,7 +165,7 @@ class TokenServiceImplTest {
         when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(true);
         when(localCredentialService.verifyPassword(credential, "wrong")).thenReturn(false);
 
-        assertThatThrownBy(() -> tokenService.generateToken(LOGIN,"wrong", TENANT_CODE))
+        assertThatThrownBy(() -> tokenService.generateToken(LOGIN, "wrong", TENANT_CODE))
                 .isInstanceOf(UnAuthorizedException.class);
         verify(localCredentialService).recordFailedLogin(CREDENTIAL_ID);
     }
@@ -178,7 +178,7 @@ class TokenServiceImplTest {
         when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(true);
         when(localCredentialService.verifyPassword(credential, RAW_PASSWORD)).thenReturn(true);
 
-        assertThatThrownBy(() -> tokenService.generateToken(LOGIN,RAW_PASSWORD, TENANT_CODE))
+        assertThatThrownBy(() -> tokenService.generateToken(LOGIN, RAW_PASSWORD, TENANT_CODE))
                 .isInstanceOf(PasswordChangeRequiredException.class)
                 .extracting(e -> ((PasswordChangeRequiredException) e).getErrorCode())
                 .isEqualTo(ErrorCode.PASSWORD_EXPIRED);
@@ -194,7 +194,7 @@ class TokenServiceImplTest {
         when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(true);
         when(localCredentialService.verifyPassword(credential, RAW_PASSWORD)).thenReturn(true);
 
-        assertThatThrownBy(() -> tokenService.generateToken(LOGIN,RAW_PASSWORD, TENANT_CODE))
+        assertThatThrownBy(() -> tokenService.generateToken(LOGIN, RAW_PASSWORD, TENANT_CODE))
                 .isInstanceOf(PasswordChangeRequiredException.class)
                 .extracting(e -> ((PasswordChangeRequiredException) e).getErrorCode())
                 .isEqualTo(ErrorCode.PASSWORD_CHANGE_REQUIRED);
@@ -226,14 +226,14 @@ class TokenServiceImplTest {
     @Test
     void checkValidRejectsUnknownTenant() {
         when(tenantService.getByCode(TENANT_CODE)).thenReturn(null);
-        assertThatThrownBy(() -> tokenService.checkValid(LOGIN,"token", TENANT_CODE))
+        assertThatThrownBy(() -> tokenService.checkValid(LOGIN, "token", TENANT_CODE))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 
     @Test
     void checkValidReturnsInvalidForBlankToken() {
         when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
-        TokenValid result = tokenService.checkValid(LOGIN,"", TENANT_CODE);
+        TokenValid result = tokenService.checkValid(LOGIN, "", TENANT_CODE);
         assertThat(result.isValid()).isFalse();
         assertThat(result.getExpireTime()).isNull();
     }
@@ -242,7 +242,7 @@ class TokenServiceImplTest {
     void checkValidReturnsInvalidWhenLoginUnknown() {
         when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
         when(localCredentialService.getByLoginName(LOGIN, false)).thenReturn(null);
-        TokenValid result = tokenService.checkValid(LOGIN,"any-token", TENANT_CODE);
+        TokenValid result = tokenService.checkValid(LOGIN, "any-token", TENANT_CODE);
         assertThat(result.isValid()).isFalse();
     }
 
@@ -251,7 +251,7 @@ class TokenServiceImplTest {
         when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
         when(localCredentialService.getByLoginName(LOGIN, false)).thenReturn(credential);
         when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(false);
-        TokenValid result = tokenService.checkValid(LOGIN,"any-token", TENANT_CODE);
+        TokenValid result = tokenService.checkValid(LOGIN, "any-token", TENANT_CODE);
         assertThat(result.isValid()).isFalse();
     }
 
@@ -262,9 +262,9 @@ class TokenServiceImplTest {
         when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(true);
         when(tokenDenylistCache.isRevoked(eq(String.valueOf(PRINCIPAL_ID)), eq(TENANT_CODE), anyLong()))
                 .thenReturn(false);
-        String token = KeyUtil.generateToken(String.valueOf(PRINCIPAL_ID),TENANT_ID);
+        String token = KeyUtil.generateToken(String.valueOf(PRINCIPAL_ID), TENANT_ID);
 
-        TokenValid result = tokenService.checkValid(LOGIN,token, TENANT_CODE);
+        TokenValid result = tokenService.checkValid(LOGIN, token, TENANT_CODE);
 
         assertThat(result.isValid()).isTrue();
         assertThat(result.getExpireTime()).isNotNull();
@@ -277,9 +277,9 @@ class TokenServiceImplTest {
         when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(true);
         when(tokenDenylistCache.isRevoked(eq(String.valueOf(PRINCIPAL_ID)), eq(TENANT_CODE), anyLong()))
                 .thenReturn(true);
-        String token = KeyUtil.generateToken(String.valueOf(PRINCIPAL_ID),TENANT_ID);
+        String token = KeyUtil.generateToken(String.valueOf(PRINCIPAL_ID), TENANT_ID);
 
-        TokenValid result = tokenService.checkValid(LOGIN,token, TENANT_CODE);
+        TokenValid result = tokenService.checkValid(LOGIN, token, TENANT_CODE);
 
         assertThat(result.isValid()).isFalse();
         assertThat(result.getExpireTime()).isNotNull();
@@ -290,7 +290,7 @@ class TokenServiceImplTest {
         when(tenantService.getByCode(TENANT_CODE)).thenReturn(tenant);
         when(localCredentialService.getByLoginName(LOGIN, false)).thenReturn(credential);
         when(tenantMembershipService.isTenantMember(TENANT_ID, PRINCIPAL_ID)).thenReturn(true);
-        TokenValid result = tokenService.checkValid(LOGIN,"garbage-token", TENANT_CODE);
+        TokenValid result = tokenService.checkValid(LOGIN, "garbage-token", TENANT_CODE);
         assertThat(result.isValid()).isFalse();
     }
 
