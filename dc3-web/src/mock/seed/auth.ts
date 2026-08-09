@@ -47,7 +47,7 @@ interface PrincipalDef {
 }
 
 const principalDefs: PrincipalDef[] = [
-  {name: 'dc3', type: 'USER', displayName: '系统管理员', source: 'LOCAL', lastLogin: LAST_LOGIN},
+  {name: 'dc3', type: 'USER', displayName: 'DC3', source: 'LOCAL', lastLogin: LAST_LOGIN},
   {name: 'ops', type: 'USER', displayName: '运维工程师', source: 'LOCAL', lastLogin: LAST_LOGIN},
   {name: 'guest', type: 'USER', displayName: '访客用户', source: 'LOCAL'},
   {
@@ -86,7 +86,7 @@ interface UserDef {
 }
 
 const userDefs: UserDef[] = [
-  {principalId: '201', userName: 'dc3', nickName: '系统管理员', phone: '13800138000', email: 'admin@dc3.site'},
+  {principalId: '201', userName: 'dc3', nickName: 'DC3', phone: '18300000000', email: 'dc3@dc3.com'},
   {principalId: '202', userName: 'ops', nickName: '运维工程师', phone: '13800138001', email: 'ops@dc3.site'},
   {
     principalId: '203',
