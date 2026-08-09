@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
 import io.github.pnoker.common.auth.entity.query.TenantMembershipQuery;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 
 import java.util.List;
 import java.util.Objects;
@@ -47,7 +48,10 @@ public interface TenantMembershipService {
     TenantMembershipBO getById(Long id);
 
     default boolean isTenantMember(Long tenantId, Long principalId) {
-        return Objects.nonNull(getByTenantIdAndPrincipalId(tenantId, principalId));
+        // Membership is scoped by the explicit tenantId argument, so the tenant-line
+        // interceptor's thread-local injection is redundant — and fatal before login,
+        // when no tenant is bound on the thread (token/generate, check, logout, OAuth).
+        return Objects.nonNull(TenantContextHolder.runIgnore(() -> getByTenantIdAndPrincipalId(tenantId, principalId)));
     }
 
     default void requireTenantMember(Long tenantId, Long principalId) {
