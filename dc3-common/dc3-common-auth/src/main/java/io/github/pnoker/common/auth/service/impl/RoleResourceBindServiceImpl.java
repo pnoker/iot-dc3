@@ -44,6 +44,7 @@ import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.RequiredArgsConstructor;
@@ -143,6 +144,11 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         if (Objects.isNull(principalId) || Objects.isNull(tenantId)) {
             return Collections.emptyList();
         }
+        // Permission lookups are scoped by the explicit tenantId argument (Step 1/2 filter by
+        // tenant_id), so bypass the thread-local tenant-line interceptor. This is reached from
+        // pre-login, gRPC-server, and boundedElastic threads that carry no tenant, where the
+        // interceptor's fail-closed guard would otherwise reject the query.
+        return TenantContextHolder.runIgnore(() -> {
         // Step 1: roles the principal is bound to in the current tenant.
         LambdaQueryWrapper<RolePrincipalBindDO> principalWrapper = Wrappers.<RolePrincipalBindDO>query().lambda();
         principalWrapper.eq(RolePrincipalBindDO::getTenantId, tenantId);
@@ -180,6 +186,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
                 .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
                 .toList();
         return resourceBuilder.buildBOListByDOList(resourceDOList);
+        });
     }
 
     @Override
