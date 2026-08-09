@@ -149,43 +149,43 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         // pre-login, gRPC-server, and boundedElastic threads that carry no tenant, where the
         // interceptor's fail-closed guard would otherwise reject the query.
         return TenantContextHolder.runIgnore(() -> {
-        // Step 1: roles the principal is bound to in the current tenant.
-        LambdaQueryWrapper<RolePrincipalBindDO> principalWrapper = Wrappers.<RolePrincipalBindDO>query().lambda();
-        principalWrapper.eq(RolePrincipalBindDO::getTenantId, tenantId);
-        principalWrapper.eq(RolePrincipalBindDO::getPrincipalId, principalId);
-        principalWrapper.select(RolePrincipalBindDO::getRoleId);
-        List<Long> roleIds = rolePrincipalBindManager.listObjs(principalWrapper, o -> (Long) o);
-        if (CollectionUtils.isEmpty(roleIds)) {
-            return Collections.emptyList();
-        }
-        // Step 2: keep only enabled roles within the same tenant.
-        LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
-        roleWrapper.in(RoleDO::getId, roleIds);
-        roleWrapper.eq(RoleDO::getEnableFlag, EnableFlagEnum.ENABLE.getIndex());
-        roleWrapper.eq(RoleDO::getTenantId, tenantId);
-        roleWrapper.select(RoleDO::getId);
-        roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
-        if (CollectionUtils.isEmpty(roleIds)) {
-            return Collections.emptyList();
-        }
-        // Step 3: role -> resource bindings.
-        LambdaQueryWrapper<RoleResourceBindDO> bindWrapper = Wrappers.<RoleResourceBindDO>query().lambda();
-        bindWrapper.in(RoleResourceBindDO::getRoleId, roleIds);
-        bindWrapper.select(RoleResourceBindDO::getResourceId);
-        List<Long> resourceIds = roleResourceBindManager.listObjs(bindWrapper, o -> (Long) o)
-                .stream()
-                .distinct()
-                .toList();
-        if (CollectionUtils.isEmpty(resourceIds)) {
-            return Collections.emptyList();
-        }
-        // Step 4: fetch resources and drop disabled ones (same rule as
-        // listResourceByRoleId).
-        List<ResourceDO> resourceDOList = resourceManager.listByIds(resourceIds)
-                .stream()
-                .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
-                .toList();
-        return resourceBuilder.buildBOListByDOList(resourceDOList);
+            // Step 1: roles the principal is bound to in the current tenant.
+            LambdaQueryWrapper<RolePrincipalBindDO> principalWrapper = Wrappers.<RolePrincipalBindDO>query().lambda();
+            principalWrapper.eq(RolePrincipalBindDO::getTenantId, tenantId);
+            principalWrapper.eq(RolePrincipalBindDO::getPrincipalId, principalId);
+            principalWrapper.select(RolePrincipalBindDO::getRoleId);
+            List<Long> roleIds = rolePrincipalBindManager.listObjs(principalWrapper, o -> (Long) o);
+            if (CollectionUtils.isEmpty(roleIds)) {
+                return Collections.emptyList();
+            }
+            // Step 2: keep only enabled roles within the same tenant.
+            LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
+            roleWrapper.in(RoleDO::getId, roleIds);
+            roleWrapper.eq(RoleDO::getEnableFlag, EnableFlagEnum.ENABLE.getIndex());
+            roleWrapper.eq(RoleDO::getTenantId, tenantId);
+            roleWrapper.select(RoleDO::getId);
+            roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
+            if (CollectionUtils.isEmpty(roleIds)) {
+                return Collections.emptyList();
+            }
+            // Step 3: role -> resource bindings.
+            LambdaQueryWrapper<RoleResourceBindDO> bindWrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+            bindWrapper.in(RoleResourceBindDO::getRoleId, roleIds);
+            bindWrapper.select(RoleResourceBindDO::getResourceId);
+            List<Long> resourceIds = roleResourceBindManager.listObjs(bindWrapper, o -> (Long) o)
+                    .stream()
+                    .distinct()
+                    .toList();
+            if (CollectionUtils.isEmpty(resourceIds)) {
+                return Collections.emptyList();
+            }
+            // Step 4: fetch resources and drop disabled ones (same rule as
+            // listResourceByRoleId).
+            List<ResourceDO> resourceDOList = resourceManager.listByIds(resourceIds)
+                    .stream()
+                    .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
+                    .toList();
+            return resourceBuilder.buildBOListByDOList(resourceDOList);
         });
     }
 
