@@ -18,8 +18,8 @@
 import {on} from './dispatch';
 import {matches, paginate} from './query';
 import {ok, responseOf} from './response';
-import {db} from './db';
 import type {MockDb} from './db';
+import {db} from './db';
 import type {MockCtx} from './types';
 
 /** Format the current time as `YYYY-MM-DD HH:mm:ss` so demo rows read naturally. */
@@ -48,12 +48,12 @@ export interface CrudSpec {
 
 const compileFilter =
   (search: string[], exact: string[]) =>
-  (row: Record<string, unknown>, body: any): boolean =>
-    search.every((f) => matches(row[f], body?.[f])) &&
-    exact.every((f) => {
-      const v = body?.[f];
-      return v === undefined || v === null || v === '' || v === 'ALL' || String(row[f]) === String(v);
-    });
+    (row: Record<string, unknown>, body: any): boolean =>
+      search.every((f) => matches(row[f], body?.[f])) &&
+      exact.every((f) => {
+        const v = body?.[f];
+        return v === undefined || v === null || v === '' || v === 'ALL' || String(row[f]) === String(v);
+      });
 
 /**
  * Register the standard CRUD endpoints for an entity against the mutable in-memory

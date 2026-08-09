@@ -43,7 +43,13 @@ const driverDefs: DriverDef[] = [
   {name: 'Modbus-RTU Driver', code: 'modbus-rtu', service: 'dc3-driver-modbus-rtu', host: '127.0.0.1:8209'},
   {name: 'DLT645 Driver', code: 'dlt645', service: 'dc3-driver-dlt645', host: '127.0.0.1:8210'},
   {name: 'IEC61850 Driver', code: 'iec61850', service: 'dc3-driver-iec61850', host: '127.0.0.1:8211'},
-  {name: 'BACnet/IP Driver', code: 'bacnet-ip', service: 'dc3-driver-bacnet-ip', host: '127.0.0.1:8212', enabled: false},
+  {
+    name: 'BACnet/IP Driver',
+    code: 'bacnet-ip',
+    service: 'dc3-driver-bacnet-ip',
+    host: '127.0.0.1:8212',
+    enabled: false
+  },
   {name: 'MQTT-SN Driver', code: 'mqtt-sn', service: 'dc3-driver-mqtt-sn', host: '127.0.0.1:8213'},
   {name: 'LoRaWAN Driver', code: 'lorawan', service: 'dc3-driver-lorawan', host: '127.0.0.1:8214'},
   {name: 'Zigbee Driver', code: 'zigbee', service: 'dc3-driver-zigbee', host: '127.0.0.1:8215'},

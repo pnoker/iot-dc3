@@ -31,7 +31,7 @@
         <div class="agentic-header__top">
           <div class="agentic-title">
             <div class="agentic-mark">
-              <img alt="" :src="assetUrl('images/common/llm.svg')"/>
+              <img :src="assetUrl('images/common/llm.svg')" alt=""/>
             </div>
             <div>
               <strong>{{ t('agentic.title') }}</strong>
@@ -208,8 +208,8 @@
         <div v-if="currentMessages.length === 0" class="agentic-empty">
           <Welcome
             :description="t('agentic.welcomeDescription')"
-            :title="t('agentic.title')"
             :icon="assetUrl('images/logo/logo.svg')"
+            :title="t('agentic.title')"
             variant="borderless"
           />
           <Prompts :items="promptItems" :wrap="true" @item-click="handlePromptClick"/>

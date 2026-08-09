@@ -42,7 +42,7 @@ export const paginate = <T extends Record<string, any>>(
   rows: T[],
   body: any,
   filter?: (row: T, body: any) => boolean,
-): {total: number; records: T[]} => {
+): { total: number; records: T[] } => {
   const {current, size} = readPage(body);
   const filtered = filter ? rows.filter((row) => filter(row, body)) : rows;
   const start = (current - 1) * size;

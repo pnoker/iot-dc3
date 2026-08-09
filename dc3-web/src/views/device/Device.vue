@@ -154,7 +154,8 @@ const onAdd = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -180,7 +181,8 @@ const importTemplate = (form: unknown, done: () => void) => {
       document.body.appendChild(link);
       link.click();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -192,7 +194,8 @@ const onImport = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -204,7 +207,8 @@ const onDisable = (id: string, driverId: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -216,7 +220,8 @@ const onEnable = (id: string, driverId: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -228,7 +233,8 @@ const onDelete = (id: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });

@@ -45,7 +45,7 @@ export function setFallback(handler: Handler): void {
 }
 
 /** Resolve the handler for a request context, or the fallback. */
-export function resolve(ctx: {method: string; url: string}): Handler {
+export function resolve(ctx: { method: string; url: string }): Handler {
   const byMethod = exact.get(entryKey(ctx.method, ctx.url));
   if (byMethod) return byMethod;
 

@@ -51,28 +51,52 @@ const channelDefs: ChannelDef[] = [
     code: 'feishu-alarm-bot',
     type: 'FEISHU_BOT',
     credential: 'feishu-bot-alarm',
-    content: {signEnabled: true, cardVersion: 'interactive-card-v1', atAllAllowed: true, testMessageEnabled: true, options: {locale: 'zh-CN'}},
+    content: {
+      signEnabled: true,
+      cardVersion: 'interactive-card-v1',
+      atAllAllowed: true,
+      testMessageEnabled: true,
+      options: {locale: 'zh-CN'}
+    },
   },
   {
     name: '钉钉运维群机器人',
     code: 'dingtalk-ops',
     type: 'DINGTALK_BOT',
     credential: 'dingtalk-ops-bot',
-    content: {signEnabled: true, cardVersion: 'markdown-v1', atAllAllowed: true, testMessageEnabled: true, options: {locale: 'zh-CN'}},
+    content: {
+      signEnabled: true,
+      cardVersion: 'markdown-v1',
+      atAllAllowed: true,
+      testMessageEnabled: true,
+      options: {locale: 'zh-CN'}
+    },
   },
   {
     name: '告警邮件通道',
     code: 'alarm-email',
     type: 'EMAIL',
     credential: 'smtp-alarm',
-    content: {signEnabled: false, cardVersion: '', atAllAllowed: false, testMessageEnabled: true, options: {locale: 'zh-CN', from: 'alarm@dc3.site'}},
+    content: {
+      signEnabled: false,
+      cardVersion: '',
+      atAllAllowed: false,
+      testMessageEnabled: true,
+      options: {locale: 'zh-CN', from: 'alarm@dc3.site'}
+    },
   },
   {
     name: '通用 Webhook',
     code: 'generic-webhook',
     type: 'WEBHOOK',
     credential: 'webhook-pagerduty',
-    content: {signEnabled: true, cardVersion: '', atAllAllowed: false, testMessageEnabled: true, options: {method: 'POST', timeoutMs: 5000}},
+    content: {
+      signEnabled: true,
+      cardVersion: '',
+      atAllAllowed: false,
+      testMessageEnabled: true,
+      options: {method: 'POST', timeoutMs: 5000}
+    },
   },
 ];
 
@@ -153,7 +177,10 @@ const messageDefs: MessageDef[] = [
         {
           channelType: 'FEISHU_BOT',
           payloadType: 'CARD',
-          template: {title: '${severity} ${device} 告警', summary: '${point} 当前 ${value}${unit}, 阈值 ${threshold}${unit}'},
+          template: {
+            title: '${severity} ${device} 告警',
+            summary: '${point} 当前 ${value}${unit}, 阈值 ${threshold}${unit}'
+          },
         },
       ],
     },
@@ -168,7 +195,10 @@ const messageDefs: MessageDef[] = [
         {
           channelType: 'DINGTALK_BOT',
           payloadType: 'MARKDOWN',
-          template: {title: '${severity} ${device} 告警', text: '${point}=${value}${unit} (阈值 ${threshold}${unit}) @ ${triggerTime}'},
+          template: {
+            title: '${severity} ${device} 告警',
+            text: '${point}=${value}${unit} (阈值 ${threshold}${unit}) @ ${triggerTime}'
+          },
         },
       ],
     },
@@ -411,7 +441,11 @@ const historyDefs: HistoryDef[] = [
     error: '',
     retry: 0,
     time: '2026-08-05T10:16:00',
-    request: {channelType: 'FEISHU_BOT', target: 'https://open.feishu.cn/open-apis/bot/v2/hook/****', payloadType: 'CARD'},
+    request: {
+      channelType: 'FEISHU_BOT',
+      target: 'https://open.feishu.cn/open-apis/bot/v2/hook/****',
+      payloadType: 'CARD'
+    },
     response: {httpStatus: 200, code: 0, bizMessage: 'ok', remoteMessageId: 'msg-feishu-90213'},
   },
   {
@@ -439,7 +473,11 @@ const historyDefs: HistoryDef[] = [
     error: 'connect timeout: dingtalk endpoint unreachable after 5000ms',
     retry: 2,
     time: '2026-08-05T09:30:00',
-    request: {channelType: 'DINGTALK_BOT', target: 'https://oapi.dingtalk.com/robot/send?access_token=****', payloadType: 'MARKDOWN'},
+    request: {
+      channelType: 'DINGTALK_BOT',
+      target: 'https://oapi.dingtalk.com/robot/send?access_token=****',
+      payloadType: 'MARKDOWN'
+    },
     response: {httpStatus: 0, code: -1, bizMessage: 'connect timeout'},
   },
   {
@@ -453,7 +491,11 @@ const historyDefs: HistoryDef[] = [
     error: '',
     retry: 1,
     time: '2026-08-05T09:10:00',
-    request: {channelType: 'FEISHU_BOT', target: 'https://open.feishu.cn/open-apis/bot/v2/hook/****', payloadType: 'CARD'},
+    request: {
+      channelType: 'FEISHU_BOT',
+      target: 'https://open.feishu.cn/open-apis/bot/v2/hook/****',
+      payloadType: 'CARD'
+    },
     response: {httpStatus: 200, code: 0, bizMessage: 'ok', remoteMessageId: 'msg-feishu-90188'},
   },
   {

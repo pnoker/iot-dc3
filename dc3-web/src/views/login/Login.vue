@@ -19,7 +19,7 @@
   <div class="login-container">
     <div class="login-wrapper-left animated bounce-in-down">
       <div class="login-left">
-        <img class="img" :src="assetUrl('images/logo/logo-white.svg')"/>
+        <img :src="assetUrl('images/logo/logo-white.svg')" class="img"/>
       </div>
     </div>
     <Particles/>

@@ -125,7 +125,8 @@ const addThing = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -137,7 +138,8 @@ const disableThing = (id: number | string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -149,7 +151,8 @@ const enableThing = (id: number | string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -161,7 +164,8 @@ const deleteThing = (id: number | string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });

@@ -45,7 +45,10 @@ export const charts = {
     id: 'humidity',
     type: 'area',
     title: '车间环境湿度（过去 24h）',
-    dataset: Array.from({length: 24}, (_, i) => ({time: hourly(i), humidity: round(48 + 12 * Math.sin(i / 4) + (i % 3))})),
+    dataset: Array.from({length: 24}, (_, i) => ({
+      time: hourly(i),
+      humidity: round(48 + 12 * Math.sin(i / 4) + (i % 3))
+    })),
     encode: {x: 'time', y: 'humidity'},
     scale: {y: 'linear'},
     meta: {unit: '%RH', yLabel: '湿度 (%RH)'},
@@ -54,7 +57,10 @@ export const charts = {
     id: 'power-trend',
     type: 'line',
     title: '有功功率趋势（过去 24h）',
-    dataset: Array.from({length: 24}, (_, i) => ({time: hourly(i), power: round(1.6 + 0.9 * Math.sin((i - 8) / 3) + (i > 8 && i < 18 ? 0.5 : 0), 2)})),
+    dataset: Array.from({length: 24}, (_, i) => ({
+      time: hourly(i),
+      power: round(1.6 + 0.9 * Math.sin((i - 8) / 3) + (i > 8 && i < 18 ? 0.5 : 0), 2)
+    })),
     encode: {x: 'time', y: 'power'},
     scale: {y: 'linear'},
     meta: {unit: 'kW', yLabel: '功率 (kW)'},
@@ -127,7 +133,7 @@ export const charts = {
 
 interface Scenario {
   match: RegExp;
-  events: {type: string; title: string; detail?: string; phase?: string; status?: string; name?: string}[];
+  events: { type: string; title: string; detail?: string; phase?: string; status?: string; name?: string }[];
   text: string;
   charts: () => AgenticVisualizationSpec[];
 }
@@ -219,7 +225,10 @@ const mockResponse = (prompt: string, stream: boolean): Response => {
   }
   return new Response(
     JSON.stringify({
-      choices: [{message: {role: 'assistant', content: s.text, contentExt: {charts: s.charts()}}, finishReason: 'stop'}],
+      choices: [{
+        message: {role: 'assistant', content: s.text, contentExt: {charts: s.charts()}},
+        finishReason: 'stop'
+      }],
     }),
     {status: 200, headers: {'Content-Type': 'application/json'}},
   );

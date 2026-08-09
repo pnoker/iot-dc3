@@ -50,7 +50,13 @@ const principalDefs: PrincipalDef[] = [
   {name: 'dc3', type: 'USER', displayName: '系统管理员', source: 'LOCAL', lastLogin: LAST_LOGIN},
   {name: 'ops', type: 'USER', displayName: '运维工程师', source: 'LOCAL', lastLogin: LAST_LOGIN},
   {name: 'guest', type: 'USER', displayName: '访客用户', source: 'LOCAL'},
-  {name: 'device-data-collector', type: 'SERVICE_ACCOUNT', displayName: '设备数据采集', source: 'SYSTEM', lastLogin: LAST_LOGIN},
+  {
+    name: 'device-data-collector',
+    type: 'SERVICE_ACCOUNT',
+    displayName: '设备数据采集',
+    source: 'SYSTEM',
+    lastLogin: LAST_LOGIN
+  },
   {name: 'mqtt-bridge', type: 'SERVICE_ACCOUNT', displayName: 'MQTT桥接接入', source: 'SYSTEM', lastLogin: LAST_LOGIN},
 ];
 
@@ -82,7 +88,14 @@ interface UserDef {
 const userDefs: UserDef[] = [
   {principalId: '201', userName: 'dc3', nickName: '系统管理员', phone: '13800138000', email: 'admin@dc3.site'},
   {principalId: '202', userName: 'ops', nickName: '运维工程师', phone: '13800138001', email: 'ops@dc3.site'},
-  {principalId: '203', userName: 'guest', nickName: '访客用户', phone: '13800138002', email: 'guest@dc3.site', enabled: false},
+  {
+    principalId: '203',
+    userName: 'guest',
+    nickName: '访客用户',
+    phone: '13800138002',
+    email: 'guest@dc3.site',
+    enabled: false
+  },
 ];
 
 export const users: UserRecord[] = userDefs.map((u, i) => ({
@@ -169,7 +182,7 @@ const roleResourceBindDefs: RoleResourceBindDef[] = [
   {roleId: '3', resourceId: '5005'},
 ];
 
-export const roleResourceBinds: (RoleResourceBindForm & {id: string; createTime: string})[] =
+export const roleResourceBinds: (RoleResourceBindForm & { id: string; createTime: string })[] =
   roleResourceBindDefs.map((b, i) => ({
     id: String(1 + i),
     roleId: b.roleId,

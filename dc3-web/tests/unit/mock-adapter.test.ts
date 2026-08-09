@@ -17,12 +17,11 @@
 
 import type {AxiosRequestConfig} from 'axios';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+import request from '@/config/axios';
+import {setupMock} from '@/mock';
 
 vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), warnMessage: vi.fn()}));
 vi.mock('@/config/router', () => ({default: {push: vi.fn(() => Promise.resolve())}}));
-
-import request from '@/config/axios';
-import {setupMock} from '@/mock';
 
 /**
  * Exercise the mock adapter end-to-end through the real axios instance + its
@@ -96,7 +95,11 @@ describe('mock adapter', () => {
   it('falls back gracefully for truly unregistered endpoints', async () => {
     // No handler registers this fictional endpoint — fallback must shape a
     // safe empty page instead of surfacing an error.
-    const res = await call({url: 'api/v3/data/fictional_metric/list', method: 'post', data: {page: {current: 1, size: 12}}});
+    const res = await call({
+      url: 'api/v3/data/fictional_metric/list',
+      method: 'post',
+      data: {page: {current: 1, size: 12}}
+    });
     expect(res.ok).toBe(true);
     expect(Array.isArray(res.data.records)).toBe(true);
   });

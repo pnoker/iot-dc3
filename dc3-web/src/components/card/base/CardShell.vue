@@ -29,8 +29,8 @@
   -->
 
 <template>
-  <div class="card-shell" :class="{ 'is-borderless': props.borderless }">
-    <el-card class="card-shell__body" :shadow="props.shadow">
+  <div :class="{ 'is-borderless': props.borderless }" class="card-shell">
+    <el-card :shadow="props.shadow" class="card-shell__body">
       <div class="card-shell__container">
         <slot name="header">
           <span v-if="props.title" class="card-shell__header">{{ props.title }}</span>

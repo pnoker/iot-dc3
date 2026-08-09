@@ -33,7 +33,7 @@ import CommandList from '@/views/settings/command/CommandList.vue';
 import EventList from '@/views/settings/event/definition/EventList.vue';
 
 import {timestamp} from '@/utils/dateUtil';
-import type {DeviceRecord, DriverRecord, ProfileRecord, PointRecord} from '@/config/types/manager';
+import type {DeviceRecord, DriverRecord, PointRecord, ProfileRecord} from '@/config/types/manager';
 
 export default defineComponent({
   components: {

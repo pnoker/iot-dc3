@@ -30,7 +30,7 @@ const hash = (s: string | number): number => {
 };
 
 /** Pick a base/amplitude for a realistic waveform from the point's unit/name. */
-const range = (point: Record<string, unknown>): {base: number; amp: number} => {
+const range = (point: Record<string, unknown>): { base: number; amp: number } => {
   const u = String(point.unit ?? '');
   const n = String(point.pointName ?? '');
   if (u.includes('℃') || u.includes('°C') || n.includes('温')) return {base: 25, amp: 5};

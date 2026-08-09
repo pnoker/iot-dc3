@@ -15,7 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {AgenticMessage, AgenticModelConfig, AgenticProvider, AgenticSession, AgenticVisualizationSpec} from '@/config/types';
+import type {
+  AgenticMessage,
+  AgenticModelConfig,
+  AgenticProvider,
+  AgenticSession,
+  AgenticVisualizationSpec
+} from '@/config/types';
 import type {McpAuditRecord, McpConnectionRecord, McpToolRecord, OAuthClientRecord} from '@/config/types/auth';
 import {charts} from '../fetch';
 
@@ -411,10 +417,10 @@ export const agenticMessages: AgenticMessage[] = messageDefs.map((m, i) => ({
   contentExt:
     m.tokens || m.reasoning || (m.charts && m.charts.length)
       ? {
-          ...(m.tokens ? {tokens: m.tokens} : {}),
-          ...(m.reasoning ? {reasoningContent: m.reasoning} : {}),
-          ...(m.charts && m.charts.length ? {charts: m.charts} : {}),
-        }
+        ...(m.tokens ? {tokens: m.tokens} : {}),
+        ...(m.reasoning ? {reasoningContent: m.reasoning} : {}),
+        ...(m.charts && m.charts.length ? {charts: m.charts} : {}),
+      }
       : undefined,
   model: m.model,
   messageIndex: m.messageIndex,

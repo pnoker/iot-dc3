@@ -19,7 +19,7 @@
   <div class="container">
     <div class="header">
       <el-col :span="4" class="header_item">
-        <img class="header_logo" :src="assetUrl('images/logo/logo.svg')"/>
+        <img :src="assetUrl('images/logo/logo.svg')" class="header_logo"/>
       </el-col>
       <el-col :span="16" class="header_item">
         <el-menu :default-active="handleMenuEnter($route.path)" :router="true" class="header_menu" mode="horizontal">

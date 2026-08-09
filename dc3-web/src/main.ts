@@ -34,6 +34,7 @@ plugins(app);
 app.config.errorHandler = (err, _instance, info) => {
   logger.error('Global error:', err, 'Info:', info);
 };
+
 /**
  * Static demo build: install a mock axios adapter before mounting so the app
  * runs on fake data with no backend. Vite replaces import.meta.env.MODE with a

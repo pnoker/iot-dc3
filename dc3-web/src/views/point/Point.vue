@@ -204,7 +204,8 @@ const onAdd = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -216,7 +217,8 @@ const onUpdate = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -228,7 +230,8 @@ const onDisable = (id: string, profileId: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -240,7 +243,8 @@ const onEnable = (id: string, profileId: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });
@@ -252,7 +256,8 @@ const onDelete = (id: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {})
+    .catch(() => {
+    })
     .finally(() => {
       done();
     });

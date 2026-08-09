@@ -45,7 +45,7 @@ export type CrudApi<TForm, TRecord> = {
   list: <T = R<PageResult<TRecord>>>(query: PageQuery) => Promise<T>;
 };
 
-export function createCrudApi<TForm, TRecord>(config: {base: string; entity?: string}): CrudApi<TForm, TRecord> {
+export function createCrudApi<TForm, TRecord>(config: { base: string; entity?: string }): CrudApi<TForm, TRecord> {
   const prefix = config.entity ? `${config.base}/${config.entity}` : config.base;
   return {
     add: (form: TForm) => httpPost<R<TRecord>>(`${prefix}/add`, form),

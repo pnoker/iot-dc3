@@ -189,7 +189,7 @@ const driverNameOf = (id: unknown): string =>
 
 /** Deterministic per-unit telemetry value so the live feed looks like real
  *  sensor readings rather than flat placeholders. */
-const streamValue = (unit: string, i: number): {valueType: string; rawValue: string} => {
+const streamValue = (unit: string, i: number): { valueType: string; rawValue: string } => {
   const r = (base: number, amp: number) => (base + Math.sin(i / 1.7) * amp + (i % 5) * 0.08).toFixed(2);
   switch (unit) {
     case '℃':
@@ -239,7 +239,7 @@ export const streamLatest: StreamRow[] = devicePointPairs.slice(0, 20).map(({dev
   };
 });
 
-const countBy = <T>(items: T[], keyOf: (item: T) => string): {key: string; count: number}[] => {
+const countBy = <T>(items: T[], keyOf: (item: T) => string): { key: string; count: number }[] => {
   const map = new Map<string, number>();
   for (const item of items) {
     const key = keyOf(item);
@@ -268,7 +268,7 @@ export const driverStats = {
 const topRows = (ids: string[], base: number, step: number, jitter: number) =>
   ids.map((id, i) => ({entityId: id, count: Math.max(1, base - i * step + (i % 3) * jitter)}));
 
-export const statsTop: Record<TopDimension, {entityId: string; count: number}[]> = {
+export const statsTop: Record<TopDimension, { entityId: string; count: number }[]> = {
   device: topRows(devices.slice(0, 10).map((d) => String(d.id)), 342, 28, 6),
   point: topRows(points.slice(0, 10).map((p) => String(p.id)), 286, 23, 7),
   driver: topRows(drivers.slice(0, 8).map((d) => String(d.id)), 524, 58, 4),
@@ -278,12 +278,42 @@ export const alertAging: AgingBacklog = {under1h: 24, h1to6: 13, h6to24: 6, over
 
 const SILENT_BASE = Date.UTC(2026, 7, 7, 14, 5, 0);
 export const silentSources: SilentSource[] = [
-  {deviceId: String(devices[1]?.id ?? 3002), pointId: String(points[0]?.id ?? 5001), lastSeen: new Date(SILENT_BASE - 2_074_000).toISOString(), silentSeconds: 2074},
-  {deviceId: String(devices[3]?.id ?? 3004), pointId: String(points[3]?.id ?? 5004), lastSeen: new Date(SILENT_BASE - 1_536_000).toISOString(), silentSeconds: 1536},
-  {deviceId: String(devices[5]?.id ?? 3006), pointId: String(points[1]?.id ?? 5002), lastSeen: new Date(SILENT_BASE - 1_102_000).toISOString(), silentSeconds: 1102},
-  {deviceId: String(devices[7]?.id ?? 3008), pointId: String(points[6]?.id ?? 5007), lastSeen: new Date(SILENT_BASE - 3_640_000).toISOString(), silentSeconds: 3640},
-  {deviceId: String(devices[9]?.id ?? 3010), pointId: String(points[2]?.id ?? 5003), lastSeen: new Date(SILENT_BASE - 988_000).toISOString(), silentSeconds: 988},
-  {deviceId: String(devices[2]?.id ?? 3003), pointId: String(points[5]?.id ?? 5006), lastSeen: new Date(SILENT_BASE - 2_752_000).toISOString(), silentSeconds: 2752},
+  {
+    deviceId: String(devices[1]?.id ?? 3002),
+    pointId: String(points[0]?.id ?? 5001),
+    lastSeen: new Date(SILENT_BASE - 2_074_000).toISOString(),
+    silentSeconds: 2074
+  },
+  {
+    deviceId: String(devices[3]?.id ?? 3004),
+    pointId: String(points[3]?.id ?? 5004),
+    lastSeen: new Date(SILENT_BASE - 1_536_000).toISOString(),
+    silentSeconds: 1536
+  },
+  {
+    deviceId: String(devices[5]?.id ?? 3006),
+    pointId: String(points[1]?.id ?? 5002),
+    lastSeen: new Date(SILENT_BASE - 1_102_000).toISOString(),
+    silentSeconds: 1102
+  },
+  {
+    deviceId: String(devices[7]?.id ?? 3008),
+    pointId: String(points[6]?.id ?? 5007),
+    lastSeen: new Date(SILENT_BASE - 3_640_000).toISOString(),
+    silentSeconds: 3640
+  },
+  {
+    deviceId: String(devices[9]?.id ?? 3010),
+    pointId: String(points[2]?.id ?? 5003),
+    lastSeen: new Date(SILENT_BASE - 988_000).toISOString(),
+    silentSeconds: 988
+  },
+  {
+    deviceId: String(devices[2]?.id ?? 3003),
+    pointId: String(points[5]?.id ?? 5006),
+    lastSeen: new Date(SILENT_BASE - 2_752_000).toISOString(),
+    silentSeconds: 2752
+  },
 ];
 
 // 6 latency buckets: <100ms / 100-500ms / 0.5-1s / 1-5s / 5-30s / >30s.
