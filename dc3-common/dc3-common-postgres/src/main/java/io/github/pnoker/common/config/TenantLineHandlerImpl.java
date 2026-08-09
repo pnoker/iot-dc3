@@ -22,7 +22,6 @@ import io.github.pnoker.common.exception.TenantNotScopedException;
 import io.github.pnoker.common.tenant.TenantContextHolder;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
-import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
@@ -36,7 +35,6 @@ import java.util.Set;
  * Tables without a tenant_id column (system/lookup tables) are whitelisted in
  * {@link #ignoreTable} so the interceptor does not inject a non-existent column.
  */
-@Component
 public class TenantLineHandlerImpl implements TenantLineHandler {
 
     /**

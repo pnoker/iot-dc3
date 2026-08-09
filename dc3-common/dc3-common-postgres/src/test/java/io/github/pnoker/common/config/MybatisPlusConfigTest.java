@@ -18,6 +18,7 @@
 package io.github.pnoker.common.config;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -26,12 +27,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MybatisPlusConfigTest {
 
+    /**
+     * Mirrors the production load path: only {@link MybatisPlusConfig} is discovered via
+     * {@code AutoConfiguration.imports}. {@code TenantLineHandlerImpl} is deliberately NOT
+     * registered separately, because center applications do not component-scan the
+     * {@code io.github.pnoker.common.config} package — the handler must be supplied by the
+     * auto-configuration itself.
+     */
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(MybatisPlusConfig.class, TenantLineHandlerImpl.class));
+            .withConfiguration(AutoConfigurations.of(MybatisPlusConfig.class));
 
     @Test
     void mybatisPlusInterceptorIsCreatedByDefault() {
         contextRunner.run(context -> assertThat(context).hasSingleBean(MybatisPlusInterceptor.class));
+    }
+
+    @Test
+    void tenantLineHandlerIsRegisteredByAutoConfiguration() {
+        contextRunner.run(context -> assertThat(context).hasSingleBean(TenantLineHandler.class));
     }
 
     @Test

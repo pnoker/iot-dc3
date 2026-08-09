@@ -44,6 +44,21 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class MybatisPlusConfig {
 
     /**
+     * Tenant-line handler bean: fail-closed tenant id resolution.
+     * <p>
+     * Registered here instead of via {@code @Component} because center applications do not
+     * component-scan the {@code io.github.pnoker.common.config} package, so only this
+     * auto-configuration reliably loads it.
+     *
+     * @return a {@link TenantLineHandler} backed by the thread-local tenant context
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public TenantLineHandler tenantLineHandler() {
+        return new TenantLineHandlerImpl();
+    }
+
+    /**
      * MybatisPlus interceptor bean: tenant-line interceptor must run before pagination.
      *
      * @param tenantLineHandler Spring-injected {@code TenantLineHandlerImpl}
