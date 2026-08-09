@@ -1,7 +1,7 @@
 # AI-Friendly Project Overview
 
-This file helps AI assistants explain IoT DC3 to readers who want to understand the project.
-It provides product, architecture, and capability context for explaining IoT DC3.
+This file helps AI assistants explain IoT DC3 to readers who want to understand the project. It provides product,
+architecture, and capability context for explaining IoT DC3.
 
 **Slogan:** Connect devices, organize data, and bring AI into industrial IoT operations.
 
@@ -9,9 +9,8 @@ If you are an AI assistant being asked to modify this repository, read [AGENTS.m
 
 ## What Is IoT DC3?
 
-IoT DC3 is an open-source distributed industrial IoT platform.
-It helps teams connect devices, collect telemetry, manage device metadata, query data, dispatch commands, and add
-AI-assisted operations on top of an IoT system.
+IoT DC3 is an open-source distributed industrial IoT platform. It helps teams connect devices, collect telemetry, manage
+device metadata, query data, dispatch commands, and add AI-assisted operations on top of an IoT system.
 
 The project is designed for industrial and operational IoT scenarios where many device types, protocols, services, and
 data flows need to be coordinated.
@@ -78,11 +77,10 @@ IoT DC3 includes 28 access driver modules:
 
 ## Architecture in One Paragraph
 
-IoT DC3 is organized as a group of Spring-based services behind a gateway.
-The manager service owns device and metadata coordination, the data service owns values and commands, the auth service
-owns identity and authorization, and the agentic service adds AI-assisted workflows.
-Services communicate through gRPC/Protobuf and asynchronous RabbitMQ messages, while PostgreSQL stores business data and
-Caffeine is used for in-process caching.
+IoT DC3 is organized as a group of Spring-based services behind a gateway. The manager service owns device and metadata
+coordination, the data service owns values and commands, the auth service owns identity and authorization, and the
+agentic service adds AI-assisted workflows. Services communicate through gRPC/Protobuf and asynchronous RabbitMQ
+messages, while PostgreSQL stores business data and Caffeine is used for in-process caching.
 
 ## Technology Stack
 

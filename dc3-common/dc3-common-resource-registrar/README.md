@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-common-resource-registrar` discovers a service's HTTP API endpoints at startup and registers them as
-authorization resources with the Auth Center. This keeps the RBAC resource catalog in sync with the controllers that
-are actually deployed, so permissions can be granted against real endpoints.
+`dc3-common-resource-registrar` discovers a service's HTTP API endpoints at startup and registers them as authorization
+resources with the Auth Center. This keeps the RBAC resource catalog in sync with the controllers that are actually
+deployed, so permissions can be granted against real endpoints.
 
 ## Module Information
 

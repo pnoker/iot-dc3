@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-common-facade-local-auth` provides the **in-process implementation** of the auth-domain facade contracts from
-`dc3-common-facade-api`. Instead of issuing gRPC calls, each facade delegates directly to the auth service beans on
-the local classpath — used inside the `dc3-center-single` monolith where auth, manager, and data run in one process.
+`dc3-common-facade-api`. Instead of issuing gRPC calls, each facade delegates directly to the auth service beans on the
+local classpath — used inside the `dc3-center-single` monolith where auth, manager, and data run in one process.
 
 ## Module Information
 

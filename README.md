@@ -82,8 +82,8 @@
 ![IoT DC3 Architecture Panorama](https://docs.dc3.site/images/architecture-panorama-en.png)
 
 Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 28 protocol
-drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack
-(ELK + Prometheus + Grafana) laid out in one view.
+drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack (ELK +
+Prometheus + Grafana) laid out in one view.
 
 🧱 **Design principles** — cross-service calls always go through Facade interfaces; the DO/BO/VO three-tier model keeps
 persistence, business, and API shapes strictly separated; and tenant isolation runs end to end across database, cache,
@@ -103,7 +103,7 @@ communication, and simulation/debugging scenarios, reducing the cost of connecti
 |------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | 🏭 **Industrial protocols**        | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
 | 📡 **IoT protocols**               | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **Data bridging**              | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
+| 🗄️ **Data bridging**               | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
 | 🔧 **Basic communication and NMS** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
 | 🧪 **Simulation and debugging**    | Virtual · Listening Virtual                                                                                                                        |
 
@@ -174,8 +174,8 @@ Use `make up-db-cn` if you prefer the Alibaba Cloud registry in Mainland China.
 IoT DC3 is built on Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
 TypeScript, and Vite.
 
-See [Technology Stack](https://docs.dc3.site/en/development/technology-stack) for component details and
-where each technology is used.
+See [Technology Stack](https://docs.dc3.site/en/development/technology-stack) for component details and where each
+technology is used.
 
 ## 📖 Documentation and Community
 
@@ -183,13 +183,13 @@ where each technology is used.
 |-----------------------|---------------------------------------------------------------------------------|
 | 📚 Online docs        | [docs.dc3.site](https://docs.dc3.site/)                                         |
 | 🚀 Quickstart         | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                        |
-| 🛠️ Technology stack  | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)      |
-| 🏗️ Architecture      | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
+| 🛠️ Technology stack   | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)       |
+| 🏗️ Architecture       | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
 | 🔧 Driver development | [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Troubleshooting    | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)               |
 | 📋 Changelog          | [Release Changelog](https://docs.dc3.site/en/development/changelog)             |
 | 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                       |
-| 🇨🇳 Gitee mirror     | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
+| 🇨🇳 Gitee mirror       | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
 
 ## 🌍 Use Cases
 

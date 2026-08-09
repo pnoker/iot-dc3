@@ -102,7 +102,7 @@ truyền thông cơ bản, mô phỏng và gỡ lỗi, giúp giảm chi phí k�
 |---------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | 🏭 **Giao thức công nghiệp**                | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
 | 📡 **Giao thức IoT**                        | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **Cầu nối dữ liệu**                     | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
+| 🗄️ **Cầu nối dữ liệu**                      | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
 | 🔧 **Truyền thông cơ bản và quản trị mạng** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
 | 🧪 **Mô phỏng và gỡ lỗi**                   | Virtual · Listening Virtual                                                                                                                        |
 
@@ -112,8 +112,8 @@ truyền thông cơ bản, mô phỏng và gỡ lỗi, giúp giảm chi phí k�
 
 Agentic Center được xây dựng trên **Spring AI**, đưa mô hình ngôn ngữ lớn vào quy trình vận hành IoT:
 
-- **Vận hành hỗ trợ bằng ngôn ngữ tự nhiên** - thông qua Tool Calling và trong phạm vi kiểm soát quyền, LLM có thể
-  truy vấn thiết bị, đọc/ghi point và hỗ trợ thực thi lệnh
+- **Vận hành hỗ trợ bằng ngôn ngữ tự nhiên** - thông qua Tool Calling và trong phạm vi kiểm soát quyền, LLM có thể truy
+  vấn thiết bị, đọc/ghi point và hỗ trợ thực thi lệnh
 - **Phân tích cảnh báo thông minh** - AI hỗ trợ phân tích nguyên nhân và đề xuất cách xử lý
 - **Thông tin chuyên sâu từ dữ liệu** - Truy vấn dữ liệu thiết bị bằng ngôn ngữ tự nhiên và sinh biểu đồ trực quan
 - **Hỗ trợ nhiều mô hình** - Tương thích với nhà cung cấp kiểu OpenAI API và các mô hình phổ biến như GPT, Claude,
@@ -172,8 +172,8 @@ Nếu cần registry Alibaba Cloud cho Trung Quốc đại lục, dùng `make up
 IoT DC3 được xây dựng trên Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
 TypeScript và Vite.
 
-Xem [Technology Stack](https://docs.dc3.site/en/development/technology-stack) để biết chi tiết từng thành phần và vị
-trí sử dụng.
+Xem [Technology Stack](https://docs.dc3.site/en/development/technology-stack) để biết chi tiết từng thành phần và vị trí
+sử dụng.
 
 ## 📖 Tài liệu và cộng đồng
 
@@ -181,13 +181,13 @@ trí sử dụng.
 |----------------------|---------------------------------------------------------------------------------|
 | 📚 Tài liệu online   | [docs.dc3.site](https://docs.dc3.site/)                                         |
 | 🚀 Quickstart        | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                        |
-| 🛠️ Công nghệ        | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)      |
-| 🏗️ Kiến trúc        | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
+| 🛠️ Công nghệ         | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)       |
+| 🏗️ Kiến trúc         | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
 | 🔧 Phát triển driver | [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Khắc phục sự cố   | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)               |
 | 📋 Changelog         | [Release Changelog](https://docs.dc3.site/en/development/changelog)             |
 | 🐛 Phản hồi issue    | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                       |
-| 🇨🇳 Gitee mirror    | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
+| 🇨🇳 Gitee mirror      | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
 
 ## 🌍 Trường hợp ứng dụng
 

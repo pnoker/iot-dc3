@@ -47,8 +47,8 @@ SocketCAN interface, parsing frame payloads into device point values and sending
 
 ## Prerequisites
 
-A Linux host with an available SocketCAN interface (e.g. `can0`) and the `can-utils` package installed
-(`candump`, `cansend`), reachable from the driver process.
+A Linux host with an available SocketCAN interface (e.g. `can0`) and the `can-utils` package installed (`candump`,
+`cansend`), reachable from the driver process.
 
 ## Running Locally
 

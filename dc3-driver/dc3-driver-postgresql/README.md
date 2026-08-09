@@ -2,10 +2,10 @@
 
 ## Overview
 
-`dc3-driver-postgresql` is the PostgreSQL database driver of the IoT DC3 platform. It connects to a PostgreSQL
-database via JDBC, reads point values by executing configured SQL `SELECT` queries on a schedule, and writes /
-executes SQL for write commands. It builds on the shared `AbstractJdbcDriverCustomService` from `dc3-common-sql`,
-which constructs the JDBC URL `jdbc:postgresql://<host>:<port>/<database>` using the `org.postgresql.Driver`.
+`dc3-driver-postgresql` is the PostgreSQL database driver of the IoT DC3 platform. It connects to a PostgreSQL database
+via JDBC, reads point values by executing configured SQL `SELECT` queries on a schedule, and writes / executes SQL for
+write commands. It builds on the shared `AbstractJdbcDriverCustomService` from `dc3-common-sql`, which constructs the
+JDBC URL `jdbc:postgresql://<host>:<port>/<database>` using the `org.postgresql.Driver`.
 
 ## Module Information
 
@@ -40,8 +40,8 @@ which constructs the JDBC URL `jdbc:postgresql://<host>:<port>/<database>` using
 
 ## Prerequisites
 
-A reachable PostgreSQL database. The connection URL, credentials, and the SQL queries to run are all supplied
-through the driver and point attributes above — nothing is hardcoded.
+A reachable PostgreSQL database. The connection URL, credentials, and the SQL queries to run are all supplied through
+the driver and point attributes above — nothing is hardcoded.
 
 ## Running Locally
 

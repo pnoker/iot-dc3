@@ -2,8 +2,8 @@
 
 ## Overview
 
-`dc3-e2e` is the backend end-to-end test suite of the IoT DC3 platform. It drives a running stack through real HTTP
-(via REST Assured) and message-queue paths to verify cross-service behavior — command call, event report, point-value
+`dc3-e2e` is the backend end-to-end test suite of the IoT DC3 platform. It drives a running stack through real HTTP (via
+REST Assured) and message-queue paths to verify cross-service behavior — command call, event report, point-value
 storage, RabbitMQ delivery, and TimescaleDB hypertables.
 
 ## Module Information

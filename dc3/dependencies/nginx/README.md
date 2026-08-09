@@ -1,8 +1,7 @@
 # 使用 ACME.SH 申请并安装 LET’S ENCRYPT SSL 证书
 
 Let’s Encrypt 是一个免费的, 自动化的, 开放的证书颁发机构（CA）, 为公众的利益而运行。 它是一项由 Internet Security Research
-Group（ISRG）提供的服务。
-acme.sh 则是实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。
+Group（ISRG）提供的服务。 acme.sh 则是实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。
 
 ## 安装 ACME.SH
 
@@ -13,8 +12,8 @@ source ~/.bashrc
 
 ## 申请证书
 
-这种方式的好处是, 你不需要任何服务器, 不需要任何公网 ip, 只需要 dns 的解析记录即可完成验证, 而且可申请泛域名证书。
-坏处是, 需要配合DNS解析服务商的API使用, 否则 acme.sh 将无法自动更新证书, 每次都需要手动再次重新解析验证域名所有权。
+这种方式的好处是, 你不需要任何服务器, 不需要任何公网 ip, 只需要 dns 的解析记录即可完成验证, 而且可申请泛域名证书。 坏处是,
+需要配合DNS解析服务商的API使用, 否则 acme.sh 将无法自动更新证书, 每次都需要手动再次重新解析验证域名所有权。
 
 ### 配置阿里云 AccessKey
 
@@ -41,8 +40,8 @@ acme.sh --installcert -d dc3.site --key-file /etc/letsencrypt/live/dc3.site/dc3.
 
 ## 更新证书
 
-Let’s Encrypt 的证书有效期为3个月, 每3个月得重新申请证书。
-通过 acme.sh 可以自动管理SSL证书的申请。通过上面步骤的安装后 acme.sh 会定期自动更新SSL证书。
+Let’s Encrypt 的证书有效期为3个月, 每3个月得重新申请证书。 通过 acme.sh 可以自动管理SSL证书的申请。通过上面步骤的安装后
+acme.sh 会定期自动更新SSL证书。
 
 ```bash
 acme.sh --renew -d dc3.site --force

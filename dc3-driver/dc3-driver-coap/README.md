@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-driver-coap` is the CoAP protocol driver of the IoT DC3 platform. It uses the Eclipse Californium CoAP
-library to talk to CoAP devices with active request-response communication: the read path performs CoAP GET
-requests against a resource path and the write path performs CoAP PUT requests.
+`dc3-driver-coap` is the CoAP protocol driver of the IoT DC3 platform. It uses the Eclipse Californium CoAP library to
+talk to CoAP devices with active request-response communication: the read path performs CoAP GET requests against a
+resource path and the write path performs CoAP PUT requests.
 
 ## Module Information
 

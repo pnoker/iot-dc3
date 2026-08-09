@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-api-driver` provides gRPC service definitions for driver services in the IoT DC3 platform. It defines the
-communication interface between device drivers and the platform's
-manager service, enabling device registration, metadata synchronization, and point value collection.
+communication interface between device drivers and the platform's manager service, enabling device registration,
+metadata synchronization, and point value collection.
 
 ## Module Information
 

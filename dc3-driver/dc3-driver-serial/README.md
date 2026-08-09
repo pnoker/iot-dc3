@@ -49,9 +49,8 @@ with the `${value}` placeholder substituted.
 
 ## Prerequisites
 
-A serial device connected to a serial port reachable from the host running the driver (e.g. `/dev/ttyUSB0`). The
-port path and line parameters (baud rate, data/stop bits, parity, timeout) are supplied through the driver
-attributes above.
+A serial device connected to a serial port reachable from the host running the driver (e.g. `/dev/ttyUSB0`). The port
+path and line parameters (baud rate, data/stop bits, parity, timeout) are supplied through the driver attributes above.
 
 ## Running Locally
 

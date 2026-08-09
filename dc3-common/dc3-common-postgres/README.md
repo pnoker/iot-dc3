@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-common-postgres` is the shared PostgreSQL and MyBatis-Plus configuration module of the IoT DC3 platform. It
-auto-configures datasource, paging plugin, and common MyBatis
-utility support for all services that use PostgreSQL as their primary storage.
+auto-configures datasource, paging plugin, and common MyBatis utility support for all services that use PostgreSQL as
+their primary storage.
 
 ## Module Information
 
@@ -35,8 +35,8 @@ spring:
           password: ${POSTGRES_PASSWORD:dc3dc3dc3}
 ```
 
-Set `dc3.postgres.auto-profile=false` to opt out of automatic `postgres` profile activation.
-Applications can override the shared MyBatis-Plus pagination interceptor by declaring their own
+Set `dc3.postgres.auto-profile=false` to opt out of automatic `postgres` profile activation. Applications can override
+the shared MyBatis-Plus pagination interceptor by declaring their own
 `MybatisPlusInterceptor` bean.
 
 ## Schema Isolation

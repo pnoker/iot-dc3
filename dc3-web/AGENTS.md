@@ -60,8 +60,8 @@ via Vite. **The dev server runs without the backend**, but login and data endpoi
 
 ## Domain Model: Four-Layer IoT Entity
 
-The core domain follows a strict hierarchy: **Driver** (protocol adapter) → **Profile** (device template) → **Device** (
-physical equipment) → **Point** (data signal). This hierarchy is reflected everywhere — API paths, types, dashboard
+The core domain follows a strict hierarchy: **Driver** (protocol adapter) → **Profile** (device template) → **Device**
+(physical equipment) → **Point** (data signal). This hierarchy is reflected everywhere — API paths, types, dashboard
 palette colors, routing, entity enums.
 
 ## Project Layout

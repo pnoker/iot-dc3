@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-center-auth` is the Authorization Center of the IoT DC3 platform. It provides authentication and authorization
-management for the entire platform including tenant management,
-local credential login, token validation, and permission control.
+management for the entire platform including tenant management, local credential login, token validation, and permission
+control.
 
 ## Module Information
 

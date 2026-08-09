@@ -24,11 +24,11 @@ pnpm install
 pnpm dev
 ```
 
-The dev server runs on `http://localhost:8080` and proxies API calls to the backend
-gateway (`http://localhost:8000`), so start the backend stack first.
+The dev server runs on `http://localhost:8080` and proxies API calls to the backend gateway (`http://localhost:8000`),
+so start the backend stack first.
 
 ## 4. More
 
-For the full command surface (build, type-check, lint, unit/component/E2E tests), the
-tech stack, environment configuration (`src/config/env/`), and project conventions, see
+For the full command surface (build, type-check, lint, unit/component/E2E tests), the tech stack, environment
+configuration (`src/config/env/`), and project conventions, see
 [`AGENTS.md`](./AGENTS.md).

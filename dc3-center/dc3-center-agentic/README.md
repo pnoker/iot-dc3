@@ -2,10 +2,10 @@
 
 ## Overview
 
-`dc3-center-agentic` is the AI / agentic center of the IoT DC3 platform. It exposes an LLM-backed
-conversational and tool-calling service (built on Spring AI) that lets users query and operate platform
-resources — drivers, devices, points, point values, profiles, commands, and events — through natural
-language. The service is a thin Spring Boot shell; the agentic logic lives in `dc3-common-agentic`.
+`dc3-center-agentic` is the AI / agentic center of the IoT DC3 platform. It exposes an LLM-backed conversational and
+tool-calling service (built on Spring AI) that lets users query and operate platform resources — drivers, devices,
+points, point values, profiles, commands, and events — through natural language. The service is a thin Spring Boot
+shell; the agentic logic lives in `dc3-common-agentic`.
 
 ## Module Information
 

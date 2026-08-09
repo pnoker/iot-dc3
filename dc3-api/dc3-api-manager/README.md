@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-api-manager` provides gRPC service definitions for the Manager Center in the IoT DC3 platform. It defines the
-interfaces used by the Data service and other consumers to query
-driver, device, point, profile, command, and event metadata from the Manager Center.
+interfaces used by the Data service and other consumers to query driver, device, point, profile, command, and event
+metadata from the Manager Center.
 
 ## Module Information
 

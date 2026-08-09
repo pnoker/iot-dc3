@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-center-manager` is the Device Management Center of the IoT DC3 platform. It provides comprehensive management for
-all device collections including device/driver registration,
-profile management, point configuration, permission management, and command interfaces.
+all device collections including device/driver registration, profile management, point configuration, permission
+management, and command interfaces.
 
 ## Module Information
 

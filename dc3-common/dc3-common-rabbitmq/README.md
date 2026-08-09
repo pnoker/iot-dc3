@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-common-rabbitmq` is the shared RabbitMQ configuration module of the IoT DC3 platform. It defines all topic
-exchanges, queue bindings, and connection configuration used for
-asynchronous communication between services and drivers.
+exchanges, queue bindings, and connection configuration used for asynchronous communication between services and
+drivers.
 
 ## Module Information
 
@@ -48,9 +48,9 @@ spring:
       verify-hostname: ${RABBITMQ_SSL_VERIFY_HOSTNAME:false}
 ```
 
-To use TLS, set `RABBITMQ_SSL_ENABLED=true` and switch the RabbitMQ port to `5671` in Compose or `35671` for
-local source runs. Server certificate validation is intentionally left to deployment configuration: provide a
-Java truststore and set Spring Boot's native `spring.rabbitmq.ssl.trust-store`, `trust-store-type`, and
+To use TLS, set `RABBITMQ_SSL_ENABLED=true` and switch the RabbitMQ port to `5671` in Compose or `35671` for local
+source runs. Server certificate validation is intentionally left to deployment configuration: provide a Java truststore
+and set Spring Boot's native `spring.rabbitmq.ssl.trust-store`, `trust-store-type`, and
 `trust-store-password` properties when `RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE=true`.
 
 ## Build Instructions

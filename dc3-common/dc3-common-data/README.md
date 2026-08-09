@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-common-data` is the shared Data Center business module of the IoT DC3 platform. It provides all service
-implementations for point value ingestion, command dispatch,
-driver/device status tracking, and data query. It is wired into `dc3-center-data`.
+implementations for point value ingestion, command dispatch, driver/device status tracking, and data query. It is wired
+into `dc3-center-data`.
 
 ## Module Information
 

@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-driver-snmp` is the SNMP driver of the IoT DC3 platform. It communicates with SNMP-enabled devices using the
-SNMP4J library over UDP, supporting SNMP v1 and v2c. Point reads issue an SNMP GET against a configured OID, and
-write commands issue an SNMP SET, with one SNMP session cached per device.
+`dc3-driver-snmp` is the SNMP driver of the IoT DC3 platform. It communicates with SNMP-enabled devices using the SNMP4J
+library over UDP, supporting SNMP v1 and v2c. Point reads issue an SNMP GET against a configured OID, and write commands
+issue an SNMP SET, with one SNMP session cached per device.
 
 ## Module Information
 
@@ -43,9 +43,9 @@ write commands issue an SNMP SET, with one SNMP session cached per device.
 
 ## Prerequisites
 
-A reachable SNMP agent. The agent host/port, SNMP version, community string, and per-point OIDs are supplied through
-the driver and point attributes above. The driver attributes include SNMPv3 USM fields, but the current
-implementation supports SNMP v1 and v2c.
+A reachable SNMP agent. The agent host/port, SNMP version, community string, and per-point OIDs are supplied through the
+driver and point attributes above. The driver attributes include SNMPv3 USM fields, but the current implementation
+supports SNMP v1 and v2c.
 
 ## Running Locally
 

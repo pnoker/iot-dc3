@@ -2,10 +2,10 @@
 
 ## Overview
 
-`dc3-driver-ethernet-ip` is the EtherNet/IP (CIP) protocol driver of the IoT DC3 platform, intended for
-communication with Rockwell Allen-Bradley PLCs. It implements the protocol over a raw TCP socket with CIP
-(Common Industrial Protocol) message framing — no external protocol library is used — reading and writing tags
-via CIP Data Table Read/Write services.
+`dc3-driver-ethernet-ip` is the EtherNet/IP (CIP) protocol driver of the IoT DC3 platform, intended for communication
+with Rockwell Allen-Bradley PLCs. It implements the protocol over a raw TCP socket with CIP (Common Industrial Protocol)
+message framing — no external protocol library is used — reading and writing tags via CIP Data Table Read/Write
+services.
 
 > ⚠️ **Work in progress.** This driver is a skeleton — its class documentation explicitly states "Protocol-level
 > I/O is not yet fully implemented" and the method bodies carry TODO markers. The CIP session setup is not done:

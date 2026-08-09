@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-common-facade-local-manager` provides the **in-process implementation** of the manager-domain facade contracts
-from `dc3-common-facade-api`. Each facade delegates directly to the manager service beans on the local classpath
-instead of issuing gRPC calls — used inside the `dc3-center-single` monolith.
+`dc3-common-facade-local-manager` provides the **in-process implementation** of the manager-domain facade contracts from
+`dc3-common-facade-api`. Each facade delegates directly to the manager service beans on the local classpath instead of
+issuing gRPC calls — used inside the `dc3-center-single` monolith.
 
 ## Module Information
 
@@ -15,8 +15,8 @@ instead of issuing gRPC calls — used inside the `dc3-center-single` monolith.
 ## Implementations
 
 In-process manager facades: `DriverLocalFacade`, `DeviceLocalFacade`, `PointLocalFacade`, `ProfileLocalFacade`,
-`CommandLocalFacade`, `EventLocalFacade`. MapStruct `Facade*Builder` classes convert between manager domain objects
-and facade BOs. Beans are registered by `LocalFacadeManagerAutoConfiguration`.
+`CommandLocalFacade`, `EventLocalFacade`. MapStruct `Facade*Builder` classes convert between manager domain objects and
+facade BOs. Beans are registered by `LocalFacadeManagerAutoConfiguration`.
 
 ## Activation
 

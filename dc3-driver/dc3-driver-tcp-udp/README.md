@@ -2,13 +2,13 @@
 
 ## Overview
 
-`dc3-driver-tcp-udp` is the generic raw TCP/UDP socket driver of the IoT DC3 platform. It communicates with devices
-over plain TCP or UDP sockets, selectable per device via the `protocol` attribute. For each point it sends a
-configured HEX command and reads back the raw response, which is then parsed by frame header/footer, data
-offset/length, delimiter, data format (HEX/ASCII/INT16/UINT16/INT32/FLOAT), and byte order. TCP connections are
-cached per device (with a consecutive-failure backoff), while UDP is connectionless. Write commands send a HEX
-command template with the `${value}` placeholder substituted. This module has no third-party protocol dependency —
-it uses the JDK socket APIs directly.
+`dc3-driver-tcp-udp` is the generic raw TCP/UDP socket driver of the IoT DC3 platform. It communicates with devices over
+plain TCP or UDP sockets, selectable per device via the `protocol` attribute. For each point it sends a configured HEX
+command and reads back the raw response, which is then parsed by frame header/footer, data offset/length, delimiter,
+data format (HEX/ASCII/INT16/UINT16/INT32/FLOAT), and byte order. TCP connections are cached per device (with a
+consecutive-failure backoff), while UDP is connectionless. Write commands send a HEX command template with the
+`${value}` placeholder substituted. This module has no third-party protocol dependency — it uses the JDK socket APIs
+directly.
 
 ## Module Information
 
@@ -49,8 +49,8 @@ it uses the JDK socket APIs directly.
 
 ## Prerequisites
 
-A reachable TCP or UDP endpoint. The protocol selection, host/port, timeouts, and per-point HEX commands are
-supplied through the driver and point attributes above.
+A reachable TCP or UDP endpoint. The protocol selection, host/port, timeouts, and per-point HEX commands are supplied
+through the driver and point attributes above.
 
 ## Running Locally
 

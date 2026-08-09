@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-common-constant` is the shared constants and enumerations module of the IoT DC3 platform. It defines all
-platform-wide constants, routing keys, service names, URL prefixes,
-and enumeration types used across services, drivers, and common modules.
+platform-wide constants, routing keys, service names, URL prefixes, and enumeration types used across services, drivers,
+and common modules.
 
 ## Module Information
 

@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-common-gateway` is the shared gateway module of the IoT DC3 platform. It provides the `Authentic` gateway filter
-factory and supporting services that validate tokens with the
-Auth Center before forwarding requests in the `dc3-gateway`.
+factory and supporting services that validate tokens with the Auth Center before forwarding requests in the
+`dc3-gateway`.
 
 ## Module Information
 

@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-common-test` is the shared test-support module of the IoT DC3 platform. It provides reusable contract tests,
-test harnesses, and Testcontainers definitions so individual modules can write integration tests without re-deriving
-the same fixtures.
+`dc3-common-test` is the shared test-support module of the IoT DC3 platform. It provides reusable contract tests, test
+harnesses, and Testcontainers definitions so individual modules can write integration tests without re-deriving the same
+fixtures.
 
 ## Module Information
 

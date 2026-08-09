@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-common-quartz` is the shared Quartz scheduler module of the IoT DC3 platform. It provides a reusable
-`QuartzService` for programmatically registering scheduled jobs across services, primarily used by Data, Manager,
-MQTT, and Driver modules for periodic tasks.
+`QuartzService` for programmatically registering scheduled jobs across services, primarily used by Data, Manager, MQTT,
+and Driver modules for periodic tasks.
 
 ## Module Information
 

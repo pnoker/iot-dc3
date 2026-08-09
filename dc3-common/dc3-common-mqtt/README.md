@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-common-mqtt` is the shared MQTT module of the IoT DC3 platform. It provides auto-configuration (via Spring
-Integration and the Eclipse Paho client) for MQTT connection, inbound message handling, and topic subscription,
-used by the MQTT driver and any service requiring MQTT connectivity.
+Integration and the Eclipse Paho client) for MQTT connection, inbound message handling, and topic subscription, used by
+the MQTT driver and any service requiring MQTT connectivity.
 
 ## Module Information
 
@@ -44,8 +44,7 @@ dc3:
 ## Usage
 
 This module is activated when the `mqtt` profile is included or MQTT-related auto-configuration is on the classpath. The
-MQTT driver (`dc3-driver-mqtt`) depends on this module as
-its primary integration layer.
+MQTT driver (`dc3-driver-mqtt`) depends on this module as its primary integration layer.
 
 ## Build Instructions
 

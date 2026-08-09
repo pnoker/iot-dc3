@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-driver-listening-virtual` is the Listening Virtual Driver of the IoT DC3 platform. It operates in passive listening
-mode, accepting inbound TCP and UDP connections from
-devices that push data. It demonstrates listening-type driver patterns supporting both TCP and UDP transports.
+mode, accepting inbound TCP and UDP connections from devices that push data. It demonstrates listening-type driver
+patterns supporting both TCP and UDP transports.
 
 ## Module Information
 

@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-driver-fins` is the Omron FINS protocol driver of the IoT DC3 platform. It communicates with Omron PLCs via
-the FINS protocol over TCP sockets, building FINS frames manually with proper headers and memory read/write
-commands. It supports the D, W, H, and C memory areas. No external protocol library is used.
+`dc3-driver-fins` is the Omron FINS protocol driver of the IoT DC3 platform. It communicates with Omron PLCs via the
+FINS protocol over TCP sockets, building FINS frames manually with proper headers and memory read/write commands. It
+supports the D, W, H, and C memory areas. No external protocol library is used.
 
 ## Module Information
 

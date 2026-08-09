@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-driver-bacnet-ip` is the BACnet/IP protocol driver of the IoT DC3 platform. It uses the BACnet4J library to
-communicate with BACnet/IP devices over UDP, reading and writing object properties addressed by remote device
-instance number, object type, object instance, and property identifier.
+communicate with BACnet/IP devices over UDP, reading and writing object properties addressed by remote device instance
+number, object type, object instance, and property identifier.
 
 ## Module Information
 

@@ -111,8 +111,7 @@ make tag major      # major: v2025.10.0 -> v2026.0.0
 `bash dc3/bin/tag.sh --dry-run` previews the next tag without pushing. Tagging only runs on `main`.
 
 Generated changelog-only release commits are skipped by default so rerunning the command after committing
-`CHANGE.md` remains stable. Set `INCLUDE_CHANGELOG_COMMITS=true` only when those commits should appear in
-release notes.
+`CHANGE.md` remains stable. Set `INCLUDE_CHANGELOG_COMMITS=true` only when those commits should appear in release notes.
 
 ## Coding Guidelines
 

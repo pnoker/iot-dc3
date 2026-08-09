@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-driver-dlms` is the DLMS/COSEM protocol driver of the IoT DC3 platform. It is intended to read COSEM object
-attributes from energy meters and similar devices over TCP or serial transports, using the Gurux DLMS library to
-build and decode DLMS frames.
+attributes from energy meters and similar devices over TCP or serial transports, using the Gurux DLMS library to build
+and decode DLMS frames.
 
 > ⚠️ **Work in progress.** This driver is a skeleton — its class documentation explicitly states "Protocol-level
 > I/O is not yet fully implemented" and the method bodies carry TODO markers. The Gurux client generates DLMS
@@ -44,8 +44,8 @@ build and decode DLMS frames.
 
 ## Prerequisites
 
-A reachable DLMS/COSEM device (or simulator) over TCP (default port 4059) or serial, plus the matching client/
-server addresses and authentication settings.
+A reachable DLMS/COSEM device (or simulator) over TCP (default port 4059) or serial, plus the matching client/ server
+addresses and authentication settings.
 
 ## Running Locally
 

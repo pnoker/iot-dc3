@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-center-data` is the Data Center of the IoT DC3 platform. It integrates common messaging middleware including AMQP,
-WebSocket, and MQTT for collecting device point values from
-drivers, storing them in the time-series repository, and exposing data query APIs.
+WebSocket, and MQTT for collecting device point values from drivers, storing them in the time-series repository, and
+exposing data query APIs.
 
 ## Module Information
 

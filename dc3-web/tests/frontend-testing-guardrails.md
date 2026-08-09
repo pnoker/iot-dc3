@@ -1,8 +1,7 @@
 # Frontend Testing Guardrails
 
-This project uses tests as guardrails for AI-assisted development. Every change
-should make the smallest safe code edit and update the test layer that protects
-the behavior being changed.
+This project uses tests as guardrails for AI-assisted development. Every change should make the smallest safe code edit
+and update the test layer that protects the behavior being changed.
 
 ## Required Test Mapping
 
@@ -18,23 +17,20 @@ the behavior being changed.
 | `src/config/router/**`              | Playwright route/auth smoke tests | `pnpm run test:e2e`             |
 | build, lint, test, CI configuration | Guardrail tests and full quality  | `pnpm run test:ci`              |
 
-Run `pnpm run test:impact` before finishing a feature to print the checks that
-match the current changed files.
+Run `pnpm run test:impact` before finishing a feature to print the checks that match the current changed files.
 
 ## AI Change Rules
 
-- Do not change production code without updating or confirming the relevant
-  test layer from the mapping above.
+- Do not change production code without updating or confirming the relevant test layer from the mapping above.
 - Do not commit focused or disabled tests such as `test.only`, `describe.only`,
   `test.skip`, or `test.todo`.
 - Do not add a new API wrapper file unless it is included in
   `tests/api/api-contracts.test.ts`.
-- Do not use URL query strings or path interpolation inside API wrapper URLs.
-  Pass dynamic values through Axios `params` or request bodies.
-- Do not add fixed production IDs to tests. Test data must be discovered or
-  created at runtime.
-- Do not add new scenarios to `tests/e2e/browser-sweep.mjs`; it is a thin
-  browser sweep entrypoint. Prefer Playwright specs for new browser scenarios.
+- Do not use URL query strings or path interpolation inside API wrapper URLs. Pass dynamic values through Axios `params`
+  or request bodies.
+- Do not add fixed production IDs to tests. Test data must be discovered or created at runtime.
+- Do not add new scenarios to `tests/e2e/browser-sweep.mjs`; it is a thin browser sweep entrypoint. Prefer Playwright
+  specs for new browser scenarios.
 - Do not hide broken coverage by loosening thresholds without a clear reason.
 
 ## E2E Data Rules
@@ -43,8 +39,7 @@ match the current changed files.
 - Runtime fixture data must use the `e2e_` prefix.
 - Data created by a test must be registered in the cleanup stack.
 - Delete checks must target disposable fixture data only.
-- Playwright tests must report console errors, page errors, and failing
-  business API responses.
+- Playwright tests must report console errors, page errors, and failing business API responses.
 
 ## CI Gates
 
@@ -56,8 +51,7 @@ Pull requests and pushes run the non-environment-dependent quality gate:
 4. `pnpm run test:ci`
 5. `pnpm build`
 
-Playwright E2E runs through the manual workflow when a disposable backend URL is
-provided with `e2e_base_url`.
+Playwright E2E runs through the manual workflow when a disposable backend URL is provided with `e2e_base_url`.
 
 ## Adding New Features
 
@@ -74,8 +68,7 @@ pnpm run test:ci
 pnpm run build
 ```
 
-For route or page changes, also run Playwright against a disposable test
-environment:
+For route or page changes, also run Playwright against a disposable test environment:
 
 ```bash
 E2E_BASE_URL=http://localhost:8080 E2E_START_SERVER=0 pnpm run test:e2e

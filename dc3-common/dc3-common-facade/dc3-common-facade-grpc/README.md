@@ -4,8 +4,8 @@
 
 `dc3-common-facade-grpc` is the **gRPC-backed implementation** of the facade contracts defined in
 `dc3-common-facade-api`. Each facade translates a business call into a gRPC request against the corresponding center
-service (auth / manager / data), so business code makes cross-process calls without touching gRPC stubs directly.
-This is the default implementation for the distributed (multi-service) deployment.
+service (auth / manager / data), so business code makes cross-process calls without touching gRPC stubs directly. This
+is the default implementation for the distributed (multi-service) deployment.
 
 ## Module Information
 
@@ -23,8 +23,8 @@ etc. `GrpcFacadeSupport` holds shared response-unwrapping / error-mapping helper
 
 ## Activation
 
-Active when `dc3.facade.mode=grpc` (`DC3_FACADE_MODE`, the default). gRPC channels are configured per service
-(e.g. the auth channel points at `dc3-center-auth:9300`).
+Active when `dc3.facade.mode=grpc` (`DC3_FACADE_MODE`, the default). gRPC channels are configured per service (e.g. the
+auth channel points at `dc3-center-auth:9300`).
 
 ## Dependencies
 

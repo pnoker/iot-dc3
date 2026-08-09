@@ -3,8 +3,7 @@
 ## Overview
 
 `dc3-api-auth` provides gRPC service definitions for authentication and authorization in the IoT DC3 platform. It
-defines the interfaces for tenant management, user authentication,
-token validation, and local credential lookup.
+defines the interfaces for tenant management, user authentication, token validation, and local credential lookup.
 
 ## Module Information
 

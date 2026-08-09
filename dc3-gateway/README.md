@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-gateway` is the API Gateway of the IoT DC3 platform, built on Spring Cloud Gateway (WebFlux). It serves as the
-single ingress point for all external HTTP traffic, providing
-rate limiting, authentication verification, service routing, and reverse proxying.
+single ingress point for all external HTTP traffic, providing rate limiting, authentication verification, service
+routing, and reverse proxying.
 
 ## Module Information
 
@@ -31,8 +31,8 @@ rate limiting, authentication verification, service routing, and reverse proxyin
 
 ## Routing Rules
 
-Routes are matched in definition order (first match wins); the public token and OAuth
-metadata routes are deliberately defined before the `/api/v3/auth/**` wildcard.
+Routes are matched in definition order (first match wins); the public token and OAuth metadata routes are deliberately
+defined before the `/api/v3/auth/**` wildcard.
 
 | Path Pattern                                                                                                     | Backend Service      | Auth Required |
 |------------------------------------------------------------------------------------------------------------------|----------------------|---------------|
@@ -44,8 +44,8 @@ metadata routes are deliberately defined before the `/api/v3/auth/**` wildcard.
 | `/api/v3/data/**`                                                                                                | `dc3-center-data`    | Yes           |
 | `/api/v3/agentic/**`                                                                                             | `dc3-center-agentic` | Yes           |
 
-The `/oauth2/**` and `/.well-known/**` routes expose the Auth Center's OAuth2
-authorization-server and MCP discovery endpoints for MCP clients.
+The `/oauth2/**` and `/.well-known/**` routes expose the Auth Center's OAuth2 authorization-server and MCP discovery
+endpoints for MCP clients.
 
 ## Dependencies
 

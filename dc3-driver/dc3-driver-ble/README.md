@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-driver-ble` is the Bluetooth LE (BLE) protocol driver of the IoT DC3 platform. It uses the Sputnikdev
-Bluetooth Manager with the TinyB transport to connect to BLE devices, read GATT characteristic values, and write
-values to characteristics.
+`dc3-driver-ble` is the Bluetooth LE (BLE) protocol driver of the IoT DC3 platform. It uses the Sputnikdev Bluetooth
+Manager with the TinyB transport to connect to BLE devices, read GATT characteristic values, and write values to
+characteristics.
 
 ## Module Information
 
@@ -39,8 +39,8 @@ values to characteristics.
 
 ## Prerequisites
 
-A host with a Bluetooth adapter and the TinyB native library available, plus a reachable BLE peripheral exposing
-the configured GATT service and characteristics.
+A host with a Bluetooth adapter and the TinyB native library available, plus a reachable BLE peripheral exposing the
+configured GATT service and characteristics.
 
 ## Running Locally
 

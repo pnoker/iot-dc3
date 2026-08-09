@@ -83,8 +83,7 @@
 
 6層マイクロサービスアーキテクチャの全体像：クライアント → ゲートウェイ → 4つのセンターサービス → メッセージバス → 28
 プロトコルドライバー → フィールドデバイス。PostgreSQL（TimescaleDB + pgvector +
-AGE）永続層とオプションの可観測性スタック（ELK +
-Prometheus + Grafana）を一望できます。
+AGE）永続層とオプションの可観測性スタック（ELK + Prometheus + Grafana）を一望できます。
 
 🧱 **設計原則** — サービス間呼び出しは常に Facade インターフェース経由；DO/BO/VO の三層モデルで永続化・ビジネス・API
 の形を厳密に分離；テナント分離をデータベース・キャッシュ・API パスまで一貫して適用。境界が明確で、サービスとチームの規模拡大に強い設計です。
@@ -99,11 +98,11 @@ Prometheus + Grafana）を一望できます。
 IoT DC3 は **28 個の接続ドライバーモジュール**を内蔵し、産業オートメーション、IoT
 通信、データブリッジ、基本通信、シミュレーションとデバッグのシナリオをカバーします。一般的なデバイスやデータソースの接続コストを下げます。
 
-| 分類                   | ドライバーモジュール                                                                                                                                         |
-|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🏭 **産業プロトコル**       | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **IoT プロトコル**     | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **データブリッジ**      | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
+| 分類                              | ドライバーモジュール                                                                                                                               |
+|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **産業プロトコル**             | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
+| 📡 **IoT プロトコル**             | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
+| 🗄️ **データブリッジ**             | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
 | 🔧 **基本通信とネットワーク管理** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
 | 🧪 **シミュレーションとデバッグ** | Virtual · Listening Virtual                                                                                                                        |
 
@@ -168,24 +167,24 @@ mvn -s .mvn/settings.xml clean package
 
 ## 🛠️ 技術スタック
 
-IoT DC3 は Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、
-TypeScript、Vite を基盤に構築されています。
+IoT DC3 は Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、TypeScript、Vite
+を基盤に構築されています。
 
 各コンポーネントの役割と詳細は [Technology Stack](https://docs.dc3.site/en/development/technology-stack) を参照してください。
 
 ## 📖 ドキュメントとコミュニティ
 
-| リソース           | リンク                                                                        |
-|----------------|----------------------------------------------------------------------------|
-| 📚 オンラインドキュメント | [docs.dc3.site](https://docs.dc3.site/)                                    |
-| 🚀 クイックスタート    | [クイックスタートガイド](https://docs.dc3.site/en/quickstart/)                        |
-| 🛠️ 技術スタック     | [Technology Stack](https://docs.dc3.site/en/development/technology-stack) |
-| 🏗️ アーキテクチャ    | [モジュールと依存関係](https://docs.dc3.site/en/architecture/modules)                |
-| 🔧 ドライバー開発     | [ドライバー開発ガイド](https://docs.dc3.site/en/development/driver-authoring)        |
-| 🐛 トラブルシューティング | [よくある問題と解決策](https://docs.dc3.site/en/guide/troubleshooting)               |
-| 📋 変更履歴        | [リリース変更履歴](https://docs.dc3.site/en/development/changelog)                 |
-| 🐛 問題報告        | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                  |
-| 🇨🇳 Gitee ミラー | [Gitee GVP プロジェクト](https://gitee.com/pnoker/iot-dc3)                       |
+| リソース                  | リンク                                                                        |
+|---------------------------|-------------------------------------------------------------------------------|
+| 📚 オンラインドキュメント | [docs.dc3.site](https://docs.dc3.site/)                                       |
+| 🚀 クイックスタート       | [クイックスタートガイド](https://docs.dc3.site/en/quickstart/)                |
+| 🛠️ 技術スタック           | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)     |
+| 🏗️ アーキテクチャ         | [モジュールと依存関係](https://docs.dc3.site/en/architecture/modules)         |
+| 🔧 ドライバー開発         | [ドライバー開発ガイド](https://docs.dc3.site/en/development/driver-authoring) |
+| 🐛 トラブルシューティング | [よくある問題と解決策](https://docs.dc3.site/en/guide/troubleshooting)        |
+| 📋 変更履歴               | [リリース変更履歴](https://docs.dc3.site/en/development/changelog)            |
+| 🐛 問題報告               | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                     |
+| 🇨🇳 Gitee ミラー           | [Gitee GVP プロジェクト](https://gitee.com/pnoker/iot-dc3)                    |
 
 ## 🌍 ユースケース
 
@@ -216,8 +215,8 @@ TypeScript、Vite を基盤に構築されています。
 
 あらゆる形のコントリビューションを歓迎します。以下の流れに従ってください。
 
-1. **Fork とブランチ作成** - `main` からブランチを作成し、`feature/your_name/feature_description` 形式で命名します
-   （例: `feature/pnoker/mqtt_driver`）
+1. **Fork とブランチ作成** - `main` からブランチを作成し、`feature/your_name/feature_description` 形式で命名します （例:
+   `feature/pnoker/mqtt_driver`）
 2. **開発とコミット** - 新しいブランチで変更を完了し、[Conventional Commits](https://www.conventionalcommits.org/)
    仕様に従います
 3. **PR 作成** - `develop` ブランチへ Pull Request を提出し、メンテナーのレビューとマージを受けます

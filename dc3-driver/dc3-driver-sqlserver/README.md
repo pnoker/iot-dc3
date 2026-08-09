@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-driver-sqlserver` is the Microsoft SQL Server database driver of the IoT DC3 platform. It connects to a SQL
-Server instance via JDBC, reads point values by executing configured SQL `SELECT` queries on a schedule, and
-writes / executes SQL for write commands. It builds on the shared `AbstractJdbcDriverCustomService` from
+`dc3-driver-sqlserver` is the Microsoft SQL Server database driver of the IoT DC3 platform. It connects to a SQL Server
+instance via JDBC, reads point values by executing configured SQL `SELECT` queries on a schedule, and writes / executes
+SQL for write commands. It builds on the shared `AbstractJdbcDriverCustomService` from
 `dc3-common-sql`, which constructs the JDBC URL
 `jdbc:sqlserver://<host>:<port>;databaseName=<database>;encrypt=<encrypt>;trustServerCertificate=<...>;`
 using the `com.microsoft.sqlserver.jdbc.SQLServerDriver`.
@@ -44,8 +44,8 @@ using the `com.microsoft.sqlserver.jdbc.SQLServerDriver`.
 
 ## Prerequisites
 
-A reachable Microsoft SQL Server instance. The connection URL, credentials, encryption flags, and the SQL queries
-to run are all supplied through the driver and point attributes above — nothing is hardcoded.
+A reachable Microsoft SQL Server instance. The connection URL, credentials, encryption flags, and the SQL queries to run
+are all supplied through the driver and point attributes above — nothing is hardcoded.
 
 ## Running Locally
 

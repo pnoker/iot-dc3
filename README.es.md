@@ -106,7 +106,7 @@ fuentes de datos comunes:
 |------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | 🏭 **Protocolos industriales**                 | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
 | 📡 **Protocolos IoT**                          | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **Puenteo de datos**                       | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
+| 🗄️ **Puenteo de datos**                        | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
 | 🔧 **Comunicaciones básicas y gestión de red** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
 | 🧪 **Simulación y depuración**                 | Virtual · Listening Virtual                                                                                                                        |
 
@@ -191,13 +191,13 @@ componentes y dónde se utiliza cada tecnología.
 |--------------------------------|--------------------------------------------------------------------------------------------|
 | 📚 Documentación en línea      | [docs.dc3.site](https://docs.dc3.site/)                                                    |
 | 🚀 Inicio rápido               | [Guía de inicio rápido](https://docs.dc3.site/en/quickstart/)                              |
-| 🛠️ Stack tecnológico          | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)                 |
-| 🏗️ Arquitectura               | [Módulos y dependencias](https://docs.dc3.site/en/architecture/modules)                    |
+| 🛠️ Stack tecnológico           | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)                  |
+| 🏗️ Arquitectura                | [Módulos y dependencias](https://docs.dc3.site/en/architecture/modules)                    |
 | 🔧 Desarrollo de controladores | [Guía de creación de controladores](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Solución de problemas       | [Solución de problemas](https://docs.dc3.site/en/guide/troubleshooting)                    |
 | 📋 Registro de cambios         | [Registro de cambios de versión](https://docs.dc3.site/en/development/changelog)           |
 | 🐛 Reporte de problemas        | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                                  |
-| 🇨🇳 Espejo de Gitee           | [Proyecto GVP de Gitee](https://gitee.com/pnoker/iot-dc3)                                  |
+| 🇨🇳 Espejo de Gitee             | [Proyecto GVP de Gitee](https://gitee.com/pnoker/iot-dc3)                                  |
 
 ## 🌍 Casos de uso
 

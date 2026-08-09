@@ -41,8 +41,8 @@ topics, parse incoming payloads as device point values, and forward commands to 
 
 ## Prerequisites
 
-An MQTT broker must be running. The dev profile connects to the RabbitMQ MQTT plugin (`dc3-rabbitmq:2883`),
-which ships with the base stack:
+An MQTT broker must be running. The dev profile connects to the RabbitMQ MQTT plugin (`dc3-rabbitmq:2883`), which ships
+with the base stack:
 
 ```bash
 podman compose -f dc3/docker-compose-db.yml up -d

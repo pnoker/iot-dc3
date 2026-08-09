@@ -4,9 +4,9 @@
 
 `dc3-driver-sl651` is the SL651-2014 hydrological telemetry driver of the IoT DC3 platform. SL651 is a server-side
 protocol: remote hydrological monitoring stations push telemetry reports to a central server. This driver starts an
-SL651 TCP server (via the `iot-communication` library) on the configured listen port, receives station reports,
-extracts the telemetry body elements, matches the station address against device code/name, and forwards the value
-at the configured element index as a point value to the DC3 platform.
+SL651 TCP server (via the `iot-communication` library) on the configured listen port, receives station reports, extracts
+the telemetry body elements, matches the station address against device code/name, and forwards the value at the
+configured element index as a point value to the DC3 platform.
 
 Because data arrives asynchronously and unsolicited from remote stations, this is a listener driver rather than a
 polling one — the SDK `read` and `write` methods are intentionally not used (`read` returns `null` and `write`
@@ -44,8 +44,8 @@ The listen port is exposed as a driver attribute (see below) and read at startup
 ## Prerequisites
 
 SL651-2014 remote stations configured to report to this driver's listen port (default 5001). The `iot-communication`
-library provides the SL651 server; the driver loads it reflectively at startup, so it logs a warning and remains idle
-if the SL651 API is unavailable.
+library provides the SL651 server; the driver loads it reflectively at startup, so it logs a warning and remains idle if
+the SL651 API is unavailable.
 
 ## Running Locally
 

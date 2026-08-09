@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-common-thread` is the shared thread pool module of the IoT DC3 platform. It exposes a set of JDK executor
-beans (configured from the `dc3.thread` properties) that other modules inject explicitly for background work such
-as concurrent point reads and batch message handling.
+`dc3-common-thread` is the shared thread pool module of the IoT DC3 platform. It exposes a set of JDK executor beans
+(configured from the `dc3.thread` properties) that other modules inject explicitly for background work such as
+concurrent point reads and batch message handling.
 
 ## Module Information
 

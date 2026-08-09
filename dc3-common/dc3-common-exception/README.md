@@ -3,8 +3,7 @@
 ## Overview
 
 `dc3-common-exception` defines the standard exception types and exception utility class for the IoT DC3 platform. All
-services and modules use these exceptions to signal business
-errors consistently.
+services and modules use these exceptions to signal business errors consistently.
 
 ## Module Information
 

@@ -3,8 +3,7 @@
 ## Overview
 
 `dc3-common-api` provides shared gRPC utility classes used across all services in the IoT DC3 platform. It contains
-builder utilities for constructing gRPC request/response objects
-from domain model entities.
+builder utilities for constructing gRPC request/response objects from domain model entities.
 
 ## Module Information
 

@@ -2,8 +2,8 @@
 
 Shared engineering instructions for AI coding agents working in this repository.
 
-This is the canonical project guidance file. Keep tool-specific files such as `CLAUDE.md` as thin compatibility
-pointers to this file so various AI coding assistants follow the same rules.
+This is the canonical project guidance file. Keep tool-specific files such as `CLAUDE.md` as thin compatibility pointers
+to this file so various AI coding assistants follow the same rules.
 
 ## Project Snapshot
 
@@ -186,7 +186,8 @@ path. CI should prefer public Maven Central defaults.
 - `dc3/env/dev.env`: IDE-friendly local Java process variables without `export`.
 - `dc3/env/dev.env.sh`: shell-friendly local Java process variables with `export`.
 
-Do not treat these files as interchangeable. See https://docs.dc3.site/en/quickstart/environment before changing environment variables.
+Do not treat these files as interchangeable. See https://docs.dc3.site/en/quickstart/environment before changing
+environment variables.
 
 ## Compose Rules
 
@@ -206,8 +207,8 @@ make up-db-global && make up-optional-global && make up-app-global
 make compose-config STACK=optional REGISTRY=cn
 ```
 
-For container changes, run `make config` or the corresponding `podman compose config` path for every
-touched compose file.
+For container changes, run `make config` or the corresponding `podman compose config` path for every touched compose
+file.
 
 ## Architecture Rules
 
@@ -242,8 +243,8 @@ When changing a gRPC contract:
 4. Preserve backward compatibility where practical.
 5. Verify tenant propagation and error envelope behavior.
 
-Server classes should be Spring beans extending generated `*ImplBase` classes. Client stubs should come from shared
-stub configuration instead of ad hoc channel construction.
+Server classes should be Spring beans extending generated `*ImplBase` classes. Client stubs should come from shared stub
+configuration instead of ad hoc channel construction.
 
 Server implementation pattern:
 
@@ -259,8 +260,8 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
 ### Driver SDK
 
-Drivers implement a composable set of SPI interfaces from `dc3-common-driver`. The SDK handles registration,
-scheduling, and value dispatch — drivers only implement protocol logic.
+Drivers implement a composable set of SPI interfaces from `dc3-common-driver`. The SDK handles registration, scheduling,
+and value dispatch — drivers only implement protocol logic.
 
 | SPI Interface            | Methods                                              | Purpose                                               |
 |--------------------------|------------------------------------------------------|-------------------------------------------------------|
@@ -285,30 +286,26 @@ the SDK runtime.
 
 ### OpenAPI / Swagger
 
-REST endpoints are documented with springdoc-openapi (annotations only, no
-hand-maintained spec). See https://docs.dc3.site/en/development/api-documentation for the full
-guide.
+REST endpoints are documented with springdoc-openapi (annotations only, no hand-maintained spec).
+See https://docs.dc3.site/en/development/api-documentation for the full guide.
 
-- Annotate controllers (`@Tag`, `@Operation`, `@Parameter`) and DTOs
-  (`@Schema` with `example` / `requiredMode` where useful). Keep all doc text
-  English.
-- Each business module owns a `GroupedOpenApi` bean (e.g. `AuthApiGroupConfig`);
-  add one when introducing a new center with its own controller package, plus a
-  gateway aggregation route and `swagger-ui.urls` entry.
+- Annotate controllers (`@Tag`, `@Operation`, `@Parameter`) and DTOs (`@Schema` with `example` / `requiredMode` where
+  useful). Keep all doc text English.
+- Each business module owns a `GroupedOpenApi` bean (e.g. `AuthApiGroupConfig`); add one when introducing a new center
+  with its own controller package, plus a gateway aggregation route and `swagger-ui.urls` entry.
 - Shared config (`SpringDocConfig`, `WebFluxSecurityConfig`) lives in
-  `dc3-common-web` and is registered in `AutoConfiguration.imports` — center
-  apps do not scan `io.github.pnoker.common.config`, so a plain `@Configuration`
+  `dc3-common-web` and is registered in `AutoConfiguration.imports` — center apps do not scan
+  `io.github.pnoker.common.config`, so a plain `@Configuration`
   there will not load.
-- Docs are exposed in dev/test/pre and disabled in production (`pro` profile).
-  View aggregated docs at the gateway `:8000/swagger-ui.html`; export with
+- Docs are exposed in dev/test/pre and disabled in production (`pro` profile). View aggregated docs at the gateway
+  `:8000/swagger-ui.html`; export with
   `make openapi` against a running stack.
 
 ### CRUD Verb Convention
 
-The verb on every CRUD-shaped method and HTTP path must reflect the
-cardinality of the result, applied consistently across Service interfaces,
-ServiceImpl, Controller, Local Facade, gRPC Facade, gRPC server, and gRPC
-RPC names in `.proto` files.
+The verb on every CRUD-shaped method and HTTP path must reflect the cardinality of the result, applied consistently
+across Service interfaces, ServiceImpl, Controller, Local Facade, gRPC Facade, gRPC server, and gRPC RPC names in
+`.proto` files.
 
 | Action                 | Java method    | HTTP path   | gRPC RPC  |
 |------------------------|----------------|-------------|-----------|
@@ -323,8 +320,8 @@ RPC names in `.proto` files.
   `getByXxx`/`listByXxx` only with extra cardinality-matching verbs.
 - `select*` is reserved for raw MyBatis Mapper calls inside `*ManagerImpl`
   classes, never on Service/Controller/Facade APIs.
-- `remove*` is reserved for MyBatis-Plus inherited Manager methods
-  (`removeById`, `remove(wrapper)`); business deletion uses `delete*`.
+- `remove*` is reserved for MyBatis-Plus inherited Manager methods (`removeById`, `remove(wrapper)`); business deletion
+  uses `delete*`.
 - `find*`, `query*`, `fetch*` are not used as primary CRUD verbs.
 - HTTP paths use lowercase snake_case and mirror the Java method name.
 - gRPC RPC names use PascalCase and mirror the Java method name.
@@ -333,10 +330,10 @@ Special cases follow the same cardinality rule:
 
 - `getStatusByPage(Q)` for status-snapshot lookups whose return type is a
   `Map<Long,String>`, not a `Page` (DeviceStatusService, DriverStatusService).
-- Boolean-returning action methods stay on a try-pattern verb when the
-  failure outcome is a normal result, e.g. `tryCancelToken(...)`.
-- Single-record dispatch facades use `dispatch*` to avoid noun-verb
-  ambiguity (`PointValueCommandFacade.dispatchRead/dispatchWrite`).
+- Boolean-returning action methods stay on a try-pattern verb when the failure outcome is a normal result, e.g.
+  `tryCancelToken(...)`.
+- Single-record dispatch facades use `dispatch*` to avoid noun-verb ambiguity
+  (`PointValueCommandFacade.dispatchRead/dispatchWrite`).
 
 ### Domain Modeling
 
@@ -358,17 +355,16 @@ Keep persistence, business, and web representations deliberately separated.
   rule applies to persistent business entities and to write-path business inputs (command submission, event reports),
   which must accept a `BO`; the controller (or transport adapter) converts the inbound `VO`/request into that `BO`.
 - MyBatis-Plus query conditions may use enum values directly when the enum field has `@EnumValue`, for example
-  `.eq(EntityDO::getEnableFlag, EnableFlagEnum.ENABLE)`. Plain Java comparisons against `Byte` fields must compare
-  with the enum index, preferably centralized in a builder or helper.
+  `.eq(EntityDO::getEnableFlag, EnableFlagEnum.ENABLE)`. Plain Java comparisons against `Byte` fields must compare with
+  the enum index, preferably centralized in a builder or helper.
 - Do not introduce magic flag constants such as `private static final Byte DEFAULT = 1`. Add or reuse a domain enum
   instead, with `@EnumValue`, `ofIndex(...)`, and clear names.
 - Domain enum suffixes follow strict semantics:
     - `*FlagEnum` for boolean-like 0/1 toggles (`EnableFlagEnum`, `DefaultFlagEnum`, `ConfirmFlagEnum`).
     - `*StatusEnum` for state-machine values with multiple states (`EntityStatusEnum`, `RuleStatusEnum`,
       `NotifyHistoryStatusEnum`). Do not append `Flag` to a state-machine enum name.
-    - `*TypeEnum` for closed classification sets, including multi-valued classifications and levels
-      (`MetadataTypeEnum`, `PointTypeEnum`, `EventLevelEnum`, `ExpireTypeEnum`). Multi-valued sets must not
-      use the `*FlagEnum` suffix.
+    - `*TypeEnum` for closed classification sets, including multi-valued classifications and levels (`MetadataTypeEnum`,
+      `PointTypeEnum`, `EventLevelEnum`, `ExpireTypeEnum`). Multi-valued sets must not use the `*FlagEnum` suffix.
 - Enum constant names use `UPPER_SNAKE_CASE` and stay descriptive — single-letter names like `R`/`W` are not allowed.
   The internal `code` string field on enums uses lowercase tokens (e.g. `"enable"`, `"online"`, `"pending"`) so that
   values are consistent across `*FlagEnum`, `*StatusEnum`, and `*TypeEnum` definitions.
@@ -492,17 +488,16 @@ Rules:
 - For release-note-only commits, use exactly `docs(release): update generated changelog`.
 
 Husky manages Git hooks automatically — no manual install needed. The `pre-commit` hook runs lint-staged (eslint)
-on staged files before each commit. A `commit-msg` hook stub exists (`.husky/_/commit-msg`) but has no
-validation script attached yet; to enforce conventional-commit format, add a script at `.husky/commit-msg`.
+on staged files before each commit. A `commit-msg` hook stub exists (`.husky/_/commit-msg`) but has no validation script
+attached yet; to enforce conventional-commit format, add a script at `.husky/commit-msg`.
 
 ## Testing
 
 ### Test Pyramid
 
 - **Unit tests** (`*Test.java`, `*Tests.java`): run by Surefire. JUnit 5 + Mockito (
-  `@ExtendWith(MockitoExtension.class)`),
-  AssertJ assertions, Reactor `StepVerifier` for reactive code. No Spring context spin-up — controllers are tested with
-  manual dependency injection and context wiring.
+  `@ExtendWith(MockitoExtension.class)`), AssertJ assertions, Reactor `StepVerifier` for reactive code. No Spring
+  context spin-up — controllers are tested with manual dependency injection and context wiring.
 - **Integration tests** (`*IT.java`): run by Failsafe. Use `dc3-common-test` infrastructure: Testcontainers
   (`PgTimescaleContainer`, `RabbitContainer`, `MqttContainer`), gRPC in-process extension (`GrpcInProcessExtension`),
   and RabbitMQ test harness (`RabbitTestHarness`).
@@ -524,8 +519,8 @@ validation script attached yet; to enforce conventional-commit format, add a scr
 
 ### Contract Tests
 
-- `EnumContractTest<E>`: abstract test verifying `getIndex()` uniqueness, `ofIndex()` round-trip, and name stability
-  for all enum constants via `@TestFactory`.
+- `EnumContractTest<E>`: abstract test verifying `getIndex()` uniqueness, `ofIndex()` round-trip, and name stability for
+  all enum constants via `@TestFactory`.
 - `SecretFieldContractTest`: verifies sensitive fields (apiKey, password, secret, token) are excluded from
   `@ToString` and serialization.
 
@@ -545,15 +540,14 @@ Run checks proportional to the change:
 - DAL or SQL change: `make test-it` (requires a Docker-compatible container runtime, runs Testcontainers)
 - gRPC proto change: regenerate stubs and run the matching contract tests
 - Aggregate coverage check: `make coverage` and inspect
-  `dc3-coverage/target/site/jacoco-aggregate/index.html`. Coverage
-  regressions greater than 1% block the change.
+  `dc3-coverage/target/site/jacoco-aggregate/index.html`. Coverage regressions greater than 1% block the change.
 - Changelog script: `python3 -m py_compile dc3/bin/changelog.py`
 - Compose files: `podman compose -f dc3/<file>.yml config --quiet`
 - YAML syntax: parse changed YAML after normalizing Maven placeholders such as `@project.artifactId@`
 - Agent or docs changes: check links, command examples, stale filenames, and current workflow names
 
-See https://docs.dc3.site/en/development/testing for the full test pyramid, naming conventions,
-Testcontainers strategy and CI workflow expectations.
+See https://docs.dc3.site/en/development/testing for the full test pyramid, naming conventions, Testcontainers strategy
+and CI workflow expectations.
 
 Before committing code that changes public behavior, mention what was verified and what was not verified.
 
@@ -570,8 +564,11 @@ Before committing code that changes public behavior, mention what was verified a
 ## Documentation Rules
 
 - Root README files in multiple languages should stay structurally aligned.
-- Runtime and environment changes should update the environment guide in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/quickstart/environment).
-- Driver authoring changes should update the driver-authoring guide in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/development/driver-authoring).
+- Runtime and environment changes should update the environment guide
+  in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/quickstart/environment).
+- Driver authoring changes should update the driver-authoring guide
+  in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/development/driver-authoring).
 - Container changes should update compose examples and `.env.example` if variables change.
-- Test strategy, harness or coverage gate changes should update the testing guide in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/development/testing).
+- Test strategy, harness or coverage gate changes should update the testing guide
+  in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/development/testing).
 - Release workflow changes should update `CONTRIBUTING.md` and this file.

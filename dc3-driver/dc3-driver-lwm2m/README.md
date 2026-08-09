@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-driver-lwm2m` is the LwM2M (Lightweight M2M) protocol driver of the IoT DC3 platform. It is intended to run an
-embedded Eclipse Leshan LwM2M server, accept device registrations, and read/write LwM2M resources by Object /
-Object Instance / Resource ID.
+embedded Eclipse Leshan LwM2M server, accept device registrations, and read/write LwM2M resources by Object / Object
+Instance / Resource ID.
 
 > ⚠️ **Work in progress.** This driver is currently a skeleton — protocol-level I/O is not yet fully implemented. The
 > class documentation of `Lwm2mDriverCustomServiceImpl` explicitly states it is a "work-in-progress skeleton". Treat it

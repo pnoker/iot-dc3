@@ -10,8 +10,8 @@ these contracts at runtime:
 - **In-process** (`dc3-common-facade-local-auth` / `-data` / `-manager`) — direct local calls inside the
   `dc3-center-single` monolith.
 
-The implementation is selected by the `dc3.facade.mode` property (`DC3_FACADE_MODE`, default `grpc`), so controllers
-and services never depend on transport details.
+The implementation is selected by the `dc3.facade.mode` property (`DC3_FACADE_MODE`, default `grpc`), so controllers and
+services never depend on transport details.
 
 ## Module Information
 
@@ -36,8 +36,8 @@ Facades exchange business objects (BO); request/response shaping is the caller's
 ## Usage
 
 Business modules depend on this API module and inject the facade interfaces. The active implementation
-(`dc3-common-facade-grpc` or one of the `dc3-common-facade-local-*` modules) is added per deployment and wired by
-its auto-configuration.
+(`dc3-common-facade-grpc` or one of the `dc3-common-facade-local-*` modules) is added per deployment and wired by its
+auto-configuration.
 
 ## Build Instructions
 
