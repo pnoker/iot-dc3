@@ -18,8 +18,9 @@
 <template>
   <div class="container">
     <div class="header">
-      <el-col :span="4" class="header_item">
+      <el-col :span="4" class="header_item header_brand">
         <img :src="assetUrl('images/logo/logo.svg')" class="header_logo"/>
+        <span class="header_title">IoT DC3</span>
       </el-col>
       <el-col :span="16" class="header_item">
         <el-menu :default-active="handleMenuEnter($route.path)" :router="true" class="header_menu" mode="horizontal">
@@ -419,9 +420,21 @@ const handleCommand = async (command: string) => {
       height: 100%;
     }
 
+    .header_brand {
+      display: flex;
+      align-items: center;
+    }
+
     .header_logo {
-      height: 60px;
+      height: 40px;
       margin-left: 10px;
+    }
+
+    .header_title {
+      margin-left: 10px;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--el-color-primary);
     }
 
     .header_menu {
