@@ -10,15 +10,14 @@ control.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-center-auth
-- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.center.auth`
 
 ## Service Ports
 
-| Protocol  | Port                                                 |
-|-----------|------------------------------------------------------|
-| HTTP REST | `8300` (default, overridable via `SERVER_PORT`)      |
-| gRPC      | `9300` (default, overridable via `GRPC_SERVER_PORT`) |
+| Protocol  | Port   | Configuration variable |
+|-----------|--------|------------------------|
+| HTTP REST | `8300` | `DC3_AUTH_PORT`        |
+| gRPC      | `9300` | `DC3_AUTH_GRPC_PORT`   |
 
 ## Key Responsibilities
 
@@ -26,8 +25,8 @@ control.
 - **Tenant Management**: Multi-tenant registration, lookup by tenant code
 - **User Authentication**: Local credential validation with server-side password hashing
 - **Dictionary Services**: Provide lookup dictionaries for auth-scoped data
-- **gRPC Server**: Exposes `TenantApi`, `UserApi`, `LocalCredentialApi`, `TokenApi` for inter-service consumption (e.g.,
-  Gateway)
+- **gRPC Server**: Exposes tenant, user, credential, token, permission, resource-registry, and MCP-runtime APIs for
+  facade-backed inter-service consumption
 
 ## REST Endpoints (via Gateway)
 
@@ -56,21 +55,21 @@ This service wires `dc3-common-auth` which contains all business logic controlle
 
 - `application.yml` — base port and profile config
 - `application-dev.yml` — dev env: Postgres connection via `${ENV:default}` vars
-- `application-pre.yml` — pre-release: Nacos-based service discovery
-- `application-pro.yml` — production: Nacos-based service discovery
+- `application-pre.yml` — pre-release datasource and runtime overrides
+- `application-pro.yml` — production datasource and runtime overrides
 
 ## Running Locally
 
 ### 1. Start Infrastructure
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
+make up-db
 ```
 
 ### 2. Build
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-auth -am package
 ```
 
 ### 3. Run
@@ -79,14 +78,16 @@ mvn -s .mvn/settings.xml clean package
 java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar
 ```
 
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-auth -am test
+```
+
 ## Related Modules
 
 - `dc3-api-auth` - gRPC API contracts for auth service
 - `dc3-common-auth` - Business logic implementation
 - `dc3-gateway` - Consumes token validation via gRPC
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

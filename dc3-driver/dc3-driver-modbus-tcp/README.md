@@ -9,7 +9,6 @@ devices, reads coil/register values periodically, and supports write commands fo
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-modbus-tcp
-- **Version**: 2026.5.22
 - **Driver Name**: Modbus TCP Driver
 
 ## Driver Attributes (Device-level)
@@ -36,6 +35,9 @@ devices, reads coil/register values periodically, and supports write commands fo
 | Offset         | Register/coil address offset    |
 | Value Template | Template for the value to write |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
+local buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 A running Modbus TCP slave device or simulator accessible on the network.
@@ -45,23 +47,25 @@ A running Modbus TCP slave device or simulator accessible on the network.
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-modbus-tcp -am package
 java -jar dc3-driver/dc3-driver-modbus-tcp/target/dc3-driver-modbus-tcp.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-modbus-tcp -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

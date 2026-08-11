@@ -10,7 +10,6 @@ supports the D, W, H, and C memory areas. No external protocol library is used.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-fins
-- **Version**: 2026.5.22
 - **Driver Name**: Omron FINS Driver
 
 ## Driver Attributes (Device-level)
@@ -43,6 +42,9 @@ supports the D, W, H, and C memory areas. No external protocol library is used.
 | Address     | Word address within the area |
 | Data Type   | Value data type              |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
+local buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 A reachable Omron PLC speaking FINS over TCP, typically on port 9600.
@@ -52,23 +54,25 @@ A reachable Omron PLC speaking FINS over TCP, typically on port 9600.
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-fins -am package
 java -jar dc3-driver/dc3-driver-fins/target/dc3-driver-fins.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-fins -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

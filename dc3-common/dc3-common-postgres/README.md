@@ -10,7 +10,6 @@ their primary storage.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-postgres
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -52,16 +51,18 @@ Each center service uses a separate Postgres schema via `currentSchema` in the J
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-postgres -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-postgres -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-manager`, `dc3-common-auth`, `dc3-common-data` — Include this as a dependency for Postgres access
 - `dc3-common-dal` — Builds on top of this for shared DAL entities
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

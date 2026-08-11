@@ -2,15 +2,14 @@
 
 ## Overview
 
-`dc3-common-public` is the foundational common utilities module of the IoT DC3 platform. It provides the universal
-response wrapper (`R<T>`), base entity classes, JWT key management, HTTP client configuration, and shared utility
-functions used across all platform modules.
+`dc3-common-public` is the foundational public contracts and utilities module of the IoT DC3 platform. It provides the
+universal response wrapper (`R<T>`), `BaseService`, shared request/pagination/tree entities, tenant markers, HTTP client
+configuration, HMAC signing, and framework-neutral utility functions.
 
 ## Module Information
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-public
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -45,9 +44,11 @@ Fields: `ok` (boolean), `code` (String), `message` (String), `data` (T)
 | Utility               | Purpose                                                  |
 |-----------------------|----------------------------------------------------------|
 | `JsonUtil`            | Jackson JSON serialization/deserialization helpers       |
-| `PrincipalHeaderUtil` | Extracts `PrincipalHeader` from reactive WebFlux context |
 | `HostUtil`            | Resolves host/IP information                             |
-| `ResponseUtil`        | Writes HTTP responses in WebFlux context                 |
+| `PageUtil`            | Converts and normalizes pagination objects               |
+| `HmacAuthSigner`      | Signs and verifies trusted gateway principal headers     |
+
+WebFlux-specific `BaseController`, `PrincipalHeaderUtil`, and `ResponseUtil` belong to `dc3-common-web`.
 
 ### HTTP Client
 
@@ -79,15 +80,17 @@ Secret lookup order:
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-public -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-public -am test
 ```
 
 ## Related Modules
 
 Foundation for all `dc3-common-*`, `dc3-center-*`, and `dc3-driver-*` modules.
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

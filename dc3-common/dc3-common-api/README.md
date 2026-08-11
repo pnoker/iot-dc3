@@ -9,7 +9,6 @@ builder utilities for constructing gRPC request/response objects from domain mod
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-api
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -24,16 +23,18 @@ protobuf classes.
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-api -am package
+```
+
+## Testing
+
+This module currently has no module-specific automated tests. Verify generated or production sources by compiling the
+affected reactor from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -q -pl dc3-common/dc3-common-api -am -DskipTests compile
 ```
 
 ## Related Modules
 
 - `dc3-api-auth` / `dc3-api-data` / `dc3-api-driver` / `dc3-api-manager` — gRPC API contracts that use these utilities
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

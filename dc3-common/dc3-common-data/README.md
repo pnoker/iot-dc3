@@ -10,40 +10,54 @@ into `dc3-center-data`.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-data
-- **Version**: 2026.5.22
 
 ## Key Components
 
-| Layer        | Contents                                                                                 |
-|--------------|------------------------------------------------------------------------------------------|
-| Controllers  | REST controllers for point value read/write, query, status                               |
-| Services     | `PointCommandService`, `PointValueService`, `DriverStatusService`, `DeviceStatusService` |
-| gRPC Clients | `@GrpcClient(ManagerConstant.SERVICE_NAME)` stubs for `DriverApi`, `PointApi`            |
-| RabbitMQ     | Producer for `dc3.e.command`; Consumer for `dc3.e.value`, `dc3.e.event`                  |
-| Init         | `DataInitRunner` for startup preparation                                                 |
+| Layer        | Contents                                                                                          |
+|--------------|---------------------------------------------------------------------------------------------------|
+| Controllers  | REST controllers for point values, point/custom commands, events, status, and health            |
+| Services     | Point value, point command, command history, event history, driver status, and device status      |
+| Facades      | `DriverFacade`, `PointFacade`, and related transport-independent cross-service APIs               |
+| RabbitMQ     | Point/custom-command producers plus value, state, alarm, event, and result consumers              |
+| Init         | `DataInitRunner` for startup preparation                                                          |
 
 ## Command Dispatch Flow
 
 ```
 REST /api/v3/data/point_value/read
   → PointCommandServiceImpl
-    → gRPC: driverApiBlockingStub.selectByDeviceId()
-    → RabbitMQ: dc3.e.command / dc3.r.command.device.{serviceName}
+    → DriverFacade.getByDeviceId(tenantId, deviceId)
+    → RabbitMQ: dc3.e.point_command / dc3.r.point_command.{serviceName}
       → Driver receives and acts
 ```
 
+Custom device commands follow the parallel `dc3.e.command` / `dc3.r.command.{serviceName}` route through
+`CommandHistoryServiceImpl`.
+
 ## MQ Topics
 
-| Exchange        | Queue                                       | Direction               |
-|-----------------|---------------------------------------------|-------------------------|
-| `dc3.e.value`   | `dc3.q.value.point`                         | Inbound (from drivers)  |
-| `dc3.e.command` | `dc3.q.command.device.{service}`            | Outbound (to drivers)   |
-| `dc3.e.event`   | `dc3.q.event.driver` / `dc3.q.event.device` | Inbound (status events) |
+| Exchange              | Queue or routing key                | Direction                   |
+|-----------------------|-------------------------------------|-----------------------------|
+| `dc3.e.value`         | `dc3.q.value.point`                 | Inbound point values        |
+| `dc3.e.point_command` | `dc3.r.point_command.{service}`     | Outbound point read/write   |
+| `dc3.e.command`       | `dc3.r.command.{service}`           | Outbound custom commands    |
+| `dc3.e.state`         | `dc3.q.state.driver` / `dc3.q.state.device` | Inbound driver/device state |
+| `dc3.e.event`         | `dc3.q.event.report`                | Inbound reported events     |
+
+The optional `dc3.rabbit.tag` system property prefixes runtime names; `RabbitConstant` remains authoritative.
 
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-data -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-data -am test
 ```
 
 ## Related Modules
@@ -52,10 +66,3 @@ mvn -s ../../.mvn/settings.xml clean package
 - `dc3-api-manager` — gRPC API consumed by this module for driver/point resolution
 - `dc3-common-repository` — Storage adapter for persisting point values
 - `dc3-common-rabbitmq` — RabbitMQ exchange/queue configuration
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

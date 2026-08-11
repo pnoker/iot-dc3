@@ -10,7 +10,6 @@ factory and supporting services that validate tokens with the Auth Center before
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-gateway
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -26,7 +25,9 @@ factory and supporting services that validate tokens with the Auth Center before
 ```
 Incoming HTTP request with Authorization: Bearer {token}
   → AuthenticGatewayFilter
-    → gRPC: dc3-center-auth / TokenApi.checkTokenValid()
+    → FilterServiceImpl
+      → TokenFacade.checkValid()
+        → distributed mode: gRPC TokenApi.CheckValid
       ← token valid: inject signed X-Auth-Principal header
       ← token invalid: return 401 Unauthorized
   → Forward to backend service
@@ -35,7 +36,15 @@ Incoming HTTP request with Authorization: Bearer {token}
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-gateway -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-gateway -am test
 ```
 
 ## Related Modules
@@ -43,9 +52,3 @@ mvn -s ../../.mvn/settings.xml clean package
 - `dc3-gateway` — Bootstraps this module
 - `dc3-api-auth` — gRPC contract for token validation
 - `dc3-center-auth` — Token validation backend
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

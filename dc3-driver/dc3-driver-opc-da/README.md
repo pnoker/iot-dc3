@@ -5,11 +5,14 @@
 `dc3-driver-opc-da` is the OPC DA (Data Access) protocol driver of the IoT DC3 platform. It connects to OPC DA servers
 using DCOM/J-Interop to read real-time process data from OPC-compliant industrial devices and SCADA systems.
 
+> **Work in progress.** Protocol-level I/O is not fully implemented in `OpcDaDriverCustomServiceImpl`. Treat this
+> module as an integration skeleton, not a production-ready OPC DA driver, until its read/write TODOs are completed and
+> verified against a real server.
+
 ## Module Information
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-opc-da
-- **Version**: 2026.5.22
 - **Driver Name**: OPC DA Driver
 
 ## Driver Attributes (Device-level)
@@ -28,6 +31,9 @@ using DCOM/J-Interop to read real-time process data from OPC-compliant industria
 | Group     | OPC DA item group name |
 | Tag       | OPC DA item tag name   |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
+local buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 - An OPC DA server running on a Windows host accessible via DCOM
@@ -39,23 +45,25 @@ using DCOM/J-Interop to read real-time process data from OPC-compliant industria
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-opc-da -am package
 java -jar dc3-driver/dc3-driver-opc-da/target/dc3-driver-opc-da.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-opc-da -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

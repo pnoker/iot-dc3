@@ -10,7 +10,6 @@ concurrent point reads and batch message handling.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-thread
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -33,8 +32,8 @@ dc3:
 
 ## Usage
 
-Inject the executor you need, e.g. `private final ExecutorService virtualThreadExecutor;` in `PointValueJob` /
-`MqttScheduleJob`, or `private final ThreadPoolExecutor threadPoolExecutor;` in `DriverReadScheduleJob`.
+Inject the executor you need, for example `virtualThreadExecutor` in `MqttScheduleJob`, or `threadPoolExecutor` in
+`DriverReadScheduleJob`. Data services also inject the shared executors for concurrent persistence and message work.
 
 > Note: Spring's `@Async` does **not** use these beans — it runs on Spring Boot's default `applicationTaskExecutor`.
 > These executors are obtained by explicit constructor injection, not via `@Async`.
@@ -42,7 +41,15 @@ Inject the executor you need, e.g. `private final ExecutorService virtualThreadE
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-thread -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-thread -am test
 ```
 
 ## Related Modules
@@ -50,10 +57,3 @@ mvn -s ../../.mvn/settings.xml clean package
 - `dc3-common-data` / `dc3-common-mqtt` — inject `virtualThreadExecutor` for batch persistence / message handling
 - `dc3-common-driver` — injects `threadPoolExecutor` for concurrent device reads
 - `dc3-driver-opc-da` — injects `scheduledThreadPoolExecutor`
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

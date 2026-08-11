@@ -17,7 +17,6 @@ services never depend on transport details.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-facade-api
-- **Version**: 2026.5.22
 
 ## Facade Contracts
 
@@ -42,16 +41,19 @@ auto-configuration.
 ## Build Instructions
 
 ```bash
-mvn -s ../../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-facade/dc3-common-facade-api -am package
+```
+
+## Testing
+
+This module currently has no module-specific automated tests. Verify generated or production sources by compiling the
+affected reactor from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -q -pl dc3-common/dc3-common-facade/dc3-common-facade-api -am -DskipTests compile
 ```
 
 ## Related Modules
 
 - `dc3-common-facade-grpc` — gRPC-backed implementation
 - `dc3-common-facade-local-auth` / `-data` / `-manager` — in-process implementations
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

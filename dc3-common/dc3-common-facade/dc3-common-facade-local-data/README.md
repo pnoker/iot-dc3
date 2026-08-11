@@ -10,7 +10,6 @@ issuing gRPC calls — used inside the `dc3-center-single` monolith.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-facade-local-data
-- **Version**: 2026.5.22
 
 ## Implementations
 
@@ -30,16 +29,18 @@ Active when the in-process facade mode is selected (`dc3.facade.mode=local`) and
 ## Build Instructions
 
 ```bash
-mvn -s ../../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-facade/dc3-common-facade-local-data -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-facade/dc3-common-facade-local-data -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-facade-grpc` — gRPC alternative for distributed deployments
 - `dc3-common-facade-local-auth` / `-manager` — sibling in-process facades
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

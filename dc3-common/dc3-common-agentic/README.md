@@ -10,7 +10,6 @@ model uses to read and operate platform resources.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-agentic
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -37,16 +36,18 @@ model uses to read and operate platform resources.
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-agentic -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-agentic -am test
 ```
 
 ## Related Modules
 
 - `dc3-center-agentic` — the service shell that exposes this SDK over HTTP (`/api/v3/agentic/**`)
 - `dc3-common-facade-*` — facades the platform tools call to reach other services
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

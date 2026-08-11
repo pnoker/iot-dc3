@@ -9,7 +9,6 @@
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-plcs7
-- **Version**: 2026.5.22
 - **Driver Name**: PLC S7 Driver
 
 ## Driver Attributes (Device-level)
@@ -28,6 +27,9 @@
 | Byte Offset | Byte offset within the data block               |
 | Bit Offset  | Bit offset within the byte (for boolean points) |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
+local buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 - Siemens S7 PLC (S7-200 Smart, S7-1200, S7-1500 or compatible)
@@ -39,23 +41,25 @@
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-plcs7 -am package
 java -jar dc3-driver/dc3-driver-plcs7/target/dc3-driver-plcs7.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-plcs7 -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

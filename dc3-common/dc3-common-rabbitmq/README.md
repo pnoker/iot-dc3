@@ -2,34 +2,40 @@
 
 ## Overview
 
-`dc3-common-rabbitmq` is the shared RabbitMQ configuration module of the IoT DC3 platform. It defines all topic
-exchanges, queue bindings, and connection configuration used for asynchronous communication between services and
-drivers.
+`dc3-common-rabbitmq` is the shared RabbitMQ infrastructure module of the IoT DC3 platform. It defines the durable
+platform exchanges, connection factory, message conversion, and profile activation used by services and drivers.
+Domain modules own their queues and bindings.
 
 ## Module Information
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-rabbitmq
-- **Version**: 2026.5.22
 
 ## Key Components
 
 | Component                   | Purpose                                                              |
 |-----------------------------|----------------------------------------------------------------------|
-| `ExchangeConfig`            | Declares all 5 topic exchanges as persistent Spring beans            |
+| `ExchangeConfig`            | Declares the shared durable topic exchanges                           |
 | `RabbitConfig`              | Connection factory and Jackson-based message converter configuration |
-| `RabbitmqEnvironmentConfig` | Binds RabbitMQ connection properties from environment variables      |
-| `ActiveRabbitProfileConfig` | Profile-conditional activation                                       |
+| `RabbitmqEnvironmentConfig` | Loads RabbitMQ environment defaults                                   |
+| `ActiveRabbitProfileConfig` | Activates the `rabbit` profile unless explicitly disabled             |
 
 ## Topic Exchanges
 
-| Exchange Bean      | Exchange Name    | Purpose                                     |
-|--------------------|------------------|---------------------------------------------|
-| `eventExchange`    | `dc3.e.event`    | Driver/device status events (load-balanced) |
-| `metadataExchange` | `dc3.e.metadata` | Metadata change broadcast to drivers        |
-| `commandExchange`  | `dc3.e.command`  | Commands from data service to drivers       |
-| `valueExchange`    | `dc3.e.value`    | Point values from drivers to data center    |
-| `mqttExchange`     | `dc3.e.mqtt`     | MQTT-to-platform message bridging           |
+| Exchange bean(s) | Base exchange name(s) | Purpose |
+|---|---|---|
+| `stateExchange`, `alarmExchange` | `dc3.e.state`, `dc3.e.alarm` | Driver/device state and alarm processing |
+| `metadataExchange` | `dc3.e.metadata` | Metadata change broadcast to drivers |
+| `pointCommandExchange` | `dc3.e.point_command` | Point read/write commands |
+| `valueExchange` | `dc3.e.value` | Point values from drivers to Data Center |
+| `mqttExchange` | `dc3.e.mqtt` | MQTT-to-platform message bridging |
+| `stateTimeoutDelayExchange`, `stateTimeoutCheckExchange` | `dc3.e.state_timeout_delay`, `dc3.e.state_timeout_check` | Delayed state-timeout checks |
+| `commandExchange`, `commandResultExchange`, `commandDeadExchange` | `dc3.e.command`, `dc3.e.command_result`, `dc3.e.command_dead` | Custom commands, results, and dead letters |
+| `eventExchange` | `dc3.e.event` | Reported domain events |
+
+`ExchangeConfig` currently declares 12 shared exchanges. Data and driver modules add queues, bindings, and specialized
+dead-letter/result exchanges. The optional `dc3.rabbit.tag` system property prefixes runtime names, so use
+`RabbitConstant` rather than duplicating literal names in code.
 
 ## Configuration Properties
 
@@ -56,18 +62,20 @@ and set Spring Boot's native `spring.rabbitmq.ssl.trust-store`, `trust-store-typ
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-rabbitmq -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-rabbitmq -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-constant` / `RabbitConstant` — All exchange/queue/routing key names
-- `dc3-common-data` — Consumes `dc3.e.value`, publishes to `dc3.e.command`
+- `dc3-common-data` — Consumes values/state/events and publishes point/custom commands
 - `dc3-common-manager` — Publishes to `dc3.e.metadata`
-- `dc3-common-driver` — Consumes from `dc3.e.metadata`, `dc3.e.command`; publishes to `dc3.e.value`
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
+- `dc3-common-driver` — Consumes metadata and point/custom commands; publishes values and command results

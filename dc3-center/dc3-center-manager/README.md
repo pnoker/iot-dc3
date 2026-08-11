@@ -10,15 +10,14 @@ management, and command interfaces.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-center-manager
-- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.center.manager`
 
 ## Service Ports
 
-| Protocol  | Port                                                 |
-|-----------|------------------------------------------------------|
-| HTTP REST | `8400` (default, overridable via `SERVER_PORT`)      |
-| gRPC      | `9400` (default, overridable via `GRPC_SERVER_PORT`) |
+| Protocol  | Port   | Configuration variable |
+|-----------|--------|------------------------|
+| HTTP REST | `8400` | `DC3_MANAGER_PORT`      |
+| gRPC      | `9400` | `DC3_MANAGER_GRPC_PORT` |
 
 ## Key Responsibilities
 
@@ -49,12 +48,12 @@ Key endpoint prefixes (defined in `ManagerConstant`):
 
 ## gRPC Services (consumed by drivers and data service)
 
-| Service                      | Used By                          |
-|------------------------------|----------------------------------|
-| `DriverApi.driverRegister`   | Drivers on startup               |
-| `DeviceApi.selectById`       | Drivers fetching device config   |
-| `PointApi.selectById`        | Drivers and data service         |
-| `DriverApi.selectByDeviceId` | Data service for command routing |
+| Service                    | Used by                                         |
+|----------------------------|-------------------------------------------------|
+| `DriverApi.DriverRegister` | Drivers registering on startup                  |
+| `DeviceApi.GetById`        | Drivers fetching device configuration           |
+| `PointApi.GetById`         | Drivers fetching point configuration            |
+| `DriverApi.GetByDeviceId`  | Distributed facades resolving command routing   |
 
 ## Dependencies
 
@@ -72,21 +71,21 @@ This service wires `dc3-common-manager` which contains all business logic.
 
 - `application.yml` — base port and profile config
 - `application-dev.yml` — dev env: Postgres, RabbitMQ, gRPC client addresses
-- `application-pre.yml` — pre-release: Nacos-based service discovery
-- `application-pro.yml` — production: Nacos-based service discovery
+- `application-pre.yml` — pre-release datasource, messaging, and static gRPC client addresses
+- `application-pro.yml` — production datasource, messaging, and static gRPC client addresses
 
 ## Running Locally
 
 ### 1. Start Infrastructure
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
+make up-db
 ```
 
 ### 2. Build
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-manager -am package
 ```
 
 ### 3. Run (after auth is up)
@@ -95,14 +94,16 @@ mvn -s .mvn/settings.xml clean package
 java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
 ```
 
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-manager -am test
+```
+
 ## Related Modules
 
 - `dc3-api-driver` - Driver-side gRPC API implemented by this service
 - `dc3-api-manager` - Manager-side gRPC API implemented by this service
 - `dc3-common-manager` - Business logic implementation
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

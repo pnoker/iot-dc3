@@ -1,34 +1,51 @@
-## 1. Prepare
+# DC3 Web
 
-- `git`
-- `Visual Studio Code`
-- `nodejs` >= 22 (enforced by `engines` in `package.json`)
-- `pnpm` 11.3.0 (pinned via `packageManager`), install using
-  `corepack enable && corepack prepare pnpm@11.3.0 --activate`
+`dc3-web` is the Vue and TypeScript management frontend for IoT DC3. It communicates with the backend exclusively
+through `dc3-gateway`.
 
-## 2. Source code
+## Prerequisites
+
+- Node.js 22 or newer, as declared by `engines` in `package.json`.
+- Corepack enabled.
+- The pnpm version declared by `packageManager` in `package.json`.
 
 ```bash
-git clone https://github.com/pnoker/iot-dc3.git
+corepack enable
+pnpm install
 ```
 
-## 3. Develop
+Use pnpm only. Do not generate npm or Yarn lockfiles. When changing the package-manager version, keep `package.json` and
+the Dockerfile toolchain pin aligned.
+
+## Develop
 
 ```bash
-cd iot-dc3/dc3-web
-
-# install
-pnpm install
-
-# run
 pnpm dev
 ```
 
-The dev server runs on `http://localhost:8080` and proxies API calls to the backend gateway (`http://localhost:8000`),
-so start the backend stack first.
+The development server uses the port and API proxy configured by `vite.config.ts` and `src/config/env/`. Its defaults
+are `http://localhost:8080` for the UI and `http://localhost:8000` for the gateway. The UI can start without the backend,
+but login and data requests require a running gateway and center services.
 
-## 4. More
+## Build and verify
 
-For the full command surface (build, type-check, lint, unit/component/E2E tests), the tech stack, environment
-configuration (`src/config/env/`), and project conventions, see
-[`AGENTS.md`](./AGENTS.md).
+```bash
+pnpm check
+pnpm lint:check
+pnpm test:guard
+pnpm test:ci
+pnpm build
+```
+
+Run focused suites with `pnpm test:unit`, `pnpm test:api`, `pnpm test:component`, or `pnpm test:views`. Browser workflows
+use `pnpm test:e2e`; see [tests/README.md](./tests/README.md) for the test layers and fixture policy.
+
+## Project conventions
+
+- Vite environment files live under `src/config/env/` and use the `APP_` prefix.
+- Java 64-bit IDs are represented as strings and decoded with the existing JSONBigInt support.
+- Type-only imports must use `import type` because `verbatimModuleSyntax` is enabled.
+- API wrapper names mirror backend cardinality: `getXxx` for one result and `listXxx` for collections/pages/maps.
+- Every router-guard branch must settle navigation.
+
+Repository-wide architecture, commit, and verification rules are in [../AGENTS.md](../AGENTS.md).

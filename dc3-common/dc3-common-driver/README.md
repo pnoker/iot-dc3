@@ -10,7 +10,6 @@ scheduled data collection.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-driver
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -28,24 +27,37 @@ scheduled data collection.
 ```
 Driver startup
   → DriverInitRunner
-    → gRPC: dc3-center-manager / DriverApi.driverRegister()
+    → gRPC: dc3-center-manager / DriverApi.DriverRegister
       ← Returns: driver ID, driver attributes, point attributes, device IDs
     → Subscribe to metadata queue: dc3.q.metadata.driver.{serviceName}
-    → Subscribe to command queue: dc3.q.command.driver.{serviceName}
+    → Subscribe to point-command queue: dc3.q.point_command.{serviceName}
+    → Subscribe to custom-command queue: dc3.q.command.{serviceName}
 ```
 
 ## RabbitMQ Integration
 
-| Exchange         | Queue                             | Purpose                             |
-|------------------|-----------------------------------|-------------------------------------|
-| `dc3.e.metadata` | `dc3.q.metadata.driver.{service}` | Receive config change events        |
-| `dc3.e.command`  | `dc3.q.command.driver.{service}`  | Receive READ/WRITE commands         |
-| `dc3.e.value`    | —                                 | Publish point values to data center |
+| Exchange              | Queue                               | Purpose                              |
+|-----------------------|-------------------------------------|--------------------------------------|
+| `dc3.e.metadata`      | `dc3.q.metadata.driver.{service}`   | Receive configuration changes        |
+| `dc3.e.point_command` | `dc3.q.point_command.{service}`     | Receive point read/write commands    |
+| `dc3.e.command`       | `dc3.q.command.{service}`           | Receive custom device commands       |
+| `dc3.e.value`         | —                                   | Publish point values to Data Center  |
+
+The optional `dc3.rabbit.tag` system property prefixes runtime names; use `RabbitConstant` and `DriverTopicConfig` as
+the authoritative definitions.
 
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-driver -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-driver -am test
 ```
 
 ## Related Modules
@@ -54,10 +66,3 @@ mvn -s ../../.mvn/settings.xml clean package
 - `dc3-api-driver` — gRPC contracts consumed by this SDK
 - `dc3-common-rabbitmq` — RabbitMQ exchange configuration
 - `dc3-common-constant` — `RabbitConstant` routing key prefixes
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

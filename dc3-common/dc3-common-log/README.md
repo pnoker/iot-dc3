@@ -2,46 +2,46 @@
 
 ## Overview
 
-`dc3-common-log` is the shared logging aspect module of the IoT DC3 platform. It provides a custom AOP-based `@Logs`
-annotation for declarative method-level logging across all services.
+`dc3-common-log` provides the shared Logback configuration used by IoT DC3 applications. It contributes console and
+rolling JSON file appenders plus the Logstash Logback encoder dependency.
+
+The former annotation/aspect logging implementation was removed. This module does not currently register Spring
+auto-configuration or provide `@Logs`, `LogsType`, or `LogsAspect` APIs.
 
 ## Module Information
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-log
-- **Version**: 2026.5.22
 
-## Key Components
+## Resources
 
-| Component    | Purpose                                                                       |
-|--------------|-------------------------------------------------------------------------------|
-| `@Logs`      | Method annotation to enable structured logging for controller/service methods |
-| `LogsType`   | Enum defining log types (e.g., `SysLog`, `OpLog`)                             |
-| `LogsAspect` | Spring AOP aspect that intercepts annotated methods and records log entries   |
+| Resource | Purpose |
+|---|---|
+| `logback.xml` | Runtime console logging and size/time-based rolling JSON files |
+| `logback-test.xml` | Test logging defaults |
+| `AutoConfiguration.imports` | Intentionally empty; documents that no logging aspect is registered |
 
-## Usage
+Spring Boot discovers the shared `logback.xml` from the dependency classpath. Applications normally set
+`logging.file.name` in their own `application.yml`; important overrides include `DC3_LOG_LEVEL`, `LOG_FILE`,
+`FILE_LOG_THRESHOLD`, and the standard `LOGBACK_ROLLINGPOLICY_*` properties.
 
-```java
-@Logs(title = "Add Driver", type = LogsType.OpLog)
-@PostMapping("/add")
-public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
-    // method body
-}
-```
+Keep log messages in English, use parameterized placeholders, and never log credentials, tokens, passwords, or raw
+private payloads.
 
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-log -am package
+```
+
+## Testing
+
+This module has no Java implementation classes or module-specific tests. Verify packaging from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-log -am package
 ```
 
 ## Related Modules
 
-Used by controller layers in `dc3-common-auth`, `dc3-common-data`, `dc3-common-manager`.
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-
+Center, gateway, and driver applications consume the shared Logback resources through their module dependencies.

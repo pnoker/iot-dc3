@@ -10,7 +10,6 @@ backends without coupling business logic to a specific storage implementation.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-repository
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -51,16 +50,18 @@ Set `dc3.repository.auto-profile=false` to opt out of automatic `repository` pro
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-repository -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-repository -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-data` — Uses `RepositoryStrategyFactory` to route point-value persistence operations
-- `dc3-common-data` — Caches latest point values with in-process `LocalCacheService` alongside repository storage
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
+- `dc3-common-data` — Caches latest point values with `PointValueLocalCache` alongside repository storage

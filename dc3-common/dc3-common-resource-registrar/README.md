@@ -10,7 +10,6 @@ deployed, so permissions can be granted against real endpoints.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-resource-registrar
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -34,16 +33,18 @@ gRPC or in-process facade transport.
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-resource-registrar -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-resource-registrar -am test
 ```
 
 ## Related Modules
 
 - `dc3-center-*` — include this module to register their API resources
 - `dc3-common-auth` — owns the resource registry on the receiving side
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

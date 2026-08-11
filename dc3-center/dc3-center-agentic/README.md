@@ -11,7 +11,6 @@ shell; the agentic logic lives in `dc3-common-agentic`.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-center-agentic
-- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.center.agentic`
 
 ## Service Ports
@@ -44,15 +43,26 @@ The WebFlux base path is `/agentic`; through the gateway the service is reached 
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev SERVICES="auth manager data"
 ```
+
+The agentic service has gRPC facade channels for Auth, Manager, and Data centers. Start all three before exercising
+platform tools; the gateway is optional when calling the agentic service directly.
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-agentic -am package
 java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-agentic -am test
 ```
 
 ## Related Modules
@@ -60,9 +70,3 @@ java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
 - `dc3-common-agentic` — agentic SDK: Spring AI chat client, platform tools, conversation memory, model management
 - `dc3-common-facade-grpc` — gRPC facade for cross-service access
 - `dc3-common-resource-registrar` — registers this service's API / menu resources
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

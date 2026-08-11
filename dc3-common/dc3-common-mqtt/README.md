@@ -10,7 +10,6 @@ the MQTT driver and any service requiring MQTT connectivity.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-mqtt
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -49,18 +48,19 @@ MQTT driver (`dc3-driver-mqtt`) depends on this module as its primary integratio
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-mqtt -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-mqtt -am test
 ```
 
 ## Related Modules
 
 - `dc3-driver-mqtt` — Primary consumer of this module
 - MQTT broker: the dev profile points at the RabbitMQ MQTT plugin (`dc3-rabbitmq:2883`); EMQX is also available via the
-  optional stack (`podman compose -f dc3/docker-compose-optional.yml up -d`, port `31883`)
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-
+  optional stack (`make up-optional`, port `31883`)

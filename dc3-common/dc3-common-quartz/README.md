@@ -10,7 +10,6 @@ and Driver modules for periodic tasks.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-quartz
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -35,15 +34,17 @@ quartzService.startScheduler();
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-quartz -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-quartz -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-manager` — Uses `QuartzService` for hourly data-volume statistics jobs
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

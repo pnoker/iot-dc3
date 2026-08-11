@@ -17,7 +17,6 @@ attributes addressed by node IEEE address / endpoint / cluster / attribute, and 
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-zigbee
-- **Version**: 2026.5.22
 - **Driver Name**: Zigbee Driver
 
 ## Driver Attributes (Device-level)
@@ -48,6 +47,9 @@ attributes addressed by node IEEE address / endpoint / cluster / attribute, and 
 | Cluster ID        | clusterId       | INT    | 0       | Cluster ID for writing   |
 | Attribute ID      | attributeId     | INT    | 0       | Attribute ID for writing |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
+local buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 A Zigbee coordinator dongle connected to a serial port on the host running the driver. The dependencies bundle the
@@ -59,23 +61,25 @@ the driver attributes above (see the work-in-progress warning).
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-zigbee -am package
 java -jar dc3-driver/dc3-driver-zigbee/target/dc3-driver-zigbee.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-zigbee -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

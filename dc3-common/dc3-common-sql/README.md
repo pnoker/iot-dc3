@@ -10,7 +10,6 @@ and query execution, so each database driver only supplies its dialect/connectio
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-sql
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -26,16 +25,18 @@ and query execution, so each database driver only supplies its dialect/connectio
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-sql -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-sql -am test
 ```
 
 ## Related Modules
 
 - `dc3-driver-mysql`, `dc3-driver-oracle`, `dc3-driver-postgresql`, `dc3-driver-sqlserver` — JDBC drivers that extend
   `AbstractJdbcDriverCustomService`
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

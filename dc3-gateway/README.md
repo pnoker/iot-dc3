@@ -10,7 +10,6 @@ routing, and reverse proxying.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-gateway
-- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.gateway`
 
 ## Service Ports
@@ -73,19 +72,27 @@ Route definitions and the auth gRPC channel are shared in `dc3-common-gateway`'s
 ### 1. Start Infrastructure
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
+make up-db
 ```
 
 ### 2. Build
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-gateway -am package
 ```
 
-### 3. Run (start first before any center service)
+### 3. Run after the required center services are available
 
 ```bash
 java -jar dc3-gateway/target/dc3-gateway.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-gateway -am test
 ```
 
 ## Related Modules
@@ -93,10 +100,3 @@ java -jar dc3-gateway/target/dc3-gateway.jar
 - `dc3-common-gateway` — `Authentic` filter implementation and gateway utilities
 - `dc3-api-auth` — gRPC API contracts for token validation
 - `dc3-center-auth` — Token validation backend
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

@@ -9,15 +9,14 @@ management services into a single deployable module for simplified single-node o
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-center-single
-- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.center.single`
 
 ## Service Ports
 
-| Protocol  | Port                                                 |
-|-----------|------------------------------------------------------|
-| HTTP REST | `8100` (default, overridable via `SERVER_PORT`)      |
-| gRPC      | `9100` (default, overridable via `GRPC_SERVER_PORT`) |
+| Protocol  | Port   | Configuration variable |
+|-----------|--------|------------------------|
+| HTTP REST | `8100` | `DC3_SINGLE_PORT`       |
+| gRPC      | `9100` | `DC3_SINGLE_GRPC_PORT`  |
 
 ## Key Responsibilities
 
@@ -57,7 +56,7 @@ Wires all three common service modules:
 
 - `application.yml` — base port and profile config
 - `application-dev.yml` — dev env: single Postgres/RabbitMQ config
-- `application-pre.yml` — pre-release: Nacos-based service discovery
+- `application-pre.yml` — pre-release runtime overrides for the all-in-one process
 - `application-pro.yml` — production target config
 
 ## Running Locally
@@ -65,13 +64,13 @@ Wires all three common service modules:
 ### 1. Start Infrastructure
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
+make up-db
 ```
 
 ### 2. Build
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-single -am package
 ```
 
 ### 3. Run
@@ -80,15 +79,17 @@ mvn -s .mvn/settings.xml clean package
 java -jar dc3-center/dc3-center-single/target/dc3-center-single.jar
 ```
 
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-single -am test
+```
+
 ## Related Modules
 
 - `dc3-center-auth` — Standalone auth service
 - `dc3-center-data` — Standalone data service
 - `dc3-center-manager` — Standalone manager service
 - `dc3-common-auth` / `dc3-common-data` / `dc3-common-manager` — Shared business logic
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

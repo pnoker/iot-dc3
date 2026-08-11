@@ -10,24 +10,24 @@ exposing data query APIs.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-center-data
-- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.center.data`
 
 ## Service Ports
 
-| Protocol  | Port                                                 |
-|-----------|------------------------------------------------------|
-| HTTP REST | `8500` (default, overridable via `SERVER_PORT`)      |
-| gRPC      | `9500` (default, overridable via `GRPC_SERVER_PORT`) |
+| Protocol  | Port   | Configuration variable |
+|-----------|--------|------------------------|
+| HTTP REST | `8500` | `DC3_DATA_PORT`        |
+| gRPC      | `9500` | `DC3_DATA_GRPC_PORT`   |
 
 ## Key Responsibilities
 
 - **Point Value Ingestion**: Receives point values from drivers via RabbitMQ (`dc3.e.value` exchange,
   `dc3.q.value.point` queue) and persists them to the time-series storage
 - **Point Value Query**: Exposes REST and gRPC APIs to query the latest and historical point values
-- **Device Command Dispatch**: Receives read/write commands, resolves the target driver via Manager gRPC (
-  `ManagerConstant.SERVICE_NAME`), and publishes to `dc3.e.command`
-- **Driver Status**: Tracks driver online/offline status events
+- **Point Command Dispatch**: Resolves the target driver through `DriverFacade` and publishes point read/write commands
+  to `dc3.e.point_command`
+- **Custom Command Dispatch**: Publishes custom device commands to `dc3.e.command`
+- **Driver and Device Status**: Tracks state, timeout, and alarm events
 - **Data Query**: Supports pagination query, real-time telemetry, and historical data retrieval
 
 ## REST Endpoints (via Gateway)
@@ -36,11 +36,13 @@ Accessible through the gateway at `/api/v3/data/**` (authentication required).
 
 ## Messaging Topics
 
-| Exchange        | Direction | Purpose                                 |
-|-----------------|-----------|-----------------------------------------|
-| `dc3.e.value`   | Inbound   | Receive point values from drivers       |
-| `dc3.e.command` | Outbound  | Dispatch read/write commands to drivers |
-| `dc3.e.event`   | Inbound   | Receive driver/device status events     |
+| Exchange              | Direction | Purpose                                 |
+|-----------------------|-----------|-----------------------------------------|
+| `dc3.e.value`         | Inbound   | Receive point values from drivers       |
+| `dc3.e.point_command` | Outbound  | Dispatch point read/write commands      |
+| `dc3.e.command`       | Outbound  | Dispatch custom device commands         |
+| `dc3.e.state`         | Inbound   | Receive driver/device state events      |
+| `dc3.e.event`         | Inbound   | Receive reported domain events          |
 
 ## Dependencies
 
@@ -58,21 +60,21 @@ This service wires `dc3-common-data` which contains all business logic.
 
 - `application.yml` — base port and profile config
 - `application-dev.yml` — dev env: Postgres, RabbitMQ, gRPC client addresses
-- `application-pre.yml` — pre-release: Nacos-based service discovery
-- `application-pro.yml` — production: Nacos-based service discovery
+- `application-pre.yml` — pre-release datasource, messaging, and static gRPC client addresses
+- `application-pro.yml` — production datasource, messaging, and static gRPC client addresses
 
 ## Running Locally
 
 ### 1. Start Infrastructure
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
+make up-db
 ```
 
 ### 2. Build
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-data -am package
 ```
 
 ### 3. Run (after auth and manager are up)
@@ -81,15 +83,17 @@ mvn -s .mvn/settings.xml clean package
 java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
 ```
 
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-data -am test
+```
+
 ## Related Modules
 
 - `dc3-api-data` - gRPC API contracts for point value queries
 - `dc3-api-manager` - gRPC API for resolving driver/point metadata
 - `dc3-common-data` - Business logic implementation
 - `dc3-common-repository` - Pluggable time-series storage adapter
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

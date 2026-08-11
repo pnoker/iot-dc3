@@ -12,7 +12,6 @@ with the `${value}` placeholder substituted.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-serial
-- **Version**: 2026.5.22
 - **Driver Name**: Serial Port Driver
 
 ## Driver Attributes (Device-level)
@@ -47,6 +46,9 @@ with the `${value}` placeholder substituted.
 | Send Command | sendCommand | STRING | ${value} | HEX command template with ${value} placeholder |
 | Byte Order   | byteOrder   | STRING | BIG      | Byte order for encoding value: BIG, LITTLE     |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
+local buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 A serial device connected to a serial port reachable from the host running the driver (e.g. `/dev/ttyUSB0`). The port
@@ -57,23 +59,25 @@ path and line parameters (baud rate, data/stop bits, parity, timeout) are suppli
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-serial -am package
 java -jar dc3-driver/dc3-driver-serial/target/dc3-driver-serial.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-serial -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

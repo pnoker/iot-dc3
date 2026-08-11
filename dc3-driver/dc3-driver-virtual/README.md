@@ -10,7 +10,6 @@ hardware.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-virtual
-- **Version**: 2026.5.22
 - **Driver Name**: Virtual Driver
 
 ## Driver Attributes
@@ -42,6 +41,9 @@ hardware.
 
 ## Data Collection Schedule
 
+The module `application.yml` and its profile-specific variants are authoritative for attribute codes, types, default
+values, scheduling, health, and local buffering. Keep this README aligned when that metadata changes.
+
 Configured in `application-dev.yml`:
 
 ```yaml
@@ -57,14 +59,14 @@ dc3:
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-virtual -am package
 java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 ```
 
@@ -76,12 +78,14 @@ The driver logs show gRPC registration with Manager Center on startup:
 Driver register success, service name: dc3-driver-virtual
 ```
 
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-virtual -am test
+```
+
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

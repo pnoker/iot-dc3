@@ -13,7 +13,6 @@ using the `com.microsoft.sqlserver.jdbc.SQLServerDriver`.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-sqlserver
-- **Version**: 2026.5.22
 - **Driver Name**: SQL Server Driver
 
 ## Driver Attributes (Device-level)
@@ -42,6 +41,9 @@ using the `com.microsoft.sqlserver.jdbc.SQLServerDriver`.
 |---------------|--------------|--------|----------------------------------|
 | Execute Query | executeQuery | STRING | SQL query to execute for command |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
+local buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 A reachable Microsoft SQL Server instance. The connection URL, credentials, encryption flags, and the SQL queries to run
@@ -52,24 +54,26 @@ are all supplied through the driver and point attributes above — nothing is ha
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-sqlserver -am package
 java -jar dc3-driver/dc3-driver-sqlserver/target/dc3-driver-sqlserver.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-sqlserver -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
 - `dc3-common-sql` — `AbstractJdbcDriverCustomService` base class providing JDBC read/write logic
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

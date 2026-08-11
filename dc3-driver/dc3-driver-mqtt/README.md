@@ -13,7 +13,6 @@ topics, parse incoming payloads as device point values, and forward commands to 
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-mqtt
-- **Version**: 2026.5.22
 - **Driver Name**: MQTT Driver
 
 ## Point Attributes
@@ -39,13 +38,16 @@ topics, parse incoming payloads as device point values, and forward commands to 
 | Event Code Path | Path to the event code in payload |
 | Payload Path    | Path to the event payload         |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
+local buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 An MQTT broker must be running. The dev profile connects to the RabbitMQ MQTT plugin (`dc3-rabbitmq:2883`), which ships
 with the base stack:
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
+make up-db
 ```
 
 EMQX is available as an alternative via the optional stack (`docker-compose-optional.yml`, port `31883`); point
@@ -56,24 +58,26 @@ EMQX is available as an alternative via the optional stack (`docker-compose-opti
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-mqtt -am package
 java -jar dc3-driver/dc3-driver-mqtt/target/dc3-driver-mqtt.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-mqtt -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration and RabbitMQ integration
 - `dc3-common-mqtt` — MQTT client configuration and utilities
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

@@ -10,7 +10,6 @@ number, object type, object instance, and property identifier.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-bacnet-ip
-- **Version**: 2026.5.22
 - **Driver Name**: BACnet IP Driver
 
 ## Driver Attributes (Device-level)
@@ -41,6 +40,9 @@ number, object type, object instance, and property identifier.
 | Object Instance  | Object instance number               |
 | Property ID      | Property identifier                  |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
+local buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 A reachable BACnet/IP device (or simulator) on the network. Communication uses UDP, typically on port 47808.
@@ -50,23 +52,25 @@ A reachable BACnet/IP device (or simulator) on the network. Communication uses U
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-bacnet-ip -am package
 java -jar dc3-driver/dc3-driver-bacnet-ip/target/dc3-driver-bacnet-ip.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-bacnet-ip -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
