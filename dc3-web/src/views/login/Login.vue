@@ -134,13 +134,16 @@ const loading = ref(false);
 // 定义响应式数据
 const tenant = typeof authStore.getTenant === 'string' ? authStore.getTenant : 'default';
 const name = typeof authStore.getName === 'string' ? authStore.getName : 'dc3';
+// The mock build is a public, backend-free demo. Prefill its seeded password so
+// visitors can enter directly, while every real backend mode still starts empty.
+const password = import.meta.env.MODE === 'mock' ? 'dc3dc3dc3' : '';
 const reactiveData = reactive<LoginViewState>({
   isHide: 'View',
   passwordType: 'password',
   formData: {
     tenant,
     name,
-    password: '',
+    password,
   },
 });
 
