@@ -1,574 +1,387 @@
 # AGENTS.md
 
-Shared engineering instructions for AI coding agents working in this repository.
+Canonical engineering instructions for AI coding agents working in IoT DC3.
 
-This is the canonical project guidance file. Keep tool-specific files such as `CLAUDE.md` as thin compatibility pointers
-to this file so various AI coding assistants follow the same rules.
+## Scope and precedence
 
-## Project Snapshot
+- This file applies to the whole repository.
+- Follow the user's request first, then this repository-level guidance.
+- Keep changes focused. Do not revert unrelated work in a dirty worktree.
+- Do not create a Git commit without the explicit, commit-specific confirmation described below.
 
-IoT DC3 is a distributed industrial IoT platform for device connectivity, data collection, metadata management, and
-gateway access. The project is built around Spring Boot services, gRPC contracts, RabbitMQ messaging, PostgreSQL
-persistence, and Docker/Podman Compose deployment.
+## Sources of truth
 
-Primary runtime layers:
+Avoid copying volatile versions or generated state into documentation. Verify them at the source:
 
-- **Gateway**: HTTP entrypoint through Spring Cloud Gateway.
-- **Auth Center**: tenant, token, user, role, resource, and API authorization.
-- **Manager Center**: driver, device, point, profile, and metadata coordination.
-- **Data Center**: point value ingestion, query, command dispatch, and data dashboards.
-- **Agentic Center**: AI-assisted operations backed by OpenAI-compatible APIs.
-- **Drivers**: protocol adapters for Modbus TCP, MQTT, OPC DA/UA, PLC S7, CoAP, listening-virtual, and virtual drivers.
+| Concern | Source of truth |
+|---|---|
+| Java, Spring, Maven plugins and reactor modules | root `pom.xml` and affected module POMs |
+| Backend build commands | root `Makefile` |
+| Frontend dependencies and scripts | `dc3-web/package.json` and `dc3-web/pnpm-lock.yaml` |
+| Frontend build image/tool pins | `dc3-web/Dockerfile` |
+| Containers and registries | root `Makefile`, `.env.example`, and `dc3/docker-compose*.yml` |
+| CI behaviour | `.github/workflows/` |
+| Release notes | `dc3/bin/changelog.py` and generated `dc3/doc/CHANGE.md` |
 
-Core stack:
+If this file disagrees with executable configuration, treat the executable configuration as current and update this
+file as part of the same change when appropriate.
 
-- Java 21
-- Maven 3.9+
-- Spring Boot / Spring Cloud (versions managed by the `dc3-parent` POM — check `pom.xml`)
-- Spring Framework 7
-- PostgreSQL, RabbitMQ, optional EMQX, optional Grafana/Elasticsearch stacks
-- Spring gRPC with generated protobuf APIs
-- Compose runtime, wrapped by the root `Makefile` (`COMPOSE=podman compose` by default)
+## Project overview
 
-## Repository Map
+IoT DC3 is a distributed industrial IoT platform. Its main runtime areas are:
 
-```
+- Gateway: HTTP entrypoint through Spring Cloud Gateway.
+- Auth Center: tenant, token, user, role, resource, and API authorization.
+- Manager Center: drivers, devices, points, profiles, and metadata.
+- Data Center: point-value ingestion, queries, commands, and dashboards.
+- Agentic Center: AI-assisted operations through OpenAI-compatible APIs.
+- Drivers: protocol adapters built on the shared driver SDK.
+- Web: Vue-based management UI in `dc3-web/`.
+
+The backend targets Java 21 and is a Maven multi-module Spring Boot/Spring Cloud project. Check the root POM for current
+framework versions.
+
+## Repository map
+
+```text
 iot-dc3/
-├── dc3-api/                          # Protobuf & gRPC contracts
-│   ├── dc3-api-auth                  #   auth service proto
-│   ├── dc3-api-data                  #   data service proto
-│   ├── dc3-api-driver                #   driver service proto
-│   └── dc3-api-manager               #   manager service proto
-├── dc3-common/                       # Shared libraries
-│   ├── dc3-common-model              #   Base BO/VO/DTO/Builder/Ext classes
-│   ├── dc3-common-public             #   BaseService<B,Q>, R<T> envelope, TenantOwned
-│   ├── dc3-common-web                #   BaseController (reactive), WebFlux config
-│   ├── dc3-common-auth               #   Token gRPC server, auth controllers
-│   ├── dc3-common-manager            #   Device/Driver/Point/Profile services + DAL
-│   ├── dc3-common-data               #   Point value ingestion, command dispatch
-│   ├── dc3-common-driver             #   Driver SDK (SPI interfaces + runtime)
-│   ├── dc3-common-facade/            #   Cross-service facade
-│   │   ├── dc3-common-facade-api             #     Interface contracts
-│   │   ├── dc3-common-facade-grpc            #     gRPC implementations
-│   │   ├── dc3-common-facade-local-auth      #     In-process auth facade
-│   │   ├── dc3-common-facade-local-data      #     In-process data facade
-│   │   └── dc3-common-facade-local-manager   #     In-process manager facade
-│   ├── dc3-common-dal                #   Shared label/group DAL
-│   ├── dc3-common-postgres           #   MyBatis-Plus configuration
-│   ├── dc3-common-rabbitmq           #   RabbitMQ config and constants
-│   ├── dc3-common-mqtt               #   MQTT config
-│   ├── dc3-common-repository         #   Point value repository abstraction
-│   ├── dc3-common-quartz             #   Scheduling infrastructure
-│   ├── dc3-common-test               #   Testcontainers, harnesses, contract test bases
-│   ├── dc3-common-agentic            #   AI-assisted operations
-│   ├── dc3-common-gateway            #   Gateway utilities
-│   ├── dc3-common-log                #   Logging configuration
-│   ├── dc3-common-exception          #   Exception hierarchy
-│   ├── dc3-common-constant           #   Shared constants
-│   ├── dc3-common-sql                #   SQL utilities
-│   ├── dc3-common-thread             #   Thread pool config
-│   ├── dc3-common-api                #   API utilities
-│   └── dc3-common-resource-registrar #   Resource registration
-├── dc3-center/                       # Deployable service applications
-│   ├── dc3-center-auth               #   Auth service
-│   ├── dc3-center-manager            #   Manager service
-│   ├── dc3-center-data               #   Data service
-│   ├── dc3-center-agentic            #   AI-assisted operations service
-│   └── dc3-center-single             #   All-in-one single process
-├── dc3-driver/                       # Protocol driver implementations
-│   ├── dc3-driver-modbus-tcp         #   Modbus TCP
-│   ├── dc3-driver-modbus-rtu         #   Modbus RTU
-│   ├── dc3-driver-mqtt               #   MQTT
-│   ├── dc3-driver-opc-ua             #   OPC UA
-│   ├── dc3-driver-opc-da             #   OPC DA
-│   ├── dc3-driver-plcs7              #   S7 PLC
-│   ├── dc3-driver-coap               #   CoAP
-│   ├── dc3-driver-virtual            #   Virtual (simulator)
-│   ├── dc3-driver-listening-virtual  #   Listening virtual
-│   └── ... (20+ more protocol drivers)
-├── dc3-gateway/                      # Spring Cloud Gateway (HTTP entrypoint)
-├── dc3-coverage/                     # JaCoCo aggregate coverage report
-├── dc3-e2e/                          # Testcontainers-backed E2E tests
-├── dc3/                              # Compose files, env, scripts, docs
-│   ├── docker-compose.yml            #   Main app stack
-│   ├── docker-compose-db.yml         #   Database services
-│   ├── docker-compose-dev.yml        #   Development overrides
-│   ├── docker-compose-optional.yml   #   Optional monitoring/messaging
-│   ├── env/dev.env                   #   IDE-friendly local env vars
-│   └── bin/                          #   changelog.py, tag.sh
-├── Makefile                          # Preferred command entrypoint
-├── .husky/                           # Git hooks (pre-commit runs lint-staged)
-└── .mvn/settings.xml                 # Local Maven mirror (mainland China)
+├── dc3-api/              protobuf and gRPC contracts
+├── dc3-common/           shared models, services, DAL, facades, driver SDK, and infrastructure
+├── dc3-center/           deployable auth, manager, data, agentic, and single-process applications
+├── dc3-driver/           protocol driver implementations
+├── dc3-gateway/          HTTP gateway
+├── dc3-web/              Vue/TypeScript frontend
+├── dc3-coverage/         aggregate JaCoCo report and absolute coverage gate
+├── dc3-e2e/              Testcontainers-backed end-to-end tests
+├── dc3/                  compose files, environment files, scripts, and generated release notes
+├── Makefile              preferred backend/container command entrypoint
+└── .mvn/settings.xml     local Maven mirror configuration
 ```
 
-## Layering Architecture
+## Backend architecture
 
-All business modules follow a strict four-layer pattern:
+### Layering
 
-```
-Controller (WebFlux, Mono<R<T>>)  →  Service (BO)  →  Manager (DO, MyBatis-Plus)  →  Mapper (SQL)
-```
+Business modules follow this flow:
 
-### Key Base Classes
-
-| Class                           | Module              | Purpose                                                                               |
-|---------------------------------|---------------------|---------------------------------------------------------------------------------------|
-| `BaseService<B,Q>`              | `dc3-common-public` | CRUD interface: `add`, `delete`, `update`, `getById`, `list(Q)`                       |
-| `BaseController`                | `dc3-common-web`    | Reactive controller interface with `getUserHeader`, `requireTenant`, `async` defaults |
-| `R<T>`                          | `dc3-common-public` | Response envelope: `ok`, `code`, `message`, `data` — use `R.ok(data)` / `R.fail(msg)` |
-| `BaseBO` / `BaseVO` / `BaseDTO` | `dc3-common-model`  | Shared fields: `id`, `remark`, `creatorId/Name/Time`, `operatorId/Name/Time`          |
-| `BaseBuilder`                   | `dc3-common-model`  | MapStruct `@Mapper(componentModel = "spring")` for VO↔BO↔DTO conversion               |
-| `BaseExt`                       | `dc3-common-model`  | JSON extension column: `type`, `version`, `remark`                                    |
-| `TenantOwned`                   | `dc3-common-public` | Marker interface for tenant-scoped entities; used by `BaseController.requireTenant()` |
-
-### Controller Layer
-
-Controllers implement the `BaseController` interface (Java interface with default methods, not an abstract class). They
-return `Mono<R<T>>`. The `async()` helper offloads blocking JDBC calls to the `boundedElastic` scheduler. Example:
-
-```java
-public Mono<R<DeviceBO>> getById(@PathVariable Long id) {
-    return async(() -> R.ok(deviceService.getById(id)));
-}
+```text
+Controller (WebFlux) -> Service (BO) -> Manager (DO) -> Mapper (SQL)
 ```
 
-### Service Layer
+- Controllers implement the `BaseController` interface and return `Mono<R<T>>`.
+- Use `BaseController.async(...)` to move blocking JDBC work to the bounded-elastic scheduler.
+- Services extend `BaseService<B, Q>`, work in business objects, and own business rules.
+- Managers extend MyBatis-Plus `IService<DO>`; implementations extend `ServiceImpl<Mapper, DO>`.
+- Mappers extend MyBatis-Plus `BaseMapper<DO>` and contain persistence-level SQL operations.
+- Do not expose persistence objects from controllers or facade contracts.
 
-Service interfaces extend `BaseService<B, Q>` and work exclusively in BO types. Cross-service calls go through facade
-interfaces. Concrete services inject their Manager (DAL layer) and handle BO↔DO conversion via builders.
+Common types:
 
-### Manager Layer (DAL)
+| Type | Module | Role |
+|---|---|---|
+| `BaseService<B,Q>` | `dc3-common-public` | base CRUD service contract |
+| `BaseController` | `dc3-common-web` | reactive controller helpers and user/tenant context |
+| `R<T>` | `dc3-common-public` | standard response envelope; use `R.ok(...)` and `R.fail(...)` |
+| `BaseBO`, `BaseVO`, `BaseDTO` | `dc3-common-model` | shared business, web, and transfer fields |
+| `BaseBuilder` | `dc3-common-model` | MapStruct conversion base |
+| `TenantOwned` | `dc3-common-public` | marker for tenant-scoped entities |
 
-Manager interfaces extend MyBatis-Plus `IService<DO>`. Implementations extend `ServiceImpl<Mapper, DO>`. They provide
-`checkDuplicate()` and `innerSave()`. The `select*` verb is reserved for this layer only. The Mapper layer is standard
-MyBatis-Plus `BaseMapper<DO>`.
+### Tenant safety
 
-DO classes use snowflake IDs (`@TableId(type = IdType.ASSIGN_ID)`), soft delete (`@TableLogic` on `deleted` field), and
-`JacksonTypeHandler` for JSON columns.
+Tenant isolation is a hard requirement.
 
-## Command Rules
+- Preserve tenant scope in every new query and mutation.
+- Carry tenant IDs through gRPC requests whenever the contract supports them.
+- Include tenant context in cache keys for tenant-owned data.
+- Validate ownership before returning or mutating data across service boundaries.
+- Do not add `tenantId IS NULL` shortcuts unless the data model explicitly defines global records.
+- Treat missing tenant validation as a correctness and security defect, not a convenience trade-off.
 
-Prefer the root `Makefile` when a target exists. It keeps commands consistent across local machines and CI.
+### Facade boundaries
 
-Common commands:
+Business code must use facade interfaces for cross-service calls.
+
+- Contracts belong in `dc3-common-facade-api`.
+- Transport-backed implementations belong in `dc3-common-facade-grpc`.
+- In-process implementations belong in the matching module:
+  `dc3-common-facade-local-auth`, `dc3-common-facade-local-data`, or
+  `dc3-common-facade-local-manager`.
+- `dc3-common-facade-local` is a dependency aggregator and does not contain implementation sources.
+- Keep controllers and services independent from transport details unless they are explicit transport adapters.
+
+### gRPC contracts
+
+Proto files live under `dc3-api/*/src/main/protobuf`.
+
+When changing a contract:
+
+1. Update the `.proto` file.
+2. Compile the affected API module to regenerate sources.
+3. Update server implementations and client builders/stubs together.
+4. Preserve backward compatibility where practical.
+5. Verify tenant propagation and the `GrpcR` error envelope.
+
+Servers are Spring beans extending generated `*ImplBase` classes. Reuse shared stub configuration; do not construct ad
+hoc channels in business code.
+
+### Driver SDK
+
+Drivers implement protocol behaviour through the SPI types in `dc3-common-driver`; shared runtime services handle
+registration, scheduling, and value dispatch.
+
+Primary extension points are `DriverProtocol`, `DriverLifecycle`, `DriverMetadataListener`, `DriverHealth`,
+`DeviceHealth`, and `DriverCommand`. Prefer existing SDK plumbing over driver-specific infrastructure.
+
+Driver `application.yml` metadata is user-facing:
+
+- Keep `name`, `attribute-name`, and `remark` in English.
+- Treat driver `code` values as routing-stable identifiers. Changing one requires a metadata and RabbitMQ migration
+  plan.
+
+## API and domain conventions
+
+### CRUD verbs
+
+CRUD-shaped names reflect result cardinality across Service, Controller, Facade, gRPC server, and proto RPCs:
+
+| Action | Java | HTTP | gRPC |
+|---|---|---|---|
+| create one | `add(BO)` | `/add` | n/a |
+| delete by ID | `delete(Long)` | `/delete` | n/a |
+| update one | `update(BO)` | `/update` | n/a |
+| return one | `getXxx(...)` | `/get_xxx` | `GetXxx` |
+| return many | `listXxx(...)` | `/list_xxx` | `ListXxx` |
+
+- Base CRUD comes from `BaseService<B,Q>`: `add`, `delete`, `update`, `getById`, and `list(Q)`.
+- Reserve `select*` for raw Mapper/Manager persistence operations.
+- Reserve MyBatis-Plus `remove*` for the Manager layer; business deletion uses `delete*`.
+- Do not introduce `find*`, `query*`, or `fetch*` as primary CRUD verbs.
+- HTTP paths are lowercase snake_case and mirror Java names.
+- Use `getStatusByPage(Q)` for status maps and `dispatchRead`/`dispatchWrite` for command dispatch, following existing
+  contracts.
+
+### Models and enums
+
+- DOs model database storage; BOs model business semantics; VOs/DTOs model web or transport input/output.
+- Persistent write paths accept BOs in services. Controllers and transport adapters convert VO/DTO input to BO.
+- Read-only projections may return VOs directly when a duplicate BO would add no business meaning.
+- Use MapStruct builders for VO/BO/DO conversion, including enum/index conversion.
+- Do not leak database-coded `Byte`, `Integer`, or `String` flags when a domain enum exists or should exist.
+- `*FlagEnum` is for boolean-like toggles, `*StatusEnum` for state machines, and `*TypeEnum` for classifications.
+- Enum constants use descriptive `UPPER_SNAKE_CASE`; enum `code` values use lowercase tokens.
+- Do not introduce magic flag constants such as `private static final Byte DEFAULT = 1`.
+- Do not expose secrets in VOs. Exclude `apiKey`, `password`, `secret`, `token`, and credential fields from serialization
+  and Lombok `@ToString`.
+
+### Web API and OpenAPI
+
+- Controllers return the standard `R<T>` envelope and never expose DOs.
+- Apply grouped validation consistently and keep validation/exception messages in English.
+- Document REST endpoints with springdoc annotations; do not maintain a parallel handwritten OpenAPI spec.
+- Each business controller package needs the appropriate `GroupedOpenApi` bean, gateway aggregation route, and Swagger
+  UI entry.
+- Shared WebFlux/springdoc configuration belongs in `dc3-common-web` and must be registered through
+  `AutoConfiguration.imports` when component scanning will not discover it.
+- Docs are enabled in development-style profiles and disabled in production. Export a running stack with `make openapi`.
+
+### Configuration and logging
+
+- Custom configuration-property prefixes use `dc3.*`.
+- Prefer validated, typed `@ConfigurationProperties` over scattered `@Value` fields.
+- YAML deployment values use `${ENV:default}` placeholders.
+- WebFlux base paths use `spring.webflux.base-path`, not `server.servlet.context-path`.
+- Use English, stable event names and parameterized SLF4J messages.
+- Prefer structured fields such as `tenantId={}, userId={}, deviceId={}`.
+- Never log tokens, passwords, credentials, full request bodies, or raw private payloads at info level.
+- Pass caught exceptions to warn/error logs unless stack-trace suppression is intentional.
+
+## Frontend conventions
+
+Frontend code lives in `dc3-web/`. Its executable configuration is the source of truth:
+
+- dependencies, package-manager version, and scripts: `dc3-web/package.json` and `pnpm-lock.yaml`;
+- TypeScript behaviour: `dc3-web/tsconfig.json`;
+- Vite, proxy, environment, and SCSS behaviour: `dc3-web/vite.config.ts`;
+- test configuration: `dc3-web/vitest.config.ts` and `playwright.config.ts`;
+- container toolchain pins: `dc3-web/Dockerfile`.
+
+Use pnpm only; do not create npm or Yarn lockfiles. Keep package-manager pins aligned between `package.json` and the
+Dockerfile.
+
+Key rules:
+
+- `verbatimModuleSyntax` is enabled. Use `import type` for every type-only import; Vue components, functions, and icons
+  remain normal value imports.
+- Use `<Entity>Form` for create/update payloads and `<Entity>Record` for read responses.
+- Represent Java 64-bit IDs as strings and preserve the existing JSONBigInt handling.
+- API wrappers mirror backend cardinality: `getXxx` for one value, `listXxx` for collections/maps/pages, and
+  `addXxx`/`updateXxx`/`deleteXxx` for mutations.
+- Reuse CRUD helpers from `src/api/common.ts` and API bases from `src/config/constant/api.ts`; keep API wrappers thin.
+- Prefer `<script setup>`, Composition API, setup-style Pinia stores, and existing composables.
+- Every router-guard branch must settle navigation. Prefer return-style guards for new code and cover guard changes with
+  tests.
+- Axios interceptors own authentication headers and 401 handling; do not duplicate that logic in feature APIs.
+- Vite dotenv files live under `src/config/env/` and use the `APP_` prefix.
+- Global Element Plus variables are injected by Vite; do not duplicate their `@use` directives in components.
+- Menu changes may require synchronized backend seed data, `settingsNav.ts`, router definitions, i18n locales,
+  `Layout.vue`, and `Settings.vue` changes.
+
+Common frontend checks, run from `dc3-web/`:
+
+```bash
+pnpm check
+pnpm lint:check
+pnpm test:guard
+pnpm test:ci
+pnpm build
+make ci
+```
+
+Use affected Vitest suites for focused changes and Playwright for browser-level workflows. Coverage thresholds belong in
+`vitest.config.ts`; do not duplicate their numbers here.
+
+## Commands
+
+Prefer a root `Makefile` target when one exists. It selects Docker Compose or Podman Compose from the local environment
+and centralizes Maven settings.
 
 ```bash
 make up-db
 make up-optional
-make up-db && make up-optional && make up-dev
+make up-dev
 make package
+make test
+make test-it
+make test-e2e
+make coverage
 make changelog
 ```
 
-Direct Maven commands should use the checked-in settings file for local development:
+For direct Maven work, use the checked-in settings file locally:
 
 ```bash
-mvn -s .mvn/settings.xml clean package
 mvn -s .mvn/settings.xml -q -DskipTests compile
-
-# Run tests for a single module
 mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-manager
-
-# Run a single test class
-mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-manager -Dtest=DeviceControllerTest
-
-# Run a single test method
-mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-public -Dtest="RTest#testOkWithData"
+mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-manager -Dtest=DriverControllerTest
+mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-public \
+  -Dtest="RTest#okWithDataExposesDataAndDefaultEnvelope"
 ```
 
-GitHub Actions should not need `.mvn/settings.xml` unless a workflow is intentionally testing the mainland-China mirror
-path. CI should prefer public Maven Central defaults.
+When using `-am` together with `-Dtest`, add `-Dsurefire.failIfNoSpecifiedTests=false` so dependency modules without the
+selected test do not fail spuriously.
 
-## Environment Files
+GitHub Actions should normally use public Maven repositories rather than the local mirror settings unless a workflow
+is intentionally testing that mirror.
 
-- Root `.env.example`: template for Docker/Podman Compose interpolation.
-- Root `.env`: local, untracked Compose interpolation file created from `.env.example`.
-- `dc3/env/dev.env`: IDE-friendly local Java process variables without `export`.
-- `dc3/env/dev.env.sh`: shell-friendly local Java process variables with `export`.
+## Environment and Compose
 
-Do not treat these files as interchangeable. See https://docs.dc3.site/en/quickstart/environment before changing
-environment variables.
+- `.env.example` is the Compose interpolation template.
+- `.env` is local and untracked; create it through `make init-env`.
+- `dc3/env/dev.env` is for IDE/local Java process variables without `export`.
+- `dc3/env/dev.env.sh` is shell-sourceable and uses `export`.
+- Do not treat these files as interchangeable.
 
-## Compose Rules
-
-The compose files under `dc3/` are the canonical container definitions:
+Canonical Compose files are under `dc3/`:
 
 - `docker-compose.yml`
 - `docker-compose-dev.yml`
 - `docker-compose-db.yml`
-- `docker-compose-optional.yml` (EMQX + Elasticsearch/Logstash/Kibana/APM + Prometheus/exporters/Grafana)
+- `docker-compose-optional.yml`
 
-Registry selection is controlled by environment variables and Make arguments, not by duplicated registry-specific
-compose files:
+Registry choice is controlled through Make arguments and environment variables, not duplicated Compose files. After a
+Compose change, validate every touched stack with its corresponding `make config-*` target or an equivalent
+`docker compose ... config` / `podman compose ... config` command.
 
-```bash
-make up STACK=dev REGISTRY=cn
-make up-db-global && make up-optional-global && make up-app-global
-make compose-config STACK=optional REGISTRY=cn
-```
+## Testing and verification
 
-For container changes, run `make config` or the corresponding `podman compose config` path for every touched compose
-file.
+### Test types
 
-## Architecture Rules
+- Unit tests (`*Test.java`, `*Tests.java`) run with Surefire, JUnit 5, Mockito, AssertJ, and Reactor `StepVerifier` where
+  appropriate. Do not start a Spring context for a test that can use direct construction.
+- Integration tests (`*IT.java`) run with Failsafe and may use `dc3-common-test` Testcontainers and harnesses.
+- E2E tests live in `dc3-e2e/` and are gated by the `DC3_E2E` environment variable.
 
-### Tenant Safety
+Reusable test infrastructure includes `GrpcInProcessExtension`, `RabbitTestHarness`, `PgTimescaleContainer`,
+`RabbitContainer`, `MqttContainer`, `FixedClockConfig`, `JsonAssertions`, `EnumContractTest`, and
+`SecretFieldContractTest`.
 
-Tenant isolation is a hard requirement.
+### Coverage
 
-- New queries must preserve tenant scope.
-- New gRPC requests must carry tenant IDs when the contract supports them.
-- Cache keys for tenant-scoped data must include tenant context.
-- Cross-service lookups must validate ownership before returning or mutating data.
-- Do not add `tenantId IS NULL` shortcuts unless the data model explicitly defines global records.
+`make coverage` generates the aggregate report under `dc3-coverage/target/site/jacoco-aggregate/`. The current gate is
+an absolute minimum configured in `dc3-coverage/pom.xml`; `dc3-coverage/scripts/check_coverage.py` validates the
+aggregate XML. Do not claim a relative regression gate unless the build implements one.
 
-### Facade Boundaries
+### Proportional validation
 
-Use facade interfaces for cross-service calls from business code.
+Run checks proportionate to the change:
 
-- Put contracts in `dc3-common-facade-api`.
-- Put gRPC-backed implementations in `dc3-common-facade-grpc`.
-- Put in-process implementations in `dc3-common-facade-local`.
-- Keep controllers and service classes from binding directly to transport details unless they are transport adapters.
+- Java/shared behaviour: `mvn -s .mvn/settings.xml -q -DskipTests compile`.
+- Tested behaviour: affected unit tests, then `make test` when warranted.
+- DAL/SQL or infrastructure integration: affected ITs or `make test-it` with a container runtime.
+- gRPC: compile generated sources and run matching client/server contract tests.
+- Coverage-sensitive changes: `make coverage` and inspect the aggregate report.
+- Changelog tooling: `python3 -m py_compile dc3/bin/changelog.py`.
+- Compose: render/validate every touched configuration.
+- YAML: parse after accounting for Maven placeholders such as `@project.artifactId@`.
+- Agent/docs changes: validate referenced paths, targets, scripts, test selectors, and links.
 
-### gRPC
+Report what was verified and what was not verified before handing off public-behaviour changes.
 
-Proto files live under `dc3-api/*/src/main/protobuf`.
+## Release notes
 
-When changing a gRPC contract:
-
-1. Update the `.proto` file.
-2. Regenerate by compiling the affected module or the full project.
-3. Update server implementations and client builders/stubs together.
-4. Preserve backward compatibility where practical.
-5. Verify tenant propagation and error envelope behavior.
-
-Server classes should be Spring beans extending generated `*ImplBase` classes. Client stubs should come from shared stub
-configuration instead of ad hoc channel construction.
-
-Server implementation pattern:
-
-```java
-@Service
-public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
-    // Inject Grpc*Builder for domain ↔ gRPC DTO conversion
-    // Each method builds a GrpcR result envelope (mirroring REST R<T>)
-    // Uses StreamObserver for async response:
-    //   onNext(builder.build()) + onCompleted()
-}
-```
-
-### Driver SDK
-
-Drivers implement a composable set of SPI interfaces from `dc3-common-driver`. The SDK handles registration, scheduling,
-and value dispatch — drivers only implement protocol logic.
-
-| SPI Interface            | Methods                                              | Purpose                                               |
-|--------------------------|------------------------------------------------------|-------------------------------------------------------|
-| `DriverProtocol`         | `read(...)`, `write(...)`                            | Core protocol I/O (the primary contract)              |
-| `DriverLifecycle`        | `initial()`, `schedule()`                            | Startup initialization + periodic Quartz task         |
-| `DriverMetadataListener` | `event(MetadataEventDTO)`                            | React to CRUD changes on driver/device/point metadata |
-| `DriverHealth`           | `health()` → `DriverHealthState`                     | Driver-level health (defaults to ONLINE)              |
-| `DeviceHealth`           | `health(driverConfig, device)` → `DeviceHealthState` | Per-device health check                               |
-| `DriverCommand`          | `execute(...)` → `Map<String,String>`                | Custom device commands                                |
-
-`DriverCustomService` aggregates all SPI interfaces for convenience. Protocol-agnostic plumbing (registration via
-`DriverRegisterService`, scheduling via `DriverScheduleService`, value sending via `DriverSenderService`) is handled by
-the SDK runtime.
-
-### Web API
-
-- Controllers return the standard response envelope.
-- Do not expose persistence entities directly.
-- Use BO/VO/DTO separation and existing builder classes.
-- Use grouped validation annotations consistently.
-- Keep validation and exception messages in English.
-
-### OpenAPI / Swagger
-
-REST endpoints are documented with springdoc-openapi (annotations only, no hand-maintained spec).
-See https://docs.dc3.site/en/development/api-documentation for the full guide.
-
-- Annotate controllers (`@Tag`, `@Operation`, `@Parameter`) and DTOs (`@Schema` with `example` / `requiredMode` where
-  useful). Keep all doc text English.
-- Each business module owns a `GroupedOpenApi` bean (e.g. `AuthApiGroupConfig`); add one when introducing a new center
-  with its own controller package, plus a gateway aggregation route and `swagger-ui.urls` entry.
-- Shared config (`SpringDocConfig`, `WebFluxSecurityConfig`) lives in
-  `dc3-common-web` and is registered in `AutoConfiguration.imports` — center apps do not scan
-  `io.github.pnoker.common.config`, so a plain `@Configuration`
-  there will not load.
-- Docs are exposed in dev/test/pre and disabled in production (`pro` profile). View aggregated docs at the gateway
-  `:8000/swagger-ui.html`; export with
-  `make openapi` against a running stack.
-
-### CRUD Verb Convention
-
-The verb on every CRUD-shaped method and HTTP path must reflect the cardinality of the result, applied consistently
-across Service interfaces, ServiceImpl, Controller, Local Facade, gRPC Facade, gRPC server, and gRPC RPC names in
-`.proto` files.
-
-| Action                 | Java method    | HTTP path   | gRPC RPC  |
-|------------------------|----------------|-------------|-----------|
-| Create one record      | `add(BO)`      | `/add`      | n/a       |
-| Delete by id           | `delete(Long)` | `/delete`   | n/a       |
-| Update one record      | `update(BO)`   | `/update`   | n/a       |
-| Query single record    | `getXxx(...)`  | `/get_xxx`  | `GetXxx`  |
-| Query multiple records | `listXxx(...)` | `/list_xxx` | `ListXxx` |
-
-- The base CRUD methods are inherited from `BaseService<B, Q>`:
-  `add`, `delete`, `update`, `getById`, `list(Q)`. Subinterfaces add
-  `getByXxx`/`listByXxx` only with extra cardinality-matching verbs.
-- `select*` is reserved for raw MyBatis Mapper calls inside `*ManagerImpl`
-  classes, never on Service/Controller/Facade APIs.
-- `remove*` is reserved for MyBatis-Plus inherited Manager methods (`removeById`, `remove(wrapper)`); business deletion
-  uses `delete*`.
-- `find*`, `query*`, `fetch*` are not used as primary CRUD verbs.
-- HTTP paths use lowercase snake_case and mirror the Java method name.
-- gRPC RPC names use PascalCase and mirror the Java method name.
-
-Special cases follow the same cardinality rule:
-
-- `getStatusByPage(Q)` for status-snapshot lookups whose return type is a
-  `Map<Long,String>`, not a `Page` (DeviceStatusService, DriverStatusService).
-- Boolean-returning action methods stay on a try-pattern verb when the failure outcome is a normal result, e.g.
-  `tryCancelToken(...)`.
-- Single-record dispatch facades use `dispatch*` to avoid noun-verb ambiguity
-  (`PointValueCommandFacade.dispatchRead/dispatchWrite`).
-
-### Domain Modeling
-
-Keep persistence, business, and web representations deliberately separated.
-
-- Persistence objects (`*DO`) model the database shape. Database-coded flags and type columns may stay as `Byte` on
-  `*DO` classes, but they must not leak into business or response models when a domain enum exists or should exist.
-- Business objects (`*BO`) carry business semantics. Use enums such as `EnableFlagEnum`, `DefaultFlagEnum`, or
-  domain-specific enums instead of naked `Byte`, `Integer`, or `String` flags.
-- View objects (`*VO`) carry API response/request semantics. Prefer the same domain enums used by the corresponding
-  `*BO`, unless a public API compatibility requirement explicitly requires a primitive or string.
-- Use MapStruct `*Builder` classes for `VO <-> BO <-> DO` conversion. Put enum/index conversion in the builder
-  (`EnumValue.getIndex()` for `BO -> DO`, `Enum.ofIndex(...)` for `DO -> BO`) instead of scattering it through services.
-- Controllers should translate web input/output (`VO`, request DTOs, path variables) to and from `BO`; services should
-  expose and accept `BO` rather than `VO` for persistent business entities.
-- Read-only projection/aggregation responses (dashboard statistics, health snapshots, topic listings, model-option
-  lists, history query results, etc.) may be returned directly as `VO` from read-only query services without a parallel
-  `BO` — these carry no business behaviour and forcing a duplicate `BO` is over-modeling. The "services expose `BO`"
-  rule applies to persistent business entities and to write-path business inputs (command submission, event reports),
-  which must accept a `BO`; the controller (or transport adapter) converts the inbound `VO`/request into that `BO`.
-- MyBatis-Plus query conditions may use enum values directly when the enum field has `@EnumValue`, for example
-  `.eq(EntityDO::getEnableFlag, EnableFlagEnum.ENABLE)`. Plain Java comparisons against `Byte` fields must compare with
-  the enum index, preferably centralized in a builder or helper.
-- Do not introduce magic flag constants such as `private static final Byte DEFAULT = 1`. Add or reuse a domain enum
-  instead, with `@EnumValue`, `ofIndex(...)`, and clear names.
-- Domain enum suffixes follow strict semantics:
-    - `*FlagEnum` for boolean-like 0/1 toggles (`EnableFlagEnum`, `DefaultFlagEnum`, `ConfirmFlagEnum`).
-    - `*StatusEnum` for state-machine values with multiple states (`EntityStatusEnum`, `RuleStatusEnum`,
-      `NotifyHistoryStatusEnum`). Do not append `Flag` to a state-machine enum name.
-    - `*TypeEnum` for closed classification sets, including multi-valued classifications and levels (`MetadataTypeEnum`,
-      `PointTypeEnum`, `EventLevelEnum`, `ExpireTypeEnum`). Multi-valued sets must not use the `*FlagEnum` suffix.
-- Enum constant names use `UPPER_SNAKE_CASE` and stay descriptive — single-letter names like `R`/`W` are not allowed.
-  The internal `code` string field on enums uses lowercase tokens (e.g. `"enable"`, `"online"`, `"pending"`) so that
-  values are consistent across `*FlagEnum`, `*StatusEnum`, and `*TypeEnum` definitions.
-- Do not expose secrets in `VO` classes, and exclude secret-bearing fields such as `apiKey`, `password`, `secret`,
-  `token`, and credentials from Lombok `@ToString`.
-
-### Configuration
-
-- Custom `@ConfigurationProperties` prefixes must use `dc3.*`.
-- Prefer typed properties with validation over scattered `@Value` usage.
-- Keep legacy aliases only when they protect existing deployments during migration.
-- YAML should use `${ENV:default}` placeholders for deploy-time values.
-- Services built on `dc3-common-web` use WebFlux; configure request base paths with `spring.webflux.base-path`, not
-  `server.servlet.context-path`.
-
-All custom prefixes use `dc3.*`. Check `@ConfigurationProperties` annotations in the codebase for the current set — do
-not hardcode a prefix list in documentation.
-
-### Logging
-
-Use the repository logging convention (https://docs.dc3.site/en/guide/logging).
-
-- Use English, stable event names, and parameterized SLF4J placeholders.
-- Prefer key-value fields such as `tenantId={}, userId={}, deviceId={}` over prose-only messages.
-- Do not log secrets, tokens, passwords, full request bodies, or raw private payloads at `info`.
-- Pass the exception object to warn/error logs for caught exceptions unless the stack trace is intentionally suppressed.
-
-### Driver Metadata
-
-Driver `application.yml` files are user-facing metadata. Keep `name`, `attribute-name`, and `remark` values in English.
-
-Driver `code` values are routing-critical and must remain stable after a driver is used in real deployments. Changing a
-driver code requires a migration plan for manager metadata and RabbitMQ routing.
-
-## Release Notes
-
-`dc3/doc/CHANGE.md` is generated from git history. Do not hand-edit the current release block unless fixing generator
+`dc3/doc/CHANGE.md` is generated from Git history. Do not hand-edit the current release block unless fixing generator
 output.
-
-Use:
 
 ```bash
 make changelog
 make changelog FROM=<previous-tag-or-ref> TO=HEAD VERSION=<version>
 ```
 
-Commit message quality directly affects release notes. Vague subjects such as `update`, `fix`, `.`, `add comment`, or
-non-English subjects make the generated changelog poor and should be rejected.
-
-Generated changelog-only commits with subject `docs(release): update generated changelog` are skipped by default by the
-generator so rerunning `make changelog` after committing `CHANGE.md` remains stable.
-
-## Commit Rules
-
-### AI Commit Confirmation
-
-AI coding agents must not create commits without explicit user confirmation.
-
-Before each commit, show:
-
-- the proposed commit message;
-- the files included in that commit;
-- the reason this group of files belongs together;
-- the verification already run for the change.
-
-Wait for the user to approve that specific commit before running `git commit`.
-
-Do not batch unrelated changes into one commit. Split commits by intent, for example:
-
-- feature or behavior changes;
-- bug fixes;
-- configuration changes;
-- documentation changes;
-- generated release notes.
-
-`dc3/doc/CHANGE.md` must be committed separately with exactly:
+Commit subjects feed the generated changelog. Reject vague or non-English subjects. A changelog-only commit must use
+exactly:
 
 ```text
 docs(release): update generated changelog
 ```
 
-If the user asks to commit multiple changes, first present the proposed commit sequence and wait for approval.
+Commit that file separately from behaviour, configuration, or tooling changes.
+
+## Commit rules
+
+AI coding agents must not commit without explicit confirmation for that specific commit.
+
+Before each commit, present:
+
+- proposed commit message;
+- exact files included;
+- why those files form one coherent change;
+- verification already completed.
+
+Wait for approval before running `git commit`. For multiple commits, present the sequence first and obtain approval for
+each commit before creating it.
 
 Use Conventional Commit subjects:
-
-```text
-feat(agentic): add session cleanup policy
-fix(manager): validate tenant scope for device queries
-docs(env): explain JetBrains IDEA environment variables
-refactor(container): deduplicate compose registry overrides
-```
-
-Required subject format:
 
 ```text
 <type>(optional-scope): <english imperative summary>
 ```
 
-Allowed types:
+Allowed types are `feat`, `fix`, `perf`, `refactor`, `docs`, `build`, `ci`, `test`, `chore`, `style`, `security`,
+`revert`. Use `!` for breaking changes and explain the impact in the body. Keep subjects specific enough for release
+notes.
 
-- `feat`
-- `fix`
-- `perf`
-- `refactor`
-- `docs`
-- `build`
-- `ci`
-- `test`
-- `chore`
-- `style`
-- `security`
-- `revert`
+The tracked `.husky/pre-commit` hook runs frontend `lint-staged`. Do not claim commit-message enforcement unless a
+tracked commit-msg validation hook is added.
 
-Rules:
+## Editing and documentation
 
-- Use English in the subject.
-- Keep the subject specific enough to be useful in `CHANGE.md`.
-- Prefer a scope for anything outside a tiny root-only change.
-- Do not use weak subjects such as `update`, `fix bug`, `change code`, `misc`, `wip`, or `.`.
-- Use `!` for breaking changes and explain the impact in the body.
-- For release-note-only commits, use exactly `docs(release): update generated changelog`.
-
-Husky manages Git hooks automatically — no manual install needed. The `pre-commit` hook runs lint-staged (eslint)
-on staged files before each commit. A `commit-msg` hook stub exists (`.husky/_/commit-msg`) but has no validation script
-attached yet; to enforce conventional-commit format, add a script at `.husky/commit-msg`.
-
-## Testing
-
-### Test Pyramid
-
-- **Unit tests** (`*Test.java`, `*Tests.java`): run by Surefire. JUnit 5 + Mockito (
-  `@ExtendWith(MockitoExtension.class)`), AssertJ assertions, Reactor `StepVerifier` for reactive code. No Spring
-  context spin-up — controllers are tested with manual dependency injection and context wiring.
-- **Integration tests** (`*IT.java`): run by Failsafe. Use `dc3-common-test` infrastructure: Testcontainers
-  (`PgTimescaleContainer`, `RabbitContainer`, `MqttContainer`), gRPC in-process extension (`GrpcInProcessExtension`),
-  and RabbitMQ test harness (`RabbitTestHarness`).
-- **E2E tests** (`dc3-e2e/`): gated behind `@EnabledIfEnvironmentVariable(named = "DC3_E2E")`. Boots real
-  PostgreSQL/TimescaleDB and RabbitMQ via Testcontainers on a shared Docker network. Tests messaging contracts (command
-  dispatch, event routing, hypertable operations). Run with `make test-e2e`.
-
-### Test Infrastructure (`dc3-common-test`)
-
-| Utility                  | Purpose                                                              |
-|--------------------------|----------------------------------------------------------------------|
-| `GrpcInProcessExtension` | JUnit 5 extension: in-process gRPC server + managed channel per test |
-| `RabbitTestHarness`      | Send/receive to RabbitMQ in tests; `awaitTrue()` via Awaitility      |
-| `PgTimescaleContainer`   | Singleton `timescale/timescaledb-ha:pg18` container                  |
-| `RabbitContainer`        | RabbitMQ testcontainer                                               |
-| `MqttContainer`          | MQTT testcontainer                                                   |
-| `FixedClockConfig`       | `@TestConfiguration` overriding the `Clock` bean to a fixed instant  |
-| `JsonAssertions`         | `assertJsonEquals()` and `assertJsonContains()` over JSONAssert      |
-
-### Contract Tests
-
-- `EnumContractTest<E>`: abstract test verifying `getIndex()` uniqueness, `ofIndex()` round-trip, and name stability for
-  all enum constants via `@TestFactory`.
-- `SecretFieldContractTest`: verifies sensitive fields (apiKey, password, secret, token) are excluded from
-  `@ToString` and serialization.
-
-### Coverage Gate
-
-`make coverage` generates the aggregate JaCoCo report at `dc3-coverage/target/site/jacoco-aggregate/`. The
-`check_coverage.py` script enforces minimum thresholds (default: ≥20% line, ≥15% branch). Coverage regressions greater
-than 1% block the change.
-
-## Validation Checklist
-
-Run checks proportional to the change:
-
-- Java/shared behavior: `mvn -s .mvn/settings.xml -q -DskipTests compile`
-- Full package: `mvn -s .mvn/settings.xml clean package`
-- Behaviour change in tested code: `make test`
-- DAL or SQL change: `make test-it` (requires a Docker-compatible container runtime, runs Testcontainers)
-- gRPC proto change: regenerate stubs and run the matching contract tests
-- Aggregate coverage check: `make coverage` and inspect
-  `dc3-coverage/target/site/jacoco-aggregate/index.html`. Coverage regressions greater than 1% block the change.
-- Changelog script: `python3 -m py_compile dc3/bin/changelog.py`
-- Compose files: `podman compose -f dc3/<file>.yml config --quiet`
-- YAML syntax: parse changed YAML after normalizing Maven placeholders such as `@project.artifactId@`
-- Agent or docs changes: check links, command examples, stale filenames, and current workflow names
-
-See https://docs.dc3.site/en/development/testing for the full test pyramid, naming conventions, Testcontainers strategy
-and CI workflow expectations.
-
-Before committing code that changes public behavior, mention what was verified and what was not verified.
-
-## Editing Rules
-
-- Keep changes focused on the request.
-- Do not revert unrelated user changes.
-- Prefer existing patterns and helper APIs over new abstractions.
-- Keep public/user-facing text in English unless a specific localized document is being edited.
 - Preserve AGPL headers where they already exist.
-- Avoid generated metadata churn unless the task requires it.
-- Use structured parsers or existing toolchains for structured files when practical.
-
-## Documentation Rules
-
-- Root README files in multiple languages should stay structurally aligned.
-- Runtime and environment changes should update the environment guide
-  in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/quickstart/environment).
-- Driver authoring changes should update the driver-authoring guide
-  in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/development/driver-authoring).
-- Container changes should update compose examples and `.env.example` if variables change.
-- Test strategy, harness or coverage gate changes should update the testing guide
-  in [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs) (en/development/testing).
-- Release workflow changes should update `CONTRIBUTING.md` and this file.
+- Prefer existing patterns and helpers over new abstractions.
+- Keep public/user-facing project text in English unless editing a localized document.
+- Avoid generated metadata churn unless required by the task.
+- Use structured parsers or project toolchains for structured files when practical.
+- Keep multilingual root READMEs structurally aligned.
+- Runtime/environment changes should update the environment guide in `pnoker/iot-dc3-docs`.
+- Driver-authoring changes should update the driver-authoring guide in `pnoker/iot-dc3-docs`.
+- Test strategy, harness, or coverage changes should update the testing guide in `pnoker/iot-dc3-docs`.
+- Release-workflow changes should update `CONTRIBUTING.md` and this file.
