@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, onMounted, onUnmounted, ref} from 'vue';
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
@@ -71,7 +71,7 @@ const props = withDefaults(
   {group: 'structural'}
 );
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 
 // Each group keeps its own driver → point → device → profile precedence
 // so both halves read left-to-right the same way.
@@ -222,7 +222,11 @@ const loadDriverOrDevice = async () => {
   const devicePayload = dev?.data || {byEnable: [], byProfile: [], byDriver: []};
 
   if (activeTab.value === 'deviceStatus') {
-    const buckets = (devicePayload.byEnable || []) as { key: string; count: number }[];
+    const raw = (devicePayload.byEnable || []) as { key: string; count: number }[];
+    const buckets = raw.map((bucket) => ({
+      ...bucket,
+      key: bucket.key === 'ENABLED' ? t('common.enable') : bucket.key === 'DISABLED' ? t('common.disable') : bucket.key,
+    }));
     empty.value = buckets.length === 0;
     await nextTick();
     if (!empty.value) renderPie(buckets);
@@ -290,6 +294,13 @@ const load = async () => {
 };
 
 onMounted(() => {
+  load();
+});
+
+watch(locale, () => {
+  for (const names of Object.values(nameCache)) {
+    for (const id of Object.keys(names)) delete names[id];
+  }
   load();
 });
 

@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onMounted, onUnmounted, reactive, ref} from 'vue';
+import {nextTick, onMounted, onUnmounted, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
@@ -41,7 +41,7 @@ import type {AgingBacklog} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const {loading, run} = useAsyncLoader();
 
 const data = reactive<AgingBacklog>({under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
@@ -85,6 +85,7 @@ const load = () =>
   });
 
 onMounted(load);
+watch(locale, load);
 onUnmounted(() => chart?.destroy());
 
 defineExpose({refresh: load});

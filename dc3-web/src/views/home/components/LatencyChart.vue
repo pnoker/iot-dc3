@@ -62,6 +62,9 @@ const render = (rows: { bin: number; count: number }[]) => {
     .encode('x', 'label')
     .encode('y', 'count')
     .encode('color', 'bin')
+    // Latency distributions are strongly right-skewed. A square-root scale
+    // preserves a zero baseline while keeping rare slow buckets visible.
+    .scale('y', {type: 'sqrt', zero: true, nice: true})
     .scale('color', {
       range: ['#67c23a', '#95d475', '#f0c14b', '#e6a23c', '#f56c6c', '#c45656'],
     })

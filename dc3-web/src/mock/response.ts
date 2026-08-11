@@ -43,6 +43,8 @@ export const responseOf = (
  */
 export const ok = <T = unknown>(data: T): R<T> => ({ok: true, code: '0', message: 'success', data});
 
+export const fail = (code: string, message: string): R<null> => ({ok: false, code, message, data: null});
+
 export const okPage = <T>(records: T[], total = records.length): R<{ total: number; records: T[] }> =>
   ok({total, records});
 

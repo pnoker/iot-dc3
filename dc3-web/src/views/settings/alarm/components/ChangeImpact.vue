@@ -63,7 +63,7 @@ import {resolveDashboardColour} from '@/config/constant/palette';
 import {jumpToEntity} from '@/utils/jumpUtil';
 import {formatDateTime} from '@/utils/timeUtil';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const router = useRouter();
 const {loading, run} = useAsyncLoader();
 const {resolveDevices, resolveDrivers, resolveProfiles, deviceName, driverName, profileName} = useEntityNames();
@@ -90,6 +90,7 @@ const load = () =>
   });
 
 watch(daysKey, load);
+watch(locale, load);
 onMounted(load);
 
 const entityName = (r: ChangeImpact) => {

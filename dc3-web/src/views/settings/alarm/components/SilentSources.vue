@@ -64,7 +64,7 @@ import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {formatDateTime, humanDuration} from '@/utils/timeUtil';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const router = useRouter();
 const {loading, run} = useAsyncLoader();
 const {resolveDevices, resolvePoints, deviceName, pointName} = useEntityNames();
@@ -91,6 +91,7 @@ const load = () =>
   });
 
 watch(silentKey, load);
+watch(locale, load);
 onMounted(load);
 
 const onRowClick = (row: SilentSource) => {

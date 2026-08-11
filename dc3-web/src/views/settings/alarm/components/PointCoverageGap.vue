@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive} from 'vue';
+import {computed, onMounted, reactive, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 
@@ -69,7 +69,7 @@ import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {jumpToEntity} from '@/utils/jumpUtil';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const router = useRouter();
 const {loading, run} = useAsyncLoader();
 const {resolvePoints, resolveProfiles, pointName, profileName} = useEntityNames();
@@ -106,6 +106,7 @@ const load = () =>
   });
 
 onMounted(load);
+watch(locale, load);
 
 const onRowClick = (row: CoverageGapItem) => jumpToEntity(router, 'point', row.pointId);
 

@@ -29,7 +29,7 @@
 
 <p align="center">
   <strong>
-    IoT DC3 — plataforma de código abierto de IoT industrial, multiprotocolo, impulsada por IA y nativa de la nube.<br>
+    IoT DC3 — plataforma industrial de IA e IoT, multiprotocolo, nativa de la nube y de código abierto.<br>
     Microservicios nativos de la nube · Conectividad multiprotocolo · Operaciones asistidas por IA · 28 controladores listos para usar
   </strong>
 </p>

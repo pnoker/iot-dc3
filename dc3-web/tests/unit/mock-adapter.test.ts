@@ -18,6 +18,7 @@
 import type {AxiosRequestConfig} from 'axios';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import request from '@/config/axios';
+import i18n from '@/config/i18n';
 import {setupMock} from '@/mock';
 
 vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), warnMessage: vi.fn()}));
@@ -32,6 +33,7 @@ vi.mock('@/config/router', () => ({default: {push: vi.fn(() => Promise.resolve()
 describe('mock adapter', () => {
   beforeEach(() => {
     localStorage.clear();
+    i18n.global.locale.value = 'en';
     setupMock();
   });
 
@@ -71,10 +73,15 @@ describe('mock adapter', () => {
   });
 
   it('mocks the token endpoints so login works end-to-end', async () => {
-    const salt = await call({url: 'api/v3/auth/token/salt', method: 'post', data: {}});
+    const login = {tenant: 'default', name: 'dc3', password: 'dc3dc3dc3'};
+    const salt = await call({url: 'api/v3/auth/token/salt', method: 'post', data: login});
     expect(salt.data).toBe('mock-salt');
-    const token = await call({url: 'api/v3/auth/token/generate', method: 'post', data: {}});
+    const token = await call({url: 'api/v3/auth/token/generate', method: 'post', data: login});
     expect(token.data).toBe('ok');
+
+    await expect(
+      call({url: 'api/v3/auth/token/generate', method: 'post', data: {...login, password: 'incorrect'}}),
+    ).rejects.toMatchObject({ok: false, code: 'R4010'});
   });
 
   it('returns the seeded role list with real data', async () => {
@@ -108,5 +115,169 @@ describe('mock adapter', () => {
     const res = await call({url: 'api/v3/manager/dashboard/topology', method: 'get'});
     expect(res.data.nodes.length).toBeGreaterThan(0);
     expect(res.data.stats.driverCount).toBeGreaterThan(0);
+    expect(res.data.nodes.filter((node: any) => node.type === 'driver').length).toBeLessThanOrEqual(10);
+    expect(res.data.nodes.filter((node: any) => node.type === 'device').length).toBeLessThanOrEqual(20);
+  });
+
+  it('returns complete current dashboard time payloads', async () => {
+    const series = await call({
+      url: 'api/v3/data/dashboard/stats/timeseries',
+      method: 'get',
+      params: {range_key: '24h', granularity: 'hour'},
+    });
+    expect(series.data).toHaveLength(24);
+    expect(series.data.every((row: any) => typeof row.bucket === 'string' && row.bucket.length > 0)).toBe(true);
+    expect(new Set(series.data.map((row: any) => row.bucket)).size).toBe(24);
+
+    const stream = await call({url: 'api/v3/data/dashboard/stream', method: 'get', params: {size: 1}});
+    const latest = new Date(String(stream.data[0].createTime).replace(' ', 'T')).getTime();
+    expect(Date.now() - latest).toBeLessThan(60_000);
+  });
+
+  it('serves rich localized Agentic Assistant conversations', async () => {
+    const sessions = await call({
+      url: 'api/v3/agentic/session/list',
+      method: 'post',
+      data: {page: {current: 1, size: 20}},
+    });
+    expect(sessions.data.total).toBeGreaterThanOrEqual(8);
+    expect(new Set(sessions.data.records.map((session: any) => session.sessionExt.icon)).size).toBeGreaterThanOrEqual(8);
+    expect(sessions.data.records.every((session: any) => !/[\u3400-\u9fff]/u.test(session.title))).toBe(true);
+
+    const defaultSession = sessions.data.records.find((session: any) => session.sessionExt.category === 'health');
+    const defaultMessages = await call({
+      url: 'api/v3/agentic/message/list',
+      method: 'get',
+      params: {conversation_id: defaultSession.conversationId},
+    });
+    const finalDefaultReply = defaultMessages.data.at(-1);
+    expect(defaultMessages.data.length).toBeGreaterThanOrEqual(12);
+    expect(finalDefaultReply.role).toBe('assistant');
+    expect(finalDefaultReply.contentExt.tools.length).toBeGreaterThanOrEqual(4);
+    expect(finalDefaultReply.contentExt.charts.length).toBeGreaterThanOrEqual(3);
+    expect(finalDefaultReply.contentExt.contexts.length).toBeGreaterThanOrEqual(2);
+
+    const defaultPending = await call({
+      url: 'api/v3/agentic/action/pending',
+      method: 'get',
+      params: {conversation_id: defaultSession.conversationId},
+    });
+    expect(defaultPending.data).toHaveLength(1);
+    expect(defaultPending.data[0].actionType).toBe('WORK_ORDER_CREATE');
+
+    const alarmSession = sessions.data.records.find((session: any) => session.sessionExt.category === 'alarm');
+    const messages = await call({
+      url: 'api/v3/agentic/message/list',
+      method: 'get',
+      params: {conversation_id: alarmSession.conversationId},
+    });
+    const richReply = messages.data.find((message: any) => message.role === 'assistant');
+    expect(messages.data.length).toBeGreaterThanOrEqual(4);
+    expect(richReply.content).not.toMatch(/[\u3400-\u9fff]/u);
+    expect(richReply.contentExt.tools.length).toBeGreaterThanOrEqual(3);
+    expect(richReply.contentExt.traces.length).toBeGreaterThanOrEqual(3);
+    expect(richReply.contentExt.charts.length).toBeGreaterThanOrEqual(2);
+    expect(richReply.contentExt.tokens.context).toBeGreaterThan(0);
+
+    const commandSession = sessions.data.records.find((session: any) => session.sessionExt.category === 'command');
+    const pending = await call({
+      url: 'api/v3/agentic/action/pending',
+      method: 'get',
+      params: {conversation_id: commandSession.conversationId},
+    });
+    expect(pending.data).toHaveLength(1);
+    expect(pending.data[0].title).not.toMatch(/[\u3400-\u9fff]/u);
+
+    i18n.global.locale.value = 'zh';
+    const localized = await call({
+      url: 'api/v3/agentic/session/list',
+      method: 'post',
+      data: {page: {current: 1, size: 20}},
+    });
+    expect(localized.data.records.some((session: any) => /[\u3400-\u9fff]/u.test(session.title))).toBe(true);
+  });
+
+  it('populates every Alarm Overview diagnostic endpoint', async () => {
+    const [page, trend, top, activity, types, storm, flapping, correlation, peer, mtta, changes, protocols, coverage] =
+      await Promise.all([
+        call({
+          url: 'api/v3/data/dashboard/alert/page',
+          method: 'post',
+          data: {source: 'device', confirmFlag: 0, current: 1, size: 3},
+        }),
+        call({url: 'api/v3/data/dashboard/alert/trend', method: 'get', params: {days: 7}}),
+        call({url: 'api/v3/data/dashboard/alert/top_sources', method: 'get', params: {limit: 10}}),
+        call({url: 'api/v3/data/dashboard/alert/activity', method: 'get', params: {days: 7}}),
+        call({url: 'api/v3/data/dashboard/alert/type_distribution', method: 'get', params: {days: 30}}),
+        call({
+          url: 'api/v3/data/dashboard/alert/storm_sources',
+          method: 'get',
+          params: {hours: 24, min_count: 100, limit: 10},
+        }),
+        call({url: 'api/v3/data/dashboard/alert/flapping', method: 'get', params: {min_count: 5, limit: 20}}),
+        call({url: 'api/v3/data/dashboard/alert/correlation', method: 'get', params: {limit: 15}}),
+        call({url: 'api/v3/data/dashboard/alert/peer_deviation', method: 'get', params: {days: 7}}),
+        call({url: 'api/v3/data/dashboard/alert/mtta', method: 'get', params: {days: 7}}),
+        call({url: 'api/v3/data/dashboard/alert/change_impact', method: 'get', params: {limit: 30}}),
+        call({url: 'api/v3/data/dashboard/protocol/health', method: 'get'}),
+        call({url: 'api/v3/data/dashboard/coverage/gap', method: 'get', params: {limit: 100}}),
+      ]);
+
+    expect(page.data.total).toBe(6);
+    expect(page.data.records).toHaveLength(3);
+    expect(page.data.records.every((row: any) => row.source === 'device' && row.confirmFlag === 'UNCONFIRMED')).toBe(true);
+    expect(trend.data).toHaveLength(7);
+    expect(top.data.length).toBeGreaterThanOrEqual(8);
+    expect(activity.data).toHaveLength(7 * 24);
+    expect(types.data.length).toBeGreaterThanOrEqual(5);
+    expect(storm.data.every((row: any) => row.count >= 100)).toBe(true);
+    expect(flapping.data.length).toBeGreaterThanOrEqual(10);
+    expect(correlation.data.length).toBeGreaterThanOrEqual(10);
+    expect(peer.data.length).toBeGreaterThanOrEqual(10);
+    expect(mtta.data).toHaveLength(7);
+    expect(changes.data.length).toBeGreaterThanOrEqual(10);
+    expect(protocols.data.length).toBeGreaterThanOrEqual(10);
+    expect(coverage.data.missingPoints).toBe(coverage.data.items.length);
+    expect(coverage.data.items.length).toBeGreaterThanOrEqual(8);
+  });
+
+  it('returns English display data without Chinese text', async () => {
+    const [profiles, points, stream, alerts, topology] = await Promise.all([
+      call({url: 'api/v3/manager/profile/list_by_ids', method: 'post', data: ['2001']}),
+      call({url: 'api/v3/manager/point/list_by_ids', method: 'post', data: ['5001']}),
+      call({url: 'api/v3/data/dashboard/stream', method: 'get', params: {size: 1}}),
+      call({url: 'api/v3/data/dashboard/alert/latest', method: 'get'}),
+      call({url: 'api/v3/manager/dashboard/topology', method: 'get'}),
+    ]);
+    const displayText = [
+      profiles.data['2001'].profileName,
+      points.data['5001'].pointName,
+      stream.data[0].driverName,
+      stream.data[0].deviceName,
+      stream.data[0].pointName,
+      ...alerts.data.map((row: any) => row.message),
+      ...topology.data.nodes.map((node: any) => node.name),
+    ].join(' ');
+
+    expect(displayText).not.toMatch(/[\u3400-\u9fff]/u);
+    expect(profiles.data['2001'].profileName).toBe('Temperature & Humidity Sensor');
+    expect(alerts.data[0].message).toContain('offline');
+  });
+
+  it('returns Chinese display names and messages after switching locale', async () => {
+    i18n.global.locale.value = 'zh';
+    const [drivers, profiles, stream, alerts, topology] = await Promise.all([
+      call({url: 'api/v3/manager/driver/list_by_ids', method: 'post', data: ['1001']}),
+      call({url: 'api/v3/manager/profile/list_by_ids', method: 'post', data: ['2001']}),
+      call({url: 'api/v3/data/dashboard/stream', method: 'get', params: {size: 1}}),
+      call({url: 'api/v3/data/dashboard/alert/latest', method: 'get'}),
+      call({url: 'api/v3/manager/dashboard/topology', method: 'get'}),
+    ]);
+
+    expect(drivers.data['1001'].driverName).toBe('Modbus-TCP 驱动');
+    expect(profiles.data['2001'].profileName).toBe('温湿度传感器');
+    expect(stream.data[0].deviceName).toMatch(/[\u3400-\u9fff]/u);
+    expect(alerts.data[0].message).toBe('设备离线超过 5 分钟');
+    expect(topology.data.nodes.some((node: any) => /[\u3400-\u9fff]/u.test(node.name))).toBe(true);
   });
 });

@@ -47,6 +47,16 @@ interface AlertRow {
 const wave = (base: number, amp: number, n: number): number[] =>
   Array.from({length: n}, (_, i) => Math.max(0, Math.round(base + Math.sin(i / 2) * amp)));
 
+const pad = (value: number): string => String(value).padStart(2, '0');
+
+/** Match the backend LocalDateTime JSON shape while keeping the browser's local timezone. */
+const formatDateTime = (value: Date): string =>
+  `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())} ` +
+  `${pad(value.getHours())}:${pad(value.getMinutes())}:${pad(value.getSeconds())}`;
+
+const shiftedTime = (now: Date, millisecondsAgo: number): string =>
+  formatDateTime(new Date(now.getTime() - millisecondsAgo));
+
 export const statsToday: StatsTodaySummary = {today: 128, percentChange: 12.5, total: 4823};
 
 export const alertStats: AlertStatsSummary = {
@@ -70,7 +80,35 @@ export const dailyGrowth: DailyGrowthSummary = {
   profileDailyCounts: [5, 5, 6, 6, 6, 6, profiles.length],
 };
 
-export const statsTimeseries: StatsTimeBucket[] = wave(18, 12, 24).map((count) => ({count}));
+/**
+ * Build complete bucket/count rows for the requested window. The old mock only
+ * returned count, collapsing every G2 point onto an undefined x-axis bucket.
+ */
+export const statsTimeseries = (
+  rangeKey = '24h',
+  granularity: 'hour' | 'day' = rangeKey === '7d' || rangeKey === '30d' ? 'day' : 'hour',
+  now = new Date(),
+): StatsTimeBucket[] => {
+  const isDaily = granularity === 'day';
+  const size = rangeKey === '30d' ? 30 : rangeKey === '7d' ? 7 : rangeKey === 'today' ? now.getHours() + 1 : 24;
+  const lastBucket = new Date(now);
+  if (isDaily) {
+    lastBucket.setHours(0, 0, 0, 0);
+  } else {
+    lastBucket.setMinutes(0, 0, 0);
+  }
+  const counts = wave(isDaily ? 420 : 18, isDaily ? 180 : 12, size);
+  return counts.map((count, index) => {
+    const bucket = new Date(lastBucket);
+    const stepsAgo = size - index - 1;
+    if (isDaily) {
+      bucket.setDate(bucket.getDate() - stepsAgo);
+    } else {
+      bucket.setHours(bucket.getHours() - stepsAgo);
+    }
+    return {bucket: formatDateTime(bucket), count};
+  });
+};
 
 export const systemHealth = {
   center: {auth: 'UP', data: 'UP', manager: 'UP'},
@@ -87,17 +125,46 @@ const tNode = (type: TopologyNodeType, id: unknown, name: unknown, layer: 1 | 2 
 });
 
 export const topology: TopologyResponse = (() => {
+  // Mirror the backend's cardinality Top-N safeguards so the public demo does
+  // not attempt to label every entity in a single Sankey viewport.
+  const keptDrivers = drivers.slice(0, 10);
+  const keptDriverIds = new Set(keptDrivers.map((driver) => String(driver.id)));
+  const candidateDevices = devices.filter((device) => keptDriverIds.has(String(device.driverId)));
+  const keptDevices = candidateDevices.slice(0, 20);
+  const keptDeviceIds = new Set(keptDevices.map((device) => String(device.id)));
+  const keptProfileIds = new Set(keptDevices.map((device) => String(device.profileId)));
+  const keptProfiles = profiles.filter((profile) => keptProfileIds.has(String(profile.id)));
+  const keptPoints = points.filter((point) => keptProfileIds.has(String(point.profileId)));
+
   const nodes: TopologyNode[] = [
-    ...drivers.map((d) => tNode('driver', d.id, d.driverName, 1)),
-    ...devices.map((d) => tNode('device', d.id, d.deviceName, 2)),
-    ...profiles.map((p) => tNode('profile', p.id, p.profileName, 3)),
-    ...points.map((p) => tNode('point', p.id, p.pointName, 4)),
+    ...keptDrivers.map((d) => tNode('driver', d.id, d.driverName, 1)),
+    ...keptDevices.map((d) => tNode('device', d.id, d.deviceName, 2)),
+    ...keptProfiles.map((p) => tNode('profile', p.id, p.profileName, 3)),
+    ...keptPoints.map((p) => tNode('point', p.id, p.pointName, 4)),
   ];
-  const links = [
-    ...devices.map((d) => ({source: `driver:${d.driverId}`, target: `device:${d.id}`, value: 1})),
-    ...devices.map((d) => ({source: `device:${d.id}`, target: `profile:${d.profileId}`, value: 1})),
-    ...points.map((p) => ({source: `profile:${p.profileId}`, target: `point:${p.id}`, value: 1})),
+
+  const links: TopologyResponse['links'] = [
+    ...keptDevices.map((d) => ({source: `driver:${d.driverId}`, target: `device:${d.id}`, value: 1})),
+    ...keptDevices.map((d) => ({source: `device:${d.id}`, target: `profile:${d.profileId}`, value: 1})),
+    ...keptPoints.map((p) => ({source: `profile:${p.profileId}`, target: `point:${p.id}`, value: 1})),
   ];
+
+  for (const driver of keptDrivers) {
+    const hidden = candidateDevices.filter(
+      (device) => String(device.driverId) === String(driver.id) && !keptDeviceIds.has(String(device.id)),
+    );
+    if (hidden.length === 0) continue;
+    const id = `others:device:${driver.id}`;
+    nodes.push({
+      id,
+      name: `Others (${hidden.length})`,
+      layer: 2,
+      type: 'others',
+      hiddenChildren: hidden.map((device) => ({id: `device:${device.id}`, name: String(device.deviceName), type: 'device'})),
+    });
+    links.push({source: `driver:${driver.id}`, target: id, value: hidden.length});
+  }
+
   return {
     nodes,
     links,
@@ -110,7 +177,7 @@ export const topology: TopologyResponse = (() => {
   };
 })();
 
-export const alertRows: AlertRow[] = [
+export const alertRows = (now = new Date()): AlertRow[] => [
   {
     id: '9001',
     source: 'device',
@@ -119,7 +186,7 @@ export const alertRows: AlertRow[] = [
     eventTypeFlag: 1,
     alarmLevelFlag: 2,
     confirmFlag: 'UNCONFIRMED',
-    createTime: '2026-08-01T13:50:00',
+    createTime: shiftedTime(now, 12 * 60_000),
     message: '设备离线超过 5 分钟',
   },
   {
@@ -130,18 +197,18 @@ export const alertRows: AlertRow[] = [
     eventTypeFlag: 2,
     alarmLevelFlag: 3,
     confirmFlag: 'UNCONFIRMED',
-    createTime: '2026-08-01T13:12:00',
+    createTime: shiftedTime(now, 47 * 60_000),
     message: '驱动连接异常',
   },
   {
     id: '9003',
     source: 'point',
-    sourceId: String(devices[1]?.id ?? 2),
+    sourceId: String(points[0]?.id ?? 1),
     pointId: String(points[0]?.id ?? 1),
     eventTypeFlag: 3,
     alarmLevelFlag: 1,
     confirmFlag: 'CONFIRMED',
-    createTime: '2026-08-01T11:40:00',
+    createTime: shiftedTime(now, 2 * 3_600_000),
     message: '温度超过阈值上限',
   },
   {
@@ -152,18 +219,18 @@ export const alertRows: AlertRow[] = [
     eventTypeFlag: 1,
     alarmLevelFlag: 2,
     confirmFlag: 'CONFIRMED',
-    createTime: '2026-08-01T09:20:00',
+    createTime: shiftedTime(now, 4 * 3_600_000),
     message: '设备已恢复在线',
   },
   {
     id: '9005',
     source: 'point',
-    sourceId: String(devices[2]?.id ?? 3),
-    pointId: String(points[4]?.id ?? 5),
+    sourceId: String(points[3]?.id ?? 4),
+    pointId: String(points[3]?.id ?? 4),
     eventTypeFlag: 4,
     alarmLevelFlag: 1,
     confirmFlag: 'UNCONFIRMED',
-    createTime: '2026-08-01T08:05:00',
+    createTime: shiftedTime(now, 7 * 3_600_000),
     message: '电压低于安全范围',
   },
 ];
@@ -221,9 +288,7 @@ const devicePointPairs = devices.flatMap((device) =>
     .map((point) => ({device, point})),
 );
 
-const STREAM_EPOCH = Date.UTC(2026, 7, 7, 14, 30, 42);
-
-export const streamLatest: StreamRow[] = devicePointPairs.slice(0, 20).map(({device, point}, i) => {
+export const streamLatest = (now = new Date()): StreamRow[] => devicePointPairs.slice(0, 20).map(({device, point}, i) => {
   const {valueType, rawValue} = streamValue(point.unit ?? '', i);
   return {
     deviceId: String(device.id),
@@ -235,7 +300,7 @@ export const streamLatest: StreamRow[] = devicePointPairs.slice(0, 20).map(({dev
     rawValue,
     calValue: rawValue,
     valueType,
-    createTime: new Date(STREAM_EPOCH - i * 37000).toISOString(),
+    createTime: shiftedTime(now, (i * 37 + 5) * 1000),
   };
 });
 
@@ -276,44 +341,25 @@ export const statsTop: Record<TopDimension, { entityId: string; count: number }[
 
 export const alertAging: AgingBacklog = {under1h: 24, h1to6: 13, h6to24: 6, over24h: 3, total: 46};
 
-const SILENT_BASE = Date.UTC(2026, 7, 7, 14, 5, 0);
-export const silentSources: SilentSource[] = [
-  {
-    deviceId: String(devices[1]?.id ?? 3002),
-    pointId: String(points[0]?.id ?? 5001),
-    lastSeen: new Date(SILENT_BASE - 2_074_000).toISOString(),
-    silentSeconds: 2074
-  },
-  {
-    deviceId: String(devices[3]?.id ?? 3004),
-    pointId: String(points[3]?.id ?? 5004),
-    lastSeen: new Date(SILENT_BASE - 1_536_000).toISOString(),
-    silentSeconds: 1536
-  },
-  {
-    deviceId: String(devices[5]?.id ?? 3006),
-    pointId: String(points[1]?.id ?? 5002),
-    lastSeen: new Date(SILENT_BASE - 1_102_000).toISOString(),
-    silentSeconds: 1102
-  },
-  {
-    deviceId: String(devices[7]?.id ?? 3008),
-    pointId: String(points[6]?.id ?? 5007),
-    lastSeen: new Date(SILENT_BASE - 3_640_000).toISOString(),
-    silentSeconds: 3640
-  },
-  {
-    deviceId: String(devices[9]?.id ?? 3010),
-    pointId: String(points[2]?.id ?? 5003),
-    lastSeen: new Date(SILENT_BASE - 988_000).toISOString(),
-    silentSeconds: 988
-  },
-  {
-    deviceId: String(devices[2]?.id ?? 3003),
-    pointId: String(points[5]?.id ?? 5006),
-    lastSeen: new Date(SILENT_BASE - 2_752_000).toISOString(),
-    silentSeconds: 2752
-  },
+const silentSource = (deviceIndex: number, pointIndex: number, silentSeconds: number, now: Date): SilentSource => {
+  const device = devices[deviceIndex] ?? devices[0]!;
+  const profilePoints = points.filter((point) => String(point.profileId) === String(device.profileId));
+  const point = profilePoints[pointIndex % profilePoints.length] ?? points[0]!;
+  return {
+    deviceId: String(device.id),
+    pointId: String(point.id),
+    lastSeen: shiftedTime(now, silentSeconds * 1000),
+    silentSeconds,
+  };
+};
+
+export const silentSources = (now = new Date()): SilentSource[] => [
+  silentSource(1, 0, 2074, now),
+  silentSource(3, 0, 1536, now),
+  silentSource(5, 1, 1102, now),
+  silentSource(7, 1, 3640, now),
+  silentSource(9, 0, 988, now),
+  silentSource(2, 2, 2752, now),
 ];
 
 // 6 latency buckets: <100ms / 100-500ms / 0.5-1s / 1-5s / 5-30s / >30s.
@@ -336,6 +382,21 @@ const activityCount = (dow: number, hour: number): number => {
   return Math.max(0, Math.round(base + Math.sin((hour + dow) / 2) * (peak ? 16 : 5)));
 };
 
-export const statsActivity = Array.from({length: 7}, (_, dow) =>
-  Array.from({length: 24}, (_, hour) => ({dow, hour, count: activityCount(dow, hour)})),
-).flat();
+export const statsActivity = (rangeKey = '7d', now = new Date()) => {
+  const today = now.getDay();
+  const previousDay = (today + 6) % 7;
+  const currentHour = now.getHours();
+  const factor = rangeKey === '30d' ? 4 : rangeKey === 'today' ? 0.2 : rangeKey === '24h' ? 0.25 : 1;
+
+  return Array.from({length: 7}, (_, dow) =>
+    Array.from({length: 24}, (_, hour) => {
+      const inWindow =
+        rangeKey === 'today'
+          ? dow === today && hour <= currentHour
+          : rangeKey === '24h'
+            ? (dow === today && hour <= currentHour) || (dow === previousDay && hour > currentHour)
+            : true;
+      return {dow, hour, count: inWindow ? Math.round(activityCount(dow, hour) * factor) : 0};
+    }),
+  ).flat();
+};

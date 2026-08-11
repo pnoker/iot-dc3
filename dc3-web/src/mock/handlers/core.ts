@@ -16,6 +16,7 @@
  */
 
 import {on} from '../dispatch';
+import {localizeEntities, localizeEntity} from '../locale';
 import {matches, paginate} from '../query';
 import {ok, responseOf} from '../response';
 import {newId, stamp} from '../crud';
@@ -46,61 +47,89 @@ const statusMap = (rows: Record<string, unknown>[]): Record<string, string> =>
 export function registerCoreHandlers(): void {
   // ── driver ──
   on('post', 'api/v3/manager/driver/list', (ctx) => {
+    const rows = localizeEntities('driver', ctx.db.drivers);
     const filter = (d: Record<string, unknown>) =>
       matches(d.driverName, ctx.body.driverName) &&
       matches(d.serviceName, ctx.body.serviceName) &&
       matches(d.serviceHost, ctx.body.serviceHost) &&
       enableFilter(d, ctx.body);
-    return responseOf(ctx.config, ok(paginate(ctx.db.drivers, ctx.body, filter)));
+    return responseOf(ctx.config, ok(paginate(rows, ctx.body, filter)));
   });
   on('get', 'api/v3/manager/driver/get_by_id', (ctx) =>
-    responseOf(ctx.config, ok(findById(ctx.db.drivers, ctx.params.id) ?? ctx.db.drivers[0])),
+    responseOf(
+      ctx.config,
+      ok(localizeEntity('driver', findById(ctx.db.drivers, ctx.params.id) ?? ctx.db.drivers[0])),
+    ),
   );
   on('post', 'api/v3/manager/driver/list_by_ids', (ctx) =>
-    responseOf(ctx.config, ok(byIdsMap(ctx.db.drivers, Array.isArray(ctx.body) ? ctx.body : []))),
+    responseOf(
+      ctx.config,
+      ok(byIdsMap(localizeEntities('driver', ctx.db.drivers), Array.isArray(ctx.body) ? ctx.body : [])),
+    ),
   );
 
   // ── device ──
   on('post', 'api/v3/manager/device/list', (ctx) => {
+    const rows = localizeEntities('device', ctx.db.devices);
     const filter = (d: Record<string, unknown>) =>
       matches(d.deviceName, ctx.body.deviceName) &&
       (!ctx.body.driverId || String(d.driverId) === String(ctx.body.driverId)) &&
       enableFilter(d, ctx.body);
-    return responseOf(ctx.config, ok(paginate(ctx.db.devices, ctx.body, filter)));
+    return responseOf(ctx.config, ok(paginate(rows, ctx.body, filter)));
   });
   on('get', 'api/v3/manager/device/get_by_id', (ctx) =>
-    responseOf(ctx.config, ok(findById(ctx.db.devices, ctx.params.id) ?? ctx.db.devices[0])),
+    responseOf(
+      ctx.config,
+      ok(localizeEntity('device', findById(ctx.db.devices, ctx.params.id) ?? ctx.db.devices[0])),
+    ),
   );
   on('post', 'api/v3/manager/device/list_by_ids', (ctx) =>
-    responseOf(ctx.config, ok(byIdsMap(ctx.db.devices, Array.isArray(ctx.body) ? ctx.body : []))),
+    responseOf(
+      ctx.config,
+      ok(byIdsMap(localizeEntities('device', ctx.db.devices), Array.isArray(ctx.body) ? ctx.body : [])),
+    ),
   );
 
   // ── profile ──
   on('post', 'api/v3/manager/profile/list', (ctx) => {
+    const rows = localizeEntities('profile', ctx.db.profiles);
     const filter = (p: Record<string, unknown>) =>
       matches(p.profileName, ctx.body.profileName) && enableFilter(p, ctx.body);
-    return responseOf(ctx.config, ok(paginate(ctx.db.profiles, ctx.body, filter)));
+    return responseOf(ctx.config, ok(paginate(rows, ctx.body, filter)));
   });
   on('get', 'api/v3/manager/profile/get_by_id', (ctx) =>
-    responseOf(ctx.config, ok(findById(ctx.db.profiles, ctx.params.id) ?? ctx.db.profiles[0])),
+    responseOf(
+      ctx.config,
+      ok(localizeEntity('profile', findById(ctx.db.profiles, ctx.params.id) ?? ctx.db.profiles[0])),
+    ),
   );
   on('post', 'api/v3/manager/profile/list_by_ids', (ctx) =>
-    responseOf(ctx.config, ok(byIdsMap(ctx.db.profiles, Array.isArray(ctx.body) ? ctx.body : []))),
+    responseOf(
+      ctx.config,
+      ok(byIdsMap(localizeEntities('profile', ctx.db.profiles), Array.isArray(ctx.body) ? ctx.body : [])),
+    ),
   );
 
   // ── point ──
   on('post', 'api/v3/manager/point/list', (ctx) => {
+    const rows = localizeEntities('point', ctx.db.points);
     const filter = (p: Record<string, unknown>) =>
       matches(p.pointName, ctx.body.pointName) &&
       (!ctx.body.profileId || String(p.profileId) === String(ctx.body.profileId)) &&
       enableFilter(p, ctx.body);
-    return responseOf(ctx.config, ok(paginate(ctx.db.points, ctx.body, filter)));
+    return responseOf(ctx.config, ok(paginate(rows, ctx.body, filter)));
   });
   on('get', 'api/v3/manager/point/get_by_id', (ctx) =>
-    responseOf(ctx.config, ok(findById(ctx.db.points, ctx.params.id) ?? ctx.db.points[0])),
+    responseOf(
+      ctx.config,
+      ok(localizeEntity('point', findById(ctx.db.points, ctx.params.id) ?? ctx.db.points[0])),
+    ),
   );
   on('post', 'api/v3/manager/point/list_by_ids', (ctx) =>
-    responseOf(ctx.config, ok(byIdsMap(ctx.db.points, Array.isArray(ctx.body) ? ctx.body : []))),
+    responseOf(
+      ctx.config,
+      ok(byIdsMap(localizeEntities('point', ctx.db.points), Array.isArray(ctx.body) ? ctx.body : [])),
+    ),
   );
 
   // ── runtime status (consumed as Record<id, ONLINE/OFFLINE/FAULT>) ──

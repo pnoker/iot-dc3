@@ -410,10 +410,11 @@ describe('agentic streaming contract', () => {
           'Content-Type': 'application/json',
           [AUTH_HEADERS.TENANT]: 'default',
           [AUTH_HEADERS.LOGIN]: 'dc3',
-          [AUTH_HEADERS.TOKEN]: JSON.stringify({salt: 'salt', token: 'token'}),
         }),
       })
     );
+    const requestInit = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    expect(requestInit.headers).not.toHaveProperty(AUTH_HEADERS.TOKEN);
     expect(onEvent).toHaveBeenCalledWith(
       expect.objectContaining({type: 'tool', title: 'Tool call', phase: 'start', status: 'running'})
     );

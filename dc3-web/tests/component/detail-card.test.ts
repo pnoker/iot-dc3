@@ -29,7 +29,7 @@ describe('DetailCard', () => {
       global: {stubs: {...layoutStubs}},
     });
 
-    expect(wrapper.find('.detail-card').exists()).toBe(true);
-    expect(wrapper.find('.detail-card__container .payload').exists()).toBe(true);
+    expect(wrapper.find('.card-shell').exists()).toBe(true);
+    expect(wrapper.find('.card-shell__container .payload').exists()).toBe(true);
   });
 });

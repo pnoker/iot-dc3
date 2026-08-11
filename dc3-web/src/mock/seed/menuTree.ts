@@ -82,7 +82,7 @@ export const menuTree: MenuNode[] = [
   mk('settings', {
     menuName: 'Settings', titles: {zh: '设置', en: 'Settings'}, icon: 'Setting', menuIndex: 6, children: [
       mk('settingsIdentity', {
-        menuName: 'Identity', titles: {zh: '身份', en: 'Identity'}, icon: 'User', menuIndex: 1, children: [
+        menuName: 'Accounts & Identity', titles: {zh: '账户与身份', en: 'Accounts & Identity'}, icon: 'User', menuIndex: 1, children: [
           mk('settingsUser', {
             menuName: 'User',
             titles: {zh: '用户管理', en: 'User'},
@@ -91,8 +91,8 @@ export const menuTree: MenuNode[] = [
             menuIndex: 1
           }),
           mk('settingsPrincipal', {
-            menuName: 'Principals',
-            titles: {zh: '主体', en: 'Principals'},
+            menuName: 'Identity Principals',
+            titles: {zh: '身份主体', en: 'Identity Principals'},
             icon: 'Avatar',
             url: '/settings/principal',
             menuIndex: 2
@@ -121,7 +121,7 @@ export const menuTree: MenuNode[] = [
         ]
       }),
       mk('settingsAccess', {
-        menuName: 'Access Control', titles: {zh: '权限', en: 'Access Control'}, icon: 'Stamp', menuIndex: 2, children: [
+        menuName: 'Roles & Permissions', titles: {zh: '角色与权限', en: 'Roles & Permissions'}, icon: 'Stamp', menuIndex: 2, children: [
           mk('settingsRole', {
             menuName: 'Role',
             titles: {zh: '角色管理', en: 'Role'},
@@ -130,8 +130,8 @@ export const menuTree: MenuNode[] = [
             menuIndex: 1
           }),
           mk('settingsRolePrincipalBind', {
-            menuName: 'Role Principal Bind',
-            titles: {zh: '角色主体绑定', en: 'Role Principal Bind'},
+            menuName: 'Role Assignments',
+            titles: {zh: '角色分配', en: 'Role Assignments'},
             icon: 'Link',
             url: '/settings/role_principal_bind',
             menuIndex: 2
@@ -144,8 +144,8 @@ export const menuTree: MenuNode[] = [
             menuIndex: 3
           }),
           mk('settingsApi', {
-            menuName: 'Api',
-            titles: {zh: 'API 接口', en: 'Api'},
+            menuName: 'API',
+            titles: {zh: 'API 接口', en: 'API'},
             icon: 'Connection',
             url: '/settings/api',
             menuIndex: 4
@@ -159,26 +159,76 @@ export const menuTree: MenuNode[] = [
           })
         ]
       }),
-      mk('settingsModel', {
-        menuName: 'Model', titles: {zh: '模型管理', en: 'Model Management'}, icon: 'Cpu', menuIndex: 3, children: [
-          mk('settingsModelConfig', {
-            menuName: 'Model Config',
-            titles: {zh: '模型配置', en: 'Model Config'},
-            icon: 'ChatDotRound',
-            url: '/settings/model/config',
+      mk('settingsSystem', {
+        menuName: 'Metadata', titles: {zh: '元数据', en: 'Metadata'}, icon: 'Collection', menuIndex: 3, children: [
+          mk('settingsGroup', {
+            menuName: 'Group',
+            titles: {zh: '分组管理', en: 'Groups'},
+            icon: 'Grid',
+            url: '/settings/group',
             menuIndex: 1
           }),
+          mk('settingsLabel', {
+            menuName: 'Label',
+            titles: {zh: '标签管理', en: 'Labels'},
+            icon: 'CollectionTag',
+            url: '/settings/label',
+            menuIndex: 2
+          })
+        ]
+      }),
+      mk('settingsModel', {
+        menuName: 'AI Models', titles: {zh: 'AI 模型', en: 'AI Models'}, icon: 'Cpu', menuIndex: 4, children: [
           mk('settingsModelProvider', {
             menuName: 'Model Providers',
             titles: {zh: '模型供应商', en: 'Model Providers'},
             icon: 'ChatLineSquare',
             url: '/settings/model/provider',
+            menuIndex: 1
+          }),
+          mk('settingsModelConfig', {
+            menuName: 'Model Config',
+            titles: {zh: '模型配置', en: 'Model Config'},
+            icon: 'ChatDotRound',
+            url: '/settings/model/config',
             menuIndex: 2
           })
         ]
       }),
+      mk('settingsIntegration', {
+        menuName: 'MCP Integration', titles: {zh: 'MCP 集成', en: 'MCP Integration'}, icon: 'Share', menuIndex: 5, children: [
+          mk('settingsMcpServer', {
+            menuName: 'MCP Service',
+            titles: {zh: 'MCP 服务', en: 'MCP Service'},
+            icon: 'Connection',
+            url: '/settings/mcp',
+            menuIndex: 1
+          }),
+          mk('settingsMcpClient', {
+            menuName: 'MCP Client',
+            titles: {zh: 'MCP 客户端', en: 'MCP Client'},
+            icon: 'Ticket',
+            url: '/settings/mcp/client',
+            menuIndex: 2
+          }),
+          mk('settingsMcpConnection', {
+            menuName: 'MCP Connection',
+            titles: {zh: 'MCP 连接', en: 'MCP Connection'},
+            icon: 'Link',
+            url: '/settings/mcp/connection',
+            menuIndex: 3
+          }),
+          mk('settingsMcpTool', {
+            menuName: 'MCP Tool',
+            titles: {zh: 'MCP 工具', en: 'MCP Tool'},
+            icon: 'Tools',
+            url: '/settings/mcp/tool',
+            menuIndex: 4
+          })
+        ]
+      }),
       mk('settingsAlarm', {
-        menuName: 'Alarm', titles: {zh: '告警', en: 'Alarm'}, icon: 'AlarmClock', menuIndex: 4, children: [
+        menuName: 'Alarm Configuration', titles: {zh: '告警配置', en: 'Alarm Configuration'}, icon: 'AlarmClock', menuIndex: 6, children: [
           mk('settingsAlarmRule', {
             menuName: 'Alarm Rules',
             titles: {zh: '告警规则', en: 'Alarm Rules'},
@@ -187,15 +237,15 @@ export const menuTree: MenuNode[] = [
             menuIndex: 1
           }),
           mk('settingsAlarmNotify', {
-            menuName: 'Alarm Notify',
-            titles: {zh: '告警通知策略', en: 'Alarm Notify'},
+            menuName: 'Notification Policies',
+            titles: {zh: '告警通知策略', en: 'Notification Policies'},
             icon: 'Bell',
             url: '/settings/alarm/notify',
             menuIndex: 2
           }),
           mk('settingsAlarmMessage', {
-            menuName: 'Alarm Message',
-            titles: {zh: '告警消息模板', en: 'Alarm Message'},
+            menuName: 'Message Templates',
+            titles: {zh: '告警消息模板', en: 'Message Templates'},
             icon: 'Message',
             url: '/settings/alarm/message',
             menuIndex: 3
@@ -213,75 +263,75 @@ export const menuTree: MenuNode[] = [
             icon: 'Link',
             url: '/settings/alarm/bind',
             menuIndex: 5
-          }),
+          })
+        ]
+      }),
+      mk('settingsEventCommand', {
+        menuName: 'Operations & History',
+        titles: {zh: '运行与历史', en: 'Operations & History'},
+        icon: 'Operation',
+        menuIndex: 7,
+        children: [
           mk('settingsAlarmOverview', {
             menuName: 'Overview',
             titles: {zh: '概览', en: 'Overview'},
             icon: 'DataAnalysis',
             url: '/settings/alarm/overview',
-            menuIndex: 6
+            menuIndex: 1
           }),
           mk('settingsAlarmState', {
             menuName: 'Alarm States',
             titles: {zh: '告警运行状态', en: 'Alarm States'},
             icon: 'Monitor',
             url: '/settings/alarm/state',
-            menuIndex: 7
+            menuIndex: 2
           }),
           mk('settingsAlarmHistory', {
             menuName: 'Alarm History',
             titles: {zh: '告警历史', en: 'Alarm History'},
             icon: 'DocumentChecked',
             url: '/settings/alarm/history',
-            menuIndex: 8
+            menuIndex: 3
           }),
           mk('settingsDriverAlarm', {
             menuName: 'Driver Alarm',
             titles: {zh: '驱动告警', en: 'Driver Alarm'},
             icon: 'Promotion',
             url: '/settings/alarm/driver',
-            menuIndex: 9
+            menuIndex: 4
           }),
           mk('settingsDeviceAlarm', {
             menuName: 'Device Alarm',
             titles: {zh: '设备告警', en: 'Device Alarm'},
             icon: 'Management',
             url: '/settings/alarm/device',
-            menuIndex: 10
+            menuIndex: 5
           }),
           mk('settingsPointAlarm', {
             menuName: 'Point Alarm',
             titles: {zh: '点位告警', en: 'Point Alarm'},
             icon: 'TrendCharts',
             url: '/settings/alarm/point',
-            menuIndex: 11
-          })
-        ]
-      }),
-      mk('settingsEventCommand', {
-        menuName: 'Event & Command',
-        titles: {zh: '事件与指令', en: 'Event & Command'},
-        icon: 'Operation',
-        menuIndex: 5,
-        children: [
+            menuIndex: 6
+          }),
           mk('settingsEventHistory', {
             menuName: 'Event History',
             titles: {zh: '事件历史', en: 'Event History'},
             icon: 'Document',
             url: '/settings/event/history',
-            menuIndex: 1
+            menuIndex: 7
           }),
           mk('settingsCommandHistory', {
             menuName: 'Command History',
             titles: {zh: '指令历史', en: 'Command History'},
             icon: 'Document',
             url: '/settings/command/history',
-            menuIndex: 2
+            menuIndex: 8
           })
         ]
       }),
       mk('settingsAudit', {
-        menuName: 'Audit', titles: {zh: '审计', en: 'Audit'}, icon: 'Files', menuIndex: 6, children: [
+        menuName: 'Audit', titles: {zh: '审计', en: 'Audit'}, icon: 'Files', menuIndex: 8, children: [
           mk('settingsIdentityAudit', {
             menuName: 'Identity Audit',
             titles: {zh: '身份审计', en: 'Identity Audit'},
@@ -298,62 +348,12 @@ export const menuTree: MenuNode[] = [
           })
         ]
       }),
-      mk('settingsIntegration', {
-        menuName: 'Integration', titles: {zh: '集成', en: 'Integration'}, icon: 'Share', menuIndex: 7, children: [
-          mk('settingsMcpServer', {
-            menuName: 'MCP Service',
-            titles: {zh: 'MCP 服务', en: 'MCP Service'},
-            icon: 'Connection',
-            url: '/settings/mcp',
-            menuIndex: 1
-          }),
-          mk('settingsMcpConnection', {
-            menuName: 'MCP Connection',
-            titles: {zh: 'MCP 连接', en: 'MCP Connection'},
-            icon: 'Link',
-            url: '/settings/mcp/connection',
-            menuIndex: 2
-          }),
-          mk('settingsMcpClient', {
-            menuName: 'MCP Client',
-            titles: {zh: 'MCP Client', en: 'MCP Client'},
-            icon: 'Ticket',
-            url: '/settings/mcp/client',
-            menuIndex: 3
-          }),
-          mk('settingsMcpTool', {
-            menuName: 'MCP Tool',
-            titles: {zh: 'MCP 工具', en: 'MCP Tool'},
-            icon: 'Tools',
-            url: '/settings/mcp/tool',
-            menuIndex: 4
-          })
-        ]
-      }),
-      mk('settingsSystem', {
-        menuName: 'System', titles: {zh: '系统', en: 'System'}, icon: 'Tools', menuIndex: 8, children: [
-          mk('settingsGroup', {
-            menuName: 'Group',
-            titles: {zh: '分组管理', en: 'Groups'},
-            icon: 'Grid',
-            url: '/settings/group',
-            menuIndex: 1
-          }),
-          mk('settingsLabel', {
-            menuName: 'Label',
-            titles: {zh: '标签管理', en: 'Labels'},
-            icon: 'CollectionTag',
-            url: '/settings/label',
-            menuIndex: 2
-          }),
-          mk('settingsAbout', {
-            menuName: 'About',
-            titles: {zh: '关于', en: 'About'},
-            icon: 'InfoFilled',
-            url: '/settings/about',
-            menuIndex: 3
-          })
-        ]
+      mk('settingsAbout', {
+        menuName: 'About',
+        titles: {zh: '关于', en: 'About'},
+        icon: 'InfoFilled',
+        url: '/settings/about',
+        menuIndex: 9
       })
     ]
   })

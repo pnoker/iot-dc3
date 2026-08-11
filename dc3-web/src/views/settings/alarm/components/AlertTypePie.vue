@@ -30,14 +30,14 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onMounted, onUnmounted, ref} from 'vue';
+import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
 import {alertTypeDistribution} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 
 interface TypeRow {
   type: string;
@@ -90,6 +90,7 @@ const load = async () => {
 };
 
 onMounted(load);
+watch(locale, load);
 onUnmounted(() => chart?.destroy());
 defineExpose({refresh: load});
 </script>

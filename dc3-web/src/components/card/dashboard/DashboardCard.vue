@@ -314,6 +314,7 @@ defineExpose({
   // with `width: 100%; height: 100%;` inside.
   &--chart {
     .dashboard-card__content {
+      box-sizing: border-box;
       width: 100%;
       height: 100%;
       padding: 8px 16px 16px;

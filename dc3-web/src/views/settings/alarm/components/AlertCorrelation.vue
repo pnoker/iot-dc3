@@ -48,7 +48,7 @@ import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {DASHBOARD_PALETTE} from '@/config/constant/palette';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const {loading, run} = useAsyncLoader();
 const {resolveBySource, nameBySource} = useEntityNames();
 
@@ -83,6 +83,7 @@ const load = () =>
   });
 
 watch(hoursKey, load);
+watch(locale, load);
 onMounted(load);
 onUnmounted(() => graph?.destroy());
 

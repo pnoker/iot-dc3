@@ -21,14 +21,16 @@ import {listDeviceByIds} from '@/api/device';
 import {listDriverByIds} from '@/api/driver';
 import {listPointByIds} from '@/api/point';
 import {listProfileByIds} from '@/api/profile';
+import i18n from '@/config/i18n';
 
 /**
  * Cross-component reactive cache for entity id → display name lookups.
  * Replaces the seven copies of `resolveNames` + local `nameMap` that every
  * dashboard card used to maintain. Two concrete wins:
  *
- *   1. **Cache is process-wide.** Opening FlappingSources after SilentSources
- *      already resolved a device id doesn't re-issue the batch request.
+ *   1. **Cache is process-wide and locale-aware.** Opening FlappingSources
+ *      after SilentSources reuses names resolved in the same UI language,
+ *      while a language switch cannot leak stale labels from the old locale.
  *   2. **Inflight dedup.** Two cards mounting simultaneously won't fire two
  *      identical listDeviceByIds calls for the same missing ids — the second
  *      one sees ids marked inflight and waits for the first to land.
@@ -86,13 +88,15 @@ const nameField: Record<EntityKind, string> = {
 
 async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): Promise<void> {
   if (!rawIds || rawIds.length === 0) return;
+  const locale = String(i18n.global.locale.value);
+  const cacheKey = (id: string) => `${locale}:${id}`;
   const missing: string[] = [];
   let hasInflight = false;
   for (const raw of rawIds) {
     const id = String(raw);
     if (!id) continue;
-    if (cache[kind][id] !== undefined) continue;
-    if (inflight[kind].has(id)) {
+    if (cache[kind][cacheKey(id)] !== undefined) continue;
+    if (inflight[kind].has(cacheKey(id))) {
       hasInflight = true;
       continue;
     }
@@ -108,8 +112,8 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): P
     const stillMissing: string[] = [];
     for (const raw of rawIds) {
       const id = String(raw);
-      if (!id || cache[kind][id] !== undefined) continue;
-      if (inflight[kind].has(id)) continue;
+      if (!id || cache[kind][cacheKey(id)] !== undefined) continue;
+      if (inflight[kind].has(cacheKey(id))) continue;
       stillMissing.push(id);
     }
     if (stillMissing.length === 0) return;
@@ -120,7 +124,7 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): P
   }
 
   if (missing.length === 0) return;
-  missing.forEach((id) => inflight[kind].add(id));
+  missing.forEach((id) => inflight[kind].add(cacheKey(id)));
 
   const promise = (async () => {
     try {
@@ -129,12 +133,12 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): P
       for (const id of missing) {
         const row = data[id];
         // Cache whatever the backend returned — even empty → fallback to id.
-        cache[kind][id] = row?.[nameField[kind]] ?? id;
+        cache[kind][cacheKey(id)] = row?.[nameField[kind]] ?? id;
       }
     } catch {
       // errors handled by global axios interceptor
     } finally {
-      missing.forEach((id) => inflight[kind].delete(id));
+      missing.forEach((id) => inflight[kind].delete(cacheKey(id)));
     }
   })();
 
@@ -146,19 +150,22 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): P
 export type AlertSourceKind = 'point' | 'device' | 'driver';
 
 export const useEntityNames = () => {
+  const cachedName = (kind: EntityKind, id: string | number): string =>
+    cache[kind][`${String(i18n.global.locale.value)}:${String(id)}`] ?? String(id);
+
   const resolveDevices = (ids: Array<string | number>) => fetchMissing('device', ids);
   const resolveDrivers = (ids: Array<string | number>) => fetchMissing('driver', ids);
   const resolveProfiles = (ids: Array<string | number>) => fetchMissing('profile', ids);
   const resolvePoints = (ids: Array<string | number>) => fetchMissing('point', ids);
 
   const deviceName = (id: string | number | undefined | null): string =>
-    id == null ? '' : (cache.device[String(id)] ?? String(id));
+    id == null ? '' : cachedName('device', id);
   const driverName = (id: string | number | undefined | null): string =>
-    id == null ? '' : (cache.driver[String(id)] ?? String(id));
+    id == null ? '' : cachedName('driver', id);
   const profileName = (id: string | number | undefined | null): string =>
-    id == null ? '' : (cache.profile[String(id)] ?? String(id));
+    id == null ? '' : cachedName('profile', id);
   const pointName = (id: string | number | undefined | null): string =>
-    id == null ? '' : (cache.point[String(id)] ?? String(id));
+    id == null ? '' : cachedName('point', id);
 
   /** Resolve a mixed batch of (source, id) rows in one call. */
   const resolveBySource = async (

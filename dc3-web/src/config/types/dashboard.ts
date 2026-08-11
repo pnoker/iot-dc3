@@ -190,6 +190,8 @@ export interface StatsTodaySummary {
 }
 
 export interface StatsTimeBucket {
+  /** Start of the bucket, matching backend TimeseriesPointVO.bucket. */
+  bucket: string;
   count: number;
 }
 

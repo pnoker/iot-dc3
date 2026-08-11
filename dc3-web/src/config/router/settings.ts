@@ -109,8 +109,8 @@ const settingsRouter: RouteRecordRaw = {
         {
           name: 'settingsModel',
           path: 'model',
-          redirect: '/settings/model/config',
-          meta: {title: 'Model'},
+          redirect: '/settings/model/provider',
+          meta: {title: 'AI Models'},
         },
         {
           name: 'settingsEvent',
@@ -128,19 +128,19 @@ const settingsRouter: RouteRecordRaw = {
           name: 'settingsIdentity',
           path: 'identity',
           redirect: '/settings/user',
-          meta: {title: 'Identity'},
+          meta: {title: 'Accounts & Identity'},
         },
         {
           name: 'settingsAccess',
           path: 'access',
           redirect: '/settings/role',
-          meta: {title: 'Access Control'},
+          meta: {title: 'Roles & Permissions'},
         },
         {
           name: 'settingsEventCommand',
           path: 'event-command',
-          redirect: '/settings/event/history',
-          meta: {title: 'Event & Command'},
+          redirect: '/settings/alarm/overview',
+          meta: {title: 'Operations & History'},
         },
         {
           name: 'settingsAudit',
@@ -152,13 +152,13 @@ const settingsRouter: RouteRecordRaw = {
           name: 'settingsIntegration',
           path: 'integration',
           redirect: '/settings/mcp',
-          meta: {title: 'Integration'},
+          meta: {title: 'MCP Integration'},
         },
         {
           name: 'settingsSystem',
           path: 'system',
           redirect: '/settings/group',
-          meta: {title: 'System'},
+          meta: {title: 'Metadata'},
         },
         {
           name: 'settingsAlarmRule',

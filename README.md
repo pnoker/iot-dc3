@@ -28,7 +28,7 @@
 
 <p align="center">
   <strong>
-    IoT DC3 — the multi-protocol, AI-powered, cloud-native open-source industrial IoT platform.<br>
+    IoT DC3 — the multi-protocol, cloud-native, open-source Industrial AI IoT Platform.<br>
     Cloud-native microservices · Multi-protocol connectivity · AI-assisted operations · 28 ready-to-use drivers
   </strong>
 </p>

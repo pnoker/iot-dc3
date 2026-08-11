@@ -99,7 +99,7 @@ import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const router = useRouter();
 
 const loading = ref(false);
@@ -130,7 +130,9 @@ const stats = computed<TopologyStats>(
   () => data.value?.stats ?? {driverCount: 0, deviceCount: 0, profileCount: 0, pointCount: 0}
 );
 const updatedLabel = computed(() =>
-  lastRefreshed.value ? new Date(lastRefreshed.value).toLocaleTimeString('zh-CN', {hour12: false}) : ''
+  lastRefreshed.value
+    ? new Date(lastRefreshed.value).toLocaleTimeString(locale.value === 'zh' ? 'zh-CN' : 'en-US', {hour12: false})
+    : ''
 );
 
 // Per-layer colour matching the LiveDataFeed driver/device/point palette
@@ -328,7 +330,7 @@ const load = async () => {
 // Flipping mode or rangeKey triggers a reload. rangeKey only matters
 // when mode=volume, but we watch it regardless — switching modes first
 // then nudging the range should not need a manual refresh click.
-watch([mode, rangeKey], () => {
+watch([mode, rangeKey, locale], () => {
   load();
 });
 

@@ -24,6 +24,7 @@ export type {
   AgenticSession,
   AgenticSessionExt,
   AgenticMessage,
+  AgenticMessageContent,
   AgenticMessageContext,
   AgenticMessageTokens,
   AgenticMessageRole,

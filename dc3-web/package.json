@@ -3,7 +3,7 @@
   "version": "2026.5.22",
   "private": true,
   "author": "pnoker",
-  "description": "IoT DC3 platform frontend — Vue 3 + TypeScript + Element Plus",
+  "description": "IoT DC3 Industrial AI IoT Platform frontend — Vue 3 + TypeScript + Element Plus",
   "license": "Apache-2.0",
   "homepage": "https://github.com/pnoker/iot-dc3",
   "repository": {

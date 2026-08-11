@@ -19,6 +19,34 @@ import {on} from '../dispatch';
 import {paginate} from '../query';
 import {ok, responseOf} from '../response';
 import {newId, stamp} from '../crud';
+import {currentMockLocale} from '../locale';
+
+type LocalizedRow = Record<string, unknown> & {
+  titleI18n?: Record<'zh' | 'en', string>;
+  summaryI18n?: Record<'zh' | 'en', string>;
+  descriptionI18n?: Record<'zh' | 'en', string>;
+  contentI18n?: Record<'zh' | 'en', string>;
+  contentExtI18n?: Record<'zh' | 'en', unknown>;
+};
+
+const localizeAgenticRow = (row: Record<string, unknown>): Record<string, unknown> => {
+  const locale = currentMockLocale();
+  const source = row as LocalizedRow;
+  const localized: Record<string, unknown> = {
+    ...row,
+    ...(source.titleI18n ? {title: source.titleI18n[locale]} : {}),
+    ...(source.summaryI18n ? {summary: source.summaryI18n[locale]} : {}),
+    ...(source.descriptionI18n ? {description: source.descriptionI18n[locale]} : {}),
+    ...(source.contentI18n ? {content: source.contentI18n[locale]} : {}),
+    ...(source.contentExtI18n ? {contentExt: source.contentExtI18n[locale]} : {}),
+  };
+  delete localized.titleI18n;
+  delete localized.summaryI18n;
+  delete localized.descriptionI18n;
+  delete localized.contentI18n;
+  delete localized.contentExtI18n;
+  return localized;
+};
 
 /** add/update/delete for the mutable agentic config collections. */
 const cud = (url: string, key: 'agenticModelConfigs' | 'agenticProviders') => {
@@ -66,9 +94,10 @@ export function registerAgenticHandlers(): void {
   cud('api/v3/agentic/provider/config', 'agenticProviders');
 
   // ── agentic: sessions & messages ──
-  on('post', 'api/v3/agentic/session/list', (ctx) =>
-    responseOf(ctx.config, ok(paginate(ctx.db.agenticSessions, ctx.body))),
-  );
+  on('post', 'api/v3/agentic/session/list', (ctx) => {
+    const rows = ctx.db.agenticSessions.map(localizeAgenticRow);
+    return responseOf(ctx.config, ok(paginate(rows, ctx.body)));
+  });
   on('post', 'api/v3/agentic/session/delete', (ctx) => {
     const id = ctx.body?.conversationId;
     const coll = ctx.db.agenticSessions;
@@ -79,12 +108,33 @@ export function registerAgenticHandlers(): void {
   on('post', 'api/v3/agentic/session/update', (ctx) => {
     const coll = ctx.db.agenticSessions;
     const i = coll.findIndex((r) => String(r.conversationId) === String(ctx.body?.conversationId));
-    if (i >= 0) coll[i] = {...coll[i], ...ctx.body};
-    return responseOf(ctx.config, ok(true));
+    if (i >= 0) {
+      const current = coll[i]!;
+      coll[i] = {
+        ...current,
+        ...ctx.body,
+        sessionExt: ctx.body?.sessionExt
+          ? {...(current.sessionExt as Record<string, unknown> | undefined), ...ctx.body.sessionExt}
+          : current.sessionExt,
+        operateTime: stamp(),
+      };
+      return responseOf(ctx.config, ok(localizeAgenticRow(coll[i]!)));
+    }
+    const created = {
+      ...ctx.body,
+      title: ctx.body?.title || (currentMockLocale() === 'zh' ? '新对话' : 'New conversation'),
+      createTime: stamp(),
+      operateTime: stamp(),
+    };
+    coll.unshift(created);
+    return responseOf(ctx.config, ok(created));
   });
   on('get', 'api/v3/agentic/message/list', (ctx) => {
     const id = ctx.params.conversation_id;
-    const rows = ctx.db.agenticMessages.filter((m) => String(m.conversationId) === String(id));
+    const rows = ctx.db.agenticMessages
+      .filter((m) => String(m.conversationId) === String(id))
+      .sort((a, b) => Number(a.messageIndex ?? 0) - Number(b.messageIndex ?? 0))
+      .map(localizeAgenticRow);
     return responseOf(ctx.config, ok(rows));
   });
 
@@ -104,15 +154,34 @@ export function registerAgenticHandlers(): void {
       }),
     ),
   );
-  on('get', 'api/v3/agentic/action/pending', (ctx) => responseOf(ctx.config, ok([])));
-  on('post', 'api/v3/agentic/action/confirm', (ctx) => responseOf(ctx.config, ok(true)));
-  on('post', 'api/v3/agentic/action/reject', (ctx) => responseOf(ctx.config, ok(true)));
+  on('get', 'api/v3/agentic/action/pending', (ctx) => {
+    const rows = ctx.db.agenticActions
+      .filter((action) =>
+        String(action.conversationId) === String(ctx.params.conversation_id) && Number(action.status) === 0)
+      .map(localizeAgenticRow);
+    return responseOf(ctx.config, ok(rows));
+  });
+  on('post', 'api/v3/agentic/action/confirm', (ctx) => {
+    const action = ctx.db.agenticActions.find((item) => String(item.actionId) === String(ctx.params.action_id));
+    if (action) action.status = 1;
+    return responseOf(ctx.config, ok(action ? localizeAgenticRow(action) : undefined));
+  });
+  on('post', 'api/v3/agentic/action/reject', (ctx) => {
+    const action = ctx.db.agenticActions.find((item) => String(item.actionId) === String(ctx.params.action_id));
+    if (action) action.status = 2;
+    return responseOf(ctx.config, ok(action ? localizeAgenticRow(action) : undefined));
+  });
 
   // ── agentic: attachments ──
   on('post', 'api/v3/agentic/attachment/upload', (ctx) =>
     responseOf(ctx.config, ok({id: newId(), ...ctx.body, createTime: stamp()})),
   );
-  on('get', 'api/v3/agentic/attachment/list', (ctx) => responseOf(ctx.config, ok([])));
+  on('get', 'api/v3/agentic/attachment/list', (ctx) => {
+    const rows = ctx.db.agenticAttachments.filter(
+      (attachment) => String(attachment.conversationId) === String(ctx.params.conversation_id),
+    );
+    return responseOf(ctx.config, ok(rows));
+  });
 
   // ── MCP: OAuth metadata & clients ──
   on('get', 'api/v3/auth/mcp/metadata', (ctx) =>

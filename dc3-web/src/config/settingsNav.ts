@@ -109,19 +109,19 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsEventCommand: 'Operation',
   settingsAudit: 'Files',
   settingsIntegration: 'Share',
-  settingsSystem: 'Tools',
+  settingsSystem: 'Collection',
   // identity
   settingsUser: 'User',
   settingsPrincipal: 'Avatar',
   settingsTenantMembership: 'OfficeBuilding',
   settingsLocalCredential: 'Lock',
-  settingsServiceAccount: 'Ticket',
+  settingsServiceAccount: 'Key',
   // access control
-  settingsRole: 'UserFilled',
+  settingsRole: 'Lock',
   settingsRolePrincipalBind: 'Link',
-  settingsResource: 'Key',
-  settingsApi: 'Link',
-  settingsMenu: 'Menu',
+  settingsResource: 'Tickets',
+  settingsApi: 'Connection',
+  settingsMenu: 'Discount',
   // model
   settingsModelConfig: 'ChatDotRound',
   settingsModelProvider: 'ChatLineSquare',
@@ -131,7 +131,7 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsAlarmMessage: 'Message',
   settingsAlarmChannel: 'Connection',
   settingsAlarmBind: 'Link',
-  settingsAlarmOverview: 'DataLine',
+  settingsAlarmOverview: 'DataAnalysis',
   settingsAlarmState: 'Monitor',
   settingsAlarmHistory: 'DocumentChecked',
   settingsDriverAlarm: 'Promotion',
@@ -176,39 +176,37 @@ export const SETTINGS_IDENTITY_CHILDREN: SettingsNavNode[] = [
   {name: 'settingsPrincipal', titleKey: 'nav.settingsPrincipal', icon: 'Avatar'},
   {name: 'settingsTenantMembership', titleKey: 'nav.settingsTenantMembership', icon: 'OfficeBuilding'},
   {name: 'settingsLocalCredential', titleKey: 'nav.settingsLocalCredential', icon: 'Lock'},
-  {name: 'settingsServiceAccount', titleKey: 'nav.settingsServiceAccount', icon: 'Ticket'},
+  {name: 'settingsServiceAccount', titleKey: 'nav.settingsServiceAccount', icon: 'Key'},
 ];
 
 export const SETTINGS_ACCESS_CHILDREN: SettingsNavNode[] = [
-  {name: 'settingsRole', titleKey: 'nav.settingsRole', icon: 'UserFilled'},
+  {name: 'settingsRole', titleKey: 'nav.settingsRole', icon: 'Lock'},
   {name: 'settingsRolePrincipalBind', titleKey: 'nav.settingsRolePrincipalBind', icon: 'Link'},
-  {name: 'settingsResource', titleKey: 'nav.settingsResource', icon: 'Key'},
-  {name: 'settingsApi', titleKey: 'nav.settingsApi', icon: 'Link'},
-  {name: 'settingsMenu', titleKey: 'nav.settingsMenu', icon: 'Menu'},
+  {name: 'settingsResource', titleKey: 'nav.settingsResource', icon: 'Tickets'},
+  {name: 'settingsApi', titleKey: 'nav.settingsApi', icon: 'Connection'},
+  {name: 'settingsMenu', titleKey: 'nav.settingsMenu', icon: 'Discount'},
 ];
 
 export const SETTINGS_MODEL_CHILDREN: SettingsNavNode[] = [
-  {name: 'settingsModelConfig', titleKey: 'nav.settingsModelConfig', icon: 'ChatDotRound'},
   {name: 'settingsModelProvider', titleKey: 'nav.settingsModelProvider', icon: 'ChatLineSquare'},
+  {name: 'settingsModelConfig', titleKey: 'nav.settingsModelConfig', icon: 'ChatDotRound'},
 ];
 
-// Order reflects two intent groups: configuration first (rule/notify/message/channel/bind),
-// then monitoring (overview/state/history + driver/device/point alarm views).
 export const SETTINGS_ALARM_CHILDREN: SettingsNavNode[] = [
   {name: 'settingsAlarmRule', titleKey: 'nav.settingsAlarmRule', icon: 'SetUp'},
   {name: 'settingsAlarmNotify', titleKey: 'nav.settingsAlarmNotify', icon: 'Bell'},
   {name: 'settingsAlarmMessage', titleKey: 'nav.settingsAlarmMessage', icon: 'Message'},
   {name: 'settingsAlarmChannel', titleKey: 'nav.settingsAlarmChannel', icon: 'Connection'},
   {name: 'settingsAlarmBind', titleKey: 'nav.settingsAlarmBind', icon: 'Link'},
-  {name: 'settingsAlarmOverview', titleKey: 'nav.settingsAlarmOverview', icon: 'DataLine'},
+];
+
+export const SETTINGS_EVENT_COMMAND_CHILDREN: SettingsNavNode[] = [
+  {name: 'settingsAlarmOverview', titleKey: 'nav.settingsAlarmOverview', icon: 'DataAnalysis'},
   {name: 'settingsAlarmState', titleKey: 'nav.settingsAlarmState', icon: 'Monitor'},
   {name: 'settingsAlarmHistory', titleKey: 'nav.settingsAlarmHistory', icon: 'DocumentChecked'},
   {name: 'settingsDriverAlarm', titleKey: 'nav.settingsDriverAlarm', icon: 'Promotion'},
   {name: 'settingsDeviceAlarm', titleKey: 'nav.settingsDeviceAlarm', icon: 'Management'},
   {name: 'settingsPointAlarm', titleKey: 'nav.settingsPointAlarm', icon: 'TrendCharts'},
-];
-
-export const SETTINGS_EVENT_COMMAND_CHILDREN: SettingsNavNode[] = [
   {name: 'settingsEventHistory', titleKey: 'nav.settingsEventHistory', icon: 'Document'},
   {name: 'settingsCommandHistory', titleKey: 'nav.settingsCommandHistory', icon: 'Document'},
 ];
@@ -220,21 +218,27 @@ export const SETTINGS_AUDIT_CHILDREN: SettingsNavNode[] = [
 
 export const SETTINGS_INTEGRATION_CHILDREN: SettingsNavNode[] = [
   {name: 'settingsMcpServer', titleKey: 'nav.settingsMcpServer', icon: 'Connection'},
-  {name: 'settingsMcpConnection', titleKey: 'nav.settingsMcpConnection', icon: 'Link'},
   {name: 'settingsMcpClient', titleKey: 'nav.settingsMcpClient', icon: 'Ticket'},
+  {name: 'settingsMcpConnection', titleKey: 'nav.settingsMcpConnection', icon: 'Link'},
   {name: 'settingsMcpTool', titleKey: 'nav.settingsMcpTool', icon: 'Tools'},
 ];
 
 export const SETTINGS_SYSTEM_CHILDREN: SettingsNavNode[] = [
   {name: 'settingsGroup', titleKey: 'nav.settingsGroup', icon: 'Grid'},
   {name: 'settingsLabel', titleKey: 'nav.settingsLabel', icon: 'CollectionTag'},
-  {name: 'settingsAbout', titleKey: 'nav.settingsAbout', icon: 'InfoFilled'},
 ];
 
 export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
   {name: 'settingsIdentity', titleKey: 'nav.settingsIdentity', icon: 'User', children: SETTINGS_IDENTITY_CHILDREN},
   {name: 'settingsAccess', titleKey: 'nav.settingsAccess', icon: 'Stamp', children: SETTINGS_ACCESS_CHILDREN},
+  {name: 'settingsSystem', titleKey: 'nav.settingsSystem', icon: 'Collection', children: SETTINGS_SYSTEM_CHILDREN},
   {name: 'settingsModel', titleKey: 'nav.settingsModel', icon: 'Cpu', children: SETTINGS_MODEL_CHILDREN},
+  {
+    name: 'settingsIntegration',
+    titleKey: 'nav.settingsIntegration',
+    icon: 'Share',
+    children: SETTINGS_INTEGRATION_CHILDREN,
+  },
   {name: 'settingsAlarm', titleKey: 'nav.settingsAlarm', icon: 'AlarmClock', children: SETTINGS_ALARM_CHILDREN},
   {
     name: 'settingsEventCommand',
@@ -243,22 +247,16 @@ export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
     children: SETTINGS_EVENT_COMMAND_CHILDREN,
   },
   {name: 'settingsAudit', titleKey: 'nav.settingsAudit', icon: 'Files', children: SETTINGS_AUDIT_CHILDREN},
-  {
-    name: 'settingsIntegration',
-    titleKey: 'nav.settingsIntegration',
-    icon: 'Share',
-    children: SETTINGS_INTEGRATION_CHILDREN,
-  },
-  {name: 'settingsSystem', titleKey: 'nav.settingsSystem', icon: 'Tools', children: SETTINGS_SYSTEM_CHILDREN},
+  {name: 'settingsAbout', titleKey: 'nav.settingsAbout', icon: 'InfoFilled'},
 ];
 
 export const SETTINGS_ACTIVE_ALIAS: Record<string, string> = {
   // group container → its first child (used when a route resolves to a container name)
   settingsIdentity: 'settingsUser',
   settingsAccess: 'settingsRole',
-  settingsModel: 'settingsModelConfig',
+  settingsModel: 'settingsModelProvider',
   settingsAlarm: 'settingsAlarmRule',
-  settingsEventCommand: 'settingsEventHistory',
+  settingsEventCommand: 'settingsAlarmOverview',
   settingsAudit: 'settingsIdentityAudit',
   settingsIntegration: 'settingsMcpServer',
   settingsSystem: 'settingsGroup',
@@ -287,9 +285,9 @@ export const SETTINGS_ACTIVE_ALIAS: Record<string, string> = {
 export const SETTINGS_ROUTE_ALIAS: Record<string, string> = {
   settingsIdentity: 'settingsUser',
   settingsAccess: 'settingsRole',
-  settingsModel: 'settingsModelConfig',
+  settingsModel: 'settingsModelProvider',
   settingsAlarm: 'settingsAlarmRule',
-  settingsEventCommand: 'settingsEventHistory',
+  settingsEventCommand: 'settingsAlarmOverview',
   settingsAudit: 'settingsIdentityAudit',
   settingsIntegration: 'settingsMcpServer',
   settingsSystem: 'settingsGroup',
@@ -313,19 +311,19 @@ export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
   // model
   settingsModelConfig: 'settingsModel',
   settingsModelProvider: 'settingsModel',
-  // alarm
+  // alarm configuration
   settingsAlarmRule: 'settingsAlarm',
   settingsAlarmNotify: 'settingsAlarm',
   settingsAlarmMessage: 'settingsAlarm',
   settingsAlarmChannel: 'settingsAlarm',
   settingsAlarmBind: 'settingsAlarm',
-  settingsAlarmOverview: 'settingsAlarm',
-  settingsAlarmState: 'settingsAlarm',
-  settingsAlarmHistory: 'settingsAlarm',
-  settingsDriverAlarm: 'settingsAlarm',
-  settingsDeviceAlarm: 'settingsAlarm',
-  settingsPointAlarm: 'settingsAlarm',
-  // event & command
+  // operations & history
+  settingsAlarmOverview: 'settingsEventCommand',
+  settingsAlarmState: 'settingsEventCommand',
+  settingsAlarmHistory: 'settingsEventCommand',
+  settingsDriverAlarm: 'settingsEventCommand',
+  settingsDeviceAlarm: 'settingsEventCommand',
+  settingsPointAlarm: 'settingsEventCommand',
   settingsEventHistory: 'settingsEventCommand',
   settingsCommandHistory: 'settingsEventCommand',
   // audit
@@ -339,7 +337,6 @@ export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
   // system
   settingsGroup: 'settingsSystem',
   settingsLabel: 'settingsSystem',
-  settingsAbout: 'settingsSystem',
 };
 
 export const getSettingsRouteName = (name: string): string => SETTINGS_ROUTE_ALIAS[name] || name;
@@ -419,19 +416,19 @@ export const SETTINGS_BREADCRUMB_PARENTS: Record<string, SettingsBreadcrumbParen
   // model leaves
   settingsModelConfig: [modelParent],
   settingsModelProvider: [modelParent],
-  // alarm leaves
+  // alarm configuration leaves
   settingsAlarmRule: [alarmParent],
   settingsAlarmNotify: [alarmParent],
   settingsAlarmMessage: [alarmParent],
   settingsAlarmChannel: [alarmParent],
   settingsAlarmBind: [alarmParent],
-  settingsAlarmOverview: [alarmParent],
-  settingsAlarmState: [alarmParent],
-  settingsAlarmHistory: [alarmParent],
-  settingsDriverAlarm: [alarmParent],
-  settingsDeviceAlarm: [alarmParent],
-  settingsPointAlarm: [alarmParent],
-  // event & command leaves
+  // operations & history leaves
+  settingsAlarmOverview: [eventCommandParent],
+  settingsAlarmState: [eventCommandParent],
+  settingsAlarmHistory: [eventCommandParent],
+  settingsDriverAlarm: [eventCommandParent],
+  settingsDeviceAlarm: [eventCommandParent],
+  settingsPointAlarm: [eventCommandParent],
   settingsEventHistory: [eventCommandParent],
   settingsCommandHistory: [eventCommandParent],
   // audit leaves
@@ -445,7 +442,7 @@ export const SETTINGS_BREADCRUMB_PARENTS: Record<string, SettingsBreadcrumbParen
   // system leaves
   settingsGroup: [systemParent],
   settingsLabel: [systemParent],
-  settingsAbout: [systemParent],
+  settingsAbout: [],
   // detail pages: group → list → detail
   settingsUserDetail: [identityParent, {path: '/settings/user', titleKey: 'nav.settingsUser', code: 'settingsUser'}],
   settingsRoleDetail: [accessParent, {path: '/settings/role', titleKey: 'nav.settingsRole', code: 'settingsRole'}],
@@ -478,11 +475,11 @@ export const SETTINGS_BREADCRUMB_PARENTS: Record<string, SettingsBreadcrumbParen
     {path: '/settings/alarm/bind', titleKey: 'nav.settingsAlarmBind', code: 'settingsAlarmBind'},
   ],
   settingsAlarmStateDetail: [
-    alarmParent,
+    eventCommandParent,
     {path: '/settings/alarm/state', titleKey: 'nav.settingsAlarmState', code: 'settingsAlarmState'},
   ],
   settingsAlarmHistoryDetail: [
-    alarmParent,
+    eventCommandParent,
     {path: '/settings/alarm/history', titleKey: 'nav.settingsAlarmHistory', code: 'settingsAlarmHistory'},
   ],
   settingsModelConfigDetail: [

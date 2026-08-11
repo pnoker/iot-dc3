@@ -74,7 +74,7 @@ import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {jumpToSourceEvents} from '@/utils/jumpUtil';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const router = useRouter();
 const {loading, run} = useAsyncLoader();
 const {resolveDevices, resolveProfiles, deviceName, profileName} = useEntityNames();
@@ -99,6 +99,7 @@ const load = () =>
   });
 
 watch(daysKey, load);
+watch(locale, load);
 onMounted(load);
 
 const onRowClick = (row: PeerDeviation) => jumpToSourceEvents(router, 'device', row.deviceId);

@@ -151,7 +151,13 @@
                     :key="session.conversationId"
                     :command="`select:${session.conversationId}`"
                   >
-                    <span class="agentic-history-item">{{ session.title }}</span>
+                    <span :class="`is-${session.sessionExt?.icon || 'monitor'}`" class="agentic-history-icon">
+                      <el-icon><component :is="sessionIcon(session.sessionExt?.icon)"/></el-icon>
+                    </span>
+                    <span class="agentic-history-item">
+                      <strong>{{ session.title }}</strong>
+                      <small v-if="session.summary">{{ session.summary }}</small>
+                    </span>
                   </el-dropdown-item>
                   <el-dropdown-item v-if="conversationItems.length === 0" disabled
                   >{{ t('agentic.headerNoHistory') }}
@@ -260,7 +266,18 @@
                   :charts="message.contentExt?.charts || []"
                   :content="message.content"
                 />
-                <div v-else class="agentic-text">{{ message.content }}</div>
+                <div v-else class="agentic-user-content">
+                  <div v-if="userMessageParts(message.content).quote" class="agentic-user-quote">
+                    <div class="agentic-user-quote__header">
+                      <el-icon><ChatLineSquare/></el-icon>
+                      <span>{{ userMessageParts(message.content).label }}</span>
+                    </div>
+                    <p>{{ userMessageParts(message.content).quote }}</p>
+                  </div>
+                  <div v-if="userMessageParts(message.content).body" class="agentic-text">
+                    {{ userMessageParts(message.content).body }}
+                  </div>
+                </div>
                 <span
                   v-if="message.streaming && !message.content && !hasReasoningPanel(message)"
                   class="agentic-cursor"
@@ -381,6 +398,9 @@
       <footer class="agentic-composer">
         <div v-if="currentPendingActions.length" class="agentic-actions">
           <div v-for="action in currentPendingActions" :key="action.actionId" class="agentic-action">
+            <span class="agentic-action__icon">
+              <el-icon><component :is="actionIcon(action.actionType)"/></el-icon>
+            </span>
             <div class="agentic-action__content">
               <strong>{{ action.title }}</strong>
               <span>{{ action.description }}</span>
@@ -391,19 +411,41 @@
                 <el-icon>
                   <Check/>
                 </el-icon>
-                Confirm
+                {{ t('agentic.confirm') }}
               </el-button>
               <el-button size="small" @click="handleRejectAction(action.actionId)">
                 <el-icon>
                   <CircleClose/>
                 </el-icon>
-                Reject
+                {{ t('agentic.reject') }}
               </el-button>
             </div>
           </div>
         </div>
 
         <div class="agentic-input-shell">
+          <div v-if="quotedMessage" class="agentic-quote-preview">
+            <span class="agentic-quote-preview__icon">
+              <el-icon><ChatLineSquare/></el-icon>
+            </span>
+            <div class="agentic-quote-preview__content">
+              <span class="agentic-quote-preview__meta">
+                {{ t('agentic.quotePreview') }}
+                <strong>{{ quoteLabel(quotedMessage.role) }}</strong>
+              </span>
+              <p>{{ quotePreview }}</p>
+            </div>
+            <button
+              :aria-label="t('agentic.quoteRemove')"
+              :title="t('agentic.quoteRemove')"
+              class="agentic-quote-preview__close"
+              type="button"
+              @click="quotedMessage = undefined"
+            >
+              <el-icon><Close/></el-icon>
+            </button>
+          </div>
+
           <div v-if="currentAttachments.length" class="agentic-attachments">
             <el-tag
               v-for="attachment in currentAttachments"
@@ -479,25 +521,39 @@ import {
   CircleClose,
   Clock,
   Close,
+  Connection,
   Cpu,
+  DataAnalysis,
   Delete,
   Document,
   DocumentCopy,
   EditPen,
   Lightning,
   Loading,
+  Monitor,
+  Odometer,
+  Operation,
   Paperclip,
   Plus,
   Promotion,
   Setting,
+  Tools,
+  TrendCharts,
   VideoPause,
   Warning,
+  WarningFilled,
 } from '@element-plus/icons-vue';
 import {ElMessage, ElMessageBox} from 'element-plus';
 import {storeToRefs} from 'pinia';
 import {useI18n} from 'vue-i18n';
 import {computed, nextTick, onBeforeUnmount, ref, watch} from 'vue';
-import type {AgenticMessage, AgenticMessageContext, AgenticMessageTokens, AgenticTraceEvent} from '@/config/types';
+import type {
+  AgenticMessage,
+  AgenticMessageContext,
+  AgenticMessageTokens,
+  AgenticSessionExt,
+  AgenticTraceEvent,
+} from '@/config/types';
 import {useAgenticStore} from '@/store';
 import RenderedAssistantMessage from './RenderedAssistantMessage.vue';
 import {toPlainText} from './assistantContent';
@@ -533,9 +589,15 @@ interface AssistantTokenItem {
   value: string;
 }
 
+interface UserMessageParts {
+  body: string;
+  label?: string;
+  quote?: string;
+}
+
 const agenticStore = useAgenticStore();
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const {
   visible,
   loading,
@@ -556,6 +618,7 @@ const {
 } = storeToRefs(agenticStore);
 
 const draft = ref('');
+const quotedMessage = ref<AgenticMessage>();
 const fileInputRef = ref<HTMLInputElement>();
 const bodyRef = ref<HTMLElement>();
 const panelRef = ref<HTMLElement>();
@@ -587,12 +650,47 @@ const promptItems = computed<AssistantPromptItem[]>(() => [
   },
 ]);
 
+const quoteExcerpt = (content: string) => {
+  return toPlainText(content)
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
+    .replace(/^\s*(?:[-*+] |\d+\.\s+)/gm, '')
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+    .replace(/[*_`~]+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const quotePreview = computed(() => {
+  if (!quotedMessage.value) return '';
+  return quoteExcerpt(quotedMessage.value.content);
+});
+
 const conversationItems = computed(() => {
   return sessions.value.map((session) => ({
     ...session,
     title: session.title || t('agentic.newConversation'),
   }));
 });
+
+const sessionIcons = {
+  monitor: Monitor,
+  warning: WarningFilled,
+  trend: TrendCharts,
+  connection: Connection,
+  odometer: Odometer,
+  tools: Tools,
+  operation: Operation,
+  lightning: Lightning,
+} as const;
+
+const sessionIcon = (icon?: AgenticSessionExt['icon']) => sessionIcons[icon || 'monitor'] || Monitor;
+
+const actionIcon = (actionType: string) => {
+  if (actionType.includes('WRITE')) return Lightning;
+  if (actionType.includes('CONFIG')) return Setting;
+  if (actionType.includes('WORK_ORDER')) return Tools;
+  return DataAnalysis;
+};
 
 const temperatureProxy = computed({
   get: () => temperature.value ?? activeModel.value.temperature ?? 0.7,
@@ -625,6 +723,10 @@ watch(
   }
 );
 
+watch(activeConversationId, () => {
+  quotedMessage.value = undefined;
+});
+
 watch(
   () => activeConversationId.value,
   () => {
@@ -636,6 +738,17 @@ watch(
   () => messageScrollSignature.value,
   () => scheduleScrollToBottom(),
   {flush: 'post'}
+);
+
+watch(
+  () => locale.value,
+  async () => {
+    if (!visible.value) return;
+    await agenticStore.loadSessions();
+    if (activeConversationId.value) {
+      await agenticStore.selectSession(activeConversationId.value);
+    }
+  }
 );
 
 onBeforeUnmount(() => {
@@ -727,11 +840,13 @@ const handleResizeEnd = () => {
 };
 
 const handleSubmit = async () => {
-  const content = draft.value.trim() || (currentAttachments.value.length ? t('agentic.attachAnalyze') : '');
-  if (!content) {
+  const messageBody = draft.value.trim() || (currentAttachments.value.length ? t('agentic.attachAnalyze') : '');
+  if (!messageBody) {
     return;
   }
+  const content = quotedMessage.value ? formatQuotedMessage(quotedMessage.value, messageBody) : messageBody;
   draft.value = '';
+  quotedMessage.value = undefined;
   await agenticStore.sendMessage(content);
 };
 
@@ -780,11 +895,42 @@ const handleCopyMessage = async (message: AgenticMessage) => {
 const handleQuoteMessage = (message: AgenticMessage) => {
   const text = toPlainText(message.content);
   if (!text) return;
-  const quoted = text
+  quotedMessage.value = message;
+};
+
+const quoteLabel = (role: AgenticMessage['role']) => {
+  return role === 'assistant' ? t('agentic.quoteAssistant') : t('agentic.quoteUser');
+};
+
+const formatQuotedMessage = (message: AgenticMessage, body: string) => {
+  const quoted = toPlainText(message.content)
     .split('\n')
     .map((line) => `> ${line}`)
     .join('\n');
-  draft.value = `${quoted}\n\n${draft.value || ''}`.trim();
+  return `> **${quoteLabel(message.role)}**\n${quoted}\n\n${body}`;
+};
+
+const userMessageParts = (content: string): UserMessageParts => {
+  const lines = content.split('\n');
+  const labelMatch = lines[0]?.match(/^> \*\*(.+)\*\*$/);
+  if (!labelMatch) {
+    return {body: content};
+  }
+
+  const quoteLines: string[] = [];
+  let index = 1;
+  while (index < lines.length) {
+    const line = lines[index];
+    if (!line?.startsWith('>')) break;
+    quoteLines.push(line.replace(/^> ?/, ''));
+    index += 1;
+  }
+
+  return {
+    label: labelMatch[1],
+    quote: quoteExcerpt(quoteLines.join('\n')),
+    body: lines.slice(index).join('\n').trim(),
+  };
 };
 
 const canShowMessageToolbar = (message: AgenticMessage) => {
@@ -815,6 +961,9 @@ const assistantStatus = (message: AgenticMessage) => {
   const reason = message.finishReason?.toLowerCase();
   if (reason === 'error' || reason === 'failed') {
     return t('agentic.statusFailed');
+  }
+  if (message.contentExt?.recovered) {
+    return t('agentic.statusDone');
   }
   if (assistantTraceEvents(message).some((event) => event.type === 'error' || event.status === 'failed')) {
     return t('agentic.statusFailed');
@@ -1294,11 +1443,50 @@ const formatFileSize = (size = 0) => {
 }
 
 .agentic-history-item {
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
   overflow: hidden;
-  max-width: 280px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  max-width: 300px;
+
+  strong,
+  small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    color: var(--el-text-color-primary);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  small {
+    margin-top: 2px;
+    color: var(--el-text-color-secondary);
+    font-size: 11px;
+  }
+}
+
+.agentic-history-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-right: 9px;
+  color: #2563eb;
+  background: #eff6ff;
+  border-radius: 9px;
+
+  &.is-warning { color: #dc2626; background: #fef2f2; }
+  &.is-trend { color: #059669; background: #ecfdf5; }
+  &.is-connection { color: #7c3aed; background: #f5f3ff; }
+  &.is-odometer { color: #0891b2; background: #ecfeff; }
+  &.is-tools { color: #d97706; background: #fffbeb; }
+  &.is-operation { color: #4f46e5; background: #eef2ff; }
+  &.is-lightning { color: #c2410c; background: #fff7ed; }
 }
 
 .agentic-body {
@@ -1412,6 +1600,54 @@ const formatFileSize = (size = 0) => {
 .agentic-text {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+}
+
+.agentic-user-content {
+  min-width: 0;
+}
+
+.agentic-user-quote {
+  position: relative;
+  max-width: 100%;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-left: 3px solid rgba(255, 255, 255, 0.82);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.13);
+
+  &::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 18px;
+    pointer-events: none;
+    content: '';
+    background: linear-gradient(transparent, rgba(64, 158, 255, 0.88));
+  }
+
+  p {
+    display: -webkit-box;
+    margin: 4px 0 0;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}
+
+.agentic-user-quote__header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .agentic-message__warning {
@@ -1985,13 +2221,24 @@ const formatFileSize = (size = 0) => {
 
 .agentic-action {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   gap: 10px;
   align-items: center;
   padding: 10px 12px;
   border: 1px solid #f3c96b;
   border-radius: 6px;
   background: #fffaf0;
+}
+
+.agentic-action__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: #d97706;
+  background: #fef3c7;
+  border-radius: 9px;
 }
 
 .agentic-action__content {
@@ -2030,6 +2277,91 @@ const formatFileSize = (size = 0) => {
   border: 1px solid #d6dde8;
   border-radius: 8px;
   background: #ffffff;
+}
+
+.agentic-quote-preview {
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 24px;
+  gap: 9px;
+  align-items: start;
+  min-width: 0;
+  margin-bottom: 9px;
+  padding: 9px 8px 9px 10px;
+  overflow: hidden;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fbff 58%, #eef2ff 100%);
+  box-shadow: inset 3px 0 0 #3b82f6;
+}
+
+.agentic-quote-preview__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: #2563eb;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.12);
+}
+
+.agentic-quote-preview__content {
+  min-width: 0;
+
+  p {
+    display: -webkit-box;
+    margin: 3px 0 0;
+    overflow: hidden;
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+.agentic-quote-preview__meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.3;
+
+  strong {
+    padding: 1px 5px;
+    border-radius: 999px;
+    color: #1d4ed8;
+    font-size: 10px;
+    font-weight: 700;
+    background: #dbeafe;
+  }
+}
+
+.agentic-quote-preview__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color: #64748b;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.16s ease, background 0.16s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: #dc2626;
+    background: #fee2e2;
+    outline: none;
+  }
 }
 
 .agentic-attachments {
@@ -2174,15 +2506,30 @@ const formatFileSize = (size = 0) => {
   }
 
   blockquote {
+    position: relative;
     box-sizing: border-box;
     max-width: 100%;
     margin: 8px 0;
-    padding: 8px 10px 8px 12px;
+    padding: 10px 12px 10px 38px;
     overflow-wrap: anywhere;
-    border-left: 3px solid var(--el-color-primary-light-3);
-    border-radius: 4px;
+    border: 1px solid #dbeafe;
+    border-left: 3px solid #60a5fa;
+    border-radius: 7px;
     color: #334155;
-    background: #f8fafc;
+    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
+
+    &::before {
+      position: absolute;
+      top: 5px;
+      left: 11px;
+      color: #60a5fa;
+      content: '\201C';
+      font-family: Georgia, serif;
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1;
+    }
 
     > :first-child {
       margin-top: 0;

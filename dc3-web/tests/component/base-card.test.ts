@@ -29,8 +29,8 @@ describe('BaseCard', () => {
       global: {stubs: {...layoutStubs}},
     });
 
-    expect(wrapper.find('.base-card').exists()).toBe(true);
-    expect(wrapper.find('.base-card__container .payload').exists()).toBe(true);
+    expect(wrapper.find('.card-shell').exists()).toBe(true);
+    expect(wrapper.find('.card-shell__container .payload').exists()).toBe(true);
     expect(wrapper.text()).toContain('payload');
   });
 });

@@ -114,7 +114,7 @@ describe('AI coding guardrails', () => {
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.test\.ts$/.test(path))
       .filter((path) => !path.includes('setup/stubs'))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => inlineStub.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
 
@@ -144,7 +144,7 @@ describe('AI coding guardrails', () => {
     const badAssertion = /\bas\s+unknown\s+as\b|\bas\s+never\b/;
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.test\.ts$/.test(path))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => badAssertion.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
 
@@ -164,7 +164,7 @@ describe('AI coding guardrails', () => {
     const callPattern = /(?<![.\w])(?:it|test)\(\s*(['"`])([^'"`\n]+)\1/g;
     const offenders: string[] = [];
     for (const path of walk(join(root, 'tests')).filter((p) => /\.test\.ts$/.test(p))) {
-      if (path.includes('tests/guardrails/')) continue;
+      if (relativeProjectPath(path).startsWith('tests/guardrails/')) continue;
       const source = readFileSync(path, 'utf8');
       let match: RegExpExecArray | null;
       while ((match = callPattern.exec(source)) !== null) {
@@ -196,7 +196,7 @@ describe('AI coding guardrails', () => {
     ];
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.test\.ts$/.test(path))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => {
         const src = readFileSync(path, 'utf8');
         return tautologies.some((re) => re.test(src));
@@ -213,7 +213,7 @@ describe('AI coding guardrails', () => {
     const weakAssertion = /\.(?:toBeTruthy|toBeFalsy)\s*\(/;
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.(?:test|spec)\.ts$/.test(path))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => weakAssertion.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
 
@@ -224,7 +224,7 @@ describe('AI coding guardrails', () => {
     const debugCalls = /\bconsole\.(?:log|debug|info)\s*\(/;
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.test\.ts$/.test(path))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => debugCalls.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
 
@@ -239,7 +239,7 @@ describe('AI coding guardrails', () => {
     const setTimeoutWait = /\bsetTimeout\s*\(/;
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\/(?:unit|component|views|api)\/[^/]+\.test\.ts$/.test(path))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => setTimeoutWait.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
 

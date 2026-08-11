@@ -63,7 +63,7 @@ import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {jumpToSourceEvents} from '@/utils/jumpUtil';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const router = useRouter();
 const {loading, run} = useAsyncLoader();
 const {resolveBySource, nameBySource} = useEntityNames();
@@ -93,6 +93,7 @@ const load = () =>
   });
 
 watch(windowKey, load);
+watch(locale, load);
 onMounted(load);
 
 const eventTypeLabel = (flag: number) => {

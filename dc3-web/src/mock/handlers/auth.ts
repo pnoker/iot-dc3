@@ -16,7 +16,14 @@
  */
 
 import {on} from '../dispatch';
-import {ok, responseOf} from '../response';
+import {fail, ok, responseOf} from '../response';
+
+const DEFAULT_TENANT = 'default';
+const DEFAULT_LOGIN = 'dc3';
+const DEFAULT_PASSWORD = 'dc3dc3dc3';
+
+const hasDefaultIdentity = (body: Record<string, unknown>) =>
+  String(body.tenant ?? '') === DEFAULT_TENANT && String(body.name ?? '') === DEFAULT_LOGIN;
 
 /**
  * Mock the token endpoints so the real login/logout/change-password flow runs
@@ -24,9 +31,21 @@ import {ok, responseOf} from '../response';
  * strings, so we return R<string> envelopes.
  */
 export function registerAuthHandlers(): void {
-  on('post', 'api/v3/auth/token/salt', (ctx) => responseOf(ctx.config, ok('mock-salt')));
-  on('post', 'api/v3/auth/token/generate', (ctx) => responseOf(ctx.config, ok('ok')));
-  on('post', 'api/v3/auth/token/check', (ctx) => responseOf(ctx.config, ok(true)));
+  on('post', 'api/v3/auth/token/salt', (ctx) =>
+    responseOf(
+      ctx.config,
+      hasDefaultIdentity(ctx.body) ? ok('mock-salt') : fail('R4010', 'Invalid tenant or username'),
+    ),
+  );
+  on('post', 'api/v3/auth/token/generate', (ctx) =>
+    responseOf(
+      ctx.config,
+      hasDefaultIdentity(ctx.body) && String(ctx.body.password ?? '') === DEFAULT_PASSWORD
+        ? ok('ok')
+        : fail('R4010', 'Invalid credentials'),
+    ),
+  );
+  on('post', 'api/v3/auth/token/check', (ctx) => responseOf(ctx.config, ok(hasDefaultIdentity(ctx.body))));
   on('post', 'api/v3/auth/token/cancel', (ctx) => responseOf(ctx.config, ok(true)));
   on('post', 'api/v3/auth/token/change_password', (ctx) => responseOf(ctx.config, ok(true)));
 }

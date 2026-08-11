@@ -171,4 +171,45 @@ describe('AgenticAssistant', () => {
     expect(wrapper.find('.agentic-details').text()).not.toContain('先读取租户上下文');
     expect(wrapper.find('.agentic-details').text()).toContain('searchDevices');
   });
+
+  it('shows a compact removable preview instead of inserting raw markdown into the composer', async () => {
+    seedAssistant([
+      {
+        id: 'assistant-quote',
+        role: 'assistant',
+        content: '### 分析结果\n这是一段需要引用的 **AI 分析结果**。\n它包含多行详细信息。',
+        streaming: false,
+      },
+    ]);
+
+    const wrapper = mountAssistant();
+    const actions = wrapper.findAll('.agentic-message__action');
+    await actions[1].trigger('click');
+
+    expect(wrapper.find('.agentic-quote-preview').exists()).toBe(true);
+    expect(wrapper.find('.agentic-quote-preview').text()).toContain('AI response');
+    expect(wrapper.find('.agentic-quote-preview').text()).toContain('需要引用的 AI 分析结果');
+    expect(wrapper.find('.agentic-quote-preview').text()).not.toContain('> ');
+    expect(wrapper.find('.agentic-quote-preview').text()).not.toContain('###');
+
+    await wrapper.find('.agentic-quote-preview__close').trigger('click');
+    expect(wrapper.find('.agentic-quote-preview').exists()).toBe(false);
+  });
+
+  it('renders quoted user content as a styled card instead of raw markdown markers', () => {
+    seedAssistant([
+      {
+        id: 'user-quote',
+        role: 'user',
+        content: '> **AI response**\n> FAN-03 温度趋势存在异常。\n\n请继续分析原因。',
+        streaming: false,
+      },
+    ]);
+
+    const wrapper = mountAssistant();
+
+    expect(wrapper.find('.agentic-user-quote').text()).toContain('FAN-03 温度趋势存在异常');
+    expect(wrapper.find('.agentic-text').text()).toBe('请继续分析原因。');
+    expect(wrapper.find('.agentic-message__content').text()).not.toContain('> **');
+  });
 });

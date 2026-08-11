@@ -809,6 +809,8 @@ const normalizeSessionExt = (sessionExt?: RawAgenticSessionExt): AgenticSessionE
     reasoningEnabled: sessionExt.reasoningEnabled ?? sessionExt.reasoning_enabled,
     temperature: sessionExt.temperature,
     maxTokens: sessionExt.maxTokens ?? sessionExt.max_tokens,
+    icon: sessionExt.icon,
+    category: sessionExt.category,
   };
 };
 

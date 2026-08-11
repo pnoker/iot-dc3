@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {streamLatest} from '@/api/dashboard';
@@ -89,7 +89,7 @@ const props = defineProps({
   size: {type: Number, default: 20},
 });
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 
 const loading = ref(false);
 const rows = ref<Row[]>([]);
@@ -130,7 +130,7 @@ const formatTime = (v?: string | Date) => {
   if (!v) return '';
   const d = typeof v === 'string' ? new Date(v.replace(' ', 'T')) : v;
   if (Number.isNaN(d.getTime())) return String(v);
-  return d.toLocaleTimeString('zh-CN', {hour12: false});
+  return d.toLocaleTimeString(locale.value === 'zh' ? 'zh-CN' : 'en-US', {hour12: false});
 };
 
 const typeColor = (vt?: string) => {
@@ -145,6 +145,7 @@ const typeColor = (vt?: string) => {
 };
 
 onMounted(refresh);
+watch(locale, refresh);
 </script>
 
 <style lang="scss" scoped>

@@ -27,14 +27,14 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, onMounted, onUnmounted, ref} from 'vue';
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
 import {alertActivity} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 
 const loading = ref(false);
 const chartRef = ref<HTMLElement>();
@@ -95,6 +95,7 @@ const load = async () => {
 };
 
 onMounted(load);
+watch(locale, load);
 onUnmounted(() => chart?.destroy());
 defineExpose({refresh: load});
 </script>

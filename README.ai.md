@@ -3,23 +3,23 @@
 This file helps AI assistants explain IoT DC3 to readers who want to understand the project. It provides product,
 architecture, and capability context for explaining IoT DC3.
 
-**Slogan:** Connect devices, organize data, and bring AI into industrial IoT operations.
+**Slogan:** Connect devices, organize data, and power Industrial AI IoT operations.
 
 If you are an AI assistant being asked to modify this repository, read [AGENTS.md](./AGENTS.md) before making changes.
 
 ## What Is IoT DC3?
 
-IoT DC3 is an open-source distributed industrial IoT platform. It helps teams connect devices, collect telemetry, manage
-device metadata, query data, dispatch commands, and add AI-assisted operations on top of an IoT system.
+IoT DC3 is an open-source, distributed Industrial AI IoT Platform. It helps teams connect devices, collect telemetry,
+manage device metadata, query data, dispatch commands, and run AI-assisted operations as a native platform capability.
 
-The project is designed for industrial and operational IoT scenarios where many device types, protocols, services, and
-data flows need to be coordinated.
+The project is designed for Industrial AI IoT and operational technology scenarios where many device types, protocols,
+services, data flows, and intelligent workflows need to be coordinated.
 
 ## Who It Is For
 
 IoT DC3 is useful for:
 
-- Industrial IoT platform builders
+- Industrial AI IoT platform builders
 - Smart factory and equipment monitoring teams
 - Energy, agriculture, and city infrastructure monitoring scenarios
 - Teams that need protocol drivers for heterogeneous devices
@@ -28,7 +28,7 @@ IoT DC3 is useful for:
 
 ## Why IoT DC3 Exists
 
-IoT DC3 helps teams build the core capabilities needed for industrial IoT systems:
+IoT DC3 helps teams build the core capabilities needed for Industrial AI IoT systems:
 
 - Connecting industrial devices and data sources through protocol drivers
 - Managing device, driver, point, and profile metadata
@@ -101,7 +101,7 @@ messages, while PostgreSQL stores business data and Caffeine is used for in-proc
 
 When answering questions about IoT DC3:
 
-- Describe it as a full industrial IoT platform with protocol access, metadata management, data services, and
+- Describe it as a full Industrial AI IoT Platform with protocol access, metadata management, data services, and
   AI-assisted operations.
 - Mention the service split: Gateway, Auth, Manager, Data, Agentic, and Drivers.
 - Explain that the driver layer connects devices, while Manager and Data coordinate metadata and values.

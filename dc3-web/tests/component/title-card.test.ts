@@ -30,7 +30,7 @@ describe('TitleCard', () => {
       global: {stubs: {...layoutStubs}},
     });
 
-    const header = wrapper.find('.title-card__header');
+    const header = wrapper.find('.card-shell__header');
     expect(header.exists()).toBe(true);
     expect(header.text()).toBe('Devices');
     expect(wrapper.find('.content').exists()).toBe(true);
@@ -44,6 +44,6 @@ describe('TitleCard', () => {
     });
 
     expect(wrapper.find('.custom').text()).toBe('Custom header');
-    expect(wrapper.find('.title-card__header').exists()).toBe(false);
+    expect(wrapper.find('.card-shell__header').exists()).toBe(false);
   });
 });

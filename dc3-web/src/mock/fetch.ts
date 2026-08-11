@@ -16,6 +16,8 @@
  */
 
 import type {AgenticVisualizationSpec} from '@/config/types';
+import {currentMockLocale} from './locale';
+import type {MockDb} from './db';
 
 const CHAT_URL = '/api/v3/agentic/chat/completions';
 
@@ -135,6 +137,7 @@ interface Scenario {
   match: RegExp;
   events: { type: string; title: string; detail?: string; phase?: string; status?: string; name?: string }[];
   text: string;
+  textEn: string;
   charts: () => AgenticVisualizationSpec[];
 }
 
@@ -148,6 +151,8 @@ const scenarios: Scenario[] = [
     ],
     text:
       '3 号风机轴承温度在过去 24 小时持续攀升，**14:00 达到峰值 85.4℃**，超过 80℃ 告警阈值约 2 小时。结合状态分布，当前有 1 台设备处于告警。建议检查润滑与散热，必要时降低负载。',
+    textEn:
+      'Fan 3 bearing temperature climbed over the last 24 hours and **peaked at 85.4°C at 14:00**, staying above the 80°C threshold for about two hours. One asset is currently in alarm. Check lubrication and cooling, and reduce load if necessary.',
     charts: () => [charts.tempTrend(), charts.deviceStatus(), charts.alarmSummary()],
   },
   {
@@ -159,6 +164,8 @@ const scenarios: Scenario[] = [
     ],
     text:
       '近 7 日总能耗 **340.9 kWh**，工作日均值 55.2 kWh，周末降至 31.9 kWh。周四最高（61.2 kWh）。功率曲线显示白天（8-18 时）负载明显抬升，符合生产节律。可考虑在谷电时段调度高耗能任务。',
+    textEn:
+      'Total energy over the last seven days was **340.9 kWh**. Weekdays averaged 55.2 kWh and weekends 31.9 kWh, with Thursday highest at 61.2 kWh. The daytime load increase matches production hours; schedule flexible loads during off-peak tariffs.',
     charts: () => [charts.energyWeek(), charts.powerTrend()],
   },
   {
@@ -170,6 +177,8 @@ const scenarios: Scenario[] = [
     ],
     text:
       '8 个采集驱动中，**S7 PLC** 负载最高（CPU 41% / 内存 64%），**OPC-UA** 次之。CANopen 最低。OPC-UA 近期存在周期性掉线（与定时任务重合），建议检查证书有效期与握手超时。',
+    textEn:
+      'Among eight collection drivers, **S7 PLC** has the highest load (41% CPU / 64% memory), followed by **OPC-UA**. CANopen is lowest. OPC-UA disconnects align with a scheduled task; check certificate validity and handshake timeout.',
     charts: () => [charts.driverLoad(), charts.deviceStatus()],
   },
   {
@@ -179,6 +188,7 @@ const scenarios: Scenario[] = [
       {type: 'tool', title: '查询位号实时值', phase: 'result', status: 'success'},
     ],
     text: '当前关键位号实时值：温度 24.5℃、湿度 58.2%RH、电压 221.3V、电流 9.8A、功率 2.1kW，均在正常区间。环境湿度过去 24h 在 48-60% 波动。',
+    textEn: 'Current key values are 24.5°C, 58.2% RH, 221.3 V, 9.8 A, and 2.1 kW. All are within normal ranges; ambient humidity varied between 48% and 60% over the last 24 hours.',
     charts: () => [charts.pointValues(), charts.humidity()],
   },
 ];
@@ -192,18 +202,59 @@ const defaultScenario: Scenario = {
   ],
   text:
     '已为你汇总当前平台态势：16 台设备中 12 在线、3 离线、1 告警；近 24h 共 17 条告警（P0×1, P1×4, P2×12），已恢复 9 条。3 号风机温度异常是当前首要风险，详细分析可参见相关会话。',
+  textEn:
+    'Current platform summary: 12 of 16 assets are online, three are offline, and one is in alarm. There were 17 alarms in the last 24 hours (P0×1, P1×4, P2×12), with nine recovered. Fan 3 temperature is the top current risk.',
   charts: () => [charts.deviceStatus(), charts.tempTrend(), charts.alarmSummary()],
 };
 
 const pickScenario = (prompt: string): Scenario =>
   scenarios.find((s) => s.match.test(prompt)) ?? defaultScenario;
 
+const scenarioText = (scenario: Scenario) => currentMockLocale() === 'zh' ? scenario.text : scenario.textEn;
+
+const localizedEvents = (scenario: Scenario) => {
+  if (currentMockLocale() === 'zh') return scenario.events;
+  return scenario.events.map((event) => ({
+    ...event,
+    title: event.name ? event.name.replaceAll('_', ' ') : 'Analyze operational context',
+    detail: event.detail ? 'Correlate current telemetry, history, and alarm context.' : undefined,
+  }));
+};
+
+const localizedChart = (spec: AgenticVisualizationSpec): AgenticVisualizationSpec => {
+  if (currentMockLocale() === 'zh') return spec;
+  const titles: Record<string, string> = {
+    'temp-trend': 'Fan 3 bearing temperature (last 24h)',
+    humidity: 'Workshop humidity (last 24h)',
+    'power-trend': 'Active power trend (last 24h)',
+    'device-status': 'Device connectivity distribution',
+    'point-values': 'Current key point values',
+    'energy-week': 'Energy consumption (last 7 days)',
+    'alarm-summary': 'Alarm summary (last 24h)',
+    'driver-load': 'Driver load distribution (CPU vs memory)',
+  };
+  let dataset = spec.dataset;
+  if (spec.id === 'device-status') {
+    const statuses: Record<string, string> = {'在线': 'Online', '离线': 'Offline', '告警': 'Alarm'};
+    dataset = dataset.map((row) => ({...row, status: statuses[String(row.status)] || row.status}));
+  } else if (spec.id === 'point-values') {
+    const points: Record<string, string> = {'温度': 'Temperature', '湿度': 'Humidity', '电压': 'Voltage', '电流': 'Current', '功率': 'Power'};
+    dataset = dataset.map((row) => ({...row, point: points[String(row.point)] || row.point}));
+  } else if (spec.id === 'energy-week') {
+    const days: Record<string, string> = {'周一': 'Mon', '周二': 'Tue', '周三': 'Wed', '周四': 'Thu', '周五': 'Fri', '周六': 'Sat', '周日': 'Sun'};
+    dataset = dataset.map((row) => ({...row, day: days[String(row.day)] || row.day}));
+  } else if (spec.id === 'alarm-summary') {
+    dataset = [{total: 17, P0: 1, P1: 4, P2: 12, recovered: 9}];
+  }
+  return {...spec, title: titles[spec.id || ''] || spec.title, dataset};
+};
+
 const streamChunks = (prompt: string): unknown[] => {
   const s = pickScenario(prompt);
-  const chunks: unknown[] = s.events.map((e) => ({object: 'agentic.event', ...e}));
-  chunks.push({choices: [{delta: {content: s.text}}]});
-  for (const c of s.charts()) chunks.push({object: 'agentic.visualization', visualization: c});
-  chunks.push({choices: [{delta: {content: '需要进一步下钻某个设备或时段，告诉我即可。'}}]});
+  const chunks: unknown[] = localizedEvents(s).map((e) => ({object: 'agentic.event', ...e}));
+  chunks.push({choices: [{delta: {content: scenarioText(s)}}]});
+  for (const c of s.charts()) chunks.push({object: 'agentic.visualization', visualization: localizedChart(c)});
+  chunks.push({choices: [{delta: {content: currentMockLocale() === 'zh' ? '需要进一步下钻某个设备或时段，告诉我即可。' : 'Tell me if you want to drill into a specific asset or time range.'}}]});
   chunks.push({choices: [{finish_reason: 'stop'}]});
   return chunks;
 };
@@ -226,12 +277,48 @@ const mockResponse = (prompt: string, stream: boolean): Response => {
   return new Response(
     JSON.stringify({
       choices: [{
-        message: {role: 'assistant', content: s.text, contentExt: {charts: s.charts()}},
+        message: {role: 'assistant', content: scenarioText(s), contentExt: {charts: s.charts().map(localizedChart)}},
         finishReason: 'stop'
       }],
     }),
     {status: 200, headers: {'Content-Type': 'application/json'}},
   );
+};
+
+interface MockChatRequest {
+  conversationId?: string;
+  model?: string;
+  messages?: Array<{role?: string; content?: string}>;
+}
+
+const persistMockTurn = (db: MockDb, request: MockChatRequest, prompt: string): void => {
+  if (!request.conversationId) return;
+  const scenario = pickScenario(prompt);
+  const rows = db.agenticMessages.filter((message) => String(message.conversationId) === request.conversationId);
+  const nextIndex = rows.reduce((max, message) => Math.max(max, Number(message.messageIndex ?? -1)), -1) + 1;
+  const created = new Date().toISOString();
+  const suffix = currentMockLocale() === 'zh'
+    ? '需要进一步下钻某个设备或时段，告诉我即可。'
+    : 'Tell me if you want to drill into a specific asset or time range.';
+  db.agenticMessages.push(
+    {id: `mock-user-${Date.now()}`, conversationId: request.conversationId, role: 'user', content: prompt, messageIndex: nextIndex, status: 2, streaming: false, createTime: created},
+    {
+      id: `mock-assistant-${Date.now()}`,
+      conversationId: request.conversationId,
+      role: 'assistant',
+      content: `${scenarioText(scenario)}${suffix}`,
+      contentExt: {
+        tools: localizedEvents(scenario).filter((event) => event.type === 'tool').map((event) => event.name).filter(Boolean),
+        traces: localizedEvents(scenario),
+        charts: scenario.charts().map(localizedChart),
+        tokens: {input: 1480, output: 680, context: 820},
+      },
+      model: request.model || 'gpt-4o', messageIndex: nextIndex + 1, status: 2, streaming: false,
+      finishReason: 'stop', createTime: created,
+    },
+  );
+  const session = db.agenticSessions.find((item) => String(item.conversationId) === request.conversationId);
+  if (session) session.operateTime = created;
 };
 
 /**
@@ -240,21 +327,23 @@ const mockResponse = (prompt: string, stream: boolean): Response => {
  * answers `/api/v3/agentic/chat/completions` with a scripted, chart-bearing,
  * keyword-aware reply so the AI assistant is fully demoable without a backend.
  */
-export function installAgenticFetchMock(): void {
+export function installAgenticFetchMock(db: MockDb): void {
   const original = window.fetch.bind(window);
   window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     if (url.includes(CHAT_URL)) {
       let stream = true;
       let prompt = '';
+      let request: MockChatRequest = {};
       try {
-        const body = JSON.parse(String(init?.body ?? '{}'));
-        stream = body.stream !== false;
-        const msgs = Array.isArray(body.messages) ? body.messages : [];
+        request = JSON.parse(String(init?.body ?? '{}')) as MockChatRequest & {stream?: boolean};
+        stream = (request as MockChatRequest & {stream?: boolean}).stream !== false;
+        const msgs = Array.isArray(request.messages) ? request.messages : [];
         prompt = String(msgs[msgs.length - 1]?.content ?? '');
       } catch {
         /* defaults */
       }
+      persistMockTurn(db, request, prompt);
       return Promise.resolve(mockResponse(prompt, stream));
     }
     return original(input as RequestInfo, init);

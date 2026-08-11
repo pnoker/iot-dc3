@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {alertPage} from '@/api/dashboard';
@@ -67,7 +67,7 @@ interface Row {
   message?: string;
 }
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const loading = ref(false);
 const rows = ref<Row[]>([]);
 const {resolveBySource, nameBySource} = useEntityNames();
@@ -100,7 +100,7 @@ const formatTime = (v?: string) => {
   if (!v) return '';
   const d = new Date(v.replace(' ', 'T'));
   if (Number.isNaN(d.getTime())) return v;
-  return d.toLocaleString('zh-CN', {
+  return d.toLocaleString(locale.value === 'zh' ? 'zh-CN' : 'en-US', {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
@@ -110,6 +110,7 @@ const formatTime = (v?: string) => {
 };
 
 onMounted(load);
+watch(locale, load);
 defineExpose({refresh: load});
 </script>
 

@@ -18,6 +18,7 @@
 import type {Dictionary} from '@/config/types';
 
 import {on} from '../dispatch';
+import {localizeEntities} from '../locale';
 import {matches} from '../query';
 import {okPage, responseOf} from '../response';
 
@@ -34,17 +35,17 @@ const dictPage = (rows: Dictionary[], label: unknown) => okPage(label ? rows.fil
 
 export function registerDictionaryHandlers(): void {
   on('post', 'api/v3/manager/dictionary/driver', (ctx) => {
-    const rows = ctx.db.drivers.map((d) => toDict(d, d.driverName, 'driver'));
+    const rows = localizeEntities('driver', ctx.db.drivers).map((d) => toDict(d, d.driverName, 'driver'));
     return responseOf(ctx.config, dictPage(rows, ctx.body.label));
   });
 
   on('post', 'api/v3/manager/dictionary/device', (ctx) => {
-    const rows = ctx.db.devices.map((d) => toDict(d, d.deviceName, 'device'));
+    const rows = localizeEntities('device', ctx.db.devices).map((d) => toDict(d, d.deviceName, 'device'));
     return responseOf(ctx.config, dictPage(rows, ctx.body.label));
   });
 
   on('post', 'api/v3/manager/dictionary/profile', (ctx) => {
-    const rows = ctx.db.profiles.map((p) => toDict(p, p.profileName, 'profile'));
+    const rows = localizeEntities('profile', ctx.db.profiles).map((p) => toDict(p, p.profileName, 'profile'));
     return responseOf(ctx.config, dictPage(rows, ctx.body.label));
   });
 
@@ -58,7 +59,7 @@ export function registerDictionaryHandlers(): void {
         pool = ctx.db.points.filter((p) => String(p.profileId) === String(device.profileId));
       }
     }
-    const rows = pool.map((p) => toDict(p, p.pointName, 'point'));
+    const rows = localizeEntities('point', pool).map((p) => toDict(p, p.pointName, 'point'));
     return responseOf(ctx.config, dictPage(rows, ctx.body.label));
   });
 }

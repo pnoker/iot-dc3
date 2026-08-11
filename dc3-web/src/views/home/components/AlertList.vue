@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive, ref} from 'vue';
+import {computed, onMounted, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {alertLatest, alertStats} from '@/api/dashboard';
@@ -83,7 +83,7 @@ const props = defineProps({
   size: {type: Number, default: 10},
 });
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 
 const loading = ref(false);
 const rows = ref<AlertRow[]>([]);
@@ -111,7 +111,7 @@ const groupedRows = computed(() => {
   const byDate = new Map<string, AlertRow[]>();
   for (const row of rows.value) {
     const d = parseTime(row.createTime);
-    const key = d ? d.toLocaleDateString() : '-';
+    const key = d ? d.toLocaleDateString(locale.value === 'zh' ? 'zh-CN' : 'en-US') : '-';
     if (!byDate.has(key)) byDate.set(key, []);
     byDate.get(key)!.push(row);
   }
@@ -163,10 +163,11 @@ const parseTime = (v?: string): Date | null => {
 const formatClock = (v?: string) => {
   const d = parseTime(v);
   if (!d) return v || '';
-  return d.toLocaleTimeString('zh-CN', {hour12: false});
+  return d.toLocaleTimeString(locale.value === 'zh' ? 'zh-CN' : 'en-US', {hour12: false});
 };
 
 onMounted(refresh);
+watch(locale, refresh);
 defineExpose({refresh});
 </script>
 

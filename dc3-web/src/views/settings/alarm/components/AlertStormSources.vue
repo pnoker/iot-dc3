@@ -69,7 +69,7 @@ const props = defineProps({
   limit: {type: Number, default: 10},
 });
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const router = useRouter();
 const {resolveBySource, nameBySource} = useEntityNames();
 
@@ -111,6 +111,7 @@ const load = async () => {
 };
 
 watch(windowKey, load);
+watch(locale, load);
 
 const nameFor = (r: StormRow) => nameBySource(r.source, r.sourceId);
 

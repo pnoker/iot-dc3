@@ -35,7 +35,9 @@ import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
 const {t} = useI18n();
-const rangeKey = ref<RangeKey>('24h');
+// A weekday/hour heatmap is most informative over a full week. The previous
+// 24h default correctly populated only two day rows, which looked incomplete.
+const rangeKey = ref<RangeKey>('7d');
 const loading = ref(false);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;

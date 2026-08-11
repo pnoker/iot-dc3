@@ -72,6 +72,7 @@ export interface AgenticModelConfig {
 export interface AgenticSession {
   conversationId: string;
   title?: string;
+  summary?: string;
   sessionExt?: AgenticSessionExt;
   createTime?: string;
   operateTime?: string;
@@ -84,6 +85,9 @@ export interface AgenticSessionExt {
   reasoningEnabled?: boolean;
   temperature?: number;
   maxTokens?: number;
+  /** Optional visual category metadata used by rich clients and mock demos. */
+  icon?: 'monitor' | 'warning' | 'trend' | 'connection' | 'odometer' | 'tools' | 'operation' | 'lightning';
+  category?: string;
 }
 
 export type AgenticMessageRole = 'user' | 'assistant' | 'system';
@@ -115,6 +119,8 @@ export interface AgenticMessageContent {
   tokens?: AgenticMessageTokens;
   reasoning?: boolean;
   reasoningContent?: string;
+  /** The assistant recovered through a fallback path after a tool failure. */
+  recovered?: boolean;
 }
 
 export type AgenticVisualizationType =
@@ -166,6 +172,8 @@ export interface AgenticAttachment {
   size: number;
   filePath?: string;
   createTime?: string;
+
+  [key: string]: unknown;
 }
 
 export interface AgenticAction {
@@ -179,6 +187,8 @@ export interface AgenticAction {
   status: number;
   expireTime?: string;
   remark?: string;
+
+  [key: string]: unknown;
 }
 
 export interface AgenticChatMessage {

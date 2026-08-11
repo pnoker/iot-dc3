@@ -49,15 +49,19 @@ import {
   alarmRuleStates,
 } from './seed/data';
 import {
-  agenticMessages,
   agenticModelConfigs,
   agenticProviders,
-  agenticSessions,
   mcpAudits,
   mcpClients,
   mcpConnections,
   mcpTools,
 } from './seed/agentic';
+import {
+  agenticActions,
+  agenticAttachments,
+  agenticMessages,
+  agenticSessions,
+} from './seed/agentic-conversations';
 
 /**
  * Mutable in-memory store. add/update/delete handlers mutate these arrays so a
@@ -99,6 +103,8 @@ export interface MockDb {
   agenticModelConfigs: Record<string, unknown>[];
   agenticSessions: Record<string, unknown>[];
   agenticMessages: Record<string, unknown>[];
+  agenticActions: Record<string, unknown>[];
+  agenticAttachments: Record<string, unknown>[];
   mcpClients: Record<string, unknown>[];
   mcpConnections: Record<string, unknown>[];
   mcpTools: Record<string, unknown>[];
@@ -142,6 +148,8 @@ export const db: MockDb = {
   agenticModelConfigs: copy(agenticModelConfigs),
   agenticSessions: copy(agenticSessions),
   agenticMessages: copy(agenticMessages),
+  agenticActions: copy(agenticActions),
+  agenticAttachments: copy(agenticAttachments),
   mcpClients: copy(mcpClients),
   mcpConnections: copy(mcpConnections),
   mcpTools: copy(mcpTools),

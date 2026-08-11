@@ -28,6 +28,7 @@
 
 <script lang="ts" setup>
 import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
 import {alertTopSources} from '@/api/dashboard';
@@ -35,6 +36,7 @@ import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 
 const props = defineProps<{ days?: number; limit?: number }>();
+const {locale} = useI18n();
 
 const loading = ref(false);
 const chartRef = ref<HTMLElement>();
@@ -86,6 +88,7 @@ const load = async () => {
 
 onMounted(load);
 watch(() => props.days, load);
+watch(locale, load);
 onUnmounted(() => chart?.destroy());
 
 defineExpose({refresh: load});

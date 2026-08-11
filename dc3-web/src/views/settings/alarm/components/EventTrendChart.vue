@@ -28,12 +28,14 @@
 
 <script lang="ts" setup>
 import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
 import {alertTrend} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
 const props = defineProps<{ days?: number }>();
+const {t, locale} = useI18n();
 
 const loading = ref(false);
 const chartRef = ref<HTMLElement>();
@@ -65,9 +67,9 @@ const load = async () => {
     const rows: any[] = res?.data ?? [];
     const flat: { date: string; source: string; count: number }[] = [];
     for (const r of rows) {
-      flat.push({date: r.date, source: 'Device', count: r.deviceCount ?? 0});
-      flat.push({date: r.date, source: 'Driver', count: r.driverCount ?? 0});
-      flat.push({date: r.date, source: 'Point', count: r.pointCount ?? 0});
+      flat.push({date: r.date, source: t('settings.event.sourceDevice'), count: r.deviceCount ?? 0});
+      flat.push({date: r.date, source: t('settings.event.sourceDriver'), count: r.driverCount ?? 0});
+      flat.push({date: r.date, source: t('settings.event.sourcePoint'), count: r.pointCount ?? 0});
     }
     await nextTick();
     render(flat);
@@ -80,6 +82,7 @@ const load = async () => {
 
 onMounted(load);
 watch(() => props.days, load);
+watch(locale, load);
 onUnmounted(() => chart?.destroy());
 
 defineExpose({refresh: load});

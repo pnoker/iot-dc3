@@ -19,8 +19,10 @@
   <div class="container">
     <div class="header">
       <el-col :span="4" class="header_item header_brand">
-        <img :src="assetUrl('images/logo/logo.svg')" class="header_logo"/>
-        <span class="header_title">IoT DC3</span>
+        <div class="header_brand_glass">
+          <img :src="assetUrl('images/logo/logo.svg')" class="header_logo"/>
+          <span class="header_title">IoT DC3</span>
+        </div>
       </el-col>
       <el-col :span="16" class="header_item">
         <el-menu :default-active="handleMenuEnter($route.path)" :router="true" class="header_menu" mode="horizontal">
@@ -64,7 +66,7 @@
             <el-avatar>
               <img :src="assetUrl('images/common/avatar.png')"/>
             </el-avatar>
-            <span class="user_name">{{ t('layout.admin') }}</span>
+            <span class="user_name">{{ currentLogin }}</span>
           </span>
           <template #dropdown>
             <el-dropdown-menu>
@@ -135,6 +137,7 @@ const route = useRoute();
 const authStore = useAuthStore();
 const menuStore = useMenuStore();
 const agenticStore = useAgenticStore();
+const currentLogin = computed(() => String(authStore.getName || authStore.name || 'dc3'));
 
 // The AI assistant is shown in every build; in mock builds the fetch
 // interceptor (src/mock/fetch.ts) answers its chat completions.
@@ -423,18 +426,75 @@ const handleCommand = async (command: string) => {
     .header_brand {
       display: flex;
       align-items: center;
+      padding-left: 10px;
+    }
+
+    .header_brand_glass {
+      position: relative;
+      isolation: isolate;
+      display: inline-flex;
+      align-items: center;
+      box-sizing: border-box;
+      width: fit-content;
+      height: 40px;
+      padding: 5px 13px 5px 6px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 216, 246, 0.34);
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.82), transparent 38%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.54), rgba(115, 205, 241, 0.13) 52%, rgba(75, 88, 210, 0.08));
+      box-shadow:
+        0 10px 28px rgba(12, 89, 153, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.86),
+        inset 0 -8px 18px rgba(55, 131, 203, 0.05);
+      backdrop-filter: blur(18px) saturate(1.45);
+      -webkit-backdrop-filter: blur(18px) saturate(1.45);
+      transition: transform 260ms ease, border-color 260ms ease, box-shadow 260ms ease;
+
+      &::after {
+        position: absolute;
+        z-index: -1;
+        top: 1px;
+        right: 12px;
+        left: 12px;
+        height: 42%;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.48), transparent);
+        opacity: 0.72;
+        pointer-events: none;
+        content: '';
+      }
+
+      &:hover {
+        border-color: rgba(61, 172, 224, 0.46);
+        box-shadow:
+          0 14px 34px rgba(12, 89, 153, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.92),
+          inset 0 -8px 18px rgba(55, 131, 203, 0.07);
+        transform: translateY(-1px);
+      }
     }
 
     .header_logo {
-      height: 40px;
-      margin-left: 10px;
+      flex: 0 0 auto;
+      width: 30px;
+      height: 30px;
+      filter: drop-shadow(0 4px 7px rgba(13, 82, 157, 0.2));
     }
 
     .header_title {
-      margin-left: 10px;
+      margin-left: 8px;
+      background: linear-gradient(112deg, #07549a, #149ed7 46%, #4f52bf);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
       font-size: 20px;
-      font-weight: 600;
-      color: var(--el-color-primary);
+      font-weight: 740;
+      letter-spacing: -0.01em;
+      line-height: 1;
+      white-space: nowrap;
+      -webkit-text-fill-color: transparent;
     }
 
     .header_menu {
