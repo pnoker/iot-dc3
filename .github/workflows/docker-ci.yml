@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - v*
+  # Manual runs validate the complete build without publishing mutable tags.
+  # To republish a release, run the workflow against its existing v* tag.
   workflow_dispatch:
 
 permissions:
@@ -19,30 +21,63 @@ env:
   DOCKER_REGISTRY_ALIYUN: registry.cn-beijing.aliyuncs.com/dc3
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      publish: ${{ steps.variables.outputs.publish }}
+      service_version: ${{ steps.variables.outputs.service_version }}
+      service_series: ${{ steps.variables.outputs.service_series }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
+      - name: Validate release identity
+        id: variables
+        run: |
+          set -euo pipefail
+
+          VERSION=$(awk -F'[<>]' '/<parent>/,/<\/parent>/{if($2=="version") print $3}' pom.xml | head -1)
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid project version in pom.xml: $VERSION" >&2
+            exit 1
+          fi
+
+          SERIES="${VERSION%.*}"
+          PUBLISH=false
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            EXPECTED_TAG="v$VERSION"
+            if [[ "$GITHUB_REF_NAME" != "$EXPECTED_TAG" ]]; then
+              echo "Release tag '$GITHUB_REF_NAME' does not match pom.xml version '$EXPECTED_TAG'." >&2
+              exit 1
+            fi
+            PUBLISH=true
+          fi
+
+          echo "publish=$PUBLISH" >> "$GITHUB_OUTPUT"
+          echo "service_version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "service_series=$SERIES" >> "$GITHUB_OUTPUT"
+
+  verify-backend:
+    uses: ./.github/workflows/test.yml
+
+  verify-web:
+    uses: ./.github/workflows/ci-web.yml
+
   build-backend:
+    needs:
+      - validate
+      - verify-backend
+      - verify-web
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    environment: release
     permissions:
       contents: read
       actions: write   # for GitHub Actions cache (--cache-to type=gha)
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-
-      - name: Extract variables
-        id: variables
-        run: |
-          set -euo pipefail
-          # Read project.version from pom.xml without invoking Maven (the
-          # whole build runs inside Docker now; the runner does not need
-          # a JDK at all). iot-dc3's <version> is inherited from <parent>.
-          VERSION=$(awk -F'[<>]' '/<parent>/,/<\/parent>/{if($2=="version") print $3}' pom.xml | head -1)
-          SERIES="$VERSION"
-          if [[ "$VERSION" == *.*.* ]]; then
-            SERIES="${VERSION%.*}"
-          fi
-          echo "service_version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "service_series=$SERIES" >> "$GITHUB_OUTPUT"
 
       - name: Set QEMU
         uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8
@@ -51,22 +86,25 @@ jobs:
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
 
       - name: Login Docker Default Registry
+        if: needs.validate.outputs.publish == 'true'
         uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login Docker Aliyun Registry
+        if: needs.validate.outputs.publish == 'true'
         uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0
         with:
           registry: registry.cn-beijing.aliyuncs.com
           username: ${{ vars.ALIYUN_DOCKERHUB_USERNAME }}
           password: ${{ secrets.ALIYUN_DOCKERHUB_TOKEN }}
 
-      - name: Build and push all images
+      - name: Build backend images
         env:
-          SERVICE_VERSION: ${{ steps.variables.outputs.service_version }}
-          SERVICE_SERIES: ${{ steps.variables.outputs.service_series }}
+          PUBLISH: ${{ needs.validate.outputs.publish }}
+          SERVICE_VERSION: ${{ needs.validate.outputs.service_version }}
+          SERVICE_SERIES: ${{ needs.validate.outputs.service_series }}
         run: |
           set -euo pipefail
 
@@ -108,7 +146,21 @@ jobs:
           )
 
           for name in "${services[@]}"; do
-            echo "Building and pushing: $name"
+            output_args=(--output=type=cacheonly)
+            tag_args=()
+            if [[ "$PUBLISH" == "true" ]]; then
+              output_args=(--push)
+              tag_args=(
+                --tag "$DOCKER_REGISTRY_DEFAULT/$name:latest"
+                --tag "$DOCKER_REGISTRY_DEFAULT/$name:$SERVICE_SERIES"
+                --tag "$DOCKER_REGISTRY_DEFAULT/$name:$SERVICE_VERSION"
+                --tag "$DOCKER_REGISTRY_ALIYUN/$name:latest"
+                --tag "$DOCKER_REGISTRY_ALIYUN/$name:$SERVICE_SERIES"
+                --tag "$DOCKER_REGISTRY_ALIYUN/$name:$SERVICE_VERSION"
+              )
+            fi
+
+            echo "Building $name (publish=$PUBLISH)"
             # Single root-level Dockerfile defines a target stage per service.
             # The shared `builder` stage (mvn package) runs ONCE for the
             # whole reactor; BuildKit reuses it across every target image.
@@ -121,18 +173,22 @@ jobs:
               --build-arg PROFILE="$PROFILE" \
               --cache-from type=gha,scope=dc3-builder \
               --cache-to type=gha,scope=dc3-builder,mode=max \
-              --push \
-              --tag "$DOCKER_REGISTRY_DEFAULT/$name:latest" \
-              --tag "$DOCKER_REGISTRY_DEFAULT/$name:$SERVICE_SERIES" \
-              --tag "$DOCKER_REGISTRY_DEFAULT/$name:$SERVICE_VERSION" \
-              --tag "$DOCKER_REGISTRY_ALIYUN/$name:latest" \
-              --tag "$DOCKER_REGISTRY_ALIYUN/$name:$SERVICE_SERIES" \
-              --tag "$DOCKER_REGISTRY_ALIYUN/$name:$SERVICE_VERSION" \
+              "${output_args[@]}" \
+              "${tag_args[@]}" \
               .
           done
 
   build-web:
+    needs:
+      - validate
+      - verify-backend
+      - verify-web
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: release
+    permissions:
+      contents: read
+      actions: write
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
@@ -144,12 +200,14 @@ jobs:
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
 
       - name: Login DockerHub
+        if: needs.validate.outputs.publish == 'true'
         uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login Aliyun Registry
+        if: needs.validate.outputs.publish == 'true'
         uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0
         with:
           registry: registry.cn-beijing.aliyuncs.com
@@ -167,12 +225,12 @@ jobs:
             type=match,pattern=v(.*),group=1
             type=raw,value=latest
 
-      - name: Build and Push
+      - name: Build web image
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
         with:
           context: .
           file: dc3-web/Dockerfile
-          push: true
+          push: ${{ needs.validate.outputs.publish == 'true' }}
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -184,8 +242,10 @@ jobs:
     needs:
       - build-backend
       - build-web
+      - validate
     if: startsWith(github.ref, 'refs/tags/v')
     timeout-minutes: 20
+    environment: release
     permissions:
       contents: write
     steps:
@@ -194,17 +254,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract variables
-        id: variables
-        run: |
-          set -euo pipefail
-          VERSION=$(awk -F'[<>]' '/<parent>/,/<\/parent>/{if($2=="version") print $3}' pom.xml | head -1)
-          echo "service_version=$VERSION" >> "$GITHUB_OUTPUT"
-
       - name: Generate release notes
         id: release_notes
         env:
-          SERVICE_VERSION: ${{ steps.variables.outputs.service_version }}
+          SERVICE_VERSION: ${{ needs.validate.outputs.service_version }}
           SERVICE_WORKSPACE: ${{ github.workspace }}
         run: |
           set -euo pipefail
@@ -223,7 +276,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228
         with:
-          name: ${{ steps.variables.outputs.service_version }}
+          name: ${{ needs.validate.outputs.service_version }}
           body: ${{ steps.release_notes.outputs.release_notes }}
           tag_name: ${{ github.ref_name }}
           draft: false

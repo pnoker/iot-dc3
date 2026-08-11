@@ -1,6 +1,13 @@
 name: Web CI
 
 on:
+  workflow_call:
+    inputs:
+      e2e_base_url:
+        description: 'Optional running web environment URL for Playwright e2e'
+        required: false
+        type: string
+        default: ''
   pull_request:
     paths:
       - dc3-web/**
@@ -27,6 +34,7 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: dc3-web
@@ -67,6 +75,7 @@ jobs:
   e2e:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.e2e_base_url != '' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: dc3-web

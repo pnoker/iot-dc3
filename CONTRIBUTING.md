@@ -100,15 +100,18 @@ By default this reads the current version from `pom.xml`, compares `HEAD` with t
 make changelog FROM=v2025.9.3 TO=HEAD VERSION=2026.5.22
 ```
 
-To cut a release, switch to `main` and create the next semver tag (this also opens a GitHub Release):
+The root `pom.xml` version is the release identity. Update and commit that version and the generated changelog first,
+then switch to a clean, up-to-date `main` and create the matching tag:
 
 ```bash
-make tag            # patch: v2025.9.3 -> v2025.9.4
-make tag minor      # minor: v2025.9.4 -> v2025.10.0
-make tag major      # major: v2025.10.0 -> v2026.0.0
+make tag            # pom.xml 2026.5.22 -> tag v2026.5.22
 ```
 
-`bash dc3/bin/tag.sh --dry-run` previews the next tag without pushing. Tagging only runs on `main`.
+`bash dc3/bin/tag.sh --dry-run` previews the exact tag without pushing. The script refuses dirty, non-`main`,
+out-of-date, duplicate, or malformed-version releases. It only pushes the annotated tag; the `Docker Images` workflow
+then reruns backend and web verification, checks that the tag matches `pom.xml`, publishes images, and creates the
+GitHub Release. Configure the `release` environment with required reviewers, protected `v*` tags, and the registry
+credentials. A manual workflow run performs a non-publishing build unless it targets an existing matching `v*` tag.
 
 Generated changelog-only release commits are skipped by default so rerunning the command after committing
 `CHANGE.md` remains stable. Set `INCLUDE_CHANGELOG_COMMITS=true` only when those commits should appear in release notes.

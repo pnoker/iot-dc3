@@ -252,12 +252,11 @@ deploy: package
 	&& $(MVN_SUB) clean deploy -P deploy
 
 tag:
-	@dc3/bin/tag.sh $(filter-out $@,$(MAKECMDGOALS))
+	@dc3/bin/tag.sh
 
-# Catch-all for tag's extra words (e.g. `make tag minor` passes "minor" as a goal).
-# Reject genuine typos like `make pakcage` instead of silently succeeding.
+# Reject unknown targets instead of silently succeeding.
 %:
-	@$(if $(MAKECMDGOALS),$(if $(filter tag,$(MAKECMDGOALS)),,echo "Unknown target '$@'. Run 'make help' for available targets." && exit 1))
+	@echo "Unknown target '$@'. Run 'make help' for available targets." && exit 1
 
 changelog:
 	@FROM="$(FROM)" TO="$(TO)" VERSION="$(VERSION)" CHANGE_FILE="$(CHANGE_FILE)" dc3/bin/changelog.py

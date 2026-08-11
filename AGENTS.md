@@ -346,6 +346,11 @@ docs(release): update generated changelog
 
 Commit that file separately from behaviour, configuration, or tooling changes.
 
+The root `pom.xml` version is the release identity. After committing the version and generated changelog on `main`, run
+`make tag`; the script creates only the matching annotated `v<project.version>` tag. It must not calculate a new version
+or create a GitHub Release directly. The `Docker Images` workflow owns release verification, image publishing, and
+GitHub Release creation. Keep its `release` environment protected with required reviewers and tag restrictions.
+
 ## Commit rules
 
 AI coding agents must not commit without explicit confirmation for that specific commit.
