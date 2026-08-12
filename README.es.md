@@ -247,4 +247,4 @@ Para detalles de licenciamiento comercial, consulte [LICENSE.txt](./LICENSE.txt)
 
 ## ⭐ Historial de estrellas
 
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.dera.page/#pnoker/iot-dc3&Date)
