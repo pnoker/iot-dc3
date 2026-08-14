@@ -227,4 +227,4 @@ IoT DC3는 [AGPL 3.0](./LICENSE-AGPL.txt) 라이선스 하에 오픈소스로 �
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.dera.page/#pnoker/iot-dc3&Date)
