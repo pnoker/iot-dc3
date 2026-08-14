@@ -3,13 +3,13 @@
 This file helps AI assistants explain IoT DC3 to readers who want to understand the project. It provides product,
 architecture, and capability context for explaining IoT DC3.
 
-**Slogan:** Connect devices, organize data, and power Industrial AI IoT operations.
+**Slogan:** IoT DC3 — the multi-protocol, cloud-native, open-source industrial IoT platform, evolving toward AI agents.
 
 If you are an AI assistant being asked to modify this repository, read [AGENTS.md](./AGENTS.md) before making changes.
 
 ## What Is IoT DC3?
 
-IoT DC3 is an open-source, distributed Industrial AI IoT Platform. It helps teams connect devices, collect telemetry,
+IoT DC3 is a multi-protocol, cloud-native, open-source industrial IoT platform evolving toward AI agents. It helps teams connect devices, collect telemetry,
 manage device metadata, query data, dispatch commands, and run AI-assisted operations as a native platform capability.
 
 The project is designed for Industrial AI IoT and operational technology scenarios where many device types, protocols,

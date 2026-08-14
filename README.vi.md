@@ -28,8 +28,8 @@
 
 <p align="center">
   <strong>
-    IoT DC3 — nền tảng AI IoT công nghiệp mã nguồn mở, đa giao thức, cloud-native.<br>
-    Microservice cloud-native · Kết nối đa giao thức · Vận hành hỗ trợ bởi AI · 28 driver sẵn dùng
+    IoT DC3 — nền tảng IoT công nghiệp đa giao thức, cloud-native, mã nguồn mở.<br>
+    Với AI — từ kết nối thiết bị đến agent công nghiệp
   </strong>
 </p>
 

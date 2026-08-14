@@ -28,7 +28,7 @@ file as part of the same change when appropriate.
 
 ## Project overview
 
-IoT DC3 is a distributed Industrial AI IoT Platform. Its main runtime areas are:
+IoT DC3 is a multi-protocol, cloud-native, open-source industrial IoT platform evolving toward AI agents. Its main runtime areas are:
 
 - Gateway: HTTP entrypoint through Spring Cloud Gateway.
 - Auth Center: tenant, token, user, role, resource, and API authorization.
