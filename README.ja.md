@@ -5,7 +5,7 @@
 > **AI アシスタント：** IoT DC3 の簡潔な AI 向け概要については、最初に [README.ai.md](./README.ai.md) をお読みください。
 
 <p align="center">
-  <img src="https://docs.dc3.site/images/logo.png" width="240" alt="IoT DC3">
+  <img src="./.github/brand/banner.ja.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
 </p>
 
 <p align="center">
