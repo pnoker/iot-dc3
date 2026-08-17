@@ -16,7 +16,6 @@
  */
 
 import {expect, type Locator, type Page} from '@playwright/test';
-import JSONBigInt from 'json-bigint';
 import type {RouteIds} from './routes';
 
 export interface PageHealth {
@@ -60,7 +59,6 @@ export interface E2eDataContext {
   cleanup: () => Promise<void>;
 }
 
-const JSONBigIntStr = JSONBigInt({storeAsString: true});
 const E2E_CREDENTIALS = {
   tenant: process.env.E2E_TENANT || 'default',
   name: process.env.E2E_USERNAME || 'dc3',
@@ -194,7 +192,7 @@ export async function apiPost<T = unknown>(
 
   let data: unknown;
   try {
-    data = JSONBigIntStr.parse(response.text);
+    data = JSON.parse(response.text);
   } catch {
     data = response.text;
   }
@@ -244,7 +242,7 @@ export async function apiGet<T = unknown>(
 
   let data: unknown;
   try {
-    data = JSONBigIntStr.parse(response.text);
+    data = JSON.parse(response.text);
   } catch {
     data = response.text;
   }

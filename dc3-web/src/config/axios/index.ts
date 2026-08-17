@@ -25,40 +25,16 @@ import {failMessage, warnMessage} from '@/utils/notificationUtil';
 import {getStorage, removeStorage} from '@/utils/storageUtil';
 import {isNull} from '@/utils/validationUtil';
 import router from '@/config/router';
-import JSONBigInt from 'json-bigint';
-
-/**
- * JSONBigInt parser instance with storeAsString option
- */
-const JSONBigIntStr = JSONBigInt({storeAsString: true});
-
-/**
- * Transform response data using JSONBigInt to handle large integers
- *
- * @param data Raw response data
- * @returns Parsed data
- */
-function transformResponse(data: any): any {
-  if (typeof data !== 'string' || data === '') {
-    return data;
-  }
-  try {
-    return JSONBigIntStr.parse(data);
-  } catch {
-    return data;
-  }
-}
 
 /**
  * Custom Axios instance with default configuration
- * Handles large integers via JSONBigInt and includes authentication headers
+ * Includes authentication headers
  */
 const request: AxiosInstance = axios.create({
   timeout: AXIOS_CONFIG.TIMEOUT,
   withCredentials: true,
   headers: {Accept: AXIOS_CONFIG.HEADERS.ACCEPT, 'Content-Type': AXIOS_CONFIG.HEADERS.CONTENT_TYPE},
   validateStatus: (status) => status >= AXIOS_CONFIG.MIN_STATUS && status <= AXIOS_CONFIG.MAX_STATUS,
-  transformResponse: [transformResponse],
 });
 
 /**

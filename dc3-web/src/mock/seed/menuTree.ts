@@ -34,8 +34,8 @@ interface NodeOpts {
  * static demo matches what the backend serves; resolveMenuTitle prefers content.titles.
  */
 const mk = (menuCode: string, opts: NodeOpts = {}): MenuNode => ({
-  id: ++seq,
-  parentMenuId: 0,
+  id: String(++seq),
+  parentMenuId: '0',
   menuName: opts.menuName ?? menuCode,
   menuCode,
   menuIndex: opts.menuIndex,

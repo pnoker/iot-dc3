@@ -720,7 +720,7 @@ export default defineComponent({
       listDriverInfoByDeviceId(reactiveData.id)
         .then((res) => {
           const formData: AttributeFormData = reactiveData.driverFormData;
-          res.data.forEach((info: { attributeId: string | number; id: any; configValue: any }) => {
+          res.data.forEach((info: { attributeId: string; id: any; configValue: any }) => {
             const attributeCode = reactiveData.driverAttributeTable[info.attributeId];
             const attribute = reactiveData.driverAttributes.find((item) => item.attributeCode === attributeCode);
             if (attribute) {
@@ -778,7 +778,7 @@ export default defineComponent({
           return listPointInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
               (infoRes.data || []).forEach(
-                (info: { pointId: string; attributeId: string | number; id: string; configValue: unknown }) => {
+                (info: { pointId: string; attributeId: string; id: string; configValue: unknown }) => {
                   const attributeCode = reactiveData.pointAttributeTable[info.attributeId];
                   const attribute = reactiveData.pointAttributes.find((item) => item.attributeCode === attributeCode);
                   const row = rowTable[info.pointId];
@@ -842,7 +842,7 @@ export default defineComponent({
           return listCommandInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
               (infoRes.data || []).forEach(
-                (info: { commandId: string; attributeId: string | number; id: string; configValue: unknown }) => {
+                (info: { commandId: string; attributeId: string; id: string; configValue: unknown }) => {
                   const attributeCode = reactiveData.commandAttributeTable[info.attributeId];
                   const attribute = reactiveData.commandAttributes.find((item) => item.attributeCode === attributeCode);
                   const row = rowTable[String(info.commandId)];
@@ -903,7 +903,7 @@ export default defineComponent({
           return listEventInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
               (infoRes.data || []).forEach(
-                (info: { eventId: string; attributeId: string | number; id: string; configValue: unknown }) => {
+                (info: { eventId: string; attributeId: string; id: string; configValue: unknown }) => {
                   const attributeCode = reactiveData.eventAttributeTable[info.attributeId];
                   const attribute = reactiveData.eventAttributes.find((item) => item.attributeCode === attributeCode);
                   const row = rowTable[String(info.eventId)];

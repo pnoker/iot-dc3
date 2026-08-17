@@ -20,8 +20,8 @@ import {defineStore} from 'pinia';
 import {listMenuTree} from '@/api/menu';
 
 export interface MenuNode {
-  id: number | string;
-  parentMenuId: number | string;
+  id: string;
+  parentMenuId: string;
   menuName: string;
   menuCode: string;
   menuTypeFlag?: string;
@@ -86,7 +86,7 @@ export const useMenuStore = defineStore('menu', {
      */
     findById:
       (state) =>
-        (id: number | string): MenuNode | undefined => {
+        (id: string): MenuNode | undefined => {
           const key = String(id);
           const walk = (nodes: MenuNode[]): MenuNode | undefined => {
             for (const n of nodes) {

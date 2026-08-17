@@ -71,7 +71,7 @@ export const useAgenticStore = defineStore('agentic', () => {
   const currentAbortController = ref<AbortController>();
   const messagesByConversation = ref<Record<string, AgenticMessage[]>>(readCachedMessages());
   const attachmentsByConversation = ref<Record<string, AgenticAttachment[]>>({});
-  const pendingAttachmentIdsByConversation = ref<Record<string, number[]>>({});
+  const pendingAttachmentIdsByConversation = ref<Record<string, string[]>>({});
   const pendingActionsByConversation = ref<Record<string, AgenticAction[]>>({});
   const traceEventsByConversation = ref<Record<string, AgenticTraceEvent[]>>({});
 
@@ -206,7 +206,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     persistMessages();
   };
 
-  const selectSession = async (conversationId?: string | number) => {
+  const selectSession = async (conversationId?: string) => {
     if (!conversationId) {
       return;
     }
@@ -405,7 +405,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     ];
   };
 
-  const removeLocalAttachment = (attachmentId: number) => {
+  const removeLocalAttachment = (attachmentId: string) => {
     const conversationId = activeConversationId.value;
     pendingAttachmentIdsByConversation.value[conversationId] = (
       pendingAttachmentIdsByConversation.value[conversationId] || []
@@ -472,7 +472,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     }
   };
 
-  const setSelectedModel = async (model: string | number) => {
+  const setSelectedModel = async (model: string) => {
     const nextModel = resolveModelName(String(model || ''));
     selectedModel.value = nextModel;
     applyModelCapabilities();

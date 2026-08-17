@@ -191,10 +191,10 @@ import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
 interface Row {
-  id: number | string;
+  id: string;
   source: 'point' | 'device' | 'driver';
-  sourceId: number | string;
-  pointId: number | string;
+  sourceId: string;
+  pointId: string;
   eventTypeFlag: number;
   alarmLevelFlag?: number;
   confirmFlag: string;

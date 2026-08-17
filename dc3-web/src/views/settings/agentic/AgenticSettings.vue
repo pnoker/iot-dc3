@@ -118,7 +118,7 @@ const providers = ref<AgenticProvider[]>([]);
 
 interface ModelConfigQuery {
   model?: string;
-  providerId?: string | number;
+  providerId?: string;
   enableFlag?: string;
 }
 

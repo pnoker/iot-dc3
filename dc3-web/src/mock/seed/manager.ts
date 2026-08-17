@@ -36,7 +36,7 @@ const KEEP = {content: {keep: ''}};
 export const groups: GroupRecord[] = [
   {
     id: '1',
-    parentGroupId: 0,
+    parentGroupId: '0',
     groupTypeFlag: 'DRIVER',
     groupName: '驱动分组',
     groupCode: 'DRIVER-GROUP',
@@ -49,7 +49,7 @@ export const groups: GroupRecord[] = [
   },
   {
     id: '2',
-    parentGroupId: 1,
+    parentGroupId: '1',
     groupTypeFlag: 'DRIVER',
     groupName: 'Modbus 驱动组',
     groupCode: 'DRIVER-MODBUS',
@@ -62,7 +62,7 @@ export const groups: GroupRecord[] = [
   },
   {
     id: '3',
-    parentGroupId: 0,
+    parentGroupId: '0',
     groupTypeFlag: 'DEVICE',
     groupName: '设备分组',
     groupCode: 'DEVICE-GROUP',
@@ -75,7 +75,7 @@ export const groups: GroupRecord[] = [
   },
   {
     id: '4',
-    parentGroupId: 3,
+    parentGroupId: '3',
     groupTypeFlag: 'DEVICE',
     groupName: '温湿度设备组',
     groupCode: 'DEVICE-TH',
@@ -88,7 +88,7 @@ export const groups: GroupRecord[] = [
   },
   {
     id: '5',
-    parentGroupId: 3,
+    parentGroupId: '3',
     groupTypeFlag: 'DEVICE',
     groupName: '电力设备组',
     groupCode: 'DEVICE-POWER',
@@ -238,7 +238,7 @@ export const apis: ApiRecord[] = [
 export const resources: ResourceRecord[] = [
   {
     id: '5001',
-    parentResourceId: 0,
+    parentResourceId: '0',
     resourceName: '根资源',
     resourceCode: 'ROOT',
     serviceName: 'dc3-manager',
@@ -253,7 +253,7 @@ export const resources: ResourceRecord[] = [
   },
   {
     id: '5002',
-    parentResourceId: 5001,
+    parentResourceId: '5001',
     resourceName: '驱动新增',
     resourceCode: 'driver_add',
     serviceName: 'dc3-manager',
@@ -268,7 +268,7 @@ export const resources: ResourceRecord[] = [
   },
   {
     id: '5003',
-    parentResourceId: 5001,
+    parentResourceId: '5001',
     resourceName: '设备查询',
     resourceCode: 'device_list',
     serviceName: 'dc3-manager',
@@ -283,7 +283,7 @@ export const resources: ResourceRecord[] = [
   },
   {
     id: '5004',
-    parentResourceId: 5001,
+    parentResourceId: '5001',
     resourceName: '位号更新',
     resourceCode: 'point_update',
     serviceName: 'dc3-data',
@@ -298,7 +298,7 @@ export const resources: ResourceRecord[] = [
   },
   {
     id: '5005',
-    parentResourceId: 5001,
+    parentResourceId: '5001',
     resourceName: '模板删除',
     resourceCode: 'profile_delete',
     serviceName: 'dc3-manager',

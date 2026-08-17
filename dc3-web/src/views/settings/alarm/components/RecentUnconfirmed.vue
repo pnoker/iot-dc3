@@ -60,9 +60,9 @@ import {useEntityNames} from '@/composables/useEntityNames';
 import type {AlertSource} from '@/config/types/dashboard';
 
 interface Row {
-  id: number | string;
+  id: string;
   source: AlertSource;
-  sourceId: number | string;
+  sourceId: string;
   createTime: string;
   message?: string;
 }

@@ -69,10 +69,10 @@ import {useEntityNames} from '@/composables/useEntityNames';
 import type {AlertSource} from '@/config/types/dashboard';
 
 interface AlertRow {
-  id: number | string;
+  id: string;
   source: AlertSource;
-  sourceId: number | string;
-  pointId: number | string;
+  sourceId: string;
+  pointId: string;
   eventTypeFlag: number;
   confirmFlag: string;
   createTime: string;

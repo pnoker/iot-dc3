@@ -172,7 +172,7 @@ export interface EventInfoForm {
 
 export interface GroupForm {
   id?: string;
-  parentGroupId?: number | string | null;
+  parentGroupId?: string | null;
   groupTypeFlag?: string;
   groupName?: string;
   groupCode?: string;

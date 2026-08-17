@@ -43,7 +43,7 @@ export interface UserRecord extends UserForm {
 
 export interface RoleForm {
   id?: string;
-  parentRoleId?: number | string;
+  parentRoleId?: string;
   roleName?: string;
   roleCode?: string;
   enableFlag?: string;
@@ -63,7 +63,7 @@ export interface RoleRecord extends RoleForm {
 
 export interface MenuForm {
   id?: string;
-  parentMenuId?: number | string;
+  parentMenuId?: string;
   menuName?: string;
   menuCode?: string;
   menuTypeFlag?: string;
@@ -93,13 +93,13 @@ export interface MenuRecord extends MenuForm {
 
 export interface ResourceForm {
   id?: string;
-  parentResourceId?: number | string;
+  parentResourceId?: string;
   resourceName?: string;
   resourceCode?: string;
   serviceName?: string;
   resourceTypeFlag?: string;
   resourceScopeFlag?: string;
-  entityId?: string | number;
+  entityId?: string;
   resourceExt?: Record<string, unknown>;
   enableFlag?: string;
   remark?: string;

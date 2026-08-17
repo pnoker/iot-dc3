@@ -112,24 +112,24 @@ export interface TopologyResponse {
 
 export interface FlappingSource {
   source: AlertSource;
-  sourceId: number | string;
+  sourceId: string;
   eventTypeFlag: number;
   count: number;
 }
 
 export interface CorrelationPair {
   aSource: AlertSource;
-  aSourceId: number | string;
+  aSourceId: string;
   aEventType: number;
   bSource: AlertSource;
-  bSourceId: number | string;
+  bSourceId: string;
   bEventType: number;
   coCount: number;
 }
 
 export interface PeerDeviation {
-  profileId: number | string;
-  deviceId: number | string;
+  profileId: string;
+  deviceId: string;
   alarmCount: number;
   peerMedian: number;
   ratio: number;
@@ -159,20 +159,20 @@ export interface ProtocolHealth {
 
 export interface ChangeImpact {
   kind: ChangeKind;
-  entityId: number | string;
+  entityId: string;
   operateTime: string;
 }
 
 export interface SilentSource {
-  deviceId: number | string;
-  pointId: number | string;
+  deviceId: string;
+  pointId: string;
   lastSeen: string;
   silentSeconds: number;
 }
 
 export interface CoverageGapItem {
-  pointId: number | string;
-  profileId: number | string;
+  pointId: string;
+  profileId: string;
 }
 
 export interface CoverageGap {

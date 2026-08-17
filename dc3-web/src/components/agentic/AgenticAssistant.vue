@@ -801,7 +801,7 @@ const handlePromptClick = (item: AssistantPromptItem) => {
   draft.value = `${item.label || ''}${description}`.trim();
 };
 
-const handleModelChange = (model: string | number) => {
+const handleModelChange = (model: string) => {
   void agenticStore.setSelectedModel(model);
 };
 

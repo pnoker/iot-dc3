@@ -86,7 +86,7 @@ const nameField: Record<EntityKind, string> = {
   point: 'pointName',
 };
 
-async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): Promise<void> {
+async function fetchMissing(kind: EntityKind, rawIds: Array<string>): Promise<void> {
   if (!rawIds || rawIds.length === 0) return;
   const locale = String(i18n.global.locale.value);
   const cacheKey = (id: string) => `${locale}:${id}`;
@@ -150,33 +150,33 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): P
 export type AlertSourceKind = 'point' | 'device' | 'driver';
 
 export const useEntityNames = () => {
-  const cachedName = (kind: EntityKind, id: string | number): string =>
+  const cachedName = (kind: EntityKind, id: string): string =>
     cache[kind][`${String(i18n.global.locale.value)}:${String(id)}`] ?? String(id);
 
-  const resolveDevices = (ids: Array<string | number>) => fetchMissing('device', ids);
-  const resolveDrivers = (ids: Array<string | number>) => fetchMissing('driver', ids);
-  const resolveProfiles = (ids: Array<string | number>) => fetchMissing('profile', ids);
-  const resolvePoints = (ids: Array<string | number>) => fetchMissing('point', ids);
+  const resolveDevices = (ids: Array<string>) => fetchMissing('device', ids);
+  const resolveDrivers = (ids: Array<string>) => fetchMissing('driver', ids);
+  const resolveProfiles = (ids: Array<string>) => fetchMissing('profile', ids);
+  const resolvePoints = (ids: Array<string>) => fetchMissing('point', ids);
 
-  const deviceName = (id: string | number | undefined | null): string =>
+  const deviceName = (id: string | undefined | null): string =>
     id == null ? '' : cachedName('device', id);
-  const driverName = (id: string | number | undefined | null): string =>
+  const driverName = (id: string | undefined | null): string =>
     id == null ? '' : cachedName('driver', id);
-  const profileName = (id: string | number | undefined | null): string =>
+  const profileName = (id: string | undefined | null): string =>
     id == null ? '' : cachedName('profile', id);
-  const pointName = (id: string | number | undefined | null): string =>
+  const pointName = (id: string | undefined | null): string =>
     id == null ? '' : cachedName('point', id);
 
   /** Resolve a mixed batch of (source, id) rows in one call. */
   const resolveBySource = async (
     rows: Array<{
       source: AlertSourceKind;
-      sourceId: string | number;
+      sourceId: string;
     }>
   ): Promise<void> => {
-    const ptIds: Array<string | number> = [];
-    const devIds: Array<string | number> = [];
-    const drvIds: Array<string | number> = [];
+    const ptIds: Array<string> = [];
+    const devIds: Array<string> = [];
+    const drvIds: Array<string> = [];
     for (const r of rows) {
       if (r.source === 'point') ptIds.push(r.sourceId);
       else if (r.source === 'device') devIds.push(r.sourceId);
@@ -185,7 +185,7 @@ export const useEntityNames = () => {
     await Promise.all([resolvePoints(ptIds), resolveDevices(devIds), resolveDrivers(drvIds)]);
   };
 
-  const nameBySource = (source: AlertSourceKind, id: string | number): string => {
+  const nameBySource = (source: AlertSourceKind, id: string): string => {
     if (source === 'point') return pointName(id);
     if (source === 'driver') return driverName(id);
     return deviceName(id);

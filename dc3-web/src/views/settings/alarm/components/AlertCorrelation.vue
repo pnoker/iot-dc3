@@ -87,7 +87,7 @@ watch(locale, load);
 onMounted(load);
 onUnmounted(() => graph?.destroy());
 
-const nodeId = (source: string, id: number | string) => `${source}:${id}`;
+const nodeId = (source: string, id: string) => `${source}:${id}`;
 
 const renderGraph = () => {
   const container = graphRef.value;
@@ -95,7 +95,7 @@ const renderGraph = () => {
   graph?.destroy();
 
   // Convert pairs → unique nodes + weighted edges.
-  const nodeMap = new Map<string, { id: string; data: { source: string; sid: number | string; name: string } }>();
+  const nodeMap = new Map<string, { id: string; data: { source: string; sid: string; name: string } }>();
   const edges: Array<{ source: string; target: string; data: { weight: number } }> = [];
   for (const p of pairs.value) {
     const aId = nodeId(p.aSource, p.aSourceId);

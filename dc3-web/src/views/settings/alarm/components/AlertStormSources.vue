@@ -61,7 +61,7 @@ import type {AlertSource} from '@/config/types/dashboard';
 
 interface StormRow {
   source: AlertSource;
-  sourceId: number | string;
+  sourceId: string;
   count: number;
 }
 

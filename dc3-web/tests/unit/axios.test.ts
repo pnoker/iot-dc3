@@ -52,7 +52,7 @@ describe('axios request instance', () => {
     notificationSpies.warnMessage.mockClear();
   });
 
-  it('injects auth headers and parses large integer JSON responses as strings', async () => {
+  it('injects auth headers and preserves string identifiers in JSON responses', async () => {
     setStorage(AUTH_HEADERS.TENANT, 'default');
     setStorage(AUTH_HEADERS.LOGIN, 'dc3');
 
@@ -62,7 +62,7 @@ describe('axios request instance', () => {
       // Token is NOT injected — it travels in an httpOnly cookie.
       expect(config.headers.get(AUTH_HEADERS.TOKEN)).toBeUndefined();
 
-      return responseOf(config, 200, '{"ok":true,"code":0,"message":"success","data":{"id":9007199254740993}}');
+      return responseOf(config, 200, '{"ok":true,"code":0,"message":"success","data":{"id":"9007199254740993"}}');
     });
 
     const response = await request({

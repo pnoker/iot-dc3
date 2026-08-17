@@ -70,9 +70,9 @@ import {streamLatest} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
 interface Row {
-  deviceId: number | string;
-  pointId: number | string;
-  driverId?: number | string;
+  deviceId: string;
+  pointId: string;
+  driverId?: string;
   // driverName / deviceName / pointName are populated server-side by
   // DashboardServiceImpl.latestStream via the metadata facades, so the
   // feed can render the full tuple without a separate lookup round-trip.

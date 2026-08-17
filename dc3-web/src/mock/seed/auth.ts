@@ -115,7 +115,7 @@ export const users: UserRecord[] = userDefs.map((u, i) => ({
 // nested under ROLE_OPERATOR / ROLE_ADMIN to exercise the role tree.
 
 interface RoleDef {
-  parentRoleId: number;
+  parentRoleId: string;
   roleName: string;
   roleCode: string;
   remark: string;
@@ -123,11 +123,11 @@ interface RoleDef {
 }
 
 const roleDefs: RoleDef[] = [
-  {parentRoleId: 0, roleName: '系统管理员', roleCode: 'ROLE_ADMIN', remark: '内置超级管理员，拥有全部权限'},
-  {parentRoleId: 0, roleName: '运维人员', roleCode: 'ROLE_OPERATOR', remark: '负责设备与驱动的日常运维'},
-  {parentRoleId: 0, roleName: '只读访客', roleCode: 'ROLE_VIEWER', remark: '仅可查看监控数据'},
-  {parentRoleId: 2, roleName: '运维组长', roleCode: 'ROLE_OPERATOR_LEAD', remark: '运维组长，可管理运维人员'},
-  {parentRoleId: 1, roleName: '审计员', roleCode: 'ROLE_AUDITOR', remark: '审计员，查看审计与日志', enabled: false},
+  {parentRoleId: '0', roleName: '系统管理员', roleCode: 'ROLE_ADMIN', remark: '内置超级管理员，拥有全部权限'},
+  {parentRoleId: '0', roleName: '运维人员', roleCode: 'ROLE_OPERATOR', remark: '负责设备与驱动的日常运维'},
+  {parentRoleId: '0', roleName: '只读访客', roleCode: 'ROLE_VIEWER', remark: '仅可查看监控数据'},
+  {parentRoleId: '2', roleName: '运维组长', roleCode: 'ROLE_OPERATOR_LEAD', remark: '运维组长，可管理运维人员'},
+  {parentRoleId: '1', roleName: '审计员', roleCode: 'ROLE_AUDITOR', remark: '审计员，查看审计与日志', enabled: false},
 ];
 
 export const roles: RoleRecord[] = roleDefs.map((r, i) => ({

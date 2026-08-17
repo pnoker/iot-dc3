@@ -132,7 +132,7 @@ const addThing = (form: unknown, done: () => void) => {
     });
 };
 
-const disableThing = (id: number | string, done: () => void) => {
+const disableThing = (id: string, done: () => void) => {
   updateProfile({id: String(id), enableFlag: 'DISABLE'})
     .then(() => {
       successMessage();
@@ -145,7 +145,7 @@ const disableThing = (id: number | string, done: () => void) => {
     });
 };
 
-const enableThing = (id: number | string, done: () => void) => {
+const enableThing = (id: string, done: () => void) => {
   updateProfile({id: String(id), enableFlag: 'ENABLE'})
     .then(() => {
       successMessage();
@@ -158,7 +158,7 @@ const enableThing = (id: number | string, done: () => void) => {
     });
 };
 
-const deleteThing = (id: number | string, done: () => void) => {
+const deleteThing = (id: string, done: () => void) => {
   deleteProfile(String(id))
     .then(() => {
       successMessage();

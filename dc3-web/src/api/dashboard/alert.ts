@@ -21,13 +21,13 @@ import type {AlertPageQuery, AlertSource} from '@/config/types/dashboard';
 
 export const alertPage = (body: AlertPageQuery = {}) => httpPost(`${API_DATA_BASE}/dashboard/alert/page`, body);
 
-export const alertConfirm = (source: AlertSource, id: string | number) =>
+export const alertConfirm = (source: AlertSource, id: string) =>
   httpPost(`${API_DATA_BASE}/dashboard/alert/confirm`, undefined, {params: {source, id}});
 
-export const alertUnconfirm = (source: AlertSource, id: string | number) =>
+export const alertUnconfirm = (source: AlertSource, id: string) =>
   httpPost(`${API_DATA_BASE}/dashboard/alert/unconfirm`, undefined, {params: {source, id}});
 
-export const alertBulkConfirm = (items: Array<{ source: AlertSource; id: string | number }>, confirm: boolean) =>
+export const alertBulkConfirm = (items: Array<{ source: AlertSource; id: string }>, confirm: boolean) =>
   httpPost(`${API_DATA_BASE}/dashboard/alert/bulk_confirm`, {items, confirm});
 
 export const alertTrend = (days = 30) => httpGet(`${API_DATA_BASE}/dashboard/alert/trend`, {params: {days}});

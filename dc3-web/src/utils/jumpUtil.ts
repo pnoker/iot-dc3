@@ -40,7 +40,7 @@ export type AlertSourceKind = 'point' | 'device' | 'driver';
  * kind. Router errors (e.g. aborted nav during transitions) are swallowed
  * so callers don't have to .catch() themselves.
  */
-export const jumpToEntity = (router: Router, kind: JumpKind, id: string | number): void => {
+export const jumpToEntity = (router: Router, kind: JumpKind, id: string): void => {
   const idStr = String(id);
   if (!idStr) return;
   switch (kind) {
@@ -66,7 +66,7 @@ export const jumpToEntity = (router: Router, kind: JumpKind, id: string | number
 /**
  * Jump to the per-source event list with the source id pre-filtered.
  */
-export const jumpToSourceEvents = (router: Router, source: AlertSourceKind, sourceId: string | number): void => {
+export const jumpToSourceEvents = (router: Router, source: AlertSourceKind, sourceId: string): void => {
   let name: string;
   if (source === 'point') name = 'settingsPointAlarm';
   else if (source === 'driver') name = 'settingsDriverAlarm';

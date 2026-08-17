@@ -111,7 +111,7 @@ export interface AgenticMessage {
 export interface AgenticMessageContent {
   text?: string;
   format?: string;
-  attachments?: number[];
+  attachments?: string[];
   tools?: string[];
   traces?: AgenticTraceEvent[];
   charts?: AgenticVisualizationSpec[];
@@ -165,7 +165,7 @@ export interface AgenticMessageTokens {
 }
 
 export interface AgenticAttachment {
-  id: number;
+  id: string;
   conversationId: string;
   fileName: string;
   contentType: string;
@@ -209,7 +209,7 @@ export interface AgenticChatCompletionRequest {
    * Leaving this empty is rejected by the backend with HTTP 400.
    */
   conversationId: string;
-  attachments?: number[];
+  attachments?: string[];
   reasoning?: boolean;
 }
 

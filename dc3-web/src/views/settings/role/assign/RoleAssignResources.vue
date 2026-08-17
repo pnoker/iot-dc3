@@ -101,7 +101,7 @@ import {listResourceByRoleId, listRoleResourceBind} from '@/api/roleResourceBind
 
 interface ResourceNode {
   id: string;
-  parentResourceId?: string | number;
+  parentResourceId?: string;
   resourceName: string;
   resourceCode: string;
   resourceTypeFlag: string;

@@ -54,6 +54,7 @@ iot-dc3/
 ├── dc3-coverage/         aggregate JaCoCo report and absolute coverage gate
 ├── dc3-e2e/              Testcontainers-backed end-to-end tests
 ├── dc3/                  compose files, environment files, scripts, and generated release notes
+├── docs/design/          design documents (e.g. `mq-abstraction.md` — proposed pluggable broker port)
 ├── Makefile              preferred backend/container command entrypoint
 └── .mvn/settings.xml     local Maven mirror configuration
 ```
@@ -213,7 +214,7 @@ Key rules:
 - `verbatimModuleSyntax` is enabled. Use `import type` for every type-only import; Vue components, functions, and icons
   remain normal value imports.
 - Use `<Entity>Form` for create/update payloads and `<Entity>Record` for read responses.
-- Represent Java 64-bit IDs as strings and preserve the existing JSONBigInt handling.
+- Represent Java 64-bit IDs as strings. The backend emits identifiers as JSON strings on the HTTP contract, so standard JSON parsing (no JSONBigInt) is sufficient.
 - API wrappers mirror backend cardinality: `getXxx` for one value, `listXxx` for collections/maps/pages, and
   `addXxx`/`updateXxx`/`deleteXxx` for mutations.
 - Reuse CRUD helpers from `src/api/common.ts` and API bases from `src/config/constant/api.ts`; keep API wrappers thin.
