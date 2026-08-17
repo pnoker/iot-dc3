@@ -1,0 +1,87 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+dc3:
+  driver:
+    tenant: default
+    name: Kafka Driver
+    code: KafkaDriver
+    type: DRIVER_SERVER
+    remark: @project.description@
+    schedule:
+      read:
+        enable: false
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    kafka:
+      topic: dc3-driver-kafka
+      group-id: dc3-driver-kafka-group
+    driver-attribute:
+      - attribute-name: Topic
+        attribute-code: topic
+        attribute-type-flag: STRING
+        default-value: dc3-driver-kafka
+        remark: Default Kafka topic for produce and consume
+    point-attribute:
+      - attribute-name: Topic
+        attribute-code: topic
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Override topic for this point (defaults to driver topic)
+      - attribute-name: Key
+        attribute-code: key
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Message key used for produce and cache lookup
+    command-attribute:
+      - attribute-name: Topic
+        attribute-code: topic
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Override topic for this command
+
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/kafka/buffer.db
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:dc3-kafka:9092}
+    consumer:
+      group-id: dc3-driver-kafka-group
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+logging:
+  file:
+    name: dc3/logs/driver/kafka/${spring.application.name}.log
