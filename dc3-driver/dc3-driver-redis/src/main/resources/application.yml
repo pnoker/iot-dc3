@@ -1,0 +1,86 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+dc3:
+  driver:
+    tenant: default
+    name: Redis Driver
+    code: RedisDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Key Prefix
+        attribute-code: keyPrefix
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Prefix prepended to every point key
+    point-attribute:
+      - attribute-name: Key
+        attribute-code: key
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Redis key (relative to the device key prefix)
+      - attribute-name: Data Type
+        attribute-code: dataType
+        attribute-type-flag: STRING
+        default-value: STRING
+        remark: Redis data type: STRING or HASH
+      - attribute-name: Field
+        attribute-code: field
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Hash field, required when dataType is HASH
+    command-attribute:
+      - attribute-name: Data Type
+        attribute-code: dataType
+        attribute-type-flag: STRING
+        default-value: STRING
+        remark: Redis data type: STRING or HASH
+
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/redis/buffer.db
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+  data:
+    redis:
+      host: ${REDIS_HOST:dc3-redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+      timeout: 3s
+
+logging:
+  file:
+    name: dc3/logs/driver/redis/${spring.application.name}.log
