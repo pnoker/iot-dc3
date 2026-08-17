@@ -1,0 +1,119 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+dc3:
+  driver:
+    tenant: default
+    name: DL/T 645 Driver
+    code: Dlt645Driver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Serial Port
+        attribute-code: port
+        attribute-type-flag: STRING
+        default-value: /dev/ttyUSB0
+        remark: Serial port device path
+      - attribute-name: Baud Rate
+        attribute-code: baudRate
+        attribute-type-flag: INT
+        default-value: 2400
+        remark: Baud rate (1200, 2400, 4800, 9600)
+      - attribute-name: Data Bits
+        attribute-code: dataBits
+        attribute-type-flag: INT
+        default-value: 8
+        remark: Data bits (7, 8)
+      - attribute-name: Stop Bits
+        attribute-code: stopBits
+        attribute-type-flag: INT
+        default-value: 1
+        remark: Stop bits (1, 2)
+      - attribute-name: Parity
+        attribute-code: parity
+        attribute-type-flag: INT
+        default-value: 2
+        remark: Parity (0=None, 1=Odd, 2=Even)
+      - attribute-name: Timeout
+        attribute-code: timeout
+        attribute-type-flag: INT
+        default-value: 1000
+        remark: Read timeout in milliseconds
+      - attribute-name: Meter Address
+        attribute-code: meterAddress
+        attribute-type-flag: STRING
+        default-value: '000000000000'
+        remark: 12-digit meter address in BCD
+      - attribute-name: Write Password
+        attribute-code: password
+        attribute-type-flag: STRING
+        default-value: '00000000'
+        remark: 8-character hexadecimal write password (4 bytes)
+      - attribute-name: Operator Code
+        attribute-code: operatorCode
+        attribute-type-flag: STRING
+        default-value: '00000000'
+        remark: 8-character hexadecimal operator code (4 bytes)
+    point-attribute:
+      - attribute-name: Data Identifier
+        attribute-code: di
+        attribute-type-flag: STRING
+        default-value: '00010000'
+        remark: 8-character hexadecimal data identifier DI0-DI3 (e.g. 00010000 = total active energy)
+      - attribute-name: Data Format
+        attribute-code: dataFormat
+        attribute-type-flag: STRING
+        default-value: HEX
+        remark: Data format: HEX, BCD, INT, FLOAT, ASCII
+    command-attribute:
+      - attribute-name: Data Identifier
+        attribute-code: di
+        attribute-type-flag: STRING
+        default-value: '00010000'
+        remark: 8-character hexadecimal data identifier DI0-DI3
+      - attribute-name: Data Format
+        attribute-code: dataFormat
+        attribute-type-flag: STRING
+        default-value: HEX
+        remark: Data format for encoding the value: HEX, BCD, INT, FLOAT, ASCII
+
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/dlt645/buffer.db
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/dlt645/${spring.application.name}.log
