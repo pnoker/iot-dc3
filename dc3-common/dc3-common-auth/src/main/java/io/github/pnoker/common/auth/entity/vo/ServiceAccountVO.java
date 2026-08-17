@@ -47,16 +47,16 @@ import java.time.LocalDateTime;
 public class ServiceAccountVO extends BaseVO {
 
     @Schema(description = "Identifier of the service account principal", example = "1024")
-    private Long principalId;
+    private String principalId;
 
     @Schema(description = "Identifier of the owning tenant", example = "1")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Human-readable name of the service account", example = "data-pipeline-bot")
     private String serviceAccountName;
 
     @Schema(description = "Identifier of the owning user principal", example = "2048")
-    private Long ownerPrincipalId;
+    private String ownerPrincipalId;
 
     @Schema(description = "Description of the service account's intended use", example = "Token used by the nightly ETL job")
     private String purpose;

@@ -81,7 +81,7 @@ public class CommandVO extends BaseVO {
     @Schema(description = "ID of the profile (device template) this command is defined in.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
-    private Long profileId;
+    private String profileId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;

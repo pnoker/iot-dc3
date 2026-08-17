@@ -51,19 +51,19 @@ public class CommandHistoryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Primary key")
-    private Long id;
+    private String id;
 
     @Schema(description = "Unique record ID for this command history entry.", example = "123456")
     private String recordId;
 
     @Schema(description = "Tenant ID")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "ID of the device the command was sent to.", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "ID of the command definition invoked.", example = "4096")
-    private Long commandId;
+    private String commandId;
 
     @Schema(description = "Command code. Stable business identifier for this command.", example = "READ_HOLDING_REG")
     private String commandCode;
@@ -90,7 +90,7 @@ public class CommandHistoryVO implements Serializable {
     private CommandHistorySourceEnum source;
 
     @Schema(description = "ID of the user who issued this command.", example = "1000")
-    private Long sourceUserId;
+    private String sourceUserId;
 
     @Schema(description = "Timestamp when the command was issued.")
     private LocalDateTime occurTime;

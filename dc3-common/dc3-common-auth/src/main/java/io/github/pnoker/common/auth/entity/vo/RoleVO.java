@@ -55,7 +55,7 @@ public class RoleVO extends BaseVO {
      */
     @Schema(description = "ID of the parent role in the role hierarchy; use 0 to indicate a top-level role. Must belong to the same tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Role parent id can't be empty", groups = {Add.class, Update.class})
-    private Long parentRoleId;
+    private String parentRoleId;
 
     /**
      * Name

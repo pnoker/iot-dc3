@@ -47,19 +47,19 @@ import lombok.ToString;
 public class NotifyHistoryVO extends BaseVO {
 
     @Schema(description = "ID of the rule that triggered this notification.", example = "1024")
-    private Long ruleId;
+    private String ruleId;
 
     @Schema(description = "ID of the notification definition used.", example = "2048")
-    private Long notifyId;
+    private String notifyId;
 
     @Schema(description = "ID of the message template used for this notification.", example = "4096")
-    private Long messageId;
+    private String messageId;
 
     @Schema(description = "ID of the notification channel through which this notification was delivered.", example = "512")
-    private Long channelId;
+    private String channelId;
 
     @Schema(description = "ID of the alarm associated with this notification.", example = "512")
-    private Long alarmId;
+    private String alarmId;
 
     @Schema(description = "Channel type used to deliver this notification (e.g. EMAIL, SMS, WEBHOOK).", example = "EMAIL")
     private NotifyChannelTypeEnum channelTypeFlag;

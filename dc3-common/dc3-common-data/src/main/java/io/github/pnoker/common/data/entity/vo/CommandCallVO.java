@@ -45,10 +45,10 @@ public class CommandCallVO implements Serializable {
 
     @Schema(description = "Identifier of the target device; must belong to the current tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "Identifier of the command being invoked; must reference a command accessible to the current tenant.", example = "4096")
-    private Long commandId;
+    private String commandId;
 
     @Schema(description = "Command code. Stable business identifier matching the command definition.", example = "READ_HOLDING_REG")
     private String commandCode;

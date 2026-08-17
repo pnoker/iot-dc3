@@ -203,11 +203,11 @@ public class DeviceController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list_by_ids")
-    public Mono<R<Map<Long, DeviceVO>>> listByIds(@RequestBody List<Long> deviceIds) {
+    public Mono<R<Map<String, DeviceVO>>> listByIds(@RequestBody List<Long> deviceIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<DeviceBO> entityBOList = filterTenant(tenantId, deviceService.listByIds(deviceIds));
-            Map<Long, DeviceVO> deviceMap = entityBOList.stream()
-                    .collect(Collectors.toMap(DeviceBO::getId, entityBO -> deviceBuilder.buildVOByBO(entityBO)));
+            Map<String, DeviceVO> deviceMap = entityBOList.stream()
+                    .collect(Collectors.toMap(bo -> String.valueOf(bo.getId()), entityBO -> deviceBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
         }));
     }

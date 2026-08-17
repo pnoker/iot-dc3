@@ -248,7 +248,7 @@ class PointServiceImplTest {
     void unitMapsIdToUnit() {
         doRow.setUnit("celsius");
         when(pointManager.listByIds(Set.of(1L))).thenReturn(List.of(doRow));
-        assertThat(service.unit(Set.of(1L))).containsEntry(1L, "celsius");
+        assertThat(service.unit(Set.of(1L))).containsEntry("1", "celsius");
     }
 
     @Test

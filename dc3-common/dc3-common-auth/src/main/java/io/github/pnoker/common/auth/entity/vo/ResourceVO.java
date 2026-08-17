@@ -57,7 +57,7 @@ public class ResourceVO extends BaseVO {
      */
     @Schema(description = "ID of the parent resource in the hierarchy. Null for top-level resources.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Resource parent id can't be empty", groups = {Add.class, Update.class})
-    private Long parentResourceId;
+    private String parentResourceId;
 
     /**
      * Name
@@ -104,7 +104,7 @@ public class ResourceVO extends BaseVO {
      */
     @Schema(description = "ID of the entity (API or menu) this resource secures.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
-    private Long entityId;
+    private String entityId;
 
     /**
      *

@@ -199,11 +199,11 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list_by_ids")
-    public Mono<R<Map<Long, PointVO>>> listByIds(@RequestBody Set<Long> pointIds) {
+    public Mono<R<Map<String, PointVO>>> listByIds(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByIds(pointIds));
-            Map<Long, PointVO> deviceMap = entityBOList.stream()
-                    .collect(Collectors.toMap(PointBO::getId, entityBO -> pointBuilder.buildVOByBO(entityBO)));
+            Map<String, PointVO> deviceMap = entityBOList.stream()
+                    .collect(Collectors.toMap(bo -> String.valueOf(bo.getId()), entityBO -> pointBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
         }));
     }
@@ -300,14 +300,14 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/unit")
-    public Mono<R<Map<Long, String>>> unit(@RequestBody Set<Long> pointIds) {
+    public Mono<R<Map<String, String>>> unit(@RequestBody Set<Long> pointIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             Set<Long> scopedPointIds = filterTenant(tenantId, pointService.listByIds(pointIds)).stream()
                     .map(PointBO::getId)
                     .collect(Collectors.toSet());
-            Map<Long, String> units = pointService.unit(scopedPointIds);
+            Map<String, String> units = pointService.unit(scopedPointIds);
             if (Objects.nonNull(units)) {
-                Map<Long, String> unitCodeMap = units.entrySet()
+                Map<String, String> unitCodeMap = units.entrySet()
                         .stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                 return R.ok(unitCodeMap);

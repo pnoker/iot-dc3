@@ -56,7 +56,7 @@ public class BaseVO implements Serializable {
      */
     @Schema(description = "Unique primary key of the record; required on update requests.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Primary key ID can't be empty", groups = {Update.class})
-    private Long id;
+    private String id;
 
     /**
      * Description
@@ -68,7 +68,7 @@ public class BaseVO implements Serializable {
      * Creator ID
      */
     @Schema(description = "Identifier of the user who created the record; server-populated.", example = "1000")
-    private Long creatorId;
+    private String creatorId;
 
     /**
      * Creator Name
@@ -87,7 +87,7 @@ public class BaseVO implements Serializable {
      * Operator ID
      */
     @Schema(description = "Identifier of the user who last updated the record; server-populated.", example = "1000")
-    private Long operatorId;
+    private String operatorId;
 
     /**
      * Operator Name

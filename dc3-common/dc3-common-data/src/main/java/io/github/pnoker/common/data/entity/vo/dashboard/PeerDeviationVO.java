@@ -45,10 +45,10 @@ public class PeerDeviationVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "profile ID the device belongs to", example = "1024")
-    private long profileId;
+    private String profileId;
 
     @Schema(description = "device ID")
-    private long deviceId;
+    private String deviceId;
 
     @Schema(description = "alarm count for this device", example = "15")
     private long alarmCount;

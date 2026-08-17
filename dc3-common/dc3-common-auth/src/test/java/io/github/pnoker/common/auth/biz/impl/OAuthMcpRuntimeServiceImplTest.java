@@ -114,9 +114,9 @@ class OAuthMcpRuntimeServiceImplTest {
 
     private McpToolAuthorizeRequestDTO authorizeRequest(String confirmId, String idempotencyKey, String digest) {
         return McpToolAuthorizeRequestDTO.builder()
-                .tenantId(1L)
-                .principalId(100L)
-                .mcpConnectionId(300L)
+                .tenantId("1")
+                .principalId("100")
+                .mcpConnectionId("300")
                 .scope("mcp:tools:call mcp:tools:call:high")
                 .toolName("manager_device_delete")
                 .argumentDigest(digest)
@@ -135,7 +135,7 @@ class OAuthMcpRuntimeServiceImplTest {
                 .thenReturn(lowRisk);
 
         McpToolAuthorizeResponseDTO decision = service.authorizeToolCall(McpToolAuthorizeRequestDTO.builder()
-                .tenantId(1L).principalId(100L).mcpConnectionId(300L)
+                .tenantId("1").principalId("100").mcpConnectionId("300")
                 .scope("mcp:tools:call mcp:tools:call:high").toolName("manager_device_get").build());
 
         assertThat(decision.getDecision()).isEqualTo("AUTHORIZED");

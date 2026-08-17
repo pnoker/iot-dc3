@@ -95,7 +95,7 @@ class DeviceStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(null);
         assertThat(service.getStatusByPage(new DeviceQuery()))
-                .containsEntry(10L, EntityStatusEnum.OFFLINE.getCode());
+                .containsEntry("10", EntityStatusEnum.OFFLINE.getCode());
     }
 
     @Test
@@ -107,7 +107,7 @@ class DeviceStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(onlineState(10L));
         assertThat(service.getStatusByPage(new DeviceQuery()))
-                .containsEntry(10L, EntityStatusEnum.ONLINE.getCode());
+                .containsEntry("10", EntityStatusEnum.ONLINE.getCode());
     }
 
     @Test
@@ -119,7 +119,7 @@ class DeviceStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(expiredState(10L));
         assertThat(service.getStatusByPage(new DeviceQuery()))
-                .containsEntry(10L, EntityStatusEnum.OFFLINE.getCode());
+                .containsEntry("10", EntityStatusEnum.OFFLINE.getCode());
     }
 
     @Test
@@ -135,7 +135,7 @@ class DeviceStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(onlineState(10L)).thenReturn(null);
         assertThat(service.listByProfileId(1L, 5L))
-                .containsEntry(10L, EntityStatusEnum.ONLINE.getCode())
-                .containsEntry(11L, EntityStatusEnum.OFFLINE.getCode());
+                .containsEntry("10", EntityStatusEnum.ONLINE.getCode())
+                .containsEntry("11", EntityStatusEnum.OFFLINE.getCode());
     }
 }

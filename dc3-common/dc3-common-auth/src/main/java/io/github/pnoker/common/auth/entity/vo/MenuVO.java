@@ -57,7 +57,7 @@ public class MenuVO extends BaseVO {
      */
     @Schema(description = "ID of the parent menu node in the hierarchy. Null for root-level menus.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Menu parent id can't be empty", groups = {Add.class, Update.class})
-    private Long parentMenuId;
+    private String parentMenuId;
 
     /**
      * Type

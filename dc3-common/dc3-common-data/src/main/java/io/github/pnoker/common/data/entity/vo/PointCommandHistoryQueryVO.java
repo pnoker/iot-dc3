@@ -50,10 +50,10 @@ public class PointCommandHistoryQueryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Identifier of the device to filter by; must belong to the current tenant.", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "Identifier of the data point to filter by; must belong to the current tenant.", example = "2048")
-    private Long pointId;
+    private String pointId;
 
     @Schema(description = "Lifecycle status of the command to filter by (e.g. pending, success, failed).", example = "SUCCESS")
     private PointCommandStatusEnum status;

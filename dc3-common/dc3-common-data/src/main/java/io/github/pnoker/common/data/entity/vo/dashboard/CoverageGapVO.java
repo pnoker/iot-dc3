@@ -87,10 +87,10 @@ public class CoverageGapVO implements Serializable {
         private static final long serialVersionUID = 1L;
 
         @Schema(description = "point ID", example = "2048")
-        private long pointId;
+        private String pointId;
 
         @Schema(description = "profile ID the point belongs to", example = "1024")
-        private long profileId;
+        private String profileId;
 
     }
 

@@ -53,7 +53,7 @@ public class GroupVO extends BaseVO {
      * Parent group ID.
      */
     @Schema(description = "ID of the parent group in the hierarchy. Null for root-level groups.", example = "1024")
-    private Long parentGroupId;
+    private String parentGroupId;
 
     /**
      * Group type flag.

@@ -55,7 +55,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
 
     @Override
-    public Map<Long, String> getStatusByPage(DeviceQuery pageQuery) {
+    public Map<String, String> getStatusByPage(DeviceQuery pageQuery) {
         FacadeDeviceQuery facadeQuery = FacadeDeviceQuery.builder()
                 .page(pageQuery.getPage())
                 .deviceName(pageQuery.getDeviceName())
@@ -75,7 +75,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     }
 
     @Override
-    public Map<Long, String> listByProfileId(Long tenantId, Long profileId) {
+    public Map<String, String> listByProfileId(Long tenantId, Long profileId) {
         List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(tenantId, profileId);
         if (devices.isEmpty()) {
             return Map.of();
@@ -86,8 +86,8 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     /**
      * Get a map of device statuses keyed by device id.
      */
-    private Map<Long, String> getStatusMap(List<FacadeDeviceBO> devices) {
-        Map<Long, String> statusMap = new HashMap<>(16);
+    private Map<String, String> getStatusMap(List<FacadeDeviceBO> devices) {
+        Map<String, String> statusMap = new HashMap<>(16);
         LocalDateTime now = LocalDateTime.now();
         devices.forEach(device -> {
             EntityStateDO state = entityStateManager.lambdaQuery()
@@ -102,7 +102,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
                 EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
                 status = Objects.nonNull(e) ? e.getCode() : EntityStatusEnum.OFFLINE.getCode();
             }
-            statusMap.put(device.getId(), status);
+            statusMap.put(String.valueOf(device.getId()), status);
         });
         return statusMap;
     }

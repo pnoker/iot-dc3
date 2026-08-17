@@ -71,10 +71,10 @@ public class OAuthClientRegistrationRequestVO implements Serializable {
 
     @Schema(description = "Tenant the client belongs to; defaults to the caller tenant.", example = "1")
     @JsonProperty(McpConstant.Field.TENANT_ID)
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Service-account principal id when the client acts on behalf of a service account.", example = "2048")
     @JsonProperty(McpConstant.Field.SERVICE_ACCOUNT_PRINCIPAL_ID)
-    private Long serviceAccountPrincipalId;
+    private String serviceAccountPrincipalId;
 
 }

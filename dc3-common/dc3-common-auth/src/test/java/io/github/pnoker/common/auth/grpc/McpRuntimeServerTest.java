@@ -89,12 +89,12 @@ class McpRuntimeServerTest {
         when(oauthMcpRuntimeService.introspect("token")).thenReturn(McpIntrospectResponseDTO.builder()
                 .active(true)
                 .aud(Set.of("dc3-mcp"))
-                .tenantId(1L)
-                .principalId(100L)
+                .tenantId("1")
+                .principalId("100")
                 .principalType("USER")
                 .principalName("admin")
                 .clientId("dc3_client")
-                .mcpConnectionId(300L)
+                .mcpConnectionId("300")
                 .scope("mcp:tools:list")
                 .build());
 

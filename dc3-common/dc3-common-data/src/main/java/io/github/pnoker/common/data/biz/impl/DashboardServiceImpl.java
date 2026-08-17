@@ -155,10 +155,10 @@ public class DashboardServiceImpl implements DashboardService {
         List<AlertItemVO> records = new ArrayList<>(rows.size());
         for (var row : rows) {
             AlertItemVO vo = new AlertItemVO();
-            vo.setId(row.getId());
+            vo.setId(String.valueOf(row.getId()));
             vo.setSource(row.getSource());
-            vo.setSourceId(row.getSourceId());
-            vo.setPointId(row.getPointId());
+            vo.setSourceId(String.valueOf(row.getSourceId()));
+            vo.setPointId(String.valueOf(row.getPointId()));
             vo.setAlarmTypeFlag(AlarmTypeEnum.ofIndex((byte) row.getAlarmTypeFlag()));
             vo.setConfirmFlag(ConfirmFlagEnum.ofIndex((byte) row.getConfirmFlag()));
             vo.setCreateTime(row.getCreateTime());
@@ -199,7 +199,7 @@ public class DashboardServiceImpl implements DashboardService {
             String source = item.getSource();
             if (!ALERT_SOURCES.contains(source))
                 continue;
-            long id = item.getId();
+            long id = Long.parseLong(item.getId());
             changed += confirm ? alertMapper.confirmOne(tenantId, source, id)
                     : alertMapper.unconfirmOne(tenantId, source, id);
         }
@@ -259,7 +259,7 @@ public class DashboardServiceImpl implements DashboardService {
         List<TopEntityVO> out = new ArrayList<>(rows.size());
         for (var row : rows) {
             TopEntityVO vo = new TopEntityVO();
-            vo.setEntityId(row.getEntityId());
+            vo.setEntityId(String.valueOf(row.getEntityId()));
             vo.setCount(row.getCount());
             out.add(vo);
         }
@@ -276,20 +276,20 @@ public class DashboardServiceImpl implements DashboardService {
         Set<Long> driverIds = new HashSet<>();
         for (var row : rows) {
             LatestPointValueVO vo = new LatestPointValueVO();
-            vo.setDeviceId(row.getDeviceId());
-            vo.setPointId(row.getPointId());
-            vo.setDriverId(row.getDriverId());
+            vo.setDeviceId(String.valueOf(row.getDeviceId()));
+            vo.setPointId(String.valueOf(row.getPointId()));
+            vo.setDriverId(String.valueOf(row.getDriverId()));
             vo.setRawValue(row.getRawValue());
             vo.setCalValue(row.getCalValue());
             vo.setValueType(row.getValueType());
             vo.setCreateTime(row.getCreateTime());
             out.add(vo);
-            if (Objects.nonNull(vo.getDeviceId()) && vo.getDeviceId() > 0)
-                deviceIds.add(vo.getDeviceId());
-            if (Objects.nonNull(vo.getPointId()) && vo.getPointId() > 0)
-                pointIds.add(vo.getPointId());
-            if (Objects.nonNull(vo.getDriverId()) && vo.getDriverId() > 0)
-                driverIds.add(vo.getDriverId());
+            if (row.getDeviceId() > 0)
+                deviceIds.add(row.getDeviceId());
+            if (row.getPointId() > 0)
+                pointIds.add(row.getPointId());
+            if (row.getDriverId() > 0)
+                driverIds.add(row.getDriverId());
         }
 
         // Point-value tables live in the history data source; device / point /
@@ -389,10 +389,10 @@ public class DashboardServiceImpl implements DashboardService {
         List<AlertItemVO> out = new ArrayList<>(rows.size());
         for (var row : rows) {
             AlertItemVO vo = new AlertItemVO();
-            vo.setId(row.getId());
+            vo.setId(String.valueOf(row.getId()));
             vo.setSource(row.getSource());
-            vo.setSourceId(row.getSourceId());
-            vo.setPointId(row.getPointId());
+            vo.setSourceId(String.valueOf(row.getSourceId()));
+            vo.setPointId(String.valueOf(row.getPointId()));
             vo.setAlarmTypeFlag(AlarmTypeEnum.ofIndex((byte) row.getAlarmTypeFlag()));
             vo.setConfirmFlag(ConfirmFlagEnum.ofIndex((byte) row.getConfirmFlag()));
             vo.setCreateTime(row.getCreateTime());
@@ -428,7 +428,7 @@ public class DashboardServiceImpl implements DashboardService {
         for (var row : rows) {
             AlertTopSourceVO vo = new AlertTopSourceVO();
             vo.setSource(row.getSource());
-            vo.setSourceId(row.getSourceId());
+            vo.setSourceId(String.valueOf(row.getSourceId()));
             vo.setCount(row.getCount());
             out.add(vo);
         }
@@ -488,7 +488,7 @@ public class DashboardServiceImpl implements DashboardService {
         for (var row : rows) {
             AlertTopSourceVO vo = new AlertTopSourceVO();
             vo.setSource(row.getSource());
-            vo.setSourceId(row.getSourceId());
+            vo.setSourceId(String.valueOf(row.getSourceId()));
             vo.setCount(row.getCount());
             out.add(vo);
         }
@@ -510,7 +510,7 @@ public class DashboardServiceImpl implements DashboardService {
         for (var r : rows) {
             FlappingSourceVO vo = new FlappingSourceVO();
             vo.setSource(r.getSource());
-            vo.setSourceId(r.getSourceId());
+            vo.setSourceId(String.valueOf(r.getSourceId()));
             vo.setAlarmTypeFlag(r.getAlarmTypeFlag());
             vo.setCount(r.getCount());
             out.add(vo);
@@ -529,10 +529,10 @@ public class DashboardServiceImpl implements DashboardService {
         for (var r : rows) {
             CorrelationPairVO vo = new CorrelationPairVO();
             vo.setASource(r.getASource());
-            vo.setASourceId(r.getASourceId());
+            vo.setASourceId(String.valueOf(r.getASourceId()));
             vo.setAEventType(r.getAEventType());
             vo.setBSource(r.getBSource());
-            vo.setBSourceId(r.getBSourceId());
+            vo.setBSourceId(String.valueOf(r.getBSourceId()));
             vo.setBEventType(r.getBEventType());
             vo.setCoCount(r.getCoCount());
             out.add(vo);
@@ -571,8 +571,8 @@ public class DashboardServiceImpl implements DashboardService {
                 if (median == 0 && a[1] < 5)
                     continue;
                 PeerDeviationVO vo = new PeerDeviationVO();
-                vo.setProfileId(e.getKey());
-                vo.setDeviceId(a[0]);
+                vo.setProfileId(String.valueOf(e.getKey()));
+                vo.setDeviceId(String.valueOf(a[0]));
                 vo.setAlarmCount(a[1]);
                 vo.setPeerMedian(median);
                 vo.setRatio(median == 0 ? 0.0 : Math.round((double) a[1] / median * 100.0) / 100.0);
@@ -640,7 +640,7 @@ public class DashboardServiceImpl implements DashboardService {
         for (var r : rows) {
             ChangeImpactVO vo = new ChangeImpactVO();
             vo.setKind(r.getKind());
-            vo.setEntityId(r.getEntityId());
+            vo.setEntityId(String.valueOf(r.getEntityId()));
             vo.setOperateTime(r.getOperateTime());
             out.add(vo);
         }
@@ -661,8 +661,8 @@ public class DashboardServiceImpl implements DashboardService {
         List<SilentSourceVO> out = new ArrayList<>(rows.size());
         for (var r : rows) {
             SilentSourceVO vo = new SilentSourceVO();
-            vo.setDeviceId(r.getDeviceId());
-            vo.setPointId(r.getPointId());
+            vo.setDeviceId(String.valueOf(r.getDeviceId()));
+            vo.setPointId(String.valueOf(r.getPointId()));
             LocalDateTime last = r.getLastSeen();
             vo.setLastSeen(last);
             if (Objects.nonNull(last)) {
@@ -681,8 +681,8 @@ public class DashboardServiceImpl implements DashboardService {
         var rows = dashboardMapper.coverageGapItems(tenantId, lim);
         for (var r : rows) {
             CoverageGapVO.Item it = new CoverageGapVO.Item();
-            it.setPointId(r.getPointId());
-            it.setProfileId(r.getProfileId());
+            it.setPointId(String.valueOf(r.getPointId()));
+            it.setProfileId(String.valueOf(r.getProfileId()));
             vo.addItem(it);
         }
         // missingPoints = actual count; items may be capped. Use a second

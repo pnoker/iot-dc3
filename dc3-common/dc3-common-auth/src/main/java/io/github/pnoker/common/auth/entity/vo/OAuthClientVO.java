@@ -55,13 +55,13 @@ public class OAuthClientVO extends BaseVO {
     private OAuthClientTypeEnum clientType;
 
     @Schema(description = "Principal that owns the client.", example = "1024")
-    private Long ownerPrincipalId;
+    private String ownerPrincipalId;
 
     @Schema(description = "Service account principal bound to the client, for client_credentials.", example = "2048")
-    private Long serviceAccountPrincipalId;
+    private String serviceAccountPrincipalId;
 
     @Schema(description = "Tenant the client belongs to.", example = "1")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Timestamp when the client secret expires.", example = "2027-06-19 12:00:00")
     private LocalDateTime clientSecretExpiresAt;

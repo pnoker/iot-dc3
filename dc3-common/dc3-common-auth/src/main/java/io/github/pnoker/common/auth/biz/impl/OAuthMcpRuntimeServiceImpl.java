@@ -487,13 +487,13 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                         .jti(jti)
                         .exp(claims.getExpiration().toInstant().getEpochSecond())
                         .iat(claims.getIssuedAt().toInstant().getEpochSecond())
-                        .tenantId(tenantId)
-                        .principalId(principalId)
+                        .tenantId(String.valueOf(tenantId))
+                        .principalId(String.valueOf(principalId))
                         .principalType(stringValue(claims.get(McpConstant.Field.PRINCIPAL_TYPE)))
                         .principalName(principal.getPrincipalName())
                         .displayName(principal.getDisplayName())
                         .clientId(clientId)
-                        .mcpConnectionId(connectionId)
+                        .mcpConnectionId(String.valueOf(connectionId))
                         .grantType(stringValue(claims.get(McpConstant.Field.GRANT_TYPE)))
                         .scope(stringValue(claims.get(McpConstant.Field.SCOPE)))
                         .build();
@@ -715,8 +715,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         Set<String> scopes = splitValues(request.getScope());
         // Re-run the full visibility/whitelist/scope check; this is the authoritative gate and
         // also yields the tool's risk level and stable tool_id.
-        McpToolResolveResponseDTO tool = resolveVisibleTool(request.getTenantId(), request.getPrincipalId(),
-                request.getMcpConnectionId(), request.getToolName(), scopes);
+        McpToolResolveResponseDTO tool = resolveVisibleTool(toLong(request.getTenantId()), toLong(request.getPrincipalId()),
+                toLong(request.getMcpConnectionId()), request.getToolName(), scopes);
 
         // Only HIGH-risk tools require platform confirmation; the rest pass straight through.
         if (!McpRiskLevelEnum.HIGH.getValue().equals(tool.getRiskLevel())) {
@@ -731,7 +731,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         if (StringUtils.isBlank(confirmId)) {
             // Reject an idempotency key already consumed by an earlier high-risk call.
             if (StringUtils.isNotBlank(idempotencyKey)
-                    && oauthMcpMapper.selectConsumedByIdempotencyKey(request.getMcpConnectionId(),
+                    && oauthMcpMapper.selectConsumedByIdempotencyKey(toLong(request.getMcpConnectionId()),
                     idempotencyKey) != null) {
                 return authorizeDecision(McpConstant.Confirmation.DECISION_REJECTED, "",
                         "idempotency key has already been used", tool.getRiskLevel());
@@ -741,9 +741,9 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             McpToolConfirmationRecord ticket = new McpToolConfirmationRecord();
             ticket.setId(IdWorker.getId());
             ticket.setConfirmId(issuedConfirmId);
-            ticket.setTenantId(request.getTenantId());
-            ticket.setPrincipalId(request.getPrincipalId());
-            ticket.setConnectionId(request.getMcpConnectionId());
+            ticket.setTenantId(toLong(request.getTenantId()));
+            ticket.setPrincipalId(toLong(request.getPrincipalId()));
+            ticket.setConnectionId(toLong(request.getMcpConnectionId()));
             ticket.setToolId(tool.getToolId());
             ticket.setArgumentDigest(argumentDigest);
             ticket.setIdempotencyKey(idempotencyKey);
@@ -781,8 +781,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         if (ticket.getExpireTime() == null || ticket.getExpireTime().isBefore(LocalDateTime.now())) {
             return "confirmation has expired";
         }
-        if (!Objects.equals(ticket.getPrincipalId(), request.getPrincipalId())
-                || !Objects.equals(ticket.getConnectionId(), request.getMcpConnectionId())
+        if (!Objects.equals(ticket.getPrincipalId(), toLong(request.getPrincipalId()))
+                || !Objects.equals(ticket.getConnectionId(), toLong(request.getMcpConnectionId()))
                 || !Objects.equals(ticket.getToolId(), tool.getToolId())) {
             return "confirmation does not match the caller";
         }
@@ -800,6 +800,10 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                 .message(message)
                 .riskLevel(riskLevel)
                 .build();
+    }
+
+    private Long toLong(String value) {
+        return StringUtils.isBlank(value) ? null : Long.parseLong(value);
     }
 
     @Override

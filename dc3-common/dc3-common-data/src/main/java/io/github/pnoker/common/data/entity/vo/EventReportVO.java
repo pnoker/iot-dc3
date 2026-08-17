@@ -45,10 +45,10 @@ public class EventReportVO implements Serializable {
 
     @Schema(description = "Identifier of the reporting device; must belong to the current tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "Identifier of the event definition being reported; must belong to the current tenant.", example = "4096")
-    private Long eventId;
+    private String eventId;
 
     @Schema(description = "Stable business code of the event; must match a defined event code.", example = "HIGH_TEMP_ALARM")
     private String eventCode;

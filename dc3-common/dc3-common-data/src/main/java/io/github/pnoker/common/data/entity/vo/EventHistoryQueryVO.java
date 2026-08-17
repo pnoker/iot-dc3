@@ -46,10 +46,10 @@ public class EventHistoryQueryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Identifier of the device to filter by; must belong to the current tenant.", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "Identifier of the event definition to filter by; must belong to the current tenant.", example = "4096")
-    private Long eventId;
+    private String eventId;
 
     @Schema(description = "Code of the event to filter by.", example = "HIGH_TEMP_ALARM")
     private String eventCode;

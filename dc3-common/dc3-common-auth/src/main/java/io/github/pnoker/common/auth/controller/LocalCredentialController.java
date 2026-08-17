@@ -141,7 +141,7 @@ public class LocalCredentialController implements BaseController {
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody LocalCredentialVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
-            LocalCredentialBO current = localCredentialService.getById(entityVO.getId());
+            LocalCredentialBO current = localCredentialService.getById(Long.parseLong(entityVO.getId()));
             tenantMembershipService.requireTenantMember(header.getTenantId(), current.getPrincipalId());
             LocalCredentialBO entityBO = localCredentialBuilder.buildBOByVO(entityVO);
             entityBO.setPrincipalId(current.getPrincipalId());

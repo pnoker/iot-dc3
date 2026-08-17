@@ -54,13 +54,13 @@ public class McpConnectionAddVO extends BaseVO {
     private String clientId;
 
     @Schema(description = "Principal that owns the connection; defaults to the caller.", example = "1024")
-    private Long principalId;
+    private String principalId;
 
     @Schema(description = "Principal type: USER or SERVICE_ACCOUNT.", example = "USER")
     private String principalType;
 
     @Schema(description = "Tenant the connection belongs to; defaults to the caller tenant.", example = "1")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Authorization grant type; defaults to authorization_code.", example = "authorization_code")
     private String grantType;

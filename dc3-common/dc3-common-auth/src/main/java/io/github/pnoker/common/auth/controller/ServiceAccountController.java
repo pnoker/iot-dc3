@@ -146,7 +146,7 @@ public class ServiceAccountController implements BaseController {
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody ServiceAccountVO entityVO) {
         return getPrincipalHeader().flatMap(header -> async(() -> {
-            ServiceAccountBO current = requireTenant(header.getTenantId(), serviceAccountService.getById(entityVO.getId()));
+            ServiceAccountBO current = requireTenant(header.getTenantId(), serviceAccountService.getById(Long.parseLong(entityVO.getId())));
             ServiceAccountBO entityBO = serviceAccountBuilder.buildBOByVO(entityVO);
             entityBO.setId(current.getId());
             entityBO.setTenantId(current.getTenantId());

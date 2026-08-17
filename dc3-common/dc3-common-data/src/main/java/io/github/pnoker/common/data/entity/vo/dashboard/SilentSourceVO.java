@@ -47,10 +47,10 @@ public class SilentSourceVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "device ID")
-    private long deviceId;
+    private String deviceId;
 
     @Schema(description = "point ID")
-    private long pointId;
+    private String pointId;
 
     @Schema(description = "time the last sample was seen")
     private LocalDateTime lastSeen;

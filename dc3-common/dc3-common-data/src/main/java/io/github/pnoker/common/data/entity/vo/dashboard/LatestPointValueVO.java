@@ -50,13 +50,13 @@ public class LatestPointValueVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "device ID", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "point ID", example = "2048")
-    private Long pointId;
+    private String pointId;
 
     @Schema(description = "driver ID", example = "512")
-    private Long driverId;
+    private String driverId;
 
     /**
      * Display name for the device, resolved via {@code DeviceFacade}. May be {@code null}

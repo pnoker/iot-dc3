@@ -184,11 +184,11 @@ public class ProfileController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list_by_ids")
-    public Mono<R<Map<Long, ProfileVO>>> listByIds(@RequestBody Set<Long> profileIds) {
+    public Mono<R<Map<String, ProfileVO>>> listByIds(@RequestBody Set<Long> profileIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.listByIds(profileIds));
-            Map<Long, ProfileVO> deviceMap = entityBOList.stream()
-                    .collect(Collectors.toMap(ProfileBO::getId, entityBO -> profileBuilder.buildVOByBO(entityBO)));
+            Map<String, ProfileVO> deviceMap = entityBOList.stream()
+                    .collect(Collectors.toMap(bo -> String.valueOf(bo.getId()), entityBO -> profileBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
         }));
     }

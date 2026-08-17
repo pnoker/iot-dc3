@@ -49,7 +49,7 @@ public class FlappingSourceVO implements Serializable {
     private String source;
 
     @Schema(description = "source entity ID", example = "1024")
-    private long sourceId;
+    private String sourceId;
 
     @Schema(description = "Alarm type enum", example = "1")
     private int alarmTypeFlag;

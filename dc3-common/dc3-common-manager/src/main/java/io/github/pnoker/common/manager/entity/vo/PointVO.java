@@ -112,7 +112,7 @@ public class PointVO extends BaseVO {
      */
     @Schema(description = "ID of the profile (device template) this data point belongs to.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
-    private Long profileId;
+    private String profileId;
 
     /**
      *

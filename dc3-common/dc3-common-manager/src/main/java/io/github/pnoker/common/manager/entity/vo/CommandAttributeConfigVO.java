@@ -52,7 +52,7 @@ public class CommandAttributeConfigVO extends BaseVO {
      */
     @Schema(description = "ID of the command attribute whose value is being configured.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Command attribute ID can't be empty", groups = {Add.class, Update.class})
-    private Long attributeId;
+    private String attributeId;
 
     /**
      *
@@ -66,7 +66,7 @@ public class CommandAttributeConfigVO extends BaseVO {
      */
     @Schema(description = "ID of the device this configuration applies to.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Device ID can't be empty", groups = {Add.class, Update.class})
-    private Long deviceId;
+    private String deviceId;
 
     /**
      *
@@ -79,7 +79,7 @@ public class CommandAttributeConfigVO extends BaseVO {
      */
     @Schema(description = "Identifier of the command this configuration is scoped to; must belong to the current tenant.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Command ID can't be empty", groups = {Add.class, Update.class})
-    private Long commandId;
+    private String commandId;
 
     /**
      * Enable flag

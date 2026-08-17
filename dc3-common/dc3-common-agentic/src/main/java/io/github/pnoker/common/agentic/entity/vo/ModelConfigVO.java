@@ -44,7 +44,7 @@ public class ModelConfigVO extends BaseVO {
     private String label;
 
     @Schema(description = "Identifier of the model provider this configuration belongs to; must belong to the current tenant.", example = "1024")
-    private Long providerId;
+    private String providerId;
 
     @Schema(description = "Display name of the model provider, denormalised for read convenience.", example = "OpenAI")
     private String providerName;
@@ -74,6 +74,6 @@ public class ModelConfigVO extends BaseVO {
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Identifier of the tenant this model configuration belongs to.", example = "1024")
-    private Long tenantId;
+    private String tenantId;
 
 }

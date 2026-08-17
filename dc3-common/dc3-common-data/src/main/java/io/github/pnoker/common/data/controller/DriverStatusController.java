@@ -73,11 +73,11 @@ public class DriverStatusController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
+    public Mono<R<Map<String, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DriverQuery query = Objects.isNull(entityQuery) ? new DriverQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Map<Long, String> statuses = driverStatusService.getStatusByPage(query);
+            Map<String, String> statuses = driverStatusService.getStatusByPage(query);
             return R.ok(statuses);
         }));
     }

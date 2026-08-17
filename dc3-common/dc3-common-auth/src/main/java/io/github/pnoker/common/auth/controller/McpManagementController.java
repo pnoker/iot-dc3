@@ -229,7 +229,7 @@ public class McpManagementController implements BaseController {
         return getPrincipalHeader().flatMap(header -> async(() -> {
             McpConnectionToolsReplaceVO body =
                     request == null ? new McpConnectionToolsReplaceVO() : request;
-            oauthMcpRuntimeService.replaceConnectionTools(body.getConnectionId(), toolIds(body.getToolIds()),
+            oauthMcpRuntimeService.replaceConnectionTools(Long.parseLong(body.getConnectionId()), toolIds(body.getToolIds()),
                     header);
             return R.ok(true);
         }));

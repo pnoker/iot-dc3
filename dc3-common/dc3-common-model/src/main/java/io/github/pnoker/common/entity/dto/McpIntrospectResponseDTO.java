@@ -62,9 +62,9 @@ public class McpIntrospectResponseDTO implements Serializable {
 
     private Long iat;
 
-    private Long tenantId;
+    private String tenantId;
 
-    private Long principalId;
+    private String principalId;
 
     private String principalType;
 
@@ -74,7 +74,7 @@ public class McpIntrospectResponseDTO implements Serializable {
 
     private String clientId;
 
-    private Long mcpConnectionId;
+    private String mcpConnectionId;
 
     private String grantType;
 

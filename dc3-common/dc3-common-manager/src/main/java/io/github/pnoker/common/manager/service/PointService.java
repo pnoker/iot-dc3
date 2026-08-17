@@ -76,7 +76,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * @param pointIds Point ID set
      * @return map from point ID to its unit string
      */
-    Map<Long, String> unit(Set<Long> pointIds);
+    Map<String, String> unit(Set<Long> pointIds);
 
     /**
      * Query a point together with the statistics of the devices that use it.

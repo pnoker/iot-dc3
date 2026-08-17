@@ -186,11 +186,11 @@ public class DriverController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list_by_ids")
-    public Mono<R<Map<Long, DriverVO>>> listByIds(@RequestBody Set<Long> driverIds) {
+    public Mono<R<Map<String, DriverVO>>> listByIds(@RequestBody Set<Long> driverIds) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             List<DriverBO> entityBOList = filterTenant(tenantId, driverService.listByIds(driverIds));
-            Map<Long, DriverVO> driverMap = entityBOList.stream()
-                    .collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
+            Map<String, DriverVO> driverMap = entityBOList.stream()
+                    .collect(Collectors.toMap(bo -> String.valueOf(bo.getId()), entityBO -> driverBuilder.buildVOByBO(entityBO)));
             return R.ok(driverMap);
         }));
     }

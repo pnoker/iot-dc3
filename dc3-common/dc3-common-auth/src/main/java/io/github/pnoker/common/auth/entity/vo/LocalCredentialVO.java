@@ -51,7 +51,7 @@ import java.time.LocalDateTime;
 public class LocalCredentialVO extends BaseVO {
 
     @Schema(description = "Identifier of the principal (user) this credential belongs to.", example = "1024")
-    private Long principalId;
+    private String principalId;
 
     @Schema(description = "Login name used to authenticate; unique within the tenant.", example = "alice")
     private String loginName;

@@ -52,7 +52,7 @@ public class DriverAttributeConfigVO extends BaseVO {
      */
     @Schema(description = "ID of the driver attribute whose value is being configured.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Driver attribute ID can't be empty", groups = {Add.class, Update.class})
-    private Long attributeId;
+    private String attributeId;
 
     /**
      *
@@ -66,7 +66,7 @@ public class DriverAttributeConfigVO extends BaseVO {
      */
     @Schema(description = "ID of the device this configuration applies to.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Device ID can't be empty", groups = {Add.class, Update.class})
-    private Long deviceId;
+    private String deviceId;
 
     /**
      *

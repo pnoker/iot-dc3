@@ -50,13 +50,13 @@ import java.time.LocalDateTime;
 public class RuleStateVO extends BaseVO {
 
     @Schema(description = "ID of the rule whose execution state is recorded.", example = "1024")
-    private Long ruleId;
+    private String ruleId;
 
     @Schema(description = "Alarm target type enum", example = "DEVICE")
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     @Schema(description = "Associated entity ID", example = "2048")
-    private Long entityId;
+    private String entityId;
 
     @Schema(description = "Alarm fingerprint", example = "rule_HIGH_TEMP_ALERT_device_1024")
     private String fingerprint;
@@ -88,7 +88,7 @@ public class RuleStateVO extends BaseVO {
     private Long triggerCount;
 
     @Schema(description = "ID of the active alarm associated with this rule state.", example = "512")
-    private Long alarmId;
+    private String alarmId;
 
     @Schema(description = "Entity state extension information, serialized as JSON for custom runtime metadata.")
     private RuleStateExt entityStateExt;

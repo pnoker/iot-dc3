@@ -37,7 +37,7 @@ public interface DeviceStatusService {
      * @return Map Long:String, where Long is the device ID and String is the device
      * status
      */
-    Map<Long, String> getStatusByPage(DeviceQuery deviceQuery);
+    Map<String, String> getStatusByPage(DeviceQuery deviceQuery);
 
     /**
      * Query device status by profile ID
@@ -47,6 +47,6 @@ public interface DeviceStatusService {
      * @return Map Long:String, where Long is the device ID and String is the device
      * status
      */
-    Map<Long, String> listByProfileId(Long tenantId, Long profileId);
+    Map<String, String> listByProfileId(Long tenantId, Long profileId);
 
 }

@@ -59,13 +59,13 @@ public class LabelBindVO extends BaseVO {
      */
     @Schema(description = "ID of the label to bind.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Label ID can't be empty", groups = {Add.class, Update.class})
-    private Long labelId;
+    private String labelId;
 
     /**
      * Entity ID.
      */
     @Schema(description = "Associated entity ID", example = "1000", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
-    private Long entityId;
+    private String entityId;
 
 }

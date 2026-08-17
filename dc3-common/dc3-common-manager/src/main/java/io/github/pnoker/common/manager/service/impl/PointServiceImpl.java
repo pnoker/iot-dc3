@@ -222,12 +222,12 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public Map<Long, String> unit(Set<Long> ids) {
+    public Map<String, String> unit(Set<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyMap();
         }
         List<PointDO> pointDOList = pointManager.listByIds(ids);
-        return pointDOList.stream().collect(Collectors.toMap(PointDO::getId, PointDO::getUnit));
+        return pointDOList.stream().collect(Collectors.toMap(pointDO -> String.valueOf(pointDO.getId()), PointDO::getUnit));
     }
 
     @Override

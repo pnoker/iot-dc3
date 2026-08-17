@@ -80,7 +80,7 @@ public class AlertBulkConfirmVO implements Serializable {
          * Alert row id.
          */
         @Schema(description = "Primary key of the alert row in dc3_entity_alert to confirm or unconfirm.", example = "1024")
-        private Long id;
+        private String id;
 
     }
 

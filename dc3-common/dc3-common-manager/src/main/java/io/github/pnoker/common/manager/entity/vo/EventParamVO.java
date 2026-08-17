@@ -72,7 +72,7 @@ public class EventParamVO extends BaseVO {
     @Schema(description = "ID of the parent event this parameter belongs to.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Event ID can't be empty", groups = {Add.class, Update.class})
-    private Long eventId;
+    private String eventId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;

@@ -67,19 +67,19 @@ public class RuleVO extends BaseVO {
      * Entity ID
      */
     @Schema(description = "ID of the entity (point, device, driver, or event) that this rule monitors, as selected by alarmTargetTypeFlag.", example = "2048")
-    private Long entityId;
+    private String entityId;
 
     /**
      * Alarm notification template ID
      */
     @Schema(description = "ID of the notification rule to invoke when this rule triggers.", example = "1024")
-    private Long notifyId;
+    private String notifyId;
 
     /**
      * Alarm message template ID
      */
     @Schema(description = "ID of the message template to use for the alert payload of this rule.", example = "2048")
-    private Long messageId;
+    private String messageId;
 
     /**
      * Alarm rule

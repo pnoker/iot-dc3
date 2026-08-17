@@ -48,11 +48,11 @@ public class McpToolAuthorizeRequestDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Long tenantId;
+    private String tenantId;
 
-    private Long principalId;
+    private String principalId;
 
-    private Long mcpConnectionId;
+    private String mcpConnectionId;
 
     private String scope;
 

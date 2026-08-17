@@ -135,7 +135,7 @@ class DriverControllerTest {
     @Test
     void updateProjectsTenantAndChecksOwnership() {
         DriverVO vo = new DriverVO();
-        vo.setId(1L);
+        vo.setId("1");
         DriverBO bo = new DriverBO();
         bo.setId(1L);
         bo.setTenantId(TENANT_ID);
@@ -151,7 +151,7 @@ class DriverControllerTest {
     @Test
     void updateRejectsCrossTenantUpdate() {
         DriverVO vo = new DriverVO();
-        vo.setId(1L);
+        vo.setId("1");
         DriverBO bo = new DriverBO();
         bo.setId(1L);
         DriverBO existing = new DriverBO();
@@ -201,14 +201,14 @@ class DriverControllerTest {
         foreign.setId(2L);
         foreign.setTenantId(999L);
         DriverVO vo = new DriverVO();
-        vo.setId(1L);
+        vo.setId("1");
         when(driverService.listByIds(Set.of(1L, 2L))).thenReturn(List.of(own, foreign));
         when(driverBuilder.buildVOByBO(own)).thenReturn(vo);
 
         StepVerifier.create(withTenantContext(controller.listByIds(Set.of(1L, 2L))))
                 .assertNext(envelope -> {
-                    assertThat(envelope.getData()).hasSize(1).containsKey(1L);
-                    assertThat(envelope.getData().get(1L)).isSameAs(vo);
+                    assertThat(envelope.getData()).hasSize(1).containsKey("1");
+                    assertThat(envelope.getData().get("1")).isSameAs(vo);
                 })
                 .verifyComplete();
     }

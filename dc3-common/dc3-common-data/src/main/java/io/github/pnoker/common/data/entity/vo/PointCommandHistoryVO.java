@@ -52,22 +52,22 @@ public class PointCommandHistoryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Primary key", example = "1")
-    private Long id;
+    private String id;
 
     @Schema(description = "ID of the command definition invoked.", example = "4096")
     private String commandId;
 
     @Schema(description = "Tenant ID", example = "100001")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Point command type", example = "READ")
     private PointCommandTypeEnum type;
 
     @Schema(description = "ID of the device the point command was sent to.", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "ID of the target data point.", example = "2048")
-    private Long pointId;
+    private String pointId;
 
     @Schema(description = "Command value sent to the data point.", example = "42")
     private String requestValue;
@@ -88,7 +88,7 @@ public class PointCommandHistoryVO implements Serializable {
     private PointCommandSourceEnum source;
 
     @Schema(description = "ID of the user who issued this point command.", example = "1000")
-    private Long sourceUserId;
+    private String sourceUserId;
 
     @Schema(description = "Timestamp when the point command was issued.")
     private LocalDateTime occurTime;

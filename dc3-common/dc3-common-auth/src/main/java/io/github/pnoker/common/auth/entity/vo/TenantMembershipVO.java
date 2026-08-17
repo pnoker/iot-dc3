@@ -48,10 +48,10 @@ import java.time.LocalDateTime;
 public class TenantMembershipVO extends BaseVO {
 
     @Schema(description = "Identifier of the tenant this membership belongs to.", example = "1024")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Identifier of the principal (user or service account) attached to the tenant.", example = "2048")
-    private Long principalId;
+    private String principalId;
 
     @Schema(description = "Classification of the principal: USER, SERVICE_ACCOUNT, or SYSTEM.", example = "USER")
     private PrincipalTypeEnum principalType;

@@ -99,9 +99,9 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
     public McpToolAuthorizeResponseDTO authorizeToolCall(McpToolAuthorizeRequestDTO request) {
         request = request == null ? new McpToolAuthorizeRequestDTO() : request;
         GrpcMcpToolAuthorizeRequest grpcRequest = GrpcMcpToolAuthorizeRequest.newBuilder()
-                .setTenantId(value(request.getTenantId()))
-                .setPrincipalId(value(request.getPrincipalId()))
-                .setMcpConnectionId(value(request.getMcpConnectionId()))
+                .setTenantId(parseLong(request.getTenantId()))
+                .setPrincipalId(parseLong(request.getPrincipalId()))
+                .setMcpConnectionId(parseLong(request.getMcpConnectionId()))
                 .setScope(StringUtils.defaultString(request.getScope()))
                 .setToolName(StringUtils.defaultString(request.getToolName()))
                 .setArgumentDigest(StringUtils.defaultString(request.getArgumentDigest()))
@@ -139,13 +139,13 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
                 .jti(source.getJti())
                 .exp(zeroToNull(source.getExp()))
                 .iat(zeroToNull(source.getIat()))
-                .tenantId(zeroToNull(source.getTenantId()))
-                .principalId(zeroToNull(source.getPrincipalId()))
+                .tenantId(toNullableString(source.getTenantId()))
+                .principalId(toNullableString(source.getPrincipalId()))
                 .principalType(source.getPrincipalType().name())
                 .principalName(source.getPrincipalName())
                 .displayName(source.getDisplayName())
                 .clientId(source.getClientId())
-                .mcpConnectionId(zeroToNull(source.getMcpConnectionId()))
+                .mcpConnectionId(toNullableString(source.getMcpConnectionId()))
                 .grantType(source.getGrantType().name().toLowerCase())
                 .scope(source.getScope())
                 .build();
@@ -222,6 +222,14 @@ public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
 
     private long value(Long value) {
         return value == null ? 0 : value;
+    }
+
+    private String toNullableString(long value) {
+        return value == 0 ? null : String.valueOf(value);
+    }
+
+    private long parseLong(String value) {
+        return StringUtils.isBlank(value) ? 0 : Long.parseLong(value);
     }
 
     private void requireOk(String operation, GrpcR result) {

@@ -54,7 +54,7 @@ public class UserVO extends BaseVO {
      * Principal ID.
      */
     @Schema(description = "ID of the security principal (identity carrier) this user profile extends.", example = "1024")
-    private Long principalId;
+    private String principalId;
 
     /**
      *

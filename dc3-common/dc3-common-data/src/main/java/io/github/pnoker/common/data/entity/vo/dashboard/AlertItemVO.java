@@ -48,16 +48,16 @@ public class AlertItemVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "alert row ID", example = "1")
-    private Long id;
+    private String id;
 
     @Schema(description = "alert source: device or driver", example = "device")
     private String source;
 
     @Schema(description = "source entity ID (device ID or driver ID)", example = "1024")
-    private Long sourceId;
+    private String sourceId;
 
     @Schema(description = "point ID, present when source is device", example = "2048")
-    private Long pointId;
+    private String pointId;
 
     @Schema(description = "Alarm type enum", example = "OFFLINE")
     private AlarmTypeEnum alarmTypeFlag;

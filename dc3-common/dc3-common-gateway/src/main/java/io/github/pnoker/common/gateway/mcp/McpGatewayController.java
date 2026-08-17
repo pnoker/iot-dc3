@@ -279,8 +279,8 @@ public class McpGatewayController {
          * @return the visible tool list response
          */
         Mono<McpToolListResponseDTO> listTools(McpIntrospectResponseDTO context) {
-            return blocking(() -> mcpRuntimeFacade.listTools(context.getTenantId(), context.getPrincipalId(),
-                    context.getMcpConnectionId(), context.getScope()));
+            return blocking(() -> mcpRuntimeFacade.listTools(toLong(context.getTenantId()), toLong(context.getPrincipalId()),
+                    toLong(context.getMcpConnectionId()), context.getScope()));
         }
 
         /**
@@ -302,8 +302,8 @@ public class McpGatewayController {
             long start = System.nanoTime();
             String traceId = UUID.randomUUID().toString();
             String argumentDigest = DecodeUtil.sha256Base64Url(JsonUtil.toJsonString(arguments));
-            return blocking(() -> mcpRuntimeFacade.resolveTool(context.getTenantId(), context.getPrincipalId(),
-                    context.getMcpConnectionId(), context.getScope(), toolName)).flatMap(tool -> {
+            return blocking(() -> mcpRuntimeFacade.resolveTool(toLong(context.getTenantId()), toLong(context.getPrincipalId()),
+                    toLong(context.getMcpConnectionId()), context.getScope(), toolName)).flatMap(tool -> {
                 McpToolCallControls controls = controlValues(callMeta, exchange);
                 return blocking(() -> mcpRuntimeFacade.authorizeToolCall(McpToolAuthorizeRequestDTO.builder()
                         .tenantId(context.getTenantId())
@@ -418,13 +418,13 @@ public class McpGatewayController {
          */
         private HttpHeaders principalHeaders(McpIntrospectResponseDTO context) {
             RequestHeader.PrincipalHeader principal = new RequestHeader.PrincipalHeader();
-            principal.setPrincipalId(context.getPrincipalId());
+            principal.setPrincipalId(toLong(context.getPrincipalId()));
             principal.setPrincipalType(StringUtils.defaultString(context.getPrincipalType()));
             principal.setPrincipalName(StringUtils.defaultString(context.getPrincipalName()));
             principal.setDisplayName(StringUtils.defaultString(context.getDisplayName()));
-            principal.setTenantId(context.getTenantId());
+            principal.setTenantId(toLong(context.getTenantId()));
             principal.setClientId(StringUtils.defaultString(context.getClientId()));
-            principal.setConnectionId(context.getMcpConnectionId());
+            principal.setConnectionId(toLong(context.getMcpConnectionId()));
 
             String payload = JsonUtil.toJsonString(principal);
             HttpHeaders headers = new HttpHeaders();
@@ -456,11 +456,11 @@ public class McpGatewayController {
             long duration = (System.nanoTime() - start) / 1_000_000;
             McpAuditCommandDTO command = McpAuditCommandDTO.builder()
                     .traceId(traceId)
-                    .tenantId(context.getTenantId())
-                    .principalId(context.getPrincipalId())
+                    .tenantId(toLong(context.getTenantId()))
+                    .principalId(toLong(context.getPrincipalId()))
                     .principalType(context.getPrincipalType())
                     .clientId(context.getClientId())
-                    .connectionId(context.getMcpConnectionId())
+                    .connectionId(toLong(context.getMcpConnectionId()))
                     .toolId(tool.getToolId())
                     .toolName(tool.getToolName())
                     .permissionCode(tool.getPermissionCode())
@@ -509,6 +509,10 @@ public class McpGatewayController {
                 }
             }
             return "";
+        }
+
+        private Long toLong(String value) {
+            return StringUtils.isBlank(value) ? null : Long.parseLong(value);
         }
 
         private <T> Mono<T> blocking(java.util.concurrent.Callable<T> callable) {

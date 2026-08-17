@@ -147,7 +147,7 @@ public class TenantController implements BaseController {
         return getTenantId().flatMap(tenantId -> async(() -> {
             TenantBO userTenant = tenantService.getById(tenantId);
             boolean isSystemAdmin = "default".equals(userTenant.getTenantCode());
-            if (!isSystemAdmin && !Objects.equals(entityVO.getId(), tenantId)) {
+            if (!isSystemAdmin && !Objects.equals(Long.parseLong(entityVO.getId()), tenantId)) {
                 throw new ServiceException("Access denied: cannot update another tenant.");
             }
             TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);

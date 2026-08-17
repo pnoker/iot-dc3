@@ -119,8 +119,8 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
         TenantContextHolder.setTenantId(request.getTenantId());
         try {
             EventHistoryQueryVO queryVO = new EventHistoryQueryVO();
-            queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
-            queryVO.setEventId(request.getEventId() != 0 ? request.getEventId() : null);
+            queryVO.setDeviceId(request.getDeviceId() != 0 ? String.valueOf(request.getDeviceId()) : null);
+            queryVO.setEventId(request.getEventId() != 0 ? String.valueOf(request.getEventId()) : null);
             if (request.getEventTypeFlag() != 0) {
                 queryVO.setEventTypeFlag(EventTypeFlagEnum.ofIndex((byte) request.getEventTypeFlag()));
             }
@@ -155,11 +155,11 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
 
     private GrpcEventHistoryDTO toGrpcDTO(EventHistoryVO record) {
         return GrpcEventHistoryDTO.newBuilder()
-                .setId(Objects.nonNull(record.getId()) ? record.getId() : 0)
+                .setId(Objects.nonNull(record.getId()) ? Long.parseLong(record.getId()) : 0)
                 .setRecordId(Objects.nonNull(record.getRecordId()) ? record.getRecordId() : "")
-                .setTenantId(Objects.nonNull(record.getTenantId()) ? record.getTenantId() : 0)
-                .setDeviceId(Objects.nonNull(record.getDeviceId()) ? record.getDeviceId() : 0)
-                .setEventId(Objects.nonNull(record.getEventId()) ? record.getEventId() : 0)
+                .setTenantId(Objects.nonNull(record.getTenantId()) ? Long.parseLong(record.getTenantId()) : 0)
+                .setDeviceId(Objects.nonNull(record.getDeviceId()) ? Long.parseLong(record.getDeviceId()) : 0)
+                .setEventId(Objects.nonNull(record.getEventId()) ? Long.parseLong(record.getEventId()) : 0)
                 .setEventCode(Objects.nonNull(record.getEventCode()) ? record.getEventCode() : "")
                 .setEventTypeFlag(Objects.nonNull(record.getEventTypeFlag()) ? record.getEventTypeFlag().getIndex() : 0)
                 .setEventLevelFlag(Objects.nonNull(record.getEventLevelFlag()) ? record.getEventLevelFlag().getIndex() : 0)
@@ -173,7 +173,7 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
                 .setCreateTime(toEpochSecond(record.getCreateTime()))
                 .setOperateTime(toEpochSecond(record.getOperateTime()))
                 .setAcknowledgeTime(toEpochSecond(record.getAcknowledgeTime()))
-                .setAcknowledgeUserId(Objects.nonNull(record.getAcknowledgeUserId()) ? record.getAcknowledgeUserId() : 0)
+                .setAcknowledgeUserId(Objects.nonNull(record.getAcknowledgeUserId()) ? Long.parseLong(record.getAcknowledgeUserId()) : 0)
                 .build();
     }
 

@@ -72,7 +72,7 @@ public class DeviceVO extends BaseVO {
     @Schema(description = "ID of the driver this device connects through.", example = "1024",
             requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class, Upload.class})
-    private Long driverId;
+    private String driverId;
 
     /**
      *
@@ -104,6 +104,6 @@ public class DeviceVO extends BaseVO {
     @Schema(description = "ID of the profile (device template) this device is derived from.", example = "2048",
             requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Upload.class})
-    private Long profileId;
+    private String profileId;
 
 }

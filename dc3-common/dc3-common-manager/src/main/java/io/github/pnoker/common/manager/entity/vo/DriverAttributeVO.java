@@ -85,7 +85,7 @@ public class DriverAttributeVO extends BaseVO {
      */
     @Schema(description = "ID of the protocol driver this attribute belongs to.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class})
-    private Long driverId;
+    private String driverId;
 
     /**
      *

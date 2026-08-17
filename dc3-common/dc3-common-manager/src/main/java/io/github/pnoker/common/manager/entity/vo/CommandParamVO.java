@@ -84,7 +84,7 @@ public class CommandParamVO extends BaseVO {
     @Schema(description = "ID of the parent command this parameter belongs to.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
 
     @NotNull(message = "Command ID can't be empty", groups = {Add.class, Update.class})
-    private Long commandId;
+    private String commandId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;

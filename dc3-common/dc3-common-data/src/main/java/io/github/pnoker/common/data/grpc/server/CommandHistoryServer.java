@@ -118,8 +118,8 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
         TenantContextHolder.setTenantId(request.getTenantId());
         try {
             CommandHistoryQueryVO queryVO = new CommandHistoryQueryVO();
-            queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
-            queryVO.setCommandId(request.getCommandId() != 0 ? request.getCommandId() : null);
+            queryVO.setDeviceId(request.getDeviceId() != 0 ? String.valueOf(request.getDeviceId()) : null);
+            queryVO.setCommandId(request.getCommandId() != 0 ? String.valueOf(request.getCommandId()) : null);
             queryVO.setStatus(request.getStatus() != 0
                     ? PointCommandStatusEnum.ofIndex((byte) request.getStatus()) : null);
             queryVO.setPage(GrpcBuilderUtil.buildPagesByGrpcPage(request.getPage()));
@@ -153,11 +153,11 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
 
     private GrpcCommandHistoryDTO toGrpcDTO(CommandHistoryVO record) {
         return GrpcCommandHistoryDTO.newBuilder()
-                .setId(Objects.nonNull(record.getId()) ? record.getId() : 0)
+                .setId(Objects.nonNull(record.getId()) ? Long.parseLong(record.getId()) : 0)
                 .setRecordId(Objects.nonNull(record.getRecordId()) ? record.getRecordId() : "")
-                .setTenantId(Objects.nonNull(record.getTenantId()) ? record.getTenantId() : 0)
-                .setDeviceId(Objects.nonNull(record.getDeviceId()) ? record.getDeviceId() : 0)
-                .setCommandId(Objects.nonNull(record.getCommandId()) ? record.getCommandId() : 0)
+                .setTenantId(Objects.nonNull(record.getTenantId()) ? Long.parseLong(record.getTenantId()) : 0)
+                .setDeviceId(Objects.nonNull(record.getDeviceId()) ? Long.parseLong(record.getDeviceId()) : 0)
+                .setCommandId(Objects.nonNull(record.getCommandId()) ? Long.parseLong(record.getCommandId()) : 0)
                 .setCommandCode(Objects.nonNull(record.getCommandCode()) ? record.getCommandCode() : "")
                 .putAllParamValues(toStringMap(record.getParamValues()))
                 .putAllResultValues(toStringMap(record.getResultValues()))
@@ -166,7 +166,7 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
                 .setErrorCode(Objects.nonNull(record.getErrorCode()) ? record.getErrorCode() : "")
                 .setErrorMessage(Objects.nonNull(record.getErrorMessage()) ? record.getErrorMessage() : "")
                 .setSource(Objects.nonNull(record.getSource()) ? record.getSource().getIndex() : 0)
-                .setSourceUserId(Objects.nonNull(record.getSourceUserId()) ? record.getSourceUserId() : 0)
+                .setSourceUserId(Objects.nonNull(record.getSourceUserId()) ? Long.parseLong(record.getSourceUserId()) : 0)
                 .setOccurTime(toEpochSecond(record.getOccurTime()))
                 .setSendTime(toEpochSecond(record.getSendTime()))
                 .setFinishTime(toEpochSecond(record.getFinishTime()))

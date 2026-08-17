@@ -106,7 +106,7 @@ class DriverStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(null);
         assertThat(service.getStatusByPage(new DriverQuery()))
-                .containsEntry(1L, EntityStatusEnum.OFFLINE.getCode());
+                .containsEntry("1", EntityStatusEnum.OFFLINE.getCode());
     }
 
     @Test
@@ -118,7 +118,7 @@ class DriverStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(onlineState(1L, EntityTypeEnum.DRIVER.getIndex()));
         assertThat(service.getStatusByPage(new DriverQuery()))
-                .containsEntry(1L, EntityStatusEnum.ONLINE.getCode());
+                .containsEntry("1", EntityStatusEnum.ONLINE.getCode());
     }
 
     @Test
@@ -130,7 +130,7 @@ class DriverStatusServiceImplTest {
         when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
         when(queryWrapper.one()).thenReturn(expiredState(1L, EntityTypeEnum.DRIVER.getIndex()));
         assertThat(service.getStatusByPage(new DriverQuery()))
-                .containsEntry(1L, EntityStatusEnum.OFFLINE.getCode());
+                .containsEntry("1", EntityStatusEnum.OFFLINE.getCode());
     }
 
     @Test

@@ -46,19 +46,19 @@ public class IdentityAuditLogVO {
      * Primary key ID
      */
     @Schema(description = "Unique identifier of this audit log entry.", example = "1024")
-    private Long id;
+    private String id;
 
     /**
      * Tenant ID
      */
     @Schema(description = "Identifier of the tenant this audit log entry belongs to; scopes the record to a single tenant.", example = "1024")
-    private Long tenantId;
+    private String tenantId;
 
     /**
      * Principal ID
      */
     @Schema(description = "Identifier of the principal (user or service account) that performed the audited action; must belong to the same tenant.", example = "1024")
-    private Long principalId;
+    private String principalId;
 
     /**
      * Principal type
@@ -82,7 +82,7 @@ public class IdentityAuditLogVO {
      * Resource ID
      */
     @Schema(description = "Identifier of the specific resource that was acted upon; must belong to the same tenant.", example = "1024")
-    private Long resourceId;
+    private String resourceId;
 
     /**
      * Resource name

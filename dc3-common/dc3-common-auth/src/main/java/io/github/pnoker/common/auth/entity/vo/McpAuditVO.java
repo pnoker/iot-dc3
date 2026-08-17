@@ -49,10 +49,10 @@ public class McpAuditVO extends BaseVO {
     private String traceId;
 
     @Schema(description = "Tenant the audit record belongs to.", example = "1")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Principal that invoked the tool.", example = "1024")
-    private Long principalId;
+    private String principalId;
 
     @Schema(description = "Principal type: USER or SERVICE_ACCOUNT.", example = "USER")
     private PrincipalTypeEnum principalType;
@@ -61,7 +61,7 @@ public class McpAuditVO extends BaseVO {
     private String clientId;
 
     @Schema(description = "MCP connection id.", example = "1024")
-    private Long connectionId;
+    private String connectionId;
 
     @Schema(description = "Invoked tool id.", example = "tool_read_device")
     private String toolId;

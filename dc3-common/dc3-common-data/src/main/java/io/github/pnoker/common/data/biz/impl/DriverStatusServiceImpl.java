@@ -60,7 +60,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
 
     @Override
-    public Map<Long, String> getStatusByPage(DriverQuery pageQuery) {
+    public Map<String, String> getStatusByPage(DriverQuery pageQuery) {
         FacadeDriverQuery facadeQuery = FacadeDriverQuery.builder()
                 .page(pageQuery.getPage())
                 .driverName(pageQuery.getDriverName())
@@ -139,8 +139,8 @@ public class DriverStatusServiceImpl implements DriverStatusService {
      * @param drivers the drivers to resolve status for
      * @return map from driver id to its status code
      */
-    private Map<Long, String> getStatusMap(List<FacadeDriverBO> drivers) {
-        Map<Long, String> statusMap = new HashMap<>(16);
+    private Map<String, String> getStatusMap(List<FacadeDriverBO> drivers) {
+        Map<String, String> statusMap = new HashMap<>(16);
         LocalDateTime now = LocalDateTime.now();
         drivers.forEach(driver -> {
             EntityStateDO state = entityStateManager.lambdaQuery()
@@ -155,7 +155,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
                 EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
                 status = Objects.nonNull(e) ? e.getCode() : EntityStatusEnum.OFFLINE.getCode();
             }
-            statusMap.put(driver.getId(), status);
+            statusMap.put(String.valueOf(driver.getId()), status);
         });
         return statusMap;
     }

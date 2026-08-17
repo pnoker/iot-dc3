@@ -52,7 +52,7 @@ public class McpConnectionToolsReplaceVO implements Serializable {
 
     @NotNull(message = "Connection id can't be empty", groups = {Update.class})
     @Schema(description = "Primary key of the MCP connection to update.", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Long connectionId;
+    private String connectionId;
 
     @Schema(description = "New tool id whitelist; fully overwrites the previous one.", example = "[\"tool_read_device\"]")
     private List<String> toolIds;

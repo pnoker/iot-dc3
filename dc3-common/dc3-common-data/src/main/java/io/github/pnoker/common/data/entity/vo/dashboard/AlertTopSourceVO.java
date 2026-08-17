@@ -47,7 +47,7 @@ public class AlertTopSourceVO implements Serializable {
     private String source;
 
     @Schema(description = "Identifier of the source entity (device id or driver id) the alarms belong to; must resolve within the current tenant.", example = "1024")
-    private long sourceId;
+    private String sourceId;
 
     @Schema(description = "Number of alarms attributed to this source within the query window.", example = "256")
     private long count;

@@ -52,13 +52,13 @@ public class PointValueVO implements Serializable {
      * Device ID
      */
     @Schema(description = "ID of the device that produced this value.", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
     /**
      * Point ID
      */
     @Schema(description = "ID of the data point this value belongs to.", example = "2048")
-    private Long pointId;
+    private String pointId;
 
     /**
      * Raw value
@@ -88,13 +88,13 @@ public class PointValueVO implements Serializable {
      * Driver ID
      */
     @Schema(description = "ID of the driver that collected this value.", example = "512")
-    private Long driverId;
+    private String driverId;
 
     /**
      * Tenant ID
      */
     @Schema(description = "Identifier of the tenant that owns this point value.", example = "1")
-    private Long tenantId;
+    private String tenantId;
 
     /**
      * Create Time

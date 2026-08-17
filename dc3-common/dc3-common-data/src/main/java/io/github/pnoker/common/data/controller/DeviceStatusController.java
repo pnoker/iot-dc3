@@ -73,11 +73,11 @@ public class DeviceStatusController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
+    public Mono<R<Map<String, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery query = Objects.isNull(deviceQuery) ? new DeviceQuery() : deviceQuery;
             query.setTenantId(tenantId);
-            Map<Long, String> statuses = deviceStatusService.getStatusByPage(query);
+            Map<String, String> statuses = deviceStatusService.getStatusByPage(query);
             return R.ok(statuses);
         }));
     }
@@ -98,12 +98,12 @@ public class DeviceStatusController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list_by_driver_id")
-    public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@Parameter(description = "Identifier of the driver; must belong to the current tenant. Only devices managed by this driver are returned.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+    public Mono<R<Map<String, String>>> deviceStatusByDriverId(@Parameter(description = "Identifier of the driver; must belong to the current tenant. Only devices managed by this driver are returned.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setDriverId(driverId);
             deviceQuery.setTenantId(tenantId);
-            Map<Long, String> statuses = deviceStatusService.getStatusByPage(deviceQuery);
+            Map<String, String> statuses = deviceStatusService.getStatusByPage(deviceQuery);
             return R.ok(statuses);
         }));
     }
@@ -124,13 +124,13 @@ public class DeviceStatusController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list_by_profile_id")
-    public Mono<R<Map<Long, String>>> deviceStatusByProfileId(
+    public Mono<R<Map<String, String>>> deviceStatusByProfileId(
             @Parameter(description = "Identifier of the profile template; must belong to the current tenant. Only devices bound to this profile are returned.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
         return getTenantId().flatMap(tenantId -> async(() -> {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setProfileId(profileId);
             deviceQuery.setTenantId(tenantId);
-            Map<Long, String> statuses = deviceStatusService.getStatusByPage(deviceQuery);
+            Map<String, String> statuses = deviceStatusService.getStatusByPage(deviceQuery);
             return R.ok(statuses);
         }));
     }

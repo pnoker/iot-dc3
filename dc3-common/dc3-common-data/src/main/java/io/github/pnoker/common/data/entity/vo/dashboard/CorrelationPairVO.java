@@ -49,7 +49,7 @@ public class CorrelationPairVO implements Serializable {
     private String aSource;
 
     @Schema(description = "source entity ID of event A", example = "1024")
-    private long aSourceId;
+    private String aSourceId;
 
     @Schema(description = "event type of event A", example = "1")
     private int aEventType;
@@ -58,7 +58,7 @@ public class CorrelationPairVO implements Serializable {
     private String bSource;
 
     @Schema(description = "source entity ID of event B", example = "512")
-    private long bSourceId;
+    private String bSourceId;
 
     @Schema(description = "event type of event B", example = "2")
     private int bEventType;

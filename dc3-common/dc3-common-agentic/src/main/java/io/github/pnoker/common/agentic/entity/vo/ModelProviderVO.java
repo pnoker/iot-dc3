@@ -54,7 +54,7 @@ public class ModelProviderVO extends BaseVO {
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Identifier of the tenant that owns this provider; all operations are scoped to this tenant.", example = "1024")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "API key used to authenticate requests to the provider's endpoint. Write-only: never included in API responses.", accessMode = Schema.AccessMode.WRITE_ONLY)
     private String apiKey;

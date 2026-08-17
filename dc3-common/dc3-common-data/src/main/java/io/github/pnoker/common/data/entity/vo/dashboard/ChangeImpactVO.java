@@ -53,7 +53,7 @@ public class ChangeImpactVO implements Serializable {
     private String kind;
 
     @Schema(description = "changed entity ID", example = "1024")
-    private long entityId;
+    private String entityId;
 
     @Schema(description = "time the entity was edited")
     private LocalDateTime operateTime;
