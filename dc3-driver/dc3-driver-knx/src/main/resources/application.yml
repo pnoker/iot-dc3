@@ -1,0 +1,99 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+dc3:
+  driver:
+    tenant: default
+    name: KNX Driver
+    code: KnxDriver
+    type: DRIVER_CLIENT
+    remark: @project.description@
+    schedule:
+      read:
+        enable: true
+        cron: '0/30 * * * * ?'
+      custom:
+        enable: true
+        cron: '0/5 * * * * ?'
+    health:
+      device:
+        enable: true
+        cron: '0/15 * * * * ?'
+        timeout: 45
+        timeout-unit: SECONDS
+    driver-attribute:
+      - attribute-name: Remote Host
+        attribute-code: remoteHost
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: KNX IP gateway address (tunneling server)
+      - attribute-name: Remote Port
+        attribute-code: remotePort
+        attribute-type-flag: INT
+        default-value: '3671'
+        remark: KNX IP gateway port
+      - attribute-name: Local Host
+        attribute-code: localHost
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Local bind address (optional)
+      - attribute-name: Use NAT
+        attribute-code: useNat
+        attribute-type-flag: BOOLEAN
+        default-value: 'false'
+        remark: Enable NAT mode for tunneling
+      - attribute-name: Device Address
+        attribute-code: deviceAddress
+        attribute-type-flag: STRING
+        default-value: '0.0.0'
+        remark: Local KNX individual address
+    point-attribute:
+      - attribute-name: Group Address
+        attribute-code: groupAddress
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: KNX group address, e.g. 1/2/3
+      - attribute-name: Data Type
+        attribute-code: dataType
+        attribute-type-flag: STRING
+        default-value: BOOL
+        remark: BOOL, UINT, FLOAT, or CONTROL
+      - attribute-name: DPT
+        attribute-code: dpt
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: Datapoint type for UINT reads/writes, e.g. 5.001
+    command-attribute:
+      - attribute-name: Group Address
+        attribute-code: groupAddress
+        attribute-type-flag: STRING
+        default-value: ''
+        remark: KNX group address for commands
+
+    buffer:
+      enable: true
+      db-path: dc3/data/driver/knx/buffer.db
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+
+logging:
+  file:
+    name: dc3/logs/driver/knx/${spring.application.name}.log
