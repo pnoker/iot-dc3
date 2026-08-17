@@ -101,6 +101,9 @@ public class DriverReadScheduleJob extends QuartzJobBean {
     }
 
     private void readDevice(DeviceBO device) {
+        if (!driverMetadata.ownsDevice(device.getId())) {
+            return;
+        }
         device.getPointIds().forEach(pointId -> readPoint(device.getId(), pointId));
     }
 

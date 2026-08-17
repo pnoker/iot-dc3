@@ -49,7 +49,7 @@ public interface RepositoryService {
      * @param entityBO point value to persist
      * @throws IOException on write failure
      */
-    void savePointValue(PointValueBO entityBO) throws IOException;
+    boolean savePointValue(PointValueBO entityBO) throws IOException;
 
     /**
      * Persist a batch of point values to the time-series store.
@@ -57,7 +57,7 @@ public interface RepositoryService {
      * @param entityBOList point values to persist
      * @throws IOException on write failure
      */
-    void savePointValues(List<PointValueBO> entityBOList) throws IOException;
+    List<PointValueBO> savePointValues(List<PointValueBO> entityBOList) throws IOException;
 
     /**
      * Get historical point values within the tenant scope.

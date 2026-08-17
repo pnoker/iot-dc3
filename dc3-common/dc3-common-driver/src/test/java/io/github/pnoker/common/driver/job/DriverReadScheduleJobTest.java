@@ -30,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -66,7 +67,7 @@ class DriverReadScheduleJobTest {
 
     @Test
     void enabledPointsAreSubmittedToExecutor() {
-        driverMetadata.setDeviceIds(Set.of(10L));
+        driverMetadata.setDeviceLeases(Map.of(10L, 1L), System.currentTimeMillis() + 60_000, 1L);
         when(deviceMetadata.getCache(10L)).thenReturn(readableDevice(10L, Set.of(20L, 21L)));
 
         job.executeInternal(null);
@@ -77,7 +78,7 @@ class DriverReadScheduleJobTest {
 
     @Test
     void disabledDeviceIsSkipped() {
-        driverMetadata.setDeviceIds(Set.of(10L));
+        driverMetadata.setDeviceLeases(Map.of(10L, 1L), System.currentTimeMillis() + 60_000, 1L);
         DeviceBO device = readableDevice(10L, Set.of(20L));
         device.setEnableFlag(EnableFlagEnum.DISABLE);
         when(deviceMetadata.getCache(10L)).thenReturn(device);

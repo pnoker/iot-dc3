@@ -35,7 +35,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
- * Point-value ingestion no longer has a Quartz tick (it is driven by PointValueIngestBuffer),
+ * Point-value ingestion no longer has a Quartz tick (RabbitMQ consumer batches drive it),
  * so only the hourly cron job registration is asserted here.
  *
  * @author pnoker

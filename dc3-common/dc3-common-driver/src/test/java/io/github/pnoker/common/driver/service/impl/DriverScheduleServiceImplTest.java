@@ -19,9 +19,11 @@ package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
+import io.github.pnoker.common.driver.job.BufferRepublishScheduleJob;
 import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
 import io.github.pnoker.common.driver.job.DriverHealthScheduleJob;
+import io.github.pnoker.common.driver.job.DriverLeaseRenewScheduleJob;
 import io.github.pnoker.common.driver.job.DriverReadScheduleJob;
 import io.github.pnoker.common.exception.CronException;
 import io.github.pnoker.common.quartz.QuartzService;
@@ -32,7 +34,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.SchedulerException;
 
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -57,9 +58,11 @@ class DriverScheduleServiceImplTest {
     }
 
     @Test
-    void initialNoOpsWhenScheduleConfigMissing() {
+    void initialFailsClosedWhenScheduleConfigMissing() {
         properties.setSchedule(null);
-        assertThatNoException().isThrownBy(() -> service.initialize());
+        assertThatThrownBy(() -> service.initialize())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("schedule configuration is required");
         verifyNoInteractions(quartzService);
     }
 
@@ -73,7 +76,35 @@ class DriverScheduleServiceImplTest {
                 eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_JOB),
                 eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_CRON),
                 eq(DriverHealthScheduleJob.class));
+        verify(quartzService).createJobWithCron(
+                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                eq(ScheduleConstant.DRIVER_LEASE_RENEW_SCHEDULE_JOB),
+                eq(properties.getLease().getRenewCron()),
+                eq(DriverLeaseRenewScheduleJob.class));
+        verify(quartzService).createJobWithCron(
+                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                eq(ScheduleConstant.BUFFER_REPUBLISH_SCHEDULE_JOB),
+                eq(properties.getBuffer().getRepublishCron()),
+                eq(BufferRepublishScheduleJob.class));
         verify(quartzService).startScheduler();
+    }
+
+    @Test
+    void initialRejectsMissingOutboxConfig() {
+        properties.setBuffer(null);
+
+        assertThatThrownBy(() -> service.initialize())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("outbox configuration is required");
+    }
+
+    @Test
+    void initialRejectsInvalidOutboxCron() {
+        properties.getBuffer().setRepublishCron("not-a-cron");
+
+        assertThatThrownBy(() -> service.initialize())
+                .isInstanceOf(CronException.class)
+                .hasMessageContaining("Buffer republish schedule");
     }
 
     @Test

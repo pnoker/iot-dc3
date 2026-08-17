@@ -23,6 +23,8 @@ import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.CommandCallDTO;
@@ -46,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -69,6 +72,9 @@ class CommandReceiverTest {
     private CommandDedupCache dedupCache;
 
     @Mock
+    private DriverMetadata driverMetadata;
+
+    @Mock
     private Channel channel;
 
     private CommandReceiver receiver;
@@ -76,8 +82,11 @@ class CommandReceiverTest {
 
     @BeforeEach
     void setUp() {
+        DriverProperties properties = new DriverProperties();
+        properties.setNode("node-a");
         receiver = new CommandReceiver(driverCustomService, driverSenderService, commandFacade,
-                deviceMetadata, dedupCache, new DeviceLockManager());
+                deviceMetadata, dedupCache, new DeviceLockManager(), driverMetadata, properties);
+        lenient().when(driverMetadata.getFencingToken(10L)).thenReturn(77L);
 
         MessageProperties props = new MessageProperties();
         props.setDeliveryTag(9L);
@@ -182,6 +191,8 @@ class CommandReceiverTest {
         return CommandCallDTO.builder()
                 .recordId(recordId)
                 .tenantId(100L)
+                .ownerNode("node-a")
+                .fencingToken(77L)
                 .deviceId(10L)
                 .commandId(20L)
                 .paramValues(Map.of("setpoint", "42"))

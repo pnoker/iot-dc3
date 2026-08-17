@@ -30,7 +30,6 @@ import io.github.pnoker.common.entity.bo.WindowAggregateResult;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.common.entity.query.WindowAggregateQuery;
-import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.utils.FieldUtil;
@@ -40,10 +39,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * PostgreSQL-based repository service implementation for point value persistence.
@@ -57,6 +61,15 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PostgresRepositoryServiceImpl implements RepositoryService, InitializingBean {
 
+    private static final Comparator<PointValueDO> INGEST_ORDER = Comparator
+            .comparing(PointValueDO::getTenantId, Comparator.nullsFirst(Comparator.naturalOrder()))
+            .thenComparing(PointValueDO::getDeviceId, Comparator.nullsFirst(Comparator.naturalOrder()))
+            .thenComparing(PointValueDO::getPointId, Comparator.nullsFirst(Comparator.naturalOrder()))
+            .thenComparing(PointValueDO::getFencingToken, Comparator.nullsFirst(Comparator.naturalOrder()))
+            .thenComparing(PointValueDO::getCreateTime, Comparator.nullsFirst(Comparator.naturalOrder()))
+            .thenComparing(PointValueDO::getSequence, Comparator.nullsFirst(Comparator.naturalOrder()))
+            .thenComparing(PointValueDO::getMessageId, Comparator.nullsFirst(Comparator.naturalOrder()));
+
     private final PointValueBuilder pointValueBuilder;
 
     private final PointValueManager pointValueManager;
@@ -69,19 +82,36 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     @Override
-    public void savePointValue(PointValueBO entityBO) {
-        PointValueDO entityDO = pointValueBuilder.buildDOByBO(entityBO);
-        if (!pointValueManager.save(entityDO)) {
-            throw new AddException("Failed to create point value");
-        }
+    public boolean savePointValue(PointValueBO entityBO) {
+        return !savePointValues(List.of(entityBO)).isEmpty();
     }
 
     @Override
-    public void savePointValues(List<PointValueBO> entityBOList) {
-        List<PointValueDO> entityDOList = pointValueBuilder.buildDOListByBOList(entityBOList);
-        if (!pointValueManager.saveBatch(entityDOList)) {
-            throw new AddException("Failed to create point value list");
+    @Transactional(rollbackFor = Exception.class)
+    public List<PointValueBO> savePointValues(List<PointValueBO> entityBOList) {
+        if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
+            return List.of();
         }
+        // Every concurrent consumer acquires lease rows and latest-value keys in the
+        // same order. This prevents opposite RabbitMQ batch orders from creating a
+        // PostgreSQL deadlock under high ingest concurrency.
+        List<PointValueDO> entityDOList = pointValueBuilder.buildDOListByBOList(entityBOList).stream()
+                .sorted(INGEST_ORDER)
+                .toList();
+        Set<String> insertedIds = new java.util.HashSet<>(pointValueMapper.insertHistoryBatch(entityDOList));
+        if (insertedIds.isEmpty()) {
+            return List.of();
+        }
+        Map<String, PointValueDO> acceptedById = entityDOList.stream()
+                .filter(value -> insertedIds.contains(value.getMessageId()))
+                .collect(java.util.stream.Collectors.toMap(PointValueDO::getMessageId, value -> value,
+                        (first, duplicate) -> first, LinkedHashMap::new));
+        List<PointValueDO> acceptedDOs = List.copyOf(acceptedById.values());
+        pointValueMapper.upsertLatestBatch(acceptedDOs);
+        Set<String> returnedIds = new java.util.HashSet<>();
+        return entityBOList.stream()
+                .filter(value -> insertedIds.contains(value.getMessageId()) && returnedIds.add(value.getMessageId()))
+                .toList();
     }
 
     @Override
@@ -102,15 +132,8 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
 
     @Override
     public PointValueBO selectLatestPointValue(Long tenantId, Long deviceId, Long pointId) {
-        LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
-        wrapper.eq(PointValueDO::getTenantId, tenantId);
-        wrapper.eq(PointValueDO::getDeviceId, deviceId);
-        wrapper.eq(PointValueDO::getPointId, pointId);
-        wrapper.orderByDesc(PointValueDO::getCreateTime);
-        wrapper.last("limit 1");
-
-        PointValueDO entityDO = pointValueManager.getOne(wrapper);
-        return pointValueBuilder.buildBOByDO(entityDO);
+        List<PointValueBO> values = listLatestPointValues(tenantId, deviceId, List.of(pointId));
+        return values.isEmpty() ? null : values.getFirst();
     }
 
     @Override

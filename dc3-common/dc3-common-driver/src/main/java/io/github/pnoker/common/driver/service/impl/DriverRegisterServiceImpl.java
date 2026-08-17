@@ -93,6 +93,8 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         entityBO.setDriver(driverBO);
         entityBO.setTenant(driverProperties.getTenant());
         entityBO.setClient(driverProperties.getClient());
+        entityBO.setNode(driverProperties.getNode());
+        entityBO.setLeaseSeconds(driverProperties.getLease().getSeconds());
         entityBO.setDriverAttributes(driverProperties.getDriverAttribute());
         entityBO.setPointAttributes(driverProperties.getPointAttribute());
         entityBO.setCommandAttributes(driverProperties.getCommandAttribute());

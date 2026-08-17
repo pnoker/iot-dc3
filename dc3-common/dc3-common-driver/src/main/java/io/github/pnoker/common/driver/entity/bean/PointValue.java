@@ -55,6 +55,30 @@ public class PointValue implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Immutable event identity used for end-to-end idempotency.
+     */
+    private String messageId;
+
+    /**
+     * Wire schema version. Consumers reject unsupported versions instead of silently
+     * interpreting an incompatible payload.
+     */
+    private Integer schemaVersion;
+
+    /**
+     * Unique runtime node that produced this reading.
+     */
+    private String driverNode;
+
+    /**
+     * Monotonically increasing sequence within {@link #driverNode}.
+     */
+    private Long sequence;
+
+    /** Manager-issued device ownership fencing token. */
+    private Long fencingToken;
+
+    /**
      * Driver ID that collected the data. Populated by the sender before the message is
      * published.
      */

@@ -70,7 +70,6 @@ dc3:
         remark: Bit offset (only used for boolean type)
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/plcs7/buffer.db
 
 spring:

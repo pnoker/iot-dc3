@@ -23,6 +23,7 @@ import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.facade.local.builder.FacadeDeviceBuilder;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
+import io.github.pnoker.common.manager.biz.DriverLeaseService;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.tenant.TenantContextHolder;
@@ -53,6 +54,9 @@ class DeviceLocalFacadeTest {
     @Mock
     private FacadeDeviceBuilder facadeDeviceBuilder;
 
+    @Mock
+    private DriverLeaseService driverLeaseService;
+
     private DeviceLocalFacade facade;
 
     private static <T> T any() {
@@ -65,7 +69,7 @@ class DeviceLocalFacadeTest {
 
     @BeforeEach
     void setUp() {
-        facade = new DeviceLocalFacade(deviceService, facadeDeviceBuilder);
+        facade = new DeviceLocalFacade(deviceService, facadeDeviceBuilder, driverLeaseService);
     }
 
     @AfterEach

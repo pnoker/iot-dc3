@@ -94,10 +94,8 @@ public class MetadataReceiver {
                 if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
                         || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
                     log.debug("Upsert device: {}", entityDTO.getId());
-                    // Add the id first so a refresh that races with a Quartz scan does
-                    // not bypass the just-loaded entry; loadCache below either fills
-                    // the cache or, on a null upstream, removes the orphan id again.
-                    driverMetadata.addDeviceId(entityDTO.getId());
+                    // Metadata events invalidate/load data only. Ownership is assigned by
+                    // the Manager lease service and is never inferred from an ADD event.
                     deviceMetadata.loadCache(entityDTO.getId());
                 } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
                     log.debug("Delete device: {}", entityDTO.getId());

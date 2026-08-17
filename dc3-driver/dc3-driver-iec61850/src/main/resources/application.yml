@@ -64,7 +64,6 @@ dc3:
         remark: Data object reference for commands
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/iec61850/buffer.db
 
 spring:

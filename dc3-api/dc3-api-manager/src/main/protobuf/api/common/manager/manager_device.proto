@@ -43,6 +43,8 @@ service DeviceApi {
   rpc GetByDeviceId (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
   // Batch query device information by Device IDs
   rpc ListByDeviceIds (GrpcDeviceIdsQuery) returns (GrpcRDeviceListDTO);
+  // Resolve the active runtime owner used for fenced command routing.
+  rpc GetActiveOwner (GrpcDeviceQuery) returns (GrpcRDeviceOwnerDTO);
 }
 
 // Response wrapper for paginated device query
@@ -79,4 +81,11 @@ message GrpcRDeviceDTO {
 
   // Returned single device data
   GrpcDeviceDTO data = 2;
+}
+
+message GrpcRDeviceOwnerDTO {
+  GrpcR result = 1;
+  int64 driver_id = 2;
+  string owner_node = 3;
+  int64 fencing_token = 4;
 }

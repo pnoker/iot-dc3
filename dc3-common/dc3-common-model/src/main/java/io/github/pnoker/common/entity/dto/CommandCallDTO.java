@@ -32,6 +32,8 @@ import java.util.Map;
 public record CommandCallDTO(
         String recordId,
         Long tenantId,
+        String ownerNode,
+        Long fencingToken,
         Long deviceId,
         Long commandId,
         String commandCode,
@@ -50,6 +52,8 @@ public record CommandCallDTO(
     public static class Builder {
         private String recordId;
         private Long tenantId;
+        private String ownerNode;
+        private Long fencingToken;
         private Long deviceId;
         private Long commandId;
         private String commandCode;
@@ -67,6 +71,16 @@ public record CommandCallDTO(
 
         public Builder tenantId(Long tenantId) {
             this.tenantId = tenantId;
+            return this;
+        }
+
+        public Builder ownerNode(String ownerNode) {
+            this.ownerNode = ownerNode;
+            return this;
+        }
+
+        public Builder fencingToken(Long fencingToken) {
+            this.fencingToken = fencingToken;
             return this;
         }
 
@@ -116,7 +130,7 @@ public record CommandCallDTO(
         }
 
         public CommandCallDTO build() {
-            return new CommandCallDTO(recordId, tenantId, deviceId, commandId, commandCode,
+            return new CommandCallDTO(recordId, tenantId, ownerNode, fencingToken, deviceId, commandId, commandCode,
                     paramValues, source, sourceUserId, occurredAt, expireAt, schemaVersion);
         }
     }

@@ -18,8 +18,9 @@
 CREATE SCHEMA IF NOT EXISTS dc3_history;
 SET search_path TO dc3_history, public;
 
--- History hypertables are treated as append-only data here.
--- Keep operate_time for compatibility, but do not maintain UPDATE triggers.
+-- History hypertables are append-only. create_time is the device acquisition
+-- timestamp; operate_time is the platform persistence timestamp. Writers set
+-- both explicitly, so history tables do not need UPDATE triggers.
 --
 -- Storage model: a single dc3_point_value hypertable holds every sample
 -- regardless of declared point type. The textual raw_value / cal_value
@@ -34,6 +35,11 @@ SET search_path TO dc3_history, public;
 -- ----------------------------
 CREATE TABLE dc3_point_value
 (
+    message_id VARCHAR(36) NOT NULL,                            -- Immutable event identity
+    schema_version INTEGER NOT NULL,                            -- Point-value wire schema version
+    driver_node VARCHAR(128) NOT NULL,                          -- Producing driver runtime node
+    sequence BIGINT NOT NULL,                                  -- Monotonic sequence within driver_node
+    fencing_token BIGINT NOT NULL,                             -- Manager-issued ownership fence
     device_id BIGINT DEFAULT 0 NOT NULL,                        -- Device ID
     point_id  BIGINT DEFAULT 0 NOT NULL,                        -- Point ID
     raw_value TEXT   DEFAULT ''::TEXT          NOT NULL,        -- Raw value as captured from the device
@@ -80,6 +86,11 @@ FROM public.create_hypertable('dc3_point_value', public.by_range('create_time', 
 SELECT *
 FROM public.add_dimension('dc3_point_value', public.by_hash('device_id', 16));
 
+-- TimescaleDB requires every partitioning column in a unique index. The event id,
+-- acquisition time, and device hash dimension together provide replay idempotency.
+CREATE UNIQUE INDEX uk_point_value_event
+    ON dc3_point_value (message_id, create_time, device_id);
+
 ALTER TABLE dc3_point_value
 SET(
         timescaledb.compress,
@@ -88,3 +99,32 @@ SET(
 );
 SELECT public.add_compression_policy('dc3_point_value', INTERVAL '7 days');
 SELECT public.add_retention_policy('dc3_point_value', INTERVAL '180 days');
+
+-- ----------------------------
+-- Transactional latest-value projection
+-- ----------------------------
+-- This is a normal PostgreSQL table, not an in-process cache. Every Data Center
+-- replica reads and writes the same projection. History and latest are updated in
+-- one transaction, and older/out-of-order readings cannot overwrite newer values.
+CREATE TABLE dc3_point_latest
+(
+    tenant_id BIGINT NOT NULL,
+    device_id BIGINT NOT NULL,
+    point_id BIGINT NOT NULL,
+    message_id VARCHAR(36) NOT NULL,
+    schema_version INTEGER NOT NULL,
+    driver_node VARCHAR(128) NOT NULL,
+    sequence BIGINT NOT NULL,
+    fencing_token BIGINT NOT NULL,
+    raw_value TEXT DEFAULT ''::TEXT NOT NULL,
+    cal_value TEXT DEFAULT ''::TEXT NOT NULL,
+    num_value DOUBLE PRECISION,
+    driver_id BIGINT DEFAULT 0 NOT NULL,
+    create_time TIMESTAMPTZ NOT NULL,
+    operate_time TIMESTAMPTZ NOT NULL,
+    PRIMARY KEY (tenant_id, device_id, point_id)
+);
+
+CREATE INDEX idx_point_latest_driver ON dc3_point_latest (tenant_id, driver_id);
+
+COMMENT ON TABLE dc3_point_latest IS 'Transactional latest point value projection shared by all Data Center replicas';

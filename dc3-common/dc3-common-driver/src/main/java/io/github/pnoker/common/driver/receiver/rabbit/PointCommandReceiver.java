@@ -23,6 +23,8 @@ import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.entity.dto.PointCommandPayload;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
@@ -53,7 +55,7 @@ import java.util.Objects;
 public class PointCommandReceiver {
 
     /**
-     * Message schema version stamped on outgoing command results, used by the data center to drive compatibility handling.
+     * Message schema version stamped on outgoing command results.
      */
     private static final int SCHEMA_VERSION = 1;
     private final DriverReadService driverReadService;
@@ -61,6 +63,8 @@ public class PointCommandReceiver {
     private final DriverSenderService driverSenderService;
     private final CommandDedupCache dedupCache;
     private final DeviceLockManager deviceLockManager;
+    private final DriverMetadata driverMetadata;
+    private final DriverProperties driverProperties;
 
     /**
      * Handles an incoming point command by validating the payload, rejecting duplicates,
@@ -81,7 +85,8 @@ public class PointCommandReceiver {
             // payload must be rejected before logging to avoid an NPE that would
             // otherwise fall through to the nack(requeue) path and requeue garbage.
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.commandId())
-                    || Objects.isNull(entityDTO.tenantId()) || Objects.isNull(entityDTO.type())
+                    || Objects.isNull(entityDTO.tenantId()) || Objects.isNull(entityDTO.ownerNode())
+                    || Objects.isNull(entityDTO.fencingToken()) || Objects.isNull(entityDTO.type())
                     || Objects.isNull(entityDTO.payload())) {
                 log.error("Invalid point command: {}", entityDTO);
                 RabbitAckUtil.reject(channel, deliveryTag);
@@ -119,6 +124,15 @@ public class PointCommandReceiver {
                 case PointCommandPayload.ReadPayload r -> r.deviceId();
                 case PointCommandPayload.WritePayload w -> w.deviceId();
             };
+
+            if (!Objects.equals(driverProperties.getNode(), entityDTO.ownerNode())
+                    || !Objects.equals(driverMetadata.getFencingToken(lockDeviceId), entityDTO.fencingToken())) {
+                log.warn("Reject stale-owner point command, commandId={}, deviceId={}, fencingToken={}",
+                        commandId, lockDeviceId, entityDTO.fencingToken());
+                sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED,
+                        null, "STALE_OWNER", "Device ownership lease changed", channel, deliveryTag);
+                return;
+            }
 
             // Dispatch under per-device lock to prevent protocol interleaving
             String responseValue = deviceLockManager.runExclusive(lockDeviceId, () -> {
@@ -195,6 +209,11 @@ public class PointCommandReceiver {
             }
         } catch (Exception e) {
             log.error("Failed to send command result, commandId={}", commandId, e);
+            if (Objects.nonNull(commandId)) {
+                dedupCache.release(commandId);
+            }
+            RabbitAckUtil.nack(channel, deliveryTag, true);
+            return;
         }
         RabbitAckUtil.ack(channel, deliveryTag);
     }

@@ -26,16 +26,12 @@ import io.github.pnoker.common.data.dal.CommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.dto.CommandCallDTO;
 import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -45,10 +41,12 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.RabbitPublishConfirm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +55,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -75,10 +74,6 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
 
     private static final int DEFAULT_COMMAND_TIMEOUT_SECONDS = 30;
 
-    private static final int LEGACY_MILLISECONDS_THRESHOLD = 1000;
-
-    private static final int MILLISECONDS_PER_SECOND = 1000;
-
     private final DeviceFacade deviceFacade;
 
     private final DriverFacade driverFacade;
@@ -91,8 +86,6 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
 
     private final CommandHistoryBuilder commandHistoryBuilder;
 
-    private final EntityStateMapper entityStateMapper;
-
     @Override
     public String call(Long tenantId, CommandCallBO entityBO) {
         FacadeCommandBO command = validateCommandScope(tenantId, entityBO.getDeviceId(), entityBO.getCommandId(),
@@ -103,7 +96,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         if (Objects.isNull(driver)) {
             throw new ServiceException("No driver registered for this device");
         }
-        checkDriverOnline(tenantId, driver.getId());
+        FacadeDeviceOwnerBO owner = requireActiveOwner(tenantId, entityBO.getDeviceId(), driver.getId());
 
         int timeoutSeconds = resolveCommandTimeout(command);
 
@@ -125,9 +118,11 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         recordDO.setSchemaVersion((short) 1);
         commandHistoryManager.save(recordDO);
 
-        publishCommand(CommandCallDTO.builder()
+        CommandCallDTO commandDTO = CommandCallDTO.builder()
                 .recordId(recordId)
                 .tenantId(tenantId)
+                .ownerNode(owner.ownerNode())
+                .fencingToken(owner.fencingToken())
                 .deviceId(entityBO.getDeviceId())
                 .commandId(commandId)
                 .commandCode(command.getCommandCode())
@@ -136,7 +131,13 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
                 .occurredAt(now)
                 .expireAt(now.plusSeconds(timeoutSeconds))
                 .schemaVersion(1)
-                .build(), driver.getServiceName(), recordId);
+                .build();
+        try {
+            publishCommand(commandDTO, driver.getServiceName(), owner.ownerNode(), recordId);
+        } catch (Exception e) {
+            markPublishFailed(recordDO, e);
+            throw new ServiceException("Failed to route custom command to active driver owner", e);
+        }
 
         recordDO.setStatus(PointCommandStatusEnum.SENT);
         recordDO.setSendTime(LocalDateTime.now());
@@ -166,24 +167,6 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
                 .orderByDesc(CommandHistoryDO::getOccurTime);
         Page<CommandHistoryDO> page = commandHistoryManager.page(queryVO.toPage(), wrapper);
         return commandHistoryBuilder.buildVOPageByDOPage(page);
-    }
-
-    /**
-     * Verify the driver serving the command is online, throwing {@link ServiceException}
-     * when no online state exists for the driver.
-     *
-     * @param tenantId tenant scope
-     * @param driverId the driver to check
-     */
-    private void checkDriverOnline(Long tenantId, Long driverId) {
-        EntityStateDO driverState = entityStateMapper.selectOne(
-                new LambdaQueryWrapper<EntityStateDO>()
-                        .eq(EntityStateDO::getTenantId, tenantId)
-                        .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
-                        .eq(EntityStateDO::getEntityId, driverId));
-        if (Objects.isNull(driverState) || !EntityStatusEnum.ONLINE.getIndex().equals(driverState.getStateFlag())) {
-            throw new ServiceException("Driver is offline");
-        }
     }
 
     /**
@@ -251,8 +234,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
     }
 
     /**
-     * Resolve the command timeout in seconds. Falls back to the default when missing or
-     * non-positive, and interprets legacy millisecond values as seconds.
+     * Resolve the command timeout in seconds. The model has one unit only: seconds.
      *
      * @param command the command carrying the raw timeout
      * @return the timeout in seconds
@@ -261,14 +243,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         if (Objects.isNull(command) || Objects.isNull(command.getTimeout()) || command.getTimeout() <= 0) {
             return DEFAULT_COMMAND_TIMEOUT_SECONDS;
         }
-        int timeout = command.getTimeout();
-        if (timeout >= LEGACY_MILLISECONDS_THRESHOLD && timeout % MILLISECONDS_PER_SECOND == 0) {
-            int timeoutSeconds = timeout / MILLISECONDS_PER_SECOND;
-            log.warn("Interpreting command timeout as legacy milliseconds: commandId={}, rawTimeout={}, timeoutSeconds={}",
-                    command.getId(), timeout, timeoutSeconds);
-            return timeoutSeconds;
-        }
-        return timeout;
+        return command.getTimeout();
     }
 
     /**
@@ -278,10 +253,29 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
      * @param serviceName the target driver's service name
      * @param recordId    the command history record id, used as the correlation id
      */
-    private void publishCommand(CommandCallDTO dto, String serviceName, String recordId) {
+    private void publishCommand(CommandCallDTO dto, String serviceName, String ownerNode, String recordId) {
         CorrelationData correlationData = new CorrelationData(recordId);
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-                RabbitConstant.ROUTING_COMMAND_PREFIX + serviceName, dto, correlationData);
+                RabbitConstant.ROUTING_COMMAND_PREFIX + serviceName + "." + ownerNode, dto, correlationData);
+        RabbitPublishConfirm.awaitRouted(correlationData, Duration.ofSeconds(5));
+    }
+
+    private void markPublishFailed(CommandHistoryDO recordDO, Exception cause) {
+        recordDO.setStatus(PointCommandStatusEnum.FAILED);
+        recordDO.setErrorCode("BROKER_PUBLISH_FAILED");
+        recordDO.setErrorMessage(cause.getMessage());
+        recordDO.setFinishTime(LocalDateTime.now());
+        commandHistoryManager.updateById(recordDO);
+    }
+
+    private FacadeDeviceOwnerBO requireActiveOwner(Long tenantId, Long deviceId, Long driverId) {
+        FacadeDeviceOwnerBO owner = deviceFacade.getActiveOwner(tenantId, deviceId);
+        if (Objects.isNull(owner) || !Objects.equals(owner.driverId(), driverId)
+                || Objects.isNull(owner.ownerNode()) || owner.ownerNode().isBlank()
+                || Objects.isNull(owner.fencingToken()) || owner.fencingToken() <= 0) {
+            throw new ServiceException("Device has no active driver owner");
+        }
+        return owner;
     }
 
 }

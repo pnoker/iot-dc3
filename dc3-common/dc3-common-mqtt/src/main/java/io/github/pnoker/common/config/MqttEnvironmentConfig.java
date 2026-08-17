@@ -25,10 +25,8 @@ import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -52,8 +50,6 @@ public class MqttEnvironmentConfig implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        addLegacyMqttAliases(environment);
-
         String node = environment.getProperty(EnvironmentConstant.DRIVER_NODE, String.class);
         if (StringUtils.isEmpty(node)) {
             node = EnvironmentUtil.getNodeId();
@@ -74,25 +70,6 @@ public class MqttEnvironmentConfig implements EnvironmentPostProcessor {
         source.put(EnvironmentConstant.MQTT_PREFIX, prefix);
         MutablePropertySources propertySources = environment.getPropertySources();
         propertySources.addFirst(new MapPropertySource("mqtt", source));
-    }
-
-    private void addLegacyMqttAliases(ConfigurableEnvironment environment) {
-        Map<String, Object> aliases = new HashMap<>();
-        for (PropertySource<?> propertySource : environment.getPropertySources()) {
-            if (propertySource instanceof EnumerablePropertySource<?> enumerablePropertySource) {
-                for (String propertyName : enumerablePropertySource.getPropertyNames()) {
-                    if (propertyName.startsWith("driver.mqtt.")) {
-                        String aliasName = "dc3." + propertyName;
-                        if (!environment.containsProperty(aliasName)) {
-                            aliases.put(aliasName, enumerablePropertySource.getProperty(propertyName));
-                        }
-                    }
-                }
-            }
-        }
-        if (!aliases.isEmpty()) {
-            environment.getPropertySources().addLast(new MapPropertySource("legacyMqttAliases", aliases));
-        }
     }
 
 }

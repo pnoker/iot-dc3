@@ -33,9 +33,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Thin Caffeine wrapper with a Redis-like surface (setKey/getKey with optional TTL, batch
- * variants) so call sites only need to swap the injected type. Variable per-entry TTL is
- * honored via a custom {@link Expiry}.
+ * Thin Caffeine wrapper for process-local, TTL-bound operational state. Durable telemetry,
+ * latest point values, and distributed driver ownership never use this cache. Variable
+ * per-entry TTL is honored via a custom {@link Expiry}.
  *
  * <p>
  * Exposes {@link #onExpire(ExpireListener)} so callers can react when an entry is evicted

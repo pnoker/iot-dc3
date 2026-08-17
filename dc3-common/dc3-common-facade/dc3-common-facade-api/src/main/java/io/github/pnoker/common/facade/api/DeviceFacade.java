@@ -18,6 +18,7 @@
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 
@@ -51,6 +52,9 @@ public interface DeviceFacade {
      * belongs to another tenant.
      */
     FacadeDeviceBO getById(Long tenantId, Long id);
+
+    /** Resolve an active, fenced runtime owner or return {@code null}. */
+    FacadeDeviceOwnerBO getActiveOwner(Long tenantId, Long deviceId);
 
     /**
      * Tenant-scoped bulk lookup. Missing or cross-tenant devices are omitted.

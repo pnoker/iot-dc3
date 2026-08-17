@@ -23,6 +23,8 @@ import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.CommandCallDTO;
@@ -60,7 +62,7 @@ import java.util.Objects;
 public class CommandReceiver {
 
     /**
-     * Message schema version stamped on outbound command results for forward/backward compatibility.
+     * Message schema version stamped on outbound command results.
      */
     private static final int SCHEMA_VERSION = 1;
     private final DriverCustomService driverCustomService;
@@ -69,6 +71,8 @@ public class CommandReceiver {
     private final DeviceMetadata deviceMetadata;
     private final CommandDedupCache dedupCache;
     private final DeviceLockManager deviceLockManager;
+    private final DriverMetadata driverMetadata;
+    private final DriverProperties driverProperties;
 
     /**
      * Dispatch a custom command call to the driver: validate the payload, drop
@@ -93,6 +97,7 @@ public class CommandReceiver {
             // otherwise fall through to the nack(requeue) path and requeue garbage.
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
                     || Objects.isNull(entityDTO.tenantId())
+                    || Objects.isNull(entityDTO.ownerNode()) || Objects.isNull(entityDTO.fencingToken())
                     || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.commandId())) {
                 log.error("Invalid custom command: {}", entityDTO);
                 RabbitAckUtil.reject(channel, deliveryTag);
@@ -105,6 +110,15 @@ public class CommandReceiver {
             Long tenantId = entityDTO.tenantId();
             Long deviceId = entityDTO.deviceId();
             Long commandId = entityDTO.commandId();
+
+            if (!Objects.equals(driverProperties.getNode(), entityDTO.ownerNode())
+                    || !Objects.equals(driverMetadata.getFencingToken(deviceId), entityDTO.fencingToken())) {
+                log.warn("Reject stale-owner custom command, recordId={}, deviceId={}, fencingToken={}",
+                        recordId, deviceId, entityDTO.fencingToken());
+                sendResult(recordId, tenantId, PointCommandStatusEnum.FAILED,
+                        null, null, "STALE_OWNER", "Device ownership lease changed", channel, deliveryTag);
+                return;
+            }
 
             // Expire-at pre-check
             if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
@@ -184,6 +198,11 @@ public class CommandReceiver {
             }
         } catch (Exception e) {
             log.error("Failed to send command result, recordId={}", recordId, e);
+            if (Objects.nonNull(recordId)) {
+                dedupCache.release(recordId);
+            }
+            RabbitAckUtil.nack(channel, deliveryTag, true);
+            return;
         }
         RabbitAckUtil.ack(channel, deliveryTag);
     }

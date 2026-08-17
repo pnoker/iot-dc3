@@ -20,10 +20,13 @@ package io.github.pnoker.common.facade.local;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.facade.local.builder.FacadeDeviceBuilder;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
+import io.github.pnoker.common.manager.entity.bo.DeviceLeaseBO;
+import io.github.pnoker.common.manager.biz.DriverLeaseService;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.tenant.TenantContextHolder;
@@ -56,12 +59,26 @@ public class DeviceLocalFacade implements DeviceFacade {
 
     private final FacadeDeviceBuilder facadeDeviceBuilder;
 
+    private final DriverLeaseService driverLeaseService;
+
     @Override
     public FacadeDeviceBO getById(Long tenantId, Long id) {
         TenantContextHolder.setTenantId(tenantId);
         try {
             DeviceBO managerBO = deviceService.getById(id);
             return Objects.isNull(managerBO) ? null : facadeDeviceBuilder.toFacadeBO(managerBO);
+        } finally {
+            TenantContextHolder.clear();
+        }
+    }
+
+    @Override
+    public FacadeDeviceOwnerBO getActiveOwner(Long tenantId, Long deviceId) {
+        TenantContextHolder.setTenantId(tenantId);
+        try {
+            DeviceLeaseBO owner = driverLeaseService.getActiveOwner(tenantId, deviceId);
+            return owner == null ? null
+                    : new FacadeDeviceOwnerBO(owner.driverId(), owner.ownerNode(), owner.fencingToken());
         } finally {
             TenantContextHolder.clear();
         }

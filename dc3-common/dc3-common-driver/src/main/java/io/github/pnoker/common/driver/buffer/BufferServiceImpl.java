@@ -25,6 +25,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -32,16 +33,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * SQLite-backed {@link BufferService}. Persists point values that failed to reach RabbitMQ
- * (synchronous {@link AmqpException} or asynchronous publisher NACK) and republishes them
- * from a Quartz job with exponential backoff. When the buffer file exceeds the configured
- * size cap the oldest records are evicted to keep the newest readings.
- *
- * <p>Republish is optimistic: a record that leaves the channel without throwing is deleted,
- * and a later NACK re-queues it through the confirm callback using the same correlation id.
+ * SQLite-backed durable point-value outbox. Values are persisted before the first
+ * RabbitMQ publish and deleted only after a positive publisher confirm with no return.
+ * Every failure path retains the same message identity for idempotent downstream retry.
  *
  * @author pnoker
- * @version 2026.5.22
+ * @version 2026.8.12
  * @since 2026.6.2
  */
 @Slf4j
@@ -61,33 +58,48 @@ public class BufferServiceImpl implements BufferService {
     @Override
     public void initialize() {
         DriverProperties.BufferProperties config = driverProperties.getBuffer();
-        if (Objects.isNull(config) || !Boolean.TRUE.equals(config.getEnabled())) {
-            log.info("Point value buffer disabled, skip initialization");
-            return;
+        if (Objects.isNull(config)) {
+            throw new IllegalStateException("Driver point-value outbox configuration is required");
         }
         this.buffer = new PointValueBuffer(config.getDbPath());
         this.buffer.initialize();
     }
 
-    @Override
-    public boolean isEnabled() {
-        DriverProperties.BufferProperties config = driverProperties.getBuffer();
-        return Objects.nonNull(config) && Boolean.TRUE.equals(config.getEnabled()) && Objects.nonNull(buffer);
+    private PointValueBuffer requireBuffer() {
+        if (Objects.isNull(buffer)) {
+            throw new IllegalStateException("Driver point-value outbox is not initialized");
+        }
+        return buffer;
     }
 
     @Override
     public long pendingCount() {
-        return Objects.nonNull(buffer) ? buffer.count() : 0;
+        return requireBuffer().count();
     }
 
     @Override
-    public void offer(PointValue pointValue, String routingKey, String correlationId, int attempt) {
-        if (!isEnabled()) {
+    public void publish(PointValue pointValue, String routingKey) {
+        publishBatch(List.of(pointValue), routingKey);
+    }
+
+    @Override
+    public void publishBatch(List<PointValue> pointValues, String routingKey) {
+        if (pointValues == null || pointValues.isEmpty()) {
             return;
         }
-        DriverProperties.BufferProperties config = driverProperties.getBuffer();
         long now = epochSecond();
-        BufferedPointValue record = new BufferedPointValue(
+        List<BufferedPointValue> records = pointValues.stream()
+                .map(pointValue -> toRecord(pointValue, routingKey, pointValue.getMessageId(), 0, now))
+                .toList();
+        requireBuffer().upsertBatch(records);
+        pointValues.forEach(pointValue -> publishPersisted(
+                pointValue, routingKey, pointValue.getMessageId(), 1));
+    }
+
+    private BufferedPointValue toRecord(PointValue pointValue, String routingKey, String correlationId,
+                                        int attempt, long now) {
+        DriverProperties.BufferProperties config = driverProperties.getBuffer();
+        return new BufferedPointValue(
                 correlationId,
                 pointValue.getDeviceId(),
                 pointValue.getPointId(),
@@ -97,92 +109,72 @@ public class BufferServiceImpl implements BufferService {
                 routingKey,
                 attempt,
                 now + backoffSeconds(attempt, config),
-                now
-        );
-        buffer.upsert(record);
-        if (log.isDebugEnabled()) {
-            log.debug("Buffered point value, id={}, deviceId={}, pointId={}, attempt={}, queueSize={}",
-                    correlationId, pointValue.getDeviceId(), pointValue.getPointId(), attempt, buffer.count());
-        }
-        enforceCapacity(config);
+                now);
     }
 
     @Override
     public void republishBatch() {
-        if (!isEnabled()) {
-            return;
-        }
         DriverProperties.BufferProperties config = driverProperties.getBuffer();
-        List<BufferedPointValue> records = buffer.selectPending(config.getBatchSize(), epochSecond());
+        List<BufferedPointValue> records = requireBuffer().selectPending(config.getBatchSize(), epochSecond());
         if (records.isEmpty()) {
             return;
         }
-        log.debug("Republishing {} buffered point values", records.size());
-        for (BufferedPointValue record : records) {
-            republishOne(record, config);
-        }
-        enforceCapacity(config);
+        log.debug("Republishing {} point values from outbox", records.size());
+        records.forEach(record -> republishOne(record, config));
     }
 
-    /**
-     * Republish a single buffered record. Records that have exhausted {@code maxRetry} are
-     * dropped as poison with an ERROR log; the rest are re-sent with an incremented attempt
-     * counter carried in the correlation so a NACK re-queue stores the right ordinal.
-     */
     private void republishOne(BufferedPointValue record, DriverProperties.BufferProperties config) {
-        if (record.attempt() >= config.getMaxRetry()) {
-            log.error("Buffer record exceeded max retry ({}), dropping poison, id={}, deviceId={}, pointId={}",
-                    config.getMaxRetry(), record.id(), record.deviceId(), record.pointId());
-            buffer.delete(record.id());
-            return;
-        }
         PointValue pointValue;
         try {
             pointValue = JsonUtil.parseObject(record.payloadJson(), PointValue.class);
         } catch (Exception e) {
-            log.error("Buffer record payload corrupted, dropping, id={}, deviceId={}, pointId={}",
+            buffer.markRetry(record.id(), record.attempt(), epochSecond() + config.getMaxBackoffSeconds());
+            log.error("Outbox payload corrupted and retained, id={}, deviceId={}, pointId={}",
                     record.id(), record.deviceId(), record.pointId(), e);
-            buffer.delete(record.id());
             return;
         }
-        int nextAttempt = record.attempt() + 1;
+
+        int nextAttempt = record.attempt() == Integer.MAX_VALUE ? Integer.MAX_VALUE : record.attempt() + 1;
+        long backoff = backoffSeconds(nextAttempt, config);
+        // Claim the row before publishing so overlapping scheduler runs do not resend it.
+        buffer.markRetry(record.id(), nextAttempt, epochSecond() + backoff);
+        publishPersisted(pointValue, record.routingKey(), record.id(), nextAttempt);
+    }
+
+    private void publishPersisted(PointValue pointValue, String routingKey, String correlationId, int attempt) {
         PointValueCorrelation correlation = new PointValueCorrelation(
-                record.id(), record.deviceId(), record.pointId(), nextAttempt,
-                record.payloadJson(), record.routingKey());
+                correlationId, pointValue.getDeviceId(), pointValue.getPointId(), attempt,
+                JsonUtil.toJsonString(pointValue), routingKey);
         try {
-            rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE, record.routingKey(), pointValue, correlation);
-            // Optimistic delete: the message left the channel. A later NACK re-queues it
-            // via the ConfirmCallback using the same correlation id.
-            buffer.delete(record.id());
+            rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE, routingKey, pointValue, correlation);
+            correlation.getFuture().whenComplete((confirm, failure) -> {
+                if (Objects.isNull(failure) && Objects.nonNull(confirm) && confirm.isAck()
+                        && Objects.isNull(correlation.getReturned())) {
+                    buffer.delete(correlationId);
+                    return;
+                }
+                markPublishFailure(correlationId, attempt, confirm, correlation, failure);
+            });
         } catch (AmqpException e) {
-            long backoff = backoffSeconds(nextAttempt, config);
-            log.warn("Buffer republish rejected, id={}, attempt={}, retrying in {}s",
-                    record.id(), nextAttempt, backoff);
-            buffer.markRetry(record.id(), nextAttempt, epochSecond() + backoff);
+            markPublishFailure(correlationId, attempt, null, correlation, e);
         }
     }
 
-    /**
-     * When the SQLite file exceeds the configured size cap, evict the oldest batch. SQLite
-     * reuses freed pages, so the file does not shrink without a VACUUM — that is acceptable
-     * for a bounded buffer that cycles through records.
-     */
-    private void enforceCapacity(DriverProperties.BufferProperties config) {
-        long maxBytes = config.getMaxSizeMb() * 1024L * 1024L;
-        if (buffer.fileSize() <= maxBytes) {
-            return;
-        }
-        int evicted = buffer.deleteOldest(config.getBatchSize());
-        log.warn("Buffer capacity exceeded ({}B > {}B), evicted {} oldest records",
-                buffer.fileSize(), maxBytes, evicted);
+    private void markPublishFailure(String correlationId, int attempt, CorrelationData.Confirm confirm,
+                                    PointValueCorrelation correlation, Throwable failure) {
+        DriverProperties.BufferProperties config = driverProperties.getBuffer();
+        long backoff = backoffSeconds(attempt, config);
+        buffer.markRetry(correlationId, attempt, epochSecond() + backoff);
+        log.warn("Point value publish unconfirmed, id={}, attempt={}, retryInSeconds={}, ack={}, returned={}",
+                correlationId, attempt, backoff, Objects.nonNull(confirm) && confirm.isAck(),
+                Objects.nonNull(correlation.getReturned()), failure);
     }
 
-    /**
-     * Exponential backoff in seconds: {@code backoffSeconds * 2^(attempt-1)}, capped at
-     * {@code maxBackoffSeconds}.
-     */
     private long backoffSeconds(int attempt, DriverProperties.BufferProperties config) {
-        long delay = (long) (config.getBackoffSeconds() * Math.pow(2, attempt - 1));
+        int exponent = Math.max(0, Math.min(attempt - 1, 30));
+        long multiplier = 1L << exponent;
+        long initial = config.getBackoffSeconds();
+        long delay = initial > Long.MAX_VALUE / multiplier ? Long.MAX_VALUE : initial * multiplier;
         return Math.min(delay, config.getMaxBackoffSeconds());
     }
 

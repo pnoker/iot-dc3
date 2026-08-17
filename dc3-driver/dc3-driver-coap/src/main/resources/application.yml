@@ -65,7 +65,6 @@ dc3:
           Content format: json, text, cbor, octet-stream
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/coap/buffer.db
 
 spring:

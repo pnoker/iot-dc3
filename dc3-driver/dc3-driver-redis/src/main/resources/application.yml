@@ -64,7 +64,6 @@ dc3:
         remark: Redis data type: STRING or HASH
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/redis/buffer.db
 
 spring:

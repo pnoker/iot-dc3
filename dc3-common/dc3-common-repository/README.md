@@ -17,7 +17,7 @@ backends without coupling business logic to a specific storage implementation.
 |------------------------------------|-----------------------------------------------------------------------------------------------|
 | `RepositoryService`                | Storage interface: save point values and query latest/history/page data                       |
 | `RepositoryStrategyFactory`        | Runtime registry for available `RepositoryService` implementations                            |
-| `PointValueBO`                     | Business object representing a point value with timestamp, device ID, point ID, and raw value |
+| `PointValueBO`                     | Versioned telemetry event with immutable identity, ownership fence, timestamps, and values    |
 | `PointQueryBO` / `PointValueQuery` | Query objects for paginated and filter-based retrieval                                        |
 | `ActiveRepositoryProfileConfig`    | Activates the `repository` profile unless `dc3.repository.auto-profile=false` is set          |
 
@@ -64,4 +64,4 @@ mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-repository -am test
 ## Related Modules
 
 - `dc3-common-data` — Uses `RepositoryStrategyFactory` to route point-value persistence operations
-- `dc3-common-data` — Caches latest point values with `PointValueLocalCache` alongside repository storage
+- `dc3-common-data` — Persists history and the shared PostgreSQL latest-value projection in one transaction

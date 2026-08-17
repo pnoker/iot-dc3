@@ -26,6 +26,7 @@ import io.github.pnoker.api.center.manager.GrpcPageDeviceQuery;
 import io.github.pnoker.api.center.manager.GrpcProfileQuery;
 import io.github.pnoker.api.center.manager.GrpcRDeviceDTO;
 import io.github.pnoker.api.center.manager.GrpcRDeviceListDTO;
+import io.github.pnoker.api.center.manager.GrpcRDeviceOwnerDTO;
 import io.github.pnoker.api.center.manager.GrpcRPageDeviceDTO;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcDriverQuery;
@@ -33,6 +34,8 @@ import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.manager.biz.DriverLeaseService;
+import io.github.pnoker.common.manager.entity.bo.DeviceLeaseBO;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDeviceBuilder;
@@ -62,6 +65,30 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     private final GrpcDeviceBuilder grpcDeviceBuilder;
 
     private final DeviceService deviceService;
+
+    private final DriverLeaseService driverLeaseService;
+
+    @Override
+    public void getActiveOwner(GrpcDeviceQuery request,
+                               StreamObserver<GrpcRDeviceOwnerDTO> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            GrpcRDeviceOwnerDTO.Builder builder = GrpcRDeviceOwnerDTO.newBuilder();
+            DeviceLeaseBO owner = driverLeaseService.getActiveOwner(request.getTenantId(), request.getDeviceId());
+            if (owner == null) {
+                builder.setResult(GrpcRFactory.notFound());
+            } else {
+                builder.setDriverId(owner.driverId())
+                        .setOwnerNode(owner.ownerNode())
+                        .setFencingToken(owner.fencingToken())
+                        .setResult(GrpcRFactory.ok());
+            }
+            responseObserver.onNext(builder.build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
+        }
+    }
 
     @Override
     public void listByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {

@@ -78,19 +78,6 @@ class PointValueBufferTest {
     }
 
     @Test
-    void deleteOldestEvictsByCreatedAt(@TempDir Path tmp) {
-        PointValueBuffer buffer = newBuffer(tmp);
-        long now = epoch();
-        buffer.upsert(rec("old", 10L, 20L, 1, now, now - 100));
-        buffer.upsert(rec("new", 11L, 21L, 1, now, now));
-
-        assertThat(buffer.deleteOldest(1)).isEqualTo(1);
-        List<BufferedPointValue> pending = buffer.selectPending(10, now);
-        assertThat(pending).hasSize(1).extracting(BufferedPointValue::id).contains("new");
-        buffer.close();
-    }
-
-    @Test
     void upsertReplacesExistingRow(@TempDir Path tmp) {
         PointValueBuffer buffer = newBuffer(tmp);
         long now = epoch();
@@ -100,6 +87,39 @@ class PointValueBufferTest {
         assertThat(buffer.count()).isEqualTo(1);
         assertThat(buffer.selectPending(10, now + 30).get(0).attempt()).isEqualTo(2);
         buffer.close();
+    }
+
+    @Test
+    void upsertBatchCommitsEveryRow(@TempDir Path tmp) {
+        PointValueBuffer buffer = newBuffer(tmp);
+        long now = epoch();
+
+        buffer.upsertBatch(List.of(
+                rec("batch-1", 10L, 20L, 0, now, now),
+                rec("batch-2", 11L, 21L, 0, now, now)));
+
+        assertThat(buffer.selectPending(10, now))
+                .extracting(BufferedPointValue::id)
+                .containsExactly("batch-1", "batch-2");
+        buffer.close();
+    }
+
+    @Test
+    void committedRowsSurviveReopen(@TempDir Path tmp) {
+        Path db = tmp.resolve("buffer.db");
+        long now = epoch();
+        PointValueBuffer first = new PointValueBuffer(db.toString());
+        first.initialize();
+        first.upsert(rec("durable", 10L, 20L, 0, now, now));
+        first.close();
+
+        PointValueBuffer reopened = new PointValueBuffer(db.toString());
+        reopened.initialize();
+        assertThat(reopened.selectPending(10, now))
+                .singleElement()
+                .extracting(BufferedPointValue::id)
+                .isEqualTo("durable");
+        reopened.close();
     }
 
     private PointValueBuffer newBuffer(Path tmp) {

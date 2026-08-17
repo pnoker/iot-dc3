@@ -29,9 +29,8 @@ import org.springframework.stereotype.Service;
 /**
  * Business service implementation for data-center scheduled jobs.
  *
- * <p>Point-value ingestion no longer has a Quartz tick here — it is driven by
- * {@link io.github.pnoker.common.data.buffer.PointValueIngestBuffer}'s worker threads. Only the
- * hourly maintenance job remains.
+ * <p>Point-value ingestion no longer has a Quartz tick here; RabbitMQ consumer batches drive
+ * persistence directly. Only the hourly maintenance job remains.
  *
  * @author pnoker
  * @version 2026.7.8
