@@ -8,15 +8,15 @@ dispatch.
 
 | Family | Modules |
 |---|---|
-| Industrial protocols | `bacnet-ip`, `can`, `dlms`, `ethernet-ip`, `fins`, `iec104`, `melsec`, `modbus-rtu`, `modbus-tcp`, `opc-da`, `opc-ua`, `plcs7`, `sl651`, `snmp` |
-| Messaging/network | `coap`, `http`, `lwm2m`, `mqtt`, `tcp-udp` |
-| Databases | `mysql`, `oracle`, `postgresql`, `sqlserver` |
+| Industrial protocols | `bacnet-ip`, `can`, `dlms`, `dlt645`, `dnp3`, `ethernet-ip`, `fins`, `iec104`, `iec61850`, `knx`, `mbus`, `melsec`, `modbus-rtu`, `modbus-tcp`, `opc-da`, `opc-ua`, `plcs7`, `sl651`, `snmp` |
+| Messaging/network | `coap`, `http`, `kafka`, `lorawan`, `lwm2m`, `mqtt`, `tcp-udp` |
+| Databases | `mysql`, `oracle`, `postgresql`, `redis`, `sqlserver` |
 | Local/device buses | `ble`, `serial`, `zigbee` |
 | Simulation | `virtual`, `listening-virtual` |
 
 The following drivers currently declare incomplete protocol I/O and must be treated as work in progress: `can`, `dlms`,
-`ethernet-ip`, `iec104`, `lwm2m`, `mqtt`, `opc-da`, and `zigbee`. Check the child README and implementation before
-production use.
+`ethernet-ip`, `iec104`, `lwm2m`, `mqtt`, `opc-da`, and `zigbee`. Check the child README and implementation
+before production use.
 
 ## Driver metadata
 

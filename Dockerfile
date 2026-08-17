@@ -630,3 +630,123 @@ RUN mkdir -p /dc3-driver/dc3-driver-zigbee/dc3/data/driver/zigbee
 VOLUME /dc3-driver/dc3-driver-zigbee/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-zigbee.jar"]
+# ---------- dc3-driver-dlt645 ----------
+FROM runtime-base AS dc3-driver-dlt645
+ENV SERVER_NAME=dc3-driver-dlt645
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/dlt645/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/dlt645/gc/gc-%t.log
+WORKDIR /dc3-driver/dc3-driver-dlt645
+RUN mkdir -p /dc3-driver/dc3-driver-dlt645/dc3/logs/driver/dlt645/gc
+COPY --from=builder /build/dc3-driver/dc3-driver-dlt645/target/dc3-driver-dlt645.jar ./
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+VOLUME /dc3-driver/dc3-driver-dlt645/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-dlt645/dc3/data/driver/dlt645
+VOLUME /dc3-driver/dc3-driver-dlt645/dc3/data
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["dc3-driver-dlt645.jar"]
+
+# ---------- dc3-driver-dnp3 ----------
+FROM runtime-base AS dc3-driver-dnp3
+ENV SERVER_NAME=dc3-driver-dnp3
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/dnp3/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/dnp3/gc/gc-%t.log
+WORKDIR /dc3-driver/dc3-driver-dnp3
+RUN mkdir -p /dc3-driver/dc3-driver-dnp3/dc3/logs/driver/dnp3/gc
+COPY --from=builder /build/dc3-driver/dc3-driver-dnp3/target/dc3-driver-dnp3.jar ./
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+VOLUME /dc3-driver/dc3-driver-dnp3/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-dnp3/dc3/data/driver/dnp3
+VOLUME /dc3-driver/dc3-driver-dnp3/dc3/data
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["dc3-driver-dnp3.jar"]
+
+# ---------- dc3-driver-iec61850 ----------
+FROM runtime-base AS dc3-driver-iec61850
+ENV SERVER_NAME=dc3-driver-iec61850
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/iec61850/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/iec61850/gc/gc-%t.log
+WORKDIR /dc3-driver/dc3-driver-iec61850
+RUN mkdir -p /dc3-driver/dc3-driver-iec61850/dc3/logs/driver/iec61850/gc
+COPY --from=builder /build/dc3-driver/dc3-driver-iec61850/target/dc3-driver-iec61850.jar ./
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+VOLUME /dc3-driver/dc3-driver-iec61850/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-iec61850/dc3/data/driver/iec61850
+VOLUME /dc3-driver/dc3-driver-iec61850/dc3/data
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["dc3-driver-iec61850.jar"]
+
+# ---------- dc3-driver-kafka ----------
+FROM runtime-base AS dc3-driver-kafka
+ENV SERVER_NAME=dc3-driver-kafka
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/kafka/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/kafka/gc/gc-%t.log
+WORKDIR /dc3-driver/dc3-driver-kafka
+RUN mkdir -p /dc3-driver/dc3-driver-kafka/dc3/logs/driver/kafka/gc
+COPY --from=builder /build/dc3-driver/dc3-driver-kafka/target/dc3-driver-kafka.jar ./
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+VOLUME /dc3-driver/dc3-driver-kafka/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-kafka/dc3/data/driver/kafka
+VOLUME /dc3-driver/dc3-driver-kafka/dc3/data
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["dc3-driver-kafka.jar"]
+
+# ---------- dc3-driver-knx ----------
+FROM runtime-base AS dc3-driver-knx
+ENV SERVER_NAME=dc3-driver-knx
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/knx/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/knx/gc/gc-%t.log
+WORKDIR /dc3-driver/dc3-driver-knx
+RUN mkdir -p /dc3-driver/dc3-driver-knx/dc3/logs/driver/knx/gc
+COPY --from=builder /build/dc3-driver/dc3-driver-knx/target/dc3-driver-knx.jar ./
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+VOLUME /dc3-driver/dc3-driver-knx/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-knx/dc3/data/driver/knx
+VOLUME /dc3-driver/dc3-driver-knx/dc3/data
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["dc3-driver-knx.jar"]
+
+# ---------- dc3-driver-lorawan ----------
+FROM runtime-base AS dc3-driver-lorawan
+ENV SERVER_NAME=dc3-driver-lorawan
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/lorawan/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/lorawan/gc/gc-%t.log
+WORKDIR /dc3-driver/dc3-driver-lorawan
+RUN mkdir -p /dc3-driver/dc3-driver-lorawan/dc3/logs/driver/lorawan/gc
+COPY --from=builder /build/dc3-driver/dc3-driver-lorawan/target/dc3-driver-lorawan.jar ./
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+VOLUME /dc3-driver/dc3-driver-lorawan/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-lorawan/dc3/data/driver/lorawan
+VOLUME /dc3-driver/dc3-driver-lorawan/dc3/data
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["dc3-driver-lorawan.jar"]
+
+# ---------- dc3-driver-mbus ----------
+FROM runtime-base AS dc3-driver-mbus
+ENV SERVER_NAME=dc3-driver-mbus
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/mbus/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/mbus/gc/gc-%t.log
+WORKDIR /dc3-driver/dc3-driver-mbus
+RUN mkdir -p /dc3-driver/dc3-driver-mbus/dc3/logs/driver/mbus/gc
+COPY --from=builder /build/dc3-driver/dc3-driver-mbus/target/dc3-driver-mbus.jar ./
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+VOLUME /dc3-driver/dc3-driver-mbus/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-mbus/dc3/data/driver/mbus
+VOLUME /dc3-driver/dc3-driver-mbus/dc3/data
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["dc3-driver-mbus.jar"]
+
+# ---------- dc3-driver-redis ----------
+FROM runtime-base AS dc3-driver-redis
+ENV SERVER_NAME=dc3-driver-redis
+ENV JAVA_HEAP_DUMP_PATH=dc3/logs/driver/redis/gc/dump.hprof
+ENV JAVA_GC_LOG_PATH=dc3/logs/driver/redis/gc/gc-%t.log
+WORKDIR /dc3-driver/dc3-driver-redis
+RUN mkdir -p /dc3-driver/dc3-driver-redis/dc3/logs/driver/redis/gc
+COPY --from=builder /build/dc3-driver/dc3-driver-redis/target/dc3-driver-redis.jar ./
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+VOLUME /dc3-driver/dc3-driver-redis/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-redis/dc3/data/driver/redis
+VOLUME /dc3-driver/dc3-driver-redis/dc3/data
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["dc3-driver-redis.jar"]
+

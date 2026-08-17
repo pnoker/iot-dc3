@@ -64,6 +64,15 @@
 
         <!-- SNMP -->
         <snmp4j.version>3.12.2</snmp4j.version>
+
+        <!-- KNX -->
+        <calimero.version>2.6</calimero.version>
+
+        <!-- IEC 61850 -->
+        <openiec61850.version>1.7.0</openiec61850.version>
+
+        <!-- DNP3 -->
+        <dnp3.version>1.6.0</dnp3.version>
     </properties>
 
     <dependencyManagement>
@@ -174,6 +183,27 @@
                 <artifactId>snmp4j</artifactId>
                 <version>${snmp4j.version}</version>
             </dependency>
+
+            <!-- KNX -->
+            <dependency>
+                <groupId>com.github.calimero</groupId>
+                <artifactId>calimero-core</artifactId>
+                <version>${calimero.version}</version>
+            </dependency>
+
+            <!-- IEC 61850 -->
+            <dependency>
+                <groupId>org.openmuc</groupId>
+                <artifactId>openiec61850</artifactId>
+                <version>${openiec61850.version}</version>
+            </dependency>
+
+            <!-- DNP3 -->
+            <dependency>
+                <groupId>io.stepfunc</groupId>
+                <artifactId>dnp3</artifactId>
+                <version>${dnp3.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -183,12 +213,19 @@
         <module>dc3-driver-can</module>
         <module>dc3-driver-coap</module>
         <module>dc3-driver-dlms</module>
+        <module>dc3-driver-dlt645</module>
+        <module>dc3-driver-dnp3</module>
         <module>dc3-driver-ethernet-ip</module>
         <module>dc3-driver-fins</module>
         <module>dc3-driver-http</module>
         <module>dc3-driver-iec104</module>
+        <module>dc3-driver-iec61850</module>
+        <module>dc3-driver-kafka</module>
+        <module>dc3-driver-knx</module>
         <module>dc3-driver-listening-virtual</module>
+        <module>dc3-driver-lorawan</module>
         <module>dc3-driver-lwm2m</module>
+        <module>dc3-driver-mbus</module>
         <module>dc3-driver-melsec</module>
         <module>dc3-driver-modbus-tcp</module>
         <module>dc3-driver-modbus-rtu</module>
@@ -199,6 +236,7 @@
         <module>dc3-driver-oracle</module>
         <module>dc3-driver-plcs7</module>
         <module>dc3-driver-postgresql</module>
+        <module>dc3-driver-redis</module>
         <module>dc3-driver-serial</module>
         <module>dc3-driver-sl651</module>
         <module>dc3-driver-snmp</module>
