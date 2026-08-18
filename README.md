@@ -150,8 +150,9 @@ Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 20
 - **Driver SDK** - A complete driver development toolkit. See
   the [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring)
 - **Separated frontend and backend** - Vue 3 + TypeScript frontend, RESTful and gRPC APIs
-- **Containerized deployment** - One-command startup with Podman / Docker Compose, with a path toward Kubernetes and
-  other container platforms
+- **Containerized deployment** - One-command startup with Podman / Docker Compose, plus compose
+  scaling, Docker Swarm, Kubernetes and Helm deployment configs. See
+  the [Deployment Guide](dc3/doc/DEPLOYMENT.md).
 - **Complete documentation** - Online docs, quickstart guide, and troubleshooting guide
 
 ## ⚡ Quick Start
