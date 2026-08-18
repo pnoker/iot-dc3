@@ -3,8 +3,9 @@
 ## Overview
 
 `dc3-common-model` is the shared domain model module of the IoT DC3 platform. It defines the base BO/VO/DTO classes,
-MapStruct builder contracts, JSON extension models, domain enums, validation groups, and shared transport DTOs used
-across services and drivers. Persistence DO classes remain in the modules that own their database tables.
+MapStruct builder contracts, JSON extension models, validation groups, and shared transport DTOs used across services
+and drivers. Shared domain/wire/persistence enums belong to `dc3-common-constant`; persistence DO classes remain in the
+modules that own their database tables.
 
 ## Module Information
 
@@ -41,7 +42,8 @@ Used with `@Validated(...)` in controllers:
 - `CommandCallDTO` / `CommandCallResultDTO` — Custom command request/result payloads
 - Domain-specific `*Ext` classes — JSON extension-column shapes
 
-`RequestHeader`, `Pages`, `TreeNode`, `R<T>`, and `TenantOwned` belong to `dc3-common-public`, not this module.
+`RequestHeader`, `Pages`, `TreeNode`, `R<T>`, and `TenantOwned` belong to `dc3-common-public`, not this module. Shared
+top-level enums belong to `dc3-common-constant` and are referenced by model fields where appropriate.
 
 ## Usage Example
 

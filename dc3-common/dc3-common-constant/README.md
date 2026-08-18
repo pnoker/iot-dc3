@@ -2,9 +2,12 @@
 
 ## Overview
 
-`dc3-common-constant` is the shared constants and enumerations module of the IoT DC3 platform. It defines all
-platform-wide constants, routing keys, service names, URL prefixes, and enumeration types used across services, drivers,
-and common modules.
+`dc3-common-constant` is the shared constants and enumerations module of the IoT DC3 platform. It defines platform-wide
+constants, routing keys, service names, URL prefixes, and top-level domain/wire/persistence enums used across services,
+drivers, and common modules. Constants and nested enums used by only one module, protocol, configuration object, or
+implementation remain beside their owner until they become a stable cross-module contract. Top-level `*Constant`
+classes and top-level public enums are reserved for this module; local holders use concern-specific names such as
+`*Limits` or `*Defaults`.
 
 ## Module Information
 
@@ -50,6 +53,7 @@ consumer, and deployed queue migration.
 | `DefaultConstant`                   | Platform defaults (page size, etc.)           |
 | `TimeConstant`                      | Date/time format strings                      |
 | `RequestConstant`                   | HTTP header key names (tenant/user injection) |
+| `RequestIdConstant`                 | Cross-transport request correlation keys      |
 | `PrefixConstant` / `SuffixConstant` | Common cache/key prefixes and suffixes        |
 
 ### Enumerations

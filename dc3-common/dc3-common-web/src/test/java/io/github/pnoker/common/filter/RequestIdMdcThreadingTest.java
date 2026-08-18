@@ -18,6 +18,7 @@
 package io.github.pnoker.common.filter;
 
 import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.github.pnoker.common.entity.R;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ class RequestIdMdcThreadingTest {
 
     @AfterEach
     void clearMdc() {
-        MDC.remove(RequestIdWebFilter.MDC_REQUEST_ID);
+        MDC.remove(RequestIdConstant.MDC_KEY);
     }
 
     /**
@@ -57,9 +58,9 @@ class RequestIdMdcThreadingTest {
      * value seen on that worker thread — this is exactly where business log calls happen.
      */
     private Mono<String> requestIdSeenBySupplier(String inboundRequestId) {
-        return controller.async(() -> R.ok(MDC.get(RequestIdWebFilter.MDC_REQUEST_ID)))
+        return controller.async(() -> R.ok(MDC.get(RequestIdConstant.MDC_KEY)))
                 .map(R::getMessage)
-                .contextWrite(ctx -> ctx.put(RequestIdWebFilter.CONTEXT_REQUEST_ID, inboundRequestId));
+                .contextWrite(ctx -> ctx.put(RequestIdConstant.REACTOR_CONTEXT_KEY, inboundRequestId));
     }
 
     @Test
@@ -79,6 +80,6 @@ class RequestIdMdcThreadingTest {
                 .assertNext(seen -> assertThat(seen).isEqualTo("req-first"))
                 .verifyComplete();
         // The test thread never had the id set; confirm it stayed clean.
-        assertThat(MDC.get(RequestIdWebFilter.MDC_REQUEST_ID)).isNull();
+        assertThat(MDC.get(RequestIdConstant.MDC_KEY)).isNull();
     }
 }

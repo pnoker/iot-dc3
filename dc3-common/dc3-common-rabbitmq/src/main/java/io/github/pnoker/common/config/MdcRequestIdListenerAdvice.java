@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -40,7 +41,7 @@ import java.util.UUID;
  * </ol>
  * This ensures full compatibility with both systems while maintaining backward compatibility.
  *
- * <p>The id is carried in the {@value #HEADER_REQUEST_ID} message header, stamped on the
+ * <p>The id is carried in the {@value RequestIdConstant#HEADER} message header, stamped on the
  * producer side by the {@code beforePublish} post-processor in {@link RabbitConfig}. On the
  * consumer side, the listener container runs on a pooled thread; this advice reads the header
  * before the listener runs, publishes it into the MDC, and removes it afterwards — guaranteeing
@@ -54,31 +55,19 @@ import java.util.UUID;
  * {@code @RabbitListener} methods are covered without touching individual receivers.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2026.7.8
  */
 public class MdcRequestIdListenerAdvice implements MethodInterceptor {
-
-    /**
-     * MDC key — kept in sync with {@code RequestIdWebFilter.MDC_REQUEST_ID} (same placeholder in
-     * the logback pattern).
-     */
-    public static final String MDC_REQUEST_ID = "requestId";
-
-    /**
-     * AMQP message header carrying the request id, mirroring the HTTP/gRPC {@code X-Request-Id}.
-     */
-    public static final String HEADER_REQUEST_ID = "X-Request-Id";
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Message message = extractMessage(invocation.getArguments());
         String requestId = readRequestId(message);
-        MDC.put(MDC_REQUEST_ID, requestId);
+        MDC.put(RequestIdConstant.MDC_KEY, requestId);
         try {
             return invocation.proceed();
         } finally {
-            MDC.remove(MDC_REQUEST_ID);
+            MDC.remove(RequestIdConstant.MDC_KEY);
         }
     }
 
@@ -114,7 +103,7 @@ public class MdcRequestIdListenerAdvice implements MethodInterceptor {
         if (message != null) {
             MessageProperties properties = message.getMessageProperties();
             if (properties != null) {
-                String header = properties.getHeader(HEADER_REQUEST_ID);
+                String header = properties.getHeader(RequestIdConstant.HEADER);
                 if (header != null && !header.isBlank()) {
                     return header;
                 }

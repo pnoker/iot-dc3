@@ -17,12 +17,12 @@
 
 package io.github.pnoker.common.base;
 
+import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.filter.RequestIdWebFilter;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
@@ -51,7 +51,6 @@ import java.util.stream.Collectors;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface BaseController {
@@ -148,16 +147,16 @@ public interface BaseController {
                     // requestId is sourced from the Reactor Context published by
                     // RequestIdWebFilter, since MDC does not survive the thread hop.
                     tenantId.ifPresent(TenantContextHolder::setTenantId);
-                    String requestId = ctx.getOrDefault(RequestIdWebFilter.CONTEXT_REQUEST_ID, null);
+                    String requestId = ctx.getOrDefault(RequestIdConstant.REACTOR_CONTEXT_KEY, null);
                     if (requestId != null) {
-                        MDC.put(RequestIdWebFilter.MDC_REQUEST_ID, requestId);
+                        MDC.put(RequestIdConstant.MDC_KEY, requestId);
                     }
                     try {
                         return supplier.get();
                     } finally {
                         TenantContextHolder.clear();
                         if (requestId != null) {
-                            MDC.remove(RequestIdWebFilter.MDC_REQUEST_ID);
+                            MDC.remove(RequestIdConstant.MDC_KEY);
                         }
                     }
                 }).subscribeOn(Schedulers.boundedElastic())));

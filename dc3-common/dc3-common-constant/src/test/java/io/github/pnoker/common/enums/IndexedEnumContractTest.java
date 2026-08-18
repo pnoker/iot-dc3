@@ -21,7 +21,15 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -44,95 +52,71 @@ import static org.assertj.core.api.Assertions.assertThat;
  *       and falls back to legacy behaviour rather than throwing.</li>
  * </ul>
  *
- * <p>Adding a new enum that follows the convention only requires adding its class
- * literal to the {@link #INDEXED_ENUMS} list. {@link TimeRangeKeyEnum} is excluded
- * intentionally because it keys off a string code rather than an integer index;
- * its contract is exercised in the dc3-common-public TimeRangeUtilTest.
+ * <p>Enums are discovered from the compiled {@code io.github.pnoker.common.enums}
+ * package. New domain enums therefore enter the applicable contract automatically.
  */
 class IndexedEnumContractTest {
 
-    private static final List<Class<? extends Enum<?>>> INDEXED_ENUMS = List.of(
-            AccrueTypeEnum.class,
-            AgenticActionStatusEnum.class,
-            AgenticMessageStatusEnum.class,
-            AgenticModelProviderTypeEnum.class,
-            AlarmMessageLevelEnum.class,
-            AlarmSourceTypeEnum.class,
-            AlarmTargetTypeEnum.class,
-            AlarmTypeEnum.class,
-            ApiTypeEnum.class,
-            AttributeTypeEnum.class,
-            AutoConfirmFlagEnum.class,
-            DefaultFlagEnum.class,
-            PointCommandTypeEnum.class,
-            EntityStatusEnum.class,
-            DriverTypeEnum.class,
-            EnableFlagEnum.class,
-            EntityTypeEnum.class,
-            ExpireTypeEnum.class,
-            MenuLevelEnum.class,
-            MenuTypeFlagEnum.class,
-            MetadataOperateTypeEnum.class,
-            MetadataTypeEnum.class,
-            NotifyChannelTypeEnum.class,
-            NotifyHistoryStatusEnum.class,
-            PointTypeEnum.class,
-            ProfileShareTypeEnum.class,
-            ProfileTypeEnum.class,
-            ResourceScopeTypeEnum.class,
-            ResourceTypeEnum.class,
-            RuleStatusEnum.class,
-            RwTypeEnum.class);
+    private static final String ENUM_PACKAGE = "io.github.pnoker.common.enums";
+    private static final List<Class<? extends Enum<?>>> DOMAIN_ENUMS = discoverDomainEnums();
+    private static final List<Class<? extends Enum<?>>> INDEXED_ENUMS = DOMAIN_ENUMS.stream()
+            .filter(type -> hasMethod(type, "getIndex"))
+            .toList();
+    private static final List<Class<? extends Enum<?>>> CODED_ENUMS = DOMAIN_ENUMS.stream()
+            .filter(type -> hasMethod(type, "getCode"))
+            .toList();
 
-    private static final List<Class<? extends Enum<?>>> CODED_ENUMS = List.of(
-            AccrueTypeEnum.class,
-            AgenticActionStatusEnum.class,
-            AgenticMessageStatusEnum.class,
-            AgenticModelProviderTypeEnum.class,
-            AlarmMessageLevelEnum.class,
-            AlarmSourceTypeEnum.class,
-            AlarmTargetTypeEnum.class,
-            AlarmTypeEnum.class,
-            ApiTypeEnum.class,
-            AttributeTypeEnum.class,
-            AutoConfirmFlagEnum.class,
-            CallTypeEnum.class,
-            CommandHistorySourceEnum.class,
-            CommandTypeEnum.class,
-            ConfirmFlagEnum.class,
-            DefaultFlagEnum.class,
-            DriverTypeEnum.class,
-            EnableFlagEnum.class,
-            EntityStatusEnum.class,
-            EntityTypeEnum.class,
-            EventHistoryAcknowledgeFlagEnum.class,
-            EventLevelEnum.class,
-            EventTypeFlagEnum.class,
-            ExpireTypeEnum.class,
-            McpAuditStatusEnum.class,
-            McpConfirmationStatusEnum.class,
-            McpRiskLevelEnum.class,
-            MenuLevelEnum.class,
-            MenuTypeFlagEnum.class,
-            MetadataOperateTypeEnum.class,
-            MetadataTypeEnum.class,
-            NotifyChannelTypeEnum.class,
-            NotifyHistoryStatusEnum.class,
-            OAuthClientTypeEnum.class,
-            OAuthGrantTypeEnum.class,
-            ParamDirectionTypeEnum.class,
-            PointCommandSourceEnum.class,
-            PointCommandStatusEnum.class,
-            PointCommandTypeEnum.class,
-            PointTypeEnum.class,
-            ProfileShareTypeEnum.class,
-            ProfileTypeEnum.class,
-            ResourceScopeTypeEnum.class,
-            ResourceTypeEnum.class,
-            RuleStatusEnum.class,
-            RwTypeEnum.class,
-            TimeRangeKeyEnum.class,
-            TimeoutSourceTypeEnum.class);
+    private static List<Class<? extends Enum<?>>> discoverDomainEnums() {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        String packagePath = ENUM_PACKAGE.replace('.', '/');
+        List<Class<? extends Enum<?>>> enums = new ArrayList<>();
+        try {
+            Enumeration<URL> resources = classLoader.getResources(packagePath);
+            while (resources.hasMoreElements()) {
+                URL resource = resources.nextElement();
+                if (!"file".equals(resource.getProtocol())) {
+                    continue;
+                }
+                try (Stream<Path> classes = Files.list(Path.of(resource.toURI()))) {
+                    classes.filter(path -> path.getFileName().toString().endsWith("Enum.class"))
+                            .filter(path -> !path.getFileName().toString().contains("$"))
+                            .forEach(path -> addEnumClass(classLoader, path, enums));
+                }
+            }
+        } catch (IOException | URISyntaxException e) {
+            throw new IllegalStateException("Failed to discover common domain enums", e);
+        }
+        if (enums.isEmpty()) {
+            throw new IllegalStateException("No common domain enums discovered from " + packagePath);
+        }
+        enums.sort(Comparator.comparing(Class::getName));
+        return List.copyOf(enums);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void addEnumClass(ClassLoader classLoader, Path path,
+                                     List<Class<? extends Enum<?>>> enums) {
+        String fileName = path.getFileName().toString();
+        String className = ENUM_PACKAGE + SymbolConstant.DOT
+                + fileName.substring(0, fileName.length() - ".class".length());
+        try {
+            Class<?> candidate = Class.forName(className, false, classLoader);
+            if (candidate.isEnum()) {
+                enums.add((Class<? extends Enum<?>>) candidate);
+            }
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Failed to load discovered enum " + className, e);
+        }
+    }
+
+    private static boolean hasMethod(Class<?> type, String name, Class<?>... parameterTypes) {
+        try {
+            type.getMethod(name, parameterTypes);
+            return true;
+        } catch (NoSuchMethodException ignored) {
+            return false;
+        }
+    }
 
     private static Method method(Class<?> type, String name, Class<?>... parameterTypes) {
         try {
