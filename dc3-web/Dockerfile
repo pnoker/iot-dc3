@@ -27,7 +27,7 @@ WORKDIR /build
 
 COPY dc3-web/ ./
 
-RUN corepack enable && corepack prepare pnpm@11.3.0 --activate
+RUN corepack enable && corepack prepare pnpm@11.15.0 --activate
 RUN pnpm install --frozen-lockfile
 RUN pnpm build
 

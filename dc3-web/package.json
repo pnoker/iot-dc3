@@ -4,7 +4,7 @@
   "private": true,
   "author": "pnoker",
   "description": "IoT DC3 Industrial AI IoT Platform frontend — Vue 3 + TypeScript + Element Plus",
-  "license": "Apache-2.0",
+  "license": "AGPL-3.0-or-later",
   "homepage": "https://github.com/pnoker/iot-dc3",
   "repository": {
     "type": "git",
