@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dc3-gateway
+  namespace: dc3
+  labels:
+    app.kubernetes.io/name: dc3-gateway
+    app.kubernetes.io/part-of: iot-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dc3-gateway
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: dc3-gateway
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: dc3-gateway
+          image: pnoker/dc3-gateway:2026.6
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: dc3-config
+            - secretRef:
+                name: dc3-secrets
+          ports:
+            - name: http
+              containerPort: 8000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 1024Mi
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+            - name: logs
+              mountPath: /dc3-gateway/dc3/logs
+      volumes:
+        - name: logs
+          emptyDir: {}

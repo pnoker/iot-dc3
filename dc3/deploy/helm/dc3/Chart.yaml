@@ -1,0 +1,15 @@
+apiVersion: v2
+name: dc3
+description: >-
+  IoT DC3 - container-based industrial IoT platform: HTTP gateway, auth/manager/data/
+  agentic centers, protocol drivers, and the Vue web console, with PostgreSQL and
+  RabbitMQ as stateful dependencies.
+type: application
+version: 0.1.0
+appVersion: "2026.6"
+home: https://github.com/pnoker/iot-dc3
+sources:
+  - https://github.com/pnoker/iot-dc3
+maintainers:
+  - name: IoT DC3 maintainers
+    email: pnokers.icloud.com

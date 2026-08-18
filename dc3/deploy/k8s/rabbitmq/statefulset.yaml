@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dc3-rabbitmq
+  namespace: dc3
+  labels:
+    app.kubernetes.io/name: dc3-rabbitmq
+    app.kubernetes.io/part-of: iot-dc3
+spec:
+  serviceName: dc3-rabbitmq
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dc3-rabbitmq
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: dc3-rabbitmq
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: dc3-rabbitmq
+          # Built locally from dc3/dependencies/rabbitmq (see scripts/push-images.sh);
+          # layers rabbitmq.conf / definitions.json / TLS keys on dc3-rabbitmq-base.
+          image: pnoker/dc3-rabbitmq:2026.6
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: RABBITMQ_DEFAULT_VHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: dc3-config
+                  key: RABBITMQ_VIRTUAL_HOST
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dc3-secrets
+                  key: RABBITMQ_USERNAME
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: dc3-secrets
+                  key: RABBITMQ_PASSWORD
+          ports:
+            - name: amqp
+              containerPort: 5672
+            - name: amqps
+              containerPort: 5671
+            - name: mqtt
+              containerPort: 1883
+            - name: management
+              containerPort: 15672
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1024Mi
+          readinessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - -q
+                - ping
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - -q
+                - ping
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/rabbitmq
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 8Gi

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dc3-web
+  namespace: dc3
+  labels:
+    app.kubernetes.io/name: dc3-web
+    app.kubernetes.io/part-of: iot-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dc3-web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: dc3-web
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: dc3-web
+          image: pnoker/dc3-web:2026.6
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: APP_API_HOST
+              value: "dc3-gateway"
+            - name: APP_API_PORT
+              value: "8000"
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: "0.5"
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+            - name: nginx-logs
+              mountPath: /var/log/nginx
+      volumes:
+        - name: nginx-logs
+          emptyDir: {}

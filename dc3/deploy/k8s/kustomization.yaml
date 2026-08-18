@@ -1,0 +1,138 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# =============================================================================
+# IoT DC3 on Kubernetes - kustomize root
+#
+# Apply (creates namespace dc3, Secrets, StatefulSets, Deployments, HPA, PDB,
+# Ingress). Dependency images (dc3-postgres/dc3-rabbitmq) must exist in the
+# registry first - see scripts/push-images.sh and README.md.
+#
+#   kubectl apply -k dc3/deploy/k8s
+#
+# Common overrides:
+#   kubectl kustomize dc3/deploy/k8s | kubectl apply -f -
+#   kustomize edit set image pnoker/dc3-gateway=my.registry/dc3-gateway:2026.6
+# =============================================================================
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - postgres/statefulset.yaml
+  - postgres/service.yaml
+  - rabbitmq/statefulset.yaml
+  - rabbitmq/service.yaml
+  - auth/deployment.yaml
+  - auth/service.yaml
+  - manager/deployment.yaml
+  - manager/service.yaml
+  - data/deployment.yaml
+  - data/service.yaml
+  - agentic/deployment.yaml
+  - agentic/service.yaml
+  - agentic/pvc.yaml
+  - gateway/deployment.yaml
+  - gateway/service.yaml
+  - web/deployment.yaml
+  - web/service.yaml
+  - drivers/driver-listening-virtual.yaml
+  - drivers/driver-modbus-tcp.yaml
+  - drivers/driver-modbus-rtu.yaml
+  - drivers/driver-mqtt.yaml
+  - drivers/driver-opc-da.yaml
+  - drivers/driver-opc-ua.yaml
+  - drivers/driver-plcs7.yaml
+  - drivers/driver-virtual.yaml
+  - drivers/driver-bacnet-ip.yaml
+  - drivers/driver-fins.yaml
+  - drivers/driver-melsec.yaml
+  - drivers/driver-ethernet-ip.yaml
+  - drivers/driver-iec104.yaml
+  - drivers/driver-sl651.yaml
+  - drivers/driver-snmp.yaml
+  - drivers/driver-dlms.yaml
+  - drivers/driver-coap.yaml
+  - drivers/driver-lwm2m.yaml
+  - drivers/driver-http.yaml
+  - drivers/driver-serial.yaml
+  - drivers/driver-tcp-udp.yaml
+  - drivers/driver-mysql.yaml
+  - drivers/driver-postgresql.yaml
+  - drivers/driver-oracle.yaml
+  - drivers/driver-sqlserver.yaml
+  - drivers/service-listening-virtual.yaml
+  - ingress.yaml
+  - hpa.yaml
+  - pdb.yaml
+
+secretGenerator:
+  - name: dc3-secrets
+    envs:
+      - secret.env
+    options:
+      disableNameSuffixHash: true
+
+# Single place to bump/switch the image tag or registry for every component.
+images:
+  - name: pnoker/dc3-web
+    newTag: 2026.6
+  - name: pnoker/dc3-gateway
+    newTag: 2026.6
+  - name: pnoker/dc3-center-auth
+    newTag: 2026.6
+  - name: pnoker/dc3-center-manager
+    newTag: 2026.6
+  - name: pnoker/dc3-center-data
+    newTag: 2026.6
+  - name: pnoker/dc3-center-agentic
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-listening-virtual
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-modbus-tcp
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-modbus-rtu
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-mqtt
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-opc-da
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-opc-ua
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-plcs7
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-virtual
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-bacnet-ip
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-fins
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-melsec
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-ethernet-ip
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-iec104
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-sl651
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-snmp
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-dlms
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-coap
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-lwm2m
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-http
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-serial
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-tcp-udp
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-mysql
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-postgresql
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-oracle
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-sqlserver
+    newTag: 2026.6

@@ -1,0 +1,96 @@
+{{- range $name, $svc := .Values.services }}
+{{- if $svc.enabled }}
+{{- $logPath := "/var/log/nginx" }}
+{{- if eq $name "gateway" }}
+{{- $logPath = "/dc3-gateway/dc3/logs" }}
+{{- else if ne $name "web" }}
+{{- $logPath = printf "/dc3-center/dc3-center-%s/dc3/logs" $name }}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dc3-{{ $name }}
+  labels:
+    {{- include "dc3.labels" $ | nindent 4 }}
+spec:
+  replicas: {{ $svc.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: dc3-{{ $name }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: dc3-{{ $name }}
+    spec:
+      serviceAccountName: {{ include "dc3.serviceAccountName" $ }}
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: dc3-{{ $name }}
+          image: "{{ $.Values.image.registry }}/{{ $svc.image }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+{{- if $svc.envFrom }}
+          envFrom:
+            - configMapRef:
+                name: dc3-config
+            - secretRef:
+                name: {{ include "dc3.secretName" $ }}
+{{- end }}
+{{- if eq $name "web" }}
+          env:
+            - name: APP_API_HOST
+              value: dc3-gateway
+            - name: APP_API_PORT
+              value: "8000"
+{{- end }}
+          ports:
+            - name: http
+              containerPort: {{ $svc.httpPort }}
+{{- if $svc.grpcPort }}
+            - name: grpc
+              containerPort: {{ $svc.grpcPort }}
+{{- end }}
+{{- if $svc.httpsPort }}
+            - name: https
+              containerPort: {{ $svc.httpsPort }}
+{{- end }}
+          resources:
+            {{- toYaml $svc.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: {{ $svc.probePath | default "/" }}
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: {{ $svc.probePath | default "/" }}
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+            - name: logs
+              mountPath: {{ $logPath }}
+{{- if and $svc.pvc $svc.pvc.enabled }}
+            - name: data
+              mountPath: /dc3-center/dc3-center-{{ $name }}/dc3/data
+{{- end }}
+      volumes:
+        - name: logs
+          emptyDir: {}
+{{- if and $svc.pvc $svc.pvc.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: dc3-{{ $name }}-data
+{{- end }}
+{{- end }}
+{{- end }}

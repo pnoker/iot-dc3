@@ -20,7 +20,8 @@ SHELL := /bin/bash
 
 .PHONY: help env init-env clean package test test-it test-e2e coverage deploy \
 	build up stop down ps logs config pull restart refresh reset \
-	run changelog openapi tag validate-annotations
+	run changelog openapi tag validate-annotations \
+	stack-deploy stack-rm stack-ps k8s-apply k8s-delete helm-install helm-uninstall
 
 ENV_FILE ?= $(firstword $(wildcard .env) .env.example)
 RUNTIME_ENV_FILE ?= dc3/env/dev.env
@@ -227,7 +228,7 @@ run:
 # filtering) is reused. Examples: make up-db-cn  make logs-dev  make down-app
 COMPOSE_OPS          := up down stop ps logs build pull restart refresh config reset
 COMPOSE_REGISTRY_OPS := up pull build refresh
-COMPOSE_STACKS       := dev app db optional
+COMPOSE_STACKS       := dev app db optional scale
 COMPOSE_REGISTRIES   := cn global
 
 define dc3_stack_target
@@ -254,6 +255,48 @@ deploy: package
 tag:
 	@dc3/bin/tag.sh
 
+# ----------------------------------------------------------------------------
+# Orchestrator deployments (Docker Swarm / Kubernetes / Helm)
+# ----------------------------------------------------------------------------
+# Swarm: dc3/docker-compose-swarm.yml is a full self-contained stack. Dependency
+# images (dc3-postgres/dc3-rabbitmq) must be built and pushed first, see
+# dc3/doc/DEPLOYMENT.md section 2.
+STACK_CMD ?= docker stack
+STACK_NAME ?= dc3
+
+.PHONY: stack-deploy stack-rm stack-ps
+stack-deploy:
+	$(STACK_CMD) deploy -c dc3/docker-compose-swarm.yml $(STACK_NAME)
+
+stack-rm:
+	$(STACK_CMD) rm $(STACK_NAME)
+
+stack-ps:
+	$(STACK_CMD) services $(STACK_NAME)
+
+# Kubernetes (kustomize) - copy dc3/deploy/k8s/secret.env.example to
+# dc3/deploy/k8s/secret.env and edit it first.
+K8S_DIR ?= dc3/deploy/k8s
+
+.PHONY: k8s-apply k8s-delete
+k8s-apply:
+	kubectl apply -k $(K8S_DIR)
+
+k8s-delete:
+	kubectl delete -k $(K8S_DIR)
+
+# Helm - dc3/deploy/helm/dc3 (see chart README for values).
+HELM_RELEASE ?= dc3
+HELM_CHART ?= dc3/deploy/helm/dc3
+HELM_VALUES ?= $(HELM_CHART)/values-production.yaml
+
+.PHONY: helm-install helm-uninstall
+helm-install:
+	helm upgrade --install $(HELM_RELEASE) $(HELM_CHART) -f $(HELM_VALUES)
+
+helm-uninstall:
+	helm uninstall $(HELM_RELEASE)
+
 # Reject unknown targets instead of silently succeeding.
 %:
 	@echo "Unknown target '$@'. Run 'make help' for available targets." && exit 1
@@ -265,4 +308,3 @@ changelog:
 # OPENAPI_BASE overrides the gateway URL; OPENAPI_OUT the output directory.
 openapi:
 	@OPENAPI_BASE="$(OPENAPI_BASE)" dc3/bin/export_openapi.sh $(OPENAPI_OUT)
-

@@ -1,0 +1,22 @@
+{{- $lv := index .Values.drivers "listening-virtual" }}
+{{- if and $lv $lv.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: dc3-driver-listening-virtual
+  labels:
+    {{- include "dc3.labels" . | nindent 4 }}
+spec:
+  type: NodePort
+  selector:
+    app: dc3-driver-listening-virtual
+  ports:
+    - name: tcp
+      port: 6270
+      targetPort: tcp
+      nodePort: {{ index $lv "nodePort" "tcp" }}
+    - name: udp
+      port: 6271
+      targetPort: udp
+      nodePort: {{ index $lv "nodePort" "udp" }}
+{{- end }}

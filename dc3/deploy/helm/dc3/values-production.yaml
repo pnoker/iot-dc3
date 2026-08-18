@@ -1,0 +1,60 @@
+# =============================================================================
+# IoT DC3 Helm chart - production presets
+#
+#   helm upgrade --install dc3 . -f values-production.yaml #       --set-string secrets.DC3_SECURITY_KEY=<random> #       --set-string secrets.AUTH_HMAC_SECRET=<random> #       --set secrets.POSTGRES_PASSWORD=<strong> #       --set secrets.RABBITMQ_PASSWORD=<strong> #       --set ingress.host=dc3.example.com
+#
+# Or - recommended - provision your own Secret and point existingSecret at it.
+# =============================================================================
+secrets:
+  # Public weak placeholders - REPLACE. The pro profile fails startup on weak
+  # DC3_SECURITY_KEY / AUTH_HMAC_SECRET on purpose.
+  POSTGRES_USERNAME: dc3
+  POSTGRES_PASSWORD: "*********"
+  RABBITMQ_USERNAME: dc3
+  RABBITMQ_PASSWORD: "*********"
+  MQTT_USERNAME: dc3
+  MQTT_PASSWORD: "*********"
+  DC3_SECURITY_KEY: dc3.security.key.2026.io.github.pnoker
+  AUTH_HMAC_SECRET: io.github.pnoker.dc3
+  AGENTIC_FALLBACK_OPENAI_API_KEY: ""
+
+services:
+  gateway:
+    replicas: 3
+    resources:
+      requests: { cpu: 250m, memory: 512Mi }
+      limits: { cpu: "2", memory: 2048Mi }
+  web:
+    replicas: 2
+  auth:
+    replicas: 2
+  manager:
+    replicas: 2
+  data:
+    replicas: 2
+  agentic:
+    replicas: 2
+
+ingress:
+  enabled: true
+  host: dc3.example.com
+  tls:
+    enabled: true
+    secretName: dc3-tls
+    clusterIssuer: letsencrypt-prod
+
+autoscaling:
+  gateway:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPU: 70
+  web:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPU: 70
+
+pdb:
+  enabled: true
+  minAvailable: 1

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dc3-rabbitmq
+  namespace: dc3
+  labels:
+    app.kubernetes.io/name: dc3-rabbitmq
+    app.kubernetes.io/part-of: iot-dc3
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: dc3-rabbitmq
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: amqp
+    - name: mqtt
+      port: 1883
+      targetPort: mqtt

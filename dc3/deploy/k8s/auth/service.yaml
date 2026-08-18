@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dc3-auth
+  namespace: dc3
+  labels:
+    app.kubernetes.io/name: dc3-auth
+    app.kubernetes.io/part-of: iot-dc3
+spec:
+  type: ClusterIP
+  selector:
+    app: dc3-auth
+  ports:
+    - name: http
+      port: 8300
+      targetPort: http
+    - name: grpc
+      port: 9300
+      targetPort: grpc

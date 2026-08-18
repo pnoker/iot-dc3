@@ -1,0 +1,314 @@
+# =============================================================================
+# IoT DC3 Helm chart - default values
+#
+# Install:  helm install dc3 . -f values-production.yaml
+# Upgrade:  helm upgrade dc3 . -f values-production.yaml --reuse-values
+# Values reference: helm show values dc3
+# =============================================================================
+
+image:
+  registry: pnoker
+  tag: "2026.6"
+  pullPolicy: IfNotPresent
+
+# Secrets rendered into a chart-owned Secret \`dc3-secrets\`. The defaults are
+# PUBLIC WEAK VALUES - override them (--set-string, values file, or \`existingSecret\`)
+# before any non-local deployment. \`DC3_SECURITY_KEY\` / \`AUTH_HMAC_SECRET\` are
+# validated by the pro profile: weak keys fail startup on purpose.
+secrets:
+  POSTGRES_USERNAME: dc3
+  POSTGRES_PASSWORD: "*********"
+  RABBITMQ_USERNAME: dc3
+  RABBITMQ_PASSWORD: "*********"
+  MQTT_USERNAME: dc3
+  MQTT_PASSWORD: "*********"
+  DC3_SECURITY_KEY: dc3.security.key.2026.io.github.pnoker
+  AUTH_HMAC_SECRET: io.github.pnoker.dc3
+  AGENTIC_FALLBACK_OPENAI_API_KEY: ""
+
+# Set to the name of an externally-managed Secret to skip creating one; the
+# Secret must contain every key listed under \`secrets\`.
+existingSecret: ""
+
+# Non-secret runtime environment (ConfigMap dc3-config).
+config:
+  NODE_ENV: test
+  APM_AGENT_ENABLE: "false"
+  DC3_FACADE_MODE: grpc
+  DC3_FACADE_GRPC_DEADLINE_MS: "3000"
+  POSTGRES_HOST: dc3-postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: dc3
+  RABBITMQ_VIRTUAL_HOST: dc3
+  RABBITMQ_HOST: dc3-rabbitmq
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_SSL_ENABLED: "false"
+  RABBITMQ_SSL_ALGORITHM: TLS
+  RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE: "false"
+  RABBITMQ_SSL_VERIFY_HOSTNAME: "false"
+  MQTT_BROKER_HOST: dc3-rabbitmq
+  MQTT_BROKER_PORT: "1883"
+  CENTER_AUTH_HOST: dc3-center-auth
+  CENTER_MANAGER_HOST: dc3-center-manager
+  CENTER_DATA_HOST: dc3-center-data
+  CENTER_AGENTIC_HOST: dc3-center-agentic
+  AGENTIC_FALLBACK_OPENAI_BASE_URL: https://api.openai.com
+  AGENTIC_FALLBACK_OPENAI_MODEL: gpt-4o
+  AGENTIC_FALLBACK_OPENAI_TEMPERATURE: "0.7"
+  AGENTIC_FALLBACK_OPENAI_MAX_TOKENS: "2048"
+  AGENTIC_MEMORY_SCHEMA_INIT: never
+  AGENTIC_MEMORY_ENABLED: "false"
+  AGENTIC_TOOL_CALLING_ENABLED: "true"
+  AGENTIC_MEMORY_MAX_MESSAGES: "50"
+  AGENTIC_ATTACHMENT_STORAGE_PATH: dc3/data/agentic/attachments
+  POINT_BATCH_SPEED: "100"
+  POINT_BATCH_INTERVAL: "5"
+  MQTT_BATCH_SPEED: "100"
+  MQTT_BATCH_INTERVAL: "5"
+
+# -----------------------------------------------------------------------------
+# Stateful dependencies (singletons - do not scale replicas past 1)
+# -----------------------------------------------------------------------------
+postgres:
+  enabled: true
+  image: dc3-postgres
+  storage: 20Gi
+  storageClass: ""
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2048Mi
+
+rabbitmq:
+  enabled: true
+  image: dc3-rabbitmq
+  storage: 8Gi
+  storageClass: ""
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1024Mi
+
+# -----------------------------------------------------------------------------
+# Stateless app tier (Deployment + ClusterIP Service each)
+# -----------------------------------------------------------------------------
+services:
+  web:
+    enabled: true
+    image: dc3-web
+    replicas: 1
+    envFrom: false
+    httpPort: 80
+    httpsPort: 443
+    probePath: /
+    resources:
+      requests: { cpu: 50m, memory: 64Mi }
+      limits: { cpu: "0.5", memory: 256Mi }
+  gateway:
+    enabled: true
+    image: dc3-gateway
+    replicas: 2
+    envFrom: true
+    httpPort: 8000
+    probePath: /actuator/health/readiness
+    resources:
+      requests: { cpu: 100m, memory: 128Mi }
+      limits: { cpu: "1", memory: 1024Mi }
+  auth:
+    enabled: true
+    image: dc3-center-auth
+    replicas: 1
+    envFrom: true
+    httpPort: 8300
+    grpcPort: 9300
+    probePath: /auth/actuator/health/readiness
+    resources:
+      requests: { cpu: 100m, memory: 128Mi }
+      limits: { cpu: "1", memory: 1024Mi }
+  manager:
+    enabled: true
+    image: dc3-center-manager
+    replicas: 1
+    envFrom: true
+    httpPort: 8400
+    grpcPort: 9400
+    probePath: /manager/actuator/health/readiness
+    resources:
+      requests: { cpu: 100m, memory: 128Mi }
+      limits: { cpu: "1", memory: 1024Mi }
+  data:
+    enabled: true
+    image: dc3-center-data
+    replicas: 1
+    envFrom: true
+    httpPort: 8500
+    grpcPort: 9500
+    probePath: /data/actuator/health/readiness
+    resources:
+      requests: { cpu: 100m, memory: 128Mi }
+      limits: { cpu: "1", memory: 1024Mi }
+  agentic:
+    enabled: true
+    image: dc3-center-agentic
+    replicas: 1
+    envFrom: true
+    httpPort: 8600
+    probePath: /agentic/actuator/health/readiness
+    pvc:
+      enabled: true
+      size: 5Gi
+    resources:
+      requests: { cpu: 100m, memory: 128Mi }
+      limits: { cpu: "1", memory: 1024Mi }
+
+# Shared resource profile for every protocol driver Deployment.
+driverResources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: "0.5"
+    memory: 512Mi
+
+# -----------------------------------------------------------------------------
+# Protocol drivers (Deployment each; listening-virtual also gets a NodePort
+# Service for inbound device TCP/UDP). All are stateless workers except
+# listening-virtual, which must stay at replicas: 1.
+# -----------------------------------------------------------------------------
+drivers:
+  listening-virtual:
+    enabled: true
+    replicas: 1
+    nodePort: { tcp: 30670, udp: 30671 }
+  modbus-tcp:
+    enabled: true
+    replicas: 1
+  modbus-rtu:
+    enabled: true
+    replicas: 1
+  mqtt:
+    enabled: true
+    replicas: 1
+  opc-da:
+    enabled: true
+    replicas: 1
+  opc-ua:
+    enabled: true
+    replicas: 1
+  plcs7:
+    enabled: true
+    replicas: 1
+  virtual:
+    enabled: true
+    replicas: 1
+  bacnet-ip:
+    enabled: true
+    replicas: 1
+  fins:
+    enabled: true
+    replicas: 1
+  melsec:
+    enabled: true
+    replicas: 1
+  ethernet-ip:
+    enabled: true
+    replicas: 1
+  iec104:
+    enabled: true
+    replicas: 1
+  sl651:
+    enabled: true
+    replicas: 1
+  snmp:
+    enabled: true
+    replicas: 1
+  dlms:
+    enabled: true
+    replicas: 1
+  coap:
+    enabled: true
+    replicas: 1
+  lwm2m:
+    enabled: true
+    replicas: 1
+  http:
+    enabled: true
+    replicas: 1
+  serial:
+    enabled: true
+    replicas: 1
+  tcp-udp:
+    enabled: true
+    replicas: 1
+  mysql:
+    enabled: true
+    replicas: 1
+  postgresql:
+    enabled: true
+    replicas: 1
+  oracle:
+    enabled: true
+    replicas: 1
+  sqlserver:
+    enabled: true
+    replicas: 1
+
+# -----------------------------------------------------------------------------
+# Ingress
+# -----------------------------------------------------------------------------
+ingress:
+  enabled: true
+  className: nginx
+  host: dc3.example.com
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+  tls:
+    enabled: false
+    secretName: dc3-tls
+    # cert-manager ClusterIssuer name (e.g. letsencrypt-prod) once enabled
+    clusterIssuer: ""
+
+# -----------------------------------------------------------------------------
+# Autoscaling (gateway / web only - they are the HTTP entry tier)
+# -----------------------------------------------------------------------------
+autoscaling:
+  gateway:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPU: 70
+  web:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPU: 70
+
+# -----------------------------------------------------------------------------
+# PodDisruptionBudget
+# -----------------------------------------------------------------------------
+pdb:
+  enabled: true
+  minAvailable: 1
+  targets:
+    - gateway
+    - web
+    - auth
+    - manager
+    - data
+    - agentic
+
+# -----------------------------------------------------------------------------
+# Service account
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}

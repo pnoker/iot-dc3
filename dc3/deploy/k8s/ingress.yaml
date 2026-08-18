@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dc3-ingress
+  namespace: dc3
+  labels:
+    app.kubernetes.io/part-of: iot-dc3
+  annotations:
+    # nginx-ingress (ingress-nginx) example. Adjust to your ingress controller.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    # Uncomment once cert-manager is installed and you own the domain:
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - dc3.example.com
+      secretName: dc3-tls
+  rules:
+    - host: dc3.example.com
+      http:
+        paths:
+          - path: /api/
+            pathType: Prefix
+            backend:
+              service:
+                name: dc3-gateway
+                port:
+                  name: http
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dc3-web
+                port:
+                  name: http

@@ -1,0 +1,65 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dc3-gateway
+  namespace: dc3
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: dc3-gateway
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dc3-web
+  namespace: dc3
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: dc3-web
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dc3-center-auth
+  namespace: dc3
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: dc3-center-auth
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dc3-center-manager
+  namespace: dc3
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: dc3-center-manager
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dc3-center-data
+  namespace: dc3
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: dc3-center-data
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dc3-center-agentic
+  namespace: dc3
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: dc3-center-agentic

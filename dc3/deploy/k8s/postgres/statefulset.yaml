@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dc3-postgres
+  namespace: dc3
+  labels:
+    app.kubernetes.io/name: dc3-postgres
+    app.kubernetes.io/part-of: iot-dc3
+spec:
+  serviceName: dc3-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dc3-postgres
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: dc3-postgres
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: dc3-postgres
+          # Built locally from dc3/dependencies/postgres (see scripts/push-images.sh);
+          # pulls the dc3-postgres-base image and layers the initdb seed SQL.
+          image: pnoker/dc3-postgres:2026.6
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: dc3-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dc3-secrets
+                  key: POSTGRES_USERNAME
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dc3-secrets
+                  key: POSTGRES_PASSWORD
+          ports:
+            - name: postgres
+              containerPort: 5432
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2048Mi
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - dc3
+                - -d
+                - dc3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - dc3
+                - -d
+                - dc3
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 20Gi

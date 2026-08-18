@@ -1,0 +1,31 @@
+IoT DC3 has been deployed to your cluster.
+
+  Release:  {{ .Release.Name }}
+  Chart:    {{ .Chart.Name }} v{{ .Chart.Version }} (app {{ .Chart.AppVersion }})
+
+Services:
+{{- range $name, $svc := .Values.services }}
+{{- if $svc.enabled }}
+  - dc3-{{ $name }}   ({{ $svc.image }}){{ if $svc.replicas }} x{{ $svc.replicas }}{{ end }}
+{{- end }}
+{{- end }}
+{{- range $name, $cfg := .Values.drivers }}
+{{- if $cfg.enabled }}
+  - dc3-driver-{{ $name }}{{ if $cfg.replicas }} x{{ $cfg.replicas }}{{ end }}
+{{- end }}
+{{- end }}
+  - dc3-postgres   (StatefulSet, 1 replica)
+  - dc3-rabbitmq   (StatefulSet, 1 replica)
+
+Get status:
+  kubectl get pods,svc -l app.kubernetes.io/instance={{ .Release.Name }}
+
+Access (after setting ingress.host and provisioning TLS):
+  Web console: https://{{ .Values.ingress.host }}/
+  API:         https://{{ .Values.ingress.host }}/api/
+  Device TCP:  kubectl get svc dc3-driver-listening-virtual -o jsonpath='{.spec.ports[0].nodePort}'
+
+Secrets: change the public weak defaults before production!
+  helm upgrade {{ .Release.Name }} . --reuse-values \
+      --set-string secrets.DC3_SECURITY_KEY=<random> \
+      --set-string secrets.AUTH_HMAC_SECRET=<random>

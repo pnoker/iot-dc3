@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dc3-postgres
+  namespace: dc3
+  labels:
+    app.kubernetes.io/name: dc3-postgres
+    app.kubernetes.io/part-of: iot-dc3
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: dc3-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres

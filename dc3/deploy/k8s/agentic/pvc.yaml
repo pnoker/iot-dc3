@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dc3-agentic-data
+  namespace: dc3
+  labels:
+    app.kubernetes.io/name: dc3-center-agentic
+    app.kubernetes.io/part-of: iot-dc3
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 5Gi

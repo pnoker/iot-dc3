@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dc3-agentic
+  namespace: dc3
+  labels:
+    app.kubernetes.io/name: dc3-agentic
+    app.kubernetes.io/part-of: iot-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dc3-agentic
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: dc3-agentic
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: dc3-agentic
+          image: pnoker/dc3-center-agentic:2026.6
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: dc3-config
+            - secretRef:
+                name: dc3-secrets
+          ports:
+            - name: http
+              containerPort: 8600
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 1024Mi
+          readinessProbe:
+            httpGet:
+              path: /agentic/actuator/health/readiness
+              port: http
+            initialDelaySeconds: 40
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /agentic/actuator/health/readiness
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+            - name: logs
+              mountPath: /dc3-center/dc3-center-agentic/dc3/logs
+            - name: data
+              mountPath: /dc3-center/dc3-center-agentic/dc3/data
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: data
+          persistentVolumeClaim:
+            claimName: dc3-agentic-data
