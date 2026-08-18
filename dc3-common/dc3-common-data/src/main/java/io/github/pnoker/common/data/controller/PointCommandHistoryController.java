@@ -47,7 +47,6 @@ import java.util.Objects;
  * REST controller for point command history queries.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Tag(name = "point_command_history", description = "Point command audit trail: query historical records of commands dispatched to device data points including timestamps and execution outcomes")

@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * and device management capabilities.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication

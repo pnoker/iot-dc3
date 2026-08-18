@@ -147,7 +147,7 @@ const emitDelete = () => {
 </script>
 
 <style lang="scss" scoped>
-// PointCard 用双栏列表展示字段,200px 固定宽度是为了和卡片尺寸匹配。
+// A fixed 200px field width keeps PointCard's two-column list aligned with the card size.
 .things-body-content-item-column-2 {
   width: 200px;
 }

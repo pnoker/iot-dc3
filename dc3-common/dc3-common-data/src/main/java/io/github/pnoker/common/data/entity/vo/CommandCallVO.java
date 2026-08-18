@@ -31,7 +31,6 @@ import java.util.Map;
  * VO for submitting a custom command call.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Getter

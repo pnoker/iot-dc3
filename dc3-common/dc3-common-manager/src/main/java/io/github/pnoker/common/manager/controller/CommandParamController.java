@@ -55,7 +55,6 @@ import java.util.Objects;
  * Manages input and output parameter definitions declared on downward device commands.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "command_param", description = "Command parameter definitions: manage input parameters for device commands including name, data type, and validation rules")

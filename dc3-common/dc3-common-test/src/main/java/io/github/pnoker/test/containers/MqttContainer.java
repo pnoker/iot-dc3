@@ -57,14 +57,29 @@ public final class MqttContainer {
     private MqttContainer() {
     }
 
+    /**
+     * Instance.
+     *
+     * @return instance result
+     */
     public static GenericContainer<?> instance() {
         return INSTANCE;
     }
 
+    /**
+     * Broker url.
+     *
+     * @return broker url result
+     */
     public static String brokerUrl() {
         return "tcp://%s:%d".formatted(INSTANCE.getHost(), INSTANCE.getMappedPort(1883));
     }
 
+    /**
+     * Register.
+     *
+     * @param registry registry
+     */
     public static void register(DynamicPropertyRegistry registry) {
         registry.add("dc3.driver.mqtt.url", MqttContainer::brokerUrl);
     }

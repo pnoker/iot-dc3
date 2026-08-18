@@ -29,7 +29,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * Password hashing utility for server-side raw password handling.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.5.19
  */
 @Slf4j

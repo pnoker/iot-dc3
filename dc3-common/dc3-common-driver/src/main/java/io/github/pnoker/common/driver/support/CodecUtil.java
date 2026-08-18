@@ -29,7 +29,6 @@ import java.util.Base64;
  * manipulation operations including Base64, BCD, Hex, and ASCII conversions.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

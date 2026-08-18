@@ -22,7 +22,6 @@ package io.github.pnoker.common.data.biz.alarm;
  * existing event overview and can be linked from notification records.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface RuleAlarmPersistenceService {

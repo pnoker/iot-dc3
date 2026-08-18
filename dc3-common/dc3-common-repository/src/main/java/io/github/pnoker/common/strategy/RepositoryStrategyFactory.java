@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Data Storage Strategy Factory Used to manage and store different repository services
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class RepositoryStrategyFactory {

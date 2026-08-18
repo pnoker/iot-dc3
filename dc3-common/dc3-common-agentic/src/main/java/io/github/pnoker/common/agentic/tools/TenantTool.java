@@ -28,13 +28,18 @@ import org.springframework.stereotype.Component;
  * Tenant-context tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
 @Component
 public class TenantTool {
 
+    /**
+     * Return current tenant info.
+     *
+     * @param toolContext tool context
+     * @return get current tenant info result
+     */
     @Tool(description = "Get the current tenant context. Returns only the current tenant ID.")
     @AgenticToolMetadata(domain = "tenant", title = "Read current tenant context")
     public AgenticToolResult<CurrentTenantContext> getCurrentTenantInfo(ToolContext toolContext) {

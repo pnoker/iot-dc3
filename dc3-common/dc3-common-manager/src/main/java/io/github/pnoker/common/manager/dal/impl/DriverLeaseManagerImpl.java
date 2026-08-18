@@ -27,6 +27,12 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * MyBatis-backed {@link DriverLeaseManager} implementation with bounded assignment writes.
+ *
+ * @author pnoker
+ * @since 2026.5.22
+ */
 @Service
 @RequiredArgsConstructor
 public class DriverLeaseManagerImpl implements DriverLeaseManager {

@@ -42,7 +42,6 @@ import java.time.Duration;
  * a transient outage cascades into a full driver CrashLoopBackOff.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

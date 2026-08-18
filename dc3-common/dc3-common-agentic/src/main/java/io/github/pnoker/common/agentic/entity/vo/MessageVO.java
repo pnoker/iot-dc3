@@ -28,7 +28,6 @@ import lombok.ToString;
  * View object for agentic message API responses.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Getter

@@ -59,7 +59,6 @@ import java.util.Objects;
  * safety net only.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Slf4j
@@ -128,6 +127,12 @@ public class NotifyConfigCache {
         return bo;
     }
 
+    /**
+     * Return message.
+     *
+     * @param id id
+     * @return get message result
+     */
     public MessageBO getMessage(Long id) {
         if (!isValidId(id)) {
             return null;
@@ -184,18 +189,33 @@ public class NotifyConfigCache {
         return Objects.requireNonNullElse(list, List.of());
     }
 
+    /**
+     * Invalidate notify.
+     *
+     * @param id id
+     */
     public void invalidateNotify(Long id) {
         if (Objects.nonNull(id)) {
             notifyCache.invalidate(id);
         }
     }
 
+    /**
+     * Invalidate message.
+     *
+     * @param id id
+     */
     public void invalidateMessage(Long id) {
         if (Objects.nonNull(id)) {
             messageCache.invalidate(id);
         }
     }
 
+    /**
+     * Invalidate channel.
+     *
+     * @param id id
+     */
     public void invalidateChannel(Long id) {
         if (Objects.nonNull(id)) {
             channelCache.invalidate(id);

@@ -32,7 +32,6 @@ import java.util.Objects;
  * accessors that would each need an explicit ignore mapping.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component

@@ -50,7 +50,6 @@ import org.springframework.context.annotation.Bean;
  * HTTP&nbsp;→&nbsp;gRPC&nbsp;→&nbsp;RabbitMQ path.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2016.10.1
  */
 @Slf4j

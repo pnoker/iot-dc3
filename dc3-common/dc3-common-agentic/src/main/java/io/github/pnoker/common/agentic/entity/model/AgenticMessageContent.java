@@ -30,7 +30,6 @@ import java.util.List;
  * Structured content persisted for an agentic chat message.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Getter
@@ -63,6 +62,12 @@ public class AgenticMessageContent implements Serializable {
 
     private String reasoningContent;
 
+    /**
+     * Of text.
+     *
+     * @param text text
+     * @return of text result
+     */
     public static AgenticMessageContent ofText(String text) {
         AgenticMessageContent content = new AgenticMessageContent();
         content.setText(text);
@@ -94,10 +99,33 @@ public class AgenticMessageContent implements Serializable {
 
         private Long created;
 
+        /**
+         * Of.
+         *
+         * @param type type
+         * @param title title
+         * @param detail detail
+         * @param name name
+         * @param created created
+         * @return of result
+         */
         public static Trace of(String type, String title, String detail, String name, Long created) {
             return of(type, title, detail, name, created, null, null, null);
         }
 
+        /**
+         * Of.
+         *
+         * @param type type
+         * @param title title
+         * @param detail detail
+         * @param name name
+         * @param created created
+         * @param phase phase
+         * @param status status
+         * @param code code
+         * @return of result
+         */
         public static Trace of(String type, String title, String detail, String name, Long created, String phase,
                                String status, String code) {
             Trace trace = new Trace();
@@ -127,6 +155,13 @@ public class AgenticMessageContent implements Serializable {
 
         private String content;
 
+        /**
+         * Of.
+         *
+         * @param type type
+         * @param content content
+         * @return of result
+         */
         public static Context of(String type, String content) {
             Context context = new Context();
             context.setType(type);
@@ -157,6 +192,17 @@ public class AgenticMessageContent implements Serializable {
 
         private Integer memory;
 
+        /**
+         * Of.
+         *
+         * @param input input
+         * @param output output
+         * @param text text
+         * @param context context
+         * @param system system
+         * @param memory memory
+         * @return of result
+         */
         public static Tokens of(Integer input, Integer output, Integer text, Integer context, Integer system,
                                 Integer memory) {
             Tokens tokens = new Tokens();

@@ -46,7 +46,6 @@ import java.util.Optional;
  * MapStruct builder converting between menu BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -81,6 +80,12 @@ public interface MenuBuilder {
     @Mapping(target = "deleted", ignore = true)
     MenuDO buildDOByBO(MenuBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(MenuBO entityBO, @MappingTarget MenuDO entityDO) {
         // Code
@@ -132,6 +137,12 @@ public interface MenuBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     MenuBO buildBOByDO(MenuDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(MenuDO entityDO, @MappingTarget MenuBO entityBO) {
         // Json Ext
@@ -202,10 +213,22 @@ public interface MenuBuilder {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }
 
+    /**
+     * Convert bo list to tree view object list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     default List<MenuTreeVO> buildTreeVOListByBOList(List<MenuTreeBO> entityBOList) {
         return entityBOList.stream().map(this::buildTreeVOByBO).toList();
     }
 
+    /**
+     * Convert bo to tree view object.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     default MenuTreeVO buildTreeVOByBO(MenuTreeBO entityBO) {
         MenuVO flat = buildVOByBO(entityBO);
         MenuTreeVO out = new MenuTreeVO();

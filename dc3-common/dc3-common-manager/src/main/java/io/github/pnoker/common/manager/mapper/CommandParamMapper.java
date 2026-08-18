@@ -24,7 +24,6 @@ import io.github.pnoker.common.manager.entity.model.CommandParamDO;
  * MyBatis-Plus mapper for the dc3_command_param table.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface CommandParamMapper extends BaseMapper<CommandParamDO> {

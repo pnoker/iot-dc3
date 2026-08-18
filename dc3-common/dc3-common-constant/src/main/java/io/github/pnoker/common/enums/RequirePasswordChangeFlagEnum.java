@@ -28,7 +28,6 @@ import java.util.Optional;
  * Enumeration of the "require password change on next login" flag values (0/1 toggle).
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Getter

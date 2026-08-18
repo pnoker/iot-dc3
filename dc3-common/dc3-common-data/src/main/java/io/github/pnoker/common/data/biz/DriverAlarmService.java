@@ -23,7 +23,6 @@ import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
  * Persists driver alarm events to {@code dc3_entity_alarm} and feeds the rule pipeline.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DriverAlarmService {

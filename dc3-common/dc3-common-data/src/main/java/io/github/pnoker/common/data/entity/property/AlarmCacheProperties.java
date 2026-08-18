@@ -33,7 +33,6 @@ import org.springframework.validation.annotation.Validated;
  * a safety net for missed invalidations during a node restart.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Getter

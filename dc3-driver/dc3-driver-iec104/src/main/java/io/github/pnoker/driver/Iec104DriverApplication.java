@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * substation automation and telecontrol equipment.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication

@@ -34,7 +34,6 @@ import java.util.Optional;
  * Utility methods for building gRPC request/response messages.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class GrpcBuilderUtil {

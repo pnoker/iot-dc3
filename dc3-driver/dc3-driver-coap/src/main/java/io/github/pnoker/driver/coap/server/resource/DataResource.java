@@ -30,7 +30,6 @@ import org.eclipse.californium.core.coap.CoAP;
  * Handles POST requests from devices pushing telemetry data.
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Slf4j

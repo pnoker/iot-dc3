@@ -36,7 +36,6 @@ import java.util.Objects;
  * gRPC server handling user facade requests.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -81,6 +80,11 @@ public class UserServer extends UserApiGrpc.UserApiImplBase {
 
     @FunctionalInterface
     private interface UserLookup {
+        /**
+         * Resolve a user for a specific gRPC lookup strategy.
+         *
+         * @return the resolved user, or {@code null} when no user matches
+         */
         UserBO get();
     }
 

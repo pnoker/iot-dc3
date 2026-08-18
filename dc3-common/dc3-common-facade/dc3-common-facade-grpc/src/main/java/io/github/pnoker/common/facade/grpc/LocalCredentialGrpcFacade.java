@@ -34,7 +34,6 @@ import org.springframework.stereotype.Component;
  * gRPC {@link LocalCredentialFacade}.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Slf4j

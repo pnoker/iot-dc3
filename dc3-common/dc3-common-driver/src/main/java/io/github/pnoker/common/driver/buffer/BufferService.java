@@ -28,7 +28,6 @@ import java.util.List;
  * confirms that the message was accepted and routed.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.6.2
  */
 public interface BufferService {

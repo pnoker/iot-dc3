@@ -45,7 +45,6 @@ import java.util.concurrent.TimeUnit;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.16
  */
 @Component
@@ -53,6 +52,9 @@ public class TokenDenylistCache {
 
     private Cache<String, Long> cache;
 
+    /**
+     * Init.
+     */
     @PostConstruct
     public void init() {
         this.cache = Caffeine.newBuilder()

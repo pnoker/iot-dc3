@@ -36,7 +36,6 @@ import java.util.Optional;
  * MapStruct builder converting between group binding BO, VO, and DO.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -84,6 +83,12 @@ public interface GroupBindBuilder {
     @Mapping(target = "entityTypeFlag", ignore = true)
     GroupBindBO buildBOByDO(GroupBindDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(GroupBindDO entityDO, @MappingTarget GroupBindBO entityBO) {
         Byte entityTypeFlag = entityDO.getEntityTypeFlag();
@@ -108,6 +113,12 @@ public interface GroupBindBuilder {
     @Mapping(target = "deleted", ignore = true)
     GroupBindDO buildDOByBO(GroupBindBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(GroupBindBO entityBO, @MappingTarget GroupBindDO entityDO) {
         EntityTypeEnum entityTypeFlag = entityBO.getEntityTypeFlag();

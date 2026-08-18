@@ -36,7 +36,6 @@ import java.time.LocalDateTime;
  * View object for principals.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

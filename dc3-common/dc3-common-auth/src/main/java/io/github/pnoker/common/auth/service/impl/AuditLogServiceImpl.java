@@ -32,7 +32,6 @@ import java.util.List;
  * Identity audit log service implementation.
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 @Slf4j

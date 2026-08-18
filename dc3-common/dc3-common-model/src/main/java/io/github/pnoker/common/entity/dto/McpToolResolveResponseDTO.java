@@ -32,7 +32,6 @@ import java.io.Serializable;
  * Auth-to-gateway resolved backend invocation contract for one MCP tool.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

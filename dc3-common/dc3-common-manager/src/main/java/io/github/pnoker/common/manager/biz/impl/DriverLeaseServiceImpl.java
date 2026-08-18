@@ -38,6 +38,13 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Serializes driver membership changes, assigns devices with rendezvous hashing, and advances fencing generations when
+ * membership or inventory changes.
+ *
+ * @author pnoker
+ * @since 2026.5.22
+ */
 @Service
 @RequiredArgsConstructor
 public class DriverLeaseServiceImpl implements DriverLeaseService {

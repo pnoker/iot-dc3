@@ -25,7 +25,6 @@ import lombok.ToString;
  * (source, total, unconfirmed) — per-source alert counts.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

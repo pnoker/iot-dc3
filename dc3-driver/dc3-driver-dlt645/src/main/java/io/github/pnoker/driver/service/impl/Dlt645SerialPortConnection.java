@@ -30,7 +30,6 @@ import java.util.Objects;
  * jSerialComm serial port connection for DL/T 645 meters.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j

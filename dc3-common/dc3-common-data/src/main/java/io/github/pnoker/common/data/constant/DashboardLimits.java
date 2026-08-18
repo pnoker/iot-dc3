@@ -30,7 +30,6 @@ package io.github.pnoker.common.data.constant;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.4
  */
 public final class DashboardLimits {

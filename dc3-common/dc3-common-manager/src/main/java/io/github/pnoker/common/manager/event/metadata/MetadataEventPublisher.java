@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
  * Event publisher for metadata entity changes.
  *
  * @author zhangzi
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

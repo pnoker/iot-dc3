@@ -26,7 +26,6 @@ import java.util.function.IntConsumer;
  * Optional wrapper for {@link Integer} with positive-value checks.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public final class IntegerOptional {
@@ -37,16 +36,33 @@ public final class IntegerOptional {
         this.value = value;
     }
 
+    /**
+     * Create a wrapper that treats {@code null} and non-positive integers as absent.
+     *
+     * @param value integer to wrap
+     * @return wrapper for the supplied value
+     */
     public static IntegerOptional ofNullable(Integer value) {
         return new IntegerOptional(value);
     }
 
+    /**
+     * Invoke the action when the wrapped integer is positive.
+     *
+     * @param action action that consumes the present integer
+     */
     public void ifPresent(IntConsumer action) {
         if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
             action.accept(value);
         }
     }
 
+    /**
+     * Invoke exactly one branch according to whether the wrapped integer is positive.
+     *
+     * @param action action that consumes a positive integer
+     * @param emptyAction action to run for a {@code null} or non-positive integer
+     */
     public void ifPresentOrElse(IntConsumer action, Runnable emptyAction) {
         if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
             action.accept(value);

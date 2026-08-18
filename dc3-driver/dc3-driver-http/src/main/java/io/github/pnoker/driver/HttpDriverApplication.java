@@ -24,12 +24,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * HTTP REST client driver application.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class HttpDriverApplication {
 
+    /**
+     * Start the http driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(HttpDriverApplication.class, args);
     }

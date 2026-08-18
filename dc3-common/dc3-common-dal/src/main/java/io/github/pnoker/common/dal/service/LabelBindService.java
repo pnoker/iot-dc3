@@ -25,7 +25,6 @@ import io.github.pnoker.common.dal.entity.query.LabelBindQuery;
  * Business service for label binding operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface LabelBindService extends BaseService<LabelBindBO, LabelBindQuery> {

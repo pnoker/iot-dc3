@@ -46,7 +46,6 @@ import java.util.stream.Collectors;
  * returns 403 rather than masking a transient outage as a 401.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Slf4j

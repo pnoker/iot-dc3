@@ -28,6 +28,11 @@ import org.sputnikdev.bluetooth.manager.impl.BluetoothManagerBuilder;
 @Component
 public class BleManagerFactory {
 
+    /**
+     * Create and start a BLE manager backed by TinyB.
+     *
+     * @return a started manager that tolerates transport initialization failures
+     */
     public BluetoothManager create() {
         return new BluetoothManagerBuilder()
                 .withTinyBTransport(true)

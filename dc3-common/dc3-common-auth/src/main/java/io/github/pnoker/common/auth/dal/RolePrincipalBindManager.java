@@ -24,7 +24,6 @@ import io.github.pnoker.common.auth.entity.model.RolePrincipalBindDO;
  * Persistence manager for role-principal bindings.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface RolePrincipalBindManager extends IService<RolePrincipalBindDO> {

@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
  * High-risk MCP tool call confirmation ticket projection.
  *
  * @author pnoker
- * @version 2026.6.17
  * @since 2026.6.17
  */
 @Getter

@@ -41,7 +41,6 @@ import java.util.Optional;
  * MapStruct builder converting between event attribute BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -76,6 +75,12 @@ public interface EventAttributeBuilder {
     @Mapping(target = "deleted", ignore = true)
     EventAttributeDO buildDOByBO(EventAttributeBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(EventAttributeBO entityBO, @MappingTarget EventAttributeDO entityDO) {
         // Json Ext
@@ -117,6 +122,12 @@ public interface EventAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     EventAttributeBO buildBOByDO(EventAttributeDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(EventAttributeDO entityDO, @MappingTarget EventAttributeBO entityBO) {
         // Json Ext

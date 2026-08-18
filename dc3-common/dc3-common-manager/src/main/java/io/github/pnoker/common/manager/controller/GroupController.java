@@ -53,7 +53,6 @@ import java.util.Objects;
  * REST controller exposing group management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "group", description = "Logical group hierarchy: create, update, and manage groups for organizing devices, drivers, and platform resources into hierarchical collections")

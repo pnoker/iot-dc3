@@ -29,16 +29,27 @@ import org.mapstruct.Mapping;
  * FacadeDriver ↔ manager DriverBO/Query mapper. Field sets are aligned.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeDriverBuilder {
 
+    /**
+     * To manager query.
+     *
+     * @param facadeQuery facade query
+     * @return to manager query result
+     */
     @Mapping(target = "groupId", ignore = true)
     @Mapping(target = "labelId", ignore = true)
     DriverQuery toManagerQuery(FacadeDriverQuery facadeQuery);
 
+    /**
+     * To facade business object.
+     *
+     * @param managerBO business object
+     * @return to facade business object result
+     */
     FacadeDriverBO toFacadeBO(DriverBO managerBO);
 
 }

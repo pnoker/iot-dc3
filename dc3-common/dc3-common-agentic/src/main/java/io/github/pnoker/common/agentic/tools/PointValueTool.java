@@ -46,7 +46,6 @@ import java.util.Objects;
  * Point-value tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -60,6 +59,14 @@ public class PointValueTool {
 
     private final ActionService actionService;
 
+    /**
+     * Return latest point value.
+     *
+     * @param deviceId device identifier
+     * @param pointId point identifier
+     * @param toolContext tool context
+     * @return get latest point value result
+     */
     @Tool(description = "Get the latest point value for a specific device and point. Returns the current value.")
     @AgenticToolMetadata(domain = "point-value", title = "Get latest point value")
     public AgenticToolResult<FacadePointValueBO> getLatestPointValue(
@@ -83,6 +90,15 @@ public class PointValueTool {
         }
     }
 
+    /**
+     * Return point value history.
+     *
+     * @param deviceId device identifier
+     * @param pointId point identifier
+     * @param count count
+     * @param toolContext tool context
+     * @return get point value history result
+     */
     @Tool(description = "Get historical point values for a specific device and point. Returns raw values and chart-ready numeric points as structured data.")
     @AgenticToolMetadata(domain = "point-value", title = "Get point value history")
     public AgenticToolResult<PointValueHistory> getPointValueHistory(
@@ -115,6 +131,14 @@ public class PointValueTool {
         }
     }
 
+    /**
+     * Read point value.
+     *
+     * @param deviceId device identifier
+     * @param pointId point identifier
+     * @param toolContext tool context
+     * @return read point value result
+     */
     @Tool(description = "Send a read command to a device for a specific point. The driver will read the current value from the physical device.")
     @AgenticToolMetadata(domain = "point-value", title = "Send point read command")
     public AgenticToolResult<PointCommandResult> readPointValue(
@@ -138,6 +162,15 @@ public class PointValueTool {
         }
     }
 
+    /**
+     * Write point value.
+     *
+     * @param deviceId device identifier
+     * @param pointId point identifier
+     * @param value value
+     * @param toolContext tool context
+     * @return write point value result
+     */
     @Tool(description = "Prepare a point write command for a specific device and point. This tool never writes directly; it creates a pending action that requires explicit user confirmation before execution.")
     @AgenticToolMetadata(domain = "point-value", title = "Prepare point write command")
     public AgenticToolResult<PointCommandResult> writePointValue(

@@ -23,7 +23,6 @@ import reactor.core.publisher.Flux;
  * Executes the model/tool runtime for one prepared agentic chat turn.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public interface AgenticRuntime {

@@ -46,7 +46,6 @@ import java.util.Objects;
  * REST controller exposing driver status management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "driver_status", description = "Driver operational status: query current connected, disconnected, and error states of protocol driver instances")

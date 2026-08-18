@@ -39,7 +39,6 @@ import java.util.Set;
  * Local host IP, hostname, and MAC address lookup.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

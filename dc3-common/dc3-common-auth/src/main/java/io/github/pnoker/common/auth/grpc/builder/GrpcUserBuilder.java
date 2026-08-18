@@ -34,7 +34,6 @@ import java.util.Optional;
  * MapStruct builder for user gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -65,6 +64,12 @@ public interface GrpcUserBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcUserDTO buildGrpcDTOByBO(UserBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(UserBO entityBO, @MappingTarget GrpcUserDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);

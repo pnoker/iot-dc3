@@ -26,7 +26,6 @@ import io.github.pnoker.common.manager.entity.model.DriverAttributeDO;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DriverAttributeManager extends IService<DriverAttributeDO> {

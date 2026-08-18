@@ -86,7 +86,6 @@ import java.util.stream.Collectors;
  * Spring Security's default reactive chain via {@code spring.autoconfigure.exclude}.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @AutoConfiguration
@@ -128,6 +127,13 @@ public class WebFluxSecurityConfig {
         return new PermissionProvider.DefaultPermissionProvider();
     }
 
+    /**
+     * Create and configure the application-managed gateway jwt converter.
+     *
+     * @param hmacAuthSigner hmac auth signer
+     * @param permissionProvider permission provider
+     * @return gateway jwt converter result
+     */
     @Bean
     public GatewayJwtConverter gatewayJwtConverter(
             HmacAuthSigner hmacAuthSigner,
@@ -135,6 +141,18 @@ public class WebFluxSecurityConfig {
         return new GatewayJwtConverter(hmacAuthSigner, permissionProvider);
     }
 
+    /**
+     * Create and configure the application-managed security web filter chain.
+     *
+     * @param http http
+     * @param converter converter
+     * @param hmacAuthSigner hmac auth signer
+     * @param environment environment
+     * @param docsPublicEnabled docs public enabled
+     * @param docsInternalSignatureEnabled docs internal signature enabled
+     * @param oauthDcrEnabled oauth dcr enabled
+     * @return security web filter chain result
+     */
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(
             ServerHttpSecurity http,

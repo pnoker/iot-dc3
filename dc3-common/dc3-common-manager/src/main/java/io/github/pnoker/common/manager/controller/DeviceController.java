@@ -70,7 +70,6 @@ import java.util.stream.Collectors;
  * REST controller exposing device management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "device", description = "Industrial device lifecycle: register, configure, and manage device connectivity including driver assignment, topic binding, and operational status tracking")

@@ -30,7 +30,6 @@ import java.util.Map;
  * JSON extension object for event attribute configuration.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "JSON extension object for event attribute configuration")

@@ -31,7 +31,6 @@ import java.util.Map;
  * Transport-neutral system health snapshot.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2026.5.14
  */
 @Getter

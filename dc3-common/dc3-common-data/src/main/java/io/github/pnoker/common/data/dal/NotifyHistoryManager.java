@@ -24,7 +24,6 @@ import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
  * Notification delivery history manager.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface NotifyHistoryManager extends IService<NotifyHistoryDO> {

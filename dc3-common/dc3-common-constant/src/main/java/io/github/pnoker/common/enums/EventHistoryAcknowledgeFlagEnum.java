@@ -28,7 +28,6 @@ import java.util.Optional;
  * Enumeration of event record acknowledge flags.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Getter
@@ -53,6 +52,12 @@ public enum EventHistoryAcknowledgeFlagEnum {
 
     private final String remark;
 
+    /**
+     * Resolve an acknowledgement flag from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching flag, or {@code null} when the index is unknown
+     */
     public static EventHistoryAcknowledgeFlagEnum ofIndex(Byte index) {
         Optional<EventHistoryAcknowledgeFlagEnum> any = Arrays.stream(EventHistoryAcknowledgeFlagEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -60,6 +65,12 @@ public enum EventHistoryAcknowledgeFlagEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an acknowledgement flag from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching flag, or {@code null} when the code is unknown
+     */
     public static EventHistoryAcknowledgeFlagEnum ofCode(String code) {
         Optional<EventHistoryAcknowledgeFlagEnum> any = Arrays.stream(EventHistoryAcknowledgeFlagEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -67,6 +78,12 @@ public enum EventHistoryAcknowledgeFlagEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an acknowledgement flag from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching flag, or {@code null} when the name is unknown
+     */
     public static EventHistoryAcknowledgeFlagEnum ofName(String name) {
         try {
             return valueOf(name);

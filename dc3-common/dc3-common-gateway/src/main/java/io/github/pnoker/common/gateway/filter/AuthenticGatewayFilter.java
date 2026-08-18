@@ -45,7 +45,6 @@ import reactor.core.scheduler.Schedulers;
  * Gateway filter that validates authentication headers.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

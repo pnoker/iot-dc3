@@ -46,7 +46,6 @@ import java.util.Optional;
  * MapStruct builder converting between point BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -82,6 +81,12 @@ public interface PointBuilder {
     @Mapping(target = "deleted", ignore = true)
     PointDO buildDOByBO(PointBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(PointBO entityBO, @MappingTarget PointDO entityDO) {
         // Code
@@ -133,6 +138,12 @@ public interface PointBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointBO buildBOByDO(PointDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(PointDO entityDO, @MappingTarget PointBO entityBO) {
         // Json Ext
@@ -203,6 +214,12 @@ public interface PointBuilder {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }
 
+    /**
+     * Convert bo to vo device.
+     *
+     * @param pointConfigByDeviceBO business object
+     * @return converted value
+     */
     PointConfigByDeviceVO buildVODeviceByBO(PointConfigByDeviceBO pointConfigByDeviceBO);
 
 }

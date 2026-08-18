@@ -41,12 +41,17 @@ import java.util.Optional;
  * Converts between facade profile shapes and protobuf profile DTOs.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcProfileBuilder {
 
+    /**
+     * To grpc page query.
+     *
+     * @param query query
+     * @return to grpc page query result
+     */
     public GrpcPageProfileQuery toGrpcPageQuery(FacadeProfileQuery query) {
         GrpcPageProfileQuery.Builder builder = GrpcPageProfileQuery.newBuilder();
         Pages pages = Objects.isNull(query.getPage()) ? new Pages() : query.getPage();
@@ -70,6 +75,12 @@ public class FacadeGrpcProfileBuilder {
         return builder.build();
     }
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeProfileBO toFacadeBO(GrpcProfileDTO dto) {
         if (Objects.isNull(dto)) {
             return null;

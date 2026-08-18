@@ -35,7 +35,6 @@ import java.io.Serializable;
  * Query view object for point command list API.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter

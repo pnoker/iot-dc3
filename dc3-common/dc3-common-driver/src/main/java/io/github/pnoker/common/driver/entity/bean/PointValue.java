@@ -39,7 +39,6 @@ import java.util.Objects;
  * value, and the timestamp when the reading was produced.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

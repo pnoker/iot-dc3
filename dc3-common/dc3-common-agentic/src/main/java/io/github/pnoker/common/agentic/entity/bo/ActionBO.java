@@ -32,7 +32,6 @@ import java.util.Map;
  * Business object for agentic action operations.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Getter
@@ -58,7 +57,6 @@ public class ActionBO extends BaseBO implements TenantOwned {
 
     private LocalDateTime expireTime;
 
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private Long userId;

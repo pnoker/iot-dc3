@@ -34,12 +34,17 @@ import java.util.Optional;
  * MapStruct builder for local credential gRPC message conversion.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcLocalCredentialBuilder {
 
+    /**
+     * Convert bo to grpc transfer object.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "loginNameBytes", ignore = true)
     @Mapping(target = "mergeFrom", ignore = true)
@@ -52,6 +57,12 @@ public interface GrpcLocalCredentialBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcLocalCredentialDTO buildGrpcDTOByBO(LocalCredentialBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(LocalCredentialBO entityBO, @MappingTarget GrpcLocalCredentialDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);

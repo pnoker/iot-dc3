@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
  * and submits it to the manager center.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

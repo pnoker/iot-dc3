@@ -35,12 +35,17 @@ import org.mapstruct.MappingTarget;
  * MapStruct mapper for converting device gRPC DTOs into internal business objects.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DeviceBuilder {
 
+    /**
+     * Convert grpc transfer object to dto.
+     *
+     * @param entityGrpc entity grpc
+     * @return converted value
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
@@ -59,6 +64,12 @@ public interface DeviceBuilder {
     @Mapping(target = "eventAttributeConfigIdMap", ignore = true)
     DeviceBO buildDTOByGrpcDTO(GrpcDeviceDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(GrpcDeviceDTO entityGrpc, @MappingTarget DeviceBO entityBO) {
         GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);

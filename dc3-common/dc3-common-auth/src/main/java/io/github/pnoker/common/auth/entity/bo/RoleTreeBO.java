@@ -33,7 +33,6 @@ import java.util.Objects;
  * (el-tree-select in RoleEditForm).
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -68,6 +67,11 @@ public class RoleTreeBO extends RoleBO {
         return node;
     }
 
+    /**
+     * Create child.
+     *
+     * @param child child
+     */
     public void addChild(RoleTreeBO child) {
         if (Objects.isNull(children)) {
             children = new ArrayList<>();

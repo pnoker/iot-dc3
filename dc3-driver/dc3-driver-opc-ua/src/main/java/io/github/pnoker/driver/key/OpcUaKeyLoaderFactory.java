@@ -27,6 +27,12 @@ import java.nio.file.Path;
 @Component
 public class OpcUaKeyLoaderFactory {
 
+    /**
+     * Load or create the OPC UA client certificate material in the driver's working directory.
+     *
+     * @return the initialized key loader
+     * @throws Exception when the certificate or key material cannot be loaded or created
+     */
     public KeyLoader load() throws Exception {
         Path baseDirectory = Path.of(System.getProperty("user.dir"), "dc3", "opc-ua");
         return new KeyLoader().load(baseDirectory);

@@ -28,7 +28,6 @@ import org.apache.commons.lang3.StringUtils;
  * Structured SSE payload for one agentic runtime event.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Getter
@@ -64,6 +63,12 @@ public class AgenticRunEventVO {
     @Schema(description = "Unix epoch seconds when the event was emitted; derived from the internal millisecond timestamp divided by 1000.", example = "1718700000")
     private Long created;
 
+    /**
+     * Of.
+     *
+     * @param runEvent run event
+     * @return of result
+     */
     public static AgenticRunEventVO of(AgenticRunEvent runEvent) {
         AgenticRunEventVO response = new AgenticRunEventVO();
         response.setObject(AgenticConstant.RunEvent.OBJECT);

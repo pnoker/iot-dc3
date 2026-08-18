@@ -41,12 +41,17 @@ import java.util.Optional;
  * GrpcProfile Builder.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2016.10.1
  */
 @Component
 public class GrpcProfileBuilder {
 
+    /**
+     * Convert grpc query to query.
+     *
+     * @param entityGrpc entity grpc
+     * @return converted value
+     */
     public ProfileQuery buildQueryByGrpcQuery(GrpcPageProfileQuery entityGrpc) {
         ProfileQuery.ProfileQueryBuilder builder = ProfileQuery.builder();
         Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
@@ -70,6 +75,12 @@ public class GrpcProfileBuilder {
         return builder.build();
     }
 
+    /**
+     * Convert bo to grpc transfer object.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     public GrpcProfileDTO buildGrpcDTOByBO(ProfileBO entityBO) {
         GrpcProfileDTO.Builder builder = GrpcProfileDTO.newBuilder();
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
@@ -96,6 +107,12 @@ public class GrpcProfileBuilder {
         return builder.build();
     }
 
+    /**
+     * Build grpc page.
+     *
+     * @param page page
+     * @return converted value
+     */
     public GrpcPage buildGrpcPage(com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProfileBO> page) {
         return GrpcPage.newBuilder()
                 .setCurrent(page.getCurrent())

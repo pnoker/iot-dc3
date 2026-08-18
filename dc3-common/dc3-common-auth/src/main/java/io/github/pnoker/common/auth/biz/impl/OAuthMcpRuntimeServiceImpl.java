@@ -116,7 +116,6 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
  * OAuth records defined by the design.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Slf4j

@@ -30,7 +30,6 @@ import io.github.pnoker.common.enums.SuccessCode;
  * with the HTTP envelope's {@link ResponseCode} set.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public final class GrpcRFactory {

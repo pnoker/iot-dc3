@@ -23,12 +23,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * KNX (ISO/IEC 14543-3) smart building driver application.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class KnxDriverApplication {
 
+    /**
+     * Start the knx driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(KnxDriverApplication.class, args);
     }

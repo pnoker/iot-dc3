@@ -26,7 +26,6 @@ import java.math.RoundingMode;
  * Precise BigDecimal arithmetic operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class ArithmeticUtil {

@@ -28,6 +28,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class ZigbeeNetworkManagerFactory {
 
+    /**
+     * Create a Zigbee network manager connected to the configured serial adapter.
+     *
+     * @param serialPort serial device path
+     * @param baudRate serial communication rate
+     * @return a network manager ready to be initialized by the driver lifecycle
+     */
     public ZigBeeNetworkManager create(String serialPort, int baudRate) {
         ZigBeeSerialPort serialPortConnection = new ZigBeeSerialPort(serialPort, baudRate,
                 ZigBeeSerialPort.FlowControl.FLOWCONTROL_OUT_XONOFF);

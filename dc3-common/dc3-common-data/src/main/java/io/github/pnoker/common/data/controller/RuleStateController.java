@@ -49,7 +49,6 @@ import java.util.Objects;
  * Rule runtime state controller.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "rule_state", description = "Rule execution states: manage rule engine states including activation, suspension, and runtime statistics for data processing rules")

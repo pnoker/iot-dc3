@@ -24,7 +24,6 @@ import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
  * Manager interface for dc3_command_history table.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 public interface CommandHistoryManager extends IService<CommandHistoryDO> {

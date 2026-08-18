@@ -23,7 +23,6 @@ import io.github.pnoker.common.enums.EntityTypeEnum;
  * Tenant guard for manager entities referenced by polymorphic bindings.
  *
  * @author pnoker
- * @version 2026.6.10
  * @since 2026.6.10
  */
 public interface EntityTenantService {

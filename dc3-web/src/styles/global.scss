@@ -18,13 +18,12 @@
 @use '@/styles/things-dialog.scss';
 @use '@/styles/things-card.scss';
 
-// 真正的全局样式,在 main.ts 里一次性 import。
-// 不能放到 element-variables.scss 里,因为后者是 Vite additionalData,
-// 会被预置到每个 scoped <style> 块,所有选择器都会被附加 scope hash,
-// 对 body、teleport(dropdown/popover/dialog 外层)等 scope-less 元素全部失效。
+// Imported once by main.ts. These rules cannot live in element-variables.scss because
+// Vite injects additionalData into every scoped style block and appends scope hashes,
+// which do not match body or teleported dropdown, popover, and dialog containers.
 
-// 品牌主色：把 Element Plus 默认蓝（#409eff）统一为品牌蓝 #1296db。
-// 完整引入预编译 CSS，故用 CSS 变量覆盖；light-N / dark-2 取自 Element Plus 官方混色算法结果。
+// Override Element Plus blue with the brand color. Derived shades follow the
+// Element Plus light-N and dark-2 mixing algorithm.
 :root {
   --el-color-primary: #1296db;
   --el-color-primary-light-3: #59b6e6;
@@ -85,13 +84,9 @@ body {
   word-break: break-word;
 }
 
-// el-popconfirm 的 popper 也通过 teleport 挂到 body,作用域外样式必须放在全局。
-// Element Plus 默认 popconfirm 只按文字宽度撑开,文字 + 两个按钮常常挤在一行,
-// 视觉上又窄又紧。这里统一:
-//   1. 给 __main 设置最小宽度,保证标题有充足呼吸空间
-//   2. 标题与操作区之间留出垂直间距
-//   3. 操作区按钮之间补 gap,避免贴在一起
-//   4. 主危险按钮加粗,强调不可逆操作
+// Popconfirm is teleported to body, so its unscoped layout belongs here. Keep enough
+// width and vertical space for the title and actions, separate adjacent buttons, and
+// emphasize the irreversible primary danger action.
 .el-popover.el-popper.el-popconfirm {
   --el-popover-padding: 14px 16px;
 
@@ -115,9 +110,8 @@ body {
 }
 
 .el-dropdown-menu {
-  // 让 emoji 国旗占一个和 el-icon 同尺寸的方格,与同级走 :icon 属性的
-  // 设置 / 关于 / 退出项在同一条基线上。em 单位跟随 dropdown-item 字号,
-  // 在高 DPI 下也保持稳定。
+  // Give emoji flags the same em-sized box as el-icon so language, settings,
+  // about, and sign-out items share a baseline at every display density.
   .lang-flag {
     display: inline-flex;
     align-items: center;

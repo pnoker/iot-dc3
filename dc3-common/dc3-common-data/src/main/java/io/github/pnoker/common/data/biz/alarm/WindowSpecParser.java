@@ -32,7 +32,6 @@ import java.util.Objects;
  * parser so the validation rules cannot drift between the two paths.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 public final class WindowSpecParser {

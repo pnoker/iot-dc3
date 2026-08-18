@@ -34,7 +34,6 @@ import java.time.LocalDateTime;
  * Persistence object for the dc3_role_principal_bind table.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

@@ -31,7 +31,6 @@ import java.util.Objects;
  * resource-code authorities.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 public class GatewayAuthenticationToken extends AbstractAuthenticationToken {
@@ -58,18 +57,38 @@ public class GatewayAuthenticationToken extends AbstractAuthenticationToken {
         return null;
     }
 
+    /**
+     * Return principal header.
+     *
+     * @return get principal header result
+     */
     public RequestHeader.PrincipalHeader getPrincipalHeader() {
         return principalHeader;
     }
 
+    /**
+     * Return tenant identifier.
+     *
+     * @return get tenant identifier result
+     */
     public Long getTenantId() {
         return principalHeader.getTenantId();
     }
 
+    /**
+     * Return user identifier.
+     *
+     * @return get user identifier result
+     */
     public Long getUserId() {
         return principalHeader.getPrincipalId();
     }
 
+    /**
+     * Return principal identifier.
+     *
+     * @return get principal identifier result
+     */
     public Long getPrincipalId() {
         return principalHeader.getPrincipalId();
     }

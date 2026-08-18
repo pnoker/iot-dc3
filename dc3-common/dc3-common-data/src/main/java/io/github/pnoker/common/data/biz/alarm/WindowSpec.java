@@ -37,19 +37,37 @@ import java.time.Duration;
  * @param reason     human-readable rejection cause when {@code valid} is false;
  *                   null otherwise.
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 public record WindowSpec(WindowModeEnum mode, Duration duration, int minSamples, boolean valid, String reason) {
 
+    /**
+     * Last.
+     *
+     * @return last result
+     */
     public static WindowSpec last() {
         return new WindowSpec(WindowModeEnum.LAST, null, 1, true, null);
     }
 
+    /**
+     * Ok.
+     *
+     * @param mode mode
+     * @param duration duration
+     * @param minSamples min samples
+     * @return ok result
+     */
     public static WindowSpec ok(WindowModeEnum mode, Duration duration, int minSamples) {
         return new WindowSpec(mode, duration, Math.max(0, minSamples), true, null);
     }
 
+    /**
+     * Invalid.
+     *
+     * @param reason reason
+     * @return invalid result
+     */
     public static WindowSpec invalid(String reason) {
         return new WindowSpec(null, null, 0, false, reason);
     }

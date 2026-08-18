@@ -29,7 +29,6 @@ import java.util.Optional;
  * MCP tool-call audit outcome.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -79,6 +78,12 @@ public enum McpAuditStatusEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve an MCP audit status from its persisted wire value.
+     *
+     * @param value persisted status value
+     * @return matching status, or {@code null} when the value is unknown
+     */
     public static McpAuditStatusEnum ofValue(String value) {
         Optional<McpAuditStatusEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))

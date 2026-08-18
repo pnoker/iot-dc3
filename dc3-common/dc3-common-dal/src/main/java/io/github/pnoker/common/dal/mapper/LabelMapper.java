@@ -29,7 +29,6 @@ import io.github.pnoker.common.dal.entity.model.LabelDO;
  * MyBatis-Plus mapper for the dc3_label table.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface LabelMapper extends BaseMapper<LabelDO> {

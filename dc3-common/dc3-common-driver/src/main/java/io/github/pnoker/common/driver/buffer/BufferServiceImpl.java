@@ -38,7 +38,6 @@ import java.util.Objects;
  * Every failure path retains the same message identity for idempotent downstream retry.
  *
  * @author pnoker
- * @version 2026.8.12
  * @since 2026.6.2
  */
 @Slf4j

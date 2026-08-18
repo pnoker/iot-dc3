@@ -39,17 +39,34 @@ import java.util.Optional;
  * MapStruct builder converting between model provider BO, VO, and DO.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface ModelProviderBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     @Mapping(target = "apiKey", ignore = true)
     ModelProviderBO buildBOByVO(ModelProviderVO entityVO);
 
+    /**
+     * Convert vo list to bo list.
+     *
+     * @param entityVOList entity view object list
+     * @return converted value
+     */
     List<ModelProviderBO> buildBOListByVOList(List<ModelProviderVO> entityVOList);
 
+    /**
+     * After process.
+     *
+     * @param entityRequest entity request
+     * @param entityBO business object
+     */
     @Mapping(target = "providerType", ignore = true)
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
@@ -66,12 +83,24 @@ public interface ModelProviderBuilder {
         entityBO.setProviderType(entityRequest.getProviderType());
     }
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "providerType", ignore = true)
     @Mapping(target = "defaultFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ModelProviderDO buildDOByBO(ModelProviderBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(ModelProviderBO entityBO, @MappingTarget ModelProviderDO entityDO) {
         AgenticModelProviderTypeEnum providerType = entityBO.getProviderType();
@@ -84,13 +113,31 @@ public interface ModelProviderBuilder {
         Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
+    /**
+     * Convert bo list to do list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<ModelProviderDO> buildDOListByBOList(List<ModelProviderBO> entityBOList);
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "providerType", ignore = true)
     @Mapping(target = "defaultFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     ModelProviderBO buildBOByDO(ModelProviderDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(ModelProviderDO entityDO, @MappingTarget ModelProviderBO entityBO) {
         Byte providerType = entityDO.getProviderType();
@@ -103,20 +150,56 @@ public interface ModelProviderBuilder {
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<ModelProviderBO> buildBOListByDOList(List<ModelProviderDO> entityDOList);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     ModelProviderVO buildVOByBO(ModelProviderBO entityBO);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<ModelProviderVO> buildVOListByBOList(List<ModelProviderBO> entityBOList);
 
+    /**
+     * Convert do page to bo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
     default Page<ModelProviderBO> buildBOPageByDOPage(Page<ModelProviderDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
+    /**
+     * Convert bo page to vo page.
+     *
+     * @param entityPageBO business object
+     * @return converted value
+     */
     default Page<ModelProviderVO> buildVOPageByBOPage(Page<ModelProviderBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }
 
+    /**
+     * Provider type.
+     *
+     * @param value value
+     * @return provider type result
+     */
     default AgenticModelProviderTypeEnum providerType(String value) {
         if (StringUtils.isBlank(value)) {
             return null;

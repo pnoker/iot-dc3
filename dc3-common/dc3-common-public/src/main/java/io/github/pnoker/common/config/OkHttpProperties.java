@@ -29,7 +29,6 @@ import java.time.Duration;
  * Shared OkHttp client properties.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Getter

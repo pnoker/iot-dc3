@@ -42,7 +42,6 @@ import java.util.Objects;
  * is free of timezone/format pitfalls.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.6.2
  */
 @Slf4j

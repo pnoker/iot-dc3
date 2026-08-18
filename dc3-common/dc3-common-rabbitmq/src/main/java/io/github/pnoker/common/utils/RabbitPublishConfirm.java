@@ -31,6 +31,12 @@ public final class RabbitPublishConfirm {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
+    /**
+     * Await routed.
+     *
+     * @param correlationData correlation data
+     * @param timeout timeout
+     */
     public static void awaitRouted(CorrelationData correlationData, Duration timeout) {
         try {
             CorrelationData.Confirm confirm = correlationData.getFuture()

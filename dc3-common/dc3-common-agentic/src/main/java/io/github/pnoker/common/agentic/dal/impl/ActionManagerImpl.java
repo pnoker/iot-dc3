@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
  * MyBatis-Plus implementation of agentic action persistence.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service

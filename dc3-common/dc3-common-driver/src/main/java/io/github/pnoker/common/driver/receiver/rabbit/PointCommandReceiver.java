@@ -46,7 +46,6 @@ import java.util.Objects;
  * receipts back to the data center.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j

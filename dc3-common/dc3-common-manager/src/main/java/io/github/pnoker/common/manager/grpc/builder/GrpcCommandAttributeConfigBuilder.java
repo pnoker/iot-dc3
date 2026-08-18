@@ -34,7 +34,6 @@ import java.util.Optional;
  * GrpcCommandAttributeConfig Builder
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -59,6 +58,12 @@ public interface GrpcCommandAttributeConfigBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcCommandAttributeConfigDTO buildGrpcDTOByBO(CommandAttributeConfigBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(CommandAttributeConfigBO entityBO,
                               @MappingTarget GrpcCommandAttributeConfigDTO.Builder entityGrpc) {

@@ -61,7 +61,6 @@ import java.util.Objects;
  * REST controller exposing point attribute config management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "point_attribute_config", description = "Point attribute configuration values: set and update per-device customization values for data point properties inherited from point attribute definitions")

@@ -28,11 +28,18 @@ import org.apache.ibatis.annotations.Param;
  * MyBatis-Plus mapper for the dc3_command table.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface CommandMapper extends BaseMapper<CommandDO> {
 
+    /**
+     * Select page with device.
+     *
+     * @param page page
+     * @param wrapper wrapper
+     * @param deviceId device identifier
+     * @return paginated result
+     */
     Page<CommandDO> selectPageWithDevice(Page<CommandDO> page, @Param(Constants.WRAPPER) Wrapper<CommandDO> wrapper,
                                          @Param("deviceId") Long deviceId);
 

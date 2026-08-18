@@ -50,7 +50,6 @@ import java.util.Objects;
  * REST controller exposing session management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "session", description = "Agent conversation sessions: create, manage, and terminate AI agent conversation contexts including message history and tool invocation state")

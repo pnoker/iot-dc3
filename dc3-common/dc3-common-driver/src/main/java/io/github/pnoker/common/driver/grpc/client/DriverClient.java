@@ -61,7 +61,6 @@ import java.util.stream.Collectors;
  * by the manager center after registration succeeds.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 

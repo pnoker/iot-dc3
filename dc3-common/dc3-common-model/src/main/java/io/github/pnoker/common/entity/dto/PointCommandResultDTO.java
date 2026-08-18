@@ -26,7 +26,6 @@ import java.time.Instant;
  * Received by {@code PointCommandResultReceiver} on the data-center side.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 public record PointCommandResultDTO(
@@ -40,6 +39,11 @@ public record PointCommandResultDTO(
         int schemaVersion
 ) {
 
+    /**
+     * Builder.
+     *
+     * @return converted value
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -54,46 +58,99 @@ public record PointCommandResultDTO(
         private Instant finishedAt;
         private int schemaVersion;
 
+        /**
+         * Command identifier.
+         *
+         * @param commandId command identifier
+         * @return command identifier result
+         */
         public Builder commandId(String commandId) {
             this.commandId = commandId;
             return this;
         }
 
+        /**
+         * Tenant identifier.
+         *
+         * @param tenantId tenant identifier
+         * @return tenant identifier result
+         */
         public Builder tenantId(Long tenantId) {
             this.tenantId = tenantId;
             return this;
         }
 
+        /**
+         * Status.
+         *
+         * @param status status
+         * @return status result
+         */
         public Builder status(PointCommandStatusEnum status) {
             this.status = status;
             return this;
         }
 
+        /**
+         * Response value.
+         *
+         * @param responseValue response value
+         * @return response value result
+         */
         public Builder responseValue(String responseValue) {
             this.responseValue = responseValue;
             return this;
         }
 
+        /**
+         * Error code.
+         *
+         * @param errorCode error code
+         * @return error code result
+         */
         public Builder errorCode(String errorCode) {
             this.errorCode = errorCode;
             return this;
         }
 
+        /**
+         * Error message.
+         *
+         * @param errorMessage error message
+         * @return error message result
+         */
         public Builder errorMessage(String errorMessage) {
             this.errorMessage = errorMessage;
             return this;
         }
 
+        /**
+         * Finished at.
+         *
+         * @param finishedAt finished at
+         * @return finished at result
+         */
         public Builder finishedAt(Instant finishedAt) {
             this.finishedAt = finishedAt;
             return this;
         }
 
+        /**
+         * Schema version.
+         *
+         * @param schemaVersion schema version
+         * @return schema version result
+         */
         public Builder schemaVersion(int schemaVersion) {
             this.schemaVersion = schemaVersion;
             return this;
         }
 
+        /**
+         * Build an immutable point command result from the accumulated fields.
+         *
+         * @return the point command result DTO
+         */
         public PointCommandResultDTO build() {
             return new PointCommandResultDTO(commandId, tenantId, status, responseValue, errorCode, errorMessage,
                     finishedAt, schemaVersion);

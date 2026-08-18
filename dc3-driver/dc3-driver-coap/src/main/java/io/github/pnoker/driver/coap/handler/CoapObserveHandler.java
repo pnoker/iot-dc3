@@ -23,7 +23,6 @@ import io.github.pnoker.driver.coap.entity.CoapMessage;
  * CoAP Observe Handler Interface
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 public interface CoapObserveHandler {

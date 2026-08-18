@@ -65,7 +65,6 @@ import java.util.Set;
  * Dashboard service implementation providing home-page aggregates and topology.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Slf4j
@@ -691,6 +690,12 @@ public class DashboardServiceImpl implements DashboardService {
     @FunctionalInterface
     private interface KeyFormatter {
 
+        /**
+         * Format.
+         *
+         * @param raw raw
+         * @return format result
+         */
         String format(Object raw);
 
     }

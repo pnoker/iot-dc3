@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
  * Alarm rule processing pipeline implementation.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service

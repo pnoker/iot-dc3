@@ -31,7 +31,6 @@ import lombok.ToString;
  * Business object for notification channel binding operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -49,7 +48,6 @@ public class NotifyChannelBindBO extends BaseBO implements TenantOwned {
 
     private EnableFlagEnum enableFlag;
 
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
 }

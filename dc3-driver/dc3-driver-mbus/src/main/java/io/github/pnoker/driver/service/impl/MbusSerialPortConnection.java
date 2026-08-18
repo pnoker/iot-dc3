@@ -29,7 +29,6 @@ import java.util.Objects;
  * jSerialComm serial port connection for M-Bus meters.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -55,6 +54,9 @@ public class MbusSerialPortConnection {
         this.timeout = timeout;
     }
 
+    /**
+     * Open.
+     */
     public void open() {
         serialPort = SerialPort.getCommPort(portName);
         serialPort.setBaudRate(baudRate);
@@ -74,6 +76,13 @@ public class MbusSerialPortConnection {
                 portName, baudRate, dataBits, stopBits, parity);
     }
 
+    /**
+     * Send and receive.
+     *
+     * @param command command
+     * @return send and receive result
+     * @throws IOException when the operation cannot be completed
+     */
     public byte[] sendAndReceive(byte[] command) throws IOException {
         if (Objects.isNull(outputStream) || Objects.isNull(inputStream)) {
             throw new IOException("Serial port is not open: " + portName);
@@ -86,6 +95,9 @@ public class MbusSerialPortConnection {
         return readUntilTimeout();
     }
 
+    /**
+     * Close.
+     */
     public void close() {
         try {
             if (Objects.nonNull(inputStream)) {
@@ -107,6 +119,11 @@ public class MbusSerialPortConnection {
         }
     }
 
+    /**
+     * Determine whether the underlying serial port is currently open.
+     *
+     * @return {@code true} when a serial port exists and reports itself open
+     */
     public boolean isOpen() {
         return Objects.nonNull(serialPort) && serialPort.isOpen();
     }

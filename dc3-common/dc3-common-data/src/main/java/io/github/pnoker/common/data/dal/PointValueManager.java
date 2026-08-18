@@ -27,7 +27,6 @@ import io.github.pnoker.common.data.entity.model.PointValueDO;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @DS("history")

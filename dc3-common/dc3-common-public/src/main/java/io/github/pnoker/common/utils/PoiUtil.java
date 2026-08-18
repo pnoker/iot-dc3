@@ -35,7 +35,6 @@ import java.util.Objects;
  * Apache POI Excel cell and merge helpers.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
  * is inclusive, {@code to} is exclusive.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Schema(description = "Window aggregation request")

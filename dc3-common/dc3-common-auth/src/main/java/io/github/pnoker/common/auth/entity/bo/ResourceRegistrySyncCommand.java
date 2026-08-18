@@ -30,7 +30,6 @@ import java.util.List;
  * Command driving a resource-registry sync call.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter

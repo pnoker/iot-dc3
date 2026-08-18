@@ -26,13 +26,17 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
  * LwM2M Driver Application
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 @EnableConfigurationProperties(Lwm2mProperties.class)
 public class Lwm2mDriverApplication {
 
+    /**
+     * Start the lwm2m driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(Lwm2mDriverApplication.class, args);
     }

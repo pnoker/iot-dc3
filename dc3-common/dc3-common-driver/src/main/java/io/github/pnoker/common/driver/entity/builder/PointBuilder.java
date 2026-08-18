@@ -38,12 +38,17 @@ import java.util.Optional;
  * MapStruct mapper for converting point gRPC DTOs into internal business objects.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface PointBuilder {
 
+    /**
+     * Convert grpc transfer object to dto.
+     *
+     * @param entityGrpc entity grpc
+     * @return converted value
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
@@ -58,6 +63,12 @@ public interface PointBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointBO buildDTOByGrpcDTO(GrpcPointDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(GrpcPointDTO entityGrpc, @MappingTarget PointBO entityBO) {
         GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);

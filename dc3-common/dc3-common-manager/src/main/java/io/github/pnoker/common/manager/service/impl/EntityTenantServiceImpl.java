@@ -34,7 +34,6 @@ import java.util.Objects;
  * Tenant guard for manager entities referenced by polymorphic bindings.
  *
  * @author pnoker
- * @version 2026.6.10
  * @since 2026.6.10
  */
 @Service

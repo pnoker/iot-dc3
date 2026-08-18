@@ -43,7 +43,6 @@ import java.util.Map;
  * that are meaningful for their protocol.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 public interface DriverValidator {

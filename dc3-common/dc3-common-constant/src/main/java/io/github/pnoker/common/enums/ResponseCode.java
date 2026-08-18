@@ -25,7 +25,6 @@ package io.github.pnoker.common.enums;
  * status the web layer aligns to, so the body code and transport status never diverge.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface ResponseCode {

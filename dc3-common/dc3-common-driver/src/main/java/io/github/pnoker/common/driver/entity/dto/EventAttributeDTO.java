@@ -30,7 +30,6 @@ import lombok.Setter;
  * Data transfer object that describes a event-level attribute definition.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

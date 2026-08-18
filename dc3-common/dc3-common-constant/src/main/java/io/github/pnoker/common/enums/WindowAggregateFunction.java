@@ -31,7 +31,6 @@ import java.util.Locale;
  * {@code num_value}; COUNT counts every row in the window.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Getter

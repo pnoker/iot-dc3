@@ -36,7 +36,6 @@ import java.time.LocalDateTime;
  * Persistence object for identity providers.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

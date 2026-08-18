@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -102,7 +101,6 @@ public class ThreadPoolConfig {
      * </p>
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {

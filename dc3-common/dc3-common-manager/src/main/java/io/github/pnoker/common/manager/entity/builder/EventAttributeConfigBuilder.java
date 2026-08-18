@@ -36,7 +36,6 @@ import java.util.Optional;
  * EventAttributeConfig Builder
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -69,6 +68,12 @@ public interface EventAttributeConfigBuilder {
     @Mapping(target = "deleted", ignore = true)
     EventAttributeConfigDO buildDOByBO(EventAttributeConfigBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(EventAttributeConfigBO entityBO, @MappingTarget EventAttributeConfigDO entityDO) {
         // Enable Flag
@@ -93,6 +98,12 @@ public interface EventAttributeConfigBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     EventAttributeConfigBO buildBOByDO(EventAttributeConfigDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(EventAttributeConfigDO entityDO, @MappingTarget EventAttributeConfigBO entityBO) {
         // Enable Flag

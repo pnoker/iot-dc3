@@ -33,7 +33,6 @@ import java.util.function.Function;
  * Shared guardrails for blocking gRPC facade calls.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.9
  */
 @Component

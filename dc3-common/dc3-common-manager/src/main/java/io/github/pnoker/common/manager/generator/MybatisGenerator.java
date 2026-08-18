@@ -26,15 +26,22 @@ import io.github.pnoker.common.utils.MybatisUtil;
  * MyBatis code generator for the manager module.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class MybatisGenerator {
 
+    /**
+     * Start the mybatis generator.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         generator();
     }
 
+    /**
+     * Generator.
+     */
     public static void generator() {
         String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-manager/src/main";
         MybatisUtil.defaultGenerator("dc3-postgres", "35432", "dc3", "dc3_manager", "dc3", "dc3dc3dc3")

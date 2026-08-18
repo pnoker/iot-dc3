@@ -28,7 +28,6 @@ import java.util.Optional;
  * Agentic action execution status.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Getter

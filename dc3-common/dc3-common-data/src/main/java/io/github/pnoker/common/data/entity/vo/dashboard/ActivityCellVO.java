@@ -31,7 +31,6 @@ import java.io.Serializable;
  * 0=Sunday..6=Saturday; {@code hour} is 0..23.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Getter

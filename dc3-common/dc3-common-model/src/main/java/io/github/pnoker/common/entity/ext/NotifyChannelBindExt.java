@@ -29,7 +29,6 @@ import java.util.List;
  * JSON extension object for notification channel binding metadata.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "JSON extension object for notification channel binding metadata")

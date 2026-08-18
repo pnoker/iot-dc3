@@ -37,7 +37,6 @@ import java.util.Objects;
  * MapStruct builder converting an OAuth registered client projection to its view object.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -52,6 +51,12 @@ public interface OAuthClientBuilder {
     @Mapping(target = "clientType", ignore = true)
     OAuthClientVO buildVOByRecord(OAuthRegisteredClientRecord entityRecord);
 
+    /**
+     * After process.
+     *
+     * @param entityRecord entity record
+     * @param entityVO view object
+     */
     @AfterMapping
     default void afterProcess(OAuthRegisteredClientRecord entityRecord, @MappingTarget OAuthClientVO entityVO) {
         entityVO.setClientType(OAuthClientTypeEnum.ofValue(entityRecord.getClientType()));
@@ -75,6 +80,12 @@ public interface OAuthClientBuilder {
     @Mapping(target = "grantTypes", ignore = true)
     OAuthClientRegistrationBO buildBOByRequestVO(OAuthClientRegistrationRequestVO entityVO);
 
+    /**
+     * After process.
+     *
+     * @param entityVO view object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(OAuthClientRegistrationRequestVO entityVO,
                               @MappingTarget OAuthClientRegistrationBO entityBO) {

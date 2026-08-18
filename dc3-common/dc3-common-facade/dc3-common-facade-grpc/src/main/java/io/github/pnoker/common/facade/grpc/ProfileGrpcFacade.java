@@ -46,7 +46,6 @@ import java.util.Objects;
  * gRPC ProfileFacade: forwards to Manager Center via {@link ProfileApiGrpc}.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2016.10.1
  */
 @Slf4j

@@ -33,7 +33,6 @@ import java.util.List;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 public final class MbusFrame {

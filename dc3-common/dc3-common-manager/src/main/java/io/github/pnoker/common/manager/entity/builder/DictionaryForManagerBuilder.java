@@ -32,7 +32,6 @@ import org.mapstruct.Mapper;
  * Dictionary For Manager Builder
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})

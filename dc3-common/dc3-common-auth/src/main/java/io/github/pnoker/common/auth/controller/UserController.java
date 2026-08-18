@@ -63,7 +63,6 @@ import java.util.Objects;
  * REST controller exposing user account management endpoints.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Tag(name = "user", description = "User account lifecycle: create, update, enable, disable, and manage user identities within tenant scope")

@@ -39,20 +39,37 @@ import java.util.Objects;
  * MapStruct builder for local credentials.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface LocalCredentialBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     @Mapping(source = "password", target = "rawPassword")
     @Mapping(target = "loginNameNormalized", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
     LocalCredentialBO buildBOByVO(LocalCredentialVO entityVO);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "password", ignore = true)
     LocalCredentialVO buildVOByBO(LocalCredentialBO entityBO);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "credentialType", ignore = true)
     @Mapping(target = "passwordAlgorithm", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
@@ -60,6 +77,12 @@ public interface LocalCredentialBuilder {
     @Mapping(target = "deleted", ignore = true)
     LocalCredentialDO buildDOByBO(LocalCredentialBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(LocalCredentialBO entityBO, @MappingTarget LocalCredentialDO entityDO) {
         if (Objects.nonNull(entityBO.getCredentialType())) {
@@ -76,6 +99,12 @@ public interface LocalCredentialBuilder {
         }
     }
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "credentialType", ignore = true)
     @Mapping(target = "passwordAlgorithm", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
@@ -83,6 +112,12 @@ public interface LocalCredentialBuilder {
     @Mapping(target = "rawPassword", ignore = true)
     LocalCredentialBO buildBOByDO(LocalCredentialDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(LocalCredentialDO entityDO, @MappingTarget LocalCredentialBO entityBO) {
         entityBO.setCredentialType(CredentialTypeEnum.ofValue(entityDO.getCredentialType()));
@@ -91,12 +126,30 @@ public interface LocalCredentialBuilder {
         entityBO.setRequirePasswordChange(RequirePasswordChangeFlagEnum.ofIndex(entityDO.getRequirePasswordChange()));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<LocalCredentialBO> buildBOListByDOList(List<LocalCredentialDO> entityDOList);
 
+    /**
+     * Convert do page to bo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
     default Page<LocalCredentialBO> buildBOPageByDOPage(Page<LocalCredentialDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
+    /**
+     * Convert bo page to vo page.
+     *
+     * @param entityPageBO business object
+     * @return converted value
+     */
     default Page<LocalCredentialVO> buildVOPageByBOPage(Page<LocalCredentialBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }

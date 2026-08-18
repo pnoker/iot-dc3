@@ -53,7 +53,6 @@ import java.util.Map;
  * OAuth 2.1 endpoints used by MCP clients.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @RestController

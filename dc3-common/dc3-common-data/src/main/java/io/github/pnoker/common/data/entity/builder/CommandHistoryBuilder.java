@@ -35,7 +35,6 @@ import java.util.List;
  * enum index is persisted via {@code @EnumValue} and exposed over JSON by name.
  *
  * @author pnoker
- * @version 2026.6.5
  * @since 2026.6.5
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -49,10 +48,28 @@ public interface CommandHistoryBuilder {
      */
     CommandCallBO buildBOByVO(CommandCallVO entityVO);
 
+    /**
+     * Convert do to vo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     CommandHistoryVO buildVOByDO(CommandHistoryDO entityDO);
 
+    /**
+     * Convert do list to vo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<CommandHistoryVO> buildVOListByDOList(List<CommandHistoryDO> entityDOList);
 
+    /**
+     * Convert do page to vo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
     default Page<CommandHistoryVO> buildVOPageByDOPage(Page<CommandHistoryDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildVOByDO);
     }

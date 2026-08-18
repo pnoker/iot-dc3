@@ -51,7 +51,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * Melsec MC driver service backed by the iot-communication library.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j

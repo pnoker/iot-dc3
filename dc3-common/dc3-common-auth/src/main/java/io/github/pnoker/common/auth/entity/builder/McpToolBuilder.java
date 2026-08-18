@@ -32,7 +32,6 @@ import java.util.List;
  * MapStruct builder converting an MCP tool projection to its view object.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -47,6 +46,12 @@ public interface McpToolBuilder {
     @Mapping(target = "riskLevel", ignore = true)
     McpToolVO buildVOByRecord(McpToolRecord entityRecord);
 
+    /**
+     * After process.
+     *
+     * @param entityRecord entity record
+     * @param entityVO view object
+     */
     @AfterMapping
     default void afterProcess(McpToolRecord entityRecord, @MappingTarget McpToolVO entityVO) {
         entityVO.setRiskLevel(McpRiskLevelEnum.ofValue(entityRecord.getRiskLevel()));

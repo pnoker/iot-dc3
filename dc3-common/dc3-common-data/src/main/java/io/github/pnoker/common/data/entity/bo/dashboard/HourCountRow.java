@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
  * count is the number of events in that hour.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

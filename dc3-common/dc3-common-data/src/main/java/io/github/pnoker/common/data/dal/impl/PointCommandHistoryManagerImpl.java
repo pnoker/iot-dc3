@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
  * Manager implementation for dc3_point_command_history table.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Service

@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
  * MyBatis-Plus implementation of tenant membership persistence.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Service

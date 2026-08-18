@@ -33,7 +33,6 @@ import java.util.Objects;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -165,6 +164,11 @@ public class SerialPortConnection {
         return Objects.nonNull(serialPort) && serialPort.isOpen();
     }
 
+    /**
+     * Return port name.
+     *
+     * @return get port name result
+     */
     public String getPortName() {
         return portName;
     }

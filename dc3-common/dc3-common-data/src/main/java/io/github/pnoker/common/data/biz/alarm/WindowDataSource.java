@@ -36,7 +36,6 @@ import java.util.List;
  * <p>{@link HybridWindowDataSource} routes between them by window duration.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 public interface WindowDataSource {
@@ -61,6 +60,11 @@ public interface WindowDataSource {
      */
     record AggregateOutcome(BigDecimal value, long sampleCount) {
 
+        /**
+         * Empty.
+         *
+         * @return empty result
+         */
         public static AggregateOutcome empty() {
             return new AggregateOutcome(null, 0L);
         }

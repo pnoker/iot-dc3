@@ -54,7 +54,6 @@ export default defineComponent({
 
     const deviceViewRef: any = ref<InstanceType<typeof device>>();
 
-    // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
       active: (route.query.active as string) || 'detail',
@@ -65,14 +64,12 @@ export default defineComponent({
       return deviceViewRef.value?.reactiveData?.page?.total || 0;
     });
 
-    // 加载驱动数据
     const driver = () => {
       getDriverById(reactiveData.id).then((res) => {
         reactiveData.data = res.data;
       });
     };
 
-    // 切换Tab
     const changeActive = (tab: any) => {
       reactiveData.active = tab.props.name;
       const query = route.query;

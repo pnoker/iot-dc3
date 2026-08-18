@@ -48,7 +48,6 @@ import java.util.Objects;
  * Notification channel service implementation.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

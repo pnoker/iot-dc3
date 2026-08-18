@@ -51,7 +51,6 @@ import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -80,7 +79,6 @@ public class NettyServerHandler {
      * - Keyword: 1 byte (hex)
      * - Point values: variable length based on point configuration
      * </pre>
-     * </p>
      *
      * @param context The channel handler context for the current connection
      * @param byteBuf The byte buffer containing the incoming message

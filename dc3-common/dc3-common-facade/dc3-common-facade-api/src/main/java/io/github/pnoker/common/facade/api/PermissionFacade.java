@@ -23,7 +23,6 @@ import java.util.Set;
  * Protocol-neutral permission facade. Mirrors {@code api.center.auth.PermissionApi}.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2026.6.0
  */
 public interface PermissionFacade {

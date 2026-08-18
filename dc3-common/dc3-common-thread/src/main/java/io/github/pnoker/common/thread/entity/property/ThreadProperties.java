@@ -34,7 +34,6 @@ import org.springframework.validation.annotation.Validated;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -67,6 +66,11 @@ public class ThreadProperties {
     @Min(value = 1, message = "Keep alive time must be greater than 0")
     private int keepAliveTime = 15;
 
+    /**
+     * Validate that the maximum pool size is not smaller than the core pool size.
+     *
+     * @return {@code true} when the configured pool sizes form a valid range
+     */
     @AssertTrue(message = "Maximum pool size must be greater than or equal to core pool size")
     public boolean isPoolSizeValid() {
         return maximumPoolSize >= corePoolSize;

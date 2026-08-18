@@ -60,7 +60,6 @@ import java.util.Objects;
  * {@code dc3_notify_history} are the audit trail for operators.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.21
  */
 @Slf4j
@@ -84,6 +83,13 @@ public class NotifyWorker {
 
     private final NotifyTaskSender notifyTaskSender;
 
+    /**
+     * On notify task.
+     *
+     * @param channel channel
+     * @param message message
+     * @param task task
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{notifyTaskQueue.name}")
     public void onNotifyTask(Channel channel, Message message, NotifyTaskDTO task) {

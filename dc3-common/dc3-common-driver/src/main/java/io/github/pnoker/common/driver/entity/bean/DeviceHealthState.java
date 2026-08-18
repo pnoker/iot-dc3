@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
  * device state lease.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter

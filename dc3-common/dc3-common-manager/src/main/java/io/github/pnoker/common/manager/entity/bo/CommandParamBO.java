@@ -33,7 +33,6 @@ import lombok.ToString;
  * Business object for command param operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -61,7 +60,6 @@ public class CommandParamBO extends BaseBO implements TenantOwned {
 
     private EnableFlagEnum enableFlag;
 
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private String signature;

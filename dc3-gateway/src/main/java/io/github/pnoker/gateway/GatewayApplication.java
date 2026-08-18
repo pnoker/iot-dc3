@@ -27,7 +27,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * initializing and launching the Spring Boot application.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @SpringBootApplication

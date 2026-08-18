@@ -29,7 +29,6 @@ import java.util.Optional;
  * MCP high-risk tool confirmation ticket status (persisted lifecycle).
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -64,6 +63,12 @@ public enum McpConfirmationStatusEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve an MCP confirmation status from its persisted wire value.
+     *
+     * @param value persisted status value
+     * @return matching status, or {@code null} when the value is unknown
+     */
     public static McpConfirmationStatusEnum ofValue(String value) {
         Optional<McpConfirmationStatusEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))

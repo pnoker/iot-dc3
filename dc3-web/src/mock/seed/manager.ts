@@ -102,7 +102,7 @@ export const groups: GroupRecord[] = [
 ];
 
 // ─── Label ───────────────────────────────────────────────────────────
-// Status colors: 在线 #67C23A / 离线 #909399 / 告警 #F56C6C.
+// Status colors: online #67C23A, offline #909399, alarm #F56C6C.
 export const labels: LabelRecord[] = [
   {
     id: '1',
@@ -289,7 +289,7 @@ export const resources: ResourceRecord[] = [
     serviceName: 'dc3-data',
     resourceTypeFlag: 'POINT',
     resourceScopeFlag: 'UPDATE',
-    entityId: points[0]!.id, // 5001 温度
+    entityId: points[0]!.id, // 5001 Temperature
     resourceExt: {},
     enableFlag: 'ENABLE',
     remark: '更新位号资源',
@@ -304,7 +304,7 @@ export const resources: ResourceRecord[] = [
     serviceName: 'dc3-manager',
     resourceTypeFlag: 'PROFILE',
     resourceScopeFlag: 'DELETE',
-    entityId: profiles[0]!.id, // 2001 温湿度传感器
+    entityId: profiles[0]!.id, // 2001 Temperature and humidity sensor
     resourceExt: {},
     enableFlag: 'ENABLE',
     remark: '删除模板资源',
@@ -325,7 +325,7 @@ export const commands: CommandRecord[] = [
     callTypeFlag: 'ASYNC',
     timeout: 30,
     commandExt: KEEP,
-    profileId: profiles[3]!.id, // 2004 边缘网关
+    profileId: profiles[3]!.id, // 2004 Edge gateway
     enableFlag: 'ENABLE',
     remark: '远程重启边缘网关',
     createTime: CREATED,
@@ -339,7 +339,7 @@ export const commands: CommandRecord[] = [
     callTypeFlag: 'SYNC',
     timeout: 10,
     commandExt: KEEP,
-    profileId: profiles[4]!.id, // 2005 PLC控制器
+    profileId: profiles[4]!.id, // 2005 PLC controller
     enableFlag: 'ENABLE',
     remark: '启动 PLC 运行',
     createTime: CREATED,
@@ -353,7 +353,7 @@ export const commands: CommandRecord[] = [
     callTypeFlag: 'SYNC',
     timeout: 10,
     commandExt: KEEP,
-    profileId: profiles[4]!.id, // 2005 PLC控制器
+    profileId: profiles[4]!.id, // 2005 PLC controller
     enableFlag: 'ENABLE',
     remark: '下发 PLC 运行速度',
     createTime: CREATED,
@@ -367,7 +367,7 @@ export const commands: CommandRecord[] = [
     callTypeFlag: 'SYNC',
     timeout: 15,
     commandExt: KEEP,
-    profileId: profiles[5]!.id, // 2006 中央空调
+    profileId: profiles[5]!.id, // 2006 Central air conditioner
     enableFlag: 'ENABLE',
     remark: '下发空调设定温度',
     createTime: CREATED,
@@ -381,7 +381,7 @@ export const commands: CommandRecord[] = [
     callTypeFlag: 'ASYNC',
     timeout: 60,
     commandExt: KEEP,
-    profileId: profiles[2]!.id, // 2003 智能水表
+    profileId: profiles[2]!.id, // 2003 Smart water meter
     enableFlag: 'ENABLE',
     remark: '远程读取水表累计流量',
     createTime: CREATED,
@@ -478,7 +478,7 @@ export const events: EventRecord[] = [
     eventTypeFlag: 'ALERT',
     eventLevelFlag: 'HIGH',
     eventExt: KEEP,
-    profileId: profiles[0]!.id, // 2001 温湿度传感器
+    profileId: profiles[0]!.id, // 2001 Temperature and humidity sensor
     enableFlag: 'ENABLE',
     remark: '温度超过阈值上限',
     createTime: CREATED,
@@ -491,7 +491,7 @@ export const events: EventRecord[] = [
     eventTypeFlag: 'ALERT',
     eventLevelFlag: 'MEDIUM',
     eventExt: KEEP,
-    profileId: profiles[0]!.id, // 2001 温湿度传感器
+    profileId: profiles[0]!.id, // 2001 Temperature and humidity sensor
     enableFlag: 'ENABLE',
     remark: '电池电量低于告警阈值',
     createTime: CREATED,
@@ -504,7 +504,7 @@ export const events: EventRecord[] = [
     eventTypeFlag: 'ALERT',
     eventLevelFlag: 'HIGH',
     eventExt: KEEP,
-    profileId: profiles[3]!.id, // 2004 边缘网关
+    profileId: profiles[3]!.id, // 2004 Edge gateway
     enableFlag: 'ENABLE',
     remark: '网关通信链路中断',
     createTime: CREATED,
@@ -517,7 +517,7 @@ export const events: EventRecord[] = [
     eventTypeFlag: 'INFO',
     eventLevelFlag: 'LOW',
     eventExt: KEEP,
-    profileId: profiles[3]!.id, // 2004 边缘网关
+    profileId: profiles[3]!.id, // 2004 Edge gateway
     enableFlag: 'ENABLE',
     remark: '网关登录上线通知',
     createTime: CREATED,
@@ -530,7 +530,7 @@ export const events: EventRecord[] = [
     eventTypeFlag: 'ALERT',
     eventLevelFlag: 'HIGH',
     eventExt: KEEP,
-    profileId: profiles[1]!.id, // 2002 电力监测仪表
+    profileId: profiles[1]!.id, // 2002 Power monitoring meter
     enableFlag: 'ENABLE',
     remark: '电流超过安全范围',
     createTime: CREATED,
@@ -673,7 +673,7 @@ interface AttributeConfigRecord {
 }
 
 export const attributeConfigs: AttributeConfigRecord[] = [
-  // driver_attribute_config (设备级驱动属性)
+  // driver_attribute_config (device-level driver attributes)
   {
     id: '30001',
     deviceId: devices[0]!.id, // 3001
@@ -692,29 +692,29 @@ export const attributeConfigs: AttributeConfigRecord[] = [
     attributeId: '8003', // unitId
     configValue: '2',
   },
-  // point_attribute_config (位号级属性)
+  // point_attribute_config (point-level attributes)
   {
     id: '30004',
     deviceId: devices[0]!.id, // 3001
-    pointId: points[0]!.id, // 5001 温度
+    pointId: points[0]!.id, // 5001 Temperature
     attributeId: '8004', // address
     configValue: '0',
   },
   {
     id: '30005',
     deviceId: devices[0]!.id, // 3001
-    pointId: points[0]!.id, // 5001 温度
+    pointId: points[0]!.id, // 5001 Temperature
     attributeId: '8006', // factor
     configValue: '0.1',
   },
   {
     id: '30006',
     deviceId: devices[0]!.id, // 3001
-    pointId: points[1]!.id, // 5002 湿度
+    pointId: points[1]!.id, // 5002 Humidity
     attributeId: '8004', // address
     configValue: '1',
   },
-  // command_attribute_config (命令级属性)
+  // command_attribute_config (command-level attributes)
   {
     id: '30007',
     deviceId: devices[10]!.id, // 3013 PLC (profile 2005)
@@ -729,7 +729,7 @@ export const attributeConfigs: AttributeConfigRecord[] = [
     attributeId: '8004', // address
     configValue: '20',
   },
-  // event_attribute_config (事件级属性)
+  // event_attribute_config (event-level attributes)
   {
     id: '30009',
     deviceId: devices[0]!.id, // 3001 (profile 2001)

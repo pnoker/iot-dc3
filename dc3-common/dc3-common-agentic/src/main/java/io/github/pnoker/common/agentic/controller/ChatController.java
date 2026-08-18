@@ -44,7 +44,6 @@ import java.util.Objects;
  * (JSON) response modes, following the OpenAI API format.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "chat", description = "AI chat operations: handle real-time chat interactions including message streaming, tool calling, and conversation context management with language models")

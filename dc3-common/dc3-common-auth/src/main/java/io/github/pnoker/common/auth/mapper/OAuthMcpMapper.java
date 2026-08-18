@@ -32,7 +32,6 @@ import java.util.List;
  * SQL boundary for OAuth and MCP runtime state.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface OAuthMcpMapper {

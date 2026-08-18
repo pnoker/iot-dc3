@@ -31,7 +31,6 @@ import lombok.ToString;
  * Business object that describes a registered driver instance and its platform metadata.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

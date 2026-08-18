@@ -43,7 +43,6 @@ import java.util.Optional;
  * MapStruct builder converting between API BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -77,6 +76,12 @@ public interface ApiBuilder {
     @Mapping(target = "deleted", ignore = true)
     ApiDO buildDOByBO(ApiBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(ApiBO entityBO, @MappingTarget ApiDO entityDO) {
         // Code
@@ -124,6 +129,12 @@ public interface ApiBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     ApiBO buildBOByDO(ApiDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(ApiDO entityDO, @MappingTarget ApiBO entityBO) {
         // Json Ext

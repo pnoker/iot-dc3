@@ -25,7 +25,6 @@ import java.util.Map;
  * Ordered runtime value map helper used at the rule-engine boundary.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 final class RuleValueMap {

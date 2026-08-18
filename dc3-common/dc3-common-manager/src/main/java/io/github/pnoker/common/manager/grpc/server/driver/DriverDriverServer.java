@@ -66,7 +66,6 @@ import java.util.Optional;
  * gRPC server handling driver-to-manager driver requests.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

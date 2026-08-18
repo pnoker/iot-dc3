@@ -24,7 +24,6 @@ package io.github.pnoker.common.utils;
  * user-controlled strings.
  *
  * @author pnoker
- * @version 2026.7.0
  * @since 2026.7.0
  */
 public final class LogSanitizer {

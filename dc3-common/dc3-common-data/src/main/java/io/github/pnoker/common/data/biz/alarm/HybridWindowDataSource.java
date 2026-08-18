@@ -39,7 +39,6 @@ import java.util.Objects;
  * directly when they want to target one side.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Component

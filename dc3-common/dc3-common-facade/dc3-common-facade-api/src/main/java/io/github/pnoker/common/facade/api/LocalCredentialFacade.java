@@ -23,7 +23,6 @@ import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
  * Protocol-neutral local credential facade.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface LocalCredentialFacade {

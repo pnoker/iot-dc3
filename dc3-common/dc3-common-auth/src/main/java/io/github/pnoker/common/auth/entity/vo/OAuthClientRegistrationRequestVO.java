@@ -35,7 +35,6 @@ import java.util.List;
  * Supported OAuth dynamic client registration fields for MCP clients.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

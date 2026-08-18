@@ -26,7 +26,6 @@ import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
  * Business service for custom command call operations.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 public interface CommandHistoryService {

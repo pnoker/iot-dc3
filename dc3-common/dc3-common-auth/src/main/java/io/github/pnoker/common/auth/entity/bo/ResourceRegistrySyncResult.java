@@ -28,7 +28,6 @@ import lombok.ToString;
  * Counters summarizing a resource-registry sync run.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter

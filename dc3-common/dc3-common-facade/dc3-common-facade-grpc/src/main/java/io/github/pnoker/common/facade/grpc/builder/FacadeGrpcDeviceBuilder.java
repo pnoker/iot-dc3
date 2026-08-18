@@ -44,12 +44,17 @@ import java.util.Optional;
  * need an explicit {@code @Mapping(target = "...", ignore = true)}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcDeviceBuilder {
 
+    /**
+     * To grpc page query.
+     *
+     * @param query query
+     * @return to grpc page query result
+     */
     public GrpcPageDeviceQuery toGrpcPageQuery(FacadeDeviceQuery query) {
         GrpcPageDeviceQuery.Builder builder = GrpcPageDeviceQuery.newBuilder();
 
@@ -69,6 +74,12 @@ public class FacadeGrpcDeviceBuilder {
         return builder.build();
     }
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeDeviceBO toFacadeBO(GrpcDeviceDTO dto) {
         if (Objects.isNull(dto)) {
             return null;

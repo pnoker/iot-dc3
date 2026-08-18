@@ -44,7 +44,6 @@ import java.util.stream.Collectors;
  * caller's authority set loaded at authentication time.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Slf4j

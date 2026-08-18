@@ -49,7 +49,6 @@ import java.util.Objects;
  * legacy behavior — recovery does not get a separate window definition.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Slf4j

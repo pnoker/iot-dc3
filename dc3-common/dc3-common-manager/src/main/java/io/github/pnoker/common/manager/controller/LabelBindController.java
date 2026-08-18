@@ -58,7 +58,6 @@ import java.util.Objects;
  * REST controller exposing label binding management endpoints.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Tag(name = "label_bind", description = "Label tag bindings: assign and remove labels on devices, drivers, and other entities to enable categorization and filtered queries")

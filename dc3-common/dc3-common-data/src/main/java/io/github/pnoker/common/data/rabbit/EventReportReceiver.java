@@ -34,7 +34,6 @@ import java.util.Objects;
  * RabbitMQ receiver for event reports published by protocol drivers.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Slf4j

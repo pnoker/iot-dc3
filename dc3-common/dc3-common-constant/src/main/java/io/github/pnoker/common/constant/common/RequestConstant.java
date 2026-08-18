@@ -21,7 +21,6 @@ package io.github.pnoker.common.constant.common;
  * HTTP request related constants.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class RequestConstant {
@@ -44,7 +43,6 @@ public class RequestConstant {
      * Custom request header related constants.
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Header {
@@ -133,7 +131,6 @@ public class RequestConstant {
      * Custom request message related constants.
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Message {
@@ -153,7 +150,6 @@ public class RequestConstant {
      * Custom request key related constants.
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Key {

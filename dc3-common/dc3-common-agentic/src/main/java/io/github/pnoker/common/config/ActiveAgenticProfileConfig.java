@@ -29,7 +29,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * Spring profile activation configuration for the agentic service.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Slf4j

@@ -29,7 +29,6 @@ import java.util.List;
  * Base MapStruct builder providing shared conversion methods.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})

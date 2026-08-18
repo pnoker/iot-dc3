@@ -24,7 +24,6 @@ import io.github.pnoker.common.constant.common.BaseConstant;
  * Auth service related constants.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class AuthConstant {

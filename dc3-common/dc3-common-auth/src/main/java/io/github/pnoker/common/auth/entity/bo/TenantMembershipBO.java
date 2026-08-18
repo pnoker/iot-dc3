@@ -33,7 +33,6 @@ import java.time.LocalDateTime;
  * Business object for tenant memberships.
  *
  * @author pnoker
- * @version 2026.6.13
  * @since 2026.6.13
  */
 @Getter

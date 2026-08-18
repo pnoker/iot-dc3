@@ -41,18 +41,29 @@ import java.util.Optional;
  * MapStruct builder for command gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcCommandBuilder {
 
+    /**
+     * Convert grpc query to query.
+     *
+     * @param entityQuery entity query
+     * @return converted value
+     */
     @Mapping(target = "page", ignore = true)
     @Mapping(target = "commandType", ignore = true)
     @Mapping(target = "callType", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     CommandQuery buildQueryByGrpcQuery(GrpcPageCommandQuery entityQuery);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityQuery entity query
+     */
     @AfterMapping
     default void afterProcess(GrpcPageCommandQuery entityGrpc, @MappingTarget CommandQuery.CommandQueryBuilder entityQuery) {
         Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
@@ -65,6 +76,12 @@ public interface GrpcCommandBuilder {
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
     }
 
+    /**
+     * Convert bo to grpc transfer object.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "commandExt", ignore = true)
     @Mapping(target = "commandTypeFlag", ignore = true)
     @Mapping(target = "callTypeFlag", ignore = true)
@@ -83,6 +100,12 @@ public interface GrpcCommandBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcCommandDTO buildGrpcDTOByBO(CommandBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(CommandBO entityBO, @MappingTarget GrpcCommandDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);

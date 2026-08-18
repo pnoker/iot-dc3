@@ -34,7 +34,6 @@ import java.math.BigDecimal;
  * Facade-level point BO. Field set matches {@code api.center.manager.PointApi}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

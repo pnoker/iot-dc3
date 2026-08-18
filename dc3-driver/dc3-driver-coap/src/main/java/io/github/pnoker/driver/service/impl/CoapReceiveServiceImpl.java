@@ -37,7 +37,6 @@ import java.util.Objects;
  * and forwarding them to the DC3 platform.
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Slf4j

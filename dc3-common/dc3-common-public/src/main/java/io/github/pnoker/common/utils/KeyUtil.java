@@ -58,7 +58,6 @@ import java.util.Date;
  * AES/RSA encryption and JWT token utility.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

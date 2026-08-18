@@ -36,16 +36,33 @@ import java.util.Optional;
  * MapStruct builder converting between model configuration BO, VO, and DO.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface ModelConfigBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     ModelConfigBO buildBOByVO(ModelConfigVO entityVO);
 
+    /**
+     * Convert vo list to bo list.
+     *
+     * @param entityVOList entity view object list
+     * @return converted value
+     */
     List<ModelConfigBO> buildBOListByVOList(List<ModelConfigVO> entityVOList);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
     @Mapping(target = "creatorName", ignore = true)
@@ -58,6 +75,12 @@ public interface ModelConfigBuilder {
     @Mapping(target = "deleted", ignore = true)
     ModelConfigDO buildDOByBO(ModelConfigBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(ModelConfigBO entityBO, @MappingTarget ModelConfigDO entityDO) {
         DefaultFlagEnum defaultFlag = entityBO.getDefaultFlag();
@@ -67,13 +90,31 @@ public interface ModelConfigBuilder {
         Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
+    /**
+     * Convert bo list to do list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<ModelConfigDO> buildDOListByBOList(List<ModelConfigBO> entityBOList);
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "providerName", ignore = true)
     @Mapping(target = "defaultFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     ModelConfigBO buildBOByDO(ModelConfigDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(ModelConfigDO entityDO, @MappingTarget ModelConfigBO entityBO) {
         Byte defaultFlag = entityDO.getDefaultFlag();
@@ -83,16 +124,46 @@ public interface ModelConfigBuilder {
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<ModelConfigBO> buildBOListByDOList(List<ModelConfigDO> entityDOList);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     ModelConfigVO buildVOByBO(ModelConfigBO entityBO);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<ModelConfigVO> buildVOListByBOList(List<ModelConfigBO> entityBOList);
 
+    /**
+     * Convert do page to bo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
     default Page<ModelConfigBO> buildBOPageByDOPage(Page<ModelConfigDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
+    /**
+     * Convert bo page to vo page.
+     *
+     * @param entityPageBO business object
+     * @return converted value
+     */
     default Page<ModelConfigVO> buildVOPageByBOPage(Page<ModelConfigBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }

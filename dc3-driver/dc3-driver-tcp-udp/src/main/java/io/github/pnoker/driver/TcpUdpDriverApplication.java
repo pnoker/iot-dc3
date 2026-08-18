@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * capabilities for interacting with any device that supports raw socket protocols.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication

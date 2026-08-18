@@ -31,7 +31,6 @@ import java.util.List;
  * Result produced when a normalized fact satisfies a rule.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

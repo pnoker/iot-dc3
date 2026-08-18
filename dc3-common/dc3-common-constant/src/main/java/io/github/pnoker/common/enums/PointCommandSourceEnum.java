@@ -28,7 +28,6 @@ import java.util.Optional;
  * Enumeration of point command sources.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter

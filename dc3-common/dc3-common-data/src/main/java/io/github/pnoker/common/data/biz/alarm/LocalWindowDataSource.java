@@ -33,7 +33,6 @@ import java.util.Objects;
  * windows route to {@link RepositoryWindowDataSource} instead.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Component

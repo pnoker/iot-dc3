@@ -39,7 +39,6 @@ import java.util.Objects;
  * Event listener that processes metadata change events.
  *
  * @author zhangzi
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -51,6 +50,11 @@ public class MetadataEventListener {
 
     private final RabbitTemplate rabbitTemplate;
 
+    /**
+     * On application event.
+     *
+     * @param metadataEvent metadata event
+     */
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void onApplicationEvent(MetadataEvent metadataEvent) {

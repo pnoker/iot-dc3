@@ -21,11 +21,15 @@ package io.github.pnoker.common.entity.common;
  * Marker contract for tenant-scoped objects.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 public interface TenantOwned {
 
+    /**
+     * Return the tenant that owns this object.
+     *
+     * @return owning tenant identifier
+     */
     Long getTenantId();
 
 }

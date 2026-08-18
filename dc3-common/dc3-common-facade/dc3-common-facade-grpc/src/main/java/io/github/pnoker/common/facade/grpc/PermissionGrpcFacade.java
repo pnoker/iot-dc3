@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
  * gRPC {@link PermissionFacade}.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Slf4j

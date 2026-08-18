@@ -40,7 +40,6 @@ import java.util.List;
  * gRPC client used to query point metadata associated with the current driver.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 

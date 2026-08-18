@@ -28,14 +28,25 @@ import org.mapstruct.Mapper;
  * FacadeProfile ↔ manager ProfileBO/Query mapper.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeProfileBuilder {
 
+    /**
+     * To manager query.
+     *
+     * @param facadeQuery facade query
+     * @return to manager query result
+     */
     ProfileQuery toManagerQuery(FacadeProfileQuery facadeQuery);
 
+    /**
+     * To facade business object.
+     *
+     * @param managerBO business object
+     * @return to facade business object result
+     */
     FacadeProfileBO toFacadeBO(ProfileBO managerBO);
 
 }

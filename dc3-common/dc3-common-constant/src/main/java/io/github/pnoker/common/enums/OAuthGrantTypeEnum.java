@@ -29,7 +29,6 @@ import java.util.Optional;
  * OAuth 2.1 authorization grant type.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -69,6 +68,12 @@ public enum OAuthGrantTypeEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve an OAuth grant type from its persisted wire value.
+     *
+     * @param value persisted grant-type value
+     * @return matching type, or {@code null} when the value is unknown
+     */
     public static OAuthGrantTypeEnum ofValue(String value) {
         Optional<OAuthGrantTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))

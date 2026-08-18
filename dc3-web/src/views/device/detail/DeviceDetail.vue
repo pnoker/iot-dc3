@@ -95,7 +95,6 @@ const commandViewRef = ref<InstanceType<typeof CommandList>>();
 const eventViewRef = ref<InstanceType<typeof EventList>>();
 const pointValueViewRef = ref<InstanceType<typeof pointValue>>();
 
-// 定义响应式数据
 const reactiveData = reactive({
   id: route.query.id as string,
   active: (route.query.active as string) || 'detail',

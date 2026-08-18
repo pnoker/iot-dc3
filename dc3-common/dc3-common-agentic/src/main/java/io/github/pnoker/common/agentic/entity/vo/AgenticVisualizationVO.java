@@ -27,7 +27,6 @@ import lombok.Setter;
  * Structured SSE payload for one agentic visualization.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -45,6 +44,13 @@ public class AgenticVisualizationVO {
     @Schema(description = "Unix timestamp (milliseconds since epoch) when the visualization response was generated.", example = "1718678400000")
     private Long created;
 
+    /**
+     * Of.
+     *
+     * @param visualization visualization
+     * @param created created
+     * @return of result
+     */
     public static AgenticVisualizationVO of(AgenticVisualizationSpec visualization, long created) {
         AgenticVisualizationVO response = new AgenticVisualizationVO();
         response.setObject(AgenticConstant.Visualization.OBJECT);

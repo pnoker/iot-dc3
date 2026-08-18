@@ -64,7 +64,6 @@ import java.util.UUID;
  * Business service implementation for custom command call operations.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Slf4j

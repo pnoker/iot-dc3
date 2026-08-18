@@ -26,7 +26,6 @@ import java.util.Map;
  * Result receipt sent by the driver after executing a custom command.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 public record CommandCallResultDTO(
@@ -41,6 +40,11 @@ public record CommandCallResultDTO(
         int schemaVersion
 ) {
 
+    /**
+     * Builder.
+     *
+     * @return converted value
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -56,51 +60,110 @@ public record CommandCallResultDTO(
         private Instant finishedAt;
         private int schemaVersion;
 
+        /**
+         * Record identifier.
+         *
+         * @param recordId record identifier
+         * @return record identifier result
+         */
         public Builder recordId(String recordId) {
             this.recordId = recordId;
             return this;
         }
 
+        /**
+         * Tenant identifier.
+         *
+         * @param tenantId tenant identifier
+         * @return tenant identifier result
+         */
         public Builder tenantId(Long tenantId) {
             this.tenantId = tenantId;
             return this;
         }
 
+        /**
+         * Status.
+         *
+         * @param status status
+         * @return status result
+         */
         public Builder status(PointCommandStatusEnum status) {
             this.status = status;
             return this;
         }
 
+        /**
+         * Result values.
+         *
+         * @param resultValues result values
+         * @return result values result
+         */
         public Builder resultValues(Map<String, String> resultValues) {
             this.resultValues = resultValues;
             return this;
         }
 
+        /**
+         * Config snapshot.
+         *
+         * @param configSnapshot config snapshot
+         * @return config snapshot result
+         */
         public Builder configSnapshot(String configSnapshot) {
             this.configSnapshot = configSnapshot;
             return this;
         }
 
+        /**
+         * Error code.
+         *
+         * @param errorCode error code
+         * @return error code result
+         */
         public Builder errorCode(String errorCode) {
             this.errorCode = errorCode;
             return this;
         }
 
+        /**
+         * Error message.
+         *
+         * @param errorMessage error message
+         * @return error message result
+         */
         public Builder errorMessage(String errorMessage) {
             this.errorMessage = errorMessage;
             return this;
         }
 
+        /**
+         * Finished at.
+         *
+         * @param finishedAt finished at
+         * @return finished at result
+         */
         public Builder finishedAt(Instant finishedAt) {
             this.finishedAt = finishedAt;
             return this;
         }
 
+        /**
+         * Schema version.
+         *
+         * @param schemaVersion schema version
+         * @return schema version result
+         */
         public Builder schemaVersion(int schemaVersion) {
             this.schemaVersion = schemaVersion;
             return this;
         }
 
+        /**
+         * Build an immutable command result from the accumulated fields.
+         *
+         * @return the command result DTO
+         */
         public CommandCallResultDTO build() {
             return new CommandCallResultDTO(recordId, tenantId, status, resultValues, configSnapshot,
                     errorCode, errorMessage, finishedAt, schemaVersion);

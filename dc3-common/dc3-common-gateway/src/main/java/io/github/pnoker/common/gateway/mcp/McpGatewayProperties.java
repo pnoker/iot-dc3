@@ -32,7 +32,6 @@ import java.util.Map;
  * Gateway MCP endpoint and backend invocation configuration.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -57,6 +56,12 @@ public class McpGatewayProperties {
     @NotEmpty(message = "MCP backend base urls can't be empty")
     private Map<String, String> backendBaseUrls = new LinkedHashMap<>();
 
+    /**
+     * Backend base url.
+     *
+     * @param serviceName service name
+     * @return backend base url result
+     */
     public String backendBaseUrl(String serviceName) {
         String baseUrl = backendBaseUrls.get(serviceName);
         if (StringUtils.isBlank(baseUrl)) {

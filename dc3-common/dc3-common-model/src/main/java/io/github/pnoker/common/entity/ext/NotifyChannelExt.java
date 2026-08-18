@@ -31,7 +31,6 @@ import java.util.Map;
  * Non-sensitive channel configuration. Secrets are referenced by credentialRef.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "Notify channel extension object. Holds non-sensitive channel configuration; secrets are referenced by credentialRef.")

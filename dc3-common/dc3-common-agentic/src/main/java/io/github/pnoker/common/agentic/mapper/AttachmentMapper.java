@@ -23,7 +23,6 @@ import io.github.pnoker.common.agentic.entity.model.AttachmentDO;
  * MyBatis-Plus mapper for the dc3_attachment table.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 public interface AttachmentMapper extends BaseMapper<AttachmentDO> {

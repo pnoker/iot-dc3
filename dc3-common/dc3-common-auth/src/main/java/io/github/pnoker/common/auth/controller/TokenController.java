@@ -50,7 +50,6 @@ import java.util.Objects;
  * REST controller for token validation and management.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "token", description = "Token-based authentication: login, logout, token refresh, and session invalidation for user and service account sessions")
@@ -70,6 +69,12 @@ public class TokenController implements BaseController {
      */
     // Public endpoint: invoked before login, so no @PreAuthorize. Path is also
     // permitted in WebFluxSecurityConfig (POST /token/salt).
+    /**
+     * Handle the generate salt request.
+     *
+     * @param entityVO view object
+     * @return asynchronous operation result
+     */
     @PublicEndpoint
     @SecurityRequirements
     @Operation(summary = "Generate Token Salt", description = "Generate a random salt for a user under the given tenant, " +
@@ -97,6 +102,13 @@ public class TokenController implements BaseController {
      */
     // Public endpoint: invoked during login (before a token exists), so no
     // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/generate).
+    /**
+     * Handle the generate token request.
+     *
+     * @param entityVO view object
+     * @param response response
+     * @return asynchronous operation result
+     */
     @PublicEndpoint
     @SecurityRequirements
     @Operation(summary = "Generate Token", description = "Issue an access token for a user by validating name, salt, password and tenant. " +
@@ -133,6 +145,12 @@ public class TokenController implements BaseController {
      */
     // Public endpoint: invoked during login when no token can be issued yet, so no
     // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/change_password).
+    /**
+     * Handle the change password request.
+     *
+     * @param entityVO view object
+     * @return asynchronous operation result
+     */
     @PublicEndpoint
     @SecurityRequirements
     @Operation(summary = "Change Password", description = "Change a user's password using the current password and a new one, scoped to the given tenant. " +

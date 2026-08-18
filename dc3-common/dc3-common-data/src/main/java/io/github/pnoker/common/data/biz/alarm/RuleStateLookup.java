@@ -32,7 +32,6 @@ import java.util.Objects;
  * lookup without standing up a full MyBatis-Plus chain wrapper.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.21
  */
 @Component

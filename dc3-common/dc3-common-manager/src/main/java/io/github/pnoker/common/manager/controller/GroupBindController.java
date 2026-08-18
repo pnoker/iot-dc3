@@ -58,7 +58,6 @@ import java.util.Objects;
  * REST controller exposing group binding management endpoints.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Tag(name = "group_bind", description = "Group membership bindings: associate devices, drivers, and other entities with logical groups for hierarchical organization and bulk operations")

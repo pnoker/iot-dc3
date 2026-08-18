@@ -30,7 +30,6 @@ import java.util.List;
  * mapping.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Mapper

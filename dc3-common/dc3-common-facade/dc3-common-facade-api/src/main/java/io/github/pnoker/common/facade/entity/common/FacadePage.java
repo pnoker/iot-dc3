@@ -35,7 +35,6 @@ import java.util.List;
  * {@code dc3-common-facade-api} keeps zero persistence dependencies.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -58,6 +57,12 @@ public class FacadePage<T> implements Serializable {
 
     private List<T> records;
 
+    /**
+     * Empty.
+     *
+     * @param <T> generic type parameter
+     * @return empty result
+     */
     public static <T> FacadePage<T> empty() {
         return new FacadePage<>(1L, 0L, 0L, 0L, Collections.emptyList());
     }

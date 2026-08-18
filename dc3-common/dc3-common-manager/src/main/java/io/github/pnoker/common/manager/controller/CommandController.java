@@ -56,7 +56,6 @@ import java.util.Objects;
  * Manages device command definitions declared on profile templates, including the downward control instructions a driver sends to devices.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "command", description = "Device command definitions: manage industrial device operations including read, write, and configuration commands with parameter specifications")

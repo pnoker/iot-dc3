@@ -49,7 +49,6 @@ import java.util.Objects;
  * Notification delivery history controller.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "notify_history", description = "Notification delivery history: query alert dispatch records including timestamps, target channels, and delivery status for audit and troubleshooting")

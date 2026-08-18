@@ -41,7 +41,6 @@ import java.util.Set;
  * OAuth 2.1 and MCP runtime service.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface OAuthMcpRuntimeService {

@@ -25,7 +25,6 @@ import io.github.pnoker.common.dal.entity.query.GroupBindQuery;
  * Business service for group binding operations.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 public interface GroupBindService extends BaseService<GroupBindBO, GroupBindQuery> {

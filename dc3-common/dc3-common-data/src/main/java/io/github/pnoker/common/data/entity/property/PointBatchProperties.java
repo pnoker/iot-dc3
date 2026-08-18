@@ -27,7 +27,6 @@ import org.springframework.validation.annotation.Validated;
  * RabbitMQ-to-PostgreSQL point-value batch ingestion tuning.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2026.7.8
  */
 @Getter

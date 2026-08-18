@@ -39,7 +39,6 @@ import java.util.Optional;
  * Generic webhook notification channel adapter.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service
@@ -72,6 +71,14 @@ public class WebhookNotifyChannelAdapter implements NotifyChannelAdapter {
         return postJson(channel.getCredentialRef(), credential, payload.getPayload());
     }
 
+    /**
+     * Post json.
+     *
+     * @param target target
+     * @param credential credential
+     * @param body body
+     * @return post json result
+     */
     protected NotifySendResult postJson(String target, NotifyCredential credential, Map<String, Object> body) {
         String json = JsonUtil.toJsonString(body);
         Request.Builder builder = new Request.Builder()

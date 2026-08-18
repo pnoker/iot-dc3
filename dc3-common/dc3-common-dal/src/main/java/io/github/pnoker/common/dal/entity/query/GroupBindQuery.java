@@ -34,7 +34,6 @@ import java.io.Serializable;
  * Query parameters for group binding listing and filtering.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Getter

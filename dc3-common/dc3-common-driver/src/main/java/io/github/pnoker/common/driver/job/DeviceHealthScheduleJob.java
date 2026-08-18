@@ -49,7 +49,6 @@ import java.util.concurrent.TimeUnit;
  * protocol-specific health decision and may return a per-device lease timeout.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j

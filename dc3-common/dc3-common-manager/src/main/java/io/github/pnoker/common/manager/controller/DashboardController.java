@@ -51,7 +51,6 @@ import reactor.core.publisher.Mono;
  * </ul>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Tag(name = "dashboard", description = "Manager dashboard configuration: manage device-management dashboard layouts, widgets, and display preferences")

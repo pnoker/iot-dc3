@@ -46,7 +46,6 @@ import java.util.UUID;
  * Encodes agentic chat responses and server-sent events.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -85,11 +84,25 @@ public class AgenticChatResponseCodec {
                 .build();
     }
 
+    /**
+     * New chat identifier.
+     *
+     * @return new chat identifier result
+     */
     public String newChatId() {
         return AgenticConstant.Chat.ID_PREFIX
                 + UUID.randomUUID().toString().replace(SymbolConstant.HYPHEN, StringUtils.EMPTY).substring(0, 24);
     }
 
+    /**
+     * Format final chunk.
+     *
+     * @param id id
+     * @param created created
+     * @param model model
+     * @param finishReason finish reason
+     * @return format final chunk result
+     */
     public String formatFinalChunk(String id, long created, String model, String finishReason) {
         ChatCompletionChunkVO chunk = ChatCompletionChunkVO.builder()
                 .id(id)
@@ -105,6 +118,12 @@ public class AgenticChatResponseCodec {
         return toJson(chunk);
     }
 
+    /**
+     * Initial events.
+     *
+     * @param prepared prepared
+     * @return initial events result
+     */
     public List<ServerSentEvent<String>> initialEvents(AgenticPreparedChatBO prepared) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
         if (prepared.reasoning()) {
@@ -146,10 +165,22 @@ public class AgenticChatResponseCodec {
         return events;
     }
 
+    /**
+     * Format event.
+     *
+     * @param runEvent run event
+     * @return format event result
+     */
     public String formatEvent(AgenticRunEvent runEvent) {
         return toJson(AgenticRunEventVO.of(runEvent));
     }
 
+    /**
+     * Format visualization.
+     *
+     * @param visualization visualization
+     * @return format visualization result
+     */
     public String formatVisualization(AgenticVisualizationSpec visualization) {
         return toJson(AgenticVisualizationVO.of(visualization, Instant.now().getEpochSecond()));
     }

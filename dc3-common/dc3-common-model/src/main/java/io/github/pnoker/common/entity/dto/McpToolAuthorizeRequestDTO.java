@@ -33,7 +33,6 @@ import java.io.Serializable;
  * confirmation ticket and idempotency key when present.
  *
  * @author pnoker
- * @version 2026.6.17
  * @since 2026.6.17
  */
 @Getter

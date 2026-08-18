@@ -33,7 +33,6 @@ import java.io.Serializable;
  * Query parameters for identity audit log entries.
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 @Getter

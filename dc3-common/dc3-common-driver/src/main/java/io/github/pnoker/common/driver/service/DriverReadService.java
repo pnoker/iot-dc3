@@ -21,7 +21,6 @@ package io.github.pnoker.common.driver.service;
  * Service contract for executing point read operations.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 public interface DriverReadService {

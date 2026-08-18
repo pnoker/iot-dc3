@@ -41,18 +41,29 @@ import java.util.Optional;
  * MapStruct builder for event gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcEventBuilder {
 
+    /**
+     * Convert grpc query to query.
+     *
+     * @param entityQuery entity query
+     * @return converted value
+     */
     @Mapping(target = "page", ignore = true)
     @Mapping(target = "eventType", ignore = true)
     @Mapping(target = "eventLevel", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     EventQuery buildQueryByGrpcQuery(GrpcPageEventQuery entityQuery);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityQuery entity query
+     */
     @AfterMapping
     default void afterProcess(GrpcPageEventQuery entityGrpc, @MappingTarget EventQuery.EventQueryBuilder entityQuery) {
         Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
@@ -65,6 +76,12 @@ public interface GrpcEventBuilder {
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
     }
 
+    /**
+     * Convert bo to grpc transfer object.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "eventExt", ignore = true)
     @Mapping(target = "eventTypeFlag", ignore = true)
     @Mapping(target = "eventLevelFlag", ignore = true)
@@ -83,6 +100,12 @@ public interface GrpcEventBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcEventDTO buildGrpcDTOByBO(EventBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(EventBO entityBO, @MappingTarget GrpcEventDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);

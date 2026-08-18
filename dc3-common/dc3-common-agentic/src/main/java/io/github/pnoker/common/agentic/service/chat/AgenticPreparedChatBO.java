@@ -26,7 +26,6 @@ import java.util.Map;
  * Immutable request state shared by the chat orchestration pipeline.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public record AgenticPreparedChatBO(String userMessage, String scopedConversationId,

@@ -29,7 +29,6 @@ import lombok.Setter;
  * Query parameters for token validation and generation.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

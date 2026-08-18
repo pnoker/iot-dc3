@@ -53,7 +53,6 @@ import java.util.Objects;
  * and sends result receipts back to the data center.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Slf4j

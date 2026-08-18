@@ -28,7 +28,6 @@ import lombok.ToString;
  * Facade-level counters summarizing a resource-registry sync run.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

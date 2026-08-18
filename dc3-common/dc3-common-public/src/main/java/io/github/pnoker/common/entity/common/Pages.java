@@ -34,7 +34,6 @@ import java.util.List;
  * Pagination parameters for data queries.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 
@@ -64,8 +63,8 @@ public class Pages implements Serializable {
 
     /**
      * Unmodifiable view of the order items, so callers cannot mutate internal state
-     * through the getter. Use {@link #addOrder(OrderItem)} to append, or
-     * {@link #setOrders(List)} to replace.
+     * through the getter. Use {@link #addOrder(OrderItem)} to append, or the
+     * Lombok-generated {@code setOrders(List)} method to replace.
      *
      * @return unmodifiable view of the order items
      */

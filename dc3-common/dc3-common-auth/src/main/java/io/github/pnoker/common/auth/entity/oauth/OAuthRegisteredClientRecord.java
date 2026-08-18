@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
  * Minimal OAuth registered client projection used by the OAuth endpoints.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

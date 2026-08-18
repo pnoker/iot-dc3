@@ -31,7 +31,6 @@ import lombok.ToString;
  * Label business object (BO) used in service and DAL layers.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -69,7 +68,6 @@ public class LabelBO extends BaseBO implements TenantOwned {
     /**
      * Tenant ID.
      */
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
 }

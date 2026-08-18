@@ -39,7 +39,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j

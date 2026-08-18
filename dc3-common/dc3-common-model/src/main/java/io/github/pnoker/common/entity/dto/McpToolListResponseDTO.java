@@ -32,7 +32,6 @@ import java.util.List;
  * Auth-to-gateway MCP visible tool list response.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

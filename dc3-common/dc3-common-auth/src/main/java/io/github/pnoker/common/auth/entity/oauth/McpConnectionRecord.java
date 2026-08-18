@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
  * MCP OAuth connection projection.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

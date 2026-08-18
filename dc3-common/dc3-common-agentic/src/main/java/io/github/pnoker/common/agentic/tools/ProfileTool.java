@@ -42,7 +42,6 @@ import java.util.Optional;
  * Profile/template-domain tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -52,6 +51,13 @@ public class ProfileTool {
 
     private final Optional<ProfileFacade> profileFacade;
 
+    /**
+     * Return profile by identifier.
+     *
+     * @param profileId profile identifier
+     * @param toolContext tool context
+     * @return lookup profile by identifier result
+     */
     @Tool(description = "Look up a profile/template by its numeric ID. Returns template name, code, type, share flag, enable status, and version.")
     @AgenticToolMetadata(domain = "profile", title = "Query profile by ID")
     public AgenticToolResult<FacadeProfileBO> lookupProfileById(
@@ -71,6 +77,13 @@ public class ProfileTool {
         return AgenticToolResult.ok("Profile loaded", profile);
     }
 
+    /**
+     * Return profiles by identifiers.
+     *
+     * @param profileIds profile identifiers
+     * @param toolContext tool context
+     * @return lookup profiles by identifiers result
+     */
     @Tool(description = "Batch look up profiles/templates by numeric IDs. Returns up to 50 tenant-scoped templates.")
     @AgenticToolMetadata(domain = "profile", title = "Batch query profiles by IDs")
     public AgenticToolResult<List<FacadeProfileBO>> lookupProfilesByIds(
@@ -93,6 +106,17 @@ public class ProfileTool {
         return AgenticToolResult.ok("Profiles loaded", profiles);
     }
 
+    /**
+     * Return the matching profiles.
+     *
+     * @param profileName profile name
+     * @param profileCode profile code
+     * @param profileType profile type
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return search profiles result
+     */
     @Tool(description = "Search profiles/templates with optional filters. profileType accepts system, driver, user, or their enum names.")
     @AgenticToolMetadata(domain = "profile", title = "Search profiles")
     public AgenticToolResult<FacadePage<FacadeProfileBO>> searchProfiles(
@@ -124,6 +148,13 @@ public class ProfileTool {
         return AgenticToolResult.ok("Profile page loaded", result);
     }
 
+    /**
+     * Return the matching profiles by device identifier.
+     *
+     * @param deviceId device identifier
+     * @param toolContext tool context
+     * @return list profiles by device identifier result
+     */
     @Tool(description = "List profiles/templates bound to a specific device ID.")
     @AgenticToolMetadata(domain = "profile", title = "List profiles by device")
     public AgenticToolResult<List<FacadeProfileBO>> listProfilesByDeviceId(

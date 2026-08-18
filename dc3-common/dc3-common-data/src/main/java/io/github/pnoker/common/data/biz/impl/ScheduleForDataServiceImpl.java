@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
  * persistence directly. Only the hourly maintenance job remains.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2016.10.1
  */
 @Service

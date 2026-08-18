@@ -31,12 +31,17 @@ import org.mapstruct.MappingTarget;
  * MapStruct mapper for converting point attribute configuration DTOs from gRPC responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcPointAttributeConfigBuilder {
 
+    /**
+     * Convert grpc transfer object to dto.
+     *
+     * @param entityGrpc entity grpc
+     * @return converted value
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
@@ -48,6 +53,12 @@ public interface GrpcPointAttributeConfigBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointAttributeConfigDTO buildDTOByGrpcDTO(GrpcPointAttributeConfigDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityDTO transfer object
+     */
     @AfterMapping
     default void afterProcess(GrpcPointAttributeConfigDTO entityGrpc,
                               @MappingTarget PointAttributeConfigDTO entityDTO) {

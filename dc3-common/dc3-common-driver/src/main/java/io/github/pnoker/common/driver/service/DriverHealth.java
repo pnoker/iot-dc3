@@ -27,7 +27,6 @@ import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
  * {@code FAULT}, {@code MAINTAIN}, or an explicit {@code OFFLINE} state.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 public interface DriverHealth {

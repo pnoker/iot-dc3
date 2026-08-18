@@ -39,7 +39,6 @@ import java.util.Optional;
  * MapStruct builder converting between label BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -88,6 +87,12 @@ public interface LabelBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     LabelBO buildBOByDO(LabelDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(LabelDO entityDO, @MappingTarget LabelBO entityBO) {
         // EntityType Flag
@@ -118,6 +123,12 @@ public interface LabelBuilder {
     @Mapping(target = "deleted", ignore = true)
     LabelDO buildDOByBO(LabelBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(LabelBO entityBO, @MappingTarget LabelDO entityDO) {
         // Code

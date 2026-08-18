@@ -56,7 +56,6 @@ import java.util.Objects;
  * REST controller exposing tenant management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "tenant", description = "Tenant registration and configuration: manage tenant lifecycles including creation, update, enablement, and multi-tenant isolation settings")

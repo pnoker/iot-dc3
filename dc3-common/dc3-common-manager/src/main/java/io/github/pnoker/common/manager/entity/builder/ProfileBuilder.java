@@ -44,7 +44,6 @@ import java.util.Optional;
  * MapStruct builder converting between profile BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -80,6 +79,12 @@ public interface ProfileBuilder {
     @Mapping(target = "deleted", ignore = true)
     ProfileDO buildDOByBO(ProfileBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(ProfileBO entityBO, @MappingTarget ProfileDO entityDO) {
         // Code
@@ -131,6 +136,12 @@ public interface ProfileBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     ProfileBO buildBOByDO(ProfileDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(ProfileDO entityDO, @MappingTarget ProfileBO entityBO) {
         // Json Ext

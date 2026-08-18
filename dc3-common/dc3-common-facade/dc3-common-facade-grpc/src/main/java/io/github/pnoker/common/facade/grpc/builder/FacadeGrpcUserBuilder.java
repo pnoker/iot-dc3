@@ -30,12 +30,17 @@ import java.util.Objects;
  * as opaque JSON strings — keeping the wire representation untouched.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcUserBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeUserBO toFacadeBO(GrpcUserDTO dto) {
         if (Objects.isNull(dto)) {
             return null;

@@ -31,7 +31,6 @@ import java.time.temporal.ChronoUnit;
  * Zoned date-time utility class (with time zone, default Shanghai time zone).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

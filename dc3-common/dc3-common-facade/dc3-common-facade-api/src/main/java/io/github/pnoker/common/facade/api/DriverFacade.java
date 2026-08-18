@@ -33,7 +33,6 @@ import java.util.List;
  * it on the thread. Callers must supply the tenant id explicitly.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DriverFacade {

@@ -32,7 +32,6 @@ import java.time.Duration;
  * routes to the time-series repository instead.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Getter

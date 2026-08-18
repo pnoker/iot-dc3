@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
  * Persistence object for the dc3_point_value table.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

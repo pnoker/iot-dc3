@@ -29,7 +29,6 @@ import java.util.List;
  * tenant-scoped.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2026.5.14
  */
 public interface ProfileFacade {

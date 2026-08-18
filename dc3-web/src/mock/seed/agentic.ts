@@ -264,7 +264,7 @@ interface MessageDef {
 }
 
 const messageDefs: MessageDef[] = [
-  // Session 0 — Modbus 点位查询
+  // Session 0 — Modbus point query
   {
     sessionIndex: 0,
     role: 'user',
@@ -311,7 +311,7 @@ const messageDefs: MessageDef[] = [
     content:
       '过去 24h 温度在 71-85℃ 波动，14:00 达到峰值 85.4℃（接近 80℃ 告警阈值）；湿度稳定在 48-60%RH。整体环境正常，建议关注午后温度峰值。',
   },
-  // Session 1 — 电力仪表数据分析
+  // Session 1 — power meter data analysis
   {
     sessionIndex: 1,
     role: 'user',
@@ -359,7 +359,7 @@ const messageDefs: MessageDef[] = [
     content:
       '能耗 Top3：① 3 号风机（68.4 kWh，占 20%）② 注塑机 A（54.2 kWh）③ 空压机（41.7 kWh）。3 号风机近期温度偏高，可能与持续高负载相关，建议结合温度告警一并排查。',
   },
-  // Session 2 — 驱动配置异常排查
+  // Session 2 — driver configuration troubleshooting
   {
     sessionIndex: 2,
     role: 'user',
@@ -383,7 +383,7 @@ const messageDefs: MessageDef[] = [
     content:
       '日志显示 OPC-UA 掉线集中在每小时第 12 分附近，伴随 SecureChannel 超时。各驱动负载如上：S7 PLC（CPU 41%/内存 64%）、OPC-UA（35%/58%）偏高。建议：1) 检查服务端证书有效期；2) 排查第 12 分定时任务导致的网络抖动；3) 把握手超时从 5s 调到 10s 后观察一轮。',
   },
-  // Session 3 — 设备总览
+  // Session 3 — device overview
   {
     sessionIndex: 3,
     role: 'user',

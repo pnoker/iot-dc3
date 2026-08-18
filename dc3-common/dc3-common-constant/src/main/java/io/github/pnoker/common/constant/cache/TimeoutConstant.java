@@ -24,7 +24,6 @@ import io.github.pnoker.common.constant.common.BaseConstant;
  * Timeout duration constants for cache entries.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class TimeoutConstant {

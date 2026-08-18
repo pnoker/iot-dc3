@@ -41,7 +41,6 @@ import java.util.Optional;
  * MapStruct builder for point gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -60,6 +59,12 @@ public interface GrpcPointBuilder {
     @Mapping(target = "labelId", ignore = true)
     PointQuery buildQueryByGrpcQuery(GrpcPagePointQuery entityQuery);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityQuery entity query
+     */
     @AfterMapping
     default void afterProcess(GrpcPagePointQuery entityGrpc, @MappingTarget PointQuery.PointQueryBuilder entityQuery) {
         Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
@@ -71,6 +76,12 @@ public interface GrpcPointBuilder {
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
     }
 
+    /**
+     * Convert grpc query to query.
+     *
+     * @param entityQuery entity query
+     * @return converted value
+     */
     @Mapping(target = "page", ignore = true)
     @Mapping(target = "pointName", ignore = true)
     @Mapping(target = "pointCode", ignore = true)
@@ -83,6 +94,12 @@ public interface GrpcPointBuilder {
     @Mapping(target = "labelId", ignore = true)
     PointQuery buildQueryByGrpcQuery(io.github.pnoker.api.common.driver.GrpcPagePointQuery entityQuery);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityQuery entity query
+     */
     @AfterMapping
     default void afterProcess(io.github.pnoker.api.common.driver.GrpcPagePointQuery entityGrpc,
                               @MappingTarget PointQuery.PointQueryBuilder entityQuery) {
@@ -115,6 +132,12 @@ public interface GrpcPointBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcPointDTO buildGrpcDTOByBO(PointBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(PointBO entityBO, @MappingTarget GrpcPointDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);

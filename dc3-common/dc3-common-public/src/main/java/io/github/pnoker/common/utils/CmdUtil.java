@@ -29,7 +29,6 @@ import java.io.OutputStreamWriter;
  * Process termination via stdin exit command.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

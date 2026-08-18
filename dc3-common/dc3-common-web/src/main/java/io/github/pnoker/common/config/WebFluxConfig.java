@@ -27,7 +27,6 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
  * WebFlux auto-configuration for static resources and JSON codecs.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration

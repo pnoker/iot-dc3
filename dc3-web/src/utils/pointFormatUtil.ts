@@ -35,7 +35,7 @@ const RW_FLAG_KEY: Record<string, string> = {
   READ_WRITE: 'status.readWrite',
 };
 
-// 返回 i18n key 而非翻译后的字符串,让模板用 $t(pointTypeKey(...)) 保持 locale 切换响应式
+// Return the i18n key so $t(pointTypeKey(...)) remains reactive when the locale changes.
 export function pointTypeKey(flag?: string): string {
   return POINT_TYPE_KEY[flag ?? ''] ?? 'status.unknown';
 }

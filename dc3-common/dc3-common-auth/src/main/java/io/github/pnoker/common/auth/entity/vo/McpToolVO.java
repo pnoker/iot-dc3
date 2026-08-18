@@ -31,7 +31,6 @@ import lombok.ToString;
  * View object for MCP tool catalog API responses.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter

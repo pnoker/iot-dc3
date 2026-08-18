@@ -44,7 +44,6 @@ import java.util.Optional;
  * MapStruct builder converting between role BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -78,6 +77,12 @@ public interface RoleBuilder {
     @Mapping(target = "deleted", ignore = true)
     RoleDO buildDOByBO(RoleBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(RoleBO entityBO, @MappingTarget RoleDO entityDO) {
         // Code
@@ -119,6 +124,12 @@ public interface RoleBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     RoleBO buildBOByDO(RoleDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(RoleDO entityDO, @MappingTarget RoleBO entityBO) {
         // Json Ext
@@ -181,10 +192,22 @@ public interface RoleBuilder {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }
 
+    /**
+     * Convert bo list to tree view object list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     default List<RoleTreeVO> buildTreeVOListByBOList(List<RoleTreeBO> entityBOList) {
         return entityBOList.stream().map(this::buildTreeVOByBO).toList();
     }
 
+    /**
+     * Convert bo to tree view object.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     default RoleTreeVO buildTreeVOByBO(RoleTreeBO entityBO) {
         RoleVO flat = buildVOByBO(entityBO);
         RoleTreeVO out = new RoleTreeVO();

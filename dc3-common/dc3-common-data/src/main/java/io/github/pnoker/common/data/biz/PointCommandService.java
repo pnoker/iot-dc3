@@ -24,7 +24,6 @@ import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
  * Business service for point command operations.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 public interface PointCommandService {

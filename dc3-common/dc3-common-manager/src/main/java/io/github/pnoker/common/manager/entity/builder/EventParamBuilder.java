@@ -43,23 +43,46 @@ import java.util.Optional;
  * MapStruct builder converting between event param BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface EventParamBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     @Mapping(target = "tenantId", ignore = true)
     EventParamBO buildBOByVO(EventParamVO entityVO);
 
+    /**
+     * Convert vo list to bo list.
+     *
+     * @param entityVOList entity view object list
+     * @return converted value
+     */
     List<EventParamBO> buildBOListByVOList(List<EventParamVO> entityVOList);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "paramExt", ignore = true)
     @Mapping(target = "paramTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     EventParamDO buildDOByBO(EventParamBO entityBO);
 
+    /**
+     * After build persistence object.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterBuildDO(EventParamBO entityBO, @MappingTarget EventParamDO entityDO) {
         if (StringUtils.isEmpty(entityBO.getParamCode())) {
@@ -80,13 +103,31 @@ public interface EventParamBuilder {
         Optional.ofNullable(entityBO.getEnableFlag()).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
+    /**
+     * Convert bo list to do list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<EventParamDO> buildDOListByBOList(List<EventParamBO> entityBOList);
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "paramExt", ignore = true)
     @Mapping(target = "paramTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     EventParamBO buildBOByDO(EventParamDO entityDO);
 
+    /**
+     * After build business object.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterBuildBO(EventParamDO entityDO, @MappingTarget EventParamBO entityBO) {
         JsonExt entityExt = entityDO.getParamExt();
@@ -103,16 +144,46 @@ public interface EventParamBuilder {
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(entityDO.getEnableFlag()));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<EventParamBO> buildBOListByDOList(List<EventParamDO> entityDOList);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     EventParamVO buildVOByBO(EventParamBO entityBO);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<EventParamVO> buildVOListByBOList(List<EventParamBO> entityBOList);
 
+    /**
+     * Convert do page to bo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
     default Page<EventParamBO> buildBOPageByDOPage(Page<EventParamDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
+    /**
+     * Convert bo page to vo page.
+     *
+     * @param entityPageBO business object
+     * @return converted value
+     */
     default Page<EventParamVO> buildVOPageByBOPage(Page<EventParamBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }

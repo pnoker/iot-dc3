@@ -28,7 +28,6 @@ import lombok.ToString;
  * Business object for agentic attachment operations.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Getter
@@ -48,7 +47,6 @@ public class AttachmentBO extends BaseBO implements TenantOwned {
 
     private String filePath;
 
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private Long userId;

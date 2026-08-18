@@ -47,7 +47,6 @@ import java.util.Objects;
  * REST controller exposing dictionary management endpoints for the manager module.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "dictionary_manager", description = "Device-management dictionaries: manage lookup entries for driver types, device categories, point classifications, and other operational metadata")

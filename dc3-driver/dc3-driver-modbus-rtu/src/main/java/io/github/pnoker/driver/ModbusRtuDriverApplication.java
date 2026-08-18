@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * device management capabilities over RS-232/RS-485 serial interfaces.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @SpringBootApplication

@@ -28,14 +28,25 @@ import org.mapstruct.Mapper;
  * FacadeCommand ↔ manager CommandBO/Query mapper.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeCommandBuilder {
 
+    /**
+     * To manager query.
+     *
+     * @param facadeQuery facade query
+     * @return to manager query result
+     */
     CommandQuery toManagerQuery(FacadeCommandQuery facadeQuery);
 
+    /**
+     * To facade business object.
+     *
+     * @param managerBO business object
+     * @return to facade business object result
+     */
     FacadeCommandBO toFacadeBO(CommandBO managerBO);
 
 }

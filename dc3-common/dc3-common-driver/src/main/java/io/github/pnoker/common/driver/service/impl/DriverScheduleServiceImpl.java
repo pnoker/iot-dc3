@@ -41,7 +41,6 @@ import java.util.Objects;
  * registers the built-in Quartz jobs required by the driver runtime.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service

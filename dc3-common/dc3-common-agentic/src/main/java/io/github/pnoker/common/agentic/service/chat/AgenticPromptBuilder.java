@@ -35,7 +35,6 @@ import java.util.Objects;
  * Builds Spring AI chat prompts from prepared request state.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Component

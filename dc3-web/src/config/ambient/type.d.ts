@@ -16,7 +16,7 @@
  */
 
 /**
- * 统一返回
+ * Standard response envelope.
  */
 declare type R<T = any> = {
   ok: boolean;

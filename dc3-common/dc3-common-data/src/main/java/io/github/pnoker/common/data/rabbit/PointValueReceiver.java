@@ -41,7 +41,6 @@ import java.util.Objects;
  * only after that transaction commits.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2016.10.1
  */
 @Slf4j

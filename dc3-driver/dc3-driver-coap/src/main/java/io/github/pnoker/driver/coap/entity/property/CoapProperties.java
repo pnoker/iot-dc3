@@ -30,7 +30,6 @@ import org.springframework.validation.annotation.Validated;
  * CoAP Properties Configuration Class
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Getter

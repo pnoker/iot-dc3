@@ -33,7 +33,6 @@ import java.time.LocalDateTime;
  * View object for registered OAuth client API responses. The client secret hash is never exposed.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter

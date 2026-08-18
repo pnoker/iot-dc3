@@ -67,7 +67,6 @@ import java.util.UUID;
  * callers can use to poll for the terminal result.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j

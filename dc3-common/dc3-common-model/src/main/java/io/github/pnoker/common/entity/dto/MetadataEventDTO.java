@@ -31,7 +31,6 @@ import java.io.Serializable;
  * Data transfer object for metadata change events propagated via RabbitMQ.
  *
  * @author zhangzi
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

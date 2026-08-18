@@ -28,7 +28,6 @@ import java.util.Optional;
  * Notification delivery history status enumeration.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -53,6 +52,12 @@ public enum NotifyHistoryStatusEnum {
 
     private final String remark;
 
+    /**
+     * Resolve a notification-history status from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching status, or {@code null} when the index is unknown
+     */
     public static NotifyHistoryStatusEnum ofIndex(Byte index) {
         Optional<NotifyHistoryStatusEnum> any = Arrays.stream(NotifyHistoryStatusEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -60,6 +65,12 @@ public enum NotifyHistoryStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a notification-history status from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching status, or {@code null} when the code is unknown
+     */
     public static NotifyHistoryStatusEnum ofCode(String code) {
         Optional<NotifyHistoryStatusEnum> any = Arrays.stream(NotifyHistoryStatusEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -67,6 +78,12 @@ public enum NotifyHistoryStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a notification-history status from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching status, or {@code null} when the name is unknown
+     */
     public static NotifyHistoryStatusEnum ofName(String name) {
         try {
             return valueOf(name);

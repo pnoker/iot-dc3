@@ -30,7 +30,6 @@ import java.util.List;
  * Business service for role-principal bindings.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface RolePrincipalBindService extends BaseService<RolePrincipalBindBO, RolePrincipalBindQuery> {
@@ -45,8 +44,21 @@ public interface RolePrincipalBindService extends BaseService<RolePrincipalBindB
      */
     Page<RolePrincipalBindBO> list(RolePrincipalBindQuery entityQuery, Long tenantId);
 
+    /**
+     * Return the matching role by tenant identifier and principal identifier.
+     *
+     * @param tenantId tenant identifier
+     * @param principalId principal identifier
+     * @return list role by tenant identifier and principal identifier result
+     */
     List<RoleBO> listRoleByTenantIdAndPrincipalId(Long tenantId, Long principalId);
 
+    /**
+     * Return the matching user by role identifier.
+     *
+     * @param roleId role identifier
+     * @return list user by role identifier result
+     */
     List<UserBO> listUserByRoleId(Long roleId);
 
 }

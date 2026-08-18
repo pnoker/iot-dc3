@@ -24,7 +24,6 @@ import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
  * MyBatis-Plus manager for the dc3_entity_alarm table.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface EntityAlarmManager extends IService<EntityAlarmDO> {

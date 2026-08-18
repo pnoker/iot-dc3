@@ -36,7 +36,6 @@ import java.util.Optional;
  * PointAttributeConfig Builder
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -69,6 +68,12 @@ public interface PointAttributeConfigBuilder {
     @Mapping(target = "deleted", ignore = true)
     PointAttributeConfigDO buildDOByBO(PointAttributeConfigBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(PointAttributeConfigBO entityBO, @MappingTarget PointAttributeConfigDO entityDO) {
         // Enable Flag
@@ -93,6 +98,12 @@ public interface PointAttributeConfigBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointAttributeConfigBO buildBOByDO(PointAttributeConfigDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(PointAttributeConfigDO entityDO, @MappingTarget PointAttributeConfigBO entityBO) {
         // Enable Flag

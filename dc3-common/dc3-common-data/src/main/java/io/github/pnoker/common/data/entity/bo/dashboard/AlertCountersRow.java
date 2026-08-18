@@ -26,7 +26,6 @@ import lombok.ToString;
  * separate per-source and today-only queries to populate the full AlertStatsVO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

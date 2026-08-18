@@ -58,7 +58,6 @@ import java.util.stream.Collectors;
  * REST controller exposing profile management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "profile", description = "Device profile templates: manage reusable configuration bundles that combine driver settings, data point definitions, and command templates for rapid device onboarding")

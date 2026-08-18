@@ -24,7 +24,6 @@ import lombok.Setter;
  * One (device, profile) link from dc3_device — 1:1 edge in the topology.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

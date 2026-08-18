@@ -28,7 +28,6 @@ import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
  * Protocol-neutral MCP runtime facade used by gateway-to-auth internal calls.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface McpRuntimeFacade {

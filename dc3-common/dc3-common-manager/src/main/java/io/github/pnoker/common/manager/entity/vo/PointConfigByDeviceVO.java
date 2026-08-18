@@ -32,7 +32,6 @@ import java.util.List;
  * View object for point-configuration-by-device API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 

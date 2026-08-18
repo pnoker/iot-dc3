@@ -311,7 +311,6 @@ export default defineComponent({
     const route = useRoute();
     const {t} = useI18n();
 
-    // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
       active: resolveDeviceTab(route.query.active),
@@ -356,7 +355,6 @@ export default defineComponent({
       profileLoading: false,
     });
 
-    // 定义表单校验规则
     const deviceFormRule = reactive<FormRules>({
       deviceName: nameRules(t, t('common.entityDevice')),
       driverId: [

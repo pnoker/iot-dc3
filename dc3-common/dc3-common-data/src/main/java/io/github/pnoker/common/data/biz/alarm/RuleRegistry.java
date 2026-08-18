@@ -45,7 +45,6 @@ import java.util.Objects;
  * safety net — ordinary correctness comes from the explicit invalidations.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Slf4j

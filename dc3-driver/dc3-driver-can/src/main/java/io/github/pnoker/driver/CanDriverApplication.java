@@ -24,12 +24,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * CAN bus driver application.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class CanDriverApplication {
 
+    /**
+     * Start the can driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(CanDriverApplication.class, args);
     }

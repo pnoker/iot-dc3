@@ -33,7 +33,6 @@ import org.springframework.stereotype.Component;
  * to enforce this rule before mutating global metadata.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -43,6 +42,11 @@ public class AdminChecker {
 
     private final TenantService tenantService;
 
+    /**
+     * Assert system admin.
+     *
+     * @param tenantId tenant identifier
+     */
     public void assertSystemAdmin(Long tenantId) {
         TenantBO userTenant = tenantService.getById(tenantId);
         if (!"default".equals(userTenant.getTenantCode())) {

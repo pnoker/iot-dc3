@@ -38,7 +38,6 @@ import java.util.Objects;
  * Point-domain tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -48,6 +47,13 @@ public class PointTool {
 
     private final PointFacade pointFacade;
 
+    /**
+     * Return point by identifier.
+     *
+     * @param pointId point identifier
+     * @param toolContext tool context
+     * @return lookup point by identifier result
+     */
     @Tool(description = "Look up a point (data point / metric) by its numeric ID. Returns point name, code, type, read/write flag, unit, base value, and multiplier.")
     @AgenticToolMetadata(domain = "point", title = "Query point by ID")
     public AgenticToolResult<FacadePointBO> lookupPointById(
@@ -62,6 +68,13 @@ public class PointTool {
         return AgenticToolResult.ok("Point loaded", bo);
     }
 
+    /**
+     * Return points by identifiers.
+     *
+     * @param pointIds point identifiers
+     * @param toolContext tool context
+     * @return lookup points by identifiers result
+     */
     @Tool(description = "Batch look up points by numeric IDs. Returns up to 50 tenant-scoped points.")
     @AgenticToolMetadata(domain = "point", title = "Batch query points by IDs")
     public AgenticToolResult<List<FacadePointBO>> lookupPointsByIds(
@@ -80,6 +93,16 @@ public class PointTool {
         return AgenticToolResult.ok("Points loaded", points);
     }
 
+    /**
+     * Return the matching points.
+     *
+     * @param pointName point name
+     * @param profileId profile identifier
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return search points result
+     */
     @Tool(description = "Search for points with optional filters. Returns a paginated list.")
     @AgenticToolMetadata(domain = "point", title = "Search points")
     public AgenticToolResult<FacadePage<FacadePointBO>> searchPoints(
@@ -105,6 +128,15 @@ public class PointTool {
         return AgenticToolResult.ok("Point page loaded", result);
     }
 
+    /**
+     * Return the matching points by device identifier.
+     *
+     * @param deviceId device identifier
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return list points by device identifier result
+     */
     @Tool(description = "List points bound to a specific device ID. Use this before reading or writing values when the user knows the device but not the point ID.")
     @AgenticToolMetadata(domain = "point", title = "List points by device")
     public AgenticToolResult<FacadePage<FacadePointBO>> listPointsByDeviceId(
@@ -128,6 +160,15 @@ public class PointTool {
         return AgenticToolResult.ok("Point page loaded for device " + deviceId, result);
     }
 
+    /**
+     * Return the matching points by profile identifier.
+     *
+     * @param profileId profile identifier
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return list points by profile identifier result
+     */
     @Tool(description = "List points under a specific profile/template ID. Use this when the user wants all metrics defined by a template.")
     @AgenticToolMetadata(domain = "point", title = "List points by profile")
     public AgenticToolResult<FacadePage<FacadePointBO>> listPointsByProfileId(

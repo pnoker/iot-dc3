@@ -34,7 +34,6 @@ import java.io.Serializable;
  * a high-risk confirmation is required.
  *
  * @author pnoker
- * @version 2026.6.17
  * @since 2026.6.17
  */
 @Getter

@@ -45,7 +45,6 @@ import java.util.Objects;
  * In-process StatusHealthFacade implementation.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2016.10.1
  */
 @Slf4j

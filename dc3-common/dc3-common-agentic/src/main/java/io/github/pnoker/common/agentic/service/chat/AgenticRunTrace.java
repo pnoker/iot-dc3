@@ -30,7 +30,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Tracks runtime events produced during one agentic turn.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public class AgenticRunTrace {
@@ -43,20 +42,40 @@ public class AgenticRunTrace {
 
     private final List<AgenticVisualizationSpec> recordedVisualizations = Collections.synchronizedList(new ArrayList<>());
 
+    /**
+     * Pending events.
+     *
+     * @return pending events result
+     */
     public Queue<AgenticRunEvent> pendingEvents() {
         return pendingEvents;
     }
 
+    /**
+     * Pending visualizations.
+     *
+     * @return pending visualizations result
+     */
     public Queue<AgenticVisualizationSpec> pendingVisualizations() {
         return pendingVisualizations;
     }
 
+    /**
+     * Record pending event.
+     *
+     * @param event event
+     */
     public void recordPendingEvent(AgenticRunEvent event) {
         if (Objects.nonNull(event)) {
             pendingEvents.add(event);
         }
     }
 
+    /**
+     * Drain pending events.
+     *
+     * @return drain pending events result
+     */
     public List<AgenticRunEvent> drainPendingEvents() {
         List<AgenticRunEvent> drained = new ArrayList<>();
         AgenticRunEvent event = pendingEvents.poll();
@@ -68,12 +87,22 @@ public class AgenticRunTrace {
         return drained;
     }
 
+    /**
+     * Record pending visualization.
+     *
+     * @param visualization visualization
+     */
     public void recordPendingVisualization(AgenticVisualizationSpec visualization) {
         if (Objects.nonNull(visualization)) {
             pendingVisualizations.add(visualization);
         }
     }
 
+    /**
+     * Drain pending visualizations.
+     *
+     * @return drain pending visualizations result
+     */
     public List<AgenticVisualizationSpec> drainPendingVisualizations() {
         List<AgenticVisualizationSpec> drained = new ArrayList<>();
         AgenticVisualizationSpec visualization = pendingVisualizations.poll();
@@ -85,23 +114,43 @@ public class AgenticRunTrace {
         return drained;
     }
 
+    /**
+     * Recorded events.
+     *
+     * @return recorded events result
+     */
     public List<AgenticRunEvent> recordedEvents() {
         synchronized (recordedEvents) {
             return List.copyOf(recordedEvents);
         }
     }
 
+    /**
+     * Recorded visualizations.
+     *
+     * @return recorded visualizations result
+     */
     public List<AgenticVisualizationSpec> recordedVisualizations() {
         synchronized (recordedVisualizations) {
             return List.copyOf(recordedVisualizations);
         }
     }
 
+    /**
+     * Drain and recorded events.
+     *
+     * @return drain and recorded events result
+     */
     public List<AgenticRunEvent> drainAndRecordedEvents() {
         drainPendingEvents();
         return recordedEvents();
     }
 
+    /**
+     * Drain and recorded visualizations.
+     *
+     * @return drain and recorded visualizations result
+     */
     public List<AgenticVisualizationSpec> drainAndRecordedVisualizations() {
         drainPendingVisualizations();
         return recordedVisualizations();

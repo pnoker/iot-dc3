@@ -34,7 +34,6 @@ import lombok.ToString;
  * {@code dc3-common-driver}'s DeviceBO and are not part of the center-to-center contract.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

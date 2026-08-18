@@ -33,7 +33,6 @@ import java.util.List;
  * Persists user and assistant messages for the agentic chat pipeline.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Component
@@ -42,11 +41,24 @@ public class AgenticMessageRecorder {
 
     private final MessageService messageService;
 
+    /**
+     * Persist user message.
+     *
+     * @param prepared prepared
+     * @param userHeader user header
+     */
     public void persistUserMessage(AgenticPreparedChatBO prepared, RequestHeader.PrincipalHeader userHeader) {
         messageService.save(prepared.scopedConversationId(), "user", buildUserContent(prepared), prepared.model(),
                 userHeader);
     }
 
+    /**
+     * Persist assistant message.
+     *
+     * @param prepared prepared
+     * @param content content
+     * @param userHeader user header
+     */
     public void persistAssistantMessage(AgenticPreparedChatBO prepared, String content,
                                         RequestHeader.PrincipalHeader userHeader) {
         persistAssistantMessage(prepared, content, null, userHeader);

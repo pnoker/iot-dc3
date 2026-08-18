@@ -27,7 +27,6 @@ import lombok.Setter;
  * HTTP request header containers for token and user context.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

@@ -30,7 +30,6 @@ import java.util.List;
  * Business object for point configuration grouped by device.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 

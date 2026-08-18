@@ -24,7 +24,6 @@ import io.github.pnoker.common.auth.entity.model.RolePrincipalBindDO;
  * MyBatis-Plus mapper for the dc3_role_principal_bind table.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface RolePrincipalBindMapper extends BaseMapper<RolePrincipalBindDO> {

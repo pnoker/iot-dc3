@@ -30,7 +30,6 @@ import java.time.Instant;
  * (UTC) uniformly.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 public record PointCommandDTO(

@@ -32,7 +32,6 @@ import lombok.ToString;
  * Facade-level profile/template BO.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2026.5.14
  */
 @Getter

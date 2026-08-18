@@ -27,7 +27,6 @@ import java.util.Set;
  * Other services use {@link FacadePermissionProvider} to query the auth center.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface PermissionProvider {

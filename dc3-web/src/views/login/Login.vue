@@ -127,11 +127,9 @@ interface LoginViewState {
 
 const {t} = useI18n();
 const authStore = useAuthStore();
-// 定义表单引用
 const formDataRef = ref<FormInstance>();
 const loading = ref(false);
 
-// 定义响应式数据
 const tenant = typeof authStore.getTenant === 'string' ? authStore.getTenant : 'default';
 const name = typeof authStore.getName === 'string' ? authStore.getName : 'dc3';
 // The mock build is a public, backend-free demo. Prefill its seeded password so
@@ -147,7 +145,6 @@ const reactiveData = reactive<LoginViewState>({
   },
 });
 
-// 定义表单校验规则
 const formRule = reactive<FormRules>({
   tenant: [{required: true, message: t('login.tenantRequired'), trigger: 'blur'}],
   name: [{required: true, message: t('login.usernameRequired'), trigger: 'blur'}],
@@ -157,13 +154,11 @@ const formRule = reactive<FormRules>({
   ],
 });
 
-// 显示, 隐藏密码
 const showPassword = () => {
   reactiveData.passwordType === '' ? (reactiveData.passwordType = 'password') : (reactiveData.passwordType = '');
   reactiveData.isHide === 'View' ? (reactiveData.isHide = 'Hide') : (reactiveData.isHide = 'View');
 };
 
-// 登录
 const handleLogin = async () => {
   const form = unref(formDataRef);
   if (!form) {

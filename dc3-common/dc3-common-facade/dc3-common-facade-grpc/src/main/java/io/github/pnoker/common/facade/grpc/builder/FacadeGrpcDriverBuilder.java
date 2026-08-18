@@ -43,12 +43,17 @@ import java.util.Optional;
  * (unlike Device, which piggy-backs on {@code DEFAULT_INT = 0}).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcDriverBuilder {
 
+    /**
+     * To grpc page query.
+     *
+     * @param query query
+     * @return to grpc page query result
+     */
     public GrpcPageDriverQuery toGrpcPageQuery(FacadeDriverQuery query) {
         GrpcPageDriverQuery.Builder builder = GrpcPageDriverQuery.newBuilder();
 
@@ -71,6 +76,12 @@ public class FacadeGrpcDriverBuilder {
         return builder.build();
     }
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeDriverBO toFacadeBO(GrpcDriverDTO dto) {
         if (Objects.isNull(dto)) {
             return null;

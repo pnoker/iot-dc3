@@ -27,7 +27,6 @@ import lombok.ToString;
  * Business object for submitting a point read command.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

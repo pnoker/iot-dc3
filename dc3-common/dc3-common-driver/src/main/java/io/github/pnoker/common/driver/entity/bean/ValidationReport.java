@@ -37,7 +37,6 @@ import java.util.List;
  * issues for diagnostics. An empty issue list means the validation passed.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter

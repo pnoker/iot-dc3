@@ -42,7 +42,6 @@ import java.util.Objects;
  * before this signer is created.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -54,6 +53,13 @@ public class HmacAuthSigner {
 
     private final boolean enabled;
 
+    /**
+     * Create a signer from the shared secret used by trusted gateway and backend services.
+     * A blank secret disables signing; protected profiles reject that configuration before
+     * constructing this component.
+     *
+     * @param secret shared HMAC secret, or blank to disable signing in development
+     */
     public HmacAuthSigner(String secret) {
         if (StringUtils.isBlank(secret)) {
             this.secret = null;
@@ -67,11 +73,19 @@ public class HmacAuthSigner {
         }
     }
 
+    /**
+     * Report whether this signer has a usable shared secret.
+     *
+     * @return {@code true} when signing and verification are enabled
+     */
     public boolean isEnabled() {
         return enabled;
     }
 
     /**
+     * Sign a payload with HMAC-SHA256.
+     *
+     * @param payload UTF-8 payload to sign
      * @return hex-encoded HMAC of {@code payload}, or {@code null} when signing is disabled
      * or the payload is null.
      */
@@ -93,6 +107,8 @@ public class HmacAuthSigner {
      * Constant-time verification of a signature against a payload. Caller must check
      * {@link #isEnabled()} first if it wants to skip verification when signing is disabled.
      *
+     * @param payload UTF-8 payload whose signature is being verified
+     * @param expectedHex expected hexadecimal HMAC
      * @return {@code true} iff the supplied hex signature matches the computed HMAC.
      */
     public boolean verify(String payload, String expectedHex) {

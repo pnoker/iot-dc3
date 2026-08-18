@@ -27,7 +27,6 @@ import io.github.pnoker.common.entity.dto.EventReportDTO;
  * Business service for event report operations.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 public interface EventHistoryService {

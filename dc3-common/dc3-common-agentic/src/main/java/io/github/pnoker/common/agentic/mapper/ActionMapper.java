@@ -23,7 +23,6 @@ import io.github.pnoker.common.agentic.entity.model.ActionDO;
  * MyBatis-Plus mapper for the dc3_action table.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 public interface ActionMapper extends BaseMapper<ActionDO> {

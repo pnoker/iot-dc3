@@ -24,12 +24,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * DL/T 645-2007 smart meter driver application.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class Dlt645DriverApplication {
 
+    /**
+     * Start the dlt645 driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(Dlt645DriverApplication.class, args);
     }

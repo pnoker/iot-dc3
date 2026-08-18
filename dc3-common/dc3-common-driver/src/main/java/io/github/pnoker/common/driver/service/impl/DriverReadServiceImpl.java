@@ -41,7 +41,6 @@ import java.util.Objects;
  * actual read operation to the custom driver, and publishes the resulting point value.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j

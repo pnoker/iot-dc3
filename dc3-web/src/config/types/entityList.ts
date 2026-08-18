@@ -42,17 +42,17 @@ export interface EntityTreeSource {
 export interface EntityFieldConfig {
   prop: string;
   label: string;
-  kind?: EntityFieldKind; // 默认 'input'
+  kind?: EntityFieldKind; // Defaults to 'input'.
   options?: EntityOption[]; // select
   tree?: EntityTreeSource; // treeSelect
   placeholder?: string;
   required?: boolean;
-  rules?: FormItemRule[]; // 追加校验（与 required/json 合并）
-  span?: number; // 栅格，默认 12
+  rules?: FormItemRule[]; // Additional rules merged with required/JSON validation.
+  span?: number; // Grid span; defaults to 12.
   rows?: number; // textarea/json
   precision?: number; // number
   maxlength?: number;
-  disabledOnEdit?: boolean; // 编辑态禁用（如 userName）
+  disabledOnEdit?: boolean; // Disable immutable fields such as userName while editing.
 }
 
 export interface EntityColumnContext {
@@ -61,17 +61,17 @@ export interface EntityColumnContext {
 }
 
 export interface EntityColumnConfig {
-  prop: string; // 支持点路径，如 'menuExt.content.url'
+  prop: string; // Supports paths such as 'menuExt.content.url'.
   label: string;
-  kind?: EntityColumnKind; // 默认 'text'
+  kind?: EntityColumnKind; // Defaults to 'text'.
   width?: number | string;
   minWidth?: number | string;
   fixed?: boolean | 'left' | 'right';
-  overflow?: boolean; // 默认 true
-  options?: EntityOption[]; // tag/text 的值→标签映射来源
+  overflow?: boolean; // Defaults to true.
+  options?: EntityOption[]; // Value-to-label mapping for tag/text columns.
   formatter?: (row: Record<string, any>, ctx: EntityColumnContext) => string;
   onClick?: (row: Record<string, any>) => void; // link
-  linkable?: (row: Record<string, any>) => boolean; // link，缺省视为可点击
+  linkable?: (row: Record<string, any>) => boolean; // Link columns are clickable by default.
 }
 
 export interface EntitySearchFieldConfig {
@@ -80,7 +80,7 @@ export interface EntitySearchFieldConfig {
   kind: EntitySearchKind;
   options?: EntityOption[];
   placeholder?: string;
-  multiple?: boolean; // select 多选
+  multiple?: boolean; // Enables multi-select.
   includeAll?: boolean; // enableFlag segmented
 }
 
@@ -91,13 +91,13 @@ export interface EntityRowAction {
   onClick: (row: Record<string, any>) => void;
 }
 
-/** 工具栏级自定义按钮（与内置 Add 并列），用于无法走通用增删改的动作，如刷新目录、注册、新增连接。 */
+/** Toolbar action for operations outside generic CRUD, such as refresh, registration, or connection creation. */
 export interface EntityToolbarAction {
   key: string;
   label: string;
-  icon?: string; // 图标名，经 resolveIcon 解析
+  icon?: string; // Icon name resolved through resolveIcon.
   type?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
-  loading?: () => boolean; // 响应式 loading（闭包读取页面 ref）
+  loading?: () => boolean; // Reactive loading state read from the owning page.
   onClick: () => void;
 }
 
@@ -107,14 +107,14 @@ export interface EntityRelation {
 }
 
 export interface EntityListConfig {
-  name: string; // 调试/组件名
-  title?: string; // 对话框标题用的本地化实体名；缺省回退 name
-  mode?: EntityMode; // 默认 'page'
+  name: string; // Diagnostic and component name.
+  title?: string; // Localized dialog entity name; falls back to name.
+  mode?: EntityMode; // Defaults to 'page'.
   editable: boolean;
-  rowKey?: string; // tree 模式必填，默认 'id'
+  rowKey?: string; // Required in tree mode; defaults to 'id'.
   defaultExpandAll?: boolean; // tree
-  pageSize?: number; // page，默认 12
-  defaultOrderColumn?: string; // page 排序列，默认 'create_time'
+  pageSize?: number; // Page mode size; defaults to 12.
+  defaultOrderColumn?: string; // Page sort column; defaults to 'create_time'.
 
   searchFields: EntitySearchFieldConfig[];
   columns: EntityColumnConfig[];
@@ -122,9 +122,9 @@ export interface EntityListConfig {
   defaultForm: () => Record<string, unknown>;
   relations?: EntityRelation[];
 
-  /** 编辑态打开时注入的派生/额外表单值（覆盖默认的按字段映射值）。 */
+  /** Supplies derived form values when editing, overriding the default field mapping. */
   fromRow?: (row: Record<string, any>) => Record<string, unknown>;
-  /** 由表单构建提交载荷（存在时替代默认的载荷组装）。 */
+  /** Builds the submitted payload instead of using the default field assembly. */
   toPayload?: (form: Record<string, any>) => Record<string, unknown>;
 
   list: (query: PageQuery) => Promise<R>;
@@ -132,14 +132,14 @@ export interface EntityListConfig {
   update?: (payload: Record<string, unknown>) => Promise<R>;
   remove?: (id: string) => Promise<R>;
 
-  detail?: { routeName: string }; // 跳转详情；缺省则无 detail 按钮
+  detail?: { routeName: string }; // Detail route; omit to hide the detail action.
   extraActions?: EntityRowAction[];
-  toolbarActions?: EntityToolbarAction[]; // 工具栏自定义按钮
-  operationWidth?: number; // 覆盖操作列宽（自动估算不适配长标签时）
-  rowEditable?: (row: Record<string, any>) => boolean; // 行级编辑可用（resource 分组节点禁）
+  toolbarActions?: EntityToolbarAction[]; // Custom toolbar actions.
+  operationWidth?: number; // Override when automatic sizing cannot fit long labels.
+  rowEditable?: (row: Record<string, any>) => boolean; // Controls editability for individual rows.
   rowDeletable?: (row: Record<string, any>) => boolean;
 
-  dialogWidth?: string; // 默认 '720px'
+  dialogWidth?: string; // Defaults to '720px'.
   confirmDeleteText?: string;
   emptyText?: string;
 }

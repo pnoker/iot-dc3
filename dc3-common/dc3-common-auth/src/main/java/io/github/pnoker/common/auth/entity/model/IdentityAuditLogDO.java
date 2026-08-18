@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
  * change events (who/tenant acted, what action on which resource, outcome).
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 @Getter

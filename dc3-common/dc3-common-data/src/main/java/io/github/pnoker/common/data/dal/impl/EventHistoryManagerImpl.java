@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
  * Manager implementation for dc3_event_history table.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Service

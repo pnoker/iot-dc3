@@ -38,7 +38,7 @@ import java.util.Objects;
 /**
  * Business service implementation for device alarm event persistence.
  *
- * <p>Backfills {@code tenantId} via {@link DeviceFacade#getById(Long)} when the
+ * <p>Backfills {@code tenantId} via {@link DeviceFacade#getById(Long, Long)} when the
  * incoming DTO did not carry it — without this, alarms with a missing tenant
  * would be persisted with {@code tenant_id = 0} and then silently dropped by
  * the rule trigger (which requires a valid tenant id), losing the user-visible
@@ -47,7 +47,6 @@ import java.util.Objects;
  * database.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

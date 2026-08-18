@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
  * View object for identity and authorization audit log API responses.
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 @Getter

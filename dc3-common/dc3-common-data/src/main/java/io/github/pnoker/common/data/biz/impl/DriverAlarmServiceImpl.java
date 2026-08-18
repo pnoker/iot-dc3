@@ -40,7 +40,6 @@ import java.util.Objects;
  * backfill — the same silent-drop hazard exists on the driver path.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

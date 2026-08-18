@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
  * Applies notification policies to rule matches.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface NotifyPolicyEngine {

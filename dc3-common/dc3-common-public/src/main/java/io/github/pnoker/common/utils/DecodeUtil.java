@@ -32,7 +32,6 @@ import java.util.HexFormat;
  * Encoding/decoding utility for Base64, hex, MD5, and UTF-8.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

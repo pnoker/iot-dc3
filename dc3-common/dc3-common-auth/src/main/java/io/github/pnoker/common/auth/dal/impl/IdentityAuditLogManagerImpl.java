@@ -29,7 +29,6 @@ import java.util.List;
  * MyBatis-Plus implementation of identity audit log persistence.
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 @Service

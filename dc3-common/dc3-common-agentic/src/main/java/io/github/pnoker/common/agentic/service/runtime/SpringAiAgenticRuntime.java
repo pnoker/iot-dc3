@@ -28,7 +28,6 @@ import reactor.core.publisher.Flux;
  * Spring AI backed implementation of the agentic runtime.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Component

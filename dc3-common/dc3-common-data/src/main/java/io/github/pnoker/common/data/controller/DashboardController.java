@@ -63,7 +63,6 @@ import java.util.Objects;
  * </ul>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Tag(name = "dashboard", description = "Data monitoring dashboard configuration: manage data-side dashboard layouts, widgets, and visualization preferences for device data monitoring")

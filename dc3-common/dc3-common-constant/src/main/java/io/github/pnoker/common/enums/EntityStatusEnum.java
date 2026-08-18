@@ -31,7 +31,6 @@ import java.util.Optional;
  * used on MQ payloads and API responses.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Getter
@@ -60,6 +59,12 @@ public enum EntityStatusEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve an entity status from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching status, or {@code null} when the index is unknown
+     */
     public static EntityStatusEnum ofIndex(Byte index) {
         Optional<EntityStatusEnum> any = Arrays.stream(EntityStatusEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -67,6 +72,12 @@ public enum EntityStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an entity status from its case-insensitive wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching status, or {@code null} when the code is unknown
+     */
     public static EntityStatusEnum ofCode(String code) {
         Optional<EntityStatusEnum> any = Arrays.stream(EntityStatusEnum.values())
                 .filter(type -> type.getCode().equalsIgnoreCase(code))
@@ -74,6 +85,12 @@ public enum EntityStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an entity status from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching status, or {@code null} when the name is unknown
+     */
     public static EntityStatusEnum ofName(String name) {
         try {
             return valueOf(name);

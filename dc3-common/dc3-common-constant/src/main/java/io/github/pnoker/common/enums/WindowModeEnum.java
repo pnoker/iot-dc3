@@ -34,7 +34,6 @@ import java.util.Locale;
  * sample-by-sample.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Getter

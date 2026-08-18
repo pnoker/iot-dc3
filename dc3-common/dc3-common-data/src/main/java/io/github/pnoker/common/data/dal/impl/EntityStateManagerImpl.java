@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
  * Manager implementation for dc3_entity_state table.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Service

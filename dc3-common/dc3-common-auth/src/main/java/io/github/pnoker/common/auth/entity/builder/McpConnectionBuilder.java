@@ -35,7 +35,6 @@ import java.util.List;
  * MapStruct builder converting between MCP connection projection and view objects.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -51,6 +50,12 @@ public interface McpConnectionBuilder {
     @Mapping(target = "grantType", ignore = true)
     McpConnectionVO buildVOByRecord(McpConnectionRecord entityRecord);
 
+    /**
+     * After process.
+     *
+     * @param entityRecord entity record
+     * @param entityVO view object
+     */
     @AfterMapping
     default void afterProcess(McpConnectionRecord entityRecord, @MappingTarget McpConnectionVO entityVO) {
         entityVO.setPrincipalType(PrincipalTypeEnum.ofValue(entityRecord.getPrincipalType()));
@@ -75,6 +80,12 @@ public interface McpConnectionBuilder {
     @Mapping(target = "grantType", ignore = true)
     McpConnectionAddBO buildBOByAddVO(McpConnectionAddVO entityVO);
 
+    /**
+     * After process.
+     *
+     * @param entityVO view object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(McpConnectionAddVO entityVO, @MappingTarget McpConnectionAddBO entityBO) {
         entityBO.setPrincipalType(PrincipalTypeEnum.ofValue(entityVO.getPrincipalType()));

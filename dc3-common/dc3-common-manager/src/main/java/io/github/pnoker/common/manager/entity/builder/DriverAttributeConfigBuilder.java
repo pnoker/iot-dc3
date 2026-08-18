@@ -36,7 +36,6 @@ import java.util.Optional;
  * DriverAttributeConfig Builder
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -69,6 +68,12 @@ public interface DriverAttributeConfigBuilder {
     @Mapping(target = "deleted", ignore = true)
     DriverAttributeConfigDO buildDOByBO(DriverAttributeConfigBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(DriverAttributeConfigBO entityBO, @MappingTarget DriverAttributeConfigDO entityDO) {
         // Enable Flag
@@ -93,6 +98,12 @@ public interface DriverAttributeConfigBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     DriverAttributeConfigBO buildBOByDO(DriverAttributeConfigDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(DriverAttributeConfigDO entityDO, @MappingTarget DriverAttributeConfigBO entityBO) {
         // Enable Flag

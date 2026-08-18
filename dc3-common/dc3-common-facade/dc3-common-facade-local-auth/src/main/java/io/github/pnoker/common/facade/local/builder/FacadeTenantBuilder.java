@@ -27,12 +27,17 @@ import org.mapstruct.Mapper;
  * and therefore dropped by MapStruct.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeTenantBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param authBO business object
+     * @return to facade business object result
+     */
     FacadeTenantBO toFacadeBO(TenantBO authBO);
 
 }

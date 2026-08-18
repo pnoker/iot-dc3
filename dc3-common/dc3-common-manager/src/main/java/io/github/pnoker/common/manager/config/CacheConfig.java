@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Configuration;
  * Enables Spring Cache abstraction backed by Caffeine (auto-configured by Boot).
  *
  * @author pnoker
- * @version 2026.5.26
  * @since 2026.5.26
  */
 @Configuration

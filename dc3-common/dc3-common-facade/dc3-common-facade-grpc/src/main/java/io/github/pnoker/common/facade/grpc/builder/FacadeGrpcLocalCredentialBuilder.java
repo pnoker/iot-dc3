@@ -32,12 +32,17 @@ import java.util.Optional;
  * {@code GrpcLocalCredentialDTO} to {@link FacadeLocalCredentialBO}.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Component
 public class FacadeGrpcLocalCredentialBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeLocalCredentialBO toFacadeBO(GrpcLocalCredentialDTO dto) {
         if (Objects.isNull(dto)) {
             return null;

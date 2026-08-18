@@ -41,7 +41,6 @@ import java.math.BigDecimal;
  * View object for point API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

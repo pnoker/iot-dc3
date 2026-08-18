@@ -25,7 +25,6 @@ import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
  * Business service for point command history queries.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 public interface PointCommandHistoryService {
@@ -38,6 +37,12 @@ public interface PointCommandHistoryService {
      */
     PointCommandHistoryVO getByCommandId(Long tenantId, String commandId);
 
+    /**
+     * Return by command identifier.
+     *
+     * @param commandId command identifier
+     * @return get by command identifier result
+     */
     default PointCommandHistoryVO getByCommandId(String commandId) {
         return getByCommandId(null, commandId);
     }

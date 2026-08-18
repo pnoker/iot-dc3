@@ -32,7 +32,6 @@ import lombok.ToString;
  * Business object for driver attribute operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -80,7 +79,6 @@ public class DriverAttributeBO extends BaseBO implements TenantOwned {
     /**
      * Tenant ID
      */
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     /**

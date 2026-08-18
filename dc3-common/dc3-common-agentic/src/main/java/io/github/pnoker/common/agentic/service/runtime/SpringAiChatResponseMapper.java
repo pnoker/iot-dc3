@@ -31,13 +31,18 @@ import java.util.Optional;
  * Maps Spring AI chat responses into runtime-owned result objects.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
 @Component
 public class SpringAiChatResponseMapper {
 
+    /**
+     * Assistant content.
+     *
+     * @param chatResponse chat response
+     * @return assistant content result
+     */
     public String assistantContent(ChatResponse chatResponse) {
         return Objects.nonNull(chatResponse) && Objects.nonNull(chatResponse.getResult())
                 && Objects.nonNull(chatResponse.getResult().getOutput())
@@ -45,6 +50,12 @@ public class SpringAiChatResponseMapper {
                 : "";
     }
 
+    /**
+     * Finish reason or null.
+     *
+     * @param chatResponse chat response
+     * @return finish reason or null result
+     */
     public String finishReasonOrNull(ChatResponse chatResponse) {
         String finishReason = Objects.nonNull(chatResponse) && Objects.nonNull(chatResponse.getResult())
                 && Objects.nonNull(chatResponse.getResult().getMetadata())
@@ -53,6 +64,12 @@ public class SpringAiChatResponseMapper {
         return StringUtils.trimToNull(finishReason);
     }
 
+    /**
+     * Stream delta.
+     *
+     * @param response response
+     * @return stream delta result
+     */
     public AgenticStreamDelta streamDelta(ChatResponse response) {
         if (Objects.isNull(response) || Objects.isNull(response.getResult())) {
             return AgenticStreamDelta.empty();

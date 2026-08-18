@@ -24,7 +24,6 @@ import io.github.pnoker.common.auth.entity.model.PrincipalDO;
  * MyBatis-Plus mapper for the dc3_principal table.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface PrincipalMapper extends BaseMapper<PrincipalDO> {

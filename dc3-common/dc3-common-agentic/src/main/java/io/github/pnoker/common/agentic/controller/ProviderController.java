@@ -48,7 +48,6 @@ import java.util.List;
  * REST controller exposing agentic model provider management endpoints.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Tag(name = "provider", description = "AI model provider configuration: manage provider endpoints, authentication credentials, and capability specifications for connecting to LLM services")

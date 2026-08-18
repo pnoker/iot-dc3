@@ -70,8 +70,18 @@ public abstract class SecretFieldContractTest {
         });
     }
 
+    /**
+     * Vo classes.
+     *
+     * @return vo classes result
+     */
     protected abstract List<Class<?>> voClasses();
 
+    /**
+     * Sensitive fields.
+     *
+     * @return sensitive fields result
+     */
     protected Set<String> sensitiveFields() {
         return DEFAULT_SENSITIVE;
     }

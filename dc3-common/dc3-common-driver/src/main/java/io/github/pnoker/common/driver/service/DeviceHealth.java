@@ -32,7 +32,6 @@ import java.util.Map;
  * and, when needed, a per-device lease timeout.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 public interface DeviceHealth {

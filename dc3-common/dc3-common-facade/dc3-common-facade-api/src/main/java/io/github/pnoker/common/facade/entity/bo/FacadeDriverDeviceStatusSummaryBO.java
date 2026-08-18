@@ -33,7 +33,6 @@ import java.util.Objects;
  * Device online/offline summary under one driver.
  *
  * @author pnoker
- * @version 2026.5.18
  * @since 2026.5.18
  */
 @Getter
@@ -60,6 +59,12 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
 
     private int offline;
 
+    /**
+     * From map.
+     *
+     * @param source source
+     * @return from map result
+     */
     public static FacadeDriverDeviceStatusSummaryBO fromMap(Map<String, String> source) {
         if (Objects.isNull(source) || source.isEmpty()) {
             return null;
@@ -93,6 +98,11 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
         }
     }
 
+    /**
+     * To map.
+     *
+     * @return to map result
+     */
     public Map<String, String> toMap() {
         Map<String, String> target = new LinkedHashMap<>();
         target.put(DRIVER_ID, Objects.toString(driverId, ""));

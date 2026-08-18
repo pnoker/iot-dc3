@@ -36,7 +36,6 @@ import java.util.Objects;
  * RabbitMQ receiver for custom command messages rejected into the dead letter exchange.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Slf4j

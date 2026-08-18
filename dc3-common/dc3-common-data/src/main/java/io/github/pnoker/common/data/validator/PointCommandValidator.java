@@ -29,7 +29,6 @@ import org.springframework.stereotype.Component;
  * {@code constraints} field is populated in the point schema.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j

@@ -29,7 +29,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * Spring profile activation configuration for the gateway service.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

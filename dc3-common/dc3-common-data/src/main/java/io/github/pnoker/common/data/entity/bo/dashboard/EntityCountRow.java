@@ -25,7 +25,6 @@ import lombok.ToString;
  * (entityId, count) for Top-N queries on the pv history.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

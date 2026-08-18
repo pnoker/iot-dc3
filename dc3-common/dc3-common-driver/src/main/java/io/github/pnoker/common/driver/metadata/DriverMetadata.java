@@ -47,7 +47,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@code getDeviceIds()}) continue to see the live state.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -154,14 +153,31 @@ public final class DriverMetadata {
         this.leaseUntilEpochMillis = leaseUntilEpochMillis;
     }
 
+    /**
+     * Determine whether the current lease assigns a device to this driver instance.
+     *
+     * @param deviceId device identifier
+     * @return {@code true} when the lease is valid and a fencing token exists for the device
+     */
     public boolean ownsDevice(Long deviceId) {
         return leaseValid() && deviceFencingTokens.containsKey(deviceId);
     }
 
+    /**
+     * Return fencing token.
+     *
+     * @param deviceId device identifier
+     * @return get fencing token result
+     */
     public Long getFencingToken(Long deviceId) {
         return ownsDevice(deviceId) ? deviceFencingTokens.get(deviceId) : null;
     }
 
+    /**
+     * Determine whether the driver lease has not expired.
+     *
+     * @return {@code true} when the lease deadline is later than the current time
+     */
     public boolean leaseValid() {
         return System.currentTimeMillis() < leaseUntilEpochMillis;
     }

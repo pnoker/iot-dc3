@@ -41,7 +41,6 @@ import java.util.Optional;
  * MapStruct builder converting between driver attribute BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -76,6 +75,12 @@ public interface DriverAttributeBuilder {
     @Mapping(target = "deleted", ignore = true)
     DriverAttributeDO buildDOByBO(DriverAttributeBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(DriverAttributeBO entityBO, @MappingTarget DriverAttributeDO entityDO) {
         // Json Ext
@@ -117,6 +122,12 @@ public interface DriverAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     DriverAttributeBO buildBOByDO(DriverAttributeDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(DriverAttributeDO entityDO, @MappingTarget DriverAttributeBO entityBO) {
         // Json Ext

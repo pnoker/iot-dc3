@@ -41,7 +41,6 @@ import org.springframework.context.annotation.Bean;
  * would never be picked up.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @AutoConfiguration
@@ -64,6 +63,11 @@ public class SpringDocConfig {
                 .description(description);
     }
 
+    /**
+     * Create and configure the application-managed dc3 open api.
+     *
+     * @return dc3 open api result
+     */
     @Bean
     public OpenAPI dc3OpenApi() {
         return new OpenAPI()

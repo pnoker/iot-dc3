@@ -23,7 +23,6 @@ import io.github.pnoker.common.enums.ErrorCode;
  * Exception for service registration failures.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class RegisterException extends BusinessException {

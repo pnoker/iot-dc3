@@ -30,7 +30,6 @@ import java.util.Objects;
  * Shared helpers for platform-bound agentic tools.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public class AgenticToolUtil {
@@ -39,6 +38,12 @@ public class AgenticToolUtil {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
+    /**
+     * Normalize identifiers.
+     *
+     * @param ids ids
+     * @return normalize identifiers result
+     */
     public static List<Long> normalizeIds(List<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return List.of();
@@ -50,6 +55,13 @@ public class AgenticToolUtil {
                 .toList();
     }
 
+    /**
+     * Page.
+     *
+     * @param current current
+     * @param size size
+     * @return page result
+     */
     public static Pages page(int current, int size) {
         Pages page = new Pages();
         page.setCurrent(current);
@@ -57,18 +69,44 @@ public class AgenticToolUtil {
         return page;
     }
 
+    /**
+     * Clamp.
+     *
+     * @param value value
+     * @param min min
+     * @param max max
+     * @return clamp result
+     */
     public static int clamp(int value, int min, int max) {
         return Math.min(Math.max(value, min), max);
     }
 
+    /**
+     * Determine whether empty.
+     *
+     * @param values values
+     * @return {@code true} when the collection is {@code null} or empty
+     */
     public static boolean isEmpty(Collection<?> values) {
         return Objects.isNull(values) || values.isEmpty();
     }
 
+    /**
+     * Determine whether empty.
+     *
+     * @param values values
+     * @return {@code true} when the map is {@code null} or empty
+     */
     public static boolean isEmpty(Map<?, ?> values) {
         return Objects.isNull(values) || values.isEmpty();
     }
 
+    /**
+     * Determine whether records.
+     *
+     * @param page page
+     * @return {@code true} when the page contains at least one record
+     */
     public static boolean hasRecords(FacadePage<?> page) {
         return Objects.nonNull(page) && !isEmpty(page.getRecords());
     }

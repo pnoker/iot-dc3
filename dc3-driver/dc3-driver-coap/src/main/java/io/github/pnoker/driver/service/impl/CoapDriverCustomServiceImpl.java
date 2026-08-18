@@ -51,7 +51,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * The read method performs CoAP GET requests and the write method performs CoAP PUT requests.
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Slf4j

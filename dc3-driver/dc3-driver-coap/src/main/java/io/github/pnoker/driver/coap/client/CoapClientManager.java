@@ -37,7 +37,6 @@ import java.util.concurrent.TimeUnit;
  * Manages a pool of CoapClient instances keyed by device URI.
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Slf4j

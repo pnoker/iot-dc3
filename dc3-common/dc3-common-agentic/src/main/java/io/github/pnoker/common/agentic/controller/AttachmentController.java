@@ -47,7 +47,6 @@ import java.util.List;
  * REST controller exposing attachment upload and listing endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "attachment", description = "Agent conversation attachments: manage files, images, and structured data objects associated with AI agent conversation messages")

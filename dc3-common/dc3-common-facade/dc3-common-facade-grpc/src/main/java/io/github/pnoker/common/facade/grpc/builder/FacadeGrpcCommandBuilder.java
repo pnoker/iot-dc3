@@ -41,12 +41,17 @@ import java.util.Optional;
  * Hand-rolled conversion between facade shapes and protobuf command types.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcCommandBuilder {
 
+    /**
+     * To grpc page query.
+     *
+     * @param query query
+     * @return to grpc page query result
+     */
     public GrpcPageCommandQuery toGrpcPageQuery(FacadeCommandQuery query) {
         GrpcPageCommandQuery.Builder builder = GrpcPageCommandQuery.newBuilder();
 
@@ -74,6 +79,12 @@ public class FacadeGrpcCommandBuilder {
         return builder.build();
     }
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeCommandBO toFacadeBO(GrpcCommandDTO dto) {
         if (Objects.isNull(dto)) {
             return null;

@@ -56,7 +56,6 @@ import java.util.Objects;
  * REST controller exposing role management endpoints.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Tag(name = "role", description = "Role management: create, update, and delete roles that aggregate permissions for assignment to users and service accounts")

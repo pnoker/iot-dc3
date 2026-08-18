@@ -36,7 +36,6 @@ import java.util.Optional;
  * CommandAttributeConfig Builder
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -69,6 +68,12 @@ public interface CommandAttributeConfigBuilder {
     @Mapping(target = "deleted", ignore = true)
     CommandAttributeConfigDO buildDOByBO(CommandAttributeConfigBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(CommandAttributeConfigBO entityBO, @MappingTarget CommandAttributeConfigDO entityDO) {
         // Enable Flag
@@ -93,6 +98,12 @@ public interface CommandAttributeConfigBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     CommandAttributeConfigBO buildBOByDO(CommandAttributeConfigDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(CommandAttributeConfigDO entityDO, @MappingTarget CommandAttributeConfigBO entityBO) {
         // Enable Flag

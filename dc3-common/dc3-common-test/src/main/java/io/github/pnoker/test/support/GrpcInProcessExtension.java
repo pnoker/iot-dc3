@@ -44,6 +44,11 @@ public class GrpcInProcessExtension implements BeforeEachCallback, AfterEachCall
     private Server server;
     private ManagedChannel channel;
 
+    /**
+     * Channel.
+     *
+     * @return channel result
+     */
     public ManagedChannel channel() {
         return channel;
     }
