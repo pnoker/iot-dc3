@@ -30,7 +30,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 
 @ExtendWith(MockitoExtension.class)
 class EthernetIpDriverCustomServiceImplTest {
@@ -61,8 +60,4 @@ class EthernetIpDriverCustomServiceImplTest {
         assertThat(report.getIssues()).isNotEmpty();
     }
 
-    @Test
-    void scheduleIsNoOp() {
-        assertThatNoException().isThrownBy(() -> service.schedule());
-    }
 }

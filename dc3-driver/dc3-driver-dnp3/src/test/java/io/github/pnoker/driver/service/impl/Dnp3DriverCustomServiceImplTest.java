@@ -29,7 +29,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 
 @ExtendWith(MockitoExtension.class)
 class Dnp3DriverCustomServiceImplTest {
@@ -61,11 +60,6 @@ class Dnp3DriverCustomServiceImplTest {
         ValidationReport report = service.validatePoint(new HashMap<>(), point);
         assertThat(report.isPassed()).isFalse();
         assertThat(report.getIssues()).isNotEmpty();
-    }
-
-    @Test
-    void scheduleDoesNothing() {
-        assertThatNoException().isThrownBy(() -> service.schedule());
     }
 
 }

@@ -1163,6 +1163,9 @@
                             </goals>
                             <configuration>
                                 <propertyName>argLine</propertyName>
+                                <excludes>
+                                    <exclude>net.sf.jsqlparser.*</exclude>
+                                </excludes>
                             </configuration>
                         </execution>
                         <execution>
@@ -1173,6 +1176,9 @@
                             <configuration>
                                 <propertyName>failsafe.argLine</propertyName>
                                 <destFile>${project.build.directory}/jacoco-it.exec</destFile>
+                                <excludes>
+                                    <exclude>net.sf.jsqlparser.*</exclude>
+                                </excludes>
                             </configuration>
                         </execution>
                         <execution>

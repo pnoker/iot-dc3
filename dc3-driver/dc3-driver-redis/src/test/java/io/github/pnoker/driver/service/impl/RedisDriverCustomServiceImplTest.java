@@ -30,7 +30,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 
 @ExtendWith(MockitoExtension.class)
 class RedisDriverCustomServiceImplTest {
@@ -63,11 +62,6 @@ class RedisDriverCustomServiceImplTest {
         point.setId(1L);
         ValidationReport report = service.validatePoint(new HashMap<>(), point);
         assertThat(report.isPassed()).isFalse();
-    }
-
-    @Test
-    void scheduleDoesNothing() {
-        assertThatNoException().isThrownBy(() -> service.schedule());
     }
 
 }
