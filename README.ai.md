@@ -65,15 +65,15 @@ IoT DC3 helps teams build the core capabilities needed for industrial IoT system
 
 ## Driver Coverage
 
-IoT DC3 includes 28 access driver modules:
+IoT DC3 includes 36 access driver modules:
 
-| Category                                   | Driver Modules                                                                                                                          |
-|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| Industrial protocols                       | Modbus TCP, Modbus RTU, OPC UA, OPC DA, Siemens S7, BACnet/IP, EtherNet/IP, Omron FINS, Mitsubishi MELSEC, IEC 60870-5-104, SL651, DLMS |
-| IoT protocols                              | MQTT, CoAP, LwM2M, HTTP, BLE, Zigbee                                                                                                    |
-| Data bridging                              | MySQL, PostgreSQL, Oracle, SQL Server                                                                                                   |
-| Basic communication and network management | TCP/UDP, Serial, SNMP, CAN                                                                                                              |
-| Simulation and debugging                   | Virtual, Listening Virtual                                                                                                              |
+| Category                                               | Driver Modules                                                                                                                                                                                                       |
+|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Industrial protocols                                   | Modbus TCP, Modbus RTU, OPC UA, OPC DA, Siemens S7, BACnet/IP, EtherNet/IP, Omron FINS, Mitsubishi MELSEC, IEC 60870-5-104, IEC 61850, DNP3, DLMS, DLT645, KNX, M-Bus, SL651 |
+| IoT protocols                                          | MQTT, CoAP, LwM2M, HTTP, BLE, Zigbee, LoRaWAN                                                                                                                                                                       |
+| Data bridging                                          | MySQL, PostgreSQL, Oracle, SQL Server, Redis                                                                                                                                                                         |
+| Basic communication, messaging and network management  | TCP/UDP, Serial, SNMP, CAN, Kafka                                                                                                                                                                                    |
+| Simulation and debugging                               | Virtual, Listening Virtual                                                                                                                                                                                           |
 
 ## Architecture in One Paragraph
 

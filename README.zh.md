@@ -81,7 +81,7 @@
 
 ![IoT DC3 产品架构全景](https://docs.dc3.site/images/architecture-panorama-zh.png)
 
-六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 28 协议驱动 → 现场设备。PostgreSQL（TimescaleDB + pgvector +
+六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 36 协议驱动 → 现场设备。PostgreSQL（TimescaleDB + pgvector +
 AGE）持久层与可选运维栈（ELK + Prometheus + Grafana）一并铺开。
 
 🧱 **设计原则** — 跨服务调用统一经 Facade 接口；DO/BO/VO 三层模型严格分离持久化、业务与接口形态；租户隔离贯穿数据库、缓存到
@@ -93,15 +93,15 @@ API 全链路。边界清晰，易于规模化扩展与多团队协作。
 
 ### 🔌 多协议设备接入
 
-内置 **28 个接入驱动模块**，覆盖工业自动化、物联网通信、数据桥接、基础通信与仿真调试场景，降低常见设备与数据源的接入成本：
+内置 **36 个接入驱动模块**，覆盖工业自动化、物联网通信、数据桥接、基础通信与仿真调试场景，降低常见设备与数据源的接入成本：
 
-| 分类                  | 驱动模块                                                                                                                                           |
-|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🏭 **工业协议**       | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **物联网协议**     | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **数据桥接**       | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
-| 🔧 **基础通信与管理** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
-| 🧪 **仿真与调试**     | Virtual · Listening Virtual                                                                                                                        |
+| 分类                        | 驱动模块                                                                                                                                                                                              |
+|-----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **工业协议**             | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · IEC 61850 · DNP3 · DLMS · DLT645 · KNX · M-Bus · SL651 |
+| 📡 **物联网协议**           | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                                   |
+| 🗄️ **数据桥接**             | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                                      |
+| 🔧 **基础通信、消息与管理** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                                 |
+| 🧪 **仿真与调试**           | Virtual · Listening Virtual                                                                                                                                                                           |
 
 提供完整的 **Driver SDK**，支持快速开发自定义协议驱动，热插拔注册到运行平台。
 

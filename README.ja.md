@@ -81,7 +81,7 @@
 
 ![IoT DC3 Architecture Panorama](https://docs.dc3.site/images/architecture-panorama-ja.png)
 
-6層マイクロサービスアーキテクチャの全体像：クライアント → ゲートウェイ → 4つのセンターサービス → メッセージバス → 28
+6層マイクロサービスアーキテクチャの全体像：クライアント → ゲートウェイ → 4つのセンターサービス → メッセージバス → 36
 プロトコルドライバー → フィールドデバイス。PostgreSQL（TimescaleDB + pgvector +
 AGE）永続層とオプションの可観測性スタック（ELK + Prometheus + Grafana）を一望できます。
 
@@ -95,16 +95,16 @@ AGE）永続層とオプションの可観測性スタック（ELK + Prometheus 
 
 ### 🔌 マルチプロトコルデバイス接続
 
-IoT DC3 は **28 個の接続ドライバーモジュール**を内蔵し、産業オートメーション、IoT
+IoT DC3 は **36 個の接続ドライバーモジュール**を内蔵し、産業オートメーション、IoT
 通信、データブリッジ、基本通信、シミュレーションとデバッグのシナリオをカバーします。一般的なデバイスやデータソースの接続コストを下げます。
 
-| 分類                              | ドライバーモジュール                                                                                                                               |
-|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🏭 **産業プロトコル**             | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **IoT プロトコル**             | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **データブリッジ**             | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
-| 🔧 **基本通信とネットワーク管理** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
-| 🧪 **シミュレーションとデバッグ** | Virtual · Listening Virtual                                                                                                                        |
+| 分類                              | ドライバーモジュール                                                                                                                                                                                  |
+|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **産業プロトコル**             | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · IEC 61850 · DNP3 · DLMS · DLT645 · KNX · M-Bus · SL651 |
+| 📡 **IoT プロトコル**             | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                                    |
+| 🗄️ **データブリッジ**             | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                                       |
+| 🔧 **基本通信とネットワーク管理** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                                  |
+| 🧪 **シミュレーションとデバッグ** | Virtual · Listening Virtual                                                                                                                                                                            |
 
 **Driver SDK** により、カスタムプロトコルドライバーをすばやく開発し、実行中のプラットフォームへ登録できます。
 

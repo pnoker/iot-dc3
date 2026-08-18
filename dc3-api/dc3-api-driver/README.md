@@ -9,6 +9,7 @@ driver-scoped device and point configuration. Generated Java types use `io.githu
 |---|---|---|---|
 | `DriverApi` | `DriverRegister` | `GrpcRDriverRegisterDTO` | register metadata and receive assigned configuration |
 | `DriverApi` | `GetById` | `GrpcRDriverRegisterDTO` | reload registered driver metadata |
+| `DriverApi` | `RenewLease` | stream of `GrpcRDriverLeaseDTO` | renew one runtime lease and stream its owned-device snapshot |
 | `DeviceApi` | `ListByPage` | `GrpcRPageDeviceDTO` | page through driver-owned devices |
 | `DeviceApi` | `GetById` | `GrpcRDeviceDTO` | get one device with attached attribute configuration |
 | `PointApi` | `ListByPage` | `GrpcRPagePointDTO` | page through driver-visible points |
@@ -22,8 +23,10 @@ wrapper shapes.
 1. `dc3-common-driver` builds `GrpcDriverRegisterDTO` from the driver's `application.yml` metadata.
 2. The driver calls `DriverApi.DriverRegister` on the Manager Center.
 3. The response supplies driver metadata, device IDs, and supported driver/point/command/event attributes.
-4. `DeviceClient` and `PointClient` load attached configuration with `GetById` or `ListByPage`.
-5. The SDK initializes protocol scheduling, metadata subscriptions, commands, and value dispatch.
+4. Each runtime instance calls `DriverApi.RenewLease` to renew its bounded lease and receive the devices it currently
+   owns. Command routing uses the active owner and assignment version to fence stale instances.
+5. `DeviceClient` and `PointClient` load attached configuration with `GetById` or `ListByPage`.
+6. The SDK initializes protocol scheduling, metadata subscriptions, commands, and value dispatch.
 
 ## Response handling example
 

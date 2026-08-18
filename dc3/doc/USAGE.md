@@ -7,7 +7,7 @@
 
 - **JDK 21**: Java Development Kit version 21 or higher
 - **Maven**: Build automation and dependency management tool
-- **Podman**: Container platform for building and running applications
+- **Podman or Docker**: Container platform with Compose support for building and running applications
 
 ### 🍻 Quick Start
 
@@ -39,9 +39,9 @@ make up STACK=app REGISTRY=cn
 make up-db && make up-optional && make up-dev
 make up-db-cn && make up-optional-cn && make up-dev-cn
 make up-db-cn && make up-optional-cn && make up-app-cn
-make compose-up STACK=optional
-make compose-up STACK=optional REGISTRY=cn
-make compose-logs STACK=dev REGISTRY=global
+make up STACK=optional
+make up STACK=optional REGISTRY=cn
+make logs STACK=dev REGISTRY=global
 ```
 
 For frontend and API testing, use the service-level shortcuts to start only the modules under test:
@@ -81,8 +81,29 @@ All images are built for multiple platforms:
 | Single Center            | `pnoker/dc3-center-single:${DC3_IMAGE_TAG}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-center-single:${DC3_IMAGE_TAG}`            |
 | Listening Virtual Driver | `pnoker/dc3-driver-listening-virtual:${DC3_IMAGE_TAG}` | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:${DC3_IMAGE_TAG}` |
 | Modbus TCP Driver        | `pnoker/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG}`        | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG}`        |
+| Modbus RTU Driver        | `pnoker/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG}`        | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG}`        |
 | MQTT Driver              | `pnoker/dc3-driver-mqtt:${DC3_IMAGE_TAG}`              | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:${DC3_IMAGE_TAG}`              |
 | OPC DA Driver            | `pnoker/dc3-driver-opc-da:${DC3_IMAGE_TAG}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:${DC3_IMAGE_TAG}`            |
 | OPC UA Driver            | `pnoker/dc3-driver-opc-ua:${DC3_IMAGE_TAG}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:${DC3_IMAGE_TAG}`            |
 | Siemens S7 Driver        | `pnoker/dc3-driver-plcs7:${DC3_IMAGE_TAG}`             | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:${DC3_IMAGE_TAG}`             |
 | Virtual Driver           | `pnoker/dc3-driver-virtual:${DC3_IMAGE_TAG}`           | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:${DC3_IMAGE_TAG}`           |
+| BACnet/IP Driver         | `pnoker/dc3-driver-bacnet-ip:${DC3_IMAGE_TAG}`         | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-bacnet-ip:${DC3_IMAGE_TAG}`         |
+| BLE Driver               | `pnoker/dc3-driver-ble:${DC3_IMAGE_TAG}`               | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-ble:${DC3_IMAGE_TAG}`               |
+| CAN Driver               | `pnoker/dc3-driver-can:${DC3_IMAGE_TAG}`               | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-can:${DC3_IMAGE_TAG}`               |
+| CoAP Driver              | `pnoker/dc3-driver-coap:${DC3_IMAGE_TAG}`              | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-coap:${DC3_IMAGE_TAG}`              |
+| DLMS Driver              | `pnoker/dc3-driver-dlms:${DC3_IMAGE_TAG}`              | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-dlms:${DC3_IMAGE_TAG}`              |
+| EtherNet/IP Driver       | `pnoker/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG}`       | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG}`       |
+| Omron FINS Driver        | `pnoker/dc3-driver-fins:${DC3_IMAGE_TAG}`              | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-fins:${DC3_IMAGE_TAG}`              |
+| HTTP Driver              | `pnoker/dc3-driver-http:${DC3_IMAGE_TAG}`              | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-http:${DC3_IMAGE_TAG}`              |
+| IEC 60870-5-104 Driver   | `pnoker/dc3-driver-iec104:${DC3_IMAGE_TAG}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-iec104:${DC3_IMAGE_TAG}`            |
+| LwM2M Driver             | `pnoker/dc3-driver-lwm2m:${DC3_IMAGE_TAG}`             | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-lwm2m:${DC3_IMAGE_TAG}`             |
+| Mitsubishi MELSEC Driver | `pnoker/dc3-driver-melsec:${DC3_IMAGE_TAG}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-melsec:${DC3_IMAGE_TAG}`            |
+| MySQL Driver             | `pnoker/dc3-driver-mysql:${DC3_IMAGE_TAG}`             | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mysql:${DC3_IMAGE_TAG}`             |
+| Oracle Driver            | `pnoker/dc3-driver-oracle:${DC3_IMAGE_TAG}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-oracle:${DC3_IMAGE_TAG}`            |
+| PostgreSQL Driver        | `pnoker/dc3-driver-postgresql:${DC3_IMAGE_TAG}`        | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-postgresql:${DC3_IMAGE_TAG}`        |
+| Serial Driver            | `pnoker/dc3-driver-serial:${DC3_IMAGE_TAG}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-serial:${DC3_IMAGE_TAG}`            |
+| SL651 Driver             | `pnoker/dc3-driver-sl651:${DC3_IMAGE_TAG}`             | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-sl651:${DC3_IMAGE_TAG}`             |
+| SNMP Driver              | `pnoker/dc3-driver-snmp:${DC3_IMAGE_TAG}`              | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-snmp:${DC3_IMAGE_TAG}`              |
+| SQL Server Driver        | `pnoker/dc3-driver-sqlserver:${DC3_IMAGE_TAG}`         | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-sqlserver:${DC3_IMAGE_TAG}`         |
+| TCP/UDP Driver           | `pnoker/dc3-driver-tcp-udp:${DC3_IMAGE_TAG}`           | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-tcp-udp:${DC3_IMAGE_TAG}`           |
+| Zigbee Driver            | `pnoker/dc3-driver-zigbee:${DC3_IMAGE_TAG}`            | `registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-zigbee:${DC3_IMAGE_TAG}`            |
