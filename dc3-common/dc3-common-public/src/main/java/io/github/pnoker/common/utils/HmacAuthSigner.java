@@ -58,10 +58,7 @@ public class HmacAuthSigner {
         if (StringUtils.isBlank(secret)) {
             this.secret = null;
             this.enabled = false;
-            log.warn(
-                    "{} (env {}) is not configured. X-Auth-Principal header signing is DISABLED. "
-                            + "Backend services will trust the X-Auth-Principal header without verification, which is unsafe in production. "
-                            + "Set a strong shared secret to enable signing.",
+            log.warn("HMAC principal signing disabled, property={}, environmentVariable={}, productionSafe=false",
                     EnvironmentConstant.AUTH_HMAC_SECRET_PROPERTY, EnvironmentConstant.AUTH_HMAC_SECRET_ENV);
         } else {
             this.secret = secret.getBytes(StandardCharsets.UTF_8);

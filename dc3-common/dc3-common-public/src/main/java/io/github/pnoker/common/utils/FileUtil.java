@@ -67,7 +67,7 @@ public class FileUtil {
             try {
                 createSecureTempDirectories(dir);
             } catch (IOException e) {
-                log.error("Failed to create temp directory: {}", dir, e);
+                log.error("Temporary directory creation failed, directory={}", dir, e);
             }
         }
         return dir.toString() + SymbolConstant.SLASH;

@@ -101,7 +101,7 @@ public class Lwm2mServerManager implements DisposableBean {
             });
 
             server.start();
-            log.info("LwM2M server started on coap://{}:{} (secure port: {})",
+            log.info("LwM2M server started, host={}, port={}, securePort={}",
                     lwm2mProperties.getServerHost(),
                     lwm2mProperties.getServerPort(),
                     lwm2mProperties.getSecurePort());

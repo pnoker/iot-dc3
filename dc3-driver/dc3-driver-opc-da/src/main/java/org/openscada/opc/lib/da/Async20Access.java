@@ -103,7 +103,7 @@ public class Async20Access extends AccessBase implements IOPCDataCallback {
     @Override
     public void dataChange(final int transactionId, final int serverGroupHandle, final int masterQuality,
                            final int masterErrorCode, final KeyedResultSet<Integer, ValueData> result) {
-        log.debug("dataChange - transId {}, items: {}", transactionId, result.size());
+        log.debug("OPC DA data change received, transactionId={}, itemCount={}", transactionId, result.size());
 
         final Group group = this.group;
         if (group == null) {

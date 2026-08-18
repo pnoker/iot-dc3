@@ -61,13 +61,14 @@ public class DataResource extends CoapResource {
                     .method("POST")
                     .build();
 
-            log.debug("CoAP POST received from {}:{}, uri: {}, payload: {}",
-                    message.getSourceAddress(), message.getSourcePort(), message.getUriPath(), payload);
+            log.debug("CoAP POST received, source={}:{}, path={}, payloadLength={}",
+                    message.getSourceAddress(), message.getSourcePort(), message.getUriPath(), payload.length());
 
             coapReceiveService.receiveValue(message);
             exchange.respond(CoAP.ResponseCode.CHANGED);
         } catch (Exception e) {
-            log.error("Failed to handle CoAP POST", e);
+            log.error("CoAP POST handling failed, path={}",
+                    exchange.getRequestOptions().getUriPathString(), e);
             exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }

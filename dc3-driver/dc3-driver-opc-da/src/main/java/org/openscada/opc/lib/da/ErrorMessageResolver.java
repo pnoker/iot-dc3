@@ -59,9 +59,9 @@ public class ErrorMessageResolver {
         if (message == null) {
             try {
                 message = this._opcCommon.getErrorString(errorCode, this._localeId);
-                log.info(String.format("Resolved %08X to '%s'", errorCode, message));
+                log.info("OPC DA error resolved, errorCode={}, message={}", errorCode, message);
             } catch (JIException e) {
-                log.warn(String.format("Failed to resolve error code for %08X", errorCode), e);
+                log.warn("OPC DA error resolution failed, errorCode={}", errorCode, e);
             }
             if (message != null) {
                 this._messageCache.put(errorCode, message);

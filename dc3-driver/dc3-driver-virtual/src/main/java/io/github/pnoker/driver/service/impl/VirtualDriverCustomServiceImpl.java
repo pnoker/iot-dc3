@@ -260,8 +260,8 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         Map<String, String> result = parseResponse(response);
         result.putIfAbsent("payload", payload);
         result.putIfAbsent("response", response);
-        log.info("Virtual command executed, deviceId={}, commandId={}, payload={}, response={}",
-                device.getId(), command.getId(), payload, response);
+        log.info("Virtual command executed, deviceId={}, commandId={}, payloadLength={}, responseLength={}, resultCount={}",
+                device.getId(), command.getId(), payload.length(), response.length(), result.size());
         return result;
     }
 
@@ -331,8 +331,8 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
 
             EventReportDTO report = buildEventReport(device, event, eventConfig);
             driverSenderService.eventReportSender(report);
-            log.info("Virtual event reported, deviceId={}, eventId={}, eventCode={}, paramValues={}",
-                    device.getId(), event.getId(), report.eventCode(), JsonUtil.toJsonString(report.paramValues()));
+            log.info("Virtual event reported, deviceId={}, eventId={}, eventCode={}, parameterCount={}",
+                    device.getId(), event.getId(), report.eventCode(), report.paramValues().size());
         }
     }
 

@@ -96,7 +96,7 @@ public class PointClient {
                 .setDriverId(driverMetadata.getDriver().getId()).setPointId(id);
         GrpcRPointDTO rPointDTO = pointApiBlockingStub.getById(query.build());
         if (!rPointDTO.getResult().getOk()) {
-            log.error("Point doesn't exist: {}", id);
+            log.error("Point metadata unavailable, pointId={}", id);
             return null;
         }
 

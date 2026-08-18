@@ -19,7 +19,6 @@ package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MqttUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -116,7 +115,8 @@ public class MqttConfig {
         adapter.setOutputChannel(mqttInboundChannel);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setCompletionTimeout(mqttProperties.getCompletionTimeout());
-        log.info("Set receive topics: {}", JsonUtil.toJsonString(prefixedTopics));
+        log.info("MQTT inbound configured, clientId={}, topicCount={}",
+                mqttProperties.getClient() + "_in", prefixedTopics.size());
         return adapter;
     }
 
@@ -137,7 +137,8 @@ public class MqttConfig {
         messageHandler.setAsync(true);
         messageHandler.setDefaultQos(prefixedDefaultSendTopic.getQos());
         messageHandler.setDefaultTopic(prefixedDefaultSendTopic.getName());
-        log.info("Set default send topic: {}", JsonUtil.toJsonString(prefixedDefaultSendTopic));
+        log.info("MQTT outbound configured, clientId={}, defaultQos={}",
+                mqttProperties.getClient() + "_out", prefixedDefaultSendTopic.getQos());
         return messageHandler;
     }
 

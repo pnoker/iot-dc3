@@ -18,6 +18,7 @@
 import type {App} from 'vue';
 import setupElementPlus from '@/config/plugins/element/element';
 import setupHighlight from '@/config/plugins/highlight/highlight';
+import {logger} from '@/utils/log';
 
 /**
  * IoT DC3 Platform ASCII art banner
@@ -42,5 +43,5 @@ export default function setupPlugins(app: App): void {
   setupElementPlus(app);
   setupHighlight(app);
 
-  console.log(PLATFORM_BANNER);
+  logger.info('Platform initialized', PLATFORM_BANNER);
 }

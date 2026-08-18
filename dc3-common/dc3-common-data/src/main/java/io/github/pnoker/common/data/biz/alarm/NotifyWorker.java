@@ -91,7 +91,9 @@ public class NotifyWorker {
         try {
             if (Objects.isNull(task) || Objects.isNull(task.getNotifyHistoryId())
                     || Objects.isNull(task.getChannelId())) {
-                log.error("Invalid notify task payload: {}", task);
+                log.error("Notify task rejected, reason=invalidEnvelope, historyId={}, channelId={}",
+                        Objects.nonNull(task) ? task.getNotifyHistoryId() : null,
+                        Objects.nonNull(task) ? task.getChannelId() : null);
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

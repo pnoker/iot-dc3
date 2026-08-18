@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.rabbit;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +56,9 @@ public class DriverAlarmReceiver {
     public void driverAlarmReceive(Channel channel, Message message, DriverAlarmDTO entityDTO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            log.debug("Receive driver alarm: {}", JsonUtil.toJsonString(entityDTO));
+            log.debug("Driver alarm received, tenantId={}, driverId={}",
+                    Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
+                    Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
                 log.warn("Invalid driver alarm, driverId is null, driverId={}",
                         Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());

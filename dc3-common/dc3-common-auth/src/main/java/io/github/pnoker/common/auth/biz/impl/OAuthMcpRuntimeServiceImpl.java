@@ -1448,8 +1448,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
             generator.initialize(2048);
             KeyPair pair = generator.generateKeyPair();
-            log.warn("dc3.oauth.jwt.private-key/public-key are not configured. Generated an ephemeral OAuth JWT key "
-                    + "for this process; configure stable RSA keys before production use.");
+            log.warn("OAuth JWT keys are not configured, fallback=ephemeralRsaKey, productionSafe=false");
             return new KeyMaterial(pair.getPrivate(), pair.getPublic());
         } catch (Exception e) {
             throw new IllegalStateException("OAuth RSA key initialization failed", e);

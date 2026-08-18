@@ -173,7 +173,7 @@ public abstract class AccessBase implements ServerConnectionStateListener {
                 stop();
             }
         } catch (final Exception e) {
-            log.error(String.format("Failed to change state (%s)", connected), e);
+            log.error("OPC DA connection state change failed, connected={}", connected, e);
         }
     }
 
@@ -194,7 +194,7 @@ public abstract class AccessBase implements ServerConnectionStateListener {
     }
 
     protected void realizeItem(final String itemId) throws JIException, AddFailedException {
-        log.debug("Realizing item: {}", itemId);
+        log.debug("OPC DA item realization started, itemId={}", itemId);
 
         final DataCallback dataCallback = this.itemSet.get(itemId);
         if (dataCallback == null) {
@@ -214,7 +214,7 @@ public abstract class AccessBase implements ServerConnectionStateListener {
         try {
             this.group.removeItem(itemId);
         } catch (final Throwable e) {
-            log.error(String.format("Failed to unrealize item '%s'", itemId), e);
+            log.error("OPC DA item unrealization failed, itemId={}", itemId, e);
         }
     }
 
@@ -230,10 +230,10 @@ public abstract class AccessBase implements ServerConnectionStateListener {
                 if (rc == null) {
                     rc = -1;
                 }
-                log.warn(String.format("Failed to add item: %s (%08X)", itemId, rc));
+                log.warn("OPC DA item addition failed, itemId={}, resultCode={}", itemId, rc);
 
             } catch (final Exception e) {
-                log.warn("Failed to realize item: " + itemId, e);
+                log.warn("OPC DA item realization failed, itemId={}", itemId, e);
             }
         }
     }

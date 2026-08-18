@@ -186,7 +186,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             Files.deleteIfExists(filePath);
         } catch (Exception e) {
-            log.warn("Failed to clean up attachment file after upload error: {}", filePath, e);
+            log.warn("Attachment cleanup failed after upload error, file={}", filePath, e);
         }
     }
 

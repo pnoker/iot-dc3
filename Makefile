@@ -20,7 +20,7 @@ SHELL := /bin/bash
 
 .PHONY: help env init-env clean package test test-it test-e2e coverage deploy \
 	build up stop down ps logs config pull restart refresh reset \
-	run changelog openapi tag validate-annotations
+	run changelog openapi tag validate-annotations validate-logging
 
 ENV_FILE ?= $(firstword $(wildcard .env) .env.example)
 RUNTIME_ENV_FILE ?= dc3/env/dev.env
@@ -100,6 +100,7 @@ help:
 	@printf '  %-24s %s\n' 'make test-it' 'Run integration-test phase'
 	@printf '  %-24s %s\n' 'make test-e2e' 'Run E2E harness'
 	@printf '  %-24s %s\n' 'make coverage' 'Generate aggregated JaCoCo coverage'
+	@printf '  %-24s %s\n' 'make validate-logging' 'Run backend and frontend logging policy gates'
 	@printf '  %-24s %s\n' 'make run SERVICE=auth' 'Run one Spring Boot service with env auto-loaded'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Compose:'
@@ -169,6 +170,10 @@ validate-annotations:
 	$(MVN) -q -pl dc3-common/dc3-common-agentic -am test -Dtest=AgenticAnnotationGateTest -Dsurefire.failIfNoSpecifiedTests=false
 	$(MVN) -q -pl dc3-common/dc3-common-auth -am test -Dtest=AuthAnnotationGateTest -Dsurefire.failIfNoSpecifiedTests=false
 	@echo "Allowlisted: manager, data, agentic, auth (all center services)."
+
+validate-logging:
+	$(MVN) -q -pl dc3-common/dc3-common-log test -Dtest=LoggingPolicyTest,LogbackConfigurationTest
+	cd dc3-web && pnpm exec vitest run tests/guardrails/ai-guardrails.test.ts
 
 test-it:
 	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify
@@ -265,4 +270,3 @@ changelog:
 # OPENAPI_BASE overrides the gateway URL; OPENAPI_OUT the output directory.
 openapi:
 	@OPENAPI_BASE="$(OPENAPI_BASE)" dc3/bin/export_openapi.sh $(OPENAPI_OUT)
-

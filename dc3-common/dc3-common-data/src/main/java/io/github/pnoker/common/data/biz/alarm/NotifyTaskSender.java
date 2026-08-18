@@ -50,7 +50,8 @@ public class NotifyTaskSender {
 
     public void publish(NotifyTaskDTO task) {
         if (Objects.isNull(task) || Objects.isNull(task.getNotifyHistoryId())) {
-            log.warn("Refusing to publish notify task without a history id: {}", task);
+            log.warn("Notify task publish skipped, reason=missingHistoryId, channelId={}",
+                    Objects.nonNull(task) ? task.getChannelId() : null);
             return;
         }
         String channelType = Objects.nonNull(task.getChannelTypeFlag())

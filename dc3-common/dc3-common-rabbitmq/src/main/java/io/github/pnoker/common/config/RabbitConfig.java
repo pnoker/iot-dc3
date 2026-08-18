@@ -33,8 +33,6 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import java.nio.charset.StandardCharsets;
-
 /**
  * RabbitMQ Configuration Class
  * <p>
@@ -60,24 +58,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class RabbitConfig {
 
-    /**
-     * Cap how many bytes of a returned message body we log. RabbitMQ returns happen on
-     * the connection thread, so a 1 MB unroutable message would otherwise dump 1 MB into
-     * the log file every time the routing key changes.
-     */
-    private static final int RETURN_BODY_LOG_LIMIT = 512;
-
     private final ConnectionFactory connectionFactory;
-
-    private static String summarizeBody(Message message) {
-        if (message == null || message.getBody() == null) {
-            return "<empty>";
-        }
-        byte[] body = message.getBody();
-        int len = Math.min(body.length, RETURN_BODY_LOG_LIMIT);
-        String prefix = new String(body, 0, len, StandardCharsets.UTF_8);
-        return body.length <= RETURN_BODY_LOG_LIMIT ? prefix : prefix + "…(truncated " + body.length + "B)";
-    }
 
     /**
      * Configure RabbitTemplate for message publishing.
@@ -93,10 +74,13 @@ public class RabbitConfig {
         rabbitTemplate.setReturnsCallback(returned -> {
             // Returned messages mean the broker accepted the publish but no queue was
             // bound to the routing key — almost always a deployment misconfiguration.
-            // Keep the body excerpt bounded so a flood of returns can't blow up logs.
-            log.error("RabbitMQ message returned, exchange={}, routingKey={}, replyCode={}, replyText={}, body={}",
+            // Never render the body: it can contain telemetry, commands or credentials.
+            Message returnedMessage = returned.getMessage();
+            int bodyLength = returnedMessage != null && returnedMessage.getBody() != null
+                    ? returnedMessage.getBody().length : 0;
+            log.error("RabbitMQ message returned, exchange={}, routingKey={}, replyCode={}, replyText={}, bodyLength={}",
                     returned.getExchange(), returned.getRoutingKey(), returned.getReplyCode(), returned.getReplyText(),
-                    summarizeBody(returned.getMessage()));
+                    bodyLength);
         });
         rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
             if (!ack) {

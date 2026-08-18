@@ -116,7 +116,7 @@ public class ThreadPoolConfig {
         @Override
         public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
             try {
-                log.info("BlockingRejectedExecutionHandler: {}", executor.toString());
+                log.info("Blocking executor rejected task, executor={}", executor);
 
                 if (!executor.isShutdown()) {
                     runnable.run();

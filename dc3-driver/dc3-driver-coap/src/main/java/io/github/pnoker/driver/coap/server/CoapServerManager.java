@@ -55,7 +55,7 @@ public class CoapServerManager implements CommandLineRunner {
     public void run(String... args) {
         CoapProperties.ModeEnum mode = coapProperties.getMode();
         if (mode != CoapProperties.ModeEnum.SERVER && mode != CoapProperties.ModeEnum.BOTH) {
-            log.info("CoAP server mode disabled, current mode: {}", mode);
+            log.info("CoAP server startup skipped, reason=serverModeDisabled, mode={}", mode);
             return;
         }
 
@@ -74,7 +74,8 @@ public class CoapServerManager implements CommandLineRunner {
         coapServer.add(new DataResource("data", coapReceiveService));
 
         coapServer.start();
-        log.info("CoAP server started on {}:{} (mode: {})", coapProperties.getServerHost(), coapProperties.getServerPort(), mode);
+        log.info("CoAP server started, host={}, port={}, mode={}",
+                coapProperties.getServerHost(), coapProperties.getServerPort(), mode);
     }
 
     /**

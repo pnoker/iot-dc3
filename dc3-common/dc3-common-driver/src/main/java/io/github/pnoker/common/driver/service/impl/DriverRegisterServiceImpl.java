@@ -23,7 +23,6 @@ import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.grpc.client.DriverClient;
 import io.github.pnoker.common.driver.service.DriverRegisterService;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,10 +60,8 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         try {
             // Build driver registration information from properties
             RegisterBO entityBO = buildRegisterBOByProperty();
-            // Log driver metadata at debug level to avoid leaking sensitive config in production logs
-            if (log.isDebugEnabled()) {
-                log.debug("The driver information is: {}", JsonUtil.toJsonString(entityBO));
-            }
+            log.debug("Driver registration prepared, serviceName={}, driverCode={}, tenantCode={}",
+                    entityBO.getDriver().getServiceName(), entityBO.getDriver().getDriverCode(), entityBO.getTenant());
             // Register driver with the driver client
             driverClient.driverRegister(entityBO);
         } catch (Exception e) {

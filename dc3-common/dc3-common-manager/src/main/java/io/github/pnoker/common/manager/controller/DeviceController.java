@@ -401,7 +401,7 @@ public class DeviceController implements BaseController {
         try {
             Files.deleteIfExists(filePath);
         } catch (java.io.IOException e) {
-            log.warn("Failed to delete temporary import file: {}", filePath, e);
+            log.warn("Temporary import file deletion failed, file={}", filePath, e);
         }
     }
 

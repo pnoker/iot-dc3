@@ -77,12 +77,12 @@ public class CoapClientManager implements DisposableBean {
 
                 org.eclipse.californium.core.CoapResponse response = client.get();
                 if (response == null) {
-                    log.warn("CoAP GET timeout: {}{}", uri, path);
+                    log.warn("CoAP GET timed out, uri={}, path={}", uri, path);
                     return null;
                 }
                 return toResult(response);
             } catch (Exception e) {
-                log.error("CoAP GET failed: {}{}", uri, path, e);
+                log.error("CoAP GET failed, uri={}, path={}", uri, path, e);
                 return null;
             }
         }
@@ -103,12 +103,12 @@ public class CoapClientManager implements DisposableBean {
             try {
                 org.eclipse.californium.core.CoapResponse response = client.put(payload, MediaTypeRegistry.APPLICATION_JSON);
                 if (response == null) {
-                    log.warn("CoAP PUT timeout: {}{}", uri, path);
+                    log.warn("CoAP PUT timed out, uri={}, path={}", uri, path);
                     return null;
                 }
                 return toResult(response);
             } catch (Exception e) {
-                log.error("CoAP PUT failed: {}{}", uri, path, e);
+                log.error("CoAP PUT failed, uri={}, path={}", uri, path, e);
                 return null;
             }
         }
@@ -137,7 +137,7 @@ public class CoapClientManager implements DisposableBean {
 
     private CoapClient createClient(String uri) {
         CoapClient client = new CoapClient(uri);
-        log.debug("Created CoAP client for: {}", uri);
+        log.debug("CoAP client created, uri={}", uri);
         return client;
     }
 

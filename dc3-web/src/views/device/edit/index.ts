@@ -1104,7 +1104,7 @@ export default defineComponent({
           } catch (error) {
             failedCount++;
             cell.error = t('device.edit.pointSaveCellFailed');
-            logger.debug(error);
+            logger.debug('Point configuration save failed', error);
           } finally {
             cell.saving = false;
           }
@@ -1221,7 +1221,7 @@ export default defineComponent({
           } catch (error) {
             failedCount++;
             cell.error = t('device.edit.commandSaveCellFailed');
-            logger.debug(error);
+            logger.debug('Command configuration save failed', error);
           } finally {
             cell.saving = false;
           }
@@ -1336,7 +1336,7 @@ export default defineComponent({
           } catch (error) {
             failedCount++;
             cell.error = t('device.edit.eventSaveCellFailed');
-            logger.debug(error);
+            logger.debug('Event configuration save failed', error);
           } finally {
             cell.saving = false;
           }

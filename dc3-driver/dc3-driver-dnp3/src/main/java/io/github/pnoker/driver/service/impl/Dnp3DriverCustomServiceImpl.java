@@ -178,8 +178,8 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
             connection.channel().readWithHandler(connection.associationId(),
                     Request.classRequest(true, true, true, true), handler)
                     .exceptionally(ex -> {
-                        log.warn("DNP3 poll failed, protocol={}, deviceId={}, message={}",
-                                driverCode, device.getId(), ex.getMessage());
+                        log.warn("DNP3 poll failed, protocol={}, deviceId={}",
+                                driverCode, device.getId(), ex);
                         return null;
                     });
             if (!latch.await(POLL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {

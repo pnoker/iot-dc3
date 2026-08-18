@@ -76,7 +76,7 @@ public class Dlt645SerialPortConnection {
 
         inputStream = serialPort.getInputStream();
         outputStream = serialPort.getOutputStream();
-        log.info("Serial port opened: {}, baudRate={}, dataBits={}, stopBits={}, parity={}",
+        log.info("Serial port opened, portName={}, baudRate={}, dataBits={}, stopBits={}, parity={}",
                 portName, baudRate, dataBits, stopBits, parity);
     }
 
@@ -122,18 +122,18 @@ public class Dlt645SerialPortConnection {
                 inputStream.close();
             }
         } catch (IOException e) {
-            log.warn("Failed to close serial input stream: {}", portName, e);
+            log.warn("Serial input stream closure failed, portName={}", portName, e);
         }
         try {
             if (Objects.nonNull(outputStream)) {
                 outputStream.close();
             }
         } catch (IOException e) {
-            log.warn("Failed to close serial output stream: {}", portName, e);
+            log.warn("Serial output stream closure failed, portName={}", portName, e);
         }
         if (Objects.nonNull(serialPort) && serialPort.isOpen()) {
             serialPort.closePort();
-            log.info("Serial port closed: {}", portName);
+            log.info("Serial port closed, portName={}", portName);
         }
     }
 

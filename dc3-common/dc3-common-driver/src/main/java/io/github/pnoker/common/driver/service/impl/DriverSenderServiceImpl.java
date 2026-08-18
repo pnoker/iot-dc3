@@ -32,7 +32,6 @@ import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitPublishConfirm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -148,7 +147,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     public void driverAlarmSender(String message) {
         DriverBO driver = driverMetadata.getDriver();
         if (Objects.isNull(driver)) {
-            log.warn("Driver not registered yet; drop alarm: {}", message);
+            log.warn("Driver alarm publish skipped, reason=driverNotRegistered, messageLength={}",
+                    Objects.nonNull(message) ? message.length() : 0);
             return;
         }
         DriverAlarmDTO alarm = DriverAlarmDTO.builder()
@@ -156,7 +156,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 .driverId(driver.getId())
                 .message(message)
                 .build();
-        log.info("Report driver alarm: {}", message);
+        log.info("Driver alarm published, tenantId={}, driverId={}, messageLength={}",
+                driver.getTenantId(), driver.getId(), Objects.nonNull(message) ? message.length() : 0);
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_ALARM,
                 RabbitConstant.ROUTING_DRIVER_ALARM_PREFIX + driverProperties.getService(), alarm);
     }
@@ -181,7 +182,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
             alarm.setDriverId(driver.getId());
             alarm.setTenantId(driver.getTenantId());
         }
-        log.info("Report device alarm: deviceId={}, message={}", deviceId, message);
+        log.info("Device alarm published, tenantId={}, driverId={}, deviceId={}, messageLength={}",
+                alarm.getTenantId(), alarm.getDriverId(), deviceId, Objects.nonNull(message) ? message.length() : 0);
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_ALARM,
                 RabbitConstant.ROUTING_DEVICE_ALARM_PREFIX + driverProperties.getService(), alarm);
     }
@@ -229,7 +231,9 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         pointValue.setSequence(pointValueSequence.incrementAndGet());
         pointValue.setFencingToken(fencingToken);
         if (log.isDebugEnabled()) {
-            log.debug("Send point value: {}", JsonUtil.toJsonString(pointValue));
+            log.debug("Point value staged, messageId={}, tenantId={}, driverId={}, deviceId={}, pointId={}, sequence={}",
+                    pointValue.getMessageId(), pointValue.getTenantId(), pointValue.getDriverId(),
+                    pointValue.getDeviceId(), pointValue.getPointId(), pointValue.getSequence());
         }
         return true;
     }
@@ -326,10 +330,9 @@ public class DriverSenderServiceImpl implements DriverSenderService {
             deviceState.setDriverId(driver.getId());
             deviceState.setTenantId(driver.getTenantId());
         } else {
-            log.warn(
-                    "DriverMetadata has no registered driver yet; device status will be published without driverId/tenantId");
+            log.warn("Device state publish degraded, reason=driverNotRegistered, deviceId={}", deviceId);
         }
-        log.info("Report device state: {}, deviceId={}", status.getCode(), deviceId);
+        log.info("Device state published, deviceId={}, status={}", deviceId, status.getCode());
         deviceStateSender(deviceState);
     }
 

@@ -54,7 +54,7 @@ public class CmdUtil {
             }
             process.destroyForcibly();
         } catch (IOException e) {
-            log.error("Failed to destroy process with command: {}", cmd, e);
+            log.error("Process destruction failed, commandLength={}", StringUtils.length(cmd), e);
         }
     }
 

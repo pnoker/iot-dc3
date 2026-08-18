@@ -42,7 +42,6 @@ import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.EventAttributeService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.tenant.TenantContextHolder;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -106,11 +105,13 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             Objects.requireNonNull(driverBO).setTenantId(tenant.getId());
             DriverBO entityBO = driverService.getByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
             if (Objects.nonNull(entityBO)) {
-                log.info("The driver has been registered, perform update: {}", JsonUtil.toJsonString(driverBO));
+                log.info("Driver registration updated, tenantId={}, driverId={}, serviceName={}, driverCode={}",
+                        driverBO.getTenantId(), entityBO.getId(), driverBO.getServiceName(), driverBO.getDriverCode());
                 driverBO.setId(entityBO.getId());
                 driverService.update(driverBO);
             } else {
-                log.info("The driver is not registered, perform new addition: {}", JsonUtil.toJsonString(driverBO));
+                log.info("Driver registration created, tenantId={}, serviceName={}, driverCode={}",
+                        driverBO.getTenantId(), driverBO.getServiceName(), driverBO.getDriverCode());
                 driverService.add(driverBO);
             }
 
@@ -156,7 +157,8 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
                     toRemoveIds.add(entry.getValue().getId());
                 }
             }
-            log.debug("Driver attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+            log.debug("Driver attribute reconciliation completed, driverId={}, inserted={}, updated={}, removed={}",
+                    entityBO.getId(),
                     toInsert.size(), toUpdate.size(), toRemoveIds.size());
             driverAttributeService.saveBatch(toInsert);
             driverAttributeService.updateBatch(toUpdate);
@@ -205,7 +207,8 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
                     pointToRemoveIds.add(entry.getValue().getId());
                 }
             }
-            log.debug("Point attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+            log.debug("Point attribute reconciliation completed, driverId={}, inserted={}, updated={}, removed={}",
+                    entityBO.getId(),
                     pointToInsert.size(), pointToUpdate.size(), pointToRemoveIds.size());
             pointAttributeService.saveBatch(pointToInsert);
             pointAttributeService.updateBatch(pointToUpdate);
@@ -253,7 +256,8 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
                     commandToRemoveIds.add(entry.getValue().getId());
                 }
             }
-            log.debug("Command attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+            log.debug("Command attribute reconciliation completed, driverId={}, inserted={}, updated={}, removed={}",
+                    entityBO.getId(),
                     commandToInsert.size(), commandToUpdate.size(), commandToRemoveIds.size());
             commandAttributeService.saveBatch(commandToInsert);
             commandAttributeService.updateBatch(commandToUpdate);
@@ -301,7 +305,8 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
                     eventToRemoveIds.add(entry.getValue().getId());
                 }
             }
-            log.debug("Event attribute diff for driver {}: insert={} update={} remove={}", entityBO.getId(),
+            log.debug("Event attribute reconciliation completed, driverId={}, inserted={}, updated={}, removed={}",
+                    entityBO.getId(),
                     eventToInsert.size(), eventToUpdate.size(), eventToRemoveIds.size());
             eventAttributeService.saveBatch(eventToInsert);
             eventAttributeService.updateBatch(eventToUpdate);

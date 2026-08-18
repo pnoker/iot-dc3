@@ -93,12 +93,12 @@ public class MetadataReceiver {
             if (MetadataTypeEnum.DEVICE.equals(entityDTO.getMetadataType())) {
                 if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
                         || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.debug("Upsert device: {}", entityDTO.getId());
+                    log.debug("Device metadata upserted, deviceId={}", entityDTO.getId());
                     // Metadata events invalidate/load data only. Ownership is assigned by
                     // the Manager lease service and is never inferred from an ADD event.
                     deviceMetadata.loadCache(entityDTO.getId());
                 } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.debug("Delete device: {}", entityDTO.getId());
+                    log.debug("Device metadata deleted, deviceId={}", entityDTO.getId());
                     // Remove the id before invalidating the cache so a Quartz scan
                     // hitting the cache between the two operations does not re-fetch
                     // the doomed device through the loader.
@@ -114,10 +114,10 @@ public class MetadataReceiver {
             else if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
                 if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
                         || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.debug("Upsert point: {}", entityDTO.getId());
+                    log.debug("Point metadata upserted, pointId={}", entityDTO.getId());
                     pointMetadata.loadCache(entityDTO.getId());
                 } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.debug("Delete point: {}", entityDTO.getId());
+                    log.debug("Point metadata deleted, pointId={}", entityDTO.getId());
                     pointMetadata.removeCache(entityDTO.getId());
                 }
 
@@ -126,13 +126,13 @@ public class MetadataReceiver {
                         new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.POINT, entityDTO.getOperateType()));
             } else if (MetadataTypeEnum.DRIVER.equals(entityDTO.getMetadataType())) {
                 if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.debug("Delete driver metadata: {}", entityDTO.getId());
+                    log.debug("Driver metadata deleted, driverId={}", entityDTO.getId());
                     driverMetadata.clear();
                     deviceMetadata.clearCache();
                     pointMetadata.clearCache();
                 } else if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
                         || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.debug("Refresh driver metadata: {}", entityDTO.getId());
+                    log.debug("Driver metadata refreshed, driverId={}", entityDTO.getId());
                     driverClient.refreshMetadata(entityDTO.getId());
                 }
 
@@ -140,11 +140,13 @@ public class MetadataReceiver {
                         new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.DRIVER, entityDTO.getOperateType()));
             } else if (MetadataTypeEnum.COMMAND.equals(entityDTO.getMetadataType())
                     || MetadataTypeEnum.EVENT.equals(entityDTO.getMetadataType())) {
-                log.debug("Forward {} metadata event: {}", entityDTO.getMetadataType(), entityDTO.getId());
+                log.debug("Driver metadata event forwarded, type={}, id={}",
+                        entityDTO.getMetadataType(), entityDTO.getId());
                 metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), entityDTO.getMetadataType(),
                         entityDTO.getOperateType()));
             } else {
-                log.error("Unsupported metadata type: {}", entityDTO.getMetadataType());
+                log.error("Driver metadata event rejected, reason=unsupportedType, type={}",
+                        entityDTO.getMetadataType());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

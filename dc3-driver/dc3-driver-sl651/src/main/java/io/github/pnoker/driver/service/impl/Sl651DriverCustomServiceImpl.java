@@ -299,7 +299,8 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             Object body = responses.get(i);
             List<String> bodyElements = invokeBodyElements(body);
             if (!bodyElements.isEmpty()) {
-                log.debug("Driver SL651 body[{}], protocol={}, elements={}", i, driverCode, bodyElements);
+                log.debug("Driver SL651 body decoded, protocol={}, bodyIndex={}, elementCount={}",
+                        driverCode, i, bodyElements.size());
                 elements.addAll(bodyElements);
             }
         }

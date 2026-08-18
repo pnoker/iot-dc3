@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.rabbit;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.EventHistoryService;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +56,10 @@ public class EventReportReceiver {
     public void onEventReport(Channel channel, Message message, EventReportDTO entityDTO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            log.debug("Receive event report: {}", JsonUtil.toJsonString(entityDTO));
+            log.debug("Event report received, recordId={}, deviceId={}, eventId={}",
+                    Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
+                    Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
+                    Objects.isNull(entityDTO) ? null : entityDTO.eventId());
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
                     || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.eventId())) {
                 log.warn("Invalid event report, some required fields are null, recordId={}, deviceId={}, eventId={}",

@@ -43,7 +43,7 @@ public class HourlyJobForData extends QuartzJobBean {
      */
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        log.info("hourlyJobHandler: {}", LocalDateTimeUtil.now());
+        log.debug("Data hourly job started, executionTime={}", LocalDateTimeUtil.now());
     }
 
 }

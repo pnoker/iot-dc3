@@ -283,9 +283,9 @@ public class DeviceServiceImpl implements DeviceService {
             try {
                 importDeviceBO = importDeviceService.importDevice(entityBO, pointBOList, driverAttributeBOList,
                         pointAttributeBOList, sheet, i);
-                log.info("Import device succeeded, row index: {}", i + 1);
+                log.info("Device import row succeeded, rowIndex={}", i + 1);
             } catch (Exception e) {
-                log.warn("Skip import device, row index: {}", i + 1, e);
+                log.warn("Device import row skipped, rowIndex={}", i + 1, e);
                 continue;
             }
 
@@ -298,7 +298,7 @@ public class DeviceServiceImpl implements DeviceService {
         try {
             FileUtils.delete(file);
         } catch (IOException e) {
-            log.error("Failed to delete imported device file: {}", file, e);
+            log.error("Imported device file deletion failed, file={}", file, e);
         }
     }
 

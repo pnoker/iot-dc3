@@ -222,8 +222,8 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                         driverCode, deviceId, host, port);
                 return socket;
             } catch (IOException e) {
-                log.error("Driver FINS connection failed, protocol={}, deviceId={}, host={}:{}, message={}",
-                        driverCode, deviceId, host, port, e.getMessage());
+                log.error("Driver FINS connection failed, protocol={}, deviceId={}, host={}, port={}",
+                        driverCode, deviceId, host, port, e);
                 return null;
             }
         });

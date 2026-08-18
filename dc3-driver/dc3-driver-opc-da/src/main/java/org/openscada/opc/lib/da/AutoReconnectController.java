@@ -117,7 +117,7 @@ public class AutoReconnectController implements ServerConnectionStateListener {
 
     @Override
     public synchronized void connectionStateChanged(final boolean connected) {
-        log.debug("Connection state changed: " + connected);
+        log.debug("OPC DA connection state changed, connected={}", connected);
 
         if (!connected) {
             if (isRequested()) {
@@ -150,7 +150,7 @@ public class AutoReconnectController implements ServerConnectionStateListener {
                     result = performReconnect(wait);
                 } finally {
                     AutoReconnectController.this._connectTask = null;
-                    log.debug(String.format("performReconnect completed : %s", result));
+                    log.debug("OPC DA reconnect attempt completed, connected={}", result);
                     if (!result) {
                         triggerReconnect(true);
                     }
@@ -165,14 +165,17 @@ public class AutoReconnectController implements ServerConnectionStateListener {
         try {
             if (wait) {
                 notifyStateChange(AutoReconnectState.WAITING);
-                log.debug(String.format("Delaying (%s)...", this._delay));
+                log.debug("OPC DA reconnect delayed, delayMillis={}", this._delay);
                 Thread.sleep(this._delay);
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.info("OPC DA reconnect interrupted");
+            return true;
         }
 
         if (!isRequested()) {
-            log.debug("Request canceled during delay");
+            log.debug("OPC DA reconnect canceled during delay");
             return true;
         }
 

@@ -99,12 +99,17 @@ public class CommandReceiver {
                     || Objects.isNull(entityDTO.tenantId())
                     || Objects.isNull(entityDTO.ownerNode()) || Objects.isNull(entityDTO.fencingToken())
                     || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.commandId())) {
-                log.error("Invalid custom command: {}", entityDTO);
+                log.error("Custom command rejected, reason=invalidEnvelope, recordId={}, tenantId={}, deviceId={}, commandId={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.tenantId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.commandId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
 
-            log.debug("Receive custom command: recordId={}", entityDTO.recordId());
+            log.debug("Custom command received, recordId={}, deviceId={}, commandId={}",
+                    entityDTO.recordId(), entityDTO.deviceId(), entityDTO.commandId());
 
             String recordId = entityDTO.recordId();
             Long tenantId = entityDTO.tenantId();
@@ -122,7 +127,8 @@ public class CommandReceiver {
 
             // Expire-at pre-check
             if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
-                log.warn("Command already expired: recordId={}, expireAt={}", recordId, entityDTO.expireAt());
+                log.warn("Custom command rejected, reason=expired, recordId={}, expireAt={}",
+                        recordId, entityDTO.expireAt());
                 sendResult(recordId, tenantId, PointCommandStatusEnum.EXPIRED,
                         null, null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
                 return;

@@ -89,10 +89,6 @@ public class NettyServerHandler {
         int readableBytes = byteBuf.readableBytes();
         log.debug("Driver message received, protocol={}, remoteAddress={}, bytes={}", PROTOCOL,
                 context.channel().remoteAddress(), readableBytes);
-        if (log.isTraceEnabled()) {
-            log.trace("Driver message payload received, protocol={}, remoteAddress={}, payload={}", PROTOCOL,
-                    context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
-        }
         if (readableBytes < MIN_MESSAGE_LENGTH) {
             log.warn("Driver message skipped, protocol={}, remoteAddress={}, reason=payloadTooShort, bytes={}", PROTOCOL,
                     context.channel().remoteAddress(), readableBytes);

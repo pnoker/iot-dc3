@@ -144,9 +144,11 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
                 if (Objects.nonNull(removed)) {
                     try {
                         removed.close();
-                    } catch (IOException ignored) {
+                    } catch (IOException e) {
+                        log.warn("Driver connection closure failed, protocol={}, deviceId={}, operation={}",
+                                driverCode, metadataEvent.getId(), operateType, e);
                     }
-                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                    log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}",
                             driverCode, metadataEvent.getId(), operateType);
                 }
             }
@@ -220,7 +222,8 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
         connectMap.remove(deviceId, socket);
         try {
             if (Objects.nonNull(socket) && !socket.isClosed()) socket.close();
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            log.warn("Driver connection closure failed, protocol={}, deviceId={}", driverCode, deviceId, e);
         }
     }
 

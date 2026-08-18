@@ -66,7 +66,7 @@ public class ResponseUtil {
 
             return ResponseEntity.ok().headers(headers).contentLength(resource.contentLength()).body(resource);
         } catch (Exception e) {
-            log.error("Failed to response file: {}", path.getFileName(), e);
+            log.error("File response failed, fileName={}", path.getFileName(), e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

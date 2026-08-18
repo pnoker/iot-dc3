@@ -231,6 +231,33 @@ describe('AI coding guardrails', () => {
     expect(offenders).toEqual([]);
   });
 
+  it('routes application console output through the unified logger', () => {
+    const consoleCall = /\bconsole\.(?:log|debug|info|warn|error)\s*\(/;
+    const offenders = walk(join(root, 'src'))
+      .filter((path) => /\.(?:ts|tsx|vue|js)$/.test(path))
+      .filter((path) => relativeProjectPath(path) !== 'src/utils/log.ts')
+      .filter((path) => consoleCall.test(readFileSync(path, 'utf8')))
+      .map(relativeProjectPath);
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('requires stable English event names for application logs', () => {
+    const loggerCall = /\blogger\.(?:debug|info|warn|error)\s*\(\s*(?!['"`])/;
+    const loggerEvent = /\blogger\.(?:debug|info|warn|error)\s*\(\s*(['"`])([^'"`]*?)\1/g;
+    const hanCharacter = /\p{Script=Han}/u;
+    const offenders = walk(join(root, 'src'))
+      .filter((path) => /\.(?:ts|tsx|vue|js)$/.test(path))
+      .filter((path) => {
+        const source = readFileSync(path, 'utf8');
+        if (loggerCall.test(source)) return true;
+        return [...source.matchAll(loggerEvent)].some((match) => hanCharacter.test(match[2]));
+      })
+      .map(relativeProjectPath);
+
+    expect(offenders).toEqual([]);
+  });
+
   it('forbids hard-coded setTimeout waits in unit/component/view tests', () => {
     // setTimeout(fn, N) for "wait N ms" makes tests slow AND flaky.
     // Use vi.waitFor / await flushPromises / await Promise.resolve()

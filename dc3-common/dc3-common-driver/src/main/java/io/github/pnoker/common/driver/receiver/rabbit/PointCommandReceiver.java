@@ -88,14 +88,18 @@ public class PointCommandReceiver {
                     || Objects.isNull(entityDTO.tenantId()) || Objects.isNull(entityDTO.ownerNode())
                     || Objects.isNull(entityDTO.fencingToken()) || Objects.isNull(entityDTO.type())
                     || Objects.isNull(entityDTO.payload())) {
-                log.error("Invalid point command: {}", entityDTO);
+                log.error("Point command rejected, reason=invalidEnvelope, commandId={}, tenantId={}, type={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.commandId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.tenantId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.type());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
 
-            log.debug("Receive point command: commandId={}, type={}", entityDTO.commandId(), entityDTO.type());
+            log.debug("Point command received, commandId={}, type={}", entityDTO.commandId(), entityDTO.type());
             if (isInvalidPayload(entityDTO.payload())) {
-                log.error("Invalid point command payload: {}", entityDTO);
+                log.error("Point command rejected, reason=invalidPayload, commandId={}, tenantId={}, type={}",
+                        entityDTO.commandId(), entityDTO.tenantId(), entityDTO.type());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
@@ -105,7 +109,8 @@ public class PointCommandReceiver {
 
             // Expire-at pre-check
             if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
-                log.warn("Command already expired: commandId={}, expireAt={}", commandId, entityDTO.expireAt());
+                log.warn("Point command rejected, reason=expired, commandId={}, expireAt={}",
+                        commandId, entityDTO.expireAt());
                 sendResult(commandId, tenantId, PointCommandStatusEnum.EXPIRED,
                         null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
                 return;
@@ -113,7 +118,7 @@ public class PointCommandReceiver {
 
             // Dedup check
             if (!dedupCache.tryAcquire(commandId)) {
-                log.warn("Duplicate command detected: commandId={}", commandId);
+                log.warn("Point command rejected, reason=duplicate, commandId={}", commandId);
                 sendResult(commandId, tenantId, PointCommandStatusEnum.DUPLICATE,
                         null, "DUPLICATE", "Command already processed", channel, deliveryTag);
                 return;

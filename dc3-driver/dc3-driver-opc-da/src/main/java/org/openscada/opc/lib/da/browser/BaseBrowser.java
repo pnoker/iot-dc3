@@ -100,7 +100,7 @@ public class BaseBrowser {
             accessMaskValue |= Access.WRITE.getCode();
         }
 
-        log.debug("Browsing with a batch size of " + this._batchSize);
+        log.debug("OPC DA browse started, batchSize={}", this._batchSize);
 
         return this._browser.browse(type, filterCriteria, accessMaskValue, variantType).asCollection(this._batchSize);
     }

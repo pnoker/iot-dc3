@@ -166,8 +166,8 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
 
                 driverSenderService.eventReportSender(report);
                 reported++;
-                log.info("MQTT event reported, topic={}, deviceId={}, eventId={}, eventCode={}, paramValues={}",
-                        topic, device.getId(), eventId, report.eventCode(), JsonUtil.toJsonString(report.paramValues()));
+                log.info("MQTT event reported, topic={}, deviceId={}, eventId={}, eventCode={}, parameterCount={}",
+                        topic, device.getId(), eventId, report.eventCode(), report.paramValues().size());
             }
         }
         return reported;

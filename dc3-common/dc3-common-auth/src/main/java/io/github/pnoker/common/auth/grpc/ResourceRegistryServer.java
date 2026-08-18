@@ -85,7 +85,7 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
                     .setUnchanged(result.getUnchanged())
                     .build());
         } catch (Exception e) {
-            log.error("Resource registry sync failed for service [{}]", request.getServiceName(), e);
+            log.error("Resource registry synchronization failed, serviceName={}", request.getServiceName(), e);
             builder.setResult(Objects.nonNull(e.getMessage())
                     ? GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage())
                     : GrpcRFactory.fail(ErrorCode.FAILURE));

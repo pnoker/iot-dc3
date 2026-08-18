@@ -39,7 +39,7 @@ public class Item {
 
     Item(final Group group, final int serverHandle, final int clientHandle, final String id) {
         super();
-        log.debug(String.format("Adding new item '%s' (0x%08X) for group %s", id, serverHandle, group.toString()));
+        log.debug("OPC DA item created, itemId={}, serverHandle={}, group={}", id, serverHandle, group);
         this._group = group;
         this._serverHandle = serverHandle;
         this._clientHandle = clientHandle;
