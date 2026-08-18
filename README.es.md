@@ -6,7 +6,7 @@
 > amigable para IA de IoT DC3.
 
 <p align="center">
-  <img src="./.github/brand/banner.es.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
+  <img src="./.github/brand/png/banner.es.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
 </p>
 
 <p align="center">
