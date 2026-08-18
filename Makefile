@@ -20,7 +20,7 @@ SHELL := /bin/bash
 
 .PHONY: help env init-env clean package test test-it test-e2e coverage deploy \
 	build up stop down ps logs config pull restart refresh reset \
-	run changelog openapi tag validate-annotations validate-logging
+	run changelog openapi tag validate-annotations validate-logging validate-postgres-init
 
 ENV_FILE ?= $(firstword $(wildcard .env) .env.example)
 RUNTIME_ENV_FILE ?= dc3/env/dev.env
@@ -101,6 +101,7 @@ help:
 	@printf '  %-24s %s\n' 'make test-e2e' 'Run E2E harness'
 	@printf '  %-24s %s\n' 'make coverage' 'Generate aggregated JaCoCo coverage'
 	@printf '  %-24s %s\n' 'make validate-logging' 'Run backend and frontend logging policy gates'
+	@printf '  %-24s %s\n' 'make validate-postgres-init' 'Validate PostgreSQL initialization schema comments and syntax policy'
 	@printf '  %-24s %s\n' 'make run SERVICE=auth' 'Run one Spring Boot service with env auto-loaded'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Compose:'
@@ -174,6 +175,9 @@ validate-annotations:
 validate-logging:
 	$(MVN) -q -pl dc3-common/dc3-common-log test -Dtest=LoggingPolicyTest,LogbackConfigurationTest
 	cd dc3-web && pnpm exec vitest run tests/guardrails/ai-guardrails.test.ts
+
+validate-postgres-init:
+	python3 dc3/bin/check_postgres_init.py
 
 test-it:
 	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify

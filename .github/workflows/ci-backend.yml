@@ -37,6 +37,9 @@ jobs:
       - name: Audit controller permissions
         run: python3 dc3/bin/audit_controller_permissions.py
 
+      - name: Validate PostgreSQL initialization schema
+        run: python3 dc3/bin/check_postgres_init.py
+
       - name: Compile
         run: |
           set -euo pipefail
