@@ -92,6 +92,7 @@ public class KeyLoader {
      * @throws Exception if certificate generation or loading fails
      */
     public KeyLoader load(Path baseDir) throws Exception {
+        Files.createDirectories(baseDir);
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         Path serverKeyStore = baseDir.resolve("dc3-opc-ua-client.pfx");
 

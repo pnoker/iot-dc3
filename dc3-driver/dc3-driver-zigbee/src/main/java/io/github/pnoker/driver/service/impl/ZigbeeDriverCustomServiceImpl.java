@@ -18,12 +18,11 @@
 package io.github.pnoker.driver.service.impl;
 
 import com.zsmartsystems.zigbee.IeeeAddress;
+import com.zsmartsystems.zigbee.CommandResult;
 import com.zsmartsystems.zigbee.ZigBeeEndpoint;
 import com.zsmartsystems.zigbee.ZigBeeNetworkManager;
 import com.zsmartsystems.zigbee.ZigBeeNode;
 import com.zsmartsystems.zigbee.ZigBeeStatus;
-import com.zsmartsystems.zigbee.dongle.telegesis.ZigBeeDongleTelegesis;
-import com.zsmartsystems.zigbee.serial.ZigBeeSerialPort;
 import com.zsmartsystems.zigbee.zcl.ZclAttribute;
 import com.zsmartsystems.zigbee.zcl.ZclCluster;
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
@@ -50,6 +49,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Custom driver service implementation for the Zigbee driver.
@@ -72,8 +74,11 @@ import java.util.Objects;
 @Service
 public class ZigbeeDriverCustomServiceImpl implements DriverCustomService {
 
+    private static final long ATTRIBUTE_TIMEOUT_SECONDS = 5;
+
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final ZigbeeNetworkManagerFactory networkManagerFactory;
 
     @Value("${dc3.driver.code}")
     private String driverCode;
@@ -86,9 +91,11 @@ public class ZigbeeDriverCustomServiceImpl implements DriverCustomService {
      * @param driverMetadata      driver metadata context
      * @param driverSenderService service for sending data to the DC3 platform
      */
-    public ZigbeeDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
+    public ZigbeeDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService,
+                                         ZigbeeNetworkManagerFactory networkManagerFactory) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
+        this.networkManagerFactory = networkManagerFactory;
     }
 
     private static void checkRequired(Map<String, AttributeBO> config, String code,
@@ -107,11 +114,7 @@ public class ZigbeeDriverCustomServiceImpl implements DriverCustomService {
         String serialPort = "/dev/ttyUSB0";
         int baudRate = 115200;
 
-        ZigBeeSerialPort serialPortConn = new ZigBeeSerialPort(serialPort, baudRate,
-                ZigBeeSerialPort.FlowControl.FLOWCONTROL_OUT_XONOFF);
-
-        ZigBeeDongleTelegesis dongle = new ZigBeeDongleTelegesis(serialPortConn);
-        networkManager = new ZigBeeNetworkManager(dongle);
+        networkManager = networkManagerFactory.create(serialPort, baudRate);
 
         // Add network state listener
         networkManager.addNetworkStateListener(state -> {
@@ -243,14 +246,13 @@ public class ZigbeeDriverCustomServiceImpl implements DriverCustomService {
                     driverCode, clusterId);
         }
 
-        // TODO: Verify ZclAttribute read API and return type
         ZclAttribute attribute = cluster.getAttribute(attributeId);
         if (Objects.isNull(attribute)) {
             throw new ReadPointException("Driver Zigbee attribute not found, protocol={}, attributeId={}",
                     driverCode, attributeId);
         }
 
-        Object value = attribute.getLastValue();
+        Object value = attribute.readValue(TimeUnit.SECONDS.toMillis(ATTRIBUTE_TIMEOUT_SECONDS));
         return Objects.nonNull(value) ? String.valueOf(value) : "0";
     }
 
@@ -287,15 +289,29 @@ public class ZigbeeDriverCustomServiceImpl implements DriverCustomService {
                     driverCode, clusterId);
         }
 
-        // TODO: Verify ZclCluster write attribute API and type conversion
         ZclAttribute attribute = cluster.getAttribute(attributeId);
         if (Objects.isNull(attribute)) {
             throw new WritePointException("Driver Zigbee attribute not found, protocol={}, attributeId={}",
                     driverCode, attributeId);
         }
 
-        log.info("Driver Zigbee write completed, protocol={}, nodeIeeeAddress={}, clusterId={}, attributeId={}, value={}",
-                driverCode, nodeIeeeAddress, clusterId, attributeId, value);
+        try {
+            CommandResult result = attribute.writeValue(value).get(ATTRIBUTE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            if (Objects.isNull(result) || !result.isSuccess()) {
+                throw new WritePointException(
+                        "Driver Zigbee attribute write rejected, protocol={}, nodeIeeeAddress={}, attributeId={}",
+                        driverCode, nodeIeeeAddress, attributeId);
+            }
+            log.info("Driver Zigbee write completed, protocol={}, nodeIeeeAddress={}, clusterId={}, attributeId={}",
+                    driverCode, nodeIeeeAddress, clusterId, attributeId);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new WritePointException("Driver Zigbee attribute write interrupted, protocol={}, attributeId={}",
+                    driverCode, attributeId, e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new WritePointException("Driver Zigbee attribute write failed, protocol={}, attributeId={}",
+                    driverCode, attributeId, e);
+        }
     }
 
     @Override

@@ -37,6 +37,7 @@ import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.driver.key.KeyLoader;
+import io.github.pnoker.driver.key.OpcUaKeyLoaderFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
@@ -98,6 +99,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     private static final long FAILURE_BACKOFF_MS = 60_000;
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final OpcUaKeyLoaderFactory keyLoaderFactory;
     @Value("${dc3.driver.code}")
     private String driverCode;
     private Map<Long, OpcUaClient> connectMap;
@@ -135,8 +137,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
         connectMap = new ConcurrentHashMap<>(16);
         failureMap = new ConcurrentHashMap<>(16);
         try {
-            keyLoader = new KeyLoader().load(
-                    java.nio.file.Path.of(System.getProperty("user.dir"), "dc3", "opc-ua"));
+            keyLoader = keyLoaderFactory.load();
         } catch (Exception e) {
             log.warn("OPC UA KeyLoader initialization failed, falling back to anonymous auth", e);
             keyLoader = null;
