@@ -1,0 +1,975 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: ${DC3_LOG_MAX_SIZE:-10M}
+    max-file: "${DC3_LOG_MAX_FILE:-20}"
+
+# =============================================================================
+# docker-compose-scale.yml - the "app" topology rebuilt for horizontal scaling
+# =============================================================================
+#
+# Differences vs docker-compose.yml:
+#   * no container_name / hostname pins      -> `--scale <svc>=N` works
+#   * no per-replica host port publishing    -> replicas never fight over ports
+#   * deploy.resources limits                -> enforced by Docker Compose v2
+#
+# This stack is intentionally NOT self-contained: PostgreSQL and RabbitMQ are
+# singleton stateful services and stay in docker-compose-db.yml. Both files live
+# in dc3/ so they belong to the same compose project and share the dc3net
+# network (dc3-postgres / dc3-rabbitmq DNS aliases). Start the dependency stack
+# first, then bring up the app stack with the replica counts you want:
+#
+#   docker compose -f dc3/docker-compose-db.yml up -d
+#   docker compose -f dc3/docker-compose-scale.yml up -d \
+#       --scale gateway=2 --scale modbus-tcp=2 --scale data=2
+#
+# Scaling semantics (see dc3/doc/DEPLOYMENT.md for details):
+#   * web        - keep replicas at 1 (publishes host ports 8080/8443); put your
+#                  own LB in front if you need more capacity.
+#   * gateway    - the nginx in dc3-web resolves dc3-gateway to every replica and
+#                  round-robins between them (restart web after scaling).
+#   * drivers    - stateless workers: replicas consume the same RabbitMQ queues
+#                  and share manager metadata. Exception: listening-virtual must
+#                  stay at 1 replica (inbound device sockets are connection-pinned).
+#   * centers    - replicas give HA / rolling-update safety. HTTP traffic from the
+#                  gateway is load-balanced by Spring Cloud Gateway; center-to-center
+#                  gRPC uses static DNS targets (one channel per client), so a
+#                  restarted replica is failed over but not request-balanced.
+#
+# Docker Swarm users: use docker-compose-swarm.yml instead (full stack, overlay
+# network, replicas managed with `docker service scale`).
+# =============================================================================
+
+x-app-runtime-env: &app-runtime-env
+  NODE_ENV: test
+  APM_AGENT_ENABLE: ${APM_AGENT_ENABLE:-false}
+  DC3_SECURITY_KEY: ${DC3_SECURITY_KEY:-dc3.security.key.2026.io.github.pnoker}
+  AUTH_HMAC_SECRET: ${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+  POSTGRES_HOST: dc3-postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_USERNAME: ${POSTGRES_USERNAME:-dc3}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-*********}
+  POSTGRES_DB: ${POSTGRES_DB:-dc3}
+  RABBITMQ_VIRTUAL_HOST: ${RABBITMQ_VIRTUAL_HOST:-dc3}
+  RABBITMQ_HOST: dc3-rabbitmq
+  RABBITMQ_PORT: "${RABBITMQ_CONTAINER_PORT:-5672}"
+  RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-dc3}
+  RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-*********}
+  RABBITMQ_SSL_ENABLED: "${RABBITMQ_SSL_ENABLED:-false}"
+  RABBITMQ_SSL_ALGORITHM: "${RABBITMQ_SSL_ALGORITHM:-TLS}"
+  RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE: "${RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE:-false}"
+  RABBITMQ_SSL_VERIFY_HOSTNAME: "${RABBITMQ_SSL_VERIFY_HOSTNAME:-false}"
+  MQTT_BROKER_HOST: dc3-rabbitmq
+  MQTT_BROKER_PORT: "1883"
+  MQTT_USERNAME: ${MQTT_USERNAME:-dc3}
+  MQTT_PASSWORD: ${MQTT_PASSWORD:-*********}
+
+services:
+  web:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-web:${DC3_VERSION:-latest}
+    restart: always
+    depends_on:
+      gateway:
+        condition: service_healthy
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_WEB_HTTP_PORT:-8080}:80"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_WEB_HTTPS_PORT:-8443}:443"
+    environment:
+      - APP_API_HOST=${APP_API_HOST:-dc3-gateway}
+      - APP_API_PORT=${APP_API_PORT:-8000}
+    volumes:
+      - nginx:/var/log/nginx
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1/ >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-web
+
+  gateway:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      auth:
+        condition: service_healthy
+      manager:
+        condition: service_healthy
+      data:
+        condition: service_healthy
+      agentic:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-gateway/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8000/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-gateway
+
+  auth:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-center/dc3-center-auth/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8300/auth/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-center-auth
+
+  manager:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      auth:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-center/dc3-center-manager/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8400/manager/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-center-manager
+
+  data:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      auth:
+        condition: service_healthy
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-center/dc3-center-data/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8500/data/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-center-data
+
+  agentic:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      auth:
+        condition: service_healthy
+      manager:
+        condition: service_healthy
+      data:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+      AGENTIC_FALLBACK_OPENAI_BASE_URL: ${AGENTIC_FALLBACK_OPENAI_BASE_URL:-https://api.openai.com}
+      AGENTIC_FALLBACK_OPENAI_API_KEY: ${AGENTIC_FALLBACK_OPENAI_API_KEY:-}
+      AGENTIC_FALLBACK_OPENAI_MODEL: ${AGENTIC_FALLBACK_OPENAI_MODEL:-gpt-4o}
+      AGENTIC_FALLBACK_OPENAI_TEMPERATURE: ${AGENTIC_FALLBACK_OPENAI_TEMPERATURE:-0.7}
+      AGENTIC_FALLBACK_OPENAI_MAX_TOKENS: ${AGENTIC_FALLBACK_OPENAI_MAX_TOKENS:-2048}
+      AGENTIC_MEMORY_SCHEMA_INIT: ${AGENTIC_MEMORY_SCHEMA_INIT:-never}
+      AGENTIC_MEMORY_ENABLED: ${AGENTIC_MEMORY_ENABLED:-false}
+      AGENTIC_TOOL_CALLING_ENABLED: ${AGENTIC_TOOL_CALLING_ENABLED:-true}
+      AGENTIC_MEMORY_MAX_MESSAGES: ${AGENTIC_MEMORY_MAX_MESSAGES:-50}
+      AGENTIC_ATTACHMENT_STORAGE_PATH: ${AGENTIC_ATTACHMENT_STORAGE_PATH:-dc3/data/agentic/attachments}
+    volumes:
+      - logs:/dc3-center/dc3-center-agentic/dc3/logs
+      - agentic_data:/dc3-center/dc3-center-agentic/dc3/data
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8600/agentic/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-center-agentic
+
+  listening-virtual:
+    # Device ingress (TCP/UDP). Keep replicas at 1: an established device
+    # connection is pinned to one container.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_TCP_PORT:-6270}:6270"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_UDP_PORT:-6271}:6271"
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-listening-virtual/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-listening-virtual/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-listening-virtual
+
+  modbus-tcp:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-modbus-tcp/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-modbus-tcp
+
+  modbus-rtu:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-modbus-rtu/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-modbus-rtu/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-modbus-rtu
+
+  mqtt:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mqtt/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mqtt
+
+  opc-da:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-opc-da/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-opc-da/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-opc-da
+
+  opc-ua:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-opc-ua/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-opc-ua/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-opc-ua
+
+  plcs7:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-plcs7/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-plcs7/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-plcs7
+
+  virtual:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-virtual/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-virtual/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-virtual
+
+  bacnet-ip:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-bacnet-ip:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-bacnet-ip/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-bacnet-ip/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-bacnet-ip
+
+  fins:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-fins:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-fins/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-fins/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-fins
+
+  melsec:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-melsec:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-melsec/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-melsec/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-melsec
+
+  ethernet-ip:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-ethernet-ip/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-ethernet-ip/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-ethernet-ip
+
+  iec104:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec104:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-iec104/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-iec104/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-iec104
+
+  sl651:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sl651:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-sl651/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-sl651/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-sl651
+
+  snmp:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-snmp:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-snmp/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-snmp/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-snmp
+
+  dlms:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlms:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dlms/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dlms/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dlms
+
+  coap:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-coap:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-coap/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-coap/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-coap
+
+  lwm2m:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lwm2m:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-lwm2m/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-lwm2m/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-lwm2m
+
+  http:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-http:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-http/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-http/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-http
+
+  serial:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-serial:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-serial/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-serial/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-serial
+
+  tcp-udp:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-tcp-udp:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-tcp-udp/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-tcp-udp/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-tcp-udp
+
+  mysql:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mysql:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mysql/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mysql/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mysql
+
+  postgresql:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-postgresql:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-postgresql/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-postgresql/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-postgresql
+
+  oracle:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-oracle:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-oracle/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-oracle/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-oracle
+
+  sqlserver:
+    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
+    # queues and the manager metadata).
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sqlserver:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-sqlserver/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-sqlserver/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-sqlserver
+
+volumes:
+  logs:
+  driver_data:
+  agentic_data:
+  nginx:
+
+networks:
+  dc3net:
+    driver: bridge
