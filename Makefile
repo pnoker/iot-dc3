@@ -20,7 +20,8 @@ SHELL := /bin/bash
 
 .PHONY: help env init-env clean package test test-it test-e2e coverage deploy \
 	build up stop down ps logs config pull restart refresh reset \
-	run changelog openapi tag validate-annotations validate-logging validate-postgres-init
+	run changelog openapi tag validate-annotations validate-logging validate-postgres-init \
+	validate-documentation validate-javadoc
 
 ENV_FILE ?= $(firstword $(wildcard .env) .env.example)
 RUNTIME_ENV_FILE ?= dc3/env/dev.env
@@ -102,6 +103,8 @@ help:
 	@printf '  %-24s %s\n' 'make coverage' 'Generate aggregated JaCoCo coverage'
 	@printf '  %-24s %s\n' 'make validate-logging' 'Run backend and frontend logging policy gates'
 	@printf '  %-24s %s\n' 'make validate-postgres-init' 'Validate PostgreSQL initialization schema comments and syntax policy'
+	@printf '  %-24s %s\n' 'make validate-documentation' 'Validate documentation against executable project metadata'
+	@printf '  %-24s %s\n' 'make validate-javadoc' 'Validate public Java API documentation and references'
 	@printf '  %-24s %s\n' 'make run SERVICE=auth' 'Run one Spring Boot service with env auto-loaded'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Compose:'
@@ -178,6 +181,14 @@ validate-logging:
 
 validate-postgres-init:
 	python3 dc3/bin/check_postgres_init.py
+
+validate-documentation:
+	python3 dc3/bin/check_documentation.py
+
+validate-javadoc:
+	$(MVN) -B -DskipTests -pl dc3-common/dc3-common-public -am install
+	$(MVN) -B -DskipTests -Ddoclint=all \
+		-pl dc3-common/dc3-common-constant,dc3-common/dc3-common-public javadoc:javadoc
 
 test-it:
 	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify

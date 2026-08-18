@@ -86,6 +86,27 @@ Common types:
 | `BaseBuilder` | `dc3-common-model` | MapStruct conversion base |
 | `TenantOwned` | `dc3-common-public` | marker for tenant-scoped entities |
 
+### Shared code placement
+
+Place code according to ownership and dependency direction, not Java visibility. A `public` method is not automatically
+shared infrastructure.
+
+- Put framework-neutral contracts, request/pagination/tree entities, tenant markers, and broadly reusable utilities in
+  `dc3-common-public`.
+- Put platform-wide constants and top-level shared domain/wire/persistence enums in `dc3-common-constant`.
+- Put BO/VO/DTO bases, builders, validation groups, extensions, and shared transport models in `dc3-common-model`; those
+  models may reference enums owned by `dc3-common-constant`.
+- Keep framework- or capability-specific public helpers in the narrowest owning module, such as gRPC conversion in
+  `dc3-common-api`, WebFlux helpers in `dc3-common-web`, and RabbitMQ helpers in `dc3-common-rabbitmq`.
+- Keep constants and nested enums used by only one module, protocol, configuration object, or implementation beside
+  that owner. Reserve top-level `*Constant` classes and top-level public enums for `dc3-common-constant`; use a
+  concern-specific local name such as `*Limits`/`*Defaults`, a nested enum, or a private field until the concept becomes
+  a stable cross-module contract.
+- Do not duplicate cross-module wire names, header names, routing identifiers, cache-key fragments, or persistence codes.
+  Define one canonical symbol in `dc3-common-constant` and migrate callers together.
+- Preserve the dependency floor: `dc3-common-constant` must not depend on other DC3 modules, and `dc3-common-public`
+  must not depend on capability modules.
+
 ### Tenant safety
 
 Tenant isolation is a hard requirement.
@@ -234,7 +255,6 @@ pnpm lint:check
 pnpm test:guard
 pnpm test:ci
 pnpm build
-make ci
 ```
 
 Use affected Vitest suites for focused changes and Playwright for browser-level workflows. Coverage thresholds belong in
@@ -255,6 +275,8 @@ make test-it
 make test-e2e
 make coverage
 make changelog
+make validate-documentation
+make validate-javadoc
 ```
 
 For direct Maven work, use the checked-in settings file locally:
@@ -324,6 +346,7 @@ Run checks proportionate to the change:
 - Compose: render/validate every touched configuration.
 - YAML: parse after accounting for Maven placeholders such as `@project.artifactId@`.
 - Agent/docs changes: validate referenced paths, targets, scripts, test selectors, and links.
+- Documentation or public Javadoc changes: run `make validate-documentation` and `make validate-javadoc`.
 
 Report what was verified and what was not verified before handing off public-behaviour changes.
 
@@ -383,6 +406,12 @@ tracked commit-msg validation hook is added.
 - Preserve AGPL headers where they already exist.
 - Prefer existing patterns and helpers over new abstractions.
 - Keep public/user-facing project text in English unless editing a localized document.
+- Document public types and non-override methods with their contract, constraints, nullability, tenant scope,
+  concurrency semantics, or other non-obvious invariants. An inherited contract is sufficient for an
+  `@Override` method. Do not restate the signature or implementation line by line.
+- Keep code comments focused on intent and design constraints. Remove comments that merely narrate the next statement,
+  and update comments in the same change as the behavior they describe.
+- Do not use volatile `@version` Javadoc tags. Use `@since` only when it records a stable public API milestone.
 - Avoid generated metadata churn unless required by the task.
 - Use structured parsers or project toolchains for structured files when practical.
 - Keep multilingual root READMEs structurally aligned.

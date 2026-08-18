@@ -40,7 +40,18 @@ jobs:
       - name: Validate PostgreSQL initialization schema
         run: python3 dc3/bin/check_postgres_init.py
 
+      - name: Validate repository documentation
+        run: python3 dc3/bin/check_documentation.py
+
       - name: Compile
         run: |
           set -euo pipefail
           mvn -U -e -B -DskipTests compile --no-transfer-progress
+
+      - name: Validate Javadoc
+        run: |
+          set -euo pipefail
+          mvn -B -DskipTests -pl dc3-common/dc3-common-public -am install --no-transfer-progress
+          mvn -B -DskipTests -Ddoclint=all \
+            -pl dc3-common/dc3-common-constant,dc3-common/dc3-common-public \
+            javadoc:javadoc --no-transfer-progress
