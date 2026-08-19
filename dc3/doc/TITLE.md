@@ -1,4 +1,4 @@
-# 🚀 IoT DC3 v${SERVICE_VERSION} Released — Fully Open-Source Distributed IoT Platform!
+# 🚀 IoT DC3 v${SERVICE_VERSION} Released — Open-Source, Cloud-Native, AI-Empowered Industrial IoT Platform!
 
 IoT DC3 is a fully open-source, distributed Internet of Things (IoT) platform built on Spring Cloud.
 
