@@ -32,7 +32,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: dc3-{{ $name }}
-          image: "{{ $.Values.image.registry }}/{{ $svc.image }}:{{ $.Values.image.tag }}"
+          image: "{{ $.Values.image.registry }}/{{ $svc.image }}:{{ $svc.tag | default $.Values.image.tag }}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
 {{- if $svc.envFrom }}
           envFrom:

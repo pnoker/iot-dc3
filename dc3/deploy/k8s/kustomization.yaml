@@ -74,8 +74,11 @@ secretGenerator:
 
 # Single place to bump/switch the image tag or registry for every component.
 images:
+  # dc3-web is published only as `latest` and full release versions (e.g.
+  # 2026.6.0) - it has NO series tag. Pin a full release version here for
+  # reproducible production rollouts.
   - name: pnoker/dc3-web
-    newTag: 2026.6
+    newTag: latest
   - name: pnoker/dc3-gateway
     newTag: 2026.6
   - name: pnoker/dc3-center-auth

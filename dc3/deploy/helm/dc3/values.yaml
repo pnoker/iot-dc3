@@ -102,6 +102,10 @@ services:
   web:
     enabled: true
     image: dc3-web
+    # dc3-web is published only as `latest` and full release versions (e.g.
+    # 2026.6.0) - it has NO series tag, so it overrides the global image.tag.
+    # Pin a full release version for reproducible production rollouts.
+    tag: latest
     replicas: 1
     envFrom: false
     httpPort: 80

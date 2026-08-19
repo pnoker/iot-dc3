@@ -24,7 +24,8 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: dc3-web
-          image: pnoker/dc3-web:2026.6
+          # dc3-web has no series tag - latest or a full release version only
+          image: pnoker/dc3-web:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: APP_API_HOST

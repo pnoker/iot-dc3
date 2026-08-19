@@ -40,7 +40,7 @@ helm upgrade --install dc3 . -f values-production.yaml   --set image.registry=my
 
 | Value | Default | Meaning |
 |-------|---------|---------|
-| `image.registry` / `image.tag` | `pnoker` / `2026.6` | image source for every component |
+| `image.registry` / `image.tag` | `pnoker` / `2026.6` | image source for every component (`services.web.tag` overrides: web has no series tag) |
 | `secrets.*` | weak public defaults | **replace before production** |
 | `existingSecret` | `""` | use your own Secret instead of the chart-owned one |
 | `services.<name>.replicas` | per service | replica count per stateless service |
