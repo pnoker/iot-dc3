@@ -1,34 +1,36 @@
 # IoT DC3 Documentation
 
-> 大部分文档已迁移到项目文档站。本目录仅保留 release 流程依赖的源文件。
+> Most documentation has migrated to the project documentation site. This directory keeps
+> only the source files the release process depends on.
 
-## 在线文档
+## Online documentation
 
-- 在线文档：<https://docs.dc3.site/>
-- 文档站源文件仓库：[pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs)
+- Documentation site: <https://docs.dc3.site/>
+- Documentation source repository: [pnoker/iot-dc3-docs](https://github.com/pnoker/iot-dc3-docs)
 
-## 仍保留在本目录的文件（被 CI 直接引用，请勿迁移）
+## Files retained in this directory (referenced directly by CI - do not migrate)
 
-| 文件                       | 用途                                                                              |
-|----------------------------|-----------------------------------------------------------------------------------|
-| [`TITLE.md`](./TITLE.md)   | release 标题与简介，由 `.github/workflows/docker-ci.yml` 拼入 GitHub Release body |
-| [`CHANGE.md`](./CHANGE.md) | 版本变更日志，由 `dc3/bin/changelog.py` 写入，docker-ci 拼入 release body         |
-| [`USAGE.md`](./USAGE.md)   | 镜像使用说明，docker-ci 拼入 release body                                         |
+| File                          | Purpose                                                                            |
+|-------------------------------|------------------------------------------------------------------------------------|
+| [`TITLE.md`](./TITLE.md)      | Release title and summary, assembled into the GitHub Release body by `.github/workflows/docker-ci.yml` |
+| [`CHANGE.md`](./CHANGE.md)    | Version changelog, written by `dc3/bin/changelog.py` and assembled into the Release body by docker-ci |
+| [`USAGE.md`](./USAGE.md)      | Image usage guide, assembled into the Release body by docker-ci                    |
+| [`DEPLOYMENT.md`](./DEPLOYMENT.md) | Full deployment runbook (compose scale / swarm / k8s / helm); linked from `USAGE.md` and snapshotted into the docs site by `scripts/sync-external.sh` in the docs repository |
 
-文档站里的 [变更日志](https://docs.dc3.site/zh/development/changelog)
-与 [镜像与部署](https://docs.dc3.site/zh/guide/usage) 通过 VitePress 的
-`<!--@include:-->` 语法直接引用上述源文件，保持单一信源。
+The documentation site embeds the [changelog](https://docs.dc3.site/en/development/changelog)
+and [images & deployment](https://docs.dc3.site/en/guide/usage) pages from the files above
+through VitePress `<!--@include:-->` syntax, keeping a single source of truth.
 
-## 已迁移到文档站的旧路径对照
+## Old paths migrated to the documentation site
 
-| 旧路径                        | 新位置                                                            |
-|-------------------------------|-------------------------------------------------------------------|
-| `dc3/doc/QUICKSTART.md`       | [快速开始](https://docs.dc3.site/zh/quickstart/)                  |
-| `dc3/doc/ENVIRONMENT.md`      | [环境变量](https://docs.dc3.site/zh/quickstart/environment)       |
-| `dc3/doc/LOGGING.md`          | [日志规范](https://docs.dc3.site/zh/guide/logging)                |
-| `dc3/doc/TROUBLESHOOTING.md`  | [故障排查](https://docs.dc3.site/zh/guide/troubleshooting)        |
-| `dc3/doc/MODULES.md`          | [模块与依赖](https://docs.dc3.site/zh/architecture/modules)       |
-| `dc3/doc/DRIVER-AUTHORING.md` | [驱动开发](https://docs.dc3.site/zh/development/driver-authoring) |
-| `dc3/doc/TESTING.md`          | [测试](https://docs.dc3.site/zh/development/testing)              |
+| Old path                    | New location                                                              |
+|------------------------------|---------------------------------------------------------------------------|
+| `dc3/doc/QUICKSTART.md`      | [Quick Start](https://docs.dc3.site/en/quickstart/)                       |
+| `dc3/doc/ENVIRONMENT.md`     | [Environment Variables](https://docs.dc3.site/en/quickstart/environment)  |
+| `dc3/doc/LOGGING.md`         | [Logging Conventions](https://docs.dc3.site/en/guide/logging)             |
+| `dc3/doc/TROUBLESHOOTING.md` | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)         |
+| `dc3/doc/MODULES.md`         | [Modules & Dependencies](https://docs.dc3.site/en/architecture/modules)   |
+| `dc3/doc/DRIVER-AUTHORING.md`| [Driver Authoring](https://docs.dc3.site/en/development/driver-authoring)|
+| `dc3/doc/TESTING.md`         | [Testing](https://docs.dc3.site/en/development/testing)                   |
 
-如果你是从外部链接跳转到此页面，请更新书签到对应的新地址。
+If an external link brought you here, please update your bookmark to the new address.
