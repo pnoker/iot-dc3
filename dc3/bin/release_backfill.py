@@ -220,8 +220,11 @@ def main() -> int:
             run(["gh", "release", "edit", f"v{plan.version}", "--notes-file", notes])
             print(f"refreshed v{plan.version}")
         else:
+            # --latest=false: creating a release through the API can otherwise
+            # move the repository's `latest` pointer when the new tag sorts
+            # highest; the real latest stays whatever CI published last.
             run(["gh", "release", "create", f"v{plan.version}", "--target", plan.commit,
-                 "--title", plan.version, "--notes-file", notes])
+                 "--latest=false", "--title", plan.version, "--notes-file", notes])
             print(f"created v{plan.version}")
         time.sleep(1)
     verb = "refreshed" if args.refresh else "created"
