@@ -1,5 +1,8 @@
 ## 🚀 Quick Start
 
+> Prerequisites and the full walkthrough - from environment setup to your first device - live at
+> **<https://docs.dc3.site/en/quickstart/>**.
+
 ```bash
 # Docker Hub (global)
 cd iot-dc3
