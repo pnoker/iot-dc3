@@ -22,7 +22,8 @@ SHELL := /bin/bash
 	build up stop down ps logs config pull restart refresh reset \
 	run changelog openapi tag validate-annotations validate-logging validate-postgres-init \
 	validate-documentation validate-javadoc \
-	stack-deploy stack-rm stack-ps k8s-apply k8s-delete helm-install helm-uninstall
+	stack-deploy stack-rm stack-ps k8s-apply k8s-delete helm-install helm-uninstall \
+	release-backfill release-backfill-apply release-backfill-refresh
 
 ENV_FILE ?= $(firstword $(wildcard .env) .env.example)
 RUNTIME_ENV_FILE ?= dc3/env/dev.env
@@ -323,6 +324,22 @@ helm-uninstall:
 
 changelog:
 	@FROM="$(FROM)" TO="$(TO)" VERSION="$(VERSION)" CHANGE_FILE="$(CHANGE_FILE)" dc3/bin/changelog.py
+
+# Backfill GitHub Releases for CHANGE.md versions that were never released.
+# Dry-run lists the gap; release-backfill-apply creates them through the API
+# (tags created via API do not trigger the Docker Images workflow, and the
+# 'latest' pointer is never moved). Requires gh authenticated.
+release-backfill:
+	python3 dc3/bin/release_backfill.py
+
+release-backfill-apply:
+	python3 dc3/bin/release_backfill.py --apply
+
+# Re-render the release bodies of backfilled releases (e.g. after TITLE.md or
+# RELEASE-FOOTER.md evolves). Never touches tags, targets, or the 'latest'
+# pointer; CI-published releases (dc3.release.* tags) are left alone.
+release-backfill-refresh:
+	python3 dc3/bin/release_backfill.py --refresh --apply
 
 # Export each center's OpenAPI JSON from a running stack (dev/test profile).
 # OPENAPI_BASE overrides the gateway URL; OPENAPI_OUT the output directory.

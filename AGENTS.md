@@ -375,6 +375,12 @@ The root `pom.xml` version is the release identity. After committing the version
 or create a GitHub Release directly. The `Docker Images` workflow owns release verification, image publishing, and
 GitHub Release creation. Keep its `release` environment protected with required reviewers and tag restrictions.
 
+If a version lands in `CHANGE.md` without a matching GitHub Release, backfill it with `make release-backfill`
+(dry-run) or `make release-backfill-apply`. The tool maps date-formatted versions to same-day commits, assembles
+the standard release body (TITLE.md + changelog block + RELEASE-FOOTER.md quick start that links docs.dc3.site),
+and creates tags through the API - no image publishing, no `latest` pointer change. After TITLE.md or
+RELEASE-FOOTER.md evolves, `make release-backfill-refresh` re-renders existing backfilled release bodies.
+
 ## Commit rules
 
 AI coding agents must not commit without explicit confirmation for that specific commit.

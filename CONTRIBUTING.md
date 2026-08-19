@@ -117,6 +117,23 @@ credentials. A manual workflow run performs a non-publishing build unless it tar
 Generated changelog-only release commits are skipped by default so rerunning the command after committing
 `CHANGE.md` remains stable. Set `INCLUDE_CHANGELOG_COMMITS=true` only when those commits should appear in release notes.
 
+### Backfilling Missing Releases
+
+Every version recorded in `CHANGE.md` should end up with a GitHub Release. When a release window is skipped (a
+version is committed to `CHANGE.md` but never tagged), close the gap without re-tagging history:
+
+```bash
+make release-backfill          # dry-run: list CHANGE.md versions that have no release
+make release-backfill-apply    # create them (gh CLI, authenticated)
+```
+
+The tool maps each date-formatted version to the last commit dated on or before that version day, assembles the
+release body from `TITLE.md` + the version's changelog block + the `RELEASE-FOOTER.md` quick start (deep usage and
+deployment content lives on docs.dc3.site), and creates the tag through the GitHub API — which does **not** trigger
+the `Docker Images` workflow and never moves the `latest` pointer. When `TITLE.md` or `RELEASE-FOOTER.md` evolves,
+`make release-backfill-refresh` re-renders the bodies of already-backfilled releases. Run the dry-run periodically to
+catch drift between `CHANGE.md` and the release list.
+
 ## Coding Guidelines
 
 - Follow the existing package structure, naming, validation, exception, logging, and facade patterns.

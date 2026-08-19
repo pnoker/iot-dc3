@@ -269,7 +269,7 @@ jobs:
             echo ""
             perl -pe 's/\$\{SERVICE_VERSION\}/$ENV{SERVICE_VERSION}/g' "$SERVICE_WORKSPACE/dc3/doc/CHANGE.md"
             echo ""
-            perl -pe 's/\$\{SERVICE_VERSION\}/$ENV{SERVICE_VERSION}/g' "$SERVICE_WORKSPACE/dc3/doc/USAGE.md"
+            perl -pe 's/\$\{SERVICE_VERSION\}/$ENV{SERVICE_VERSION}/g' "$SERVICE_WORKSPACE/dc3/doc/RELEASE-FOOTER.md"
             echo "RELEASE_NOTES_EOF"
           } >> "$GITHUB_OUTPUT"
 
