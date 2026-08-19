@@ -50,6 +50,13 @@ images** `dc3-postgres` and `dc3-rabbitmq` are built locally by
 DC3_IMAGE_REGISTRY=my.registry/dc3 ./dc3/deploy/k8s/scripts/push-images.sh
 ```
 
+Tag layout differs per image family: the backend images (gateway, centers, drivers) are
+published as `latest`, the series tag (`2026.6`), and the full version (`2026.6.0`), while
+`dc3-web` is published only as `latest` and full release versions (no series tag). The
+deployment configs already account for this - web pins `latest` with a documented override
+(`services.web.tag` in Helm, the `images:` block in kustomize); pin a full release version
+for `dc3-web` when you need reproducible rollouts.
+
 ## 3. Mode 0 - single host (Compose)
 
 ```bash
@@ -202,8 +209,10 @@ Apply every item before connecting real devices:
 6. **Network** - restrict egress with firewall/NetworkPolicies (centers need the LLM
    endpoint; everything else is internal), keep backend ports off the host, enable
    Pod Security Admission `baseline` on k8s.
-7. **API surface** - Swagger/OpenAPI is disabled on the `pro` profile (release images
-   are built with `PROFILE=pro`); verify no debug endpoints are reachable.
+7. **API surface** - Swagger/OpenAPI is disabled on the `pro` profile. Release images are
+   built with `PROFILE=pro`, and at runtime every deployment config selects the profile via
+   `NODE_ENV` (`test` by default; set `NODE_ENV=pro` for the hardened profile - OpenAPI/Swagger
+   UI off, weak secrets rejected). Verify no debug endpoints are reachable.
 
 ## 9. Common questions
 
@@ -216,6 +225,11 @@ Apply every item before connecting real devices:
   workers over shared RabbitMQ queues). No for `listening-virtual`, which owns inbound
   device sockets - keep it at 1 replica.
 - **PostgreSQL/RabbitMQ replicas?** Not supported by these configs - they are
-  stateful singletons. For HA run managed services and point the ConfigMap/env at them.
+  stateful singletons. For HA run managed services (or your own cluster) and override the
+  host variables: `POSTGRES_HOST`, `RABBITMQ_HOST`, `MQTT_BROKER_HOST` (plus
+  `CENTER_*_HOST`/`APP_API_HOST` if you also move the services). Self-managed replacements
+  must provide what the bundled images provide: PostgreSQL with the AGE, TimescaleDB and
+  pgvector extensions (plus the seed SQL on first start), RabbitMQ with the MQTT plugin and
+  the `dc3.e.mqtt` exchange.
 - **Do the k8s/helm configs need the dependency images?** Yes; build and push them with
   `scripts/push-images.sh` (or `kind load` on single-node clusters).
