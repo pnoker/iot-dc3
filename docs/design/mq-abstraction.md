@@ -2,7 +2,7 @@
 
 |                |                                                                                   |
 |----------------|-----------------------------------------------------------------------------------|
-| **Status**     | Proposed — not yet implemented                                                     |
+| **Status**     | Phases 1–3 delivered: port + rabbitmq / kafka / activemq / mqtt adapters TCK-certified; rocketmq adapter pending certification, pulsar pending |
 | **Date**       | 2026-08-17, revised 2026-08-19 (re-verified after commit `956de3dd3`; MQTT decoupling) |
 | **Scope**      | `dc3-common-*` messaging layer (center ↔ driver async plane)                       |
 | **Target**     | RabbitMQ (default), Kafka, RocketMQ, Pulsar, ActiveMQ (Artemis / Classic), MQTT 5 (EMQX / HiveMQ / NanoMQ / …) |
@@ -544,17 +544,28 @@ lease/ownership before dispatch.
 
 ## 9. Capability matrix (published, per adapter)
 
-| Capability | RabbitMQ | Kafka | RocketMQ | Pulsar | ActiveMQ | MQTT 5 |
+Implementation status (2026-08-19): rabbitmq, kafka, activemq (Artemis) and mqtt 5
+adapters are implemented and certified by the TCK against live brokers; rocketmq is
+implemented but pending certification (fresh-consumer-group offset isolation under
+investigation); pulsar is pending. Certified columns below reflect the implemented
+behavior (e.g. rabbit delays arbitrary messages through the port fallback, rocketmq
+native delay levels would quantize requested durations).
+
+| Capability | RabbitMQ ✅ | Kafka ✅ | ActiveMQ ✅ | MQTT 5 ✅ | RocketMQ (pending) | Pulsar (pending) |
 |------------|----------|-------|----------|--------|----------|--------|
-| Delayed message | ✅ TTL+DLX | ❌ → local fallback | ✅ native | ✅ native | ✅ scheduled | ❌ → local fallback |
-| Native DLQ | ✅ DLX | adapter topic | ✅ built-in | ✅ policy | ✅ policy | adapter topic |
-| Broadcast | ✅ | ✅ (instance groups) | ✅ | ✅ | ✅ | ✅ |
-| Per-message ack | ✅ | offset (approx) | ✅ | ✅ | ✅ | ✅ (QoS 1) |
-| Publisher confirm | ✅ | ✅ (acks=all) | ✅ | ✅ | ❌ best-effort (outbox covers it, §8.4) | ✅ (PUBACK) |
-| Batch delivery | ✅ native | ✅ native | ✅ native | ✅ native | ⚠️ synthesized | ⚠️ synthesized |
-| Per-key ordering | ❌ | ✅ | ✅ (per queue) | ✅ (key_shared) | ❌ | ❌ |
-| Subscription expiry | ✅ x-expires | ❌ documented | ⚠️ group config | ⚠️ policy | ❌ documented | ⚠️ session expiry |
-| Retention | queue TTL | retention config | retention | retention/TTL | TTL policy | message expiry |
+| Delayed message | fallback* | ❌ → local fallback | ✅ JMS scheduled | ❌ → local fallback | fallback (levels quantize) | ✅ native |
+| Native DLQ | DLX + quarantine | adapter `.dlq` topic | adapter `.dlq` queue | adapter `/dlq` topic | adapter `-dlq` topic | ✅ policy |
+| Broadcast | ✅ per-instance queue | ✅ (instance groups) | ✅ topic consumer | ✅ plain filter | ✅ BROADCASTING | ✅ |
+| Per-message ack | ✅ | offset (approx) | ✅ client ack | ✅ QoS 1 | ✅ | ✅ |
+| Publisher confirm | ✅ confirms | ✅ (acks=all) | ❌ best-effort (outbox covers it, §8.4) | ✅ (PUBACK) | ✅ sync send | ✅ |
+| Batch delivery | ✅ native | ✅ native | ⚠️ synthesized | ⚠️ synthesized | ✅ consumer batch | ✅ batch receive |
+| Per-key ordering | ❌ | ✅ | ❌ | ❌ | ✅ (per queue) | ✅ (key_shared) |
+| Subscription expiry | ✅ x-expires | ❌ documented | ❌ documented | ❌ documented | ❌ documented | ⚠️ session expiry |
+| Group durability offline | ✅ durable queue | ✅ log retention | ✅ durable subscription | ⚠️ broker-dependent (§13.8) | ✅ offsets | ✅ |
+| Retention | queue TTL | retention config | subscription retention | broker-dependent | retention | retention/TTL |
+
+\* rabbit intrinsic TTL+DLX delays (STATE_TIMEOUT / DEVICE_SCAN) work server-side as
+before; arbitrary per-message delays use the port fallback (capability false).
 
 This table is user-facing documentation ("which broker should I pick?") and the startup
 negotiation log summarizes it per deployment.
