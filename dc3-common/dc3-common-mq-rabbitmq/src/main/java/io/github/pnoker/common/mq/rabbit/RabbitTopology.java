@@ -24,12 +24,23 @@ import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 
+import java.util.List;
+import java.util.Objects;
+
+import java.util.List;
+
 /**
  * Declares the physical RabbitMQ topology (exchanges, queues, bindings) with arguments
  * byte-for-byte identical to the pre-port {@code ExchangeConfig}/{@code DataTopicConfig}
  * layout: same names, same TTLs, same dead-letter wiring, same binding arguments. All
  * declarations are idempotent, so a rolling deployment across mixed versions converges
  * on the same topology.
+ *
+ * <p>Platform-shared queues have a descriptor table; a subscription carrying a non-blank
+ * {@code group} gets a group-suffixed copy of the same queue (same arguments, same
+ * binding). The blank-group names are exactly the pre-port ones, so production
+ * deployments are unchanged — the suffix exists for named consumer groups and for
+ * contract-test isolation.
  *
  * @author pnoker
  * @since 2026.8.19
@@ -40,6 +51,57 @@ public final class RabbitTopology {
      * Binding argument carried over from the pre-port layout; kept for wire identity.
      */
     private static final String BINDING_AUTO_DELETE = "x-auto-delete";
+
+    /**
+     * Descriptor of a platform-shared queue.
+     *
+     * @param queueName     queue name
+     * @param exchangeName  source exchange
+     * @param routingKey    binding routing key (pattern)
+     * @param ttlMillis     per-queue message TTL, 0 = none
+     * @param deadExchange  dead-letter exchange, null = none
+     * @param deadRouting   dead-letter routing key
+     * @param bindingArgument whether the binding carries the x-auto-delete argument
+     */
+    private record SharedQueue(String queueName, String exchangeName, String routingKey, int ttlMillis,
+                               String deadExchange, String deadRouting, boolean bindingArgument) {
+    }
+
+    private static final List<SharedQueue> SHARED_QUEUES = List.of(
+            new SharedQueue(RabbitNames.QUEUE_DRIVER_STATE, RabbitNames.EXCHANGE_STATE,
+                    "dc3.r.state.driver.*", 30_000, null, null, true),
+            new SharedQueue(RabbitNames.QUEUE_DEVICE_STATE, RabbitNames.EXCHANGE_STATE,
+                    "dc3.r.state.device.*", 30_000, null, null, true),
+            new SharedQueue(RabbitNames.QUEUE_DRIVER_ALARM, RabbitNames.EXCHANGE_ALARM,
+                    "dc3.r.alarm.driver.*", 30_000, null, null, true),
+            new SharedQueue(RabbitNames.QUEUE_DEVICE_ALARM, RabbitNames.EXCHANGE_ALARM,
+                    "dc3.r.alarm.device.*", 30_000, null, null, true),
+            new SharedQueue(RabbitNames.QUEUE_POINT_VALUE, RabbitNames.EXCHANGE_VALUE,
+                    "dc3.r.value.point.*", 604_800_000, RabbitNames.EXCHANGE_POINT_VALUE_DEAD, "#", true),
+            new SharedQueue(RabbitNames.QUEUE_POINT_VALUE_DEAD, RabbitNames.EXCHANGE_POINT_VALUE_DEAD,
+                    "#", 0, null, null, false),
+            new SharedQueue(RabbitNames.QUEUE_NOTIFY_TASK, RabbitNames.EXCHANGE_ALARM,
+                    "dc3.r.notify.task.*", 86_400_000, null, null, true),
+            new SharedQueue(RabbitNames.QUEUE_DRIVER_TIMEOUT_DELAY, RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY,
+                    RabbitNames.ROUTING_DRIVER_TIMEOUT_DELAY, 45_000,
+                    RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK, RabbitNames.ROUTING_DRIVER_TIMEOUT_CHECK, false),
+            new SharedQueue(RabbitNames.QUEUE_DRIVER_TIMEOUT_CHECK, RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
+                    RabbitNames.ROUTING_DRIVER_TIMEOUT_CHECK, 0, null, null, false),
+            new SharedQueue(RabbitNames.QUEUE_DEVICE_SCAN_TICK, RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY,
+                    RabbitNames.ROUTING_DEVICE_SCAN_TICK, 10_000,
+                    RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK, RabbitNames.ROUTING_DEVICE_SCAN, false),
+            new SharedQueue(RabbitNames.QUEUE_DEVICE_SCAN, RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
+                    RabbitNames.ROUTING_DEVICE_SCAN, 0, null, null, false),
+            new SharedQueue(RabbitNames.QUEUE_POINT_COMMAND_DEAD, RabbitNames.EXCHANGE_POINT_COMMAND_DEAD,
+                    "#", 0, null, null, false),
+            new SharedQueue(RabbitNames.QUEUE_COMMAND_DEAD, RabbitNames.EXCHANGE_COMMAND_DEAD,
+                    "#", 0, null, null, false),
+            new SharedQueue(RabbitNames.QUEUE_POINT_COMMAND_RESULT, RabbitNames.EXCHANGE_POINT_COMMAND_RESULT,
+                    "dc3.r.point_command_result.*", 60_000, null, null, false),
+            new SharedQueue(RabbitNames.QUEUE_COMMAND_RESULT, RabbitNames.EXCHANGE_COMMAND_RESULT,
+                    RabbitNames.ROUTING_COMMAND_RESULT_PREFIX + "*", 60_000, null, null, false),
+            new SharedQueue(RabbitNames.QUEUE_EVENT_REPORT, RabbitNames.EXCHANGE_EVENT,
+                    RabbitNames.ROUTING_EVENT_PREFIX + "*", 60_000, null, null, false));
 
     private RabbitTopology() {
         throw new IllegalStateException("Utility class");
@@ -52,78 +114,34 @@ public final class RabbitTopology {
      * @param admin the rabbit admin to declare through
      */
     public static void declareSharedTopology(RabbitAdmin admin) {
-        TopicExchange state = declareExchange(admin, RabbitNames.EXCHANGE_STATE);
-        TopicExchange alarm = declareExchange(admin, RabbitNames.EXCHANGE_ALARM);
-        TopicExchange metadata = declareExchange(admin, RabbitNames.EXCHANGE_METADATA);
-        TopicExchange pointCommand = declareExchange(admin, RabbitNames.EXCHANGE_POINT_COMMAND);
-        TopicExchange value = declareExchange(admin, RabbitNames.EXCHANGE_VALUE);
-        TopicExchange timeoutDelay = declareExchange(admin, RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY);
-        TopicExchange timeoutCheck = declareExchange(admin, RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK);
-        TopicExchange command = declareExchange(admin, RabbitNames.EXCHANGE_COMMAND);
-        TopicExchange commandResult = declareExchange(admin, RabbitNames.EXCHANGE_COMMAND_RESULT);
-        TopicExchange commandDead = declareExchange(admin, RabbitNames.EXCHANGE_COMMAND_DEAD);
-        TopicExchange event = declareExchange(admin, RabbitNames.EXCHANGE_EVENT);
-        TopicExchange pointValueDead = declareExchange(admin, RabbitNames.EXCHANGE_POINT_VALUE_DEAD);
-        TopicExchange pointCommandDead = declareExchange(admin, RabbitNames.EXCHANGE_POINT_COMMAND_DEAD);
-        declareExchange(admin, RabbitNames.EXCHANGE_POINT_COMMAND_RESULT);
+        for (String exchange : new String[]{
+                RabbitNames.EXCHANGE_STATE, RabbitNames.EXCHANGE_ALARM, RabbitNames.EXCHANGE_METADATA,
+                RabbitNames.EXCHANGE_POINT_COMMAND, RabbitNames.EXCHANGE_VALUE,
+                RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY, RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
+                RabbitNames.EXCHANGE_COMMAND, RabbitNames.EXCHANGE_COMMAND_RESULT,
+                RabbitNames.EXCHANGE_COMMAND_DEAD, RabbitNames.EXCHANGE_EVENT,
+                RabbitNames.EXCHANGE_POINT_VALUE_DEAD, RabbitNames.EXCHANGE_POINT_COMMAND_DEAD,
+                RabbitNames.EXCHANGE_POINT_COMMAND_RESULT}) {
+            admin.declareExchange(new TopicExchange(exchange, true, false));
+        }
+        SHARED_QUEUES.forEach(def -> declare(admin, def, def.queueName()));
+    }
 
-        // state / alarm queues, 30 s TTL (these bindings carry the x-auto-delete argument)
-        bind(admin, QueueBuilder.durable(RabbitNames.QUEUE_DRIVER_STATE).ttl(30_000).build(),
-                state, "dc3.r.state.driver.*");
-        bind(admin, QueueBuilder.durable(RabbitNames.QUEUE_DEVICE_STATE).ttl(30_000).build(),
-                state, "dc3.r.state.device.*");
-        bind(admin, QueueBuilder.durable(RabbitNames.QUEUE_DRIVER_ALARM).ttl(30_000).build(),
-                alarm, "dc3.r.alarm.driver.*");
-        bind(admin, QueueBuilder.durable(RabbitNames.QUEUE_DEVICE_ALARM).ttl(30_000).build(),
-                alarm, "dc3.r.alarm.device.*");
-
-        // point value: 7 d TTL then dead-letter to the quarantine exchange
-        bind(admin, QueueBuilder.durable(RabbitNames.QUEUE_POINT_VALUE)
-                        .ttl(604_800_000)
-                        .deadLetterExchange(RabbitNames.EXCHANGE_POINT_VALUE_DEAD)
-                        .deadLetterRoutingKey("#")
-                        .build(),
-                value, "dc3.r.value.point.*");
-        bindPlain(admin, QueueBuilder.durable(RabbitNames.QUEUE_POINT_VALUE_DEAD).build(), pointValueDead, "#");
-
-        // notify task: 24 h TTL guard against runaway outbound backlog
-        bind(admin, QueueBuilder.durable(RabbitNames.QUEUE_NOTIFY_TASK).ttl(86_400_000).build(),
-                alarm, "dc3.r.notify.task.*");
-
-        // driver timeout delay chain (45 s TTL + DLX)
-        bindPlain(admin, QueueBuilder.durable(RabbitNames.QUEUE_DRIVER_TIMEOUT_DELAY)
-                        .ttl(45_000)
-                        .deadLetterExchange(RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK)
-                        .deadLetterRoutingKey(RabbitNames.ROUTING_DRIVER_TIMEOUT_CHECK)
-                        .build(),
-                timeoutDelay, RabbitNames.ROUTING_DRIVER_TIMEOUT_DELAY);
-        bindPlain(admin, QueueBuilder.durable(RabbitNames.QUEUE_DRIVER_TIMEOUT_CHECK).build(),
-                timeoutCheck, RabbitNames.ROUTING_DRIVER_TIMEOUT_CHECK);
-
-        // device scan tick chain (10 s TTL + DLX)
-        bindPlain(admin, QueueBuilder.durable(RabbitNames.QUEUE_DEVICE_SCAN_TICK)
-                        .ttl(10_000)
-                        .deadLetterExchange(RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK)
-                        .deadLetterRoutingKey(RabbitNames.ROUTING_DEVICE_SCAN)
-                        .build(),
-                timeoutDelay, RabbitNames.ROUTING_DEVICE_SCAN_TICK);
-        bindPlain(admin, QueueBuilder.durable(RabbitNames.QUEUE_DEVICE_SCAN).build(),
-                timeoutCheck, RabbitNames.ROUTING_DEVICE_SCAN);
-
-        // dead letters and results (plain bindings, no binding argument)
-        bindPlain(admin, QueueBuilder.durable(RabbitNames.QUEUE_POINT_COMMAND_DEAD).build(), pointCommandDead, "#");
-        bindPlain(admin, QueueBuilder.durable(RabbitNames.QUEUE_COMMAND_DEAD).build(), commandDead, "#");
-        bindPlain(admin, QueueBuilder.durable(RabbitNames.QUEUE_POINT_COMMAND_RESULT).ttl(60_000).build(),
-                declareExchange(admin, RabbitNames.EXCHANGE_POINT_COMMAND_RESULT),
-                "dc3.r.point_command_result.*");
-        bindPlain(admin, QueueBuilder.durable(RabbitNames.QUEUE_COMMAND_RESULT).ttl(60_000).build(),
-                commandResult, RabbitNames.ROUTING_COMMAND_RESULT_PREFIX + "*");
-        bindPlain(admin, QueueBuilder.durable(RabbitNames.QUEUE_EVENT_REPORT).ttl(60_000).build(),
-                event, RabbitNames.ROUTING_EVENT_PREFIX + "*");
-
-        // metadata / point command / command exchanges are also consumed by per-instance
-        // driver queues declared on subscribe; the exchanges above are already declared.
-        assert metadata != null && pointCommand != null && command != null;
+    /**
+     * Declare a group-suffixed copy of a platform-shared queue (same arguments, same
+     * binding) for named consumer groups; used by the contract suite for isolation.
+     *
+     * @param admin     rabbit admin
+     * @param baseQueue base queue name from {@link RabbitNames}
+     * @param group     consumer group suffix
+     * @return the suffixed queue name
+     */
+    public static String declareGroupedQueue(RabbitAdmin admin, String baseQueue, String group) {
+        SHARED_QUEUES.stream()
+                .filter(def -> def.queueName().equals(baseQueue))
+                .findFirst()
+                .ifPresent(def -> declare(admin, def, baseQueue + "." + group));
+        return baseQueue + "." + group;
     }
 
     /**
@@ -173,21 +191,22 @@ public final class RabbitTopology {
         admin.declareBinding(binding);
     }
 
-    private static TopicExchange declareExchange(RabbitAdmin admin, String name) {
-        TopicExchange exchange = new TopicExchange(name, true, false);
-        admin.declareExchange(exchange);
-        return exchange;
-    }
-
-    private static void bind(RabbitAdmin admin, Queue queue, TopicExchange exchange, String routingKey) {
-        Binding binding = BindingBuilder.bind(queue).to(exchange).with(routingKey);
-        binding.addArgument(BINDING_AUTO_DELETE, false);
+    private static void declare(RabbitAdmin admin, SharedQueue def, String queueName) {
+        QueueBuilder builder = QueueBuilder.durable(queueName);
+        if (def.ttlMillis() > 0) {
+            builder.ttl(def.ttlMillis());
+        }
+        if (Objects.nonNull(def.deadExchange())) {
+            builder.deadLetterExchange(def.deadExchange()).deadLetterRoutingKey(def.deadRouting());
+        }
+        Queue queue = builder.build();
+        Binding binding = BindingBuilder.bind(queue)
+                .to(new TopicExchange(def.exchangeName()))
+                .with(def.routingKey());
+        if (def.bindingArgument()) {
+            binding.addArgument(BINDING_AUTO_DELETE, false);
+        }
         admin.declareQueue(queue);
         admin.declareBinding(binding);
-    }
-
-    private static void bindPlain(RabbitAdmin admin, Queue queue, TopicExchange exchange, String routingKey) {
-        admin.declareQueue(queue);
-        admin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(routingKey));
     }
 }

@@ -42,6 +42,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.api.ChannelAwareBatchMessageListener;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.amqp.rabbit.retry.MessageBatchRecoverer;
 import org.aopalliance.aop.Advice;
@@ -98,7 +99,10 @@ public class RabbitMqAdapter implements BrokerAdapter {
 
     @Override
     public BrokerCapabilities capabilities() {
-        return new BrokerCapabilities(true, true, true, true, true, true, true, OrderingGuarantee.NONE);
+        // delayedMessage=false: only the intrinsic TTL+DLX topics (STATE_TIMEOUT,
+        // DEVICE_SCAN) delay server-side, and their senders do not set message delays.
+        // Arbitrary per-message delays go through the port's local-scheduler fallback.
+        return new BrokerCapabilities(false, true, true, true, true, true, true, OrderingGuarantee.NONE);
     }
 
     @Override
@@ -148,17 +152,8 @@ public class RabbitMqAdapter implements BrokerAdapter {
         container.setBatchSize(batchProperties.getBatchSize());
         container.setBatchReceiveTimeout(batchProperties.getReceiveTimeoutMillis());
         container.setAdviceChain(batchRetryAdvice());
-        container.setMessageListener(new ChannelAwareMessageListener() {
-            @Override
-            public void onMessage(Message message, Channel channel) {
-                handleBatch(List.of(message), channel, listener);
-            }
-
-            @Override
-            public void onMessageBatch(List<Message> messages, Channel channel) {
-                handleBatch(messages, channel, listener);
-            }
-        });
+        container.setMessageListener((ChannelAwareBatchMessageListener) (messages, channel)
+                -> handleBatch(messages, channel, listener));
         start(spec, queue, container);
     }
 
@@ -298,20 +293,32 @@ public class RabbitMqAdapter implements BrokerAdapter {
         };
     }
 
+
+    /**
+     * Blank group resolves to the platform-shared queue (pre-port name); a named group
+     * gets a group-suffixed copy of the same queue for named consumer groups.
+     */
+    private String grouped(String baseQueue, String group) {
+        if (Objects.isNull(group) || group.isBlank()) {
+            return baseQueue;
+        }
+        return RabbitTopology.declareGroupedQueue(rabbitAdmin, baseQueue, group);
+    }
+
     private String resolveQueue(SubscriptionSpec spec) {
         String group = spec.group();
         String keyPattern = spec.keyPattern();
         return switch (spec.topic()) {
             case STATE -> switch (keyPattern) {
-                case "driver.*" -> RabbitNames.QUEUE_DRIVER_STATE;
-                case "device.*" -> RabbitNames.QUEUE_DEVICE_STATE;
+                case "driver.*" -> grouped(RabbitNames.QUEUE_DRIVER_STATE, group);
+                case "device.*" -> grouped(RabbitNames.QUEUE_DEVICE_STATE, group);
                 default -> throw new IllegalArgumentException(
                         "STATE subscription requires keyPattern driver.* or device.*, got: " + keyPattern);
             };
             case ALARM -> switch (keyPattern) {
-                case "driver.*" -> RabbitNames.QUEUE_DRIVER_ALARM;
-                case "device.*" -> RabbitNames.QUEUE_DEVICE_ALARM;
-                case "task.*" -> RabbitNames.QUEUE_NOTIFY_TASK;
+                case "driver.*" -> grouped(RabbitNames.QUEUE_DRIVER_ALARM, group);
+                case "device.*" -> grouped(RabbitNames.QUEUE_DEVICE_ALARM, group);
+                case "task.*" -> grouped(RabbitNames.QUEUE_NOTIFY_TASK, group);
                 default -> throw new IllegalArgumentException(
                         "ALARM subscription requires keyPattern driver.*, device.* or task.*, got: " + keyPattern);
             };
@@ -320,8 +327,8 @@ public class RabbitMqAdapter implements BrokerAdapter {
                         RabbitNames.ROUTING_DRIVER_METADATA_PREFIX + keyPattern);
                 yield RabbitNames.QUEUE_DRIVER_METADATA_PREFIX + group;
             }
-            case POINT_VALUE -> RabbitNames.QUEUE_POINT_VALUE;
-            case EVENT -> RabbitNames.QUEUE_EVENT_REPORT;
+            case POINT_VALUE -> grouped(RabbitNames.QUEUE_POINT_VALUE, group);
+            case EVENT -> grouped(RabbitNames.QUEUE_EVENT_REPORT, group);
             case COMMAND -> {
                 RabbitTopology.declareDriverCommandQueue(rabbitAdmin, RabbitNames.QUEUE_COMMAND_PREFIX + group,
                         RabbitNames.EXCHANGE_COMMAND, RabbitNames.EXCHANGE_COMMAND_DEAD,
@@ -329,20 +336,22 @@ public class RabbitMqAdapter implements BrokerAdapter {
                 yield RabbitNames.QUEUE_COMMAND_PREFIX + group;
             }
             case POINT_COMMAND -> {
+                int expires = Objects.nonNull(spec.instanceTtl()) && !spec.instanceTtl().isZero()
+                        ? (int) Math.min(spec.instanceTtl().toMillis(), Integer.MAX_VALUE)
+                        : driverQueueExpiresMillis;
                 RabbitTopology.declareDriverCommandQueue(rabbitAdmin, RabbitNames.QUEUE_POINT_COMMAND_PREFIX + group,
                         RabbitNames.EXCHANGE_POINT_COMMAND, RabbitNames.EXCHANGE_POINT_COMMAND_DEAD,
-                        RabbitNames.ROUTING_POINT_COMMAND_PREFIX + keyPattern, driverQueueExpiresMillis);
+                        RabbitNames.ROUTING_POINT_COMMAND_PREFIX + keyPattern, expires);
                 yield RabbitNames.QUEUE_POINT_COMMAND_PREFIX + group;
             }
-            case COMMAND_RESULT -> RabbitNames.QUEUE_COMMAND_RESULT;
-            case POINT_COMMAND_RESULT -> RabbitNames.QUEUE_POINT_COMMAND_RESULT;
-            case NOTIFY_TASK -> RabbitNames.QUEUE_NOTIFY_TASK;
-            case STATE_TIMEOUT -> RabbitNames.QUEUE_DRIVER_TIMEOUT_CHECK;
-            case DEVICE_SCAN -> RabbitNames.QUEUE_DEVICE_SCAN;
-            case POINT_COMMAND_DEAD -> RabbitNames.QUEUE_POINT_COMMAND_DEAD;
-            case COMMAND_DEAD -> RabbitNames.QUEUE_COMMAND_DEAD;
-            case POINT_VALUE_DEAD -> throw new IllegalArgumentException(
-                    "POINT_VALUE_DEAD is a consumer-less quarantine by design");
+            case COMMAND_RESULT -> grouped(RabbitNames.QUEUE_COMMAND_RESULT, group);
+            case POINT_COMMAND_RESULT -> grouped(RabbitNames.QUEUE_POINT_COMMAND_RESULT, group);
+            case NOTIFY_TASK -> grouped(RabbitNames.QUEUE_NOTIFY_TASK, group);
+            case STATE_TIMEOUT -> grouped(RabbitNames.QUEUE_DRIVER_TIMEOUT_CHECK, group);
+            case DEVICE_SCAN -> grouped(RabbitNames.QUEUE_DEVICE_SCAN, group);
+            case POINT_COMMAND_DEAD -> grouped(RabbitNames.QUEUE_POINT_COMMAND_DEAD, group);
+            case COMMAND_DEAD -> grouped(RabbitNames.QUEUE_COMMAND_DEAD, group);
+            case POINT_VALUE_DEAD -> grouped(RabbitNames.QUEUE_POINT_VALUE_DEAD, group);
         };
     }
 }
