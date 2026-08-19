@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
@@ -40,18 +39,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,7 +66,7 @@ class PointCommandServiceImplTest {
     private PointFacade pointFacade;
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private MessageSender messageSender;
 
     @Mock
     private PointCommandHistoryManager pointCommandHistoryManager;
@@ -97,12 +96,6 @@ class PointCommandServiceImplTest {
         driver = new FacadeDriverBO();
         driver.setId(30L);
         driver.setServiceName("dc3-driver-modbus-tcp");
-        lenient().doAnswer(invocation -> {
-            CorrelationData correlation = invocation.getArgument(3);
-            correlation.getFuture().complete(new CorrelationData.Confirm(true, null));
-            return null;
-        }).when(rabbitTemplate).convertAndSend(any(String.class), any(String.class),
-                any(PointCommandDTO.class), any(CorrelationData.class));
     }
 
     @Test
@@ -117,11 +110,8 @@ class PointCommandServiceImplTest {
         vo.setPointId(20L);
         service.read(1L, vo);
 
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND),
-                eq(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + "dc3-driver-modbus-tcp.node-a"),
-                any(Object.class),
-                any(org.springframework.amqp.rabbit.connection.CorrelationData.class));
+        verify(messageSender).sendConfirmed(argThat(m -> m.getTopic() == MqTopic.POINT_COMMAND
+                && "dc3-driver-modbus-tcp.node-a".equals(m.getPartitionKey())), any());
         verify(pointCommandHistoryManager).save(any());
         verify(pointCommandHistoryManager).updateById(any());
     }
@@ -139,7 +129,7 @@ class PointCommandServiceImplTest {
                 .isInstanceOf(ServiceException.class)
                 .hasMessageContaining("No driver registered");
 
-        verifyNoInteractions(rabbitTemplate);
+        verifyNoInteractions(messageSender);
     }
 
     @Test
@@ -204,11 +194,8 @@ class PointCommandServiceImplTest {
         vo.setValue("42.5");
         service.write(1L, vo);
 
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND),
-                eq(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + "dc3-driver-modbus-tcp.node-a"),
-                any(Object.class),
-                any(org.springframework.amqp.rabbit.connection.CorrelationData.class));
+        verify(messageSender).sendConfirmed(argThat(m -> m.getTopic() == MqTopic.POINT_COMMAND
+                && "dc3-driver-modbus-tcp.node-a".equals(m.getPartitionKey())), any());
         verify(pointCommandHistoryManager).save(any());
         verify(pointCommandHistoryManager).updateById(any());
     }
@@ -225,7 +212,7 @@ class PointCommandServiceImplTest {
         assertThatThrownBy(() -> service.write(1L, vo))
                 .isInstanceOf(ServiceException.class)
                 .hasMessageContaining("No driver registered");
-        verifyNoInteractions(rabbitTemplate);
+        verifyNoInteractions(messageSender);
     }
 
     @Test

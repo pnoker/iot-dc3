@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.dal.CommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
@@ -37,11 +36,13 @@ import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
+import io.github.pnoker.common.mq.sender.MqPublishException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -69,7 +70,7 @@ class CommandHistoryServiceImplTest {
     private CommandFacade commandFacade;
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private MessageSender messageSender;
 
     @Mock
     private CommandHistoryManager commandHistoryManager;
@@ -81,16 +82,10 @@ class CommandHistoryServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new CommandHistoryServiceImpl(deviceFacade, driverFacade, commandFacade, rabbitTemplate,
+        service = new CommandHistoryServiceImpl(deviceFacade, driverFacade, commandFacade, messageSender,
                 commandHistoryManager, commandHistoryBuilder);
         lenient().when(deviceFacade.getActiveOwner(any(), any()))
                 .thenReturn(new FacadeDeviceOwnerBO(40L, "node-a", 77L));
-        lenient().doAnswer(invocation -> {
-            CorrelationData correlation = invocation.getArgument(3);
-            correlation.getFuture().complete(new CorrelationData.Confirm(true, null));
-            return null;
-        }).when(rabbitTemplate).convertAndSend(any(String.class), any(String.class),
-                any(CommandCallDTO.class), any(CorrelationData.class));
     }
 
     @Test
@@ -140,11 +135,11 @@ class CommandHistoryServiceImplTest {
         assertThat(savedRecord.getExpireTime()).isAfterOrEqualTo(beforeLocal.plusSeconds(5));
         assertThat(savedRecord.getExpireTime()).isBeforeOrEqualTo(afterLocal.plusSeconds(5));
 
-        ArgumentCaptor<CommandCallDTO> dtoCaptor = ArgumentCaptor.forClass(CommandCallDTO.class);
-        verify(rabbitTemplate).convertAndSend(eq(RabbitConstant.TOPIC_EXCHANGE_COMMAND),
-                eq(RabbitConstant.ROUTING_COMMAND_PREFIX + "modbus-driver.node-a"), dtoCaptor.capture(),
-                any(CorrelationData.class));
-        CommandCallDTO dto = dtoCaptor.getValue();
+        ArgumentCaptor<MqMessage> dtoCaptor = ArgumentCaptor.forClass(MqMessage.class);
+        verify(messageSender).sendConfirmed(dtoCaptor.capture(), any());
+        assertThat(dtoCaptor.getValue().getTopic()).isEqualTo(MqTopic.COMMAND);
+        assertThat(dtoCaptor.getValue().getPartitionKey()).isEqualTo("modbus-driver.node-a");
+        CommandCallDTO dto = (CommandCallDTO) dtoCaptor.getValue().getPayload();
         assertThat(dto.recordId()).isEqualTo(recordId);
         assertThat(dto.expireAt()).isAfterOrEqualTo(beforeInstant.plusSeconds(5));
         assertThat(dto.expireAt()).isBeforeOrEqualTo(afterInstant.plusSeconds(5));
@@ -195,11 +190,11 @@ class CommandHistoryServiceImplTest {
         assertThat(savedRecord.getExpireTime()).isAfterOrEqualTo(beforeLocal.plusSeconds(30));
         assertThat(savedRecord.getExpireTime()).isBeforeOrEqualTo(afterLocal.plusSeconds(30));
 
-        ArgumentCaptor<CommandCallDTO> dtoCaptor = ArgumentCaptor.forClass(CommandCallDTO.class);
-        verify(rabbitTemplate).convertAndSend(eq(RabbitConstant.TOPIC_EXCHANGE_COMMAND),
-                eq(RabbitConstant.ROUTING_COMMAND_PREFIX + "modbus-driver.node-a"), dtoCaptor.capture(),
-                any(CorrelationData.class));
-        CommandCallDTO dto = dtoCaptor.getValue();
+        ArgumentCaptor<MqMessage> dtoCaptor = ArgumentCaptor.forClass(MqMessage.class);
+        verify(messageSender).sendConfirmed(dtoCaptor.capture(), any());
+        assertThat(dtoCaptor.getValue().getTopic()).isEqualTo(MqTopic.COMMAND);
+        assertThat(dtoCaptor.getValue().getPartitionKey()).isEqualTo("modbus-driver.node-a");
+        CommandCallDTO dto = (CommandCallDTO) dtoCaptor.getValue().getPayload();
         assertThat(dto.expireAt()).isAfterOrEqualTo(beforeInstant.plusSeconds(30));
         assertThat(dto.expireAt()).isBeforeOrEqualTo(afterInstant.plusSeconds(30));
         verify(commandFacade).getById(tenantId, commandId);
@@ -246,11 +241,12 @@ class CommandHistoryServiceImplTest {
         assertThat(queryCaptor.getValue().getProfileId()).isEqualTo(30L);
         assertThat(queryCaptor.getValue().getCommandCode()).isEqualTo("restart");
 
-        ArgumentCaptor<CommandCallDTO> dtoCaptor = ArgumentCaptor.forClass(CommandCallDTO.class);
-        verify(rabbitTemplate).convertAndSend(eq(RabbitConstant.TOPIC_EXCHANGE_COMMAND),
-                eq(RabbitConstant.ROUTING_COMMAND_PREFIX + "modbus-driver.node-a"), dtoCaptor.capture(),
-                any(CorrelationData.class));
-        assertThat(dtoCaptor.getValue().commandId()).isEqualTo(commandId);
+        ArgumentCaptor<MqMessage> dtoCaptor = ArgumentCaptor.forClass(MqMessage.class);
+        verify(messageSender).sendConfirmed(dtoCaptor.capture(), any());
+        assertThat(dtoCaptor.getValue().getTopic()).isEqualTo(MqTopic.COMMAND);
+        assertThat(dtoCaptor.getValue().getPartitionKey()).isEqualTo("modbus-driver.node-a");
+        CommandCallDTO dto = (CommandCallDTO) dtoCaptor.getValue().getPayload();
+        assertThat(dto.commandId()).isEqualTo(commandId);
     }
 
 }

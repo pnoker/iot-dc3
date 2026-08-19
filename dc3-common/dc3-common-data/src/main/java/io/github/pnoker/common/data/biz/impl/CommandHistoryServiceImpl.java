@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.biz.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
 import io.github.pnoker.common.data.dal.CommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
@@ -46,12 +45,13 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.common.utils.RabbitPublishConfirm;
+import io.github.pnoker.common.mq.MqHeaders;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -79,7 +79,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
 
     private final CommandFacade commandFacade;
 
-    private final RabbitTemplate rabbitTemplate;
+    private final MessageSender messageSender;
 
     private final CommandHistoryManager commandHistoryManager;
 
@@ -253,10 +253,12 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
      * @param recordId    the command history record id, used as the correlation id
      */
     private void publishCommand(CommandCallDTO dto, String serviceName, String ownerNode, String recordId) {
-        CorrelationData correlationData = new CorrelationData(recordId);
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-                RabbitConstant.ROUTING_COMMAND_PREFIX + serviceName + "." + ownerNode, dto, correlationData);
-        RabbitPublishConfirm.awaitRouted(correlationData, Duration.ofSeconds(5));
+        messageSender.sendConfirmed(MqMessage.builder()
+                .topic(MqTopic.COMMAND)
+                .partitionKey(serviceName + "." + ownerNode)
+                .payload(dto)
+                .header(MqHeaders.CORRELATION_ID, recordId)
+                .build(), Duration.ofSeconds(5));
     }
 
     private void markPublishFailed(CommandHistoryDO recordDO, Exception cause) {

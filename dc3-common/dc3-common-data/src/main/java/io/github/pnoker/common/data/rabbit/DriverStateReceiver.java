@@ -17,15 +17,14 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DriverStateService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -51,10 +50,9 @@ public class DriverStateReceiver {
      * @param message   the raw message carrying the delivery tag
      * @param entityDTO the deserialized driver state
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{driverStateQueue.name}")
-    public void driverStateReceive(Channel channel, Message message, DriverStateDTO entityDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.STATE, keyPattern = "driver.*")
+    public void driverStateReceive(MqReceived<DriverStateDTO> message, Acknowledgment ack) {
+        DriverStateDTO entityDTO = message.payload();
         try {
             log.debug("Driver state received, tenantId={}, driverId={}, status={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
@@ -64,14 +62,14 @@ public class DriverStateReceiver {
                     || Objects.isNull(entityDTO.getTenantId()) || Objects.isNull(entityDTO.getStatus())) {
                 log.warn("Invalid driver state, some required fields are null, driverId={}",
                         Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
             driverStateService.heartbeat(entityDTO);
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
-            log.error("Driver state consume failed, deliveryTag={}", deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            log.error("Driver state consume failed.", e);
+            ack.reject(true);
         }
     }
 

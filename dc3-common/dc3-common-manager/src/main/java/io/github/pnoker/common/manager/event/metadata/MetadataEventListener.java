@@ -17,16 +17,17 @@
 
 package io.github.pnoker.common.manager.event.metadata;
 
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -48,7 +49,7 @@ public class MetadataEventListener {
 
     private final DriverService driverService;
 
-    private final RabbitTemplate rabbitTemplate;
+    private final MessageSender messageSender;
 
     /**
      * On application event.
@@ -101,8 +102,7 @@ public class MetadataEventListener {
         }
         log.debug("Driver metadata notification published, serviceName={}, id={}, type={}",
                 service, entityDTO.getId(), entityDTO.getMetadataType());
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA,
-                RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + service, entityDTO);
+        messageSender.send(MqMessage.of(MqTopic.METADATA, service, entityDTO));
     }
 
 }

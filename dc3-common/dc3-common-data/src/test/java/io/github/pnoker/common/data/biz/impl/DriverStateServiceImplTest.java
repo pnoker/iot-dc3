@@ -27,11 +27,13 @@ import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.TimeoutSourceTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.time.LocalDateTime;
 
@@ -57,7 +59,7 @@ class DriverStateServiceImplTest {
     private EntityStateMapper entityStateMapper;
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private MessageSender messageSender;
 
     @InjectMocks
     private DriverStateServiceImpl service;
@@ -95,7 +97,7 @@ class DriverStateServiceImplTest {
     void nullDtoDoesNothing() {
         service.heartbeat(null);
 
-        verifyNoInteractions(entityStateMapper, rabbitTemplate);
+        verifyNoInteractions(entityStateMapper, messageSender);
     }
 
     @Test
@@ -105,7 +107,7 @@ class DriverStateServiceImplTest {
 
         service.heartbeat(dto);
 
-        verifyNoInteractions(entityStateMapper, rabbitTemplate);
+        verifyNoInteractions(entityStateMapper, messageSender);
     }
 
     @Test
@@ -128,11 +130,13 @@ class DriverStateServiceImplTest {
                 eq("driver-heartbeat"),
                 any());
 
-        ArgumentCaptor<DriverTimeoutCheckDTO> captor = ArgumentCaptor.forClass(DriverTimeoutCheckDTO.class);
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), captor.capture());
-        assertThat(captor.getValue().getDriverId()).isEqualTo(1L);
-        assertThat(captor.getValue().getTenantId()).isEqualTo(100L);
-        assertThat(captor.getValue().getLeaseVersion()).isEqualTo(6L);
+        ArgumentCaptor<MqMessage> captor = ArgumentCaptor.forClass(MqMessage.class);
+        verify(messageSender).send(captor.capture());
+        DriverTimeoutCheckDTO sent = (DriverTimeoutCheckDTO) captor.getValue().getPayload();
+        assertThat(captor.getValue().getTopic()).isEqualTo(MqTopic.STATE_TIMEOUT);
+        assertThat(sent.getDriverId()).isEqualTo(1L);
+        assertThat(sent.getTenantId()).isEqualTo(100L);
+        assertThat(sent.getLeaseVersion()).isEqualTo(6L);
     }
 
     @Test

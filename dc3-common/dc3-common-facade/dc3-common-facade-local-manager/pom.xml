@@ -35,7 +35,7 @@
     <description>
         Local (in-process) Facade implementations for the manager domain: Device / Driver /
         Point. Activated when dc3.facade.mode=local. Transitively pulls in dc3-common-manager
-        and its dependencies (including dc3-common-rabbitmq for command dispatch).
+        and its dependencies (including the messaging port for command dispatch).
     </description>
 
     <dependencies>

@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
@@ -35,13 +33,14 @@ import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.tenant.TenantContextHolder;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -78,7 +77,7 @@ public class EntityStateExpiryScanner {
     private final EntityStateMapper entityStateMapper;
     private final EntityAlarmManager entityAlarmManager;
     private final AlarmRuleTriggerService alarmRuleTriggerService;
-    private final RabbitTemplate rabbitTemplate;
+    private final MessageSender messageSender;
 
     /**
      * Bootstrap the first tick after the context is fully started.
@@ -88,10 +87,7 @@ public class EntityStateExpiryScanner {
      */
     @EventListener(ApplicationReadyEvent.class)
     void publishInitialTick() {
-        rabbitTemplate.convertAndSend(
-                RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY,
-                RabbitConstant.ROUTING_DEVICE_SCAN_TICK,
-                TICK_BODY);
+        messageSender.send(MqMessage.of(MqTopic.DEVICE_SCAN, "", TICK_BODY));
         log.info("Published initial device scan tick");
     }
 
@@ -99,10 +95,8 @@ public class EntityStateExpiryScanner {
      * Process one scan cycle: find expired devices, mark offline, write alarms,
      * then publish the next tick.
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{deviceScanQueue.name}")
-    public void onScanTick(Channel channel, Message message) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.DEVICE_SCAN)
+    public void onScanTick(MqReceived<Object> message, Acknowledgment ack) {
         try {
             // This tick fires on a RabbitMQ consumer thread with no HTTP/security
             // context, so there is no tenant on the thread. The scan must look
@@ -111,15 +105,12 @@ public class EntityStateExpiryScanner {
             TenantContextHolder.runIgnoreAction(this::scanExpiredDevices);
 
             // Publish next tick to keep the cycle going
-            rabbitTemplate.convertAndSend(
-                    RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY,
-                    RabbitConstant.ROUTING_DEVICE_SCAN_TICK,
-                    TICK_BODY);
+            messageSender.send(MqMessage.of(MqTopic.DEVICE_SCAN, "", TICK_BODY));
 
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
             log.error("Device scan tick failed", e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            ack.reject(true);
         }
     }
 

@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
@@ -43,9 +43,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class NotifyTaskSender {
 
-    private final RabbitTemplate rabbitTemplate;
-
-    private final TopicExchange alarmExchange;
+    private final MessageSender messageSender;
 
     /**
      * Publish.
@@ -61,8 +59,7 @@ public class NotifyTaskSender {
         String channelType = Objects.nonNull(task.getChannelTypeFlag())
                 ? task.getChannelTypeFlag().toString()
                 : DataConstant.STATUS_UNKNOWN;
-        String routingKey = (RabbitConstant.ROUTING_NOTIFY_TASK_PREFIX + channelType).toLowerCase(Locale.ROOT);
-        rabbitTemplate.convertAndSend(alarmExchange.getName(), routingKey, task);
+        messageSender.send(MqMessage.of(MqTopic.NOTIFY_TASK, channelType.toLowerCase(Locale.ROOT), task));
     }
 
 }

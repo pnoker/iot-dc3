@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.event.metadata;
 
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
@@ -28,14 +27,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -50,7 +51,7 @@ class MetadataEventListenerTest {
     private DriverService driverService;
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private MessageSender messageSender;
 
     @InjectMocks
     private MetadataEventListener listener;
@@ -71,10 +72,8 @@ class MetadataEventListenerTest {
         listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.UPDATE));
 
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
-                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-modbus-tcp"),
-                any(MetadataEventDTO.class));
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.METADATA
+                && "dc3-driver-modbus-tcp".equals(m.getPartitionKey())));
     }
 
     @Test
@@ -86,16 +85,11 @@ class MetadataEventListenerTest {
         listener.onApplicationEvent(new MetadataEvent(this, 20L, MetadataTypeEnum.POINT,
                 MetadataOperateTypeEnum.ADD));
 
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
-                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-modbus-tcp"),
-                any(MetadataEventDTO.class));
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
-                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-mqtt"),
-                any(MetadataEventDTO.class));
-        verify(rabbitTemplate, times(2)).convertAndSend(
-                any(String.class), any(String.class), any(MetadataEventDTO.class));
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.METADATA
+                && "dc3-driver-modbus-tcp".equals(m.getPartitionKey())));
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.METADATA
+                && "dc3-driver-mqtt".equals(m.getPartitionKey())));
+        verify(messageSender, times(2)).send(any());
     }
 
     @Test
@@ -105,7 +99,7 @@ class MetadataEventListenerTest {
         listener.onApplicationEvent(new MetadataEvent(this, 20L, MetadataTypeEnum.POINT,
                 MetadataOperateTypeEnum.UPDATE));
 
-        verifyNoInteractions(rabbitTemplate);
+        verifyNoInteractions(messageSender);
     }
 
     @Test
@@ -114,10 +108,8 @@ class MetadataEventListenerTest {
                 MetadataOperateTypeEnum.DELETE, Set.of("dc3-driver-old")));
 
         verify(driverService, never()).getByDeviceId(10L, null);
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
-                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-old"),
-                any(MetadataEventDTO.class));
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.METADATA
+                && "dc3-driver-old".equals(m.getPartitionKey())));
     }
 
     @Test
@@ -127,10 +119,8 @@ class MetadataEventListenerTest {
         listener.onApplicationEvent(new MetadataEvent(this, 7L, MetadataTypeEnum.DRIVER,
                 MetadataOperateTypeEnum.UPDATE));
 
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
-                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-modbus-tcp"),
-                any(MetadataEventDTO.class));
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.METADATA
+                && "dc3-driver-modbus-tcp".equals(m.getPartitionKey())));
     }
 
     @Test
@@ -140,7 +130,6 @@ class MetadataEventListenerTest {
         listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
                 MetadataOperateTypeEnum.DELETE));
 
-        verify(rabbitTemplate, never()).convertAndSend(
-                any(String.class), any(String.class), any(MetadataEventDTO.class));
+        verify(messageSender, never()).send(any());
     }
 }

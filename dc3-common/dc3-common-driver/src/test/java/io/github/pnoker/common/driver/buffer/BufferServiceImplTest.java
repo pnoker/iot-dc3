@@ -24,14 +24,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
+import io.github.pnoker.common.mq.sender.MqPublishException;
+import io.github.pnoker.common.mq.sender.SendConfirmation;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.ReturnedMessage;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -54,7 +53,7 @@ class BufferServiceImplTest {
     Path tmp;
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private MessageSender messageSender;
 
     private BufferServiceImpl service;
 
@@ -64,7 +63,7 @@ class BufferServiceImplTest {
         properties.getBuffer().setDbPath(tmp.resolve("outbox.db").toString());
         properties.getBuffer().setBatchSize(10);
         properties.getBuffer().setBackoffSeconds(1);
-        service = new BufferServiceImpl(properties, rabbitTemplate);
+        service = new BufferServiceImpl(properties, messageSender);
         service.initialize();
     }
 
@@ -77,10 +76,10 @@ class BufferServiceImplTest {
     void publishPersistsBeforeSendAndDeletesOnlyAfterRoutedConfirm() {
         doAnswer(invocation -> {
             assertThat(service.pendingCount()).isEqualTo(1);
-            CorrelationData correlation = invocation.getArgument(3);
-            correlation.getFuture().complete(new CorrelationData.Confirm(true, null));
+            SendConfirmation confirmation = invocation.getArgument(1);
+            confirmation.onConfirm(invocation.getArgument(0), true, null);
             return null;
-        }).when(rabbitTemplate).convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
+        }).when(messageSender).sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
         service.publish(pointValue("id-1"), "rk");
 
@@ -90,10 +89,10 @@ class BufferServiceImplTest {
     @Test
     void nackRetainsRecordForRetry() {
         doAnswer(invocation -> {
-            CorrelationData correlation = invocation.getArgument(3);
-            correlation.getFuture().complete(new CorrelationData.Confirm(false, "broker nack"));
+            SendConfirmation confirmation = invocation.getArgument(1);
+            confirmation.onConfirm(invocation.getArgument(0), false, new MqPublishException("broker nack"));
             return null;
-        }).when(rabbitTemplate).convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
+        }).when(messageSender).sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
         service.publish(pointValue("id-2"), "rk");
 
@@ -103,12 +102,11 @@ class BufferServiceImplTest {
     @Test
     void returnedMessageRetainsRecordDespiteAck() {
         doAnswer(invocation -> {
-            CorrelationData correlation = invocation.getArgument(3);
-            correlation.setReturned(new ReturnedMessage(new Message(new byte[0], new MessageProperties()),
-                    312, "NO_ROUTE", "exchange", "rk"));
-            correlation.getFuture().complete(new CorrelationData.Confirm(true, null));
+            // routed=false covers the returned-message case: the outbox must retain the row
+            SendConfirmation confirmation = invocation.getArgument(1);
+            confirmation.onConfirm(invocation.getArgument(0), false, null);
             return null;
-        }).when(rabbitTemplate).convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
+        }).when(messageSender).sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
         service.publish(pointValue("id-3"), "rk");
 
@@ -117,8 +115,8 @@ class BufferServiceImplTest {
 
     @Test
     void synchronousFailureRetainsRecord() {
-        doThrow(new AmqpException("broker down")).when(rabbitTemplate)
-                .convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
+        doThrow(new MqPublishException("broker down")).when(messageSender)
+                .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
         service.publish(pointValue("id-4"), "rk");
 
@@ -132,26 +130,25 @@ class BufferServiceImplTest {
             if (sends.getAndIncrement() == 0) {
                 assertThat(service.pendingCount()).isEqualTo(2);
             }
-            CorrelationData correlation = invocation.getArgument(3);
-            correlation.getFuture().complete(new CorrelationData.Confirm(true, null));
+            SendConfirmation confirmation = invocation.getArgument(1);
+            confirmation.onConfirm(invocation.getArgument(0), true, null);
             return null;
-        }).when(rabbitTemplate).convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
+        }).when(messageSender).sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
         service.publishBatch(List.of(pointValue("batch-1"), pointValue("batch-2")), "rk");
 
         assertThat(service.pendingCount()).isZero();
-        verify(rabbitTemplate, times(2))
-                .convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
+        verify(messageSender, times(2)).sendAsync(any(MqMessage.class), any(SendConfirmation.class));
     }
 
     @Test
     void publishFailsClosedBeforeOutboxInitialization() {
-        BufferServiceImpl uninitialized = new BufferServiceImpl(new DriverProperties(), rabbitTemplate);
+        BufferServiceImpl uninitialized = new BufferServiceImpl(new DriverProperties(), messageSender);
 
         assertThatThrownBy(() -> uninitialized.publish(pointValue("id-5"), "rk"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("outbox is not initialized");
-        verifyNoInteractions(rabbitTemplate);
+        verifyNoInteractions(messageSender);
     }
 
     private PointValue pointValue(String messageId) {

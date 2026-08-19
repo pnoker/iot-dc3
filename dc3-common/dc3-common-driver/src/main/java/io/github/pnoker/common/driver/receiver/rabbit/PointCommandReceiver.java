@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.driver.receiver.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.driver.command.CommandDedupCache;
 import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.service.DriverReadService;
@@ -29,12 +28,12 @@ import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.entity.dto.PointCommandPayload;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -74,11 +73,10 @@ public class PointCommandReceiver {
      * @param message   Spring AMQP message carrying the delivery tag and redelivery flag
      * @param entityDTO deserialized point command payload (type, command id, tenant, value)
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{pointCommandQueue.name}")
-    public void pointCommandReceive(Channel channel, Message message, PointCommandDTO entityDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
-        boolean redelivered = Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
+    @Dc3Listener(topic = MqTopic.POINT_COMMAND, group = "${dc3.driver.client}", keyPattern = "${dc3.driver.service}.${dc3.driver.node}")
+    public void pointCommandReceive(MqReceived<PointCommandDTO> message, Acknowledgment ack) {
+        PointCommandDTO entityDTO = message.payload();
+        boolean redelivered = message.redelivered();
         try {
             // Validate first: the debug log below dereferences entityDTO, so a null
             // payload must be rejected before logging to avoid an NPE that would
@@ -91,7 +89,7 @@ public class PointCommandReceiver {
                         Objects.isNull(entityDTO) ? null : entityDTO.commandId(),
                         Objects.isNull(entityDTO) ? null : entityDTO.tenantId(),
                         Objects.isNull(entityDTO) ? null : entityDTO.type());
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
 
@@ -99,7 +97,7 @@ public class PointCommandReceiver {
             if (isInvalidPayload(entityDTO.payload())) {
                 log.error("Point command rejected, reason=invalidPayload, commandId={}, tenantId={}, type={}",
                         entityDTO.commandId(), entityDTO.tenantId(), entityDTO.type());
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
 
@@ -111,7 +109,7 @@ public class PointCommandReceiver {
                 log.warn("Point command rejected, reason=expired, commandId={}, expireAt={}",
                         commandId, entityDTO.expireAt());
                 sendResult(commandId, tenantId, PointCommandStatusEnum.EXPIRED,
-                        null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
+                        null, "EXPIRED", "Command expired before execution", ack);
                 return;
             }
 
@@ -119,7 +117,7 @@ public class PointCommandReceiver {
             if (!dedupCache.tryAcquire(commandId)) {
                 log.warn("Point command rejected, reason=duplicate, commandId={}", commandId);
                 sendResult(commandId, tenantId, PointCommandStatusEnum.DUPLICATE,
-                        null, "DUPLICATE", "Command already processed", channel, deliveryTag);
+                        null, "DUPLICATE", "Command already processed", ack);
                 return;
             }
 
@@ -134,7 +132,7 @@ public class PointCommandReceiver {
                 log.warn("Reject stale-owner point command, commandId={}, deviceId={}, fencingToken={}",
                         commandId, lockDeviceId, entityDTO.fencingToken());
                 sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED,
-                        null, "STALE_OWNER", "Device ownership lease changed", channel, deliveryTag);
+                        null, "STALE_OWNER", "Device ownership lease changed", ack);
                 return;
             }
 
@@ -158,24 +156,24 @@ public class PointCommandReceiver {
             if (Objects.isNull(responseValue) && entityDTO.payload()
                     instanceof PointCommandPayload.WritePayload) {
                 sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED,
-                        null, "WRITE_FAILED", "Device write returned false", channel, deliveryTag);
+                        null, "WRITE_FAILED", "Device write returned false", ack);
                 return;
             }
 
             sendResult(commandId, tenantId, PointCommandStatusEnum.SUCCESS,
-                    responseValue, null, null, channel, deliveryTag);
+                    responseValue, null, null, ack);
 
         } catch (Exception e) {
             if (redelivered) {
-                log.error("Point command failed on redelivery, sending FAILED. deliveryTag={}", deliveryTag, e);
+                log.error("Point command failed on redelivery, sending FAILED.", e);
                 String commandId = Objects.nonNull(entityDTO) ? entityDTO.commandId() : null;
                 Long tenantId = Objects.nonNull(entityDTO) ? entityDTO.tenantId() : null;
                 sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED,
-                        null, "DRIVER_ERROR", e.getMessage(), channel, deliveryTag);
+                        null, "DRIVER_ERROR", e.getMessage(), ack);
             } else {
-                log.warn("Point command failed, requeueing. deliveryTag={}", deliveryTag, e);
+                log.warn("Point command failed, requeueing.", e);
                 releaseDedup(entityDTO);
-                RabbitAckUtil.nack(channel, deliveryTag, true);
+                ack.reject(true);
             }
         }
     }
@@ -196,7 +194,7 @@ public class PointCommandReceiver {
 
     private void sendResult(String commandId, Long tenantId, PointCommandStatusEnum status,
                             String responseValue, String errorCode, String errorMessage,
-                            Channel channel, long deliveryTag) {
+                            Acknowledgment ack) {
         try {
             if (Objects.nonNull(commandId)) {
                 PointCommandResultDTO result = PointCommandResultDTO.builder()
@@ -216,10 +214,10 @@ public class PointCommandReceiver {
             if (Objects.nonNull(commandId)) {
                 dedupCache.release(commandId);
             }
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            ack.reject(true);
             return;
         }
-        RabbitAckUtil.ack(channel, deliveryTag);
+        ack.ack();
     }
 
 }

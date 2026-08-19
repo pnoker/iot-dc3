@@ -26,9 +26,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.Map;
 import java.util.List;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.verify;
 class DriverSenderServiceImplTest {
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private MessageSender messageSender;
 
     @Mock
     private BufferService bufferService;
@@ -60,7 +60,7 @@ class DriverSenderServiceImplTest {
         driver.setTenantId(1L);
         metadata.setDriver(driver);
         metadata.setDeviceLeases(Map.of(10L, 77L), System.currentTimeMillis() + 10_000, 5L);
-        service = new DriverSenderServiceImpl(properties, metadata, rabbitTemplate, bufferService);
+        service = new DriverSenderServiceImpl(properties, metadata, messageSender, bufferService);
     }
 
     @Test
@@ -76,7 +76,7 @@ class DriverSenderServiceImplTest {
 
         ArgumentCaptor<PointValue> captor = ArgumentCaptor.forClass(PointValue.class);
         verify(bufferService).publish(captor.capture(),
-                org.mockito.ArgumentMatchers.eq("dc3.r.value.point.tenant/driver"));
+                org.mockito.ArgumentMatchers.eq("tenant/driver"));
         PointValue sent = captor.getValue();
         assertThat(sent.getMessageId()).isNotBlank();
         assertThat(sent.getSchemaVersion()).isEqualTo(1);
@@ -107,7 +107,7 @@ class DriverSenderServiceImplTest {
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<PointValue>> captor = ArgumentCaptor.forClass(List.class);
         verify(bufferService).publishBatch(captor.capture(),
-                org.mockito.ArgumentMatchers.eq("dc3.r.value.point.tenant/driver"));
+                org.mockito.ArgumentMatchers.eq("tenant/driver"));
         assertThat(captor.getValue()).hasSize(2);
         assertThat(first.getMessageId()).isNotBlank().isNotEqualTo(second.getMessageId());
         assertThat(first.getSequence()).isLessThan(second.getSequence());

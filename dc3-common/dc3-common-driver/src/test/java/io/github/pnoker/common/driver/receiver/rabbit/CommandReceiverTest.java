@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.driver.receiver.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.driver.command.CommandDedupCache;
 import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -32,14 +31,14 @@ import io.github.pnoker.common.entity.dto.CommandCallResultDTO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.facade.api.CommandFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 
 import java.time.Instant;
 import java.util.Map;
@@ -75,10 +74,9 @@ class CommandReceiverTest {
     private DriverMetadata driverMetadata;
 
     @Mock
-    private Channel channel;
+    private Acknowledgment ack;
 
     private CommandReceiver receiver;
-    private Message message;
 
     @BeforeEach
     void setUp() {
@@ -88,9 +86,6 @@ class CommandReceiverTest {
                 deviceMetadata, dedupCache, new DeviceLockManager(), driverMetadata, properties);
         lenient().when(driverMetadata.getFencingToken(10L)).thenReturn(77L);
 
-        MessageProperties props = new MessageProperties();
-        props.setDeliveryTag(9L);
-        message = new Message(new byte[0], props);
     }
 
     @Test
@@ -110,13 +105,13 @@ class CommandReceiverTest {
         when(driverCustomService.execute(eq(driverConfig), eq(commandConfig), eq(device), eq(command), any()))
                 .thenReturn(Map.of("result", "ok"));
 
-        receiver.commandReceive(channel, message, command("record-1"));
+        receiver.commandReceive(new MqReceived<>(command("record-1"), Map.of(), false), ack);
 
         ArgumentCaptor<CommandCallResultDTO> captor = ArgumentCaptor.forClass(CommandCallResultDTO.class);
         verify(driverSenderService).commandResultSender(captor.capture());
         assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.SUCCESS);
         assertThat(captor.getValue().resultValues()).containsEntry("result", "ok");
-        verify(channel).basicAck(eq(9L), eq(false));
+        verify(ack).ack();
     }
 
     @Test
@@ -124,48 +119,46 @@ class CommandReceiverTest {
         when(dedupCache.tryAcquire("record-2")).thenReturn(true);
         when(deviceMetadata.getCache(10L)).thenReturn(null);
 
-        receiver.commandReceive(channel, message, command("record-2"));
+        receiver.commandReceive(new MqReceived<>(command("record-2"), Map.of(), false), ack);
 
         // A first-time failure must NOT send a result — the command is requeued and will
         // be retried, so reporting FAILED here would double-report on the redelivery.
         verify(driverSenderService, never()).commandResultSender(any());
         verify(dedupCache).release("record-2");
-        verify(channel).basicNack(eq(9L), eq(false), eq(true));
+        verify(ack).reject(true);
     }
 
     @Test
     void redeliveryFailureSendsFailedResultWithoutRelease() throws Exception {
         when(dedupCache.tryAcquire("record-3")).thenReturn(true);
         when(deviceMetadata.getCache(10L)).thenReturn(null);
-        message.getMessageProperties().setRedelivered(true);
-
-        receiver.commandReceive(channel, message, command("record-3"));
+        receiver.commandReceive(new MqReceived<>(command("record-3"), Map.of(), true), ack);
 
         ArgumentCaptor<CommandCallResultDTO> captor = ArgumentCaptor.forClass(CommandCallResultDTO.class);
         verify(driverSenderService).commandResultSender(captor.capture());
         assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.FAILED);
         verify(dedupCache, never()).release("record-3");
-        verify(channel).basicAck(eq(9L), eq(false));
+        verify(ack).ack();
     }
 
     @Test
     void duplicateCommandSendsDuplicateResult() throws Exception {
         when(dedupCache.tryAcquire("record-4")).thenReturn(false);
 
-        receiver.commandReceive(channel, message, command("record-4"));
+        receiver.commandReceive(new MqReceived<>(command("record-4"), Map.of(), false), ack);
 
         verifyNoInteractions(driverCustomService);
         ArgumentCaptor<CommandCallResultDTO> captor = ArgumentCaptor.forClass(CommandCallResultDTO.class);
         verify(driverSenderService).commandResultSender(captor.capture());
         assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.DUPLICATE);
-        verify(channel).basicAck(eq(9L), eq(false));
+        verify(ack).ack();
     }
 
     @Test
     void invalidCommandIsRejected() throws Exception {
-        receiver.commandReceive(channel, message, null);
+        receiver.commandReceive(new MqReceived<>(null, Map.of(), false), ack);
 
-        verify(channel).basicReject(eq(9L), eq(false));
+        verify(ack).reject(false);
         verifyNoInteractions(driverCustomService, driverSenderService);
     }
 
@@ -181,9 +174,9 @@ class CommandReceiverTest {
                 .schemaVersion(1)
                 .build();
 
-        receiver.commandReceive(channel, message, dto);
+        receiver.commandReceive(new MqReceived<>(dto, Map.of(), false), ack);
 
-        verify(channel).basicReject(eq(9L), eq(false));
+        verify(ack).reject(false);
         verifyNoInteractions(driverCustomService, driverSenderService);
     }
 

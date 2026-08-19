@@ -19,7 +19,6 @@ package io.github.pnoker.common.data.rabbit;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.EntityStateManager;
@@ -28,15 +27,16 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -58,7 +58,7 @@ class DriverTimeoutCheckReceiverTest {
     private AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Mock
-    private Channel channel;
+    private Acknowledgment ack;
 
     @Mock
     private LambdaQueryChainWrapper<EntityStateDO> queryWrapper;
@@ -76,11 +76,6 @@ class DriverTimeoutCheckReceiverTest {
         receiver = new DriverTimeoutCheckReceiver(entityStateManager, entityAlarmManager, alarmRuleTriggerService);
     }
 
-    private Message mockMessage(long deliveryTag) {
-        MessageProperties props = new MessageProperties();
-        props.setDeliveryTag(deliveryTag);
-        return new Message(new byte[0], props);
-    }
 
     private DriverTimeoutCheckDTO timeoutCheck(Long driverId, Long tenantId, Long leaseVersion) {
         return DriverTimeoutCheckDTO.builder()
@@ -121,10 +116,10 @@ class DriverTimeoutCheckReceiverTest {
 
     @Test
     void rejectsInvalidPayload() throws Exception {
-        receiver.driverTimeoutCheck(channel, mockMessage(7L), timeoutCheck(null, 100L, 1L));
+        receiver.driverTimeoutCheck(new MqReceived<>(timeoutCheck(null, 100L, 1L), Map.of(), false), ack);
 
         verifyNoInteractions(entityStateManager, entityAlarmManager, alarmRuleTriggerService);
-        verify(channel).basicReject(eq(7L), eq(false));
+        verify(ack).reject(false);
     }
 
     @Test
@@ -132,9 +127,9 @@ class DriverTimeoutCheckReceiverTest {
         stubQuery(driverState((byte) EntityStatusEnum.ONLINE.getIndex(), 3L,
                 LocalDateTime.now().minusSeconds(1)));
 
-        receiver.driverTimeoutCheck(channel, mockMessage(8L), timeoutCheck(7L, 100L, 2L));
+        receiver.driverTimeoutCheck(new MqReceived<>(timeoutCheck(7L, 100L, 2L), Map.of(), false), ack);
 
-        verify(channel).basicAck(eq(8L), eq(false));
+        verify(ack).ack();
         verify(entityStateManager, never()).lambdaUpdate();
         verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService);
     }
@@ -146,12 +141,12 @@ class DriverTimeoutCheckReceiverTest {
         stubUpdateChain();
         when(entityAlarmManager.save(any(EntityAlarmDO.class))).thenReturn(true);
 
-        receiver.driverTimeoutCheck(channel, mockMessage(9L), timeoutCheck(7L, 100L, 4L));
+        receiver.driverTimeoutCheck(new MqReceived<>(timeoutCheck(7L, 100L, 4L), Map.of(), false), ack);
 
         verify(claimUpdateWrapper).set(any(), eq(EntityStatusEnum.OFFLINE.getIndex()));
         verify(entityAlarmManager).save(any(EntityAlarmDO.class));
         verify(alarmRuleTriggerService).processDriverAlarm(any());
-        verify(channel).basicAck(eq(9L), eq(false));
+        verify(ack).ack();
     }
 
 }

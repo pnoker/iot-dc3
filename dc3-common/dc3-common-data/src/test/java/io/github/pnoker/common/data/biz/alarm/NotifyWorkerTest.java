@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.dal.NotifyChannelManager;
 import io.github.pnoker.common.data.dal.NotifyHistoryManager;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
@@ -28,6 +27,8 @@ import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,8 +36,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 
 import java.util.Map;
 import java.util.Optional;
@@ -71,12 +70,11 @@ class NotifyWorkerTest {
     private NotifyChannelAdapter adapter;
 
     @Mock
-    private Channel channel;
+    private Acknowledgment ack;
 
     @InjectMocks
     private NotifyWorker worker;
 
-    private Message message;
 
     private static NotifyTaskDTO task(int retry) {
         return NotifyTaskDTO.builder()
@@ -92,9 +90,6 @@ class NotifyWorkerTest {
 
     @BeforeEach
     void setUp() {
-        MessageProperties props = new MessageProperties();
-        props.setDeliveryTag(11L);
-        message = new Message(new byte[0], props);
     }
 
     private void stubChannel(boolean enabled, NotifyChannelTypeEnum type) {
@@ -118,13 +113,13 @@ class NotifyWorkerTest {
         when(notifyChannelAdapterRegistry.find(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
         when(adapter.send(any(), any())).thenReturn(NotifySendResult.success("https://hook", 200, "OK", Map.of()));
 
-        worker.onNotifyTask(channel, message, task(0));
+        worker.onNotifyTask(new MqReceived<>(task(0), Map.of(), false), ack);
 
         ArgumentCaptor<NotifyHistoryDO> captor = ArgumentCaptor.forClass(NotifyHistoryDO.class);
         verify(notifyHistoryManager).updateById(captor.capture());
         assertThat(captor.getValue().getId()).isEqualTo(50L);
         assertThat(captor.getValue().getStatusFlag()).isEqualTo(NotifyHistoryStatusEnum.SUCCESS.getIndex());
-        verify(channel).basicAck(eq(11L), eq(false));
+        verify(ack).ack();
         verify(notifyTaskSender, never()).publish(any());
     }
 
@@ -134,7 +129,7 @@ class NotifyWorkerTest {
         when(notifyChannelAdapterRegistry.find(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
         when(adapter.send(any(), any())).thenReturn(NotifySendResult.failed("https://hook", "503"));
 
-        worker.onNotifyTask(channel, message, task(0));
+        worker.onNotifyTask(new MqReceived<>(task(0), Map.of(), false), ack);
 
         ArgumentCaptor<NotifyHistoryDO> captor = ArgumentCaptor.forClass(NotifyHistoryDO.class);
         verify(notifyHistoryManager).updateById(captor.capture());
@@ -144,7 +139,7 @@ class NotifyWorkerTest {
         ArgumentCaptor<NotifyTaskDTO> taskCaptor = ArgumentCaptor.forClass(NotifyTaskDTO.class);
         verify(notifyTaskSender).publish(taskCaptor.capture());
         assertThat(taskCaptor.getValue().getRetryCount()).isEqualTo(1);
-        verify(channel).basicAck(eq(11L), eq(false));
+        verify(ack).ack();
     }
 
     @Test
@@ -154,34 +149,34 @@ class NotifyWorkerTest {
         when(adapter.send(any(), any())).thenReturn(NotifySendResult.failed("https://hook", "503"));
 
         // retry already at MAX_ATTEMPTS - 1; one more failure should terminate.
-        worker.onNotifyTask(channel, message, task(NotifyWorker.MAX_ATTEMPTS - 1));
+        worker.onNotifyTask(new MqReceived<>(task(NotifyWorker.MAX_ATTEMPTS - 1), Map.of(), false), ack);
 
         ArgumentCaptor<NotifyHistoryDO> captor = ArgumentCaptor.forClass(NotifyHistoryDO.class);
         verify(notifyHistoryManager).updateById(captor.capture());
         assertThat(captor.getValue().getStatusFlag()).isEqualTo(NotifyHistoryStatusEnum.FAILED.getIndex());
         verify(notifyTaskSender, never()).publish(any());
-        verify(channel).basicAck(eq(11L), eq(false));
+        verify(ack).ack();
     }
 
     @Test
     void marksHistorySkippedWhenChannelDisabled() throws Exception {
         stubChannel(false, NotifyChannelTypeEnum.WEBHOOK);
 
-        worker.onNotifyTask(channel, message, task(0));
+        worker.onNotifyTask(new MqReceived<>(task(0), Map.of(), false), ack);
 
         ArgumentCaptor<NotifyHistoryDO> captor = ArgumentCaptor.forClass(NotifyHistoryDO.class);
         verify(notifyHistoryManager).updateById(captor.capture());
         assertThat(captor.getValue().getStatusFlag()).isEqualTo(NotifyHistoryStatusEnum.SKIPPED.getIndex());
         // Adapter must not be invoked for a disabled channel
         verifyNoInteractions(adapter);
-        verify(channel).basicAck(eq(11L), eq(false));
+        verify(ack).ack();
     }
 
     @Test
     void rejectsTaskWithoutHistoryId() throws Exception {
         NotifyTaskDTO bad = NotifyTaskDTO.builder().channelId(2L).build();
-        worker.onNotifyTask(channel, message, bad);
-        verify(channel).basicReject(eq(11L), eq(false));
+        worker.onNotifyTask(new MqReceived<>(bad, Map.of(), false), ack);
+        verify(ack).reject(false);
         verify(notifyHistoryManager, never()).updateById(any());
     }
 
@@ -190,15 +185,15 @@ class NotifyWorkerTest {
         stubChannel(true, NotifyChannelTypeEnum.FEISHU_BOT);
         when(notifyChannelAdapterRegistry.find(NotifyChannelTypeEnum.FEISHU_BOT)).thenReturn(Optional.empty());
 
-        worker.onNotifyTask(channel, message, NotifyTaskDTO.builder()
+        worker.onNotifyTask(new MqReceived<>(NotifyTaskDTO.builder()
                 .notifyHistoryId(50L).tenantId(7L).channelId(2L)
                 .channelTypeFlag(NotifyChannelTypeEnum.FEISHU_BOT.getIndex())
-                .build());
+                .build(), Map.of(), false), ack);
 
         ArgumentCaptor<NotifyHistoryDO> captor = ArgumentCaptor.forClass(NotifyHistoryDO.class);
         verify(notifyHistoryManager).updateById(captor.capture());
         assertThat(captor.getValue().getStatusFlag()).isEqualTo(NotifyHistoryStatusEnum.FAILED.getIndex());
-        verify(channel).basicAck(eq(11L), eq(false));
+        verify(ack).ack();
     }
 
 }

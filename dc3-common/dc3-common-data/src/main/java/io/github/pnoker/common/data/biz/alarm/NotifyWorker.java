@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.data.dal.NotifyChannelManager;
 import io.github.pnoker.common.data.dal.NotifyHistoryManager;
@@ -31,12 +30,12 @@ import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -86,25 +85,23 @@ public class NotifyWorker {
     /**
      * On notify task.
      *
-     * @param channel channel
-     * @param message message
-     * @param task task
+     * @param message the notify task delivery
+     * @param ack     the acknowledgement handle
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{notifyTaskQueue.name}")
-    public void onNotifyTask(Channel channel, Message message, NotifyTaskDTO task) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.NOTIFY_TASK)
+    public void onNotifyTask(MqReceived<NotifyTaskDTO> message, Acknowledgment ack) {
+        NotifyTaskDTO task = message.payload();
         try {
             if (Objects.isNull(task) || Objects.isNull(task.getNotifyHistoryId())
                     || Objects.isNull(task.getChannelId())) {
                 log.error("Notify task rejected, reason=invalidEnvelope, historyId={}, channelId={}",
                         Objects.nonNull(task) ? task.getNotifyHistoryId() : null,
                         Objects.nonNull(task) ? task.getChannelId() : null);
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
             dispatch(task);
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
             log.error("Notify task consume failed, historyId={}, channelId={}, retry={}",
                     Objects.nonNull(task) ? task.getNotifyHistoryId() : null,
@@ -113,7 +110,7 @@ public class NotifyWorker {
             // Worker exception is internal — the task itself is preserved on the
             // history row and the next /admin replay can pick it up; nack-requeue
             // would loop in tight cases.
-            RabbitAckUtil.nack(channel, deliveryTag, false);
+            ack.reject(false);
         }
     }
 

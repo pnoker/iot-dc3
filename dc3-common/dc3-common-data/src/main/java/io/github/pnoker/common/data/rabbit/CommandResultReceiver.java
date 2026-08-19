@@ -17,17 +17,16 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.dal.CommandHistoryManager;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.entity.dto.CommandCallResultDTO;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -55,13 +54,12 @@ public class CommandResultReceiver {
      * @param message   the raw message carrying the delivery tag
      * @param resultDTO the deserialized command result
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{commandResultQueue.name}")
-    public void onResult(Channel channel, Message message, CommandCallResultDTO resultDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.COMMAND_RESULT)
+    public void onResult(MqReceived<CommandCallResultDTO> message, Acknowledgment ack) {
+        CommandCallResultDTO resultDTO = message.payload();
         try {
             if (Objects.isNull(resultDTO) || Objects.isNull(resultDTO.recordId())) {
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
 
@@ -92,10 +90,10 @@ public class CommandResultReceiver {
                 log.warn("Command record not found for result: recordId={}", resultDTO.recordId());
             }
 
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
-            log.error("Command result processing failed, deliveryTag={}", deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            log.error("Command result processing failed.", e);
+            ack.reject(true);
         }
     }
 

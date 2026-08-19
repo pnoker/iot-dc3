@@ -17,15 +17,14 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -50,10 +49,9 @@ public class DriverAlarmReceiver {
      * @param message   the raw message carrying the delivery tag
      * @param entityDTO the deserialized driver alarm
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{driverAlarmQueue.name}")
-    public void driverAlarmReceive(Channel channel, Message message, DriverAlarmDTO entityDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.ALARM, keyPattern = "driver.*")
+    public void driverAlarmReceive(MqReceived<DriverAlarmDTO> message, Acknowledgment ack) {
+        DriverAlarmDTO entityDTO = message.payload();
         try {
             log.debug("Driver alarm received, tenantId={}, driverId={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
@@ -61,14 +59,14 @@ public class DriverAlarmReceiver {
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
                 log.warn("Invalid driver alarm, driverId is null, driverId={}",
                         Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
             driverAlarmService.alarm(entityDTO);
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
-            log.error("Driver alarm consume failed, deliveryTag={}", deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            log.error("Driver alarm consume failed.", e);
+            ack.reject(true);
         }
     }
 

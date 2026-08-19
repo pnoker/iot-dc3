@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.EntityStateManager;
@@ -32,12 +31,12 @@ import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -78,14 +77,13 @@ public class DriverTimeoutCheckReceiver {
      * @param message the raw message carrying the delivery tag
      * @param dto     the driver timeout check carrying tenant, driver id, and lease version
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{driverTimeoutCheckQueue.name}")
-    public void driverTimeoutCheck(Channel channel, Message message, DriverTimeoutCheckDTO dto) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.STATE_TIMEOUT)
+    public void driverTimeoutCheck(MqReceived<DriverTimeoutCheckDTO> message, Acknowledgment ack) {
+        DriverTimeoutCheckDTO dto = message.payload();
         try {
             if (Objects.isNull(dto) || Objects.isNull(dto.getDriverId()) || Objects.isNull(dto.getTenantId())
                     || Objects.isNull(dto.getLeaseVersion())) {
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
 
@@ -97,26 +95,26 @@ public class DriverTimeoutCheckReceiver {
 
             // State row gone — nothing to do
             if (Objects.isNull(state)) {
-                RabbitAckUtil.ack(channel, deliveryTag);
+                ack.ack();
                 return;
             }
 
             // lease_version mismatched means a newer heartbeat arrived
             if (!Objects.equals(state.getLeaseVersion(), dto.getLeaseVersion())) {
-                RabbitAckUtil.ack(channel, deliveryTag);
+                ack.ack();
                 return;
             }
 
             // Not expired yet
             if (state.getExpireTime().isAfter(LocalDateTime.now())) {
-                RabbitAckUtil.ack(channel, deliveryTag);
+                ack.ack();
                 return;
             }
 
             // Already offline
             Byte offlineIndex = EntityStatusEnum.OFFLINE.getIndex();
             if (Objects.equals(state.getStateFlag(), offlineIndex)) {
-                RabbitAckUtil.ack(channel, deliveryTag);
+                ack.ack();
                 return;
             }
 
@@ -125,7 +123,7 @@ public class DriverTimeoutCheckReceiver {
                     || statusIs(state.getStateFlag(), EntityStatusEnum.MAINTAIN)
                     || statusIs(state.getStateFlag(), EntityStatusEnum.FAULT);
             if (!heartbeatRenewed) {
-                RabbitAckUtil.ack(channel, deliveryTag);
+                ack.ack();
                 return;
             }
 
@@ -143,7 +141,7 @@ public class DriverTimeoutCheckReceiver {
                     .update();
 
             if (!claimed) {
-                RabbitAckUtil.ack(channel, deliveryTag);
+                ack.ack();
                 return;
             }
 
@@ -192,10 +190,10 @@ public class DriverTimeoutCheckReceiver {
             log.info("Driver timeout check confirmed OFFLINE: driverId={}, tenantId={}, prevStatus={}",
                     dto.getDriverId(), dto.getTenantId(), prevCode);
 
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
-            log.error("Driver timeout check failed, deliveryTag={}", deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            log.error("Driver timeout check failed.", e);
+            ack.reject(true);
         }
     }
 }

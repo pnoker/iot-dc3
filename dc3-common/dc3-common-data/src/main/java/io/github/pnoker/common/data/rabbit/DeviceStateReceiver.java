@@ -17,15 +17,14 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DeviceStateService;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -51,10 +50,9 @@ public class DeviceStateReceiver {
      * @param message   the raw message carrying the delivery tag
      * @param entityDTO the deserialized device state
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{deviceStateQueue.name}")
-    public void deviceStateReceive(Channel channel, Message message, DeviceStateDTO entityDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.STATE, keyPattern = "device.*")
+    public void deviceStateReceive(MqReceived<DeviceStateDTO> message, Acknowledgment ack) {
+        DeviceStateDTO entityDTO = message.payload();
         try {
             log.debug("Device state received, tenantId={}, driverId={}, deviceId={}, status={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
@@ -68,14 +66,14 @@ public class DeviceStateReceiver {
                 log.warn("Invalid device state, some required fields are null, deviceId={}, driverId={}",
                         Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId(),
                         Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
             deviceStateService.heartbeat(entityDTO);
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
-            log.error("Device state consume failed, deliveryTag={}", deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            log.error("Device state consume failed.", e);
+            ack.reject(true);
         }
     }
 

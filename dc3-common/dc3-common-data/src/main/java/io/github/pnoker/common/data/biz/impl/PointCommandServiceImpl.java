@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.biz.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.biz.PointCommandHistoryService;
 import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
@@ -47,11 +46,12 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.utils.RabbitPublishConfirm;
+import io.github.pnoker.common.mq.MqHeaders;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -80,7 +80,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
 
     private final PointFacade pointFacade;
 
-    private final RabbitTemplate rabbitTemplate;
+    private final MessageSender messageSender;
 
     private final PointCommandHistoryManager pointCommandHistoryManager;
 
@@ -281,10 +281,12 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
      * Publish a point command DTO to the driver via RabbitMQ.
      */
     private void publishCommand(PointCommandDTO dto, String serviceName, String ownerNode, String commandId) {
-        CorrelationData correlationData = new CorrelationData(commandId);
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND,
-                RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + serviceName + "." + ownerNode, dto, correlationData);
-        RabbitPublishConfirm.awaitRouted(correlationData, Duration.ofSeconds(5));
+        messageSender.sendConfirmed(MqMessage.builder()
+                .topic(MqTopic.POINT_COMMAND)
+                .partitionKey(serviceName + "." + ownerNode)
+                .payload(dto)
+                .header(MqHeaders.CORRELATION_ID, commandId)
+                .build(), Duration.ofSeconds(5));
     }
 
     private void markPublishFailed(PointCommandHistoryDO commandDO, Exception cause) {

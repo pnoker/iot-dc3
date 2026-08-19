@@ -21,7 +21,6 @@ import io.github.pnoker.common.data.biz.ScheduleForDataService;
 import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
 import io.github.pnoker.common.data.entity.property.NotifyCredentialProperties;
-import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import lombok.RequiredArgsConstructor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
@@ -41,7 +40,7 @@ import org.springframework.context.annotation.ComponentScan;
 @AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.data"})
 @MapperScan(basePackages = {"io.github.pnoker.common.data.mapper"})
-@EnableConfigurationProperties({PointBatchProperties.class, NotifyCredentialProperties.class,
+@EnableConfigurationProperties({NotifyCredentialProperties.class,
         AlarmCacheProperties.class, AlarmWindowProperties.class})
 @RequiredArgsConstructor
 public class DataInitRunner implements ApplicationRunner {

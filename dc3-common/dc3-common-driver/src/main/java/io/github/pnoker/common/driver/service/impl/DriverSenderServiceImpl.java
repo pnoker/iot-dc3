@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.driver.buffer.BufferService;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
@@ -32,11 +31,11 @@ import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.utils.RabbitPublishConfirm;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -73,9 +72,9 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     private final DriverMetadata driverMetadata;
 
     /**
-     * RabbitMQ publisher used to deliver every outbound message to the data-center exchanges.
+     * Broker-neutral publisher used to deliver every outbound message to the data center.
      */
-    private final RabbitTemplate rabbitTemplate;
+    private final MessageSender messageSender;
 
     /**
      * Durable point-value outbox. Values are committed locally before RabbitMQ publication and are
@@ -93,8 +92,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         if (Objects.isNull(entityDTO)) {
             return;
         }
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_STATE,
-                RabbitConstant.ROUTING_DRIVER_STATE_PREFIX + driverProperties.getService(), entityDTO);
+        messageSender.send(MqMessage.of(MqTopic.STATE, "driver." + driverProperties.getService(), entityDTO));
     }
 
     /**
@@ -107,8 +105,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         if (Objects.isNull(entityDTO)) {
             return;
         }
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_STATE,
-                RabbitConstant.ROUTING_DEVICE_STATE_PREFIX + driverProperties.getService(), entityDTO);
+        messageSender.send(MqMessage.of(MqTopic.STATE, "device." + driverProperties.getService(), entityDTO));
     }
 
     /**
@@ -157,8 +154,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 .build();
         log.info("Driver alarm published, tenantId={}, driverId={}, messageLength={}",
                 driver.getTenantId(), driver.getId(), Objects.nonNull(message) ? message.length() : 0);
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_ALARM,
-                RabbitConstant.ROUTING_DRIVER_ALARM_PREFIX + driverProperties.getService(), alarm);
+        messageSender.send(MqMessage.of(MqTopic.ALARM, "driver." + driverProperties.getService(), alarm));
     }
 
     /**
@@ -183,8 +179,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
         log.info("Device alarm published, tenantId={}, driverId={}, deviceId={}, messageLength={}",
                 alarm.getTenantId(), alarm.getDriverId(), deviceId, Objects.nonNull(message) ? message.length() : 0);
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_ALARM,
-                RabbitConstant.ROUTING_DEVICE_ALARM_PREFIX + driverProperties.getService(), alarm);
+        messageSender.send(MqMessage.of(MqTopic.ALARM, "device." + driverProperties.getService(), alarm));
     }
 
     /**
@@ -207,8 +202,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
             return;
         }
 
-        String routingKey = RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService();
-        bufferService.publish(entityDTO, routingKey);
+        bufferService.publish(entityDTO, driverProperties.getService());
     }
 
     private boolean stampPointValue(PointValue pointValue, DriverBO driver) {
@@ -259,8 +253,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
             }
         }
         if (!pointValues.isEmpty()) {
-            bufferService.publishBatch(pointValues,
-                    RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService());
+            bufferService.publishBatch(pointValues, driverProperties.getService());
         }
     }
 
@@ -274,9 +267,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         if (Objects.isNull(resultDTO)) {
             return;
         }
-        sendConfirmed(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT,
-                RabbitConstant.ROUTING_POINT_COMMAND_RESULT_PREFIX + driverProperties.getService(),
-                resultDTO, resultDTO.commandId());
+        sendConfirmed(MqTopic.POINT_COMMAND_RESULT, driverProperties.getService(), resultDTO);
     }
 
     /**
@@ -289,9 +280,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         if (Objects.isNull(resultDTO)) {
             return;
         }
-        sendConfirmed(RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT,
-                RabbitConstant.ROUTING_COMMAND_RESULT_PREFIX + driverProperties.getService(),
-                resultDTO, resultDTO.recordId());
+        sendConfirmed(MqTopic.COMMAND_RESULT, driverProperties.getService(), resultDTO);
     }
 
     /**
@@ -304,8 +293,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         if (Objects.isNull(entityDTO)) {
             return;
         }
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                RabbitConstant.ROUTING_EVENT_PREFIX + driverProperties.getService(), entityDTO);
+        messageSender.send(MqMessage.of(MqTopic.EVENT, driverProperties.getService(), entityDTO));
     }
 
     /**
@@ -335,11 +323,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         deviceStateSender(deviceState);
     }
 
-    private void sendConfirmed(String exchange, String routingKey, Object payload, String correlationId) {
-        CorrelationData correlationData = new CorrelationData(
-                Objects.nonNull(correlationId) ? correlationId : UUID.randomUUID().toString());
-        rabbitTemplate.convertAndSend(exchange, routingKey, payload, correlationData);
-        RabbitPublishConfirm.awaitRouted(correlationData, Duration.ofSeconds(5));
+    private void sendConfirmed(MqTopic topic, String partitionKey, Object payload) {
+        messageSender.sendConfirmed(MqMessage.of(topic, partitionKey, payload), Duration.ofSeconds(5));
     }
 
 }

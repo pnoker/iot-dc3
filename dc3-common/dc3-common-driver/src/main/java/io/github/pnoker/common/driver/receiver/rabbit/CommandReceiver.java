@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.driver.receiver.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.driver.command.CommandDedupCache;
 import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -33,12 +32,12 @@ import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.facade.api.CommandFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -85,11 +84,10 @@ public class CommandReceiver {
      * @param message   the inbound RabbitMQ message carrying the delivery tag and redelivery flag
      * @param entityDTO the deserialized command call payload
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{commandQueue.name}")
-    public void commandReceive(Channel channel, Message message, CommandCallDTO entityDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
-        boolean redelivered = Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
+    @Dc3Listener(topic = MqTopic.COMMAND, group = "${dc3.driver.client}", keyPattern = "${dc3.driver.service}.${dc3.driver.node}")
+    public void commandReceive(MqReceived<CommandCallDTO> message, Acknowledgment ack) {
+        CommandCallDTO entityDTO = message.payload();
+        boolean redelivered = message.redelivered();
         try {
             // Validate first: the debug log below dereferences entityDTO, so a null
             // payload must be rejected before logging to avoid an NPE that would
@@ -103,7 +101,7 @@ public class CommandReceiver {
                         Objects.isNull(entityDTO) ? null : entityDTO.tenantId(),
                         Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
                         Objects.isNull(entityDTO) ? null : entityDTO.commandId());
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
 
@@ -120,7 +118,7 @@ public class CommandReceiver {
                 log.warn("Reject stale-owner custom command, recordId={}, deviceId={}, fencingToken={}",
                         recordId, deviceId, entityDTO.fencingToken());
                 sendResult(recordId, tenantId, PointCommandStatusEnum.FAILED,
-                        null, null, "STALE_OWNER", "Device ownership lease changed", channel, deliveryTag);
+                        null, null, "STALE_OWNER", "Device ownership lease changed", ack);
                 return;
             }
 
@@ -129,7 +127,7 @@ public class CommandReceiver {
                 log.warn("Custom command rejected, reason=expired, recordId={}, expireAt={}",
                         recordId, entityDTO.expireAt());
                 sendResult(recordId, tenantId, PointCommandStatusEnum.EXPIRED,
-                        null, null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
+                        null, null, "EXPIRED", "Command expired before execution", ack);
                 return;
             }
 
@@ -137,7 +135,7 @@ public class CommandReceiver {
             if (!dedupCache.tryAcquire(recordId)) {
                 log.warn("Duplicate command detected: recordId={}", recordId);
                 sendResult(recordId, tenantId, PointCommandStatusEnum.DUPLICATE,
-                        null, null, "DUPLICATE", "Command already processed", channel, deliveryTag);
+                        null, null, "DUPLICATE", "Command already processed", ack);
                 return;
             }
 
@@ -159,19 +157,19 @@ public class CommandReceiver {
             });
 
             sendResult(recordId, tenantId, PointCommandStatusEnum.SUCCESS,
-                    executionResult.resultValues(), executionResult.configSnapshot(), null, null, channel, deliveryTag);
+                    executionResult.resultValues(), executionResult.configSnapshot(), null, null, ack);
 
         } catch (Exception e) {
             if (redelivered) {
-                log.error("Custom command failed on redelivery, sending FAILED. deliveryTag={}", deliveryTag, e);
+                log.error("Custom command failed on redelivery, sending FAILED.", e);
                 String recordId = Objects.nonNull(entityDTO) ? entityDTO.recordId() : null;
                 Long tenantId = Objects.nonNull(entityDTO) ? entityDTO.tenantId() : null;
                 sendResult(recordId, tenantId, PointCommandStatusEnum.FAILED,
-                        null, null, "DRIVER_ERROR", e.getMessage(), channel, deliveryTag);
+                        null, null, "DRIVER_ERROR", e.getMessage(), ack);
             } else {
-                log.warn("Custom command failed, requeueing. deliveryTag={}", deliveryTag, e);
+                log.warn("Custom command failed, requeueing.", e);
                 releaseDedup(entityDTO);
-                RabbitAckUtil.nack(channel, deliveryTag, true);
+                ack.reject(true);
             }
         }
     }
@@ -185,7 +183,7 @@ public class CommandReceiver {
     private void sendResult(String recordId, Long tenantId, PointCommandStatusEnum status,
                             Map<String, String> resultValues, String configSnapshot,
                             String errorCode, String errorMessage,
-                            Channel channel, long deliveryTag) {
+                            Acknowledgment ack) {
         try {
             if (Objects.nonNull(recordId)) {
                 CommandCallResultDTO result = CommandCallResultDTO.builder()
@@ -206,10 +204,10 @@ public class CommandReceiver {
             if (Objects.nonNull(recordId)) {
                 dedupCache.release(recordId);
             }
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            ack.reject(true);
             return;
         }
-        RabbitAckUtil.ack(channel, deliveryTag);
+        ack.ack();
     }
 
     /**

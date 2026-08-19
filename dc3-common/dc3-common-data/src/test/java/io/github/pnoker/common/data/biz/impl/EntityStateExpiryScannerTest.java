@@ -18,7 +18,6 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.EntityStateManager;
@@ -29,11 +28,13 @@ import io.github.pnoker.common.enums.EntityTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
+import io.github.pnoker.common.mq.sender.MessageSender;
+import java.util.Map;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -45,6 +46,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -65,10 +67,10 @@ class EntityStateExpiryScannerTest {
     private AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private MessageSender messageSender;
 
     @Mock
-    private Channel channel;
+    private Acknowledgment ack;
 
     @Mock
     private LambdaUpdateChainWrapper<EntityStateDO> updateWrapper;
@@ -90,11 +92,6 @@ class EntityStateExpiryScannerTest {
         return state;
     }
 
-    private Message mockMessage(long deliveryTag) {
-        MessageProperties props = new MessageProperties();
-        props.setDeliveryTag(deliveryTag);
-        return new Message("tick".getBytes(), props);
-    }
 
     private void stubClaimedDevices(List<EntityStateDO> results) {
         when(entityStateMapper.claimExpiredDevices(anyByte(), anyByte(), anyByte(), anyByte(), anyByte(), anyInt(), anyInt()))
@@ -112,9 +109,9 @@ class EntityStateExpiryScannerTest {
     void noExpiredRowsDoesNothing() throws Exception {
         stubClaimedDevices(Collections.emptyList());
 
-        scanner.onScanTick(channel, mockMessage(1L));
+        scanner.onScanTick(new MqReceived<>("tick", Map.of(), false), ack);
 
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), anyString());
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.DEVICE_SCAN));
         verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService);
     }
 
@@ -122,7 +119,7 @@ class EntityStateExpiryScannerTest {
     void emptyClaimSkipsAlarm() throws Exception {
         stubClaimedDevices(Collections.emptyList());
 
-        scanner.onScanTick(channel, mockMessage(1L));
+        scanner.onScanTick(new MqReceived<>("tick", Map.of(), false), ack);
 
         verify(entityStateMapper).claimExpiredDevices(
                 eq((byte) EntityTypeEnum.DEVICE.getIndex()),
@@ -134,7 +131,7 @@ class EntityStateExpiryScannerTest {
                 anyInt());
         verify(entityAlarmManager, never()).save(any());
         verify(alarmRuleTriggerService, never()).processDeviceAlarm(any());
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), anyString());
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.DEVICE_SCAN));
     }
 
     @Test
@@ -147,34 +144,31 @@ class EntityStateExpiryScannerTest {
         stubLastAlarmUpdate();
         when(entityAlarmManager.saveBatch(any())).thenReturn(true);
 
-        scanner.onScanTick(channel, mockMessage(1L));
+        scanner.onScanTick(new MqReceived<>("tick", Map.of(), false), ack);
 
         verify(entityAlarmManager).saveBatch(any());
         verify(alarmRuleTriggerService).processDeviceAlarm(any());
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), anyString());
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.DEVICE_SCAN));
     }
 
     @Test
     void anotherInstanceAlreadyClaimedRowsDoesNothing() throws Exception {
         stubClaimedDevices(Collections.emptyList());
 
-        scanner.onScanTick(channel, mockMessage(1L));
+        scanner.onScanTick(new MqReceived<>("tick", Map.of(), false), ack);
 
         verify(entityAlarmManager, never()).save(any());
         verify(alarmRuleTriggerService, never()).processDeviceAlarm(any());
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), anyString());
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.DEVICE_SCAN));
     }
 
     @Test
     void scanTickPublishesNextTickOnSuccess() throws Exception {
         stubClaimedDevices(Collections.emptyList());
 
-        scanner.onScanTick(channel, mockMessage(1L));
+        scanner.onScanTick(new MqReceived<>("tick", Map.of(), false), ack);
 
-        verify(rabbitTemplate).convertAndSend(
-                "dc3.e.state_timeout_delay",
-                "state.timeout.device.scan.tick",
-                "tick");
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.DEVICE_SCAN));
     }
 
     @Test
@@ -182,10 +176,10 @@ class EntityStateExpiryScannerTest {
         when(entityStateMapper.claimExpiredDevices(anyByte(), anyByte(), anyByte(), anyByte(), anyByte(), anyInt(), anyInt()))
                 .thenThrow(new RuntimeException("DB down"));
 
-        scanner.onScanTick(channel, mockMessage(1L));
+        scanner.onScanTick(new MqReceived<>("tick", Map.of(), false), ack);
 
-        verify(channel).basicNack(1L, false, true);
+        verify(ack).reject(true);
         // next tick NOT published on failure
-        verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), anyString());
+        verify(messageSender, never()).send(any());
     }
 }

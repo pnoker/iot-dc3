@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.driver.receiver.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.driver.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.driver.grpc.client.DriverClient;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
@@ -27,12 +26,13 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
+import io.github.pnoker.common.constant.mq.SubscriptionMode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -66,10 +66,9 @@ public class MetadataReceiver {
      * @param message   RabbitMQ message
      * @param entityDTO Metadata event data transfer object
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{metadataQueue.name}")
-    public void metadataReceive(Channel channel, Message message, MetadataEventDTO entityDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.METADATA, mode = SubscriptionMode.BROADCAST, group = "${dc3.driver.client}", keyPattern = "${dc3.driver.service}")
+    public void metadataReceive(MqReceived<MetadataEventDTO> message, Acknowledgment ack) {
+        MetadataEventDTO entityDTO = message.payload();
         try {
             // Validate metadata event first: the debug log below dereferences entityDTO,
             // so a null payload must be rejected before logging to avoid an NPE that
@@ -81,7 +80,7 @@ public class MetadataReceiver {
                         Objects.nonNull(entityDTO) ? entityDTO.getId() : null,
                         Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
                         Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null);
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
 
@@ -146,17 +145,16 @@ public class MetadataReceiver {
             } else {
                 log.error("Driver metadata event rejected, reason=unsupportedType, type={}",
                         entityDTO.getMetadataType());
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
-            log.error("Driver metadata consume failed, metadataType={}, operateType={}, id={}, deliveryTag={}, routingKey={}",
+            log.error("Driver metadata consume failed, metadataType={}, operateType={}, id={}",
                     Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
                     Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null,
-                    Objects.nonNull(entityDTO) ? entityDTO.getId() : null,
-                    deliveryTag, message.getMessageProperties().getReceivedRoutingKey(), e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+                    Objects.nonNull(entityDTO) ? entityDTO.getId() : null, e);
+            ack.reject(true);
         }
     }
 

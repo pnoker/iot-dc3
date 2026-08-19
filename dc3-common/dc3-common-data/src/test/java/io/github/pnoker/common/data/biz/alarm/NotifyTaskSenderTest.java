@@ -21,12 +21,14 @@ import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
+import io.github.pnoker.common.constant.mq.MqTopic;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -36,17 +38,15 @@ import static org.mockito.Mockito.when;
 class NotifyTaskSenderTest {
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private MessageSender messageSender;
 
-    @Mock
-    private TopicExchange alarmExchange;
+
 
     @InjectMocks
     private NotifyTaskSender sender;
 
     @Test
     void publishesWithChannelTypedRoutingKey() {
-        when(alarmExchange.getName()).thenReturn("dc3.e.alarm");
         NotifyTaskDTO task = NotifyTaskDTO.builder()
                 .notifyHistoryId(1L)
                 .channelId(2L)
@@ -55,12 +55,12 @@ class NotifyTaskSenderTest {
 
         sender.publish(task);
 
-        verify(rabbitTemplate).convertAndSend(eq("dc3.e.alarm"), eq("dc3.r.notify.task.0"), eq(task));
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
+                && "0".equals(m.getPartitionKey()) && m.getPayload() == task));
     }
 
     @Test
     void usesUnknownRoutingKeyWhenChannelTypeIsMissing() {
-        when(alarmExchange.getName()).thenReturn("dc3.e.alarm");
         NotifyTaskDTO task = NotifyTaskDTO.builder()
                 .notifyHistoryId(1L)
                 .channelId(2L)
@@ -68,14 +68,15 @@ class NotifyTaskSenderTest {
 
         sender.publish(task);
 
-        verify(rabbitTemplate).convertAndSend(eq("dc3.e.alarm"), eq("dc3.r.notify.task.unknown"), eq(task));
+        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
+                && "unknown".equals(m.getPartitionKey()) && m.getPayload() == task));
     }
 
     @Test
     void refusesToPublishWhenHistoryIdIsMissing() {
         NotifyTaskDTO task = NotifyTaskDTO.builder().channelId(2L).build();
         sender.publish(task);
-        verify(rabbitTemplate, never()).convertAndSend((String) any(), any(), (Object) any());
+        verify(messageSender, never()).send(any());
     }
 
 }

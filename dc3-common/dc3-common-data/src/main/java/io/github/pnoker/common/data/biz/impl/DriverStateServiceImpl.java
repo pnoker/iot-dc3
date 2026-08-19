@@ -18,7 +18,6 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
 import io.github.pnoker.common.data.biz.DriverStateService;
@@ -30,9 +29,11 @@ import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.TimeoutSourceTypeEnum;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -55,7 +56,7 @@ public class DriverStateServiceImpl implements DriverStateService {
 
     private final EntityStateMapper entityStateMapper;
 
-    private final RabbitTemplate rabbitTemplate;
+    private final MessageSender messageSender;
 
     /**
      * Return whether the online/offline side changed between the previous state index
@@ -119,8 +120,7 @@ public class DriverStateServiceImpl implements DriverStateService {
                 .leaseVersion(stateDO.getLeaseVersion())
                 .tenantId(entityDTO.getTenantId())
                 .build();
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY,
-                RabbitConstant.ROUTING_DRIVER_TIMEOUT_DELAY, checkDTO);
+        messageSender.send(MqMessage.of(MqTopic.STATE_TIMEOUT, "", checkDTO));
 
         byte lastIndex = stateDO.getLastStateFlag();
         if (isFlip(lastIndex, current)) {

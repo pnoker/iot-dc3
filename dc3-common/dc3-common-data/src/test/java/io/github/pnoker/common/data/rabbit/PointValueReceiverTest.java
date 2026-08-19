@@ -17,23 +17,21 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqPoisonException;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.AmqpRejectAndDontRequeueException;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -50,7 +48,7 @@ class PointValueReceiverTest {
     private PointValueService pointValueService;
 
     @Mock
-    private Channel channel;
+    private Acknowledgment ack;
 
     private PointValueReceiver receiver;
 
@@ -60,30 +58,28 @@ class PointValueReceiverTest {
     }
 
     @Test
-    void persistsCompleteBatchBeforeAcknowledging() throws Exception {
-        Message first = message(validValue("m-1", 1L), 7L);
-        Message second = message(validValue("m-2", 2L), 8L);
+    void persistsCompleteBatchBeforeAcknowledging() {
+        MqReceived<PointValueBO> first = received(validValue("m-1", 1L));
+        MqReceived<PointValueBO> second = received(validValue("m-2", 2L));
 
-        receiver.pointValueReceive(List.of(first, second), channel);
+        receiver.pointValueReceive(List.of(first, second), ack);
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<PointValueBO>> captor = ArgumentCaptor.forClass(List.class);
         verify(pointValueService).save(captor.capture());
         assertThat(captor.getValue()).extracting(PointValueBO::getMessageId)
                 .containsExactly("m-1", "m-2");
-        verify(channel).basicAck(8L, true);
+        verify(ack).ack();
     }
 
     @Test
-    void doesNotAcknowledgeWhenPersistenceFails() throws Exception {
+    void doesNotAcknowledgeWhenPersistenceFails() {
         doThrow(new IllegalStateException("database unavailable"))
                 .when(pointValueService).save(anyList());
 
-        Message message = message(validValue("m-1", 1L), 7L);
-
-        assertThatThrownBy(() -> receiver.pointValueReceive(List.of(message), channel))
+        assertThatThrownBy(() -> receiver.pointValueReceive(List.of(received(validValue("m-1", 1L))), ack))
                 .isInstanceOf(IllegalStateException.class);
-        verify(channel, never()).basicAck(7L, true);
+        verify(ack, never()).ack();
     }
 
     @Test
@@ -91,20 +87,20 @@ class PointValueReceiverTest {
         PointValueBO invalid = validValue("m-1", 1L);
         invalid.setDriverNode(null);
 
-        assertThatThrownBy(() -> receiver.pointValueReceive(List.of(message(invalid, 7L)), channel))
-                .isInstanceOf(AmqpRejectAndDontRequeueException.class);
+        assertThatThrownBy(() -> receiver.pointValueReceive(List.of(received(invalid)), ack))
+                .isInstanceOf(MqPoisonException.class);
         verifyNoInteractions(pointValueService);
     }
 
     @Test
-    void rejectsMalformedJson() {
-        MessageProperties properties = new MessageProperties();
-        properties.setDeliveryTag(7L);
-        Message malformed = new Message("{".getBytes(StandardCharsets.UTF_8), properties);
+    void ignoresEmptyBatch() {
+        receiver.pointValueReceive(List.of(), ack);
 
-        assertThatThrownBy(() -> receiver.pointValueReceive(List.of(malformed), channel))
-                .isInstanceOf(AmqpRejectAndDontRequeueException.class);
-        verifyNoInteractions(pointValueService);
+        verifyNoInteractions(pointValueService, ack);
+    }
+
+    private MqReceived<PointValueBO> received(PointValueBO value) {
+        return new MqReceived<>(value, Map.of(), false);
     }
 
     private PointValueBO validValue(String messageId, long sequence) {
@@ -122,11 +118,5 @@ class PointValueReceiverTest {
                 .calValue("42")
                 .createTime(LocalDateTime.now())
                 .build();
-    }
-
-    private Message message(PointValueBO value, long deliveryTag) {
-        MessageProperties properties = new MessageProperties();
-        properties.setDeliveryTag(deliveryTag);
-        return new Message(JsonUtil.toJsonString(value).getBytes(StandardCharsets.UTF_8), properties);
     }
 }

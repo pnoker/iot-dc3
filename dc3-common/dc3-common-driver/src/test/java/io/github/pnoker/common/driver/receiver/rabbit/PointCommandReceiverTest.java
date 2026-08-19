@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.driver.receiver.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.driver.command.CommandDedupCache;
 import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
@@ -30,6 +29,8 @@ import io.github.pnoker.common.entity.dto.PointCommandPayload;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,10 +38,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,10 +76,9 @@ class PointCommandReceiverTest {
     private DriverMetadata driverMetadata;
 
     @Mock
-    private Channel channel;
+    private Acknowledgment ack;
 
     private PointCommandReceiver receiver;
-    private Message message;
 
     @BeforeEach
     void setUp() {
@@ -93,9 +92,6 @@ class PointCommandReceiverTest {
         lenient().when(deviceLockManager.runExclusive(anyLong(), ArgumentMatchers.<Supplier<String>>any()))
                 .thenAnswer(invocation -> ((Supplier<?>) invocation.getArgument(1)).get());
 
-        MessageProperties props = new MessageProperties();
-        props.setDeliveryTag(7L);
-        message = new Message(new byte[0], props);
     }
 
     private PointCommandDTO readCommand(String commandId) {
@@ -116,7 +112,7 @@ class PointCommandReceiverTest {
     void readCommandIsDispatchedToReadServiceAndSendsSuccessResult() throws Exception {
         when(dedupCache.tryAcquire("test-cmd-1")).thenReturn(true);
 
-        receiver.pointCommandReceive(channel, message, readCommand("test-cmd-1"));
+        receiver.pointCommandReceive(new MqReceived<>(readCommand("test-cmd-1"), Map.of(), false), ack);
 
         verify(driverReadService).read(eq(10L), eq(20L));
         ArgumentCaptor<PointCommandResultDTO> captor = ArgumentCaptor.forClass(PointCommandResultDTO.class);
@@ -125,7 +121,7 @@ class PointCommandReceiverTest {
         assertThat(captor.getValue().commandId()).isEqualTo("test-cmd-1");
         // read returns no value, so responseValue stays null
         assertThat(captor.getValue().responseValue()).isNull();
-        verify(channel).basicAck(eq(7L), eq(false));
+        verify(ack).ack();
     }
 
     @Test
@@ -133,7 +129,7 @@ class PointCommandReceiverTest {
         when(dedupCache.tryAcquire("test-cmd-2")).thenReturn(true);
         when(driverWriteService.write(eq(10L), eq(20L), eq("42"))).thenReturn(true);
 
-        receiver.pointCommandReceive(channel, message, writeCommand("test-cmd-2"));
+        receiver.pointCommandReceive(new MqReceived<>(writeCommand("test-cmd-2"), Map.of(), false), ack);
 
         verify(driverWriteService).write(eq(10L), eq(20L), eq("42"));
         ArgumentCaptor<PointCommandResultDTO> captor = ArgumentCaptor.forClass(PointCommandResultDTO.class);
@@ -141,15 +137,15 @@ class PointCommandReceiverTest {
         assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.SUCCESS);
         // a successful write echoes the written value back as the responseValue
         assertThat(captor.getValue().responseValue()).isEqualTo("42");
-        verify(channel).basicAck(eq(7L), eq(false));
+        verify(ack).ack();
     }
 
     @Test
     void rejectsNullPayload() throws Exception {
-        receiver.pointCommandReceive(channel, message, null);
+        receiver.pointCommandReceive(new MqReceived<>(null, Map.of(), false), ack);
 
-        verify(channel).basicReject(eq(7L), eq(false));
-        verify(channel, never()).basicAck(eq(7L), eq(false));
+        verify(ack).reject(false);
+        verify(ack, never()).ack();
     }
 
     @Test
@@ -158,16 +154,16 @@ class PointCommandReceiverTest {
                 new PointCommandPayload.ReadPayload(10L, 20L),
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
                 Instant.now(), Instant.now().plusSeconds(10), 1);
-        receiver.pointCommandReceive(channel, message, dto);
+        receiver.pointCommandReceive(new MqReceived<>(dto, Map.of(), false), ack);
 
-        verify(channel).basicReject(eq(7L), eq(false));
+        verify(ack).reject(false);
     }
 
     @Test
     void rejectsPayloadWithNullCommandId() throws Exception {
-        receiver.pointCommandReceive(channel, message, readCommand(null));
+        receiver.pointCommandReceive(new MqReceived<>(readCommand(null), Map.of(), false), ack);
 
-        verify(channel).basicReject(eq(7L), eq(false));
+        verify(ack).reject(false);
         verifyNoInteractions(driverReadService, driverWriteService);
     }
 
@@ -178,9 +174,9 @@ class PointCommandReceiverTest {
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
                 Instant.now(), Instant.now().plusSeconds(10), 1);
 
-        receiver.pointCommandReceive(channel, message, dto);
+        receiver.pointCommandReceive(new MqReceived<>(dto, Map.of(), false), ack);
 
-        verify(channel).basicReject(eq(7L), eq(false));
+        verify(ack).reject(false);
         verifyNoInteractions(driverReadService, driverWriteService);
     }
 
@@ -189,13 +185,13 @@ class PointCommandReceiverTest {
         when(dedupCache.tryAcquire("test-cmd-4")).thenReturn(true);
         doThrow(new RuntimeException("driver offline")).when(driverReadService).read(anyLong(), anyLong());
 
-        receiver.pointCommandReceive(channel, message, readCommand("test-cmd-4"));
+        receiver.pointCommandReceive(new MqReceived<>(readCommand("test-cmd-4"), Map.of(), false), ack);
 
         // A first-time failure must NOT send a result — the command is requeued and will
         // be retried, so reporting FAILED here would double-report on the redelivery.
         verify(driverSenderService, never()).pointCommandResultSender(any());
         verify(dedupCache).release("test-cmd-4");
-        verify(channel).basicNack(eq(7L), eq(false), eq(true));
+        verify(ack).reject(true);
     }
 
     @Test
@@ -205,9 +201,9 @@ class PointCommandReceiverTest {
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
                 Instant.now(), Instant.now().plusSeconds(10), 1);
 
-        receiver.pointCommandReceive(channel, message, dto);
+        receiver.pointCommandReceive(new MqReceived<>(dto, Map.of(), false), ack);
 
-        verify(channel).basicReject(eq(7L), eq(false));
+        verify(ack).reject(false);
         verifyNoInteractions(driverReadService, driverWriteService);
     }
 
@@ -215,7 +211,7 @@ class PointCommandReceiverTest {
     void duplicateCommandSendsDuplicateResult() throws Exception {
         when(dedupCache.tryAcquire("dup-cmd")).thenReturn(false);
 
-        receiver.pointCommandReceive(channel, message, readCommand("dup-cmd"));
+        receiver.pointCommandReceive(new MqReceived<>(readCommand("dup-cmd"), Map.of(), false), ack);
 
         verifyNoInteractions(driverReadService, driverWriteService);
         ArgumentCaptor<PointCommandResultDTO> captor = ArgumentCaptor.forClass(PointCommandResultDTO.class);
@@ -223,7 +219,7 @@ class PointCommandReceiverTest {
         assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.DUPLICATE);
         assertThat(captor.getValue().errorCode()).isEqualTo("DUPLICATE");
         assertThat(captor.getValue().commandId()).isEqualTo("dup-cmd");
-        verify(channel).basicAck(eq(7L), eq(false));
+        verify(ack).ack();
     }
 
     @Test
@@ -233,7 +229,7 @@ class PointCommandReceiverTest {
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
                 Instant.now().minusSeconds(60), Instant.now().minusSeconds(30), 1);
 
-        receiver.pointCommandReceive(channel, message, expired);
+        receiver.pointCommandReceive(new MqReceived<>(expired, Map.of(), false), ack);
 
         verifyNoInteractions(driverReadService, driverWriteService);
         // expired commands must be rejected before touching the dedup cache
@@ -243,7 +239,7 @@ class PointCommandReceiverTest {
         assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.EXPIRED);
         assertThat(captor.getValue().errorCode()).isEqualTo("EXPIRED");
         assertThat(captor.getValue().commandId()).isEqualTo("exp-cmd");
-        verify(channel).basicAck(eq(7L), eq(false));
+        verify(ack).ack();
     }
 
     @Test
@@ -251,13 +247,13 @@ class PointCommandReceiverTest {
         when(dedupCache.tryAcquire("write-fail")).thenReturn(true);
         when(driverWriteService.write(eq(10L), eq(20L), eq("42"))).thenReturn(false);
 
-        receiver.pointCommandReceive(channel, message, writeCommand("write-fail"));
+        receiver.pointCommandReceive(new MqReceived<>(writeCommand("write-fail"), Map.of(), false), ack);
 
         ArgumentCaptor<PointCommandResultDTO> captor = ArgumentCaptor.forClass(PointCommandResultDTO.class);
         verify(driverSenderService).pointCommandResultSender(captor.capture());
         assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.FAILED);
         assertThat(captor.getValue().errorCode()).isEqualTo("WRITE_FAILED");
         assertThat(captor.getValue().responseValue()).isNull();
-        verify(channel).basicAck(eq(7L), eq(false));
+        verify(ack).ack();
     }
 }

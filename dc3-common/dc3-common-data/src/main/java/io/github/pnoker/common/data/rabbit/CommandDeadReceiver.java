@@ -17,16 +17,16 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.dal.CommandHistoryManager;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.mq.MqHeaders;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -49,15 +49,13 @@ public class CommandDeadReceiver {
      * Consume a command dead-letter message and mark the matching command history record
      * as dead, using the message correlation id as the record id.
      *
-     * @param channel the RabbitMQ channel for manual ack
-     * @param message the dead-letter message carrying the correlation id
+     * @param message the dead-letter delivery carrying the correlation id header
+     * @param ack     the acknowledgement handle
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{commandDeadQueue.name}")
-    public void onDeadLetter(Channel channel, Message message) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.COMMAND_DEAD)
+    public void onDeadLetter(MqReceived<Object> message, Acknowledgment ack) {
         try {
-            String correlationId = message.getMessageProperties().getCorrelationId();
+            String correlationId = message.headers().get(MqHeaders.CORRELATION_ID);
             if (Objects.nonNull(correlationId)) {
                 CommandHistoryDO recordDO = commandHistoryManager.lambdaQuery()
                         .eq(CommandHistoryDO::getRecordId, correlationId)
@@ -71,10 +69,10 @@ public class CommandDeadReceiver {
                     log.info("Marked dead command record: recordId={}", correlationId);
                 }
             }
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
             log.error("Command dead letter processing failed", e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            ack.reject(true);
         }
     }
 

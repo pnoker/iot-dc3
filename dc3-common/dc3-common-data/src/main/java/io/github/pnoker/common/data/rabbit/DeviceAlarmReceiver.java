@@ -17,15 +17,14 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -50,10 +49,9 @@ public class DeviceAlarmReceiver {
      * @param message   the raw message carrying the delivery tag
      * @param entityDTO the deserialized device alarm
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{deviceAlarmQueue.name}")
-    public void deviceAlarmReceive(Channel channel, Message message, DeviceAlarmDTO entityDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.ALARM, keyPattern = "device.*")
+    public void deviceAlarmReceive(MqReceived<DeviceAlarmDTO> message, Acknowledgment ack) {
+        DeviceAlarmDTO entityDTO = message.payload();
         try {
             log.debug("Device alarm received, tenantId={}, driverId={}, deviceId={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
@@ -62,14 +60,14 @@ public class DeviceAlarmReceiver {
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())) {
                 log.warn("Invalid device alarm, deviceId is null, deviceId={}",
                         Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
             deviceAlarmService.alarm(entityDTO);
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
-            log.error("Device alarm consume failed, deliveryTag={}", deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            log.error("Device alarm consume failed.", e);
+            ack.reject(true);
         }
     }
 

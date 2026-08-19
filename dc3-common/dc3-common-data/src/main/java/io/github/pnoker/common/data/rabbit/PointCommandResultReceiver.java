@@ -17,16 +17,15 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
 import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -55,13 +54,12 @@ public class PointCommandResultReceiver {
      * @param message   the raw message carrying the delivery tag
      * @param resultDTO the deserialized point command result
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{pointCommandResultQueue.name}")
-    public void onResult(Channel channel, Message message, PointCommandResultDTO resultDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    @Dc3Listener(topic = MqTopic.POINT_COMMAND_RESULT)
+    public void onResult(MqReceived<PointCommandResultDTO> message, Acknowledgment ack) {
+        PointCommandResultDTO resultDTO = message.payload();
         try {
             if (Objects.isNull(resultDTO) || Objects.isNull(resultDTO.commandId())) {
-                RabbitAckUtil.reject(channel, deliveryTag);
+                ack.reject(false);
                 return;
             }
 
@@ -87,10 +85,10 @@ public class PointCommandResultReceiver {
                 log.warn("Command not found for result: commandId={}", resultDTO.commandId());
             }
 
-            RabbitAckUtil.ack(channel, deliveryTag);
+            ack.ack();
         } catch (Exception e) {
-            log.error("Point command result processing failed, deliveryTag={}", deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            log.error("Point command result processing failed.", e);
+            ack.reject(true);
         }
     }
 
