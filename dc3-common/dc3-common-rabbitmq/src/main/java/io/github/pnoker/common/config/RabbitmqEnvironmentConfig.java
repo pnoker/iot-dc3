@@ -39,7 +39,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j
@@ -73,7 +72,7 @@ public class RabbitmqEnvironmentConfig implements EnvironmentPostProcessor {
         // which is before application context creation -- so by the time any class
         // references RabbitConstant, the system property is already set.
         System.setProperty(DC3_RABBIT_TAG, tag);
-        log.info("RabbitMQ environment tag set: {}", tag);
+        log.info("RabbitMQ environment configured, tag={}", tag);
     }
 
 }

@@ -27,7 +27,6 @@ import org.springframework.validation.annotation.Validated;
  * Shared HMAC signing properties.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Getter

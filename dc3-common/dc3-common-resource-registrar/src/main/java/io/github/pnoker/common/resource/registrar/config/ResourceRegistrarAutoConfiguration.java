@@ -35,7 +35,6 @@ import org.springframework.web.reactive.result.method.annotation.RequestMappingH
  * local or gRPC facade impl), and the feature is not disabled via properties.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration

@@ -24,7 +24,6 @@ import io.github.pnoker.common.constant.common.BaseConstant;
  * Agentic service related constants.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class AgenticConstant {
@@ -78,7 +77,6 @@ public class AgenticConstant {
      * Spring AI tool context keys used to pass request scope into tool calls.
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class ToolContextKey {
@@ -105,7 +103,6 @@ public class AgenticConstant {
      * OpenAI-compatible chat response constants.
      *
      * @author pnoker
-     * @version 2026.5.16
      * @since 2016.10.1
      */
     public static class Chat {
@@ -140,7 +137,6 @@ public class AgenticConstant {
      * Structured agentic visualization constants.
      *
      * @author pnoker
-     * @version 2026.5.17
      * @since 2016.10.1
      */
     public static class Visualization {
@@ -195,7 +191,6 @@ public class AgenticConstant {
      * Agentic session constants.
      *
      * @author pnoker
-     * @version 2026.5.16
      * @since 2016.10.1
      */
     public static class Session {
@@ -212,7 +207,6 @@ public class AgenticConstant {
      * Agentic runtime event constants.
      *
      * @author pnoker
-     * @version 2026.5.16
      * @since 2016.10.1
      */
     public static class RunEvent {
@@ -253,7 +247,6 @@ public class AgenticConstant {
      * Agentic tool result envelope constants.
      *
      * @author pnoker
-     * @version 2026.5.16
      * @since 2016.10.1
      */
     public static class ToolResult {
@@ -286,7 +279,6 @@ public class AgenticConstant {
      * Shared tool execution limits.
      *
      * @author pnoker
-     * @version 2026.5.16
      * @since 2016.10.1
      */
     public static class ToolLimit {
@@ -307,7 +299,6 @@ public class AgenticConstant {
      * Shared agentic tool messages.
      *
      * @author pnoker
-     * @version 2026.5.16
      * @since 2016.10.1
      */
     public static class ToolMessage {

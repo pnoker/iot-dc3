@@ -52,7 +52,6 @@ import java.util.Objects;
  * gRPC server implementation for the EventReport service.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Slf4j

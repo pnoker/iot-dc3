@@ -72,7 +72,7 @@ public class Group {
 
     Group(final Server server, final int serverHandle, final OPCGroupStateMgt group)
             throws IllegalArgumentException, UnknownHostException, JIException {
-        log.debug("Creating new group instance with COM group " + group);
+        log.debug("OPC DA group instance created, comGroup={}", group);
         this._server = server;
         this._serverHandle = serverHandle;
         this._group = group;
@@ -229,7 +229,7 @@ public class Group {
     }
 
     private synchronized void addItem(final Item item) {
-        log.debug(String.format("Adding item: '%s', %d", item.getId(), item.getServerHandle()));
+        log.debug("OPC DA group item added, itemId={}, serverHandle={}", item.getId(), item.getServerHandle());
 
         this._itemHandleMap.put(item.getId(), item.getServerHandle());
         this._itemMap.put(item.getServerHandle(), item);
@@ -245,10 +245,10 @@ public class Group {
     protected Item getItemByOPCItemId(final String opcItemId) {
         Integer serverHandle = this._itemHandleMap.get(opcItemId);
         if (serverHandle == null) {
-            log.debug(String.format("Failed to locate item with id '%s'", opcItemId));
+            log.debug("OPC DA group item lookup missed, itemId={}", opcItemId);
             return null;
         }
-        log.debug(String.format("Item '%s' has server id '%d'", opcItemId, serverHandle));
+        log.debug("OPC DA group item resolved, itemId={}, serverHandle={}", opcItemId, serverHandle);
         return this._itemMap.get(serverHandle);
     }
 
@@ -379,14 +379,14 @@ public class Group {
 
     public synchronized void removeItem(final String opcItemId)
             throws IllegalArgumentException, UnknownHostException, JIException {
-        log.debug(String.format("Removing item '%s'", opcItemId));
+        log.debug("OPC DA group item removal started, itemId={}", opcItemId);
         Item item = getItemByOPCItemId(opcItemId);
         if (item != null) {
             this._group.getItemManagement().remove(item.getServerHandle());
             removeItem(item);
-            log.debug(String.format("Removed item '%s'", opcItemId));
+            log.debug("OPC DA group item removed, itemId={}", opcItemId);
         } else {
-            log.warn(String.format("Unable to find item '%s'", opcItemId));
+            log.warn("OPC DA group item removal skipped, reason=itemNotFound, itemId={}", opcItemId);
         }
     }
 

@@ -51,7 +51,6 @@ import java.util.Map;
  * without that service's schema enrichment.
  *
  * @author pnoker
- * @version 2026.6.18
  * @since 2026.6.13
  */
 @Slf4j

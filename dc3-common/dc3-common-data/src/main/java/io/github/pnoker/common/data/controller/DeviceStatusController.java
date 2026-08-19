@@ -46,7 +46,6 @@ import java.util.Objects;
  * REST controller exposing device status management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "device_status", description = "Device operational status: query current online, offline, fault, and maintenance states of registered industrial devices")

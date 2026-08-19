@@ -24,7 +24,6 @@ import io.github.pnoker.common.constant.common.BaseConstant;
  * Constants for driver/device event messaging.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class EventConstant {
@@ -37,7 +36,6 @@ public class EventConstant {
      * Driver event related constants
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Driver {
@@ -66,7 +64,6 @@ public class EventConstant {
      * Device event related constants
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Device {

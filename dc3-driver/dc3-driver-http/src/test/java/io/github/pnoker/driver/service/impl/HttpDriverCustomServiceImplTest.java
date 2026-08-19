@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,8 +87,8 @@ class HttpDriverCustomServiceImplTest {
     }
 
     @Test
-    void scheduleIsNoOp() {
-        assertThatNoException().isThrownBy(() -> service.schedule());
+    void scheduleDoesNotEmitDeviceStatus() {
+        service.schedule();
         verifyNoInteractions(driverSenderService);
     }
 

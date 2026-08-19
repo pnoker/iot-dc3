@@ -29,7 +29,6 @@ import lombok.Getter;
  * distinct remark for log and debug clarity.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -42,11 +41,8 @@ public enum SuccessCode implements ResponseCode {
     UPDATE(200, "R200", "Updated successfully"),
     ;
 
-    @Getter(onMethod_ = {@Override})
     private final int httpStatus;
-    @Getter(onMethod_ = {@Override})
     private final String code;
-    @Getter(onMethod_ = {@Override})
     private final String remark;
 
 }

@@ -34,7 +34,6 @@ import java.util.Map;
  * Public MCP tool definition returned by JSON-RPC tools/list.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

@@ -25,11 +25,16 @@ import io.github.pnoker.common.manager.entity.vo.TopicVO;
  * Business service for topic operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface TopicService {
 
+    /**
+     * Page through message topics that satisfy the supplied filters.
+     *
+     * @param topicQuery topic filters and pagination settings
+     * @return the matching topics
+     */
     Page<TopicVO> list(TopicQuery topicQuery);
 
 }

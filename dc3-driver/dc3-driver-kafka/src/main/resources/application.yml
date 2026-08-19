@@ -62,7 +62,6 @@ dc3:
         remark: Override topic for this command
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/kafka/buffer.db
 
 spring:

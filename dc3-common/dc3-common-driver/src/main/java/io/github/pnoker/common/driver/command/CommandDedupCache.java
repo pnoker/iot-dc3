@@ -28,7 +28,6 @@ import java.time.Duration;
  * Tracks commandIds that have already been processed within a 5-minute window.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Component

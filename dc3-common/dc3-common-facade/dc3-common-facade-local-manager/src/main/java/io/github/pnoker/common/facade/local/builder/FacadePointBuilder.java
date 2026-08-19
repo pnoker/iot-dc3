@@ -29,16 +29,27 @@ import org.mapstruct.Mapping;
  * FacadePoint ↔ manager PointBO/Query mapper.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadePointBuilder {
 
+    /**
+     * To manager query.
+     *
+     * @param facadeQuery facade query
+     * @return to manager query result
+     */
     @Mapping(target = "groupId", ignore = true)
     @Mapping(target = "labelId", ignore = true)
     PointQuery toManagerQuery(FacadePointQuery facadeQuery);
 
+    /**
+     * To facade business object.
+     *
+     * @param managerBO business object
+     * @return to facade business object result
+     */
     FacadePointBO toFacadeBO(PointBO managerBO);
 
 }

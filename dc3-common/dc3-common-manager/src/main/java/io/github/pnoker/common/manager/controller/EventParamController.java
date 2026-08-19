@@ -55,7 +55,6 @@ import java.util.Objects;
  * Manages parameter definitions declared on device-reported events.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "event_param", description = "Event parameter definitions: manage data payload specifications for device events including name, type, and value mapping")

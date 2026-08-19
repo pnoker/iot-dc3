@@ -42,7 +42,6 @@ import java.util.List;
  * REST controller exposing auth-related dictionary lookup endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "dictionary_auth", description = "Authorization dictionaries: manage lookup entries for identity types, permission categories, and other auth-related metadata classifications")

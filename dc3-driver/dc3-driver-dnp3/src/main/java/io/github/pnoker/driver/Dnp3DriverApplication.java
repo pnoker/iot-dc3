@@ -23,12 +23,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * DNP3 (IEEE 1815) master driver application for utility automation.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class Dnp3DriverApplication {
 
+    /**
+     * Start the dnp3 driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(Dnp3DriverApplication.class, args);
     }

@@ -19,6 +19,69 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.common.data.mapper.PointValueMapper">
 
+    <select id="insertHistoryBatch" resultType="string" affectData="true" flushCache="true">
+        INSERT INTO dc3_point_value
+        (message_id, schema_version, driver_node, sequence, fencing_token,
+         tenant_id, device_id, point_id, raw_value, cal_value, num_value,
+         driver_id, create_time, operate_time)
+        SELECT value.message_id, value.schema_version, value.driver_node, value.sequence,
+               value.fencing_token, value.tenant_id, value.device_id, value.point_id,
+               value.raw_value, value.cal_value, value.num_value, value.driver_id,
+               value.create_time, value.operate_time
+        FROM (VALUES
+        <foreach collection="values" item="value" separator=",">
+            (#{value.messageId}, #{value.schemaVersion}, #{value.driverNode}, #{value.sequence}, #{value.fencingToken},
+             #{value.tenantId}, #{value.deviceId}, #{value.pointId}, #{value.rawValue},
+             #{value.calValue}, #{value.numValue}, #{value.driverId},
+             #{value.createTime}, #{value.operateTime})
+        </foreach>
+        ) AS value(message_id, schema_version, driver_node, sequence, fencing_token,
+                   tenant_id, device_id, point_id, raw_value, cal_value, num_value,
+                   driver_id, create_time, operate_time)
+        JOIN dc3_manager.dc3_device_lease lease
+          ON lease.tenant_id = value.tenant_id
+         AND lease.driver_id = value.driver_id
+         AND lease.device_id = value.device_id
+         AND lease.owner_node = value.driver_node
+         AND lease.fencing_token = value.fencing_token
+        JOIN dc3_manager.dc3_driver_instance instance
+          ON instance.tenant_id = lease.tenant_id
+         AND instance.driver_id = lease.driver_id
+         AND instance.node_id = lease.owner_node
+         AND instance.lease_until &gt; CURRENT_TIMESTAMP
+        FOR KEY SHARE OF lease, instance
+        ON CONFLICT (message_id, create_time, device_id) DO NOTHING
+        RETURNING message_id
+    </select>
+
+    <insert id="upsertLatestBatch">
+        INSERT INTO dc3_point_latest
+        (tenant_id, device_id, point_id, message_id, schema_version, driver_node,
+         sequence, fencing_token, raw_value, cal_value, num_value, driver_id, create_time, operate_time)
+        VALUES
+        <foreach collection="values" item="value" separator=",">
+            (#{value.tenantId}, #{value.deviceId}, #{value.pointId}, #{value.messageId},
+             #{value.schemaVersion}, #{value.driverNode}, #{value.sequence}, #{value.fencingToken},
+             #{value.rawValue}, #{value.calValue}, #{value.numValue}, #{value.driverId},
+             #{value.createTime}, #{value.operateTime})
+        </foreach>
+        ON CONFLICT (tenant_id, device_id, point_id) DO UPDATE SET
+            message_id = EXCLUDED.message_id,
+            schema_version = EXCLUDED.schema_version,
+            driver_node = EXCLUDED.driver_node,
+            sequence = EXCLUDED.sequence,
+            fencing_token = EXCLUDED.fencing_token,
+            raw_value = EXCLUDED.raw_value,
+            cal_value = EXCLUDED.cal_value,
+            num_value = EXCLUDED.num_value,
+            driver_id = EXCLUDED.driver_id,
+            create_time = EXCLUDED.create_time,
+            operate_time = EXCLUDED.operate_time
+        WHERE (EXCLUDED.fencing_token, EXCLUDED.create_time, EXCLUDED.sequence, EXCLUDED.message_id)
+            &gt; (dc3_point_latest.fencing_token, dc3_point_latest.create_time,
+                  dc3_point_latest.sequence, dc3_point_latest.message_id)
+    </insert>
+
     <!--
       Window aggregation pushdown for the long-window alarm evaluator.
       The aggregate function is selected by <choose> from a fixed set so the
@@ -68,24 +131,18 @@
         ORDER BY create_time
     </select>
 
-    <!--
-      Batch latest point value query using PostgreSQL DISTINCT ON.
-      For each (device_id, point_id) pair, returns the single row with the
-      most recent create_time. Replaces the N+1 loop in PointValueServiceImpl.
-    -->
+    <!-- Shared latest-value projection; safe across multiple Data Center replicas. -->
     <select id="selectLatestPointValues" resultType="io.github.pnoker.common.data.entity.model.PointValueDO">
-        SELECT DISTINCT ON (pv.device_id, pv.point_id)
-        pv.id, pv.tenant_id, pv.device_id, pv.point_id,
-        pv.raw_value, pv.cal_value, pv.num_value, pv.driver_id,
-        pv.create_time, pv.operate_time
-        FROM dc3_point_value pv
-        WHERE pv.tenant_id = #{tenantId}
-        AND pv.device_id = #{deviceId}
-        AND pv.point_id IN
+        SELECT tenant_id, device_id, point_id, message_id, schema_version,
+               driver_node, sequence, fencing_token, raw_value, cal_value, num_value,
+               driver_id, create_time, operate_time
+        FROM dc3_point_latest
+        WHERE tenant_id = #{tenantId}
+        AND device_id = #{deviceId}
+        AND point_id IN
         <foreach collection="pointIds" item="pointId" open="(" separator="," close=")">
             #{pointId}
         </foreach>
-        ORDER BY pv.device_id, pv.point_id, pv.create_time DESC
     </select>
 
 </mapper>

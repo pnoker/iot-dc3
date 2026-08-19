@@ -35,7 +35,6 @@ import java.io.Serializable;
  * Facade-level profile/template query.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2026.5.14
  */
 @Getter

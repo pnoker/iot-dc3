@@ -31,7 +31,6 @@ import java.util.Map;
  * Extended information related to menus.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "JSON extension object for menu configuration metadata, holding extended information related to menus")

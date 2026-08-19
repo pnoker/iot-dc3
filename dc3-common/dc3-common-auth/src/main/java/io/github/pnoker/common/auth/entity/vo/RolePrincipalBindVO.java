@@ -31,7 +31,6 @@ import lombok.ToString;
  * View object for role-principal bindings.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
  * Starts the server on application startup and shuts it down on context close.
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Slf4j
@@ -55,7 +54,7 @@ public class CoapServerManager implements CommandLineRunner {
     public void run(String... args) {
         CoapProperties.ModeEnum mode = coapProperties.getMode();
         if (mode != CoapProperties.ModeEnum.SERVER && mode != CoapProperties.ModeEnum.BOTH) {
-            log.info("CoAP server mode disabled, current mode: {}", mode);
+            log.info("CoAP server startup skipped, reason=serverModeDisabled, mode={}", mode);
             return;
         }
 
@@ -74,7 +73,8 @@ public class CoapServerManager implements CommandLineRunner {
         coapServer.add(new DataResource("data", coapReceiveService));
 
         coapServer.start();
-        log.info("CoAP server started on {}:{} (mode: {})", coapProperties.getServerHost(), coapProperties.getServerPort(), mode);
+        log.info("CoAP server started, host={}, port={}, mode={}",
+                coapProperties.getServerHost(), coapProperties.getServerPort(), mode);
     }
 
     /**

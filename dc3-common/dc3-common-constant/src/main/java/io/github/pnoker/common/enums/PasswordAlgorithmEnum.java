@@ -28,7 +28,6 @@ import java.util.Optional;
  * Password hashing algorithm.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -47,6 +46,12 @@ public enum PasswordAlgorithmEnum {
 
     private final String remark;
 
+    /**
+     * Resolve a password algorithm from its encoded-hash identifier.
+     *
+     * @param value algorithm identifier
+     * @return matching algorithm, or {@code null} when the value is unknown
+     */
     public static PasswordAlgorithmEnum ofValue(String value) {
         Optional<PasswordAlgorithmEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))

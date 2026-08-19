@@ -31,7 +31,6 @@ import lombok.Getter;
  * the login flow can tell the two states apart, even though both map to 403.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -50,11 +49,8 @@ public enum ErrorCode implements ResponseCode {
     FAILURE(500, "R500", "Service exception"),
     ;
 
-    @Getter(onMethod_ = {@Override})
     private final int httpStatus;
-    @Getter(onMethod_ = {@Override})
     private final String code;
-    @Getter(onMethod_ = {@Override})
     private final String remark;
 
 }

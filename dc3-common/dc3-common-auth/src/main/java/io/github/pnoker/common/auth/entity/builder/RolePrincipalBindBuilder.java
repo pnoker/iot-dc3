@@ -36,20 +36,43 @@ import java.util.Objects;
  * MapStruct builder for role-principal bindings.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface RolePrincipalBindBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     RolePrincipalBindBO buildBOByVO(RolePrincipalBindVO entityVO);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     RolePrincipalBindVO buildVOByBO(RolePrincipalBindBO entityBO);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "principalType", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     RolePrincipalBindDO buildDOByBO(RolePrincipalBindBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(RolePrincipalBindBO entityBO, @MappingTarget RolePrincipalBindDO entityDO) {
         if (Objects.nonNull(entityBO.getPrincipalType())) {
@@ -57,20 +80,50 @@ public interface RolePrincipalBindBuilder {
         }
     }
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "principalType", ignore = true)
     RolePrincipalBindBO buildBOByDO(RolePrincipalBindDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(RolePrincipalBindDO entityDO, @MappingTarget RolePrincipalBindBO entityBO) {
         entityBO.setPrincipalType(PrincipalTypeEnum.ofValue(entityDO.getPrincipalType()));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<RolePrincipalBindBO> buildBOListByDOList(List<RolePrincipalBindDO> entityDOList);
 
+    /**
+     * Convert do page to bo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
     default Page<RolePrincipalBindBO> buildBOPageByDOPage(Page<RolePrincipalBindDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
+    /**
+     * Convert bo page to vo page.
+     *
+     * @param entityPageBO business object
+     * @return converted value
+     */
     default Page<RolePrincipalBindVO> buildVOPageByBOPage(Page<RolePrincipalBindBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }

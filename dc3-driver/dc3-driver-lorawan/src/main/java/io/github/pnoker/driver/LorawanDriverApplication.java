@@ -23,12 +23,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * LoRaWAN driver application ingesting ChirpStack MQTT uplinks.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class LorawanDriverApplication {
 
+    /**
+     * Start the lorawan driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(LorawanDriverApplication.class, args);
     }

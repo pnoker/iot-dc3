@@ -25,7 +25,6 @@ import org.apache.ibatis.annotations.Mapper;
  * MyBatis-Plus mapper for dc3_command_history table.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Mapper

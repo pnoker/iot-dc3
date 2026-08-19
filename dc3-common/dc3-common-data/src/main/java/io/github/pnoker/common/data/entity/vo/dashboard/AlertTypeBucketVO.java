@@ -32,7 +32,6 @@ import java.io.Serializable;
  * {@code driver-alarm}, {@code device-offline}, {@code device-alarm}).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.3
  */
 @Getter

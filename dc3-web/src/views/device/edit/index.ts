@@ -311,7 +311,6 @@ export default defineComponent({
     const route = useRoute();
     const {t} = useI18n();
 
-    // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
       active: resolveDeviceTab(route.query.active),
@@ -356,7 +355,6 @@ export default defineComponent({
       profileLoading: false,
     });
 
-    // 定义表单校验规则
     const deviceFormRule = reactive<FormRules>({
       deviceName: nameRules(t, t('common.entityDevice')),
       driverId: [
@@ -1104,7 +1102,7 @@ export default defineComponent({
           } catch (error) {
             failedCount++;
             cell.error = t('device.edit.pointSaveCellFailed');
-            logger.debug(error);
+            logger.debug('Point configuration save failed', error);
           } finally {
             cell.saving = false;
           }
@@ -1221,7 +1219,7 @@ export default defineComponent({
           } catch (error) {
             failedCount++;
             cell.error = t('device.edit.commandSaveCellFailed');
-            logger.debug(error);
+            logger.debug('Command configuration save failed', error);
           } finally {
             cell.saving = false;
           }
@@ -1336,7 +1334,7 @@ export default defineComponent({
           } catch (error) {
             failedCount++;
             cell.error = t('device.edit.eventSaveCellFailed');
-            logger.debug(error);
+            logger.debug('Event configuration save failed', error);
           } finally {
             cell.saving = false;
           }

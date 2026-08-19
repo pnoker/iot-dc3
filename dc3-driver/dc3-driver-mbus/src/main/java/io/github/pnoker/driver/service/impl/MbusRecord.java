@@ -22,7 +22,6 @@ import java.util.Arrays;
  * A single decoded M-Bus data record (DIF/VIF header plus raw value bytes).
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 public class MbusRecord {
@@ -37,14 +36,29 @@ public class MbusRecord {
         this.valueBytes = valueBytes;
     }
 
+    /**
+     * Return dif.
+     *
+     * @return get dif result
+     */
     public int getDif() {
         return dif;
     }
 
+    /**
+     * Return vif.
+     *
+     * @return get vif result
+     */
     public int getVif() {
         return vif;
     }
 
+    /**
+     * Return value bytes.
+     *
+     * @return get value bytes result
+     */
     public byte[] getValueBytes() {
         return valueBytes;
     }

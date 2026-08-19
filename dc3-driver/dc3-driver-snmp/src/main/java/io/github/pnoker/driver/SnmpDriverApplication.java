@@ -24,12 +24,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * SNMP driver application.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class SnmpDriverApplication {
 
+    /**
+     * Start the snmp driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(SnmpDriverApplication.class, args);
     }

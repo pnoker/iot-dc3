@@ -6,7 +6,7 @@
 > amigable para IA de IoT DC3.
 
 <p align="center">
-  <img src="./.github/brand/banner.es.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
+  <img src="./.github/brand/png/banner.es.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
 </p>
 
 <p align="center">
@@ -35,7 +35,7 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.dc3.site">https://docs.dc3.site</a>
+  <a href="https://dc3.site">https://dc3.site</a>
 </p>
 
 <p align="center">
@@ -83,7 +83,7 @@
 ![Panorama de Arquitectura de IoT DC3](https://docs.dc3.site/images/architecture-panorama-es.png)
 
 Arquitectura de microservicios en seis capas de un vistazo: clientes → puerta de enlace → cuatro servicios centrales →
-bus de mensajes → 28 controladores de protocolo → dispositivos de campo. PostgreSQL (TimescaleDB + pgvector + AGE) para
+bus de mensajes → 36 controladores de protocolo → dispositivos de campo. PostgreSQL (TimescaleDB + pgvector + AGE) para
 persistencia y stack de observabilidad opcional (ELK + Prometheus + Grafana) presentados en una sola vista.
 
 🧱 **Principios de diseño** — Las llamadas entre servicios siempre se realizan a través de interfaces Facade; el modelo
@@ -98,17 +98,17 @@ que escalan entre servicios y equipos.
 
 ### 🔌 Conectividad de dispositivos multiprotocolo
 
-IoT DC3 incluye **28 módulos de controladores de acceso** para automatización industrial, comunicaciones IoT, puenteo de
+IoT DC3 incluye **36 módulos de controladores de acceso** para automatización industrial, comunicaciones IoT, puenteo de
 datos, comunicaciones básicas y escenarios de simulación/depuración, reduciendo el costo de conectar dispositivos y
 fuentes de datos comunes:
 
-| Categoría                                      | Módulos de controladores                                                                                                                           |
-|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🏭 **Protocolos industriales**                 | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **Protocolos IoT**                          | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **Puenteo de datos**                        | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
-| 🔧 **Comunicaciones básicas y gestión de red** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
-| 🧪 **Simulación y depuración**                 | Virtual · Listening Virtual                                                                                                                        |
+| Categoría                                      | Módulos de controladores                                                                                                                                                                              |
+|------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **Protocolos industriales**                 | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · IEC 61850 · DNP3 · DLMS · DLT645 · KNX · M-Bus · SL651 |
+| 📡 **Protocolos IoT**                          | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                                    |
+| 🗄️ **Puenteo de datos**                        | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                                       |
+| 🔧 **Comunicaciones básicas y gestión de red** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                                  |
+| 🧪 **Simulación y depuración**                 | Virtual · Listening Virtual                                                                                                                                                                            |
 
 El **Driver SDK** permite el desarrollo rápido de controladores de protocolo personalizados y su registro en la
 plataforma de ejecución.

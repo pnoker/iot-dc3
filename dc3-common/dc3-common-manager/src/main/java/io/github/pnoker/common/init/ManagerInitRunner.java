@@ -32,7 +32,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * configures component scanning for manager packages and sets up MyBatis mapper scanning.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration

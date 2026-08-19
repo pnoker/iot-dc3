@@ -29,7 +29,6 @@ import lombok.ToString;
  * Business object for session operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -45,7 +44,6 @@ public class SessionBO extends BaseBO implements TenantOwned {
 
     private SessionExt sessionExt;
 
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private Long userId;

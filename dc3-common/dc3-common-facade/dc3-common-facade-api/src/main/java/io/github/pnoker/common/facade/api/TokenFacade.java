@@ -25,19 +25,17 @@ package io.github.pnoker.common.facade.api;
  * from the gateway.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface TokenFacade {
 
     /**
-     * Validate a token triple against the backing auth service.
+     * Validate a token for a tenant-scoped login identity against the backing auth service.
      *
      * @param tenant tenant code
      * @param name   login name
-     * @param salt   salt the client holds
      * @param token  token the client holds
-     * @return {@code true} when the triple is valid and unexpired
+     * @return {@code true} when the token is valid and unexpired for the identity
      */
     boolean checkValid(String tenant, String name, String token);
 

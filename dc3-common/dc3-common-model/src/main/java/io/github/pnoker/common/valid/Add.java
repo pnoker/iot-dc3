@@ -24,7 +24,6 @@ package io.github.pnoker.common.valid;
  * validation groups for different scenarios.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface Add {

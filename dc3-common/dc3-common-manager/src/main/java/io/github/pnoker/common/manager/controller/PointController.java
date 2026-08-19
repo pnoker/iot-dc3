@@ -64,7 +64,6 @@ import java.util.stream.Collectors;
  * REST controller exposing point management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "point", description = "Data point definitions: manage measurable or controllable attributes of industrial devices including read/write mode, data type, and value range")

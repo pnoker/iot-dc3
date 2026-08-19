@@ -45,7 +45,6 @@ import reactor.core.scheduler.Schedulers;
  * Gateway filter that validates authentication headers.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -79,10 +78,11 @@ public class AuthenticGatewayFilter implements GatewayFilter {
                     }).build();
                     return chain.filter(exchange.mutate().request(mutated).build());
                 }).onErrorResume(UnAuthorizedException.class, e -> {
-                    log.warn("AuthenticGatewayFilter unauthorized, Url: {}", request.getURI(), e);
+                    log.warn("Gateway request unauthorized, path={}", request.getURI().getRawPath(), e);
                     return writeErrorResponse(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
                 }).onErrorResume(e -> {
-                    log.error("AuthenticGatewayFilter unexpected error, Url: {}", request.getURI(), e);
+                    log.error("Gateway authentication failed unexpectedly, path={}",
+                            request.getURI().getRawPath(), e);
                     return writeErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
                 });
     }

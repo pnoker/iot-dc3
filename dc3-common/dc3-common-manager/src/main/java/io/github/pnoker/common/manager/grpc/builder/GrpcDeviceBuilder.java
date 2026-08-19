@@ -41,7 +41,6 @@ import java.util.Optional;
  * MapStruct builder for device gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -58,6 +57,12 @@ public interface GrpcDeviceBuilder {
     @Mapping(target = "labelId", ignore = true)
     DeviceQuery buildQueryByGrpcQuery(GrpcPageDeviceQuery entityQuery);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityQuery entity query
+     */
     @AfterMapping
     default void afterProcess(GrpcPageDeviceQuery entityGrpc,
                               @MappingTarget DeviceQuery.DeviceQueryBuilder entityQuery) {
@@ -83,6 +88,12 @@ public interface GrpcDeviceBuilder {
     @Mapping(target = "labelId", ignore = true)
     DeviceQuery buildQueryByGrpcQuery(io.github.pnoker.api.common.driver.GrpcPageDeviceQuery entityQuery);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityQuery entity query
+     */
     @AfterMapping
     default void afterProcess(io.github.pnoker.api.common.driver.GrpcPageDeviceQuery entityGrpc,
                               @MappingTarget DeviceQuery.DeviceQueryBuilder entityQuery) {
@@ -113,6 +124,12 @@ public interface GrpcDeviceBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcDeviceDTO buildGrpcDTOByBO(DeviceBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(DeviceBO entityBO, @MappingTarget GrpcDeviceDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);

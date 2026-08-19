@@ -38,7 +38,6 @@ import java.util.Objects;
  * Command-domain tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -48,6 +47,13 @@ public class CommandTool {
 
     private final CommandFacade commandFacade;
 
+    /**
+     * Return command by identifier.
+     *
+     * @param commandId command identifier
+     * @param toolContext tool context
+     * @return lookup command by identifier result
+     */
     @Tool(description = "Look up a command (custom instruction) by its numeric ID. Returns command name, code, type (custom/config/action), call type (sync/async), timeout in seconds, and bound profile ID.")
     @AgenticToolMetadata(domain = "command", title = "Query command by ID")
     public AgenticToolResult<FacadeCommandBO> lookupCommandById(
@@ -62,6 +68,13 @@ public class CommandTool {
         return AgenticToolResult.ok("Command loaded", bo);
     }
 
+    /**
+     * Return commands by identifiers.
+     *
+     * @param commandIds command identifiers
+     * @param toolContext tool context
+     * @return lookup commands by identifiers result
+     */
     @Tool(description = "Batch look up commands by numeric IDs. Returns up to 50 tenant-scoped commands.")
     @AgenticToolMetadata(domain = "command", title = "Batch query commands by IDs")
     public AgenticToolResult<List<FacadeCommandBO>> lookupCommandsByIds(
@@ -80,6 +93,16 @@ public class CommandTool {
         return AgenticToolResult.ok("Commands loaded", commands);
     }
 
+    /**
+     * Return the matching commands.
+     *
+     * @param commandName command name
+     * @param profileId profile identifier
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return search commands result
+     */
     @Tool(description = "Search for commands with optional filters. Returns a paginated list.")
     @AgenticToolMetadata(domain = "command", title = "Search commands")
     public AgenticToolResult<FacadePage<FacadeCommandBO>> searchCommands(
@@ -105,6 +128,15 @@ public class CommandTool {
         return AgenticToolResult.ok("Command page loaded", result);
     }
 
+    /**
+     * Return the matching commands by device identifier.
+     *
+     * @param deviceId device identifier
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return list commands by device identifier result
+     */
     @Tool(description = "List commands bound to a specific device ID. Use this before executing commands when the user knows the device but not the command ID.")
     @AgenticToolMetadata(domain = "command", title = "List commands by device")
     public AgenticToolResult<FacadePage<FacadeCommandBO>> listCommandsByDeviceId(
@@ -128,6 +160,15 @@ public class CommandTool {
         return AgenticToolResult.ok("Command page loaded for device " + deviceId, result);
     }
 
+    /**
+     * Return the matching commands by profile identifier.
+     *
+     * @param profileId profile identifier
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return list commands by profile identifier result
+     */
     @Tool(description = "List commands under a specific profile/template ID. Use this when the user wants all custom instructions defined by a template.")
     @AgenticToolMetadata(domain = "command", title = "List commands by profile")
     public AgenticToolResult<FacadePage<FacadeCommandBO>> listCommandsByProfileId(

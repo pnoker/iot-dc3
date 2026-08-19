@@ -43,6 +43,11 @@ public final class RabbitContainer {
     private RabbitContainer() {
     }
 
+    /**
+     * Instance.
+     *
+     * @return instance result
+     */
     public static RabbitMQContainer instance() {
         return INSTANCE;
     }

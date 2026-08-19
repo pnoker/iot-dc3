@@ -31,15 +31,22 @@ import io.github.pnoker.common.utils.MybatisUtil;
  * reconfigure the path parameter if you need to use it for other modules.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class MybatisGenerator {
 
+    /**
+     * Start the mybatis generator.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         generator();
     }
 
+    /**
+     * Generator.
+     */
     public static void generator() {
         String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-data/src/main";
         MybatisUtil.defaultGenerator("localhost", "35432", "dc3", "dc3_history", "dc3", "dc3dc3dc3")

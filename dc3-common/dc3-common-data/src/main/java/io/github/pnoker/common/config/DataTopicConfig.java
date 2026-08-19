@@ -34,7 +34,6 @@ import org.springframework.context.annotation.Bean;
  * Spring auto-configuration for data service RabbitMQ topic exchanges.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

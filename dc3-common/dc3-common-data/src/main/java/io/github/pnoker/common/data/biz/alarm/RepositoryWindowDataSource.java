@@ -43,7 +43,6 @@ import java.util.Objects;
  * storage layout.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Slf4j

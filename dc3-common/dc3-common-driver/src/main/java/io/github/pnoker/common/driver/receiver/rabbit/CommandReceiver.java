@@ -23,6 +23,8 @@ import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.CommandCallDTO;
@@ -51,7 +53,6 @@ import java.util.Objects;
  * and sends result receipts back to the data center.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Slf4j
@@ -60,7 +61,7 @@ import java.util.Objects;
 public class CommandReceiver {
 
     /**
-     * Message schema version stamped on outbound command results for forward/backward compatibility.
+     * Message schema version stamped on outbound command results.
      */
     private static final int SCHEMA_VERSION = 1;
     private final DriverCustomService driverCustomService;
@@ -69,6 +70,8 @@ public class CommandReceiver {
     private final DeviceMetadata deviceMetadata;
     private final CommandDedupCache dedupCache;
     private final DeviceLockManager deviceLockManager;
+    private final DriverMetadata driverMetadata;
+    private final DriverProperties driverProperties;
 
     /**
      * Dispatch a custom command call to the driver: validate the payload, drop
@@ -93,22 +96,38 @@ public class CommandReceiver {
             // otherwise fall through to the nack(requeue) path and requeue garbage.
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
                     || Objects.isNull(entityDTO.tenantId())
+                    || Objects.isNull(entityDTO.ownerNode()) || Objects.isNull(entityDTO.fencingToken())
                     || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.commandId())) {
-                log.error("Invalid custom command: {}", entityDTO);
+                log.error("Custom command rejected, reason=invalidEnvelope, recordId={}, tenantId={}, deviceId={}, commandId={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.tenantId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.commandId());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
 
-            log.debug("Receive custom command: recordId={}", entityDTO.recordId());
+            log.debug("Custom command received, recordId={}, deviceId={}, commandId={}",
+                    entityDTO.recordId(), entityDTO.deviceId(), entityDTO.commandId());
 
             String recordId = entityDTO.recordId();
             Long tenantId = entityDTO.tenantId();
             Long deviceId = entityDTO.deviceId();
             Long commandId = entityDTO.commandId();
 
+            if (!Objects.equals(driverProperties.getNode(), entityDTO.ownerNode())
+                    || !Objects.equals(driverMetadata.getFencingToken(deviceId), entityDTO.fencingToken())) {
+                log.warn("Reject stale-owner custom command, recordId={}, deviceId={}, fencingToken={}",
+                        recordId, deviceId, entityDTO.fencingToken());
+                sendResult(recordId, tenantId, PointCommandStatusEnum.FAILED,
+                        null, null, "STALE_OWNER", "Device ownership lease changed", channel, deliveryTag);
+                return;
+            }
+
             // Expire-at pre-check
             if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
-                log.warn("Command already expired: recordId={}, expireAt={}", recordId, entityDTO.expireAt());
+                log.warn("Custom command rejected, reason=expired, recordId={}, expireAt={}",
+                        recordId, entityDTO.expireAt());
                 sendResult(recordId, tenantId, PointCommandStatusEnum.EXPIRED,
                         null, null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
                 return;
@@ -184,6 +203,11 @@ public class CommandReceiver {
             }
         } catch (Exception e) {
             log.error("Failed to send command result, recordId={}", recordId, e);
+            if (Objects.nonNull(recordId)) {
+                dedupCache.release(recordId);
+            }
+            RabbitAckUtil.nack(channel, deliveryTag, true);
+            return;
         }
         RabbitAckUtil.ack(channel, deliveryTag);
     }

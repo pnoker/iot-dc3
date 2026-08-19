@@ -37,21 +37,29 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <!-- Coverage thresholds gated by the aggregate XML report. Tightened per-stage. -->
-        <coverage.line.minimum>0.20</coverage.line.minimum>
-        <coverage.branch.minimum>0.15</coverage.branch.minimum>
+        <!--
+          Truthful all-runtime-module baseline measured on 2026-08-18:
+          line 24.90%, branch 21.28%. Keep a small cross-platform margin while
+          still failing any material regression.
+        -->
+        <coverage.line.minimum>0.24</coverage.line.minimum>
+        <coverage.branch.minimum>0.20</coverage.branch.minimum>
         <coverage.check.skip>false</coverage.check.skip>
     </properties>
 
     <dependencies>
         <!--
-          Modules listed here contribute to the aggregate report. Generated API
-          artifacts and pure deployment wrappers stay out of this baseline so
-          the report follows hand-written code that currently has tests.
+          All hand-written runtime modules contribute to the aggregate report.
+          Generated protobuf artifacts, test-support modules and pure deployment
+          wrappers stay out of the baseline.
         -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-agentic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-api</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -72,6 +80,10 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-exception</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-facade-grpc</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -127,6 +139,10 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-sql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-thread</artifactId>
         </dependency>
         <dependency>
@@ -135,12 +151,97 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-bacnet-ip</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-ble</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-can</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-driver-coap</artifactId>
             <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-dlms</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-dlt645</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-dnp3</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-ethernet-ip</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-fins</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-http</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-iec104</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-iec61850</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-kafka</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-knx</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-driver-listening-virtual</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-lorawan</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-lwm2m</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-mbus</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-melsec</artifactId>
             <version>${dc3.version}</version>
         </dependency>
         <dependency>
@@ -160,6 +261,11 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-mysql</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-driver-opc-da</artifactId>
             <version>${dc3.version}</version>
         </dependency>
@@ -170,12 +276,57 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-oracle</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-driver-plcs7</artifactId>
             <version>${dc3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-postgresql</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-redis</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-serial</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-sl651</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-snmp</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-sqlserver</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-tcp-udp</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-driver-virtual</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-driver-zigbee</artifactId>
             <version>${dc3.version}</version>
         </dependency>
     </dependencies>
@@ -202,6 +353,7 @@
                                 <exclude>**/entity/vo/**</exclude>
                                 <exclude>**/entity/model/**</exclude>
                                 <exclude>**/entity/query/**</exclude>
+                                <exclude>**/entity/builder/*BuilderImpl.class</exclude>
                                 <exclude>com/serotonin/modbus4j/sero/log/**</exclude>
                                 <exclude>com/serotonin/modbus4j/sero/timer/**</exclude>
                                 <exclude>com/serotonin/modbus4j/sero/epoll/**</exclude>

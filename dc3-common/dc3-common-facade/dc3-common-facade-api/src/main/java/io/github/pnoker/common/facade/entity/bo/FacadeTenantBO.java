@@ -30,7 +30,6 @@ import lombok.ToString;
  * (no tenantExt — that is not exposed through gRPC).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

@@ -65,7 +65,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -233,8 +232,7 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
                 log.info("Driver SNMP connection established, protocol={}, deviceId={}", driverCode, deviceId);
                 return snmp;
             } catch (Exception e) {
-                log.error("Driver SNMP connection failed, protocol={}, deviceId={}, message={}",
-                        driverCode, deviceId, e.getMessage());
+                log.error("Driver SNMP connection failed, protocol={}, deviceId={}", driverCode, deviceId, e);
                 return null;
             }
         });

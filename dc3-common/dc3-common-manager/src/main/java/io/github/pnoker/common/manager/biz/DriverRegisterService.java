@@ -33,7 +33,6 @@ import java.util.List;
  * the registration payload and bound explicitly to the tenant context for each method.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DriverRegisterService {

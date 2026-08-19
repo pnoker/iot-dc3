@@ -31,7 +31,6 @@ import java.io.Serializable;
  * alarmCount / peerMedian; service filters to ratio &gt;= 3.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

@@ -26,11 +26,18 @@ import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
  * those rules read from the same time-ordered series.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 public record WindowSampleKey(Long tenantId, AlarmTargetTypeEnum targetType, Long entityId) {
 
+    /**
+     * Of.
+     *
+     * @param tenantId tenant identifier
+     * @param targetType target type
+     * @param entityId entity identifier
+     * @return of result
+     */
     public static WindowSampleKey of(Long tenantId, AlarmTargetTypeEnum targetType, Long entityId) {
         return new WindowSampleKey(tenantId, targetType, entityId);
     }

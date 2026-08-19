@@ -137,12 +137,14 @@ class RepositoryStrategyFactoryTest {
         }
 
         @Override
-        public void savePointValue(PointValueBO entityBO) throws IOException {
+        public boolean savePointValue(PointValueBO entityBO) throws IOException {
+            return true;
             // no-op
         }
 
         @Override
-        public void savePointValues(List<PointValueBO> entityBOList) throws IOException {
+        public List<PointValueBO> savePointValues(List<PointValueBO> entityBOList) throws IOException {
+            return entityBOList;
             // no-op
         }
 

@@ -25,7 +25,6 @@ import lombok.ToString;
  * Per-day ack-latency percentile row.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

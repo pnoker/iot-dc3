@@ -29,7 +29,6 @@ import java.util.List;
  * {@code api.center.manager.PointApi}. Single-record and bulk lookups are tenant-scoped.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface PointFacade {

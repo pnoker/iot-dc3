@@ -53,7 +53,6 @@ import java.util.Objects;
  * Alarm message template controller.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "message", description = "Alarm message templates: manage reusable message templates (name, code, level, enabled flag) that alarm rules and notifications can reference")

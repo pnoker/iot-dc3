@@ -34,7 +34,6 @@ import java.time.LocalDateTime;
  * View object for MCP connection API responses.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter

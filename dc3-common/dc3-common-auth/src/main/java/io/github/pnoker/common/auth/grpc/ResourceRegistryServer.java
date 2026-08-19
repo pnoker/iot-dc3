@@ -41,7 +41,6 @@ import java.util.Objects;
  * gRPC server handling resource registration requests.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Slf4j
@@ -85,7 +84,7 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
                     .setUnchanged(result.getUnchanged())
                     .build());
         } catch (Exception e) {
-            log.error("Resource registry sync failed for service [{}]", request.getServiceName(), e);
+            log.error("Resource registry synchronization failed, serviceName={}", request.getServiceName(), e);
             builder.setResult(Objects.nonNull(e.getMessage())
                     ? GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage())
                     : GrpcRFactory.fail(ErrorCode.FAILURE));

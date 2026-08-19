@@ -35,7 +35,6 @@ import java.util.Optional;
  * System-health tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -45,6 +44,12 @@ public class SystemTool {
 
     private final Optional<StatusHealthFacade> statusHealthFacade;
 
+    /**
+     * Return system health.
+     *
+     * @param toolContext tool context
+     * @return get system health result
+     */
     @Tool(description = "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
     @AgenticToolMetadata(domain = "system", title = "Get system health")
     public AgenticToolResult<FacadeSystemHealthBO> getSystemHealth(ToolContext toolContext) {

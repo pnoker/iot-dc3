@@ -30,7 +30,6 @@ import java.time.Duration;
  * Prefix: {@code dc3.oauth}
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

@@ -38,7 +38,6 @@ import java.util.Objects;
  * Updates the matching {@code dc3_point_command_history} row with the terminal status.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j

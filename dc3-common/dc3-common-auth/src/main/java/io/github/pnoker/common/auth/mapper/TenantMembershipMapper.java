@@ -24,7 +24,6 @@ import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
  * MyBatis-Plus mapper for the dc3_tenant_membership table.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface TenantMembershipMapper extends BaseMapper<TenantMembershipDO> {

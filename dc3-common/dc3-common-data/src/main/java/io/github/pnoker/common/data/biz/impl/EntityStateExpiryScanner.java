@@ -63,7 +63,6 @@ import java.util.Objects;
  * continues indefinitely.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.21
  */
 @Slf4j

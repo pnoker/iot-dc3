@@ -30,7 +30,6 @@ import java.io.Serializable;
  * CoAP Message Entity Class
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Getter

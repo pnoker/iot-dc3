@@ -51,7 +51,6 @@ import tools.jackson.databind.ObjectMapper;
  * {@link MessageChatMemoryAdvisor} bean defined here.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2016.10.1
  */
 @Configuration
@@ -71,6 +70,13 @@ public class ChatClientConfig {
             - System health lookup.
             """;
 
+    /**
+     * Create and configure the application-managed agentic chat memory repository.
+     *
+     * @param messageService message service
+     * @param properties properties
+     * @return agentic chat memory repository result
+     */
     @Bean
     @Primary
     public ChatMemoryRepository agenticChatMemoryRepository(MessageService messageService,
@@ -78,6 +84,13 @@ public class ChatClientConfig {
         return new MessageChatMemoryRepository(messageService, properties);
     }
 
+    /**
+     * Create and configure the application-managed agentic chat memory.
+     *
+     * @param chatMemoryRepository chat memory repository
+     * @param properties properties
+     * @return agentic chat memory result
+     */
     @Bean
     @Primary
     public ChatMemory agenticChatMemory(@Qualifier("agenticChatMemoryRepository") ChatMemoryRepository chatMemoryRepository,
@@ -88,11 +101,23 @@ public class ChatClientConfig {
                 .build();
     }
 
+    /**
+     * Create and configure the application-managed agentic chat memory advisor.
+     *
+     * @param chatMemory chat memory
+     * @return agentic chat memory advisor result
+     */
     @Bean
     public Advisor agenticChatMemoryAdvisor(@Qualifier("agenticChatMemory") ChatMemory chatMemory) {
         return MessageChatMemoryAdvisor.builder(chatMemory).build();
     }
 
+    /**
+     * Create and configure the application-managed agentic tool call advisor.
+     *
+     * @param toolCallingManager tool calling manager
+     * @return agentic tool call advisor result
+     */
     @Bean
     public Advisor agenticToolCallAdvisor(ToolCallingManager toolCallingManager) {
         return ToolCallingAdvisor.builder()
@@ -101,6 +126,20 @@ public class ChatClientConfig {
                 .build();
     }
 
+    /**
+     * Create and configure the application-managed agentic tool callback provider.
+     *
+     * @param tenantTool tenant tool
+     * @param userTool user tool
+     * @param deviceTool device tool
+     * @param driverTool driver tool
+     * @param profileTool profile tool
+     * @param pointTool point tool
+     * @param pointValueTool point value tool
+     * @param systemTool system tool
+     * @param objectMapper object mapper
+     * @return agentic tool callback provider result
+     */
     @Bean
     public ToolCallbackProvider agenticToolCallbackProvider(TenantTool tenantTool, UserTool userTool,
                                                             DeviceTool deviceTool, DriverTool driverTool,
@@ -115,6 +154,13 @@ public class ChatClientConfig {
                 driverTool, profileTool, pointTool, pointValueTool, systemTool);
     }
 
+    /**
+     * Create and configure the application-managed agentic chat client builder.
+     *
+     * @param chatModel chat model
+     * @param memoryAdvisor memory advisor
+     * @return agentic chat client builder result
+     */
     @Bean
     @Primary
     public ChatClient.Builder agenticChatClientBuilder(@Qualifier("openAiChatModel") ChatModel chatModel,

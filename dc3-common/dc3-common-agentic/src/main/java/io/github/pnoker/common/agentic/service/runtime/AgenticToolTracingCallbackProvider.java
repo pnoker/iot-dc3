@@ -35,7 +35,6 @@ import java.util.Objects;
  * Wraps Spring AI tool callbacks with structured tracing.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public class AgenticToolTracingCallbackProvider implements ToolCallbackProvider {

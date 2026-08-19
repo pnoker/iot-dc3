@@ -104,7 +104,6 @@ dc3:
         remark: Data format for encoding the value: HEX, BCD, INT, FLOAT, ASCII
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/dlt645/buffer.db
 
 spring:

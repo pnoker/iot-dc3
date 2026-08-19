@@ -8,7 +8,7 @@ services. Generated Java types use `io.github.pnoker.api.center.manager`.
 | Service | Single-result RPCs | Collection/page RPCs |
 |---|---|---|
 | `DriverApi` | `GetByDriverId`, `GetByDeviceId` | `ListByPage`, `ListByDriverIds` |
-| `DeviceApi` | `GetByDeviceId` | `ListByPage`, `ListByProfileId`, `ListByDriverId`, `ListByDeviceIds` |
+| `DeviceApi` | `GetByDeviceId`, `GetActiveOwner` | `ListByPage`, `ListByProfileId`, `ListByDriverId`, `ListByDeviceIds` |
 | `PointApi` | `GetById` | `ListByPage`, `ListByIds` |
 | `ProfileApi` | `GetByProfileId` | `ListByPage`, `ListByProfileIds`, `ListByDeviceId` |
 | `CommandApi` | `GetById` | `ListByPage`, `ListByIds` |

@@ -53,7 +53,6 @@ import java.util.Objects;
  * Alarm rule controller.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "rule", description = "Data processing rule definitions: manage filtering, transformation, and routing pipelines that process device data streams through the rule engine")

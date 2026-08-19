@@ -30,16 +30,27 @@ import org.mapstruct.Mapping;
  * sets are aligned by design, so MapStruct auto-maps every property.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeDeviceBuilder {
 
+    /**
+     * To manager query.
+     *
+     * @param facadeQuery facade query
+     * @return to manager query result
+     */
     @Mapping(target = "groupId", ignore = true)
     @Mapping(target = "labelId", ignore = true)
     DeviceQuery toManagerQuery(FacadeDeviceQuery facadeQuery);
 
+    /**
+     * To facade business object.
+     *
+     * @param managerBO business object
+     * @return to facade business object result
+     */
     FacadeDeviceBO toFacadeBO(DeviceBO managerBO);
 
 }

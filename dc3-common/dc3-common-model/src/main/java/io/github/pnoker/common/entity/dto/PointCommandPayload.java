@@ -26,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * uses the {@code kind} property to select the concrete record type.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")

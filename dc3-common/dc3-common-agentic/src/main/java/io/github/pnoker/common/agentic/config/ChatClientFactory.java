@@ -65,7 +65,6 @@ import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
  * {@code dc3_message} is replayed back to the model on each call.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.10
  */
 @Slf4j
@@ -205,6 +204,11 @@ public class ChatClientFactory {
                 && properties.isFallbackToolCallingEnabled();
     }
 
+    /**
+     * Evict.
+     *
+     * @param providerId provider identifier
+     */
     public void evict(Long providerId) {
         ChatClient removed = cache.remove(providerId);
         if (Objects.nonNull(removed)) {

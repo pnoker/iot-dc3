@@ -104,7 +104,7 @@ public class Server {
         }
 
         final int socketTimeout = Integer.getInteger("rpc.socketTimeout", 0);
-        log.debug(String.format("Socket timeout: %s ", socketTimeout));
+        log.debug("OPC DA socket timeout configured, timeoutMillis={}", socketTimeout);
 
         try {
             if (this.connectionInformation.getClsid() != null) {
@@ -187,6 +187,7 @@ public class Server {
         try {
             notifyConnectionStateChange(false);
         } catch (final Throwable t) {
+            log.warn("OPC DA disconnect notification failed", t);
         }
 
         cleanup();

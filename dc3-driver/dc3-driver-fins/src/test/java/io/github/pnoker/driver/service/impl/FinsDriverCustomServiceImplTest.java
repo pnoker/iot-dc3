@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 
 @ExtendWith(MockitoExtension.class)
 class FinsDriverCustomServiceImplTest {
@@ -84,11 +83,6 @@ class FinsDriverCustomServiceImplTest {
 
         assertThat(report.isPassed()).isTrue();
         assertThat(report.getIssues()).isEmpty();
-    }
-
-    @Test
-    void scheduleIsNoOp() {
-        assertThatNoException().isThrownBy(() -> service.schedule());
     }
 
     @Test

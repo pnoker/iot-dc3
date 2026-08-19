@@ -43,7 +43,6 @@ import java.util.Objects;
  * Tenant membership service implementation.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Service

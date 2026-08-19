@@ -23,7 +23,6 @@ import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.service.DriverService;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -40,7 +39,6 @@ import java.util.Objects;
  * Event listener that processes metadata change events.
  *
  * @author zhangzi
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -52,10 +50,16 @@ public class MetadataEventListener {
 
     private final RabbitTemplate rabbitTemplate;
 
+    /**
+     * On application event.
+     *
+     * @param metadataEvent metadata event
+     */
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void onApplicationEvent(MetadataEvent metadataEvent) {
-        log.debug("Metadata event listener received: id={}, type={}", metadataEvent.getId(), metadataEvent.getMetadataType());
+        log.debug("Metadata event received, id={}, type={}, operation={}", metadataEvent.getId(),
+                metadataEvent.getMetadataType(), metadataEvent.getOperateType());
         try {
             Long id = metadataEvent.getId();
             MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
@@ -82,7 +86,8 @@ public class MetadataEventListener {
                 }
             }
         } catch (Exception e) {
-            log.error("Metadata event listener failed, event={}", JsonUtil.toJsonString(metadataEvent), e);
+            log.error("Metadata event handling failed, id={}, type={}, operation={}", metadataEvent.getId(),
+                    metadataEvent.getMetadataType(), metadataEvent.getOperateType(), e);
         }
     }
 
@@ -94,7 +99,8 @@ public class MetadataEventListener {
         if (Objects.isNull(service) || service.isBlank()) {
             return;
         }
-        log.debug("Notify driver[{}]: id={}, type={}", service, entityDTO.getId(), entityDTO.getMetadataType());
+        log.debug("Driver metadata notification published, serviceName={}, id={}, type={}",
+                service, entityDTO.getId(), entityDTO.getMetadataType());
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA,
                 RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + service, entityDTO);
     }

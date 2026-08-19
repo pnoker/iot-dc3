@@ -41,7 +41,6 @@ import java.util.Optional;
  * MapStruct builder converting between user BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -75,6 +74,12 @@ public interface UserBuilder {
     @Mapping(target = "deleted", ignore = true)
     UserDO buildDOByBO(UserBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(UserBO entityBO, @MappingTarget UserDO entityDO) {
 
@@ -125,6 +130,12 @@ public interface UserBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     UserBO buildBOByDO(UserDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(UserDO entityDO, @MappingTarget UserBO entityBO) {
         JsonExt entitySocialExt = entityDO.getSocialExt();

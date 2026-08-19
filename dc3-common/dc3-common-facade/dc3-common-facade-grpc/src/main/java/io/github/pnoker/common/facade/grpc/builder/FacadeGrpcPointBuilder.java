@@ -49,12 +49,17 @@ import java.util.Optional;
  * {@code rwFlag} / {@code profileId}, matching {@code GrpcPointBuilder}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcPointBuilder {
 
+    /**
+     * To grpc page query.
+     *
+     * @param query query
+     * @return to grpc page query result
+     */
     public GrpcPagePointQuery toGrpcPageQuery(FacadePointQuery query) {
         GrpcPagePointQuery.Builder builder = GrpcPagePointQuery.newBuilder();
 
@@ -82,6 +87,12 @@ public class FacadeGrpcPointBuilder {
         return builder.build();
     }
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadePointBO toFacadeBO(GrpcPointDTO dto) {
         if (Objects.isNull(dto)) {
             return null;

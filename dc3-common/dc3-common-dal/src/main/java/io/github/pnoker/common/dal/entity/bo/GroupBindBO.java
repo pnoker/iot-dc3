@@ -31,7 +31,6 @@ import lombok.ToString;
  * entities.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Getter
@@ -59,7 +58,6 @@ public class GroupBindBO extends BaseBO implements TenantOwned {
     /**
      * Tenant ID.
      */
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
 }

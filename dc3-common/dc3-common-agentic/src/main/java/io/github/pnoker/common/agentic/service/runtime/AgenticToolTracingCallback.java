@@ -37,7 +37,6 @@ import java.util.Objects;
  * Adds structured runtime tracing around Spring AI tool callbacks.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j

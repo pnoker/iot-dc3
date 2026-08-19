@@ -23,6 +23,8 @@ import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.entity.dto.PointCommandPayload;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
@@ -44,7 +46,6 @@ import java.util.Objects;
  * receipts back to the data center.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j
@@ -53,7 +54,7 @@ import java.util.Objects;
 public class PointCommandReceiver {
 
     /**
-     * Message schema version stamped on outgoing command results, used by the data center to drive compatibility handling.
+     * Message schema version stamped on outgoing command results.
      */
     private static final int SCHEMA_VERSION = 1;
     private final DriverReadService driverReadService;
@@ -61,6 +62,8 @@ public class PointCommandReceiver {
     private final DriverSenderService driverSenderService;
     private final CommandDedupCache dedupCache;
     private final DeviceLockManager deviceLockManager;
+    private final DriverMetadata driverMetadata;
+    private final DriverProperties driverProperties;
 
     /**
      * Handles an incoming point command by validating the payload, rejecting duplicates,
@@ -81,16 +84,21 @@ public class PointCommandReceiver {
             // payload must be rejected before logging to avoid an NPE that would
             // otherwise fall through to the nack(requeue) path and requeue garbage.
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.commandId())
-                    || Objects.isNull(entityDTO.tenantId()) || Objects.isNull(entityDTO.type())
+                    || Objects.isNull(entityDTO.tenantId()) || Objects.isNull(entityDTO.ownerNode())
+                    || Objects.isNull(entityDTO.fencingToken()) || Objects.isNull(entityDTO.type())
                     || Objects.isNull(entityDTO.payload())) {
-                log.error("Invalid point command: {}", entityDTO);
+                log.error("Point command rejected, reason=invalidEnvelope, commandId={}, tenantId={}, type={}",
+                        Objects.isNull(entityDTO) ? null : entityDTO.commandId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.tenantId(),
+                        Objects.isNull(entityDTO) ? null : entityDTO.type());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
 
-            log.debug("Receive point command: commandId={}, type={}", entityDTO.commandId(), entityDTO.type());
+            log.debug("Point command received, commandId={}, type={}", entityDTO.commandId(), entityDTO.type());
             if (isInvalidPayload(entityDTO.payload())) {
-                log.error("Invalid point command payload: {}", entityDTO);
+                log.error("Point command rejected, reason=invalidPayload, commandId={}, tenantId={}, type={}",
+                        entityDTO.commandId(), entityDTO.tenantId(), entityDTO.type());
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }
@@ -100,7 +108,8 @@ public class PointCommandReceiver {
 
             // Expire-at pre-check
             if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
-                log.warn("Command already expired: commandId={}, expireAt={}", commandId, entityDTO.expireAt());
+                log.warn("Point command rejected, reason=expired, commandId={}, expireAt={}",
+                        commandId, entityDTO.expireAt());
                 sendResult(commandId, tenantId, PointCommandStatusEnum.EXPIRED,
                         null, "EXPIRED", "Command expired before execution", channel, deliveryTag);
                 return;
@@ -108,7 +117,7 @@ public class PointCommandReceiver {
 
             // Dedup check
             if (!dedupCache.tryAcquire(commandId)) {
-                log.warn("Duplicate command detected: commandId={}", commandId);
+                log.warn("Point command rejected, reason=duplicate, commandId={}", commandId);
                 sendResult(commandId, tenantId, PointCommandStatusEnum.DUPLICATE,
                         null, "DUPLICATE", "Command already processed", channel, deliveryTag);
                 return;
@@ -119,6 +128,15 @@ public class PointCommandReceiver {
                 case PointCommandPayload.ReadPayload r -> r.deviceId();
                 case PointCommandPayload.WritePayload w -> w.deviceId();
             };
+
+            if (!Objects.equals(driverProperties.getNode(), entityDTO.ownerNode())
+                    || !Objects.equals(driverMetadata.getFencingToken(lockDeviceId), entityDTO.fencingToken())) {
+                log.warn("Reject stale-owner point command, commandId={}, deviceId={}, fencingToken={}",
+                        commandId, lockDeviceId, entityDTO.fencingToken());
+                sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED,
+                        null, "STALE_OWNER", "Device ownership lease changed", channel, deliveryTag);
+                return;
+            }
 
             // Dispatch under per-device lock to prevent protocol interleaving
             String responseValue = deviceLockManager.runExclusive(lockDeviceId, () -> {
@@ -195,6 +213,11 @@ public class PointCommandReceiver {
             }
         } catch (Exception e) {
             log.error("Failed to send command result, commandId={}", commandId, e);
+            if (Objects.nonNull(commandId)) {
+                dedupCache.release(commandId);
+            }
+            RabbitAckUtil.nack(channel, deliveryTag, true);
+            return;
         }
         RabbitAckUtil.ack(channel, deliveryTag);
     }

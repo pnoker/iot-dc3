@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.pnoker.common.manager.mapper.DriverLeaseMapper">
+
+    <select id="acquireDriverLock" resultType="long">
+        SELECT pg_advisory_xact_lock(#{driverId})
+    </select>
+
+    <insert id="upsertInstance">
+        INSERT INTO dc3_driver_instance
+            (tenant_id, driver_id, node_id, client_id, service_host, lease_until)
+        VALUES
+            (#{tenantId}, #{driverId}, #{node}, #{client}, #{host}, #{leaseUntil})
+        ON CONFLICT (tenant_id, driver_id, node_id) DO UPDATE SET
+            client_id = EXCLUDED.client_id,
+            service_host = EXCLUDED.service_host,
+            last_heartbeat = CURRENT_TIMESTAMP,
+            lease_until = EXCLUDED.lease_until
+    </insert>
+
+    <select id="listActiveNodes" resultType="string">
+        SELECT node_id
+        FROM dc3_driver_instance
+        WHERE tenant_id = #{tenantId}
+          AND driver_id = #{driverId}
+          AND lease_until &gt; CURRENT_TIMESTAMP
+        ORDER BY node_id
+    </select>
+
+    <select id="listDriverDeviceIds" resultType="long">
+        SELECT id
+        FROM dc3_device
+        WHERE tenant_id = #{tenantId}
+          AND driver_id = #{driverId}
+          AND deleted = 0
+          AND enable_flag = 0
+          AND id &gt; #{afterDeviceId}
+        ORDER BY id
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectLeaseState"
+            resultType="io.github.pnoker.common.manager.entity.model.DriverLeaseStateDO">
+        SELECT tenant_id, driver_id, membership_hash, device_revision, assignment_version
+        FROM dc3_driver_lease_state
+        WHERE tenant_id = #{tenantId}
+          AND driver_id = #{driverId}
+    </select>
+
+    <select id="selectDeviceRevision" resultType="long">
+        SELECT revision
+        FROM dc3_driver_device_revision
+        WHERE tenant_id = #{tenantId}
+          AND driver_id = #{driverId}
+    </select>
+
+    <select id="upsertLeaseState" resultType="long" affectData="true" flushCache="true">
+        INSERT INTO dc3_driver_lease_state
+            (tenant_id, driver_id, membership_hash, device_revision)
+        VALUES
+            (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision})
+        ON CONFLICT (tenant_id, driver_id) DO UPDATE SET
+            membership_hash = EXCLUDED.membership_hash,
+            device_revision = EXCLUDED.device_revision,
+            assignment_version = nextval('dc3_driver_assignment_version_seq'),
+            operate_time = CURRENT_TIMESTAMP
+        RETURNING assignment_version
+    </select>
+
+    <delete id="deleteExpiredInstances">
+        DELETE FROM dc3_driver_instance
+        WHERE tenant_id = #{tenantId}
+          AND driver_id = #{driverId}
+          AND lease_until &lt; #{expiredBefore}
+    </delete>
+
+    <insert id="upsertDeviceLeases">
+        INSERT INTO dc3_device_lease (tenant_id, driver_id, device_id, owner_node)
+        VALUES
+        <foreach collection="leases" item="lease" separator=",">
+            (#{lease.tenantId}, #{lease.driverId}, #{lease.deviceId}, #{lease.ownerNode})
+        </foreach>
+        ON CONFLICT (tenant_id, device_id) DO UPDATE SET
+            driver_id = EXCLUDED.driver_id,
+            owner_node = EXCLUDED.owner_node,
+            fencing_token = nextval('dc3_device_lease_fencing_seq'),
+            operate_time = CURRENT_TIMESTAMP
+        WHERE dc3_device_lease.driver_id != EXCLUDED.driver_id
+           OR dc3_device_lease.owner_node != EXCLUDED.owner_node
+    </insert>
+
+    <delete id="deleteOrphanedLeases">
+        DELETE FROM dc3_device_lease lease
+        WHERE lease.tenant_id = #{tenantId}
+          AND lease.driver_id = #{driverId}
+          AND NOT EXISTS (
+              SELECT 1 FROM dc3_device device
+              WHERE device.tenant_id = lease.tenant_id
+                AND device.id = lease.device_id
+                AND device.driver_id = lease.driver_id
+                AND device.deleted = 0
+                AND device.enable_flag = 0
+          )
+    </delete>
+
+    <select id="listOwnedLeases" resultType="io.github.pnoker.common.manager.entity.model.DeviceLeaseDO">
+        SELECT tenant_id, driver_id, device_id, owner_node, fencing_token
+        FROM dc3_device_lease
+        WHERE tenant_id = #{tenantId}
+          AND driver_id = #{driverId}
+          AND owner_node = #{node}
+          AND device_id &gt; #{afterDeviceId}
+        ORDER BY device_id
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectActiveLease" resultType="io.github.pnoker.common.manager.entity.model.DeviceLeaseDO">
+        SELECT lease.tenant_id, lease.driver_id, lease.device_id,
+               lease.owner_node, lease.fencing_token
+        FROM dc3_device_lease lease
+        JOIN dc3_driver_instance instance
+          ON instance.tenant_id = lease.tenant_id
+         AND instance.driver_id = lease.driver_id
+         AND instance.node_id = lease.owner_node
+        WHERE lease.tenant_id = #{tenantId}
+          AND lease.device_id = #{deviceId}
+          AND instance.lease_until &gt; CURRENT_TIMESTAMP
+    </select>
+
+</mapper>

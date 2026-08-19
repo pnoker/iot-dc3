@@ -57,7 +57,6 @@ import java.util.Objects;
  * Manages event attribute field definitions declared on profile templates, the configurable fields of a device-reported event.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "event_attribute", description = "Event attribute definitions: manage configurable properties of device events including name, type, and value constraints")

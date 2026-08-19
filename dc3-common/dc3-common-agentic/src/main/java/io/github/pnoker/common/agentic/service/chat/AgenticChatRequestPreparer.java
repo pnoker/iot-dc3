@@ -49,7 +49,6 @@ import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
  * Converts an API chat request into validated, tenant-scoped orchestration state.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j

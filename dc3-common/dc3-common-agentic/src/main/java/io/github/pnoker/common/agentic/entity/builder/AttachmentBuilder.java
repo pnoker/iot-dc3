@@ -31,35 +31,94 @@ import java.util.List;
  * MapStruct builder converting between attachment BO, VO, and DO.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface AttachmentBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "userId", ignore = true)
     AttachmentBO buildBOByVO(AttachmentVO entityVO);
 
+    /**
+     * Convert vo list to bo list.
+     *
+     * @param entityVOList entity view object list
+     * @return converted value
+     */
     List<AttachmentBO> buildBOListByVOList(List<AttachmentVO> entityVOList);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "deleted", ignore = true)
     AttachmentDO buildDOByBO(AttachmentBO entityBO);
 
+    /**
+     * Convert bo list to do list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<AttachmentDO> buildDOListByBOList(List<AttachmentBO> entityBOList);
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     AttachmentBO buildBOByDO(AttachmentDO entityDO);
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<AttachmentBO> buildBOListByDOList(List<AttachmentDO> entityDOList);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     AttachmentVO buildVOByBO(AttachmentBO entityBO);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<AttachmentVO> buildVOListByBOList(List<AttachmentBO> entityBOList);
 
+    /**
+     * Convert do page to bo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
     default Page<AttachmentBO> buildBOPageByDOPage(Page<AttachmentDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
+    /**
+     * Convert bo page to vo page.
+     *
+     * @param entityPageBO business object
+     * @return converted value
+     */
     default Page<AttachmentVO> buildVOPageByBOPage(Page<AttachmentBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }

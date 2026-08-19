@@ -72,7 +72,6 @@ dc3:
         default-value: '${value}'
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/ethernet-ip/buffer.db
 
 spring:

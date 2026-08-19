@@ -126,6 +126,45 @@ describe('utils (services)', () => {
       expect(authNameRules(t, 'Role')).toHaveLength(3);
       expect(remarkRules(t)[0]).toMatchObject({max: 300, trigger: 'blur'});
     });
+
+    it('validates decimal, byte and positive-integer boundaries', async () => {
+      const {byteRules, decimalRules, positiveIntegerRules, requiredSelectRule, requiredStringRule} =
+        await import('@/utils/formRuleUtil');
+      const t = vi.fn((key: string, args?: Record<string, unknown>) =>
+        `${key}:${args?.min ?? ''}:${args?.max ?? ''}`
+      );
+      type RuleValidator = (rule: unknown, value: unknown, callback: (error?: Error) => void) => void;
+      const validate = (rule: {validator?: unknown}, value: unknown): Promise<void> =>
+        new Promise((resolve, reject) => {
+          const validator = rule.validator as RuleValidator;
+          validator(rule, value, error => (error ? reject(error) : resolve()));
+        });
+
+      const decimal = decimalRules('decimal only', 'value required');
+      expect(decimal[0]).toMatchObject({required: true, whitespace: true, message: 'value required'});
+      await expect(validate(decimal[1], '')).resolves.toBeUndefined();
+      await expect(validate(decimal[1], '-12.345')).resolves.toBeUndefined();
+      await expect(validate(decimal[1], '12.3456')).rejects.toThrow('decimal only');
+
+      const byte = byteRules(t, 'byte required')[1];
+      await expect(validate(byte, 0)).resolves.toBeUndefined();
+      await expect(validate(byte, 127)).resolves.toBeUndefined();
+      await expect(validate(byte, 128)).rejects.toThrow('common.byteRange:0:127');
+      await expect(validate(byte, 1.5)).rejects.toThrow('common.byteRange:0:127');
+
+      const positiveInteger = positiveIntegerRules(t, 'count required')[1];
+      await expect(validate(positiveInteger, '1')).resolves.toBeUndefined();
+      await expect(validate(positiveInteger, '0')).rejects.toThrow('common.positiveIntegerFormat');
+      await expect(validate(positiveInteger, '-1')).rejects.toThrow('common.positiveIntegerFormat');
+      await expect(validate(positiveInteger, '1.5')).rejects.toThrow('common.positiveIntegerFormat');
+
+      expect(requiredStringRule('name required', 'change')[0]).toMatchObject({
+        required: true,
+        whitespace: true,
+        trigger: 'change',
+      });
+      expect(requiredSelectRule('selection required')[0]).toMatchObject({required: true, trigger: 'change'});
+    });
   });
 
   describe('commonUtil', () => {

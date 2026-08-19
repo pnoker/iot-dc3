@@ -28,7 +28,6 @@ import java.util.Set;
  * {@link PermissionProvider} backed by the active facade implementation.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @RequiredArgsConstructor

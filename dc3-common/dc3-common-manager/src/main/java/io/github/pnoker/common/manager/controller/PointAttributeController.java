@@ -57,7 +57,6 @@ import java.util.Objects;
  * REST controller exposing point attribute management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "point_attribute", description = "Point attribute definitions: manage configurable properties of data points including name, type, default value, and validation rules")

@@ -40,7 +40,6 @@ import java.util.List;
  * gRPC client used to query point metadata associated with the current driver.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 
@@ -96,7 +95,7 @@ public class PointClient {
                 .setDriverId(driverMetadata.getDriver().getId()).setPointId(id);
         GrpcRPointDTO rPointDTO = pointApiBlockingStub.getById(query.build());
         if (!rPointDTO.getResult().getOk()) {
-            log.error("Point doesn't exist: {}", id);
+            log.error("Point metadata unavailable, pointId={}", id);
             return null;
         }
 

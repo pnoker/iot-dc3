@@ -48,7 +48,6 @@ import java.util.Optional;
  * Device-domain tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -64,6 +63,13 @@ public class DeviceTool {
 
     private final Optional<StatusHealthFacade> statusHealthFacade;
 
+    /**
+     * Return device by identifier.
+     *
+     * @param deviceId device identifier
+     * @param toolContext tool context
+     * @return lookup device by identifier result
+     */
     @Tool(description = "Look up a device by its numeric ID. Returns device name, code, driver ID, enable status, and profile IDs.")
     @AgenticToolMetadata(domain = "device", title = "Query device by ID")
     public AgenticToolResult<FacadeDeviceBO> lookupDeviceById(
@@ -78,6 +84,13 @@ public class DeviceTool {
         return AgenticToolResult.ok("Device loaded", bo);
     }
 
+    /**
+     * Return devices by identifiers.
+     *
+     * @param deviceIds device identifiers
+     * @param toolContext tool context
+     * @return lookup devices by identifiers result
+     */
     @Tool(description = "Batch look up devices by numeric IDs. Returns up to 50 tenant-scoped devices.")
     @AgenticToolMetadata(domain = "device", title = "Batch query devices by IDs")
     public AgenticToolResult<List<FacadeDeviceBO>> lookupDevicesByIds(
@@ -96,6 +109,17 @@ public class DeviceTool {
         return AgenticToolResult.ok("Devices loaded", devices);
     }
 
+    /**
+     * Return the matching devices.
+     *
+     * @param deviceName device name
+     * @param deviceCode device code
+     * @param driverId driver identifier
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return search devices result
+     */
     @Tool(description = "Search for devices with optional filters. Supports filtering by device name, code, or driver ID. Returns a paginated list of devices.")
     @AgenticToolMetadata(domain = "device", title = "Search devices")
     public AgenticToolResult<FacadePage<FacadeDeviceBO>> searchDevices(
@@ -124,6 +148,13 @@ public class DeviceTool {
         return AgenticToolResult.ok("Device page loaded", result);
     }
 
+    /**
+     * Return the matching devices by driver identifier.
+     *
+     * @param driverId driver identifier
+     * @param toolContext tool context
+     * @return list devices by driver identifier result
+     */
     @Tool(description = "List all devices attached to a given driver ID.")
     @AgenticToolMetadata(domain = "device", title = "List devices by driver")
     public AgenticToolResult<List<FacadeDeviceBO>> listDevicesByDriverId(
@@ -139,6 +170,13 @@ public class DeviceTool {
         return AgenticToolResult.ok("Devices loaded for driver " + driverId, devices);
     }
 
+    /**
+     * Return the matching devices by profile identifier.
+     *
+     * @param profileId profile identifier
+     * @param toolContext tool context
+     * @return list devices by profile identifier result
+     */
     @Tool(description = "List all devices that use a given profile (device template) ID.")
     @AgenticToolMetadata(domain = "device", title = "List devices by profile")
     public AgenticToolResult<List<FacadeDeviceBO>> listDevicesByProfileId(
@@ -154,6 +192,14 @@ public class DeviceTool {
         return AgenticToolResult.ok("Devices loaded for profile " + profileId, devices);
     }
 
+    /**
+     * Return device latest point values.
+     *
+     * @param deviceId device identifier
+     * @param limit limit
+     * @param toolContext tool context
+     * @return get device latest point values result
+     */
     @Tool(description = "Get a latest-value snapshot for points bound to a device. Returns point metadata and latest values for up to the requested limit.")
     @AgenticToolMetadata(domain = "device", title = "Get device latest point values")
     public AgenticToolResult<DeviceLatestPointValues> getDeviceLatestPointValues(
@@ -194,6 +240,13 @@ public class DeviceTool {
         }
     }
 
+    /**
+     * Return device statuses by identifiers.
+     *
+     * @param deviceIds device identifiers
+     * @param toolContext tool context
+     * @return get device statuses by identifiers result
+     */
     @Tool(description = "Get device online/offline statuses for device IDs. Returns up to 50 tenant-scoped statuses.")
     @AgenticToolMetadata(domain = "device", title = "Get device statuses")
     public AgenticToolResult<Map<Long, String>> getDeviceStatusesByIds(
@@ -216,6 +269,13 @@ public class DeviceTool {
         return AgenticToolResult.ok("Device statuses loaded", statuses);
     }
 
+    /**
+     * Return device statuses by profile identifier.
+     *
+     * @param profileId profile identifier
+     * @param toolContext tool context
+     * @return get device statuses by profile identifier result
+     */
     @Tool(description = "Get device online/offline statuses for devices bound to a profile/template.")
     @AgenticToolMetadata(domain = "device", title = "Get device statuses by profile")
     public AgenticToolResult<Map<Long, String>> getDeviceStatusesByProfileId(

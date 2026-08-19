@@ -26,7 +26,6 @@ import java.util.function.LongConsumer;
  * Optional wrapper for {@link Long} with positive-value checks.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public final class LongOptional {
@@ -37,16 +36,33 @@ public final class LongOptional {
         this.value = value;
     }
 
+    /**
+     * Create a wrapper that treats {@code null} and non-positive longs as absent.
+     *
+     * @param value long value to wrap
+     * @return wrapper for the supplied value
+     */
     public static LongOptional ofNullable(Long value) {
         return new LongOptional(value);
     }
 
+    /**
+     * Invoke the action when the wrapped long is positive.
+     *
+     * @param action action that consumes the present long
+     */
     public void ifPresent(LongConsumer action) {
         if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
             action.accept(value);
         }
     }
 
+    /**
+     * Invoke exactly one branch according to whether the wrapped long is positive.
+     *
+     * @param action action that consumes a positive long
+     * @param emptyAction action to run for a {@code null} or non-positive long
+     */
     public void ifPresentOrElse(LongConsumer action, Runnable emptyAction) {
         if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
             action.accept(value);

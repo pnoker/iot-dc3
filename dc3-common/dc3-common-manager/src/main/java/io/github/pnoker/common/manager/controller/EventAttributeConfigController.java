@@ -61,7 +61,6 @@ import java.util.Objects;
  * Manages per-device event attribute configuration values that override the defaults declared on a profile template's event attributes.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "event_attribute_config", description = "Event attribute configuration values: set and update per-device customization values for event properties inherited from event attribute definitions")

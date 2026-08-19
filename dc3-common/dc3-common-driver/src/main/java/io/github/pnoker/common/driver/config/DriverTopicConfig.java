@@ -37,7 +37,6 @@ import org.springframework.context.annotation.Bean;
  * together with their exchange bindings.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -101,8 +100,9 @@ public class DriverTopicConfig {
      */
     @Bean
     Queue pointCommandQueue() {
-        return QueueBuilder.durable(RabbitConstant.QUEUE_POINT_COMMAND_PREFIX + driverProperties.getService())
+        return QueueBuilder.durable(RabbitConstant.QUEUE_POINT_COMMAND_PREFIX + driverProperties.getClient())
                 .ttl(30000)
+                .expires(driverProperties.getLease().getQueueExpiresMillis())
                 .deadLetterExchange(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_DEAD)
                 .deadLetterRoutingKey(SymbolConstant.HASHTAG)
                 .build();
@@ -118,7 +118,8 @@ public class DriverTopicConfig {
     Binding pointCommandBinding(Queue pointCommandQueue) {
         Binding binding = BindingBuilder.bind(pointCommandQueue)
                 .to(pointCommandExchange)
-                .with(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + driverProperties.getService());
+                .with(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + driverProperties.getService()
+                        + SymbolConstant.DOT + driverProperties.getNode());
         binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }
@@ -130,8 +131,9 @@ public class DriverTopicConfig {
      */
     @Bean
     Queue commandQueue() {
-        return QueueBuilder.durable(RabbitConstant.QUEUE_COMMAND_PREFIX + driverProperties.getService())
+        return QueueBuilder.durable(RabbitConstant.QUEUE_COMMAND_PREFIX + driverProperties.getClient())
                 .ttl(30000)
+                .expires(driverProperties.getLease().getQueueExpiresMillis())
                 .deadLetterExchange(RabbitConstant.TOPIC_EXCHANGE_COMMAND_DEAD)
                 .deadLetterRoutingKey(SymbolConstant.HASHTAG)
                 .build();
@@ -147,7 +149,8 @@ public class DriverTopicConfig {
     Binding commandBinding(Queue commandQueue) {
         Binding binding = BindingBuilder.bind(commandQueue)
                 .to(commandExchange)
-                .with(RabbitConstant.ROUTING_COMMAND_PREFIX + driverProperties.getService());
+                .with(RabbitConstant.ROUTING_COMMAND_PREFIX + driverProperties.getService()
+                        + SymbolConstant.DOT + driverProperties.getNode());
         binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }

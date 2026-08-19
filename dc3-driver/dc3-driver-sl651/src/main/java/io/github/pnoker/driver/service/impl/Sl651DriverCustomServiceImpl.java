@@ -61,7 +61,6 @@ import java.util.Set;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j
@@ -299,7 +298,8 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             Object body = responses.get(i);
             List<String> bodyElements = invokeBodyElements(body);
             if (!bodyElements.isEmpty()) {
-                log.debug("Driver SL651 body[{}], protocol={}, elements={}", i, driverCode, bodyElements);
+                log.debug("Driver SL651 body decoded, protocol={}, bodyIndex={}, elementCount={}",
+                        driverCode, i, bodyElements.size());
                 elements.addAll(bodyElements);
             }
         }

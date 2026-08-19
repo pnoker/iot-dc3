@@ -40,7 +40,6 @@ import java.util.Objects;
  * {@code LocalDateTimeTypeHandler}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @MappedTypes(LocalDateTime.class)

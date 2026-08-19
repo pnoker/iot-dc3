@@ -32,7 +32,6 @@ import java.io.Serializable;
  * Query view object for paging the MCP tool catalog.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter

@@ -33,7 +33,6 @@ import java.util.Map;
  * against the device and return output parameter name-value pairs.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 public interface DriverCommand {

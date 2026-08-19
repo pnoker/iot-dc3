@@ -54,7 +54,6 @@ import java.util.Objects;
  * REST controller exposing API management endpoints.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Tag(name = "api", description = "API endpoint registry: manage metadata for REST API endpoints including path, method, auth requirements, and documentation references")

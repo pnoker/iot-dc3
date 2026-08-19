@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.facade.grpc.config;
 
+import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.grpc.ForwardingServerCallListener;
 import io.grpc.Metadata;
 import io.grpc.ServerCall;
@@ -57,7 +58,6 @@ import java.util.UUID;
  * every gRPC server automatically.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2026.7.8
  */
 @Component
@@ -65,15 +65,10 @@ import java.util.UUID;
 public class RequestIdGrpcServerInterceptor implements ServerInterceptor {
 
     /**
-     * MDC key — kept in sync with {@code RequestIdWebFilter.MDC_REQUEST_ID}.
-     */
-    private static final String MDC_REQUEST_ID = "requestId";
-
-    /**
      * gRPC metadata key for the request id, mirroring the HTTP header name.
      */
     private static final Metadata.Key<String> REQUEST_ID_KEY =
-            Metadata.Key.of("X-Request-Id", Metadata.ASCII_STRING_MARSHALLER);
+            Metadata.Key.of(RequestIdConstant.HEADER, Metadata.ASCII_STRING_MARSHALLER);
 
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers,
@@ -117,11 +112,11 @@ public class RequestIdGrpcServerInterceptor implements ServerInterceptor {
         }
 
         private void withRequestId(Runnable action) {
-            MDC.put(MDC_REQUEST_ID, requestId);
+            MDC.put(RequestIdConstant.MDC_KEY, requestId);
             try {
                 action.run();
             } finally {
-                MDC.remove(MDC_REQUEST_ID);
+                MDC.remove(RequestIdConstant.MDC_KEY);
             }
         }
 

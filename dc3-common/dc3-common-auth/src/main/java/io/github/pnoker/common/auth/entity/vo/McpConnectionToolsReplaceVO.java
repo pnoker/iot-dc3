@@ -35,7 +35,6 @@ import java.util.List;
  * Request view object for replacing an MCP connection's tool whitelist.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter

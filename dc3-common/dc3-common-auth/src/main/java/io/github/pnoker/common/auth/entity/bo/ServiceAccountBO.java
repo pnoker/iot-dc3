@@ -33,7 +33,6 @@ import java.time.LocalDateTime;
  * Business object for service accounts.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -45,7 +44,6 @@ public class ServiceAccountBO extends BaseBO implements TenantOwned {
 
     private Long principalId;
 
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private String serviceAccountName;

@@ -28,7 +28,6 @@ import java.util.Optional;
  * Enumeration of alarm type flags.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -68,6 +67,12 @@ public enum AlarmTypeEnum {
 
     private final String remark;
 
+    /**
+     * Resolve an alarm type from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching type, or {@code null} when the index is unknown
+     */
     public static AlarmTypeEnum ofIndex(Byte index) {
         Optional<AlarmTypeEnum> any = Arrays.stream(AlarmTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -75,6 +80,12 @@ public enum AlarmTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an alarm type from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching type, or {@code null} when the code is unknown
+     */
     public static AlarmTypeEnum ofCode(String code) {
         Optional<AlarmTypeEnum> any = Arrays.stream(AlarmTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -82,6 +93,12 @@ public enum AlarmTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an alarm type from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching type, or {@code null} when the name is unknown
+     */
     public static AlarmTypeEnum ofName(String name) {
         try {
             return valueOf(name);

@@ -28,7 +28,6 @@ import java.util.Optional;
  * Local credential type.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -45,6 +44,12 @@ public enum CredentialTypeEnum {
 
     private final String remark;
 
+    /**
+     * Resolve a credential type from its persisted value.
+     *
+     * @param value persisted credential value
+     * @return matching type, or {@code null} when the value is unknown
+     */
     public static CredentialTypeEnum ofValue(String value) {
         Optional<CredentialTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))

@@ -44,7 +44,6 @@ import java.util.function.Function;
  *
  * @param <V> cached value type
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -111,7 +110,7 @@ public abstract class AbstractMetadataCache<V> {
 
     /**
      * Returns the cached value for {@code id}, triggering the loader on miss. Bounded
-     * by {@link DriverProperties.MetadataProperties.CacheProperties#getLoadTimeoutSeconds()}.
+     * by {@code DriverProperties.MetadataProperties.CacheProperties#getLoadTimeoutSeconds()}.
      *
      * @param id cache key
      * @return cached value, or {@code null} if loading timed out, was interrupted, or

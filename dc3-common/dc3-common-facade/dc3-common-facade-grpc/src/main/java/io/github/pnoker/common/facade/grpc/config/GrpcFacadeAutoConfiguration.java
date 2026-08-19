@@ -28,7 +28,6 @@ import org.springframework.context.annotation.ComponentScan;
  * facade-grpc package so the {@code @Component} beans are registered.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration

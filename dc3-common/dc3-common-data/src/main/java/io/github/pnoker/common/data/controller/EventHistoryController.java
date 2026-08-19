@@ -50,7 +50,6 @@ import java.util.Objects;
  * REST controller for event report management.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Tag(name = "event_history", description = "Device event audit trail: query historical records of device alarms, state changes, and status transitions with timestamps and event payloads")

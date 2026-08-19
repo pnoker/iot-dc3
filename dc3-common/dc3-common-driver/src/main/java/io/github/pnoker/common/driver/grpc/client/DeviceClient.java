@@ -57,7 +57,6 @@ import java.util.stream.Collectors;
  * from the manager center.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 
@@ -122,7 +121,7 @@ public class DeviceClient {
                 .setDriverId(driverMetadata.getDriver().getId()).setDeviceId(id);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.getById(query.build());
         if (!rDeviceDTO.getResult().getOk()) {
-            log.error("Device doesn't exist: {}", id);
+            log.error("Device metadata unavailable, deviceId={}", id);
             return null;
         }
 

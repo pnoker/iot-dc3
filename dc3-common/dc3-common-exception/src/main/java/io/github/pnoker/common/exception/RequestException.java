@@ -23,7 +23,6 @@ import io.github.pnoker.common.enums.ErrorCode;
  * Exception for invalid request handling.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class RequestException extends BusinessException {

@@ -43,7 +43,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -156,8 +155,8 @@ public class MqttScheduleJob extends QuartzJobBean {
         long speed = MESSAGE_COUNT.getAndSet(0) / interval;
         MESSAGE_SPEED.set(speed);
         if (speed >= batchSpeed) {
-            log.debug("Mqtt message receiver speed: {} /s, value size: {}, interval: {}", speed, getMqttMessagesSize(),
-                    interval);
+            log.debug("MQTT receive rate sampled, messagesPerSecond={}, queuedMessages={}, intervalSeconds={}",
+                    speed, getMqttMessagesSize(), interval);
         }
 
         // Process a private snapshot outside the lock so inbound MQTT threads are not

@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -50,6 +49,29 @@ public class PointValueBO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Immutable event identity used for end-to-end idempotency.
+     */
+    private String messageId;
+
+    /**
+     * Wire schema version.
+     */
+    private Integer schemaVersion;
+
+    /**
+     * Unique runtime node that produced this reading.
+     */
+    private String driverNode;
+
+    /**
+     * Monotonically increasing sequence within {@link #driverNode}.
+     */
+    private Long sequence;
+
+    /** Manager-issued device ownership fencing token. */
+    private Long fencingToken;
 
     /**
      * Device ID associated with the point value

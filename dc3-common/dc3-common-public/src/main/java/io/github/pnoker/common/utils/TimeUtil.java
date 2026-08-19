@@ -31,7 +31,6 @@ import java.util.Date;
  * Legacy {@link Date} formatting and time calculation with thread-safe formatters.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

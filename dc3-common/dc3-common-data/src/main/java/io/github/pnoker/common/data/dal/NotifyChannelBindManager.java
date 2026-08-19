@@ -24,7 +24,6 @@ import io.github.pnoker.common.data.entity.model.NotifyChannelBindDO;
  * Notification channel binding manager.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface NotifyChannelBindManager extends IService<NotifyChannelBindDO> {

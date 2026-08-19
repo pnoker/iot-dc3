@@ -55,7 +55,6 @@ import java.util.Objects;
  * REST controller exposing local credential management endpoints.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Tag(name = "local_credential", description = "Local credential management: create, update, verify, and rotate username/password credentials for user authentication")

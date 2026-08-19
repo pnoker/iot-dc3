@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
  * One raw alarm row from the paged / latest list.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

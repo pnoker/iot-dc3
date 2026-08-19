@@ -29,7 +29,6 @@ import java.util.List;
  * Business service for device operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {

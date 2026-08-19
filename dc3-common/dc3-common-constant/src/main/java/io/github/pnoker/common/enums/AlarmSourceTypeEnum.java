@@ -28,7 +28,6 @@ import java.util.Optional;
  * Enumeration of alarm source flags.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -75,6 +74,12 @@ public enum AlarmSourceTypeEnum {
 
     private final String remark;
 
+    /**
+     * Resolve an alarm source from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching source, or {@code null} when the index is unknown
+     */
     public static AlarmSourceTypeEnum ofIndex(Byte index) {
         Optional<AlarmSourceTypeEnum> any = Arrays.stream(AlarmSourceTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -82,6 +87,12 @@ public enum AlarmSourceTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an alarm source from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching source, or {@code null} when the code is unknown
+     */
     public static AlarmSourceTypeEnum ofCode(String code) {
         Optional<AlarmSourceTypeEnum> any = Arrays.stream(AlarmSourceTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -89,6 +100,12 @@ public enum AlarmSourceTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an alarm source from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching source, or {@code null} when the name is unknown
+     */
     public static AlarmSourceTypeEnum ofName(String name) {
         try {
             return valueOf(name);

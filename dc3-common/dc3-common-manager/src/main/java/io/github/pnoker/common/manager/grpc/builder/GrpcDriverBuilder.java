@@ -42,7 +42,6 @@ import java.util.Optional;
  * MapStruct builder for driver gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -61,6 +60,12 @@ public interface GrpcDriverBuilder {
     @Mapping(target = "labelId", ignore = true)
     DriverQuery buildQueryByGrpcQuery(GrpcPageDriverQuery entityQuery);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityQuery entity query
+     */
     @AfterMapping
     default void afterProcess(GrpcPageDriverQuery entityGrpc,
                               @MappingTarget DriverQuery.DriverQueryBuilder entityQuery) {
@@ -97,6 +102,12 @@ public interface GrpcDriverBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcDriverDTO buildGrpcDTOByBO(DriverBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(DriverBO entityBO, @MappingTarget GrpcDriverDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
@@ -131,6 +142,12 @@ public interface GrpcDriverBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     DriverBO buildBOByGrpcDTO(GrpcDriverDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(GrpcDriverDTO entityGrpc, @MappingTarget DriverBO entityBO) {
         GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);

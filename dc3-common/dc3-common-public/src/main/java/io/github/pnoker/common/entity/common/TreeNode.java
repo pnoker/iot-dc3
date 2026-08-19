@@ -29,7 +29,6 @@ import java.util.List;
  * Generic tree node with parent-child relationships.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 

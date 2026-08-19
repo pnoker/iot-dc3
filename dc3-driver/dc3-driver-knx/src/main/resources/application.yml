@@ -84,7 +84,6 @@ dc3:
         remark: KNX group address for commands
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/knx/buffer.db
 
 spring:

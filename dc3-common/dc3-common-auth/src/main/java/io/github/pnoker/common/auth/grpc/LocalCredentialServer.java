@@ -36,7 +36,6 @@ import java.util.Objects;
  * gRPC server handling local credential facade requests.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Slf4j

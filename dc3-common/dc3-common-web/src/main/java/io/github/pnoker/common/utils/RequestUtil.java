@@ -31,7 +31,6 @@ import java.util.Objects;
  * information from ServerHttpRequest objects such as IP addresses, headers and cookies.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

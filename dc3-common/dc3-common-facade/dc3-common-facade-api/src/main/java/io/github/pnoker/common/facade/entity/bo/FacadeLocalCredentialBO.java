@@ -29,7 +29,6 @@ import lombok.ToString;
  * Facade-level local credential BO.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter

@@ -32,7 +32,6 @@ import java.io.Serializable;
  * Base JSON extension object with a typed version field.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

@@ -59,7 +59,6 @@ import java.util.Objects;
  * REST controller exposing driver attribute config management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "driver_attribute_config", description = "Driver attribute configuration values: set and update per-device customization values for driver properties inherited from driver attribute definitions")

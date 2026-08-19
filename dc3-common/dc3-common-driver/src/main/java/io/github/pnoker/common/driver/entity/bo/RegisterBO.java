@@ -37,7 +37,6 @@ import java.util.List;
  * center.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -60,6 +59,12 @@ public class RegisterBO implements Serializable {
      * Driver client identifier.
      */
     private String client;
+
+    /** Runtime node identity. */
+    private String node;
+
+    /** Requested runtime lease duration in seconds. */
+    private Integer leaseSeconds;
 
     /**
      * Driver definition to register.

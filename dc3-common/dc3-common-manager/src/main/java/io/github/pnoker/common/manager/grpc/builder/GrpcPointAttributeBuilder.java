@@ -39,7 +39,6 @@ import java.util.Optional;
  * MapStruct builder for point attribute gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -64,6 +63,12 @@ public interface GrpcPointAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointAttributeBO buildBOByGrpcDTO(GrpcPointAttributeDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(GrpcPointAttributeDTO entityGrpc, @MappingTarget PointAttributeBO entityBO) {
         GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
@@ -99,6 +104,12 @@ public interface GrpcPointAttributeBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcPointAttributeDTO buildGrpcDTOByBO(PointAttributeBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(PointAttributeBO entityBO, @MappingTarget GrpcPointAttributeDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);

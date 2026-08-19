@@ -26,12 +26,11 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
  * <p>
  * All fields are {@code final}. The environment/group tag prefix is read from
  * the {@code dc3.rabbit.tag} system property during class initialization.
- * {@link io.github.pnoker.common.config.RabbitmqEnvironmentConfig} sets this
+ * {@code RabbitmqEnvironmentConfig} in the RabbitMQ integration module sets this
  * property during {@code EnvironmentPostProcessor} execution, which runs
  * before any application context beans are created.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 public class RabbitConstant {

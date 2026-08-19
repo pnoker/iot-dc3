@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.rabbit;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,6 @@ import java.util.Objects;
  * RabbitMQ receiver for device alarm events.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -57,7 +55,10 @@ public class DeviceAlarmReceiver {
     public void deviceAlarmReceive(Channel channel, Message message, DeviceAlarmDTO entityDTO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            log.debug("Receive device alarm: {}", JsonUtil.toJsonString(entityDTO));
+            log.debug("Device alarm received, tenantId={}, driverId={}, deviceId={}",
+                    Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
+                    Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
+                    Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())) {
                 log.warn("Invalid device alarm, deviceId is null, deviceId={}",
                         Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());

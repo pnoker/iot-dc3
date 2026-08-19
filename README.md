@@ -5,7 +5,7 @@
 > **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
 
 <p align="center">
-  <img src="./.github/brand/banner.en.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
+  <img src="./.github/brand/png/banner.en.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
 </p>
 
 <p align="center">
@@ -34,7 +34,7 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.dc3.site">https://docs.dc3.site</a>
+  <a href="https://dc3.site">https://dc3.site</a>
 </p>
 
 <p align="center">
@@ -81,7 +81,7 @@
 
 ![IoT DC3 Architecture Panorama](https://docs.dc3.site/images/architecture-panorama-en.png)
 
-Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 28 protocol
+Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 36 protocol
 drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack (ELK +
 Prometheus + Grafana) laid out in one view.
 
@@ -96,16 +96,16 @@ and API paths. Clear boundaries that scale across services and teams.
 
 ### 🔌 Multi-Protocol Device Connectivity
 
-IoT DC3 includes **28 access driver modules** for industrial automation, IoT communication, data bridging, basic
+IoT DC3 includes **36 access driver modules** for industrial automation, IoT communication, data bridging, basic
 communication, and simulation/debugging scenarios, reducing the cost of connecting common devices and data sources:
 
-| Category                           | Driver Modules                                                                                                                                     |
-|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🏭 **Industrial protocols**        | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **IoT protocols**               | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **Data bridging**               | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
-| 🔧 **Basic communication and NMS** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
-| 🧪 **Simulation and debugging**    | Virtual · Listening Virtual                                                                                                                        |
+| Category                                      | Driver Modules                                                                                                                                                                                      |
+|-----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **Industrial protocols**                   | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · IEC 61850 · DNP3 · DLMS · DLT645 · KNX · M-Bus · SL651 |
+| 📡 **IoT protocols**                          | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                                 |
+| 🗄️ **Data bridging**                          | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                                    |
+| 🔧 **Basic communication, messaging and NMS** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                               |
+| 🧪 **Simulation and debugging**               | Virtual · Listening Virtual                                                                                                                                                                         |
 
 The **Driver SDK** supports fast development of custom protocol drivers and registration into the runtime platform.
 

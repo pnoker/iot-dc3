@@ -31,12 +31,11 @@ import java.util.concurrent.TimeUnit;
  * In-memory denylist of cancelled tokens, keyed by (loginName, tenantCode).
  *
  * <p>
- * The platform replaced Redis with Caffeine for shared caches; this component keeps the
- * same model for token revocation. We do not store the full JWT — instead we record the
- * UTC milliseconds at which a user logged out. Any token whose {@code issuedAt} predates
- * that timestamp is treated as cancelled. One logout therefore invalidates every active
- * token for that login (which is the safer behaviour when the same account is used from
- * multiple devices).
+ * This component is an instance-local, short-lived token revocation cache. We do not store
+ * the full JWT — instead we record the UTC milliseconds at which a user logged out. Any
+ * token whose {@code issuedAt} predates that timestamp is treated as cancelled by this
+ * application instance. One logout therefore invalidates every active token for that login
+ * on the same instance.
  * </p>
  *
  * <p>
@@ -46,7 +45,6 @@ import java.util.concurrent.TimeUnit;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.16
  */
 @Component
@@ -54,6 +52,9 @@ public class TokenDenylistCache {
 
     private Cache<String, Long> cache;
 
+    /**
+     * Init.
+     */
     @PostConstruct
     public void init() {
         this.cache = Caffeine.newBuilder()

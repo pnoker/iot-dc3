@@ -30,7 +30,6 @@ import java.time.LocalDateTime;
  * Business object for identity and authorization audit log entries.
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 @Getter

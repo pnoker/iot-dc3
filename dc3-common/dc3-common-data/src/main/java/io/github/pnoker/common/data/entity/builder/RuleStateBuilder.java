@@ -41,22 +41,45 @@ import java.util.Optional;
  * MapStruct builder converting between rule runtime state BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface RuleStateBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     @Mapping(target = "tenantId", ignore = true)
     RuleStateBO buildBOByVO(RuleStateVO entityVO);
 
+    /**
+     * Convert vo list to bo list.
+     *
+     * @param entityVOList entity view object list
+     * @return converted value
+     */
     List<RuleStateBO> buildBOListByVOList(List<RuleStateVO> entityVOList);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "entityStateExt", ignore = true)
     @Mapping(target = "alarmTargetTypeFlag", ignore = true)
     @Mapping(target = "entityStateFlag", ignore = true)
     RuleStateDO buildDOByBO(RuleStateBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(RuleStateBO entityBO, @MappingTarget RuleStateDO entityDO) {
         RuleStateExt entityExt = entityBO.getEntityStateExt();
@@ -77,13 +100,31 @@ public interface RuleStateBuilder {
         Optional.ofNullable(entityStateFlag).ifPresent(value -> entityDO.setEntityStateFlag(value.getIndex()));
     }
 
+    /**
+     * Convert bo list to do list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<RuleStateDO> buildDOListByBOList(List<RuleStateBO> entityBOList);
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "entityStateExt", ignore = true)
     @Mapping(target = "alarmTargetTypeFlag", ignore = true)
     @Mapping(target = "entityStateFlag", ignore = true)
     RuleStateBO buildBOByDO(RuleStateDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(RuleStateDO entityDO, @MappingTarget RuleStateBO entityBO) {
         JsonExt entityExt = entityDO.getEntityStateExt();
@@ -103,16 +144,46 @@ public interface RuleStateBuilder {
         entityBO.setEntityStateFlag(RuleStatusEnum.ofIndex(entityStateFlag));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<RuleStateBO> buildBOListByDOList(List<RuleStateDO> entityDOList);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     RuleStateVO buildVOByBO(RuleStateBO entityBO);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<RuleStateVO> buildVOListByBOList(List<RuleStateBO> entityBOList);
 
+    /**
+     * Convert do page to bo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
     default Page<RuleStateBO> buildBOPageByDOPage(Page<RuleStateDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
+    /**
+     * Convert bo page to vo page.
+     *
+     * @param entityPageBO business object
+     * @return converted value
+     */
     default Page<RuleStateVO> buildVOPageByBOPage(Page<RuleStateBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }

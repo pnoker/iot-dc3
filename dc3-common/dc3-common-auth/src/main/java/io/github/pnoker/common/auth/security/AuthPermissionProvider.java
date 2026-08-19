@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
  * Caches permission results per principal for a short TTL to avoid repeated database queries.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

@@ -41,7 +41,6 @@ import java.util.Optional;
  * MapStruct builder converting between command attribute BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -76,6 +75,12 @@ public interface CommandAttributeBuilder {
     @Mapping(target = "deleted", ignore = true)
     CommandAttributeDO buildDOByBO(CommandAttributeBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(CommandAttributeBO entityBO, @MappingTarget CommandAttributeDO entityDO) {
         // Json Ext
@@ -117,6 +122,12 @@ public interface CommandAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     CommandAttributeBO buildBOByDO(CommandAttributeDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(CommandAttributeDO entityDO, @MappingTarget CommandAttributeBO entityBO) {
         // Json Ext

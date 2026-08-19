@@ -26,7 +26,6 @@ import io.github.pnoker.common.auth.entity.model.IdentityProviderDO;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface IdentityProviderMapper extends BaseMapper<IdentityProviderDO> {

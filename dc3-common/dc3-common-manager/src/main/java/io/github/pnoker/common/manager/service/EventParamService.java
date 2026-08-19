@@ -28,7 +28,6 @@ import java.util.Set;
  * Business service for event param operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface EventParamService extends BaseService<EventParamBO, EventParamQuery> {

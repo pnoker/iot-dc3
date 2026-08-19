@@ -41,7 +41,6 @@ import org.sputnikdev.bluetooth.URL;
 import org.sputnikdev.bluetooth.manager.BluetoothManager;
 import org.sputnikdev.bluetooth.manager.CharacteristicGovernor;
 import org.sputnikdev.bluetooth.manager.DeviceGovernor;
-import org.sputnikdev.bluetooth.manager.impl.BluetoothManagerBuilder;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -60,7 +59,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -69,15 +67,18 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final BleManagerFactory managerFactory;
     @Value("${dc3.driver.code}")
     private String driverCode;
 
     private BluetoothManager bluetoothManager;
     private Map<Long, DeviceGovernor> deviceGovernorMap;
 
-    public BleDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
+    public BleDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService,
+                                      BleManagerFactory managerFactory) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
+        this.managerFactory = managerFactory;
     }
 
     private static int readInt16(byte[] data, String byteOrder) {
@@ -119,12 +120,7 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         deviceGovernorMap = new ConcurrentHashMap<>(16);
-        bluetoothManager = new BluetoothManagerBuilder()
-                .withTinyBTransport(true)
-                .withIgnoreTransportInitErrors(true)
-                .withStarted(true)
-                .withDiscovering(false)
-                .build();
+        bluetoothManager = managerFactory.create();
         log.info("BLE driver initialized, protocol={}", driverCode);
     }
 
@@ -269,6 +265,7 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
     public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
         checkRequired(driverConfig, "adapterName", issues);
+        checkRequired(driverConfig, "deviceAddress", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
                 .issues(issues).build();
@@ -277,7 +274,6 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
-        checkRequired(pointConfig, "deviceAddress", issues);
         checkRequired(pointConfig, "serviceUuid", issues);
         checkRequired(pointConfig, "characteristicUuid", issues);
         return ValidationReport.builder()

@@ -147,7 +147,7 @@ class MqttReceiveServiceImplTest {
 
     @Test
     void receiveEventMessageMatchesConfiguredTopicAndReportsEvent() {
-        driverMetadata.addDeviceId(10L);
+        installDeviceLease();
         driverMetadata.setEventAttributeIdMap(Map.of(
                 1L, eventAttribute(1L, "sourceTopic"),
                 2L, eventAttribute(2L, "eventCodePath"),
@@ -192,7 +192,7 @@ class MqttReceiveServiceImplTest {
 
     @Test
     void eventMessageWithPointIdentityReportsBothEventAndPointValue() {
-        driverMetadata.addDeviceId(10L);
+        installDeviceLease();
         driverMetadata.setEventAttributeIdMap(Map.of(
                 1L, eventAttribute(1L, "sourceTopic"),
                 2L, eventAttribute(2L, "eventCodePath"),
@@ -233,7 +233,7 @@ class MqttReceiveServiceImplTest {
 
     @Test
     void eventReportFailureDoesNotDropPointValue() {
-        driverMetadata.addDeviceId(10L);
+        installDeviceLease();
         driverMetadata.setEventAttributeIdMap(Map.of(
                 1L, eventAttribute(1L, "sourceTopic"),
                 2L, eventAttribute(2L, "eventCodePath"),
@@ -257,5 +257,9 @@ class MqttReceiveServiceImplTest {
         service.receiveValue(msg);
 
         verify(driverSenderService).pointValueSender(any(PointValue.class));
+    }
+
+    private void installDeviceLease() {
+        driverMetadata.setDeviceLeases(Map.of(10L, 1L), System.currentTimeMillis() + 60_000, 1L);
     }
 }

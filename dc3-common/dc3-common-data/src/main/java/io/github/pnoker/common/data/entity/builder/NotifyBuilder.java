@@ -43,7 +43,6 @@ import java.util.Optional;
  * MapStruct builder converting between alarm notification BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -78,6 +77,12 @@ public interface NotifyBuilder {
     @Mapping(target = "deleted", ignore = true)
     NotifyDO buildDOByBO(NotifyBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(NotifyBO entityBO, @MappingTarget NotifyDO entityDO) {
         // Code
@@ -124,6 +129,12 @@ public interface NotifyBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     NotifyBO buildBOByDO(NotifyDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(NotifyDO entityDO, @MappingTarget NotifyBO entityBO) {
         // Json Ext

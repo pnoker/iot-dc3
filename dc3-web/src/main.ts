@@ -32,7 +32,7 @@ app.use(createPinia());
 app.use(i18n);
 plugins(app);
 app.config.errorHandler = (err, _instance, info) => {
-  logger.error('Global error:', err, 'Info:', info);
+  logger.error('Global Vue error', info, err);
 };
 
 /**

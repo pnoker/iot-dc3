@@ -370,7 +370,7 @@ const operationWidth = computed(() => {
   return 320;
 });
 
-// 供父页在配套弹窗保存 / 工具栏动作完成后刷新表格
+// Allow the owning page to refresh after a companion dialog or toolbar action completes.
 defineExpose({reload: load});
 </script>
 

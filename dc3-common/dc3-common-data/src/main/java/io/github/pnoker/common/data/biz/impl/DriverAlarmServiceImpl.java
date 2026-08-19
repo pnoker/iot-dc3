@@ -40,7 +40,6 @@ import java.util.Objects;
  * backfill — the same silent-drop hazard exists on the driver path.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -55,7 +54,8 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
     @Override
     public void alarm(DriverAlarmDTO entityDTO) {
         if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
-            log.warn("Drop driver alarm without driverId: {}", entityDTO);
+            log.warn("Driver alarm dropped, reason=missingDriverId, tenantId={}",
+                    Objects.nonNull(entityDTO) ? entityDTO.getTenantId() : null);
             return;
         }
 
@@ -63,7 +63,7 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
         if (Objects.isNull(tenantId) || tenantId <= 0) {
             // See DeviceAlarmServiceImpl: tenant must come from the upstream source; the
             // fail-closed interceptor forbids reverse-resolving it from the driver.
-            log.warn("Drop driver alarm because tenantId is missing, driverId={}", entityDTO.getDriverId());
+            log.warn("Driver alarm dropped, reason=missingTenantId, driverId={}", entityDTO.getDriverId());
             return;
         }
         entityDTO.setTenantId(tenantId);

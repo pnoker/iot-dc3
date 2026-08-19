@@ -125,7 +125,7 @@ const detail = () => {
 <style lang="scss" scoped>
 @use '@/views/driver/card/style.scss';
 
-// DriverCard 的 footer 只有单个 detail 按钮,不使用 ThingsCardActions,在此补齐样式。
+// DriverCard has one detail action and therefore owns its compact footer styling.
 .things-card__footer {
   height: 35px;
   margin-top: 2px;

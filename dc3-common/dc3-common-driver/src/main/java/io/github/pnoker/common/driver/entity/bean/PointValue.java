@@ -39,7 +39,6 @@ import java.util.Objects;
  * value, and the timestamp when the reading was produced.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -53,6 +52,30 @@ public class PointValue implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Immutable event identity used for end-to-end idempotency.
+     */
+    private String messageId;
+
+    /**
+     * Wire schema version. Consumers reject unsupported versions instead of silently
+     * interpreting an incompatible payload.
+     */
+    private Integer schemaVersion;
+
+    /**
+     * Unique runtime node that produced this reading.
+     */
+    private String driverNode;
+
+    /**
+     * Monotonically increasing sequence within {@link #driverNode}.
+     */
+    private Long sequence;
+
+    /** Manager-issued device ownership fencing token. */
+    private Long fencingToken;
 
     /**
      * Driver ID that collected the data. Populated by the sender before the message is

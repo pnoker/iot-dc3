@@ -25,7 +25,6 @@ import io.github.pnoker.common.base.service.BaseService;
  * Business service for service accounts.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface ServiceAccountService extends BaseService<ServiceAccountBO, ServiceAccountQuery> {

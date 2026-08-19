@@ -33,7 +33,6 @@ import java.util.List;
  * el-table tree can render {@code row-key="id" :tree-props="{ children: 'children' }"}.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter

@@ -28,7 +28,6 @@ import java.util.Optional;
  * Enumeration of custom command record sources.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Getter
@@ -58,6 +57,12 @@ public enum CommandHistorySourceEnum {
 
     private final String remark;
 
+    /**
+     * Resolve a command source from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching source, or {@code null} when the index is unknown
+     */
     public static CommandHistorySourceEnum ofIndex(Byte index) {
         Optional<CommandHistorySourceEnum> any = Arrays.stream(CommandHistorySourceEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -65,6 +70,12 @@ public enum CommandHistorySourceEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a command source from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching source, or {@code null} when the code is unknown
+     */
     public static CommandHistorySourceEnum ofCode(String code) {
         Optional<CommandHistorySourceEnum> any = Arrays.stream(CommandHistorySourceEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -72,6 +83,12 @@ public enum CommandHistorySourceEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a command source from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching source, or {@code null} when the name is unknown
+     */
     public static CommandHistorySourceEnum ofName(String name) {
         try {
             return valueOf(name);

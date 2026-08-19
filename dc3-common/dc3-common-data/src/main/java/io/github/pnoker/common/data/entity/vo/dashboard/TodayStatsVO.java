@@ -31,7 +31,6 @@ import java.io.Serializable;
  * Dashboard count summary for the current day.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.22
  */
 @Getter

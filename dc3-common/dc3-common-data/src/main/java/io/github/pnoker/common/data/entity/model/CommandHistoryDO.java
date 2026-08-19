@@ -35,7 +35,6 @@ import java.time.LocalDateTime;
  * Persistence object for the dc3_command_history table.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Getter

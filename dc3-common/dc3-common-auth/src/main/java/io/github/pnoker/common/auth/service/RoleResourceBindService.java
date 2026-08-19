@@ -30,7 +30,6 @@ import java.util.List;
  * Business service for role-resource binding operations.
  *
  * @author linys
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface RoleResourceBindService extends BaseService<RoleResourceBindBO, RoleResourceBindQuery> {

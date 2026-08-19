@@ -106,7 +106,6 @@ dc3:
         remark: Property identifier
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/bacnet-ip/buffer.db
 
 spring:

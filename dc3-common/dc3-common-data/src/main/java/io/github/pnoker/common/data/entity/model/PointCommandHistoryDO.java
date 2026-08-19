@@ -39,7 +39,6 @@ import java.time.LocalDateTime;
  * through driver execution to terminal status.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter

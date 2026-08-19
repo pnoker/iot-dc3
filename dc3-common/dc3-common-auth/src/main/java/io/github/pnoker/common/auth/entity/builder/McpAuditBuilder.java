@@ -34,7 +34,6 @@ import java.util.List;
  * MapStruct builder converting an MCP audit command projection to its view object.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -51,6 +50,12 @@ public interface McpAuditBuilder {
     @Mapping(target = "status", ignore = true)
     McpAuditVO buildVOByRecord(McpAuditCommand entityRecord);
 
+    /**
+     * After process.
+     *
+     * @param entityRecord entity record
+     * @param entityVO view object
+     */
     @AfterMapping
     default void afterProcess(McpAuditCommand entityRecord, @MappingTarget McpAuditVO entityVO) {
         entityVO.setPrincipalType(PrincipalTypeEnum.ofValue(entityRecord.getPrincipalType()));

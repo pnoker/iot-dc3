@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +51,8 @@ class DeviceMetadataTest {
         driverProperties = new DriverProperties();
         driverProperties.getMetadata().getCache().setRecordStats(true);
         driverMetadata = new DriverMetadata();
-        driverMetadata.setDeviceIds(new HashSet<>(Set.of(10L, 11L)));
+        driverMetadata.setDeviceLeases(Map.of(10L, 1L, 11L, 2L),
+                System.currentTimeMillis() + 60_000, 1L);
         deviceMetadata = new DeviceMetadata(driverProperties, driverMetadata, deviceClient);
     }
 

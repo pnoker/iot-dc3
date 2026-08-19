@@ -22,15 +22,24 @@ import org.apache.commons.lang3.StringUtils;
  * Content emitted by one streaming model frame.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public record AgenticStreamDelta(String content, String reasoningContent) {
 
+    /**
+     * Empty.
+     *
+     * @return empty result
+     */
     public static AgenticStreamDelta empty() {
         return new AgenticStreamDelta("", null);
     }
 
+    /**
+     * Determine whether this delta carries visible or reasoning content.
+     *
+     * @return {@code true} when either content field is non-empty
+     */
     public boolean hasContent() {
         return StringUtils.isNotEmpty(content) || StringUtils.isNotEmpty(reasoningContent);
     }

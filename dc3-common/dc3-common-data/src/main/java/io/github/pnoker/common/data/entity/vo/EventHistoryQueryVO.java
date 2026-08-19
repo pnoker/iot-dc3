@@ -33,7 +33,6 @@ import java.io.Serializable;
  * VO for querying event records with pagination and filters.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Getter
@@ -60,6 +59,12 @@ public class EventHistoryQueryVO implements Serializable {
     @Schema(description = "Pagination parameters: page number and page size.")
     private Pages page;
 
+    /**
+     * To page.
+     *
+     * @param <T> generic type parameter
+     * @return paginated result
+     */
     public <T> Page<T> toPage() {
         return PageUtil.page(page);
     }

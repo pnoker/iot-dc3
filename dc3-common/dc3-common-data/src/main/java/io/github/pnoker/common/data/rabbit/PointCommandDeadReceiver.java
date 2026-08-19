@@ -37,7 +37,6 @@ import java.util.Objects;
  * dead letter exchange. Marks the corresponding command row as {@code dead}.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j

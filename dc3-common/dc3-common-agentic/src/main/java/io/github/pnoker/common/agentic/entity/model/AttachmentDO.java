@@ -33,7 +33,6 @@ import java.time.LocalDateTime;
  * Agentic uploaded attachment metadata and file location.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Getter

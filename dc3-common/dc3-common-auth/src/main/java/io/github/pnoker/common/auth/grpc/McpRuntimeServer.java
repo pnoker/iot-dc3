@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
  * gRPC server for gateway-to-auth MCP runtime calls.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Slf4j

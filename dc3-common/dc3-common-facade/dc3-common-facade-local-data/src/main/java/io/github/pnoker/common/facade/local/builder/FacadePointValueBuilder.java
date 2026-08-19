@@ -34,12 +34,17 @@ import java.util.Objects;
  * epoch seconds.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadePointValueBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param bo bo
+     * @return to facade business object result
+     */
     @Mapping(source = "calValue", target = "value")
     @Mapping(source = "createTime", target = "createTime")
     FacadePointValueBO toFacadeBO(PointValueBO bo);

@@ -19,7 +19,6 @@ package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.driver.buffer.BufferService;
-import io.github.pnoker.common.driver.buffer.PointValueCorrelation;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
@@ -33,31 +32,35 @@ import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.PostConstruct;
+import io.github.pnoker.common.utils.RabbitPublishConfirm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Implements point-value dispatch to the data center via RabbitMQ.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DriverSenderServiceImpl implements DriverSenderService {
+
+    private static final int POINT_VALUE_SCHEMA_VERSION = 1;
+
+    private final AtomicLong pointValueSequence = new AtomicLong();
 
     /**
      * Tenant-scoped driver configuration (service name, health timeouts, etc.).
@@ -75,32 +78,10 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     private final RabbitTemplate rabbitTemplate;
 
     /**
-     * Local buffer for point values that fail to reach RabbitMQ, republished once the broker recovers.
+     * Durable point-value outbox. Values are committed locally before RabbitMQ publication and are
+     * republished until broker confirmation removes them.
      */
     private final BufferService bufferService;
-
-    @PostConstruct
-    void init() {
-        rabbitTemplate.setConfirmCallback((correlation, ack, reason) -> {
-            if (ack) {
-                return;
-            }
-            if (correlation instanceof PointValueCorrelation ctx) {
-                log.warn("Point value publish NACKed, buffering for retry: deviceId={}, pointId={}, attempt={}, reason={}",
-                        ctx.getDeviceId(), ctx.getPointId(), ctx.getAttempt(), reason);
-                try {
-                    PointValue pointValue = JsonUtil.parseObject(ctx.getPayloadJson(), PointValue.class);
-                    bufferService.offer(pointValue, ctx.getRoutingKey(), ctx.getId(), ctx.getAttempt());
-                } catch (Exception e) {
-                    log.error("Failed to re-queue NACKed point value, payload corrupted, correlationId={}",
-                            ctx.getId(), e);
-                }
-            } else {
-                log.error("RabbitMQ publisher confirm NACK, correlationId={}, cause={}",
-                        Objects.nonNull(correlation) ? correlation.getId() : null, reason);
-            }
-        });
-    }
 
     /**
      * Publish the driver's lifecycle state to the state exchange.
@@ -165,7 +146,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     public void driverAlarmSender(String message) {
         DriverBO driver = driverMetadata.getDriver();
         if (Objects.isNull(driver)) {
-            log.warn("Driver not registered yet; drop alarm: {}", message);
+            log.warn("Driver alarm publish skipped, reason=driverNotRegistered, messageLength={}",
+                    Objects.nonNull(message) ? message.length() : 0);
             return;
         }
         DriverAlarmDTO alarm = DriverAlarmDTO.builder()
@@ -173,7 +155,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 .driverId(driver.getId())
                 .message(message)
                 .build();
-        log.info("Report driver alarm: {}", message);
+        log.info("Driver alarm published, tenantId={}, driverId={}, messageLength={}",
+                driver.getTenantId(), driver.getId(), Objects.nonNull(message) ? message.length() : 0);
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_ALARM,
                 RabbitConstant.ROUTING_DRIVER_ALARM_PREFIX + driverProperties.getService(), alarm);
     }
@@ -198,7 +181,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
             alarm.setDriverId(driver.getId());
             alarm.setTenantId(driver.getTenantId());
         }
-        log.info("Report device alarm: deviceId={}, message={}", deviceId, message);
+        log.info("Device alarm published, tenantId={}, driverId={}, deviceId={}, messageLength={}",
+                alarm.getTenantId(), alarm.getDriverId(), deviceId, Objects.nonNull(message) ? message.length() : 0);
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_ALARM,
                 RabbitConstant.ROUTING_DEVICE_ALARM_PREFIX + driverProperties.getService(), alarm);
     }
@@ -214,50 +198,69 @@ public class DriverSenderServiceImpl implements DriverSenderService {
             return;
         }
         DriverBO driver = driverMetadata.getDriver();
-        if (Objects.nonNull(driver)) {
-            if (Objects.isNull(entityDTO.getDriverId())) {
-                entityDTO.setDriverId(driver.getId());
-            }
-            if (Objects.isNull(entityDTO.getTenantId())) {
-                entityDTO.setTenantId(driver.getTenantId());
-            }
-        } else {
-            log.warn(
-                    "DriverMetadata has no registered driver yet; point value will be published without driverId/tenantId");
+        if (Objects.isNull(driver)) {
+            log.error("Reject point value before driver registration, deviceId={}, pointId={}",
+                    entityDTO.getDeviceId(), entityDTO.getPointId());
+            return;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Send point value: {}", JsonUtil.toJsonString(entityDTO));
+        if (!stampPointValue(entityDTO, driver)) {
+            return;
         }
 
         String routingKey = RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService();
-        boolean buffering = bufferService.isEnabled();
-        CorrelationData correlationData = buffering
-                ? new PointValueCorrelation(UUID.randomUUID().toString(), entityDTO.getDeviceId(),
-                entityDTO.getPointId(), 1, JsonUtil.toJsonString(entityDTO), routingKey)
-                : new CorrelationData(UUID.randomUUID().toString());
-        try {
-            rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_VALUE, routingKey, entityDTO, correlationData);
-        } catch (AmqpException e) {
-            if (buffering) {
-                log.warn("Point value publish rejected, buffering for retry: deviceId={}, pointId={}",
-                        entityDTO.getDeviceId(), entityDTO.getPointId(), e);
-                bufferService.offer(entityDTO, routingKey, correlationData.getId(), 1);
-            } else {
-                log.error("Point value publish rejected: deviceId={}, pointId={}",
-                        entityDTO.getDeviceId(), entityDTO.getPointId(), e);
-            }
+        bufferService.publish(entityDTO, routingKey);
+    }
+
+    private boolean stampPointValue(PointValue pointValue, DriverBO driver) {
+        if (Objects.isNull(pointValue.getDriverId())) {
+            pointValue.setDriverId(driver.getId());
         }
+        if (Objects.isNull(pointValue.getTenantId())) {
+            pointValue.setTenantId(driver.getTenantId());
+        }
+        Long fencingToken = driverMetadata.getFencingToken(pointValue.getDeviceId());
+        if (Objects.isNull(fencingToken)) {
+            log.error("Reject point value without active device lease, deviceId={}, pointId={}, node={}",
+                    pointValue.getDeviceId(), pointValue.getPointId(), driverProperties.getNode());
+            return false;
+        }
+        pointValue.setMessageId(UUID.randomUUID().toString());
+        pointValue.setSchemaVersion(POINT_VALUE_SCHEMA_VERSION);
+        pointValue.setDriverNode(driverProperties.getNode());
+        pointValue.setSequence(pointValueSequence.incrementAndGet());
+        pointValue.setFencingToken(fencingToken);
+        if (log.isDebugEnabled()) {
+            log.debug("Point value staged, messageId={}, tenantId={}, driverId={}, deviceId={}, pointId={}, sequence={}",
+                    pointValue.getMessageId(), pointValue.getTenantId(), pointValue.getDriverId(),
+                    pointValue.getDeviceId(), pointValue.getPointId(), pointValue.getSequence());
+        }
+        return true;
     }
 
     /**
-     * Publish each point value in the supplied list individually.
+     * Persist the supplied point values in one outbox transaction, then publish them.
      *
      * @param entityDTOList point value payloads, may be null
      */
     @Override
     public void pointValueSender(List<PointValue> entityDTOList) {
-        if (Objects.nonNull(entityDTOList)) {
-            entityDTOList.forEach(this::pointValueSender);
+        if (Objects.isNull(entityDTOList) || entityDTOList.isEmpty()) {
+            return;
+        }
+        DriverBO driver = driverMetadata.getDriver();
+        if (Objects.isNull(driver)) {
+            log.error("Reject point-value batch before driver registration, size={}", entityDTOList.size());
+            return;
+        }
+        List<PointValue> pointValues = new ArrayList<>(entityDTOList.size());
+        for (PointValue pointValue : entityDTOList) {
+            if (Objects.nonNull(pointValue) && stampPointValue(pointValue, driver)) {
+                pointValues.add(pointValue);
+            }
+        }
+        if (!pointValues.isEmpty()) {
+            bufferService.publishBatch(pointValues,
+                    RabbitConstant.ROUTING_POINT_VALUE_PREFIX + driverProperties.getService());
         }
     }
 
@@ -271,8 +274,9 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         if (Objects.isNull(resultDTO)) {
             return;
         }
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT,
-                RabbitConstant.ROUTING_POINT_COMMAND_RESULT_PREFIX + driverProperties.getService(), resultDTO);
+        sendConfirmed(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND_RESULT,
+                RabbitConstant.ROUTING_POINT_COMMAND_RESULT_PREFIX + driverProperties.getService(),
+                resultDTO, resultDTO.commandId());
     }
 
     /**
@@ -285,8 +289,9 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         if (Objects.isNull(resultDTO)) {
             return;
         }
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT,
-                RabbitConstant.ROUTING_COMMAND_RESULT_PREFIX + driverProperties.getService(), resultDTO);
+        sendConfirmed(RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT,
+                RabbitConstant.ROUTING_COMMAND_RESULT_PREFIX + driverProperties.getService(),
+                resultDTO, resultDTO.recordId());
     }
 
     /**
@@ -324,11 +329,17 @@ public class DriverSenderServiceImpl implements DriverSenderService {
             deviceState.setDriverId(driver.getId());
             deviceState.setTenantId(driver.getTenantId());
         } else {
-            log.warn(
-                    "DriverMetadata has no registered driver yet; device status will be published without driverId/tenantId");
+            log.warn("Device state publish degraded, reason=driverNotRegistered, deviceId={}", deviceId);
         }
-        log.info("Report device state: {}, deviceId={}", status.getCode(), deviceId);
+        log.info("Device state published, deviceId={}, status={}", deviceId, status.getCode());
         deviceStateSender(deviceState);
+    }
+
+    private void sendConfirmed(String exchange, String routingKey, Object payload, String correlationId) {
+        CorrelationData correlationData = new CorrelationData(
+                Objects.nonNull(correlationId) ? correlationId : UUID.randomUUID().toString());
+        rabbitTemplate.convertAndSend(exchange, routingKey, payload, correlationData);
+        RabbitPublishConfirm.awaitRouted(correlationData, Duration.ofSeconds(5));
     }
 
 }

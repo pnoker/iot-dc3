@@ -44,7 +44,6 @@ import java.util.List;
  * REST controller exposing the identity/authorization audit log. Admin-only and tenant-scoped.
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 @Tag(name = "identity_audit", description = "Identity audit trails: query authentication and authorization event logs for security compliance and forensic analysis")

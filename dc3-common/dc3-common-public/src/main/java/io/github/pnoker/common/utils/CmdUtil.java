@@ -29,7 +29,6 @@ import java.io.OutputStreamWriter;
  * Process termination via stdin exit command.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -54,7 +53,7 @@ public class CmdUtil {
             }
             process.destroyForcibly();
         } catch (IOException e) {
-            log.error("Failed to destroy process with command: {}", cmd, e);
+            log.error("Process destruction failed, commandLength={}", StringUtils.length(cmd), e);
         }
     }
 

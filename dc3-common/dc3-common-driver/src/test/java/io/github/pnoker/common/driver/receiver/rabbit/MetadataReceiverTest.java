@@ -38,8 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -84,7 +83,7 @@ class MetadataReceiverTest {
     @BeforeEach
     void setUp() {
         driverMetadata = new DriverMetadata();
-        driverMetadata.setDeviceIds(new HashSet<>(Set.of(99L)));
+        driverMetadata.setDeviceLeases(Map.of(99L, 1L), System.currentTimeMillis() + 60_000, 1L);
 
         receiver = new MetadataReceiver(pointMetadata, driverMetadata, deviceMetadata, driverClient, metadataEventPublisher);
 
@@ -110,11 +109,11 @@ class MetadataReceiverTest {
     }
 
     @Test
-    void deviceAddTriggersLoadCacheAndAddsToDriverDeviceIds() throws Exception {
+    void deviceAddRefreshesCacheWithoutBypassingLeaseOwnership() throws Exception {
         MetadataEventDTO dto = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 10L);
         receiver.metadataReceive(channel, message, dto);
         verify(deviceMetadata).loadCache(10L);
-        assertThat(driverMetadata.getDeviceIds()).contains(10L);
+        assertThat(driverMetadata.getDeviceIds()).containsExactly(99L);
         verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
         verify(channel).basicAck(eq(7L), eq(false));
     }
@@ -129,7 +128,7 @@ class MetadataReceiverTest {
 
     @Test
     void deviceDeleteRemovesCacheAndDriverDeviceIds() throws Exception {
-        driverMetadata.addDeviceId(99L);
+        driverMetadata.setDeviceLeases(Map.of(99L, 1L), System.currentTimeMillis() + 60_000, 1L);
         MetadataEventDTO dto = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE, 99L);
         receiver.metadataReceive(channel, message, dto);
         verify(deviceMetadata).removeCache(99L);
@@ -225,10 +224,9 @@ class MetadataReceiverTest {
         // gRPC failure must surface as nack(requeue) rather than ack — earlier the
         // loader was fire-and-forget and a failure silently dropped the event.
         verify(channel).basicNack(eq(7L), eq(false), eq(true));
-        // deviceId is added before loadCache so that a Quartz scan racing with the
-        // refresh sees a consistent view; on failure the id stays so the requeued
-        // event can retry, and a confirmed-null upstream will clean it via postLoad.
-        assertThat(driverMetadata.getDeviceIds()).contains(10L);
+        // Metadata events never create ownership; only a complete Manager lease
+        // snapshot can install a device and fencing token.
+        assertThat(driverMetadata.getDeviceIds()).containsExactly(99L);
         verify(metadataEventPublisher, never()).publishEvent(any());
     }
 }

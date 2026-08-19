@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
  * logged (not rethrown) so one bad batch does not abort the scheduler.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.6.2
  */
 @Slf4j

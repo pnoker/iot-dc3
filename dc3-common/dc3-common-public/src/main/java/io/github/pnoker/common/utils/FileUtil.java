@@ -36,7 +36,6 @@ import java.util.UUID;
  * Temp directory and random XLSX file name helpers.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -67,7 +66,7 @@ public class FileUtil {
             try {
                 createSecureTempDirectories(dir);
             } catch (IOException e) {
-                log.error("Failed to create temp directory: {}", dir, e);
+                log.error("Temporary directory creation failed, directory={}", dir, e);
             }
         }
         return dir.toString() + SymbolConstant.SLASH;

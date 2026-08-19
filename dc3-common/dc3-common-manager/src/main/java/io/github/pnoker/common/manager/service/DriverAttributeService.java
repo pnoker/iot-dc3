@@ -28,7 +28,6 @@ import java.util.List;
  * Business service for driver attribute operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DriverAttributeService extends BaseService<DriverAttributeBO, DriverAttributeQuery> {

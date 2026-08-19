@@ -62,7 +62,6 @@ import java.util.Map;
  * RBAC-protected MCP management endpoints used by the settings UI.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Tag(name = "mcp", description = "MCP OAuth connections: register clients, exchange tokens, and manage authorization flows for AI agent integration via the Model Context Protocol")

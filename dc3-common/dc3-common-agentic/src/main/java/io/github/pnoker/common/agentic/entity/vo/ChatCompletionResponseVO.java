@@ -33,7 +33,6 @@ import java.util.List;
  * OpenAI-compatible non-streaming chat completion response.
  *
  * @author pnoker
- * @version 2025.9.0
  * @see <a href="https://platform.openai.com/docs/api-reference/chat/object">OpenAI Chat
  * Object</a>
  * @since 2016.10.1

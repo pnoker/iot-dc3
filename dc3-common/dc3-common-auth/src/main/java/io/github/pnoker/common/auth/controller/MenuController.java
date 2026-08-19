@@ -61,7 +61,6 @@ import java.util.stream.Collectors;
  * REST controller exposing menu management endpoints.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Tag(name = "menu", description = "Navigation menu hierarchy: manage menu trees, items, and routing configurations that define the platform user interface navigation structure")

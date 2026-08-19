@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
  * Service contract for publishing driver, device, and point-value messages to RabbitMQ.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DriverSenderService {

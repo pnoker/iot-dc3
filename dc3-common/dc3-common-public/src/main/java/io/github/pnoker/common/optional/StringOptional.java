@@ -25,7 +25,6 @@ import java.util.function.Consumer;
  * Optional wrapper for {@link String} with null/empty checks.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public final class StringOptional {
@@ -36,16 +35,33 @@ public final class StringOptional {
         this.value = value;
     }
 
+    /**
+     * Create a wrapper that treats {@code null} and empty strings as absent.
+     *
+     * @param value string to wrap
+     * @return wrapper for the supplied string
+     */
     public static StringOptional ofNullable(String value) {
         return new StringOptional(value);
     }
 
+    /**
+     * Invoke the action when the wrapped string is not empty.
+     *
+     * @param action action that consumes the present string
+     */
     public void ifPresent(Consumer<String> action) {
         if (StringUtils.isNotEmpty(value)) {
             action.accept(value);
         }
     }
 
+    /**
+     * Invoke exactly one branch according to whether the wrapped string is empty.
+     *
+     * @param action action that consumes a present string
+     * @param emptyAction action to run for a {@code null} or empty string
+     */
     public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {
         if (StringUtils.isNotEmpty(value)) {
             action.accept(value);

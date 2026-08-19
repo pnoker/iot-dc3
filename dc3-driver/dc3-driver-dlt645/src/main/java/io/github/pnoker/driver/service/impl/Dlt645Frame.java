@@ -30,7 +30,6 @@ import io.github.pnoker.common.exception.ConnectorException;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 public final class Dlt645Frame {

@@ -41,7 +41,6 @@ import java.util.Map;
  * webhook tokens or signing secrets.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.21
  */
 @Getter

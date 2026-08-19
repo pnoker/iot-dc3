@@ -71,7 +71,6 @@ import java.util.Objects;
  * fields must be preserved across tool-call continuations.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Slf4j

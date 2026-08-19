@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import io.github.pnoker.common.constant.common.RequestIdConstant;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -51,12 +52,9 @@ import static org.mockito.Mockito.when;
  */
 class MdcRequestIdRabbitPropagationTest {
 
-    private static final String MDC_REQUEST_ID = "requestId";
-    private static final String HEADER_REQUEST_ID = "X-Request-Id";
-
     @AfterEach
     void clearMdc() {
-        MDC.remove(MDC_REQUEST_ID);
+        MDC.remove(RequestIdConstant.MDC_KEY);
     }
 
     private MethodInvocation invocationWith(Message message) throws Throwable {
@@ -71,7 +69,7 @@ class MdcRequestIdRabbitPropagationTest {
     private Message messageWithHeader(String headerValue) {
         MessageProperties properties = new MessageProperties();
         if (headerValue != null) {
-            properties.setHeader(HEADER_REQUEST_ID, headerValue);
+            properties.setHeader(RequestIdConstant.HEADER, headerValue);
         }
         return new Message(new byte[0], properties);
     }
@@ -87,7 +85,7 @@ class MdcRequestIdRabbitPropagationTest {
         String[] capturedDuringHandling = new String[1];
         MethodInvocation invocation = invocationWith(message);
         when(invocation.proceed()).thenAnswer(inv -> {
-            capturedDuringHandling[0] = MDC.get(MDC_REQUEST_ID);
+            capturedDuringHandling[0] = MDC.get(RequestIdConstant.MDC_KEY);
             return null;
         });
         new MdcRequestIdListenerAdvice().invoke(invocation);
@@ -99,7 +97,7 @@ class MdcRequestIdRabbitPropagationTest {
         Message message = messageWithHeader("req-abc");
         new MdcRequestIdListenerAdvice().invoke(invocationWith(message));
         // The pooled listener thread must not leak the id into the next message.
-        assertThat((Object) MDC.get(MDC_REQUEST_ID)).isNull();
+        assertThat((Object) MDC.get(RequestIdConstant.MDC_KEY)).isNull();
     }
 
     @Test
@@ -112,7 +110,7 @@ class MdcRequestIdRabbitPropagationTest {
         } catch (IllegalStateException expected) {
             // expected — the advice must propagate the original exception unchanged
         }
-        assertThat((Object) MDC.get(MDC_REQUEST_ID)).isNull();
+        assertThat((Object) MDC.get(RequestIdConstant.MDC_KEY)).isNull();
     }
 
     @Test
@@ -123,7 +121,7 @@ class MdcRequestIdRabbitPropagationTest {
         String[] capturedDuringHandling = new String[1];
         MethodInvocation invocation = invocationWith(message);
         when(invocation.proceed()).thenAnswer(inv -> {
-            capturedDuringHandling[0] = MDC.get(MDC_REQUEST_ID);
+            capturedDuringHandling[0] = MDC.get(RequestIdConstant.MDC_KEY);
             return null;
         });
         new MdcRequestIdListenerAdvice().invoke(invocation);
@@ -136,23 +134,23 @@ class MdcRequestIdRabbitPropagationTest {
     void postProcessorStampsCurrentRequestIdOnOutboundMessage() {
         // A producer running inside an HTTP request (or a consumer that already restored the
         // id) has the id in its MDC. The post-processor must copy it onto the message header.
-        MDC.put(MDC_REQUEST_ID, "req-from-producer");
+        MDC.put(RequestIdConstant.MDC_KEY, "req-from-producer");
         try {
             Message outbound = new MdcRequestIdMessagePostProcessor()
                     .postProcessMessage(messageWithHeader(null));
-            assertThat((String) outbound.getMessageProperties().getHeader(HEADER_REQUEST_ID))
+            assertThat((String) outbound.getMessageProperties().getHeader(RequestIdConstant.HEADER))
                     .isEqualTo("req-from-producer");
         } finally {
-            MDC.remove(MDC_REQUEST_ID);
+            MDC.remove(RequestIdConstant.MDC_KEY);
         }
     }
 
     @Test
     void postProcessorLeavesHeaderAbsentWhenMdcEmpty() {
         // When MDC has no request id, nothing should be stamped — the consumer mints its own.
-        assertThat((Object) MDC.get(MDC_REQUEST_ID)).isNull();
+        assertThat((Object) MDC.get(RequestIdConstant.MDC_KEY)).isNull();
         Message outbound = new MdcRequestIdMessagePostProcessor()
                 .postProcessMessage(messageWithHeader(null));
-        assertThat((Object) outbound.getMessageProperties().getHeader(HEADER_REQUEST_ID)).isNull();
+        assertThat((Object) outbound.getMessageProperties().getHeader(RequestIdConstant.HEADER)).isNull();
     }
 }

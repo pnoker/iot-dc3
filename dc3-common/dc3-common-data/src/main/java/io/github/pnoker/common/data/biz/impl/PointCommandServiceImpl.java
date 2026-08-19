@@ -27,16 +27,12 @@ import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.data.entity.builder.PointCommandHistoryBuilder;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.data.validator.PointCommandValidator;
 import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
@@ -48,8 +44,10 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
+import io.github.pnoker.common.utils.RabbitPublishConfirm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -57,6 +55,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -68,7 +67,6 @@ import java.util.UUID;
  * callers can use to poll for the terminal result.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Slf4j
@@ -88,8 +86,6 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
 
     private final PointCommandHistoryBuilder pointCommandHistoryBuilder;
 
-    private final EntityStateMapper entityStateMapper;
-
     private final PointCommandValidator pointCommandValidator;
 
     @Override
@@ -106,7 +102,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         if (Objects.isNull(driver)) {
             throw new ServiceException("No driver registered for this device");
         }
-        checkDriverOnline(tenantId, driver.getId());
+        FacadeDeviceOwnerBO owner = requireActiveOwner(tenantId, entityBO.getDeviceId(), driver.getId());
 
         String commandId = resolveCommandId(entityBO.getCommandId());
         LocalDateTime nowLocal = LocalDateTime.now();
@@ -124,8 +120,13 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         commandDO.setSchemaVersion((short) 1);
         pointCommandHistoryManager.save(commandDO);
 
-        publishCommand(PointCommandDTO.ofRead(commandId, tenantId, entityBO.getDeviceId(),
-                entityBO.getPointId()), driver.getServiceName(), commandId);
+        try {
+            publishCommand(PointCommandDTO.ofRead(commandId, tenantId, owner.ownerNode(), owner.fencingToken(),
+                    entityBO.getDeviceId(), entityBO.getPointId()), driver.getServiceName(), owner.ownerNode(), commandId);
+        } catch (Exception e) {
+            markPublishFailed(commandDO, e);
+            throw new ServiceException("Failed to route point command to active driver owner", e);
+        }
 
         commandDO.setStatus(PointCommandStatusEnum.SENT);
         commandDO.setSendTime(LocalDateTime.now());
@@ -148,7 +149,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         if (Objects.isNull(driver)) {
             throw new ServiceException("No driver registered for this device");
         }
-        checkDriverOnline(tenantId, driver.getId());
+        FacadeDeviceOwnerBO owner = requireActiveOwner(tenantId, entityBO.getDeviceId(), driver.getId());
 
         pointCommandValidator.validateWriteValue(entityBO.getValue());
 
@@ -169,8 +170,14 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
         commandDO.setSchemaVersion((short) 1);
         pointCommandHistoryManager.save(commandDO);
 
-        publishCommand(PointCommandDTO.ofWrite(commandId, tenantId, entityBO.getDeviceId(),
-                entityBO.getPointId(), entityBO.getValue()), driver.getServiceName(), commandId);
+        try {
+            publishCommand(PointCommandDTO.ofWrite(commandId, tenantId, owner.ownerNode(), owner.fencingToken(),
+                            entityBO.getDeviceId(), entityBO.getPointId(), entityBO.getValue()),
+                    driver.getServiceName(), owner.ownerNode(), commandId);
+        } catch (Exception e) {
+            markPublishFailed(commandDO, e);
+            throw new ServiceException("Failed to route point command to active driver owner", e);
+        }
 
         commandDO.setStatus(PointCommandStatusEnum.SENT);
         commandDO.setSendTime(LocalDateTime.now());
@@ -199,24 +206,6 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
                 .orderByDesc(PointCommandHistoryDO::getOccurTime);
         Page<PointCommandHistoryDO> page = pointCommandHistoryManager.page(queryVO.toPage(), wrapper);
         return pointCommandHistoryBuilder.buildVOPageByDOPage(page);
-    }
-
-    /**
-     * Verify the driver serving the command is online, throwing {@link ServiceException}
-     * when no online state exists for the driver.
-     *
-     * @param tenantId tenant scope
-     * @param driverId the driver to check
-     */
-    private void checkDriverOnline(Long tenantId, Long driverId) {
-        EntityStateDO driverState = entityStateMapper.selectOne(
-                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<EntityStateDO>()
-                        .eq(EntityStateDO::getTenantId, tenantId)
-                        .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
-                        .eq(EntityStateDO::getEntityId, driverId));
-        if (Objects.isNull(driverState) || !EntityStatusEnum.ONLINE.getIndex().equals(driverState.getStateFlag())) {
-            throw new ServiceException("Driver is offline");
-        }
     }
 
     /**
@@ -291,10 +280,29 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     /**
      * Publish a point command DTO to the driver via RabbitMQ.
      */
-    private void publishCommand(PointCommandDTO dto, String serviceName, String commandId) {
+    private void publishCommand(PointCommandDTO dto, String serviceName, String ownerNode, String commandId) {
         CorrelationData correlationData = new CorrelationData(commandId);
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND,
-                RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + serviceName, dto, correlationData);
+                RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + serviceName + "." + ownerNode, dto, correlationData);
+        RabbitPublishConfirm.awaitRouted(correlationData, Duration.ofSeconds(5));
+    }
+
+    private void markPublishFailed(PointCommandHistoryDO commandDO, Exception cause) {
+        commandDO.setStatus(PointCommandStatusEnum.FAILED);
+        commandDO.setErrorCode("BROKER_PUBLISH_FAILED");
+        commandDO.setErrorMessage(cause.getMessage());
+        commandDO.setFinishTime(LocalDateTime.now());
+        pointCommandHistoryManager.updateById(commandDO);
+    }
+
+    private FacadeDeviceOwnerBO requireActiveOwner(Long tenantId, Long deviceId, Long driverId) {
+        FacadeDeviceOwnerBO owner = deviceFacade.getActiveOwner(tenantId, deviceId);
+        if (Objects.isNull(owner) || !Objects.equals(owner.driverId(), driverId)
+                || Objects.isNull(owner.ownerNode()) || owner.ownerNode().isBlank()
+                || Objects.isNull(owner.fencingToken()) || owner.fencingToken() <= 0) {
+            throw new ServiceException("Device has no active driver owner");
+        }
+        return owner;
     }
 
 }

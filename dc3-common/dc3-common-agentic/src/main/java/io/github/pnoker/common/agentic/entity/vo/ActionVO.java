@@ -30,7 +30,6 @@ import java.util.Map;
  * View object for agentic action API responses.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Getter

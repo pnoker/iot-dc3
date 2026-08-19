@@ -47,7 +47,6 @@ import java.util.concurrent.ThreadPoolExecutor;
  * still prevents overlapping Quartz fires for the same job.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -101,6 +100,9 @@ public class DriverReadScheduleJob extends QuartzJobBean {
     }
 
     private void readDevice(DeviceBO device) {
+        if (!driverMetadata.ownsDevice(device.getId())) {
+            return;
+        }
         device.getPointIds().forEach(pointId -> readPoint(device.getId(), pointId));
     }
 

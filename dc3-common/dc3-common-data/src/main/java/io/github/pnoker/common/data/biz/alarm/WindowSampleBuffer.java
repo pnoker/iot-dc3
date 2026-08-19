@@ -50,7 +50,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * is benign for window-aggregated alarms).
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Slf4j
@@ -135,6 +134,9 @@ public class WindowSampleBuffer {
         }
     }
 
+    /**
+     * Invalidate all.
+     */
     public void invalidateAll() {
         buffers.invalidateAll();
     }

@@ -68,7 +68,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -222,8 +221,8 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                         driverCode, deviceId, host, port);
                 return socket;
             } catch (IOException e) {
-                log.error("Driver FINS connection failed, protocol={}, deviceId={}, host={}:{}, message={}",
-                        driverCode, deviceId, host, port, e.getMessage());
+                log.error("Driver FINS connection failed, protocol={}, deviceId={}, host={}, port={}",
+                        driverCode, deviceId, host, port, e);
                 return null;
             }
         });

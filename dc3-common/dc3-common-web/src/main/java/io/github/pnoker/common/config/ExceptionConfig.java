@@ -52,7 +52,6 @@ import java.util.Objects;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration
@@ -95,9 +94,11 @@ public class ExceptionConfig {
 
         String path = request.getURI().getRawPath();
         if (errorCode.getHttpStatus() >= 500) {
-            log.error("Business exception {} on {}: {}", errorCode.getCode(), path, exception.getMessage(), exception);
+            log.error("Business exception handled, code={}, status={}, path={}, message={}", errorCode.getCode(),
+                    errorCode.getHttpStatus(), path, exception.getMessage(), exception);
         } else {
-            log.warn("Business exception {} on {}: {}", errorCode.getCode(), path, exception.getMessage());
+            log.warn("Business exception handled, code={}, status={}, path={}, message={}", errorCode.getCode(),
+                    errorCode.getHttpStatus(), path, exception.getMessage());
         }
         return Mono.just(R.fail(errorCode, exception.getMessage()));
     }
@@ -121,12 +122,14 @@ public class ExceptionConfig {
 
         String path = request.getURI().getRawPath();
         if (status.is5xxServerError()) {
-            log.error("Response status exception {} on {}: {}", status.value(), path, exception.getMessage(),
+            log.error("Response status exception handled, status={}, path={}, message={}",
+                    status.value(), path, exception.getMessage(),
                     exception);
         } else if (HttpStatus.NOT_FOUND.value() == status.value()) {
-            log.debug("Not found: {}", path);
+            log.debug("Request path not found, path={}", path);
         } else {
-            log.warn("Response status exception {} on {}: {}", status.value(), path, exception.getMessage());
+            log.warn("Response status exception handled, status={}, path={}, message={}",
+                    status.value(), path, exception.getMessage());
         }
 
         String reason = exception.getReason();

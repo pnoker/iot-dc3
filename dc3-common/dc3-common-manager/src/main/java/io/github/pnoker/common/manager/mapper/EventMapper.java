@@ -28,11 +28,18 @@ import org.apache.ibatis.annotations.Param;
  * MyBatis-Plus mapper for the dc3_event table.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface EventMapper extends BaseMapper<EventDO> {
 
+    /**
+     * Select page with device.
+     *
+     * @param page page
+     * @param wrapper wrapper
+     * @param deviceId device identifier
+     * @return paginated result
+     */
     Page<EventDO> selectPageWithDevice(Page<EventDO> page, @Param(Constants.WRAPPER) Wrapper<EventDO> wrapper,
                                        @Param("deviceId") Long deviceId);
 

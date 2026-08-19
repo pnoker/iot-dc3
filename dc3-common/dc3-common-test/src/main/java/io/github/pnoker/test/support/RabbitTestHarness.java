@@ -35,10 +35,24 @@ public final class RabbitTestHarness {
 
     private final RabbitTemplate rabbitTemplate;
 
+    /**
+     * Send.
+     *
+     * @param exchange exchange
+     * @param routingKey routing key
+     * @param payload payload
+     */
     public void send(String exchange, String routingKey, Object payload) {
         rabbitTemplate.convertAndSend(exchange, routingKey, payload);
     }
 
+    /**
+     * Receive.
+     *
+     * @param queue queue
+     * @param timeout timeout
+     * @return receive result
+     */
     public Message receive(String queue, Duration timeout) {
         rabbitTemplate.setReceiveTimeout(timeout.toMillis());
         return rabbitTemplate.receive(queue);

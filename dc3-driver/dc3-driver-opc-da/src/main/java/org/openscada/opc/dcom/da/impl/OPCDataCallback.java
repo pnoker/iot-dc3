@@ -17,6 +17,7 @@
 
 package org.openscada.opc.dcom.da.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.JIArray;
 import org.jinterop.dcom.core.JIFlags;
@@ -45,6 +46,7 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2016.10.1
  */
+@Slf4j
 public class OPCDataCallback extends EventHandlerImpl {
 
     private IOPCDataCallback callback = null;
@@ -84,7 +86,8 @@ public class OPCDataCallback extends EventHandlerImpl {
         try {
             callback.dataChange(transactionId, serverGroupHandle, masterQuality, masterErrorCode, result);
         } catch (final Throwable e) {
-            e.printStackTrace();
+            log.error("OPC DA data-change callback failed, transactionId={}, serverGroupHandle={}",
+                    transactionId, serverGroupHandle, e);
         }
 
         // The client must always return S_OK
@@ -119,7 +122,8 @@ public class OPCDataCallback extends EventHandlerImpl {
         try {
             this.callback.readComplete(transactionId, serverGroupHandle, masterQuality, masterErrorCode, result);
         } catch (final Throwable e) {
-            e.printStackTrace();
+            log.error("OPC DA read-complete callback failed, transactionId={}, serverGroupHandle={}",
+                    transactionId, serverGroupHandle, e);
         }
 
         // The client must always return S_OK
@@ -146,7 +150,8 @@ public class OPCDataCallback extends EventHandlerImpl {
         try {
             this.callback.writeComplete(transactionId, serverGroupHandle, masterErrorCode, result);
         } catch (final Throwable e) {
-            e.printStackTrace();
+            log.error("OPC DA write-complete callback failed, transactionId={}, serverGroupHandle={}",
+                    transactionId, serverGroupHandle, e);
         }
 
         // The client must always return S_OK

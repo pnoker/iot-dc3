@@ -27,7 +27,6 @@ import io.github.pnoker.common.enums.ErrorCode;
  * </p>
  *
  * @author pnoker
- * @version 1.0.0
  * @since 2016.10.1
  */
 public class ServiceException extends BusinessException {

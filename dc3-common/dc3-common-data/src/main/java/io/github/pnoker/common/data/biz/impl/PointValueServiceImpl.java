@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.cache.PointValueLocalCache;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
@@ -40,7 +39,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -48,13 +46,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Business service implementation for point value operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -65,8 +61,6 @@ public class PointValueServiceImpl implements PointValueService {
     private final PointFacade pointFacade;
 
     private final DeviceFacade deviceFacade;
-
-    private final PointValueLocalCache pointValueLocalCacheService;
 
     private final AlarmRuleTriggerService alarmRuleTriggerService;
 
@@ -83,8 +77,15 @@ public class PointValueServiceImpl implements PointValueService {
             pointValueBO.setCreateTime(LocalDateTimeUtil.now());
         }
         pointValueBO.setOperateTime(LocalDateTimeUtil.now());
-        savePointValueToRepository(pointValueBO);
-        alarmRuleTriggerService.processPointValue(pointValueBO);
+        if (!persistPointValue(pointValueBO)) {
+            return;
+        }
+        try {
+            alarmRuleTriggerService.processPointValue(pointValueBO);
+        } catch (Exception e) {
+            log.warn("Alarm rule evaluation failed after point persistence, messageId={}",
+                    pointValueBO.getMessageId(), e);
+        }
     }
 
     @Override
@@ -93,23 +94,29 @@ public class PointValueServiceImpl implements PointValueService {
             return;
         }
 
-        final Map<Long, List<PointValueBO>> group = pointValueBOList.stream().map(pointValue -> {
+        final java.time.LocalDateTime operateTime = LocalDateTimeUtil.now();
+        pointValueBOList.forEach(pointValue -> {
             if (Objects.isNull(pointValue.getCreateTime())) {
                 pointValue.setCreateTime(LocalDateTimeUtil.now());
             }
-            // See single-row save() — operate_time is the persistence
-            // timestamp, not a mirror of create_time.
-            pointValue.setOperateTime(LocalDateTimeUtil.now());
-            return pointValue;
-        }).collect(Collectors.groupingBy(PointValueBO::getDeviceId));
+            pointValue.setOperateTime(operateTime);
+        });
 
-        group.forEach(this::savePointValuesToRepository);
+        List<PointValueBO> acceptedValues = persistPointValues(pointValueBOList);
+        int rejected = pointValueBOList.size() - acceptedValues.size();
+        if (rejected > 0) {
+            log.warn("Point-value batch contained replayed or stale-owner events, received={}, accepted={}, rejected={}",
+                    pointValueBOList.size(), acceptedValues.size(), rejected);
+        }
+        if (acceptedValues.isEmpty()) {
+            return;
+        }
         try {
-            alarmRuleTriggerService.processPointValues(pointValueBOList);
+            alarmRuleTriggerService.processPointValues(acceptedValues);
         } catch (Exception e) {
             // Alarm evaluation runs after persistence: a failure here must not trigger a
             // re-queue that would re-insert the already-persisted rows.
-            log.warn("Alarm rule evaluation failed, size={}, skipped", pointValueBOList.size(), e);
+            log.warn("Alarm rule evaluation failed, size={}, skipped", acceptedValues.size(), e);
         }
     }
 
@@ -156,23 +163,13 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         Long tenantId = entityQuery.getTenantId();
-        Map<Long, PointValueBO> pointValueBOMap = pointValueLocalCacheService.selectLatestPointValue(tenantId,
-                entityQuery.getDeviceId(), pointIds);
         RepositoryService repositoryService = getFirstRepositoryService();
-
-        // Collect point IDs not found in the local cache and batch-query the repository
-        List<Long> missingIds = pointIds.stream()
-                .filter(id -> !pointValueBOMap.containsKey(id))
-                .toList();
-        if (!missingIds.isEmpty()) {
-            List<PointValueBO> dbResults = repositoryService.listLatestPointValues(tenantId,
-                    entityQuery.getDeviceId(), missingIds);
-            for (PointValueBO bo : dbResults) {
-                if (Objects.nonNull(bo) && Objects.nonNull(bo.getPointId())) {
-                    pointValueBOMap.put(bo.getPointId(), bo);
-                }
-            }
-        }
+        Map<Long, PointValueBO> pointValueBOMap = repositoryService
+                .listLatestPointValues(tenantId, entityQuery.getDeviceId(), pointIds)
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(value -> Objects.nonNull(value.getPointId()))
+                .collect(java.util.stream.Collectors.toMap(PointValueBO::getPointId, value -> value));
 
         // Build the final list maintaining the original pointIds order
         List<PointValueBO> pointValueBOList = pointIds.stream().map(id -> {
@@ -206,48 +203,6 @@ public class PointValueServiceImpl implements PointValueService {
 
         RepositoryService repositoryService = getFirstRepositoryService();
         return repositoryService.listPagePointValue(entityQuery);
-    }
-
-    /**
-     * Save PointValue to the specified storage service
-     *
-     * @param pointValueBO PointValue
-     */
-    private void savePointValueToRepository(PointValueBO pointValueBO) {
-        try {
-            // local hot cache
-            pointValueLocalCacheService.savePointValue(pointValueBO);
-
-            // other repository
-            RepositoryService repositoryService = getFirstRepositoryService();
-            repositoryService.savePointValue(pointValueBO);
-        } catch (Exception e) {
-            log.error("Save point value failed, tenantId={}, deviceId={}, pointId={}", pointValueBO.getTenantId(),
-                    pointValueBO.getDeviceId(), pointValueBO.getPointId(), e);
-        }
-    }
-
-    /**
-     * Save PointValues to the specified storage service
-     *
-     * @param deviceId         Device ID
-     * @param pointValueBOList Array
-     */
-    private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOList) {
-        try {
-            // local hot cache
-            pointValueLocalCacheService.savePointValue(deviceId, pointValueBOList);
-
-            // Repository persistence — wrap any failure (incl. checked IOException) so the
-            // ingest buffer can re-queue the batch for retry instead of silently dropping it.
-            RepositoryService repositoryService = getFirstRepositoryService();
-            List<List<PointValueBO>> splitPointValueBOList = ListUtils.partition(pointValueBOList, 100);
-            for (List<PointValueBO> splitPointValueBO : splitPointValueBOList) {
-                repositoryService.savePointValues(splitPointValueBO);
-            }
-        } catch (Exception e) {
-            throw new RepositoryException(e);
-        }
     }
 
     /**
@@ -294,6 +249,22 @@ public class PointValueServiceImpl implements PointValueService {
      */
     private boolean isValidId(Long id) {
         return Objects.nonNull(id) && id > 0;
+    }
+
+    private boolean persistPointValue(PointValueBO pointValueBO) {
+        try {
+            return getFirstRepositoryService().savePointValue(pointValueBO);
+        } catch (Exception e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    private List<PointValueBO> persistPointValues(List<PointValueBO> pointValueBOList) {
+        try {
+            return getFirstRepositoryService().savePointValues(pointValueBOList);
+        } catch (Exception e) {
+            throw new RepositoryException(e);
+        }
     }
 
     /**

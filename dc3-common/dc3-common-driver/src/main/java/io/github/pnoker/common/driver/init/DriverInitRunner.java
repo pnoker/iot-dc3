@@ -42,7 +42,6 @@ import java.time.Duration;
  * a transient outage cascades into a full driver CrashLoopBackOff.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -113,16 +112,16 @@ public class DriverInitRunner implements ApplicationRunner {
             try {
                 driverRegisterService.initial();
                 if (attempt > 1) {
-                    log.info("Driver register succeeded on attempt {}", attempt);
+                    log.info("Driver registration succeeded, attempt={}", attempt);
                 }
                 return;
             } catch (Exception e) {
                 if (attempt >= REGISTER_MAX_ATTEMPTS) {
-                    log.error("Driver register failed after {} attempts, giving up", attempt, e);
+                    log.error("Driver registration failed permanently, attempts={}", attempt, e);
                     throw e;
                 }
-                log.warn("Driver register failed on attempt {}/{}, retrying in {} ms: {}", attempt,
-                        REGISTER_MAX_ATTEMPTS, backoffMs, e.getMessage());
+                log.warn("Driver registration failed, attempt={}, maxAttempts={}, retryDelayMillis={}",
+                        attempt, REGISTER_MAX_ATTEMPTS, backoffMs, e);
                 Thread.sleep(backoffMs);
                 backoffMs = Math.min(backoffMs * 2, REGISTER_MAX_BACKOFF.toMillis());
             }

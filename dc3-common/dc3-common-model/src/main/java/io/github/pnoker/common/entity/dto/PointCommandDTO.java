@@ -30,12 +30,13 @@ import java.time.Instant;
  * (UTC) uniformly.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 public record PointCommandDTO(
         String commandId,
         Long tenantId,
+        String ownerNode,
+        Long fencingToken,
         PointCommandTypeEnum type,
         PointCommandPayload payload,
         PointCommandSourceEnum source,
@@ -48,10 +49,13 @@ public record PointCommandDTO(
     /**
      * Create a read command DTO with default source and timing.
      */
-    public static PointCommandDTO ofRead(String commandId, Long tenantId, Long deviceId, Long pointId) {
+    public static PointCommandDTO ofRead(String commandId, Long tenantId, String ownerNode,
+                                         Long fencingToken, Long deviceId, Long pointId) {
         return new PointCommandDTO(
                 commandId,
                 tenantId,
+                ownerNode,
+                fencingToken,
                 PointCommandTypeEnum.READ,
                 new PointCommandPayload.ReadPayload(deviceId, pointId),
                 PointCommandSourceEnum.HTTP,
@@ -65,10 +69,13 @@ public record PointCommandDTO(
     /**
      * Create a write command DTO with default source and timing.
      */
-    public static PointCommandDTO ofWrite(String commandId, Long tenantId, Long deviceId, Long pointId, String value) {
+    public static PointCommandDTO ofWrite(String commandId, Long tenantId, String ownerNode,
+                                          Long fencingToken, Long deviceId, Long pointId, String value) {
         return new PointCommandDTO(
                 commandId,
                 tenantId,
+                ownerNode,
+                fencingToken,
                 PointCommandTypeEnum.WRITE,
                 new PointCommandPayload.WritePayload(deviceId, pointId, value),
                 PointCommandSourceEnum.HTTP,

@@ -65,7 +65,6 @@ import java.util.concurrent.TimeUnit;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -214,7 +213,7 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         if (!CAN_COMMAND_PATTERN.matcher(command).matches()) {
             throw new ReadPointException("Unsafe CAN command rejected, command={}", command);
         }
-        log.debug("Executing CAN command: {}", command);
+        log.debug("CAN command execution started, commandLength={}", command.length());
         Process process = new ProcessBuilder("sh", "-c", command)
                 .redirectErrorStream(true)
                 .start();

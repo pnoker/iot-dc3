@@ -28,7 +28,6 @@ import java.lang.annotation.Target;
  * The authorization filter skips permission checks for annotated endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Target({ElementType.METHOD, ElementType.TYPE})

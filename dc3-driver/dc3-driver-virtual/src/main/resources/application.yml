@@ -77,7 +77,6 @@ dc3:
         remark: JSON path used to resolve event payload
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/virtual/buffer.db
 
 spring:

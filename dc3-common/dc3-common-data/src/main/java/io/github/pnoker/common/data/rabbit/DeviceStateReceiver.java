@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.rabbit;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DeviceStateService;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,6 @@ import java.util.Objects;
  * RabbitMQ receiver for device state events.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -58,7 +56,11 @@ public class DeviceStateReceiver {
     public void deviceStateReceive(Channel channel, Message message, DeviceStateDTO entityDTO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            log.debug("Receive device state: {}", JsonUtil.toJsonString(entityDTO));
+            log.debug("Device state received, tenantId={}, driverId={}, deviceId={}, status={}",
+                    Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
+                    Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
+                    Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId(),
+                    Objects.isNull(entityDTO) ? null : entityDTO.getStatus());
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())
                     || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getTenantId())
                     || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeoutUnit())

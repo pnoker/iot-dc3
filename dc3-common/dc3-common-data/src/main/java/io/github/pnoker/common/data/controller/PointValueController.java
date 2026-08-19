@@ -50,7 +50,6 @@ import java.util.Objects;
  * REST controller exposing point value management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "point_value", description = "Data point values: query real-time snapshots and historical time-series values collected from industrial device data points")

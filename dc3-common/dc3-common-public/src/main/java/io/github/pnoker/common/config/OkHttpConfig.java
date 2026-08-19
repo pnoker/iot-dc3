@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
  * OkHttp client auto-configuration.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration

@@ -33,9 +33,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Thin Caffeine wrapper with a Redis-like surface (setKey/getKey with optional TTL, batch
- * variants) so call sites only need to swap the injected type. Variable per-entry TTL is
- * honored via a custom {@link Expiry}.
+ * Thin Caffeine wrapper for process-local, TTL-bound operational state. Durable telemetry,
+ * latest point values, and distributed driver ownership never use this cache. Variable
+ * per-entry TTL is honored via a custom {@link Expiry}.
  *
  * <p>
  * Exposes {@link #onExpire(ExpireListener)} so callers can react when an entry is evicted
@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -59,6 +58,9 @@ public class LocalCacheImpl {
 
     private Cache<String, Entry> cache;
 
+    /**
+     * Init.
+     */
     @PostConstruct
     public void init() {
         this.cache = Caffeine.newBuilder().maximumSize(200_000L).expireAfter(new Expiry<String, Entry>() {
@@ -95,15 +97,37 @@ public class LocalCacheImpl {
         }).build();
     }
 
+    /**
+     * Update key.
+     *
+     * @param <T> generic type parameter
+     * @param key key
+     * @param value value
+     */
     public <T> void setKey(String key, T value) {
         cache.put(key, new Entry(value, Long.MAX_VALUE));
     }
 
+    /**
+     * Update key.
+     *
+     * @param <T> generic type parameter
+     * @param key key
+     * @param value value
+     * @param time time
+     * @param unit unit
+     */
     public <T> void setKey(String key, T value, long time, TimeUnit unit) {
         long ttl = time > 0 ? unit.toNanos(time) : Long.MAX_VALUE;
         cache.put(key, new Entry(value, ttl));
     }
 
+    /**
+     * Update key.
+     *
+     * @param <T> generic type parameter
+     * @param valuesMap values map
+     */
     public <T> void setKey(Map<String, T> valuesMap) {
         if (Objects.isNull(valuesMap) || valuesMap.isEmpty()) {
             return;
@@ -111,12 +135,26 @@ public class LocalCacheImpl {
         valuesMap.forEach(this::setKey);
     }
 
+    /**
+     * Return key.
+     *
+     * @param <T> generic type parameter
+     * @param key key
+     * @return get key result
+     */
     @SuppressWarnings("unchecked")
     public <T> T getKey(String key) {
         Entry entry = cache.getIfPresent(key);
         return Objects.isNull(entry) ? null : (T) entry.value;
     }
 
+    /**
+     * Return key.
+     *
+     * @param <T> generic type parameter
+     * @param keys keys
+     * @return get key result
+     */
     public <T> List<T> getKey(List<String> keys) {
         if (Objects.isNull(keys) || keys.isEmpty()) {
             return List.of();
@@ -141,6 +179,12 @@ public class LocalCacheImpl {
     @FunctionalInterface
     public interface ExpireListener {
 
+        /**
+         * On expire.
+         *
+         * @param key key
+         * @param lastValue last value
+         */
         void onExpire(String key, Object lastValue);
 
     }

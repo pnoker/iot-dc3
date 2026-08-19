@@ -61,7 +61,6 @@ import java.util.Objects;
  * Manages per-device command attribute configuration values that override the defaults declared on a profile template's command attributes.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "command_attribute_config", description = "Command attribute configuration values: set and update per-device customization values for command properties inherited from command attribute definitions")

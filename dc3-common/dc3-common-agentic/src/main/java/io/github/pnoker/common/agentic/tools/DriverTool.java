@@ -43,7 +43,6 @@ import java.util.Optional;
  * Driver-domain tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -55,6 +54,13 @@ public class DriverTool {
 
     private final Optional<StatusHealthFacade> statusHealthFacade;
 
+    /**
+     * Return driver by identifier.
+     *
+     * @param driverId driver identifier
+     * @param toolContext tool context
+     * @return lookup driver by identifier result
+     */
     @Tool(description = "Look up a driver by its numeric ID. Returns driver name, code, service name, host, type, and enable status.")
     @AgenticToolMetadata(domain = "driver", title = "Query driver by ID")
     public AgenticToolResult<FacadeDriverBO> lookupDriverById(
@@ -69,6 +75,13 @@ public class DriverTool {
         return AgenticToolResult.ok("Driver loaded", bo);
     }
 
+    /**
+     * Return drivers by identifiers.
+     *
+     * @param driverIds driver identifiers
+     * @param toolContext tool context
+     * @return lookup drivers by identifiers result
+     */
     @Tool(description = "Batch look up drivers by numeric IDs. Returns up to 50 tenant-scoped drivers.")
     @AgenticToolMetadata(domain = "driver", title = "Batch query drivers by IDs")
     public AgenticToolResult<List<FacadeDriverBO>> lookupDriversByIds(
@@ -87,6 +100,13 @@ public class DriverTool {
         return AgenticToolResult.ok("Drivers loaded", drivers);
     }
 
+    /**
+     * Return driver by device identifier.
+     *
+     * @param deviceId device identifier
+     * @param toolContext tool context
+     * @return lookup driver by device identifier result
+     */
     @Tool(description = "Resolve the driver that owns a given device. Returns the driver details.")
     @AgenticToolMetadata(domain = "driver", title = "Query device driver")
     public AgenticToolResult<FacadeDriverBO> lookupDriverByDeviceId(
@@ -102,6 +122,15 @@ public class DriverTool {
         return AgenticToolResult.ok("Driver loaded for device " + deviceId, bo);
     }
 
+    /**
+     * Return the matching drivers.
+     *
+     * @param driverName driver name
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return search drivers result
+     */
     @Tool(description = "Search for drivers with optional name filter. Returns a paginated list.")
     @AgenticToolMetadata(domain = "driver", title = "Search drivers")
     public AgenticToolResult<FacadePage<FacadeDriverBO>> searchDrivers(
@@ -125,6 +154,13 @@ public class DriverTool {
         return AgenticToolResult.ok("Driver page loaded", result);
     }
 
+    /**
+     * Return driver statuses by identifiers.
+     *
+     * @param driverIds driver identifiers
+     * @param toolContext tool context
+     * @return get driver statuses by identifiers result
+     */
     @Tool(description = "Get driver online/offline statuses for driver IDs. Returns up to 50 tenant-scoped statuses.")
     @AgenticToolMetadata(domain = "driver", title = "Get driver statuses")
     public AgenticToolResult<Map<Long, String>> getDriverStatusesByIds(
@@ -147,6 +183,13 @@ public class DriverTool {
         return AgenticToolResult.ok("Driver statuses loaded", statuses);
     }
 
+    /**
+     * Return driver device status summary.
+     *
+     * @param driverId driver identifier
+     * @param toolContext tool context
+     * @return get driver device status summary result
+     */
     @Tool(description = "Get the online/offline device count summary under a driver.")
     @AgenticToolMetadata(domain = "driver", title = "Get driver device status summary")
     public AgenticToolResult<FacadeDriverDeviceStatusSummaryBO> getDriverDeviceStatusSummary(

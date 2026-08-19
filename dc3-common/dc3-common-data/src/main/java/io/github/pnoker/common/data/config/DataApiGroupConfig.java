@@ -31,12 +31,16 @@ import org.springframework.context.annotation.Configuration;
  * selectable groups.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Configuration
 public class DataApiGroupConfig {
 
+    /**
+     * Create and configure the application-managed data api group.
+     *
+     * @return data api group result
+     */
     @Bean
     public GroupedOpenApi dataApiGroup() {
         return GroupedOpenApi.builder()

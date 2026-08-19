@@ -25,7 +25,6 @@ import io.github.pnoker.common.data.entity.query.NotifyQuery;
  * Business service for alarm notification template operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface NotifyService extends BaseService<NotifyBO, NotifyQuery> {

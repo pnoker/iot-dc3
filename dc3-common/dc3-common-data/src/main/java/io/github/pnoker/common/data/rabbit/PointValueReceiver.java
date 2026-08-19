@@ -18,27 +18,29 @@
 package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.buffer.PointValueIngestBuffer;
+import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
  * RabbitMQ receiver for point value ingestion events.
  *
- * <p>Every valid message is handed to {@link PointValueIngestBuffer}; ack when accepted,
- * nack-requeue when the buffer is full so RabbitMQ back-pressures instead of the center
- * OOM-ing. Uses the high-throughput container factory (wider prefetch / concurrency).
+ * <p>The listener receives broker-created batches, validates the complete wire contract,
+ * persists history and latest projections in one transaction, and acknowledges the batch
+ * only after that transaction commits.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2016.10.1
  */
 @Slf4j
@@ -46,41 +48,68 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointValueReceiver {
 
-    private final PointValueIngestBuffer pointValueIngestBuffer;
+    private static final int SUPPORTED_SCHEMA_VERSION = 1;
+
+    private final PointValueService pointValueService;
 
     /**
-     * Consume a point value message: validate, offer to the ingest buffer, ack on success or
-     * nack-requeue when the buffer is full (back-pressure). Invalid messages are rejected.
+     * Consume and durably persist one broker batch.
      *
      * @param channel      the RabbitMQ channel for manual ack
-     * @param message      the raw message carrying the delivery tag
-     * @param pointValueBO the deserialized point value
+     * @param messages raw messages in broker delivery order
      */
-    @RabbitHandler
     @RabbitListener(queues = "#{pointValueQueue.name}",
-            containerFactory = "highThroughputRabbitListenerContainerFactory")
-    public void pointValueReceive(Channel channel, Message message, PointValueBO pointValueBO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
-        try {
-            if (Objects.isNull(pointValueBO) || Objects.isNull(pointValueBO.getDeviceId())) {
-                log.warn("Invalid point value, deviceId is null or pointValue is blank, deviceId={}",
-                        Objects.isNull(pointValueBO) ? null : pointValueBO.getDeviceId());
-                RabbitAckUtil.reject(channel, deliveryTag);
-                return;
-            }
-            if (pointValueIngestBuffer.offer(pointValueBO)) {
-                RabbitAckUtil.ack(channel, deliveryTag);
-            } else {
-                log.warn("Point value ingest buffer full, nack-requeue to back-pressure, deviceId={}, pointId={}",
-                        pointValueBO.getDeviceId(), pointValueBO.getPointId());
-                RabbitAckUtil.nack(channel, deliveryTag, true);
-            }
-        } catch (Exception e) {
-            log.error("Point value consume failed, deviceId={}, pointId={}, deliveryTag={}",
-                    Objects.nonNull(pointValueBO) ? pointValueBO.getDeviceId() : null,
-                    Objects.nonNull(pointValueBO) ? pointValueBO.getPointId() : null,
-                    deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+            containerFactory = "pointValueRabbitListenerContainerFactory")
+    public void pointValueReceive(List<Message> messages, Channel channel) throws IOException {
+        if (messages.isEmpty()) {
+            return;
         }
+
+        List<PointValueBO> values = new ArrayList<>(messages.size());
+        for (Message message : messages) {
+            PointValueBO value;
+            try {
+                value = JsonUtil.parseObject(message.getBody(), PointValueBO.class);
+            } catch (Exception e) {
+                throw poison(message, "Point-value payload is not valid JSON", e);
+            }
+            if (!valid(value)) {
+                throw poison(message, "Point-value payload violates schema version 1", null);
+            }
+            values.add(value);
+        }
+
+        pointValueService.save(values);
+
+        long lastDeliveryTag = messages.getLast().getMessageProperties().getDeliveryTag();
+        channel.basicAck(lastDeliveryTag, true);
+        log.debug("Persisted and acknowledged point-value batch, size={}, lastDeliveryTag={}",
+                values.size(), lastDeliveryTag);
+    }
+
+    private boolean valid(PointValueBO value) {
+        return Objects.nonNull(value)
+                && Objects.equals(value.getSchemaVersion(), SUPPORTED_SCHEMA_VERSION)
+                && Objects.nonNull(value.getMessageId()) && !value.getMessageId().isBlank()
+                && Objects.nonNull(value.getDriverNode()) && !value.getDriverNode().isBlank()
+                && positive(value.getSequence())
+                && positive(value.getFencingToken())
+                && positive(value.getTenantId())
+                && positive(value.getDriverId())
+                && positive(value.getDeviceId())
+                && positive(value.getPointId())
+                && Objects.nonNull(value.getRawValue())
+                && Objects.nonNull(value.getCalValue())
+                && Objects.nonNull(value.getCreateTime());
+    }
+
+    private boolean positive(Long value) {
+        return Objects.nonNull(value) && value > 0;
+    }
+
+    private AmqpRejectAndDontRequeueException poison(Message message, String reason, Exception cause) {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        log.error("Reject poison point-value batch, reason={}, deliveryTag={}", reason, deliveryTag, cause);
+        return new AmqpRejectAndDontRequeueException(reason, true, cause);
     }
 }

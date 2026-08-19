@@ -43,23 +43,46 @@ import java.util.Optional;
  * MapStruct builder converting between notification channel BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface NotifyChannelBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     @Mapping(target = "tenantId", ignore = true)
     NotifyChannelBO buildBOByVO(NotifyChannelVO entityVO);
 
+    /**
+     * Convert vo list to bo list.
+     *
+     * @param entityVOList entity view object list
+     * @return converted value
+     */
     List<NotifyChannelBO> buildBOListByVOList(List<NotifyChannelVO> entityVOList);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "channelExt", ignore = true)
     @Mapping(target = "channelTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     NotifyChannelDO buildDOByBO(NotifyChannelBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(NotifyChannelBO entityBO, @MappingTarget NotifyChannelDO entityDO) {
         if (StringUtils.isEmpty(entityBO.getChannelCode())) {
@@ -83,13 +106,31 @@ public interface NotifyChannelBuilder {
         Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
+    /**
+     * Convert bo list to do list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<NotifyChannelDO> buildDOListByBOList(List<NotifyChannelBO> entityBOList);
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "channelExt", ignore = true)
     @Mapping(target = "channelTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     NotifyChannelBO buildBOByDO(NotifyChannelDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(NotifyChannelDO entityDO, @MappingTarget NotifyChannelBO entityBO) {
         JsonExt entityExt = entityDO.getChannelExt();
@@ -109,16 +150,46 @@ public interface NotifyChannelBuilder {
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<NotifyChannelBO> buildBOListByDOList(List<NotifyChannelDO> entityDOList);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     NotifyChannelVO buildVOByBO(NotifyChannelBO entityBO);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<NotifyChannelVO> buildVOListByBOList(List<NotifyChannelBO> entityBOList);
 
+    /**
+     * Convert do page to bo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
     default Page<NotifyChannelBO> buildBOPageByDOPage(Page<NotifyChannelDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
+    /**
+     * Convert bo page to vo page.
+     *
+     * @param entityPageBO business object
+     * @return converted value
+     */
     default Page<NotifyChannelVO> buildVOPageByBOPage(Page<NotifyChannelBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }

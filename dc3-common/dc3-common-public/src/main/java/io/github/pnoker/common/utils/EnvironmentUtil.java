@@ -28,7 +28,6 @@ import java.util.UUID;
  * Node ID generation and environment tag builder.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

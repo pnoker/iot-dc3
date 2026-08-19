@@ -40,12 +40,17 @@ import java.util.Optional;
  * internal DTOs.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcDriverAttributeBuilder {
 
+    /**
+     * Convert grpc transfer object to dto.
+     *
+     * @param entityGrpc entity grpc
+     * @return converted value
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
@@ -59,6 +64,12 @@ public interface GrpcDriverAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     DriverAttributeDTO buildDTOByGrpcDTO(GrpcDriverAttributeDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityDTO transfer object
+     */
     @AfterMapping
     default void afterProcess(GrpcDriverAttributeDTO entityGrpc, @MappingTarget DriverAttributeDTO entityDTO) {
         GrpcBuilderUtil.buildBaseDTOByGrpcBase(entityGrpc.getBase(), entityDTO);
@@ -70,6 +81,12 @@ public interface GrpcDriverAttributeBuilder {
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityDTO::setEnableFlag);
     }
 
+    /**
+     * Convert dto to grpc transfer object.
+     *
+     * @param entityDTO transfer object
+     * @return converted value
+     */
     @Mapping(target = "attributeExt", ignore = true)
     @Mapping(target = "attributeTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
@@ -88,6 +105,12 @@ public interface GrpcDriverAttributeBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcDriverAttributeDTO buildGrpcDTOByDTO(DriverAttributeDTO entityDTO);
 
+    /**
+     * After process.
+     *
+     * @param entityDTO transfer object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(DriverAttributeDTO entityDTO, @MappingTarget GrpcDriverAttributeDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByDTO(entityDTO);

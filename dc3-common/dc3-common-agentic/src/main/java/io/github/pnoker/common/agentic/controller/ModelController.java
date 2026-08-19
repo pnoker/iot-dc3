@@ -49,7 +49,6 @@ import java.util.List;
  * REST controller exposing agentic model configuration endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "model", description = "AI model registry: manage model metadata including name, version, capabilities, context limits, and provider associations")

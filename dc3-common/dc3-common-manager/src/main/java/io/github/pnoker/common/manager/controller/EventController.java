@@ -56,7 +56,6 @@ import java.util.Objects;
  * Manages device-reported event definitions declared on profile templates, the occurrences a device raises at runtime.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "event", description = "Device event definitions: manage alarm definitions, state-change notifications, and status events with configurable trigger conditions and severity levels")

@@ -18,11 +18,11 @@ center and driver applications.
 
 | Module | Responsibility |
 |---|---|
-| `dc3-common-model` | shared BO/VO/DTO bases, builders, extension models, validation groups, and domain enums |
+| `dc3-common-model` | shared BO/VO/DTO bases, builders, extension models, validation groups, and transport models |
 | `dc3-common-public` | response envelope, `BaseService`, shared entities/utilities, and tenant markers |
 | `dc3-common-api` | shared gRPC conversion helpers |
 | `dc3-common-facade` | cross-service facade contracts and implementations |
-| `dc3-common-constant` | stable shared constants |
+| `dc3-common-constant` | stable platform-wide constants and shared domain/wire/persistence enums |
 | `dc3-common-exception` | shared exception hierarchy |
 
 ## Infrastructure modules
@@ -49,6 +49,11 @@ center and driver applications.
 - Use BOs in persistent business services and builders for VO/BO/DO conversion.
 - Use facade interfaces for cross-service business calls.
 - Add dependencies to the narrowest module that owns the required capability.
+- Treat Java visibility and module ownership separately: framework-neutral shared code belongs in `dc3-common-public`,
+  while capability-specific public APIs remain with their owning module.
+- Keep platform-wide constants and top-level shared enums in `dc3-common-constant`; keep module-local constants and
+  nested implementation/configuration enums beside their owner. Top-level `*Constant` names and top-level public enums
+  are reserved for `dc3-common-constant`; use concern-specific local names such as `*Limits` or `*Defaults`.
 
 ## Verification
 

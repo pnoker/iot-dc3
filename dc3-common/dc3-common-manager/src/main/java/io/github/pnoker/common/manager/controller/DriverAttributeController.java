@@ -57,7 +57,6 @@ import java.util.Objects;
  * REST controller exposing driver attribute management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "driver_attribute", description = "Driver attribute definitions: manage configurable properties of protocol drivers including name, type, default value, and validation constraints")

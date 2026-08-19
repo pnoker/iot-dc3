@@ -28,7 +28,6 @@ import java.util.Optional;
  * Principal source classification.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -49,6 +48,12 @@ public enum PrincipalSourceTypeEnum {
 
     private final String remark;
 
+    /**
+     * Resolve a principal source from its persisted wire value.
+     *
+     * @param value persisted source value
+     * @return matching source, or {@code null} when the value is unknown
+     */
     public static PrincipalSourceTypeEnum ofValue(String value) {
         Optional<PrincipalSourceTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))

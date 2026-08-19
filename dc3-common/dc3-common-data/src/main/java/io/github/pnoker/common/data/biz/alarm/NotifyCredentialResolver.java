@@ -23,7 +23,6 @@ import java.util.Optional;
  * Resolves notification credential references.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface NotifyCredentialResolver {

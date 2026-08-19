@@ -1,6 +1,7 @@
-// DC3 品牌 banner 多语言生成器:
-//   banner.template.svg(设计源,占位符 {{TAGLINE}}/{{TECHTAGS}}) × LANGS 语言表
-//   → banner.<lang>.svg + banner.<lang>.png(@2x,3200×840,retina 锐利)
+// DC3 品牌图片生成器:
+//   svg/banner.template.svg(设计源,占位符 {{TAGLINE}}/{{TECHTAGS}}) × LANGS 语言表
+//   → svg/banner.<lang>.svg + png/banner.<lang>.png(@2x,3200×840,retina 锐利)
+//   svg/social-preview.svg → png/social-preview.png(1200×600)
 //
 // 运行: node .github/brand/gen-banners.mjs
 // 依赖 playwright:本仓库是 Java 工程、无 JS 依赖,脚本会尝试从兄弟仓库
@@ -12,6 +13,8 @@ import {fileURLToPath} from 'node:url'
 import {dirname, join} from 'node:path'
 
 const here = dirname(fileURLToPath(import.meta.url))
+const svgDir = join(here, 'svg')
+const pngDir = join(here, 'png')
 
 // 各语言文案(与仓库根各 README 的 hero 主标语保持同一译法;SENSE–DECIDE–ACT 为品牌术语,各语言保留原文)
 const LANGS = {
@@ -65,25 +68,62 @@ function loadPlaywright() {
 
 const template = await async function () {
   const {readFile} = await import('node:fs/promises')
-  return readFile(join(here, 'banner.template.svg'), 'utf-8')
+  return readFile(join(svgDir, 'banner.template.svg'), 'utf-8')
 }()
 
 for (const [lang, {tagline, techtags}] of Object.entries(LANGS)) {
   const svg = template.replaceAll('{{TAGLINE}}', tagline).replaceAll('{{TECHTAGS}}', techtags)
-  await (await import('node:fs/promises')).writeFile(join(here, `banner.${lang}.svg`), svg)
+  await (await import('node:fs/promises')).writeFile(join(svgDir, `banner.${lang}.svg`), svg)
 }
 
 const {chromium} = loadPlaywright()
-const browser = await chromium.launch()
+const browserExecutable = [
+  process.env.BANNER_BROWSER_PATH,
+  'C:/Program Files/Google/Chrome/Application/chrome.exe',
+  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+  '/usr/bin/google-chrome',
+  '/usr/bin/chromium',
+  '/usr/bin/chromium-browser'
+].filter(Boolean).find(existsSync)
+const browser = await chromium.launch(browserExecutable ? {executablePath: browserExecutable} : {})
+
+async function assertTextWithinSafeArea(page, label) {
+  const overflows = await page.$$eval('text[data-min-x], text[data-max-x]', nodes => nodes.flatMap(node => {
+    const box = node.getBoundingClientRect()
+    const left = box.left
+    const right = box.right
+    const minX = node.dataset.minX === undefined ? Number.NEGATIVE_INFINITY : Number(node.dataset.minX)
+    const maxX = node.dataset.maxX === undefined ? Number.POSITIVE_INFINITY : Number(node.dataset.maxX)
+    return left < minX - 0.5 || right > maxX + 0.5
+      ? [{text: node.textContent, left, right, minX, maxX}]
+      : []
+  }))
+  if (overflows.length > 0) {
+    throw new Error(`${label} text exceeds its safe area: ${JSON.stringify(overflows)}`)
+  }
+}
+
 for (const lang of Object.keys(LANGS)) {
   const page = await browser.newPage({viewport: {width: 1600, height: 420}, deviceScaleFactor: 2})
-  await page.goto('file://' + join(here, `banner.${lang}.svg`))
+  await page.goto('file://' + join(svgDir, `banner.${lang}.svg`))
+  await assertTextWithinSafeArea(page, `banner.${lang}`)
   await page.screenshot({
-    path: join(here, `banner.${lang}.png`),
+    path: join(pngDir, `banner.${lang}.png`),
     clip: {x: 0, y: 0, width: 1600, height: 420}
   })
   await page.close()
-  console.log(`generated banner.${lang}.svg / banner.${lang}.png`)
+  console.log(`generated svg/banner.${lang}.svg / png/banner.${lang}.png`)
 }
+
+const socialPage = await browser.newPage({viewport: {width: 1200, height: 600}})
+await socialPage.goto('file://' + join(svgDir, 'social-preview.svg'))
+await assertTextWithinSafeArea(socialPage, 'social preview')
+await socialPage.screenshot({
+  path: join(pngDir, 'social-preview.png'),
+  clip: {x: 0, y: 0, width: 1200, height: 600}
+})
+await socialPage.close()
+console.log('generated svg/social-preview.svg / png/social-preview.png')
+
 await browser.close()
-console.log('done: 7 languages')
+console.log('done: 7 banner languages and social preview')

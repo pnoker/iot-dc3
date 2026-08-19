@@ -27,7 +27,6 @@ import org.springframework.messaging.handler.annotation.Header;
  * Service (QoS) levels. It is implemented as a Spring Integration messaging gateway.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @MessagingGateway(defaultRequestChannel = "mqttOutboundChannel")

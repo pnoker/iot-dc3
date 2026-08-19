@@ -28,11 +28,15 @@ import java.math.BigDecimal;
  * @param sampleCount number of rows that fell inside {@code [from, to)}.
  *                    Aggregators use this to enforce {@code minSamples}.
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 public record WindowAggregateResult(BigDecimal value, long sampleCount) {
 
+    /**
+     * Empty.
+     *
+     * @return empty result
+     */
     public static WindowAggregateResult empty() {
         return new WindowAggregateResult(null, 0L);
     }

@@ -39,7 +39,6 @@ import java.util.Optional;
  * MapStruct builder for command attribute gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -64,6 +63,12 @@ public interface GrpcCommandAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     CommandAttributeBO buildBOByGrpcDTO(GrpcCommandAttributeDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(GrpcCommandAttributeDTO entityGrpc, @MappingTarget CommandAttributeBO entityBO) {
         GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
@@ -99,6 +104,12 @@ public interface GrpcCommandAttributeBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcCommandAttributeDTO buildGrpcDTOByBO(CommandAttributeBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(CommandAttributeBO entityBO, @MappingTarget GrpcCommandAttributeDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);

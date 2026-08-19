@@ -57,7 +57,6 @@ import java.util.Objects;
  * REST controller exposing resource management endpoints.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Tag(name = "resource", description = "Protected resource registry: manage API endpoints, menu items, and other securable artifacts that require permission to access")

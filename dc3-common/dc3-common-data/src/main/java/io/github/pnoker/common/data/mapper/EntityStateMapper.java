@@ -28,7 +28,6 @@ import java.util.List;
  * Mapper for dc3_entity_state table.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Mapper

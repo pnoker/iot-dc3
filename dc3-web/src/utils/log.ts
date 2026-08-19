@@ -37,7 +37,7 @@ const format = (args: LogArgs): LogArgs => [PREFIX, ...args];
 export const logger = {
   /**
    * Debug-level output — suppressed in production. Use for high-frequency or
-   * detailed diagnostic info (e.g. lifecycle steps, payload dumps).
+   * detailed diagnostic metadata. Never pass credentials or raw business payloads.
    */
   debug(...args: LogArgs): void {
     if (isDev) {

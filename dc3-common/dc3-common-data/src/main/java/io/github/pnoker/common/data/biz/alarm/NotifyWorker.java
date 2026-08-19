@@ -60,7 +60,6 @@ import java.util.Objects;
  * {@code dc3_notify_history} are the audit trail for operators.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.21
  */
 @Slf4j
@@ -84,6 +83,13 @@ public class NotifyWorker {
 
     private final NotifyTaskSender notifyTaskSender;
 
+    /**
+     * On notify task.
+     *
+     * @param channel channel
+     * @param message message
+     * @param task task
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{notifyTaskQueue.name}")
     public void onNotifyTask(Channel channel, Message message, NotifyTaskDTO task) {
@@ -91,7 +97,9 @@ public class NotifyWorker {
         try {
             if (Objects.isNull(task) || Objects.isNull(task.getNotifyHistoryId())
                     || Objects.isNull(task.getChannelId())) {
-                log.error("Invalid notify task payload: {}", task);
+                log.error("Notify task rejected, reason=invalidEnvelope, historyId={}, channelId={}",
+                        Objects.nonNull(task) ? task.getNotifyHistoryId() : null,
+                        Objects.nonNull(task) ? task.getChannelId() : null);
                 RabbitAckUtil.reject(channel, deliveryTag);
                 return;
             }

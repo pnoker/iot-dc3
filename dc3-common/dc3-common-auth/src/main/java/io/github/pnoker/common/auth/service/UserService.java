@@ -25,7 +25,6 @@ import io.github.pnoker.common.base.service.BaseService;
  * Business service for user operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface UserService extends BaseService<UserBO, UserQuery> {

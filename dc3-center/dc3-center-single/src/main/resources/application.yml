@@ -34,8 +34,15 @@ dc3:
   data:
     point:
       batch:
-        speed: ${POINT_BATCH_SPEED:100}
-        interval: ${POINT_BATCH_INTERVAL:5}
+        batch-size: ${POINT_BATCH_SIZE:500}
+        receive-timeout-millis: ${POINT_BATCH_RECEIVE_TIMEOUT_MILLIS:100}
+        concurrent-consumers: ${POINT_CONCURRENT_CONSUMERS:4}
+        max-concurrent-consumers: ${POINT_MAX_CONCURRENT_CONSUMERS:16}
+        prefetch-count: ${POINT_PREFETCH_COUNT:1000}
+        max-retries: ${POINT_RETRY_MAX_RETRIES:3}
+        retry-initial-interval-millis: ${POINT_RETRY_INITIAL_INTERVAL_MILLIS:1000}
+        retry-multiplier: ${POINT_RETRY_MULTIPLIER:2}
+        retry-max-interval-millis: ${POINT_RETRY_MAX_INTERVAL_MILLIS:10000}
   facade:
     mode: ${DC3_FACADE_MODE:local}
 

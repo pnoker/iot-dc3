@@ -30,7 +30,6 @@ import java.util.Map;
  * JSON extension object for command attribute configuration.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "Command attribute extension. JSON extension object describing the configuration of a single command attribute, including UI rendering, validation rules, security and applicability scope.", example = "READ")

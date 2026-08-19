@@ -27,7 +27,6 @@ import java.util.List;
  * the audit view reads them via {@link #list}.
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 public interface AuditLogService {

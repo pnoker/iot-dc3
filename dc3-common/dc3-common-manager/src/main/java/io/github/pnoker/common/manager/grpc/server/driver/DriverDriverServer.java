@@ -27,12 +27,18 @@ import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
+import io.github.pnoker.api.common.driver.GrpcDriverLeaseRequest;
+import io.github.pnoker.api.common.driver.GrpcDeviceLeaseDTO;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
+import io.github.pnoker.api.common.driver.GrpcRDriverLeaseDTO;
 import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.manager.biz.DriverRegisterService;
+import io.github.pnoker.common.manager.biz.DriverLeaseService;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
+import io.github.pnoker.common.manager.entity.bo.DeviceLeaseBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
+import io.github.pnoker.common.manager.entity.bo.DriverLeaseGrantBO;
 import io.github.pnoker.common.manager.entity.bo.EventAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.grpc.builder.GrpcCommandAttributeBuilder;
@@ -41,13 +47,13 @@ import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcEventAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointAttributeBuilder;
 import io.github.pnoker.common.manager.service.CommandAttributeService;
-import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.EventAttributeService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.grpc.stub.StreamObserver;
+import io.grpc.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -60,13 +66,14 @@ import java.util.Optional;
  * gRPC server handling driver-to-manager driver requests.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
+
+    private static final int ASSIGNMENT_BATCH_SIZE = 1_000;
 
     private final GrpcDriverBuilder grpcDriverBuilder;
 
@@ -90,7 +97,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
     private final EventAttributeService eventAttributeService;
 
-    private final DeviceService deviceService;
+    private final DriverLeaseService driverLeaseService;
 
     @Override
     public void driverRegister(GrpcDriverRegisterDTO request, StreamObserver<GrpcRDriverRegisterDTO> responseObserver) {
@@ -135,10 +142,6 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
                     .toList();
             builder.addAllEventAttributes(grpcEventAttributeDTOList);
 
-            // Attach the device ids bound to this driver
-            List<Long> idList = deviceService.listIdsByDriverId(entityBO.getId(), entityBO.getTenantId());
-            builder.addAllDeviceIds(idList);
-
             result = GrpcRFactory.ok();
         } catch (Exception e) {
             result = GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage());
@@ -150,6 +153,29 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
         builder.setResult(result);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void renewLease(GrpcDriverLeaseRequest request,
+                           StreamObserver<GrpcRDriverLeaseDTO> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            DriverLeaseGrantBO grant = driverLeaseService.renew(request.getTenantId(), request.getDriverId(),
+                    request.getNode(), request.getClient(), request.getHost(), request.getLeaseSeconds(),
+                    request.getAssignmentVersion());
+            if (!grant.assignmentsChanged()) {
+                responseObserver.onNext(leaseResponse(grant, List.of(), true));
+            } else {
+                streamAssignmentSnapshot(request, grant, responseObserver);
+            }
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Driver lease renewal failed, tenantId={}, driverId={}, node={}",
+                    request.getTenantId(), request.getDriverId(), request.getNode(), e);
+            responseObserver.onError(Status.ABORTED.withDescription(e.getMessage()).withCause(e).asRuntimeException());
+        } finally {
+            TenantContextHolder.clear();
+        }
     }
 
     @Override
@@ -221,8 +247,58 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
                 .toList();
         builder.addAllEventAttributes(eventAttributeDTOList);
 
-        List<Long> idList = Optional.ofNullable(deviceService.listIdsByDriverId(entityBO.getId(), entityBO.getTenantId())).orElseGet(List::of);
-        builder.addAllDeviceIds(idList);
+    }
+
+    private void streamAssignmentSnapshot(GrpcDriverLeaseRequest request, DriverLeaseGrantBO grant,
+                                          StreamObserver<GrpcRDriverLeaseDTO> responseObserver) {
+        long afterDeviceId = 0;
+        while (true) {
+            assertAssignmentVersion(request, grant.assignmentVersion());
+            List<DeviceLeaseBO> page = driverLeaseService.listOwnedLeases(
+                    request.getTenantId(), request.getDriverId(), request.getNode(), afterDeviceId,
+                    ASSIGNMENT_BATCH_SIZE + 1);
+            boolean complete = page.size() <= ASSIGNMENT_BATCH_SIZE;
+            List<DeviceLeaseBO> batch = complete ? page : page.subList(0, ASSIGNMENT_BATCH_SIZE);
+            if (!batch.isEmpty()) {
+                afterDeviceId = batch.getLast().deviceId();
+            }
+            if (complete) {
+                assertAssignmentVersion(request, grant.assignmentVersion());
+            }
+            responseObserver.onNext(leaseResponse(grant, batch, complete));
+            if (complete) {
+                return;
+            }
+        }
+    }
+
+    private void assertAssignmentVersion(GrpcDriverLeaseRequest request, long expectedVersion) {
+        long currentVersion = driverLeaseService.getAssignmentVersion(
+                request.getTenantId(), request.getDriverId());
+        if (currentVersion != expectedVersion) {
+            throw new IllegalStateException("Driver assignment changed while streaming snapshot");
+        }
+    }
+
+    private GrpcRDriverLeaseDTO leaseResponse(DriverLeaseGrantBO grant, List<DeviceLeaseBO> leases,
+                                               boolean complete) {
+        return GrpcRDriverLeaseDTO.newBuilder()
+                .setResult(GrpcRFactory.ok())
+                .addAllDeviceLeases(toGrpcLeases(leases))
+                .setLeaseUntilEpochMillis(grant.leaseUntilEpochMillis())
+                .setAssignmentVersion(grant.assignmentVersion())
+                .setAssignmentsChanged(grant.assignmentsChanged())
+                .setSnapshotComplete(complete)
+                .build();
+    }
+
+    private List<GrpcDeviceLeaseDTO> toGrpcLeases(List<DeviceLeaseBO> leases) {
+        return leases.stream()
+                .map(lease -> GrpcDeviceLeaseDTO.newBuilder()
+                        .setDeviceId(lease.deviceId())
+                        .setFencingToken(lease.fencingToken())
+                        .build())
+                .toList();
     }
 
 }

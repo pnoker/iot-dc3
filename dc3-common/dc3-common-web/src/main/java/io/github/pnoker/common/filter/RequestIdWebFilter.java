@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.filter;
 
+import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -58,38 +59,20 @@ import java.util.UUID;
  * which is a different thread than the Netty event loop this filter runs on. MDC is
  * {@link ThreadLocal}-backed and does not cross that hop, so the id is published via the Reactor
  * {@link Context} instead — it propagates along the call chain regardless of thread switches.
- * {@code BaseController.async()} reads it back from the {@link ContextView} and sets MDC on the
+ * {@code BaseController.async()} reads it back from the Reactor {@code ContextView} and sets MDC on the
  * worker thread, where the business {@code log.*} calls actually execute.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2026.7.7
  */
 @AutoConfiguration
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestIdWebFilter implements WebFilter {
 
-    /**
-     * MDC key under which the request id is published on the worker thread (matches the
-     * logback pattern placeholder). Shared with {@code BaseController.async()}.
-     */
-    public static final String MDC_REQUEST_ID = "requestId";
-
-    /**
-     * Reactor Context key under which the request id travels from this filter to
-     * {@code BaseController.async()} across the boundedElastic thread hop.
-     */
-    public static final String CONTEXT_REQUEST_ID = "dc3.requestId";
-
-    /**
-     * Header name for the request id, read on the way in and written on the way out.
-     */
-    public static final String HEADER_REQUEST_ID = "X-Request-Id";
-
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         HttpHeaders headers = exchange.getRequest().getHeaders();
-        String requestId = headers.getFirst(HEADER_REQUEST_ID);
+        String requestId = headers.getFirst(RequestIdConstant.HEADER);
 
         // Priority 1: Use X-Request-Id from header (backward compatibility)
         // Priority 2: Use OpenTelemetry Trace ID if available
@@ -108,12 +91,12 @@ public class RequestIdWebFilter implements WebFilter {
 
         String finalRequestId = requestId;
         // Echo back so callers can correlate a failing request with server-side logs and traces.
-        exchange.getResponse().getHeaders().add(HEADER_REQUEST_ID, finalRequestId);
+        exchange.getResponse().getHeaders().add(RequestIdConstant.HEADER, finalRequestId);
         // Publish the id through the Reactor Context (not just MDC): the Context propagates
         // along the reactive call chain regardless of thread hops, so BaseController.async()
         // — which switches to Schedulers.boundedElastic() — can read it and set MDC on the
         // worker thread where business log.* calls actually execute. MDC alone would be lost
         // the moment the supplier hops off the Netty event loop.
-        return chain.filter(exchange).contextWrite(ctx -> ctx.put(CONTEXT_REQUEST_ID, finalRequestId));
+        return chain.filter(exchange).contextWrite(ctx -> ctx.put(RequestIdConstant.REACTOR_CONTEXT_KEY, finalRequestId));
     }
 }

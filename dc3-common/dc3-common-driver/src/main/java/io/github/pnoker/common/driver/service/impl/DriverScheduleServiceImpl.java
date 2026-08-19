@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.job.BufferRepublishScheduleJob;
 import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
 import io.github.pnoker.common.driver.job.DriverHealthScheduleJob;
+import io.github.pnoker.common.driver.job.DriverLeaseRenewScheduleJob;
 import io.github.pnoker.common.driver.job.DriverReadScheduleJob;
 import io.github.pnoker.common.driver.service.DriverScheduleService;
 import io.github.pnoker.common.exception.CronException;
@@ -40,7 +41,6 @@ import java.util.Objects;
  * registers the built-in Quartz jobs required by the driver runtime.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service
@@ -66,7 +66,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
         // Get schedule properties from driver configuration
         DriverProperties.ScheduleProperties property = driverProperties.getSchedule();
         if (Objects.isNull(property)) {
-            return;
+            throw new IllegalStateException("Driver schedule configuration is required");
         }
 
         try {
@@ -74,6 +74,13 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
                     ScheduleConstant.DRIVER_HEALTH_SCHEDULE_JOB, ScheduleConstant.DRIVER_HEALTH_SCHEDULE_CRON,
                     DriverHealthScheduleJob.class);
+
+            if (!CronExpression.isValidExpression(driverProperties.getLease().getRenewCron())) {
+                throw new CronException("Driver lease renewal cron expression is invalid");
+            }
+            quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                    ScheduleConstant.DRIVER_LEASE_RENEW_SCHEDULE_JOB,
+                    driverProperties.getLease().getRenewCron(), DriverLeaseRenewScheduleJob.class);
 
             // Create and schedule the device health job if enabled
             DriverProperties.DeviceHealthProperties deviceHealth = driverProperties.getHealth().getDevice();
@@ -108,16 +115,17 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
                         DriverCustomScheduleJob.class);
             }
 
-            // Create and schedule the buffer republish job if enabled
+            // The durable outbox is mandatory, so its republish job is mandatory too.
             DriverProperties.BufferProperties buffer = driverProperties.getBuffer();
-            if (Objects.nonNull(buffer) && Boolean.TRUE.equals(buffer.getEnabled())) {
-                if (!CronExpression.isValidExpression(buffer.getRepublishCron())) {
-                    throw new CronException("Buffer republish schedule cron expression is invalid");
-                }
-                quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-                        ScheduleConstant.BUFFER_REPUBLISH_SCHEDULE_JOB, buffer.getRepublishCron(),
-                        BufferRepublishScheduleJob.class);
+            if (Objects.isNull(buffer)) {
+                throw new IllegalStateException("Driver point-value outbox configuration is required");
             }
+            if (!CronExpression.isValidExpression(buffer.getRepublishCron())) {
+                throw new CronException("Buffer republish schedule cron expression is invalid");
+            }
+            quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                    ScheduleConstant.BUFFER_REPUBLISH_SCHEDULE_JOB, buffer.getRepublishCron(),
+                    BufferRepublishScheduleJob.class);
 
             // Start the scheduler after all jobs are configured
             quartzService.startScheduler();

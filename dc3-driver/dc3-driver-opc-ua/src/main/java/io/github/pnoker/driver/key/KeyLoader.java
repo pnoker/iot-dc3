@@ -42,7 +42,6 @@ import java.util.regex.Pattern;
  * for the client.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -92,6 +91,7 @@ public class KeyLoader {
      * @throws Exception if certificate generation or loading fails
      */
     public KeyLoader load(Path baseDir) throws Exception {
+        Files.createDirectories(baseDir);
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         Path serverKeyStore = baseDir.resolve("dc3-opc-ua-client.pfx");
 

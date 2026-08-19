@@ -33,7 +33,6 @@ import java.io.Serializable;
  * check queue where Data Center performs a lease-version comparison.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter

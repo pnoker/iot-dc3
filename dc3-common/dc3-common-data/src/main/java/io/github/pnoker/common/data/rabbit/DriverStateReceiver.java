@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.rabbit;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DriverStateService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RabbitAckUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,6 @@ import java.util.Objects;
  * RabbitMQ receiver for driver state events.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -58,7 +56,10 @@ public class DriverStateReceiver {
     public void driverStateReceive(Channel channel, Message message, DriverStateDTO entityDTO) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {
-            log.debug("Receive driver state: {}", JsonUtil.toJsonString(entityDTO));
+            log.debug("Driver state received, tenantId={}, driverId={}, status={}",
+                    Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
+                    Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
+                    Objects.isNull(entityDTO) ? null : entityDTO.getStatus());
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())
                     || Objects.isNull(entityDTO.getTenantId()) || Objects.isNull(entityDTO.getStatus())) {
                 log.warn("Invalid driver state, some required fields are null, driverId={}",

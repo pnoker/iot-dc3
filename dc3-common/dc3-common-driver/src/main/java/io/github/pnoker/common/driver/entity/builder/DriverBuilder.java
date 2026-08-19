@@ -40,12 +40,17 @@ import java.util.Optional;
  * objects.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DriverBuilder {
 
+    /**
+     * Convert grpc transfer object to dto.
+     *
+     * @param entityGrpc entity grpc
+     * @return converted value
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
@@ -59,6 +64,12 @@ public interface DriverBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     DriverBO buildDTOByGrpcDTO(GrpcDriverDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(GrpcDriverDTO entityGrpc, @MappingTarget DriverBO entityBO) {
         GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
@@ -70,6 +81,12 @@ public interface DriverBuilder {
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
     }
 
+    /**
+     * Convert dto to grpc transfer object.
+     *
+     * @param entityDTO transfer object
+     * @return converted value
+     */
     @Mapping(target = "driverExt", ignore = true)
     @Mapping(target = "driverTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
@@ -89,6 +106,12 @@ public interface DriverBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcDriverDTO buildGrpcDTOByDTO(DriverBO entityDTO);
 
+    /**
+     * After process.
+     *
+     * @param entityDTO transfer object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(DriverBO entityDTO, @MappingTarget GrpcDriverDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityDTO);

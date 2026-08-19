@@ -63,7 +63,6 @@ import java.util.Objects;
  * REST controller exposing role-principal binding management endpoints.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2016.10.1
  */
 @Tag(name = "role_principal_bind", description = "Role-to-principal bindings: assign roles to users or service accounts, enabling or revoking permission sets for principals")

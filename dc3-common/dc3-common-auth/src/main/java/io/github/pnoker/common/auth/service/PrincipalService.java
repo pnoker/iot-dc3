@@ -31,13 +31,24 @@ import java.util.List;
  * this service exposes lookup/list and enable/disable only — no create.
  *
  * @author pnoker
- * @version 2026.6.13
  * @since 2026.6.13
  */
 public interface PrincipalService {
 
+    /**
+     * Get a principal by its identifier.
+     *
+     * @param id principal identifier
+     * @return the matching principal
+     */
     PrincipalBO getById(Long id);
 
+    /**
+     * Page through principals that satisfy the supplied filters.
+     *
+     * @param entityQuery principal filters and pagination settings
+     * @return the matching principals
+     */
     Page<PrincipalBO> list(PrincipalQuery entityQuery);
 
     /**
@@ -46,5 +57,13 @@ public interface PrincipalService {
      */
     List<PrincipalBO> listByIds(Collection<Long> ids);
 
+    /**
+     * Update enable flag.
+     *
+     * @param id id
+     * @param target target
+     * @param operatorId operator identifier
+     * @param operatorName operator name
+     */
     void setEnableFlag(Long id, EnableFlagEnum target, Long operatorId, String operatorName);
 }

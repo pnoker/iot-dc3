@@ -32,7 +32,6 @@ import java.time.LocalDateTime;
  * Business object for creating an MCP connection (write-path input, domain enums).
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter

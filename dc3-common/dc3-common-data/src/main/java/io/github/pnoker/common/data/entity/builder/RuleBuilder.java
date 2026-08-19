@@ -43,7 +43,6 @@ import java.util.Optional;
  * MapStruct builder converting between alarm rule BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -78,6 +77,12 @@ public interface RuleBuilder {
     @Mapping(target = "deleted", ignore = true)
     RuleDO buildDOByBO(RuleBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(RuleBO entityBO, @MappingTarget RuleDO entityDO) {
         // Code
@@ -124,6 +129,12 @@ public interface RuleBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     RuleBO buildBOByDO(RuleDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(RuleDO entityDO, @MappingTarget RuleBO entityBO) {
         // Json Ext

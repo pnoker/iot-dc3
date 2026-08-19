@@ -29,7 +29,6 @@ import java.util.List;
  * OpenAI-compatible chat completion request body.
  *
  * @author pnoker
- * @version 2025.9.0
  * @see <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI API
  * Reference</a>
  * @since 2016.10.1
@@ -91,6 +90,11 @@ public class ChatCompletionRequestVO {
     @Schema(description = "When true, requests that the model include its reasoning trace in the response; treated as advisory metadata by the current endpoint.", example = "false")
     private Boolean reasoning;
 
+    /**
+     * Determine whether the client requested a streaming response.
+     *
+     * @return {@code true} only when the nullable stream flag is explicitly enabled
+     */
     public boolean isStream() {
         return Boolean.TRUE.equals(stream);
     }

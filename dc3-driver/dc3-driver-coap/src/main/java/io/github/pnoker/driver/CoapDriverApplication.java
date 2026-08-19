@@ -26,13 +26,17 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
  * CoAP Driver Application
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @SpringBootApplication
 @EnableConfigurationProperties(CoapProperties.class)
 public class CoapDriverApplication {
 
+    /**
+     * Start the coap driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(CoapDriverApplication.class, args);
     }

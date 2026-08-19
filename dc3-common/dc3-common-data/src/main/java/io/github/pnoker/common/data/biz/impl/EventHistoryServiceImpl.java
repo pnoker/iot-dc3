@@ -56,7 +56,6 @@ import java.util.UUID;
  * Business service implementation for event report operations.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Slf4j

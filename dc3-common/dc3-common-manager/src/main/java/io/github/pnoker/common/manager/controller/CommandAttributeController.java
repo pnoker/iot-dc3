@@ -57,7 +57,6 @@ import java.util.Objects;
  * Manages command attribute field definitions declared on profile templates, the configurable fields of a downward control instruction.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "command_attribute", description = "Command attribute definitions: manage configurable parameters of device commands including name, type, default value, and validation rules")

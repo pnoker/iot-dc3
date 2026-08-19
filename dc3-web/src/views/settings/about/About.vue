@@ -29,7 +29,7 @@
         <el-descriptions-item :label="t('settings.about.version')">v{{ version }}</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.license')">AGPL-3.0</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.docs')">
-          <external-link href="https://iotdc3.com">iotdc3.com</external-link>
+          <external-link href="https://docs.dc3.site">docs.dc3.site</external-link>
         </el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.repo')">
           <external-link href="https://github.com/pnoker/iot-dc3">github.com/pnoker/iot-dc3</external-link>

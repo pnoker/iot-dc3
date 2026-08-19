@@ -19,48 +19,49 @@ package io.github.pnoker.common.driver.buffer;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 
+import java.util.List;
+
 /**
- * Local SQLite-backed buffer for point values that could not be delivered to RabbitMQ.
+ * Local SQLite-backed transactional outbox for point values delivered to RabbitMQ.
  *
- * <p>Failed/NACKed readings are persisted and republished by a Quartz job once the
- * broker recovers, so a RabbitMQ outage no longer loses collected data.
+ * <p>Readings are persisted before the first publish and removed only after RabbitMQ
+ * confirms that the message was accepted and routed.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.6.2
  */
 public interface BufferService {
 
     /**
      * Initialize the SQLite database: create parent directories, open the connection
-     * pool, and create the buffer table. Idempotent; a no-op when the buffer is disabled.
+     * pool, validate WAL/FULL durability, and create the buffer table. Idempotent.
      */
     void initialize();
 
     /**
-     * Persist a point value that failed to publish, keyed by the publisher-confirm
-     * correlation id so a later NACK republish overwrites the same row (INSERT OR REPLACE).
+     * Persist and publish one point value using its message id as the outbox identity.
      *
-     * @param pointValue    the failed point value
-     * @param routingKey    RabbitMQ routing key to republish with
-     * @param correlationId publisher-confirm correlation id, used as the buffer row primary key
-     * @param attempt       ordinal of the send attempt that just failed
+     * @param pointValue point value with a stable message id
+     * @param routingKey RabbitMQ routing key
      */
-    void offer(PointValue pointValue, String routingKey, String correlationId, int attempt);
+    void publish(PointValue pointValue, String routingKey);
 
     /**
-     * Republish up to {@code batchSize} due buffered point values, deleting the ones that
-     * leave the channel cleanly and back-offing the ones that throw.
+     * Persist an entire group in one transaction before publishing any value.
+     *
+     * @param pointValues values with stable message ids
+     * @param routingKey  RabbitMQ routing key
+     */
+    void publishBatch(List<PointValue> pointValues, String routingKey);
+
+    /**
+     * Republish due outbox records. A record is deleted only after a positive publisher
+     * confirmation with no returned message.
      */
     void republishBatch();
 
     /**
-     * @return whether the buffer is enabled in configuration
-     */
-    boolean isEnabled();
-
-    /**
-     * @return current number of records awaiting republish (0 when disabled)
+     * @return current number of records awaiting republish
      */
     long pendingCount();
 }

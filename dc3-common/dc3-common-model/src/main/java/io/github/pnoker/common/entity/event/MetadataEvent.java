@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
  * Metadata event.
  *
  * @author zhangzi
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

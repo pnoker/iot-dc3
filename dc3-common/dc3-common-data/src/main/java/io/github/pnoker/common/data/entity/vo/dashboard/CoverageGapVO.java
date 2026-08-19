@@ -35,7 +35,6 @@ import java.util.List;
  * {@code items} is the (capped) list of offending ids so the UI can drill in.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

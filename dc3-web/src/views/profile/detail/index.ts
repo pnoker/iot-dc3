@@ -55,7 +55,6 @@ export default defineComponent({
     const commandViewRef: any = ref<InstanceType<typeof CommandList>>();
     const eventViewRef: any = ref<InstanceType<typeof EventList>>();
 
-    // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
       active: (route.query.active as string) || 'detail',

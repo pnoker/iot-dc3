@@ -38,7 +38,6 @@ import java.util.Objects;
  * Event-domain tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -48,6 +47,13 @@ public class EventTool {
 
     private final EventFacade eventFacade;
 
+    /**
+     * Return event by identifier.
+     *
+     * @param eventId event identifier
+     * @param toolContext tool context
+     * @return lookup event by identifier result
+     */
     @Tool(description = "Look up an event by its numeric ID. Returns event name, code, type (info/alert/fault/lifecycle), level (low/medium/high/critical), and bound profile ID.")
     @AgenticToolMetadata(domain = "event", title = "Query event by ID")
     public AgenticToolResult<FacadeEventBO> lookupEventById(
@@ -62,6 +68,13 @@ public class EventTool {
         return AgenticToolResult.ok("Event loaded", bo);
     }
 
+    /**
+     * Return events by identifiers.
+     *
+     * @param eventIds event identifiers
+     * @param toolContext tool context
+     * @return lookup events by identifiers result
+     */
     @Tool(description = "Batch look up events by numeric IDs. Returns up to 50 tenant-scoped events.")
     @AgenticToolMetadata(domain = "event", title = "Batch query events by IDs")
     public AgenticToolResult<List<FacadeEventBO>> lookupEventsByIds(
@@ -80,6 +93,16 @@ public class EventTool {
         return AgenticToolResult.ok("Events loaded", events);
     }
 
+    /**
+     * Return the matching events.
+     *
+     * @param eventName event name
+     * @param profileId profile identifier
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return search events result
+     */
     @Tool(description = "Search for events with optional filters. Returns a paginated list.")
     @AgenticToolMetadata(domain = "event", title = "Search events")
     public AgenticToolResult<FacadePage<FacadeEventBO>> searchEvents(
@@ -105,6 +128,15 @@ public class EventTool {
         return AgenticToolResult.ok("Event page loaded", result);
     }
 
+    /**
+     * Return the matching events by device identifier.
+     *
+     * @param deviceId device identifier
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return list events by device identifier result
+     */
     @Tool(description = "List events bound to a specific device ID. Use this when the user knows the device but not the event ID.")
     @AgenticToolMetadata(domain = "event", title = "List events by device")
     public AgenticToolResult<FacadePage<FacadeEventBO>> listEventsByDeviceId(
@@ -128,6 +160,15 @@ public class EventTool {
         return AgenticToolResult.ok("Event page loaded for device " + deviceId, result);
     }
 
+    /**
+     * Return the matching events by profile identifier.
+     *
+     * @param profileId profile identifier
+     * @param page page
+     * @param size size
+     * @param toolContext tool context
+     * @return list events by profile identifier result
+     */
     @Tool(description = "List events under a specific profile/template ID. Use this when the user wants all events defined by a template.")
     @AgenticToolMetadata(domain = "event", title = "List events by profile")
     public AgenticToolResult<FacadePage<FacadeEventBO>> listEventsByProfileId(

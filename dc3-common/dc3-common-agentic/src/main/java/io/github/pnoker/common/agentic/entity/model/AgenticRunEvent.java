@@ -25,7 +25,6 @@ import java.time.Instant;
  * Runtime event emitted while an agentic turn is executing.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public record AgenticRunEvent(String type, String name, String title, String detail, long timestamp, String phase,
@@ -42,11 +41,28 @@ public record AgenticRunEvent(String type, String name, String title, String det
         code = StringUtils.defaultString(code);
     }
 
+    /**
+     * Tool start.
+     *
+     * @param toolName tool name
+     * @param domain domain
+     * @param title title
+     * @return tool start result
+     */
     public static AgenticRunEvent toolStart(String toolName, String domain, String title) {
         return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_TOOL, toolName, title, domain, now(),
                 AgenticConstant.RunEvent.PHASE_START, AgenticConstant.RunEvent.STATUS_RUNNING, null);
     }
 
+    /**
+     * Tool result.
+     *
+     * @param toolName tool name
+     * @param success success
+     * @param code code
+     * @param message message
+     * @return tool result result
+     */
     public static AgenticRunEvent toolResult(String toolName, boolean success, String code, String message) {
         String normalizedCode = StringUtils.defaultIfBlank(code,
                 success ? AgenticConstant.ToolResult.CODE_OK : AgenticConstant.ToolResult.CODE_ERROR);
@@ -59,6 +75,13 @@ public record AgenticRunEvent(String type, String name, String title, String det
                 normalizedCode, now(), AgenticConstant.RunEvent.PHASE_RESULT, status, normalizedCode);
     }
 
+    /**
+     * Tool error.
+     *
+     * @param toolName tool name
+     * @param message message
+     * @return tool error result
+     */
     public static AgenticRunEvent toolError(String toolName, String message) {
         return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_TOOL, toolName,
                 StringUtils.defaultIfBlank(message, AgenticConstant.ToolResult.MESSAGE_EXECUTION_FAILED),
@@ -66,12 +89,23 @@ public record AgenticRunEvent(String type, String name, String title, String det
                 AgenticConstant.RunEvent.STATUS_FAILED, AgenticConstant.ToolResult.CODE_ERROR);
     }
 
+    /**
+     * Reasoning requested.
+     *
+     * @return reasoning requested result
+     */
     public static AgenticRunEvent reasoningRequested() {
         return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_REASONING, AgenticConstant.RunEvent.NAME_AGENTIC,
                 "Thinking", "Reasoning mode requested for this model.", now(),
                 AgenticConstant.RunEvent.PHASE_START, AgenticConstant.RunEvent.STATUS_RUNNING, null);
     }
 
+    /**
+     * Request failed.
+     *
+     * @param message message
+     * @return request failed result
+     */
     public static AgenticRunEvent requestFailed(String message) {
         return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_ERROR, AgenticConstant.RunEvent.NAME_AGENTIC,
                 AgenticConstant.ToolMessage.REQUEST_FAILED,

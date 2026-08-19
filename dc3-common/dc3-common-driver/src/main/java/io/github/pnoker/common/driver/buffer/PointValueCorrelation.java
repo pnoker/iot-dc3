@@ -28,7 +28,6 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
  * republish stores the same counter the synchronous catch path would.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.6.2
  */
 @Getter

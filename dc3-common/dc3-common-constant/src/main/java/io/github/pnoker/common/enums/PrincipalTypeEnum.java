@@ -28,7 +28,6 @@ import java.util.Optional;
  * Principal classification for authenticated and authorized callers.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -67,6 +66,12 @@ public enum PrincipalTypeEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve a principal type from its persisted wire value.
+     *
+     * @param value persisted principal-type value
+     * @return matching type, or {@code null} when the value is unknown
+     */
     public static PrincipalTypeEnum ofValue(String value) {
         Optional<PrincipalTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))
@@ -74,6 +79,12 @@ public enum PrincipalTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a principal type from its stable code.
+     *
+     * @param code principal-type code
+     * @return matching type, or {@code null} when the code is unknown
+     */
     public static PrincipalTypeEnum ofCode(String code) {
         Optional<PrincipalTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getCode().equals(code))

@@ -36,7 +36,6 @@ import java.time.LocalDateTime;
  * View object for point command history API responses.
  *
  * @author pnoker
- * @version 2026.6.5
  * @since 2026.6.5
  */
 @Getter

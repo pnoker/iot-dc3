@@ -34,7 +34,6 @@ import java.time.LocalDateTime;
  * Request view object for creating an MCP connection.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter

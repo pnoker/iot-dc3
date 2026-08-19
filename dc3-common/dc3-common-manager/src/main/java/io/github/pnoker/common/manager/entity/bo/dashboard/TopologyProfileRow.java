@@ -25,7 +25,6 @@ import lombok.ToString;
  * Profile row for the topology L3 column: id + name.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

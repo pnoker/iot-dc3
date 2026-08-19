@@ -34,7 +34,6 @@ import java.util.Map;
  * namespace so external deployments can migrate gradually.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.9
  */
 @Order(Ordered.LOWEST_PRECEDENCE - 100)

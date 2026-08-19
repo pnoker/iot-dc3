@@ -28,7 +28,6 @@ import java.util.Optional;
  * Rule runtime state enumeration.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -49,6 +48,12 @@ public enum RuleStatusEnum {
 
     private final String remark;
 
+    /**
+     * Resolve a rule status from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching status, or {@code null} when the index is unknown
+     */
     public static RuleStatusEnum ofIndex(Byte index) {
         Optional<RuleStatusEnum> any = Arrays.stream(RuleStatusEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -56,6 +61,12 @@ public enum RuleStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a rule status from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching status, or {@code null} when the code is unknown
+     */
     public static RuleStatusEnum ofCode(String code) {
         Optional<RuleStatusEnum> any = Arrays.stream(RuleStatusEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -63,6 +74,12 @@ public enum RuleStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a rule status from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching status, or {@code null} when the name is unknown
+     */
     public static RuleStatusEnum ofName(String name) {
         try {
             return valueOf(name);

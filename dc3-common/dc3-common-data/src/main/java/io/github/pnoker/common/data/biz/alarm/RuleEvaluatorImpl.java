@@ -39,7 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * evaluator skips it with a one-time warn per rule id.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -110,7 +109,8 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
         RuleExt.Window window = window(rule);
         WindowSpec spec = WindowSpecParser.parse(window);
         if (!spec.valid() && Objects.nonNull(rule.getId()) && warnedInvalidRules.add(rule.getId())) {
-            log.warn("Skipping rule[{}] because window spec is invalid: {}", rule.getId(), spec.reason());
+            log.warn("Alarm rule evaluation skipped, reason=invalidWindowSpec, ruleId={}, detail={}",
+                    rule.getId(), spec.reason());
         }
         return spec;
     }

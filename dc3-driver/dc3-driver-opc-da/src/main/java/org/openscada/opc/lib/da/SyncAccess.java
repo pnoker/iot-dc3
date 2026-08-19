@@ -64,6 +64,9 @@ public class SyncAccess extends AccessBase implements Runnable {
             try {
                 Thread.sleep(getPeriod());
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.info("OPC DA synchronous reader interrupted");
+                return;
             }
         }
     }

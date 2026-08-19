@@ -25,7 +25,6 @@ import io.github.pnoker.common.data.entity.query.RuleQuery;
  * Business service for alarm rule operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface RuleService extends BaseService<RuleBO, RuleQuery> {

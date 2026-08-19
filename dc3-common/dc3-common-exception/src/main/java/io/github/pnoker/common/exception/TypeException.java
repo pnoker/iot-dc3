@@ -23,7 +23,6 @@ import io.github.pnoker.common.enums.ErrorCode;
  * Exception for type mismatch or conversion errors.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class TypeException extends BusinessException {

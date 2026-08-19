@@ -34,7 +34,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @SpringBootApplication

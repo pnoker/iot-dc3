@@ -32,6 +32,7 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.driver.key.KeyLoader;
+import io.github.pnoker.driver.key.OpcUaKeyLoaderFactory;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
 import org.eclipse.milo.opcua.sdk.client.api.identity.IdentityProvider;
@@ -51,6 +52,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -77,6 +79,12 @@ class OpcUaDriverCustomServiceImplTest {
 
     @Mock
     private DriverSenderService driverSenderService;
+
+    @Mock
+    private OpcUaKeyLoaderFactory keyLoaderFactory;
+
+    @Mock
+    private KeyLoader keyLoader;
 
     private OpcUaDriverCustomServiceImpl service;
 
@@ -129,8 +137,9 @@ class OpcUaDriverCustomServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() {
-        service = new OpcUaDriverCustomServiceImpl(driverMetadata, driverSenderService);
+    void setUp() throws Exception {
+        Mockito.when(keyLoaderFactory.load()).thenReturn(keyLoader);
+        service = new OpcUaDriverCustomServiceImpl(driverMetadata, driverSenderService, keyLoaderFactory);
         service.initial();
     }
 
@@ -143,12 +152,6 @@ class OpcUaDriverCustomServiceImplTest {
 
     @Test
     void scheduleDoesNotReportDeviceStatus() {
-        assertThatNoException().isThrownBy(() -> service.schedule());
-        verifyNoInteractions(driverSenderService);
-    }
-
-    @Test
-    void scheduleIsSilentWhenNoDevicesRegistered() {
         assertThatNoException().isThrownBy(() -> service.schedule());
         verifyNoInteractions(driverSenderService);
     }
@@ -276,7 +279,8 @@ class OpcUaDriverCustomServiceImplTest {
 
     @Test
     void healthReportsDegradedModeWhenKeyLoaderFailed() throws Exception {
-        setCertificateDegraded(true);
+        Mockito.when(keyLoaderFactory.load()).thenThrow(new IOException("keystore unavailable"));
+        service.initial();
         OpcUaClient client = Mockito.mock(OpcUaClient.class);
         Mockito.when(client.connect()).thenReturn(CompletableFuture.completedFuture(client));
         connectionMap().put(1L, client);
@@ -289,7 +293,6 @@ class OpcUaDriverCustomServiceImplTest {
 
     @Test
     void healthReportsOnlineWhenNotDegraded() throws Exception {
-        setCertificateDegraded(false);
         OpcUaClient client = Mockito.mock(OpcUaClient.class);
         Mockito.when(client.connect()).thenReturn(CompletableFuture.completedFuture(client));
         connectionMap().put(2L, client);
@@ -352,12 +355,6 @@ class OpcUaDriverCustomServiceImplTest {
         assertThat(connectionMap()).doesNotContainKey(9L);
         // Disconnect is best-effort but should have been attempted on the now-stale client.
         Mockito.verify(badClient).disconnect();
-    }
-
-    private void setCertificateDegraded(boolean value) throws Exception {
-        Field field = OpcUaDriverCustomServiceImpl.class.getDeclaredField("certificateDegraded");
-        field.setAccessible(true);
-        field.setBoolean(service, value);
     }
 
     @SuppressWarnings("unchecked")

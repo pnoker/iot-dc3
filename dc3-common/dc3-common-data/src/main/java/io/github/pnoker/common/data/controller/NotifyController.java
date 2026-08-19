@@ -53,7 +53,6 @@ import java.util.Objects;
  * Alarm notification policy controller.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "notify", description = "Notification rule definitions: manage alert rules that trigger on device events, data thresholds, and status changes with configurable severity and routing")

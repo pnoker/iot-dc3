@@ -37,6 +37,9 @@ service DriverApi {
 
   // Query the current registered driver metadata without re-registering it
   rpc GetById (GrpcDriverQuery) returns (GrpcRDriverRegisterDTO);
+
+  // Renew this runtime instance and stream a bounded snapshot of the devices it owns.
+  rpc RenewLease (GrpcDriverLeaseRequest) returns (stream GrpcRDriverLeaseDTO);
 }
 
 // Driver registration response structure
@@ -47,8 +50,7 @@ message GrpcRDriverRegisterDTO {
   // Basic driver information
   GrpcDriverDTO driver = 2;
 
-  // List of device IDs managed by the driver
-  repeated int64 device_ids = 3;
+  reserved 3, 8, 9, 10;
 
   // List of driver attribute configurations
   repeated GrpcDriverAttributeDTO driver_attributes = 4;
@@ -61,4 +63,16 @@ message GrpcRDriverRegisterDTO {
 
   // List of event attribute configurations supported by the driver
   repeated GrpcEventAttributeDTO event_attributes = 7;
+
+}
+
+message GrpcRDriverLeaseDTO {
+  GrpcR result = 1;
+  repeated GrpcDeviceLeaseDTO device_leases = 2;
+  int64 lease_until_epoch_millis = 3;
+  int64 assignment_version = 4;
+  bool assignments_changed = 5;
+  // True only on the final batch. Changed assignments are installed atomically
+  // by the client after this marker and normal stream completion.
+  bool snapshot_complete = 6;
 }

@@ -27,7 +27,6 @@ import lombok.Setter;
  * JSON extension object for driver metadata and configuration.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "Driver extension object holding driver metadata and configuration content")

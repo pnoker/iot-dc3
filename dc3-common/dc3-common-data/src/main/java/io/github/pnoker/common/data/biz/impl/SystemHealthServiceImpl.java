@@ -65,7 +65,6 @@ import java.util.concurrent.TimeoutException;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Slf4j
@@ -273,6 +272,12 @@ public class SystemHealthServiceImpl implements SystemHealthService {
     @FunctionalInterface
     private interface Probe {
 
+        /**
+         * Execute a single dependency health probe.
+         *
+         * @return {@code true} when the dependency is healthy; otherwise {@code false}
+         * @throws Exception when the dependency cannot be probed
+         */
         boolean check() throws Exception;
 
     }

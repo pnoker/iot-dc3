@@ -27,7 +27,6 @@ import org.springframework.validation.annotation.Validated;
  * gRPC facade transport settings.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Getter

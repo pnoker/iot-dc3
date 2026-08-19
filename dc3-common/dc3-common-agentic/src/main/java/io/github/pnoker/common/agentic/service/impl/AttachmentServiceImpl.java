@@ -48,7 +48,6 @@ import java.util.UUID;
  * Implements attachment upload, listing, and AI-based summarization.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -186,7 +185,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             Files.deleteIfExists(filePath);
         } catch (Exception e) {
-            log.warn("Failed to clean up attachment file after upload error: {}", filePath, e);
+            log.warn("Attachment cleanup failed after upload error, file={}", filePath, e);
         }
     }
 

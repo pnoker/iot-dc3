@@ -25,6 +25,8 @@ import io.github.pnoker.api.common.GrpcEventAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
+import io.github.pnoker.api.common.driver.GrpcDriverLeaseRequest;
+import io.github.pnoker.api.common.driver.GrpcRDriverLeaseDTO;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.bo.RegisterBO;
@@ -37,6 +39,7 @@ import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.exception.RegisterException;
@@ -46,7 +49,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,7 +61,6 @@ import java.util.stream.Collectors;
  * by the manager center after registration succeeds.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 
@@ -69,6 +72,8 @@ public class DriverClient {
     private final DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
 
     private final DriverMetadata driverMetadata;
+
+    private final DriverProperties driverProperties;
 
     private final DriverBuilder driverBuilder;
 
@@ -90,7 +95,11 @@ public class DriverClient {
         // Build driver registration information
         GrpcDriverRegisterDTO.Builder builder = GrpcDriverRegisterDTO.newBuilder();
         GrpcDriverDTO grpcDriverDTO = driverBuilder.buildGrpcDTOByDTO(entityBO.getDriver());
-        builder.setTenant(entityBO.getTenant()).setClient(entityBO.getClient()).setDriver(grpcDriverDTO);
+        builder.setTenant(entityBO.getTenant())
+                .setClient(entityBO.getClient())
+                .setNode(entityBO.getNode())
+                .setLeaseSeconds(entityBO.getLeaseSeconds())
+                .setDriver(grpcDriverDTO);
 
         CollectionOptional.ofNullable(entityBO.getDriverAttributes()).ifPresent(value -> {
             List<GrpcDriverAttributeDTO> grpcDriverAttributeDTOList = value.stream()
@@ -124,6 +133,7 @@ public class DriverClient {
         }
 
         applyMetadata(rDriverRegisterDTO);
+        renewLease();
     }
 
     /**
@@ -148,11 +158,71 @@ public class DriverClient {
         applyMetadata(rDriverRegisterDTO);
     }
 
+    /** Renew runtime membership and replace the locally owned device set. */
+    public void renewLease() {
+        DriverBO driver = driverMetadata.getDriver();
+        if (Objects.isNull(driver)) {
+            throw new ServiceException("Failed to renew driver lease: driver is not registered");
+        }
+        GrpcDriverLeaseRequest request = GrpcDriverLeaseRequest.newBuilder()
+                .setTenantId(driver.getTenantId())
+                .setDriverId(driver.getId())
+                .setNode(driverProperties.getNode())
+                .setClient(driverProperties.getClient())
+                .setHost(driverProperties.getHost())
+                .setLeaseSeconds(driverProperties.getLease().getSeconds())
+                .setAssignmentVersion(driverMetadata.getAssignmentVersion())
+                .build();
+        Iterator<GrpcRDriverLeaseDTO> responses = driverApiBlockingStub.renewLease(request);
+        Map<Long, Long> owned = new HashMap<>();
+        Long assignmentVersion = null;
+        Long leaseUntilEpochMillis = null;
+        Boolean assignmentsChanged = null;
+        boolean snapshotComplete = false;
+        int batches = 0;
+        while (responses.hasNext()) {
+            GrpcRDriverLeaseDTO response = responses.next();
+            if (!response.getResult().getOk()) {
+                throw new ServiceException(response.getResult().getMessage());
+            }
+            if (snapshotComplete) {
+                throw new ServiceException("Driver lease stream continued after snapshot completion");
+            }
+            if (assignmentVersion == null) {
+                assignmentVersion = response.getAssignmentVersion();
+                leaseUntilEpochMillis = response.getLeaseUntilEpochMillis();
+                assignmentsChanged = response.getAssignmentsChanged();
+            } else if (assignmentVersion != response.getAssignmentVersion()
+                    || leaseUntilEpochMillis != response.getLeaseUntilEpochMillis()
+                    || assignmentsChanged != response.getAssignmentsChanged()) {
+                throw new ServiceException("Driver lease stream metadata changed between batches");
+            }
+            response.getDeviceLeasesList().forEach(lease -> {
+                Long previous = owned.put(lease.getDeviceId(), lease.getFencingToken());
+                if (previous != null) {
+                    throw new ServiceException("Driver lease stream contains duplicate device {}", lease.getDeviceId());
+                }
+            });
+            snapshotComplete = response.getSnapshotComplete();
+            batches++;
+        }
+        if (batches == 0 || !snapshotComplete || assignmentVersion == null
+                || leaseUntilEpochMillis == null || assignmentsChanged == null) {
+            throw new ServiceException("Driver lease stream ended before snapshot completion");
+        }
+        if (assignmentsChanged) {
+            driverMetadata.setDeviceLeases(owned, leaseUntilEpochMillis, assignmentVersion);
+        } else {
+            if (!owned.isEmpty()) {
+                throw new ServiceException("Unchanged driver lease stream contains device assignments");
+            }
+            driverMetadata.renewLeaseDeadline(leaseUntilEpochMillis);
+        }
+    }
+
     private void applyMetadata(GrpcRDriverRegisterDTO rDriverRegisterDTO) {
         DriverBO driverBO = driverBuilder.buildDTOByGrpcDTO(rDriverRegisterDTO.getDriver());
         driverMetadata.setDriver(driverBO);
-
-        driverMetadata.setDeviceIds(new HashSet<>(rDriverRegisterDTO.getDeviceIdsList()));
 
         List<GrpcDriverAttributeDTO> driverAttributesList = rDriverRegisterDTO.getDriverAttributesList();
         Map<Long, DriverAttributeDTO> driverAttributeIdMap = driverAttributesList.stream()

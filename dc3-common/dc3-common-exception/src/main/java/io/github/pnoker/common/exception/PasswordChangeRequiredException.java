@@ -28,7 +28,6 @@ import io.github.pnoker.common.enums.ErrorCode;
  * flow treats it as a routable outcome rather than a hard failure.
  *
  * @author pnoker
- * @version 2026.6.17
  * @since 2026.6.17
  */
 public class PasswordChangeRequiredException extends BusinessException {

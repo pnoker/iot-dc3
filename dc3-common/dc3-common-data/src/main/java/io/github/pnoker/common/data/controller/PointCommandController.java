@@ -42,7 +42,6 @@ import reactor.core.publisher.Mono;
  * REST controller exposing point command management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "point_command", description = "Point-level command dispatch: send commands to individual device data points and track their execution status in real time")

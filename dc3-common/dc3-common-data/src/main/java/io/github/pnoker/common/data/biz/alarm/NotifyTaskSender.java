@@ -36,7 +36,6 @@ import java.util.Objects;
  * (e.g. dedicated workers per channel) without re-writing the producer.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.21
  */
 @Slf4j
@@ -48,9 +47,15 @@ public class NotifyTaskSender {
 
     private final TopicExchange alarmExchange;
 
+    /**
+     * Publish.
+     *
+     * @param task task
+     */
     public void publish(NotifyTaskDTO task) {
         if (Objects.isNull(task) || Objects.isNull(task.getNotifyHistoryId())) {
-            log.warn("Refusing to publish notify task without a history id: {}", task);
+            log.warn("Notify task publish skipped, reason=missingHistoryId, channelId={}",
+                    Objects.nonNull(task) ? task.getChannelId() : null);
             return;
         }
         String channelType = Objects.nonNull(task.getChannelTypeFlag())

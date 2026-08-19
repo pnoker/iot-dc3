@@ -39,7 +39,6 @@ import java.time.LocalDateTime;
  * query services read this table as the authoritative source of truth.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.21
  */
 @Getter

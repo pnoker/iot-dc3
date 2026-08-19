@@ -26,7 +26,6 @@ import java.util.function.Consumer;
  * Optional wrapper for enable-flag enumeration values.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public final class EnableOptional {
@@ -41,20 +40,43 @@ public final class EnableOptional {
         this.value = EnableFlagEnum.ofIndex((byte) index);
     }
 
+    /**
+     * Create a wrapper from a persisted byte index.
+     *
+     * @param index enable-flag index
+     * @return wrapper containing the resolved flag, if known
+     */
     public static EnableOptional ofNullable(byte index) {
         return new EnableOptional(index);
     }
 
+    /**
+     * Create a wrapper from an integer index after narrowing it to the persisted byte form.
+     *
+     * @param index enable-flag index
+     * @return wrapper containing the resolved flag, if known
+     */
     public static EnableOptional ofNullable(int index) {
         return new EnableOptional(index);
     }
 
+    /**
+     * Invoke the action when the index resolves to a known enable flag.
+     *
+     * @param action action that consumes the resolved flag
+     */
     public void ifPresent(Consumer<EnableFlagEnum> action) {
         if (Objects.nonNull(value)) {
             action.accept(value);
         }
     }
 
+    /**
+     * Invoke exactly one branch according to whether the index resolves to a flag.
+     *
+     * @param action action that consumes the resolved flag
+     * @param emptyAction action to run when the index is unknown
+     */
     public void ifPresentOrElse(Consumer<EnableFlagEnum> action, Runnable emptyAction) {
         if (Objects.nonNull(value)) {
             action.accept(value);

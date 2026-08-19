@@ -28,14 +28,25 @@ import org.mapstruct.Mapper;
  * FacadeEvent ↔ manager EventBO/Query mapper.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeEventBuilder {
 
+    /**
+     * To manager query.
+     *
+     * @param facadeQuery facade query
+     * @return to manager query result
+     */
     EventQuery toManagerQuery(FacadeEventQuery facadeQuery);
 
+    /**
+     * To facade business object.
+     *
+     * @param managerBO business object
+     * @return to facade business object result
+     */
     FacadeEventBO toFacadeBO(EventBO managerBO);
 
 }

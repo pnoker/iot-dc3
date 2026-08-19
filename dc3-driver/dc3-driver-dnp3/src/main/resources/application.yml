@@ -79,7 +79,6 @@ dc3:
         remark: BINARY_OUTPUT or ANALOG_OUTPUT for commands
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/dnp3/buffer.db
 
 spring:

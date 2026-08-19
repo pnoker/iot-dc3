@@ -101,7 +101,6 @@ dc3:
     security-mode: NOSEC
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/lwm2m/buffer.db
 
 spring:

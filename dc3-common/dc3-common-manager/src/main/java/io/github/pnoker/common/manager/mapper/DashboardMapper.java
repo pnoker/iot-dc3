@@ -45,7 +45,6 @@ import java.util.List;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Mapper
@@ -91,17 +90,51 @@ public interface DashboardMapper {
 
     // ---- Topology (GET /dashboard/topology) ----------------------------
 
+    /**
+     * Topology drivers.
+     *
+     * @param tenantId tenant identifier
+     * @return topology drivers result
+     */
     List<TopologyDriverRow> topologyDrivers(@Param("tenantId") Long tenantId);
 
+    /**
+     * Topology devices by drivers.
+     *
+     * @param tenantId tenant identifier
+     * @param driverIds driver identifiers
+     * @return topology devices by drivers result
+     */
     List<TopologyDeviceRow> topologyDevicesByDrivers(@Param("tenantId") Long tenantId,
                                                      @Param("driverIds") Collection<Long> driverIds);
 
+    /**
+     * Topology profile bindings.
+     *
+     * @param tenantId tenant identifier
+     * @param deviceIds device identifiers
+     * @return topology profile bindings result
+     */
     List<ProfileBindingRow> topologyProfileBindings(@Param("tenantId") Long tenantId,
                                                     @Param("deviceIds") Collection<Long> deviceIds);
 
+    /**
+     * Topology profiles by identifiers.
+     *
+     * @param tenantId tenant identifier
+     * @param profileIds profile identifiers
+     * @return topology profiles by identifiers result
+     */
     List<TopologyProfileRow> topologyProfilesByIds(@Param("tenantId") Long tenantId,
                                                    @Param("profileIds") Collection<Long> profileIds);
 
+    /**
+     * Topology points by profiles.
+     *
+     * @param tenantId tenant identifier
+     * @param profileIds profile identifiers
+     * @return topology points by profiles result
+     */
     List<TopologyPointRow> topologyPointsByProfiles(@Param("tenantId") Long tenantId,
                                                     @Param("profileIds") Collection<Long> profileIds);
 

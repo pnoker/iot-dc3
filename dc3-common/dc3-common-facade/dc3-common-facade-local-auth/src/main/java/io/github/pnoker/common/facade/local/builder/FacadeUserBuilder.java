@@ -38,16 +38,27 @@ import java.util.Objects;
  * these two fields need an explicit conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeUserBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param authBO business object
+     * @return to facade business object result
+     */
     @Mapping(target = "socialExt", ignore = true)
     @Mapping(target = "identityExt", ignore = true)
     FacadeUserBO toFacadeBO(UserBO authBO);
 
+    /**
+     * After process.
+     *
+     * @param authBO business object
+     * @param facadeBO business object
+     */
     @AfterMapping
     default void afterProcess(UserBO authBO, @MappingTarget FacadeUserBO facadeBO) {
         UserSocialExt social = authBO.getSocialExt();

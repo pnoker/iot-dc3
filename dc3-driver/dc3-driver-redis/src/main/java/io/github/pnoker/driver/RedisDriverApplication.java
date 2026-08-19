@@ -23,12 +23,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Redis key-value data source driver application.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class RedisDriverApplication {
 
+    /**
+     * Start the redis driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(RedisDriverApplication.class, args);
     }

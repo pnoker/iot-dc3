@@ -55,7 +55,6 @@ import java.util.Objects;
  * rather than a tenant column on {@code dc3_principal}.
  *
  * @author pnoker
- * @version 2026.6.13
  * @since 2026.6.13
  */
 @Tag(name = "principal", description = "Security principals: manage users and service accounts as identity carriers for authentication, authorization, and access control")

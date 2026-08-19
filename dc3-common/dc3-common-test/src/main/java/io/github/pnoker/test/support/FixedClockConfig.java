@@ -35,6 +35,11 @@ public class FixedClockConfig {
 
     public static final Instant FIXED_INSTANT = Instant.parse("2026-01-01T00:00:00Z");
 
+    /**
+     * Create and configure the application-managed fixed clock.
+     *
+     * @return fixed clock result
+     */
     @Bean
     @Primary
     public Clock fixedClock() {

@@ -27,7 +27,6 @@ import java.util.Map;
  * Protocol-neutral status and health facade.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2026.5.14
  */
 public interface StatusHealthFacade {

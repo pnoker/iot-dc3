@@ -52,6 +52,11 @@ public final class PgTimescaleContainer {
     private PgTimescaleContainer() {
     }
 
+    /**
+     * Instance.
+     *
+     * @return instance result
+     */
     public static PostgreSQLContainer<?> instance() {
         return INSTANCE;
     }

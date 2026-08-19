@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.facade.grpc.config;
 
+import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.ClientCall;
@@ -52,7 +53,6 @@ import org.springframework.stereotype.Component;
  * client channel automatically.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2026.7.8
  */
 @Component
@@ -60,21 +60,15 @@ import org.springframework.stereotype.Component;
 public class RequestIdGrpcClientInterceptor implements ClientInterceptor {
 
     /**
-     * MDC key — kept in sync with {@code RequestIdWebFilter.MDC_REQUEST_ID} (same name, same
-     * placeholder in the logback pattern).
-     */
-    private static final String MDC_REQUEST_ID = "requestId";
-
-    /**
      * gRPC metadata key for the request id. ASCII, matching the HTTP header name.
      */
     private static final Metadata.Key<String> REQUEST_ID_KEY =
-            Metadata.Key.of("X-Request-Id", Metadata.ASCII_STRING_MARSHALLER);
+            Metadata.Key.of(RequestIdConstant.HEADER, Metadata.ASCII_STRING_MARSHALLER);
 
     @Override
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(MethodDescriptor<ReqT, RespT> method,
                                                                CallOptions callOptions, Channel next) {
-        String requestId = MDC.get(MDC_REQUEST_ID);
+        String requestId = MDC.get(RequestIdConstant.MDC_KEY);
 
         // If MDC doesn't have requestId, try to get it from OpenTelemetry
         if (requestId == null || requestId.isBlank()) {

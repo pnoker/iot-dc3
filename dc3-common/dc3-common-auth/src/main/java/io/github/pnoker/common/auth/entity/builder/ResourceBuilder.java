@@ -46,7 +46,6 @@ import java.util.Optional;
  * MapStruct builder converting between resource BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -81,6 +80,12 @@ public interface ResourceBuilder {
     @Mapping(target = "deleted", ignore = true)
     ResourceDO buildDOByBO(ResourceBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(ResourceBO entityBO, @MappingTarget ResourceDO entityDO) {
         // Code
@@ -132,6 +137,12 @@ public interface ResourceBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     ResourceBO buildBOByDO(ResourceDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(ResourceDO entityDO, @MappingTarget ResourceBO entityBO) {
         // Json Ext
@@ -202,10 +213,22 @@ public interface ResourceBuilder {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }
 
+    /**
+     * Convert bo list to tree view object list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     default List<ResourceTreeVO> buildTreeVOListByBOList(List<ResourceTreeBO> entityBOList) {
         return entityBOList.stream().map(this::buildTreeVOByBO).toList();
     }
 
+    /**
+     * Convert bo to tree view object.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     default ResourceTreeVO buildTreeVOByBO(ResourceTreeBO entityBO) {
         ResourceVO flat = buildVOByBO(entityBO);
         ResourceTreeVO out = new ResourceTreeVO();

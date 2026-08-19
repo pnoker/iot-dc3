@@ -34,7 +34,6 @@ import java.util.function.Supplier;
  * lock table permanently.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j

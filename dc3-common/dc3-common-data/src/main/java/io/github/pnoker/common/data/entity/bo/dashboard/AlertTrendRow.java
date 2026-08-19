@@ -25,7 +25,6 @@ import lombok.ToString;
  * One day's split alert count (device vs driver source).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

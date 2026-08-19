@@ -33,7 +33,6 @@ import java.io.Serializable;
  * Typed point value to be written to a device.
  *
  * @author pnoker
- * @version 2026.5.15
  * @since 2026.5.15
  */
 @Getter

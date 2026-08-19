@@ -24,7 +24,6 @@ import io.github.pnoker.common.data.entity.model.EntityStateDO;
  * Manager for dc3_entity_state table.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 public interface EntityStateManager extends IService<EntityStateDO> {

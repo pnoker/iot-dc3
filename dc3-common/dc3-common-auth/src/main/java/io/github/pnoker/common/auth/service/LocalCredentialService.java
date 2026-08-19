@@ -25,7 +25,6 @@ import io.github.pnoker.common.base.service.BaseService;
  * Business service for local credentials.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface LocalCredentialService extends BaseService<LocalCredentialBO, LocalCredentialQuery> {
@@ -39,10 +38,29 @@ public interface LocalCredentialService extends BaseService<LocalCredentialBO, L
      */
     LocalCredentialBO getByLoginName(String loginName, boolean throwException);
 
+    /**
+     * Determine whether a login name can be assigned to a new credential.
+     *
+     * @param loginName login name
+     * @return {@code true} when no credential already uses the login name
+     */
     boolean isLoginNameAvailable(String loginName);
 
+    /**
+     * Verify password.
+     *
+     * @param credential credential
+     * @param rawPassword raw password
+     * @return {@code true} when the raw password matches the stored credential
+     */
     boolean verifyPassword(LocalCredentialBO credential, String rawPassword);
 
+    /**
+     * Reset password.
+     *
+     * @param id id
+     * @param rawPassword raw password
+     */
     void resetPassword(Long id, String rawPassword);
 
     /**
@@ -56,8 +74,18 @@ public interface LocalCredentialService extends BaseService<LocalCredentialBO, L
      */
     void changePassword(String loginName, String currentPassword, String newPassword);
 
+    /**
+     * Record successful login.
+     *
+     * @param id id
+     */
     void recordSuccessfulLogin(Long id);
 
+    /**
+     * Record failed login.
+     *
+     * @param id id
+     */
     void recordFailedLogin(Long id);
 
 }

@@ -31,7 +31,6 @@ import java.io.Serializable;
  * bucket is the SLA breach indicator.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

@@ -57,7 +57,6 @@ import java.util.stream.Collectors;
  * REST controller exposing driver management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "driver", description = "Protocol driver lifecycle: register, configure, schedule, and control industrial protocol adapters that connect physical devices to the platform")

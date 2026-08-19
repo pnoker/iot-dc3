@@ -46,7 +46,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -65,18 +64,38 @@ public class NettyTcpServer {
     private static final Map<Long, Channel> DEVICE_CHANNEL_MAP = new ConcurrentHashMap<>(16);
     private final NettyTcpServerHandler nettyTcpServerHandler;
 
+    /**
+     * Register device channel.
+     *
+     * @param deviceId device identifier
+     * @param channel channel
+     */
     public static void registerDeviceChannel(Long deviceId, Channel channel) {
         DEVICE_CHANNEL_MAP.put(deviceId, channel);
     }
 
+    /**
+     * Return device channel.
+     *
+     * @param deviceId device identifier
+     * @return get device channel result
+     */
     public static Channel getDeviceChannel(Long deviceId) {
         return DEVICE_CHANNEL_MAP.get(deviceId);
     }
 
+    /**
+     * Unregister device channel.
+     *
+     * @param channel channel
+     */
     public static void unregisterDeviceChannel(Channel channel) {
         DEVICE_CHANNEL_MAP.entrySet().removeIf(entry -> entry.getValue() == channel);
     }
 
+    /**
+     * Clear device channels.
+     */
     public static void clearDeviceChannels() {
         DEVICE_CHANNEL_MAP.clear();
     }

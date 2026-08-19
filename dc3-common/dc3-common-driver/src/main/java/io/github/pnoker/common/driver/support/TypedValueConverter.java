@@ -38,7 +38,6 @@ import java.util.Optional;
  * point readings.
  *
  * @author pnoker
- * @version 2026.5.15
  * @since 2016.10.1
  */
 public final class TypedValueConverter {

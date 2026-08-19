@@ -25,6 +25,7 @@ import io.github.pnoker.api.center.manager.GrpcPageDeviceQuery;
 import io.github.pnoker.api.center.manager.GrpcProfileQuery;
 import io.github.pnoker.api.center.manager.GrpcRDeviceDTO;
 import io.github.pnoker.api.center.manager.GrpcRDeviceListDTO;
+import io.github.pnoker.api.center.manager.GrpcRDeviceOwnerDTO;
 import io.github.pnoker.api.center.manager.GrpcRPageDeviceDTO;
 import io.github.pnoker.api.common.GrpcDriverQuery;
 import io.github.pnoker.api.common.GrpcR;
@@ -32,6 +33,7 @@ import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcDeviceBuilder;
@@ -52,7 +54,6 @@ import java.util.Objects;
  * auto-configuration declaration).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -76,6 +77,20 @@ public class DeviceGrpcFacade implements DeviceFacade {
             return null;
         }
         return facadeGrpcDeviceBuilder.toFacadeBO(response.getData());
+    }
+
+    @Override
+    public FacadeDeviceOwnerBO getActiveOwner(Long tenantId, Long deviceId) {
+        GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder()
+                .setDeviceId(deviceId).setTenantId(tenantId).build();
+        GrpcRDeviceOwnerDTO response = grpcFacadeSupport.call("DeviceFacade.getActiveOwner",
+                deviceApiBlockingStub, stub -> stub.getActiveOwner(request));
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "getActiveOwner");
+            return null;
+        }
+        return new FacadeDeviceOwnerBO(response.getDriverId(), response.getOwnerNode(),
+                response.getFencingToken());
     }
 
     @Override

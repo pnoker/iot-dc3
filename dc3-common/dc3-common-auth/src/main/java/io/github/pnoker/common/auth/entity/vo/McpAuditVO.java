@@ -33,7 +33,6 @@ import lombok.ToString;
  * View object for MCP tool-call audit API responses.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter

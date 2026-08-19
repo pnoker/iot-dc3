@@ -21,7 +21,6 @@ package io.github.pnoker.common.constant.common;
  * Ultra-low-level constants used internally by the constants module itself.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 public class BaseConstant {

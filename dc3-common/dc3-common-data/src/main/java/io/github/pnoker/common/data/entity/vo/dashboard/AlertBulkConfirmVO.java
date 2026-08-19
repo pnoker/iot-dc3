@@ -32,7 +32,6 @@ import java.util.List;
  * Bulk confirm/unconfirm request body for the dashboard alert panel.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Getter

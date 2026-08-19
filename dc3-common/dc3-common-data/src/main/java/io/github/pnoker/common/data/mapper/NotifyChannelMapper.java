@@ -24,7 +24,6 @@ import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
  * Notification channel mapper.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface NotifyChannelMapper extends BaseMapper<NotifyChannelDO> {

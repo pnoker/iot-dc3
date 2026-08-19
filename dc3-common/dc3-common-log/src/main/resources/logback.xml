@@ -20,11 +20,12 @@
 <configuration scan="true">
     <!-- Override the parameter configurations in base.xml. -->
     <property name="CONSOLE_LOG_PATTERN"
-              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr([%X{requestId:-},%X{traceId:-},%X{spanId:-}]){faint} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){magenta} [%clr(%4line){magenta}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"/>
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr([${APPLICATION_NAME:-unknown}]){green} %clr([%X{requestId:-},%X{traceId:-},%X{spanId:-}]){faint} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){magenta} [%clr(%4line){magenta}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"/>
     <property name="LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START" value="false"/>
     <property name="LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE" value="200MB"/>
     <property name="LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP" value="20GB"/>
     <property name="LOGBACK_ROLLINGPOLICY_MAX_HISTORY" value="30"/>
+    <property name="LOGBACK_ASYNC_QUEUE_SIZE" value="8192"/>
 
     <!-- Include base.xml -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
@@ -54,16 +55,37 @@
                 <logLevel/>
                 <logLevelValue/>
                 <mdc/>
+                <keyValuePairs/>
                 <contextName/>
+                <pattern>
+                    <pattern>{"service":"${APPLICATION_NAME:-unknown}","pid":"${PID:-unknown}"}</pattern>
+                </pattern>
                 <stackTrace/>
             </providers>
         </encoder>
     </appender>
 
+    <!-- Keep console and JSON file I/O off application threads while preserving every event. -->
+    <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>${LOGBACK_ASYNC_QUEUE_SIZE:-8192}</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>false</neverBlock>
+        <includeCallerData>true</includeCallerData>
+        <appender-ref ref="CONSOLE"/>
+    </appender>
+
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>${LOGBACK_ASYNC_QUEUE_SIZE:-8192}</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>false</neverBlock>
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="FILE"/>
+    </appender>
+
     <!-- Root level is overridable via DC3_LOG_LEVEL env var (defaults to INFO) -->
     <root level="${DC3_LOG_LEVEL:-INFO}">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
+        <appender-ref ref="ASYNC_CONSOLE"/>
+        <appender-ref ref="ASYNC_FILE"/>
     </root>
 
     <!-- Nop Status Listener -->

@@ -26,11 +26,22 @@ import java.util.List;
  * Persistence manager for identity audit log entries.
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 public interface IdentityAuditLogManager extends IService<IdentityAuditLogDO> {
 
+    /**
+     * Return the matching identity audit.
+     *
+     * @param tenantId tenant identifier
+     * @param principalId principal identifier
+     * @param action action to execute
+     * @param resourceType resource type
+     * @param resourceId resource identifier
+     * @param status status
+     * @param limit limit
+     * @return list identifierentity audit result
+     */
     List<IdentityAuditLogDO> listIdentityAudit(Long tenantId, Long principalId, String action,
                                                String resourceType, Long resourceId, String status, int limit);
 }

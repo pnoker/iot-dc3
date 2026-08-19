@@ -17,23 +17,20 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.data.dal.CommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.entity.dto.CommandCallDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.facade.api.CommandFacade;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
@@ -56,6 +53,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class CommandHistoryServiceImplTest {
@@ -76,9 +75,6 @@ class CommandHistoryServiceImplTest {
     private CommandHistoryManager commandHistoryManager;
 
     @Mock
-    private EntityStateMapper entityStateMapper;
-
-    @Mock
     private CommandHistoryBuilder commandHistoryBuilder;
 
     private CommandHistoryServiceImpl service;
@@ -86,7 +82,15 @@ class CommandHistoryServiceImplTest {
     @BeforeEach
     void setUp() {
         service = new CommandHistoryServiceImpl(deviceFacade, driverFacade, commandFacade, rabbitTemplate,
-                commandHistoryManager, commandHistoryBuilder, entityStateMapper);
+                commandHistoryManager, commandHistoryBuilder);
+        lenient().when(deviceFacade.getActiveOwner(any(), any()))
+                .thenReturn(new FacadeDeviceOwnerBO(40L, "node-a", 77L));
+        lenient().doAnswer(invocation -> {
+            CorrelationData correlation = invocation.getArgument(3);
+            correlation.getFuture().complete(new CorrelationData.Confirm(true, null));
+            return null;
+        }).when(rabbitTemplate).convertAndSend(any(String.class), any(String.class),
+                any(CommandCallDTO.class), any(CorrelationData.class));
     }
 
     @Test
@@ -113,9 +117,6 @@ class CommandHistoryServiceImplTest {
         driver.setId(40L);
         driver.setServiceName("modbus-driver");
 
-        EntityStateDO driverState = new EntityStateDO();
-        driverState.setStateFlag(EntityStatusEnum.ONLINE.getIndex());
-
         CommandCallBO call = new CommandCallBO();
         call.setDeviceId(deviceId);
         call.setCommandId(commandId);
@@ -124,7 +125,6 @@ class CommandHistoryServiceImplTest {
         when(deviceFacade.getById(tenantId, deviceId)).thenReturn(device);
         when(commandFacade.getById(tenantId, commandId)).thenReturn(command);
         when(driverFacade.getByDeviceId(tenantId, deviceId)).thenReturn(driver);
-        when(entityStateMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(driverState);
 
         LocalDateTime beforeLocal = LocalDateTime.now();
         Instant beforeInstant = Instant.now();
@@ -142,7 +142,7 @@ class CommandHistoryServiceImplTest {
 
         ArgumentCaptor<CommandCallDTO> dtoCaptor = ArgumentCaptor.forClass(CommandCallDTO.class);
         verify(rabbitTemplate).convertAndSend(eq(RabbitConstant.TOPIC_EXCHANGE_COMMAND),
-                eq(RabbitConstant.ROUTING_COMMAND_PREFIX + "modbus-driver"), dtoCaptor.capture(),
+                eq(RabbitConstant.ROUTING_COMMAND_PREFIX + "modbus-driver.node-a"), dtoCaptor.capture(),
                 any(CorrelationData.class));
         CommandCallDTO dto = dtoCaptor.getValue();
         assertThat(dto.recordId()).isEqualTo(recordId);
@@ -152,7 +152,7 @@ class CommandHistoryServiceImplTest {
     }
 
     @Test
-    void callTreatsLegacyMillisecondTimeoutAsSeconds() {
+    void callUsesTimeoutSecondsWithoutUnitConversion() {
         Long tenantId = 100L;
         Long deviceId = 10L;
         Long commandId = 20L;
@@ -168,15 +168,12 @@ class CommandHistoryServiceImplTest {
         command.setTenantId(tenantId);
         command.setProfileId(30L);
         command.setCommandCode("restart");
-        command.setTimeout(30000);
+        command.setTimeout(30);
         command.setEnableFlag(EnableFlagEnum.ENABLE);
 
         FacadeDriverBO driver = new FacadeDriverBO();
         driver.setId(40L);
         driver.setServiceName("modbus-driver");
-
-        EntityStateDO driverState = new EntityStateDO();
-        driverState.setStateFlag(EntityStatusEnum.ONLINE.getIndex());
 
         CommandCallBO call = new CommandCallBO();
         call.setDeviceId(deviceId);
@@ -185,7 +182,6 @@ class CommandHistoryServiceImplTest {
         when(deviceFacade.getById(tenantId, deviceId)).thenReturn(device);
         when(commandFacade.getById(tenantId, commandId)).thenReturn(command);
         when(driverFacade.getByDeviceId(tenantId, deviceId)).thenReturn(driver);
-        when(entityStateMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(driverState);
 
         LocalDateTime beforeLocal = LocalDateTime.now();
         Instant beforeInstant = Instant.now();
@@ -201,7 +197,7 @@ class CommandHistoryServiceImplTest {
 
         ArgumentCaptor<CommandCallDTO> dtoCaptor = ArgumentCaptor.forClass(CommandCallDTO.class);
         verify(rabbitTemplate).convertAndSend(eq(RabbitConstant.TOPIC_EXCHANGE_COMMAND),
-                eq(RabbitConstant.ROUTING_COMMAND_PREFIX + "modbus-driver"), dtoCaptor.capture(),
+                eq(RabbitConstant.ROUTING_COMMAND_PREFIX + "modbus-driver.node-a"), dtoCaptor.capture(),
                 any(CorrelationData.class));
         CommandCallDTO dto = dtoCaptor.getValue();
         assertThat(dto.expireAt()).isAfterOrEqualTo(beforeInstant.plusSeconds(30));
@@ -233,9 +229,6 @@ class CommandHistoryServiceImplTest {
         driver.setId(40L);
         driver.setServiceName("modbus-driver");
 
-        EntityStateDO driverState = new EntityStateDO();
-        driverState.setStateFlag(EntityStatusEnum.ONLINE.getIndex());
-
         CommandCallBO call = new CommandCallBO();
         call.setDeviceId(deviceId);
         call.setCommandCode("restart");
@@ -244,7 +237,6 @@ class CommandHistoryServiceImplTest {
         when(commandFacade.listByPage(any(FacadeCommandQuery.class)))
                 .thenReturn(new FacadePage<>(1L, 1L, 1L, 1L, List.of(command)));
         when(driverFacade.getByDeviceId(tenantId, deviceId)).thenReturn(driver);
-        when(entityStateMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(driverState);
 
         service.call(tenantId, call);
 
@@ -256,7 +248,7 @@ class CommandHistoryServiceImplTest {
 
         ArgumentCaptor<CommandCallDTO> dtoCaptor = ArgumentCaptor.forClass(CommandCallDTO.class);
         verify(rabbitTemplate).convertAndSend(eq(RabbitConstant.TOPIC_EXCHANGE_COMMAND),
-                eq(RabbitConstant.ROUTING_COMMAND_PREFIX + "modbus-driver"), dtoCaptor.capture(),
+                eq(RabbitConstant.ROUTING_COMMAND_PREFIX + "modbus-driver.node-a"), dtoCaptor.capture(),
                 any(CorrelationData.class));
         assertThat(dtoCaptor.getValue().commandId()).isEqualTo(commandId);
     }

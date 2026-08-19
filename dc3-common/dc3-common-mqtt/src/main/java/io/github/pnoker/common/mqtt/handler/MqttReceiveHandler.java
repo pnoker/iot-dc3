@@ -42,7 +42,6 @@ import java.util.concurrent.ExecutorService;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -74,14 +73,14 @@ public class MqttReceiveHandler {
                 MessageHeader messageHeader = new MessageHeader(message.getHeaders());
                 String payload = message.getPayload().toString();
                 if (StringUtils.isEmpty(payload)) {
-                    log.error("Invalid mqtt inbound, From: {}, Qos: {}, Payload: null",
+                    log.error("MQTT inbound rejected, reason=emptyPayload, topic={}, qos={}",
                             messageHeader.getMqttReceivedTopic(), messageHeader.getMqttReceivedQos());
                     return;
                 }
                 MqttScheduleJob.recordMessage();
                 MqttMessage mqttMessage = MqttMessage.builder().header(messageHeader).payload(payload).build();
-                log.debug("Mqtt inbound, From: {}, Qos: {}, Payload: {}", messageHeader.getMqttReceivedTopic(),
-                        messageHeader.getMqttReceivedQos(), payload);
+                log.debug("MQTT inbound received, topic={}, qos={}, payloadLength={}",
+                        messageHeader.getMqttReceivedTopic(), messageHeader.getMqttReceivedQos(), payload.length());
 
                 // Determine whether to process data in batch based on transmission speed
                 Integer batchSpeed = mqttProperties.getBatch().getSpeed();
@@ -92,7 +91,8 @@ public class MqttReceiveHandler {
                     MqttScheduleJob.addMqttMessages(mqttMessage);
                 }
             } catch (Exception e) {
-                log.error("MQTT inbound dispatch failed, headers={}", message.getHeaders(), e);
+                log.error("MQTT inbound dispatch failed, payloadType={}",
+                        message.getPayload().getClass().getSimpleName(), e);
             }
         };
     }

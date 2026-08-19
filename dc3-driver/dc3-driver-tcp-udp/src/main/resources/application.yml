@@ -104,7 +104,6 @@ dc3:
         default-value: '${value}'
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/tcp-udp/buffer.db
 
 spring:

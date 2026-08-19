@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 
 /**
  * Offline unit tests for {@link SnmpDriverCustomServiceImpl}.
@@ -93,11 +92,6 @@ class SnmpDriverCustomServiceImplTest {
 
         assertThat(report.isPassed()).isFalse();
         assertThat(report.getIssues()).isNotEmpty();
-    }
-
-    @Test
-    void scheduleIsNoOp() {
-        assertThatNoException().isThrownBy(() -> service.schedule());
     }
 
 }

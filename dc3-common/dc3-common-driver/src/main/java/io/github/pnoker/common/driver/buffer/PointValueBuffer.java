@@ -42,7 +42,6 @@ import java.util.Objects;
  * is free of timezone/format pitfalls.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.6.2
  */
 @Slf4j
@@ -82,11 +81,6 @@ public class PointValueBuffer {
     private static final String DELETE_SQL = "DELETE FROM point_value_buffer WHERE id = ?";
     private static final String MARK_RETRY_SQL =
             "UPDATE point_value_buffer SET attempt = ?, next_attempt_at = ? WHERE id = ?";
-    private static final String DELETE_OLDEST_SQL = """
-            DELETE FROM point_value_buffer WHERE id IN (
-                SELECT id FROM point_value_buffer ORDER BY created_at ASC LIMIT ?
-            )
-            """;
     private static final String COUNT_SQL = "SELECT COUNT(*) FROM point_value_buffer";
 
     private final String dbPath;
@@ -122,11 +116,30 @@ public class PointValueBuffer {
         config.setDriverClassName("org.sqlite.JDBC");
         config.setMaximumPoolSize(1);
         config.setMinimumIdle(1);
-        config.setConnectionInitSql("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;");
+        config.setConnectionInitSql("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;");
         config.setPoolName("dc3-driver-buffer");
         this.dataSource = new HikariDataSource(config);
+        validateDurability();
         createTableIfNotExists();
         log.info("Point value buffer initialized, dbPath={}", dbPath);
+    }
+
+    private void validateDurability() {
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            String journalMode;
+            try (ResultSet rs = stmt.executeQuery("PRAGMA journal_mode")) {
+                journalMode = rs.next() ? rs.getString(1) : null;
+            }
+            int synchronous;
+            try (ResultSet rs = stmt.executeQuery("PRAGMA synchronous")) {
+                synchronous = rs.next() ? rs.getInt(1) : -1;
+            }
+            if (!"wal".equalsIgnoreCase(journalMode) || synchronous < 2) {
+                throw new ServiceException("Point-value outbox requires SQLite WAL with synchronous FULL");
+            }
+        } catch (SQLException e) {
+            throw new ServiceException("Failed to validate point-value outbox durability", e);
+        }
     }
 
     private void createTableIfNotExists() {
@@ -143,22 +156,51 @@ public class PointValueBuffer {
      * Insert or replace a buffered record keyed by the correlation id.
      */
     public void upsert(BufferedPointValue record) {
+        upsertBatch(List.of(record));
+    }
+
+    /**
+     * Commit a group of records in one FULL-synchronous transaction. The transaction
+     * boundary preserves power-loss durability without paying one fsync per value.
+     */
+    public void upsertBatch(List<BufferedPointValue> records) {
+        if (records == null || records.isEmpty()) {
+            return;
+        }
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPSERT_SQL)) {
-            ps.setString(1, record.id());
-            setLong(ps, 2, record.deviceId());
-            setLong(ps, 3, record.pointId());
-            setLong(ps, 4, record.driverId());
-            setLong(ps, 5, record.tenantId());
-            ps.setString(6, record.payloadJson());
-            ps.setString(7, record.routingKey());
-            ps.setInt(8, record.attempt());
-            ps.setLong(9, record.nextAttemptAt());
-            ps.setLong(10, record.createdAt());
-            ps.executeUpdate();
+            conn.setAutoCommit(false);
+            try {
+                for (BufferedPointValue record : records) {
+                    bindUpsert(ps, record);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+                conn.commit();
+            } catch (SQLException e) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackFailure) {
+                    e.addSuppressed(rollbackFailure);
+                }
+                throw e;
+            }
         } catch (SQLException e) {
-            log.error("Buffer upsert failed, id={}, attempt={}", record.id(), record.attempt(), e);
+            throw new ServiceException("Point-value outbox batch upsert failed, size=" + records.size(), e);
         }
+    }
+
+    private void bindUpsert(PreparedStatement ps, BufferedPointValue record) throws SQLException {
+        ps.setString(1, record.id());
+        setLong(ps, 2, record.deviceId());
+        setLong(ps, 3, record.pointId());
+        setLong(ps, 4, record.driverId());
+        setLong(ps, 5, record.tenantId());
+        ps.setString(6, record.payloadJson());
+        ps.setString(7, record.routingKey());
+        ps.setInt(8, record.attempt());
+        ps.setLong(9, record.nextAttemptAt());
+        ps.setLong(10, record.createdAt());
     }
 
     /**
@@ -202,7 +244,7 @@ public class PointValueBuffer {
             ps.setString(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
-            log.error("Buffer delete failed, id={}", id, e);
+            throw new ServiceException("Point-value outbox delete failed: " + id, e);
         }
     }
 
@@ -217,23 +259,7 @@ public class PointValueBuffer {
             ps.setString(3, id);
             ps.executeUpdate();
         } catch (SQLException e) {
-            log.error("Buffer markRetry failed, id={}, attempt={}", id, attempt, e);
-        }
-    }
-
-    /**
-     * Delete the {@code evictBatch} oldest records (by created_at) for capacity enforcement.
-     *
-     * @return number of records deleted
-     */
-    public int deleteOldest(int evictBatch) {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(DELETE_OLDEST_SQL)) {
-            ps.setInt(1, evictBatch);
-            return ps.executeUpdate();
-        } catch (SQLException e) {
-            log.error("Buffer deleteOldest failed", e);
-            return 0;
+            throw new ServiceException("Point-value outbox retry update failed: " + id, e);
         }
     }
 
@@ -249,14 +275,6 @@ public class PointValueBuffer {
             log.error("Buffer count failed", e);
             return 0;
         }
-    }
-
-    /**
-     * @return on-disk size of the SQLite database file in bytes
-     */
-    public long fileSize() {
-        File file = new File(dbPath);
-        return file.exists() ? file.length() : 0;
     }
 
     /**

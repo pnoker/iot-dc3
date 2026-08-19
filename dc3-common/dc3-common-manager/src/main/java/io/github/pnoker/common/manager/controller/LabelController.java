@@ -53,7 +53,6 @@ import java.util.Objects;
  * REST controller exposing label management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "label", description = "Label definitions: create, update, and manage labels for categorizing and tagging devices, drivers, and other platform entities with flexible key-value metadata")

@@ -33,7 +33,6 @@ import java.io.Serializable;
  * Driver health result returned by protocol drivers.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter

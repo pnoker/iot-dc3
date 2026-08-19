@@ -28,7 +28,6 @@ import java.util.Optional;
  * Enumeration of timeout source flags.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter
@@ -63,6 +62,12 @@ public enum TimeoutSourceTypeEnum {
 
     private final String remark;
 
+    /**
+     * Resolve a timeout source from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching source, or {@code null} when the index is unknown
+     */
     public static TimeoutSourceTypeEnum ofIndex(Byte index) {
         Optional<TimeoutSourceTypeEnum> any = Arrays.stream(TimeoutSourceTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -70,6 +75,12 @@ public enum TimeoutSourceTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a timeout source from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching source, or {@code null} when the code is unknown
+     */
     public static TimeoutSourceTypeEnum ofCode(String code) {
         Optional<TimeoutSourceTypeEnum> any = Arrays.stream(TimeoutSourceTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -77,6 +88,12 @@ public enum TimeoutSourceTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a timeout source from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching source, or {@code null} when the name is unknown
+     */
     public static TimeoutSourceTypeEnum ofName(String name) {
         try {
             return valueOf(name);

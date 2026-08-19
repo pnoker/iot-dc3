@@ -89,7 +89,6 @@ dc3:
         remark: Data format for encoding the written value
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/mbus/buffer.db
 
 spring:

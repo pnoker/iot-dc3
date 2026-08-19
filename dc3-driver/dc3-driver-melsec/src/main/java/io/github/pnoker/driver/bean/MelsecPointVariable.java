@@ -23,7 +23,6 @@ import lombok.Getter;
  * Melsec point variable holding a device address string and type code.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Getter

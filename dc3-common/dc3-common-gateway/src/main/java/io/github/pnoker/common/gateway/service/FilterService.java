@@ -26,7 +26,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
  * Service interface for gateway filter logic.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface FilterService {

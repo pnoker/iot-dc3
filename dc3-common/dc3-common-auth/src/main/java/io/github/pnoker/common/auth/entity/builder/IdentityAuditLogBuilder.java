@@ -29,7 +29,6 @@ import java.util.List;
  * MapStruct builder converting between identity audit log DO, BO, and VO.
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})

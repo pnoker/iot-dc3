@@ -20,7 +20,6 @@ package io.github.pnoker.common.data.biz.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.cache.PointValueLocalCache;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
@@ -43,14 +42,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -64,9 +61,6 @@ class PointValueServiceImplTest {
     private DeviceFacade deviceFacade;
 
     @Mock
-    private PointValueLocalCache pointValueLocalCacheService;
-
-    @Mock
     private RepositoryService repositoryService;
 
     @Mock
@@ -76,10 +70,6 @@ class PointValueServiceImplTest {
     private PointValueServiceImpl service;
 
     private PointValueBO pv;
-
-    private static Long eqLong(long value) {
-        return org.mockito.ArgumentMatchers.eq(value);
-    }
 
     private static FacadeDeviceBO stubDevice(Long tenantId, Long profileId) {
         FacadeDeviceBO device = new FacadeDeviceBO();
@@ -106,27 +96,27 @@ class PointValueServiceImplTest {
     @Test
     void singleSaveIgnoresNullPayload() {
         assertThatNoException().isThrownBy(() -> service.save((PointValueBO) null));
-        verify(pointValueLocalCacheService, never()).savePointValue(any(PointValueBO.class));
+        verifyNoRepositoryWrites();
     }
 
     @Test
     void batchSaveIgnoresNullAndEmptyList() {
         assertThatNoException().isThrownBy(() -> service.save((List<PointValueBO>) null));
         assertThatNoException().isThrownBy(() -> service.save(List.of()));
-        verify(pointValueLocalCacheService, never()).savePointValue(any(Long.class), any());
+        verifyNoRepositoryWrites();
     }
 
     @Test
-    void singleSaveStampsTimestampsAndPersistsToBothLayers() throws Exception {
+    void singleSaveStampsTimestampsAndPersistsTransactionally() throws Exception {
         try (MockedStatic<RepositoryStrategyFactory> factory =
                      Mockito.mockStatic(RepositoryStrategyFactory.class)) {
             factory.when(RepositoryStrategyFactory::get).thenReturn(List.of(repositoryService));
+            when(repositoryService.savePointValue(pv)).thenReturn(true);
 
             service.save(pv);
 
             assertThat(pv.getCreateTime()).isNotNull();
             assertThat(pv.getOperateTime()).isNotNull();
-            verify(pointValueLocalCacheService).savePointValue(pv);
             verify(repositoryService).savePointValue(pv);
             verify(alarmRuleTriggerService).processPointValue(pv);
         }
@@ -147,7 +137,7 @@ class PointValueServiceImplTest {
     }
 
     @Test
-    void batchSavePartitionsLargeListIntoChunksOfHundred() throws Exception {
+    void batchSaveUsesOneRepositoryTransaction() throws Exception {
         List<PointValueBO> batch = new java.util.ArrayList<>();
         for (int i = 0; i < 250; i++) {
             batch.add(PointValueBO.builder().deviceId(10L).pointId((long) i).build());
@@ -156,10 +146,9 @@ class PointValueServiceImplTest {
         try (MockedStatic<RepositoryStrategyFactory> factory =
                      Mockito.mockStatic(RepositoryStrategyFactory.class)) {
             factory.when(RepositoryStrategyFactory::get).thenReturn(List.of(repositoryService));
+            when(repositoryService.savePointValues(batch)).thenReturn(batch);
             service.save(batch);
-            // 250 entries -> 100 + 100 + 50 = 3 chunks
-            verify(repositoryService, times(3)).savePointValues(any());
-            verify(pointValueLocalCacheService).savePointValue(eqLong(10L), any());
+            verify(repositoryService).savePointValues(batch);
             // PointValueServiceImpl.save(List) hands the whole batch to the trigger
             // in one call now; the trigger's own contract is responsible for the
             // per-element fan-out (covered in AlarmRuleTriggerServiceImplTest).
@@ -168,14 +157,15 @@ class PointValueServiceImplTest {
     }
 
     @Test
-    void singleSaveSwallowsRepositoryFailures() throws Exception {
+    void singleSavePropagatesRepositoryFailuresForBrokerRetry() throws Exception {
         try (MockedStatic<RepositoryStrategyFactory> factory =
                      Mockito.mockStatic(RepositoryStrategyFactory.class)) {
             factory.when(RepositoryStrategyFactory::get).thenReturn(List.of(repositoryService));
             org.mockito.Mockito.doThrow(new RuntimeException("downstream offline"))
                     .when(repositoryService).savePointValue(any(PointValueBO.class));
 
-            assertThatNoException().isThrownBy(() -> service.save(pv));
+            assertThatThrownBy(() -> service.save(pv))
+                    .isInstanceOf(RepositoryException.class);
         }
     }
 
@@ -286,12 +276,8 @@ class PointValueServiceImplTest {
         when(deviceFacade.getById(1L, 10L)).thenReturn(stubDevice(1L, 5L));
         when(pointFacade.listByPage(any())).thenReturn(new FacadePage<>(1, 10, 2, 1,
                 List.of(pointWithValue, pointWithoutValue)));
-        when(pointValueLocalCacheService.selectLatestPointValue(1L, 10L, List.of(20L, 21L)))
-                .thenReturn(Map.of(20L, cached));
-        // Point 21 is not in the local cache, so it is batch-queried from the repository,
-        // which returns nothing -> point 21 becomes a placeholder.
-        when(repositoryService.listLatestPointValues(1L, 10L, List.of(21L)))
-                .thenReturn(List.of());
+        when(repositoryService.listLatestPointValues(1L, 10L, List.of(20L, 21L)))
+                .thenReturn(List.of(cached));
 
         try (MockedStatic<RepositoryStrategyFactory> factory =
                      Mockito.mockStatic(RepositoryStrategyFactory.class)) {
@@ -314,10 +300,7 @@ class PointValueServiceImplTest {
             assertThat(placeholder.getOperateTime()).isNull();
         }
 
-        // Only the cache-missing point (21) is batch-queried from the repository;
-        // the cached point (20) is never queried.
-        verify(repositoryService).listLatestPointValues(1L, 10L, List.of(21L));
-        verify(repositoryService, never()).listLatestPointValues(1L, 10L, List.of(20L));
+        verify(repositoryService).listLatestPointValues(1L, 10L, List.of(20L, 21L));
     }
 
     @Test
@@ -337,6 +320,15 @@ class PointValueServiceImplTest {
             factory.when(RepositoryStrategyFactory::get).thenReturn(List.of(repositoryService));
             service.page(query);
             verify(repositoryService).listPagePointValue(query);
+        }
+    }
+
+    private void verifyNoRepositoryWrites() {
+        try {
+            verify(repositoryService, never()).savePointValue(any());
+            verify(repositoryService, never()).savePointValues(any());
+        } catch (Exception e) {
+            throw new AssertionError(e);
         }
     }
 }

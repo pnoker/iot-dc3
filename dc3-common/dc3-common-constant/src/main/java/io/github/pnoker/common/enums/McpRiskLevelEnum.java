@@ -29,7 +29,6 @@ import java.util.Optional;
  * MCP tool risk level (governs confirmation and visibility policy).
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -69,6 +68,12 @@ public enum McpRiskLevelEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve an MCP risk level from its persisted wire value.
+     *
+     * @param value persisted risk-level value
+     * @return matching level, or {@code null} when the value is unknown
+     */
     public static McpRiskLevelEnum ofValue(String value) {
         Optional<McpRiskLevelEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))

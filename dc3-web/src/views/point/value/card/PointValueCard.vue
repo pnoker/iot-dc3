@@ -243,8 +243,8 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-// PointValueCard 内联了 header / footer / 实时数值展示区,不使用 ThingsCardHeader / ThingsCardActions,
-// 因此在此补齐对应样式。`header-enable` / `header-disable` 语义不同:基于 data.interval 表示延时是否正常。
+// PointValueCard owns its header, footer, and live-value area. Its header-enable and
+// header-disable states indicate whether data.interval is within the expected delay.
 
 .things-card__header {
   width: 100%;

@@ -28,7 +28,6 @@ import java.util.List;
  * Converts runtime data into rule facts and feeds the alarm rule pipeline.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface AlarmRuleTriggerService {

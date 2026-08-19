@@ -50,7 +50,6 @@ import java.util.Objects;
  * REST controller for custom command call management.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Tag(name = "command_history", description = "Command execution audit trail: query historical records of commands sent to devices including execution status, timestamps, and response data")

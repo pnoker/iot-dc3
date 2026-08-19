@@ -19,30 +19,26 @@ package io.github.pnoker.common.data.biz.repository;
 import io.github.pnoker.common.data.dal.PointValueManager;
 import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
+import io.github.pnoker.common.data.mapper.PointValueMapper;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.exception.AddException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.anyList;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-/**
- * Unit tests for {@link PostgresRepositoryServiceImpl} verifying that
- * numValue set by the driver is passed through to the DAL layer unchanged.
- */
 @ExtendWith(MockitoExtension.class)
 class PostgresRepositoryServiceImplTest {
 
@@ -52,11 +48,11 @@ class PostgresRepositoryServiceImplTest {
     @Mock
     private PointValueManager pointValueManager;
 
+    @Mock
+    private PointValueMapper pointValueMapper;
+
     @InjectMocks
     private PostgresRepositoryServiceImpl service;
-
-    @Captor
-    private ArgumentCaptor<PointValueDO> doCaptor;
 
     private PointValueBO numericBO;
     private PointValueBO stringBO;
@@ -66,103 +62,85 @@ class PostgresRepositoryServiceImplTest {
     @BeforeEach
     void setUp() {
         LocalDateTime now = LocalDateTime.now();
-
         numericBO = PointValueBO.builder()
-                .deviceId(1L).pointId(10L).tenantId(100L)
+                .messageId("m-1").schemaVersion(1).driverNode("node-a").sequence(1L)
+                .deviceId(1L).pointId(10L).driverId(20L).tenantId(100L)
                 .rawValue("42").calValue("42.5").numValue(42.5)
-                .createTime(now).operateTime(now)
-                .build();
-
+                .createTime(now).operateTime(now).build();
         stringBO = PointValueBO.builder()
-                .deviceId(2L).pointId(20L).tenantId(100L)
-                .rawValue("on").calValue("on").numValue(null)
-                .createTime(now).operateTime(now)
-                .build();
+                .messageId("m-2").schemaVersion(1).driverNode("node-a").sequence(2L)
+                .deviceId(2L).pointId(20L).driverId(20L).tenantId(100L)
+                .rawValue("on").calValue("on").createTime(now).operateTime(now).build();
 
         numericDO = new PointValueDO();
-        numericDO.setDeviceId(1L);
-        numericDO.setPointId(10L);
-        numericDO.setTenantId(100L);
-        numericDO.setRawValue("42");
-        numericDO.setCalValue("42.5");
+        numericDO.setMessageId("m-1");
         numericDO.setNumValue(42.5);
-
         stringDO = new PointValueDO();
-        stringDO.setDeviceId(2L);
-        stringDO.setPointId(20L);
-        stringDO.setTenantId(100L);
-        stringDO.setRawValue("on");
-        stringDO.setCalValue("on");
-        stringDO.setNumValue(null);
+        stringDO.setMessageId("m-2");
     }
 
     @Test
-    void savePointValuePassesNumericValueThrough() {
-        when(pointValueBuilder.buildDOByBO(numericBO)).thenReturn(numericDO);
-        when(pointValueManager.save(numericDO)).thenReturn(true);
+    void savesHistoryAndLatestProjectionFromSameConvertedBatch() {
+        List<PointValueBO> input = List.of(numericBO, stringBO);
+        List<PointValueDO> converted = List.of(numericDO, stringDO);
+        when(pointValueBuilder.buildDOListByBOList(input)).thenReturn(converted);
+        when(pointValueMapper.insertHistoryBatch(converted)).thenReturn(List.of("m-1", "m-2"));
+
+        service.savePointValues(input);
+
+        var order = inOrder(pointValueMapper);
+        order.verify(pointValueMapper).insertHistoryBatch(converted);
+        order.verify(pointValueMapper).upsertLatestBatch(converted);
+        assertThat(converted).extracting(PointValueDO::getNumValue)
+                .containsExactly(42.5, null);
+        verifyNoInteractions(pointValueManager);
+    }
+
+    @Test
+    void singleSaveUsesTheSameTransactionalBatchPath() {
+        when(pointValueBuilder.buildDOListByBOList(anyList())).thenReturn(List.of(numericDO));
+        when(pointValueMapper.insertHistoryBatch(List.of(numericDO))).thenReturn(List.of("m-1"));
 
         service.savePointValue(numericBO);
 
-        verify(pointValueBuilder).buildDOByBO(numericBO);
-        verify(pointValueManager).save(doCaptor.capture());
-        assertThat(doCaptor.getValue().getNumValue()).isEqualTo(42.5);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<PointValueDO>> captor = ArgumentCaptor.forClass(List.class);
+        verify(pointValueMapper).insertHistoryBatch(captor.capture());
+        verify(pointValueMapper).upsertLatestBatch(captor.getValue());
+        assertThat(captor.getValue()).extracting(PointValueDO::getMessageId)
+                .containsExactly("m-1");
     }
 
     @Test
-    void savePointValuePassesNullNumValueThrough() {
-        when(pointValueBuilder.buildDOByBO(stringBO)).thenReturn(stringDO);
-        when(pointValueManager.save(stringDO)).thenReturn(true);
-
-        service.savePointValue(stringBO);
-
-        verify(pointValueManager).save(doCaptor.capture());
-        assertThat(doCaptor.getValue().getNumValue()).isNull();
+    void emptyBatchDoesNotTouchDatabase() {
+        service.savePointValues(List.of());
+        verifyNoInteractions(pointValueBuilder, pointValueMapper, pointValueManager);
     }
 
     @Test
-    void savePointValueThrowsOnFailure() {
-        when(pointValueBuilder.buildDOByBO(numericBO)).thenReturn(numericDO);
-        when(pointValueManager.save(numericDO)).thenReturn(false);
+    void duplicateMessageIdCannotUpsertTheSameLatestKeyTwice() {
+        List<PointValueBO> input = List.of(numericBO, numericBO);
+        when(pointValueBuilder.buildDOListByBOList(input)).thenReturn(List.of(numericDO, numericDO));
+        when(pointValueMapper.insertHistoryBatch(anyList())).thenReturn(List.of("m-1"));
 
-        assertThatThrownBy(() -> service.savePointValue(numericBO))
-                .isInstanceOf(AddException.class);
-    }
-
-    @Test
-    void savePointValuesBatchPassesNumericValuesThrough() {
-        when(pointValueBuilder.buildDOListByBOList(anyList())).thenReturn(java.util.List.of(numericDO, stringDO));
-        when(pointValueManager.saveBatch(anyList())).thenReturn(true);
-
-        service.savePointValues(java.util.List.of(numericBO, stringBO));
+        List<PointValueBO> accepted = service.savePointValues(input);
 
         @SuppressWarnings("unchecked")
-        ArgumentCaptor<java.util.List<PointValueDO>> listCaptor = ArgumentCaptor.forClass(java.util.List.class);
-        verify(pointValueManager).saveBatch(listCaptor.capture());
-        java.util.List<PointValueDO> saved = listCaptor.getValue();
-        assertThat(saved).hasSize(2);
-        assertThat(saved.get(0).getNumValue()).isEqualTo(42.5);
-        assertThat(saved.get(1).getNumValue()).isNull();
+        ArgumentCaptor<List<PointValueDO>> captor = ArgumentCaptor.forClass(List.class);
+        verify(pointValueMapper).upsertLatestBatch(captor.capture());
+        assertThat(captor.getValue()).hasSize(1);
+        assertThat(accepted).containsExactly(numericBO);
     }
 
     @Test
-    void noApplyNumericProjectionCalled() {
-        // Verify the service does NOT modify numValue after builder conversion.
-        // Before the refactoring, applyNumericProjection would overwrite numValue.
-        // Now the driver sets it, and we pass it through unchanged.
-        PointValueDO captured = new PointValueDO();
-        captured.setNumValue(99.9); // driver-set value
-        when(pointValueBuilder.buildDOByBO(any())).thenReturn(captured);
-        when(pointValueManager.save(any())).thenReturn(true);
+    void latestReadsSharedProjection() {
+        when(pointValueMapper.selectLatestPointValues(100L, 1L, List.of(10L)))
+                .thenReturn(List.of(numericDO));
+        when(pointValueBuilder.buildBOListByDOList(List.of(numericDO)))
+                .thenReturn(List.of(numericBO));
 
-        PointValueBO bo = PointValueBO.builder()
-                .deviceId(1L).pointId(10L).tenantId(100L)
-                .rawValue("99.9").calValue("99.9").numValue(99.9)
-                .build();
+        List<PointValueBO> result = service.listLatestPointValues(100L, 1L, List.of(10L));
 
-        service.savePointValue(bo);
-
-        verify(pointValueManager).save(doCaptor.capture());
-        // numValue should be exactly what the driver set, not re-parsed
-        assertThat(doCaptor.getValue().getNumValue()).isEqualTo(99.9);
+        assertThat(result).containsExactly(numericBO);
     }
 }

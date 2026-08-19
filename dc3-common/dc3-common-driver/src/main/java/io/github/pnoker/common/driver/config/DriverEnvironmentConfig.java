@@ -27,10 +27,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -41,7 +39,6 @@ import java.util.Map;
  * such as node, service, host, and client identifiers.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -49,16 +46,13 @@ import java.util.Map;
 public class DriverEnvironmentConfig implements EnvironmentPostProcessor {
 
     /**
-     * Registers legacy {@code driver.*} → {@code dc3.*} property aliases and adds
-     * the driver node/service/host/client identifiers to the {@link ConfigurableEnvironment}.
+     * Adds the driver node/service/host/client identifiers to the environment.
      *
      * @param environment the Spring environment being customized
      * @param application the current Spring application
      */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        addLegacyDriverAliases(environment);
-
         String node = environment.getProperty(EnvironmentConstant.DRIVER_NODE, String.class);
         if (StringUtils.isEmpty(node)) {
             node = EnvironmentUtil.getNodeId();
@@ -76,25 +70,6 @@ public class DriverEnvironmentConfig implements EnvironmentPostProcessor {
         source.put(EnvironmentConstant.DRIVER_CLIENT, client);
         MutablePropertySources propertySources = environment.getPropertySources();
         propertySources.addFirst(new MapPropertySource("driver", source));
-    }
-
-    private void addLegacyDriverAliases(ConfigurableEnvironment environment) {
-        Map<String, Object> aliases = new HashMap<>();
-        for (PropertySource<?> propertySource : environment.getPropertySources()) {
-            if (propertySource instanceof EnumerablePropertySource<?> enumerablePropertySource) {
-                for (String propertyName : enumerablePropertySource.getPropertyNames()) {
-                    if (propertyName.startsWith("driver.")) {
-                        String aliasName = "dc3." + propertyName;
-                        if (!environment.containsProperty(aliasName)) {
-                            aliases.put(aliasName, enumerablePropertySource.getProperty(propertyName));
-                        }
-                    }
-                }
-            }
-        }
-        if (!aliases.isEmpty()) {
-            environment.getPropertySources().addLast(new MapPropertySource("legacyDriverAliases", aliases));
-        }
     }
 
 }

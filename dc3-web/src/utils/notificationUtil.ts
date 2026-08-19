@@ -56,7 +56,7 @@ export const warnMessage = (
   }
 
   if (error) {
-    logger.debug(error);
+    logger.debug('Warning notification error detail', error);
   }
 
   ElNotification({
@@ -84,7 +84,7 @@ export const failMessage = (
   }
 
   if (error) {
-    logger.debug(error);
+    logger.debug('Failure notification error detail', error);
   }
 
   ElNotification({

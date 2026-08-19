@@ -24,12 +24,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Point-value ingest buffer tuning. Replaces the legacy speed/interval threshold pair: every
- * received point value enters a bounded queue and is flushed to the repository by worker
- * threads on a size-or-time trigger.
+ * RabbitMQ-to-PostgreSQL point-value batch ingestion tuning.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2026.7.8
  */
 @Getter
@@ -38,15 +35,30 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "dc3.data.point.batch")
 public class PointBatchProperties {
 
-    @Min(value = 1, message = "Point batch queue capacity must be greater than 0")
-    private int queueCapacity = 100000;
-
     @Min(value = 1, message = "Point batch size must be greater than 0")
-    private int batchSize = 1000;
+    private int batchSize = 500;
 
-    @Min(value = 1, message = "Point batch flush interval must be greater than 0")
-    private long flushIntervalMillis = 500;
+    @Min(value = 1, message = "Point batch receive timeout must be greater than 0")
+    private long receiveTimeoutMillis = 100;
 
-    @Min(value = 1, message = "Point batch worker count must be greater than 0")
-    private int workerCount = 4;
+    @Min(value = 1, message = "Point consumer count must be greater than 0")
+    private int concurrentConsumers = 4;
+
+    @Min(value = 1, message = "Point maximum consumer count must be greater than 0")
+    private int maxConcurrentConsumers = 16;
+
+    @Min(value = 1, message = "Point prefetch count must be greater than 0")
+    private int prefetchCount = 1000;
+
+    @Min(value = 0, message = "Point retry count can't be negative")
+    private int maxRetries = 3;
+
+    @Min(value = 1, message = "Point retry initial interval must be greater than 0")
+    private long retryInitialIntervalMillis = 1000;
+
+    @Min(value = 1, message = "Point retry multiplier must be at least 1")
+    private int retryMultiplier = 2;
+
+    @Min(value = 1, message = "Point retry maximum interval must be greater than 0")
+    private long retryMaxIntervalMillis = 10000;
 }

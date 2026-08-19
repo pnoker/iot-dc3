@@ -23,12 +23,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * M-Bus (Meter-Bus) driver application.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class MbusDriverApplication {
 
+    /**
+     * Start the mbus driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(MbusDriverApplication.class, args);
     }

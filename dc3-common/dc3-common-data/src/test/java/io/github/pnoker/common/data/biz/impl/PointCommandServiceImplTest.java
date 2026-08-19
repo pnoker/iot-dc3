@@ -22,11 +22,9 @@ import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.data.entity.builder.PointCommandHistoryBuilder;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.data.validator.PointCommandValidator;
+import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -35,6 +33,7 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +43,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,6 +51,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class PointCommandServiceImplTest {
@@ -74,9 +76,6 @@ class PointCommandServiceImplTest {
     private PointCommandHistoryBuilder pointCommandHistoryBuilder;
 
     @Mock
-    private EntityStateMapper entityStateMapper;
-
-    @Mock
     private PointCommandValidator pointCommandValidator;
 
     @InjectMocks
@@ -98,6 +97,12 @@ class PointCommandServiceImplTest {
         driver = new FacadeDriverBO();
         driver.setId(30L);
         driver.setServiceName("dc3-driver-modbus-tcp");
+        lenient().doAnswer(invocation -> {
+            CorrelationData correlation = invocation.getArgument(3);
+            correlation.getFuture().complete(new CorrelationData.Confirm(true, null));
+            return null;
+        }).when(rabbitTemplate).convertAndSend(any(String.class), any(String.class),
+                any(PointCommandDTO.class), any(CorrelationData.class));
     }
 
     @Test
@@ -105,7 +110,7 @@ class PointCommandServiceImplTest {
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
         when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(driver);
-        mockDriverOnline();
+        mockActiveOwner();
 
         PointCommandReadBO vo = new PointCommandReadBO();
         vo.setDeviceId(10L);
@@ -114,7 +119,7 @@ class PointCommandServiceImplTest {
 
         verify(rabbitTemplate).convertAndSend(
                 eq(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND),
-                eq(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + "dc3-driver-modbus-tcp"),
+                eq(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + "dc3-driver-modbus-tcp.node-a"),
                 any(Object.class),
                 any(org.springframework.amqp.rabbit.connection.CorrelationData.class));
         verify(pointCommandHistoryManager).save(any());
@@ -191,7 +196,7 @@ class PointCommandServiceImplTest {
         when(deviceFacade.getById(1L, 10L)).thenReturn(device);
         when(pointFacade.getById(1L, 20L)).thenReturn(point);
         when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(driver);
-        mockDriverOnline();
+        mockActiveOwner();
 
         PointCommandWriteBO vo = new PointCommandWriteBO();
         vo.setDeviceId(10L);
@@ -201,7 +206,7 @@ class PointCommandServiceImplTest {
 
         verify(rabbitTemplate).convertAndSend(
                 eq(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND),
-                eq(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + "dc3-driver-modbus-tcp"),
+                eq(RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + "dc3-driver-modbus-tcp.node-a"),
                 any(Object.class),
                 any(org.springframework.amqp.rabbit.connection.CorrelationData.class));
         verify(pointCommandHistoryManager).save(any());
@@ -281,9 +286,8 @@ class PointCommandServiceImplTest {
                 .hasMessageContaining("not writable");
     }
 
-    private void mockDriverOnline() {
-        EntityStateDO driverState = new EntityStateDO();
-        driverState.setStateFlag(EntityStatusEnum.ONLINE.getIndex());
-        when(entityStateMapper.selectOne(any())).thenReturn(driverState);
+    private void mockActiveOwner() {
+        when(deviceFacade.getActiveOwner(1L, 10L))
+                .thenReturn(new FacadeDeviceOwnerBO(30L, "node-a", 77L));
     }
 }

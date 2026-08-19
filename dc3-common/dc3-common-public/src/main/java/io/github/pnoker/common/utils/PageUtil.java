@@ -34,7 +34,6 @@ import java.util.function.Function;
  * Converts {@code Pages} DTO to MyBatis-Plus {@code Page}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

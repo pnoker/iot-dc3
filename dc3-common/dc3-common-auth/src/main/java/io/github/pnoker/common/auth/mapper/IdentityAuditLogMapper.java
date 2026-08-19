@@ -27,11 +27,22 @@ import java.util.List;
  * MyBatis-Plus mapper for the dc3_identity_audit_log table.
  *
  * @author pnoker
- * @version 2026.6.14
  * @since 2026.6.14
  */
 public interface IdentityAuditLogMapper extends BaseMapper<IdentityAuditLogDO> {
 
+    /**
+     * Return the matching identity audit.
+     *
+     * @param tenantId tenant identifier
+     * @param principalId principal identifier
+     * @param action action to execute
+     * @param resourceType resource type
+     * @param resourceId resource identifier
+     * @param status status
+     * @param limit limit
+     * @return list identifierentity audit result
+     */
     List<IdentityAuditLogDO> listIdentityAudit(@Param("tenantId") Long tenantId,
                                                @Param("principalId") Long principalId,
                                                @Param("action") String action,

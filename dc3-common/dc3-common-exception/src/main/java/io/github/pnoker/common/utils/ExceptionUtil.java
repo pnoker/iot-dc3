@@ -27,7 +27,6 @@ import java.text.MessageFormat;
  * Utility methods for exception message formatting.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j

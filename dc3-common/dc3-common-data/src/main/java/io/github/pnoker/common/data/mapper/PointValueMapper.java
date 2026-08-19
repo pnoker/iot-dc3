@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.entity.bo.WindowAggregateResult;
 import io.github.pnoker.common.entity.query.WindowAggregateQuery;
@@ -30,10 +31,23 @@ import java.util.List;
  * Point value Mapper.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface PointValueMapper extends BaseMapper<PointValueDO> {
+
+    /**
+     * Insert a telemetry batch into the Timescale history table. Replayed events are
+     * ignored by the event identity unique index.
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    List<String> insertHistoryBatch(@Param("values") List<PointValueDO> values);
+
+    /**
+     * Upsert the shared latest-value projection without allowing an older reading to
+     * replace a newer one.
+     */
+    @InterceptorIgnore(tenantLine = "true")
+    int upsertLatestBatch(@Param("values") List<PointValueDO> values);
 
     /**
      * Run a SQL aggregate (AVG/MIN/MAX/SUM/COUNT) over the rows that match
@@ -56,9 +70,7 @@ public interface PointValueMapper extends BaseMapper<PointValueDO> {
 
     /**
      * Batch query the latest point value for each point within a single device.
-     * Uses PostgreSQL {@code DISTINCT ON} to pick the row with the most recent
-     * {@code create_time} per {@code (device_id, point_id)} pair, replacing the
-     * N+1 loop that previously called {@code selectLatestPointValue} once per point.
+     * Reads from the transactional latest-value projection.
      */
     List<PointValueDO> selectLatestPointValues(@Param("tenantId") Long tenantId,
                                                @Param("deviceId") Long deviceId,

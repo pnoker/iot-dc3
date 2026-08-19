@@ -46,7 +46,6 @@ import java.util.List;
  * REST controller exposing agentic action management endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Tag(name = "action", description = "Agent action definitions: manage AI agent tool definitions including parameter schemas, execution handlers, and result formats for agentic workflow orchestration")

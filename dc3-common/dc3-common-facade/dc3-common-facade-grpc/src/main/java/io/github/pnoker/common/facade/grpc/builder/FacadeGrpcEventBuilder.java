@@ -41,12 +41,17 @@ import java.util.Optional;
  * Hand-rolled conversion between facade shapes and protobuf event types.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcEventBuilder {
 
+    /**
+     * To grpc page query.
+     *
+     * @param query query
+     * @return to grpc page query result
+     */
     public GrpcPageEventQuery toGrpcPageQuery(FacadeEventQuery query) {
         GrpcPageEventQuery.Builder builder = GrpcPageEventQuery.newBuilder();
 
@@ -74,6 +79,12 @@ public class FacadeGrpcEventBuilder {
         return builder.build();
     }
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeEventBO toFacadeBO(GrpcEventDTO dto) {
         if (Objects.isNull(dto)) {
             return null;

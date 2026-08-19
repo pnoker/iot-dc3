@@ -32,7 +32,6 @@ import java.util.Map;
  * rendered by the frontend through a fixed chart whitelist.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -83,6 +82,13 @@ public class AgenticVisualizationSpec implements Serializable {
 
         private String shape;
 
+        /**
+         * Xy.
+         *
+         * @param x x
+         * @param y y
+         * @return xy result
+         */
         public static Encode xy(String x, String y) {
             Encode encode = new Encode();
             encode.setX(x);

@@ -32,7 +32,6 @@ import java.time.LocalDateTime;
  * Business object for driver token operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter

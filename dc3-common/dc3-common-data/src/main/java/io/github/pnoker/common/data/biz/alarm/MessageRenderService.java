@@ -26,7 +26,6 @@ import java.util.Map;
  * Renders structured message templates into channel payloads.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface MessageRenderService {

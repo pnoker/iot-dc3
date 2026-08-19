@@ -37,7 +37,6 @@ import java.util.Optional;
  * Feishu bot notification channel adapter.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service

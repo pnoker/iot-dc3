@@ -39,7 +39,6 @@ import java.util.List;
  * or gRPC facade for distributed center services.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -73,7 +72,7 @@ public class ResourceRegistrar {
             if (properties.isFailFast()) {
                 throw new IllegalStateException(msg);
             }
-            log.warn(msg);
+            log.warn("Resource registrar disabled, reason=serviceNameUnavailable");
             return;
         }
         try {
@@ -85,14 +84,14 @@ public class ResourceRegistrar {
                     .build();
             FacadeResourceRegistrySyncResultBO result = facade.sync(command);
             log.info(
-                    "Resource registrar synced {} endpoints for [{}]: inserted={}, updated={}, deleted={}, unchanged={}",
-                    apis.size(), serviceName, result.getInserted(), result.getUpdated(), result.getDeleted(),
+                    "Resource registrar synchronized, serviceName={}, endpointCount={}, inserted={}, updated={}, deleted={}, unchanged={}",
+                    serviceName, apis.size(), result.getInserted(), result.getUpdated(), result.getDeleted(),
                     result.getUnchanged());
         } catch (RuntimeException e) {
             if (properties.isFailFast()) {
                 throw e;
             }
-            log.error("Resource registrar failed to sync endpoints for [{}]", serviceName, e);
+            log.error("Resource registrar synchronization failed, serviceName={}", serviceName, e);
         }
     }
 

@@ -18,81 +18,115 @@
 package io.github.pnoker.common.data.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.buffer.PointValueIngestBuffer;
+import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.utils.JsonUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
-import static org.mockito.ArgumentMatchers.eq;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
-/**
- * Verifies the receiver routes messages to the ingest buffer and applies back-pressure
- * (nack-requeue) when the buffer is full.
- *
- * @author pnoker
- * @version 2026.7.8
- * @since 2026.7.8
- */
 @ExtendWith(MockitoExtension.class)
 class PointValueReceiverTest {
 
     @Mock
-    private PointValueIngestBuffer buffer;
+    private PointValueService pointValueService;
 
     @Mock
     private Channel channel;
 
     private PointValueReceiver receiver;
-    private Message message;
 
     @BeforeEach
     void setUp() {
-        receiver = new PointValueReceiver(buffer);
-        MessageProperties props = new MessageProperties();
-        props.setDeliveryTag(7L);
-        message = new Message(new byte[0], props);
+        receiver = new PointValueReceiver(pointValueService);
     }
 
     @Test
-    void rejectsNullPayload() throws Exception {
-        receiver.pointValueReceive(channel, message, null);
-        verifyNoInteractions(buffer);
-        verify(channel).basicReject(eq(7L), eq(false));
+    void persistsCompleteBatchBeforeAcknowledging() throws Exception {
+        Message first = message(validValue("m-1", 1L), 7L);
+        Message second = message(validValue("m-2", 2L), 8L);
+
+        receiver.pointValueReceive(List.of(first, second), channel);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<PointValueBO>> captor = ArgumentCaptor.forClass(List.class);
+        verify(pointValueService).save(captor.capture());
+        assertThat(captor.getValue()).extracting(PointValueBO::getMessageId)
+                .containsExactly("m-1", "m-2");
+        verify(channel).basicAck(8L, true);
     }
 
     @Test
-    void rejectsPayloadWithoutDeviceId() throws Exception {
-        PointValueBO bo = PointValueBO.builder().pointId(20L).build();
-        receiver.pointValueReceive(channel, message, bo);
-        verifyNoInteractions(buffer);
-        verify(channel).basicReject(eq(7L), eq(false));
+    void doesNotAcknowledgeWhenPersistenceFails() throws Exception {
+        doThrow(new IllegalStateException("database unavailable"))
+                .when(pointValueService).save(anyList());
+
+        Message message = message(validValue("m-1", 1L), 7L);
+
+        assertThatThrownBy(() -> receiver.pointValueReceive(List.of(message), channel))
+                .isInstanceOf(IllegalStateException.class);
+        verify(channel, never()).basicAck(7L, true);
     }
 
     @Test
-    void offersAndAcks() throws Exception {
-        PointValueBO bo = PointValueBO.builder().deviceId(10L).pointId(20L).rawValue("v").build();
-        when(buffer.offer(bo)).thenReturn(true);
-        receiver.pointValueReceive(channel, message, bo);
-        verify(buffer).offer(bo);
-        verify(channel).basicAck(eq(7L), eq(false));
+    void rejectsEntireBatchWhenWireContractIsInvalid() {
+        PointValueBO invalid = validValue("m-1", 1L);
+        invalid.setDriverNode(null);
+
+        assertThatThrownBy(() -> receiver.pointValueReceive(List.of(message(invalid, 7L)), channel))
+                .isInstanceOf(AmqpRejectAndDontRequeueException.class);
+        verifyNoInteractions(pointValueService);
     }
 
     @Test
-    void nacksAndRequeuesWhenBufferFull() throws Exception {
-        PointValueBO bo = PointValueBO.builder().deviceId(10L).pointId(20L).rawValue("v").build();
-        when(buffer.offer(bo)).thenReturn(false);
-        receiver.pointValueReceive(channel, message, bo);
-        verify(buffer).offer(bo);
-        verify(channel).basicNack(eq(7L), eq(false), eq(true));
-        verify(channel, never()).basicAck(eq(7L), eq(false));
+    void rejectsMalformedJson() {
+        MessageProperties properties = new MessageProperties();
+        properties.setDeliveryTag(7L);
+        Message malformed = new Message("{".getBytes(StandardCharsets.UTF_8), properties);
+
+        assertThatThrownBy(() -> receiver.pointValueReceive(List.of(malformed), channel))
+                .isInstanceOf(AmqpRejectAndDontRequeueException.class);
+        verifyNoInteractions(pointValueService);
+    }
+
+    private PointValueBO validValue(String messageId, long sequence) {
+        return PointValueBO.builder()
+                .messageId(messageId)
+                .schemaVersion(1)
+                .driverNode("node-a")
+                .sequence(sequence)
+                .fencingToken(77L)
+                .tenantId(100L)
+                .driverId(200L)
+                .deviceId(10L)
+                .pointId(20L)
+                .rawValue("42")
+                .calValue("42")
+                .createTime(LocalDateTime.now())
+                .build();
+    }
+
+    private Message message(PointValueBO value, long deliveryTag) {
+        MessageProperties properties = new MessageProperties();
+        properties.setDeliveryTag(deliveryTag);
+        return new Message(JsonUtil.toJsonString(value).getBytes(StandardCharsets.UTF_8), properties);
     }
 }

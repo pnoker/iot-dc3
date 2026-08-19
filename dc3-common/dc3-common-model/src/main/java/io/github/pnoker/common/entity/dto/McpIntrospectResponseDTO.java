@@ -33,7 +33,6 @@ import java.util.Set;
  * Auth-to-gateway MCP token introspection response.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -80,6 +79,11 @@ public class McpIntrospectResponseDTO implements Serializable {
 
     private String scope;
 
+    /**
+     * Inactive.
+     *
+     * @return inactive result
+     */
     public static McpIntrospectResponseDTO inactive() {
         return McpIntrospectResponseDTO.builder().active(false).build();
     }

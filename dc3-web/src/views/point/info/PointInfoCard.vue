@@ -82,7 +82,7 @@ const isSelect = computed(() =>
 </script>
 
 <style lang="scss" scoped>
-// PointInfoCard 内联了一个简化的 header(无状态标签),不使用 ThingsCardHeader,在此补齐样式。
+// PointInfoCard has a simplified header without a status tag, so it supplies its own header styles.
 
 .cursor-pointer {
   cursor: pointer;

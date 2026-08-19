@@ -28,7 +28,6 @@ import org.springframework.validation.annotation.Validated;
  * LwM2M Properties Configuration Class
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter

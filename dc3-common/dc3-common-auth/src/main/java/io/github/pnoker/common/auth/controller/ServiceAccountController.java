@@ -57,7 +57,6 @@ import java.util.Objects;
  * REST controller exposing service account management endpoints.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Tag(name = "service_account", description = "Service account lifecycle: manage machine-to-machine identities including creation, update, credential rotation, and enablement")

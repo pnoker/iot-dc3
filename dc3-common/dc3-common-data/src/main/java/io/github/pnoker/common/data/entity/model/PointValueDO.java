@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
  * Persistence object for the dc3_point_value table.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -42,6 +41,34 @@ public class PointValueDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Immutable event identity used for idempotent inserts.
+     */
+    @TableField("message_id")
+    private String messageId;
+
+    /**
+     * Wire schema version.
+     */
+    @TableField("schema_version")
+    private Integer schemaVersion;
+
+    /**
+     * Unique runtime node that produced this reading.
+     */
+    @TableField("driver_node")
+    private String driverNode;
+
+    /**
+     * Monotonically increasing sequence within {@link #driverNode}.
+     */
+    @TableField("sequence")
+    private Long sequence;
+
+    /** Manager-issued device ownership fencing token. */
+    @TableField("fencing_token")
+    private Long fencingToken;
 
     /**
      * Device ID

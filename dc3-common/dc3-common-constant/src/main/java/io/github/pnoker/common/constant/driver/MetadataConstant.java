@@ -26,7 +26,6 @@ import io.github.pnoker.common.constant.common.SuffixConstant;
  * Constants for driver metadata attributes and configuration.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class MetadataConstant {
@@ -39,7 +38,6 @@ public class MetadataConstant {
      * Profile metadata related constants
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Profile {
@@ -60,7 +58,6 @@ public class MetadataConstant {
      * Point metadata related constants
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Point {
@@ -81,7 +78,6 @@ public class MetadataConstant {
      * Device metadata related constants
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Device {
@@ -102,7 +98,6 @@ public class MetadataConstant {
      * Driver configuration metadata related constants
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class DriverConfig {
@@ -123,7 +118,6 @@ public class MetadataConstant {
      * Point configuration metadata related constants
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class PointConfig {

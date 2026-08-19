@@ -33,7 +33,6 @@ import org.apache.commons.lang3.StringUtils;
  * routing reads severity from the resolved alarm level, not from the message.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.21
  */
 public final class AlarmLevelResolver {

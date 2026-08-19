@@ -24,13 +24,18 @@ import io.github.pnoker.api.common.GrpcDriverQuery;
 import io.github.pnoker.api.common.GrpcEventAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
+import io.github.pnoker.api.common.driver.GrpcDriverLeaseRequest;
+import io.github.pnoker.api.common.driver.GrpcRDriverLeaseDTO;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
 import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.manager.biz.DriverRegisterService;
+import io.github.pnoker.common.manager.biz.DriverLeaseService;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
+import io.github.pnoker.common.manager.entity.bo.DeviceLeaseBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
+import io.github.pnoker.common.manager.entity.bo.DriverLeaseGrantBO;
 import io.github.pnoker.common.manager.entity.bo.EventAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.grpc.builder.GrpcCommandAttributeBuilder;
@@ -39,7 +44,6 @@ import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcEventAttributeBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointAttributeBuilder;
 import io.github.pnoker.common.manager.service.CommandAttributeService;
-import io.github.pnoker.common.manager.service.DeviceService;
 import io.github.pnoker.common.manager.service.DriverAttributeService;
 import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.EventAttributeService;
@@ -55,6 +59,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -98,7 +103,7 @@ class DriverDriverServerTest {
     private EventAttributeService eventAttributeService;
 
     @Mock
-    private DeviceService deviceService;
+    private DriverLeaseService driverLeaseService;
 
     private Server server;
     private ManagedChannel channel;
@@ -109,7 +114,7 @@ class DriverDriverServerTest {
         DriverDriverServer driverServer = new DriverDriverServer(grpcDriverBuilder, grpcDriverAttributeBuilder,
                 grpcPointAttributeBuilder, grpcCommandAttributeBuilder, grpcEventAttributeBuilder,
                 driverRegisterService, driverService, driverAttributeService, pointAttributeService,
-                commandAttributeService, eventAttributeService, deviceService);
+                commandAttributeService, eventAttributeService, driverLeaseService);
 
         String name = "dc3-driver-metadata-" + UUID.randomUUID();
         server = InProcessServerBuilder.forName(name).directExecutor().addService(driverServer).build().start();
@@ -156,7 +161,6 @@ class DriverDriverServerTest {
                 .thenReturn(GrpcCommandAttributeDTO.newBuilder().build());
         when(grpcEventAttributeBuilder.buildGrpcDTOByBO(eventAttribute))
                 .thenReturn(GrpcEventAttributeDTO.newBuilder().build());
-        when(deviceService.listIdsByDriverId(7L, 100L)).thenReturn(List.of(1L, 2L));
 
         GrpcRDriverRegisterDTO response = stub.getById(GrpcDriverQuery.newBuilder().setDriverId(7L).build());
 
@@ -166,7 +170,31 @@ class DriverDriverServerTest {
         assertThat(response.getPointAttributesCount()).isEqualTo(1);
         assertThat(response.getCommandAttributesCount()).isEqualTo(1);
         assertThat(response.getEventAttributesCount()).isEqualTo(1);
-        assertThat(response.getDeviceIdsList()).containsExactly(1L, 2L);
+    }
+
+    @Test
+    void renewLeaseStreamsBoundedAssignmentPages() {
+        GrpcDriverLeaseRequest request = GrpcDriverLeaseRequest.newBuilder()
+                .setTenantId(100L).setDriverId(7L).setNode("node-a")
+                .setClient("client-a").setHost("host-a").setLeaseSeconds(30).build();
+        when(driverLeaseService.renew(100L, 7L, "node-a", "client-a", "host-a", 30, 0))
+                .thenReturn(new DriverLeaseGrantBO(123_456L, 9L, true));
+        List<DeviceLeaseBO> first = java.util.stream.LongStream.rangeClosed(1, 1001)
+                .mapToObj(id -> new DeviceLeaseBO(7L, id, "node-a", id + 1000)).toList();
+        when(driverLeaseService.getAssignmentVersion(100L, 7L)).thenReturn(9L);
+        when(driverLeaseService.listOwnedLeases(100L, 7L, "node-a", 0L, 1001)).thenReturn(first);
+        when(driverLeaseService.listOwnedLeases(100L, 7L, "node-a", 1000L, 1001))
+                .thenReturn(List.of(first.getLast()));
+
+        Iterator<GrpcRDriverLeaseDTO> responses = stub.renewLease(request);
+        GrpcRDriverLeaseDTO pageOne = responses.next();
+        GrpcRDriverLeaseDTO pageTwo = responses.next();
+
+        assertThat(pageOne.getDeviceLeasesCount()).isEqualTo(1000);
+        assertThat(pageOne.getSnapshotComplete()).isFalse();
+        assertThat(pageTwo.getDeviceLeasesCount()).isEqualTo(1);
+        assertThat(pageTwo.getSnapshotComplete()).isTrue();
+        assertThat(responses.hasNext()).isFalse();
     }
 
     @Test

@@ -33,7 +33,6 @@ import java.io.IOException;
  * another opaque listener failure with the same root cause.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.9
  */
 @Slf4j
@@ -43,6 +42,12 @@ public class RabbitAckUtil {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
+    /**
+     * Ack.
+     *
+     * @param channel channel
+     * @param deliveryTag delivery tag
+     */
     public static void ack(Channel channel, long deliveryTag) {
         try {
             channel.basicAck(deliveryTag, false);
@@ -51,6 +56,12 @@ public class RabbitAckUtil {
         }
     }
 
+    /**
+     * Reject.
+     *
+     * @param channel channel
+     * @param deliveryTag delivery tag
+     */
     public static void reject(Channel channel, long deliveryTag) {
         try {
             channel.basicReject(deliveryTag, false);
@@ -59,6 +70,13 @@ public class RabbitAckUtil {
         }
     }
 
+    /**
+     * Nack.
+     *
+     * @param channel channel
+     * @param deliveryTag delivery tag
+     * @param requeue requeue
+     */
     public static void nack(Channel channel, long deliveryTag, boolean requeue) {
         try {
             channel.basicNack(deliveryTag, false, requeue);

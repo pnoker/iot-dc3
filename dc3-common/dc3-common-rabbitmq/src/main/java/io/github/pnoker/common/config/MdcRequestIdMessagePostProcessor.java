@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.config;
 
+import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
 import org.slf4j.MDC;
@@ -44,24 +45,13 @@ import org.springframework.amqp.core.MessagePostProcessor;
  * unit-tested directly without reaching into the {@code RabbitTemplate} via reflection.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2026.7.8
  */
 public class MdcRequestIdMessagePostProcessor implements MessagePostProcessor {
 
-    /**
-     * MDC key — kept in sync with {@code RequestIdWebFilter.MDC_REQUEST_ID}.
-     */
-    public static final String MDC_REQUEST_ID = "requestId";
-
-    /**
-     * AMQP header carrying the request id, mirroring the HTTP/gRPC {@code X-Request-Id}.
-     */
-    public static final String HEADER_REQUEST_ID = "X-Request-Id";
-
     @Override
     public Message postProcessMessage(Message message) {
-        String requestId = MDC.get(MDC_REQUEST_ID);
+        String requestId = MDC.get(RequestIdConstant.MDC_KEY);
 
         // If MDC doesn't have requestId, try to get it from OpenTelemetry
         if (requestId == null || requestId.isBlank()) {
@@ -73,7 +63,7 @@ public class MdcRequestIdMessagePostProcessor implements MessagePostProcessor {
         }
 
         if (requestId != null && !requestId.isBlank()) {
-            message.getMessageProperties().setHeader(HEADER_REQUEST_ID, requestId);
+            message.getMessageProperties().setHeader(RequestIdConstant.HEADER, requestId);
         }
         return message;
     }

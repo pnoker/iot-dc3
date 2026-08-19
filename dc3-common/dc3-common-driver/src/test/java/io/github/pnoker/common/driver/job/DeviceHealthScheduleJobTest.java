@@ -35,7 +35,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.JobExecutionContext;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -86,7 +85,7 @@ class DeviceHealthScheduleJobTest {
     @Test
     void reportsOnlineWhenDeviceHealthReturnsOnline() {
         DeviceBO device = enabledDevice(10L);
-        driverMetadata.setDeviceIds(Set.of(10L));
+        installDeviceLease(10L);
         when(deviceMetadata.getCache(10L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(10L)).thenReturn(Map.of());
         when(driverCustomService.health(Map.of(), device)).thenReturn(DeviceHealthState.online());
@@ -100,7 +99,7 @@ class DeviceHealthScheduleJobTest {
     @Test
     void reportsOfflineWhenDeviceHealthReturnsOffline() {
         DeviceBO device = enabledDevice(11L);
-        driverMetadata.setDeviceIds(Set.of(11L));
+        installDeviceLease(11L);
         when(deviceMetadata.getCache(11L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(11L)).thenReturn(Map.of());
         when(driverCustomService.health(Map.of(), device)).thenReturn(DeviceHealthState.offline());
@@ -114,7 +113,7 @@ class DeviceHealthScheduleJobTest {
     @Test
     void reportsFaultWhenDeviceHealthReturnsFault() {
         DeviceBO device = enabledDevice(16L);
-        driverMetadata.setDeviceIds(Set.of(16L));
+        installDeviceLease(16L);
         when(deviceMetadata.getCache(16L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(16L)).thenReturn(Map.of());
         when(driverCustomService.health(Map.of(), device)).thenReturn(DeviceHealthState.fault());
@@ -128,7 +127,7 @@ class DeviceHealthScheduleJobTest {
     @Test
     void reportsOfflineWhenDeviceHealthThrows() {
         DeviceBO device = enabledDevice(12L);
-        driverMetadata.setDeviceIds(Set.of(12L));
+        installDeviceLease(12L);
         when(deviceMetadata.getCache(12L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(12L)).thenReturn(Map.of());
         doThrow(new IllegalStateException("session down")).when(driverCustomService).health(Map.of(), device);
@@ -142,7 +141,7 @@ class DeviceHealthScheduleJobTest {
     @Test
     void reportsDeviceSpecificTimeoutWhenProvidedByHealthHook() {
         DeviceBO device = enabledDevice(15L);
-        driverMetadata.setDeviceIds(Set.of(15L));
+        installDeviceLease(15L);
         when(deviceMetadata.getCache(15L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(15L)).thenReturn(Map.of());
         when(driverCustomService.health(Map.of(), device))
@@ -158,7 +157,7 @@ class DeviceHealthScheduleJobTest {
     void skipsDisabledDevice() {
         DeviceBO device = enabledDevice(13L);
         device.setEnableFlag(EnableFlagEnum.DISABLE);
-        driverMetadata.setDeviceIds(Set.of(13L));
+        installDeviceLease(13L);
         when(deviceMetadata.getCache(13L)).thenReturn(device);
 
         job.executeInternal(jobContext);
@@ -170,7 +169,7 @@ class DeviceHealthScheduleJobTest {
     void skipsDeviceWhenRequiredDriverConfigIsIncomplete() {
         driverMetadata.getDriverAttributeIdMap().put(1L, new DriverAttributeDTO());
         DeviceBO device = enabledDevice(14L);
-        driverMetadata.setDeviceIds(Set.of(14L));
+        installDeviceLease(14L);
         when(deviceMetadata.getCache(14L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(14L)).thenReturn(Map.of());
 
@@ -178,6 +177,10 @@ class DeviceHealthScheduleJobTest {
 
         verify(driverCustomService, never()).health(any(), any());
         verifyNoInteractions(driverSenderService);
+    }
+
+    private void installDeviceLease(long deviceId) {
+        driverMetadata.setDeviceLeases(Map.of(deviceId, 1L), System.currentTimeMillis() + 60_000, 1L);
     }
 
 }

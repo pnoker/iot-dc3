@@ -24,7 +24,6 @@ import io.github.pnoker.common.manager.entity.model.EventParamDO;
  * MyBatis-Plus mapper for the dc3_event_param table.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface EventParamMapper extends BaseMapper<EventParamDO> {

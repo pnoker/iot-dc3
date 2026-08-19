@@ -6,6 +6,10 @@
 universal response wrapper (`R<T>`), `BaseService`, shared request/pagination/tree entities, tenant markers, HTTP client
 configuration, HMAC signing, and framework-neutral utility functions.
 
+Java `public` visibility does not determine module ownership. Framework- or capability-specific public APIs and helpers
+remain in the narrowest owning module; platform-wide constants and shared top-level enums belong to
+`dc3-common-constant`.
+
 ## Module Information
 
 - **Group ID**: io.github.pnoker

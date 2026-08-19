@@ -53,7 +53,6 @@ import java.util.Objects;
  * always pinned to the caller's tenant, and delete verifies ownership before removing.
  *
  * @author pnoker
- * @version 2026.6.13
  * @since 2026.6.13
  */
 @Tag(name = "tenant_membership", description = "Tenant membership bindings: associate users, service accounts, and roles with tenants for access control within tenant scope")

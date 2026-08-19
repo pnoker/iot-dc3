@@ -41,7 +41,6 @@ export default defineComponent({
   setup() {
     const route = useRoute();
 
-    // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
       active: (route.query.active as string) || 'detail',

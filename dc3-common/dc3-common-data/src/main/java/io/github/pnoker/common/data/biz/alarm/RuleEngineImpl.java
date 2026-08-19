@@ -30,14 +30,13 @@ import java.util.Objects;
  *
  * <p>Recovery is treated as a state transition, not an independent match: even
  * when the current fact satisfies the rule's recovery condition, no
- * {@link RuleMatch.recovery} is produced unless an existing FIRING row in
+ * {@link RuleMatch#recovery(RuleBO, RuleFact)} is produced unless an existing FIRING row in
  * {@code dc3_rule_state} attests that the rule actually fired earlier. Without
  * this guard a cold start would emit {@code RECOVERED} notifications for rules
  * that never fired, and any normal data point that happens to satisfy the
  * recovery threshold would do the same.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service

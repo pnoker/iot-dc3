@@ -253,11 +253,9 @@ export default {
     driverAlarms: '今日驱动告警',
     alertUnconfirmed: '未处理 {n} 条',
     deviceAlarms: '今日设备告警',
-    // 每张卡 subtitle 补充同数据域的另一面信息,和事件概览保持一致的排版节奏:
-    //   实体卡 → 累计告警数
-    //   位号卡 → 分布于多少模板
-    //   今日数据 → 累计条数(todayTotal 已有)
-    //   今日告警 → 未处理数(alertUnconfirmed 已有)
+    // Pair each subtitle with a complementary metric from the same data domain,
+    // following the event overview layout: cumulative alarms, profile distribution,
+    // cumulative records, and unresolved alerts respectively.
     entityAlarms: '累计告警 {n} 条',
     pointsAcrossProfiles: '分布于 {n} 个模板',
     vsYesterday: '较昨日',
@@ -277,8 +275,7 @@ export default {
       topPoint: '活跃位号 TOP 10',
       topDriver: '活跃驱动 TOP 10',
       dailyVolume: '每日数据量',
-      // 每个 tab 下方的 caption 行,说明当前图表的统计口径和排序依据,
-      // 让用户一眼知道这张图到底在讲什么。
+      // Each caption states the chart's aggregation and ranking criteria.
       captionDeviceStatus: '按启用状态分组，展示启用与禁用占比',
       captionProtocol: '驱动按 service_name 聚合(modbus-tcp / mqtt / opc-ua 等)',
       captionProfile: '设备按所属 Profile 聚合,取设备数最多的前 10 个模板',
@@ -909,8 +906,8 @@ export default {
         driverUnconfirmed: '累计驱动未确认',
         todayDevice: '今日设备事件',
         todayDriver: '今日驱动事件',
-        // 6 张卡统一 subtitle:总量卡显示"多少未处理";未确认卡显示"占累计的比例";
-        // 今日卡显示"今日未确认"。
+        // Keep all six card subtitles parallel: totals show unresolved counts,
+        // unresolved cards show their share of the total, and daily cards show today's unresolved count.
         subtitleTotalUnconfirmed: '未确认 {unconfirmed}/{total} · {pct}%',
         subtitleUnconfirmedOfTotal: '累计 {total} 条 · 占 {pct}%',
         subtitleTodayUnconfirmed: '未确认 {unconfirmed} 条',

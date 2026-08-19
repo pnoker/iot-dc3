@@ -37,8 +37,8 @@ For Compose interpolation, copy the root template first:
 cp .env.example .env
 ```
 
-See `dc3/doc/ENVIRONMENT.md` for the difference between `.env.example`, `.env`, `dc3/env/dev.env`, and
-`dc3/env/dev.env.sh`, including JetBrains IDEA usage.
+See the [environment guide](https://docs.dc3.site/en/quickstart/environment) for the difference between `.env.example`,
+`.env`, `dc3/env/dev.env`, and `dc3/env/dev.env.sh`, including JetBrains IDEA usage.
 
 ## Branches and Pull Requests
 
@@ -46,8 +46,9 @@ IoT DC3 follows a simplified Git Flow:
 
 - `develop` — integration branch. Cut `feature/<scope>` branches from `develop` and open pull requests back against
   `develop`. Full CI (lint / test / build / e2e) runs here.
-- `main` — production trunk. Verified work is promoted from `develop` to `main` via pull request. Each merge to `main`
-  is a release (a tag is cut and artifacts are published).
+- `main` — production trunk. Verified work is promoted from `develop` to `main` via pull request. A release is published
+  only after the version and generated changelog are committed and the matching `v<project.version>` tag is explicitly
+  created.
 - `hotfix/<scope>` — cut from `main` for production fixes; open the PR back against `main` (then tag), and back-merge to
   `develop`.
 - `release` — archived (read-only). It is kept for history only; do not open pull requests against it.
@@ -70,8 +71,8 @@ Allowed types are `feat`, `fix`, `perf`, `refactor`, `docs`, `build`, `ci`, `tes
 `revert`. Use English, keep the subject specific, and avoid vague descriptions such as `update`, `fix`, `misc`, `wip`,
 or `.` because release notes are generated from commit history.
 
-Husky Git hooks are pre-installed in the repository (`.husky/`). The `pre-commit` hook automatically runs lint-staged
-(eslint + prettier) on staged files before each commit. No manual setup is needed.
+The repository provides a Husky `pre-commit` hook under `.husky/`. After frontend dependencies are installed, it runs
+lint-staged and applies ESLint to staged JavaScript, TypeScript, and Vue files.
 
 ## Build and Verification
 
@@ -97,14 +98,14 @@ By default this reads the current version from `pom.xml`, compares `HEAD` with t
 (semver) tag, and updates `dc3/doc/CHANGE.md`. You can override the range or version when needed:
 
 ```bash
-make changelog FROM=v2025.9.3 TO=HEAD VERSION=2026.5.22
+make changelog FROM=<previous-v-tag> TO=HEAD VERSION=<project-version>
 ```
 
 The root `pom.xml` version is the release identity. Update and commit that version and the generated changelog first,
 then switch to a clean, up-to-date `main` and create the matching tag:
 
 ```bash
-make tag            # pom.xml 2026.5.22 -> tag v2026.5.22
+make tag            # pom.xml <version> -> annotated tag v<version>
 ```
 
 `bash dc3/bin/tag.sh --dry-run` previews the exact tag without pushing. The script refuses dirty, non-`main`,
@@ -127,9 +128,9 @@ Generated changelog-only release commits are skipped by default so rerunning the
 
 ## Documentation and Translation
 
-When changing root README content, keep `README.md`, `README.zh.md`, `README.ja.md`, and `README.vi.md` structurally
-aligned. If a translated update is not possible in the same pull request, call it out clearly in the pull request
-description.
+When changing root README content, keep `README.md`, `README.zh.md`, `README.es.md`, `README.ja.md`, `README.ko.md`,
+`README.ru.md`, and `README.vi.md` structurally aligned. If a translated update is not possible in the same pull
+request, call it out clearly in the pull request description.
 
 ## License
 

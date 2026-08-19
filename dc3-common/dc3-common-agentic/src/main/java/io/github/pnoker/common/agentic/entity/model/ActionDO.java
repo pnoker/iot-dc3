@@ -35,7 +35,6 @@ import java.util.Map;
  * Pending or executed agentic action.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Getter

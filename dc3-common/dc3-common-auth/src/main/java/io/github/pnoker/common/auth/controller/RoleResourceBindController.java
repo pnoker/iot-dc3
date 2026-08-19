@@ -61,7 +61,6 @@ import java.util.Objects;
  * REST controller exposing role-resource binding management endpoints.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Tag(name = "role_resource_bind", description = "Role-to-resource permission bindings: grant or revoke access to specific API endpoints, menus, and secured artifacts for roles")

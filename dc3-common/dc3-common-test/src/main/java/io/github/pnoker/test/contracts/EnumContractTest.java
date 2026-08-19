@@ -44,12 +44,27 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
  */
 public abstract class EnumContractTest<E extends Enum<E>> {
 
+    /**
+     * Enum class.
+     *
+     * @return enum class result
+     */
     protected abstract Class<E> enumClass();
 
+    /**
+     * Index accessor.
+     *
+     * @return index accessor result
+     */
     protected String indexAccessor() {
         return "getIndex";
     }
 
+    /**
+     * Factory method.
+     *
+     * @return factory method result
+     */
     protected String factoryMethod() {
         return "ofIndex";
     }

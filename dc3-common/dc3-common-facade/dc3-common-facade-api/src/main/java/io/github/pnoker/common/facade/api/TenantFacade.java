@@ -23,7 +23,6 @@ import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
  * Protocol-neutral tenant facade. Mirrors {@code api.center.auth.TenantApi}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface TenantFacade {

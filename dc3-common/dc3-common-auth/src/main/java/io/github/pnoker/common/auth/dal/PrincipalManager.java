@@ -24,7 +24,6 @@ import io.github.pnoker.common.auth.entity.model.PrincipalDO;
  * Persistence manager for principals.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface PrincipalManager extends IService<PrincipalDO> {

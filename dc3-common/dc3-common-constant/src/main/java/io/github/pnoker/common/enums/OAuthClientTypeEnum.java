@@ -29,7 +29,6 @@ import java.util.Optional;
  * OAuth registered client type.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -64,6 +63,12 @@ public enum OAuthClientTypeEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve an OAuth client type from its persisted wire value.
+     *
+     * @param value persisted client-type value
+     * @return matching type, or {@code null} when the value is unknown
+     */
     public static OAuthClientTypeEnum ofValue(String value) {
         Optional<OAuthClientTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))

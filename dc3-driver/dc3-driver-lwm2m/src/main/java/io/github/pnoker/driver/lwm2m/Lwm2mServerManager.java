@@ -49,7 +49,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -101,7 +100,7 @@ public class Lwm2mServerManager implements DisposableBean {
             });
 
             server.start();
-            log.info("LwM2M server started on coap://{}:{} (secure port: {})",
+            log.info("LwM2M server started, host={}, port={}, securePort={}",
                     lwm2mProperties.getServerHost(),
                     lwm2mProperties.getServerPort(),
                     lwm2mProperties.getSecurePort());

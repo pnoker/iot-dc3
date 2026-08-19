@@ -20,6 +20,8 @@ package io.github.pnoker.common.driver.receiver.rabbit;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.driver.command.CommandDedupCache;
 import io.github.pnoker.common.driver.command.DeviceLockManager;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
@@ -71,6 +73,9 @@ class PointCommandReceiverTest {
     private DeviceLockManager deviceLockManager;
 
     @Mock
+    private DriverMetadata driverMetadata;
+
+    @Mock
     private Channel channel;
 
     private PointCommandReceiver receiver;
@@ -78,8 +83,11 @@ class PointCommandReceiverTest {
 
     @BeforeEach
     void setUp() {
+        DriverProperties properties = new DriverProperties();
+        properties.setNode("node-a");
         receiver = new PointCommandReceiver(driverReadService, driverWriteService,
-                driverSenderService, dedupCache, deviceLockManager);
+                driverSenderService, dedupCache, deviceLockManager, driverMetadata, properties);
+        lenient().when(driverMetadata.getFencingToken(10L)).thenReturn(77L);
 
         // DeviceLockManager executes the supplier inline
         lenient().when(deviceLockManager.runExclusive(anyLong(), ArgumentMatchers.<Supplier<String>>any()))
@@ -91,14 +99,14 @@ class PointCommandReceiverTest {
     }
 
     private PointCommandDTO readCommand(String commandId) {
-        return new PointCommandDTO(commandId, 100L, PointCommandTypeEnum.READ,
+        return new PointCommandDTO(commandId, 100L, "node-a", 77L, PointCommandTypeEnum.READ,
                 new PointCommandPayload.ReadPayload(10L, 20L),
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
                 Instant.now(), Instant.now().plusSeconds(10), 1);
     }
 
     private PointCommandDTO writeCommand(String commandId) {
-        return new PointCommandDTO(commandId, 100L, PointCommandTypeEnum.WRITE,
+        return new PointCommandDTO(commandId, 100L, "node-a", 77L, PointCommandTypeEnum.WRITE,
                 new PointCommandPayload.WritePayload(10L, 20L, "42"),
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
                 Instant.now(), Instant.now().plusSeconds(10), 1);
@@ -146,7 +154,7 @@ class PointCommandReceiverTest {
 
     @Test
     void rejectsPayloadWithNullType() throws Exception {
-        PointCommandDTO dto = new PointCommandDTO("id", 100L, null,
+        PointCommandDTO dto = new PointCommandDTO("id", 100L, "node-a", 77L, null,
                 new PointCommandPayload.ReadPayload(10L, 20L),
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
                 Instant.now(), Instant.now().plusSeconds(10), 1);
@@ -165,7 +173,7 @@ class PointCommandReceiverTest {
 
     @Test
     void rejectsPayloadWithNullTenantId() throws Exception {
-        PointCommandDTO dto = new PointCommandDTO("id", null, PointCommandTypeEnum.READ,
+        PointCommandDTO dto = new PointCommandDTO("id", null, "node-a", 77L, PointCommandTypeEnum.READ,
                 new PointCommandPayload.ReadPayload(10L, 20L),
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
                 Instant.now(), Instant.now().plusSeconds(10), 1);
@@ -192,7 +200,7 @@ class PointCommandReceiverTest {
 
     @Test
     void rejectsReadPayloadWithNullDeviceId() throws Exception {
-        PointCommandDTO dto = new PointCommandDTO("bad-read", 100L, PointCommandTypeEnum.READ,
+        PointCommandDTO dto = new PointCommandDTO("bad-read", 100L, "node-a", 77L, PointCommandTypeEnum.READ,
                 new PointCommandPayload.ReadPayload(null, 20L),
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
                 Instant.now(), Instant.now().plusSeconds(10), 1);
@@ -220,7 +228,7 @@ class PointCommandReceiverTest {
 
     @Test
     void expiredCommandSendsExpiredResult() throws Exception {
-        PointCommandDTO expired = new PointCommandDTO("exp-cmd", 100L, PointCommandTypeEnum.READ,
+        PointCommandDTO expired = new PointCommandDTO("exp-cmd", 100L, "node-a", 77L, PointCommandTypeEnum.READ,
                 new PointCommandPayload.ReadPayload(10L, 20L),
                 io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
                 Instant.now().minusSeconds(60), Instant.now().minusSeconds(30), 1);

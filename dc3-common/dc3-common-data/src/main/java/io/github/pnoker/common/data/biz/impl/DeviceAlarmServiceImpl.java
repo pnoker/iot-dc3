@@ -38,7 +38,7 @@ import java.util.Objects;
 /**
  * Business service implementation for device alarm event persistence.
  *
- * <p>Backfills {@code tenantId} via {@link DeviceFacade#getById(Long)} when the
+ * <p>Backfills {@code tenantId} via {@link DeviceFacade#getById(Long, Long)} when the
  * incoming DTO did not carry it — without this, alarms with a missing tenant
  * would be persisted with {@code tenant_id = 0} and then silently dropped by
  * the rule trigger (which requires a valid tenant id), losing the user-visible
@@ -47,7 +47,6 @@ import java.util.Objects;
  * database.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -64,7 +63,9 @@ public class DeviceAlarmServiceImpl implements DeviceAlarmService {
     @Override
     public void alarm(DeviceAlarmDTO entityDTO) {
         if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())) {
-            log.warn("Drop device alarm without deviceId: {}", entityDTO);
+            log.warn("Device alarm dropped, reason=missingDeviceId, tenantId={}, driverId={}",
+                    Objects.nonNull(entityDTO) ? entityDTO.getTenantId() : null,
+                    Objects.nonNull(entityDTO) ? entityDTO.getDriverId() : null);
             return;
         }
 
@@ -74,7 +75,7 @@ public class DeviceAlarmServiceImpl implements DeviceAlarmService {
             // check, state scan). The fail-closed tenant-line interceptor rejects unscoped
             // queries, so the tenant can no longer be reverse-resolved from the device — drop
             // instead of silently persisting with tenant_id=0.
-            log.warn("Drop device alarm because tenantId is missing, deviceId={}", entityDTO.getDeviceId());
+            log.warn("Device alarm dropped, reason=missingTenantId, deviceId={}", entityDTO.getDeviceId());
             return;
         }
         Long driverId = entityDTO.getDriverId();
@@ -82,7 +83,8 @@ public class DeviceAlarmServiceImpl implements DeviceAlarmService {
         if (Objects.isNull(driverId) || driverId <= 0) {
             device = deviceFacade.getById(tenantId, entityDTO.getDeviceId());
             if (Objects.isNull(device)) {
-                log.warn("Drop device alarm because device[{}] is not found in metadata", entityDTO.getDeviceId());
+                log.warn("Device alarm dropped, reason=deviceNotFound, tenantId={}, deviceId={}",
+                        tenantId, entityDTO.getDeviceId());
                 return;
             }
             driverId = device.getDriverId();

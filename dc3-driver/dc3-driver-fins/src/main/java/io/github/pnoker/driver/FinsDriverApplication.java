@@ -24,12 +24,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Omron FINS protocol driver application.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class FinsDriverApplication {
 
+    /**
+     * Start the fins driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(FinsDriverApplication.class, args);
     }

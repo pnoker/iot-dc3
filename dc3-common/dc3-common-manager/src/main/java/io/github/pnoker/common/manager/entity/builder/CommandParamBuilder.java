@@ -44,17 +44,34 @@ import java.util.Optional;
  * MapStruct builder converting between command param BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface CommandParamBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     @Mapping(target = "tenantId", ignore = true)
     CommandParamBO buildBOByVO(CommandParamVO entityVO);
 
+    /**
+     * Convert vo list to bo list.
+     *
+     * @param entityVOList entity view object list
+     * @return converted value
+     */
     List<CommandParamBO> buildBOListByVOList(List<CommandParamVO> entityVOList);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "paramExt", ignore = true)
     @Mapping(target = "paramDirectionFlag", ignore = true)
     @Mapping(target = "paramTypeFlag", ignore = true)
@@ -63,6 +80,12 @@ public interface CommandParamBuilder {
     @Mapping(target = "deleted", ignore = true)
     CommandParamDO buildDOByBO(CommandParamBO entityBO);
 
+    /**
+     * After build persistence object.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterBuildDO(CommandParamBO entityBO, @MappingTarget CommandParamDO entityDO) {
         if (StringUtils.isEmpty(entityBO.getParamCode())) {
@@ -85,8 +108,20 @@ public interface CommandParamBuilder {
         Optional.ofNullable(entityBO.getEnableFlag()).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
+    /**
+     * Convert bo list to do list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<CommandParamDO> buildDOListByBOList(List<CommandParamBO> entityBOList);
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "paramExt", ignore = true)
     @Mapping(target = "paramDirectionFlag", ignore = true)
     @Mapping(target = "paramTypeFlag", ignore = true)
@@ -94,6 +129,12 @@ public interface CommandParamBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     CommandParamBO buildBOByDO(CommandParamDO entityDO);
 
+    /**
+     * After build business object.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterBuildBO(CommandParamDO entityDO, @MappingTarget CommandParamBO entityBO) {
         JsonExt entityExt = entityDO.getParamExt();
@@ -112,16 +153,46 @@ public interface CommandParamBuilder {
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(entityDO.getEnableFlag()));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<CommandParamBO> buildBOListByDOList(List<CommandParamDO> entityDOList);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     CommandParamVO buildVOByBO(CommandParamBO entityBO);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<CommandParamVO> buildVOListByBOList(List<CommandParamBO> entityBOList);
 
+    /**
+     * Convert do page to bo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
     default Page<CommandParamBO> buildBOPageByDOPage(Page<CommandParamDO> entityPageDO) {
         return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
     }
 
+    /**
+     * Convert bo page to vo page.
+     *
+     * @param entityPageBO business object
+     * @return converted value
+     */
     default Page<CommandParamVO> buildVOPageByBOPage(Page<CommandParamBO> entityPageBO) {
         return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
     }

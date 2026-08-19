@@ -121,25 +121,25 @@ const resolveEntityNames = async (records: Record<string, any>[]): Promise<Recor
     promises.push(
       listDriverByIds(driverIds)
         .then((r) => fill(driverIds, r, 'driverName'))
-        .catch((e) => logger.debug('bulk name lookup failed', e))
+        .catch((e) => logger.debug('Bulk driver name lookup failed', e))
     );
   if (deviceIds.length)
     promises.push(
       listDeviceByIds(deviceIds)
         .then((r) => fill(deviceIds, r, 'deviceName'))
-        .catch((e) => logger.debug('bulk name lookup failed', e))
+        .catch((e) => logger.debug('Bulk device name lookup failed', e))
     );
   if (pointIds.length)
     promises.push(
       listPointByIds(pointIds)
         .then((r) => fill(pointIds, r, 'pointName'))
-        .catch((e) => logger.debug('bulk name lookup failed', e))
+        .catch((e) => logger.debug('Bulk point name lookup failed', e))
     );
   if (profileIds.length)
     promises.push(
       listProfileByIds(profileIds)
         .then((r) => fill(profileIds, r, 'profileName'))
-        .catch((e) => logger.debug('bulk name lookup failed', e))
+        .catch((e) => logger.debug('Bulk profile name lookup failed', e))
     );
   // APIs have no bulk-lookup endpoint; pull the whole list (capped at 1000,
   // already 10x the realistic API count on a single tenant) and resolve from
@@ -155,7 +155,7 @@ const resolveEntityNames = async (records: Record<string, any>[]): Promise<Recor
             if (name) map[id] = name;
           });
         })
-        .catch((e) => logger.debug('bulk name lookup failed', e))
+        .catch((e) => logger.debug('Bulk API name lookup failed', e))
     );
   // Menus are already cached in the pinia store for the top-nav; reuse the
   // cached tree instead of hitting the network again.

@@ -64,7 +64,6 @@ dc3:
         remark: Parse type, short, int, long, float, double, boolean, string
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/listening-virtual/buffer.db
 
 spring:

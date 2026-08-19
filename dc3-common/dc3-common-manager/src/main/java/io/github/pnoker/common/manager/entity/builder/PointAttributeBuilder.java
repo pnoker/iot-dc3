@@ -41,7 +41,6 @@ import java.util.Optional;
  * MapStruct builder converting between point attribute BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -76,6 +75,12 @@ public interface PointAttributeBuilder {
     @Mapping(target = "deleted", ignore = true)
     PointAttributeDO buildDOByBO(PointAttributeBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(PointAttributeBO entityBO, @MappingTarget PointAttributeDO entityDO) {
         // Json Ext
@@ -117,6 +122,12 @@ public interface PointAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointAttributeBO buildBOByDO(PointAttributeDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(PointAttributeDO entityDO, @MappingTarget PointAttributeBO entityBO) {
         // Json Ext

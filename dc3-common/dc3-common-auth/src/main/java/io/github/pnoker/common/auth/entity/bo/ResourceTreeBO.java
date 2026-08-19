@@ -32,7 +32,6 @@ import java.util.Objects;
  * Resource tree can be serialized into a single payload for the frontend's tree table.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -69,6 +68,11 @@ public class ResourceTreeBO extends ResourceBO {
         return node;
     }
 
+    /**
+     * Create child.
+     *
+     * @param child child
+     */
     public void addChild(ResourceTreeBO child) {
         if (Objects.isNull(children)) {
             children = new ArrayList<>();
