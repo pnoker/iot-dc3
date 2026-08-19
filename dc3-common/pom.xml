@@ -95,6 +95,7 @@
         <module>dc3-common-mq</module>
         <module>dc3-common-mq-rabbitmq</module>
         <module>dc3-common-mq-kafka</module>
+        <module>dc3-common-mq-activemq</module>
         <module>dc3-common-mq-tck</module>
         <module>dc3-common-postgres</module>
         <module>dc3-common-public</module>
@@ -385,6 +386,11 @@
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-mq-kafka</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-mq-activemq</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
