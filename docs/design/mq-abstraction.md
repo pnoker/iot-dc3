@@ -2,7 +2,7 @@
 
 |                |                                                                                   |
 |----------------|-----------------------------------------------------------------------------------|
-| **Status**     | Phases 1–3 delivered: port + rabbitmq / kafka / activemq / mqtt adapters TCK-certified; rocketmq adapter pending certification, pulsar pending |
+| **Status**     | Phases 1–3 delivered: port + rabbitmq / kafka / activemq / mqtt / rocketmq adapters TCK-certified; pulsar pending |
 | **Date**       | 2026-08-17, revised 2026-08-19 (re-verified after commit `956de3dd3`; MQTT decoupling) |
 | **Scope**      | `dc3-common-*` messaging layer (center ↔ driver async plane)                       |
 | **Target**     | RabbitMQ (default), Kafka, RocketMQ, Pulsar, ActiveMQ (Artemis / Classic), MQTT 5 (EMQX / HiveMQ / NanoMQ / …) |
@@ -544,14 +544,16 @@ lease/ownership before dispatch.
 
 ## 9. Capability matrix (published, per adapter)
 
-Implementation status (2026-08-19): rabbitmq, kafka, activemq (Artemis) and mqtt 5
-adapters are implemented and certified by the TCK against live brokers; rocketmq is
-implemented but pending certification (fresh-consumer-group offset isolation under
-investigation); pulsar is pending. Certified columns below reflect the implemented
-behavior (e.g. rabbit delays arbitrary messages through the port fallback, rocketmq
-native delay levels would quantize requested durations).
+Implementation status (2026-08-19): rabbitmq, kafka, activemq (Artemis), mqtt 5 and
+rocketmq adapters are implemented and certified by the TCK against live brokers;
+pulsar is pending. Certified columns below reflect the implemented behavior (e.g.
+rabbit delays arbitrary messages through the port fallback, rocketmq native delay
+levels would quantize requested durations; the rocketmq classic client replays topic
+backlog for brand-new consumer groups regardless of consumeFromWhere, so the adapter
+seeds fresh groups to the latest offset and warms up not-yet-created topics on
+subscribe).
 
-| Capability | RabbitMQ ✅ | Kafka ✅ | ActiveMQ ✅ | MQTT 5 ✅ | RocketMQ (pending) | Pulsar (pending) |
+| Capability | RabbitMQ ✅ | Kafka ✅ | ActiveMQ ✅ | MQTT 5 ✅ | RocketMQ ✅ | Pulsar (pending) |
 |------------|----------|-------|----------|--------|----------|--------|
 | Delayed message | fallback* | ❌ → local fallback | ✅ JMS scheduled | ❌ → local fallback | fallback (levels quantize) | ✅ native |
 | Native DLQ | DLX + quarantine | adapter `.dlq` topic | adapter `.dlq` queue | adapter `/dlq` topic | adapter `-dlq` topic | ✅ policy |
