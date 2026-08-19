@@ -92,10 +92,12 @@
         <module>dc3-common-manager</module>
         <module>dc3-common-model</module>
         <module>dc3-common-mqtt</module>
+        <module>dc3-common-mq</module>
+        <module>dc3-common-mq-rabbitmq</module>
+        <module>dc3-common-rabbitmq</module>
         <module>dc3-common-postgres</module>
         <module>dc3-common-public</module>
         <module>dc3-common-quartz</module>
-        <module>dc3-common-rabbitmq</module>
         <module>dc3-common-repository</module>
         <module>dc3-common-sql</module>
         <module>dc3-common-resource-registrar</module>
@@ -367,6 +369,16 @@
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-quartz</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-mq</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-mq-rabbitmq</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
