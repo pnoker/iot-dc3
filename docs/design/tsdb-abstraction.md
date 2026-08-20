@@ -25,7 +25,8 @@
 外加一套库中立（broker-neutral）的 TCK 作为验收门槛。TimescaleDB 首先做行为
 等价的抽取；随后是 TDengine（国内需求）、InfluxDB 3 和 IoTDB。
 
-两个架构决策承担了大部分工作量：
+两个架构决策承担了大部分工作量（另外一组**跃迁能力** S14–S18 见 §3/§9.6——
+它们默认关闭、显式启用，不参与 Phase 1 行为等价门槛）：
 
 1. **最新值投影留在关系库。** `dc3_point_latest`（按点位 fencing-token 元组守卫的
    "当前值"）是 OLTP 状态，不是时序数据——它喂给看板、流和告警，且要 join
@@ -102,6 +103,9 @@ savePointValues` —— 单个 PostgreSQL 事务：
   不是重写。
 - 看板停止绕过 port——所有位值读取都走 port。
 - 社区适配器有机械化验收门槛（TCK），同 `dc3-mq-tck`。
+- **不被现状锁死**：借抽取的机会补齐专业 IoT 时序层应有而现状没有的能力（S14–S18：
+  多序列读取、图表级聚合、多级保留+rollup、质量位、运维面），全部设计为
+  "默认行为不变、显式启用才生效"，不破坏 Phase 1 的行为等价门槛。
 - 外置存储部署：存储拥有自己的 compose 服务与 profile；主 PG 彻底卸掉
   Timescale 扩展（保留 `dc3_point_latest`）。
 
@@ -133,6 +137,13 @@ savePointValues` —— 单个 PostgreSQL 事务：
 | S11 | 租户隔离 | 每次读取携带租户范围；TCK 做反向测试 |
 | S12 | 时间戳精度 | port 层微秒 `Instant`；适配器可下调到存储原生精度（需文档化） |
 | S13 | **租户级分析面**（看板实测口径：全部为租户作用域，非单序列——已逐条核对 SQL） | ① 时间桶计数（timeseries/hourlyActivity）；② 按维度分组计数取 TopN，维度 ∈ {DEVICE, POINT, DRIVER}（top）；③ 逐序列最近样本时间 + 阈值筛（silentSources、coverageGapItems 的子查询）；④ 接收延迟毫秒直方图，对派生表达式 `receiveTime−deviceTime` 分箱（latencyHistogram） |
+| S14 | **多序列读取**（跃迁新增） | 一张图表常画同设备的多个点位曲线；逐序列循环调用太啰嗦。`history`/`last`/`aggregate`/`bucketedAggregate` 统一接受序列集合（单序列是退化解），存储侧一次下发 |
+| S15 | **图表级聚合函数**（跃迁新增） | `FIRST`/`LAST` 进枚举——配合既有 MIN/MAX 构成 **M4 降采样**（每桶 首/末/最小/最大），百万点渲染成 800px 曲线不再拉原始样本；`PERCENTILE(p)` 能力门控（SLA/P95 风格统计） |
+| S16 | **多级保留 + 降采样rollup**（跃迁新增） | 原始 30 天 → 1 分钟粒度 1 年 → 1 小时粒度永久（默认三级，可配）。读操作**对分级透明**：`bucketedAggregate` 桶宽 ≥ 某级粒度时由存储自动从该级 rollup 供数；能力 `rollupSupport: NATIVE / MANUAL / NONE`（Timescale 连续聚合、TDengine 流计算为 NATIVE；Influx 任务为 MANUAL；IoTDB NONE→原始扫描，正确但慢） |
+| S17 | **数据质量位**（跃迁新增） | 样本携带 `quality` 整型码（OPC UA 风格，0=GOOD 默认），驱动可标注 BAD/UNCERTAIN；随样本透传存储，历史查询可按质量过滤（应用层）。现在加是一个 int，将来加是全库迁移——趁 port 未落地先占位 |
+| S18 | **序列发现与运维面**（跃迁新增） | `listSeries(tenant)` 枚举窗口内有数据的序列（迁移 CLI、覆盖审计、缓存预热都要用）；读操作统一携带 deadline（防失控扫描）；适配器声明 `maxAppendBatch`（port 自动分块） |
+
+> S1–S13 为"现状实测 + 看板核对"出来的存量语义；S14–S18 是**借改造机会补的专业能力**——都设计为"默认行为不变、显式启用才生效"，不破坏行为等价的 Phase 1 门槛。
 
 **刻意不进 port**（及理由）：
 
@@ -166,11 +177,27 @@ dc3-tsdb/                     # 顶层聚合器：存储选型家族
 
 ## 6. 核心 API
 
+读取面统一用一个过滤器形状——单序列、序列集合、全租户是同一形状的三个特例，
+S13 的租户分析面与 S14 的多序列由此**合并为同一套 API**，不再有两套读原语：
+
 ```java
 package io.github.pnoker.common.tsdb;
 
 /** 序列标识——平台数字 ID；名称在应用层富化。 */
 public record SeriesKey(long tenantId, long deviceId, long pointId) {}
+
+/** 统一读取过滤器：series 非空=按集合（含单元素）；series 空=全租户扫描
+    （tenantWideScan 能力门控）。tenantId 恒在——租户隔离是硬约束（S11）。 */
+public record SeriesFilter(long tenantId, List<SeriesKey> series) {
+
+    public static SeriesFilter of(SeriesKey single) {
+        return new SeriesFilter(single.tenantId(), List.of(single));
+    }
+
+    public static SeriesFilter tenantWide(long tenantId) {
+        return new SeriesFilter(tenantId, List.of());
+    }
+}
 
 /** 一条存储样本；时间戳为 epoch 微秒 Instant。 */
 public record PointValueSample(
@@ -179,86 +206,108 @@ public record PointValueSample(
         Instant receiveTime,           // operate_time：服务端接收时间（S9）
         String rawValue, String calValue,
         Double numericValue,           // calValue 的投影；非数值为 null
+        int quality,                   // S17：质量码，0=GOOD（OPC UA 风格）
         String messageId, int schemaVersion,
         String driverNode, long sequence, long fencingToken, long driverId) {}
 
-public enum AggregateFunction { AVG, MIN, MAX, SUM, COUNT }
+/** AVG/MIN/MAX/SUM/COUNT 通用；FIRST/LAST 构成图表 M4 降采样（S15）；
+    PERCENTILE 能力门控（p 存于查询）。 */
+public enum AggregateFunction { AVG, MIN, MAX, SUM, COUNT, FIRST, LAST, PERCENTILE }
 
 public record TimeWindow(Instant from, Instant toExclusive) {}
 
 public record Cursor(Instant deviceTime, String messageId) {}   // 降序分页锚点
 
+/** 读操作统一 deadline（S18）：超时抛 TsdbQueryTimeout，防失控扫描。 */
+public record TsdbDeadline(Duration maxWait) {}
+
 public interface TsdbStore {
     String type();
     TsdbCapabilities capabilities();
 
-    /** 批量追加；存储级（series, deviceTime）upsert。同一批次幂等。
-        返回接受样本数（按存储尽力而为）。 */
+    // ===== 写入 =====
+
+    /** 批量追加；存储级（series, deviceTime）upsert；同一批次幂等；整批成功或
+        整批抛错（无部分接受）。超过 maxAppendBatch 由 port 自动分块。 */
     int append(List<PointValueSample> samples);
 
-    /** S4：单序列最新 limit 条，新的在前。 */
-    List<PointValueSample> last(SeriesKey series, int limit);
+    // ===== 读取（统一过滤器：单序列 / 多序列 / 全租户） =====
 
-    /** S5：一页降序历史，从严格晚于 cursor 处开始（null = 从最新）。
-        过滤：series 可选（缺省为全租户扫描，能力门控），窗口必填。 */
-    CursorPage<PointValueSample> history(HistoryQuery query, Cursor cursor, int pageSize);
+    /** S4/S14：每个序列各取最新 limit 条，新的在前。 */
+    Map<SeriesKey, List<PointValueSample>> last(SeriesFilter filter, int limit, TsdbDeadline deadline);
 
-    /** S6：单窗口聚合，作用于 numericValue（跳过 NULL）+ 样本计数。 */
-    WindowAggregate aggregate(SeriesKey series, AggregateFunction fn, TimeWindow window);
+    /** S5/S14：降序游标分页历史；cursor=null 从最新开始。 */
+    CursorPage<PointValueSample> history(SeriesFilter filter, TimeWindow window,
+                                         Cursor cursor, int pageSize, TsdbDeadline deadline);
 
-    /** S7：逐桶聚合，桶升序；能力 gapFill=true 时空桶补零，否则省略。
-        桶宽由调用方给定。 */
-    List<BucketAggregate> bucketedAggregate(SeriesKey series, AggregateFunction fn,
-                                            TimeWindow window, Duration bucketWidth);
+    /** S6/S15：单窗口聚合（按序列分组返回；全租户过滤器=逐序列聚合一次下发）。 */
+    Map<SeriesKey, WindowAggregate> aggregate(SeriesFilter filter, AggregateFunction fn,
+                                              TimeWindow window, TsdbDeadline deadline);
 
-    /** S8：窗口内样本计数；series 可选表示全租户计数。 */
-    long count(Long tenantId, SeriesKey seriesOrNull, TimeWindow window);
+    /** S7/S15/S16：逐桶聚合，桶升序；空桶按 gapFill 补零或省略。
+        对分级保留透明——桶宽达到某 rollup 级粒度时由存储自动从该级供数。 */
+    Map<SeriesKey, List<BucketAggregate>> bucketedAggregate(SeriesFilter filter,
+            AggregateFunction fn, TimeWindow window, Duration bucketWidth,
+            Double percentile, TsdbDeadline deadline);
 
-    /** S10/删除：能力门控的时间范围删除。 */
-    void deleteRange(SeriesKey series, TimeWindow window);
+    /** S8：窗口内样本计数（过滤器三个特例皆可）。 */
+    long count(SeriesFilter filter, TimeWindow window, TsdbDeadline deadline);
 
-    // ===== S13：租户级分析面（看板专用；能力 tenantWideAnalytics 门控） =====
+    // ===== S13：租户级分析面（tenantWideAnalytics 能力门控） =====
 
-    /** S13-①：全租户按时间桶计数，桶升序；空桶按 gapFill 补零或省略。 */
-    List<BucketAggregate> bucketedCount(Long tenantId, TimeWindow window, Duration bucketWidth);
+    /** S13-①：与 bucketedAggregate 的区别在于面向看板活动图：恒 COUNT、
+        不分序列、结果合并为单序列桶。 */
+    List<BucketAggregate> bucketedCount(Long tenantId, TimeWindow window,
+                                        Duration bucketWidth, TsdbDeadline deadline);
 
-    /** S13-②：全租户按维度分组计数，降序取前 limit。 */
+    /** S13-②：按维度分组计数取 TopN，维度 ∈ {DEVICE, POINT, DRIVER}。 */
     List<DimensionCount> countByDimension(Long tenantId, TimeWindow window,
-                                          GroupDimension dimension, int limit);
+                                          GroupDimension dimension, int limit, TsdbDeadline deadline);
 
-    /** S13-③：窗口内有样本的每个序列及其最近样本时间（silentSources / 覆盖缺口
-        的子查询；阈值筛与排序由应用层做）。 */
-    List<SeriesLastSeen> lastSeenPerSeries(Long tenantId, TimeWindow window);
+    /** S13-③：窗口内每序列最近样本时间（阈值筛与排序在应用层）。 */
+    List<SeriesLastSeen> lastSeenPerSeries(Long tenantId, TimeWindow window, TsdbDeadline deadline);
 
-    /** S13-④：接收延迟直方图——对 receiveTime−deviceTime（毫秒）按给定箱沿计数。
-        需要存储侧行级表达式，能力 latencyHistogram 门控；不支持的面板降级。 */
-    List<LatencyBin> latencyHistogram(Long tenantId, TimeWindow window, List<Long> binEdgesMs);
+    /** S13-④：接收延迟直方图——对 receiveTime−deviceTime 毫秒按箱沿计数；
+        需要存储侧行级表达式，latencyHistogram 能力门控。 */
+    List<LatencyBin> latencyHistogram(Long tenantId, TimeWindow window,
+                                      List<Long> binEdgesMs, TsdbDeadline deadline);
+
+    // ===== 运维 =====
+
+    /** S18：窗口内有数据的序列清单（迁移 CLI / 覆盖审计 / 缓存预热）。 */
+    List<SeriesKey> listSeries(long tenantId, TimeWindow window, TsdbDeadline deadline);
+
+    /** S10：能力门控的时间范围删除（租户注销）。 */
+    void deleteRange(SeriesKey series, TimeWindow window);
 }
 
 /** 降序游标页：items + 下一页锚点（null 表示到底）。 */
 record CursorPage<T>(List<T> items, Cursor nextCursor) {}
 
-/** S13-② 的分组维度：看板 top 实测支持的三种（DashboardServiceImpl 的白名单）。 */
 enum GroupDimension { DEVICE, POINT, DRIVER }
 
+record WindowAggregate(Double value, long sampleCount) {}
+record BucketAggregate(Instant bucketStart, Double value, long sampleCount) {}
 record DimensionCount(GroupDimension dimension, long entityId, long count) {}
 record SeriesLastSeen(SeriesKey series, Instant lastSeen) {}
 record LatencyBin(long fromMsInclusive, long toMsExclusive, long count) {}
 
 public record TsdbCapabilities(
         boolean gapFill,                 // 空桶补零
-        boolean tenantWideScan,          // 无 series 的 history/count
+        boolean tenantWideScan,          // series 为空的 history/aggregate/count
+        boolean tenantWideAnalytics,     // S13 租户级分析面
+        boolean latencyHistogram,        // S13-④ 存储侧延迟直方图
+        boolean percentile,              // S15 PERCENTILE
+        RollupSupport rollupSupport,     // S16：NATIVE（存储原生）/ MANUAL（适配器后台）/ NONE
+        int maxAppendBatch,              // S18：port 侧自动分块阈值
         boolean deleteRange,
         OrderingGuarantee ordering,      // NONE | PER_SERIES（每序列追加序）
         Precision precision,             // MICRO / MILLI / NANO
-        boolean backfill,                // 接受乱序 / 迟到写入
-        boolean tenantWideAnalytics,     // S13 租户级分析面（桶计数/按维度计数/逐序列 lastSeen）
-        boolean latencyHistogram         // S13-④ 存储侧延迟直方图
+        boolean backfill                 // 接受乱序 / 迟到写入
 ) {}
-```
 
-**写入编排留在 `dc3-common-data`**（schema 校验、摄入幂等窗口、
-`dc3_point_latest` 关系 upsert）——port 是存储边界，正如 MQ port 是 broker 边界。
+enum RollupSupport { NATIVE, MANUAL, NONE }
+```
 
 ### 6.1 配置与运行面
 
@@ -308,7 +357,8 @@ public record TsdbCapabilities(
 | 单窗口聚合 | SQL | SQL | SQL | SQL |
 | 分桶聚合 | `time_bucket` | `INTERVAL(width)` | `date_bin(width, time)` | `GROUP BY ([width], time)` |
 | 空桶填充 | `generate_series` join | `INTERVAL(…) FILL(0/NULL)` | 应用层填充 | `FILL` 变体 / 应用层 |
-| 保留 | drop-chunk 策略（180 天） | 每库 `KEEP` | 分区/桶生命周期 | 每存储组 TTL |
+| 保留 | drop-chunk 策略（多级：§9.6） | 每库 `KEEP` | 分区/桶生命周期 | 每存储组 TTL |
+| rollup 物化 | 连续聚合（cagg）NATIVE | 流计算 NATIVE | 任务 MANUAL | ❌ NONE |
 | 精度 | 微秒 | 微秒（`precision us`） | 纳秒（port 下调到微秒） | 按配置 毫秒/纳秒 |
 | 乱序回填 | ✅ | ✅ | ✅（v3） | ✅ |
 | 客户端 | 今天的 PG 数据源 | JDBC | Flight/HTTP（Java v3 客户端） | session SDK |
@@ -339,6 +389,11 @@ measurements 随行；按租户子树的 TTL 由存储组布局近似实现。
 | 字符串值 | ✅ TEXT | ✅ NCHAR | ✅ fields | ✅ TEXT |
 | 租户级分析面（S13-①②③） | ✅ SQL | ✅ 超级表聚合 | ✅ SQL | ⚠️ 路径模板/按层聚合 |
 | 延迟直方图（S13-④） | ✅ 表达式分箱 | ⚠️ 3.3+ HISTOGRAM/应用层 | ✅ SQL CASE | ❌ UDF 或降级 |
+| 多序列读取（S14） | ✅ IN 列表 | ✅ 超级表 tbname 集合 | ✅ SQL IN | ✅ 多路径 |
+| FIRST/LAST（S15） | ✅ | ✅ FIRST/LAST | ✅ | ✅ |
+| PERCENTILE（S15） | ✅ percentile_cont | ✅ PERCENTILE/APERCENTILE | ✅ | ⚠️ 近似/拒绝 |
+| rollup 分级（S16） | ✅ NATIVE 连续聚合 | ✅ NATIVE 流计算 | ⚠️ MANUAL 任务 | ❌ NONE→原始扫描 |
+| 质量位存储（S17） | ✅ 列 | ✅ 列 | ✅ field | ✅ measurement |
 | 内嵌 PG 模式 | ✅（默认） | ❌ | ❌ | ❌ |
 
 启动协商日志汇总当前存储的一行能力，与 MQ port 一致。
@@ -398,6 +453,36 @@ port 层微秒精度 `Instant`；适配器下调到原生精度（纳秒库保�
 ——文档化，TCK 容忍）。raw/cal/numeric 三元组原样保留——数值投影在摄入时计算
 （代码不变），绝不交给存储算。
 
+### 9.6 多级保留与降采样（S16，本次跃迁最大的架构增量）
+
+现状是"原始数据单一保留 180 天"——看板拉一年活动图等于全量扫描原始样本，这在
+数据量上来后必然崩。专业时序平台的标准生命周期是**多级保留**：
+
+```
+原始样本（30 天） ──rollup──▶ 1 分钟粒度（1 年） ──rollup──▶ 1 小时粒度（永久）
+```
+
+（级数、粒度、各级保留期全部可配：`dc3.tsdb.retention.tiers`，默认如上。）
+
+**关键设计决策：读侧对分级透明。** `bucketedAggregate` 的适配器实现按桶宽自动
+选级——桶宽 ≥ 1 分钟且请求函数在该级已物化时从 1 分钟 rollup 供数，≥ 1 小时同理；
+调用方完全无感，API 零新增。代价是物化函数集须与枚举对齐（每级默认物化
+AVG/MIN/MAX/SUM/COUNT/FIRST/LAST；PERCENTILE 不物化，永远扫原始或退化拒绝——
+能力矩阵标注）。
+
+`rollupSupport` 三档：
+
+- **NATIVE**：存储原生物化——TimescaleDB 连续聚合（cagg）、TDengine 流计算。
+  适配器负责建 cagg/流并保持与保留策略联动。
+- **MANUAL**：存储有任务机制但非自动——InfluxDB 3（任务/管道）。适配器启动时
+  注册任务并轮询健康。
+- **NONE**：无机制——IoTDB。适配器如实声明；读操作退化为原始扫描（结果正确、
+  性能差），保留策略按原始窗口执行。**诚实降级，绝不给错误数据。**
+
+写入侧 rollup 由存储/任务异步完成——最终一致（分钟级滞后），看板场景可接受；
+告警窗口（S6）永远走原始数据，不受 rollup 滞后影响（其窗口典型为分钟~小时级，
+落在原始保留期内）。
+
 ## 10. TCK —— 验收门槛
 
 `dc3-tsdb-tck`，每库一个容器跑同一套中立套件（timescale、tdengine、iotdb；
@@ -421,6 +506,13 @@ influx 视许可）：
 14. 按维度计数（S13-②）：device/point/driver 三维度分组与 TopN 排序正确
 15. 逐序列 lastSeen（S13-③）：窗口内每序列的最新时间精确
 16. 延迟直方图（S13-④，能力门控）：双时间戳样本落入正确毫秒箱
+17. 多序列过滤器（S14）：多序列 last/history/aggregate 各归各序列、互不串扰
+18. FIRST/LAST 桶值（S15）：每桶首/末与窗口边界对齐，可组成 M4 渲染
+19. PERCENTILE（S15，能力门控）：已知夹具的 P50/P95 精度在存储声明容差内
+20. rollup 分级读（S16，NATIVE/MANUAL 能力门控）：写入→等待物化→宽桶查询结果
+    与原始扫描一致；NONE 档如实退化为原始扫描
+21. quality 质量位（S17）：非零质量码随样本往返不丢
+22. 读 deadline（S18）：窗口过大时超时抛 TsdbQueryTimeout 而非挂死
 
 ## 11. 迁移计划
 
@@ -432,7 +524,10 @@ influx 视许可）：
   *门槛：既有单测全绿；E2E（`PostgresHypertableIT`、看板）不改而绿；
   `LocalDateTime→Instant` 全线换算完成并锁 UTC（§6.2）。*
 - **Phase 2 —— TCK + TDengine 适配器。** 国内需求最高；超级表映射会最早拷打
-  port 的序列模型，等于提前把 port 磨硬。
+  port 的序列模型，等于提前把 port 磨硬。跃迁能力随阶段落地：S17 质量位与
+  S15 FIRST/LAST 成本极低随 Phase 1/2 直接进；S14 多序列与 S18 运维面进
+  Phase 2；S16 多级保留+rollup 在 Phase 2 以 timescale cagg 首发验证、Phase 3
+  推广到其余三库。
 - **Phase 3 —— InfluxDB 3 + IoTDB 适配器**；发布能力矩阵；
   `dc3/dependencies/<store>/` 下的 `dc3.tsdb.type` compose profile。
 - **全程**：`dc3_point_latest` 永不搬家；即使 PG 卸掉 Timescale 扩展也保留它。
@@ -461,6 +556,13 @@ influx 视许可）：
    外置彻底；内嵌模式继续作为小部署默认。
 9. **租户差异化保留** —— 现在全局 180 天；按租户设保留（TDengine 按库 KEEP、
    Influx 按分区）是否值得做？倾向：Phase 3 前不做，全局策略 + 能力声明足够。
+10. **rollup 物化函数集与滞后窗口** —— 各级物化哪些函数（默认七函数）、物化
+    滞后多久（cagg 水位）算"可读"？倾向：物化滞后对读侧完全透明不暴露，宽桶
+    查询允许读到略旧的 rollup（看板场景分钟级滞后无感）。
+11. **状态时长分析（STATE_DURATION）** —— "该点在阈值之上停留了多久"是 IoT
+    分析刚需（TDengine 原生 STATE_DURATION/STATE_COUNT）。是否进 port 作为
+    能力门控 op，还是留应用层按 samples 自算？倾向：Phase 3 后按社区反馈定，
+    先记录不设计。
 
 ## 13. 与 storage-abstraction.md 的关系
 
