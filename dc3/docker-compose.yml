@@ -23,6 +23,15 @@ x-logging: &default-logging
 
 x-app-runtime-env: &app-runtime-env
   NODE_ENV: test
+  # Internal async-plane broker selection (docs/mq-brokers.md); rabbitmq is the default
+  DC3_MQ_TYPE: "${DC3_MQ_TYPE:-rabbitmq}"
+  # Non-rabbitmq adapter connection settings (only used when DC3_MQ_TYPE matches)
+  DC3_MQ_KAFKA_BOOTSTRAP: "${DC3_MQ_KAFKA_BOOTSTRAP:-kafka:9092}"
+  DC3_MQ_ROCKETMQ_NAMESRV: "${DC3_MQ_ROCKETMQ_NAMESRV:-rocketmq-namesrv:9876}"
+  DC3_MQ_PULSAR_URL: "${DC3_MQ_PULSAR_URL:-pulsar://pulsar:6650}"
+  DC3_MQ_ACTIVEMQ_URL: "${DC3_MQ_ACTIVEMQ_URL:-tcp://activemq:61616}"
+  DC3_MQ_MQTT_HOST: "${DC3_MQ_MQTT_HOST:-dc3-rabbitmq}"
+  DC3_MQ_MQTT_PORT: "${DC3_MQ_MQTT_PORT:-1883}"
   APM_AGENT_ENABLE: ${APM_AGENT_ENABLE:-false}
   DC3_SECURITY_KEY: ${DC3_SECURITY_KEY:-dc3.security.key.2026.io.github.pnoker}
   AUTH_HMAC_SECRET: ${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}

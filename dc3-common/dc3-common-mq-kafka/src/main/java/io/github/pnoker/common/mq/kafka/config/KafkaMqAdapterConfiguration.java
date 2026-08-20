@@ -30,7 +30,8 @@ import java.util.Map;
 
 /**
  * Activates the Kafka adapter when {@code dc3.mq.type=kafka}. Bootstrap servers come
- * from {@code spring.kafka.bootstrap-servers} (standard spring-kafka configuration).
+ * from {@code dc3.mq.kafka.bootstrap-servers} / {@code DC3_MQ_KAFKA_BOOTSTRAP},
+ * falling back to the standard {@code spring.kafka.bootstrap-servers}.
  *
  * @author pnoker
  * @since 2026.8.19
@@ -42,13 +43,13 @@ public class KafkaMqAdapterConfiguration {
     @Bean
     @ConditionalOnMissingBean(KafkaTemplate.class)
     public KafkaTemplate<String, byte[]> kafkaMqTemplate(
-            @Value("${spring.kafka.bootstrap-servers:localhost:9092}") String bootstrapServers) {
+            @Value("${dc3.mq.kafka.bootstrap-servers:${DC3_MQ_KAFKA_BOOTSTRAP:${spring.kafka.bootstrap-servers:localhost:9092}}}") String bootstrapServers) {
         return KafkaMqAdapter.template(bootstrapServers);
     }
 
     @Bean
     public KafkaMqAdapter kafkaMqAdapter(KafkaTemplate<String, byte[]> kafkaTemplate,
-                                         @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
+                                         @Value("${dc3.mq.kafka.bootstrap-servers:${DC3_MQ_KAFKA_BOOTSTRAP:${spring.kafka.bootstrap-servers:localhost:9092}}}")
                                          String bootstrapServers, BatchConsumerProperties batchProperties) {
         Map<String, Object> consumerConfig = KafkaMqAdapter.consumerConfig(bootstrapServers);
         return new KafkaMqAdapter(kafkaTemplate, consumerConfig, batchProperties);
