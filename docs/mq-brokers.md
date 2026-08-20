@@ -18,6 +18,23 @@ and the deployment picks one with a single setting plus one dependency.
 The internal plane and the device-access plane are independent: switching the
 internal broker never affects the MQTT drivers or the EMQX-based device access.
 
+## Device-access plane (southbound MQTT)
+
+The device-access MQTT stack needs no adapter layer at all — MQTT is an open wire
+protocol and the driver uses a standard Paho client, so the broker is selected by
+one URL (`dc3.driver.mqtt.url`): EMQX, Mosquitto, HiveMQ, NanoMQ, VerneMQ ... are
+drop-in replacements with zero code change. The compose default (`dc3-emqx`) is a
+deployment choice, not a dependency; vendor-specific features (management APIs,
+rule engines) must not leak into driver code, and
+`MqttVendorNeutralityIT` keeps that property verified mechanically — the same
+client code round-trips against two different broker vendors, differing only in
+the URL.
+
+One dialect note: the device-access client speaks MQTT 3.1.1, which every
+mainstream broker supports and which covers device access (publish/subscribe,
+QoS, retained, TLS, X.509). MQTT 5-only features such as shared subscriptions are
+used exclusively by the internal-plane adapter above.
+
 ## Certified brokers
 
 Every adapter below passes the same broker-neutral contract suite
