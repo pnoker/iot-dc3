@@ -142,6 +142,7 @@ savePointValues` —— 单个 PostgreSQL 事务：
 | S16 | **多级保留 + 降采样rollup**（跃迁新增） | 原始 30 天 → 1 分钟粒度 1 年 → 1 小时粒度永久（默认三级，可配）。读操作**对分级透明**：`bucketedAggregate` 桶宽 ≥ 某级粒度时由存储自动从该级 rollup 供数；能力 `rollupSupport: NATIVE / MANUAL / NONE`（Timescale 连续聚合、TDengine 流计算为 NATIVE；Influx 任务为 MANUAL；IoTDB NONE→原始扫描，正确但慢） |
 | S17 | **数据质量位**（跃迁新增） | 样本携带 `quality` 整型码（OPC UA 风格，0=GOOD 默认），驱动可标注 BAD/UNCERTAIN；随样本透传存储，历史查询可按质量过滤（应用层）。现在加是一个 int，将来加是全库迁移——趁 port 未落地先占位 |
 | S18 | **序列发现与运维面**（跃迁新增） | `listSeries(tenant)` 枚举窗口内有数据的序列（迁移 CLI、覆盖审计、缓存预热都要用）；读操作统一携带 deadline（防失控扫描）；适配器声明 `maxAppendBatch`（port 自动分块） |
+| S19 | **AI 分析查询面**（跃迁新增，§9.7） | 面向 Agentic/MCP 的粗粒度工具集（latest/history/stats/compare/rank/trend/threshold/correlate/quality 九个），由数据中心 `DataAnalyticsFacade` 组合 port 原语 + 关系元数据实现；port 仅新增能力门控原语 `correlation`；租户上下文由门面从鉴权注入，AI 无法跨租户 |
 
 > S1–S13 为"现状实测 + 看板核对"出来的存量语义；S14–S18 是**借改造机会补的专业能力**——都设计为"默认行为不变、显式启用才生效"，不破坏行为等价的 Phase 1 门槛。
 
@@ -279,6 +280,11 @@ public interface TsdbStore {
 
     /** S10：能力门控的时间范围删除（租户注销）。 */
     void deleteRange(SeriesKey series, TimeWindow window);
+
+    /** S19：两序列按桶对齐的皮尔逊相关系数 + 对齐桶数（AI correlate 工具的
+        存储端捷径；correlation=false 时门面拉桶化序列自算）。 */
+    CorrelationResult correlation(SeriesKey a, SeriesKey b, TimeWindow window,
+                                  Duration alignBucket, TsdbDeadline deadline);
 }
 
 /** 降序游标页：items + 下一页锚点（null 表示到底）。 */
@@ -291,6 +297,7 @@ record BucketAggregate(Instant bucketStart, Double value, long sampleCount) {}
 record DimensionCount(GroupDimension dimension, long entityId, long count) {}
 record SeriesLastSeen(SeriesKey series, Instant lastSeen) {}
 record LatencyBin(long fromMsInclusive, long toMsExclusive, long count) {}
+record CorrelationResult(double pearson, long alignedBuckets) {}
 
 public record TsdbCapabilities(
         boolean gapFill,                 // 空桶补零
@@ -303,7 +310,8 @@ public record TsdbCapabilities(
         boolean deleteRange,
         OrderingGuarantee ordering,      // NONE | PER_SERIES（每序列追加序）
         Precision precision,             // MICRO / MILLI / NANO
-        boolean backfill                 // 接受乱序 / 迟到写入
+        boolean backfill,                // 接受乱序 / 迟到写入
+        boolean correlation              // S19 存储端相关系数
 ) {}
 
 enum RollupSupport { NATIVE, MANUAL, NONE }
@@ -394,6 +402,7 @@ measurements 随行；按租户子树的 TTL 由存储组布局近似实现。
 | PERCENTILE（S15） | ✅ percentile_cont | ✅ PERCENTILE/APERCENTILE | ✅ | ⚠️ 近似/拒绝 |
 | rollup 分级（S16） | ✅ NATIVE 连续聚合 | ✅ NATIVE 流计算 | ⚠️ MANUAL 任务 | ❌ NONE→原始扫描 |
 | 质量位存储（S17） | ✅ 列 | ✅ 列 | ✅ field | ✅ measurement |
+| 相关系数（S19） | ✅ SQL JOIN 聚合 | ✅ SQL | ✅ SQL | ❌ 门面桶化自算 |
 | 内嵌 PG 模式 | ✅（默认） | ❌ | ❌ | ❌ |
 
 启动协商日志汇总当前存储的一行能力，与 MQ port 一致。
@@ -483,6 +492,69 @@ AVG/MIN/MAX/SUM/COUNT/FIRST/LAST；PERCENTILE 不物化，永远扫原始或退�
 告警窗口（S6）永远走原始数据，不受 rollup 滞后影响（其窗口典型为分钟~小时级，
 落在原始保留期内）。
 
+### 9.7 AI 分析查询面（S19，面向 Agentic Center / MCP 工具）
+
+**需求来源（已核现状）**：Agentic Center 已落地（`dc3-common-agentic`：session/
+message/action/model_provider），MCP 网关经 `tools/call` 让 AI 调工具；今天的
+数据 API 只有 `PointValueController`（latest/list/分页历史）与
+`point_value.proto`（GetLastValue/ListHistoryValues/读写命令）——**给人看的
+CRUD 面，不是给 AI 的分析面**。AI Agent 的查询模式完全不同：探索式、组合式、
+一次提问要跨点位/跨设备/跨时间对比，且必须以**少量粗粒度工具 + 结构化入参**
+呈现（LLM 工具表太长会劣化选择质量），返回必须是**自包含的统计结论**而非
+原始样本页。
+
+#### 三层架构：AI 工具层 / 分析门面 / 存储原语
+
+```
+MCP tools/call（AI Agent）
+   │  少量粗粒度工具 + JSON Schema 入参（MCP 网关授权，走 §Agentic 鉴权）
+   ▼
+DataAnalyticsFacade（新，数据中心内）—— AI 查询门面
+   │  ① 元数据解析：设备/点位名 → SeriesKey（含按类型/标签筛选 → 序列集）
+   │  ② 组合 port 原语成分析结论；名称富化；租户强校验
+   │  ③ 结果封包：结论 + 样本量 + 置信说明（AI 拿到即用，不再二次取数）
+   ▼
+TsdbStore port（S1-S18 原语层，不膨胀）
+```
+
+**原则：port 不为 AI 长新操作。** AI 需要的形态学查询绝大多数可由 S7/S13/S14/S15
+原语组合出来；真正组合不出的极少数（相关性、阈值停留）才以能力门控原语下沉，
+且必须先证明"应用层拉样本自算不可行"（数据量门槛论证）。
+
+#### AI 工具集（MCP `tools/call` 暴露，粗粒度 × 结构化入参）
+
+| 工具 | 语义 | 门面实现（用到的 port 原语） |
+|------|------|------------------------------|
+| `query_latest` | 设备/点位当前值（按名称或 ID，可批量） | 最新值服务（PG 投影） |
+| `query_history` | 时间窗内多序列历史（含 M4 降采样开关） | `history` / `bucketedAggregate(FIRST/LAST/MIN/MAX)`（S5/S7/S14/S15） |
+| `compute_stats` | 一组序列的统计画像：均值/标准差/分位数/极值/样本量 | `aggregate` + `bucketedAggregate(PERCENTILE)`（S6/S15） |
+| `compare_periods` | 同期对比（本周 vs 上周、昨日同时段） | 两次 `aggregate`/`bucketedAggregate` + 门面差值与百分比 |
+| `rank_entities` | 按活跃度/均值/极值给设备或点位排名 | `countByDimension`（计数维度）或序列集循环 `aggregate` + 门面排序 |
+| `trend_analysis` | 趋势与突变：逐桶序列 + 线性拟合/变化率在门面算 | `bucketedAggregate(AVG)` + 门面最小二乘 |
+| `threshold_report` | 超阈值时段报告：何时超、超多久、峰值多少 | `bucketedAggregate(MIN/MAX)` 定位 + 窗口内 `history` 精查 + 门面合并区间 |
+| `correlate` | 两序列相关性（皮尔逊） | **能力门控原语** `correlation`（下方）或降级：窗口内桶化序列门面计算 |
+| `data_quality_report` | 覆盖率/缺口/静默源/质量位分布 | `lastSeenPerSeries` + `count` + S17 质量位过滤 |
+
+工具表刻意**九个封顶**：每个入参都是强类型 JSON Schema（枚举/范围约束），
+模糊表述（"帮我看看数据"）由 LLM 先选工具再填参，而不是一个万能 query 接口。
+
+#### 下沉 port 的唯一新原语：相关性
+
+`correlation(SeriesKey a, SeriesKey b, TimeWindow, Duration alignBucket)` ——
+两序列按桶对齐后的皮尔逊系数 + 对齐桶数。Timescale/TDengine/Influx 3 都能
+SQL 端 JOIN 聚合表达；IoTDB 退化（能力 `correlation=false`）→ 门面拉两列桶化
+序列自算（M4 级数据量，可行）。**阈值停留（threshold duration）不再下沉**：
+`threshold_report` 用桶聚合 + 局部精查的组合已够，避免为它发明 STATE_DURATION
+的跨库语义（原待决 §12.11 的结论：由该组合方案替代，状态时长分析关闭）。
+
+#### 安全与租户
+
+- 工具入参**只收名称或 ID + 窗口**，SeriesKey 的 tenantId 由门面从 MCP 鉴权
+  上下文注入——AI 永远无法跨租户取数（S11 硬约束在门面二次校验）。
+- 每个工具带 `TsdbDeadline`（S18）；单次工具调用的扫描量上限（序列数 × 窗口
+  × 粒度）在门面校验，超限返回结构化降级建议（缩窗口/降粒度），不静默截断。
+- 工具调用审计进既有 `dc3_action`（Agentic 已有该表）。
+
 ## 10. TCK —— 验收门槛
 
 `dc3-tsdb-tck`，每库一个容器跑同一套中立套件（timescale、tdengine、iotdb；
@@ -513,6 +585,8 @@ influx 视许可）：
     与原始扫描一致；NONE 档如实退化为原始扫描
 21. quality 质量位（S17）：非零质量码随样本往返不丢
 22. 读 deadline（S18）：窗口过大时超时抛 TsdbQueryTimeout 而非挂死
+23. 相关系数（S19，能力门控）：已知构造序列（完全正相关/负相关/无相关）的
+    皮尔逊系数在容差内；对齐桶数正确
 
 ## 11. 迁移计划
 
@@ -527,7 +601,9 @@ influx 视许可）：
   port 的序列模型，等于提前把 port 磨硬。跃迁能力随阶段落地：S17 质量位与
   S15 FIRST/LAST 成本极低随 Phase 1/2 直接进；S14 多序列与 S18 运维面进
   Phase 2；S16 多级保留+rollup 在 Phase 2 以 timescale cagg 首发验证、Phase 3
-  推广到其余三库。
+  推广到其余三库。**S19 AI 分析门面（`DataAnalyticsFacade` + 九工具）与 MCP
+  网关对接随 Phase 2 落地**——Agentic 链路已存在，门面只依赖 port 原语与关系
+  元数据，是 Phase 2 里对上层可见度最高的一块。
 - **Phase 3 —— InfluxDB 3 + IoTDB 适配器**；发布能力矩阵；
   `dc3/dependencies/<store>/` 下的 `dc3.tsdb.type` compose profile。
 - **全程**：`dc3_point_latest` 永不搬家；即使 PG 卸掉 Timescale 扩展也保留它。
@@ -559,10 +635,9 @@ influx 视许可）：
 10. **rollup 物化函数集与滞后窗口** —— 各级物化哪些函数（默认七函数）、物化
     滞后多久（cagg 水位）算"可读"？倾向：物化滞后对读侧完全透明不暴露，宽桶
     查询允许读到略旧的 rollup（看板场景分钟级滞后无感）。
-11. **状态时长分析（STATE_DURATION）** —— "该点在阈值之上停留了多久"是 IoT
-    分析刚需（TDengine 原生 STATE_DURATION/STATE_COUNT）。是否进 port 作为
-    能力门控 op，还是留应用层按 samples 自算？倾向：Phase 3 后按社区反馈定，
-    先记录不设计。
+11. ~~**状态时长分析（STATE_DURATION）**~~ —— 已由 §9.7 的 `threshold_report`
+    组合方案解决（桶聚合定位 + 窗口精查 + 门面合并区间），不再单设 port 原语。
+    若未来高频"状态机分析"证明该组合过重，再评估能力门控原语。
 
 ## 13. 与 storage-abstraction.md 的关系
 
