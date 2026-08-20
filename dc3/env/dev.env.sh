@@ -26,6 +26,9 @@ export POSTGRES_USERNAME=dc3
 export POSTGRES_PASSWORD=dc3dc3dc3
 export POSTGRES_DB=dc3
 
+# Message broker selection (docs/mq-brokers.md); rabbitmq is the default
+export DC3_MQ_TYPE=rabbitmq
+
 # RabbitMQ
 export RABBITMQ_VIRTUAL_HOST=dc3
 export RABBITMQ_HOST=localhost
