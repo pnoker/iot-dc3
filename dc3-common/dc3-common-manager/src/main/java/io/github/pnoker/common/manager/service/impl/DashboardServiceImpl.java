@@ -25,7 +25,6 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.manager.constant.TopologyLimits;
 import io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.DailyGrowthRow;
-import io.github.pnoker.common.manager.entity.bo.dashboard.PointVolumeRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.ProfileBindingRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDeviceRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDriverRow;
@@ -40,6 +39,8 @@ import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyLinkVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyNodeVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
+import io.github.pnoker.common.constant.common.TimeConstant;
+import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.manager.mapper.DashboardMapper;
 import io.github.pnoker.common.manager.service.DashboardService;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +82,8 @@ public class DashboardServiceImpl implements DashboardService {
             .build();
 
     private final DashboardMapper dashboardMapper;
+
+    private final PointValueFacade pointValueFacade;
 
     /**
      * Convert bucket rows to bucket VOs, formatting each key with the given formatter.
@@ -399,13 +402,13 @@ public class DashboardServiceImpl implements DashboardService {
         // Map<(deviceId, pointId), count>. Empty in cardinality mode.
         Map<Long, Map<Long, Long>> volumeByDevicePoint = new HashMap<>();
         if (volumeMode) {
-            LocalDateTime from = fromOfRange(rangeKey);
-            List<PointVolumeRow> volumeRows = dashboardMapper.topologyPointVolumes(tenantId, from);
-            for (PointVolumeRow r : volumeRows) {
-                Long did = r.getDeviceId();
-                Long pid = r.getPointId();
-                long cnt = r.getCnt();
-                volumeByDevicePoint.computeIfAbsent(did, k -> new HashMap<>()).put(pid, cnt);
+            // Volumes come from the data center facade (TSDB port, S13-⑤ series
+            // counts) — the manager no longer reads dc3_history cross-schema.
+            long fromEpochMillis = fromOfRange(rangeKey)
+                    .atZone(TimeConstant.DEFAULT_ZONEID).toInstant().toEpochMilli();
+            for (var row : pointValueFacade.pointVolumes(tenantId, fromEpochMillis)) {
+                volumeByDevicePoint.computeIfAbsent(row.deviceId(), k -> new HashMap<>())
+                        .put(row.pointId(), row.count());
             }
         }
 

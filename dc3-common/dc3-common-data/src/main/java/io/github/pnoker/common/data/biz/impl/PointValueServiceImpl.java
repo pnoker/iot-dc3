@@ -21,6 +21,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
+import io.github.pnoker.common.data.biz.store.PointValueIngestService;
+import io.github.pnoker.common.data.biz.store.PointValueLatestService;
+import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
@@ -31,24 +34,35 @@ import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
-import io.github.pnoker.common.repository.RepositoryService;
-import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
+import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
+import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
+import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
+import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
+import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
+import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
+import io.github.pnoker.common.tsdb.spi.TsdbStore;
+import io.github.pnoker.common.entity.bo.PointValueVolumeBO;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
+import io.github.pnoker.common.utils.TimeRangeUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
- * Business service implementation for point value operations.
+ * Business service implementation for point value operations. Reads go through
+ * the TSDB port (history/page) and the relational latest projection; writes go
+ * through the ingest orchestration.
  *
  * @author pnoker
  * @since 2016.10.1
@@ -58,11 +72,32 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PointValueServiceImpl implements PointValueService {
 
+    /** Read deadline shared by the value-query paths (S18 runaway-scan guard). */
+    private static final TsdbDeadline DEADLINE = TsdbDeadline.ofSeconds(30);
+
+    /**
+     * Upper bound for one offset-emulation fetch. The HTTP page shape stays
+     * current/size while the port only pages by cursor, so page N is served by
+     * fetching the newest N*size rows once and slicing; beyond this cap the
+     * request degrades to an empty page rather than an unbounded scan.
+     */
+    private static final int MAX_PAGE_FETCH = 10_000;
+
+    private static final long RESOLUTION_PAGE_SIZE = 200L;
+
     private final PointFacade pointFacade;
 
     private final DeviceFacade deviceFacade;
 
     private final AlarmRuleTriggerService alarmRuleTriggerService;
+
+    private final PointValueIngestService pointValueIngestService;
+
+    private final PointValueLatestService pointValueLatestService;
+
+    private final PointValueSampleConverter converter;
+
+    private final TsdbStore tsdbStore;
 
     @Override
     public void save(PointValueBO pointValueBO) {
@@ -133,8 +168,10 @@ public class PointValueServiceImpl implements PointValueService {
             count = 500;
         }
 
-        RepositoryService repositoryService = getFirstRepositoryService();
-        return repositoryService.listHistoryPointValue(tenantId, deviceId, pointId, count);
+        SeriesKey series = new SeriesKey(tenantId, deviceId, pointId);
+        List<PointValueSample> samples = tsdbStore.last(SeriesFilter.of(series), count, DEADLINE)
+                .getOrDefault(series, List.of());
+        return converter.toBOs(samples);
     }
 
     @Override
@@ -163,9 +200,8 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         Long tenantId = entityQuery.getTenantId();
-        RepositoryService repositoryService = getFirstRepositoryService();
-        Map<Long, PointValueBO> pointValueBOMap = repositoryService
-                .listLatestPointValues(tenantId, entityQuery.getDeviceId(), pointIds)
+        Map<Long, PointValueBO> pointValueBOMap = pointValueLatestService
+                .listLatest(tenantId, entityQuery.getDeviceId(), pointIds)
                 .stream()
                 .filter(Objects::nonNull)
                 .filter(value -> Objects.nonNull(value.getPointId()))
@@ -187,22 +223,209 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    @SneakyThrows
     public Page<PointValueBO> page(PointValueQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         validateMetadataScope(entityQuery.getTenantId(), entityQuery.getDeviceId(), entityQuery.getPointId());
         if (Objects.isNull(entityQuery.getCreateTimeFrom())) {
-            java.time.LocalDateTime from = io.github.pnoker.common.utils.TimeRangeUtil
+            java.time.LocalDateTime from = TimeRangeUtil
                     .resolveFrom(entityQuery.getRangeKey(), entityQuery.getRangeHours());
             if (Objects.nonNull(from)) {
                 entityQuery.setCreateTimeFrom(from);
             }
         }
 
-        RepositoryService repositoryService = getFirstRepositoryService();
-        return repositoryService.listPagePointValue(entityQuery);
+        long current = Math.max(1, entityQuery.getPage().getCurrent());
+        long size = Math.max(1, entityQuery.getPage().getSize());
+        SeriesFilter filter = resolveSeriesFilter(entityQuery);
+        if (Objects.isNull(filter)) {
+            return emptyPage(current, size);
+        }
+        TimeWindow window = new TimeWindow(
+                Objects.nonNull(entityQuery.getCreateTimeFrom())
+                        ? converter.toInstant(entityQuery.getCreateTimeFrom()) : Instant.EPOCH,
+                Instant.now());
+
+        Page<PointValueBO> entityPageBO = emptyPage(current, size);
+        entityPageBO.setTotal(tsdbStore.count(filter, window, DEADLINE));
+
+        int fetch = (int) Math.min(current * size, MAX_PAGE_FETCH);
+        int offset = (int) Math.min((current - 1) * size, MAX_PAGE_FETCH);
+        CursorPage<PointValueSample> cursorPage = tsdbStore.history(filter, window, null, fetch, DEADLINE);
+        if (offset < cursorPage.items().size()) {
+            entityPageBO.setRecords(converter.toBOs(
+                    cursorPage.items().subList(offset, Math.min((int) (offset + size), cursorPage.items().size()))));
+        }
+        return entityPageBO;
+    }
+
+    @Override
+    public List<PointValueVolumeBO> seriesVolumes(Long tenantId, Instant from) {
+        if (Objects.isNull(tenantId)) {
+            return List.of();
+        }
+        TimeWindow window = new TimeWindow(Objects.nonNull(from) ? from : Instant.EPOCH, Instant.now());
+        return tsdbStore.seriesCounts(tenantId, window, DEADLINE).stream()
+                .map(row -> new PointValueVolumeBO(row.series().deviceId(), row.series().pointId(), row.count()))
+                .toList();
+    }
+
+    /**
+     * Translate the query's name/enable filters into a series filter via
+     * relational metadata (§6.2 of the TSDB design). Returns {@code null} when
+     * the filters provably match nothing; a tenant-wide filter when no series
+     * dimension is restricted; otherwise the explicit (device, point) pair
+     * set — pairs are enumerated through profile bindings because a point is
+     * reported under every device bound to its profile.
+     */
+    private SeriesFilter resolveSeriesFilter(PointValueQuery query) {
+        Long tenantId = query.getTenantId();
+        if (Objects.isNull(tenantId)) {
+            return SeriesFilter.tenantWide(0L);
+        }
+
+        boolean deviceScoped = isValidId(query.getDeviceId());
+        boolean deviceNamed = !deviceScoped && Objects.nonNull(query.getDeviceName())
+                && !query.getDeviceName().isBlank();
+        boolean pointScoped = isValidId(query.getPointId());
+        boolean pointFiltered = !pointScoped && (Objects.nonNull(query.getPointName())
+                || Objects.nonNull(query.getEnableFlag()));
+
+        if (!deviceScoped && !deviceNamed && !pointScoped && !pointFiltered) {
+            return SeriesFilter.tenantWide(tenantId);
+        }
+
+        // Point dimension: id when scoped, facade search when filtered.
+        Map<Long, Long> pointsById = new LinkedHashMap<>();
+        if (pointScoped) {
+            FacadePointBO point = pointFacade.getById(tenantId, query.getPointId());
+            if (Objects.isNull(point)) {
+                return null;
+            }
+            pointsById.put(point.getId(), point.getProfileId());
+        } else if (pointFiltered) {
+            FacadePointQuery facadeQuery = FacadePointQuery.builder()
+                    .tenantId(tenantId)
+                    .pointName(query.getPointName())
+                    .enableFlag(query.getEnableFlag())
+                    .build();
+            for (FacadePointBO point : pageThroughPoints(facadeQuery)) {
+                pointsById.put(point.getId(), point.getProfileId());
+            }
+            if (pointsById.isEmpty()) {
+                return null;
+            }
+        }
+
+        // Device dimension: id when scoped, facade search when named.
+        Map<Long, Long> devicesById = new LinkedHashMap<>();
+        if (deviceScoped) {
+            FacadeDeviceBO device = deviceFacade.getById(tenantId, query.getDeviceId());
+            if (Objects.isNull(device)) {
+                return null;
+            }
+            devicesById.put(device.getId(), device.getProfileId());
+        } else if (deviceNamed) {
+            FacadeDeviceQuery facadeQuery = FacadeDeviceQuery.builder()
+                    .tenantId(tenantId)
+                    .deviceName(query.getDeviceName())
+                    .build();
+            for (FacadeDeviceBO device : pageThroughDevices(facadeQuery)) {
+                devicesById.put(device.getId(), device.getProfileId());
+            }
+            if (devicesById.isEmpty()) {
+                return null;
+            }
+        }
+
+        // Both dimensions restricted: the old SQL applied the predicates
+        // independently on the row, so take the plain cross product.
+        if (!pointsById.isEmpty() && !devicesById.isEmpty()) {
+            List<SeriesKey> series = new ArrayList<>();
+            for (Map.Entry<Long, Long> device : devicesById.entrySet()) {
+                for (Map.Entry<Long, Long> point : pointsById.entrySet()) {
+                    series.add(new SeriesKey(tenantId, device.getKey(), point.getKey()));
+                }
+            }
+            return SeriesFilter.of(series);
+        }
+
+        // Only one dimension restricted: enumerate the plausible pairs through
+        // the profile binding on the unrestricted side.
+        List<SeriesKey> series = new ArrayList<>();
+        if (!pointsById.isEmpty()) {
+            for (Map.Entry<Long, Long> point : pointsById.entrySet()) {
+                for (FacadeDeviceBO device : deviceFacade.listByProfileId(tenantId, point.getValue())) {
+                    series.add(new SeriesKey(tenantId, device.getId(), point.getKey()));
+                }
+            }
+        } else {
+            for (Map.Entry<Long, Long> device : devicesById.entrySet()) {
+                FacadePointQuery facadeQuery = FacadePointQuery.builder()
+                        .tenantId(tenantId)
+                        .profileId(device.getValue())
+                        .build();
+                for (FacadePointBO point : pageThroughPoints(facadeQuery)) {
+                    series.add(new SeriesKey(tenantId, device.getKey(), point.getId()));
+                }
+            }
+        }
+        return series.isEmpty() ? null : SeriesFilter.of(series);
+    }
+
+    private List<FacadePointBO> pageThroughPoints(FacadePointQuery template) {
+        List<FacadePointBO> out = new ArrayList<>();
+        long current = 1;
+        while (true) {
+            Pages pages = new Pages();
+            pages.setCurrent(current);
+            pages.setSize(RESOLUTION_PAGE_SIZE);
+            FacadePointQuery paged = FacadePointQuery.builder()
+                    .tenantId(template.getTenantId())
+                    .pointName(template.getPointName())
+                    .pointCode(template.getPointCode())
+                    .pointTypeFlag(template.getPointTypeFlag())
+                    .rwFlag(template.getRwFlag())
+                    .profileId(template.getProfileId())
+                    .enableFlag(template.getEnableFlag())
+                    .version(template.getVersion())
+                    .deviceId(template.getDeviceId())
+                    .page(pages)
+                    .build();
+            FacadePage<FacadePointBO> page = pointFacade.listByPage(paged);
+            out.addAll(page.getRecords());
+            if (out.size() >= page.getTotal() || page.getRecords().isEmpty()) {
+                return out;
+            }
+            current++;
+        }
+    }
+
+    private List<FacadeDeviceBO> pageThroughDevices(FacadeDeviceQuery template) {
+        List<FacadeDeviceBO> out = new ArrayList<>();
+        long current = 1;
+        while (true) {
+            Pages pages = new Pages();
+            pages.setCurrent(current);
+            pages.setSize(RESOLUTION_PAGE_SIZE);
+            FacadeDeviceQuery paged = FacadeDeviceQuery.builder()
+                    .tenantId(template.getTenantId())
+                    .deviceName(template.getDeviceName())
+                    .deviceCode(template.getDeviceCode())
+                    .driverId(template.getDriverId())
+                    .enableFlag(template.getEnableFlag())
+                    .version(template.getVersion())
+                    .profileId(template.getProfileId())
+                    .page(pages)
+                    .build();
+            FacadePage<FacadeDeviceBO> page = deviceFacade.listByPage(paged);
+            out.addAll(page.getRecords());
+            if (out.size() >= page.getTotal() || page.getRecords().isEmpty()) {
+                return out;
+            }
+            current++;
+        }
     }
 
     /**
@@ -253,7 +476,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     private boolean persistPointValue(PointValueBO pointValueBO) {
         try {
-            return getFirstRepositoryService().savePointValue(pointValueBO);
+            return pointValueIngestService.saveValue(pointValueBO);
         } catch (Exception e) {
             throw new RepositoryException(e);
         }
@@ -261,10 +484,16 @@ public class PointValueServiceImpl implements PointValueService {
 
     private List<PointValueBO> persistPointValues(List<PointValueBO> pointValueBOList) {
         try {
-            return getFirstRepositoryService().savePointValues(pointValueBOList);
+            return pointValueIngestService.saveValues(pointValueBOList);
         } catch (Exception e) {
             throw new RepositoryException(e);
         }
+    }
+
+    private Page<PointValueBO> emptyPage(long current, long size) {
+        Page<PointValueBO> page = new Page<>(current, size);
+        page.setRecords(List.of());
+        return page;
     }
 
     /**
@@ -295,27 +524,6 @@ public class PointValueServiceImpl implements PointValueService {
     private PointValueBO latestPointValue(PointValueBO pointValueBO) {
         pointValueBO.setHasLatestValue(true);
         return pointValueBO;
-    }
-
-    /**
-     * Get data storage service
-     *
-     * @return RepositoryService
-     */
-    private RepositoryService getFirstRepositoryService() {
-        List<RepositoryService> repositoryServices = RepositoryStrategyFactory.get();
-        if (!repositoryServices.isEmpty() && repositoryServices.size() > 1) {
-            throw new RepositoryException(
-                    "Save point values to repository error: There are multiple repository, only one is supported.");
-        }
-
-        Optional<RepositoryService> first = repositoryServices.stream().findFirst();
-        if (first.isEmpty()) {
-            throw new RepositoryException(
-                    "Save point values to repository error: Please configure at least one repository.");
-        }
-
-        return first.get();
     }
 
 }

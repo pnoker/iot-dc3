@@ -18,10 +18,14 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.constant.common.TimeConstant;
 import io.github.pnoker.common.data.biz.DashboardService;
+import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
+import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
 import io.github.pnoker.common.data.mapper.AlertMapper;
-import io.github.pnoker.common.data.mapper.DashboardMapper;
+import io.github.pnoker.common.data.mapper.PointValueMapper;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.ConfirmFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
@@ -30,14 +34,28 @@ import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
+import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
+import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
+import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
+import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
+import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
+import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
+import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
+import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
+import io.github.pnoker.common.tsdb.spi.TsdbStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +67,8 @@ import static io.github.pnoker.common.data.constant.DashboardLimits.*;
 
 /**
  * Business service implementation for dashboard aggregation operations.
+ * Point-value statistics go through the TSDB port (S13 analytics facet) and
+ * the relational latest projection; alert statistics stay on the alert mapper.
  *
  * @author pnoker
  * @since 2026.5.2
@@ -58,12 +78,17 @@ import static io.github.pnoker.common.data.constant.DashboardLimits.*;
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
 
+    private static final TsdbDeadline DEADLINE = TsdbDeadline.ofSeconds(20);
+
+    /** UI layout of the latency histogram — six buckets, fixed edges. */
+    private static final List<Long> LATENCY_EDGES_MS = List.of(100L, 500L, 1000L, 5000L, 30000L);
+
     /**
-     * Dimensions whose column name we interpolate directly into the GROUP BY. Only these
-     * are accepted — never pass user input through unchecked.
+     * Dimensions accepted for the top-N grouping. The port's GroupDimension
+     * enum is the whitelist — never pass user input further.
      */
-    private static final Map<String, String> DIMENSION_COLUMN = Map.of("device", "device_id", "point", "point_id",
-            "driver", "driver_id");
+    private static final Map<String, GroupDimension> DIMENSIONS = Map.of(
+            "device", GroupDimension.DEVICE, "point", GroupDimension.POINT, "driver", GroupDimension.DRIVER);
 
     private static final Set<String> GRANULARITY = Set.of("hour", "day");
 
@@ -72,7 +97,7 @@ public class DashboardServiceImpl implements DashboardService {
      */
     private static final Set<String> ALERT_SOURCES = Set.of(SOURCE_DEVICE, SOURCE_DRIVER, SOURCE_POINT);
 
-    private final DashboardMapper dashboardMapper;
+    private final PointValueMapper pointValueMapper;
 
     private final AlertMapper alertMapper;
 
@@ -82,6 +107,10 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final DriverFacade driverFacade;
 
+    private final PointValueSampleConverter converter;
+
+    private final TsdbStore tsdbStore;
+
     /**
      * BucketRow.key is Object (shared across SMALLINT / VARCHAR / BIGINT group columns);
      * stringify for the VO.
@@ -90,25 +119,23 @@ public class DashboardServiceImpl implements DashboardService {
         return Objects.isNull(v) ? null : v.toString();
     }
 
+    private TimeWindow windowSince(LocalDateTime from) {
+        return new TimeWindow(converter.toInstant(from), Instant.now());
+    }
+
     @Override
     public List<LatencyBucketVO> latencyHistogram(Long tenantId, int rangeHours) {
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
-        var rows = dashboardMapper.latencyHistogram(tenantId, from, to);
-        // Pad missing bins with zero so the UI always gets six buckets.
-        long[] counts = new long[6];
-        for (var row : rows) {
-            int bin = row.getBin();
-            if (bin >= 0 && bin < counts.length) {
-                counts[bin] = row.getCount();
-            }
-        }
-        List<LatencyBucketVO> out = new ArrayList<>(counts.length);
-        for (int i = 0; i < counts.length; i++) {
+        List<LatencyBin> bins = tsdbStore.latencyHistogram(tenantId, windowSince(from),
+                LATENCY_EDGES_MS, DEADLINE);
+        // The port zero-pads every bin, so the UI always gets six buckets.
+        List<LatencyBucketVO> out = new ArrayList<>(bins.size());
+        for (int i = 0; i < bins.size(); i++) {
             LatencyBucketVO vo = new LatencyBucketVO();
             vo.setBin(i);
-            vo.setCount(counts[i]);
+            vo.setCount(bins.get(i).count());
             out.add(vo);
         }
         return out;
@@ -119,14 +146,17 @@ public class DashboardServiceImpl implements DashboardService {
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
-        var rows = dashboardMapper.hourlyActivity(tenantId, from, to);
+        List<BucketAggregate> buckets = tsdbStore.bucketedCount(tenantId, windowSince(from),
+                Duration.ofHours(1), DEADLINE);
         long[][] grid = new long[7][24];
-        for (var row : rows) {
-            int dow = row.getDow();
-            int hour = row.getHour();
-            if (dow >= 0 && dow < 7 && hour >= 0 && hour < 24) {
-                grid[dow][hour] = row.getCount();
+        for (BucketAggregate bucket : buckets) {
+            LocalDateTime wallClock = converter.toWallClock(bucket.bucketStart());
+            if (Objects.isNull(wallClock)) {
+                continue;
             }
+            int dow = wallClock.getDayOfWeek().getValue() % 7;
+            int hour = wallClock.getHour();
+            grid[dow][hour] = bucket.sampleCount();
         }
         List<ActivityCellVO> out = new ArrayList<>(7 * 24);
         for (int d = 0; d < 7; d++) {
@@ -207,21 +237,25 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public long countToday(Long tenantId) {
-        LocalDateTime from = LocalDate.now().atStartOfDay();
-        LocalDateTime to = LocalDateTime.now();
-        return dashboardMapper.countInRange(tenantId, from, to);
+        LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).atStartOfDay();
+        return tsdbStore.count(SeriesFilter.tenantWide(tenantId),
+                windowSince(from), DEADLINE);
     }
 
     @Override
     public long countYesterday(Long tenantId) {
-        LocalDateTime from = LocalDate.now().minusDays(1).atStartOfDay();
-        LocalDateTime to = LocalDate.now().atStartOfDay();
-        return dashboardMapper.countInRange(tenantId, from, to);
+        LocalDate today = LocalDate.now(TimeConstant.DEFAULT_ZONEID);
+        TimeWindow window = new TimeWindow(converter.toInstant(today.minusDays(1).atStartOfDay()),
+                converter.toInstant(today.atStartOfDay()));
+        return tsdbStore.count(SeriesFilter.tenantWide(tenantId), window, DEADLINE);
     }
 
     @Override
     public long countTotal(Long tenantId) {
-        return dashboardMapper.countTotal(tenantId);
+        // The whole history: a bounded [epoch, now) window keeps the port's
+        // TimeWindow shape without changing what a full-table count sees.
+        return tsdbStore.count(SeriesFilter.tenantWide(tenantId),
+                new TimeWindow(Instant.EPOCH, Instant.now()), DEADLINE);
     }
 
     @Override
@@ -230,14 +264,14 @@ public class DashboardServiceImpl implements DashboardService {
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
-        String bucket = "1 " + g;
 
-        var rows = dashboardMapper.timeseries(tenantId, from, to, bucket);
-        List<TimeseriesPointVO> out = new ArrayList<>(rows.size());
-        for (var row : rows) {
+        List<BucketAggregate> buckets = tsdbStore.bucketedCount(tenantId, windowSince(from),
+                "day".equals(g) ? Duration.ofDays(1) : Duration.ofHours(1), DEADLINE);
+        List<TimeseriesPointVO> out = new ArrayList<>(buckets.size());
+        for (BucketAggregate bucket : buckets) {
             TimeseriesPointVO vo = new TimeseriesPointVO();
-            vo.setBucket(row.getBucket());
-            vo.setCount(row.getCount());
+            vo.setBucket(converter.toWallClock(bucket.bucketStart()));
+            vo.setCount(bucket.sampleCount());
             out.add(vo);
         }
         return out;
@@ -245,8 +279,8 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<TopEntityVO> top(Long tenantId, String dimension, int rangeHours, int limit) {
-        String column = DIMENSION_COLUMN.get(dimension);
-        if (Objects.isNull(column)) {
+        GroupDimension groupDimension = DIMENSIONS.get(dimension);
+        if (Objects.isNull(groupDimension)) {
             throw new IllegalArgumentException("Unsupported dimension: " + dimension);
         }
         int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
@@ -254,12 +288,13 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
 
-        var rows = dashboardMapper.top(tenantId, column, from, to, clampedLimit);
+        List<DimensionCount> rows = tsdbStore.countByDimension(tenantId, windowSince(from),
+                groupDimension, clampedLimit, DEADLINE);
         List<TopEntityVO> out = new ArrayList<>(rows.size());
-        for (var row : rows) {
+        for (DimensionCount row : rows) {
             TopEntityVO vo = new TopEntityVO();
-            vo.setEntityId(String.valueOf(row.getEntityId()));
-            vo.setCount(row.getCount());
+            vo.setEntityId(String.valueOf(row.entityId()));
+            vo.setCount(row.count());
             out.add(vo);
         }
         return out;
@@ -268,19 +303,21 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<LatestPointValueVO> latestStream(Long tenantId, int size) {
         int clamped = Math.clamp(size, 1, MAX_LIVE_SIZE);
-        var rows = dashboardMapper.latestStream(tenantId, clamped);
+        List<PointValueDO> rows = pointValueMapper.selectLatestStream(tenantId, clamped);
         List<LatestPointValueVO> out = new ArrayList<>(rows.size());
         Set<Long> deviceIds = new HashSet<>();
         Set<Long> pointIds = new HashSet<>();
         Set<Long> driverIds = new HashSet<>();
-        for (var row : rows) {
+        for (PointValueDO row : rows) {
             LatestPointValueVO vo = new LatestPointValueVO();
             vo.setDeviceId(String.valueOf(row.getDeviceId()));
             vo.setPointId(String.valueOf(row.getPointId()));
             vo.setDriverId(String.valueOf(row.getDriverId()));
             vo.setRawValue(row.getRawValue());
             vo.setCalValue(row.getCalValue());
-            vo.setValueType(row.getValueType());
+            // Single value model: NUMERIC when the numeric projection parsed,
+            // STRING otherwise (booleans, JSON, free-form text).
+            vo.setValueType(Objects.nonNull(row.getNumValue()) ? "NUMERIC" : "STRING");
             vo.setCreateTime(row.getCreateTime());
             out.add(vo);
             if (row.getDeviceId() > 0)
@@ -291,7 +328,7 @@ public class DashboardServiceImpl implements DashboardService {
                 driverIds.add(row.getDriverId());
         }
 
-        // Point-value tables live in the history data source; device / point /
+        // Point-value projections live in the history data source; device / point /
         // driver metadata lives in the master data source (and in remote
         // Manager in distributed deployments), so we cannot JOIN them in SQL.
         // Resolve names in bulk — local facade does it in one SQL, gRPC fans
@@ -305,11 +342,11 @@ public class DashboardServiceImpl implements DashboardService {
 
         for (LatestPointValueVO vo : out) {
             if (Objects.nonNull(vo.getDeviceId()))
-                vo.setDeviceName(deviceNames.get(vo.getDeviceId()));
+                vo.setDeviceName(deviceNames.get(Long.valueOf(vo.getDeviceId())));
             if (Objects.nonNull(vo.getPointId()))
-                vo.setPointName(pointNames.get(vo.getPointId()));
+                vo.setPointName(pointNames.get(Long.valueOf(vo.getPointId())));
             if (Objects.nonNull(vo.getDriverId()))
-                vo.setDriverName(driverNames.get(vo.getDriverId()));
+                vo.setDriverName(driverNames.get(Long.valueOf(vo.getDriverId())));
         }
 
         return out;
@@ -656,13 +693,23 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDateTime from = now.minusDays(baseline);
         LocalDateTime silentThreshold = now.minusMinutes(silent);
 
-        var rows = dashboardMapper.silentSources(tenantId, from, silentThreshold, lim);
-        List<SilentSourceVO> out = new ArrayList<>(rows.size());
-        for (var r : rows) {
+        // Per-series lastSeen inside the baseline window; the "gone quiet"
+        // test (lastSeen < threshold) and the ordering stay in the application
+        // layer — the port only carries the S13-③ primitive.
+        List<SeriesLastSeen> seen = tsdbStore.lastSeenPerSeries(tenantId, windowSince(from), DEADLINE);
+        List<SeriesLastSeen> silentSeries = seen.stream()
+                .filter(row -> Objects.nonNull(row.lastSeen()))
+                .filter(row -> converter.toInstant(silentThreshold).isAfter(row.lastSeen()))
+                .sorted(Comparator.comparing(SeriesLastSeen::lastSeen).reversed())
+                .limit(lim)
+                .toList();
+
+        List<SilentSourceVO> out = new ArrayList<>(silentSeries.size());
+        for (SeriesLastSeen row : silentSeries) {
             SilentSourceVO vo = new SilentSourceVO();
-            vo.setDeviceId(String.valueOf(r.getDeviceId()));
-            vo.setPointId(String.valueOf(r.getPointId()));
-            LocalDateTime last = r.getLastSeen();
+            vo.setDeviceId(String.valueOf(row.series().deviceId()));
+            vo.setPointId(String.valueOf(row.series().pointId()));
+            LocalDateTime last = converter.toWallClock(row.lastSeen());
             vo.setLastSeen(last);
             if (Objects.nonNull(last)) {
                 vo.setSilentSeconds(java.time.Duration.between(last, now).getSeconds());
@@ -676,17 +723,45 @@ public class DashboardServiceImpl implements DashboardService {
     public CoverageGapVO coverageGap(Long tenantId, int limit) {
         int lim = Math.clamp(limit, 1, MAX_COVERAGE_GAP_LIMIT);
         CoverageGapVO vo = new CoverageGapVO();
-        vo.setTotalPoints(dashboardMapper.countPointsInTenant(tenantId));
-        var rows = dashboardMapper.coverageGapItems(tenantId, lim);
-        for (var r : rows) {
+
+        // Points come from the manager facade; series-with-data from the
+        // port's lastSeen primitive. The cross-schema anti-join is gone —
+        // the application layer assembles the gap list.
+        List<FacadePointBO> points = new ArrayList<>();
+        long current = 1;
+        while (true) {
+            Pages pages = new Pages();
+            pages.setCurrent(current);
+            pages.setSize(200L);
+            FacadePage<FacadePointBO> page = pointFacade.listByPage(
+                    FacadePointQuery.builder().tenantId(tenantId).page(pages).build());
+            points.addAll(page.getRecords());
+            if (points.size() >= page.getTotal() || page.getRecords().isEmpty()) {
+                break;
+            }
+            current++;
+        }
+        vo.setTotalPoints(points.size());
+
+        Set<Long> pointsWithData = new HashSet<>();
+        for (SeriesLastSeen row : tsdbStore.lastSeenPerSeries(tenantId,
+                new TimeWindow(Instant.EPOCH, Instant.now()), DEADLINE)) {
+            pointsWithData.add(row.series().pointId());
+        }
+
+        List<FacadePointBO> gaps = points.stream()
+                .filter(point -> !pointsWithData.contains(point.getId()))
+                .sorted(Comparator.comparingLong(FacadePointBO::getId).reversed())
+                .limit(lim)
+                .toList();
+        for (FacadePointBO point : gaps) {
             CoverageGapVO.Item it = new CoverageGapVO.Item();
-            it.setPointId(String.valueOf(r.getPointId()));
-            it.setProfileId(String.valueOf(r.getProfileId()));
+            it.setPointId(String.valueOf(point.getId()));
+            it.setProfileId(String.valueOf(point.getProfileId()));
             vo.addItem(it);
         }
-        // missingPoints = actual count; items may be capped. Use a second
-        // query only if we hit the cap — otherwise items.size() is authoritative.
-        vo.setMissingPoints(vo.getItems().size());
+        // missingPoints = actual count; items may be capped.
+        vo.setMissingPoints(points.size() - pointsWithData.size());
         return vo;
     }
 

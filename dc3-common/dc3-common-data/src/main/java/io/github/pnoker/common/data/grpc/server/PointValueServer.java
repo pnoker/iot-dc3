@@ -125,6 +125,38 @@ public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
         }
     }
 
+    @Override
+    public void listSeriesVolumes(io.github.pnoker.api.center.data.GrpcPointVolumeQuery request,
+                                  StreamObserver<io.github.pnoker.api.center.data.GrpcRPointVolumeList> responseObserver) {
+        TenantContextHolder.setTenantId(request.getTenantId());
+        try {
+            List<io.github.pnoker.common.entity.bo.PointValueVolumeBO> volumes = pointValueService.seriesVolumes(
+                    request.getTenantId(), java.time.Instant.ofEpochMilli(request.getFromTime()));
+
+            io.github.pnoker.api.center.data.GrpcRPointVolumeList.Builder response =
+                    io.github.pnoker.api.center.data.GrpcRPointVolumeList.newBuilder()
+                            .setResult(GrpcRFactory.ok())
+                            .addAllData(volumes.stream()
+                                    .map(row -> io.github.pnoker.api.center.data.GrpcPointVolumeDTO.newBuilder()
+                                            .setDeviceId(Objects.nonNull(row.deviceId()) ? row.deviceId() : 0)
+                                            .setPointId(Objects.nonNull(row.pointId()) ? row.pointId() : 0)
+                                            .setCount(row.count())
+                                            .build())
+                                    .toList());
+            responseObserver.onNext(response.build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("PointValueServer.listSeriesVolumes failed, tenantId={}, fromTime={}",
+                    request.getTenantId(), request.getFromTime(), e);
+            responseObserver.onNext(io.github.pnoker.api.center.data.GrpcRPointVolumeList.newBuilder()
+                    .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
+                    .build());
+            responseObserver.onCompleted();
+        } finally {
+            TenantContextHolder.clear();
+        }
+    }
+
     private GrpcPointValueDTO toGrpcDTO(io.github.pnoker.common.entity.bo.PointValueBO bo) {
         return GrpcPointValueDTO.newBuilder()
                 .setId(0)

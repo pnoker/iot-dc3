@@ -26,6 +26,7 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
 import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
 import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
+import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
@@ -311,6 +312,32 @@ public abstract class AbstractTsdbContractTest {
                 window(base.minusSeconds(1), Duration.ofMinutes(1)), GroupDimension.POINT, 10, DEADLINE);
         assertThat(byPoint).isNotEmpty();
         assertThat(byPoint.get(0).count()).isEqualTo(2);
+    }
+
+    @Test
+    void seriesCountsGroupByFullSeriesIdentity() {
+        Assumptions.assumeTrue(store().capabilities().tenantWideAnalytics(),
+                "store declares tenantWideAnalytics=false");
+        long deviceId = freshId();
+        SeriesKey sharedPointOnA = new SeriesKey(900024, deviceId, freshId());
+        SeriesKey sharedPointOnB = new SeriesKey(900024, freshId(), sharedPointOnA.pointId());
+        Instant base = Instant.parse("2026-08-21T01:00:00Z");
+        store().append(List.of(sample(sharedPointOnA, base, 1, 1),
+                sample(sharedPointOnA, base.plusSeconds(1), 2, 1),
+                sample(sharedPointOnB, base, 3, 1)));
+
+        List<SeriesCount> counts = store().seriesCounts(900024,
+                window(base.minusSeconds(1), Duration.ofMinutes(2)), DEADLINE);
+        // The same point id reported under two devices must stay two distinct
+        // rows — single-dimension grouping would merge them into one count.
+        assertThat(counts).anySatisfy(row -> {
+            assertThat(row.series()).isEqualTo(sharedPointOnA);
+            assertThat(row.count()).isEqualTo(2);
+        });
+        assertThat(counts).anySatisfy(row -> {
+            assertThat(row.series()).isEqualTo(sharedPointOnB);
+            assertThat(row.count()).isEqualTo(1);
+        });
     }
 
     @Test

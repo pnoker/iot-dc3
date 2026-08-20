@@ -29,7 +29,7 @@ import java.util.List;
  * <ul>
  *   <li>{@link LocalWindowDataSource} reads from {@link WindowSampleBuffer}
  *       — fast, but bounded by retention.</li>
- *   <li>{@link RepositoryWindowDataSource} pushes the aggregate to the
+ *   <li>{@link TsdbWindowDataSource} pushes the aggregate to the
  *       time-series store — durable, but with per-evaluation latency.</li>
  * </ul>
  *

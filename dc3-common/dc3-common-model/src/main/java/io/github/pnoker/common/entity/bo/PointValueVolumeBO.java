@@ -15,40 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.entity.bo.dashboard;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
-import java.time.LocalDateTime;
+package io.github.pnoker.common.entity.bo;
 
 /**
- * Live-feed pv row — all values coerced to text so the union over 7 typed hypertables
- * stays compatible.
+ * Sample volume of one (device, point) series inside a window — the grain the
+ * dashboard topology weights need. A point shared by several devices reports
+ * one row per device, which single-dimension counts cannot express.
  *
  * @author pnoker
- * @since 2016.10.1
+ * @since 2026.8.20
  */
-@Getter
-@Setter
-@ToString
-public class LatestPointValueRow {
-
-    private long tenantId;
-
-    private long deviceId;
-
-    private long pointId;
-
-    private long driverId;
-
-    private LocalDateTime createTime;
-
-    private String rawValue;
-
-    private String calValue;
-
-    private String valueType;
-
+public record PointValueVolumeBO(Long deviceId, Long pointId, long count) {
 }

@@ -35,6 +35,9 @@ service PointValueApi {
   // Query historical values of a device point
   rpc ListHistoryValues (GrpcPointValueHistoryQuery) returns (GrpcRPointValueStringList);
 
+  // Per-series sample volumes since a timestamp — dashboard topology weights
+  rpc ListSeriesVolumes (GrpcPointVolumeQuery) returns (GrpcRPointVolumeList);
+
   // Send a read command to a device for a specific point
   rpc ReadCommand (GrpcPointValueCommandQuery) returns (GrpcRBoolean);
 
@@ -109,6 +112,36 @@ message GrpcRPointValueStringList {
 
   // Historical point values, each carrying its value and create_time.
   repeated GrpcPointValueDTO data = 2;
+}
+
+// Request for per-series volume counts
+message GrpcPointVolumeQuery {
+  // Tenant ID
+  int64 tenant_id = 1;
+
+  // Inclusive lower bound for the sample window, epoch milliseconds
+  int64 from_time = 2;
+}
+
+// One (device, point) series volume row
+message GrpcPointVolumeDTO {
+  // Device ID
+  int64 device_id = 1;
+
+  // Point ID
+  int64 point_id = 2;
+
+  // Sample count inside the window
+  int64 count = 3;
+}
+
+// Response wrapper for per-series volume counts
+message GrpcRPointVolumeList {
+  // Common result wrapper
+  GrpcR result = 1;
+
+  // Volume rows
+  repeated GrpcPointVolumeDTO data = 2;
 }
 
 // Request structure for sending a read command

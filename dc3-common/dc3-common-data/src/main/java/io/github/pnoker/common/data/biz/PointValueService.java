@@ -19,8 +19,10 @@ package io.github.pnoker.common.data.biz;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.PointValueVolumeBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -71,5 +73,15 @@ public interface PointValueService {
      * @return Entity of BO Page
      */
     Page<PointValueBO> page(PointValueQuery pointValueQuery);
+
+    /**
+     * Per-series sample volumes since a lower bound (dashboard topology
+     * weights). One row per (device, point) pair with samples in the window.
+     *
+     * @param tenantId owning tenant
+     * @param from     inclusive lower bound, absolute instant
+     * @return the volume rows, never {@code null}
+     */
+    List<PointValueVolumeBO> seriesVolumes(Long tenantId, Instant from);
 
 }

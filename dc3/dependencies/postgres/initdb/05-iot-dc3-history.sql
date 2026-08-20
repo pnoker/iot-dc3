@@ -45,6 +45,7 @@ CREATE TABLE dc3_point_value
     raw_value      TEXT        DEFAULT ''::TEXT NOT NULL,        -- Raw value as captured from the device
     cal_value      TEXT        DEFAULT ''::TEXT NOT NULL,        -- Calculated/transformed value
     num_value      DOUBLE PRECISION,                             -- Best-effort numeric projection of cal_value (NULL for non-numeric payloads)
+    quality        INTEGER     DEFAULT 0 NOT NULL,               -- OPC-UA style quality code, 0 = GOOD (S17)
     driver_id      BIGINT      DEFAULT 0 NOT NULL,               -- Driver ID
     tenant_id      BIGINT      DEFAULT 0 NOT NULL,               -- Tenant ID
     create_time    TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
@@ -71,6 +72,7 @@ COMMENT ON COLUMN dc3_point_value.point_id IS 'Point ID';
 COMMENT ON COLUMN dc3_point_value.raw_value IS 'Raw value as captured from the device';
 COMMENT ON COLUMN dc3_point_value.cal_value IS 'Calculated/transformed value';
 COMMENT ON COLUMN dc3_point_value.num_value IS 'Best-effort numeric projection of cal_value (NULL for non-numeric payloads)';
+COMMENT ON COLUMN dc3_point_value.quality IS 'OPC-UA style quality code, 0 = GOOD';
 COMMENT ON COLUMN dc3_point_value.driver_id IS 'Driver ID';
 COMMENT ON COLUMN dc3_point_value.tenant_id IS 'Tenant ID';
 COMMENT ON COLUMN dc3_point_value.create_time IS 'Creation time';
@@ -81,10 +83,14 @@ FROM public.create_hypertable('dc3_point_value', public.by_range('create_time', 
 SELECT *
 FROM public.add_dimension('dc3_point_value', public.by_hash('device_id', 16));
 
--- TimescaleDB requires every partitioning column in a unique index. The event id,
--- acquisition time, and device hash dimension together provide replay idempotency.
-CREATE UNIQUE INDEX uk_point_value_event
-    ON dc3_point_value (message_id, create_time, device_id);
+-- TimescaleDB requires every partitioning column in a unique index. The
+-- (series, device-time) key backs the TSDB port's natural upsert — duplicate
+-- samples on the same (tenant, device, point, create_time) update in place,
+-- last write wins. The pre-port message_id event index was retired with the
+-- repository layer: replay dedup now lives in the ingest idempotency window
+-- and message_id remains a plain traceability column.
+CREATE UNIQUE INDEX uk_point_value_series_time
+    ON dc3_point_value (tenant_id, device_id, point_id, create_time);
 
 ALTER TABLE dc3_point_value
     SET (

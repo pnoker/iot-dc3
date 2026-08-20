@@ -18,6 +18,7 @@
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
+import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
 
 import java.util.List;
 
@@ -53,5 +54,15 @@ public interface PointValueFacade {
      * matches).
      */
     List<FacadePointValueBO> history(Long tenantId, Long deviceId, Long pointId, int count);
+
+    /**
+     * Per-series sample volumes since a lower bound — dashboard topology
+     * weights. One row per (device, point) pair with samples.
+     *
+     * @param tenantId        owning tenant
+     * @param fromEpochMillis inclusive lower bound, epoch milliseconds
+     * @return the volume rows (never {@code null}; empty when the window has no samples)
+     */
+    List<FacadePointVolumeBO> pointVolumes(Long tenantId, long fromEpochMillis);
 
 }

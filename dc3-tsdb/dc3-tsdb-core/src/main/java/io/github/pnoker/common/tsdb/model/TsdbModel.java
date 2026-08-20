@@ -127,6 +127,16 @@ public final class TsdbModel {
     public record DimensionCount(GroupDimension dimension, long entityId, long count) {
     }
 
+    /**
+     * S13-⑤ per-series count row — grouped by the full series identity
+     * (tenant, device, point), unlike {@link DimensionCount}'s single-column
+     * grouping. Surfaced by the manager topology volume query: a point shared
+     * by several devices reports a different volume per device, which
+     * single-dimension counts cannot reconstruct.
+     */
+    public record SeriesCount(SeriesKey series, long count) {
+    }
+
     /** S13-② grouping dimensions (the dashboard's whitelisted set). */
     public enum GroupDimension {DEVICE, POINT, DRIVER}
 

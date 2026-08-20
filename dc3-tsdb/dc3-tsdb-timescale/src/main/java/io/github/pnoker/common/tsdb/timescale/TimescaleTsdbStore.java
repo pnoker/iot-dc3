@@ -26,6 +26,7 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
 import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
 import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
+import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
@@ -82,6 +83,8 @@ public final class TimescaleTsdbStore implements TsdbStore {
 
     private static final String TABLE = "dc3_point_value";
 
+    private static final int SERIES_IN_CHUNK = 500;
+
     private static final String COLUMNS = "tenant_id, device_id, point_id, message_id, schema_version, "
             + "driver_node, sequence, fencing_token, raw_value, cal_value, num_value, quality, "
             + "driver_id, create_time, operate_time";
@@ -122,6 +125,9 @@ public final class TimescaleTsdbStore implements TsdbStore {
                     create_time    TIMESTAMPTZ NOT NULL,
                     operate_time   TIMESTAMPTZ NOT NULL
                 )""".formatted(TABLE));
+        // Deployments initialized before the port keep a table without the S17
+        // quality column; add it in place instead of failing every append.
+        jdbc.execute("ALTER TABLE %s ADD COLUMN IF NOT EXISTS quality INTEGER NOT NULL DEFAULT 0".formatted(TABLE));
         try {
             jdbc.execute("SELECT create_hypertable('%s', 'create_time', if_not_exists => TRUE)".formatted(TABLE));
         } catch (DataAccessException e) {
@@ -129,6 +135,12 @@ public final class TimescaleTsdbStore implements TsdbStore {
             // works as a plain time-ordered table; log and continue
             log.warn("TimescaleDB hypertable not created, falling back to plain table: {}", e.getMessage());
         }
+        // The pre-port unique index on (message_id, create_time, device_id) backed
+        // INSERT-side replay dedup. The port's duplicate policy is upsert on
+        // (series, deviceTime), and a re-sent event with a corrected timestamp
+        // would violate the old index mid-update — retire it here so existing
+        // deployments converge on the new access path.
+        jdbc.execute("DROP INDEX IF EXISTS uk_point_value_event");
         jdbc.execute("""
                 CREATE UNIQUE INDEX IF NOT EXISTS uk_point_value_series_time
                 ON %s (tenant_id, device_id, point_id, create_time)""".formatted(TABLE));
@@ -424,6 +436,19 @@ public final class TimescaleTsdbStore implements TsdbStore {
     }
 
     @Override
+    public List<SeriesCount> seriesCounts(long tenantId, TimeWindow window, TsdbDeadline deadline) {
+        String sql = """
+                SELECT tenant_id, device_id, point_id, COUNT(*) AS sample_count
+                FROM %s WHERE tenant_id = ? AND create_time >= ? AND create_time < ?
+                GROUP BY tenant_id, device_id, point_id""".formatted(TABLE);
+        Object[] args = {tenantId,
+                OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
+                OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC)};
+        return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new SeriesCount(
+                new SeriesKey(rs.getLong(1), rs.getLong(2), rs.getLong(3)), rs.getLong(4)), args));
+    }
+
+    @Override
     public List<SeriesLastSeen> lastSeenPerSeries(long tenantId, TimeWindow window, TsdbDeadline deadline) {
         String sql = """
                 SELECT tenant_id, device_id, point_id, MAX(create_time) AS last_seen
@@ -544,14 +569,22 @@ public final class TimescaleTsdbStore implements TsdbStore {
         if (filter.tenantWide()) {
             return "v.tenant_id = ?";
         }
+        // Row-value IN lists stay parseable for the large series sets the paged
+        // history view resolves from relational metadata; 500 pairs per list.
         StringBuilder out = new StringBuilder("v.tenant_id = ? AND (");
-        for (int i = 0; i < filter.series().size(); i++) {
-            if (i > 0) {
+        int emitted = 0;
+        for (int start = 0; start < filter.series().size(); start += SERIES_IN_CHUNK) {
+            if (emitted > 0) {
                 out.append(" OR ");
             }
-            out.append("(v.device_id = ? AND v.point_id = ?)");
+            out.append("(v.device_id, v.point_id) IN (");
+            for (int i = start; i < Math.min(start + SERIES_IN_CHUNK, filter.series().size()); i++) {
+                out.append(i > start ? ", (?, ?)" : "(?, ?)");
+            }
+            out.append(')');
+            emitted = start + SERIES_IN_CHUNK;
         }
-        return out.append(")").toString();
+        return out.append(')').toString();
     }
 
     private List<Object> seriesArgs(SeriesFilter filter) {

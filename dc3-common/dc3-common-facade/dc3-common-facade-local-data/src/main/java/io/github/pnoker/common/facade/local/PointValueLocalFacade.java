@@ -23,6 +23,7 @@ import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
+import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
 import io.github.pnoker.common.facade.local.builder.FacadePointValueBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +72,13 @@ public class PointValueLocalFacade implements PointValueFacade {
             return Collections.emptyList();
         }
         return result.stream().map(facadePointValueBuilder::toFacadeBO).toList();
+    }
+
+    @Override
+    public List<FacadePointVolumeBO> pointVolumes(Long tenantId, long fromEpochMillis) {
+        return pointValueService.seriesVolumes(tenantId, java.time.Instant.ofEpochMilli(fromEpochMillis)).stream()
+                .map(row -> new FacadePointVolumeBO(row.deviceId(), row.pointId(), row.count()))
+                .toList();
     }
 
 }

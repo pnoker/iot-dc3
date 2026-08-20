@@ -192,22 +192,4 @@
         </foreach>
     </select>
 
-    <!--
-        Cross-schema query: view lives in dc3_history (Timescale hypertable
-        union) while this DataSource's currentSchema is dc3_manager. The dc3
-        user owns both schemas so fully-qualifying the view works; this
-        keeps us from having to register a second dynamic datasource just
-        for one aggregate call.
-    -->
-    <select id="topologyPointVolumes"
-            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.PointVolumeRow">
-        SELECT device_id AS device_id,
-               point_id  AS point_id,
-               COUNT(*)  AS cnt
-        FROM dc3_history.dc3_point_value
-        WHERE tenant_id = #{tenantId}
-          AND create_time &gt;= #{from}
-        GROUP BY device_id, point_id
-    </select>
-
 </mapper>

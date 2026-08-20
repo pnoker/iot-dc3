@@ -136,7 +136,7 @@ savePointValues` —— 单个 PostgreSQL 事务：
 | S10 | 保留 | 按存储配置的时间过期（今天 180 天），能力声明 |
 | S11 | 租户隔离 | 每次读取携带租户范围；TCK 做反向测试 |
 | S12 | 时间戳精度 | port 层微秒 `Instant`；适配器可下调到存储原生精度（需文档化） |
-| S13 | **租户级分析面**（看板实测口径：全部为租户作用域，非单序列——已逐条核对 SQL） | ① 时间桶计数（timeseries/hourlyActivity）；② 按维度分组计数取 TopN，维度 ∈ {DEVICE, POINT, DRIVER}（top）；③ 逐序列最近样本时间 + 阈值筛（silentSources、coverageGapItems 的子查询）；④ 接收延迟毫秒直方图，对派生表达式 `receiveTime−deviceTime` 分箱（latencyHistogram） |
+| S13 | **租户级分析面**（看板实测口径：全部为租户作用域，非单序列——已逐条核对 SQL） | ① 时间桶计数（timeseries/hourlyActivity）；② 按维度分组计数取 TopN，维度 ∈ {DEVICE, POINT, DRIVER}（top）；③ 逐序列最近样本时间 + 阈值筛（silentSources、coverageGapItems 的子查询）；④ 接收延迟毫秒直方图，对派生表达式 `receiveTime−deviceTime` 分箱（latencyHistogram）；⑤ 逐序列计数（Phase 1 实施时从 manager 拓扑语句补入：同一 point_id 挂多设备时按 (device, point) 分组，②的单维度分组无法还原） |
 | S14 | **多序列读取**（跃迁新增） | 一张图表常画同设备的多个点位曲线；逐序列循环调用太啰嗦。`history`/`last`/`aggregate`/`bucketedAggregate` 统一接受序列集合（单序列是退化解），存储侧一次下发 |
 | S15 | **图表级聚合函数**（跃迁新增） | `FIRST`/`LAST` 进枚举——配合既有 MIN/MAX 构成 **M4 降采样**（每桶 首/末/最小/最大），百万点渲染成 800px 曲线不再拉原始样本；`PERCENTILE(p)` 能力门控（SLA/P95 风格统计） |
 | S16 | **多级保留 + 降采样rollup**（跃迁新增） | 原始 30 天 → 1 分钟粒度 1 年 → 1 小时粒度永久（默认三级，可配）。读操作**对分级透明**：`bucketedAggregate` 桶宽 ≥ 某级粒度时由存储自动从该级 rollup 供数；能力 `rollupSupport: NATIVE / MANUAL / NONE`（Timescale 连续聚合、TDengine 流计算为 NATIVE；Influx 任务为 MANUAL；IoTDB NONE→原始扫描，正确但慢） |
@@ -265,6 +265,9 @@ public interface TsdbStore {
     List<DimensionCount> countByDimension(Long tenantId, TimeWindow window,
                                           GroupDimension dimension, int limit, TsdbDeadline deadline);
 
+    /** S13-⑤：逐序列计数，按 (tenant, device, point) 全序列标识分组。 */
+    List<SeriesCount> seriesCounts(long tenantId, TimeWindow window, TsdbDeadline deadline);
+
     /** S13-③：窗口内每序列最近样本时间（阈值筛与排序在应用层）。 */
     List<SeriesLastSeen> lastSeenPerSeries(Long tenantId, TimeWindow window, TsdbDeadline deadline);
 
@@ -349,8 +352,28 @@ enum RollupSupport { NATIVE, MANUAL, NONE }
 | `selectLatestPointValue` / `listLatestPointValues` | 最新值服务（`dc3_point_latest`，脱离 TSDB port） |
 
 **迁移风险单列一条**：现有 BO 全线使用 `LocalDateTime`（隐式系统时区），port
-统一 `Instant`——Phase 1 必须完成换算并锁死 UTC，否则跨库往返会出现时区漂移。
+统一 `Instant`——Phase 1 必须完成换算并锁定固定时区，否则跨库往返会出现时区漂移。
 这是行为等价门槛的一部分（E2E 兜底）。
+
+**Phase 1 实施修订（与原文的偏差，实事求是的记录）**：
+
+1. **时区锁定为平台规范时区而非 UTC。** 原文写"锁 UTC"，但仓库的规范时区是
+   `TimeConstant.DEFAULT_ZONEID`（Asia/Shanghai）——latest 投影的 MyBatis
+   `TimestamptzLocalDateTimeTypeHandler` 一直按它写库。BO↔`Instant` 换算锁
+   同一个常量，历史（port 路径）与 latest（mapper 路径）对同一封信封落同一
+   绝对时刻；若锁 UTC 反而会让两条投影漂移 8 小时。平台将来若整体迁 UTC，
+   只需改一个常量。
+2. **lease 守卫上移为应用层检查。** 原 `insertHistoryBatch` 的跨 schema
+   `dc3_manager.dc3_device_lease` join（stale-owner 拒写）无法进 port，改由
+   摄入编排按批次内不同设备经 `DeviceFacade.getActiveOwner`（既有 local+gRPC
+   全链路）比对 (driverId, driverNode, fencingToken) 信封。与 SQL join 的
+   `FOR KEY SHARE` 不同，failover 与 append 竞态时可能漏过个别陈旧历史行
+   ——latest 投影的 fencing 元组守卫不受影响。
+3. **S13-⑤ `seriesCounts` 补入**（见 §4/§9.4）：manager 拓扑语句按
+   (device, point) 分组计数，单维度 `countByDimension` 在共享点位场景算不出
+   正确归属，port 依实补了逐序列计数原语。
+4. **latestStream 数据源从超表改为 `dc3_point_latest`**（§9.4 原定）：流语义
+   由"最近的原始样本"变为"各序列当前值按时间倒序"，符合设计意图。
 
 ## 7. 逐库映射
 
@@ -454,7 +477,7 @@ device/point/driver 三种维度分组，`silentSources` 是逐序列 lastSeen +
 | hourlyActivity（DOW×小时网格） | `bucketedCount`（1h 桶）+ 应用层折叠成网格 |
 | silentSources（逐序列 lastSeen + 阈值 HAVING） | `lastSeenPerSeries` + 应用层阈值筛与排序 |
 | coverageGapItems（dc3_manager.dc3_point 与超表子查询跨库 join） | 点位清单走 manager facade + `lastSeenPerSeries`/`count`，应用层组装——**跨库 join 彻底消失** |
-| manager 跨 schema 语句 | 改调数据中心 facade，不再读 `dc3_history` |
+| manager 跨 schema 语句（topologyPointVolumes，按 device+point 分组计数） | 改调数据中心 facade（`PointValueFacade.pointVolumes`，新增 `ListSeriesVolumes` RPC），port 侧即 S13-⑤ `seriesCounts`——不再读 `dc3_history` |
 
 ### 9.5 时间戳与值模型
 
@@ -625,8 +648,10 @@ influx 视许可）：
    历史。）倾向：不自动删；显式注销用 `deleteRange`。
 6. **库间迁移工具** —— 一键双读双写模式，还是离线拷贝 CLI（`dc3-tsdb-copy`）？
    存量历史换库前必须解决。倾向离线 CLI，Phase 3。
-7. **`dc3-common-repository` 的结局** —— 并入 `dc3-tsdb-core` 后删除，还是保留
-   为应用侧 facade 委托给 port？倾向：并入并删除（不搞兼容别名，从家风）。
+7. **`dc3-common-repository` 的结局** —— 已决（Phase 1 实施）：整体删除，无兼容
+   别名。`PointValueBO`/`PointValueQuery` 迁入 `dc3-common-model`（包名不变），
+   `WindowAggregateQuery`/`WindowAggregateResult`/`PointQueryBO` 随旧路径退役；
+   调用方直接面向 `TsdbStore` + 数据中心摄入/最新值服务。
 8. **外置 Timescale 形态** —— 同一物理 PG 的独立库（运维简单、仍抢实例资源）
    还是独立 PG 实例（彻底隔离、多一个服务）？倾向独立实例——既然要外置，就
    外置彻底；内嵌模式继续作为小部署默认。

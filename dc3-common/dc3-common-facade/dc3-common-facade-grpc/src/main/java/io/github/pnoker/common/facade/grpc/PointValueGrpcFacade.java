@@ -19,14 +19,18 @@ package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.data.GrpcPointValueHistoryQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueQuery;
+import io.github.pnoker.api.center.data.GrpcPointVolumeDTO;
+import io.github.pnoker.api.center.data.GrpcPointVolumeQuery;
 import io.github.pnoker.api.center.data.GrpcRPointValueDTO;
 import io.github.pnoker.api.center.data.GrpcRPointValueStringList;
+import io.github.pnoker.api.center.data.GrpcRPointVolumeList;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
+import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcPointValueBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +94,23 @@ public class PointValueGrpcFacade implements PointValueFacade {
             return Collections.emptyList();
         }
         return response.getDataList().stream().map(facadeGrpcPointValueBuilder::toFacadeBO).toList();
+    }
+
+    @Override
+    public List<FacadePointVolumeBO> pointVolumes(Long tenantId, long fromEpochMillis) {
+        GrpcPointVolumeQuery request = GrpcPointVolumeQuery.newBuilder()
+                .setTenantId(tenantId)
+                .setFromTime(fromEpochMillis)
+                .build();
+        GrpcRPointVolumeList response = grpcFacadeSupport.call("PointValueFacade.listSeriesVolumes", pointValueApiBlockingStub,
+                stub -> stub.listSeriesVolumes(request));
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "listSeriesVolumes");
+            return Collections.emptyList();
+        }
+        return response.getDataList().stream()
+                .map(row -> new FacadePointVolumeBO(row.getDeviceId(), row.getPointId(), row.getCount()))
+                .toList();
     }
 
     /**

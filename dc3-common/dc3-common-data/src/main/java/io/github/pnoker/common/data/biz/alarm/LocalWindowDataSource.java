@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  * Reads window samples out of {@link WindowSampleBuffer} and folds them in
  * Java. Fast enough for short windows (≤ a few thousand samples) — long
- * windows route to {@link RepositoryWindowDataSource} instead.
+ * windows route to {@link TsdbWindowDataSource} instead.
  *
  * @author pnoker
  * @since 2026.5.21

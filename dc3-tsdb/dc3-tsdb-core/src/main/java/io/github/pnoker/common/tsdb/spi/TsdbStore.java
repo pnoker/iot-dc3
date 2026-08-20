@@ -26,6 +26,7 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
 import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
 import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
+import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
@@ -117,6 +118,12 @@ public interface TsdbStore {
     /** S13-②: tenant-wide grouped counts, descending, top {@code limit}. */
     List<DimensionCount> countByDimension(long tenantId, TimeWindow window,
                                           GroupDimension dimension, int limit, TsdbDeadline deadline);
+
+    /**
+     * S13-⑤: per-series counts (grouped by tenant, device, point) inside the
+     * window — the exact grain the manager topology volume view needs.
+     */
+    List<SeriesCount> seriesCounts(long tenantId, TimeWindow window, TsdbDeadline deadline);
 
     /** S13-③: every series with samples in the window plus its newest sample time. */
     List<SeriesLastSeen> lastSeenPerSeries(long tenantId, TimeWindow window, TsdbDeadline deadline);

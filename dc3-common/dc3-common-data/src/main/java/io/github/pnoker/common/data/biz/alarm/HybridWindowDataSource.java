@@ -48,7 +48,7 @@ public class HybridWindowDataSource implements WindowDataSource {
 
     private final LocalWindowDataSource localWindowDataSource;
 
-    private final RepositoryWindowDataSource repositoryWindowDataSource;
+    private final TsdbWindowDataSource tsdbWindowDataSource;
 
     private final AlarmWindowProperties properties;
 
@@ -70,7 +70,7 @@ public class HybridWindowDataSource implements WindowDataSource {
         if (Objects.isNull(cutoff) || spec.duration().compareTo(cutoff) <= 0) {
             return localWindowDataSource;
         }
-        return repositoryWindowDataSource;
+        return tsdbWindowDataSource;
     }
 
 }

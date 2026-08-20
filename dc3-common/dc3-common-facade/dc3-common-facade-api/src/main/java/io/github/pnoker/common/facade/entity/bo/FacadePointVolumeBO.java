@@ -15,25 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.entity.bo.dashboard;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+package io.github.pnoker.common.facade.entity.bo;
 
 /**
- * Point declared but without history samples.
+ * Per-series sample volume, protocol-neutral view.
  *
  * @author pnoker
- * @since 2016.10.1
+ * @since 2026.8.20
  */
-@Getter
-@Setter
-@ToString
-public class CoverageGapRow {
-
-    private long pointId;
-
-    private long profileId;
-
+public record FacadePointVolumeBO(Long deviceId, Long pointId, long count) {
 }

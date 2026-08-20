@@ -19,7 +19,6 @@ package io.github.pnoker.common.manager.mapper;
 
 import io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.DailyGrowthRow;
-import io.github.pnoker.common.manager.entity.bo.dashboard.PointVolumeRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.ProfileBindingRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDeviceRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDriverRow;
@@ -138,11 +137,5 @@ public interface DashboardMapper {
     List<TopologyPointRow> topologyPointsByProfiles(@Param("tenantId") Long tenantId,
                                                     @Param("profileIds") Collection<Long> profileIds);
 
-    /**
-     * Volume rollup for the topology's "volume" mode — counts point_value rows per
-     * {@code (device_id, point_id)} over the selected time window, queried against
-     * {@code dc3_history.dc3_point_value} (cross-schema).
-     */
-    List<PointVolumeRow> topologyPointVolumes(@Param("tenantId") Long tenantId, @Param("from") LocalDateTime from);
 
 }

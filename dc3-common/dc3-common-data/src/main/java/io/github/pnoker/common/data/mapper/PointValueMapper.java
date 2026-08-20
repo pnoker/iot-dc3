@@ -17,30 +17,24 @@
 
 package io.github.pnoker.common.data.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
-import io.github.pnoker.common.entity.bo.WindowAggregateResult;
-import io.github.pnoker.common.entity.query.WindowAggregateQuery;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Point value Mapper.
+ * Relational access to the {@code dc3_point_latest} projection — the
+ * transactional latest-value state that deliberately stays out of the TSDB
+ * port (docs/design/tsdb-abstraction.md §9.1). Point-value history lives
+ * behind the {@code TsdbStore} port; nothing here touches the hypertable.
  *
  * @author pnoker
  * @since 2016.10.1
  */
-public interface PointValueMapper extends BaseMapper<PointValueDO> {
-
-    /**
-     * Insert a telemetry batch into the Timescale history table. Replayed events are
-     * ignored by the event identity unique index.
-     */
-    @InterceptorIgnore(tenantLine = "true")
-    List<String> insertHistoryBatch(@Param("values") List<PointValueDO> values);
+@DS("history")
+public interface PointValueMapper {
 
     /**
      * Upsert the shared latest-value projection without allowing an older reading to
@@ -50,25 +44,6 @@ public interface PointValueMapper extends BaseMapper<PointValueDO> {
     int upsertLatestBatch(@Param("values") List<PointValueDO> values);
 
     /**
-     * Run a SQL aggregate (AVG/MIN/MAX/SUM/COUNT) over the rows that match
-     * the tenant/device/point bracket and fall inside {@code [from, to)}.
-     * The function name is selected by {@code <choose>} in the XML so the
-     * parameter is safe from injection. Returns null aggregate + zero count
-     * when the window is empty.
-     */
-    WindowAggregateResult aggregateInWindow(@Param("request") WindowAggregateQuery request);
-
-    /**
-     * Pull raw rows in {@code [from, to)} ordered oldest → newest. Used by
-     * ALL/ANY long-window paths where the rule condition has to run per row.
-     */
-    List<PointValueDO> samplesInWindow(@Param("tenantId") Long tenantId,
-                                       @Param("deviceId") Long deviceId,
-                                       @Param("pointId") Long pointId,
-                                       @Param("from") LocalDateTime from,
-                                       @Param("to") LocalDateTime to);
-
-    /**
      * Batch query the latest point value for each point within a single device.
      * Reads from the transactional latest-value projection.
      */
@@ -76,4 +51,9 @@ public interface PointValueMapper extends BaseMapper<PointValueDO> {
                                                @Param("deviceId") Long deviceId,
                                                @Param("pointIds") List<Long> pointIds);
 
+    /**
+     * Newest slice of the tenant's latest values (one row per series) for the
+     * dashboard live stream.
+     */
+    List<PointValueDO> selectLatestStream(@Param("tenantId") Long tenantId, @Param("limit") int limit);
 }

@@ -19,41 +19,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.common.data.mapper.PointValueMapper">
 
-    <select id="insertHistoryBatch" resultType="string" affectData="true" flushCache="true">
-        INSERT INTO dc3_point_value
-        (message_id, schema_version, driver_node, sequence, fencing_token,
-         tenant_id, device_id, point_id, raw_value, cal_value, num_value,
-         driver_id, create_time, operate_time)
-        SELECT value.message_id, value.schema_version, value.driver_node, value.sequence,
-               value.fencing_token, value.tenant_id, value.device_id, value.point_id,
-               value.raw_value, value.cal_value, value.num_value, value.driver_id,
-               value.create_time, value.operate_time
-        FROM (VALUES
-        <foreach collection="values" item="value" separator=",">
-            (#{value.messageId}, #{value.schemaVersion}, #{value.driverNode}, #{value.sequence}, #{value.fencingToken},
-             #{value.tenantId}, #{value.deviceId}, #{value.pointId}, #{value.rawValue},
-             #{value.calValue}, #{value.numValue}, #{value.driverId},
-             #{value.createTime}, #{value.operateTime})
-        </foreach>
-        ) AS value(message_id, schema_version, driver_node, sequence, fencing_token,
-                   tenant_id, device_id, point_id, raw_value, cal_value, num_value,
-                   driver_id, create_time, operate_time)
-        JOIN dc3_manager.dc3_device_lease lease
-          ON lease.tenant_id = value.tenant_id
-         AND lease.driver_id = value.driver_id
-         AND lease.device_id = value.device_id
-         AND lease.owner_node = value.driver_node
-         AND lease.fencing_token = value.fencing_token
-        JOIN dc3_manager.dc3_driver_instance instance
-          ON instance.tenant_id = lease.tenant_id
-         AND instance.driver_id = lease.driver_id
-         AND instance.node_id = lease.owner_node
-         AND instance.lease_until &gt; CURRENT_TIMESTAMP
-        FOR KEY SHARE OF lease, instance
-        ON CONFLICT (message_id, create_time, device_id) DO NOTHING
-        RETURNING message_id
-    </select>
-
     <insert id="upsertLatestBatch">
         INSERT INTO dc3_point_latest
         (tenant_id, device_id, point_id, message_id, schema_version, driver_node,
@@ -82,55 +47,6 @@
                   dc3_point_latest.sequence, dc3_point_latest.message_id)
     </insert>
 
-    <!--
-      Window aggregation pushdown for the long-window alarm evaluator.
-      The aggregate function is selected by <choose> from a fixed set so the
-      string can't be a SQL-injection vector. AVG/MIN/MAX/SUM target num_value
-      (which is null for non-numeric payloads, hence the IS NOT NULL filter
-      mirrored on idx_dc3_point_value_num_value); COUNT counts every row in
-      the window.
-    -->
-    <select id="aggregateInWindow"
-            parameterType="io.github.pnoker.common.entity.query.WindowAggregateQuery"
-            resultType="io.github.pnoker.common.entity.bo.WindowAggregateResult">
-        SELECT
-        <choose>
-            <when test="request.function.name() == 'AVG'">AVG(num_value)</when>
-            <when test="request.function.name() == 'MIN'">MIN(num_value)</when>
-            <when test="request.function.name() == 'MAX'">MAX(num_value)</when>
-            <when test="request.function.name() == 'SUM'">SUM(num_value)</when>
-            <when test="request.function.name() == 'COUNT'">CAST(COUNT(*) AS NUMERIC)</when>
-            <otherwise>NULL</otherwise>
-        </choose>
-        AS value,
-        COUNT(*) AS sample_count
-        FROM dc3_point_value
-        WHERE tenant_id = #{request.tenantId}
-        AND device_id = #{request.deviceId}
-        AND point_id = #{request.pointId}
-        AND create_time &gt;= #{request.from}
-        AND create_time &lt; #{request.to}
-        <if test="request.function.name() == 'AVG' or request.function.name() == 'MIN' or request.function.name() == 'MAX' or request.function.name() == 'SUM'">
-            AND num_value IS NOT NULL
-        </if>
-    </select>
-
-    <!--
-      Raw sample pull used by ALL/ANY long-window evaluation. We keep the
-      column list minimal — the consumer only needs num_value, cal_value,
-      and create_time to evaluate per-sample conditions.
-    -->
-    <select id="samplesInWindow" resultType="io.github.pnoker.common.data.entity.model.PointValueDO">
-        SELECT num_value, cal_value, create_time
-        FROM dc3_point_value
-        WHERE tenant_id = #{tenantId}
-          AND device_id = #{deviceId}
-          AND point_id = #{pointId}
-          AND create_time &gt;= #{from}
-          AND create_time &lt; #{to}
-        ORDER BY create_time
-    </select>
-
     <!-- Shared latest-value projection; safe across multiple Data Center replicas. -->
     <select id="selectLatestPointValues" resultType="io.github.pnoker.common.data.entity.model.PointValueDO">
         SELECT tenant_id, device_id, point_id, message_id, schema_version,
@@ -143,6 +59,21 @@
         <foreach collection="pointIds" item="pointId" open="(" separator="," close=")">
             #{pointId}
         </foreach>
+    </select>
+
+    <!--
+        Dashboard live stream: the latest row per (device, point) series,
+        newest first. Served from the projection — the design keeps every
+        latest-value read off the time-series store (§9.4).
+    -->
+    <select id="selectLatestStream" resultType="io.github.pnoker.common.data.entity.model.PointValueDO">
+        SELECT tenant_id, device_id, point_id, message_id, schema_version,
+               driver_node, sequence, fencing_token, raw_value, cal_value, num_value,
+               driver_id, create_time, operate_time
+        FROM dc3_point_latest
+        WHERE tenant_id = #{tenantId}
+        ORDER BY create_time DESC
+        LIMIT #{limit}
     </select>
 
 </mapper>
