@@ -71,7 +71,7 @@ savePointValues` —— 单个 PostgreSQL 事务：
 | 历史分页 | `listPagePointValue` —— MyBatis-Plus `Page` + 相对窗口（`rangeHours`、`rangeKey`、`createTimeFrom`）、设备/点位名 + 启用过滤 | 走 port |
 | 末 N 条 | `listHistoryPointValue(tenant, device, point, count)` | 走 port |
 | 最新值 | `selectLatestPointValue` / `listLatestPointValues` | 走 port（读 `dc3_point_latest`） |
-| **看板（data 侧）** | `countInRange`、`countTotal`、`timeseries`（`time_bucket` + `generate_series` 补空）、`top`、`latestStream`、`latencyHistogram`（`operate_time − create_time` 毫秒分箱）、`hourlyActivity`、`silentSources`、`coverageGapItems` —— **9 条语句直查超表 SQL** | **绕过 port** |
+| **看板（data 侧）** | `countInRange`、`countTotal`、`timeseries`（`time_bucket` + `generate_series` 补空）、`top`（按 device/point/driver 维度分组）、`latestStream`、`latencyHistogram`（`operate_time − create_time` 毫秒分箱）、`hourlyActivity`、`silentSources`（逐序列 lastSeen + HAVING）、`coverageGapItems`（与 `dc3_manager.dc3_point` 跨库 join）—— **9 条语句直查超表 SQL，且全部为租户作用域** | **绕过 port** |
 | **看板（manager 侧）** | 再加 1 条跨 schema 读 `dc3_history.dc3_point_value` | **绕过 port** |
 
 ### 2.4 哪里不合理（动机，直说）
@@ -132,6 +132,7 @@ savePointValues` —— 单个 PostgreSQL 事务：
 | S10 | 保留 | 按存储配置的时间过期（今天 180 天），能力声明 |
 | S11 | 租户隔离 | 每次读取携带租户范围；TCK 做反向测试 |
 | S12 | 时间戳精度 | port 层微秒 `Instant`；适配器可下调到存储原生精度（需文档化） |
+| S13 | **租户级分析面**（看板实测口径：全部为租户作用域，非单序列——已逐条核对 SQL） | ① 时间桶计数（timeseries/hourlyActivity）；② 按维度分组计数取 TopN，维度 ∈ {DEVICE, POINT, DRIVER}（top）；③ 逐序列最近样本时间 + 阈值筛（silentSources、coverageGapItems 的子查询）；④ 接收延迟毫秒直方图，对派生表达式 `receiveTime−deviceTime` 分箱（latencyHistogram） |
 
 **刻意不进 port**（及理由）：
 
@@ -215,7 +216,34 @@ public interface TsdbStore {
 
     /** S10/删除：能力门控的时间范围删除。 */
     void deleteRange(SeriesKey series, TimeWindow window);
+
+    // ===== S13：租户级分析面（看板专用；能力 tenantWideAnalytics 门控） =====
+
+    /** S13-①：全租户按时间桶计数，桶升序；空桶按 gapFill 补零或省略。 */
+    List<BucketAggregate> bucketedCount(Long tenantId, TimeWindow window, Duration bucketWidth);
+
+    /** S13-②：全租户按维度分组计数，降序取前 limit。 */
+    List<DimensionCount> countByDimension(Long tenantId, TimeWindow window,
+                                          GroupDimension dimension, int limit);
+
+    /** S13-③：窗口内有样本的每个序列及其最近样本时间（silentSources / 覆盖缺口
+        的子查询；阈值筛与排序由应用层做）。 */
+    List<SeriesLastSeen> lastSeenPerSeries(Long tenantId, TimeWindow window);
+
+    /** S13-④：接收延迟直方图——对 receiveTime−deviceTime（毫秒）按给定箱沿计数。
+        需要存储侧行级表达式，能力 latencyHistogram 门控；不支持的面板降级。 */
+    List<LatencyBin> latencyHistogram(Long tenantId, TimeWindow window, List<Long> binEdgesMs);
 }
+
+/** 降序游标页：items + 下一页锚点（null 表示到底）。 */
+record CursorPage<T>(List<T> items, Cursor nextCursor) {}
+
+/** S13-② 的分组维度：看板 top 实测支持的三种（DashboardServiceImpl 的白名单）。 */
+enum GroupDimension { DEVICE, POINT, DRIVER }
+
+record DimensionCount(GroupDimension dimension, long entityId, long count) {}
+record SeriesLastSeen(SeriesKey series, Instant lastSeen) {}
+record LatencyBin(long fromMsInclusive, long toMsExclusive, long count) {}
 
 public record TsdbCapabilities(
         boolean gapFill,                 // 空桶补零
@@ -223,12 +251,49 @@ public record TsdbCapabilities(
         boolean deleteRange,
         OrderingGuarantee ordering,      // NONE | PER_SERIES（每序列追加序）
         Precision precision,             // MICRO / MILLI / NANO
-        boolean backfill                 // 接受乱序 / 迟到写入
+        boolean backfill,                // 接受乱序 / 迟到写入
+        boolean tenantWideAnalytics,     // S13 租户级分析面（桶计数/按维度计数/逐序列 lastSeen）
+        boolean latencyHistogram         // S13-④ 存储侧延迟直方图
 ) {}
 ```
 
 **写入编排留在 `dc3-common-data`**（schema 校验、摄入幂等窗口、
 `dc3_point_latest` 关系 upsert）——port 是存储边界，正如 MQ port 是 broker 边界。
+
+### 6.1 配置与运行面
+
+- **选型**：`dc3.tsdb.type`（默认 `timescale`），与 `dc3.mq.type` 同款机制；
+  `@ConditionalOnProperty` 激活唯一适配器，启动打印能力协商行。
+- **连接配置**（每适配器独立命名空间）：
+  `dc3.tsdb.timescale.*`（内嵌模式复用主数据源；外置模式独立数据源）、
+  `dc3.tsdb.tdengine.url`（JDBC）、`dc3.tsdb.influxdb.*`（HTTP/Flight）、
+  `dc3.tsdb.iotdb.*`（session）。容器化部署经 `DC3_TSDB_TYPE` +
+  `DC3_TSDB_*` 环境变量透传，复刻 MQ 的 compose 锚点模式。
+- **结构引导（schema bootstrap）**：适配器在启动时幂等地确保自身结构存在——
+  timescale 内嵌模式沿用种子 SQL（超表/压缩/保留策略）；外置 timescale 建库建
+  超表；TDengine 建库 + 超级表；IoTDB 建存储组与 TTL；InfluxDB 3 建库。与 MQ
+  适配器声明拓扑同一哲学：结构声明是适配器的私事。
+- **append 失败语义**：批量要么整批成功、要么整批抛错由摄入层整体重试——
+  自然 upsert 保证整批重试安全；不存在部分接受（MQ port 同款约定）。
+- **健康检查**：每适配器暴露 Spring Boot `HealthIndicator`（连通性 + 版本），
+  供 compose healthcheck 与 K8s 探针使用。
+- **观测**：port 层统一埋点（append 延迟、批量大小、游标翻页深度），适配器不
+  各自为政。
+
+### 6.2 与现有调用方的映射（迁移对照）
+
+| 现有调用 | 去处 |
+|---------|------|
+| `savePointValues` | 数据中心编排（幂等窗口 + `append` + 最新值 upsert） |
+| `listHistoryPointValue(count)` | `last` |
+| `samplesInWindow`（告警窗口） | `history`（窗口 + 大页） |
+| `listPagePointValue` 的名称/启用过滤 | 应用层经关系元数据解析为序列键集合，再进 `history`（S5） |
+| `listPagePointValue` 的 `Page` | `CursorPage`（游标降序） |
+| `selectLatestPointValue` / `listLatestPointValues` | 最新值服务（`dc3_point_latest`，脱离 TSDB port） |
+
+**迁移风险单列一条**：现有 BO 全线使用 `LocalDateTime`（隐式系统时区），port
+统一 `Instant`——Phase 1 必须完成换算并锁死 UTC，否则跨库往返会出现时区漂移。
+这是行为等价门槛的一部分（E2E 兜底）。
 
 ## 7. 逐库映射
 
@@ -248,7 +313,7 @@ public record TsdbCapabilities(
 | 乱序回填 | ✅ | ✅ | ✅（v3） | ✅ |
 | 客户端 | 今天的 PG 数据源 | JDBC | Flight/HTTP（Java v3 客户端） | session SDK |
 
-**InfluxDB 版本策略**（待决 §10.4，倾向已定）：目标 **InfluxDB 3**
+**InfluxDB 版本策略**（待决 §12.4，倾向已定）：目标 **InfluxDB 3**
 （Core/Enterprise 的 SQL 接口）。OSS 2.x 处于维护态且 Flux 已废弃；2.x 适配器
 等于绑死一门死掉的查询语言。能力矩阵中该适配器标注为 `influxdb (3.x)`。
 
@@ -272,6 +337,8 @@ measurements 随行；按租户子树的 TTL 由存储组布局近似实现。
 | 保留 | ✅ chunks | ✅ `KEEP` | ✅ 分区 | ✅ TTL |
 | 精度 | 微秒 | 微秒 | 纳秒 | 毫秒/纳秒 |
 | 字符串值 | ✅ TEXT | ✅ NCHAR | ✅ fields | ✅ TEXT |
+| 租户级分析面（S13-①②③） | ✅ SQL | ✅ 超级表聚合 | ✅ SQL | ⚠️ 路径模板/按层聚合 |
+| 延迟直方图（S13-④） | ✅ 表达式分箱 | ⚠️ 3.3+ HISTOGRAM/应用层 | ✅ SQL CASE | ❌ UDF 或降级 |
 | 内嵌 PG 模式 | ✅（默认） | ❌ | ❌ | ❌ |
 
 启动协商日志汇总当前存储的一行能力，与 MQ port 一致。
@@ -308,18 +375,21 @@ LRU），窗口大小对齐 MQ 重投视野——与生产端 driver outbox 同�
 
 ### 9.4 看板读取重新表达（单项最大工作量）
 
-十条旁路语句全部映射到 port 原语 + 应用层组装：
+**已逐条核对 SQL：看板对超表的查询全部是租户作用域（无单序列过滤），`top` 按
+device/point/driver 三种维度分组，`silentSources` 是逐序列 lastSeen + HAVING，
+`latencyHistogram` 是对派生表达式的分箱。** 这正是 S13 分析面存在的原因——单
+序列原语覆盖不了它们。十条旁路语句的映射：
 
-| 语句 | port 操作 |
+| 语句（已核口径） | port 操作 |
 |------|----------|
-| countInRange / countTotal | `count` |
-| timeseries | `bucketedAggregate`（`gapFill=false` 时应用层补空） |
-| top | 逐序列 `count`，应用层排序（全租户扫描能力） |
+| countInRange / countTotal（租户级计数） | `count`（series 缺省） |
+| timeseries（租户级按桶 COUNT） | `bucketedCount`（`gapFill=false` 时应用层补空） |
+| top（按维度分组 TopN：device/point/driver） | `countByDimension` |
 | latestStream | 最新值服务（PG 投影）——不碰 TSDB |
-| latencyHistogram | `history` 分页或对 `receiveTime−deviceTime` 逐桶 `count`——见 §10.2 |
-| hourlyActivity | 逐小时 `bucketedAggregate` COUNT，应用层组装 |
-| silentSources | 最新值投影（`dc3_point_latest`）时间戳——不碰 TSDB |
-| coverageGapItems | `bucketedAggregate` COUNT + 应用层缺口检测 |
+| latencyHistogram（对 operate−create 毫秒分箱） | `latencyHistogram`（能力门控；不支持时面板降级——去留另见 §12.1） |
+| hourlyActivity（DOW×小时网格） | `bucketedCount`（1h 桶）+ 应用层折叠成网格 |
+| silentSources（逐序列 lastSeen + 阈值 HAVING） | `lastSeenPerSeries` + 应用层阈值筛与排序 |
+| coverageGapItems（dc3_manager.dc3_point 与超表子查询跨库 join） | 点位清单走 manager facade + `lastSeenPerSeries`/`count`，应用层组装——**跨库 join 彻底消失** |
 | manager 跨 schema 语句 | 改调数据中心 facade，不再读 `dc3_history` |
 
 ### 9.5 时间戳与值模型
@@ -347,6 +417,10 @@ influx 视许可）：
 10. 保留：过期窗口数据消失（时序容忍；能力门控）
 11. 精度：微秒时间戳往返保真或按声明精度可预测取整
 12. 突发：5k 样本批次完整落库
+13. 租户桶计数（S13-①）：桶边界对齐、跨序列合计正确、空桶按 gapFill 处理
+14. 按维度计数（S13-②）：device/point/driver 三维度分组与 TopN 排序正确
+15. 逐序列 lastSeen（S13-③）：窗口内每序列的最新时间精确
+16. 延迟直方图（S13-④，能力门控）：双时间戳样本落入正确毫秒箱
 
 ## 11. 迁移计划
 
@@ -355,7 +429,8 @@ influx 视许可）：
   （去掉 `ON CONFLICT … RETURNING` 幂等，换摄入窗口），`RepositoryService`
   退役、三个调用方迁移，port 补 S7/S8/游标，并**把十条看板语句全部改表达到
   port 上**（§9.4）。最新值服务（`dc3_point_latest`）从存储接口移入数据中心。
-  *门槛：既有单测全绿；E2E（`PostgresHypertableIT`、看板）不改而绿。*
+  *门槛：既有单测全绿；E2E（`PostgresHypertableIT`、看板）不改而绿；
+  `LocalDateTime→Instant` 全线换算完成并锁 UTC（§6.2）。*
 - **Phase 2 —— TCK + TDengine 适配器。** 国内需求最高；超级表映射会最早拷打
   port 的序列模型，等于提前把 port 磨硬。
 - **Phase 3 —— InfluxDB 3 + IoTDB 适配器**；发布能力矩阵；
@@ -381,6 +456,11 @@ influx 视许可）：
    存量历史换库前必须解决。倾向离线 CLI，Phase 3。
 7. **`dc3-common-repository` 的结局** —— 并入 `dc3-tsdb-core` 后删除，还是保留
    为应用侧 facade 委托给 port？倾向：并入并删除（不搞兼容别名，从家风）。
+8. **外置 Timescale 形态** —— 同一物理 PG 的独立库（运维简单、仍抢实例资源）
+   还是独立 PG 实例（彻底隔离、多一个服务）？倾向独立实例——既然要外置，就
+   外置彻底；内嵌模式继续作为小部署默认。
+9. **租户差异化保留** —— 现在全局 180 天；按租户设保留（TDengine 按库 KEEP、
+   Influx 按分区）是否值得做？倾向：Phase 3 前不做，全局策略 + 能力声明足够。
 
 ## 13. 与 storage-abstraction.md 的关系
 
