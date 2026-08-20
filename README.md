@@ -133,7 +133,7 @@ Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 20
 
 ### 📊 Real-Time Data Engine
 
-- **Data collection** - Drivers collect device telemetry and send it asynchronously through RabbitMQ
+- **Data collection** - Drivers collect device telemetry and send it asynchronously through the internal message broker — pluggable per deployment: RabbitMQ (default), Kafka, RocketMQ, Pulsar, ActiveMQ or any MQTT 5 broker ([broker guide](docs/mq-brokers.md))
 - **Time-series storage** - Efficient queries for real-time and historical data
 - **Rule engine** - Flexible alarm rules with multi-level alarms and notifications
 - **Event traceability** - Full command and event history
@@ -172,7 +172,8 @@ Use `make up-db-cn` if you prefer the Alibaba Cloud registry in Mainland China.
 
 ## 🛠️ Technology Stack
 
-IoT DC3 is built on Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
+IoT DC3 is built on Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, a pluggable message broker
+(RabbitMQ, Kafka, RocketMQ, Pulsar, ActiveMQ or MQTT 5 — [selection guide](docs/mq-brokers.md)), gRPC, Vue 3,
 TypeScript, and Vite.
 
 See [Technology Stack](https://docs.dc3.site/en/development/technology-stack) for component details and where each
