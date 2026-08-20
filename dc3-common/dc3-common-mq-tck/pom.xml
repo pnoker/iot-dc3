@@ -82,6 +82,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-mq-pulsar</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>

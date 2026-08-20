@@ -2,7 +2,7 @@
 
 |                |                                                                                   |
 |----------------|-----------------------------------------------------------------------------------|
-| **Status**     | Phases 1–3 delivered: port + rabbitmq / kafka / activemq / mqtt / rocketmq adapters TCK-certified; pulsar pending |
+| **Status**     | Delivered: port + all six adapters (rabbitmq / kafka / activemq / mqtt / rocketmq / pulsar) TCK-certified; all phases complete |
 | **Date**       | 2026-08-17, revised 2026-08-19 (re-verified after commit `956de3dd3`; MQTT decoupling) |
 | **Scope**      | `dc3-common-*` messaging layer (center ↔ driver async plane)                       |
 | **Target**     | RabbitMQ (default), Kafka, RocketMQ, Pulsar, ActiveMQ (Artemis / Classic), MQTT 5 (EMQX / HiveMQ / NanoMQ / …) |
@@ -544,16 +544,18 @@ lease/ownership before dispatch.
 
 ## 9. Capability matrix (published, per adapter)
 
-Implementation status (2026-08-19): rabbitmq, kafka, activemq (Artemis), mqtt 5 and
-rocketmq adapters are implemented and certified by the TCK against live brokers;
-pulsar is pending. Certified columns below reflect the implemented behavior (e.g.
-rabbit delays arbitrary messages through the port fallback, rocketmq native delay
-levels would quantize requested durations; the rocketmq classic client replays topic
-backlog for brand-new consumer groups regardless of consumeFromWhere, so the adapter
-seeds fresh groups to the latest offset and warms up not-yet-created topics on
-subscribe).
+Implementation status (2026-08-20): all six adapters — rabbitmq, kafka, activemq
+(Artemis), mqtt 5, rocketmq and pulsar — are implemented and certified by the TCK
+against live brokers; every broker named in this design is now a first-class
+selection. Certified columns reflect the implemented behavior (e.g. rabbit delays
+arbitrary messages through the port fallback, rocketmq delay levels would quantize;
+the rocketmq classic client replays topic backlog for brand-new consumer groups
+regardless of consumeFromWhere, so that adapter seeds fresh groups to the latest
+offset and warms up not-yet-created topics on subscribe; pulsar subscriptions start
+at the latest position natively, which matches the fresh-queue semantics without
+seeding).
 
-| Capability | RabbitMQ ✅ | Kafka ✅ | ActiveMQ ✅ | MQTT 5 ✅ | RocketMQ ✅ | Pulsar (pending) |
+| Capability | RabbitMQ ✅ | Kafka ✅ | ActiveMQ ✅ | MQTT 5 ✅ | RocketMQ ✅ | Pulsar ✅ |
 |------------|----------|-------|----------|--------|----------|--------|
 | Delayed message | fallback* | ❌ → local fallback | ✅ JMS scheduled | ❌ → local fallback | fallback (levels quantize) | ✅ native |
 | Native DLQ | DLX + quarantine | adapter `.dlq` topic | adapter `.dlq` queue | adapter `/dlq` topic | adapter `-dlq` topic | ✅ policy |
@@ -562,7 +564,7 @@ subscribe).
 | Publisher confirm | ✅ confirms | ✅ (acks=all) | ❌ best-effort (outbox covers it, §8.4) | ✅ (PUBACK) | ✅ sync send | ✅ |
 | Batch delivery | ✅ native | ✅ native | ⚠️ synthesized | ⚠️ synthesized | ✅ consumer batch | ✅ batch receive |
 | Per-key ordering | ❌ | ✅ | ❌ | ❌ | ✅ (per queue) | ✅ (key_shared) |
-| Subscription expiry | ✅ x-expires | ❌ documented | ❌ documented | ❌ documented | ❌ documented | ⚠️ session expiry |
+| Subscription expiry | ✅ x-expires | ❌ documented | ❌ documented | ⚠️ session expiry | ❌ documented | ❌ documented |
 | Group durability offline | ✅ durable queue | ✅ log retention | ✅ durable subscription | ⚠️ broker-dependent (§13.8) | ✅ offsets | ✅ |
 | Retention | queue TTL | retention config | subscription retention | broker-dependent | retention | retention/TTL |
 
