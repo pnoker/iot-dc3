@@ -237,7 +237,3 @@ IoT DC3 is open source under the [AGPL 3.0](./LICENSE-AGPL.txt) license.
   commercial license
 
 For commercial licensing details, see [LICENSE.txt](./LICENSE.txt).
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)

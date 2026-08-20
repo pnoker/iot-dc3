@@ -233,7 +233,3 @@ IoT DC3 được phát hành mã nguồn mở theo giấy phép [AGPL 3.0](./LIC
 - ⚠️ **Cung cấp như dịch vụ thương mại cho bên thứ ba mà không open source phần sửa đổi** - Cần giấy phép thương mại
 
 Xem [LICENSE.txt](./LICENSE.txt) để biết chi tiết về giấy phép thương mại.
-
-## ⭐ Lịch sử Star
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)

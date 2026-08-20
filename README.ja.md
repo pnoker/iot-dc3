@@ -230,7 +230,3 @@ IoT DC3 は [AGPL 3.0](./LICENSE-AGPL.txt) ライセンスの下でオープン�
 - ⚠️ **変更を公開せず第三者向け商用サービスとして提供する場合** - 商用ライセンスが必要です
 
 商用ライセンスの詳細は [LICENSE.txt](./LICENSE.txt) を参照してください。
-
-## ⭐ Star 履歴
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)

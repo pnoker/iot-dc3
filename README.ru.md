@@ -241,7 +241,3 @@ IoT DC3 — проект с открытым исходным кодом под 
   лицензия
 
 Подробности о коммерческой лицензии см. в [LICENSE.txt](./LICENSE.txt).
-
-## ⭐ История звёзд
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)

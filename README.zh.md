@@ -222,7 +222,3 @@ IoT DC3 基于 [AGPL 3.0](./LICENSE-AGPL.txt) 协议开源。
 - ⚠️ **作为商业服务提供给第三方且未开源修改** — 需要商业授权
 
 商业授权详情请参阅 [LICENSE.txt](./LICENSE.txt)。
-
-## ⭐ Star 历史
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)
