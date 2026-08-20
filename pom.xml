@@ -801,6 +801,21 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-tsdb-core</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-tsdb-timescale</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-tsdb-tck</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-repository</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
@@ -836,6 +851,7 @@
         <module>dc3-api</module>
         <module>dc3-common</module>
         <module>dc3-mq</module>
+        <module>dc3-tsdb</module>
         <module>dc3-center</module>
         <module>dc3-driver</module>
         <module>dc3-gateway</module>

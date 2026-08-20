@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.pnoker</groupId>
+        <artifactId>iot-dc3</artifactId>
+        <version>2026.5.22</version>
+    </parent>
+
+    <name>${project.artifactId}</name>
+    <artifactId>dc3-tsdb</artifactId>
+    <version>2026.5.22</version>
+    <packaging>pom</packaging>
+
+    <description>
+        IoT DC3 pluggable time-series store layer: the store-neutral TsdbStore port, one
+        adapter per store (timescale default, tdengine, influxdb, iotdb planned) and the
+        contract suite that gates adapter compliance. Deployments pick exactly one store
+        via dc3.tsdb.type — see docs/design/tsdb-abstraction.md and docs/mq-brokers.md
+        for the sibling broker family.
+    </description>
+
+    <modules>
+        <module>dc3-tsdb-core</module>
+        <module>dc3-tsdb-timescale</module>
+        <module>dc3-tsdb-tck</module>
+    </modules>
+
+</project>
