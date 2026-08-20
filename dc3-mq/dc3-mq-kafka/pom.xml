@@ -22,26 +22,25 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-common</artifactId>
+        <artifactId>dc3-mq</artifactId>
         <version>2026.5.22</version>
     </parent>
 
     <name>${project.artifactId}</name>
-    <artifactId>dc3-common-mq-pulsar</artifactId>
+    <artifactId>dc3-mq-kafka</artifactId>
     <version>2026.5.22</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 Pulsar adapter for the broker-neutral messaging port</description>
+    <description>IoT DC3 Kafka adapter for the broker-neutral messaging port</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.pulsar</groupId>
-            <artifactId>pulsar-client</artifactId>
-            <version>${pulsar.client.version}</version>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mq</artifactId>
+            <artifactId>dc3-mq-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>

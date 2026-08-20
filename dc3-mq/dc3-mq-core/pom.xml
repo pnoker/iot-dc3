@@ -22,25 +22,21 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-common</artifactId>
+        <artifactId>dc3-mq</artifactId>
         <version>2026.5.22</version>
     </parent>
 
     <name>${project.artifactId}</name>
-    <artifactId>dc3-common-mq-rabbitmq</artifactId>
+    <artifactId>dc3-mq-core</artifactId>
     <version>2026.5.22</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 RabbitMQ adapter for the broker-neutral messaging port; physical topology is byte-for-byte identical to the pre-port layout</description>
+    <description>IoT DC3 broker-neutral messaging port: logical topics, subscription model, envelope, capability negotiation</description>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mq</artifactId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -49,6 +45,10 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-public</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
         </dependency>
     </dependencies>
 

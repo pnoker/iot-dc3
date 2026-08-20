@@ -38,7 +38,7 @@ used exclusively by the internal-plane adapter above.
 ## Certified brokers
 
 Every adapter below passes the same broker-neutral contract suite
-(`dc3-common-mq-tck`) against a live broker.
+(`dc3-mq-tck`) against a live broker.
 
 | Broker | `DC3_MQ_TYPE` | Connection settings | Notes |
 |--------|--------------|---------------------|-------|
@@ -78,5 +78,5 @@ for community adapters) lives in the design document linked above.
 - **At-least-once**: the delivery contract is at-least-once with idempotent
   consumers on every broker; consumers must not assume ordering (except where the
   matrix notes per-key ordering).
-- **Community adapters**: pass the contract suite in `dc3-common-mq-tck` against
+- **Community adapters**: pass the contract suite in `dc3-mq-tck` against
   your broker to certify a new adapter (Redis Streams, SQS, ...).

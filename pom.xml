@@ -761,42 +761,42 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq</artifactId>
+                <artifactId>dc3-mq-core</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-rabbitmq</artifactId>
+                <artifactId>dc3-mq-rabbitmq</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-kafka</artifactId>
+                <artifactId>dc3-mq-kafka</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-activemq</artifactId>
+                <artifactId>dc3-mq-activemq</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-mqtt</artifactId>
+                <artifactId>dc3-mq-mqtt</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-rocketmq</artifactId>
+                <artifactId>dc3-mq-rocketmq</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-pulsar</artifactId>
+                <artifactId>dc3-mq-pulsar</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-tck</artifactId>
+                <artifactId>dc3-mq-tck</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
@@ -835,6 +835,7 @@
     <modules>
         <module>dc3-api</module>
         <module>dc3-common</module>
+        <module>dc3-mq</module>
         <module>dc3-center</module>
         <module>dc3-driver</module>
         <module>dc3-gateway</module>

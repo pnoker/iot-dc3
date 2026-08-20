@@ -16,7 +16,7 @@ IoT DC3 currently talks to RabbitMQ through its native Spring AMQP API (`RabbitT
 distributed open-source project we want deployers — and the community — to be able to run the
 platform on whichever broker their environment already standardizes on.
 
-The proposal: introduce a thin **port** (`dc3-common-mq`) that abstracts the *semantics* the
+The proposal: introduce a thin **port** (`dc3-mq-core`) that abstracts the *semantics* the
 platform actually uses — logical topics, load-balanced vs broadcast subscription, delayed
 delivery, dead-lettering, batch consumption with transactional acknowledgement, bounded
 redelivery, publisher confirmation — plus one adapter module per broker. RabbitMQ comes first
@@ -129,7 +129,7 @@ tenant-scoped payloads.
 - The MQTT broker is a free deployment selection in both of its roles: the device-access
   plane stays vendor-neutral by protocol (EMQX is a compose default, not a code
   dependency), and the internal plane may optionally run over any MQTT 5 broker via the
-  `dc3-common-mq-mqtt` adapter (§7.1).
+  `dc3-mq-mqtt` adapter (§7.1).
 - Existing RabbitMQ deployments keep working through the migration: physical
   exchange/queue/routing-key names byte-for-byte identical, no forced redeploy of the
   whole fleet at once.
@@ -173,29 +173,33 @@ Mirrors the existing facade-module organization (contract module + per-transport
 implementations):
 
 ```
-dc3-common/
-├── dc3-common-mq/               # Port: interfaces, message model, envelope, capability
+dc3-mq/                          # top-level aggregator: the broker-selection family
+├── dc3-mq-core/                 # Port: interfaces, message model, envelope, capability
 │                                #      negotiation, @Dc3Listener processing, fallback
 │                                #      scheduler. Zero broker dependencies.
-├── dc3-common-mq-rabbitmq/      # Adapter: RabbitConfig/ExchangeConfig/DataTopicConfig/
-│                                #         DriverTopicConfig/PointValueRabbitConfig move
+├── dc3-mq-rabbitmq/             # Adapter: RabbitConfig/ExchangeConfig/DataTopicConfig/
+│                                #         DriverTopicConfig/PointValueRabbitConfig moved
 │                                #         here unchanged
-├── dc3-common-mq-kafka/         # Adapter: spring-kafka
-├── dc3-common-mq-rocketmq/      # Adapter: rocketmq-spring
-├── dc3-common-mq-pulsar/        # Adapter: pulsar client
-├── dc3-common-mq-activemq/      # Adapter: JMS 2.0 (covers Artemis and Classic)
-├── dc3-common-mq-mqtt/          # Adapter: MQTT 5 client (EMQX / HiveMQ / NanoMQ / …; §7.1)
-└── dc3-common-mq-tck/           # Broker-neutral contract test suite (Testcontainers)
+├── dc3-mq-kafka/                # Adapter: spring-kafka
+├── dc3-mq-rocketmq/             # Adapter: rocketmq classic client
+├── dc3-mq-pulsar/               # Adapter: pulsar client
+├── dc3-mq-activemq/             # Adapter: JMS 2.0 (covers Artemis and Classic)
+├── dc3-mq-mqtt/                 # Adapter: MQTT 5 client (EMQX / HiveMQ / NanoMQ / …; §7.1)
+└── dc3-mq-tck/                  # Broker-neutral contract test suite (Testcontainers)
 ```
+
+(Restructured 2026-08-20 out of `dc3-common` into the top-level `dc3-mq` aggregator —
+the family is a deployment selection, not shared plumbing; Java packages stay
+`io.github.pnoker.common.mq.*`.)
 
 Dependency direction after migration:
 
 ```
 dc3-common-data ─┐
-dc3-common-driver ─┼─► dc3-common-mq          (compile-time)
+dc3-common-driver ─┼─► dc3-mq-core             (compile-time)
 dc3-common-manager ─┘         ▲
                               │ (runtime, exactly one)
-        dc3-common-mq-rabbitmq / -kafka / -rocketmq / -pulsar / -activemq
+        dc3-mq-rabbitmq / -kafka / -rocketmq / -pulsar / -activemq / -mqtt
 ```
 
 Adapters are selected by `dc3.mq.type` and activated via
@@ -320,7 +324,7 @@ batchSize, prefetch and the retry policy bind from configuration (`PointBatchPro
 today) rather than annotation literals, so ops can tune them per deployment.
 
 `Channel`, `Message`, delivery tags and `RabbitAckUtil` disappear from business code. The
-`@Dc3Listener` annotation is processed by `dc3-common-mq` core, which registers the
+`@Dc3Listener` annotation is processed by `dc3-mq-core` core, which registers the
 subscription with the active adapter — mirroring how `@RabbitListener` is processed today,
 minus the broker API.
 
@@ -367,7 +371,7 @@ free, swappable selection — same principle as the rest of this design:
    Java modules; vendor specifics live in deploy configuration only. The client library
    pins the *protocol version* (3.1.1 today), not the vendor — upgrading to an MQTT 5
    client is an independent, optional library change.
-2. **Internal async plane (optional broker)** — the `dc3-common-mq-mqtt` adapter. MQTT 5
+2. **Internal async plane (optional broker)** — the `dc3-mq-mqtt` adapter. MQTT 5
    shared subscriptions express LOAD_BALANCE; a normal subscription per instance expresses
    BROADCAST; QoS 1 gives per-message ack and PUBACK confirmation (§8.4). This lets a
    deployment consolidate: one MQTT broker serving both planes, or a smaller stack without
@@ -473,7 +477,7 @@ degraded mode.
   validated in `PointValueReceiver`); the port adopts the same convention — schema fields
   live in the payload, transport hints in headers.
 - `X-Request-Id` propagation (currently `MdcRequestIdMessagePostProcessor` /
-  `MdcRequestIdListenerAdvice`) moves into `dc3-common-mq` core; all brokers support
+  `MdcRequestIdListenerAdvice`) moves into `dc3-mq-core` core; all brokers support
   string headers.
 - Tenant id remains inside the payload (and mirrored as a header for operational
   filtering); tenant scoping rules are unaffected by the broker choice.
@@ -601,7 +605,7 @@ integration.
 
 ## 11. TCK — the community extension mechanism
 
-`dc3-common-mq-tck` contains one broker-neutral contract suite executed against each
+`dc3-mq-tck` contains one broker-neutral contract suite executed against each
 adapter via Testcontainers (rabbitmq, kafka, rocketmq, pulsar, artemis, an MQTT 5 broker —
 EMQX or NanoMQ):
 
@@ -634,13 +638,13 @@ Wire compatibility is the invariant: no existing RabbitMQ deployment should noti
 refactor.
 
 - **Phase 1 — extract the port, RabbitMQ adapter moves unchanged.**
-  Create `dc3-common-mq` + `dc3-common-mq-rabbitmq`. Move `RabbitConfig`,
+  Create `dc3-mq-core` + `dc3-mq-rabbitmq`. Move `RabbitConfig`,
   `ExchangeConfig`, `DataTopicConfig`, `DriverTopicConfig`, `PointValueRabbitConfig`, MDC
   propagation, ack helpers into the adapter with **identical physical names**. Convert the
   14 raw producer call sites (8 driver send methods, outbox republish, 6 center-side
   sends) and 16 listeners to the new API (`@Dc3Listener`), including the batch point-value
-  receiver. Business-module poms swap `dc3-common-rabbitmq` → `dc3-common-mq` +
-  `dc3-common-mq-rabbitmq`.
+  receiver. Business-module poms swap `dc3-common-rabbitmq` → `dc3-mq-core` +
+  `dc3-mq-rabbitmq`.
   *Gate: existing E2E (`RabbitDeliveryIT` etc.) runs unmodified and green.*
 - **Phase 2 — TCK + Kafka adapter.** Highest global demand. Partition-key ordering per
   driver is a documented upgrade over the RabbitMQ baseline.
@@ -678,7 +682,7 @@ Suggested cleanups riding along Phase 1:
    on dead instances; non-RabbitMQ brokers express this via subscription expiry or
    heartbeat — confirm per-adapter strategy in the TCK.
 5. **Single-process mode (`dc3-center-single`)** — confirm whether it should get an
-   in-process/no-broker adapter (`dc3-common-mq-local`) for the smallest deployments,
+   in-process/no-broker adapter (`dc3-mq-local`) for the smallest deployments,
    reusing the facade `local` precedent.
 6. **Point-value dead-queue retention** — the quarantine queue has no consumer and no TTL;
    a stuck deployment grows it without bound. Decide: queue TTL, size-capped alerting, or

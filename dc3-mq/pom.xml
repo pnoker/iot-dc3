@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.pnoker</groupId>
+        <artifactId>iot-dc3</artifactId>
+        <version>2026.5.22</version>
+    </parent>
+
+    <name>${project.artifactId}</name>
+    <artifactId>dc3-mq</artifactId>
+    <version>2026.5.22</version>
+    <packaging>pom</packaging>
+
+    <description>
+        IoT DC3 pluggable message broker layer: the broker-neutral port, one certified
+        adapter per broker (rabbitmq default, kafka, rocketmq, pulsar, activemq, mqtt 5)
+        and the contract suite that gates adapter compliance. Deployments pick exactly
+        one adapter via dc3.mq.type — see docs/mq-brokers.md and
+        docs/design/mq-abstraction.md.
+    </description>
+
+    <modules>
+        <module>dc3-mq-core</module>
+        <module>dc3-mq-rabbitmq</module>
+        <module>dc3-mq-kafka</module>
+        <module>dc3-mq-rocketmq</module>
+        <module>dc3-mq-pulsar</module>
+        <module>dc3-mq-activemq</module>
+        <module>dc3-mq-mqtt</module>
+        <module>dc3-mq-tck</module>
+    </modules>
+
+</project>

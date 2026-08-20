@@ -22,12 +22,12 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-common</artifactId>
+        <artifactId>dc3-mq</artifactId>
         <version>2026.5.22</version>
     </parent>
 
     <name>${project.artifactId}</name>
-    <artifactId>dc3-common-mq-tck</artifactId>
+    <artifactId>dc3-mq-tck</artifactId>
     <version>2026.5.22</version>
     <packaging>jar</packaging>
 
@@ -36,7 +36,7 @@
     <dependencies>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mq</artifactId>
+            <artifactId>dc3-mq-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -58,32 +58,32 @@
         <!-- reference harnesses (test scope only) -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mq-rabbitmq</artifactId>
+            <artifactId>dc3-mq-rabbitmq</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mq-kafka</artifactId>
+            <artifactId>dc3-mq-kafka</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mq-activemq</artifactId>
+            <artifactId>dc3-mq-activemq</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mq-mqtt</artifactId>
+            <artifactId>dc3-mq-mqtt</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mq-rocketmq</artifactId>
+            <artifactId>dc3-mq-rocketmq</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mq-pulsar</artifactId>
+            <artifactId>dc3-mq-pulsar</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

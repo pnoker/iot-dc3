@@ -92,14 +92,6 @@
         <module>dc3-common-manager</module>
         <module>dc3-common-model</module>
         <module>dc3-common-mqtt</module>
-        <module>dc3-common-mq</module>
-        <module>dc3-common-mq-rabbitmq</module>
-        <module>dc3-common-mq-kafka</module>
-        <module>dc3-common-mq-activemq</module>
-        <module>dc3-common-mq-mqtt</module>
-        <module>dc3-common-mq-rocketmq</module>
-        <module>dc3-common-mq-pulsar</module>
-        <module>dc3-common-mq-tck</module>
         <module>dc3-common-postgres</module>
         <module>dc3-common-public</module>
         <module>dc3-common-quartz</module>
@@ -374,46 +366,6 @@
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-quartz</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-rabbitmq</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-kafka</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-activemq</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-mqtt</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-rocketmq</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-pulsar</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mq-tck</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
