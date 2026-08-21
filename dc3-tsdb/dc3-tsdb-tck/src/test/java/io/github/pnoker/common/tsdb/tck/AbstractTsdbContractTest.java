@@ -340,6 +340,57 @@ public abstract class AbstractTsdbContractTest {
         });
     }
 
+
+    @Test
+    void rollupTierReadsStayConsistentWithRawScans() {
+        SeriesKey key = new SeriesKey(900025, freshId(), freshId());
+        // Five minute-aligned minutes of 10-second samples with distinct values.
+        Instant base = Instant.parse("2026-08-21T02:00:00Z");
+        List<PointValueSample> batch = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            batch.add(sample(key, base.plusSeconds(10L * i), i, 1));
+        }
+        store().append(batch);
+        TimeWindow window = window(base, Duration.ofMinutes(5));
+
+        // COUNT via (possibly tiered) minute buckets must equal the raw count.
+        long tierCount = store().bucketedAggregate(SeriesFilter.of(key), AggregateFunction.COUNT,
+                window, Duration.ofMinutes(1), null, DEADLINE)
+                .getOrDefault(key, List.of()).stream().mapToLong(BucketAggregate::sampleCount).sum();
+        assertThat(tierCount).isEqualTo(store().count(SeriesFilter.of(key), window, DEADLINE));
+
+        // Coarse AVG recombined from tier sums must equal the raw window average.
+        BucketAggregate coarse = store().bucketedAggregate(SeriesFilter.of(key), AggregateFunction.AVG,
+                window, Duration.ofMinutes(5), null, DEADLINE).get(key).getFirst();
+        WindowAggregate rawAvg = store().aggregate(SeriesFilter.of(key), AggregateFunction.AVG,
+                window, null, DEADLINE).get(key);
+        assertThat(coarse.value()).isCloseTo(rawAvg.value(), org.assertj.core.data.Offset.offset(1e-9));
+        assertThat(coarse.sampleCount()).isEqualTo(rawAvg.sampleCount());
+
+        // Coarse LAST recombined from tier lasts must equal the raw window last.
+        BucketAggregate coarseLast = store().bucketedAggregate(SeriesFilter.of(key), AggregateFunction.LAST,
+                window, Duration.ofMinutes(5), null, DEADLINE).get(key).getFirst();
+        WindowAggregate rawLast = store().aggregate(SeriesFilter.of(key), AggregateFunction.LAST,
+                window, null, DEADLINE).get(key);
+        assertThat(coarseLast.value()).isEqualTo(rawLast.value());
+
+        // Tenant-wide bucketed count agrees with the raw tenant count.
+        long tenantBuckets = store().bucketedCount(key.tenantId(), window, Duration.ofMinutes(1), DEADLINE)
+                .stream().mapToLong(BucketAggregate::sampleCount).sum();
+        assertThat(tenantBuckets).isEqualTo(store().count(SeriesFilter.tenantWide(key.tenantId()),
+                window, DEADLINE));
+
+        // PERCENTILE never uses tiers; stores that support it must serve bucketed
+        // percentiles on the raw path without supertable-style failures.
+        if (store().capabilities().percentile()) {
+            List<BucketAggregate> p50 = store().bucketedAggregate(SeriesFilter.of(key),
+                    AggregateFunction.PERCENTILE, window, Duration.ofMinutes(1), 0.5, DEADLINE)
+                    .getOrDefault(key, List.of());
+            assertThat(p50).hasSize(5);
+            assertThat(p50).allSatisfy(bucket -> assertThat(bucket.value()).isNotNull());
+        }
+    }
+
     @Test
     void lastSeenPerSeriesReportsNewestSample() {
         Assumptions.assumeTrue(store().capabilities().tenantWideAnalytics(),

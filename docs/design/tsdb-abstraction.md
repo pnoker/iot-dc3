@@ -411,6 +411,35 @@ REST 控制器"工作（目录从 OpenAPI 快照合成），因此"九工具"的
 - `DataAnnotationGateTest` 守门要求每个请求字段带 `@Schema` 描述——正是
   inputSchema 质量的机械化保障，本次全部满足。
 
+**Phase 2 第三片（2026-08-21，S16 多级保留 + rollup 首发验证，Phase 2 至此完成）**：
+生命周期落地为 **raw 30 天（seed 05）→ 1 分钟层 1 年 → 1 小时层永久**（`dc3.tsdb.
+timescale.rollup.minute-keep-days` 可配）。实施中的关键决策与教训：
+1. **与 observability 管线合并而非并存**：seed 07 早已为 Grafana 建了
+   `cagg_point_value_1m/1h`（real-time、含 driver 维度与 cal_first/cal_last）——
+   适配器最初另建一对 cagg 会造成双份物化开销。收敛为**单一结构**：适配器
+   以 `IF NOT EXISTS` + 与 seed 完全一致的列集引导同名 cagg，嵌入式/独立部署
+   两条路径汇合；Grafana 与 port 读同一份物化。
+2. **FIRST/LAST 留在原始路径**：共享 cagg 只有 cal_value 的首末（文本），数值
+   首末列在既有部署的 cagg 里不存在——从层上供 FIRST/LAST 会造成新旧部署
+   行为分叉；M4 典型窗口（≤30 天）本就落在原始保留期内，原始扫描即可。
+3. **real-time cagg 是"读即刻正确"的关键**：TS 2.13+ 新建 cagg 默认
+   `materialized_only=TRUE`（物化前读到 0 行），显式 `materialized_only=FALSE`
+   后 TCK 在**未等任何刷新**的情况下断言分级 COUNT/AVG 与原始扫描逐位一致；
+   刷新策略只把聚合工作挪去后台。
+4. **AVG 从层重组必须 SUM(sum)/SUM(count)**（对每桶平均值再平均是错的）；
+   COUNT=SUM(sample_count)。cagg 列集为此带 num_sum/num_count。
+5. SQL 教训两则：层级 cagg 的 `GROUP BY` 不能用与源列同名的别名（绑到源列，
+   seed 07 早已注释过同款坑——GROUP BY 显式表达式或序数）；带参数的
+   time_bucket 在 SELECT 与 GROUP BY 里是两个不同表达式，**GROUP BY 用序数**
+   才引用同一输出列。
+6. TDengine 案例二十暴露 `bucketedAggregate PERCENTILE` 超级表限制——补了
+   逐序列子表分支（与 aggregate() 同款策略），TCK 断言分桶百分位不再报
+   "percentile is only supported in single table query"。
+门：timescale 24/24（含新案例"分级读与原始扫描一致"：COUNT/AVG/LAST/
+bucketedCount/分桶 P50 五路验证）+ TDengine 24/24（2 例按声明能力跳过，
+NONE 档诚实原始降级同样全过）。deleteRange 后对两层补
+refresh_continuous_aggregate，real-time 部分即刻正确、物化部分随后收敛。
+
 ## 7. 逐库映射
 
 | 概念 | TimescaleDB | TDengine 3.x | InfluxDB 3 | IoTDB |

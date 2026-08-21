@@ -26,6 +26,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
 import javax.sql.DataSource;
@@ -51,8 +52,9 @@ public class TsdbTimescaleAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(TsdbStore.class)
-    public TsdbStore tsdbStore(@Qualifier("tsdbDataSource") DataSource tsdbDataSource) {
-        TsdbStore store = new TimescaleTsdbStore(tsdbDataSource);
+    public TsdbStore tsdbStore(@Qualifier("tsdbDataSource") DataSource tsdbDataSource,
+                               @Value("${dc3.tsdb.timescale.rollup.minute-keep-days:365}") int minuteTierKeepDays) {
+        TsdbStore store = new TimescaleTsdbStore(tsdbDataSource, minuteTierKeepDays);
         log.info("TSDB port negotiated, store={}, capabilities={}", store.type(), store.capabilities());
         return store;
     }

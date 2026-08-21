@@ -317,6 +317,35 @@ public final class TdengineTsdbStore implements TsdbStore {
     public Map<SeriesKey, List<BucketAggregate>> bucketedAggregate(SeriesFilter filter, AggregateFunction fn,
                                                                    TimeWindow window, Duration bucketWidth,
                                                                    Double percentile, TsdbDeadline deadline) {
+        // TDengine PERCENTILE refuses supertable queries (including INTERVAL
+        // windows); per-series subtable scans keep it exact on the raw path —
+        // this store declares rollupSupport=NONE, so tier reads never apply.
+        if (fn == AggregateFunction.PERCENTILE) {
+            Map<SeriesKey, List<BucketAggregate>> result = new LinkedHashMap<>();
+            if (filter.tenantWide()) {
+                throw new IllegalArgumentException(
+                        "TDengine percentile needs explicit series; tenant-wide percentile is unsupported");
+            }
+            for (SeriesKey key : filter.series()) {
+                String sql = "SELECT CAST(_wstart AS BIGINT) AS bucket, %s AS agg_value, COUNT(*) AS sample_count FROM %s WHERE ts >= %d AND ts < %d INTERVAL(%d)"
+                        .formatted(aggregateExpression(fn, percentile), subtable(key),
+                                microsOf(window.from()), microsOf(window.toExclusive()),
+                                bucketWidth.toNanos() / 1000);
+                timedVoid(deadline, () -> {
+                    List<Map<String, Object>> rows = jdbc.queryForList(sql);
+                    List<BucketAggregate> buckets = new ArrayList<>();
+                    for (Map<String, Object> row : rows) {
+                        buckets.add(new BucketAggregate(instantOfMicros(((Number) row.get("bucket")).longValue()),
+                                Objects.nonNull(row.get("agg_value")) ? ((Number) row.get("agg_value")).doubleValue() : null,
+                                ((Number) row.get("sample_count")).longValue()));
+                    }
+                    if (!buckets.isEmpty()) {
+                        result.put(key, buckets);
+                    }
+                });
+            }
+            return result;
+        }
         String sql = """
                 SELECT tenant_id, device_id, point_id, CAST(_wstart AS BIGINT) AS bucket,
                        %s AS agg_value, COUNT(*) AS sample_count

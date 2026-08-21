@@ -85,9 +85,25 @@ public final class TimescaleTsdbStore implements TsdbStore {
 
     private static final int SERIES_IN_CHUNK = 500;
 
+    /**
+     * S16 rollup tiers. These are the observability pipeline's continuous
+     * aggregates (07-iot-dc3-observability.sql, queried by Grafana) — one
+     * structure serves both consumers; the adapter recreates them with an
+     * identical shape when it boots standalone.
+     */
+    private static final String ROLLUP_1M = "cagg_point_value_1m";
+
+    private static final String ROLLUP_1H = "cagg_point_value_1h";
+
+    private static final java.time.Duration TIER_MINUTE = java.time.Duration.ofMinutes(1);
+
+    private static final java.time.Duration TIER_HOUR = java.time.Duration.ofHours(1);
+
     private static final String COLUMNS = "tenant_id, device_id, point_id, message_id, schema_version, "
             + "driver_node, sequence, fencing_token, raw_value, cal_value, num_value, quality, "
             + "driver_id, create_time, operate_time";
+
+    private final int minuteTierKeepDays;
 
     private final JdbcTemplate jdbc;
 
@@ -102,6 +118,11 @@ public final class TimescaleTsdbStore implements TsdbStore {
             rs.getLong("fencing_token"), rs.getLong("driver_id"));
 
     public TimescaleTsdbStore(DataSource dataSource) {
+        this(dataSource, 365);
+    }
+
+    public TimescaleTsdbStore(DataSource dataSource, int minuteTierKeepDays) {
+        this.minuteTierKeepDays = minuteTierKeepDays;
         this.jdbc = new JdbcTemplate(dataSource);
         bootstrap();
     }
@@ -151,7 +172,70 @@ public final class TimescaleTsdbStore implements TsdbStore {
                 CREATE INDEX IF NOT EXISTS idx_point_value_tenant_time
                 ON %s (tenant_id, create_time DESC)""".formatted(TABLE));
         primeInitialChunk();
+        bootstrapRollups();
         log.info("Timescale store ready (table {})", TABLE);
+    }
+
+    /**
+     * S16 tiered lifecycle: raw → 1-minute rollup → 1-hour rollup. Both tiers are
+     * real-time continuous aggregates ({@code materialized_only = FALSE}) so reads
+     * are correct immediately after an append — the background refresh policies
+     * only move the aggregation work off the read path. Aggregates are chosen for
+     * exact composition across tiers: AVG recombines as SUM(sum)/SUM(numeric_count),
+     * FIRST/LAST re-select by bucket time; PERCENTILE stays on the raw path.
+     * The hour tier groups by the explicit time_bucket expression because its
+     * output alias collides with the source column name.
+     */
+    private void bootstrapRollups() {
+        try {
+            jdbc.execute("""
+                    CREATE MATERIALIZED VIEW IF NOT EXISTS %s
+                    WITH (timescaledb.continuous, timescaledb.materialized_only = FALSE) AS
+                    SELECT time_bucket(INTERVAL '1 minute', create_time) AS bucket,
+                           tenant_id, driver_id, device_id, point_id,
+                           COUNT(*) AS sample_count, COUNT(num_value) AS num_count,
+                           AVG(num_value) AS num_avg, MIN(num_value) AS num_min,
+                           MAX(num_value) AS num_max, SUM(num_value) AS num_sum,
+                           FIRST(cal_value, create_time) AS cal_first,
+                           LAST(cal_value, create_time) AS cal_last
+                    FROM %s
+                    GROUP BY time_bucket(INTERVAL '1 minute', create_time),
+                             tenant_id, driver_id, device_id, point_id
+                    WITH NO DATA""".formatted(ROLLUP_1M, TABLE));
+            jdbc.execute("CREATE INDEX IF NOT EXISTS idx_cagg_pv_1m_lookup ON %s (tenant_id, device_id, point_id, bucket DESC)".formatted(ROLLUP_1M));
+            jdbc.execute("""
+                    CREATE MATERIALIZED VIEW IF NOT EXISTS %s
+                    WITH (timescaledb.continuous, timescaledb.materialized_only = FALSE) AS
+                    SELECT time_bucket(INTERVAL '1 hour', bucket) AS bucket,
+                           tenant_id, driver_id, device_id, point_id,
+                           SUM(sample_count) AS sample_count, SUM(num_count) AS num_count,
+                           SUM(num_sum) / NULLIF(SUM(num_count), 0) AS num_avg,
+                           MIN(num_min) AS num_min, MAX(num_max) AS num_max,
+                           SUM(num_sum) AS num_sum,
+                           FIRST(cal_first, bucket) AS cal_first,
+                           LAST(cal_last, bucket) AS cal_last
+                    FROM %s
+                    GROUP BY time_bucket(INTERVAL '1 hour', bucket),
+                             tenant_id, driver_id, device_id, point_id
+                    WITH NO DATA""".formatted(ROLLUP_1H, ROLLUP_1M));
+            jdbc.execute("CREATE INDEX IF NOT EXISTS idx_cagg_pv_1h_lookup ON %s (tenant_id, device_id, point_id, bucket DESC)".formatted(ROLLUP_1H));
+            jdbc.execute("""
+                    SELECT add_continuous_aggregate_policy('%s', if_not_exists => TRUE,
+                            start_offset => NULL, end_offset => INTERVAL '1 minute',
+                            schedule_interval => INTERVAL '1 minute')""".formatted(ROLLUP_1M));
+            jdbc.execute("""
+                    SELECT add_continuous_aggregate_policy('%s', if_not_exists => TRUE,
+                            start_offset => NULL, end_offset => INTERVAL '5 minutes',
+                            schedule_interval => INTERVAL '5 minutes')""".formatted(ROLLUP_1H));
+            jdbc.execute("""
+                    SELECT add_retention_policy('%s', INTERVAL '%d days', if_not_exists => TRUE)"""
+                    .formatted(ROLLUP_1M, minuteTierKeepDays));
+            // The hour tier is kept forever — no retention policy.
+        } catch (DataAccessException e) {
+            // Plain-PG deployments (no timescaledb extension) skip the tiers; reads
+            // stay correct on the raw path.
+            log.warn("Rollup tiers not created, reads stay on the raw path: {}", e.getMessage());
+        }
     }
 
     /**
@@ -185,7 +269,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
     public TsdbCapabilities capabilities() {
         return new TsdbCapabilities(
                 true, true, true, true, true,
-                RollupSupport.NONE, 5000,
+                RollupSupport.NATIVE, 5000,
                 true, OrderingGuarantee.PER_SERIES, Precision.MICRO, true, true);
     }
 
@@ -359,6 +443,10 @@ public final class TimescaleTsdbStore implements TsdbStore {
     public Map<SeriesKey, List<BucketAggregate>> bucketedAggregate(SeriesFilter filter, AggregateFunction fn,
                                                                    TimeWindow window, Duration bucketWidth,
                                                                    Double percentile, TsdbDeadline deadline) {
+        String tier = rollupTierFor(fn, bucketWidth);
+        if (Objects.nonNull(tier)) {
+            return bucketedAggregateFromTier(tier, filter, fn, window, bucketWidth, deadline);
+        }
         String expr = aggregateExpression(fn, percentile);
         String sql = """
                 SELECT tenant_id, device_id, point_id, time_bucket(?::interval, create_time) AS bucket,
@@ -403,6 +491,21 @@ public final class TimescaleTsdbStore implements TsdbStore {
     @Override
     public List<BucketAggregate> bucketedCount(long tenantId, TimeWindow window,
                                                Duration bucketWidth, TsdbDeadline deadline) {
+        String tier = rollupTierFor(AggregateFunction.COUNT, bucketWidth);
+        if (Objects.nonNull(tier)) {
+            // Tier reads cover whole tier granules inside the window: buckets are
+            // precomputed counts summed per coarse bucket.
+            String sql = """
+                    SELECT time_bucket(?::interval, bucket) AS bucket, SUM(sample_count) AS sample_count
+                    FROM %s WHERE tenant_id = ? AND bucket >= ? AND bucket < ?
+                    GROUP BY 1 ORDER BY 1 ASC""".formatted(tier);
+            Object[] args = {bucketWidth.toMillis() + " milliseconds", tenantId,
+                    OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
+                    OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC)};
+            return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new BucketAggregate(
+                    toInstant(rs, 1).truncatedTo(java.time.temporal.ChronoUnit.MILLIS),
+                    null, rs.getLong(2)), args));
+        }
         String sql = """
                 SELECT time_bucket(?::interval, create_time) AS bucket, COUNT(*) AS sample_count
                 FROM %s WHERE tenant_id = ? AND create_time >= ? AND create_time < ?
@@ -521,6 +624,25 @@ public final class TimescaleTsdbStore implements TsdbStore {
                 series.tenantId(), series.deviceId(), series.pointId(),
                 OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
                 OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC));
+        refreshTiers(window);
+    }
+
+    private void refreshTiers(TimeWindow window) {
+        // The real-time tier reads reflect the delete immediately; re-materialize
+        // so the stored tier rows converge too (tenant offboarding is rare).
+        try {
+            for (String tier : new String[]{ROLLUP_1M, ROLLUP_1H}) {
+                jdbc.query("CALL refresh_continuous_aggregate(?, ?, ?)",
+                        ps -> {
+                            ps.setString(1, tier);
+                            ps.setObject(2, OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC));
+                            ps.setObject(3, OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC));
+                        }, rs -> null);
+            }
+        } catch (DataAccessException e) {
+            log.warn("Rollup refresh after deleteRange failed; background policies will converge: {}",
+                    e.getMessage());
+        }
     }
 
     @Override
@@ -548,6 +670,71 @@ public final class TimescaleTsdbStore implements TsdbStore {
     }
 
     // ===== helpers =====
+
+    /**
+     * S16 read transparency: bucket widths at or above a materialized tier's
+     * granularity are served from that tier (PERCENTILE never — it is not
+     * materialized). Tier reads cover whole tier granules inside the window.
+     */
+    private String rollupTierFor(AggregateFunction fn, Duration bucketWidth) {
+        // FIRST/LAST stay raw: the shared observability caggs carry first/last of
+        // the textual cal_value only, and serving numeric first/last from tiers
+        // would version-skew deployments created before that shape existed.
+        if (fn == AggregateFunction.PERCENTILE || fn == AggregateFunction.FIRST
+                || fn == AggregateFunction.LAST) {
+            return null;
+        }
+        if (!bucketWidth.minus(TIER_HOUR).isNegative()) {
+            return ROLLUP_1H;
+        }
+        if (!bucketWidth.minus(TIER_MINUTE).isNegative()) {
+            return ROLLUP_1M;
+        }
+        return null;
+    }
+
+    private Map<SeriesKey, List<BucketAggregate>> bucketedAggregateFromTier(String tier, SeriesFilter filter,
+                                                                            AggregateFunction fn, TimeWindow window,
+                                                                            Duration bucketWidth, TsdbDeadline deadline) {
+        String sql = """
+                SELECT time_bucket(?::interval, bucket) AS bucket, tenant_id, device_id, point_id,
+                       %s AS value, SUM(sample_count) AS sample_count
+                FROM %s v WHERE %s AND v.bucket >= ? AND v.bucket < ?
+                GROUP BY 1, 2, 3, 4
+                ORDER BY 1 ASC"""
+                .formatted(tierExpression(fn), tier, seriesWhere(filter));
+        List<Object> args = new ArrayList<>();
+        args.add(bucketWidth.toMillis() + " milliseconds");
+        args.addAll(seriesArgs(filter));
+        args.add(OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC));
+        args.add(OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC));
+        Map<SeriesKey, List<BucketAggregate>> result = new LinkedHashMap<>();
+        timedVoid(deadline, () -> {
+            List<Map<String, Object>> rows = jdbc.queryForList(sql, args.toArray());
+            for (Map<String, Object> row : rows) {
+                result.computeIfAbsent(new SeriesKey(((Number) row.get("tenant_id")).longValue(),
+                                ((Number) row.get("device_id")).longValue(),
+                                ((Number) row.get("point_id")).longValue()), k -> new ArrayList<>())
+                        .add(new BucketAggregate(((java.sql.Timestamp) row.get("bucket")).toInstant()
+                                .truncatedTo(java.time.temporal.ChronoUnit.MILLIS),
+                                (Double) row.get("value"),
+                                ((Number) row.get("sample_count")).longValue()));
+            }
+        });
+        return result;
+    }
+
+    /** Exactly composable re-aggregation over the shared observability tiers. */
+    private static String tierExpression(AggregateFunction fn) {
+        return switch (fn) {
+            case AVG -> "SUM(num_sum) / NULLIF(SUM(num_count), 0)";
+            case MIN -> "MIN(num_min)";
+            case MAX -> "MAX(num_max)";
+            case SUM -> "SUM(num_sum)";
+            case COUNT -> "CAST(SUM(sample_count) AS DOUBLE PRECISION)";
+            case FIRST, LAST, PERCENTILE -> throw new IllegalArgumentException("never tiered: " + fn);
+        };
+    }
 
     private static Instant toInstant(ResultSet rs, String column) throws SQLException {
         Timestamp ts = rs.getTimestamp(column);

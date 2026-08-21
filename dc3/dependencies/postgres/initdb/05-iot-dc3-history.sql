@@ -99,7 +99,10 @@ ALTER TABLE dc3_point_value
         timescaledb.compress_orderby = 'create_time DESC'
     );
 SELECT public.add_compression_policy('dc3_point_value', INTERVAL '7 days');
-SELECT public.add_retention_policy('dc3_point_value', INTERVAL '180 days');
+-- S16 tiered lifecycle (docs/design/tsdb-abstraction.md §9.6): raw samples are
+-- kept 30 days; the 1-minute rollup (1 year) and 1-hour rollup (forever) are
+-- real-time continuous aggregates created by the timescale adapter bootstrap.
+SELECT public.add_retention_policy('dc3_point_value', INTERVAL '30 days');
 
 -- ----------------------------
 -- Transactional latest-value projection
