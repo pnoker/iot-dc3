@@ -375,6 +375,22 @@ enum RollupSupport { NATIVE, MANUAL, NONE }
 4. **latestStream 数据源从超表改为 `dc3_point_latest`**（§9.4 原定）：流语义
    由"最近的原始样本"变为"各序列当前值按时间倒序"，符合设计意图。
 
+**Phase 2 实施记录（2026-08-21，TDengine 适配器 `dc3-tsdb-tdengine`）**：
+镜像 `tdengine/tdengine:3.3.6.13` + 驱动 `taos-jdbcdriver:3.9.0`（REST，
+`dc3.tsdb.tdengine.*` 独立数据源）。超级表 `point_value` + tags(tenant,device,point)、
+确定性子表 `pv_<t>_<d>_<p>`（首写 USING TAGS 自动建表）、库级 `PRECISION 'us'`。
+TCK 23 例 0 败 0 错、2 例按声明能力跳过（latencyHistogram/correlation=false）。
+拷打出来的教训，全已修并锁进适配器：
+1. **时间戳绝不走字符串形态**——REST 驱动按客户端 JVM 时区序列化 `Timestamp`、
+   服务端按 UTC 解析，任何部署时区都会平移写入（游标分页还会每页漂移、永不
+   终止）。根治：写入/窗口/游标一律 **epoch 微秒整数字面量**，读取一律
+   `CAST(ts AS BIGINT)` 数字往返（对镜像实证对称）。
+2. `AS value` 撞保留字 → 改 `agg_value`；`INTERVAL(60000ms)` 不认 `ms` 单位 →
+   裸数字按库精度（µs）解释。
+3. `PERCENTILE` 只支持单表查询 → 单序列走确定性子表直查，tenantWide 直接拒绝。
+4. REST 就绪探测必须 `POST /rest/sql` + Basic Auth——GET 路径式 SQL 一律 404，
+   容器健康也 404（曾因此误判启动超时烧掉两轮十分钟）。
+
 ## 7. 逐库映射
 
 | 概念 | TimescaleDB | TDengine 3.x | InfluxDB 3 | IoTDB |
@@ -419,13 +435,13 @@ measurements 随行；按租户子树的 TTL 由存储组布局近似实现。
 | 精度 | 微秒 | 微秒 | 纳秒 | 毫秒/纳秒 |
 | 字符串值 | ✅ TEXT | ✅ NCHAR | ✅ fields | ✅ TEXT |
 | 租户级分析面（S13-①②③） | ✅ SQL | ✅ 超级表聚合 | ✅ SQL | ⚠️ 路径模板/按层聚合 |
-| 延迟直方图（S13-④） | ✅ 表达式分箱 | ⚠️ 3.3+ HISTOGRAM/应用层 | ✅ SQL CASE | ❌ UDF 或降级 |
+| 延迟直方图（S13-④） | ✅ 表达式分箱 | ❌ 适配器如实声明 false，面板零桶降级（3.3.6 实测无可靠表达式分箱） | ✅ SQL CASE | ❌ UDF 或降级 |
 | 多序列读取（S14） | ✅ IN 列表 | ✅ 超级表 tbname 集合 | ✅ SQL IN | ✅ 多路径 |
 | FIRST/LAST（S15） | ✅ | ✅ FIRST/LAST | ✅ | ✅ |
 | PERCENTILE（S15） | ✅ percentile_cont | ✅ PERCENTILE/APERCENTILE | ✅ | ⚠️ 近似/拒绝 |
-| rollup 分级（S16） | ✅ NATIVE 连续聚合 | ✅ NATIVE 流计算 | ⚠️ MANUAL 任务 | ❌ NONE→原始扫描 |
+| rollup 分级（S16） | ✅ NATIVE 连续聚合 | NONE（S16 落地时切流计算，Phase 2 适配器先扫原始） | ⚠️ MANUAL 任务 | ❌ NONE→原始扫描 |
 | 质量位存储（S17） | ✅ 列 | ✅ 列 | ✅ field | ✅ measurement |
-| 相关系数（S19） | ✅ SQL JOIN 聚合 | ✅ SQL | ✅ SQL | ❌ 门面桶化自算 |
+| 相关系数（S19） | ✅ SQL JOIN 聚合 | ❌ 门面桶化自算（适配器声明 false，3.3.6 SQL 端无可靠 Pearson 表达） | ✅ SQL | ❌ 门面桶化自算 |
 | 内嵌 PG 模式 | ✅（默认） | ❌ | ❌ | ❌ |
 
 启动协商日志汇总当前存储的一行能力，与 MQ port 一致。

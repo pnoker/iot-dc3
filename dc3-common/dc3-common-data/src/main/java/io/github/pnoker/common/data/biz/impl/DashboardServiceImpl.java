@@ -128,14 +128,17 @@ public class DashboardServiceImpl implements DashboardService {
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
-        List<LatencyBin> bins = tsdbStore.latencyHistogram(tenantId, windowSince(from),
-                LATENCY_EDGES_MS, DEADLINE);
+        // Capability-gated op: stores without store-side binning (e.g. TDengine)
+        // degrade to zero-filled bins instead of failing the dashboard.
+        List<LatencyBin> bins = tsdbStore.capabilities().latencyHistogram()
+                ? tsdbStore.latencyHistogram(tenantId, windowSince(from), LATENCY_EDGES_MS, DEADLINE)
+                : List.of();
         // The port zero-pads every bin, so the UI always gets six buckets.
-        List<LatencyBucketVO> out = new ArrayList<>(bins.size());
-        for (int i = 0; i < bins.size(); i++) {
+        List<LatencyBucketVO> out = new ArrayList<>(LATENCY_EDGES_MS.size() + 1);
+        for (int i = 0; i <= LATENCY_EDGES_MS.size(); i++) {
             LatencyBucketVO vo = new LatencyBucketVO();
             vo.setBin(i);
-            vo.setCount(bins.get(i).count());
+            vo.setCount(i < bins.size() ? bins.get(i).count() : 0L);
             out.add(vo);
         }
         return out;
