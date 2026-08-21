@@ -391,6 +391,26 @@ TCK 23 例 0 败 0 错、2 例按声明能力跳过（latencyHistogram/correlati
 4. REST 就绪探测必须 `POST /rest/sql` + Basic Auth——GET 路径式 SQL 一律 404，
    容器健康也 404（曾因此误判启动超时烧掉两轮十分钟）。
 
+**Phase 2 第二片（2026-08-21，S19 AI 分析门面落地）**：`DataAnalyticsService`
+（dc3-common-data biz/analytics）+ `AnalyticsController` 九个端点
+（`/analytics/query_latest|query_history|compute_stats|compare_periods|
+rank_entities|trend_analysis|threshold_report|correlate|data_quality_report`）。
+与 §9.7 原图的一处对齐说明：MCP 网关的 tools/call 本就按"工具目录 → HTTP 转发到
+REST 控制器"工作（目录从 OpenAPI 快照合成），因此"九工具"的落地形态是九个带
+`x-dc3-ai` 元数据的端点而非九个 Java 工具类——部署侧 `make openapi` 导出快照 +
+`refreshToolCatalog` 后即出现在 MCP 工具列表，inputSchema 由 springdoc 从
+`@Schema`（含枚举 allowableValues 与范围说明）生成。关键实现事实：
+- 租户注入：控制器一律从鉴权 principal 取 tenantId，请求体无租户字段——
+  AI 无法跨租户（门面再硬校验一次，S11 双门）。
+- 扫描量上限：每次调用 ≤20 序列、每序列 ≤5000 样本、窗口 ≤90 天；超限结构化
+  拒绝并给收窄建议，截断时 `degradation` 字段如实标注。
+- 名称解析：deviceName/pointName 必须唯一命中，歧义时错误里带候选列表
+  （下一轮对话即可消歧）；percentile/stdDev/斜率/皮尔逊/区间合全在门面算。
+- correlate 双路径已验证：timescale 走 STORE 原语；TDengine（能力 false）走
+  门面桶化自算（单测构造完全正相关夹具，r=1.0 精确）。
+- `DataAnnotationGateTest` 守门要求每个请求字段带 `@Schema` 描述——正是
+  inputSchema 质量的机械化保障，本次全部满足。
+
 ## 7. 逐库映射
 
 | 概念 | TimescaleDB | TDengine 3.x | InfluxDB 3 | IoTDB |
