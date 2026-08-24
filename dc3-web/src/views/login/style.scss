@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Standalone module loaded via @use: additionalData injection does not
+// reach module loads, so pull the L2 tokens in explicitly.
+@use '@/styles/tokens.scss' as *;
+
 .login-container {
   display: flex;
   flex-wrap: wrap;
@@ -111,5 +115,40 @@
 
   i {
     color: var(--el-color-primary);
+  }
+}
+
+// Three-terminal login (A2): below the desktop breakpoint the two 500px
+// panels cannot sit side by side, so the decorative left panel drops out
+// and the form card becomes a single centered column; on phones it spans
+// the full viewport width.
+@media (max-width: $breakpoint-md-max) {
+  .login-wrapper-left {
+    display: none;
+  }
+
+  .login-wrapper-right {
+    margin: 0 auto;
+    width: 500px;
+    max-width: calc(100% - 24px);
+  }
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .login-wrapper-right {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .login-left,
+  .login-right {
+    min-height: 100vh;
+  }
+
+  .login-main {
+    width: 80%;
   }
 }

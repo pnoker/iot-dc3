@@ -55,20 +55,24 @@
           <el-pagination
             v-if="!hidePagination"
             :current-page="+page.current"
+            :layout="paginationLayout"
             :page-size="+page.size"
             :page-sizes="pageSizes"
+            :pager-count="isMobile ? 5 : 7"
+            :small="isMobile"
             :total="+page.total"
             background
-            layout="total, prev, pager, next, sizes"
             @size-change="onSizeChange"
             @current-change="onCurrentChange"
           />
           <span aria-hidden="true" class="tool-card-footer-divider"/>
+          <!-- Icon-only buttons need explicit accessible names (A7): the
+               surrounding tooltip text is not part of the button's name. -->
           <el-tooltip :content="t('common.refresh')" effect="dark" placement="top">
-            <el-button :icon="Refresh" circle @click="onRefresh"/>
+            <el-button :aria-label="t('common.refresh')" :icon="Refresh" circle @click="onRefresh"/>
           </el-tooltip>
           <el-tooltip v-if="!hideSort" :content="t('common.sort')" effect="dark" placement="top">
-            <el-button :icon="Sort" circle @click="onSort"/>
+            <el-button :aria-label="t('common.sort')" :icon="Sort" circle @click="onSort"/>
           </el-tooltip>
         </div>
       </div>
@@ -78,7 +82,9 @@
 
 <script lang="ts" setup>
 import type {PropType} from 'vue';
-import {ref, unref} from 'vue';
+import {computed, ref, unref} from 'vue';
+
+import {useBreakpoint} from '@/composables/useBreakpoint';
 import {useI18n} from 'vue-i18n';
 import type {FormInstance, FormRules} from 'element-plus';
 import {Refresh, RefreshRight, Search, Sort} from '@element-plus/icons-vue';
@@ -120,7 +126,12 @@ const emit = defineEmits<{
 }>();
 
 const {t} = useI18n();
+const {isMobile} = useBreakpoint();
 const formRef = ref<FormInstance>();
+
+// Pagination degrades to a compact pager on thumb terminals: totals and
+// page-size pickers are desktop affordances (A3).
+const paginationLayout = computed(() => (isMobile.value ? 'prev, pager, next' : 'total, prev, pager, next, sizes'));
 
 const search = async () => {
   const form = unref(formRef);
