@@ -96,7 +96,7 @@ public class DashboardServiceImpl implements DashboardService {
         List<BucketVO> out = new ArrayList<>(rows.size());
         for (BucketRow row : rows) {
             BucketVO vo = new BucketVO();
-            vo.setKey(fmt.format(row.getKey()));
+            vo.setKey(fmt.format(row.getBucketKey()));
             vo.setCount(row.getCount());
             out.add(vo);
         }

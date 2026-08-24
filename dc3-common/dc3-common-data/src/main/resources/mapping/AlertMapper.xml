@@ -28,7 +28,7 @@
 
     <select id="countAll" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow">
         SELECT COUNT(*) AS total,
-               COUNT(*)    FILTER (WHERE confirm_flag = 0) AS unconfirmed
+               COALESCE(SUM(CASE WHEN confirm_flag = 0 THEN 1 ELSE 0 END), 0) AS unconfirmed
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
     </select>
@@ -40,7 +40,7 @@
                    ELSE 'driver'
                    END  AS source,
                COUNT(*) AS total,
-               COUNT(*)    FILTER (WHERE confirm_flag = 0) AS unconfirmed
+               COALESCE(SUM(CASE WHEN confirm_flag = 0 THEN 1 ELSE 0 END), 0) AS unconfirmed
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
         GROUP BY alarm_target_type_flag
@@ -48,7 +48,7 @@
     </select>
 
     <select id="countByType" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
-        SELECT alarm_type_flag::text AS key, COUNT(*) AS count
+        SELECT CONCAT(alarm_type_flag, '') AS bucket_key, COUNT(*) AS count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
         GROUP BY alarm_type_flag
@@ -128,7 +128,7 @@
                    ELSE 'driver'
                    END  AS source,
                COUNT(*) AS total,
-               COUNT(*)    FILTER (WHERE confirm_flag = 0) AS unconfirmed
+               COALESCE(SUM(CASE WHEN confirm_flag = 0 THEN 1 ELSE 0 END), 0) AS unconfirmed
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
@@ -157,13 +157,17 @@
     </update>
 
     <select id="dailyTrend" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow">
-        SELECT d.day ::text AS date, COALESCE(
-                SUM(CASE WHEN a.alarm_target_type_flag IN (0, 1) THEN 1 ELSE 0 END), 0) AS device_count,
+        WITH RECURSIVE days(day) AS (
+            SELECT CAST(#{from} AS DATE)
+            UNION ALL
+            SELECT CAST(day + INTERVAL '1' DAY AS DATE) FROM days WHERE day &lt; CURRENT_DATE
+        )
+        SELECT CONCAT(d.day, '')                       AS date,
+               COALESCE(SUM(CASE WHEN a.alarm_target_type_flag IN (0, 1) THEN 1 ELSE 0 END), 0) AS device_count,
                COALESCE(SUM(CASE WHEN a.alarm_target_type_flag = 2 THEN 1 ELSE 0 END), 0) AS driver_count
-        FROM (SELECT generate_series(date_trunc('day', #{from})::date,
-                                     CURRENT_DATE, '1 day') ::date AS day) d
+        FROM days d
                  LEFT JOIN dc3_entity_alarm a
-                           ON date_trunc('day', a.create_time)::date = d.day
+                           ON CAST(a.create_time AS DATE) = d.day
         AND a.tenant_id = #{tenantId}
             AND a.create_time &gt;= #{from}
         GROUP BY d.day
@@ -195,7 +199,7 @@
     </select>
 
     <select id="typeDistribution" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
-        SELECT alarm_ext ->> 'type' AS key, COUNT (*) AS count
+        SELECT alarm_ext ->> 'type' AS bucket_key, COUNT (*) AS count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
@@ -336,21 +340,21 @@
 
     <select id="recentChanges" resultType="io.github.pnoker.common.data.entity.bo.dashboard.RecentChangeRow">
         SELECT kind, id AS entity_id, operate_time
-        FROM (SELECT 'driver'::text AS kind, id, operate_time, create_time
+        FROM (SELECT 'driver' AS kind, id, operate_time, create_time
               FROM dc3_manager.dc3_driver
               WHERE deleted = 0
                 AND tenant_id = #{tenantId}
                 AND operate_time &gt; create_time
                 AND operate_time &gt;= #{from}
               UNION ALL
-              SELECT 'device'::text, id, operate_time, create_time
+              SELECT 'device', id, operate_time, create_time
               FROM dc3_manager.dc3_device
               WHERE deleted = 0
                 AND tenant_id = #{tenantId}
                 AND operate_time &gt; create_time
                 AND operate_time &gt;= #{from}
               UNION ALL
-              SELECT 'profile'::text, id, operate_time, create_time
+              SELECT 'profile', id, operate_time, create_time
               FROM dc3_manager.dc3_profile
               WHERE deleted = 0
                 AND tenant_id = #{tenantId}

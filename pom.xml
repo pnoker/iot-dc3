@@ -746,7 +746,12 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-postgres</artifactId>
+                <artifactId>dc3-common-jdbc</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-db-postgres</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
@@ -866,6 +871,7 @@
         <module>dc3-api</module>
         <module>dc3-common</module>
         <module>dc3-mq</module>
+        <module>dc3-db</module>
         <module>dc3-tsdb</module>
         <module>dc3-center</module>
         <module>dc3-driver</module>

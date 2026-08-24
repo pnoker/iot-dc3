@@ -47,7 +47,7 @@ public class BucketRow {
      * of different JDBC types (SMALLINT enable_flag, VARCHAR service_name, BIGINT
      * driver_id). Service-side formatters narrow it per call-site.
      */
-    private Object key;
+    private Object bucketKey;
 
     private long count;
 

@@ -15,25 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.data.entity.bo.dashboard;
+package io.github.pnoker.common.config;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.baomidou.mybatisplus.annotation.DbType;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.Bean;
 
 /**
- * Generic (key, count) aggregate row; key is Object to fit JDBC int or varchar.
+ * PostgreSQL dialect contribution: the pagination {@link DbType} consumed by the
+ * neutral MybatisPlusConfig. The profile activation (postgres) and the
+ * timestamptz type handler ride along via application-postgres.yml and the
+ * EnvironmentPostProcessor registered in spring.factories.
  *
  * @author pnoker
- * @since 2016.10.1
+ * @since 2026.8.24
  */
-@Getter
-@Setter
-@ToString
-public class BucketRow {
+@AutoConfiguration
+public class PostgresDbAutoConfiguration {
 
-    private Object bucketKey;
-
-    private long count;
-
+    @Bean
+    public DbType paginationDbType() {
+        return DbType.POSTGRE_SQL;
+    }
 }

@@ -97,11 +97,15 @@ public class EnvironmentConstant {
     /**
      * PostgreSQL profile auto-activation configuration key: "dc3.postgres.auto-profile"
      */
+    public static final String JDBC_AUTO_PROFILE = "dc3.jdbc.auto-profile";
+
     public static final String POSTGRES_AUTO_PROFILE = "dc3.postgres.auto-profile";
 
     /**
      * Spring profile name for PostgreSQL-enabled applications: "postgres"
      */
+    public static final String JDBC_PROFILE = "jdbc";
+
     public static final String POSTGRES_PROFILE = "postgres";
 
     /**

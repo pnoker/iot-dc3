@@ -92,7 +92,7 @@
         <module>dc3-common-manager</module>
         <module>dc3-common-model</module>
         <module>dc3-common-mqtt</module>
-        <module>dc3-common-postgres</module>
+        <module>dc3-common-jdbc</module>
         <module>dc3-common-public</module>
         <module>dc3-common-quartz</module>
         <module>dc3-common-sql</module>
@@ -354,7 +354,12 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-postgres</artifactId>
+                <artifactId>dc3-common-jdbc</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-db-postgres</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>

@@ -367,7 +367,7 @@ public class DashboardServiceImpl implements DashboardService {
         List<AlertStatsVO.BucketVO> buckets = new ArrayList<>(rows.size());
         for (var row : rows) {
             AlertStatsVO.BucketVO b = new AlertStatsVO.BucketVO();
-            b.setKey(asString(row.getKey()));
+            b.setKey(asString(row.getBucketKey()));
             b.setCount(row.getCount());
             buckets.add(b);
         }
@@ -509,7 +509,7 @@ public class DashboardServiceImpl implements DashboardService {
         List<AlertTypeBucketVO> out = new ArrayList<>(rows.size());
         for (var row : rows) {
             AlertTypeBucketVO vo = new AlertTypeBucketVO();
-            vo.setType(Objects.isNull(row.getKey()) ? null : row.getKey().toString());
+            vo.setType(Objects.isNull(row.getBucketKey()) ? null : row.getBucketKey().toString());
             vo.setCount(row.getCount());
             out.add(vo);
         }

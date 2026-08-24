@@ -26,7 +26,7 @@
     -->
     <select id="countDriverByEnable"
             resultType="io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow">
-        SELECT enable_flag AS key, COUNT(*) AS count
+        SELECT enable_flag AS bucket_key, COUNT(*) AS count
         FROM dc3_driver
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
@@ -35,7 +35,7 @@
 
     <select id="countDriverByType"
             resultType="io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow">
-        SELECT driver_type_flag AS key, COUNT(*) AS count
+        SELECT driver_type_flag AS bucket_key, COUNT(*) AS count
         FROM dc3_driver
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
@@ -60,7 +60,7 @@
 
     <select id="countDeviceByEnable"
             resultType="io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow">
-        SELECT enable_flag AS key, COUNT(*) AS count
+        SELECT enable_flag AS bucket_key, COUNT(*) AS count
         FROM dc3_device
         WHERE deleted = 0
           AND tenant_id = #{tenantId}

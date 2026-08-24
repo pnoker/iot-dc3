@@ -52,7 +52,7 @@
         VALUES (#{id}, #{clientId}, #{clientName}, #{clientType}, #{ownerPrincipalId}, #{serviceAccountPrincipalId},
                 #{tenantId}, #{clientSecretHash}, #{clientSecretExpiresAt}, #{clientAuthMethods},
                 #{authorizationGrantTypes}, #{redirectUris}, #{scopes}, #{requirePkce}, #{requireConsent},
-                #{enableFlag}, '{}'::JSON, '{}'::JSON, #{ownerPrincipalId}, #{clientName}, #{ownerPrincipalId},
+                #{enableFlag}, '{}', '{}', #{ownerPrincipalId}, #{clientName}, #{ownerPrincipalId},
                 #{clientName})
     </insert>
 
@@ -208,7 +208,7 @@
          authorization_code_issued, authorization_code_expires, token_claims, token_metadata)
         VALUES (#{id}, #{registeredClientId}, #{clientId}, #{principalId}, #{principalType}, #{tenantId},
                 #{mcpConnectionId}, #{authorizationGrantType}, #{authorizedScopes}, #{stateHash},
-                #{authorizationCodeHash}, #{authorizationCodeIssued}, #{authorizationCodeExpires}, '{}'::JSON,
+                #{authorizationCodeHash}, #{authorizationCodeIssued}, #{authorizationCodeExpires}, '{}',
                 CAST(#{tokenMetadata} AS JSON))
     </insert>
 
@@ -322,7 +322,7 @@
         (id, connection_name, client_id, principal_id, principal_type, tenant_id, grant_type, enable_flag,
          expire_time, connection_ext, remark, creator_id, creator_name, operator_id, operator_name)
         VALUES (#{id}, #{connectionName}, #{clientId}, #{principalId}, #{principalType}, #{tenantId}, #{grantType},
-                #{enableFlag}, #{expireTime}, '{}'::JSON, #{remark}, #{creatorId}, #{creatorName}, #{creatorId},
+                #{enableFlag}, #{expireTime}, '{}', #{remark}, #{creatorId}, #{creatorName}, #{creatorId},
                 #{creatorName})
     </insert>
 
@@ -338,7 +338,7 @@
 
     <select id="listRegistryToolCandidates"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
-        SELECT NULL::BIGINT AS id, api.api_code AS tool_id,
+        SELECT NULL AS id, api.api_code AS tool_id,
                lower(regexp_replace(api.service_name || '_' || api.api_name || '_' ||
                                     CASE api.api_type_flag
                                         WHEN 0 THEN 'post'
@@ -390,8 +390,8 @@
         FROM dc3_mcp_tool_catalog
         WHERE deleted = 0
           AND enable_flag = 0
-          AND (#{riskLevel}::text IS NULL OR #{riskLevel}::text = ''
-        OR risk_level = #{riskLevel}::text)
+          AND (#{riskLevel} IS NULL OR #{riskLevel} = ''
+        OR risk_level = #{riskLevel})
           AND (
             #{keyword}::text IS NULL
             OR #{keyword}::text = ''
@@ -565,7 +565,7 @@
         VALUES (#{id}, #{traceId}, #{tenantId}, #{principalId}, #{principalType}, #{clientId}, #{connectionId},
                 #{toolId}, #{toolName}, #{permissionCode}, #{riskLevel}, #{confirmId}, #{idempotencyKey},
                 #{argumentDigest}, #{status}, #{errorCode}, #{durationMs}, #{clientName}, #{clientVersion},
-                #{remoteIp}, '{}'::JSON)
+                #{remoteIp}, '{}')
     </insert>
 
     <select id="listAudit"
