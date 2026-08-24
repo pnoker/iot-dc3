@@ -185,9 +185,10 @@ import {
   alarmTypeLabel,
   alarmTypeTag,
 } from '@/utils/thingModelFormatUtil';
+import {AUTO_REFRESH_INTERVAL} from '@/config/constant/ui';
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
-import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
+import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
 interface Row {
@@ -213,7 +214,6 @@ const loading = ref(false);
 const bulkRunning = ref(false);
 const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
 const lastRefreshTime = ref<number>(Date.now());
-const AUTO_REFRESH_INTERVAL = 30000;
 
 const lastRefreshText = computed(() => {
   const d = new Date(lastRefreshTime.value);

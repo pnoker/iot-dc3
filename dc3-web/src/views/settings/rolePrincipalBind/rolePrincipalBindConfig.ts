@@ -19,15 +19,10 @@ import type {ComposerTranslation} from 'vue-i18n';
 
 import {listRole} from '@/api/role';
 import {addRolePrincipalBind, deleteRolePrincipalBind, listRolePrincipalBind} from '@/api/rolePrincipalBind';
+import {PRINCIPAL_TYPE_OPTIONS} from '@/config/constant/enums';
 import type {EntityListConfig} from '@/config/types/entityList';
 
 import {principalIdField, principalNameRelation, roleNameRelation} from '../relations';
-
-const PRINCIPAL_TYPE_OPTIONS = [
-  {label: 'USER', value: 'USER'},
-  {label: 'SERVICE_ACCOUNT', value: 'SERVICE_ACCOUNT'},
-  {label: 'SYSTEM', value: 'SYSTEM'},
-];
 
 export const createRolePrincipalBindConfig = (t: ComposerTranslation): EntityListConfig => ({
   name: 'role-principal-bind',

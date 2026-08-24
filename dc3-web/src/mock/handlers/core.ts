@@ -33,6 +33,8 @@ const findById = (rows: Record<string, unknown>[], id: unknown) =>
 const byIdsMap = (rows: Record<string, unknown>[], ids: unknown[]): Record<string, unknown> => {
   const map: Record<string, unknown> = {};
   for (const id of ids) {
+    // Demo fallback: unknown ids resolve to the first row so charts stay
+    // populated instead of silently dropping a lookup. Acceptable for mock data.
     map[String(id)] = findById(rows, id) ?? rows[0];
   }
   return map;

@@ -25,17 +25,12 @@ import {successMessage} from '@/utils/notificationUtil';
 import {cleanSearchParams} from '@/utils/searchParamUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 
+import {PRINCIPAL_TYPE_OPTIONS} from '@/config/constant/enums';
 import type {PrincipalRecord} from '@/config/types';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-
-const PRINCIPAL_TYPE_OPTIONS = [
-  {label: 'USER', value: 'USER'},
-  {label: 'SERVICE_ACCOUNT', value: 'SERVICE_ACCOUNT'},
-  {label: 'SYSTEM', value: 'SYSTEM'},
-];
 
 export default defineComponent({
   name: 'SettingsPrincipal',

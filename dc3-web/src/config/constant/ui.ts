@@ -15,25 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {defineStore} from 'pinia';
-import {ref} from 'vue';
+/**
+ * UI-level constants shared across view components.
+ * Keep pure display/refresh timings here instead of re-declaring them per page.
+ */
 
-export const useIntervalStore = defineStore('interval', () => {
-  // State
-  const pointValueInterval = ref<number | null>(null);
-
-  // Actions
-  const clearPointValueInterval = (interval: number) => {
-    if (pointValueInterval.value) {
-      clearInterval(pointValueInterval.value);
-    }
-    pointValueInterval.value = interval;
-  };
-
-  return {
-    // State
-    pointValueInterval,
-    // Actions
-    clearPointValueInterval,
-  };
-});
+/** Default auto-refresh interval (ms) for history/overview tables. */
+export const AUTO_REFRESH_INTERVAL = 30000;

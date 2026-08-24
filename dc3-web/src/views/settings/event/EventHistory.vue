@@ -150,6 +150,7 @@ import {timestampColumn, timestampLabel} from '@/utils/dateUtil';
 import {prettyJson} from '@/utils/jsonUtil';
 import {eventLevelLabel, eventLevelTag, eventTypeLabel} from '@/utils/thingModelFormatUtil';
 import type {EventHistoryRecord} from '@/config/types';
+import {AUTO_REFRESH_INTERVAL} from '@/config/constant/ui';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
@@ -170,7 +171,6 @@ const detailVisible = ref(false);
 const detailRow = ref<EventHistoryRecord | null>(null);
 const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
 const lastRefreshTime = ref<number>(Date.now());
-const AUTO_REFRESH_INTERVAL = 30000;
 
 const lastRefreshText = computed(() => {
   const d = new Date(lastRefreshTime.value);

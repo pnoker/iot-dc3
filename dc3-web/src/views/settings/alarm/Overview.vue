@@ -180,6 +180,7 @@ import {useI18n} from 'vue-i18n';
 import {useRoute, useRouter} from 'vue-router';
 import {Bell, CircleCheck, Management, Promotion, Warning, WarningFilled} from '@element-plus/icons-vue';
 
+import {AUTO_REFRESH_INTERVAL} from '@/config/constant/ui';
 import {alertPage, alertStats, alertTrend} from '@/api/dashboard';
 import blankCard from '@/components/card/blank/BlankCard.vue';
 import StatCard from '@/components/card/stat/StatCard.vue';
@@ -241,7 +242,6 @@ const onTabChange = (name: string | number) => {
 const loading = ref(false);
 const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
 const lastRefreshTime = ref<number>(Date.now());
-const AUTO_REFRESH_INTERVAL = 30000;
 
 const lastRefreshText = computed(() => {
   const d = new Date(lastRefreshTime.value);
