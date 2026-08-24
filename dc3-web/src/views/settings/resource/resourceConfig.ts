@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listApi} from '@/api/api';
 import {listDeviceByIds} from '@/api/device';
 import {listDriverByIds} from '@/api/driver';
@@ -26,7 +24,7 @@ import {addResource, deleteResource, listResourceTree, updateResource} from '@/a
 import {RESOURCE_SCOPE_OPTIONS, RESOURCE_TYPE_OPTIONS} from '@/config/constant/enums';
 import {useMenuStore} from '@/store';
 import type {ApiRecord, DeviceRecord, DriverRecord, PointRecord, ProfileRecord} from '@/config/types';
-import type {EntityColumnContext, EntityListConfig} from '@/config/types/entityList';
+import type {EntityColumnContext, EntityListConfig, Translator} from '@/config/types/entityList';
 import {authNameRules, positiveIntegerRules, remarkRules, requiredSelectRule} from '@/utils/formRuleUtil';
 import {logger} from '@/utils/log';
 
@@ -190,7 +188,7 @@ const flattenTree = (nodes: any[]): any[] => {
 // one disabled group node per resource type with that type's resources nested
 // underneath. Cross-type parent/child links in the source tree are dropped: a
 // node parented to a different type becomes a root inside its own type group.
-const buildParentTreeOptions = (t: ComposerTranslation, treeData: any[]) => {
+const buildParentTreeOptions = (t: Translator, treeData: any[]) => {
   const flat = flattenTree(treeData || []);
   const buckets: Record<string, any[]> = {};
   for (const n of flat) {
@@ -237,7 +235,7 @@ interface ResourceHandlers {
   onEntityClick: (row: Record<string, any>) => void;
 }
 
-export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceHandlers): EntityListConfig => ({
+export const createResourceConfig = (t: Translator, handlers: ResourceHandlers): EntityListConfig => ({
   name: 'resource',
   title: t('nav.settingsResource'),
   mode: 'tree',

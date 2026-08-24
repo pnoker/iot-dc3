@@ -15,11 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listMcpClient} from '@/api/mcp';
 import {MCP_CLIENT_TYPE_OPTIONS} from '@/config/constant/enums';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 interface McpClientHandlers {
   onRegister: () => void;
@@ -34,7 +32,7 @@ const includes = (value: unknown, keyword: string) =>
 
 // OAuth clients. Backend `client/list` returns a flat array with no filters, so
 // search is applied client-side here before wrapping into a single-page result.
-export const createMcpClientConfig = (t: ComposerTranslation, handlers: McpClientHandlers): EntityListConfig => ({
+export const createMcpClientConfig = (t: Translator, handlers: McpClientHandlers): EntityListConfig => ({
   name: 'mcp-client',
   title: t('nav.settingsMcpClient'),
   editable: false,

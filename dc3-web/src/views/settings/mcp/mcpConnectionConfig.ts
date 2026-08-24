@@ -15,11 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listMcpConnection} from '@/api/mcp';
 import {MCP_PRINCIPAL_TYPE_OPTIONS} from '@/config/constant/enums';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 import {principalNameRelation} from '../relations';
 
@@ -41,7 +39,7 @@ const includes = (value: unknown, keyword: string) =>
 // filters, so search is applied client-side before wrapping into a single-page
 // result. principalId → name resolves through the shared family relations loader.
 export const createMcpConnectionConfig = (
-  t: ComposerTranslation,
+  t: Translator,
   handlers: McpConnectionHandlers
 ): EntityListConfig => ({
   name: 'mcp-connection',

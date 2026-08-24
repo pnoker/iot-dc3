@@ -15,15 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {addMenu, deleteMenu, listMenuTree, updateMenu} from '@/api/menu';
 import {MENU_LEVEL_OPTIONS, MENU_TYPE_OPTIONS} from '@/config/constant/enums';
 import {iconNames} from '@/config/constant/icons';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {authNameRules, remarkRules} from '@/utils/formRuleUtil';
 
-export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
+export const createMenuConfig = (t: Translator): EntityListConfig => ({
   name: 'menu',
   title: t('nav.settingsMenu'),
   mode: 'tree',

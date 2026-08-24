@@ -15,11 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listMcpTool} from '@/api/mcp';
 import {MCP_RISK_LEVEL_OPTIONS} from '@/config/constant/enums';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 interface McpToolHandlers {
   onRefresh: () => void;
@@ -31,7 +29,7 @@ const RISK_OPTIONS = MCP_RISK_LEVEL_OPTIONS.map((o) => ({label: o.label, value: 
 // Read-only tool catalog. Backend `tool/list` filters by keyword/riskLevel and
 // returns a flat array (no real paging); `list` wraps it into a single-page result
 // like the sibling MCP audit page.
-export const createMcpToolConfig = (t: ComposerTranslation, handlers: McpToolHandlers): EntityListConfig => ({
+export const createMcpToolConfig = (t: Translator, handlers: McpToolHandlers): EntityListConfig => ({
   name: 'mcp-tool',
   title: t('nav.settingsMcpTool'),
   editable: false,

@@ -15,10 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listMcpAudit} from '@/api/mcp';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 import {principalNameRelation} from '../relations';
 
@@ -35,7 +33,7 @@ const RISK_OPTIONS = [
 
 // Read-only audit log: family list page, no add/edit/delete. Backend returns the
 // latest N rows (no real paging); `list` wraps the array into a single-page result.
-export const createMcpAuditConfig = (t: ComposerTranslation): EntityListConfig => ({
+export const createMcpAuditConfig = (t: Translator): EntityListConfig => ({
   name: 'mcp-audit',
   editable: false,
   searchFields: [

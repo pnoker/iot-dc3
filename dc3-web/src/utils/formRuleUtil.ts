@@ -16,7 +16,8 @@
  */
 
 import type {FormItemRule} from 'element-plus';
-import type {ComposerTranslation} from 'vue-i18n';
+
+import type {Translator} from '@/config/types/entityList';
 
 const NAME_MIN_LENGTH = 2;
 const NAME_MAX_LENGTH = 32;
@@ -42,7 +43,7 @@ function empty(value: unknown): boolean {
   return value === undefined || value === null || value === '';
 }
 
-export function nameRules(t: ComposerTranslation, entityName: string): FormItemRule[] {
+export function nameRules(t: Translator, entityName: string): FormItemRule[] {
   return [
     {required: true, whitespace: true, message: t('common.nameRequired', {name: entityName}), trigger: 'blur'},
     {min: NAME_MIN_LENGTH, max: NAME_MAX_LENGTH, message: t('common.nameLength'), trigger: 'blur'},
@@ -50,7 +51,7 @@ export function nameRules(t: ComposerTranslation, entityName: string): FormItemR
   ];
 }
 
-export function authNameRules(t: ComposerTranslation, entityName: string): FormItemRule[] {
+export function authNameRules(t: Translator, entityName: string): FormItemRule[] {
   return [
     {required: true, whitespace: true, message: t('common.nameRequired', {name: entityName}), trigger: 'blur'},
     {min: NAME_MIN_LENGTH, max: NAME_MAX_LENGTH, message: t('common.authNameLength'), trigger: 'blur'},
@@ -58,7 +59,7 @@ export function authNameRules(t: ComposerTranslation, entityName: string): FormI
   ];
 }
 
-export function remarkRules(t: ComposerTranslation): FormItemRule[] {
+export function remarkRules(t: Translator): FormItemRule[] {
   return [{max: REMARK_MAX_LENGTH, message: t('common.remarkLength'), trigger: 'blur'}];
 }
 
@@ -89,7 +90,7 @@ export function decimalRules(message: string, requiredMessage?: string): FormIte
   return rules;
 }
 
-export function byteRules(t: ComposerTranslation, requiredMessage: string): FormItemRule[] {
+export function byteRules(t: Translator, requiredMessage: string): FormItemRule[] {
   return [
     {required: true, message: requiredMessage, trigger: 'blur'},
     {
@@ -112,7 +113,7 @@ export function byteRules(t: ComposerTranslation, requiredMessage: string): Form
   ];
 }
 
-export function positiveIntegerRules(t: ComposerTranslation, requiredMessage: string): FormItemRule[] {
+export function positiveIntegerRules(t: Translator, requiredMessage: string): FormItemRule[] {
   return [
     {required: true, message: requiredMessage, trigger: 'blur'},
     {

@@ -18,6 +18,14 @@
 import type {FormItemRule} from 'element-plus';
 import type {PageQuery} from '@/config/types';
 
+/**
+ * Minimal translation contract for semantic-layer configs (A1/A5 boundary):
+ * a function from an i18n key to a localized string. Vue's ComposerTranslation
+ * satisfies it structurally, so configs no longer import vue-i18n directly —
+ * they stay consumable by a future framework-agnostic client SDK.
+ */
+export type Translator = (key: string, params?: Record<string, unknown>) => string;
+
 export type EntityMode = 'page' | 'tree';
 export type EntityFieldKind =
   'input' | 'number' | 'select' | 'enableFlag' | 'textarea' | 'json' | 'color' | 'treeSelect';

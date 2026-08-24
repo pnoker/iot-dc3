@@ -15,10 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listIdentityAudit} from '@/api/identityAudit';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 import {principalNameRelation} from '../relations';
 
@@ -37,7 +35,7 @@ const STATUS_OPTIONS = [
 // Read-only audit log: family list page with no add/edit/delete. The backend
 // returns the latest N rows (no real paging), so `list` wraps the array into a
 // single-page result the EntityListPage contract expects.
-export const createIdentityAuditConfig = (t: ComposerTranslation): EntityListConfig => ({
+export const createIdentityAuditConfig = (t: Translator): EntityListConfig => ({
   name: 'identity-audit',
   editable: false,
   searchFields: [

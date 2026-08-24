@@ -15,17 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {addUser, deleteUser, listUser, updateUser} from '@/api/user';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {AUTH_NAME_PATTERN, EMAIL_PATTERN, NAME_PATTERN, PHONE_PATTERN} from '@/utils/formRuleUtil';
 
 interface UserHandlers {
   onAssignRoles: (row: Record<string, any>) => void;
 }
 
-export const createUserConfig = (t: ComposerTranslation, handlers: UserHandlers): EntityListConfig => ({
+export const createUserConfig = (t: Translator, handlers: UserHandlers): EntityListConfig => ({
   name: 'user',
   title: t('nav.settingsUser'),
   editable: true,

@@ -59,6 +59,7 @@ import type {
   PointInfoForm,
   PointRecord,
 } from '@/config/types';
+import type {Translator} from '@/config/types/entityList';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
 import InfoCard from '@/components/card/info/InfoCard.vue';
@@ -74,7 +75,7 @@ import {listCommandByProfileId} from '@/api/command';
 import {listEventByProfileId} from '@/api/event';
 import {nameRules, remarkRules} from '@/utils/formRuleUtil';
 import {logger} from '@/utils/log';
-import {type ComposerTranslation, useI18n} from 'vue-i18n';
+import {useI18n} from 'vue-i18n';
 
 type AttributeConfigValue = string | number | boolean | null;
 
@@ -157,7 +158,7 @@ function attributePrecision(attribute: Attribute): number | undefined {
   return DECIMAL_ATTRIBUTE_TYPES.has(attributeType(attribute)) ? 3 : 0;
 }
 
-function attributePlaceholder(attribute: Attribute, t: ComposerTranslation): string {
+function attributePlaceholder(attribute: Attribute, t: Translator): string {
   return attribute.defaultValue
     ? t('device.edit.defaultValue', {value: attribute.defaultValue})
     : t('device.edit.attributePlaceholder', {name: attribute.attributeName});
@@ -221,7 +222,7 @@ function serializeAttributeValue(value: unknown): string {
 function validateAttributeConfigValue(
   attribute: Attribute,
   value: unknown,
-  t: ComposerTranslation,
+  t: Translator,
   required = false
 ): string {
   const rawValue = serializeAttributeValue(value).trim();

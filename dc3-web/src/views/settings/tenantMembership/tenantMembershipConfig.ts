@@ -15,11 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {addTenantMembership, deleteTenantMembership, listTenantMembership} from '@/api/tenantMembership';
 import {PRINCIPAL_TYPE_OPTIONS} from '@/config/constant/enums';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 import {principalIdField, principalNameRelation} from '../relations';
 
@@ -29,7 +27,7 @@ const MEMBERSHIP_STATUS_OPTIONS = [
   {label: 'INVITED', value: 'INVITED'},
 ];
 
-export const createTenantMembershipConfig = (t: ComposerTranslation): EntityListConfig => ({
+export const createTenantMembershipConfig = (t: Translator): EntityListConfig => ({
   name: 'tenant-membership',
   title: t('nav.settingsTenantMembership'),
   editable: true,
