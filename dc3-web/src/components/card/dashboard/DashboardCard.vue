@@ -148,7 +148,7 @@ const props = withDefaults(
     loading: false,
     loadingTarget: 'body',
     empty: false,
-    emptyText: 'No data',
+    emptyText: '',
     emptyImageSize: 80,
     refreshable: true,
     autoRefresh: undefined,

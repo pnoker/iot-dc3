@@ -52,6 +52,18 @@ interface MenuState {
   loading: boolean;
 }
 
+/** Recursively find the first node matching the predicate, depth-first. */
+const walk = (nodes: MenuNode[], predicate: (node: MenuNode) => boolean): MenuNode | undefined => {
+  for (const node of nodes) {
+    if (predicate(node)) return node;
+    if (node.children && node.children.length) {
+      const hit = walk(node.children, predicate);
+      if (hit) return hit;
+    }
+  }
+  return undefined;
+};
+
 export const useMenuStore = defineStore('menu', {
   state: (): MenuState => ({
     tree: [],
@@ -66,17 +78,7 @@ export const useMenuStore = defineStore('menu', {
     findByCode:
       (state) =>
         (code: string): MenuNode | undefined => {
-          const walk = (nodes: MenuNode[]): MenuNode | undefined => {
-            for (const n of nodes) {
-              if (n.menuCode === code) return n;
-              if (n.children && n.children.length) {
-                const hit = walk(n.children);
-                if (hit) return hit;
-              }
-            }
-            return undefined;
-          };
-          return walk(state.tree);
+          return walk(state.tree, (node) => node.menuCode === code);
         },
 
     /**
@@ -88,17 +90,7 @@ export const useMenuStore = defineStore('menu', {
       (state) =>
         (id: string): MenuNode | undefined => {
           const key = String(id);
-          const walk = (nodes: MenuNode[]): MenuNode | undefined => {
-            for (const n of nodes) {
-              if (String(n.id) === key) return n;
-              if (n.children && n.children.length) {
-                const hit = walk(n.children);
-                if (hit) return hit;
-              }
-            }
-            return undefined;
-          };
-          return walk(state.tree);
+          return walk(state.tree, (node) => String(node.id) === key);
         },
   },
   actions: {

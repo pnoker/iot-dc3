@@ -174,15 +174,15 @@ export const useEntityNames = () => {
       sourceId: string;
     }>
   ): Promise<void> => {
-    const ptIds: Array<string> = [];
-    const devIds: Array<string> = [];
-    const drvIds: Array<string> = [];
+    const pointIds: Array<string> = [];
+    const deviceIds: Array<string> = [];
+    const driverIds: Array<string> = [];
     for (const r of rows) {
-      if (r.source === 'point') ptIds.push(r.sourceId);
-      else if (r.source === 'device') devIds.push(r.sourceId);
-      else drvIds.push(r.sourceId);
+      if (r.source === 'point') pointIds.push(r.sourceId);
+      else if (r.source === 'device') deviceIds.push(r.sourceId);
+      else driverIds.push(r.sourceId);
     }
-    await Promise.all([resolvePoints(ptIds), resolveDevices(devIds), resolveDrivers(drvIds)]);
+    await Promise.all([resolvePoints(pointIds), resolveDevices(deviceIds), resolveDrivers(driverIds)]);
   };
 
   const nameBySource = (source: AlertSourceKind, id: string): string => {

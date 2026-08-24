@@ -81,13 +81,13 @@ describe('usePagedList', () => {
     setAllData(sampleRows);
 
     sort();
-    expect(state.order).toBe(true);
+    expect(state.sortAsc).toBe(true);
     expect(state.page.orders).toEqual([{column: 'name', asc: true}]);
     // ascending — first listData item is Row 01.
     expect(state.listData[0].name).toBe('Row 01');
 
     sort();
-    expect(state.order).toBe(false);
+    expect(state.sortAsc).toBe(false);
     // descending — first item is Row 25.
     expect(state.listData[0].name).toBe('Row 25');
   });

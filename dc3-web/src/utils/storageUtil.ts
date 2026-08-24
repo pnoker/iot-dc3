@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {logger} from './log';
 import {isNull} from '@/utils/validationUtil';
 
 /**
@@ -60,11 +61,15 @@ export const setStorage = (key: string, value: unknown, isSession?: boolean) => 
   const obj = {
     dataType: typeof value,
     content: value,
-    type: isSession,
     datetime: new Date().getTime(),
   };
-  if (isSession) window.sessionStorage.setItem(key, JSON.stringify(obj));
-  else window.localStorage.setItem(key, JSON.stringify(obj));
+  try {
+    if (isSession) window.sessionStorage.setItem(key, JSON.stringify(obj));
+    else window.localStorage.setItem(key, JSON.stringify(obj));
+  } catch (error) {
+    // Quota overflow / private mode — persist failure must not break the caller.
+    logger.warn('Failed to persist storage key', key, error);
+  }
 };
 
 /**
@@ -104,15 +109,3 @@ export const getAllStorage = (isSession?: boolean) => {
   return list;
 };
 
-/**
- * Clear all storage values
- *
- * @param isSession Whether to use Session Storage (default: Local Storage)
- */
-export const clearAllStorage = (isSession?: boolean) => {
-  if (isSession) {
-    window.sessionStorage.clear();
-  } else {
-    window.localStorage.clear();
-  }
-};

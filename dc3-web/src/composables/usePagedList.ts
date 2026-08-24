@@ -31,7 +31,7 @@ export interface PagedListState<T, Q extends Record<string, any> = Record<string
   listData: T[];
   allData: T[];
   query: Partial<Q>;
-  order: boolean;
+  sortAsc: boolean;
   page: PagedListPage;
 }
 
@@ -51,7 +51,7 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
     listData: [] as T[],
     allData: [] as T[],
     query: {} as Partial<Q>,
-    order: false,
+    sortAsc: false,
     page: {
       total: 0,
       size: options.pageSize ?? 12,
@@ -112,8 +112,8 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
   };
 
   const sort = () => {
-    state.order = !state.order;
-    state.page.orders = [{column: options.sortColumn ?? 'create_time', asc: state.order}];
+    state.sortAsc = !state.sortAsc;
+    state.page.orders = [{column: options.sortColumn ?? 'create_time', asc: state.sortAsc}];
 
     if (options.request) {
       void load();
@@ -121,7 +121,7 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
     }
 
     if (options.sortValue) {
-      const asc = state.order;
+      const asc = state.sortAsc;
       state.allData = [...state.allData].sort((a, b) => {
         const aValue = options.sortValue?.(a);
         const bValue = options.sortValue?.(b);

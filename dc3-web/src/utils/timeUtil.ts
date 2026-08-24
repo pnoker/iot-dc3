@@ -21,11 +21,14 @@
  * (some dropped the date, some used toLocaleString, some toLocaleTimeString).
  * Normalised here so one change reaches every card.
  *
- * <p>Locale is hard-coded to zh-CN + 24-hour — matching the project's
- * i18n language and existing display conventions.</p>
+ * <p>The Intl locale follows the app i18n language ('zh' → 'zh-CN', otherwise
+ * 'en-US') with a fixed 24-hour clock — matching existing display conventions.</p>
  */
 
-const LOCALE = 'zh-CN';
+import i18n from '@/config/i18n';
+
+/** Resolve the Intl locale tag from the active app locale. */
+const LOCALE = (): string => (i18n.global.locale.value === 'zh' ? 'zh-CN' : 'en-US');
 
 /** Parse ISO / "yyyy-MM-dd HH:mm:ss" into a Date; returns null on failure. */
 export const parseDateSafe = (v: string | Date | undefined | null): Date | null => {
@@ -44,14 +47,14 @@ export const parseDateSafe = (v: string | Date | undefined | null): Date | null 
 export const formatDateTime = (v: string | Date | undefined | null): string => {
   const d = parseDateSafe(v);
   if (!d) return typeof v === 'string' ? v : '';
-  return d.toLocaleString(LOCALE, {hour12: false});
+  return d.toLocaleString(LOCALE(), {hour12: false});
 };
 
 /** Clock only — "12:34:56". Used by live feeds where the date context is already implicit. */
 export const formatClock = (v: string | Date | undefined | null): string => {
   const d = parseDateSafe(v);
   if (!d) return typeof v === 'string' ? v : '';
-  return d.toLocaleTimeString(LOCALE, {hour12: false});
+  return d.toLocaleTimeString(LOCALE(), {hour12: false});
 };
 
 /**
@@ -61,7 +64,7 @@ export const formatClock = (v: string | Date | undefined | null): string => {
 export const formatShortDateTime = (v: string | Date | undefined | null): string => {
   const d = parseDateSafe(v);
   if (!d) return typeof v === 'string' ? v : '';
-  return d.toLocaleString(LOCALE, {
+  return d.toLocaleString(LOCALE(), {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',

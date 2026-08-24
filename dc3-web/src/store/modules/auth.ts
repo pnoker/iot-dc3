@@ -38,8 +38,8 @@ interface LoginForm {
 
 export const useAuthStore = defineStore('auth', () => {
   // State
-  const tenant = ref('default');
-  const name = ref('dc3');
+  const tenantRef = ref('default');
+  const nameRef = ref('dc3');
 
   // Getters
   const getTenant = computed(() => {
@@ -51,14 +51,14 @@ export const useAuthStore = defineStore('auth', () => {
   });
 
   // Actions
-  const setToken = ({tenant: t, name: n}: Pick<Login, 'tenant' | 'name'>) => {
-    setStorage(AUTH_HEADERS.TENANT, t);
-    setStorage(AUTH_HEADERS.LOGIN, n);
+  const setToken = ({tenant, name}: Pick<Login, 'tenant' | 'name'>) => {
+    setStorage(AUTH_HEADERS.TENANT, tenant);
+    setStorage(AUTH_HEADERS.LOGIN, name);
     // Token is in an httpOnly cookie; store only a frontend-visible login flag.
     setStorage(AUTH_HEADERS.AUTHENTICATED, true, true);
 
-    tenant.value = t || 'default';
-    name.value = n || 'dc3';
+    tenantRef.value = tenant || 'default';
+    nameRef.value = name || 'dc3';
   };
 
   const removeToken = () => {
@@ -129,8 +129,8 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     // State
-    tenant,
-    name,
+    tenant: tenantRef,
+    name: nameRef,
     // Getters
     getTenant,
     getName,

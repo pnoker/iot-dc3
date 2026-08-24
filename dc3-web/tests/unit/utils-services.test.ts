@@ -101,11 +101,12 @@ describe('utils (services)', () => {
       expect(timestamp('2026-05-13T08:09:10')).toContain('2026-05-13 08:09:10');
       expect(timestampColumn({}, {}, '')).toBe('');
       expect(timestampColumn({}, {}, '2026-05-13T08:09:10')).toContain('2026-05-13 08:09:10');
+      // seconds is the sub-minute remainder (3s), not the total elapsed seconds.
       expect(calcDate(new Date('2026-05-13T00:00:00Z'), new Date('2026-05-14T01:02:03Z'))).toMatchObject({
         days: 1,
         hours: 1,
         minutes: 2,
-        seconds: 90123,
+        seconds: 3,
       });
     });
   });
