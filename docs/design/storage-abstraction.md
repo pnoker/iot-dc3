@@ -396,7 +396,7 @@ TSDB boundary checklist (T1):
   (`grep -r dc3_point_value` gate).
 
 **R1/R2 实施记录（2026-08-24）**：关系轨道全部落地——R1 可移植改写 + 模块拆分
-（`dc3-common-jdbc` 中立 + 顶层 `dc3-db` 家族）；R2 MySQL 方言（databaseId
+（中立基建 + 顶层 `dc3-db` 家族——后按家族一致性迁为 `dc3-db/dc3-db-core`，与 dc3-mq-core/dc3-tsdb-core 同构）；R2 MySQL 方言（databaseId
 fork、RETURNING 解耦为 upsert+re-select、序列退役为行内 +1、咨询锁/触发器/
 JSON 簇各有等价实现）+ 双引擎种子（`pg2mysql_seed.py` 派生）+ `dc3-db-tck`
 双方言契约套件（PG/MySQL 各 8/8：latest 围栏 upsert 三级决胜、state

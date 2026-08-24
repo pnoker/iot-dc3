@@ -56,6 +56,7 @@ iot-dc3/
 ├── dc3/                  compose files, environment files, scripts, and generated release notes
 ├── dc3-mq/               top-level MQ family aggregator (port=dc3-mq-core + 6 adapters + tck)
 ├── dc3-tsdb/             top-level TSDB family aggregator (port=dc3-tsdb-core + 4 adapters + tck)
+├── dc3-db/               top-level relational family aggregator (core=dc3-db-core + 3 dialect adapters + tck)
 ├── docs/                 selection guides (`mq-brokers.md`, `tsdb-stores.md`) and design docs under `design/`
 ├── Makefile              preferred backend/container command entrypoint
 └── .mvn/settings.xml     local Maven mirror configuration

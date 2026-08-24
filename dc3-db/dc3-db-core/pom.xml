@@ -23,11 +23,11 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-common</artifactId>
+        <artifactId>dc3-db</artifactId>
         <version>2026.5.22</version>
     </parent>
 
-    <artifactId>dc3-common-jdbc</artifactId>
+    <artifactId>dc3-db-core</artifactId>
     <name>${project.artifactId}</name>
     <description>Dialect-neutral JDBC infrastructure: MyBatis-Plus wiring, tenant-line handler, generator utils — see docs/design/storage-abstraction.md §3</description>
 

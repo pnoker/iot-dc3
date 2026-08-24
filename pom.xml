@@ -746,7 +746,7 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-jdbc</artifactId>
+                <artifactId>dc3-db-core</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
