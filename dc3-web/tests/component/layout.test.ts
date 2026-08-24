@@ -21,7 +21,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 
 import i18n from '@/config/i18n';
-import {layoutStubs} from '../setup/stubs/element-plus';
+import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus';
 import {sampleMenuTree} from '../fixtures/menu';
 
 // Layout reaches through several stores and the router push singleton.
@@ -73,6 +73,7 @@ async function mountLayout() {
       plugins: [i18n, router],
       stubs: {
         ...layoutStubs,
+        ElButton: createElButtonStub(),
         ElBacktop: {template: '<div class="el-backtop-stub" />'},
         RouterView: {template: '<div class="router-view-stub" />'},
       },
