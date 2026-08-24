@@ -153,7 +153,7 @@ const openDetail = (row: AgenticProvider) => {
 };
 const openEdit = (row: AgenticProvider) => editRef.value?.showEdit(row);
 
-const onSave = (form: AgenticProvider, done: () => void) => {
+const onSave = (form: AgenticProvider, done: (close?: boolean) => void) => {
   const apiCall = form.id ? updateAgenticProvider(form) : addAgenticProvider(form);
   apiCall
     .then(() => {
@@ -162,6 +162,7 @@ const onSave = (form: AgenticProvider, done: () => void) => {
       done();
     })
     .catch(() => {
+      done(false);
     });
 };
 

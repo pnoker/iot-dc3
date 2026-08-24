@@ -107,7 +107,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'save', form: AgenticModelConfig, done: () => void): void;
+  (e: 'save', form: AgenticModelConfig, done: (close?: boolean) => void): void;
 }>();
 
 const visible = ref(false);
@@ -183,9 +183,11 @@ const onSubmit = async () => {
     submitting.value = false;
     return;
   }
-  emit('save', {...form}, () => {
+  emit('save', {...form}, (close = true) => {
     submitting.value = false;
-    visible.value = false;
+    if (close) {
+      visible.value = false;
+    }
   });
 };
 

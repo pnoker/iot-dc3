@@ -166,7 +166,7 @@ const openDetail = (row: AgenticModelConfig) => {
 };
 const openEdit = (row: AgenticModelConfig) => editRef.value?.showEdit(row);
 
-const onSave = (form: AgenticModelConfig, done: () => void) => {
+const onSave = (form: AgenticModelConfig, done: (close?: boolean) => void) => {
   const apiCall = form.id ? updateAgenticModelConfig(form) : addAgenticModelConfig(form);
   apiCall
     .then(() => {
@@ -175,6 +175,7 @@ const onSave = (form: AgenticModelConfig, done: () => void) => {
       done();
     })
     .catch(() => {
+      done(false);
     });
 };
 

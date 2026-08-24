@@ -103,7 +103,7 @@ import {AGENTIC_PROVIDER_TYPES} from '../providerTypes';
 const providerTypes = AGENTIC_PROVIDER_TYPES;
 
 const emit = defineEmits<{
-  (e: 'save', form: AgenticProvider & { apiKey?: string }, done: () => void): void;
+  (e: 'save', form: AgenticProvider & { apiKey?: string }, done: (close?: boolean) => void): void;
 }>();
 
 const visible = ref(false);
@@ -164,9 +164,11 @@ const onSubmit = async () => {
     submitting.value = false;
     return;
   }
-  emit('save', {...form}, () => {
+  emit('save', {...form}, (close = true) => {
     submitting.value = false;
-    visible.value = false;
+    if (close) {
+      visible.value = false;
+    }
   });
 };
 
