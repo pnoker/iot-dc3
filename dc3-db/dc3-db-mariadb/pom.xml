@@ -23,20 +23,28 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>iot-dc3</artifactId>
+        <artifactId>dc3-db</artifactId>
         <version>2026.5.22</version>
     </parent>
 
-    <artifactId>dc3-db</artifactId>
+    <artifactId>dc3-db-mariadb</artifactId>
     <name>${project.artifactId}</name>
-    <packaging>pom</packaging>
-    <description>Relational dialect family: one adapter per engine behind dc3.db.type — see docs/design/storage-abstraction.md §3 and docs/tsdb-stores.md for the sibling families</description>
+    <description>MariaDB 10.6+ dialect adapter — MySQL-compatible surface except ODKU row aliases (uses VALUES()), verified against the dual-dialect contract suite</description>
 
-    <modules>
-        <module>dc3-db-postgres</module>
-        <module>dc3-db-mysql</module>
-        <module>dc3-db-mariadb</module>
-        <module>dc3-db-tck</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

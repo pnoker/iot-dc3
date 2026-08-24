@@ -53,6 +53,10 @@
             <artifactId>dc3-db-mysql</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-mariadb</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
         </dependency>

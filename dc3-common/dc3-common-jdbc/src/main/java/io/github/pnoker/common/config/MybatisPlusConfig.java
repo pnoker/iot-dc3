@@ -79,6 +79,7 @@ public class MybatisPlusConfig {
         java.util.Properties aliases = new java.util.Properties();
         aliases.setProperty("PostgreSQL", "postgres");
         aliases.setProperty("MySQL", "mysql");
+        aliases.setProperty("MariaDB", "mariadb");
         provider.setProperties(aliases);
         return provider;
     }

@@ -258,7 +258,7 @@ services:
   mysql:
     image: mysql:8.4
     restart: always
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-dc3}
       MYSQL_USER: ${MYSQL_USERNAME:-dc3}

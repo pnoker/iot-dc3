@@ -114,6 +114,8 @@ public class EnvironmentConstant {
 
     public static final String MYSQL_PROFILE = "mysql";
 
+    public static final String MARIADB_PROFILE = "mariadb";
+
     /**
      * PostgreSQL host environment variable: "POSTGRES_HOST"
      */

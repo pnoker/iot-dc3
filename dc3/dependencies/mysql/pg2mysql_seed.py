@@ -179,7 +179,7 @@ def main(src_path, dst_path, database):
     s = convert_revision_triggers(s)
     s = translate_types(s)
     s = widen_keyed_text(s)
-    s = re.sub(r"CREATE SCHEMA IF NOT EXISTS \w+;", f"CREATE DATABASE IF NOT EXISTS {database}\n    CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;", s)
+    s = re.sub(r"CREATE SCHEMA IF NOT EXISTS \w+;", f"CREATE DATABASE IF NOT EXISTS {database}\n    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", s)
     s = re.sub(r"SET search_path TO [\w, ]+;", f"USE {database};", s)
     s = re.sub(r"\n?\s*INCLUDE \([^)]*\)", "", s)
     s = re.sub(r"'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)?) \+00:00'", r"'\1'", s)
