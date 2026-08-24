@@ -1,0 +1,99 @@
+/*!
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Runtime theme tokens as CSS custom properties (L2). Imported once by
+// global.scss, so these land on :root exactly once — never inside a scoped
+// style block. The app store (src/store/modules/app.ts) toggles the .dark
+// class on <html>; Element Plus dark variables come from
+// element-plus/theme-chalk/dark/css-vars.css imported in
+// src/config/plugins/element/element.ts.
+//
+// Rule (A5): new colors/spacing/motion go HERE, not into component SCSS.
+// Components read --dc3-* at runtime and the SCSS constants in tokens.scss
+// at compile time.
+
+:root {
+  // Brand override for Element Plus (moved from global.scss to keep every
+  // color mutation in one file).
+  --el-color-primary: #1296db;
+  --el-color-primary-light-3: #59b6e6;
+  --el-color-primary-light-5: #89cbed;
+  --el-color-primary-light-7: #b8e0f4;
+  --el-color-primary-light-8: #d0eaf8;
+  --el-color-primary-light-9: #e7f5fb;
+  --el-color-primary-dark-2: #0e78af;
+
+  // dc3 surfaces / text (light)
+  --dc3-bg-body: #f6f7f9;
+  --dc3-bg-elevated: #ffffff;
+  --dc3-text-primary: #2c3e50;
+  --dc3-text-regular: #606266;
+  --dc3-border-base: #dcdfe6;
+
+  // Spacing scale (4px grid)
+  --dc3-space-1: 4px;
+  --dc3-space-2: 8px;
+  --dc3-space-3: 12px;
+  --dc3-space-4: 16px;
+  --dc3-space-5: 20px;
+  --dc3-space-6: 24px;
+  --dc3-space-8: 32px;
+  --dc3-space-10: 40px;
+
+  // Radii
+  --dc3-radius-sm: 4px;
+  --dc3-radius-md: 8px;
+  --dc3-radius-lg: 12px;
+  --dc3-radius-full: 999px;
+
+  // Motion (A4/A7: durations collapse to 0ms under prefers-reduced-motion)
+  --dc3-duration-fast: 120ms;
+  --dc3-duration-base: 200ms;
+  --dc3-duration-slow: 280ms;
+  --dc3-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --dc3-ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+
+  // Layout metrics mirror tokens.scss (read at runtime when a component
+  // needs a metric in JS or calc()).
+  --dc3-header-height: 60px;
+  --dc3-aside-width: 220px;
+  --dc3-aside-collapsed-width: 64px;
+
+  // Touch ergonomics (A3)
+  --dc3-touch-target: 44px;
+
+  color-scheme: light;
+}
+
+html.dark {
+  // Element Plus handles its own dark vars; dc3 custom tokens follow.
+  --dc3-bg-body: #141414;
+  --dc3-bg-elevated: #1d1e1f;
+  --dc3-text-primary: #e5eaf3;
+  --dc3-text-regular: #a3a6ad;
+  --dc3-border-base: #4c4d4f;
+
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dc3-duration-fast: 0ms;
+    --dc3-duration-base: 0ms;
+    --dc3-duration-slow: 0ms;
+  }
+}

@@ -17,27 +17,17 @@
 
 @use '@/styles/things-dialog.scss';
 @use '@/styles/things-card.scss';
+@use '@/styles/theme.scss';
 
 // Imported once by main.ts. These rules cannot live in element-variables.scss because
 // Vite injects additionalData into every scoped style block and appends scope hashes,
 // which do not match body or teleported dropdown, popover, and dialog containers.
 
-// Override Element Plus blue with the brand color. Derived shades follow the
-// Element Plus light-N and dark-2 mixing algorithm.
-:root {
-  --el-color-primary: #1296db;
-  --el-color-primary-light-3: #59b6e6;
-  --el-color-primary-light-5: #89cbed;
-  --el-color-primary-light-7: #b8e0f4;
-  --el-color-primary-light-8: #d0eaf8;
-  --el-color-primary-light-9: #e7f5fb;
-  --el-color-primary-dark-2: #0e78af;
-}
-
+// Brand colors and dc3 design tokens live in theme.scss (single source).
+// The 1280px/768px desktop hard floor was removed: the shell must adapt to
+// any viewport width (docs/design/frontend-three-terminal-ux.md, A2).
 body {
   margin: 0;
-  min-width: 1280px;
-  min-height: 768px;
 }
 
 // Form width helper classes are real CSS, so they live in the one-time global
