@@ -21,6 +21,7 @@ import i18n from '@/config/i18n';
 import plugins from '@/config/plugins/index';
 import router from '@/config/router';
 import {createApp} from 'vue';
+import {useAppStore} from '@/store/modules/app';
 import {logger} from '@/utils/log';
 
 import '@/styles/global.scss'; // config app
@@ -28,9 +29,13 @@ import '@/styles/global.scss'; // config app
 // config app
 const app = createApp(App);
 app.use(router);
-app.use(createPinia());
+const pinia = createPinia();
+app.use(pinia);
 app.use(i18n);
 plugins(app);
+// Apply the persisted theme before the router view mounts so there is no
+// light-mode flash (A4 — feedback latency is the perceived product).
+useAppStore(pinia).init();
 app.config.errorHandler = (err, _instance, info) => {
   logger.error('Global Vue error', info, err);
 };
