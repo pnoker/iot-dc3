@@ -61,12 +61,6 @@ public class MybatisPlusConfig {
     }
 
     /**
-     * MybatisPlus interceptor bean: tenant-line interceptor must run before pagination.
-     *
-     * @param tenantLineHandler Spring-injected {@code TenantLineHandlerImpl}
-     * @return Configured MybatisPlusInterceptor with tenant-line + PostgreSQL pagination
-     */
-    /**
      * Vendor databaseId provider — enables {@code databaseId="mysql"} statement
      * forks in mapper XML; PostgreSQL deployments resolve to {@code postgres}.
      *

@@ -70,22 +70,6 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
                                     @Param("stateDescription") String stateDescription);
 
     /**
-     * Atomically claims expired online device leases and marks them offline.
-     * <p>
-     * PostgreSQL {@code FOR UPDATE SKIP LOCKED} lets multiple Data Center
-     * instances split expired rows without blocking or processing the same row.
-     *
-     * @param entityTypeFlag      device entity type flag
-     * @param onlineFlag          online state flag
-     * @param maintainFlag        maintain state flag
-     * @param faultFlag           fault state flag
-     * @param offlineFlag         offline state flag
-     * @param batchSize           maximum rows to claim
-     * @param offlineRenewSeconds renewal window for already-offline state rows
-     * @return claimed rows after the offline update; {@code lastStateFlag}
-     * contains the previous state
-     */
-    /**
      * Step 1 of the expired-lease claim: lock-and-read a batch of expired
      * online/maintain/fault rows (FOR UPDATE SKIP LOCKED, portable across
      * PostgreSQL and MySQL 8). Call {@link #markClaimedOffline(List, byte, int)}

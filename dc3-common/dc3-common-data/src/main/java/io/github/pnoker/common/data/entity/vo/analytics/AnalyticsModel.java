@@ -43,10 +43,6 @@ public final class AnalyticsModel {
      * One series addressed either by ids or by names — ids win when both are
      * present; ambiguous or unknown names surface the candidates in the error.
      */
-    /**
-     * One series addressed either by ids or by names — ids win when both are present;
-     * ambiguous or unknown names surface the candidates in the error.
-     */
     public record SeriesSelector(
             @Schema(description = "Device id; takes precedence over deviceName when both are given", example = "1024") Long deviceId,
             @Schema(description = "Point id; takes precedence over pointName when both are given", example = "2048") Long pointId,
@@ -57,10 +53,6 @@ public final class AnalyticsModel {
     /**
      * Window as an ISO-8601 instant pair, or {@code rangeHours} back from now
      * when the pair is absent. An empty range defaults to the last 24 hours.
-     */
-    /**
-     * Window as an ISO-8601 instant pair, or {@code rangeHours} back from now when the pair is
-     * absent. An empty range defaults to the last 24 hours.
      */
     public record TimeRange(
             @Schema(description = "Inclusive window start, ISO-8601 instant", example = "2026-08-20T00:00:00Z") String fromIso,
@@ -205,10 +197,7 @@ public final class AnalyticsModel {
             @Schema(description = "Points per series, keyed by deviceName/pointName") Map<String, List<HistoryPoint>> series) {
     }
 
-    /** RAW carries {@code value}; M4 carries the first/min/max/last quadruple. */
-    /**
-     * One history point — RAW carries {@code value}; M4 carries the first/min/max/last quadruple.
-     */
+    /** One history point — RAW carries {@code value}; M4 carries the first/min/max/last quadruple. */
     public record HistoryPoint(
             @Schema(description = "Sample time / bucket start, ISO-8601 instant") String time,
             @Schema(description = "Numeric value in RAW mode") Double value,
