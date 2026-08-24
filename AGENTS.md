@@ -54,7 +54,9 @@ iot-dc3/
 ├── dc3-coverage/         aggregate JaCoCo report and absolute coverage gate
 ├── dc3-e2e/              Testcontainers-backed end-to-end tests
 ├── dc3/                  compose files, environment files, scripts, and generated release notes
-├── docs/design/          design documents (e.g. `mq-abstraction.md` — proposed pluggable broker port)
+├── dc3-mq/               top-level MQ family aggregator (port=dc3-mq-core + 6 adapters + tck)
+├── dc3-tsdb/             top-level TSDB family aggregator (port=dc3-tsdb-core + 4 adapters + tck)
+├── docs/                 selection guides (`mq-brokers.md`, `tsdb-stores.md`) and design docs under `design/`
 ├── Makefile              preferred backend/container command entrypoint
 └── .mvn/settings.xml     local Maven mirror configuration
 ```
