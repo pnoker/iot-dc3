@@ -20,7 +20,6 @@ package io.github.pnoker.driver.service.impl;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,9 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 class SqlserverDriverCustomServiceImplTest {
 
-    @Mock
-    private DriverSenderService driverSenderService;
-
     private SqlserverDriverCustomServiceImpl service;
 
     private static AttributeBO string(String value) {
@@ -47,7 +43,7 @@ class SqlserverDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new SqlserverDriverCustomServiceImpl(driverSenderService);
+        service = new SqlserverDriverCustomServiceImpl();
     }
 
     @Test

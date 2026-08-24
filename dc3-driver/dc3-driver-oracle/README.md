@@ -19,13 +19,12 @@ queries and writes through configured `UPDATE`/`INSERT` queries. JDBC connection
 |-----------------|-------------------------------------------|
 | Host            | Oracle host                               |
 | Port            | Oracle port                               |
-| Database        | Oracle database name                      |
 | Username        | Oracle username                           |
 | Password        | Oracle password                           |
 | Query Timeout   | SQL query timeout in seconds              |
 | Connection Type | Oracle connection type [SID, ServiceName] |
-| SID             | Oracle SID                                |
-| Service Name    | Oracle service name                       |
+| SID             | Oracle SID (used when Connection Type is SID)          |
+| Service Name    | Oracle service name (required when Connection Type is ServiceName) |
 
 ## Point Attributes
 

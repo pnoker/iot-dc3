@@ -22,12 +22,10 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -51,7 +49,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Testcontainers(disabledWithoutDocker = true)
@@ -95,7 +92,7 @@ class PostgresqlDriverCustomServiceIT {
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new PostgresqlDriverCustomServiceImpl(Mockito.mock(DriverSenderService.class));
+        service = new PostgresqlDriverCustomServiceImpl();
         service.initial();
         try (Connection conn = DriverManager.getConnection(
                 POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());

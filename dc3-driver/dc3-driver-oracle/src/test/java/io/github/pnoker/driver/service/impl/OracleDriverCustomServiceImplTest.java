@@ -18,25 +18,36 @@
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class OracleDriverCustomServiceImplTest {
 
-    @Mock
-    private DriverSenderService driverSenderService;
-
     private OracleDriverCustomServiceImpl service;
+
+    private static AttributeBO str(String value) {
+        return AttributeBO.builder().value(value).type(AttributeTypeEnum.STRING).build();
+    }
+
+    private static Map<String, AttributeBO> baseConfig() {
+        Map<String, AttributeBO> config = new HashMap<>();
+        config.put("host", str("localhost"));
+        config.put("port", AttributeBO.builder().value("1521").type(AttributeTypeEnum.INT).build());
+        config.put("username", str("system"));
+        config.put("password", str("secret"));
+        return config;
+    }
 
     private static PointBO point(Long id) {
         PointBO point = new PointBO();
@@ -46,7 +57,7 @@ class OracleDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new OracleDriverCustomServiceImpl(driverSenderService);
+        service = new OracleDriverCustomServiceImpl();
     }
 
     @Test
@@ -63,6 +74,36 @@ class OracleDriverCustomServiceImplTest {
 
         assertThat(report.isPassed()).isFalse();
         assertThat(report.getIssues()).isNotEmpty();
+    }
+
+    @Test
+    void validatePassesForSidWithoutDatabaseOrServiceName() {
+        ValidationReport report = service.validate(baseConfig());
+
+        assertThat(report.isPassed()).isTrue();
+        assertThat(report.getIssues()).isEmpty();
+    }
+
+    @Test
+    void validateRequiresServiceNameForServiceNameConnectionType() {
+        Map<String, AttributeBO> config = baseConfig();
+        config.put("connectionType", str("ServiceName"));
+
+        ValidationReport report = service.validate(config);
+
+        assertThat(report.isPassed()).isFalse();
+        assertThat(report.getIssues()).isNotEmpty();
+    }
+
+    @Test
+    void validatePassesForServiceNameWithServiceNamePresent() {
+        Map<String, AttributeBO> config = baseConfig();
+        config.put("connectionType", str("ServiceName"));
+        config.put("serviceName", str("ORCLPDB1"));
+
+        ValidationReport report = service.validate(config);
+
+        assertThat(report.isPassed()).isTrue();
     }
 
 }

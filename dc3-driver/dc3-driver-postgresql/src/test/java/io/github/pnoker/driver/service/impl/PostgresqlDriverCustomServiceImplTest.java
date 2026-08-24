@@ -19,7 +19,6 @@ package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.driver.service.DriverSenderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,9 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 class PostgresqlDriverCustomServiceImplTest {
 
-    @Mock
-    private DriverSenderService driverSenderService;
-
     private PostgresqlDriverCustomServiceImpl service;
 
     private static PointBO point(Long id) {
@@ -46,7 +42,7 @@ class PostgresqlDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new PostgresqlDriverCustomServiceImpl(driverSenderService);
+        service = new PostgresqlDriverCustomServiceImpl();
     }
 
     @Test
