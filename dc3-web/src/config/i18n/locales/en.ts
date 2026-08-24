@@ -382,6 +382,9 @@ export default {
     admin: 'Admin',
     pending: 'Coming soon',
     settings: 'Settings',
+    navigation: 'Navigation',
+    collapseSettings: 'Collapse menu',
+    expandSettings: 'Expand menu',
   },
   driver: {
     tool: {

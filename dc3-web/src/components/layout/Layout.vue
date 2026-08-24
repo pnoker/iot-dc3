@@ -18,49 +18,26 @@
 <template>
   <div class="container">
     <div class="header">
-      <el-col :span="4" class="header_item header_brand">
+      <div class="header_item header_brand">
+        <!-- Thumb terminals get a hamburger instead of the horizontal menu
+             strip (A3: drawer navigation, docs/design/frontend-three-terminal-ux.md). -->
+        <el-button
+          :aria-label="t('layout.navigation')"
+          :icon="Menu"
+          circle
+          class="header_menu_toggle"
+          text
+          @click="navDrawerVisible = true"
+        />
         <div class="header_brand_glass">
           <img :src="assetUrl('images/logo/logo.svg')" class="header_logo"/>
           <span class="header_title">IoT DC3</span>
         </div>
-      </el-col>
-      <el-col :span="16" class="header_item">
-        <el-menu :default-active="handleMenuEnter($route.path)" :router="true" class="header_menu" mode="horizontal">
-          <el-menu-item index="/home">
-            <el-icon>
-              <HomeFilled/>
-            </el-icon>
-            {{ t('nav.home') }}
-          </el-menu-item>
-          <template v-for="node in topLevelMenus" :key="`menu-${node.id}`">
-            <el-sub-menu v-if="node.children && node.children.length > 0" :index="`node-${node.id}`">
-              <template #title>
-                <el-icon v-if="node.menuExt?.content?.icon">
-                  <component :is="node.menuExt.content.icon"/>
-                </el-icon>
-                {{ resolveMenuTitle(node) }}
-              </template>
-              <el-menu-item
-                v-for="child in node.children"
-                :key="`menu-child-${child.id}`"
-                :index="child.menuExt?.content?.url || `/${child.menuCode}`"
-              >
-                <el-icon v-if="child.menuExt?.content?.icon">
-                  <component :is="child.menuExt.content.icon"/>
-                </el-icon>
-                {{ resolveMenuTitle(child) }}
-              </el-menu-item>
-            </el-sub-menu>
-            <el-menu-item v-else :index="node.menuExt?.content?.url || `/${node.menuCode}`">
-              <el-icon v-if="node.menuExt?.content?.icon">
-                <component :is="node.menuExt.content.icon"/>
-              </el-icon>
-              {{ resolveMenuTitle(node) }}
-            </el-menu-item>
-          </template>
-        </el-menu>
-      </el-col>
-      <el-col :span="4" class="header_item header_user">
+      </div>
+      <div v-if="!isMobile" class="header_item header_menu_wrap">
+        <nav-menu mode="horizontal"/>
+      </div>
+      <div class="header_item header_user">
         <el-dropdown trigger="click" @command="handleCommand">
           <span class="user_avatar">
             <el-avatar>
@@ -85,8 +62,19 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-      </el-col>
+      </div>
     </div>
+    <!-- Mobile navigation drawer: the same NavMenu component, vertical mode. -->
+    <el-drawer
+      v-model="navDrawerVisible"
+      :size="280"
+      :title="t('layout.navigation')"
+      :with-header="true"
+      direction="ltr"
+      class="nav-drawer"
+    >
+      <nav-menu mode="vertical"/>
+    </el-drawer>
     <div class="body">
       <div class="body-main">
         <div v-if="breadcrumbItems.length > 1" class="breadcrumb">
@@ -109,27 +97,29 @@
         </div>
       </div>
       <agentic-assistant/>
-      <el-backtop :bottom="40" :right="40" target=".body-main .el-scrollbar__wrap"/>
+      <!-- Backtop keeps clear of the assistant FAB and screen edges on
+           thumb terminals (A3). -->
+      <el-backtop :bottom="isMobile ? 88 : 40" :right="isMobile ? 16 : 40" target=".body-main .el-scrollbar__wrap"/>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import AgenticAssistant from '@/components/agentic/AgenticAssistant.vue';
+import NavMenu from '@/components/layout/NavMenu.vue';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 import router from '@/config/router';
-import {HomeFilled, QuestionFilled, Setting, SwitchButton} from '@element-plus/icons-vue';
-import {computed, onMounted} from 'vue';
+import {Menu, QuestionFilled, Setting, SwitchButton} from '@element-plus/icons-vue';
+import {computed, onMounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRoute} from 'vue-router';
 import {
-  getSettingsLeafIconCode,
   getSettingsTitleKey,
   SETTINGS_BREADCRUMB_PARENTS,
   SETTINGS_FALLBACK_ICON,
 } from '@/config/settingsNav';
 import {useAgenticStore, useAuthStore, useMenuStore} from '@/store';
 import type {MenuNode} from '@/store/modules/menu';
-import {resolveMenuTitle} from '@/utils/menuUtil';
 import {assetUrl} from '@/utils/assetUrl';
 
 const {t, locale} = useI18n();
@@ -137,7 +127,14 @@ const route = useRoute();
 const authStore = useAuthStore();
 const menuStore = useMenuStore();
 const agenticStore = useAgenticStore();
+const {isMobile} = useBreakpoint();
+const navDrawerVisible = ref(false);
 const currentLogin = computed(() => String(authStore.getName || authStore.name || 'dc3'));
+
+// Close the mobile navigation drawer once navigation actually happens.
+watch(() => route.fullPath, () => {
+  navDrawerVisible.value = false;
+});
 
 // The AI assistant is shown in every build; in mock builds the fetch
 // interceptor (src/mock/fetch.ts) answers its chat completions.
@@ -329,7 +326,7 @@ const breadcrumbItems = computed(() => {
 
   const titleKey = name.startsWith('settings') ? getSettingsTitleKey(name) : nameMap[name];
   const title = titleKey ? t(titleKey) : name;
-  const leafCode = getSettingsLeafIconCode(name);
+  const leafCode = name;
   if (name.startsWith('driver')) {
     items.push({path: '/driver', title: t('nav.driver'), icon: iconForCode('driver')});
   } else if (name.startsWith('device')) {
@@ -353,16 +350,6 @@ const breadcrumbItems = computed(() => {
   return items;
 });
 
-// Top-level menus come from the backend (dc3_menu). Home is rendered separately
-// as the leftmost entry with its own fixed icon; Settings is reached from the
-// avatar dropdown, not the header bar.
-const topLevelMenus = computed(() => {
-  return (menuStore.tree || [])
-    .filter((n) => n.menuCode !== 'home' && n.menuCode !== 'settings')
-    .slice()
-    .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0));
-});
-
 const firstRouteableMenuName = (node?: MenuNode): string | undefined => {
   if (!node) return undefined;
   if (node.menuExt?.content?.url) return node.menuCode;
@@ -374,16 +361,6 @@ const firstRouteableMenuName = (node?: MenuNode): string | undefined => {
 };
 
 const settingsEntryName = computed(() => firstRouteableMenuName(menuStore.findByCode('settings')));
-
-const handleMenuEnter = (index: string) => {
-  if (index.indexOf('/') === 0) {
-    const split = index.split('/');
-    if (split.length > 2) {
-      return '/' + split[1];
-    }
-  }
-  return index;
-};
 
 const handleCommand = async (command: string) => {
   if (command === 'settings') {
@@ -408,25 +385,40 @@ const handleCommand = async (command: string) => {
 
 <style lang="scss" scoped>
 .container {
-  color: #2c3e50;
+  color: var(--dc3-text-primary);
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
 
   .header {
     width: 100%;
-    height: 60px;
+    height: var(--dc3-header-height);
     display: flex;
-    border-bottom: 1px solid #dcdfe6;
+    border-bottom: 1px solid var(--dc3-border-base);
 
+    // 1:4:1 flex split mirrors the legacy el-col 4/16/4 grid so the
+    // desktop layout is unchanged; the menu wrap disappears on mobile
+    // and the two side cells absorb the space.
     .header_item {
       height: 100%;
     }
 
     .header_brand {
+      flex: 1 1 0;
       display: flex;
       align-items: center;
+      gap: var(--dc3-space-2);
       padding-left: 10px;
+    }
+
+    .header_menu_wrap {
+      flex: 4 1 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .header_menu_toggle {
+      display: none;
     }
 
     .header_brand_glass {
@@ -497,17 +489,8 @@ const handleCommand = async (command: string) => {
       -webkit-text-fill-color: transparent;
     }
 
-    .header_menu {
-      display: flex;
-      justify-content: center;
-      border-bottom: none !important;
-    }
-
-    .header_menu .el-menu-item {
-      font-size: 15px;
-    }
-
     .header_user {
+      flex: 1 1 0;
       display: flex;
       justify-content: flex-end;
       align-items: center;
@@ -530,19 +513,49 @@ const handleCommand = async (command: string) => {
         }
       }
     }
+
+    // Thumb-terminal header (A3): hamburger replaces the menu strip,
+    // brand and user cells shrink to icon-only.
+    @media (max-width: $breakpoint-xs-max) {
+      .header_brand {
+        padding-left: var(--dc3-space-2);
+      }
+
+      .header_menu_toggle {
+        display: inline-flex;
+      }
+
+      .header_user {
+        padding-right: var(--dc3-space-3);
+
+        .user_name {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // Mobile navigation drawer content.
+  .nav-drawer {
+    :deep(.el-drawer__body) {
+      padding: var(--dc3-space-2);
+    }
+
+    :deep(.nav-menu) {
+      border-right: none;
+    }
   }
 
   .body {
-    top: 60px;
+    top: var(--dc3-header-height);
     right: 0;
     left: 0;
     bottom: 0;
     display: flex;
-    min-width: 1280px;
     padding: 1px 0 5px 0;
     overflow: hidden;
     position: absolute;
-    background: #f6f7f9;
+    background: var(--dc3-bg-body);
 
     .body-main {
       display: flex;
@@ -564,10 +577,10 @@ const handleCommand = async (command: string) => {
     }
 
     .breadcrumb {
-      padding: 12px 20px;
+      padding: var(--dc3-space-3) var(--dc3-space-5);
       margin-bottom: 1px;
-      background: #fff;
-      border-radius: 4px;
+      background: var(--dc3-bg-elevated);
+      border-radius: var(--dc3-radius-sm);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 
       .breadcrumb__item {

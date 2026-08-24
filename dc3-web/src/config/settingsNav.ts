@@ -282,19 +282,6 @@ export const SETTINGS_ACTIVE_ALIAS: Record<string, string> = {
   settingsLabelDetail: 'settingsLabel',
 };
 
-export const SETTINGS_ROUTE_ALIAS: Record<string, string> = {
-  settingsIdentity: 'settingsUser',
-  settingsAccess: 'settingsRole',
-  settingsModel: 'settingsModelProvider',
-  settingsAlarm: 'settingsAlarmRule',
-  settingsEventCommand: 'settingsAlarmOverview',
-  settingsAudit: 'settingsIdentityAudit',
-  settingsIntegration: 'settingsMcpServer',
-  settingsSystem: 'settingsGroup',
-  settingsCommand: 'settingsCommandHistory',
-  settingsEvent: 'settingsEventHistory',
-};
-
 export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
   // identity
   settingsUser: 'settingsIdentity',
@@ -339,7 +326,7 @@ export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
   settingsLabel: 'settingsSystem',
 };
 
-export const getSettingsRouteName = (name: string): string => SETTINGS_ROUTE_ALIAS[name] || name;
+export const getSettingsRouteName = (name: string): string => SETTINGS_ACTIVE_ALIAS[name] || name;
 
 export const getSettingsActiveName = (name: string): string => SETTINGS_ACTIVE_ALIAS[name] || name;
 
@@ -349,8 +336,6 @@ export const getSettingsDefaultOpeneds = (activeName: string): string[] => {
 };
 
 export const getSettingsTitleKey = (name: string): string | undefined => SETTINGS_TITLE_KEYS[name];
-
-export const getSettingsLeafIconCode = (name: string): string => name;
 
 const identityParent: SettingsBreadcrumbParent = {
   path: '/settings/identity',
@@ -377,7 +362,7 @@ const alarmParent: SettingsBreadcrumbParent = {
 };
 
 const eventCommandParent: SettingsBreadcrumbParent = {
-  path: '/settings/event-command',
+  path: '/settings/event_command',
   titleKey: 'nav.settingsEventCommand',
   code: 'settingsEventCommand',
 };

@@ -17,10 +17,10 @@
 
 import type {AxiosInstance} from 'axios';
 import axios, {type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig} from 'axios';
-import {ElNotification} from 'element-plus';
 
-import {AXIOS_CONFIG, AXIOS_ERROR_MESSAGES, PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
+import {AXIOS_CONFIG, PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
 import {AUTH_HEADERS} from '@/config/constant/common';
+import i18n from '@/config/i18n';
 import {failMessage, warnMessage} from '@/utils/notificationUtil';
 import {getStorage, removeStorage} from '@/utils/storageUtil';
 import {isNull} from '@/utils/validationUtil';
@@ -94,7 +94,7 @@ request.interceptors.response.use(
 
     // Handle unauthorized access
     if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
-      warnMessage(AXIOS_ERROR_MESSAGES.UNAUTHORIZED, AXIOS_ERROR_MESSAGES.UNAUTHORIZED_TITLE);
+      warnMessage(i18n.global.t('common.axios.unauthorized'), i18n.global.t('common.axios.unauthorizedTitle'));
       // Remove auth keys only — never nuke entire localStorage. The token cookie
       // is cleared server-side on 401; here we just drop the frontend flag.
       removeStorage(AUTH_HEADERS.TENANT);
@@ -103,13 +103,9 @@ request.interceptors.response.use(
       router.push({name: 'login'}).catch(() => {
       });
     } else if (status >= 500) {
-      ElNotification({
-        title: 'Server Error',
-        message: `The server encountered an error (${status}). Please try again later.`,
-        type: 'error',
-      });
+      failMessage(i18n.global.t('common.axios.serverErrorMessage', {status}), i18n.global.t('common.axios.serverError'));
     } else {
-      failMessage(AXIOS_ERROR_MESSAGES.REQUEST_ERROR, response.data?.code, response.data);
+      failMessage(i18n.global.t('common.axios.requestError'), response.data?.code, response.data);
     }
     // Reject with the server payload so callers can inspect code/message if needed.
     // Existing no-op `.catch(() => {})` sites remain valid because they ignore the argument.
@@ -118,11 +114,7 @@ request.interceptors.response.use(
   (error: AxiosError) => {
     if (!error.response) {
       // Network error — no response received
-      ElNotification({
-        title: 'Network Error',
-        message: 'Unable to reach the server. Please check your connection.',
-        type: 'error',
-      });
+      failMessage(i18n.global.t('common.axios.networkErrorMessage'), i18n.global.t('common.axios.networkError'));
     }
     return Promise.reject(error);
   }

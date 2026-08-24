@@ -43,9 +43,10 @@ import {failMessage, warnMessage} from '@/utils/notificationUtil';
 import {getStorage, setStorage} from '@/utils/storageUtil';
 import {defineStore} from 'pinia';
 import {computed, ref} from 'vue';
+import i18n from '@/config/i18n';
 
 const MESSAGE_STORAGE_KEY = 'dc3-agentic-messages';
-const DEFAULT_SESSION_TITLE = 'New Conversation';
+const defaultSessionTitle = () => i18n.global.t('agentic.defaultSessionTitle');
 const DEFAULT_MODEL: AgenticModel = {
   model: 'dc3-agentic',
   label: 'DC3 Agentic',
@@ -157,7 +158,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       models.value = response.data?.length ? response.data : [DEFAULT_MODEL];
     } catch (error) {
       models.value = [DEFAULT_MODEL];
-      warnMessage('Failed to load agentic models, fallback model is used.', 'Agentic', error);
+      warnMessage(i18n.global.t('agentic.failedModels'), 'Agentic', error);
     }
 
     const firstModel = models.value[0] || DEFAULT_MODEL;
@@ -178,7 +179,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       }
     } catch (error) {
       sessions.value = [];
-      warnMessage('Failed to load agentic sessions.', 'Agentic', error);
+      warnMessage(i18n.global.t('agentic.failedSessions'), 'Agentic', error);
     }
   };
 
@@ -197,7 +198,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       sessions.value = [
         {
           conversationId,
-          title: DEFAULT_SESSION_TITLE,
+          title: defaultSessionTitle(),
           sessionExt: buildCurrentSessionExt(model),
         },
         ...sessions.value,
@@ -228,7 +229,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     try {
       await deleteAgenticSession(conversationId);
     } catch (error) {
-      warnMessage('Failed to delete server-side agentic session, local session is removed.', 'Agentic', error);
+      warnMessage(i18n.global.t('agentic.failedSessionDelete'), 'Agentic', error);
     }
 
     delete messagesByConversation.value[conversationId];
@@ -262,7 +263,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         session.conversationId === conversationId ? normalizeSession({...session, ...(response.data || {})}) : session
       );
     } catch (error) {
-      warnMessage('Failed to update agentic session metadata.', 'Agentic', error);
+      warnMessage(i18n.global.t('agentic.failedSessionUpdate'), 'Agentic', error);
     }
   };
 
@@ -337,10 +338,10 @@ export const useAgenticStore = defineStore('agentic', () => {
       await Promise.all([loadMessages(conversationId), loadPendingActions(conversationId)]);
     } catch (error) {
       if ((error as Error).name === 'AbortError') {
-        appendAssistantDelta(conversationId, assistantMessage.id, '\n\nCanceled.');
+        appendAssistantDelta(conversationId, assistantMessage.id, `\n\n${i18n.global.t('agentic.canceled')}`);
       } else {
         failMessage('Agentic chat failed.', 'Agentic', error);
-        appendAssistantDelta(conversationId, assistantMessage.id, '\n\nRequest failed.');
+        appendAssistantDelta(conversationId, assistantMessage.id, `\n\n${i18n.global.t('agentic.requestFailed')}`);
         setAssistantFinishReason(conversationId, assistantMessage.id, 'error');
       }
       markAssistantComplete(conversationId, assistantMessage.id);
@@ -375,7 +376,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         persistMessages();
       }
     } catch (error) {
-      warnMessage('Failed to load agentic messages, local cache is used.', 'Agentic', error);
+      warnMessage(i18n.global.t('agentic.failedMessages'), 'Agentic', error);
     }
   };
 
@@ -388,7 +389,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       attachmentsByConversation.value[conversationId] = response.data || [];
     } catch (error) {
       attachmentsByConversation.value[conversationId] = attachmentsByConversation.value[conversationId] || [];
-      warnMessage('Failed to load agentic attachments.', 'Agentic', error);
+      warnMessage(i18n.global.t('agentic.failedAttachments'), 'Agentic', error);
     }
   };
 
@@ -421,7 +422,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       pendingActionsByConversation.value[conversationId] = response.data || [];
     } catch (error) {
       pendingActionsByConversation.value[conversationId] = [];
-      warnMessage('Failed to load pending agentic actions.', 'Agentic', error);
+      warnMessage(i18n.global.t('agentic.failedActions'), 'Agentic', error);
     }
   };
 
@@ -466,7 +467,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         await renameSession(conversationId, title);
         return;
       }
-      if (normalizeTitle(session.title || DEFAULT_SESSION_TITLE) !== title) {
+      if (normalizeTitle(session.title || defaultSessionTitle()) !== title) {
         await renameSession(conversationId, title);
       }
     }
@@ -492,7 +493,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         session.conversationId === conversationId ? normalizeSession({...session, ...(response.data || {})}) : session
       );
     } catch (error) {
-      warnMessage('Failed to update agentic session model.', 'Agentic', error);
+      warnMessage(i18n.global.t('agentic.failedSessionModel'), 'Agentic', error);
     }
   };
 
@@ -531,7 +532,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         sessionExt,
       });
     } catch (error) {
-      warnMessage('Failed to update agentic session preferences.', 'Agentic', error);
+      warnMessage(i18n.global.t('agentic.failedSessionPreferences'), 'Agentic', error);
     }
   };
 
@@ -745,11 +746,11 @@ const createTraceEventId = (type: string) => {
 
 const normalizeTitle = (title: string) => {
   const trimmed = title.trim().replace(/\s+/g, ' ');
-  return trimmed.length > 32 ? `${trimmed.slice(0, 32)}...` : trimmed || DEFAULT_SESSION_TITLE;
+  return trimmed.length > 32 ? `${trimmed.slice(0, 32)}...` : trimmed || defaultSessionTitle();
 };
 
 const shouldGenerateSessionTitle = (title?: string) => {
-  return !title || normalizeTitle(title) === DEFAULT_SESSION_TITLE;
+  return !title || normalizeTitle(title) === defaultSessionTitle();
 };
 
 const mergeEphemeralAssistantState = (previous: AgenticMessage[], loaded: AgenticMessage[]) => {

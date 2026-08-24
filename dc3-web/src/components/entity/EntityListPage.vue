@@ -147,15 +147,22 @@
               {{ t('common.detail') }}
             </el-button>
             <template v-if="config.extraActions">
-              <el-button
-                v-for="action in config.extraActions"
-                :key="action.key"
-                :type="action.type || 'primary'"
-                link
-                @click="action.onClick(row)"
-              >
-                {{ action.label }}
-              </el-button>
+              <template v-for="action in config.extraActions" :key="action.key">
+                <el-popconfirm
+                  v-if="action.popconfirmTitle"
+                  :cancel-button-text="t('common.cancel')"
+                  :confirm-button-text="t('common.confirm')"
+                  :title="action.popconfirmTitle"
+                  @confirm="action.onClick(row)"
+                >
+                  <template #reference>
+                    <el-button :type="action.type || 'primary'" link>{{ action.label }}</el-button>
+                  </template>
+                </el-popconfirm>
+                <el-button v-else :type="action.type || 'primary'" link @click="action.onClick(row)">
+                  {{ action.label }}
+                </el-button>
+              </template>
             </template>
             <el-button v-if="config.editable && canEdit(row)" link type="primary" @click="openEdit(row)">
               {{ t('common.edit') }}

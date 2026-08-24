@@ -27,7 +27,6 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import {useI18n} from 'vue-i18n';
-import {ElMessageBox} from 'element-plus';
 
 import {revokeMcpConnection} from '@/api/mcp';
 import EntityListPage from '@/components/entity/EntityListPage.vue';
@@ -48,15 +47,6 @@ const toolsRef = ref<InstanceType<typeof ManageToolsDrawer>>();
 const reload = () => listRef.value?.reload();
 
 const onRevoke = async (row: Record<string, any>) => {
-  try {
-    await ElMessageBox.confirm(t('settings.mcp.revoke'), t('settings.mcp.connectionInfo'), {
-      type: 'warning',
-      confirmButtonText: t('common.confirm'),
-      cancelButtonText: t('common.cancel'),
-    });
-  } catch {
-    return; // cancelled
-  }
   await revokeMcpConnection((row as McpConnectionRecord).id);
   successMessage(t('settings.mcp.saved'));
   reload();

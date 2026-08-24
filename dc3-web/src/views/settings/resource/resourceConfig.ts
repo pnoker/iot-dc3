@@ -340,15 +340,7 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
       kind: 'select',
       required: true,
       placeholder: t('settings.resource.resourceTypePlaceholder'),
-      options: [
-        {label: 'DRIVER', value: 'DRIVER'},
-        {label: 'PROFILE', value: 'PROFILE'},
-        {label: 'POINT', value: 'POINT'},
-        {label: 'DEVICE', value: 'DEVICE'},
-        {label: 'DATA', value: 'DATA'},
-        {label: 'MENU', value: 'MENU'},
-        {label: 'API', value: 'API'},
-      ],
+      options: RESOURCE_TYPE_OPTIONS,
       rules: requiredSelectRule(t('settings.resource.resourceTypePlaceholder')),
     },
     {

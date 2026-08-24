@@ -24,7 +24,7 @@
           :icon="icon"
           :name="data.pointName"
           :status-title="$t('common.name')"
-          @copy-id="copy(data.id, $t('point.card.profile'))"
+          @copy-id="copy(data.id, $t('point.card.copyPointId'))"
         />
         <div class="things-card__body">
           <div class="things-card-body-content">

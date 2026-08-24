@@ -27,13 +27,6 @@ export const AXIOS_CONFIG = {
   },
 } as const;
 
-/** Error messages for Axios interceptors */
-export const AXIOS_ERROR_MESSAGES = {
-  UNAUTHORIZED: 'You are not logged in or your login credentials have expired. Please log in again!',
-  UNAUTHORIZED_TITLE: 'Login credentials expired',
-  REQUEST_ERROR: 'API request error. Please contact the system administrator.',
-} as const;
-
 /**
  * Business response codes the interceptor must pass through silently so the calling
  * flow can react (e.g. drive the user to the password change dialog) instead of the

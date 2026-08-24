@@ -26,7 +26,7 @@
       </div>
     </div>
     <div v-else-if="canRenderG2Chart" ref="containerRef" class="agentic-chart__canvas"></div>
-    <div v-else class="agentic-chart__empty">Chart data is unavailable.</div>
+    <div v-else class="agentic-chart__empty">{{ t('agentic.chartUnavailable') }}</div>
     <ul v-if="annotationItems.length" class="agentic-chart__annotations">
       <li v-for="item in annotationItems" :key="`${item.type}-${item.label}-${item.value}`">
         <span>{{ item.label }}</span>
@@ -35,13 +35,14 @@
     </ul>
   </figure>
   <figure v-else-if="hasChartInput" class="agentic-chart">
-    <div class="agentic-chart__empty">Chart data is unavailable.</div>
+    <div class="agentic-chart__empty">{{ t('agentic.chartUnavailable') }}</div>
   </figure>
 </template>
 
 <script lang="ts" setup>
 import {Chart} from '@antv/g2';
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue';
+import i18n from '@/config/i18n';
 import type {ChartSpec} from './assistantContent';
 import type {AgenticVisualizationSpec, AgenticVisualizationType} from '@/config/types';
 
@@ -50,6 +51,8 @@ const props = defineProps<{
   spec?: ChartSpec;
   chart?: AgenticVisualizationSpec;
 }>();
+
+const t = i18n.global.t.bind(i18n.global);
 
 const containerRef = ref<HTMLDivElement>();
 let chartInstance: Chart | undefined;

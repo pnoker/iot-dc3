@@ -41,8 +41,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'driverDetail',
         path: '/driver/detail',
         meta: {
-          icon: 'el-icon-s-promotion',
-          title: 'Driver Detail',
+          title: 'nav.driverDetail',
         },
         component: () => import('@/views/driver/detail/DriverDetail.vue'),
       },
@@ -56,8 +55,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'deviceDetail',
         path: '/device/detail',
         meta: {
-          icon: 'el-icon-s-finance',
-          title: 'Device Detail',
+          title: 'nav.deviceDetail',
         },
         component: () => import('@/views/device/detail/DeviceDetail.vue'),
       },
@@ -65,8 +63,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'deviceEdit',
         path: '/device/edit',
         meta: {
-          icon: 'el-icon-s-finance',
-          title: 'Device Edit',
+          title: 'nav.deviceEdit',
         },
         component: () => import('@/views/device/edit/DeviceEdit.vue'),
       },
@@ -80,8 +77,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'profileDetail',
         path: '/profile/detail',
         meta: {
-          icon: 'el-icon-s-order',
-          title: 'Profile Detail',
+          title: 'nav.profileDetail',
         },
         component: () => import('@/views/profile/detail/ProfileDetail.vue'),
       },
@@ -89,8 +85,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'profileEdit',
         path: '/profile/edit',
         meta: {
-          icon: 'el-icon-s-order',
-          title: 'Profile Edit',
+          title: 'nav.profileEdit',
         },
         component: () => import('@/views/profile/edit/ProfileEdit.vue'),
       },
@@ -104,8 +99,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'pointDetail',
         path: '/point/detail',
         meta: {
-          icon: 'el-icon-s-data',
-          title: 'Point Detail',
+          title: 'nav.pointDetail',
         },
         component: () => import('@/views/point/detail/PointDetail.vue'),
       },
@@ -119,8 +113,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsApiDetail',
         path: 'api/detail',
         meta: {
-          icon: 'el-icon-link',
-          title: 'API Detail',
+          title: 'nav.settingsApiDetail',
         },
         component: () => import('@/views/settings/api/detail/ApiDetail.vue'),
       },
@@ -128,8 +121,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsGroupDetail',
         path: 'group/detail',
         meta: {
-          icon: 'el-icon-grid',
-          title: 'Group Detail',
+          title: 'nav.settingsGroupDetail',
         },
         component: () => import('@/views/settings/group/detail/GroupDetail.vue'),
       },
@@ -137,8 +129,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsLabelDetail',
         path: 'label/detail',
         meta: {
-          icon: 'el-icon-collection-tag',
-          title: 'Label Detail',
+          title: 'nav.settingsLabelDetail',
         },
         component: () => import('@/views/settings/label/detail/LabelDetail.vue'),
       },
@@ -146,8 +137,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsAlarmRuleDetail',
         path: 'alarm/rule/detail',
         meta: {
-          icon: 'el-icon-set-up',
-          title: 'Alarm Rule Detail',
+          title: 'nav.settingsAlarmRuleDetail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
         props: {entity: 'rule'},
@@ -156,8 +146,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsAlarmNotifyDetail',
         path: 'alarm/notify/detail',
         meta: {
-          icon: 'el-icon-bell',
-          title: 'Alarm Notify Policy Detail',
+          title: 'nav.settingsAlarmNotifyDetail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
         props: {entity: 'notify'},
@@ -166,8 +155,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsAlarmMessageDetail',
         path: 'alarm/message/detail',
         meta: {
-          icon: 'el-icon-message',
-          title: 'Alarm Message Template Detail',
+          title: 'nav.settingsAlarmMessageDetail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
         props: {entity: 'message'},
@@ -176,8 +164,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsAlarmChannelDetail',
         path: 'alarm/channel/detail',
         meta: {
-          icon: 'el-icon-connection',
-          title: 'Alarm Notify Channel Detail',
+          title: 'nav.settingsAlarmChannelDetail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
         props: {entity: 'channel'},
@@ -186,8 +173,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsAlarmBindDetail',
         path: 'alarm/bind/detail',
         meta: {
-          icon: 'el-icon-link',
-          title: 'Alarm Channel Binding Detail',
+          title: 'nav.settingsAlarmBindDetail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
         props: {entity: 'bind'},
@@ -196,8 +182,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsAlarmStateDetail',
         path: 'alarm/state/detail',
         meta: {
-          icon: 'el-icon-monitor',
-          title: 'Alarm Runtime State Detail',
+          title: 'nav.settingsAlarmStateDetail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
         props: {entity: 'state'},
@@ -206,8 +191,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsAlarmHistoryDetail',
         path: 'alarm/history/detail',
         meta: {
-          icon: 'el-icon-document-checked',
-          title: 'Alarm Delivery History Detail',
+          title: 'nav.settingsAlarmHistoryDetail',
         },
         component: () => import('@/views/settings/alarm/detail/AlarmDetail.vue'),
         props: {entity: 'history'},
@@ -216,8 +200,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsModelConfigDetail',
         path: 'model/config/detail',
         meta: {
-          icon: 'el-icon-chat-dot-round',
-          title: 'Model Config Detail',
+          title: 'nav.settingsModelConfigDetail',
         },
         component: () => import('@/views/settings/agentic/detail/ModelConfigDetail.vue'),
       },
@@ -225,8 +208,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsModelProviderDetail',
         path: 'model/provider/detail',
         meta: {
-          icon: 'el-icon-chat-line-square',
-          title: 'Model Provider Detail',
+          title: 'nav.settingsModelProviderDetail',
         },
         component: () => import('@/views/settings/agentic/detail/ProviderDetail.vue'),
       },
@@ -234,8 +216,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsResourceDetail',
         path: 'resource/detail',
         meta: {
-          icon: 'el-icon-key',
-          title: 'Resource Detail',
+          title: 'nav.settingsResourceDetail',
         },
         component: () => import('@/views/settings/resource/detail/ResourceDetail.vue'),
       },
@@ -243,8 +224,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsMenuDetail',
         path: 'menu/detail',
         meta: {
-          icon: 'el-icon-menu',
-          title: 'Menu Detail',
+          title: 'nav.settingsMenuDetail',
         },
         component: () => import('@/views/settings/menu/detail/MenuDetail.vue'),
       },
@@ -252,8 +232,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsUserDetail',
         path: 'user/detail',
         meta: {
-          icon: 'el-icon-user',
-          title: 'User Detail',
+          title: 'nav.settingsUserDetail',
         },
         component: () => import('@/views/settings/user/detail/UserDetail.vue'),
       },
@@ -261,8 +240,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'settingsRoleDetail',
         path: 'role/detail',
         meta: {
-          icon: 'el-icon-user-filled',
-          title: 'Role Detail',
+          title: 'nav.settingsRoleDetail',
         },
         component: () => import('@/views/settings/role/detail/RoleDetail.vue'),
       },

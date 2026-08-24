@@ -24,7 +24,7 @@
           :icon="icon"
           :name="data.deviceName"
           :status-title="$t('common.enableFlag')"
-          @copy-id="copy(data.id, 'Device ID')"
+          @copy-id="copy(data.id, $t('device.card.copyDeviceId'))"
         >
           <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
           <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">{{ $t('status.maintain') }}</el-tag>

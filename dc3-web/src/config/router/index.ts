@@ -24,6 +24,7 @@ import commonRouters from './common';
 import operateRouters from './operate';
 import settingsRouters from './settings';
 import viewsRouters from './views';
+import {SETTINGS_ACTIVE_ALIAS} from '@/config/settingsNav';
 import {getStorage} from '@/utils/storageUtil';
 import {isNull} from '@/utils/validationUtil';
 import {AUTH_HEADERS} from '@/config/constant/common';
@@ -58,29 +59,19 @@ const isRouteInMenuTree = (routeName: string, nodes: MenuNode[]): boolean => {
   return false;
 };
 
+/**
+ * Permission-check aliases. Settings detail/container routes reuse the
+ * sidebar's canonical mapping (SETTINGS_ACTIVE_ALIAS) so the two sources
+ * cannot drift; the view detail routes are router-local.
+ */
 const ROUTE_MENU_ALIASES: Record<string, string> = {
+  ...SETTINGS_ACTIVE_ALIAS,
   driverDetail: 'driver',
   deviceDetail: 'device',
   deviceEdit: 'device',
   profileDetail: 'profile',
   profileEdit: 'profile',
   pointDetail: 'pointValue',
-  settingsUserDetail: 'settingsUser',
-  settingsRoleDetail: 'settingsRole',
-  settingsResourceDetail: 'settingsResource',
-  settingsApiDetail: 'settingsApi',
-  settingsMenuDetail: 'settingsMenu',
-  settingsGroupDetail: 'settingsGroup',
-  settingsLabelDetail: 'settingsLabel',
-  settingsAlarmRuleDetail: 'settingsAlarmRule',
-  settingsAlarmNotifyDetail: 'settingsAlarmNotify',
-  settingsAlarmMessageDetail: 'settingsAlarmMessage',
-  settingsAlarmChannelDetail: 'settingsAlarmChannel',
-  settingsAlarmBindDetail: 'settingsAlarmBind',
-  settingsAlarmStateDetail: 'settingsAlarmState',
-  settingsAlarmHistoryDetail: 'settingsAlarmHistory',
-  settingsModelConfigDetail: 'settingsModelConfig',
-  settingsModelProviderDetail: 'settingsModelProvider',
 };
 
 /**
@@ -135,10 +126,12 @@ router.beforeEach(async (to: RouteLocationNormalized) => {
     }
   }
 
-  // Update page title
+  // Update page title — meta.title stores an i18n key (nav.* / page.* /
+  // error.*) resolved against the active locale so the browser tab follows
+  // the language switch. Unknown keys fall back to the key string itself.
   const meta: RouteMeta = to.meta || {};
   if (meta.title) {
-    document.title = meta.title as string;
+    document.title = i18n.global.t(meta.title as string);
   }
 
   return true;

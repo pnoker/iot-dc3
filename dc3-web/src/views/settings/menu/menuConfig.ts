@@ -71,7 +71,7 @@ export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
       rules: [{required: true, message: t('settings.menu.parentMenuIdPlaceholder'), trigger: 'change'}],
       tree: {
         load: () => listMenuTree().then((res) => res.data || []),
-        transform: (rows) => [{id: 0, menuName: 'Root', children: rows}],
+        transform: (rows) => [{id: 0, menuName: t('settings.menu.root'), children: rows}],
         props: {label: 'menuName', children: 'children'},
         nodeKey: 'id',
       },

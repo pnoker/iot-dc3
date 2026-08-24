@@ -376,6 +376,9 @@ export default {
     admin: '管理员',
     pending: '待开发',
     settings: '设置',
+    navigation: '导航',
+    collapseSettings: '折叠菜单',
+    expandSettings: '展开菜单',
   },
   driver: {
     tool: {

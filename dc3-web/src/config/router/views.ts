@@ -35,7 +35,7 @@ const routes: RouteRecordRaw = {
       name: 'home',
       path: '/home',
       meta: {
-        title: 'Home',
+        title: 'nav.home',
       },
       component: () => import('@/views/home/Home.vue'),
     },
@@ -44,7 +44,7 @@ const routes: RouteRecordRaw = {
       path: '/driver',
       meta: {
         icon: 'Promotion',
-        title: 'Driver',
+        title: 'nav.driver',
       },
       component: () => import('@/views/driver/Driver.vue'),
     },
@@ -53,7 +53,7 @@ const routes: RouteRecordRaw = {
       path: '/profile',
       meta: {
         icon: 'List',
-        title: 'Profile',
+        title: 'nav.profile',
       },
       component: () => import('@/views/profile/Profile.vue'),
     },
@@ -62,7 +62,7 @@ const routes: RouteRecordRaw = {
       path: '/device',
       meta: {
         icon: 'Management',
-        title: 'Device',
+        title: 'nav.device',
       },
       component: () => import('@/views/device/Device.vue'),
     },
@@ -71,7 +71,7 @@ const routes: RouteRecordRaw = {
       path: '/point_value',
       meta: {
         icon: 'Histogram',
-        title: 'Data',
+        title: 'page.pointValue',
       },
       component: () => import('@/views/point/value/PointValue.vue'),
     },

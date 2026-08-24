@@ -24,7 +24,7 @@
           :icon="icon"
           :name="data.driverName"
           :status-title="$t('common.name')"
-          @copy-id="copy(data.id, 'Driver ID')"
+          @copy-id="copy(data.id, $t('driver.card.copyDriverId'))"
         >
           <el-tag :type="statusTagType" effect="plain">{{ $t(statusLabelKey) }}</el-tag>
         </things-card-header>

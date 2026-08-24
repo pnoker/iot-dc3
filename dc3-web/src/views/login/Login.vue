@@ -177,7 +177,7 @@ const handleLogin = async () => {
     await authStore.login(reactiveData.formData);
   } catch (error) {
     const code = (error as { code?: string })?.code;
-    if (code && PASSWORD_CHANGE_CODES.includes(code as never)) {
+    if (code && (PASSWORD_CHANGE_CODES as readonly string[]).includes(code)) {
       openChangePassword(code);
     }
     // other failures already surface failMessage inside authStore.login
