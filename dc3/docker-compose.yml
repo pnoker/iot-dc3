@@ -29,6 +29,10 @@ x-app-runtime-env: &app-runtime-env
   DC3_TSDB_TYPE: "${DC3_TSDB_TYPE:-timescale}"
   # Non-timescale adapter connection settings (only used when DC3_TSDB_TYPE matches)
   DC3_TSDB_TDENGINE_URL: "${DC3_TSDB_TDENGINE_URL:-jdbc:TAOS-RS://dc3-tdengine:6041/}"
+  DC3_TSDB_INFLUXDB_URL: "${DC3_TSDB_INFLUXDB_URL:-http://dc3-influxdb:8181}"
+  DC3_TSDB_INFLUXDB_TOKEN: "${DC3_TSDB_INFLUXDB_TOKEN:-}"
+  DC3_TSDB_IOTDB_HOST: "${DC3_TSDB_IOTDB_HOST:-dc3-iotdb}"
+  DC3_TSDB_IOTDB_PORT: "${DC3_TSDB_IOTDB_PORT:-6667}"
   # Non-rabbitmq adapter connection settings (only used when DC3_MQ_TYPE matches)
   DC3_MQ_KAFKA_BOOTSTRAP: "${DC3_MQ_KAFKA_BOOTSTRAP:-kafka:9092}"
   DC3_MQ_ROCKETMQ_NAMESRV: "${DC3_MQ_ROCKETMQ_NAMESRV:-rocketmq-namesrv:9876}"

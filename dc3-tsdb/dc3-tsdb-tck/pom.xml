@@ -63,6 +63,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-tsdb-influxdb</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-tsdb-iotdb</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <scope>test</scope>

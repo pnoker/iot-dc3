@@ -210,6 +210,71 @@ services:
         aliases:
           - dc3-grafana
 
+  # ---------- External time-series stores (docs/tsdb-stores.md) ----------
+  # Select with DC3_TSDB_TYPE in the app stack; each service is optional and
+  # started via `make up STACK=optional SERVICES="<name>"`.
+  tdengine:
+    image: tdengine/tdengine:3.3.6.13
+    restart: always
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_TDENGINE_PORT:-36041}:6041"
+    volumes:
+      - tdengine-data:/var/lib/taos
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sf -u root:taosdata -X POST -d 'show databases' http://localhost:6041/rest/sql >/dev/null || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-tdengine
+
+  influxdb:
+    image: influxdb:3.11.2-core
+    restart: always
+    environment:
+      INFLUXDB3_NODE_ID: n0
+      INFLUXDB3_OBJECT_STORE: file
+      INFLUXDB3_DATA_DIR: /var/lib/influxdb3
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_INFLUXDB_PORT:-38181}:8181"
+    volumes:
+      - influxdb-data:/var/lib/influxdb3
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sf http://localhost:8181/health >/dev/null || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-influxdb
+
+  iotdb:
+    image: apache/iotdb:2.0.10-standalone
+    restart: always
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_IOTDB_PORT:-36667}:6667"
+    volumes:
+      - iotdb-data:/iotdb/data
+      - ./dependencies/iotdb/iotdb-system.properties:/iotdb/conf/iotdb-system.properties:ro
+    healthcheck:
+      test: [ "CMD-SHELL", "timeout 2 bash -c '</dev/tcp/127.0.0.1/6667' 2>/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 90s
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-iotdb
+
 volumes:
   emqx_data:
   emqx_log:
@@ -218,6 +283,9 @@ volumes:
   logstash:
   prometheus:
   grafana:
+  tdengine-data:
+  influxdb-data:
+  iotdb-data:
 
 networks:
   dc3net:

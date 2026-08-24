@@ -816,6 +816,16 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-tsdb-influxdb</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-tsdb-iotdb</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-tsdb-tck</artifactId>
                 <version>${dc3.version}</version>
             </dependency>

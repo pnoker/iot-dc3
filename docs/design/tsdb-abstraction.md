@@ -2,7 +2,7 @@
 
 |                |                                                                                   |
 |----------------|-----------------------------------------------------------------------------------|
-| **状态**       | Proposed — 尚未实现                                                                |
+| **状态**       | Implemented — Phase 1-3 已落地（timescale/tdengine/influxdb/iotdb 四适配器 TCK 认证；能力矩阵发布于 [tsdb-stores.md](../tsdb-stores.md)） |
 | **日期**       | 2026-08-20                                                                        |
 | **范围**       | 位值（点位遥测历史 + 分析读取）的时序存储                                          |
 | **目标库**     | TimescaleDB（默认）、TDengine、InfluxDB、IoTDB —— 外加面向社区存储的 TCK          |
@@ -734,3 +734,19 @@ influx 视许可）：
 本文取代 [`storage-abstraction.md`](./storage-abstraction.md) 的 §4
 （Layer 2）：那边勾画时假设存储仍贴着 PG；MQ 的落地经验与本次分析把目标拓宽到
 独立存储 + TCK 门槛。Layer 1（关系方言）与 Layer 3（向量占位）不受影响。
+
+**Phase 3（2026-08-21，四适配器齐装 + 能力矩阵发布——TSDB 抽象全部完成）**：
+`dc3-tsdb-influxdb`（3.11.2-core，v3 HTTP 行协议+query_sql CSV 直连，零客户端
+依赖）与 `dc3-tsdb-iotdb`（2.0.10-standalone，session API，树路径
+`root.dc3.t*.d*.p*`——路径节点不能纯数字，设计 §7 的 `root.dc3.{tenant}...`
+映射据此修订）通过契约套件认证：**timescale 24/24、tdengine 24/24（2 跳过）、
+influxdb 24/24（2 跳过）、iotdb 24/24（3 跳过）**。跳过=适配器如实声明不
+支持、套件按能力门控跳过；对应能力由门面降级或明确拒绝，绝不给错数据。
+能力矩阵按各适配器**实际声明**发布于 `docs/tsdb-stores.md`（§8 原预估表
+已由其取代）。外置存储服务（tdengine/influxdb/iotdb）进 optional compose
+栈，IoTDB 挂载两行配置（µs 精度+全接口 RPC）。两个新适配器的方言教训
+（全在选型文档）：influxdb 整型字段必须 `i` 后缀否则列绑 Float64 永久丢
+精度、JSON 数字走科学计数法必须读 CSV；iotdb `WHERE time` 裸数字按毫秒
+解释（与库精度无关，µs 字面量静默匹配空集）须用 `+00:00` ISO 形态、
+session 在端口映射下必须关重定向、TCK 容器须覆盖
+`dn_rpc_address=0.0.0.0`（模板默认只听 127.0.0.1，端口映射永远够不着）。
