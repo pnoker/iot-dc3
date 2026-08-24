@@ -186,6 +186,10 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   // Multi-arg or non-pattern shapes that can't be derived from the name.
   updateAgenticSession: ['conversation-1', {title: 'Renamed session'}],
   uploadAgenticAttachment: ['conversation-1', new File(['demo'], 'demo.txt', {type: 'text/plain'})],
+  importDevice: [
+    payload,
+    new File(['demo'], 'demo.xlsx', {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+  ],
   alertConfirm: ['driver', 'alert-1'],
   alertUnconfirm: ['driver', 'alert-1'],
   alertBulkConfirm: [[{source: 'driver', id: 'alert-1'}], true],

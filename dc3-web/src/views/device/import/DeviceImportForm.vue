@@ -137,7 +137,7 @@ type DictionaryResponse = R<DictionaryPage>;
 
 const emit = defineEmits<{
   (e: 'import-template', formData: DeviceImportFormData, done: () => void): void;
-  (e: 'import', formData: DeviceImportFormData, done: () => void): void;
+  (e: 'import', formData: DeviceImportFormData, file: File, done: () => void): void;
 }>();
 
 const {t} = useI18n();
@@ -249,18 +249,11 @@ const importTemplate = async () => {
 };
 
 const uploadRequest = (param: UploadRequestOptions): Promise<unknown> => {
-  emit(
-    'import',
-    {
-      ...reactiveData.formData,
-      file: param.file as UploadRawFile,
-    },
-    () => {
-      cancel();
-      reset();
-      successMessage(t('device.import.importSuccess'));
-    }
-  );
+  emit('import', reactiveData.formData, param.file as File, () => {
+    cancel();
+    reset();
+    successMessage(t('device.import.importSuccess'));
+  });
   return Promise.resolve();
 };
 

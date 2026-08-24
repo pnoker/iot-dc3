@@ -84,7 +84,7 @@
                   <el-icon>
                     <Sunset/>
                   </el-icon>
-                  {{ $t('pointValue.card.saveTime') }}: {{ displayTime(data.createTime) }}
+                  {{ $t('pointValue.card.saveTime') }}: {{ displayTime(data.operateTime) }}
                 </li>
               </ul>
             </div>

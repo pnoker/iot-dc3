@@ -151,7 +151,6 @@ const openAdd = () => {
 const onAdd = (form: unknown, done: () => void) => {
   addDevice(form as Record<string, unknown>)
     .then(() => {
-      successMessage();
       load();
     })
     .catch(() => {
@@ -188,10 +187,9 @@ const importTemplate = (form: unknown, done: () => void) => {
     });
 };
 
-const onImport = (form: unknown, done: () => void) => {
-  importDevice(form as Record<string, unknown>)
+const onImport = (form: unknown, file: File, done: () => void) => {
+  importDevice(form as Record<string, unknown>, file)
     .then(() => {
-      successMessage();
       load();
     })
     .catch(() => {

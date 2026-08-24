@@ -30,7 +30,7 @@
                 {{ deviceName() }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')"
-              >{{ timestamp(reactiveData.data.createTime) }}
+              >{{ timestamp(reactiveData.data.operateTime) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')"
               >{{ timestamp(reactiveData.data.createTime) }}

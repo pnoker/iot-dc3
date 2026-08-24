@@ -19,6 +19,7 @@ import {httpGet, httpPost} from '@/api/common';
 import {API_DATA_BASE, API_MANAGER_BASE} from '@/config/constant/api';
 import type {PageQuery, PageResult} from '@/config/types';
 import type {DeviceForm, DeviceRecord} from '@/config/types/manager';
+import {isNull} from '@/utils/validationUtil';
 
 export const addDevice = (device: DeviceForm) => httpPost<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/add`, device);
 
@@ -64,8 +65,19 @@ export const listDeviceByPointId = (pointId: string) =>
 export const importDeviceTemplate = (device: Record<string, unknown>) =>
   httpPost(`${API_MANAGER_BASE}/device/export/import_template`, device, {responseType: 'blob'});
 
-export const importDevice = (device: Record<string, unknown>) =>
-  httpPost(`${API_MANAGER_BASE}/device/import`, device, {
-    timeout: 0,
-    headers: {'Content-Type': 'multipart/form-data'},
+export const importDevice = (form: Record<string, unknown>, file: File) => {
+  const data = new FormData();
+  Object.entries(form).forEach(([key, value]) => {
+    // The file is appended separately below — never serialize it as a string field.
+    if (key === 'file') return;
+    if (!isNull(value)) {
+      data.append(key, String(value));
+    }
   });
+  data.append('file', file);
+  // No manual Content-Type: axios clears it for FormData in browsers so the
+  // client sets the multipart boundary automatically.
+  return httpPost(`${API_MANAGER_BASE}/device/import`, data, {
+    timeout: 0,
+  });
+};
