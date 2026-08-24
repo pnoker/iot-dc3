@@ -14,6 +14,7 @@ builder utilities for constructing gRPC request/response objects from domain mod
 
 - **`GrpcBuilderUtil`** — Utility class for building common gRPC DTOs from BO/DO entities (e.g., setting pagination,
   building result wrappers)
+- **`GrpcRFactory`** — Builds `GrpcR` response envelopes
 
 ## Dependencies
 

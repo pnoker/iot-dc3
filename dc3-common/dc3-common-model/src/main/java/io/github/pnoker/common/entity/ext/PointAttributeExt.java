@@ -46,6 +46,7 @@ public class PointAttributeExt extends BaseExt {
     @Schema(description = "Extended content payload, distinguished by the type and version fields of the base extension")
     private Content content;
 
+    /** Attribute-value retention strategy hint for point attributes. */
     @Getter
     @Setter
     @NoArgsConstructor

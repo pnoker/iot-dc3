@@ -20,7 +20,7 @@ Center. It is wired into `dc3-center-manager`.
 | gRPC Servers (Spring `@Service`) | `DriverDriverServer`, `DriverDeviceServer`, `DriverPointServer`, `ManagerPointServer`             |
 | DAL Managers                  | `DriverManager`, `DeviceManager`, `ProfileManager`, `PointManager` (MyBatis-Plus `IService`)        |
 | Metadata Events               | `MetadataEventPublisher`, `MetadataEventListener` — async metadata change notification via RabbitMQ |
-| Scheduled Jobs                | `ScheduleForManagerServiceImpl` — Quartz-based hourly statistics                                    |
+| Scheduled Jobs                | `ScheduleForManagerServiceImpl` — Quartz-based hourly maintenance job (`HourlyJobForManager`)     |
 
 ## gRPC Services Exposed
 

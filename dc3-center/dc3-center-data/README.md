@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-center-data` is the Data Center of the IoT DC3 platform. It integrates common messaging middleware including AMQP,
-WebSocket, and MQTT for collecting device point values from drivers, storing them in the time-series repository, and
-exposing data query APIs.
+`dc3-center-data` is the Data Center of the IoT DC3 platform. It consumes device point values from drivers over
+RabbitMQ (AMQP), stores them through the pluggable time-series port (`dc3-tsdb`, TimescaleDB by default), and exposes
+data query and command APIs.
 
 ## Module Information
 
@@ -96,4 +96,4 @@ mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-data -am test
 - `dc3-api-data` - gRPC API contracts for point value queries
 - `dc3-api-manager` - gRPC API for resolving driver/point metadata
 - `dc3-common-data` - Business logic implementation
-- `dc3-common-repository` - Pluggable time-series storage adapter
+- `dc3-tsdb-core` - Pluggable time-series storage adapter (TimescaleDB adapter selected by default)

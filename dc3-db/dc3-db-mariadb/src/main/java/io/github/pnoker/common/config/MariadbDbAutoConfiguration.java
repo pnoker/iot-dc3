@@ -36,6 +36,7 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.db", name = "type", havingValue = "mariadb")
 public class MariadbDbAutoConfiguration {
 
+    /** MyBatis-Plus pagination dialect for MariaDB. */
     @Bean
     public DbType paginationDbType() {
         return DbType.MARIADB;

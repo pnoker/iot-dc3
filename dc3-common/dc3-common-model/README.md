@@ -33,7 +33,10 @@ Used with `@Validated(...)` in controllers:
 | `Add`           | Marks fields required only on creation (`@PostMapping("/add")`)  |
 | `Update`        | Marks fields required only on update (`@PostMapping("/update")`) |
 | `Select`        | Marks fields for query operations                                |
-| `Read` / `Auth` | Specialized validation groups                                    |
+| `Read`          | Read-path validation (e.g. `read` requests)                      |
+| `Write`         | Write-path validation (e.g. `write` requests)                    |
+| `Auth`          | Authentication-scoped validation                                 |
+| `Check` / `Parent` / `Upload` | Specialized validation groups                    |
 
 ### Shared DTOs and Extensions
 

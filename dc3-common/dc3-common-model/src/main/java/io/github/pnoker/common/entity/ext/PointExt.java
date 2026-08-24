@@ -46,6 +46,7 @@ public class PointExt extends BaseExt {
     @Schema(description = "Extended content payload of the point; the shape is discriminated by the type and version fields inherited from the owning point's tenant scope")
     private Content content;
 
+    /** Reserved point extension slot — custom point data beyond typed fields. */
     @Getter
     @Setter
     @NoArgsConstructor

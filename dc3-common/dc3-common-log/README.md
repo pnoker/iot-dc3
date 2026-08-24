@@ -36,10 +36,11 @@ mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-log -am package
 
 ## Testing
 
-This module has no Java implementation classes or module-specific tests. Verify packaging from the repository root:
+This module has no production Java implementation classes. Its tests verify the shared Logback configuration and
+logging policy (`LogbackConfigurationTest`, `LoggingPolicyTest`):
 
 ```bash
-mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-log -am package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-log -am test
 ```
 
 ## Related Modules

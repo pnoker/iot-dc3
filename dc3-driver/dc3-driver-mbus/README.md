@@ -32,6 +32,12 @@ record by index and decoding it as BCD, integer, IEEE-754, or raw HEX.
 | Record Index | recordIndex | INT    | 0       | Zero-based index of the DIF/VIF record       |
 | Data Format  | dataFormat  | STRING | AUTO    | Data format: AUTO, HEX, BCD, INT, FLOAT      |
 
+## Command Attributes (write)
+
+| Attribute   | Code       | Type   | Default | Description                                    |
+|-------------|------------|--------|---------|------------------------------------------------|
+| Data Format | dataFormat | STRING | ASCII   | Format used to encode the written value        |
+
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.
 

@@ -176,14 +176,16 @@ public class LocalCacheImpl {
             expireListeners.add(listener);
     }
 
+    /** Callback fired (best-effort, on the eviction path) when a TTL-bound entry expires. */
     @FunctionalInterface
     public interface ExpireListener {
 
         /**
-         * On expire.
+         * React to one expired entry. Exceptions here are logged and swallowed —
+         * an eviction listener must never break the cache itself.
          *
-         * @param key key
-         * @param lastValue last value
+         * @param key the expired cache key
+         * @param lastValue the entry's value as of eviction
          */
         void onExpire(String key, Object lastValue);
 

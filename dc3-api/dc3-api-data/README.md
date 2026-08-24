@@ -7,7 +7,7 @@ types use `io.github.pnoker.api.center.data`; proto sources live under `src/main
 
 | Service | RPCs | Purpose |
 |---|---|---|
-| `PointValueApi` | `GetLastValue`, `ListHistoryValues` | query point values |
+| `PointValueApi` | `GetLastValue`, `ListHistoryValues`, `ListSeriesVolumes` | query point values and value-volume series |
 | `PointValueApi` | `ReadCommand`, `WriteCommand` | submit point read/write commands |
 | `CommandHistoryApi` | `CallCommand`, `GetByRecordId`, `ListByPage` | dispatch and query command history |
 | `EventHistoryApi` | `ReportEvent`, `GetByRecordId`, `ListByPage` | report and query event history |

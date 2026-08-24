@@ -39,6 +39,7 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.tsdb", name = "type", havingValue = "influxdb")
 public class InfluxdbTsdbAutoConfiguration {
 
+    /** The InfluxDB 3 adapter over the v3 HTTP APIs. */
     @Bean
     @ConditionalOnMissingBean(TsdbStore.class)
     public TsdbStore tsdbStore(InfluxdbTsdbProperties properties) {

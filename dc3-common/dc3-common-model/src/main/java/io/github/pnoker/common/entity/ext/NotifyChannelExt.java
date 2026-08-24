@@ -46,6 +46,7 @@ public class NotifyChannelExt extends BaseExt {
     @Schema(description = "Non-sensitive channel configuration payload; provider-specific options and toggle flags.")
     private Content content;
 
+    /** Channel-level extension slot (provider metadata for one channel). */
     @Schema(description = "Extended content for a notify channel.")
     @Getter
     @Setter

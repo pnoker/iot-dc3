@@ -58,7 +58,8 @@ consumer, and deployed queue migration.
 
 ### Enumerations
 
-Located in `io.github.pnoker.common.enums`:
+Located in `io.github.pnoker.common.enums`. The list below is a selection of the most commonly referenced enums; see
+the package for the complete set (alarm, MCP, OAuth, notify, and other domain enums live there too):
 
 - `EnableFlagEnum` — Boolean-like enable/disable state
 - `EntityStatusEnum` — Online, offline, maintenance, and fault states

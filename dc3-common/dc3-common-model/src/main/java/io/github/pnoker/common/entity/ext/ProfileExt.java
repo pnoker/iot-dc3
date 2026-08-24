@@ -46,6 +46,7 @@ public class ProfileExt extends BaseExt {
     @Schema(description = "Extended content payload of the profile/template; interpretation is driven by the type and version fields of the parent BaseExt")
     private Content content;
 
+    /** Reserved profile extension slot, currently a placeholder kept for forward compatibility. */
     @Getter
     @Setter
     @NoArgsConstructor

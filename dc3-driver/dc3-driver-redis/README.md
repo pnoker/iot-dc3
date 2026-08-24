@@ -26,8 +26,19 @@ logical devices within one Redis instance.
 | Data Type | dataType | STRING | STRING  | Redis data type: STRING or HASH           |
 | Field     | field    | STRING |         | Hash field, required when dataType=HASH   |
 
+## Command Attributes (write)
+
+| Attribute | Code     | Type   | Default | Description                                    |
+|-----------|----------|--------|---------|------------------------------------------------|
+| Data Type | dataType | STRING | STRING  | Redis data type of the written key: STRING or HASH |
+
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.
+
+## Prerequisites
+
+A reachable Redis instance. Point the `spring.data.redis.*` properties (or `REDIS_HOST`, `REDIS_PORT`,
+`REDIS_PASSWORD`, `REDIS_DATABASE`) at the target server.
 
 ## Connection
 

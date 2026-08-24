@@ -147,6 +147,7 @@ public class AgenticConstant {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
+        /** Chart type codes the visualization channel accepts (line/area/column/bar/pie/donut/heatmap/scatter/stat). */
         public static class Type {
 
             public static final String LINE = "line";
@@ -173,6 +174,7 @@ public class AgenticConstant {
 
         }
 
+        /** Axis scale kinds: linear or time. */
         public static class Scale {
 
             public static final String LINEAR = "linear";

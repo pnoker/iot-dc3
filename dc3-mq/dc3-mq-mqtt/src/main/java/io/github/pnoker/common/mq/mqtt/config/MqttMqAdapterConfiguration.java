@@ -36,6 +36,7 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.mq", name = "type", havingValue = "mqtt")
 public class MqttMqAdapterConfiguration {
 
+    /** The port adapter over the HiveMQ MQTT5 client. */
     @Bean
     public MqttMqAdapter mqttMqAdapter(@Value("${dc3.mq.mqtt.host:localhost}") String host,
                                        @Value("${dc3.mq.mqtt.port:1883}") int port,

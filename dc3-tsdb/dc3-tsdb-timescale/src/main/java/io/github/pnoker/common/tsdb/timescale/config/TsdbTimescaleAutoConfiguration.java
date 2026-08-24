@@ -50,6 +50,7 @@ import javax.sql.DataSource;
 @ConditionalOnProperty(prefix = "dc3.tsdb", name = "type", havingValue = "timescale", matchIfMissing = true)
 public class TsdbTimescaleAutoConfiguration {
 
+    /** The TimescaleDB adapter on the application-provided tsdbDataSource. */
     @Bean
     @ConditionalOnMissingBean(TsdbStore.class)
     public TsdbStore tsdbStore(@Qualifier("tsdbDataSource") DataSource tsdbDataSource,

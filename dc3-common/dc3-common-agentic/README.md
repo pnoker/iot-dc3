@@ -31,7 +31,7 @@ model uses to read and operate platform resources.
 
 ## Dependencies
 
-- `spring-ai-starter-model-chat-memory-repository-jdbc` — Spring AI chat client + JDBC memory
+- `spring-ai-starter-model-chat-memory-repository-jdbc` — Spring AI JDBC-backed conversation memory
 
 ## Build Instructions
 

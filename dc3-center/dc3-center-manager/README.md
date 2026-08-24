@@ -27,7 +27,7 @@ management, and command interfaces.
 - **Point Management**: Point definitions, type flags, scale/precision settings
 - **gRPC Server**: Implements `DriverApi`, `DeviceApi`, `PointApi` for driver registration and data query
 - **Metadata Events**: Publishes metadata change events over RabbitMQ to notify relevant drivers
-- **Scheduled Jobs**: Hourly jobs for platform statistics (e.g., point data volume)
+- **Scheduled Jobs**: Quartz-based hourly maintenance job (`HourlyJobForManager`)
 
 ## REST Endpoints (via Gateway)
 
@@ -43,8 +43,13 @@ Key endpoint prefixes (defined in `ManagerConstant`):
 | `/point`            | Point definitions       |
 | `/driver_attribute` | Driver-level attributes |
 | `/point_attribute`  | Point-level attributes  |
+| `/command`          | Device commands         |
+| `/event`            | Device events           |
 | `/group`            | Device groups           |
 | `/topic`            | MQTT/data topics        |
+
+The complete prefix set (labels, dictionaries, attribute configs, dashboards, batch operations) lives in
+`ManagerConstant`.
 
 ## gRPC Services (consumed by drivers and data service)
 

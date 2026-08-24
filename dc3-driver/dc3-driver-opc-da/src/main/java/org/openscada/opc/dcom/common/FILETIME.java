@@ -48,6 +48,7 @@ public class FILETIME {
         this.low = low;
     }
 
+    /** The COM wire shape: a two-int JIStruct (low, high), member order fixed by the OPC spec. */
     public static JIStruct getStruct() throws JIException {
         final JIStruct struct = new JIStruct();
 
@@ -57,6 +58,7 @@ public class FILETIME {
         return struct;
     }
 
+    /** Decode a wire FILETIME (low first) into the typed wrapper. */
     public static FILETIME fromStruct(final JIStruct struct) {
         final FILETIME ft = new FILETIME();
 
@@ -112,6 +114,7 @@ public class FILETIME {
         return true;
     }
 
+    /** The FILETIME epoch (1601-01-01) reinterpreted as a Calendar. */
     public Calendar asCalendar() {
         final Calendar c = Calendar.getInstance();
 

@@ -44,6 +44,7 @@ public class DriverAttributeExt extends BaseExt {
     @Schema(description = "Driver attribute extension payload carrying the reserved keep field")
     private Content content;
 
+    /** Attribute-value retention strategy hint for driver attributes. */
     @Schema(description = "Driver attribute extension content detail")
     @Getter
     @Setter

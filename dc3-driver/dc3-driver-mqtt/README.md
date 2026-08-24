@@ -79,5 +79,5 @@ mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-mqtt -am test
 
 ## Related Modules
 
-- `dc3-common-driver` — Driver SDK for registration and RabbitMQ integration
+- `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
 - `dc3-common-mqtt` — MQTT client configuration and utilities

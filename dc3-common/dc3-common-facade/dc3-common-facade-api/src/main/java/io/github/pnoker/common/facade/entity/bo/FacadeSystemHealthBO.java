@@ -53,6 +53,7 @@ public class FacadeSystemHealthBO implements Serializable {
 
     private FleetSummary devices;
 
+    /** Per-fleet online/total counts for one entity kind (drivers, devices). */
     @Getter
     @Setter
     @NoArgsConstructor

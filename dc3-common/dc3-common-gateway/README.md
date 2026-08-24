@@ -19,6 +19,8 @@ factory and supporting services that validate tokens with the Auth Center before
 | `AuthenticGatewayFilter`        | Applies token validation logic; injects principal headers downstream                      |
 | `FilterServiceImpl`             | Calls Auth Center via gRPC to validate the Bearer token                                   |
 | `GatewayInitRunner`             | Startup runner for gateway-specific initialization                                        |
+| `McpGatewayController`          | OAuth2 authorization-server and MCP discovery endpoints exposed at the gateway            |
+| `McpGatewayProperties`          | Binds MCP gateway settings from YAML                                                      |
 
 ## Filter Flow
 

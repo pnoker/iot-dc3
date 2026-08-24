@@ -60,6 +60,7 @@ public class ChatCompletionChunkVO {
     @Schema(description = "List of streaming choices included in this chunk; typically contains exactly one element for non-branching completions.")
     private List<ChunkChoice> choices;
 
+    /** One streaming choice: index + incremental delta. */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -82,6 +83,7 @@ public class ChatCompletionChunkVO {
 
     }
 
+    /** Incremental content/role fragment of one chunk. */
     @Getter
     @Setter
     @NoArgsConstructor

@@ -12,7 +12,7 @@ hardware.
 - **Artifact ID**: dc3-driver-virtual
 - **Driver Name**: Virtual Driver
 
-## Driver Attributes
+## Driver Attributes (Device-level)
 
 | Attribute | Description               |
 |-----------|---------------------------|

@@ -26,8 +26,18 @@ per IED device and reads/writes data attributes addressed by an object reference
 | Object Reference      | objectReference      | STRING |         | Data object reference, e.g. S1MMXU1.TotW.actVal    |
 | Functional Constraint | functionalConstraint | STRING | MX      | Functional constraint, e.g. MX, ST, CO, SP, SE     |
 
+## Command Attributes (write)
+
+| Attribute        | Code            | Type   | Default | Description                                            |
+|------------------|-----------------|--------|---------|--------------------------------------------------------|
+| Object Reference | objectReference | STRING |         | Data object reference to write, e.g. S1MMXU1.TotW.actVal |
+
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.
+
+## Prerequisites
+
+A reachable IEC 61850 server (IED) exposing the configured data objects, typically on MMS port 102.
 
 ## Running Locally
 

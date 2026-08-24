@@ -46,6 +46,7 @@ public class RoleExt extends BaseExt {
     @Schema(description = "Role extension payload; its shape is distinguished by the Type and Version fields of the base extension")
     private Content content;
 
+    /** Reserved role extension slot. */
     @Getter
     @Setter
     @NoArgsConstructor

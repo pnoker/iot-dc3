@@ -47,12 +47,14 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.mq", name = "type", havingValue = "rabbitmq", matchIfMissing = true)
 public class RabbitMqAdapterConfiguration {
 
+    /** JSON converter with typed envelope headers. */
     @Bean
     @ConditionalOnMissingBean
     public MessageConverter messageConverter() {
         return new JacksonJsonMessageConverter(JsonUtil.getJsonMapper());
     }
 
+    /** Publisher-confirms template with mandatory returns. */
     @Bean(name = "rabbitTemplate")
     @ConditionalOnMissingBean(RabbitTemplate.class)
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
@@ -79,12 +81,14 @@ public class RabbitMqAdapterConfiguration {
         return rabbitTemplate;
     }
 
+    /** Declares queues/exchanges/bindings at startup. */
     @Bean
     @ConditionalOnMissingBean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
         return new RabbitAdmin(connectionFactory);
     }
 
+    /** The port adapter bound to the template and admin. */
     @Bean
     public RabbitMqAdapter rabbitMqAdapter(RabbitTemplate rabbitTemplate, RabbitAdmin rabbitAdmin,
                                            ConnectionFactory connectionFactory, BatchConsumerProperties batchProperties,

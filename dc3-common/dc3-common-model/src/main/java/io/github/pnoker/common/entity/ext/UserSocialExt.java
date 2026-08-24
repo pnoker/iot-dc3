@@ -46,6 +46,7 @@ public class UserSocialExt extends BaseExt {
     @Schema(description = "Extended content, distinguished by Type and Version")
     private Content content;
 
+    /** User social-binding extension slot (third-party account metadata). */
     @Getter
     @Setter
     @NoArgsConstructor

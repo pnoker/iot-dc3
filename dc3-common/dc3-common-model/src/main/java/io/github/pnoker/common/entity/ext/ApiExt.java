@@ -46,6 +46,7 @@ public class ApiExt extends BaseExt {
     @Schema(description = "Extended content of the API interface; discriminated by Type and Version of the parent extension")
     private Content content;
 
+    /** Human-facing API metadata (title, doc URL, remark) rendered in the tool catalog and OpenAPI quality merge. */
     @Schema(description = "Extended content of the API interface")
     @Getter
     @Setter

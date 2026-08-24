@@ -52,6 +52,10 @@ public class PointValueSampleConverter {
         return Objects.isNull(instant) ? null : LocalDateTime.ofInstant(instant, TimeConstant.DEFAULT_ZONEID);
     }
 
+    /**
+     * Business BO → port sample. Quality defaults to 0 (GOOD) — the business
+     * layer does not model quality yet; when it does, this is the injection point.
+     */
     public PointValueSample toSample(PointValueBO valueBO) {
         return new PointValueSample(
                 new SeriesKey(valueBO.getTenantId(), valueBO.getDeviceId(), valueBO.getPointId()),
@@ -64,6 +68,7 @@ public class PointValueSampleConverter {
                 valueBO.getFencingToken(), valueBO.getDriverId());
     }
 
+    /** Port sample → business BO; timestamps return to wall-clock in the platform zone. */
     public PointValueBO toBO(PointValueSample sample) {
         return PointValueBO.builder()
                 .tenantId(sample.series().tenantId())
@@ -83,10 +88,12 @@ public class PointValueSampleConverter {
                 .build();
     }
 
+    /** Batch form of {@link #toSample(PointValueBO)}, order-preserving. */
     public List<PointValueSample> toSamples(List<PointValueBO> values) {
         return values.stream().map(this::toSample).toList();
     }
 
+    /** Batch form of {@link #toBO(PointValueSample)}, order-preserving. */
     public List<PointValueBO> toBOs(List<PointValueSample> samples) {
         return samples.stream().map(this::toBO).toList();
     }

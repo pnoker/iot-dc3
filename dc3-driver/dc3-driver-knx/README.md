@@ -30,8 +30,18 @@ control values.
 | Data Type     | dataType     | STRING | BOOL    | BOOL, UINT, FLOAT, or CONTROL                    |
 | DPT           | dpt          | STRING |         | Datapoint type for UINT reads/writes, e.g. 5.001 |
 
+## Command Attributes (write)
+
+| Attribute     | Code         | Type   | Default | Description                          |
+|---------------|--------------|--------|---------|--------------------------------------|
+| Group Address | groupAddress | STRING |         | KNX group address to write to        |
+
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.
+
+## Prerequisites
+
+A KNX installation reachable through a KNX IP gateway (default port 3671) with tunneling enabled.
 
 ## Running Locally
 

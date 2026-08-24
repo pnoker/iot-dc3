@@ -66,6 +66,7 @@ public class CoapProperties {
     private Dtls dtls = new Dtls();
 
     @NoArgsConstructor
+    /** CoAP role of the endpoint: client (collect from devices), server (accept device pushes), or both. */
     public enum ModeEnum {
 
         CLIENT, SERVER, BOTH,
@@ -74,6 +75,7 @@ public class CoapProperties {
 
     @Getter
     @Setter
+    /** DTLS credentials: PSK identity/secret or a trust-store path for certificate mode. */
     public static class Dtls {
 
         private String pskIdentity;

@@ -17,15 +17,31 @@ services and modules use these exceptions to signal business errors consistently
 | Exception            | Usage                                    |
 |----------------------|------------------------------------------|
 | `ServiceException`   | General service-level business error     |
+| `BusinessException`  | Business rule violation                  |
 | `UpdateException`    | Entity update failure                    |
 | `AddException`       | Entity add failure                       |
 | `DeleteException`    | Entity delete failure                    |
 | `NotFoundException`  | Entity or resource not found             |
+| `DuplicateException` | Duplicate entity conflict                |
+| `EmptyException`     | Required collection or value is empty    |
+| `OutRangeException`  | Value outside the allowed range          |
 | `JsonException`      | JSON serialization/deserialization error |
 | `SecurityException`  | General security policy violation        |
 | `UnAuthorizedException` | Missing or invalid authentication     |
 | `AccessDeniedException` | Authenticated principal lacks access  |
-| `DuplicateException` | Duplicate entity conflict                |
+| `PasswordChangeRequiredException` | A password change is enforced     |
+| `RegisterException`  | Driver/service registration failure      |
+| `ConnectorException` | Device connection failure                |
+| `ReadPointException` | Point read failure                       |
+| `WritePointException` | Point write failure                     |
+| `RepositoryException` | Time-series or storage repository error |
+| `RequestException`   | Invalid or rejected request              |
+| `TypeException`      | Unsupported type conversion              |
+| `ConfigException`    | Invalid configuration                    |
+| `CronException`      | Invalid cron expression                  |
+| `ImportException`    | Import/export failure                    |
+| `UnSupportException` | Unsupported operation or protocol        |
+| `AssociatedException` | Constraint violation by an association  |
 
 ### Utilities
 

@@ -45,6 +45,7 @@ public class RuleAlarmEventExt extends BaseExt {
     @Schema(description = "Extended content holding the rule alarm event snapshot")
     private Content content;
 
+    /** Alarm-event payload schema extension emitted by rule evaluation. */
     @Getter
     @Setter
     @NoArgsConstructor

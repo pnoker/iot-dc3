@@ -37,8 +37,20 @@ one native `Runtime` + TCP `MasterChannel` + association per outstation, class 0
 | Point Index | pointIndex | INT | 0 | DNP3 point index within the selected point type |
 | Point Type | pointType | STRING | BINARY_INPUT | BINARY_INPUT, ANALOG_INPUT, COUNTER, DOUBLE_BIT_BINARY_INPUT, BINARY_OUTPUT, or ANALOG_OUTPUT |
 
+## Command Attributes (write)
+
+| Attribute | Code | Type | Default | Description |
+|-----------|------|------|---------|-------------|
+| Point Index | pointIndex | INT | 0 | DNP3 point index within the selected output point type |
+| Point Type | pointType | STRING | BINARY_OUTPUT | BINARY_OUTPUT or ANALOG_OUTPUT |
+
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.
+
+## Prerequisites
+
+A reachable DNP3 outstation over TCP (default port 20000) with matching master/outstation link-layer addresses. Native
+library loading must be verified on the target platform before commissioning.
 
 ## Running Locally
 

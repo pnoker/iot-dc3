@@ -24,21 +24,31 @@ the MQTT driver and any service requiring MQTT connectivity.
 
 ## Configuration Properties
 
-Configure in `application*.yml` under the `dc3.driver.mqtt` prefix:
+Configure in `application*.yml` under the `dc3.driver.mqtt` prefix. The shared `application-mqtt.yml` ships
+these defaults:
 
 ```yaml
 dc3:
   driver:
     mqtt:
-      url: tcp://${MQTT_BROKER_HOST:dc3-rabbitmq}:${MQTT_BROKER_PORT:2883}
-      auth-type: USERNAME            # NONE | USERNAME | CLIENT
-      username: ${MQTT_USERNAME:dc3}
-      password: ${MQTT_PASSWORD:}
+      ca-crt: classpath:/certs/ca.crt
+      client-crt: classpath:/certs/client.crt
+      client-key: classpath:/certs/client.key
+      client-key-pass: dc3-client
       topic-prefix: dc3/${dc3.driver.tenant}/${spring.application.name}/
-      receive-topics:
-        - name: data
-          qos: 1
+      default-send-topic:
+        qos: 1
+        name: command
+      keep-alive: 15
+      completion-timeout: 3000
+      batch:
+        speed: ${MQTT_BATCH_SPEED:100}
+        interval: ${MQTT_BATCH_INTERVAL:5}
 ```
+
+Connection settings such as `url` (dev default `tcp://${MQTT_BROKER_HOST:dc3-rabbitmq}:${MQTT_BROKER_PORT:2883}`),
+`auth-type` (`NONE` | `USERNAME` | `CLIENT`), `username`, `password`, and `receive-topics` are supplied by the
+consumer application (e.g. `dc3-driver-mqtt`).
 
 ## Usage
 

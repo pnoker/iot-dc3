@@ -45,6 +45,7 @@ public class RuleStateExt extends BaseExt {
     @Schema(description = "Extended content holding the rule runtime state snapshot")
     private Content content;
 
+    /** Rule-runtime state extension (per-rule evaluation state metadata). */
     @Getter
     @Setter
     @NoArgsConstructor

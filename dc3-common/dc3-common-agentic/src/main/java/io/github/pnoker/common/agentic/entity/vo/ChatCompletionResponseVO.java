@@ -64,6 +64,7 @@ public class ChatCompletionResponseVO {
     @Schema(description = "Token usage statistics for the request and response.")
     private Usage usage;
 
+    /** One completion choice: index + assistant message. */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -85,6 +86,7 @@ public class ChatCompletionResponseVO {
 
     }
 
+    /** Generated assistant message (role + content). */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -107,6 +109,7 @@ public class ChatCompletionResponseVO {
 
     }
 
+    /** Token usage of the completion (prompt/completion/total). */
     @Getter
     @Setter
     @NoArgsConstructor

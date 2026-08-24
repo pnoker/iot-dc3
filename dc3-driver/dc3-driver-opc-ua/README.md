@@ -16,8 +16,8 @@ servers to read and write node values from industrial automation systems using t
 | Attribute | Description                          |
 |-----------|--------------------------------------|
 | Host      | OPC UA server hostname or IP         |
-| Port      | OPC UA server port (typically 4840)  |
-| Path      | OPC UA endpoint path (e.g., `/milo`) |
+| Port      | OPC UA server port (default 18600)   |
+| Path      | OPC UA endpoint path (default `/`)    |
 
 ## Point Attributes
 

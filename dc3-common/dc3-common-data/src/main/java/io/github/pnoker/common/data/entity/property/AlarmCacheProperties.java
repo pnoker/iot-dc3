@@ -47,6 +47,11 @@ public class AlarmCacheProperties {
     @Valid
     private CacheTuning notify = new CacheTuning(5_000L, 60L);
 
+    /**
+     * Per-cache sizing: Caffeine maximum entries plus entry TTL in seconds. The
+     * defaults favor correctness over memory (short TTLs) — rule/notify lookups
+     * are cheap to rebuild from the database.
+     */
     @Getter
     @Setter
     public static class CacheTuning {
@@ -57,10 +62,11 @@ public class AlarmCacheProperties {
         @Min(value = 1, message = "Cache ttl-seconds must be at least 1")
         private long ttlSeconds;
 
+        /** Required by Spring property binding. */
         public CacheTuning() {
-            // Spring property binding requires a no-arg constructor.
         }
 
+        /** All-args constructor for programmatic tuning. */
         public CacheTuning(long maxSize, long ttlSeconds) {
             this.maxSize = maxSize;
             this.ttlSeconds = ttlSeconds;

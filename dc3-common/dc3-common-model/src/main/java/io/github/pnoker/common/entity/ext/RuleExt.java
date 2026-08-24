@@ -49,6 +49,7 @@ public class RuleExt extends BaseExt {
     @Schema(description = "Extended content, which can be distinguished by type and version.")
     private Content content;
 
+    /** Alarm rule core content. */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -94,6 +95,7 @@ public class RuleExt extends BaseExt {
 
     }
 
+    /** The match predicate: field + operator + expected/threshold operands. */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -145,6 +147,7 @@ public class RuleExt extends BaseExt {
 
     }
 
+    /** Time-window scoping of the rule evaluation. */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -172,6 +175,7 @@ public class RuleExt extends BaseExt {
 
     }
 
+    /** Recovery (condition-clear) behavior of the rule. */
     @Getter
     @Setter
     @NoArgsConstructor

@@ -63,6 +63,7 @@ public class MqMessage {
     @Builder.Default
     private final Duration delay = Duration.ZERO;
 
+    /** Build a message for a topic with an explicit partition key (ordered streams). */
     public static MqMessage of(MqTopic topic, String partitionKey, Object payload) {
         return MqMessage.builder()
                 .topic(topic)

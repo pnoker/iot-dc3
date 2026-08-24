@@ -14,9 +14,9 @@ routing, and reverse proxying.
 
 ## Service Ports
 
-| Protocol | Port   |
-|----------|--------|
-| HTTP     | `8000` |
+| Protocol | Port   | Override           |
+|----------|--------|--------------------|
+| HTTP     | `8000` | `DC3_GATEWAY_PORT` |
 
 ## Key Responsibilities
 

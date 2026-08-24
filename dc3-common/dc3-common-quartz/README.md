@@ -47,4 +47,5 @@ mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-quartz -am test
 
 ## Related Modules
 
-- `dc3-common-manager` — Uses `QuartzService` for hourly data-volume statistics jobs
+- `dc3-common-manager` — Uses `QuartzService` for its hourly maintenance job
+- `dc3-common-data` / `dc3-common-mqtt` / `dc3-common-driver` — periodic persistence, message, and scheduling tasks

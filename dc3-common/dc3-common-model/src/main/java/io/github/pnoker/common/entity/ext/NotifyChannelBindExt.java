@@ -44,6 +44,7 @@ public class NotifyChannelBindExt extends BaseExt {
     @Schema(description = "Extended content holding notification channel binding settings")
     private Content content;
 
+    /** Bind-specific extension slot (routing hints for one rule-channel pair). */
     @Schema(description = "Extended content holding notification channel binding settings")
     @Getter
     @Setter

@@ -3,8 +3,9 @@
 ## Overview
 
 `dc3-common-driver` is the shared driver dependency module of the IoT DC3 platform. It provides the driver SDK shared by
-all protocol drivers, including auto-registration with Manager Center, PostgreSQL-backed runtime ownership, metadata
-sync, RabbitMQ command handling, durable telemetry publication, and scheduled data collection. Redis is not part of the
+all protocol drivers, including auto-registration with Manager Center, manager-backed runtime ownership
+(membership, assignments, and fencing tokens are persisted in PostgreSQL by the Manager Center), metadata sync,
+RabbitMQ command handling, durable telemetry publication, and scheduled data collection. Redis is not part of the
 driver coordination path.
 
 ## Module Information
@@ -102,5 +103,5 @@ mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-driver -am test
 
 - All `dc3-driver-*` modules — Consume this SDK
 - `dc3-api-driver` — gRPC contracts consumed by this SDK
-- `dc3-common-rabbitmq` — RabbitMQ exchange configuration
+- `dc3-mq-core` / `dc3-mq-rabbitmq` — broker-neutral messaging port and RabbitMQ adapter
 - `dc3-common-constant` — `RabbitConstant` routing key prefixes

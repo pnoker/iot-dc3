@@ -38,6 +38,7 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.mq", name = "type", havingValue = "activemq")
 public class ActiveMqAdapterConfiguration {
 
+    /** Connection factory from the adapter url/credentials; overridable by a user bean. */
     @Bean
     @ConditionalOnMissingBean(jakarta.jms.ConnectionFactory.class)
     public ActiveMQConnectionFactory activeMqConnectionFactory(
@@ -47,6 +48,7 @@ public class ActiveMqAdapterConfiguration {
         return new ActiveMQConnectionFactory(url, user, password);
     }
 
+    /** The port adapter bound to this broker's connection factory. */
     @Bean
     public ActiveMqAdapter activeMqAdapter(jakarta.jms.ConnectionFactory connectionFactory,
                                            BatchConsumerProperties batchProperties) {

@@ -25,8 +25,18 @@ latest cached value, and a point write produces a message to the configured topi
 | Topic     | topic | STRING |         | Override topic (defaults to driver topic)              |
 | Key       | key   | STRING |         | Message key used for produce and cache lookup          |
 
+## Command Attributes (write)
+
+| Attribute | Code  | Type   | Default | Description                              |
+|-----------|-------|--------|---------|------------------------------------------|
+| Topic     | topic | STRING |         | Topic to produce the write message to    |
+
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.
+
+## Prerequisites
+
+A reachable Kafka cluster. Point the `spring.kafka.*` properties (or `KAFKA_BOOTSTRAP_SERVERS`) at the target broker.
 
 ## Connection
 

@@ -46,6 +46,7 @@ public class DeviceExt extends BaseExt {
     @Schema(description = "Device extension content payload carrying type-specific configuration")
     private Content content;
 
+    /** Reserved device extension slot — arbitrary custom device data that does not fit a typed field. */
     @Schema(description = "Device extension content payload carrying type-specific configuration")
     @Getter
     @Setter

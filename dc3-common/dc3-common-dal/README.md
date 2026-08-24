@@ -33,6 +33,6 @@ mvn -s .mvn/settings.xml -q -pl dc3-common/dc3-common-dal -am -DskipTests compil
 
 ## Related Modules
 
-- `dc3-common-postgres` — PostgreSQL and MyBatis-Plus base configuration
+- `dc3-db-core` / `dc3-db-postgres` — datasource and MyBatis-Plus base configuration
 - `dc3-common-model` — Base BO/VO/DTO model definitions
 - `dc3-common-manager` / `dc3-common-auth` / `dc3-common-data` — Consumers of this DAL layer

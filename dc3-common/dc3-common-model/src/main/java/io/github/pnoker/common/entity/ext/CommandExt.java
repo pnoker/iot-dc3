@@ -42,6 +42,7 @@ public class CommandExt extends BaseExt {
     @Schema(description = "Extended content payload of the command metadata; carries command-specific attributes such as the reserved keep field")
     private Content content;
 
+    /** Reserved command extension slot — driver/vendor-specific command metadata. */
     @Schema(title = "CommandExt.Content", description = "Extended content payload for command metadata")
     @Getter
     @Setter

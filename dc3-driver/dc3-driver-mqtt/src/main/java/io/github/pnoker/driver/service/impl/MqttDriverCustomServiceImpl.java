@@ -62,7 +62,7 @@ import java.util.Objects;
  *
  * <p>
  * <b>WARNING:</b> This driver is a work-in-progress skeleton. Protocol-level
- * I/O is not yet fully implemented — see TODO markers in method bodies.
+ * I/O is not yet fully implemented.
  * </p>
  *
  * @author pnoker

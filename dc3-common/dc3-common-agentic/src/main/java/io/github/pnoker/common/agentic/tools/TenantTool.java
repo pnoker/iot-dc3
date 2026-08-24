@@ -48,6 +48,7 @@ public class TenantTool {
         return AgenticToolResult.ok("Current tenant context loaded", new CurrentTenantContext(tenantId));
     }
 
+    /** The tenant injected from the authenticated ToolContext (never agent-supplied). */
     public record CurrentTenantContext(Long tenantId) {
     }
 

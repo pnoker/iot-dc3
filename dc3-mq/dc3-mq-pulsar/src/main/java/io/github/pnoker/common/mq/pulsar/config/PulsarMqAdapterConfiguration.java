@@ -38,6 +38,7 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.mq", name = "type", havingValue = "pulsar")
 public class PulsarMqAdapterConfiguration {
 
+    /** Shared Pulsar client on the service url. */
     @Bean(destroyMethod = "close")
     @ConditionalOnMissingBean(PulsarClient.class)
     public PulsarClient pulsarClient(
@@ -46,6 +47,7 @@ public class PulsarMqAdapterConfiguration {
         return PulsarClient.builder().serviceUrl(serviceUrl).build();
     }
 
+    /** The port adapter bound to the shared client. */
     @Bean
     public PulsarMqAdapter pulsarMqAdapter(PulsarClient pulsarClient, BatchConsumerProperties batchProperties) {
         return new PulsarMqAdapter(pulsarClient, batchProperties);

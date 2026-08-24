@@ -74,6 +74,7 @@ public class AgenticMessageContent implements Serializable {
         return content;
     }
 
+    /** Tool-call trace entry (type, title, detail) for the run timeline. */
     @Getter
     @Setter
     @ToString
@@ -142,6 +143,7 @@ public class AgenticMessageContent implements Serializable {
 
     }
 
+    /** One context block (type + content) fed to the model. */
     @Getter
     @Setter
     @ToString
@@ -171,6 +173,7 @@ public class AgenticMessageContent implements Serializable {
 
     }
 
+    /** Token accounting: input/output/text/context counts of one message. */
     @Getter
     @Setter
     @ToString

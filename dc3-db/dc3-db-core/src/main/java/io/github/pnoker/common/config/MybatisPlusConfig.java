@@ -84,6 +84,7 @@ public class MybatisPlusConfig {
         return provider;
     }
 
+    /** Tenant-line before pagination; dialect pagination DbType injected by the db adapter. */
     @Bean
     @ConditionalOnMissingBean
     public MybatisPlusInterceptor mybatisPlusInterceptor(TenantLineHandler tenantLineHandler) {

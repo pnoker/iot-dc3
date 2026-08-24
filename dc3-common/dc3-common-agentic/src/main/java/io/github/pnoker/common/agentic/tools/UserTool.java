@@ -51,6 +51,7 @@ public class UserTool {
                 new CurrentUserProfile(userId, header.getUserName(), header.getNickName()));
     }
 
+    /** The acting user resolved from the ToolContext identity. */
     public record CurrentUserProfile(Long userId, String username, String nickname) {
     }
 

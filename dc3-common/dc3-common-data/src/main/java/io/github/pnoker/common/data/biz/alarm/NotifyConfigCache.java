@@ -243,6 +243,7 @@ public class NotifyConfigCache {
         bindCache.invalidateAll();
     }
 
+    /** Cache key of one notify rule's channel bindings: tenant + notify id. */
     public record NotifyBindKey(Long tenantId, Long notifyId) {
     }
 

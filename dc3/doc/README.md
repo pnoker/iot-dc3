@@ -14,7 +14,8 @@
 |-------------------------------|------------------------------------------------------------------------------------|
 | [`TITLE.md`](./TITLE.md)      | Release title and summary, assembled into the GitHub Release body by `.github/workflows/docker-ci.yml` |
 | [`CHANGE.md`](./CHANGE.md)    | Version changelog, written by `dc3/bin/changelog.py` and assembled into the Release body by docker-ci |
-| [`USAGE.md`](./USAGE.md)      | Image usage guide, assembled into the Release body by docker-ci                    |
+| [`RELEASE-FOOTER.md`](./RELEASE-FOOTER.md) | Release quick-start footer (docs links and image pinning), assembled into the Release body by docker-ci |
+| [`USAGE.md`](./USAGE.md)      | Image usage guide; embedded into the docs site usage page and referenced from the release footer |
 | [`DEPLOYMENT.md`](./DEPLOYMENT.md) | Full deployment runbook (compose scale / swarm / k8s / helm); linked from `USAGE.md` and snapshotted into the docs site by `scripts/sync-external.sh` in the docs repository |
 
 The documentation site embeds the [changelog](https://docs.dc3.site/en/development/changelog)

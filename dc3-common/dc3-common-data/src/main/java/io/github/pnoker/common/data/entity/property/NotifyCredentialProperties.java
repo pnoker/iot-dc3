@@ -45,6 +45,7 @@ public class NotifyCredentialProperties {
      */
     private Map<String, Credential> credentials = new LinkedHashMap<>();
 
+    /** One channel-type credential bundle (e.g. Feishu bot webhook URL), keyed by type. */
     @Getter
     @Setter
     public static class Credential {

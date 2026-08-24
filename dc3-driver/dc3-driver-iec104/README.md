@@ -20,28 +20,28 @@ polling for IEC 104 client connections.
 
 ## Driver Attributes (Device-level)
 
-| Attribute       | Description |
-|-----------------|-------------|
-| Host            |             |
-| Port            |             |
-| ASDU Address    |             |
-| COT Length      |             |
-| CA Length       |             |
-| IOA Length      |             |
-| Connect Timeout |             |
+| Attribute       | Code           | Type   | Default   | Description                          |
+|-----------------|----------------|--------|-----------|--------------------------------------|
+| Host            | host           | STRING | localhost | IEC 104 server address               |
+| Port            | port           | INT    | 2404      | IEC 104 TCP service port             |
+| ASDU Address    | asduAddress    | INT    | 1         | Common ASDU address                  |
+| COT Length      | cotLength      | INT    | 2         | Cause-of-transmission field length   |
+| CA Length       | caLength       | INT    | 2         | Common-address field length          |
+| IOA Length      | ioaLength      | INT    | 3         | Information-object-address field length |
+| Connect Timeout | connectTimeout | INT    | 10000     | Connection timeout in milliseconds   |
 
 ## Point Attributes
 
-| Attribute | Description |
-|-----------|-------------|
-| IOA       |             |
-| ASDU Type |             |
+| Attribute | Code     | Type   | Default  | Description                      |
+|-----------|----------|--------|----------|----------------------------------|
+| IOA       | ioa      | INT    | 0        | Information object address       |
+| ASDU Type | asduType | STRING | M_ME_NC_1 | ASDU type (e.g. M_ME_NC_1)    |
 
 ## Command Attributes (write)
 
-| Attribute    | Description |
-|--------------|-------------|
-| Send Command |             |
+| Attribute    | Code        | Type   | Default  | Description              |
+|--------------|-------------|--------|----------|--------------------------|
+| Send Command | sendCommand | STRING | ${value} | Command payload template |
 
 The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
 local buffering. Keep this README aligned when those user-facing settings change.

@@ -30,9 +30,6 @@ center and driver applications.
 | Module | Responsibility |
 |---|---|
 | `dc3-common-dal` | shared label/group persistence |
-| `dc3-common-postgres` | datasource and MyBatis-Plus configuration |
-| `dc3-common-repository` | point-value storage abstraction |
-| `dc3-common-rabbitmq` | shared exchanges, connection configuration, and message conversion |
 | `dc3-common-mqtt` | MQTT client configuration |
 | `dc3-common-quartz` | scheduling infrastructure |
 | `dc3-common-thread` | managed executors |
@@ -41,6 +38,13 @@ center and driver applications.
 | `dc3-common-sql` | SQL utilities |
 | `dc3-common-resource-registrar` | API/resource annotation discovery and synchronization |
 | `dc3-common-test` | shared tests, harnesses, and Testcontainers |
+
+Datasource, messaging, and time-series storage were split into dedicated top-level families; business modules depend on
+them directly:
+
+- `dc3-db` — relational dialect adapters (PostgreSQL/MySQL/MariaDB) behind `dc3.db.type`
+- `dc3-mq` — broker-neutral messaging port with per-broker adapters (RabbitMQ, Kafka, RocketMQ, Pulsar, ActiveMQ, MQTT)
+- `dc3-tsdb` — store-neutral time-series port with per-store adapters (TimescaleDB, TDengine, InfluxDB, IoTDB)
 
 ## Architecture rules
 

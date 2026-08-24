@@ -44,6 +44,7 @@ public class NotifyHistoryRequestExt extends BaseExt {
     @Schema(description = "Rendered notification content carried by the delivery request")
     private Content content;
 
+    /** Request payload schema extension for notify history calls. */
     @Getter
     @Setter
     @NoArgsConstructor

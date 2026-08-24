@@ -30,8 +30,19 @@ the ChirpStack `command/down` topic.
 | DevEUI    | devEui | STRING |         | LoRaWAN device EUI (16 hex characters)                 |
 | Field     | field  | STRING |         | Cayenne LPP object field; empty returns raw base64     |
 
+## Command Attributes (write)
+
+| Attribute | Code   | Type   | Default | Description                          |
+|-----------|--------|--------|---------|--------------------------------------|
+| DevEUI    | devEui | STRING |         | Target device EUI for the downlink   |
+
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.
+
+## Prerequisites
+
+A ChirpStack instance publishing uplinks to the configured MQTT broker topic
+(`application/+/device/+/event/up`).
 
 ## Running Locally
 
