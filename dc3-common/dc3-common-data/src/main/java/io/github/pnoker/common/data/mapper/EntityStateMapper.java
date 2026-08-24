@@ -52,9 +52,11 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
      * @param timeoutSourceFlag    timeout source flag
      * @param stateExtType         state extension type for inserted rows
      * @param stateDescription     structured description for state_ext content
-     * @return inserted or updated state row
+     * @return affected rows (1 insert / 1 update); re-read the row via
+     * {@link #selectByUniqueKey(Long, Byte, Long)} — MySQL has no
+     * INSERT ... RETURNING, so the portable shape is upsert + same-tx re-select
      */
-    EntityStateDO upsertEntityState(@Param("id") Long id,
+    int upsertEntityState(@Param("id") Long id,
                                     @Param("tenantId") Long tenantId,
                                     @Param("entityTypeFlag") Byte entityTypeFlag,
                                     @Param("entityId") Long entityId,
@@ -83,12 +85,46 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
      * @return claimed rows after the offline update; {@code lastStateFlag}
      * contains the previous state
      */
-    List<EntityStateDO> claimExpiredDevices(@Param("entityTypeFlag") byte entityTypeFlag,
-                                            @Param("onlineFlag") byte onlineFlag,
-                                            @Param("maintainFlag") byte maintainFlag,
-                                            @Param("faultFlag") byte faultFlag,
-                                            @Param("offlineFlag") byte offlineFlag,
-                                            @Param("batchSize") int batchSize,
-                                            @Param("offlineRenewSeconds") int offlineRenewSeconds);
+    /**
+     * Step 1 of the expired-lease claim: lock-and-read a batch of expired
+     * online/maintain/fault rows (FOR UPDATE SKIP LOCKED, portable across
+     * PostgreSQL and MySQL 8). Call {@link #markClaimedOffline(List, byte, int)}
+     * in the same transaction, then derive the post-update view in Java from
+     * these rows.
+     *
+     * @param entityTypeFlag device entity type flag
+     * @param onlineFlag     online state flag
+     * @param maintainFlag   maintain state flag
+     * @param faultFlag      fault state flag
+     * @param batchSize      maximum rows to claim
+     * @return the locked pre-update rows, oldest expiry first
+     */
+    List<EntityStateDO> selectExpiredForClaim(@Param("entityTypeFlag") byte entityTypeFlag,
+                                              @Param("onlineFlag") byte onlineFlag,
+                                              @Param("maintainFlag") byte maintainFlag,
+                                              @Param("faultFlag") byte faultFlag,
+                                              @Param("batchSize") int batchSize);
+
+    /**
+     * Step 2 of the claim: flip the locked rows offline with a renewed expiry.
+     * Bumped per row: lease_version + 1, last_state_flag = previous flag.
+     *
+     * @param ids                  locked row ids from step 1
+     * @param offlineFlag          offline state flag
+     * @param offlineRenewSeconds  renewal window for already-offline state rows
+     * @return updated row count
+     */
+    int markClaimedOffline(@Param("ids") List<Long> ids,
+                           @Param("offlineFlag") byte offlineFlag,
+                           @Param("offlineRenewSeconds") int offlineRenewSeconds);
+
+    /**
+     * Re-read the state row by its natural key (tenant, entity type, entity id).
+     *
+     * @return the row, or {@code null} when absent
+     */
+    EntityStateDO selectByUniqueKey(@Param("tenantId") Long tenantId,
+                                    @Param("entityTypeFlag") Byte entityTypeFlag,
+                                    @Param("entityId") Long entityId);
 
 }

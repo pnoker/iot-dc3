@@ -26,38 +26,27 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Active PostgreSQL Profile Configuration
+ * Active MySQL Profile Configuration
  * <p>
- * Environment post processor configuration that automatically activates the PostgreSQL
- * profile for Spring Boot applications. This ensures PostgreSQL-specific configurations
- * are loaded with highest precedence.
- * </p>
+ * Activates the {@code mysql} profile (driver + connection conventions) only
+ * when {@code dc3.db.type=mysql} — the PostgreSQL profile stays the default
+ * for unset values, so existing deployments are untouched.
  *
  * @author pnoker
- * @since 2016.10.1
+ * @since 2026.8.24
  */
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class ActivePostgresProfileConfig implements EnvironmentPostProcessor {
+public class ActiveMysqlProfileConfig implements EnvironmentPostProcessor {
 
-    /**
-     * Post-process the Spring environment to activate PostgreSQL profile.
-     *
-     * @param environment ConfigurableEnvironment to modify
-     * @param application SpringApplication instance
-     */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        if ("mysql".equals(environment.getProperty(EnvironmentConstant.DB_TYPE))) {
-            log.debug("Skipping postgres profile activation, {}=mysql", EnvironmentConstant.DB_TYPE);
+        String dbType = environment.getProperty(EnvironmentConstant.DB_TYPE);
+        if (!"mysql".equals(dbType)) {
             return;
         }
-        if (Boolean.FALSE.equals(environment.getProperty(EnvironmentConstant.POSTGRES_AUTO_PROFILE, Boolean.class,
-                Boolean.TRUE))) {
-            log.debug("Skipping postgres profile activation, {}=false", EnvironmentConstant.POSTGRES_AUTO_PROFILE);
-            return;
-        }
-        environment.addActiveProfile(EnvironmentConstant.POSTGRES_PROFILE);
+        environment.addActiveProfile(EnvironmentConstant.MYSQL_PROFILE);
+        log.info("Relational dialect profile activated: mysql");
     }
 
 }

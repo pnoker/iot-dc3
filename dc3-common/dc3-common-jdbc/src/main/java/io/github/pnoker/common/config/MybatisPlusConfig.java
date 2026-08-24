@@ -19,6 +19,8 @@ package io.github.pnoker.common.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import org.apache.ibatis.mapping.DatabaseIdProvider;
+import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.springframework.beans.factory.ObjectProvider;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
@@ -64,6 +66,23 @@ public class MybatisPlusConfig {
      * @param tenantLineHandler Spring-injected {@code TenantLineHandlerImpl}
      * @return Configured MybatisPlusInterceptor with tenant-line + PostgreSQL pagination
      */
+    /**
+     * Vendor databaseId provider — enables {@code databaseId="mysql"} statement
+     * forks in mapper XML; PostgreSQL deployments resolve to {@code postgres}.
+     *
+     * @return vendor-mapped DatabaseIdProvider
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public DatabaseIdProvider databaseIdProvider() {
+        VendorDatabaseIdProvider provider = new VendorDatabaseIdProvider();
+        java.util.Properties aliases = new java.util.Properties();
+        aliases.setProperty("PostgreSQL", "postgres");
+        aliases.setProperty("MySQL", "mysql");
+        provider.setProperties(aliases);
+        return provider;
+    }
+
     @Bean
     @ConditionalOnMissingBean
     public MybatisPlusInterceptor mybatisPlusInterceptor(TenantLineHandler tenantLineHandler) {

@@ -99,6 +99,10 @@ public class EnvironmentConstant {
      */
     public static final String JDBC_AUTO_PROFILE = "dc3.jdbc.auto-profile";
 
+    public static final String DB_TYPE = "dc3.db.type";
+
+    public static final String MYSQL_AUTO_PROFILE = "dc3.mysql.auto-profile";
+
     public static final String POSTGRES_AUTO_PROFILE = "dc3.postgres.auto-profile";
 
     /**
@@ -107,6 +111,8 @@ public class EnvironmentConstant {
     public static final String JDBC_PROFILE = "jdbc";
 
     public static final String POSTGRES_PROFILE = "postgres";
+
+    public static final String MYSQL_PROFILE = "mysql";
 
     /**
      * PostgreSQL host environment variable: "POSTGRES_HOST"

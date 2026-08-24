@@ -79,6 +79,8 @@ public class EntityStateExpiryScanner {
     private final AlarmRuleTriggerService alarmRuleTriggerService;
     private final MessageSender messageSender;
 
+    private final org.springframework.transaction.support.TransactionTemplate transactionTemplate;
+
     /**
      * Bootstrap the first tick after the context is fully started.
      * Uses {@code ApplicationReadyEvent} rather than {@code @PostConstruct}
@@ -120,18 +122,48 @@ public class EntityStateExpiryScanner {
      * publish).
      */
     private void scanExpiredDevices() {
-        List<EntityStateDO> expired = entityStateMapper.claimExpiredDevices(
-                EntityTypeEnum.DEVICE.getIndex(),
-                EntityStatusEnum.ONLINE.getIndex(),
-                EntityStatusEnum.MAINTAIN.getIndex(),
-                EntityStatusEnum.FAULT.getIndex(),
-                EntityStatusEnum.OFFLINE.getIndex(),
-                BATCH_LIMIT,
-                OFFLINE_RENEW_SECONDS);
-
-        if (expired.isEmpty()) {
+        List<EntityStateDO> claimed = transactionTemplate.execute(status -> {
+            List<EntityStateDO> locked = entityStateMapper.selectExpiredForClaim(
+                    EntityTypeEnum.DEVICE.getIndex(),
+                    EntityStatusEnum.ONLINE.getIndex(),
+                    EntityStatusEnum.MAINTAIN.getIndex(),
+                    EntityStatusEnum.FAULT.getIndex(),
+                    BATCH_LIMIT);
+            if (locked.isEmpty()) {
+                return List.of();
+            }
+            entityStateMapper.markClaimedOffline(
+                    locked.stream().map(EntityStateDO::getId).toList(),
+                    EntityStatusEnum.OFFLINE.getIndex(),
+                    OFFLINE_RENEW_SECONDS);
+            return locked;
+        });
+        if (claimed.isEmpty()) {
             return;
         }
+        // The claim returned pre-update rows; derive each post-update view in
+        // Java (the update is deterministic per column).
+        byte offlineFlag = EntityStatusEnum.OFFLINE.getIndex();
+        List<EntityStateDO> expired = claimed.stream().map(state -> {
+            EntityStateDO view = new EntityStateDO();
+            view.setId(state.getId());
+            view.setEntityTypeFlag(state.getEntityTypeFlag());
+            view.setEntityId(state.getEntityId());
+            view.setParentEntityId(state.getParentEntityId());
+            view.setStateFlag(offlineFlag);
+            view.setLastStateFlag(state.getStateFlag());
+            view.setLeaseVersion(state.getLeaseVersion() + 1);
+            view.setExpireTime(state.getExpireTime());
+            view.setTimeoutSeconds(state.getTimeoutSeconds());
+            view.setLastHeartbeatTime(state.getLastHeartbeatTime());
+            view.setLastAlarmId(state.getLastAlarmId());
+            view.setTimeoutSourceFlag(state.getTimeoutSourceFlag());
+            view.setStateExt(state.getStateExt());
+            view.setTenantId(state.getTenantId());
+            view.setCreateTime(state.getCreateTime());
+            view.setOperateTime(state.getOperateTime());
+            return view;
+        }).toList();
 
         List<EntityAlarmDO> alarms = new ArrayList<>();
         List<ExpiredDeviceContext> contexts = new ArrayList<>();

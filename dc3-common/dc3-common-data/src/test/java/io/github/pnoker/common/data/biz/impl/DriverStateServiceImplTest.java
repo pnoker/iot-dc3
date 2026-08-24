@@ -90,7 +90,8 @@ class DriverStateServiceImplTest {
 
     private void stubUpsert(EntityStateDO state) {
         when(entityStateMapper.upsertEntityState(anyLong(), anyLong(), anyByte(), anyLong(), anyLong(), anyByte(),
-                anyByte(), any(), anyInt(), anyByte(), anyString(), any())).thenReturn(state);
+                anyByte(), any(), anyInt(), anyByte(), anyString(), any())).thenReturn(1);
+        when(entityStateMapper.selectByUniqueKey(anyLong(), anyByte(), anyLong())).thenReturn(state);
     }
 
     @Test

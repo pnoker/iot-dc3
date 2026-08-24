@@ -175,7 +175,17 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         List<ResourceRegistryScannedApi> scanned = Objects.requireNonNullElse(command.getApis(), List.of());
 
         resourceRegistryLockMapper.advisoryLock(serviceName);
+        try {
+            return syncLocked(command, serviceName, scanned);
+        } finally {
+            // PostgreSQL's xact lock releases with the transaction; MySQL's
+            // session lock needs the explicit release.
+            resourceRegistryLockMapper.advisoryUnlock(serviceName);
+        }
+    }
 
+    private ResourceRegistrySyncResult syncLocked(ResourceRegistrySyncCommand command, String serviceName,
+                                                  List<ResourceRegistryScannedApi> scanned) {
         Map<String, ApiDO> existingByCode = loadExisting(serviceName);
         Map<String, ResourceRegistryScannedApi> scannedByCode = indexScanned(scanned, serviceName);
 

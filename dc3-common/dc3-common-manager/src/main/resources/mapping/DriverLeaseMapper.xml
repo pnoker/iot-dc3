@@ -22,6 +22,19 @@
         SELECT pg_advisory_xact_lock(#{driverId})
     </select>
 
+    <!--
+        MySQL fork: serialize per-driver lease operations by locking the driver
+        row itself — transaction-scoped like the advisory lock, released at
+        commit/rollback. The row exists whenever lease operations run (a driver
+        must be registered before it can hold a lease).
+    -->
+    <select id="acquireDriverLock" databaseId="mysql" resultType="long">
+        SELECT id
+        FROM dc3_driver
+        WHERE id = #{driverId}
+        FOR UPDATE
+    </select>
+
     <insert id="upsertInstance">
         INSERT INTO dc3_driver_instance
             (tenant_id, driver_id, node_id, client_id, service_host, lease_until)
@@ -32,6 +45,18 @@
             service_host = EXCLUDED.service_host,
             last_heartbeat = CURRENT_TIMESTAMP,
             lease_until = EXCLUDED.lease_until
+    </insert>
+
+    <insert id="upsertInstance" databaseId="mysql">
+        INSERT INTO dc3_driver_instance
+            (tenant_id, driver_id, node_id, client_id, service_host, lease_until)
+        VALUES
+            (#{tenantId}, #{driverId}, #{node}, #{client}, #{host}, #{leaseUntil})
+        ON DUPLICATE KEY UPDATE
+            client_id = VALUES(client_id),
+            service_host = VALUES(service_host),
+            last_heartbeat = CURRENT_TIMESTAMP(6),
+            lease_until = VALUES(lease_until)
     </insert>
 
     <select id="listActiveNodes" resultType="string">
@@ -70,7 +95,14 @@
           AND driver_id = #{driverId}
     </select>
 
-    <select id="upsertLeaseState" resultType="long" affectData="true" flushCache="true">
+    <!--
+        The assignment version increments per row — the per-driver generation,
+        which is the semantics callers rely on (the global sequence was an
+        implementation shortcut; row-local +1 is equivalent per driver).
+        No RETURNING: the manager re-selects in the same transaction (MySQL
+        has no INSERT ... RETURNING).
+    -->
+    <insert id="upsertLeaseState" affectData="true" flushCache="true">
         INSERT INTO dc3_driver_lease_state
             (tenant_id, driver_id, membership_hash, device_revision)
         VALUES
@@ -78,10 +110,21 @@
         ON CONFLICT (tenant_id, driver_id) DO UPDATE SET
             membership_hash = EXCLUDED.membership_hash,
             device_revision = EXCLUDED.device_revision,
-            assignment_version = nextval('dc3_driver_assignment_version_seq'),
+            assignment_version = dc3_driver_lease_state.assignment_version + 1,
             operate_time = CURRENT_TIMESTAMP
-        RETURNING assignment_version
-    </select>
+    </insert>
+
+    <insert id="upsertLeaseState" databaseId="mysql" affectData="true" flushCache="true">
+        INSERT INTO dc3_driver_lease_state
+            (tenant_id, driver_id, membership_hash, device_revision)
+        VALUES
+            (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision})
+        ON DUPLICATE KEY UPDATE
+            membership_hash = VALUES(membership_hash),
+            device_revision = VALUES(device_revision),
+            assignment_version = assignment_version + 1,
+            operate_time = CURRENT_TIMESTAMP(6)
+    </insert>
 
     <delete id="deleteExpiredInstances">
         DELETE FROM dc3_driver_instance
@@ -96,13 +139,40 @@
         <foreach collection="leases" item="lease" separator=",">
             (#{lease.tenantId}, #{lease.driverId}, #{lease.deviceId}, #{lease.ownerNode})
         </foreach>
+        <!--
+            The fencing token advances per row on every ownership change —
+            per-device monotonicity is the property stale-writer checks rely
+            on; the global sequence only ever delivered it incidentally.
+        -->
         ON CONFLICT (tenant_id, device_id) DO UPDATE SET
             driver_id = EXCLUDED.driver_id,
             owner_node = EXCLUDED.owner_node,
-            fencing_token = nextval('dc3_device_lease_fencing_seq'),
+            fencing_token = dc3_device_lease.fencing_token + 1,
             operate_time = CURRENT_TIMESTAMP
         WHERE dc3_device_lease.driver_id != EXCLUDED.driver_id
            OR dc3_device_lease.owner_node != EXCLUDED.owner_node
+    </insert>
+
+    <!--
+        MySQL fork: ON DUPLICATE KEY UPDATE has no WHERE — the ownership-change
+        guard becomes per-column IF chains that keep the old values unless the
+        incoming lease actually changes the owner.
+    -->
+    <insert id="upsertDeviceLeases" databaseId="mysql">
+        INSERT INTO dc3_device_lease (tenant_id, driver_id, device_id, owner_node)
+        VALUES
+        <foreach collection="leases" item="lease" separator=",">
+            (#{lease.tenantId}, #{lease.driverId}, #{lease.deviceId}, #{lease.ownerNode})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            driver_id = IF(VALUES(driver_id) != driver_id OR VALUES(owner_node) != owner_node,
+                VALUES(driver_id), driver_id),
+            owner_node = IF(VALUES(driver_id) != driver_id OR VALUES(owner_node) != owner_node,
+                VALUES(owner_node), owner_node),
+            fencing_token = IF(VALUES(driver_id) != driver_id OR VALUES(owner_node) != owner_node,
+                fencing_token + 1, fencing_token),
+            operate_time = IF(VALUES(driver_id) != driver_id OR VALUES(owner_node) != owner_node,
+                CURRENT_TIMESTAMP(6), operate_time)
     </insert>
 
     <delete id="deleteOrphanedLeases">

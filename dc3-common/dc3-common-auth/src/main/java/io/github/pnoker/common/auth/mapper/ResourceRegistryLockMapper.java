@@ -43,4 +43,11 @@ public interface ResourceRegistryLockMapper {
      */
     String advisoryLock(@Param("key") String key);
 
+
+    /**
+     * Release the advisory lock acquired by {@link #advisoryLock(String)}. A
+     * no-op on PostgreSQL (the xact lock releases with the transaction); on
+     * MySQL this releases the session lock — always call in a finally block.
+     */
+    void advisoryUnlock(@Param("key") String key);
 }

@@ -29,4 +29,22 @@
         SELECT pg_advisory_xact_lock(hashtext(#{key})) ::text
     </select>
 
+    <!--
+        MySQL fork: GET_LOCK is session-scoped, not transaction-scoped, so the
+        caller MUST pair it with advisoryUnlock in a finally block — the
+        PostgreSQL advisoryUnlock below is a no-op (the xact lock releases at
+        commit/rollback).
+    -->
+    <select id="advisoryLock" databaseId="mysql" resultType="java.lang.String">
+        SELECT CAST(GET_LOCK(#{key}, 10) AS CHAR)
+    </select>
+
+    <select id="advisoryUnlock" resultType="java.lang.String">
+        SELECT ''
+    </select>
+
+    <select id="advisoryUnlock" databaseId="mysql" resultType="java.lang.String">
+        SELECT CAST(RELEASE_LOCK(#{key}) AS CHAR)
+    </select>
+
 </mapper>

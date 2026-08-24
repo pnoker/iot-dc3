@@ -97,7 +97,7 @@ public class DriverStateServiceImpl implements DriverStateService {
         }
         String current = statusEnum.getCode();
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(STATUS_TIMEOUT_SECONDS);
-        EntityStateDO stateDO = entityStateMapper.upsertEntityState(
+        entityStateMapper.upsertEntityState(
                 IdWorker.getId(),
                 entityDTO.getTenantId(),
                 EntityTypeEnum.DRIVER.getIndex(),
@@ -110,6 +110,9 @@ public class DriverStateServiceImpl implements DriverStateService {
                 TimeoutSourceTypeEnum.SYSTEM.getIndex(),
                 "driver-heartbeat",
                 entityDTO.getStateDescription());
+        // MySQL has no INSERT ... RETURNING; re-read the row by its unique key.
+        EntityStateDO stateDO = entityStateMapper.selectByUniqueKey(
+                entityDTO.getTenantId(), EntityTypeEnum.DRIVER.getIndex(), entityDTO.getDriverId());
         if (Objects.isNull(stateDO)) {
             return;
         }

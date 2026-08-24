@@ -75,8 +75,39 @@
         LIMIT #{limit}
     </select>
 
+    <!-- MySQL twin: JSON extraction operators. -->
+    <select id="latest" databaseId="mysql" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow">
+        SELECT id,
+               CASE alarm_target_type_flag
+                   WHEN 0 THEN 'point'
+                   WHEN 1 THEN 'device'
+                   ELSE 'driver'
+                   END                               AS source,
+               entity_id                             AS source_id,
+               point_id,
+               alarm_type_flag                       AS alarm_type_flag,
+               confirm_flag,
+               create_time,
+               COALESCE(JSON_UNQUOTE(JSON_EXTRACT(alarm_ext, '$.content')), '') AS message
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+
     <select id="hourlyCounts" resultType="io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow">
         SELECT date_trunc('hour', create_time) AS bucket, COUNT(*) AS count
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+        GROUP BY bucket
+        ORDER BY bucket ASC
+    </select>
+
+    <!-- MySQL twin: no date_trunc — DATE_FORMAT renders the hour bucket. -->
+    <select id="hourlyCounts" databaseId="mysql"
+            resultType="io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow">
+        SELECT DATE_FORMAT(create_time, '%Y-%m-%dT%H:00:00') AS bucket, COUNT(*) AS count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
@@ -97,6 +128,32 @@
         confirm_flag,
         create_time,
         COALESCE(alarm_ext ->> 'content', '') AS message
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+        <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
+        <if test="source != null and source == 'point'">AND alarm_target_type_flag = 0</if>
+        <if test="source != null and source == 'driver'">AND alarm_target_type_flag = 2</if>
+        <if test="alarmTypeFlag != null">AND alarm_type_flag = #{alarmTypeFlag}</if>
+        <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+        <if test="from != null">AND create_time &gt;= #{from}</if>
+        ORDER BY create_time DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- MySQL twin: JSON extraction operators. -->
+    <select id="listPaged" databaseId="mysql" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow">
+        SELECT id,
+        CASE alarm_target_type_flag
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        entity_id AS source_id,
+        point_id,
+        alarm_type_flag AS alarm_type_flag,
+        confirm_flag,
+        create_time,
+        COALESCE(JSON_UNQUOTE(JSON_EXTRACT(alarm_ext, '$.content')), '') AS message
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
         <if test="source != null and source == 'device'">AND alarm_target_type_flag = 1</if>
@@ -198,15 +255,34 @@
         GROUP BY dow, hour
     </select>
 
+    <!-- MySQL twin: DAYOFWEEK/HOUR units (1=Sunday -> dow 0). -->
+    <select id="activityHeatmap" databaseId="mysql" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow">
+        SELECT DAYOFWEEK(create_time) - 1 AS dow, HOUR(create_time) AS hour, COUNT(*) AS count
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+        GROUP BY dow, hour
+    </select>
+
     <select id="typeDistribution" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
         SELECT alarm_ext ->> 'type' AS bucket_key, COUNT (*) AS count
         FROM dc3_entity_alarm
         WHERE tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
           AND alarm_ext ->> 'type' IS NOT NULL
-        GROUP BY key
-        ORDER BY count
-        DESC
+        GROUP BY bucket_key
+        ORDER BY count DESC
+    </select>
+
+    <!-- MySQL twin: JSON extraction operators. -->
+    <select id="typeDistribution" databaseId="mysql" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
+        SELECT JSON_UNQUOTE(JSON_EXTRACT(alarm_ext, '$.type')) AS bucket_key, COUNT (*) AS count
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+          AND JSON_UNQUOTE(JSON_EXTRACT(alarm_ext, '$.type')) IS NOT NULL
+        GROUP BY bucket_key
+        ORDER BY count DESC
     </select>
 
     <select id="stormSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow">

@@ -67,7 +67,7 @@ public interface DriverLeaseMapper {
                               @Param("driverId") Long driverId);
 
     /** Upserts reconciliation state and returns the atomically advanced assignment version. */
-    Long upsertLeaseState(@Param("tenantId") Long tenantId,
+    int upsertLeaseState(@Param("tenantId") Long tenantId,
                           @Param("driverId") Long driverId,
                           @Param("membershipHash") String membershipHash,
                           @Param("deviceRevision") Long deviceRevision);

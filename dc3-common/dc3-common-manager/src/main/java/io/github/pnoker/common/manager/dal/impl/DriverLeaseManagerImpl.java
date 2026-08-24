@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.List;
 
 /**
@@ -75,7 +76,11 @@ public class DriverLeaseManagerImpl implements DriverLeaseManager {
 
     @Override
     public long advanceAssignmentVersion(Long tenantId, Long driverId, String membershipHash, long deviceRevision) {
-        return driverLeaseMapper.upsertLeaseState(tenantId, driverId, membershipHash, deviceRevision);
+        // MySQL has no INSERT ... RETURNING; the portable shape re-selects the
+        // version in the same transaction.
+        driverLeaseMapper.upsertLeaseState(tenantId, driverId, membershipHash, deviceRevision);
+        DriverLeaseStateDO state = driverLeaseMapper.selectLeaseState(tenantId, driverId);
+        return Objects.isNull(state) ? 0L : state.getAssignmentVersion();
     }
 
     @Override

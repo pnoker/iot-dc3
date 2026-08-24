@@ -23,20 +23,20 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 /**
- * PostgreSQL dialect contribution: the pagination {@link DbType} consumed by the
- * neutral MybatisPlusConfig. The profile activation (postgres) and the
- * timestamptz type handler ride along via application-postgres.yml and the
- * EnvironmentPostProcessor registered in spring.factories.
+ * MySQL dialect contribution: the pagination {@link DbType} consumed by the
+ * neutral MybatisPlusConfig, active when {@code dc3.db.type=mysql}. Deployments
+ * on MySQL additionally add the mysql-connector dependency and the MySQL seed
+ * (dc3/dependencies/mysql/initdb) — see docs/design/storage-abstraction.md §3.
  *
  * @author pnoker
  * @since 2026.8.24
  */
 @AutoConfiguration
-@ConditionalOnProperty(prefix = "dc3.db", name = "type", havingValue = "postgres", matchIfMissing = true)
-public class PostgresDbAutoConfiguration {
+@ConditionalOnProperty(prefix = "dc3.db", name = "type", havingValue = "mysql")
+public class MysqlDbAutoConfiguration {
 
     @Bean
     public DbType paginationDbType() {
-        return DbType.POSTGRE_SQL;
+        return DbType.MYSQL;
     }
 }

@@ -19,6 +19,45 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.common.data.mapper.PointValueMapper">
 
+    <!--
+        MySQL fork: ON DUPLICATE KEY UPDATE with the fencing tuple guard
+        expanded into per-column IF chains — MySQL has neither row-value
+        comparison nor a WHERE clause on ON DUPLICATE KEY UPDATE. Each SET
+        keeps the old value unless the incoming envelope wins the
+        (fencing_token, create_time, sequence, message_id) lexicographic race.
+    -->
+    <insert id="upsertLatestBatch" databaseId="mysql">
+        INSERT INTO dc3_point_latest
+        (tenant_id, device_id, point_id, message_id, schema_version, driver_node,
+         sequence, fencing_token, raw_value, cal_value, num_value, driver_id, create_time, operate_time)
+        VALUES
+        <foreach collection="values" item="value" separator=",">
+            (#{value.tenantId}, #{value.deviceId}, #{value.pointId}, #{value.messageId},
+             #{value.schemaVersion}, #{value.driverNode}, #{value.sequence}, #{value.fencingToken},
+             #{value.rawValue}, #{value.calValue}, #{value.numValue}, #{value.driverId},
+             #{value.createTime}, #{value.operateTime})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            message_id = IF(
+                VALUES(fencing_token) > fencing_token
+                OR (VALUES(fencing_token) = fencing_token AND VALUES(create_time) > create_time)
+                OR (VALUES(fencing_token) = fencing_token AND VALUES(create_time) = create_time
+                    AND VALUES(sequence) > sequence)
+                OR (VALUES(fencing_token) = fencing_token AND VALUES(create_time) = create_time
+                    AND VALUES(sequence) = sequence AND VALUES(message_id) > message_id),
+                VALUES(message_id), message_id),
+            schema_version = IF(VALUES(message_id) = message_id, VALUES(schema_version), schema_version),
+            driver_node = IF(VALUES(message_id) = message_id, VALUES(driver_node), driver_node),
+            sequence = IF(VALUES(message_id) = message_id, VALUES(sequence), sequence),
+            fencing_token = IF(VALUES(message_id) = message_id, VALUES(fencing_token), fencing_token),
+            raw_value = IF(VALUES(message_id) = message_id, VALUES(raw_value), raw_value),
+            cal_value = IF(VALUES(message_id) = message_id, VALUES(cal_value), cal_value),
+            num_value = IF(VALUES(message_id) = message_id, VALUES(num_value), num_value),
+            driver_id = IF(VALUES(message_id) = message_id, VALUES(driver_id), driver_id),
+            create_time = IF(VALUES(message_id) = message_id, VALUES(create_time), create_time),
+            operate_time = IF(VALUES(message_id) = message_id, VALUES(operate_time), operate_time)
+    </insert>
+
     <insert id="upsertLatestBatch">
         INSERT INTO dc3_point_latest
         (tenant_id, device_id, point_id, message_id, schema_version, driver_node,

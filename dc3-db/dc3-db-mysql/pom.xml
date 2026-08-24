@@ -23,18 +23,27 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>iot-dc3</artifactId>
+        <artifactId>dc3-db</artifactId>
         <version>2026.5.22</version>
     </parent>
 
-    <artifactId>dc3-db</artifactId>
+    <artifactId>dc3-db-mysql</artifactId>
     <name>${project.artifactId}</name>
-    <packaging>pom</packaging>
-    <description>Relational dialect family: one adapter per engine behind dc3.db.type — see docs/design/storage-abstraction.md §3 and docs/tsdb-stores.md for the sibling families</description>
+    <description>MySQL 8 dialect adapter: driver, DATETIME(6) UTC conventions — selected by dc3.db.type=mysql; requires MySQL 8.0+ (window functions, CTEs, SKIP LOCKED)</description>
 
-    <modules>
-        <module>dc3-db-postgres</module>
-        <module>dc3-db-mysql</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

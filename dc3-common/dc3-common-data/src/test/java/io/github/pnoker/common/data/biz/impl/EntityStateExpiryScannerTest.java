@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyByte;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -59,6 +60,9 @@ class EntityStateExpiryScannerTest {
 
     @Mock
     private EntityStateMapper entityStateMapper;
+
+    @Mock
+    private org.springframework.transaction.support.TransactionTemplate transactionTemplate;
 
     @Mock
     private EntityAlarmManager entityAlarmManager;
@@ -94,8 +98,14 @@ class EntityStateExpiryScannerTest {
 
 
     private void stubClaimedDevices(List<EntityStateDO> results) {
-        when(entityStateMapper.claimExpiredDevices(anyByte(), anyByte(), anyByte(), anyByte(), anyByte(), anyInt(), anyInt()))
+        when(transactionTemplate.execute(any())).thenAnswer(invocation ->
+                ((org.springframework.transaction.support.TransactionCallback<List<EntityStateDO>>)
+                        invocation.getArgument(0)).doInTransaction(null));
+        when(entityStateMapper.selectExpiredForClaim(anyByte(), anyByte(), anyByte(), anyByte(), anyInt()))
                 .thenReturn(results);
+        // empty batches never reach the update — lenient for the skip cases
+        org.mockito.Mockito.lenient().when(entityStateMapper.markClaimedOffline(anyList(), anyByte(), anyInt()))
+                .thenReturn(results.size());
     }
 
     private void stubLastAlarmUpdate() {
@@ -121,14 +131,13 @@ class EntityStateExpiryScannerTest {
 
         scanner.onScanTick(new MqReceived<>("tick", Map.of(), false), ack);
 
-        verify(entityStateMapper).claimExpiredDevices(
+        verify(entityStateMapper).selectExpiredForClaim(
                 eq((byte) EntityTypeEnum.DEVICE.getIndex()),
                 eq((byte) EntityStatusEnum.ONLINE.getIndex()),
                 eq((byte) EntityStatusEnum.MAINTAIN.getIndex()),
                 eq((byte) EntityStatusEnum.FAULT.getIndex()),
-                eq((byte) EntityStatusEnum.OFFLINE.getIndex()),
-                anyInt(),
                 anyInt());
+        verify(entityStateMapper, never()).markClaimedOffline(anyList(), anyByte(), anyInt());
         verify(entityAlarmManager, never()).save(any());
         verify(alarmRuleTriggerService, never()).processDeviceAlarm(any());
         verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.DEVICE_SCAN));
@@ -173,8 +182,7 @@ class EntityStateExpiryScannerTest {
 
     @Test
     void scanTickNacksAndRequeuesOnFailure() throws Exception {
-        when(entityStateMapper.claimExpiredDevices(anyByte(), anyByte(), anyByte(), anyByte(), anyByte(), anyInt(), anyInt()))
-                .thenThrow(new RuntimeException("DB down"));
+        when(transactionTemplate.execute(any())).thenThrow(new RuntimeException("DB down"));
 
         scanner.onScanTick(new MqReceived<>("tick", Map.of(), false), ack);
 

@@ -96,7 +96,7 @@ public class DeviceStateServiceImpl implements DeviceStateService {
         }
         String current = statusEnum.getCode();
         LocalDateTime expireTime = LocalDateTime.now().plusSeconds(ttlSeconds);
-        EntityStateDO stateDO = entityStateMapper.upsertEntityState(
+        entityStateMapper.upsertEntityState(
                 IdWorker.getId(),
                 entityDTO.getTenantId(),
                 EntityTypeEnum.DEVICE.getIndex(),
@@ -109,6 +109,10 @@ public class DeviceStateServiceImpl implements DeviceStateService {
                 TimeoutSourceTypeEnum.DRIVER.getIndex(),
                 "device-heartbeat",
                 entityDTO.getStateDescription());
+        // MySQL has no INSERT ... RETURNING; the portable shape re-reads the row
+        // by its unique key right after the upsert.
+        EntityStateDO stateDO = entityStateMapper.selectByUniqueKey(
+                entityDTO.getTenantId(), EntityTypeEnum.DEVICE.getIndex(), entityDTO.getDeviceId());
         if (Objects.isNull(stateDO)) {
             return;
         }
