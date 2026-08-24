@@ -16,6 +16,7 @@
  */
 
 import {computed, defineComponent, onBeforeUnmount, onMounted, reactive, watch} from 'vue';
+import {ElMessageBox} from 'element-plus';
 import type {FormItemRule, FormRules} from 'element-plus';
 import {Search} from '@element-plus/icons-vue';
 
@@ -49,6 +50,7 @@ import {
 import type {
   Attribute,
   CommandInfoForm,
+  DriverInfoForm,
   CommandRecord,
   DeviceRecord,
   Dictionary,
@@ -718,8 +720,8 @@ export default defineComponent({
       listDriverInfoByDeviceId(reactiveData.id)
         .then((res) => {
           const formData: AttributeFormData = reactiveData.driverFormData;
-          res.data.forEach((info: { attributeId: string; id: any; configValue: any }) => {
-            const attributeCode = reactiveData.driverAttributeTable[info.attributeId];
+          res.data.forEach((info: DriverInfoForm) => {
+            const attributeCode = reactiveData.driverAttributeTable[info.attributeId ?? ''];
             const attribute = reactiveData.driverAttributes.find((item) => item.attributeCode === attributeCode);
             if (attribute) {
               formData[attributeCode] = createAttributeFormItem(attribute, info.id, info.configValue);
@@ -775,16 +777,14 @@ export default defineComponent({
 
           return listPointInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
-              (infoRes.data || []).forEach(
-                (info: { pointId: string; attributeId: string; id: string; configValue: unknown }) => {
-                  const attributeCode = reactiveData.pointAttributeTable[info.attributeId];
-                  const attribute = reactiveData.pointAttributes.find((item) => item.attributeCode === attributeCode);
-                  const row = rowTable[info.pointId];
-                  if (row && attribute) {
-                    row.attributes[attributeCode] = createPointAttributeCell(attribute, info.id, info.configValue);
-                  }
+              (infoRes.data || []).forEach((info: PointInfoForm) => {
+                const attributeCode = reactiveData.pointAttributeTable[info.attributeId ?? ''];
+                const attribute = reactiveData.pointAttributes.find((item) => item.attributeCode === attributeCode);
+                const row = rowTable[String(info.pointId ?? '')];
+                if (row && attribute) {
+                  row.attributes[attributeCode] = createPointAttributeCell(attribute, info.id ?? '', info.configValue);
                 }
-              );
+              });
               reactiveData.pointInfoData = rows;
               reactiveData.oldPointInfoData = clone(rows);
             })
@@ -839,16 +839,14 @@ export default defineComponent({
 
           return listCommandInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
-              (infoRes.data || []).forEach(
-                (info: { commandId: string; attributeId: string; id: string; configValue: unknown }) => {
-                  const attributeCode = reactiveData.commandAttributeTable[info.attributeId];
-                  const attribute = reactiveData.commandAttributes.find((item) => item.attributeCode === attributeCode);
-                  const row = rowTable[String(info.commandId)];
-                  if (row && attribute) {
-                    row.attributes[attributeCode] = createPointAttributeCell(attribute, info.id, info.configValue);
-                  }
+              (infoRes.data || []).forEach((info: CommandInfoForm) => {
+                const attributeCode = reactiveData.commandAttributeTable[info.attributeId ?? ''];
+                const attribute = reactiveData.commandAttributes.find((item) => item.attributeCode === attributeCode);
+                const row = rowTable[String(info.commandId ?? '')];
+                if (row && attribute) {
+                  row.attributes[attributeCode] = createPointAttributeCell(attribute, info.id ?? '', info.configValue);
                 }
-              );
+              });
               reactiveData.commandInfoData = rows;
               reactiveData.oldCommandInfoData = clone(rows);
             })
@@ -900,16 +898,14 @@ export default defineComponent({
 
           return listEventInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
-              (infoRes.data || []).forEach(
-                (info: { eventId: string; attributeId: string; id: string; configValue: unknown }) => {
-                  const attributeCode = reactiveData.eventAttributeTable[info.attributeId];
-                  const attribute = reactiveData.eventAttributes.find((item) => item.attributeCode === attributeCode);
-                  const row = rowTable[String(info.eventId)];
-                  if (row && attribute) {
-                    row.attributes[attributeCode] = createPointAttributeCell(attribute, info.id, info.configValue);
-                  }
+              (infoRes.data || []).forEach((info: EventInfoForm) => {
+                const attributeCode = reactiveData.eventAttributeTable[info.attributeId ?? ''];
+                const attribute = reactiveData.eventAttributes.find((item) => item.attributeCode === attributeCode);
+                const row = rowTable[String(info.eventId ?? '')];
+                if (row && attribute) {
+                  row.attributes[attributeCode] = createPointAttributeCell(attribute, info.id ?? '', info.configValue);
                 }
-              );
+              });
               reactiveData.eventInfoData = rows;
               reactiveData.oldEventInfoData = clone(rows);
             })
@@ -1095,8 +1091,13 @@ export default defineComponent({
           };
 
           try {
-            const res = cell.id ? await updatePointInfo(payload) : await addPointInfo(payload);
-            cell.id = String(res?.data?.id || cell.id || '');
+            // Backend add/update return R<String> (success code) without the new
+            // id, so there is nothing to read back from res.data.
+            if (cell.id) {
+              await updatePointInfo(payload);
+            } else {
+              await addPointInfo(payload);
+            }
             cell.originalValue = cell.configValue;
             cell.dirty = false;
           } catch (error) {
@@ -1212,8 +1213,11 @@ export default defineComponent({
           };
 
           try {
-            const res = cell.id ? await updateCommandInfo(payload) : await addCommandInfo(payload);
-            cell.id = String(res?.data?.id || cell.id || '');
+            if (cell.id) {
+              await updateCommandInfo(payload);
+            } else {
+              await addCommandInfo(payload);
+            }
             cell.originalValue = cell.configValue;
             cell.dirty = false;
           } catch (error) {
@@ -1327,8 +1331,11 @@ export default defineComponent({
           };
 
           try {
-            const res = cell.id ? await updateEventInfo(payload) : await addEventInfo(payload);
-            cell.id = String(res?.data?.id || cell.id || '');
+            if (cell.id) {
+              await updateEventInfo(payload);
+            } else {
+              await addEventInfo(payload);
+            }
             cell.originalValue = cell.configValue;
             cell.dirty = false;
           } catch (error) {
@@ -1473,10 +1480,15 @@ export default defineComponent({
       window.removeEventListener('beforeunload', warnBeforeUnload);
     });
 
-    onBeforeRouteLeave((_to, _from, next) => {
+    onBeforeRouteLeave(async (_to, _from, next) => {
       if (totalDirtyCount.value > 0) {
-        const leave = window.confirm('You have unsaved changes. Are you sure you want to leave?');
-        if (!leave) {
+        try {
+          await ElMessageBox.confirm(t('device.edit.unsavedConfirm'), t('common.confirm'), {
+            type: 'warning',
+            confirmButtonText: t('common.confirm'),
+            cancelButtonText: t('common.cancel'),
+          });
+        } catch {
           next(false);
           return;
         }

@@ -133,7 +133,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     activeConfig.value
       .list(query())
       .then((res: R) => {
-        const page = res.data || {};
+        const page = (res.data ?? {}) as { records?: AlarmEntity[]; total?: number };
         state.rows = page.records || [];
         state.page.total = Number(page.total || 0);
       })

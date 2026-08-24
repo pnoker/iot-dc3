@@ -23,13 +23,14 @@
 import type {PropType} from 'vue';
 import {computed} from 'vue';
 import {useI18n} from 'vue-i18n';
+import type {RangeKey} from '@/config/types/dashboard';
 
 /**
  * Presets the frontend sends as {@code rangeKey} — kept in sync with
  * backend {@link TimeRangeKeyEnum}. The empty-string sentinel is the
  * "no filter" choice, rendered only when {@code includeAll} is true.
  */
-export type RangeKey = '' | 'today' | '24h' | '7d' | '30d';
+export type {RangeKey};
 
 const props = defineProps({
   modelValue: {

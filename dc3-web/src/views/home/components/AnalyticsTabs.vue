@@ -57,7 +57,7 @@ import {listDriverByIds} from '@/api/driver';
 import {listPointByIds} from '@/api/point';
 import {listProfileByIds} from '@/api/profile';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
+import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
 type TabKey = 'deviceStatus' | 'protocol' | 'profile' | 'topDevice' | 'topPoint' | 'topDriver';

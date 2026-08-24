@@ -19,6 +19,7 @@ import type {
   MessageRecord,
   NotifyChannelBindRecord,
   NotifyChannelRecord,
+  NotifyChannelTypeFlag,
   NotifyHistoryRecord,
   NotifyRecord,
   RuleRecord,
@@ -40,7 +41,7 @@ const ext = (type: string, content: Record<string, unknown>, version = 1) => ({
 interface ChannelDef {
   name: string;
   code: string;
-  type: string;
+  type: NotifyChannelTypeFlag;
   credential: string;
   content: Record<string, unknown>;
 }
@@ -62,7 +63,7 @@ const channelDefs: ChannelDef[] = [
   {
     name: '钉钉运维群机器人',
     code: 'dingtalk-ops',
-    type: 'DINGTALK_BOT',
+    type: 'WEBHOOK',
     credential: 'dingtalk-ops-bot',
     content: {
       signEnabled: true,
@@ -193,7 +194,7 @@ const messageDefs: MessageDef[] = [
       variables: ['severity', 'device', 'point', 'value', 'unit', 'threshold', 'triggerTime'],
       templates: [
         {
-          channelType: 'DINGTALK_BOT',
+          channelType: 'WEBHOOK',
           payloadType: 'MARKDOWN',
           template: {
             title: '${severity} ${device} 告警',
@@ -335,7 +336,7 @@ const ruleDefs: RuleDef[] = [
 interface StateDef {
   ruleIdx: number;
   entity: string;
-  state: 'FIRING' | 'PENDING' | 'RECOVERED';
+  state: 'FIRING' | 'NORMAL' | 'RECOVERED';
   fingerprint: string;
   triggerCount: number;
   first: string;
@@ -376,7 +377,7 @@ const stateDefs: StateDef[] = [
   {
     ruleIdx: 2,
     entity: '5011',
-    state: 'PENDING',
+    state: 'NORMAL',
     fingerprint: 'fp-0a7b3e5d9c218f64',
     triggerCount: 0,
     first: '',
@@ -474,7 +475,7 @@ const historyDefs: HistoryDef[] = [
     retry: 2,
     time: '2026-08-05T09:30:00',
     request: {
-      channelType: 'DINGTALK_BOT',
+      channelType: 'WEBHOOK',
       target: 'https://oapi.dingtalk.com/robot/send?access_token=****',
       payloadType: 'MARKDOWN'
     },

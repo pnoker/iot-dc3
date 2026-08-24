@@ -16,14 +16,9 @@
  */
 
 /**
- * Dashboard / event-overview payload shapes. Keeping these here (not in
- * api/dashboard.ts alongside the fetch functions) follows the project-wide
- * convention described in CLAUDE.md: "config/entity/" is the interface-only
- * module, always imported with `import type` under verbatimModuleSyntax.
- *
- * <p>Shared primitives (AlertSource, RangeKey) live here too so every
- * card / API wrapper points at the same union instead of re-declaring
- * `'device' | 'driver'` inline.</p>
+ * Dashboard / event-overview payload shapes. Kept here (not inside the API
+ * wrappers) so every card and `api/dashboard/*` module points at one source
+ * of truth, always imported with `import type` under verbatimModuleSyntax.
  */
 
 /** Three canonical alarm sources — point-level, device-level, driver-level. */
@@ -214,4 +209,74 @@ export interface DailyGrowthSummary {
   deviceDailyCounts: number[];
   pointDailyCounts: number[];
   profileDailyCounts: number[];
+}
+
+// ---- Alert overview cards (previously declared inline in components) ----
+
+export interface AlertEventRow {
+  id: string;
+  source: AlertSource;
+  sourceId: string;
+  createTime: string;
+  message?: string;
+}
+
+export interface AlertStormRow {
+  source: AlertSource;
+  sourceId: string;
+  count: number;
+}
+
+export interface AlertTypeRow {
+  type: string;
+  count: number;
+}
+
+export interface AlertActivityRow {
+  /** 0..6 = Sun..Sat, matching Postgres EXTRACT(DOW). */
+  dow: number;
+  hour: number;
+  count: number;
+}
+
+export interface AlertTrendRow {
+  date: string;
+  source: string;
+  count: number;
+}
+
+export interface AlertTopSourceRow {
+  name: string;
+  count: number;
+}
+
+/** Bucket shape shared by statsTop / latency / enable-breakdown endpoints. */
+export interface StatsCountBucket {
+  entityId?: number;
+  key?: string;
+  bin?: number;
+  count: number;
+}
+
+export interface StreamRow {
+  deviceId: string;
+  pointId: string;
+  driverId?: string;
+  // driverName / deviceName / pointName are populated server-side via metadata
+  // facades, so the feed renders the full tuple without extra lookups.
+  driverName?: string;
+  deviceName?: string;
+  pointName?: string;
+}
+
+export interface DriverStats {
+  byEnable: { key: string; count: number }[];
+  byType: { key: string; count: number }[];
+  byService: { key: string; count: number }[];
+}
+
+export interface DeviceStats {
+  byEnable: { key: string; count: number }[];
+  byProfile: { key: string; count: number }[];
+  byDriver: { key: string; count: number }[];
 }

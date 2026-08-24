@@ -27,7 +27,7 @@ export const addLocalCredential = crud.add;
 export const deleteLocalCredential = crud.delete;
 
 export const resetLocalCredentialPassword = (id: string, password: string) =>
-  httpPost(`${API_LOCAL_CREDENTIAL_BASE}/reset_password`, undefined, {params: {id, password}});
+  httpPost<R<string>>(`${API_LOCAL_CREDENTIAL_BASE}/reset_password`, undefined, {params: {id, password}});
 
 export const checkLoginNameAvailable = (name: string) =>
   httpGet<R<boolean>>(`${API_LOCAL_CREDENTIAL_BASE}/check`, {params: {name}});

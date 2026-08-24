@@ -57,26 +57,18 @@ import {useI18n} from 'vue-i18n';
 import {alertPage} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
-import type {AlertSource} from '@/config/types/dashboard';
-
-interface Row {
-  id: string;
-  source: AlertSource;
-  sourceId: string;
-  createTime: string;
-  message?: string;
-}
+import type {AlertEventRow, AlertSource} from '@/config/types/dashboard';
 
 const {t, locale} = useI18n();
 const loading = ref(false);
-const rows = ref<Row[]>([]);
+const rows = ref<AlertEventRow[]>([]);
 const {resolveBySource, nameBySource} = useEntityNames();
 
 const load = async () => {
   loading.value = true;
   try {
-    const res: { data?: { records?: Row[] } } = await alertPage({confirmFlag: 0, current: 1, size: 5});
-    const data: Row[] = res?.data?.records ?? [];
+    const res: { data?: { records?: AlertEventRow[] } } = await alertPage({confirmFlag: 0, current: 1, size: 5});
+    const data: AlertEventRow[] = res?.data?.records ?? [];
     rows.value = data;
     await resolveBySource(data);
   } catch {
@@ -86,7 +78,7 @@ const load = async () => {
   }
 };
 
-const nameFor = (r: Row) => nameBySource(r.source, r.sourceId);
+const nameFor = (r: AlertEventRow) => nameBySource(r.source, r.sourceId);
 
 const sourceTagType = (s: AlertSource) => (s === 'device' ? 'primary' : s === 'driver' ? 'warning' : 'success');
 const sourceColor = (s: AlertSource) => (s === 'device' ? '#409eff' : s === 'driver' ? '#e6a23c' : '#67c23a');

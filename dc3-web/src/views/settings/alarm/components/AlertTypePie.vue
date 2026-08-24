@@ -36,16 +36,12 @@ import {Chart} from '@antv/g2';
 
 import {alertTypeDistribution} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+import type {AlertTypeRow} from '@/config/types/dashboard';
 
 const {t, locale} = useI18n();
 
-interface TypeRow {
-  type: string;
-  count: number;
-}
-
 const loading = ref(false);
-const rows = ref<TypeRow[]>([]);
+const rows = ref<AlertTypeRow[]>([]);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
 
@@ -58,7 +54,7 @@ const labelFor = (type: string) => {
   return translated && translated !== key ? translated : type;
 };
 
-const render = (data: TypeRow[]) => {
+const render = (data: AlertTypeRow[]) => {
   if (!chartRef.value) return;
   chart?.destroy();
   chart = new Chart({container: chartRef.value, autoFit: true});
@@ -78,7 +74,7 @@ const render = (data: TypeRow[]) => {
 const load = async () => {
   loading.value = true;
   try {
-    const res: { data?: TypeRow[] } = await alertTypeDistribution(30);
+    const res: { data?: AlertTypeRow[] } = await alertTypeDistribution(30);
     rows.value = res?.data ?? [];
     await nextTick();
     if (rows.value.length > 0) render(rows.value);

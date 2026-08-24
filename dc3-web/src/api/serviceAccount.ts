@@ -29,10 +29,10 @@ export const deleteServiceAccount = crud.delete;
 export const updateServiceAccount = crud.update;
 
 export const enableServiceAccount = (id: string) =>
-  httpPost(`${API_SERVICE_ACCOUNT_BASE}/enable`, undefined, {params: {id}});
+  httpPost<R<string>>(`${API_SERVICE_ACCOUNT_BASE}/enable`, undefined, {params: {id}});
 
 export const disableServiceAccount = (id: string) =>
-  httpPost(`${API_SERVICE_ACCOUNT_BASE}/disable`, undefined, {params: {id}});
+  httpPost<R<string>>(`${API_SERVICE_ACCOUNT_BASE}/disable`, undefined, {params: {id}});
 
 export const getServiceAccountById = crud.getById;
 

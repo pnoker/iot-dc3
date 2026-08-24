@@ -22,8 +22,10 @@ import {useRouter} from 'vue-router';
 
 import type {Order, PageQuery} from '@/config/types';
 import type {EntityColumnConfig, EntityListConfig, EntityOption} from '@/config/types/entityList';
+import {ENUM_TAG_TYPE_MAP} from '@/config/constant/enums';
 import {timestampLabel} from '@/utils/dateUtil';
 import {prettyJson} from '@/utils/jsonUtil';
+import {logger} from '@/utils/log';
 import {successMessage} from '@/utils/notificationUtil';
 import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
@@ -160,7 +162,9 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
         if (config.value.mode === 'tree') {
           state.rows = (res.data as Record<string, any>[]) || [];
         } else {
-          const page = res.data || {};
+          // Config-driven boundary: the envelope's data shape depends on the
+          // concrete config.list implementation, so narrow it once here.
+          const page = (res.data ?? {}) as { records?: Record<string, any>[]; total?: number };
           state.rows = page.records || [];
           state.page.total = Number(page.total || 0);
         }
@@ -269,7 +273,10 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
   const submit = () => {
     const addRequest = config.value.add;
     const updateRequest = config.value.update;
-    if (!addRequest || !updateRequest) return;
+    if (!addRequest || !updateRequest) {
+      logger.warn('Entity list action not configured', {add: Boolean(addRequest), update: Boolean(updateRequest)});
+      return;
+    }
     formRef.value?.validate((valid) => {
       if (!valid) return;
       let data: Record<string, unknown>;
@@ -317,28 +324,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
 
   const tagType = (value: unknown) => {
     const text = String(value ?? '');
-    if (
-      text === 'ENABLE' ||
-      text === 'SUCCESS' ||
-      text === 'NORMAL' ||
-      text === 'AUTO' ||
-      text === 'LOW' ||
-      text === 'ACTIVE'
-    )
-      return 'success';
-    if (
-      text === 'DISABLE' ||
-      text === 'FAILED' ||
-      text === 'FAILURE' ||
-      text === 'ERROR' ||
-      text === 'DENIED' ||
-      text === 'FIRING' ||
-      text === 'HIGH'
-    )
-      return 'danger';
-    if (text === 'PENDING' || text === 'RETRYING' || text === 'RECOVERED' || text === 'MEDIUM' || text === 'SUSPENDED')
-      return 'warning';
-    return 'info';
+    return ENUM_TAG_TYPE_MAP[text] || 'info';
   };
 
   const formatCell = (row: Record<string, any>, column: EntityColumnConfig) => {

@@ -30,7 +30,7 @@ import {Chart} from '@antv/g2';
 
 import {statsTimeseries} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
+import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 
 const rangeKey = ref<RangeKey>('24h');

@@ -57,13 +57,7 @@ import {alertStormSources} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {jumpToSourceEvents} from '@/utils/jumpUtil';
-import type {AlertSource} from '@/config/types/dashboard';
-
-interface StormRow {
-  source: AlertSource;
-  sourceId: string;
-  count: number;
-}
+import type {AlertSource, AlertStormRow} from '@/config/types/dashboard';
 
 const props = defineProps({
   limit: {type: Number, default: 10},
@@ -94,13 +88,13 @@ const windowKey = ref<WindowKey>('24h');
 const window = computed(() => WINDOW_SPECS[windowKey.value]);
 
 const loading = ref(false);
-const rows = ref<StormRow[]>([]);
+const rows = ref<AlertStormRow[]>([]);
 
 const load = async () => {
   loading.value = true;
   try {
     const {hours, minCount} = window.value;
-    const res: { data?: StormRow[] } = await alertStormSources(hours, minCount, props.limit);
+    const res: { data?: AlertStormRow[] } = await alertStormSources(hours, minCount, props.limit);
     rows.value = res?.data ?? [];
     await resolveBySource(rows.value);
   } catch {
@@ -113,9 +107,9 @@ const load = async () => {
 watch(windowKey, load);
 watch(locale, load);
 
-const nameFor = (r: StormRow) => nameBySource(r.source, r.sourceId);
+const nameFor = (r: AlertStormRow) => nameBySource(r.source, r.sourceId);
 
-const onDrillIn = (row: StormRow) => jumpToSourceEvents(router, row.source, row.sourceId);
+const onDrillIn = (row: AlertStormRow) => jumpToSourceEvents(router, row.source, row.sourceId);
 
 const sourceTagType = (s: AlertSource) => (s === 'device' ? 'primary' : s === 'driver' ? 'warning' : 'success');
 const sourceLabel = (s: AlertSource) => {

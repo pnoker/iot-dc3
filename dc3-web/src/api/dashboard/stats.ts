@@ -18,10 +18,15 @@
 import {httpGet} from '@/api/common';
 import {API_DATA_BASE, API_MANAGER_BASE} from '@/config/constant/api';
 import type {
+  AlertActivityRow,
   DailyGrowthSummary,
+  DeviceStats,
+  DriverStats,
   Granularity,
+  StatsCountBucket,
   StatsTimeBucket,
   StatsTodaySummary,
+  StreamRow,
   TimeRangeParams,
   TopDimension,
 } from '@/config/types/dashboard';
@@ -32,23 +37,24 @@ export const statsTimeseries = (params: TimeRangeParams & { granularity?: Granul
   httpGet<R<StatsTimeBucket[]>>(`${API_DATA_BASE}/dashboard/stats/timeseries`, {params: timeRangeParams(params)});
 
 export const statsTop = (params: TimeRangeParams & { dimension?: TopDimension; limit?: number } = {}) =>
-  httpGet(`${API_DATA_BASE}/dashboard/top`, {params: timeRangeParams(params)});
+  httpGet<R<StatsCountBucket[]>>(`${API_DATA_BASE}/dashboard/top`, {params: timeRangeParams(params)});
 
-export const streamLatest = (size = 20) => httpGet(`${API_DATA_BASE}/dashboard/stream`, {params: {size}});
+export const streamLatest = (size = 20) =>
+  httpGet<R<StreamRow[]>>(`${API_DATA_BASE}/dashboard/stream`, {params: {size}});
 
 export const statsLatency = (params: TimeRangeParams = {rangeKey: '24h'}) =>
-  httpGet(`${API_DATA_BASE}/dashboard/stats/latency`, {params: timeRangeParams(params)});
+  httpGet<R<StatsCountBucket[]>>(`${API_DATA_BASE}/dashboard/stats/latency`, {params: timeRangeParams(params)});
 
 export const statsActivity = (params: TimeRangeParams = {rangeKey: '7d'}) =>
-  httpGet(`${API_DATA_BASE}/dashboard/stats/activity`, {params: timeRangeParams(params)});
+  httpGet<R<AlertActivityRow[]>>(`${API_DATA_BASE}/dashboard/stats/activity`, {params: timeRangeParams(params)});
 
 export const dailyGrowth = (days = 7) =>
   httpGet<R<DailyGrowthSummary>>(`${API_MANAGER_BASE}/dashboard/growth`, {params: {days}});
 
-export const driverStats = () => httpGet(`${API_MANAGER_BASE}/dashboard/driver/stats`);
+export const driverStats = () => httpGet<R<DriverStats>>(`${API_MANAGER_BASE}/dashboard/driver/stats`);
 
 export const deviceStats = (topN = 10) =>
-  httpGet(`${API_MANAGER_BASE}/dashboard/device/stats`, {params: {top_n: topN}});
+  httpGet<R<DeviceStats>>(`${API_MANAGER_BASE}/dashboard/device/stats`, {params: {top_n: topN}});
 
 const timeRangeParams = <T extends TimeRangeParams>(params: T) => {
   const {rangeKey, rangeHours, ...rest} = params;

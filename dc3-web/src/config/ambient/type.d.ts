@@ -18,7 +18,7 @@
 /**
  * Standard response envelope.
  */
-declare type R<T = any> = {
+declare type R<T = unknown> = {
   ok: boolean;
   code: string;
   message: string;

@@ -88,6 +88,8 @@ export interface EntityRowAction {
   key: string;
   label: string;
   type?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
+  /** When set, the action renders inside el-popconfirm; onClick runs only after confirmation. */
+  popconfirmTitle?: string;
   onClick: (row: Record<string, any>) => void;
 }
 
@@ -127,10 +129,10 @@ export interface EntityListConfig {
   /** Builds the submitted payload instead of using the default field assembly. */
   toPayload?: (form: Record<string, any>) => Record<string, unknown>;
 
-  list: (query: PageQuery) => Promise<R>;
-  add?: (payload: Record<string, unknown>) => Promise<R>;
-  update?: (payload: Record<string, unknown>) => Promise<R>;
-  remove?: (id: string) => Promise<R>;
+  list: (query: PageQuery) => Promise<R<unknown>>;
+  add?: (payload: Record<string, unknown>) => Promise<R<unknown>>;
+  update?: (payload: Record<string, unknown>) => Promise<R<unknown>>;
+  remove?: (id: string) => Promise<R<unknown>>;
 
   detail?: { routeName: string }; // Detail route; omit to hide the detail action.
   extraActions?: EntityRowAction[];

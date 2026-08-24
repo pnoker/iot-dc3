@@ -217,3 +217,34 @@ export const MCP_RISK_LEVEL_OPTIONS: EnumOption[] = [
   {label: MCP_RISK_LEVELS.MEDIUM, value: MCP_RISK_LEVELS.MEDIUM},
   {label: MCP_RISK_LEVELS.HIGH, value: MCP_RISK_LEVELS.HIGH},
 ];
+
+// Backend: PrincipalTypeEnum
+export const PRINCIPAL_TYPE_OPTIONS: EnumOption[] = [
+  {label: 'USER', value: 'USER'},
+  {label: 'SERVICE_ACCOUNT', value: 'SERVICE_ACCOUNT'},
+  {label: 'SYSTEM', value: 'SYSTEM'},
+];
+
+/**
+ * Enum name → el-tag type mapping (kept in sync with backend enums).
+ */
+export const ENUM_TAG_TYPE_MAP: Record<string, 'primary' | 'success' | 'info' | 'warning' | 'danger'> = {
+  ENABLE: 'success',
+  SUCCESS: 'success',
+  NORMAL: 'success',
+  AUTO: 'success',
+  LOW: 'success',
+  ACTIVE: 'success',
+  DISABLE: 'danger',
+  FAILED: 'danger',
+  FAILURE: 'danger',
+  ERROR: 'danger',
+  DENIED: 'danger',
+  FIRING: 'danger',
+  HIGH: 'danger',
+  PENDING: 'warning',
+  RETRYING: 'warning',
+  RECOVERED: 'warning',
+  MEDIUM: 'warning',
+  SUSPENDED: 'warning',
+};

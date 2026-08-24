@@ -30,4 +30,4 @@ export const listDriver = <T = R<PageResult<DriverRecord>>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/driver/list`, query);
 
 export const listDriverStatus = (query: Record<string, unknown>) =>
-  httpPost(`${API_DATA_BASE}/driver/status/list`, query);
+  httpPost<R<Record<string, string>>>(`${API_DATA_BASE}/driver/status/list`, query);

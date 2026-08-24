@@ -92,10 +92,10 @@ export interface AlarmEntityConfig {
   columns: AlarmColumnConfig[];
   fields: AlarmFieldConfig[];
   defaultForm: () => Record<string, unknown>;
-  list: (query: PageQuery) => Promise<R>;
-  add?: (payload: Record<string, unknown>) => Promise<R>;
-  update?: (payload: Record<string, unknown>) => Promise<R>;
-  remove?: (id: string) => Promise<R>;
+  list: (query: PageQuery) => Promise<R<unknown>>;
+  add?: (payload: Record<string, unknown>) => Promise<R<unknown>>;
+  update?: (payload: Record<string, unknown>) => Promise<R<unknown>>;
+  remove?: (id: string) => Promise<R<unknown>>;
 }
 
 export const ALARM_DETAIL_ROUTE_MAP: Record<AlarmTabKey, string> = {
