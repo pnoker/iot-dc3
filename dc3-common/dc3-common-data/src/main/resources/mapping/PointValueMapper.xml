@@ -28,34 +28,34 @@
     -->
     <insert id="upsertLatestBatch" databaseId="mysql">
         INSERT INTO dc3_point_latest
-        (tenant_id, device_id, point_id, message_id, schema_version, driver_node,
-         sequence, fencing_token, raw_value, cal_value, num_value, driver_id, create_time, operate_time)
+        (tenant_id, device_id, point_id, dc3_point_latest.message_id, dc3_point_latest.schema_version, dc3_point_latest.driver_node,
+         dc3_point_latest.sequence, dc3_point_latest.fencing_token, dc3_point_latest.raw_value, dc3_point_latest.cal_value, dc3_point_latest.num_value, dc3_point_latest.driver_id, dc3_point_latest.create_time, dc3_point_latest.operate_time)
         VALUES
         <foreach collection="values" item="value" separator=",">
             (#{value.tenantId}, #{value.deviceId}, #{value.pointId}, #{value.messageId},
              #{value.schemaVersion}, #{value.driverNode}, #{value.sequence}, #{value.fencingToken},
              #{value.rawValue}, #{value.calValue}, #{value.numValue}, #{value.driverId},
              #{value.createTime}, #{value.operateTime})
-        </foreach>
+        </foreach> AS new
         ON DUPLICATE KEY UPDATE
             message_id = IF(
-                VALUES(fencing_token) > fencing_token
-                OR (VALUES(fencing_token) = fencing_token AND VALUES(create_time) > create_time)
-                OR (VALUES(fencing_token) = fencing_token AND VALUES(create_time) = create_time
-                    AND VALUES(sequence) > sequence)
-                OR (VALUES(fencing_token) = fencing_token AND VALUES(create_time) = create_time
-                    AND VALUES(sequence) = sequence AND VALUES(message_id) > message_id),
-                VALUES(message_id), message_id),
-            schema_version = IF(VALUES(message_id) = message_id, VALUES(schema_version), schema_version),
-            driver_node = IF(VALUES(message_id) = message_id, VALUES(driver_node), driver_node),
-            sequence = IF(VALUES(message_id) = message_id, VALUES(sequence), sequence),
-            fencing_token = IF(VALUES(message_id) = message_id, VALUES(fencing_token), fencing_token),
-            raw_value = IF(VALUES(message_id) = message_id, VALUES(raw_value), raw_value),
-            cal_value = IF(VALUES(message_id) = message_id, VALUES(cal_value), cal_value),
-            num_value = IF(VALUES(message_id) = message_id, VALUES(num_value), num_value),
-            driver_id = IF(VALUES(message_id) = message_id, VALUES(driver_id), driver_id),
-            create_time = IF(VALUES(message_id) = message_id, VALUES(create_time), create_time),
-            operate_time = IF(VALUES(message_id) = message_id, VALUES(operate_time), operate_time)
+                new.fencing_token > dc3_point_latest.fencing_token
+                OR (new.fencing_token = dc3_point_latest.fencing_token AND new.create_time > dc3_point_latest.create_time)
+                OR (new.fencing_token = dc3_point_latest.fencing_token AND new.create_time = dc3_point_latest.create_time
+                    AND new.sequence > dc3_point_latest.sequence)
+                OR (new.fencing_token = dc3_point_latest.fencing_token AND new.create_time = dc3_point_latest.create_time
+                    AND new.sequence = dc3_point_latest.sequence AND new.message_id > dc3_point_latest.message_id),
+                new.message_id, dc3_point_latest.message_id),
+            schema_version = IF(new.message_id = dc3_point_latest.message_id, new.schema_version, dc3_point_latest.schema_version),
+            driver_node = IF(new.message_id = dc3_point_latest.message_id, new.driver_node, dc3_point_latest.driver_node),
+            sequence = IF(new.message_id = dc3_point_latest.message_id, new.sequence, dc3_point_latest.sequence),
+            fencing_token = IF(new.message_id = dc3_point_latest.message_id, new.fencing_token, dc3_point_latest.fencing_token),
+            raw_value = IF(new.message_id = dc3_point_latest.message_id, new.raw_value, dc3_point_latest.raw_value),
+            cal_value = IF(new.message_id = dc3_point_latest.message_id, new.cal_value, dc3_point_latest.cal_value),
+            num_value = IF(new.message_id = dc3_point_latest.message_id, new.num_value, dc3_point_latest.num_value),
+            driver_id = IF(new.message_id = dc3_point_latest.message_id, new.driver_id, dc3_point_latest.driver_id),
+            create_time = IF(new.message_id = dc3_point_latest.message_id, new.create_time, dc3_point_latest.create_time),
+            operate_time = IF(new.message_id = dc3_point_latest.message_id, new.operate_time, dc3_point_latest.operate_time)
     </insert>
 
     <insert id="upsertLatestBatch">

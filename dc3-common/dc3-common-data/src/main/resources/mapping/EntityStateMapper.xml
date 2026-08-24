@@ -39,7 +39,7 @@
         <result column="operate_time" property="operateTime"/>
     </resultMap>
 
-    <select id="upsertEntityState" resultMap="EntityStateResultMap" flushCache="true" useCache="false">
+    <insert id="upsertEntityState" flushCache="true">
         INSERT INTO dc3_entity_state (id,
                                       entity_type_flag,
                                       entity_id,
@@ -90,7 +90,7 @@
             ELSE dc3_entity_state.entity_state_ext
             END,
             operate_time = CURRENT_TIMESTAMP
-    </select>
+    </insert>
 
     <!--
         MySQL fork of the state upsert: ON DUPLICATE KEY UPDATE replaces
@@ -127,24 +127,27 @@
                 0,
                 #{timeoutSourceFlag},
                 JSON_OBJECT('type', #{stateExtType}, 'content', COALESCE(#{stateDescription}, ''), 'version', 1),
-                #{tenantId})
+                #{tenantId}) AS new
         ON DUPLICATE KEY UPDATE
-            parent_entity_id = VALUES(parent_entity_id),
-            entity_state_flag = VALUES(entity_state_flag),
-            last_state_flag = entity_state_flag,
-            lease_version = lease_version + 1,
-            expire_time = VALUES(expire_time),
-            timeout_seconds = VALUES(timeout_seconds),
+            parent_entity_id = new.parent_entity_id,
+            <!-- MySQL applies SET clauses in order: capture the previous flag
+                 BEFORE entity_state_flag overwrites it (PostgreSQL reads the
+                 pre-update snapshot, so statement order is irrelevant there) -->
+            last_state_flag = dc3_entity_state.entity_state_flag,
+            entity_state_flag = new.entity_state_flag,
+            lease_version = dc3_entity_state.lease_version + 1,
+            expire_time = new.expire_time,
+            timeout_seconds = new.timeout_seconds,
             last_heartbeat_time = CURRENT_TIMESTAMP(6),
-            timeout_source_flag = VALUES(timeout_source_flag),
+            timeout_source_flag = new.timeout_source_flag,
             entity_state_ext = CASE
                 WHEN COALESCE(#{stateDescription}, '') != ''
                 THEN JSON_OBJECT(
-                    'type', JSON_UNQUOTE(JSON_EXTRACT(entity_state_ext, '$.type')),
+                    'type', JSON_UNQUOTE(JSON_EXTRACT(dc3_entity_state.entity_state_ext, '$.type')),
                     'content', #{stateDescription},
-                    'version', COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(entity_state_ext, '$.version')) AS SIGNED), 0) + 1
+                    'version', COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(dc3_entity_state.entity_state_ext, '$.version')) AS SIGNED), 0) + 1
                 )
-                ELSE entity_state_ext
+                ELSE dc3_entity_state.entity_state_ext
                 END,
             operate_time = CURRENT_TIMESTAMP(6)
     </insert>
@@ -201,8 +204,8 @@
     <update id="markClaimedOffline" databaseId="mysql">
         UPDATE dc3_entity_state
         SET lease_version     = lease_version + 1,
-            entity_state_flag = #{offlineFlag},
             last_state_flag   = entity_state_flag,
+            entity_state_flag = #{offlineFlag},
             expire_time       = CURRENT_TIMESTAMP + INTERVAL #{offlineRenewSeconds} SECOND,
             operate_time      = CURRENT_TIMESTAMP(6)
         WHERE id IN

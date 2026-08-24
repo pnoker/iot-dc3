@@ -35,6 +35,7 @@
     <modules>
         <module>dc3-db-postgres</module>
         <module>dc3-db-mysql</module>
+        <module>dc3-db-tck</module>
     </modules>
 
 </project>

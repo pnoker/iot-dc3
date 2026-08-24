@@ -177,7 +177,6 @@ COMMENT ON COLUMN dc3_driver_lease_state.device_revision IS 'Last assigned devic
 COMMENT ON COLUMN dc3_driver_lease_state.assignment_version IS 'Monotonic assignment generation';
 COMMENT ON COLUMN dc3_driver_lease_state.operate_time IS 'Operation time';
 
-COMMENT ON SEQUENCE dc3_driver_assignment_version_seq IS 'Global monotonic assignment generation source';
 
 -- ----------------------------
 -- Table structure for dc3_driver_attribute

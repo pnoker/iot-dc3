@@ -2,7 +2,7 @@
 
 |                |                                                                                   |
 |----------------|-----------------------------------------------------------------------------------|
-| **Status**     | Proposed — not yet implemented                                                     |
+| **Status**     | Implemented — R1/R2 landed (dual-dialect seed + forks + contract suite; selection guide at [db-dialects.md](../db-dialects.md)) |
 | **Date**       | 2026-08-17                                                                        |
 | **Revised**    | 2026-08-19 — inventory refreshed after the driver-lease commit (956de3dd3); §6.1 added |
 | **Scope**      | persistence layer: relational core + point-value time-series store                 |
@@ -394,3 +394,16 @@ TSDB boundary checklist (T1):
 - `dc3_point_value` DDL, hypertable/compression DDL, seed data → timescale adapter.
 - Verify zero remaining `dc3_point_value` references outside TSDB adapters
   (`grep -r dc3_point_value` gate).
+
+**R1/R2 实施记录（2026-08-24）**：关系轨道全部落地——R1 可移植改写 + 模块拆分
+（`dc3-common-jdbc` 中立 + 顶层 `dc3-db` 家族）；R2 MySQL 方言（databaseId
+fork、RETURNING 解耦为 upsert+re-select、序列退役为行内 +1、咨询锁/触发器/
+JSON 簇各有等价实现）+ 双引擎种子（`pg2mysql_seed.py` 派生）+ `dc3-db-tck`
+双方言契约套件（PG/MySQL 各 8/8：latest 围栏 upsert 三级决胜、state
+upsert+reselect、三步 claim、租约行内递增、修订触发器、目录 JSON 双跳）。
+实施中的关键发现（已全部写进 [db-dialects.md](../db-dialects.md)）：MySQL 8.4
+移除了 ODKU 的 VALUES()（行别名 `AS new` 是正道，VALUES() 会静默自比较）；
+MySQL 的 SET 按顺序生效而 PG 读快照——守卫列必须前置；内嵌 JSON 文本进
+MySQL 需 NO_BACKSLASH_ESCAPES 或参数绑定。§3.1 清单与最终交付的差异：时序
+迁移（T1-T3）先行落地后，PointValueMapper 只剩 latest 投影一条 fork、数据侧
+DashboardMapper 十条旁路已整体消失。

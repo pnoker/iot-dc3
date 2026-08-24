@@ -51,12 +51,12 @@
         INSERT INTO dc3_driver_instance
             (tenant_id, driver_id, node_id, client_id, service_host, lease_until)
         VALUES
-            (#{tenantId}, #{driverId}, #{node}, #{client}, #{host}, #{leaseUntil})
+            (#{tenantId}, #{driverId}, #{node}, #{client}, #{host}, #{leaseUntil}) AS new
         ON DUPLICATE KEY UPDATE
-            client_id = VALUES(client_id),
-            service_host = VALUES(service_host),
+            client_id = new.client_id,
+            service_host = new.service_host,
             last_heartbeat = CURRENT_TIMESTAMP(6),
-            lease_until = VALUES(lease_until)
+            lease_until = new.lease_until
     </insert>
 
     <select id="listActiveNodes" resultType="string">
@@ -118,11 +118,11 @@
         INSERT INTO dc3_driver_lease_state
             (tenant_id, driver_id, membership_hash, device_revision)
         VALUES
-            (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision})
+            (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision}) AS new
         ON DUPLICATE KEY UPDATE
-            membership_hash = VALUES(membership_hash),
-            device_revision = VALUES(device_revision),
-            assignment_version = assignment_version + 1,
+            membership_hash = new.membership_hash,
+            device_revision = new.device_revision,
+            assignment_version = dc3_driver_lease_state.assignment_version + 1,
             operate_time = CURRENT_TIMESTAMP(6)
     </insert>
 
@@ -163,16 +163,25 @@
         VALUES
         <foreach collection="leases" item="lease" separator=",">
             (#{lease.tenantId}, #{lease.driverId}, #{lease.deviceId}, #{lease.ownerNode})
-        </foreach>
+        </foreach> AS new
         ON DUPLICATE KEY UPDATE
-            driver_id = IF(VALUES(driver_id) != driver_id OR VALUES(owner_node) != owner_node,
-                VALUES(driver_id), driver_id),
-            owner_node = IF(VALUES(driver_id) != driver_id OR VALUES(owner_node) != owner_node,
-                VALUES(owner_node), owner_node),
-            fencing_token = IF(VALUES(driver_id) != driver_id OR VALUES(owner_node) != owner_node,
-                fencing_token + 1, fencing_token),
-            operate_time = IF(VALUES(driver_id) != driver_id OR VALUES(owner_node) != owner_node,
-                CURRENT_TIMESTAMP(6), operate_time)
+            <!--
+                MySQL applies SET clauses in order and later expressions see the
+                earlier assignments: the guarded columns (fencing_token,
+                operate_time) must run BEFORE driver_id/owner_node overwrite the
+                old values their guards compare against. PostgreSQL reads the
+                pre-update snapshot, so order is irrelevant there.
+            -->
+            fencing_token = IF(new.driver_id != dc3_device_lease.driver_id
+                OR new.owner_node != dc3_device_lease.owner_node, dc3_device_lease.fencing_token + 1,
+                dc3_device_lease.fencing_token),
+            operate_time = IF(new.driver_id != dc3_device_lease.driver_id
+                OR new.owner_node != dc3_device_lease.owner_node, CURRENT_TIMESTAMP(6),
+                dc3_device_lease.operate_time),
+            driver_id = IF(new.driver_id != dc3_device_lease.driver_id
+                OR new.owner_node != dc3_device_lease.owner_node, new.driver_id, dc3_device_lease.driver_id),
+            owner_node = IF(new.driver_id != dc3_device_lease.driver_id
+                OR new.owner_node != dc3_device_lease.owner_node, new.owner_node, dc3_device_lease.owner_node)
     </insert>
 
     <delete id="deleteOrphanedLeases">

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.pnoker</groupId>
+        <artifactId>dc3-db</artifactId>
+        <version>2026.5.22</version>
+    </parent>
+
+    <artifactId>dc3-db-tck</artifactId>
+    <name>${project.artifactId}</name>
+    <description>Dual-dialect relational contract suite — identical mapper-level assertions against PostgreSQL and MySQL 8, the acceptance bar for dialect forks (docs/design/storage-abstraction.md §3.3)</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-manager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-postgres</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-mysql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-mysql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
