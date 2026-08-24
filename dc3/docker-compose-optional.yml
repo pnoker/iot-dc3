@@ -255,6 +255,32 @@ services:
         aliases:
           - dc3-influxdb
 
+  mysql:
+    image: mysql:8.4
+    restart: always
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-dc3}
+      MYSQL_USER: ${MYSQL_USERNAME:-dc3}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dc3}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-dc3_data}
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MYSQL_PORT:-33306}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./dependencies/mysql/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-dc3}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-mysql
+
   iotdb:
     image: apache/iotdb:2.0.10-standalone
     restart: always
@@ -286,6 +312,7 @@ volumes:
   tdengine-data:
   influxdb-data:
   iotdb-data:
+  mysql-data:
 
 networks:
   dc3net:

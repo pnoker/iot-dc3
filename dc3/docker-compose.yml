@@ -25,6 +25,8 @@ x-app-runtime-env: &app-runtime-env
   NODE_ENV: test
   # Internal async-plane broker selection (docs/mq-brokers.md); rabbitmq is the default
   DC3_MQ_TYPE: "${DC3_MQ_TYPE:-rabbitmq}"
+  # Relational dialect selection (docs/design/storage-abstraction.md §3); postgres is the default
+  DC3_DB_TYPE: "${DC3_DB_TYPE:-postgres}"
   # Time-series store selection (docs/design/tsdb-abstraction.md); timescale is the default
   DC3_TSDB_TYPE: "${DC3_TSDB_TYPE:-timescale}"
   # Non-timescale adapter connection settings (only used when DC3_TSDB_TYPE matches)

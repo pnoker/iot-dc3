@@ -112,15 +112,13 @@ CREATE TABLE dc3_driver_instance
 CREATE INDEX idx_driver_instance_active
     ON dc3_driver_instance (tenant_id, driver_id, lease_until DESC);
 
-CREATE SEQUENCE dc3_device_lease_fencing_seq;
-
 CREATE TABLE dc3_device_lease
 (
     tenant_id    BIGINT      NOT NULL,                                             -- Tenant ID
     driver_id    BIGINT      NOT NULL,                                             -- Logical driver ID
     device_id    BIGINT      NOT NULL,                                             -- Device ID
     owner_node   TEXT        NOT NULL,                                             -- Owning runtime node ID
-    fencing_token BIGINT     DEFAULT nextval('dc3_device_lease_fencing_seq') NOT NULL, -- Monotonic ownership fencing token
+    fencing_token BIGINT     DEFAULT 1 NOT NULL, -- Monotonic ownership fencing token (row-local increment)
     operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (tenant_id, device_id)
 );
@@ -128,8 +126,6 @@ CREATE TABLE dc3_device_lease
 CREATE INDEX idx_device_lease_owner
     ON dc3_device_lease (tenant_id, driver_id, owner_node, device_id)
     INCLUDE (fencing_token);
-
-CREATE SEQUENCE dc3_driver_device_revision_seq;
 
 CREATE TABLE dc3_driver_device_revision
 (
@@ -139,15 +135,13 @@ CREATE TABLE dc3_driver_device_revision
     PRIMARY KEY (tenant_id, driver_id)
 );
 
-CREATE SEQUENCE dc3_driver_assignment_version_seq;
-
 CREATE TABLE dc3_driver_lease_state
 (
     tenant_id          BIGINT      NOT NULL,                                                   -- Tenant ID
     driver_id          BIGINT      NOT NULL,                                                   -- Logical driver ID
     membership_hash    VARCHAR(64) NOT NULL,                                                   -- SHA-256 hash of active runtime membership
     device_revision    BIGINT      NOT NULL,                                                   -- Last assigned device-set revision
-    assignment_version BIGINT      DEFAULT nextval('dc3_driver_assignment_version_seq') NOT NULL, -- Monotonic assignment generation
+    assignment_version BIGINT      DEFAULT 1 NOT NULL, -- Monotonic assignment generation (row-local increment)
     operate_time       TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,                         -- Operation time
     PRIMARY KEY (tenant_id, driver_id)
 );
@@ -183,8 +177,6 @@ COMMENT ON COLUMN dc3_driver_lease_state.device_revision IS 'Last assigned devic
 COMMENT ON COLUMN dc3_driver_lease_state.assignment_version IS 'Monotonic assignment generation';
 COMMENT ON COLUMN dc3_driver_lease_state.operate_time IS 'Operation time';
 
-COMMENT ON SEQUENCE dc3_device_lease_fencing_seq IS 'Global monotonic fencing token source for device ownership';
-COMMENT ON SEQUENCE dc3_driver_device_revision_seq IS 'Global monotonic revision source for driver device-set changes';
 COMMENT ON SEQUENCE dc3_driver_assignment_version_seq IS 'Global monotonic assignment generation source';
 
 -- ----------------------------
@@ -592,73 +584,39 @@ CREATE TRIGGER update_operate_time_trigger
     EXECUTE FUNCTION update_operate_time();
 
 -- Device ownership is recomputed only when the active device set changes. The
--- trigger turns that change into a single-row revision lookup on every driver
--- heartbeat instead of scanning all devices and leases.
-CREATE OR REPLACE FUNCTION track_driver_device_revision_insert()
+-- row-level trigger turns that change into a single-row revision bump on every
+-- driver heartbeat instead of scanning all devices and leases. Row-local
+-- revision = revision + 1 keeps per-(tenant, driver) monotonicity without a
+-- sequence object (MySQL has none), and mirrors the adapter's fencing/version
+-- increments.
+CREATE OR REPLACE FUNCTION track_driver_device_revision_change()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    INSERT INTO dc3_driver_device_revision (tenant_id, driver_id, revision)
-    SELECT changed.tenant_id, changed.driver_id, nextval('dc3_driver_device_revision_seq')
-    FROM (
-        SELECT DISTINCT tenant_id, driver_id
-        FROM new_device_rows
-        WHERE deleted = 0 AND enable_flag = 0
-    ) changed
-    ON CONFLICT (tenant_id, driver_id) DO UPDATE SET
-        revision = EXCLUDED.revision;
-    RETURN NULL;
-END;
-$$
-LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION track_driver_device_revision_delete()
-    RETURNS TRIGGER AS
-$$
-BEGIN
-    INSERT INTO dc3_driver_device_revision (tenant_id, driver_id, revision)
-    SELECT changed.tenant_id, changed.driver_id, nextval('dc3_driver_device_revision_seq')
-    FROM (
-        SELECT DISTINCT tenant_id, driver_id
-        FROM old_device_rows
-        WHERE deleted = 0 AND enable_flag = 0
-    ) changed
-    ON CONFLICT (tenant_id, driver_id) DO UPDATE SET
-        revision = EXCLUDED.revision;
-    RETURN NULL;
-END;
-$$
-LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION track_driver_device_revision_update()
-    RETURNS TRIGGER AS
-$$
-BEGIN
-    INSERT INTO dc3_driver_device_revision (tenant_id, driver_id, revision)
-    SELECT changed.tenant_id, changed.driver_id, nextval('dc3_driver_device_revision_seq')
-    FROM (
-        SELECT DISTINCT old_rows.tenant_id, old_rows.driver_id
-        FROM old_device_rows old_rows
-        FULL JOIN new_device_rows new_rows USING (id)
-        WHERE old_rows.deleted = 0 AND old_rows.enable_flag = 0
-          AND (new_rows.id IS NULL
-            OR old_rows.tenant_id IS DISTINCT FROM new_rows.tenant_id
-            OR old_rows.driver_id IS DISTINCT FROM new_rows.driver_id
-            OR old_rows.deleted IS DISTINCT FROM new_rows.deleted
-            OR old_rows.enable_flag IS DISTINCT FROM new_rows.enable_flag)
-        UNION
-        SELECT DISTINCT new_rows.tenant_id, new_rows.driver_id
-        FROM old_device_rows old_rows
-        FULL JOIN new_device_rows new_rows USING (id)
-        WHERE new_rows.deleted = 0 AND new_rows.enable_flag = 0
-          AND (old_rows.id IS NULL
-            OR old_rows.tenant_id IS DISTINCT FROM new_rows.tenant_id
-            OR old_rows.driver_id IS DISTINCT FROM new_rows.driver_id
-            OR old_rows.deleted IS DISTINCT FROM new_rows.deleted
-            OR old_rows.enable_flag IS DISTINCT FROM new_rows.enable_flag)
-    ) changed
-    ON CONFLICT (tenant_id, driver_id) DO UPDATE SET
-        revision = EXCLUDED.revision;
+    IF TG_OP IN ('UPDATE', 'DELETE') AND OLD.deleted = 0 AND OLD.enable_flag = 0
+        AND (TG_OP = 'DELETE'
+            OR NEW.tenant_id IS DISTINCT FROM OLD.tenant_id
+            OR NEW.driver_id IS DISTINCT FROM OLD.driver_id
+            OR NEW.deleted IS DISTINCT FROM OLD.deleted
+            OR NEW.enable_flag IS DISTINCT FROM OLD.enable_flag)
+    THEN
+        INSERT INTO dc3_driver_device_revision (tenant_id, driver_id, revision)
+        VALUES (OLD.tenant_id, OLD.driver_id, 1)
+        ON CONFLICT (tenant_id, driver_id) DO UPDATE SET
+            revision = dc3_driver_device_revision.revision + 1;
+    END IF;
+    IF TG_OP IN ('INSERT', 'UPDATE') AND NEW.deleted = 0 AND NEW.enable_flag = 0
+        AND (TG_OP = 'INSERT'
+            OR NEW.tenant_id IS DISTINCT FROM OLD.tenant_id
+            OR NEW.driver_id IS DISTINCT FROM OLD.driver_id
+            OR NEW.deleted IS DISTINCT FROM OLD.deleted
+            OR NEW.enable_flag IS DISTINCT FROM OLD.enable_flag)
+    THEN
+        INSERT INTO dc3_driver_device_revision (tenant_id, driver_id, revision)
+        VALUES (NEW.tenant_id, NEW.driver_id, 1)
+        ON CONFLICT (tenant_id, driver_id) DO UPDATE SET
+            revision = dc3_driver_device_revision.revision + 1;
+    END IF;
     RETURN NULL;
 END;
 $$
@@ -667,23 +625,20 @@ LANGUAGE plpgsql;
 CREATE TRIGGER track_driver_device_revision_insert_trigger
     AFTER INSERT
     ON dc3_device
-    REFERENCING NEW TABLE AS new_device_rows
-    FOR EACH STATEMENT
-    EXECUTE FUNCTION track_driver_device_revision_insert();
+    FOR EACH ROW
+    EXECUTE FUNCTION track_driver_device_revision_change();
 
 CREATE TRIGGER track_driver_device_revision_delete_trigger
     AFTER DELETE
     ON dc3_device
-    REFERENCING OLD TABLE AS old_device_rows
-    FOR EACH STATEMENT
-    EXECUTE FUNCTION track_driver_device_revision_delete();
+    FOR EACH ROW
+    EXECUTE FUNCTION track_driver_device_revision_change();
 
 CREATE TRIGGER track_driver_device_revision_update_trigger
     AFTER UPDATE
     ON dc3_device
-    REFERENCING OLD TABLE AS old_device_rows NEW TABLE AS new_device_rows
-    FOR EACH STATEMENT
-    EXECUTE FUNCTION track_driver_device_revision_update();
+    FOR EACH ROW
+    EXECUTE FUNCTION track_driver_device_revision_change();
 
 COMMENT ON TABLE dc3_device IS 'Device table';
 COMMENT ON COLUMN dc3_device.id IS 'Primary key ID';
