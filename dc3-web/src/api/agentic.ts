@@ -34,7 +34,7 @@ import type {
   PageQuery,
   PageResult,
 } from '@/config/types';
-import {getStorage} from '@/utils/storageUtil';
+import {getStorage, removeStorage} from '@/utils/storageUtil';
 import {isNull} from '@/utils/validationUtil';
 
 interface OpenAIChunk {
@@ -214,8 +214,12 @@ const buildFetchHeaders = (): HeadersInit => {
 
 const handleStreamHttpError = async (response: Response): Promise<never> => {
   if (response.status === 401) {
-    localStorage.clear();
-    sessionStorage.clear();
+    // Drop only the auth keys — never nuke the whole storage. The token cookie
+    // is cleared server-side on 401; here we just remove the frontend flag,
+    // mirroring the axios interceptor's 401 handling.
+    removeStorage(AUTH_HEADERS.TENANT);
+    removeStorage(AUTH_HEADERS.LOGIN);
+    removeStorage(AUTH_HEADERS.AUTHENTICATED, true);
     window.location.hash = '#/login';
   }
 
