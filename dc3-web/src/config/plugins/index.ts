@@ -17,8 +17,8 @@
 
 import type {App} from 'vue';
 import setupElementPlus from '@/config/plugins/element/element';
-import setupHighlight from '@/config/plugins/highlight/highlight';
 import {logger} from '@/utils/log';
+import packageJson from '../../../package.json';
 
 /**
  * IoT DC3 Platform ASCII art banner
@@ -31,17 +31,16 @@ const PLATFORM_BANNER = `
 |___|\\\\____/|____|    /_______  /\\\\______  /______  /
                              \\\\/        \\\\/       \\\\/
 https://doc.dc3.site
-IoT DC3 Platform V2026.5.22`;
+IoT DC3 Platform V${packageJson.version}`;
 
 /**
  * Plugin setup function
- * Registers all application plugins (Element Plus, Highlight.js)
+ * Registers all application plugins (Element Plus)
  *
  * @param app Vue application instance
  */
 export default function setupPlugins(app: App): void {
   setupElementPlus(app);
-  setupHighlight(app);
 
   logger.info('Platform initialized', PLATFORM_BANNER);
 }

@@ -17,7 +17,17 @@
 
 import type {App} from 'vue';
 import * as ElementIcons from '@element-plus/icons-vue';
-import 'element-plus/dist/index.css';
+// Per-component styles for Element Plus APIs imported manually outside
+// templates (ElMessage / ElNotification / ElMessageBox / ElLoading) — template
+// components get their styles injected by the unplugin-vue-components resolver.
+import 'element-plus/es/components/message/style/css';
+import 'element-plus/es/components/notification/style/css';
+import 'element-plus/es/components/message-box/style/css';
+import 'element-plus/es/components/loading/style/css';
+// Dark-mode variable overrides, activated by the .dark class on <html>
+// (toggled by src/store/modules/app.ts). Standalone override layer — safe
+// alongside the on-demand per-component style imports above.
+import 'element-plus/theme-chalk/dark/css-vars.css';
 
 /**
  * Registers every icon exported by `@element-plus/icons-vue` globally so

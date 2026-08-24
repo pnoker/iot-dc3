@@ -75,6 +75,12 @@ export default (configEnv: ConfigEnv) => {
         if (id.includes('@antv')) {
           return 'antv-vendor';
         }
+        // Agentic-only libraries — the AI assistant is route-lazy, so keeping
+        // these out of the shared vendor avoids shipping markdown rendering to
+        // every page.
+        if (id.includes('marked') || id.includes('dompurify') || id.includes('vue-element-plus-x')) {
+          return 'agentic-vendor';
+        }
         return 'vendor';
       }
       return undefined;
@@ -106,7 +112,7 @@ export default (configEnv: ConfigEnv) => {
     },
     build: {
       outDir: 'dist',
-      chunkSizeWarningLimit: 1500,
+      chunkSizeWarningLimit: 500,
       // minify defaults to rolldown in Vite 8
       // Mock builds are deployed publicly as a static demo — drop sourcemaps
       // to shrink the bundle and avoid exposing source.
